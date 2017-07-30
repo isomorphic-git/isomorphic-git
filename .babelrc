@@ -1,0 +1,11 @@
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }],
+    "flow"
+  ],
+  "plugins": ["transform-es2015-modules-commonjs", "transform-object-rest-spread", "transform-react-jsx"],
+}
