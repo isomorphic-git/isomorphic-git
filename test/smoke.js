@@ -21,18 +21,15 @@ test(async t => {
   t.true(exists('foo1/.git/objects'))
   t.true(exists('foo1/.git/refs/heads'))
   t.true(exists('foo1/.git/HEAD'))
+  // await del('foo1')
 })
 
 test(async t => {
+  await del('foo2')
   await del('foo2')
   await git('foo2').clone('https://github.com/wmhilton/nde')
   t.true(exists('foo2'))
   t.true(exists('foo2/.git/objects'))
   t.true(exists('foo2/.git/refs/remotes/origin/master'))
-})
-
-test(async t => {
-  await del('foo1')
-  await del('foo2')
-  t.pass()
+  // await del('foo2')
 })
