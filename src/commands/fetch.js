@@ -4,10 +4,19 @@ import write from 'write'
 import axios from 'axios'
 import pako from 'pako'
 import parseLinkHeader from 'parse-link-header'
+import GitCommit from '../models/GitCommit'
+import GitBlob from '../models/GitBlob'
+import GitTree from '../models/GitTree'
 import combinePayloadAndSignature from '../utils/combinePayloadAndSignature'
 import commitSha from '../utils/commitSha'
 import wrapCommit from '../utils/wrapCommit'
+import unwrapObject from '../utils/unwrapObject'
 import init from './init'
+import fs from 'fs'
+import pify from 'pify'
+const read = (file, options) => new Promise(function(resolve, reject) {
+  fs.readFile(file, options, (err, file) => err ? resolve(null) : resolve(file))
+});
 
 async function request ({url, token, headers}) {
   let res = await axios.get(url, {
@@ -55,8 +64,6 @@ async function fetchCommits ({dir, url, user, repo, commitish, since, token}) {
     }
   })
   let json = res.data
-  console.log('json =', json)
-  console.log('res.headers[\'Link\'] =', res.headers['link'])
   let pagination = parseLinkHeader(res.headers['link'])
   
   
@@ -73,7 +80,6 @@ async function fetchCommits ({dir, url, user, repo, commitish, since, token}) {
       if (commit.sha !== commitSha(comm)) {
         throw new Error('Commit hash does not match the computed SHA1 sum.')
       }
-      console.log('GitCommit.fromPayloadSignature(commit) =', comm)
       let dcomm = pako.deflate(wrapCommit(comm))
       await write(`${dir}/.git/objects/${commit.sha.slice(0, 2)}/${commit.sha.slice(2)}`, dcomm)
       console.log(`Added commit ${commit.sha}`)
@@ -84,6 +90,48 @@ async function fetchCommits ({dir, url, user, repo, commitish, since, token}) {
   if (pagination.next) {
     return fetchCommits({dir, user, repo, commitish, since, token, url: pagination.next.url})
   }
+}
+
+async function resolveRef ({dir, commitish}) {
+  let sha = await read(`${dir}/.git/refs/heads/${commitish}`, {encoding: 'utf8'})
+  if (sha) return sha
+  sha = await read(`${dir}/.git/refs/tags/${commitish}`, {encoding: 'utf8'})
+  if (sha) return sha
+  sha = await read(`${dir}/.git/refs/${commitish}`, {encoding: 'utf8'})
+  if (sha) return sha
+  throw new Error(`Could not resolve reference ${commitish}`)
+}
+
+async function fetchTree ({dir, url, user, repo, sha, since, token}) {
+  let json = await request({token, url: `https://api.github.com/repos/${user}/${repo}/git/trees/${sha}`})
+  let tree = new GitTree(json.tree)
+  if (sha !== tree.oid()) {
+    console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
+  }
+  await write(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`, tree.zipped())
+  console.log(tree.render())
+  return Promise.all(json.tree.map(async entry => {
+    if (entry.type === 'blob') {
+      await fetchBlob({dir, url, user, repo, sha: entry.sha, since, token})
+    } else if (entry.type === 'tree') {
+      await fetchTree({dir, url, user, repo, sha: entry.sha, since, token})
+    }
+  }))
+}
+
+async function fetchBlob ({dir, url, user, repo, sha, since, token}) {
+  let res = await axios.get(`https://api.github.com/repos/${user}/${repo}/git/blobs/${sha}`, {
+    headers: {
+      'Accept': 'application/vnd.github.raw',
+      'Authorization': 'token ' + token,
+    },
+    responseType: 'arraybuffer'
+  })
+  let blob = GitBlob.from(res.data)
+  if (sha !== blob.oid()) {
+    console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
+  }
+  await write(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`, blob.zipped())
 }
 
 export default async function fetch ({dir, token, user, repo, branch, remote, since}) {
@@ -108,10 +156,14 @@ export default async function fetch ({dir, token, user, repo, branch, remote, si
   let getCommits = fetchCommits({dir, user, repo, token, commitish: checkoutCommitish})
   
   await Promise.all([getBranches, getTags, getCommits])
-}
-
-if (!module.parent) {
-  let token = process.env.GITHUB_TOKEN
-  let origin = 'wmhilton/nde'
-  clone({token, origin}).then(() => console.log('done'))
+  
+  // This is all crap to get a tree SHA from a commit SHA. Seriously.
+  let sha = await resolveRef({dir, commitish: `remotes/${remote}/${checkoutCommitish}`})
+  sha = sha.trim()
+  let dcomm = await read(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`)
+  let comm = GitCommit.from((Buffer.from(unwrapObject(pako.inflate(dcomm)))).toString('utf8'))
+  sha = comm.headers().tree
+  console.log('tree: ', sha)
+  
+  await fetchTree({dir, user, repo, token, sha})
 }
