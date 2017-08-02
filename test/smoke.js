@@ -2,7 +2,7 @@ import test from 'ava'
 import fs from 'fs'
 import del from 'delete'
 let exists = fs.existsSync
-import git from '../lib/models/Git'
+import git from '../lib'
 
 test(async t => {
   let conf = git('.').config()

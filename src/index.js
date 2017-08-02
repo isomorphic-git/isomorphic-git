@@ -1,12 +1,13 @@
+import 'babel-polyfill'
 import fs from 'fs'
 import path from 'path'
 import ghurl from 'github-url-to-object'
 
-import GitConfig from './GitConfig'
+import GitConfig from './models/GitConfig'
 
-import init from '../commands/init.js'
-import fetch from '../commands/fetch.js'
-import checkout from '../commands/checkout.js'
+import init from './commands/init.js'
+import fetch from './commands/fetch.js'
+import checkout from './commands/checkout.js'
 
 // We want to be able to do
 

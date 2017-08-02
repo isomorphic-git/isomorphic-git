@@ -2,9 +2,10 @@
   "name": "esgit",
   "version": "0.0.0",
   "description": "Node library for interacting with git repositories, circa 2017",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "watch": "babel src --watch --out-dir lib --source-maps inline",
+    "build": "browserify lib/index.js -t [ babelify --presets [ env ] ] > bundle.js",
     "test": "ava"
   },
   "repository": {
@@ -40,6 +41,8 @@
   },
   "devDependencies": {
     "ava": "^0.21.0",
+    "babel-polyfill": "^6.23.0",
+    "babelify": "^7.3.0",
     "delete": "^1.1.0"
   },
   "ava": {
