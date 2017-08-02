@@ -1,9 +1,6 @@
 //@flow
-import fs from 'fs'
-import pify from 'pify'
-import path from 'path'
-import write from 'write'
-import mkdirp from 'mkdirp'
+import write from '../utils/write'
+import {mkdir, mkdirs} from '../utils/mkdirs'
 
 export default async function init (dirpath /*: string */) {
   let folders = [
@@ -15,8 +12,8 @@ export default async function init (dirpath /*: string */) {
     '.git/refs/tags',
   ]
   folders = folders.map(dir => dirpath + '/' + dir)
-  await Promise.all(folders.map(x => pify(mkdirp)(x)))
-  await write.promise(dirpath + '/.git/config', `[core]
+  await mkdirs(folders)
+  await write(dirpath + '/.git/config', `[core]
   	repositoryformatversion = 0
   	filemode = false
   	bare = false
@@ -24,7 +21,7 @@ export default async function init (dirpath /*: string */) {
   	symlinks = false
   	ignorecase = true
 `)
-  await write.promise(dirpath + '/.git/HEAD', `ref: refs/heads/master
+  await write(dirpath + '/.git/HEAD', `ref: refs/heads/master
 `)
 
 }
