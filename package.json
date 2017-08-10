@@ -23,7 +23,6 @@
   "homepage": "https://github.com/wmhilton/esgit#readme",
   "dependencies": {
     "axios": "^0.16.2",
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
@@ -40,7 +39,6 @@
   },
   "devDependencies": {
     "ava": "^0.21.0",
-    "babel-polyfill": "^6.23.0",
     "babelify": "^7.3.0",
     "delete": "^1.1.0"
   },
