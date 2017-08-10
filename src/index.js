@@ -35,6 +35,10 @@ export class Git {
   constructor (dir) {
     this.root = dir
   }
+  githubToken (token) {
+    this.operateToken = token
+    return this
+  }
   branch (name) {
     this.operateBranch = name
   }
@@ -55,7 +59,7 @@ export class Git {
       repo: ghurl(url).repo,
       branch: ghurl(url).branch,
       remote: this.operateRemote || 'origin',
-      token: process.env.GITHUB_TOKEN
+      token: this.operateToken
     })
   }
   async clone (url) {
@@ -66,7 +70,7 @@ export class Git {
       repo: ghurl(url).repo,
       branch: ghurl(url).branch,
       remote: this.operateRemote || 'origin',
-      token: process.env.GITHUB_TOKEN
+      token: this.operateToken
     })
     await checkout({
      
