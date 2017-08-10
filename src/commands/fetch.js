@@ -1,6 +1,5 @@
 // We're implementing a non-standard clone based on the Github API first, because of CORS.
 // And because we already have the code.
-import {Buffer} from 'buffer'
 import axios from 'axios'
 import pako from 'pako'
 import parseLinkHeader from 'parse-link-header'
@@ -15,6 +14,7 @@ import write from '../utils/write.js'
 import init from './init'
 import fs from 'fs'
 import pify from 'pify'
+import {Buffer} from 'buffer'
 const read = (file, options) => new Promise(function(resolve, reject) {
   fs.readFile(file, options, (err, file) => err ? resolve(null) : resolve(file))
 });
