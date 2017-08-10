@@ -64,8 +64,7 @@ async function fetchCommits ({dir, url, user, repo, commitish, since, token}) {
     }
   })
   let json = res.data
-  let pagination = parseLinkHeader(res.headers['link'])
-  
+  let link = parseLinkHeader(res.headers['link'])
   
   for (let commit of json) {
     if (!commit.commit.verification.payload) {
@@ -87,8 +86,9 @@ async function fetchCommits ({dir, url, user, repo, commitish, since, token}) {
       console.log(e.message, commit.sha)
     }
   }
-  if (pagination.next) {
-    return fetchCommits({dir, user, repo, commitish, since, token, url: pagination.next.url})
+  
+  if (link && link.next) {
+    return fetchCommits({dir, user, repo, commitish, since, token, url: link.next.url})
   }
 }
 
