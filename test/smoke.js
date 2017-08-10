@@ -27,7 +27,7 @@ test(async t => {
 test(async t => {
   await del('foo2')
   await del('foo2')
-  await git('foo2').clone('https://github.com/wmhilton/nde')
+  await git('foo2').githubToken(process.env.GITHUB_TOKEN).clone('https://github.com/wmhilton/nde')
   t.true(exists('foo2'))
   t.true(exists('foo2/.git/objects'))
   t.true(exists('foo2/.git/refs/remotes/origin/master'))
