@@ -1,6 +1,5 @@
 // We're implementing a non-standard clone based on the Github API first, because of CORS.
 // And because we already have the code.
-import write from 'write'
 import axios from 'axios'
 import pako from 'pako'
 import parseLinkHeader from 'parse-link-header'
@@ -11,6 +10,7 @@ import combinePayloadAndSignature from '../utils/combinePayloadAndSignature'
 import commitSha from '../utils/commitSha'
 import wrapCommit from '../utils/wrapCommit'
 import unwrapObject from '../utils/unwrapObject'
+import write from '../utils/write.js'
 import init from './init'
 import fs from 'fs'
 import pify from 'pify'
