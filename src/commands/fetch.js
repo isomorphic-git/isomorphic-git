@@ -145,8 +145,7 @@ export default async function fetch ({dir, token, user, repo, ref, remote, since
   await Promise.all([getBranches, getTags, getCommits])
   
   // This is all crap to get a tree SHA from a commit SHA. Seriously.
-  let sha = await resolveRef({dir, ref: `remotes/${remote}/${ref}`})
-  sha = sha.trim()
+  let sha = await resolveRef({dir, ref: `${remote}/${ref}`})
   let dcomm = await read(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`)
   let comm = GitCommit.from((Buffer.from(unwrapObject(pako.inflate(dcomm)))).toString('utf8'))
   sha = comm.headers().tree
