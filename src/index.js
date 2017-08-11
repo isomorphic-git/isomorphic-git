@@ -57,7 +57,7 @@ export class Git {
       dir: this.root,
       user: ghurl(url).user,
       repo: ghurl(url).repo,
-      branch: ghurl(url).branch,
+      ref: ghurl(url).branch,
       remote: this.operateRemote || 'origin',
       token: this.operateToken
     })
@@ -68,12 +68,9 @@ export class Git {
       dir: this.root,
       user: ghurl(url).user,
       repo: ghurl(url).repo,
-      branch: ghurl(url).branch,
+      ref: ghurl(url).branch,
       remote: this.operateRemote || 'origin',
       token: this.operateToken
-    })
-    await checkout({
-     
     })
     return
   }

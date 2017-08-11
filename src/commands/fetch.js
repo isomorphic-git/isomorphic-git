@@ -49,10 +49,10 @@ async function fetchTags ({dir, user, repo, token}) {
   )
 }
 
-async function fetchCommits ({dir, url, user, repo, commitish, since, token}) {
+async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
   if (!url) {
     url = `https://api.github.com/repos/${user}/${repo}/commits?`
-    if (commitish) url += `&sha=${commitish}`
+    if (ref) url += `&sha=${ref}`
     if (since) {
       let date = (new Date(since * 1000)).toISOString()
       url += `&since=${date}`
@@ -89,18 +89,18 @@ async function fetchCommits ({dir, url, user, repo, commitish, since, token}) {
   }
   
   if (link && link.next) {
-    return fetchCommits({dir, user, repo, commitish, since, token, url: link.next.url})
+    return fetchCommits({dir, user, repo, ref, since, token, url: link.next.url})
   }
 }
 
-async function resolveRef ({dir, commitish}) {
-  let sha = await read(`${dir}/.git/refs/heads/${commitish}`, {encoding: 'utf8'})
+async function resolveRef ({dir, ref}) {
+  let sha = await read(`${dir}/.git/refs/heads/${ref}`, {encoding: 'utf8'})
   if (sha) return sha
-  sha = await read(`${dir}/.git/refs/tags/${commitish}`, {encoding: 'utf8'})
+  sha = await read(`${dir}/.git/refs/tags/${ref}`, {encoding: 'utf8'})
   if (sha) return sha
-  sha = await read(`${dir}/.git/refs/${commitish}`, {encoding: 'utf8'})
+  sha = await read(`${dir}/.git/refs/${ref}`, {encoding: 'utf8'})
   if (sha) return sha
-  throw new Error(`Could not resolve reference ${commitish}`)
+  throw new Error(`Could not resolve reference ${ref}`)
 }
 
 async function fetchTree ({dir, url, user, repo, sha, since, token}) {
@@ -135,16 +135,13 @@ async function fetchBlob ({dir, url, user, repo, sha, since, token}) {
   await write(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`, blob.zipped())
 }
 
-export default async function fetch ({dir, token, user, repo, branch, remote, since}) {
+export default async function fetch ({dir, token, user, repo, ref, remote, since}) {
   let json
   
-  let checkoutCommitish
-  if (branch) {
-    checkoutCommitish = branch
-  } else {
+  if (!ref) {
     console.log('Determining the default branch')
     json = await request({token, url: `https://api.github.com/repos/${user}/${repo}`})
-    checkoutCommitish = json.default_branch
+    ref = json.default_branch
   }
   
   console.log('Receiving branches list')
@@ -154,12 +151,12 @@ export default async function fetch ({dir, token, user, repo, branch, remote, si
   let getTags = fetchTags({dir, user, repo, token})
   
   console.log('Receiving commits')
-  let getCommits = fetchCommits({dir, user, repo, token, commitish: checkoutCommitish})
+  let getCommits = fetchCommits({dir, user, repo, token, ref})
   
   await Promise.all([getBranches, getTags, getCommits])
   
   // This is all crap to get a tree SHA from a commit SHA. Seriously.
-  let sha = await resolveRef({dir, commitish: `remotes/${remote}/${checkoutCommitish}`})
+  let sha = await resolveRef({dir, ref: `remotes/${remote}/${ref}`})
   sha = sha.trim()
   let dcomm = await read(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`)
   let comm = GitCommit.from((Buffer.from(unwrapObject(pako.inflate(dcomm)))).toString('utf8'))
