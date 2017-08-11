@@ -10,14 +10,13 @@ import combinePayloadAndSignature from '../utils/combinePayloadAndSignature'
 import commitSha from '../utils/commitSha'
 import wrapCommit from '../utils/wrapCommit'
 import unwrapObject from '../utils/unwrapObject'
-import write from '../utils/write.js'
+import write from '../utils/write'
+import read from '../utils/read'
+import resolveRef from '../utils/resolveRef'
 import init from './init'
 import fs from 'fs'
 import pify from 'pify'
 import {Buffer} from 'buffer'
-const read = (file, options) => new Promise(function(resolve, reject) {
-  fs.readFile(file, options, (err, file) => err ? resolve(null) : resolve(file))
-});
 
 async function request ({url, token, headers}) {
   let res = await axios.get(url, {
@@ -91,16 +90,6 @@ async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
   if (link && link.next) {
     return fetchCommits({dir, user, repo, ref, since, token, url: link.next.url})
   }
-}
-
-async function resolveRef ({dir, ref}) {
-  let sha = await read(`${dir}/.git/refs/heads/${ref}`, {encoding: 'utf8'})
-  if (sha) return sha
-  sha = await read(`${dir}/.git/refs/tags/${ref}`, {encoding: 'utf8'})
-  if (sha) return sha
-  sha = await read(`${dir}/.git/refs/${ref}`, {encoding: 'utf8'})
-  if (sha) return sha
-  throw new Error(`Could not resolve reference ${ref}`)
 }
 
 async function fetchTree ({dir, url, user, repo, sha, since, token}) {
