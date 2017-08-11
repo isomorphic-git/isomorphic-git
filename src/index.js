@@ -72,6 +72,11 @@ export class Git {
       remote: this.operateRemote || 'origin',
       token: this.operateToken
     })
+    await checkout({
+      dir: this.root,
+      ref: ghurl(url).branch,
+      remote: this.operateRemote || 'origin',
+    })
     return
   }
 }

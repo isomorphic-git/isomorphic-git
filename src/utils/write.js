@@ -3,7 +3,8 @@ import path from 'path'
 import pify from 'pify'
 import {mkdir} from './mkdirs'
 import fs from 'fs'
-
+// An async writeFile variant that automatically creates missing directories,
+// and returns null instead of throwing errors.
 export default async function write (filepath /*: string */, contents /*: string | buffer */) {
   try {
     await pify(fs.writeFile)(filepath, contents)
