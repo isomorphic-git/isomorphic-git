@@ -8,11 +8,11 @@ test('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async t => {
   let ref = await resolveRef({dir: '.', ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9'})
   t.snapshot(ref)
 })
-test('master', async t => {
-  let ref = await resolveRef({dir: '.', ref: 'master'})
+test('test-branch', async t => {
+  let ref = await resolveRef({dir: '.', ref: 'test-branch'})
   t.snapshot(ref)
 })
-test('origin/master', async t => {
-  let ref = await resolveRef({dir: '.', ref: 'origin/master'})
+test('test-tag', async t => {
+  let ref = await resolveRef({dir: '.', ref: 'test-tag'})
   t.snapshot(ref)
 })

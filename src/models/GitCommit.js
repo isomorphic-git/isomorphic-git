@@ -1,5 +1,6 @@
+//@flow
 'use strict'
-import shasum from 'shasum'
+import {Buffer} from 'buffer'
 
 function formatTimezoneOffset (minutes) {
   let sign = Math.sign(minutes) || 1
@@ -50,8 +51,17 @@ function outdent (str) {
 // TODO: Make all functions have static async signature?
 
 export default class GitCommit {
-  constructor (commit) {
-    this._commit = commit
+  /*::
+  _commit : string
+  */
+  constructor (commit /*: string|Buffer*/) {
+    if (typeof commit === 'string') {
+      this._commit = commit
+    } else if (Buffer.isBuffer(commit)) {
+      this._commit = commit.toString('utf8')
+    } else {
+      throw new Error('invalid type passed to GitCommit constructor')
+    }
   }
   
   static fromPayloadSignature ({payload, signature}) {
@@ -62,48 +72,33 @@ export default class GitCommit {
   }
   
   static from (commit) {
-    if (commit === null) throw new Error('null passed to GitCommit.from')
     return new GitCommit(commit)
-    return {
-      headers: GitCommit.parseHeaders(commit),
-      message: GitCommit.justMessage(commit),
-      sha: GitCommit.sha(commit)
-    }
-  }
-    
-  static wrapObject (commit) {
-    return `commit ${commit.length}\0${commit}`
-  }
-
-  sha () {
-    return shasum(GitCommit.wrapObject(this._commit))
   }
   
-  oid () {
-    return shasum(GitCommit.wrapObject(this._commit))
+  toObject () {
+    return Buffer.from(this._commit, 'utf8')
   }
 
   // Todo: allow setting the headers and message
   headers () {
-    return GitCommit.parseHeaders(this._commit)
+    return this.parseHeaders()
   }
   
   // Todo: allow setting the headers and message
   message () {
-    return this._commit.slice(this._commit.indexOf('\n\n') + 2)
+    return GitCommit.justMessage(this._commit)
   }
   
-  static justMessage () {
-    return this._commit.slice(this._commit.indexOf('\n\n') + 2)
+  static justMessage (commit) {
+    return commit.slice(commit.indexOf('\n\n') + 2)
   }
   
   static justHeaders (commit) {
     return commit.slice(0, commit.indexOf('\n\n'))
   }
 
-  static parseHeaders (commit) {
-    if (commit === null) return null
-    let headers = GitCommit.justHeaders(commit).split('\n')
+  parseHeaders () {
+    let headers = GitCommit.justHeaders(this._commit).split('\n')
     let hs = []
     for (let h of headers) {
       if (h[0] === ' ') {
@@ -157,32 +152,32 @@ export default class GitCommit {
     return GitCommit.renderHeaders(obj) + '\n' + obj.message
   }
 
-  static withoutSignature (commit) {
-    commit = normalize(commit)
+  withoutSignature () {
+    let commit = normalize(this._commit)
     if (commit.indexOf('\ngpgsig') === -1) return commit
     let headers = commit.slice(0, commit.indexOf('\ngpgsig'))
     let message = commit.slice(commit.indexOf('-----END PGP SIGNATURE-----\n') + '-----END PGP SIGNATURE-----\n'.length)
     return normalize(headers + '\n' + message)
   }
 
-  static isolateSignature (commit) {
-    let signature = commit.slice(
-      commit.indexOf('-----BEGIN PGP SIGNATURE-----'),
-      commit.indexOf('-----END PGP SIGNATURE-----') + '-----END PGP SIGNATURE-----'.length)
+  isolateSignature () {
+    let signature = this._commit.slice(
+      this._commit.indexOf('-----BEGIN PGP SIGNATURE-----'),
+      this._commit.indexOf('-----END PGP SIGNATURE-----') + '-----END PGP SIGNATURE-----'.length)
     return outdent(signature)
   }
 
-  static async verifySignature (commit) {
-    let header = GitCommit.parseHeaders(commit)
-    let verified = await pgp.verifyDetachedSignature(header.committer.email, GitCommit.withoutSignature(commit), GitCommit.isolateSignature(commit))
+  async verifySignature () {
+    let header = this.parseHeaders()
+    let verified = await pgp.verifyDetachedSignature(header.committer.email, this.withoutSignature(), this.isolateSignature())
     return verified
   }
 
-  static async addSignature (commit) {
-    commit = GitCommit.withoutSignature(commit)
-    let headers = GitCommit.justHeaders(commit)
-    let message = GitCommit.justMessage(commit)
-    let header = GitCommit.parseHeaders(commit)
+  async addSignature () {
+    let commit = this.withoutSignature()
+    let headers = GitCommit.justHeaders(this._commit)
+    let message = GitCommit.justMessage(this._commit)
+    let header = this.parseHeaders()
     let signedmsg = await pgp.createBinaryDetachedSignature(header.committer.email, commit)
     // renormalize the line endings to the one true line-ending
     signedmsg = normalize(signedmsg)
