@@ -17,6 +17,8 @@ async function checkoutTree({dir, oid}) {
 
   let {type, object} = await GitObject.read({dir, oid})
   console.log(type, object.toString('utf8'))
+  let tree = GitTree.from(object)
+  console.log(tree.render())
 
 }
 
