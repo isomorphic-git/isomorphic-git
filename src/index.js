@@ -34,6 +34,7 @@ export default function git (dir) {
 export class Git {
   constructor (dir) {
     this.root = dir
+    this.operateRemote = 'origin'
   }
   githubToken (token) {
     this.operateToken = token
@@ -58,7 +59,7 @@ export class Git {
       user: ghurl(url).user,
       repo: ghurl(url).repo,
       ref: ghurl(url).branch,
-      remote: this.operateRemote || 'origin',
+      remote: this.operateRemote,
       token: this.operateToken
     })
   }
@@ -69,13 +70,13 @@ export class Git {
       user: ghurl(url).user,
       repo: ghurl(url).repo,
       ref: ghurl(url).branch,
-      remote: this.operateRemote || 'origin',
+      remote: this.operateRemote,
       token: this.operateToken
     })
     await checkout({
       dir: this.root,
       ref: ghurl(url).branch,
-      remote: this.operateRemote || 'origin',
+      remote: this.operateRemote,
     })
     return
   }

@@ -14,8 +14,13 @@ import {Buffer} from 'buffer'
 
 export default async function checkout ({dir, remote, ref}) {
   // Get tree
-  
+  try {
+    ref = await resolveRef({dir, ref})
+  } catch (e) {
+    ref = await resolveRef({dir, ref: `${remote}/${ref}`})
+  }
   // Get objects + recurse
+
   // Write files. Preferably atomically.
   
 }

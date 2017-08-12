@@ -1,15 +1,11 @@
 // We're implementing a non-standard clone based on the Github API first, because of CORS.
 // And because we already have the code.
 import axios from 'axios'
-import pako from 'pako'
 import parseLinkHeader from 'parse-link-header'
+import GitObject from '../models/GitObject'
 import GitCommit from '../models/GitCommit'
 import GitBlob from '../models/GitBlob'
 import GitTree from '../models/GitTree'
-import combinePayloadAndSignature from '../utils/combinePayloadAndSignature'
-import commitSha from '../utils/commitSha'
-import wrapCommit from '../utils/wrapCommit'
-import unwrapObject from '../utils/unwrapObject'
 import write from '../utils/write'
 import read from '../utils/read'
 import resolveRef from '../utils/resolveRef'
@@ -72,15 +68,14 @@ async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
       continue
     }
     try {
-      let comm = combinePayloadAndSignature({
+      let comm = GitCommit.fromPayloadSignature({
         payload: commit.commit.verification.payload,
         signature: commit.commit.verification.signature,
       })
-      if (commit.sha !== commitSha(comm)) {
-        throw new Error('Commit hash does not match the computed SHA1 sum.')
+      let oid = await GitObject.write({dir, type: 'commit', object: comm.toObject()})
+      if (commit.sha !== oid) {
+        console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
       }
-      let dcomm = pako.deflate(wrapCommit(comm))
-      await write(`${dir}/.git/objects/${commit.sha.slice(0, 2)}/${commit.sha.slice(2)}`, dcomm)
       console.log(`Added commit ${commit.sha}`)
     } catch (e) {
       console.log(e.message, commit.sha)
@@ -95,10 +90,10 @@ async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
 async function fetchTree ({dir, url, user, repo, sha, since, token}) {
   let json = await request({token, url: `https://api.github.com/repos/${user}/${repo}/git/trees/${sha}`})
   let tree = new GitTree(json.tree)
-  if (sha !== tree.oid()) {
+  let oid = await GitObject.write({dir, type: 'tree', object: tree.toObject()})
+  if (sha !== oid) {
     console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
   }
-  await write(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`, tree.zipped())
   console.log(tree.render())
   return Promise.all(json.tree.map(async entry => {
     if (entry.type === 'blob') {
@@ -117,11 +112,10 @@ async function fetchBlob ({dir, url, user, repo, sha, since, token}) {
     },
     responseType: 'arraybuffer'
   })
-  let blob = GitBlob.from(res.data)
-  if (sha !== blob.oid()) {
+  let oid = await GitObject.write({dir, type: 'blob', object: res.data})
+  if (sha !== oid) {
     console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
   }
-  await write(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`, blob.zipped())
 }
 
 export default async function fetch ({dir, token, user, repo, ref, remote, since}) {
@@ -145,10 +139,10 @@ export default async function fetch ({dir, token, user, repo, ref, remote, since
   await Promise.all([getBranches, getTags, getCommits])
   
   // This is all crap to get a tree SHA from a commit SHA. Seriously.
-  let sha = await resolveRef({dir, ref: `${remote}/${ref}`})
-  let dcomm = await read(`${dir}/.git/objects/${sha.slice(0, 2)}/${sha.slice(2)}`)
-  let comm = GitCommit.from((Buffer.from(unwrapObject(pako.inflate(dcomm)))).toString('utf8'))
-  sha = comm.headers().tree
+  let oid = await resolveRef({dir, ref: `${remote}/${ref}`})
+  let {type, object} = await GitObject.read({dir, oid})
+  let comm = GitCommit.from(object.toString('utf8'))
+  let sha = comm.headers().tree
   console.log('tree: ', sha)
   
   await fetchTree({dir, user, repo, token, sha})

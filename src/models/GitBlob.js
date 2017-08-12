@@ -3,10 +3,14 @@ import shasum from 'shasum'
 import pako from 'pako'
 
 export default class GitBlob {
-  constructor (raw : string|buffer) {
+  /*::
+  _buffer : Buffer
+  _oid : string
+  */
+  constructor (raw /*: string|Buffer*/) {
     this._buffer = Buffer.from(raw)
   }
-  static from (raw : string|buffer) {
+  static from (raw /*: string|Buffer*/) {
     return new GitBlob(raw)
   }
   wrapped () {
