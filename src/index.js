@@ -63,6 +63,9 @@ export class Git {
       token: this.operateToken
     })
   }
+  async checkout (branch) {
+    
+  }
   async clone (url) {
     await init(this.root)
     await fetch({
