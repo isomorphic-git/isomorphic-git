@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "babel src --watch --out-dir lib --source-maps inline",
     "build": "babel src --out-dir lib --source-maps",
-    "test": "ava"
+    "test": "npm run build && ava"
   },
   "repository": {
     "type": "git",
