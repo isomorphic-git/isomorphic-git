@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "watch": "babel src --watch --out-dir lib --source-maps inline",
-    "build": "browserify lib/index.js -t [ babelify --presets [ env ] ] > bundle.js",
+    "build": "babel src --out-dir lib --source-maps",
     "test": "ava"
   },
   "repository": {
