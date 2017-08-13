@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "ava": "^0.21.0",
+    "babel-cli": "^6.24.1",
     "babelify": "^7.3.0",
     "temp": "^0.8.3"
   },
