@@ -11,7 +11,7 @@ function parseBuffer (buffer) {
     let path = buffer.slice(space + 1, nullchar).toString('utf8')
     let oid = buffer.slice(nullchar + 1, nullchar + 21).toString('hex')
     cursor = nullchar + 21
-    _entries.push({mode, path, sha: oid})
+    _entries.push({mode, path, oid})
   }
   return _entries
 }
@@ -21,7 +21,7 @@ export default class GitTree {
     if (Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
     } else if (Array.isArray(entries)) {
-      this._entries = entries
+      this._entries = entries.map(x => (!x.oid && x.sha) ? Object.assign(x, {oid: x.sha}) : x)
     } else {
       throw new Error('invalid type passed to GitTree constructor')
     }
@@ -30,7 +30,7 @@ export default class GitTree {
     return new GitTree(tree)
   }
   render () {
-    return this._entries.map(entry => `${entry.mode} ${entry.type} ${entry.sha}    ${entry.path}`).join('\n')
+    return this._entries.map(entry => `${entry.mode} ${entry.type} ${entry.oid}    ${entry.path}`).join('\n')
   }
   toObject () {
     return Buffer.concat(this._entries.map(entry => {
@@ -38,8 +38,16 @@ export default class GitTree {
       let space = Buffer.from(' ')
       let path = Buffer.from(entry.path, {encoding: 'utf8'})
       let nullchar = Buffer.from([0])
-      let oid = Buffer.from(entry.sha.match(/../g).map(n => parseInt(n, 16)))
+      let oid = Buffer.from(entry.oid.match(/../g).map(n => parseInt(n, 16)))
       return Buffer.concat([mode, space, path, nullchar, oid])
     }))
+  }
+  entries () {
+    return this._entries
+  }
+  *[Symbol.iterator] () {
+    for (let entry of this._entries) {
+      yield entry
+    }
   }
 }
