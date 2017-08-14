@@ -7,7 +7,7 @@ not a way to *push* signed commits back to Github using their API.
 # Progress
 - [x] Write git init
 - [x] Write git clone
-- [ ] Write git checkout
+- [x] Write git checkout
 - [ ] Write git index
 - [ ] Write git commit
 - [ ] Write git push
