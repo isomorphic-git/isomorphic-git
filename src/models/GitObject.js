@@ -8,14 +8,14 @@ import write from '../utils/write'
 function wrapObject ({type, object} /*: {type: string, object: Buffer}*/) {
   let buffer = Buffer.concat([
     Buffer.from(type + ' '),
-    Buffer.from(object.length.toString()),
+    Buffer.from(object.byteLength.toString()),
     Buffer.from([0]),
-    object,
+    Buffer.from(object),
   ])
   let oid = shasum(buffer)
   return {
     oid,
-    file: pako.deflate(buffer)
+    file: Buffer.from(pako.deflate(buffer))
   }
 }
 

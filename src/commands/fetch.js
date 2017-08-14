@@ -67,19 +67,16 @@ async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
       console.log(`Commit ${commit.sha} skipped. Due to a technical limitations and my laziness, only signed commits can be cloned from Github over the API`)
       continue
     }
-    try {
-      let comm = GitCommit.fromPayloadSignature({
-        payload: commit.commit.verification.payload,
-        signature: commit.commit.verification.signature,
-      })
-      let oid = await GitObject.write({dir, type: 'commit', object: comm.toObject()})
-      if (commit.sha !== oid) {
-        console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
-      }
-      console.log(`Added commit ${commit.sha}`)
-    } catch (e) {
-      console.log(e.message, commit.sha)
+    let comm = GitCommit.fromPayloadSignature({
+      payload: commit.commit.verification.payload,
+      signature: commit.commit.verification.signature,
+    })
+    console.log('Created commit', comm)
+    let oid = await GitObject.write({dir, type: 'commit', object: comm.toObject()})
+    if (commit.sha !== oid) {
+      console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
     }
+    console.log(`Stored commit ${commit.sha}`)
   }
   
   if (link && link.next) {
