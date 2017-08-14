@@ -1,3 +1,6 @@
+//@flow
+import {Buffer} from 'buffer'
+
 function parseBuffer (buffer) {
   let _entries = []
   let cursor = 0

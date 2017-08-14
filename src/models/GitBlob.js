@@ -1,4 +1,5 @@
 //@flow
+import { Buffer } from 'buffer'
 import shasum from 'shasum'
 import pako from 'pako'
 
