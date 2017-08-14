@@ -2,7 +2,7 @@ import test from 'ava'
 import git from '../lib'
 import {exists, tmpdir, cleanup} from './_helpers'
 
-test(async t => {
+test.skip(async t => {
   let conf = git('.').config()
   let sym = await conf.get('core.symlinks')
   let rfv = await conf.get('core.repositoryformatversion')
