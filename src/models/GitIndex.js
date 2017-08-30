@@ -69,7 +69,7 @@ function parseBuffer (buffer) {
 
 export default class GitIndex {
   /*::
-   _entries : CacheEntry[] 
+   _entries: Array<CacheEntry>
    */
   constructor (index /*: any */) {
     if (Buffer.isBuffer(index)) {
@@ -137,7 +137,7 @@ export default class GitIndex {
     this._entries.push(entry)
     sortby(this._entries, 'path')
   }
-  get entries () {
+  get entries () /*: Array<CacheEntry> */ {
     return this._entries
   }
   *[Symbol.iterator] () {
