@@ -3,9 +3,29 @@ import sortby from 'lodash.sortby'
 import {Buffer} from 'buffer'
 import BufferCursor from 'buffercursor'
 
+/*::
+import type {Stats} from 'fs'
+
+type CacheEntry = {
+  ctime: number,
+  ctime_ns?: number,
+  mtime: number,
+  mtime_ns?: number,
+  dev: number,
+  ino: number,
+  mode: number,
+  uid: number,
+  gid: number,
+  size: number,
+  oid: Buffer,
+  flags: number,
+  path: string
+}
+*/
+
 function parseBuffer (buffer) {
   let reader = new BufferCursor(buffer)
-  let _entries = []
+  let _entries /*: CacheEntry[] */ = []
   let magic = reader.toString('utf8', 4)
   if (magic !== 'DIRC') throw new Error(`Inavlid dircache magic file number: ${magic}`)
   let version = reader.readUInt32BE()
@@ -14,22 +34,26 @@ function parseBuffer (buffer) {
   let i = 0
   while (!reader.eof() && i < numEntries) {
     let entry = {}
-    entry.createdSeconds = reader.readUInt32BE()
-    entry.createdNanoseconds = reader.readUInt32BE()
-    entry.modifiedSeconds = reader.readUInt32BE()
-    entry.modifiedNanoseconds = reader.readUInt32BE()
-    entry.device = reader.readUInt32BE()
-    entry.inode = reader.readUInt32BE()
+    let ctime_s = reader.readUInt32BE()
+    let ctime_ns = reader.readUInt32BE()
+    entry.ctime = new Date(ctime_s * 1000 + ctime_ns / 1000000)
+    entry.ctime_ns = ctime_ns
+    let mtime_s = reader.readUInt32BE()
+    let mtime_ns = reader.readUInt32BE()
+    entry.mtime = new Date(mtime_s * 1000 + mtime_ns / 1000000)
+    entry.mtime_ns = mtime_ns
+    entry.dev = reader.readUInt32BE()
+    entry.ino = reader.readUInt32BE()
     entry.mode = reader.readUInt32BE()
     entry.uid = reader.readUInt32BE()
     entry.gid = reader.readUInt32BE()
-    entry.length = reader.readUInt32BE()
+    entry.size = reader.readUInt32BE()
     entry.oid = reader.slice(20)
     entry.flags = reader.readUInt16BE() // TODO: extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
     // TODO: handle if (version === 3 && entry.flags.extended)
-    entry.pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
-    if (entry.pathlength < 1) throw new Error(`Got a path length of: ${entry.pathlength}`)
-    entry.path = reader.toString('utf8', entry.pathlength)
+    let pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
+    if (pathlength < 1) throw new Error(`Got a path length of: ${pathlength}`)
+    entry.path = reader.toString('utf8', pathlength)
     // The next bit is awkward. We expect 1 to 8 null characters 
     let tmp = reader.readUInt8()
     if (tmp !== 0) throw new Error(`Expected 1-8 null characters but got '${tmp}'`)
@@ -44,8 +68,10 @@ function parseBuffer (buffer) {
 }
 
 export default class GitIndex {
-  /* private _entries */
-  constructor (index) {
+  /*::
+   _entries : CacheEntry[] 
+   */
+  constructor (index /*: any */) {
     if (Buffer.isBuffer(index)) {
       this._entries = parseBuffer(index)
     } else if (index === null) {
@@ -71,16 +97,22 @@ export default class GitIndex {
       let length = Math.ceil((62 + entry.path.length + 1) / 8) * 8
       let written = Buffer.alloc(length)
       let writer = new BufferCursor(written)
-      writer.writeUInt32BE(entry.createdSeconds)
-      writer.writeUInt32BE(entry.createdNanoseconds)
-      writer.writeUInt32BE(entry.modifiedSeconds)
-      writer.writeUInt32BE(entry.modifiedNanoseconds)
-      writer.writeUInt32BE(entry.device)
-      writer.writeUInt32BE(entry.inode)
+      let ctime_ms = entry.ctime.valueOf()
+      let ctime_s = Math.floor(ctime_ms / 1000)
+      let ctime_ns = entry.ctime_ns || (ctime_ms * 1000000 - ctime_s * 1000000 * 1000)
+      let mtime_ms = entry.mtime.valueOf()
+      let mtime_s = Math.floor(mtime_ms / 1000)
+      let mtime_ns = entry.mtime_ns || (mtime_ms * 1000000 - mtime_s * 1000000 * 1000)
+      writer.writeUInt32BE(ctime_s)
+      writer.writeUInt32BE(ctime_ns)
+      writer.writeUInt32BE(mtime_s)
+      writer.writeUInt32BE(mtime_ns)
+      writer.writeUInt32BE(entry.dev)
+      writer.writeUInt32BE(entry.ino)
       writer.writeUInt32BE(entry.mode)
       writer.writeUInt32BE(entry.uid)
       writer.writeUInt32BE(entry.gid)
-      writer.writeUInt32BE(entry.length)
+      writer.writeUInt32BE(entry.size)
       writer.copy(entry.oid, 0, 20)
       writer.writeUInt16BE(entry.flags)
       writer.write(entry.path, entry.path.length, 'utf8')
@@ -88,21 +120,19 @@ export default class GitIndex {
     }))
     return Buffer.concat([header, body])
   }
-  insert (filename, stats) {
-    let createdSeconds = Math.floor(stats.birthtimeMs / 1000)
-    let modifiedSeconds = Math.floor(stats.mtimeMs / 1000)
+  insert (filename /*: string */, stats /*: Stats */) {
     let entry = {
-      createdSeconds,
-      createdNanoseconds: stats.birthtimeMs * 1000 - createdSeconds * 1000 * 1000,
-      modifiedSeconds,
-      modifiedNanoseconds: stats.mtimeMs * 1000 - modifiedSeconds * 1000 * 1000,
-      device: stats.dev,
-      inode: stats.ino,
+      ctime: stats.ctime.valueOf(),
+      mtime: stats.mtime.valueOf(),
+      dev: stats.dev,
+      ino: stats.ino,
       mode: stats.mode,
       uid: stats.uid,
-      git: stats.gid,
-      length: stats.size,
-      path: filename
+      gid: stats.gid,
+      size: stats.size,
+      path: filename,
+      oid: Buffer.alloc(20),
+      flags: 0
     }
     this._entries.push(entry)
     sortby(this._entries, 'path')
