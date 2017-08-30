@@ -1,15 +1,13 @@
-import fs from 'fs'
-import path from 'path'
 import ghurl from 'github-url-to-object'
-import pify from 'pify'
 
 import GitConfig from './models/GitConfig'
-import GitIndexManager from './managers/GitIndexManager'
 
 import init from './commands/init.js'
 import fetch from './commands/fetch.js'
 import checkout from './commands/checkout.js'
 import list from './commands/list.js'
+import add from './commands/add.js'
+import remove from './commands/remove.js'
 
 // We want to be able to do
 
@@ -86,22 +84,21 @@ export class Git {
     })
     return
   }
-  async lockIndex () {
-    return GitIndexManager.acquire(`${this.root}/.git/index`)
-  }
-  async unlockIndex () {
-    return GitIndexManager.release(`${this.root}/.git/index`)
-  }
   async list () {
-    const index = await this.lockIndex()
-    const filenames = index.entries.map(x => x.path)
-    this.unlockIndex()
-    return filenames
+    return list({
+      dir: this.root
+    })
   }
-  async add (filename) {
-    const index = await this.lockIndex()
-    let stats = await pify(fs.lstat)(path.join(this.root, filename))
-    index.insert(filename, stats)
-    this.unlockIndex()
+  async add (filepath) {
+    return add({
+      dir: this.root,
+      filepath
+    })
+  }
+  async remove (filepath) {
+    return remove({
+      dir: this.root,
+      filepath
+    })
   }
 }

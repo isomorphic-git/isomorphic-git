@@ -33,6 +33,7 @@
     "github-url-to-object": "^4.0.2",
     "ini": "^1.3.4",
     "lodash.get": "^4.4.2",
+    "lodash.remove": "^4.7.0",
     "lodash.sortby": "^4.7.0",
     "pako": "^1.0.5",
     "parse-link-header": "^1.0.1",

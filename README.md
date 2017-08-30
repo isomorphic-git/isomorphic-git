@@ -5,9 +5,14 @@ OH. SHIT. I just remembered why I stopped working on wikiboard. There's
 not a way to *push* signed commits back to Github using their API.
 
 # Progress
-- [x] Write git init
-- [x] Write git clone
-- [x] Write git checkout
-- [ ] Write git index
-- [ ] Write git commit
-- [ ] Write git push
+- [x] git init
+- [x] git clone
+  - [x] Github API protocol (only signed commits)
+  - [ ] HTTP smart protocol + cors-buster
+- [x] git checkout
+- [ ] git index
+  - [x] git list (ls-files)
+  - [x] git add
+  - [ ] git rm
+- [ ] git commit
+- [ ] git push
