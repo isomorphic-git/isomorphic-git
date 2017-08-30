@@ -1,12 +1,15 @@
 import fs from 'fs'
 import path from 'path'
 import ghurl from 'github-url-to-object'
+import pify from 'pify'
 
 import GitConfig from './models/GitConfig'
+import GitIndexManager from './managers/GitIndexManager'
 
 import init from './commands/init.js'
 import fetch from './commands/fetch.js'
 import checkout from './commands/checkout.js'
+import list from './commands/list.js'
 
 // We want to be able to do
 
@@ -82,5 +85,23 @@ export class Git {
       remote: this.operateRemote,
     })
     return
+  }
+  async lockIndex () {
+    return GitIndexManager.acquire(`${this.root}/.git/index`)
+  }
+  async unlockIndex () {
+    return GitIndexManager.release(`${this.root}/.git/index`)
+  }
+  async list () {
+    const index = await this.lockIndex()
+    const filenames = index.entries.map(x => x.path)
+    this.unlockIndex()
+    return filenames
+  }
+  async add (filename) {
+    const index = await this.lockIndex()
+    let stats = await pify(fs.lstat)(path.join(this.root, filename))
+    index.insert(filename, stats)
+    this.unlockIndex()
   }
 }

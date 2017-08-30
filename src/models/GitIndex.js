@@ -1,4 +1,5 @@
 //@flow
+import sortby from 'lodash.sortby'
 import {Buffer} from 'buffer'
 import BufferCursor from 'buffercursor'
 
@@ -47,6 +48,8 @@ export default class GitIndex {
   constructor (index) {
     if (Buffer.isBuffer(index)) {
       this._entries = parseBuffer(index)
+    } else if (index === null) {
+      this._entries = []
     } else {
       throw new Error('invalid type passed to GitIndex constructor')
     }
@@ -85,7 +88,26 @@ export default class GitIndex {
     }))
     return Buffer.concat([header, body])
   }
-  entries () {
+  insert (filename, stats) {
+    let createdSeconds = Math.floor(stats.birthtimeMs / 1000)
+    let modifiedSeconds = Math.floor(stats.mtimeMs / 1000)
+    let entry = {
+      createdSeconds,
+      createdNanoseconds: stats.birthtimeMs * 1000 - createdSeconds * 1000 * 1000,
+      modifiedSeconds,
+      modifiedNanoseconds: stats.mtimeMs * 1000 - modifiedSeconds * 1000 * 1000,
+      device: stats.dev,
+      inode: stats.ino,
+      mode: stats.mode,
+      uid: stats.uid,
+      git: stats.gid,
+      length: stats.size,
+      path: filename
+    }
+    this._entries.push(entry)
+    sortby(this._entries, 'path')
+  }
+  get entries () {
     return this._entries
   }
   *[Symbol.iterator] () {
