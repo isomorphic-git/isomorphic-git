@@ -25,26 +25,26 @@ async function request ({url, token, headers}) {
   return res.data
 }
 
-async function fetchRemoteBranches ({dir, remote, user, repo, token}) {
+async function fetchRemoteBranches ({gitdir, remote, user, repo, token}) {
   return request({token, url: `https://api.github.com/repos/${user}/${repo}/branches`})
   .then(json =>
     Promise.all(json.map(branch =>
-      write(`${dir}/.git/refs/remotes/${remote}/${branch.name}`, branch.commit.sha + '\n', {encoding: 'utf8'})
+      write(`${gitdir}/refs/remotes/${remote}/${branch.name}`, branch.commit.sha + '\n', {encoding: 'utf8'})
     ))
   )
 }
 
-async function fetchTags ({dir, user, repo, token}) {
+async function fetchTags ({gitdir, user, repo, token}) {
   return request({token, url: `https://api.github.com/repos/${user}/${repo}/tags`})
   .then(json =>
     Promise.all(json.map(tag =>
       // Curiously, tags are not separated between remotes like branches
-      write(`${dir}/.git/refs/tags/${tag.name}`, tag.commit.sha + '\n', {encoding: 'utf8'})
+      write(`${gitdir}/refs/tags/${tag.name}`, tag.commit.sha + '\n', {encoding: 'utf8'})
     ))
   )
 }
 
-async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
+async function fetchCommits ({gitdir, url, user, repo, ref, since, token}) {
   if (!url) {
     url = `https://api.github.com/repos/${user}/${repo}/commits?`
     if (ref) url += `&sha=${ref}`
@@ -72,7 +72,7 @@ async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
       signature: commit.commit.verification.signature,
     })
     console.log('Created commit', comm)
-    let oid = await GitObject.write({dir, type: 'commit', object: comm.toObject()})
+    let oid = await GitObject.write({gitdir, type: 'commit', object: comm.toObject()})
     if (commit.sha !== oid) {
       console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
     }
@@ -80,28 +80,28 @@ async function fetchCommits ({dir, url, user, repo, ref, since, token}) {
   }
   
   if (link && link.next) {
-    return fetchCommits({dir, user, repo, ref, since, token, url: link.next.url})
+    return fetchCommits({gitdir, user, repo, ref, since, token, url: link.next.url})
   }
 }
 
-async function fetchTree ({dir, url, user, repo, sha, since, token}) {
+async function fetchTree ({gitdir, url, user, repo, sha, since, token}) {
   let json = await request({token, url: `https://api.github.com/repos/${user}/${repo}/git/trees/${sha}`})
   let tree = new GitTree(json.tree)
-  let oid = await GitObject.write({dir, type: 'tree', object: tree.toObject()})
+  let oid = await GitObject.write({gitdir, type: 'tree', object: tree.toObject()})
   if (sha !== oid) {
     console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
   }
   console.log(tree.render())
   return Promise.all(json.tree.map(async entry => {
     if (entry.type === 'blob') {
-      await fetchBlob({dir, url, user, repo, sha: entry.sha, since, token})
+      await fetchBlob({gitdir, url, user, repo, sha: entry.sha, since, token})
     } else if (entry.type === 'tree') {
-      await fetchTree({dir, url, user, repo, sha: entry.sha, since, token})
+      await fetchTree({gitdir, url, user, repo, sha: entry.sha, since, token})
     }
   }))
 }
 
-async function fetchBlob ({dir, url, user, repo, sha, since, token}) {
+async function fetchBlob ({gitdir, url, user, repo, sha, since, token}) {
   let res = await axios.get(`https://api.github.com/repos/${user}/${repo}/git/blobs/${sha}`, {
     headers: {
       'Accept': 'application/vnd.github.raw',
@@ -109,13 +109,13 @@ async function fetchBlob ({dir, url, user, repo, sha, since, token}) {
     },
     responseType: 'arraybuffer'
   })
-  let oid = await GitObject.write({dir, type: 'blob', object: res.data})
+  let oid = await GitObject.write({gitdir, type: 'blob', object: res.data})
   if (sha !== oid) {
     console.log('AHOY! MATEY! THAR BE TROUBLE WITH \'EM HASHES!')
   }
 }
 
-export default async function fetch ({dir, token, user, repo, ref, remote, since}) {
+export default async function fetch ({gitdir, token, user, repo, ref, remote, since}) {
   let json
   
   if (!ref) {
@@ -125,22 +125,22 @@ export default async function fetch ({dir, token, user, repo, ref, remote, since
   }
   
   console.log('Receiving branches list')
-  let getBranches = fetchRemoteBranches({dir, remote, user, repo, token})
+  let getBranches = fetchRemoteBranches({gitdir, remote, user, repo, token})
   
   console.log('Receiving tags list')
-  let getTags = fetchTags({dir, user, repo, token})
+  let getTags = fetchTags({gitdir, user, repo, token})
   
   console.log('Receiving commits')
-  let getCommits = fetchCommits({dir, user, repo, token, ref})
+  let getCommits = fetchCommits({gitdir, user, repo, token, ref})
   
   await Promise.all([getBranches, getTags, getCommits])
   
   // This is all crap to get a tree SHA from a commit SHA. Seriously.
-  let oid = await resolveRef({dir, ref: `${remote}/${ref}`})
-  let {type, object} = await GitObject.read({dir, oid})
+  let oid = await resolveRef({gitdir, ref: `${remote}/${ref}`})
+  let {type, object} = await GitObject.read({gitdir, oid})
   let comm = GitCommit.from(object.toString('utf8'))
   let sha = comm.headers().tree
   console.log('tree: ', sha)
   
-  await fetchTree({dir, user, repo, token, sha})
+  await fetchTree({gitdir, user, repo, token, sha})
 }

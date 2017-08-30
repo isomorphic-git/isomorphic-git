@@ -10,9 +10,9 @@ import fs from 'fs'
 import pify from 'pify'
 import {Buffer} from 'buffer'
 
-async function writeTreeToDisk({dir, dirpath, tree}) {
+async function writeTreeToDisk({gitdir, dirpath, tree}) {
   for (let entry of tree) {
-    let {type, object} = await GitObject.read({dir, oid: entry.oid})
+    let {type, object} = await GitObject.read({gitdir, oid: entry.oid})
     let entrypath = `${dirpath}/${entry.path}`
     console.log(`I'm writing out ${entrypath}`)
     switch (type) {
@@ -21,7 +21,7 @@ async function writeTreeToDisk({dir, dirpath, tree}) {
         break
       case 'tree': 
         let tree = GitTree.from(object)
-        await writeTreeToDisk({dir, dirpath: entrypath, tree})
+        await writeTreeToDisk({gitdir, dirpath: entrypath, tree})
         break
       default:
         throw new Error(`Unexpected object type ${type} found in tree for '${dirpath}'`)
@@ -29,25 +29,25 @@ async function writeTreeToDisk({dir, dirpath, tree}) {
   }
 }
 
-export default async function checkout ({dir, remote, ref}) {
+export default async function checkout ({workdir, gitdir, remote, ref}) {
   // Get tree oid
   let oid
   try {
-    oid = await resolveRef({dir, ref})
+    oid = await resolveRef({gitdir, ref})
   } catch (e) {
-    oid = await resolveRef({dir, ref: `${remote}/${ref}`})
-    await write(`${dir}/.git/refs/heads/${ref}`, oid + '\n')
+    oid = await resolveRef({gitdir, ref: `${remote}/${ref}`})
+    await write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
   }
-  var {type, object} = await GitObject.read({dir, oid})
+  var {type, object} = await GitObject.read({gitdir, oid})
   let comm = GitCommit.from(object.toString('utf8'))
   let sha = comm.headers().tree
   console.log('tree: ', sha)
   // Get top-level tree
-  var {type, object} = await GitObject.read({dir, oid: sha})
+  var {type, object} = await GitObject.read({gitdir, oid: sha})
   console.log(type, object.toString('utf8'))
   let tree = GitTree.from(object)
   // Write files. TODO: Write them atomically
-  await writeTreeToDisk({dir, dirpath: dir, tree})
+  await writeTreeToDisk({gitdir, dirpath: workdir, tree})
   // Update HEAD TODO: Handle non-branch cases
-  write(`${dir}/.git/HEAD`, `ref: refs/heads/${ref}`)
+  write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
 }

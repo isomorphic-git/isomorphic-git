@@ -42,16 +42,16 @@ function unwrapObject ({oid, file} /*: {oid: string, file: Buffer}*/) {
 
 export default class GitObject {
   
-  static async read ({dir, oid} /*: {dir: string, oid: string}*/) {
-    let file = await read(`${dir}/.git/objects/${oid.slice(0, 2)}/${oid.slice(2)}`)
+  static async read ({gitdir, oid} /*: {gitdir: string, oid: string}*/) {
+    let file = await read(`${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`)
     if (!file) throw new Error(`Git object with oid ${oid} not found`)
     let {type, object} = unwrapObject({oid, file})
     return {type, object}
   }
   
-  static async write ({dir, type, object} /*: {dir: string, type: string, object: Buffer}*/) {
+  static async write ({gitdir, type, object} /*: {gitdir: string, type: string, object: Buffer}*/) {
     let {file, oid} = wrapObject({type, object})
-    await write(`${dir}/.git/objects/${oid.slice(0, 2)}/${oid.slice(2)}`, file)
+    await write(`${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`, file)
     return oid
   }
 
