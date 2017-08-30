@@ -1,7 +1,16 @@
 //@flow
 import {Buffer} from 'buffer'
 
-function parseBuffer (buffer) {
+/*::
+type TreeEntry = {
+  mode: string,
+  path: string,
+  oid: string,
+  type?: string
+}
+*/
+
+function parseBuffer (buffer) /*: Array<TreeEntry> */{
   let _entries = []
   let cursor = 0
   while (cursor < buffer.length) {
@@ -20,7 +29,10 @@ function parseBuffer (buffer) {
 }
 
 export default class GitTree {
-  constructor (entries) {
+  /*::
+  _entries: Array<TreeEntry>
+  */
+  constructor (entries /*: any */) {
     if (Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
     } else if (Array.isArray(entries)) {

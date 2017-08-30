@@ -2,16 +2,16 @@
 'use strict'
 import {Buffer} from 'buffer'
 
-function formatTimezoneOffset (minutes) {
+function formatTimezoneOffset (minutes /*: number */) {
   let sign = Math.sign(minutes) || 1
   minutes = Math.abs(minutes)
   let hours = Math.floor(minutes / 60)
   minutes -= hours * 60
-  hours = String(hours)
-  minutes = String(minutes)
-  if (hours.length < 2) hours = '0' + hours
-  if (minutes.length < 2) minutes = '0' + minutes
-  return (sign === -1 ? '+' : '-') + hours + minutes
+  let strHours = String(hours)
+  let strMinutes = String(minutes)
+  if (strHours.length < 2) strHours = '0' + strHours
+  if (strMinutes.length < 2) strMinutes = '0' + strMinutes
+  return (sign === -1 ? '+' : '-') + strHours + strMinutes
 }
 
 function parseTimezoneOffset (offset) {
