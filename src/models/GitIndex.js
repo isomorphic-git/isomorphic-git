@@ -7,9 +7,9 @@ import BufferCursor from 'buffercursor'
 import type {Stats} from 'fs'
 
 type CacheEntry = {
-  ctime: number,
+  ctime: Date,
   ctime_ns?: number,
-  mtime: number,
+  mtime: Date,
   mtime_ns?: number,
   dev: number,
   ino: number,
@@ -122,8 +122,8 @@ export default class GitIndex {
   }
   insert (filename /*: string */, stats /*: Stats */) {
     let entry = {
-      ctime: stats.ctime.valueOf(),
-      mtime: stats.mtime.valueOf(),
+      ctime: stats.ctime,
+      mtime: stats.mtime,
       dev: stats.dev,
       ino: stats.ino,
       mode: stats.mode,
