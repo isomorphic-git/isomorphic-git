@@ -9,24 +9,6 @@ import list from './commands/list.js'
 import add from './commands/add.js'
 import remove from './commands/remove.js'
 
-// We want to be able to do
-
-// git('.').branch('master').tree.checkout()
-// git('.').head('master').tree.checkout()
-// git('.').tag('v1.0').tree.checkout()
-// git('.').tree.addFile(filepath)
-// git('.').branch('master').commit(author, etc)
-// git('.').branch('master').push(upstream, upstreambranch)
-// git('.').fetch(upstream, upstreambranch)
-// git('.').branch('master').merge(git('.').remotes('origin/master'))
-// or should it be assumed we have all remotes/heads/tags fetched and explore directly
-// git('.').branch.master.merge(git('.').remotes.origin.master
-
-// then it's hard to tell that master is a name and merge is an operation. Maybe putting names in strings is good.
-// we could though, do this:
-// git('.').branch('master').merge(git('.').remotes('origin').branch('master'))
-// That's probably the clearest by far.
-
 // Class is merely a fluent command/query builder
 export default function git (dir) {
   return new Git(dir)
@@ -50,10 +32,6 @@ export class Git {
     this.operateToken = token
     return this
   }
-  branch (name) {
-    this.operateBranch = name
-    return this
-  }
   remote (name) {
     this.operateRemote = name
     return this
@@ -75,8 +53,13 @@ export class Git {
       token: this.operateToken
     })
   }
-  async checkout (branch) {
-    
+  async checkout (ref) {
+    await checkout({
+      workdir: this.workdir,
+      gitdir: this.gitdir,
+      ref,
+      remote: this.operateRemote,
+    })
   }
   async clone (url) {
     await init(this.workdir)
