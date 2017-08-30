@@ -34,8 +34,17 @@ export default function git (dir) {
 
 export class Git {
   constructor (dir) {
-    this.root = dir
+    this.workdir = dir
+    this.gitdir = dir.endsWith('.git') ? dir : `${dir}/.git`
     this.operateRemote = 'origin'
+  }
+  workdir (dir) {
+    this.workdir = dir
+    return this
+  }
+  gitdir (dir) {
+    this.gitdir = dir
+    return this
   }
   githubToken (token) {
     this.operateToken = token
@@ -43,20 +52,22 @@ export class Git {
   }
   branch (name) {
     this.operateBranch = name
+    return this
   }
   remote (name) {
     this.operateRemote = name
+    return this
   }
   config () {
-    return new GitConfig(this.root)
+    return new GitConfig(this.gitdir)
   }
   async init () {
-    await init(this.root)
+    await init(this.workdir)
     return
   }
   async fetch (url) {
     await fetch({
-      dir: this.root,
+      gitdir: this.gitdir,
       user: ghurl(url).user,
       repo: ghurl(url).repo,
       ref: ghurl(url).branch,
@@ -68,9 +79,9 @@ export class Git {
     
   }
   async clone (url) {
-    await init(this.root)
+    await init(this.workdir)
     await fetch({
-      dir: this.root,
+      gitdir: this.gitdir,
       user: ghurl(url).user,
       repo: ghurl(url).repo,
       ref: ghurl(url).branch,
@@ -78,7 +89,8 @@ export class Git {
       token: this.operateToken
     })
     await checkout({
-      dir: this.root,
+      workdir: this.workdir,
+      gitdir: this.gitdir,
       ref: ghurl(url).branch,
       remote: this.operateRemote,
     })
@@ -86,18 +98,19 @@ export class Git {
   }
   async list () {
     return list({
-      dir: this.root
+      gitdir: this.gitdir
     })
   }
   async add (filepath) {
     return add({
-      dir: this.root,
+      gitdir: this.gitdir,
+      workdir: this.workdir,
       filepath
     })
   }
   async remove (filepath) {
     return remove({
-      dir: this.root,
+      gitdir: this.gitdir,
       filepath
     })
   }
