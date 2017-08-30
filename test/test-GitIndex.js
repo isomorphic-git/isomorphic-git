@@ -2,7 +2,7 @@ import test from 'ava'
 import GitIndex from '../lib/models/GitIndex'
 import read from '../lib/utils/read'
 
-test('GitIndex', async t => {
+test('GitIndex.from(buffer)', async t => {
   let buffer = await read('test/fixtures/index')
   let index = GitIndex.from(buffer)
   let rendering = index.render()
