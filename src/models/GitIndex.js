@@ -1,5 +1,6 @@
 //@flow
 import sortby from 'lodash.sortby'
+import remove from 'lodash.remove'
 import {Buffer} from 'buffer'
 import BufferCursor from 'buffercursor'
 
@@ -136,6 +137,17 @@ export default class GitIndex {
     }
     this._entries.push(entry)
     sortby(this._entries, 'path')
+  }
+  delete (filename /*: string */) {
+    // Note: We could optimize this code to be faster, since
+    // we know that entries should already sorted by path
+    // during insertion or if read from a buffer. So we could
+    // simply find the first and last and splice them out.
+    // That might have corner cases I'm not thinking of though.
+    //
+    // Note: These two cases are mutually exlusive... if its a file it's not a directory.
+    // So you could optimize the operation as an if (file) removeOne else removeDir via splice
+    remove(this._entries, x => x.path === filename || x.path.startsWith(filename + '/'))
   }
   get entries () /*: Array<CacheEntry> */ {
     return this._entries

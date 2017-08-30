@@ -1,8 +1,8 @@
 import GitIndexManager from '../managers/GitIndexManager'
 
-export default async function list ({dir}) {
+export default async function remove ({dir, filepath}) {
   const index = await GitIndexManager.acquire(`${dir}/.git/index`)
-  const filenames = index.entries.map(x => x.path)
+  index.delete(filepath)
   GitIndexManager.release(`${dir}/.git/index`)
-  return filenames
+  return // TODO: return oid?
 }
