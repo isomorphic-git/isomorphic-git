@@ -2,7 +2,8 @@
   "name": "esgit",
   "version": "0.0.0",
   "description": "Node library for interacting with git repositories, circa 2017",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "bin": "lib/cli.js",
   "scripts": {
     "watch": "babel src --watch --out-dir lib --source-maps inline",
     "build": "babel src --out-dir lib --source-maps",
@@ -35,6 +36,7 @@
     "lodash.get": "^4.4.2",
     "lodash.remove": "^4.7.0",
     "lodash.sortby": "^4.7.0",
+    "minimisted": "^2.0.0",
     "pako": "^1.0.5",
     "parse-link-header": "^1.0.1",
     "pify": "^3.0.0",
