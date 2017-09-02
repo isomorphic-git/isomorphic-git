@@ -26,7 +26,7 @@ type CacheEntry = {
 
 function parseBuffer (buffer) {
   let reader = new BufferCursor(buffer)
-  let _entries /*: CacheEntry[] */ = []
+  let _entries /*: Map<string, CacheEntry> */ = new Map()
   let magic = reader.toString('utf8', 4)
   if (magic !== 'DIRC') throw new Error(`Inavlid dircache magic file number: ${magic}`)
   let version = reader.readUInt32BE()
@@ -55,28 +55,31 @@ function parseBuffer (buffer) {
     let pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
     if (pathlength < 1) throw new Error(`Got a path length of: ${pathlength}`)
     entry.path = reader.toString('utf8', pathlength)
-    // The next bit is awkward. We expect 1 to 8 null characters 
+    // The next bit is awkward. We expect 1 to 8 null characters
     let tmp = reader.readUInt8()
     if (tmp !== 0) throw new Error(`Expected 1-8 null characters but got '${tmp}'`)
     let numnull = 1
-    while (reader.readUInt8() === 0 && numnull < 9) numnull++;
+    while (!reader.eof() && reader.readUInt8() === 0 && numnull < 9) numnull++;
     reader.seek(reader.tell() - 1);
     // end of awkward part
-    _entries.push(entry)
+    _entries.set(entry.path, entry)
     i++
   }
+  
   return _entries
 }
 
 export default class GitIndex {
   /*::
-   _entries: Array<CacheEntry>
+   _entries: Map<string, CacheEntry>
+   _dirty: boolean // Used to determine if index needs to be saved to filesystem
    */
   constructor (index /*: any */) {
+    this._dirty = false
     if (Buffer.isBuffer(index)) {
       this._entries = parseBuffer(index)
     } else if (index === null) {
-      this._entries = []
+      this._entries = new Map()
     } else {
       throw new Error('invalid type passed to GitIndex constructor')
     }
@@ -85,15 +88,15 @@ export default class GitIndex {
     return new GitIndex(buffer)
   }
   render () {
-    return this._entries.map(entry => `${entry.mode.toString(8)} ${entry.oid.toString('hex')}    ${entry.path}`).join('\n')
+    return this.entries.map(entry => `${entry.mode.toString(8)} ${entry.oid.toString('hex')}    ${entry.path}`).join('\n')
   }
   toObject () {
     let header = Buffer.alloc(12)
     let writer = new BufferCursor(header)
     writer.write('DIRC', 4, 'utf8')
     writer.writeUInt32BE(2)
-    writer.writeUInt32BE(this._entries.length)
-    let body = Buffer.concat(this._entries.map(entry => {
+    writer.writeUInt32BE(this.entries.length)
+    let body = Buffer.concat(this.entries.map(entry => {
       // the fixed length + the filename + at least one null char => align by 8
       let length = Math.ceil((62 + entry.path.length + 1) / 8) * 8
       let written = Buffer.alloc(length)
@@ -121,7 +124,7 @@ export default class GitIndex {
     }))
     return Buffer.concat([header, body])
   }
-  insert (filename /*: string */, stats /*: Stats */) {
+  insert ({filepath, stats, oid} /*: {filepath: string, stats: Stats, oid: string }*/) {
     let entry = {
       ctime: stats.ctime,
       mtime: stats.mtime,
@@ -131,14 +134,14 @@ export default class GitIndex {
       uid: stats.uid,
       gid: stats.gid,
       size: stats.size,
-      path: filename,
-      oid: Buffer.alloc(20),
+      path: filepath,
+      oid: Buffer.from(oid),
       flags: 0
     }
-    this._entries.push(entry)
-    sortby(this._entries, 'path')
+    this._entries.set(entry.path, entry)
+    this._dirty = true
   }
-  delete (filename /*: string */) {
+  delete ({filepath} /*: {filepath: string} */) {
     // Note: We could optimize this code to be faster, since
     // we know that entries should already sorted by path
     // during insertion or if read from a buffer. So we could
@@ -147,13 +150,22 @@ export default class GitIndex {
     //
     // Note: These two cases are mutually exlusive... if its a file it's not a directory.
     // So you could optimize the operation as an if (file) removeOne else removeDir via splice
-    remove(this._entries, x => x.path === filename || x.path.startsWith(filename + '/'))
+    if (this._entries.has(filepath)) {
+      this._entries.delete(filepath)
+    } else {
+      for (let key of this._entries.keys()) {
+        if (key.startsWith(filepath + '/')) {
+          this._entries.delete(key)
+        }
+      }
+    }
+    this._dirty = true
   }
   get entries () /*: Array<CacheEntry> */ {
-    return this._entries
+    return sortby([...this._entries.values()], 'path')
   }
   *[Symbol.iterator] () {
-    for (let entry of this._entries) {
+    for (let entry of this.entries) {
       yield entry
     }
   }

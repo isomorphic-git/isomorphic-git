@@ -33,6 +33,8 @@
     "buffercursor": "0.0.12",
     "github-url-to-object": "^4.0.2",
     "ini": "^1.3.4",
+    "lockfile": "^1.0.3",
+    "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
     "lodash.remove": "^4.7.0",
     "lodash.sortby": "^4.7.0",
@@ -41,7 +43,8 @@
     "parse-link-header": "^1.0.1",
     "pify": "^3.0.0",
     "shasum": "^1.0.2",
-    "travix-lock-manager": "^0.4.1"
+    "travix-lock-manager": "^0.4.1",
+    "write-file-atomic": "^2.3.0"
   },
   "devDependencies": {
     "ava": "^0.21.0",

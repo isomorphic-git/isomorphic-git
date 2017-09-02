@@ -1,13 +1,23 @@
 import test from 'ava'
 import git from '../lib'
 import read from '../lib/utils/read'
+import rm from '../lib/utils/delete'
 import GitIndexManager from '../lib/managers/GitIndexManager'
 import {tmpdir, cleanup} from './_helpers'
 
-test('gitIndex.add', async t => {
+test.beforeEach(async t => {
+  await rm('test/fixtures/test-add/.git/index')
+})
+
+test('gitIndex.add(file)', async t => {
   const repo = git('test/fixtures/test-add')
+  let orig = (await repo.list()).length
   await repo.add('a.txt')
-  const index = await GitIndexManager.acquire('test/fixtures/test-add/.git/index')
-  t.true(index.entries.length == 1)
-  console.log(index.entries)
+  t.true((await repo.list()).length === 1)
+  await repo.add('a.txt')
+  t.true((await repo.list()).length === 1)
+  await repo.add('a-copy.txt')
+  t.true((await repo.list()).length === 2)
+  await repo.add('b.txt')
+  t.true((await repo.list()).length === 3)
 })
