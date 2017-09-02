@@ -29,6 +29,7 @@ export default class {
       const buffer = index.toObject()
       console.log('updating', lockfile)
       await lockfile.update(buffer)
+      index._dirty = false
     } else {
       console.log('canceling')
       await lockfile.cancel()
