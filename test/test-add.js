@@ -6,11 +6,11 @@ import GitIndexManager from '../lib/managers/GitIndexManager'
 import {tmpdir, cleanup} from './_helpers'
 
 test.beforeEach(async t => {
-  await rm('test/fixtures/test-add/.git/index')
+  await rm('fixtures/test-add/.git/index')
 })
 
 test('gitIndex.add(file)', async t => {
-  const repo = git('test/fixtures/test-add')
+  const repo = git('fixtures/test-add')
   await repo.init()
   let orig = (await repo.list()).length
   await repo.add('a.txt')

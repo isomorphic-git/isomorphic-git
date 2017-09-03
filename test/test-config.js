@@ -3,7 +3,7 @@ import git from '../lib'
 import {exists, tmpdir, cleanup} from './_helpers'
 
 test(async t => {
-  let conf = git('test/fixtures/esgit.git').config()
+  let conf = git('fixtures/esgit.git').config()
   let sym = await conf.get('core.symlinks')
   let rfv = await conf.get('core.repositoryformatversion')
   let url = await conf.get('remote "origin".url')
