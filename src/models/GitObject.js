@@ -28,9 +28,7 @@ function unwrapObject ({oid, file} /*: {oid: string, file: Buffer}*/) {
   let s = inflated.indexOf(32) // first space
   let i = inflated.indexOf(0) // first null value
   let type = inflated.slice(0, s).toString('utf8') // get type of object
-  console.log(`type = '${type}' ${type.length}`)
   let length = inflated.slice(s+1, i).toString('utf8') // get type of object
-  console.log(`length = '${length}' ${length.length}`)
   let actualLength = inflated.length - (i + 1)
   // verify length
   if (parseInt(length) !== actualLength) throw new Error(`Length mismatch: expected ${length} bytes but got ${actualLength} instead.`)

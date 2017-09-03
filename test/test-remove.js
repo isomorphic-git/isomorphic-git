@@ -21,3 +21,7 @@ test.serial('gitIndex.remove(dir)', async t => {
   await repo.remove('test')
   t.true(orig === (await repo.list()).length + 7)
 })
+
+test.afterEach(async t => {
+  await write('test/fixtures/esgit.git/index', await read('test/fixtures/esgit.git/backup.index'))
+})
