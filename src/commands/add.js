@@ -14,6 +14,6 @@ export default async function add ({gitdir, workdir, filepath}) {
   const index = await GitIndexManager.acquire(`${gitdir}/index`)
   let stats = await lstat(path.join(workdir, filepath))
   index.insert({filepath, stats, oid})
-  GitIndexManager.release(`${gitdir}/index`)
+  await GitIndexManager.release(`${gitdir}/index`)
   return // TODO: return oid?
 }
