@@ -13,3 +13,7 @@ test('test-tag', async t => {
   let ref = await resolveRef({gitdir: 'fixtures/esgit.git', ref: 'test-tag'})
   t.snapshot(ref)
 })
+test('test-HEAD', async t => {
+  let ref = await resolveRef({gitdir: 'fixtures/esgit.git', ref: 'HEAD'})
+  t.snapshot(ref)
+})
