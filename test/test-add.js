@@ -11,6 +11,7 @@ test.beforeEach(async t => {
 
 test('gitIndex.add(file)', async t => {
   const repo = git('test/fixtures/test-add')
+  await repo.init()
   let orig = (await repo.list()).length
   await repo.add('a.txt')
   t.true((await repo.list()).length === 1)
