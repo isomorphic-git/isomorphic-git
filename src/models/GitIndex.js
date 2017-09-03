@@ -87,6 +87,43 @@ export default class GitIndex {
   static from (buffer) {
     return new GitIndex(buffer)
   }
+  get entries () /*: Array<CacheEntry> */ {
+    return sortby([...this._entries.values()], 'path')
+  }
+  *[Symbol.iterator] () {
+    for (let entry of this.entries) {
+      yield entry
+    }
+  }
+  insert ({filepath, stats, oid} /*: {filepath: string, stats: Stats, oid: string }*/) {
+    let entry = {
+      ctime: stats.ctime,
+      mtime: stats.mtime,
+      dev: stats.dev,
+      ino: stats.ino,
+      mode: stats.mode,
+      uid: stats.uid,
+      gid: stats.gid,
+      size: stats.size,
+      path: filepath,
+      oid: Buffer.from(oid),
+      flags: 0
+    }
+    this._entries.set(entry.path, entry)
+    this._dirty = true
+  }
+  delete ({filepath} /*: {filepath: string} */) {
+    if (this._entries.has(filepath)) {
+      this._entries.delete(filepath)
+    } else {
+      for (let key of this._entries.keys()) {
+        if (key.startsWith(filepath + '/')) {
+          this._entries.delete(key)
+        }
+      }
+    }
+    this._dirty = true
+  }
   render () {
     return this.entries.map(entry => `${entry.mode.toString(8)} ${entry.oid.toString('hex')}    ${entry.path}`).join('\n')
   }
@@ -123,50 +160,5 @@ export default class GitIndex {
       return written
     }))
     return Buffer.concat([header, body])
-  }
-  insert ({filepath, stats, oid} /*: {filepath: string, stats: Stats, oid: string }*/) {
-    let entry = {
-      ctime: stats.ctime,
-      mtime: stats.mtime,
-      dev: stats.dev,
-      ino: stats.ino,
-      mode: stats.mode,
-      uid: stats.uid,
-      gid: stats.gid,
-      size: stats.size,
-      path: filepath,
-      oid: Buffer.from(oid),
-      flags: 0
-    }
-    this._entries.set(entry.path, entry)
-    this._dirty = true
-  }
-  delete ({filepath} /*: {filepath: string} */) {
-    // Note: We could optimize this code to be faster, since
-    // we know that entries should already sorted by path
-    // during insertion or if read from a buffer. So we could
-    // simply find the first and last and splice them out.
-    // That might have corner cases I'm not thinking of though.
-    //
-    // Note: These two cases are mutually exlusive... if its a file it's not a directory.
-    // So you could optimize the operation as an if (file) removeOne else removeDir via splice
-    if (this._entries.has(filepath)) {
-      this._entries.delete(filepath)
-    } else {
-      for (let key of this._entries.keys()) {
-        if (key.startsWith(filepath + '/')) {
-          this._entries.delete(key)
-        }
-      }
-    }
-    this._dirty = true
-  }
-  get entries () /*: Array<CacheEntry> */ {
-    return sortby([...this._entries.values()], 'path')
-  }
-  *[Symbol.iterator] () {
-    for (let entry of this.entries) {
-      yield entry
-    }
   }
 }
