@@ -18,7 +18,7 @@ type CacheEntry = {
   uid: number,
   gid: number,
   size: number,
-  oid: Buffer,
+  oid: string,
   flags: number,
   path: string
 }
@@ -49,7 +49,7 @@ function parseBuffer (buffer) {
     entry.uid = reader.readUInt32BE()
     entry.gid = reader.readUInt32BE()
     entry.size = reader.readUInt32BE()
-    entry.oid = reader.slice(20)
+    entry.oid = reader.slice(20).toString('hex')
     entry.flags = reader.readUInt16BE() // TODO: extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
     // TODO: handle if (version === 3 && entry.flags.extended)
     let pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
@@ -106,7 +106,7 @@ export default class GitIndex {
       gid: stats.gid,
       size: stats.size,
       path: filepath,
-      oid: Buffer.from(oid),
+      oid: oid,
       flags: 0
     }
     this._entries.set(entry.path, entry)
@@ -125,7 +125,7 @@ export default class GitIndex {
     this._dirty = true
   }
   render () {
-    return this.entries.map(entry => `${entry.mode.toString(8)} ${entry.oid.toString('hex')}    ${entry.path}`).join('\n')
+    return this.entries.map(entry => `${entry.mode.toString(8)} ${entry.oid}    ${entry.path}`).join('\n')
   }
   toObject () {
     let header = Buffer.alloc(12)
@@ -154,7 +154,7 @@ export default class GitIndex {
       writer.writeUInt32BE(entry.uid)
       writer.writeUInt32BE(entry.gid)
       writer.writeUInt32BE(entry.size)
-      writer.copy(entry.oid, 0, 20)
+      writer.write(entry.oid, 20, 'hex')
       writer.writeUInt16BE(entry.flags)
       writer.write(entry.path, entry.path.length, 'utf8')
       return written
