@@ -15,20 +15,23 @@ class Lockfile {
     this._filename = filename
   }
   async cancel () {
-    console.log('CANCEL', this._filename)
+    console.log(`${this._filename}.lock`, 'unlocking...')
     await lockfile.unlock(`${this._filename}.lock`)
+    console.log(`${this._filename}.lock`, 'unlocked.')
   }
   async update (buffer /*: Buffer */) {
     // TODO: support streams?
-    console.log('UPDATE', this._filename)
     try {
+      console.log(this._filename, 'updating...')
       await writeAtomic(this._filename, buffer)
+      console.log(this._filename, 'updated.')
+      console.log(`${this._filename}.lock`, 'unlocking...')
       await lockfile.unlock(`${this._filename}.lock`)
+      console.log(`${this._filename}.lock`, 'unlocked.')
     } catch (err) {
       console.log(err)
       throw err
     }
-    console.log('updated', this._filename)
   }
 }
 
@@ -37,10 +40,8 @@ export default async function Lock (filename /*: string */) {
     retries: 100,
     retryWait: 100
   }
-  // try {
-    await lockfile.lock(`${filename}.lock`, lockfileOpts)
-    return new Lockfile({filename})
-  // } catch (err) {
-    // throw new Error(`Unable to create lockfile: ${filename}.lock`)
-  // }
+  console.log(`${filename}.lock`, 'locking...')
+  await lockfile.lock(`${filename}.lock`, lockfileOpts)
+  console.log(`${filename}.lock`, 'locked.')
+  return new Lockfile({filename})
 }

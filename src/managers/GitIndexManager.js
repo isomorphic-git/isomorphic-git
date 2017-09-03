@@ -6,35 +6,37 @@ import GitIndex from '../models/GitIndex'
 import Lock from '../utils/lockfile'
 
 // TODO: replace with an LRU cache?
-const map = new Map()
+const map /*: Map<string, GitIndex> */ = new Map()
 const lm = new LockManager()
 
 export default class {
   static async acquire (filepath) {
     await lm.acquire(filepath)
     if (!map.has(filepath)) {
-      let lockfile = await Lock(filepath)
+      // Acquire a file lock while we're reading the index
+      // to make sure other processes aren't writing to it
+      // simultaneously, which could result in a corrupted index.
+      const fileLock = await Lock(filepath)
       const rawIndexFile = await read(filepath)
-      console.log('***********')
-      console.log(rawIndexFile)
       let index = GitIndex.from(rawIndexFile)
-      map.set(filepath, {index, lockfile})
+      // cache the GitIndex object so we don't need to re-read it
+      // every time.
+      // TODO: save the stat data for the index so we know whether
+      // the cached file is stale (modified by an outside process).
+      map.set(filepath, index)
+      await fileLock.cancel()
     }
-    const {index} = map.get(filepath)
-    return index
+    return map.get(filepath)
   }
   static async release (filepath) {
-    const {index, lockfile} = map.get(filepath)
-    if (index._dirty) {
+    const index = map.get(filepath)
+    if (index && index._dirty) {
+      // Acquire a file lock while we're writing the index file
+      let fileLock = await Lock(filepath)
       const buffer = index.toObject()
-      console.log('updating', lockfile)
-      await lockfile.update(buffer)
+      await fileLock.update(buffer)
       index._dirty = false
-    } else {
-      console.log('canceling')
-      await lockfile.cancel()
     }
-    console.log('RELEASE', lockfile._filename, index._dirty)
     lm.release(filepath)
   }
 }
