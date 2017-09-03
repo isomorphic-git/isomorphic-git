@@ -28,6 +28,19 @@ function parseBuffer (buffer) /*: Array<TreeEntry> */{
   return _entries
 }
 
+function nudgeIntoShape (entry) {
+  if (!entry.oid && entry.sha) {
+    entry.oid = entry.sha // Github
+  }
+  if (typeof entry.mode === 'number') {
+    entry.mode = entry.mode.toString(8) // index
+  }
+  if (!entry.type) {
+    entry.type = 'blob' // index
+  }
+  return entry
+}
+
 export default class GitTree {
   /*::
   _entries: Array<TreeEntry>
@@ -36,7 +49,7 @@ export default class GitTree {
     if (Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
     } else if (Array.isArray(entries)) {
-      this._entries = entries.map(x => (!x.oid && x.sha) ? Object.assign(x, {oid: x.sha}) : x)
+      this._entries = entries.map(nudgeIntoShape)
     } else {
       throw new Error('invalid type passed to GitTree constructor')
     }
