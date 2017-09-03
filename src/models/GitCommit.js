@@ -59,6 +59,8 @@ export default class GitCommit {
       this._commit = commit
     } else if (Buffer.isBuffer(commit)) {
       this._commit = commit.toString('utf8')
+    } else if (typeof commit === 'object') {
+      this._commit = GitCommit.render(commit)
     } else {
       throw new Error('invalid type passed to GitCommit constructor')
     }
@@ -150,6 +152,10 @@ export default class GitCommit {
 
   static render (obj) {
     return GitCommit.renderHeaders(obj) + '\n' + obj.message
+  }
+  
+  render () {
+    return this._commit
   }
 
   withoutSignature () {
