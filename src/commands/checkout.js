@@ -1,12 +1,15 @@
-import GitObject from '../models/GitObject'
 import GitCommit from '../models/GitCommit'
 import GitTree from '../models/GitTree'
+import GitObjectManager from '../managers/GitObjectManager'
 import write from '../utils/write'
 import resolveRef from '../utils/resolveRef'
 
 async function writeTreeToDisk ({ gitdir, dirpath, tree }) {
   for (let entry of tree) {
-    let { type, object } = await GitObject.read({ gitdir, oid: entry.oid })
+    let { type, object } = await GitObjectManager.read({
+      gitdir,
+      oid: entry.oid
+    })
     let entrypath = `${dirpath}/${entry.path}`
     console.log(`I'm writing out ${entrypath}`)
     switch (type) {
@@ -34,7 +37,7 @@ export default async function checkout ({ workdir, gitdir, remote, ref }) {
     oid = await resolveRef({ gitdir, ref: `${remote}/${ref}` })
     await write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
   }
-  let commit = await GitObject.read({ gitdir, oid })
+  let commit = await GitObjectManager.read({ gitdir, oid })
   if (commit.type !== 'commit') {
     throw new Error(`Unexpected type: ${commit.type}`)
   }
@@ -42,7 +45,7 @@ export default async function checkout ({ workdir, gitdir, remote, ref }) {
   let sha = comm.headers().tree
   console.log('tree: ', sha)
   // Get top-level tree
-  let { type, object } = await GitObject.read({ gitdir, oid: sha })
+  let { type, object } = await GitObjectManager.read({ gitdir, oid: sha })
   if (type !== 'tree') throw new Error(`Unexpected type: ${type}`)
   console.log(type, object.toString('utf8'))
   let tree = GitTree.from(object)
