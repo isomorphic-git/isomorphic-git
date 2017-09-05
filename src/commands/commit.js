@@ -1,6 +1,6 @@
 import GitTree from '../models/GitTree'
 import GitCommit from '../models/GitCommit'
-import GitObject from '../models/GitObject'
+import GitObjectManager from '../managers/GitObjectManager'
 import GitIndexManager from '../managers/GitIndexManager'
 import resolveRef from '../utils/resolveRef'
 import write from '../utils/write'
@@ -9,7 +9,7 @@ import path from 'path'
 export default async function commit ({ gitdir, author, message }) {
   const index = await GitIndexManager.acquire(`${gitdir}/index`)
   const tree = GitTree.from(index.entries)
-  const treeRef = await GitObject.write({
+  const treeRef = await GitObjectManager.write({
     gitdir,
     type: 'tree',
     object: tree.toObject()
@@ -36,7 +36,7 @@ export default async function commit ({ gitdir, author, message }) {
     message
   })
   console.log(commit.render())
-  let oid = GitObject.write({
+  let oid = GitObjectManager.write({
     gitdir,
     type: 'commit',
     object: commit.toObject()

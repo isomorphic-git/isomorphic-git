@@ -1,7 +1,5 @@
 import ghurl from 'github-url-to-object'
 
-import GitConfig from './models/GitConfig'
-
 import init from './commands/init.js'
 import fetch from './commands/fetch.js'
 import checkout from './commands/checkout.js'
@@ -9,6 +7,7 @@ import list from './commands/list.js'
 import add from './commands/add.js'
 import remove from './commands/remove.js'
 import commit from './commands/commit.js'
+import getConfig from './commands/getConfig.js'
 
 // Class is merely a fluent command/query builder
 export default function git (dir) {
@@ -20,7 +19,6 @@ export class Git {
     this.workdir = dir
     this.gitdir = dir.endsWith('.git') ? dir : `${dir}/.git`
     this.operateRemote = 'origin'
-    this.config = new GitConfig(this.gitdir)
   }
   workdir (dir) {
     this.workdir = dir
@@ -28,7 +26,6 @@ export class Git {
   }
   gitdir (dir) {
     this.gitdir = dir
-    this.config = new GitConfig(this.gitdir)
     return this
   }
   githubToken (token) {
@@ -111,6 +108,12 @@ export class Git {
         email: this.operateAuthorEmail || (await this.config.get('user.email'))
       },
       message
+    })
+  }
+  async getConfig (path) {
+    return getConfig({
+      gitdir: this.gitdir,
+      path
     })
   }
 }

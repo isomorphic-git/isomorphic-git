@@ -2,7 +2,7 @@
 // And because we already have the code.
 import axios from 'axios'
 import parseLinkHeader from 'parse-link-header'
-import GitObject from '../models/GitObject'
+import GitObjectManager from '../managers/GitObjectManager'
 import GitCommit from '../models/GitCommit'
 import GitTree from '../models/GitTree'
 import write from '../utils/write'
@@ -82,7 +82,7 @@ async function fetchCommits ({ gitdir, url, user, repo, ref, since, token }) {
       signature: commit.commit.verification.signature
     })
     console.log('Created commit', comm)
-    let oid = await GitObject.write({
+    let oid = await GitObjectManager.write({
       gitdir,
       type: 'commit',
       object: comm.toObject()
@@ -112,7 +112,7 @@ async function fetchTree ({ gitdir, url, user, repo, sha, since, token }) {
     url: `https://api.github.com/repos/${user}/${repo}/git/trees/${sha}`
   })
   let tree = new GitTree(json.tree)
-  let oid = await GitObject.write({
+  let oid = await GitObjectManager.write({
     gitdir,
     type: 'tree',
     object: tree.toObject()
@@ -159,7 +159,11 @@ async function fetchBlob ({ gitdir, url, user, repo, sha, since, token }) {
       responseType: 'arraybuffer'
     }
   )
-  let oid = await GitObject.write({ gitdir, type: 'blob', object: res.data })
+  let oid = await GitObjectManager.write({
+    gitdir,
+    type: 'blob',
+    object: res.data
+  })
   if (sha !== oid) {
     console.log("AHOY! MATEY! THAR BE TROUBLE WITH 'EM HASHES!")
   }
@@ -198,7 +202,7 @@ export default async function fetch ({
 
   // This is all crap to get a tree SHA from a commit SHA. Seriously.
   let oid = await resolveRef({ gitdir, ref: `${remote}/${ref}` })
-  let { type, object } = await GitObject.read({ gitdir, oid })
+  let { type, object } = await GitObjectManager.read({ gitdir, oid })
   if (type !== 'commit') throw new Error(`Unexpected type: ${type}`)
   let comm = GitCommit.from(object.toString('utf8'))
   let sha = comm.headers().tree

@@ -44,7 +44,7 @@ function unwrapObject ({ oid, file } /*: {oid: string, file: Buffer} */) {
   }
 }
 
-export default class GitObject {
+export default class GitObjectManager {
   static async read ({ gitdir, oid } /*: {gitdir: string, oid: string} */) {
     let file = await read(
       `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
