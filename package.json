@@ -10,7 +10,9 @@
     "watch": "babel src --watch --out-dir lib --source-maps inline",
     "build": "babel src --out-dir lib --source-maps",
     "test": "npm run build && ava",
-    "on-pull-request": "npm run format && npm run lint && npm run test"
+    "on-pull-request": "npm run format && npm run lint && npm run test",
+    "ban": "ban",
+    "precommit": "npm run ban"
   },
   "repository": {
     "type": "git",
@@ -50,6 +52,7 @@
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
+    "ban-sensitive-files": "^1.9.0",
     "prettier-standard": "^6.0.0",
     "standard": "^10.0.3",
     "temp": "^0.8.3"

@@ -5,7 +5,7 @@ import read from '../lib/utils/read'
 import write from '../lib/utils/write'
 
 test.beforeEach(async t => {
-  await write('fixtures/esgit.git/index', await read('fixtures/esgit.git/backup.index'))
+  await write('fixtures/esgit.git/index', await read('fixtures/esgit.git/index.orig'))
 })
 
 test.serial('gitIndex.remove(file)', async t => {
@@ -23,5 +23,5 @@ test.serial('gitIndex.remove(dir)', async t => {
 })
 
 test.afterEach(async t => {
-  await write('fixtures/esgit.git/index', await read('fixtures/esgit.git/backup.index'))
+  await write('fixtures/esgit.git/index', await read('fixtures/esgit.git/index.orig'))
 })
