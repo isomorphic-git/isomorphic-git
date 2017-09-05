@@ -1,6 +1,5 @@
-//@flow
+// @flow
 // This is modeled after the lockfile strategy used by the git source code.
-import fs from 'fs'
 import pify from 'pify'
 import lockFile from 'lockfile'
 import writeFileAtomic from 'write-file-atomic'
@@ -11,7 +10,7 @@ class Lockfile {
   /*::
   _filename : string;
   */
-  constructor ({filename}) {
+  constructor ({ filename }) {
     this._filename = filename
   }
   async cancel () {
@@ -43,5 +42,5 @@ export default async function Lock (filename /*: string */) {
   console.log(`${filename}.lock`, 'locking...')
   await lockfile.lock(`${filename}.lock`, lockfileOpts)
   console.log(`${filename}.lock`, 'locked.')
-  return new Lockfile({filename})
+  return new Lockfile({ filename })
 }

@@ -1,6 +1,5 @@
-//@flow
+// @flow
 import LockManager from 'travix-lock-manager'
-import debounce from 'lodash.debounce'
 import read from '../utils/read'
 import GitIndex from '../models/GitIndex'
 import Lock from '../utils/lockfile'

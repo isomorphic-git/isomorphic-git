@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import path from 'path'
 import pify from 'pify'
 import fs from 'fs'
