@@ -1,6 +1,6 @@
-//@flow
+// @flow
 'use strict'
-import {Buffer} from 'buffer'
+import { Buffer } from 'buffer'
 
 function formatTimezoneOffset (minutes /*: number */) {
   let sign = Math.sign(minutes) || 1
@@ -21,7 +21,9 @@ function parseTimezoneOffset (offset) {
 }
 
 function parseAuthor (author) {
-  let [, name, email, timestamp, offset] = author.match(/^(.*) <(.*)> (.*) (.*)$/)
+  let [, name, email, timestamp, offset] = author.match(
+    /^(.*) <(.*)> (.*) (.*)$/
+  )
   return {
     name: name,
     email: email,
@@ -41,11 +43,20 @@ function normalize (str) {
 }
 
 function indent (str) {
-  return str.trim().split('\n').map(x => ' ' + x).join('\n') + '\n'
+  return (
+    str
+      .trim()
+      .split('\n')
+      .map(x => ' ' + x)
+      .join('\n') + '\n'
+  )
 }
 
 function outdent (str) {
-  return str.split('\n').map(x => x.replace(/^ /, '')).join('\n')
+  return str
+    .split('\n')
+    .map(x => x.replace(/^ /, ''))
+    .join('\n')
 }
 
 // TODO: Make all functions have static async signature?
@@ -54,7 +65,7 @@ export default class GitCommit {
   /*::
   _commit : string
   */
-  constructor (commit /*: string|Buffer*/) {
+  constructor (commit /*: string|Buffer */) {
     if (typeof commit === 'string') {
       this._commit = commit
     } else if (Buffer.isBuffer(commit)) {
@@ -65,18 +76,20 @@ export default class GitCommit {
       throw new Error('invalid type passed to GitCommit constructor')
     }
   }
-  
-  static fromPayloadSignature ({payload, signature}) {
+
+  static fromPayloadSignature ({ payload, signature }) {
     let headers = GitCommit.justHeaders(payload)
     let message = GitCommit.justMessage(payload)
-    let commit = normalize(headers + '\ngpgsig' + indent(signature) + '\n' + message)
+    let commit = normalize(
+      headers + '\ngpgsig' + indent(signature) + '\n' + message
+    )
     return new GitCommit(commit)
   }
-  
+
   static from (commit) {
     return new GitCommit(commit)
   }
-  
+
   toObject () {
     return Buffer.from(this._commit, 'utf8')
   }
@@ -85,16 +98,16 @@ export default class GitCommit {
   headers () {
     return this.parseHeaders()
   }
-  
+
   // Todo: allow setting the headers and message
   message () {
     return GitCommit.justMessage(this._commit)
   }
-  
+
   static justMessage (commit) {
     return commit.slice(commit.indexOf('\n\n') + 2)
   }
-  
+
   static justHeaders (commit) {
     return commit.slice(0, commit.indexOf('\n\n'))
   }
@@ -116,7 +129,7 @@ export default class GitCommit {
       let value = h.slice(h.indexOf(' ') + 1)
       obj[key] = value
     }
-    obj.parent = (obj.parent) ? obj.parent.split(' ') : []
+    obj.parent = obj.parent ? obj.parent.split(' ') : []
     if (obj.author) {
       obj.author = parseAuthor(obj.author)
     }
@@ -141,9 +154,13 @@ export default class GitCommit {
       headers += '\n'
     }
     let author = obj.author
-    headers += `author ${author.name} <${author.email}> ${author.timestamp} ${formatTimezoneOffset(author.timezoneOffset)}\n`
+    headers += `author ${author.name} <${author.email}> ${author.timestamp} ${formatTimezoneOffset(
+      author.timezoneOffset
+    )}\n`
     let committer = obj.committer || obj.author
-    headers += `committer ${committer.name} <${committer.email}> ${committer.timestamp} ${formatTimezoneOffset(committer.timezoneOffset)}\n`
+    headers += `committer ${committer.name} <${committer.email}> ${committer.timestamp} ${formatTimezoneOffset(
+      committer.timezoneOffset
+    )}\n`
     if (obj.gpgsig) {
       headers += 'gpgsig' + indent(obj.gpgsig)
     }
@@ -153,7 +170,7 @@ export default class GitCommit {
   static render (obj) {
     return GitCommit.renderHeaders(obj) + '\n' + obj.message
   }
-  
+
   render () {
     return this._commit
   }
@@ -162,20 +179,30 @@ export default class GitCommit {
     let commit = normalize(this._commit)
     if (commit.indexOf('\ngpgsig') === -1) return commit
     let headers = commit.slice(0, commit.indexOf('\ngpgsig'))
-    let message = commit.slice(commit.indexOf('-----END PGP SIGNATURE-----\n') + '-----END PGP SIGNATURE-----\n'.length)
+    let message = commit.slice(
+      commit.indexOf('-----END PGP SIGNATURE-----\n') +
+        '-----END PGP SIGNATURE-----\n'.length
+    )
     return normalize(headers + '\n' + message)
   }
 
   isolateSignature () {
     let signature = this._commit.slice(
       this._commit.indexOf('-----BEGIN PGP SIGNATURE-----'),
-      this._commit.indexOf('-----END PGP SIGNATURE-----') + '-----END PGP SIGNATURE-----'.length)
+      this._commit.indexOf('-----END PGP SIGNATURE-----') +
+        '-----END PGP SIGNATURE-----'.length
+    )
     return outdent(signature)
   }
-
+  // Temporarily disabled
+  /*
   async verifySignature () {
     let header = this.parseHeaders()
-    let verified = await pgp.verifyDetachedSignature(header.committer.email, this.withoutSignature(), this.isolateSignature())
+    let verified = await pgp.verifyDetachedSignature(
+      header.committer.email,
+      this.withoutSignature(),
+      this.isolateSignature()
+    )
     return verified
   }
 
@@ -184,11 +211,16 @@ export default class GitCommit {
     let headers = GitCommit.justHeaders(this._commit)
     let message = GitCommit.justMessage(this._commit)
     let header = this.parseHeaders()
-    let signedmsg = await pgp.createBinaryDetachedSignature(header.committer.email, commit)
+    let signedmsg = await pgp.createBinaryDetachedSignature(
+      header.committer.email,
+      commit
+    )
     // renormalize the line endings to the one true line-ending
     signedmsg = normalize(signedmsg)
-    let signedCommit = headers + '\n' + 'gpgsig' + indent(signedmsg) + '\n' + message
+    let signedCommit =
+      headers + '\n' + 'gpgsig' + indent(signedmsg) + '\n' + message
     console.log(signedCommit)
     return signedCommit
   }
+*/
 }

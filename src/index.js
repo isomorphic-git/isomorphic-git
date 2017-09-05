@@ -49,7 +49,6 @@ export class Git {
   }
   async init () {
     await init(this.workdir)
-    return
   }
   async fetch (url) {
     await fetch({
@@ -66,7 +65,7 @@ export class Git {
       workdir: this.workdir,
       gitdir: this.gitdir,
       ref,
-      remote: this.operateRemote,
+      remote: this.operateRemote
     })
   }
   async clone (url) {
@@ -83,9 +82,8 @@ export class Git {
       workdir: this.workdir,
       gitdir: this.gitdir,
       ref: ghurl(url).branch,
-      remote: this.operateRemote,
+      remote: this.operateRemote
     })
-    return
   }
   async list () {
     return list({
@@ -109,8 +107,8 @@ export class Git {
     return commit({
       gitdir: this.gitdir,
       author: {
-        name: this.operateAuthorName || await this.config.get('user.name'),
-        email: this.operateAuthorEmail || await this.config.get('user.email')
+        name: this.operateAuthorName || (await this.config.get('user.name')),
+        email: this.operateAuthorEmail || (await this.config.get('user.email'))
       },
       message
     })

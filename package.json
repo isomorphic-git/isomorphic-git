@@ -5,9 +5,12 @@
   "main": "lib/index.js",
   "bin": "lib/cli.js",
   "scripts": {
+    "format": "prettier-standard src/**/*.js",
+    "lint": "standard src/**/*.js",
     "watch": "babel src --watch --out-dir lib --source-maps inline",
     "build": "babel src --out-dir lib --source-maps",
-    "test": "npm run build && ava"
+    "test": "npm run build && ava",
+    "on-pull-request": "npm run format && npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -24,19 +27,12 @@
   "homepage": "https://github.com/wmhilton/esgit#readme",
   "dependencies": {
     "axios": "^0.16.2",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-flow": "^6.23.0",
     "buffer": "^5.0.7",
     "buffercursor": "0.0.12",
     "github-url-to-object": "^4.0.2",
     "ini": "^1.3.4",
     "lockfile": "^1.0.3",
-    "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
-    "lodash.remove": "^4.7.0",
     "lodash.sortby": "^4.7.0",
     "minimisted": "^2.0.0",
     "pako": "^1.0.5",
@@ -49,8 +45,13 @@
   "devDependencies": {
     "ava": "^0.21.0",
     "babel-cli": "^6.24.1",
-    "babelify": "^7.3.0",
-    "shelljs": "^0.7.8",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-flow": "^6.23.0",
+    "prettier-standard": "^6.0.0",
+    "standard": "^10.0.3",
     "temp": "^0.8.3"
   },
   "ava": {

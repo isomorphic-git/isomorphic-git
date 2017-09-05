@@ -1,5 +1,5 @@
-//@flow
-import {Buffer} from 'buffer'
+// @flow
+import { Buffer } from 'buffer'
 
 /*::
 type TreeEntry = {
@@ -10,7 +10,7 @@ type TreeEntry = {
 }
 */
 
-function parseBuffer (buffer) /*: Array<TreeEntry> */{
+function parseBuffer (buffer) /*: Array<TreeEntry> */ {
   let _entries = []
   let cursor = 0
   while (cursor < buffer.length) {
@@ -23,7 +23,7 @@ function parseBuffer (buffer) /*: Array<TreeEntry> */{
     let path = buffer.slice(space + 1, nullchar).toString('utf8')
     let oid = buffer.slice(nullchar + 1, nullchar + 21).toString('hex')
     cursor = nullchar + 21
-    _entries.push({mode, path, oid})
+    _entries.push({ mode, path, oid })
   }
   return _entries
 }
@@ -58,22 +58,26 @@ export default class GitTree {
     return new GitTree(tree)
   }
   render () {
-    return this._entries.map(entry => `${entry.mode} ${entry.type} ${entry.oid}    ${entry.path}`).join('\n')
+    return this._entries
+      .map(entry => `${entry.mode} ${entry.type} ${entry.oid}    ${entry.path}`)
+      .join('\n')
   }
   toObject () {
-    return Buffer.concat(this._entries.map(entry => {
-      let mode = Buffer.from(entry.mode.replace(/^0/,''))
-      let space = Buffer.from(' ')
-      let path = Buffer.from(entry.path, {encoding: 'utf8'})
-      let nullchar = Buffer.from([0])
-      let oid = Buffer.from(entry.oid.match(/../g).map(n => parseInt(n, 16)))
-      return Buffer.concat([mode, space, path, nullchar, oid])
-    }))
+    return Buffer.concat(
+      this._entries.map(entry => {
+        let mode = Buffer.from(entry.mode.replace(/^0/, ''))
+        let space = Buffer.from(' ')
+        let path = Buffer.from(entry.path, { encoding: 'utf8' })
+        let nullchar = Buffer.from([0])
+        let oid = Buffer.from(entry.oid.match(/../g).map(n => parseInt(n, 16)))
+        return Buffer.concat([mode, space, path, nullchar, oid])
+      })
+    )
   }
   entries () {
     return this._entries
   }
-  *[Symbol.iterator] () {
+  * [Symbol.iterator] () {
     for (let entry of this._entries) {
       yield entry
     }

@@ -9,7 +9,7 @@ export default class GitConfig {
   }
   async parse () {
     if (this.ini) return
-    let text = await pify(fs.readFile)(this.filename, {encoding: 'utf8'})
+    let text = await pify(fs.readFile)(this.filename, { encoding: 'utf8' })
     this.ini = ini.decode(text)
   }
   async get (path) {

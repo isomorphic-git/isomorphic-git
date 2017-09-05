@@ -2,10 +2,7 @@
 import minimisted from 'minimisted'
 import git from '.'
 
-minimisted(async function ({
-  _: [command, arg, ...args],
-  ...opts
-}) {
+minimisted(async function ({ _: [command, arg, ...args], ...opts }) {
   const dir = process.cwd()
   const repo = git(dir)
   let cmd = `git('${dir}')`
