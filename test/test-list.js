@@ -5,7 +5,7 @@ import write from '../lib/utils/write'
 import {tmpdir, cleanup} from './_helpers'
 
 test.beforeEach(async t => {
-  await write('fixtures/esgit.git/index', await read('fixtures/esgit.git/backup.index'))
+  await write('fixtures/esgit.git/index', await read('fixtures/esgit.git/index.orig'))
 })
 
 test.serial('gitIndex.list', async t => {
