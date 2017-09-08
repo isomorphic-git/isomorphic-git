@@ -6,7 +6,13 @@ import resolveRef from '../utils/resolveRef'
 import write from '../utils/write'
 import path from 'path'
 
-export default async function commit ({ gitdir, author, committer, message, privateKey }) {
+export default async function commit ({
+  gitdir,
+  author,
+  committer,
+  message,
+  privateKey
+}) {
   // Fill in missing arguments with default values
   committer = committer || author
   let authorDateTime = author.date || new Date()
@@ -26,13 +32,15 @@ export default async function commit ({ gitdir, author, committer, message, priv
     author: {
       name: author.name,
       email: author.email,
-      timestamp: author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
+      timestamp:
+        author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
       timezoneOffset: author.timezoneOffset || 0
     },
     committer: {
       name: committer.name,
       email: committer.email,
-      timestamp: committer.timestamp || Math.floor(committerDateTime.valueOf() / 1000),
+      timestamp:
+        committer.timestamp || Math.floor(committerDateTime.valueOf() / 1000),
       timezoneOffset: committer.timezoneOffset || 0
     },
     message
