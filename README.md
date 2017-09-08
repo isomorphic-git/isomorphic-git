@@ -1,4 +1,4 @@
-# esgit
+# esgit [![Build Status](https://travis-ci.org/wmhilton/esgit.svg?branch=master)](https://travis-ci.org/wmhilton/esgit)
 Node library for interacting with git repositories, circa 2017
 
 # Progress
