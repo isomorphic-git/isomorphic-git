@@ -17,3 +17,7 @@ test('test-HEAD', async t => {
   let ref = await resolveRef({gitdir: 'fixtures/esgit.git', ref: 'HEAD'})
   t.snapshot(ref)
 })
+test('test-HEAD depth', async t => {
+  let ref = await resolveRef({gitdir: 'fixtures/esgit.git', ref: 'HEAD', depth: 2})
+  t.snapshot(ref)
+})

@@ -9,6 +9,6 @@ test.beforeEach(async t => {
 })
 
 test.serial('gitIndex.list', async t => {
-  const files = await git('fixtures/esgit.git').list()
+  const files = await git().gitdir('fixtures/esgit.git').list()
   t.snapshot(files)
 })
