@@ -16,8 +16,10 @@ export default function git (dir) {
 
 export class Git {
   constructor (dir) {
-    this.workdir = dir
-    this.gitdir = dir.endsWith('.git') ? dir : `${dir}/.git`
+    if (dir) {
+      this.workdir = dir
+      this.gitdir = `${dir}/.git`
+    }
     this.operateRemote = 'origin'
   }
   workdir (dir) {
@@ -44,8 +46,14 @@ export class Git {
     this.operateAuthorEmail = email
     return this
   }
+  datetime (date) {
+    this.operateAuthorDateTime = date
+  }
+  signingKey (asciiarmor) {
+    this.privateKey = asciiarmor
+  }
   async init () {
-    await init(this.workdir)
+    await init(this.gitdir)
   }
   async fetch (url) {
     await fetch({
@@ -104,10 +112,17 @@ export class Git {
     return commit({
       gitdir: this.gitdir,
       author: {
-        name: this.operateAuthorName || (await this.config.get('user.name')),
-        email: this.operateAuthorEmail || (await this.config.get('user.email'))
+        name: this.operateAuthorName || (await this.getConfig('user.name')),
+        email: this.operateAuthorEmail || (await this.getConfig('user.email')),
+        date: this.operateAuthorDateTime
       },
-      message
+      committer: {
+        name: this.operateAuthorName || (await this.getConfig('user.name')),
+        email: this.operateAuthorEmail || (await this.getConfig('user.email')),
+        date: this.operateAuthorDateTime
+      },
+      message,
+      privateKey: this.privateKey
     })
   }
   async getConfig (path) {

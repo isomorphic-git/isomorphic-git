@@ -197,23 +197,6 @@ export default class GitCommit {
   }
   // Temporarily disabled
   
-  async verifySignature (publicKeys /*: Array<string> */) {
-    // let header = this.parseHeaders()
-    let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
-    let verified = await openpgp.verify({
-      publicKeys: pubKeyObj,
-      message: this.withoutSignature(),
-      signature: this.isolateSignature
-    })
-    /*
-    let verified = await pgp.verifyDetachedSignature(
-      header.committer.email,
-      this.withoutSignature(),
-      this.isolateSignature()
-    )
-    */
-    return verified
-  }
   /*
   // Verify `message` with detached `signature` using the public key for `email`
   static async verifyDetachedSignature (email, message, signature) {
@@ -287,6 +270,26 @@ export default class GitCommit {
     let signedCommit =
       headers + '\n' + 'gpgsig' + indent(signature) + '\n' + message
     console.log(signedCommit)
-    return this
+    // return a new commit object
+    return GitCommit.from(signedCommit)
+  }
+  
+  async verifySignature (publicKeys /*: Array<string> */) {
+    // let header = this.parseHeaders()
+    let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
+    let verified = await openpgp.verify({
+      publicKeys: pubKeyObj,
+      message: this.withoutSignature(),
+      signature: this.isolateSignature
+    })
+    /*
+    let verified = await pgp.verifyDetachedSignature(
+      header.committer.email,
+      this.withoutSignature(),
+      this.isolateSignature()
+    )
+    */
+    console.log(verified)
+    return verified
   }
 }

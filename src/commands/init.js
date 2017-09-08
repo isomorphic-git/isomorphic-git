@@ -2,19 +2,19 @@
 import write from '../utils/write'
 import { mkdirs } from '../utils/mkdirs'
 
-export default async function init (dirpath /*: string */) {
+export default async function init (gitdir /*: string */) {
   let folders = [
-    '.git/hooks',
-    '.git/info',
-    '.git/objects/info',
-    '.git/objects/pack',
-    '.git/refs/heads',
-    '.git/refs/tags'
+    'hooks',
+    'info',
+    'objects/info',
+    'objects/pack',
+    'refs/heads',
+    'refs/tags'
   ]
-  folders = folders.map(dir => dirpath + '/' + dir)
+  folders = folders.map(dir => gitdir + '/' + dir)
   await mkdirs(folders)
   await write(
-    dirpath + '/.git/config',
+    gitdir + '/config',
     '[core]\n' +
       '\trepositoryformatversion = 0\n' +
       '\tfilemode = false\n' +
@@ -23,5 +23,5 @@ export default async function init (dirpath /*: string */) {
       '\tsymlinks = false\n' +
       '\tignorecase = true\n'
   )
-  await write(dirpath + '/.git/HEAD', 'ref: refs/heads/master\n')
+  await write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
 }

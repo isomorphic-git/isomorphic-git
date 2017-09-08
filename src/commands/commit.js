@@ -6,7 +6,11 @@ import resolveRef from '../utils/resolveRef'
 import write from '../utils/write'
 import path from 'path'
 
-export default async function commit ({ gitdir, author, message }) {
+export default async function commit ({ gitdir, author, committer, message, privateKey }) {
+  // Fill in missing arguments with default values
+  committer = committer || author
+  let authorDateTime = author.date || new Date()
+  let committerDateTime = committer.date || authorDateTime
   const index = await GitIndexManager.acquire(`${gitdir}/index`)
   const tree = GitTree.from(index.entries)
   const treeRef = await GitObjectManager.write({
@@ -14,32 +18,32 @@ export default async function commit ({ gitdir, author, message }) {
     type: 'tree',
     object: tree.toObject()
   })
-  console.log(tree.render())
   GitIndexManager.release(`${gitdir}/index`)
   const parent = await resolveRef({ gitdir, ref: 'HEAD' })
-  const time = new Date()
-  const commit = GitCommit.from({
+  let comm = GitCommit.from({
     tree: treeRef,
     parent: [parent],
     author: {
       name: author.name,
       email: author.email,
-      timestamp: Math.floor(time.valueOf() / 1000),
-      timezoneOffset: time.getTimezoneOffset()
+      timestamp: Math.floor(authorDateTime.valueOf() / 1000),
+      timezoneOffset: authorDateTime.getTimezoneOffset()
     },
     committer: {
-      name: author.name,
-      email: author.email,
-      timestamp: Math.floor(time.valueOf() / 1000),
-      timezoneOffset: time.getTimezoneOffset()
+      name: committer.name,
+      email: committer.email,
+      timestamp: Math.floor(committerDateTime.valueOf() / 1000),
+      timezoneOffset: committerDateTime.getTimezoneOffset()
     },
     message
   })
-  console.log(commit.render())
-  let oid = GitObjectManager.write({
+  if (privateKey) {
+    comm = comm.addSignature(privateKey)
+  }
+  let oid = await GitObjectManager.write({
     gitdir,
     type: 'commit',
-    object: commit.toObject()
+    object: comm.toObject()
   })
   // Update branch pointer
   const branch = await resolveRef({ gitdir, ref: 'HEAD', depth: 2 })
