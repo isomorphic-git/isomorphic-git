@@ -16,12 +16,12 @@ test('git.commit()', async t => {
   await write('fixtures/test-commit.git/HEAD', 'ref: refs/heads/master\n')
   repo.author('Mr. Test')
   repo.email('mrtest@example.com')
-  repo.datetime(new Date('2010-01-01T09:42:00-05:00'))
+  repo.timestamp(1262356920)
   let sha = await repo.commit('Initial commit')
-  t.true(sha === '07f05c5645854a50f19457777a4cc67d3b51b2d9')
+  t.true(sha === '7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
 })
 
-test('git.addSignature() and git.verifySignature()', async t => {
+test('git.signingKey() and git.verificationKey()', async t => {
   const repo = git()
   repo.gitdir('fixtures/test-commit.git')
   await repo.init()
@@ -30,7 +30,7 @@ test('git.addSignature() and git.verifySignature()', async t => {
   await write('fixtures/test-commit.git/HEAD', 'ref: refs/heads/master\n')
   repo.author('Mr. Test')
   repo.email('mrtest@example.com')
-  repo.datetime(new Date('2010-01-01T09:42:00-05:00'))
+  repo.timestamp(1504842425)
   const privateKeys = await pify(jsonfile.readFile)('fixtures/openpgp-private-keys.json')
   console.log('privateKeys =', privateKeys)
   repo.signingKey(privateKeys[0])

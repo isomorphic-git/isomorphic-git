@@ -12,7 +12,7 @@ Node library for interacting with git repositories, circa 2017
   - [x] git add
   - [x] git remove
   - [ ] git status
-- [ ] git commit
+- [x] git commit
 - [ ] git push
 - [ ] git diff
 - [ ] git merge
@@ -47,14 +47,19 @@ git('.').add('README.md')
 // Remove files from the index
 git('.').remove('.env')
 
-// TODO: git.commit(), git.merge(), git.pull(), git.push(), git.status(), git.diff(), git.tag(), git.branch(), etc
+// Create a new commit (there's actually several more options for date, committer)
+git('.')
+  .add('a.txt')
+  .author('Mr. Test')
+  .email('mrtest@example.com')
+  .signingKey('-----BEGIN PGP PRIVATE KEY BLOCK-----...')
+  .commit('Added the a.txt file')
 
-// Paths ending in .git are treated as bare repos
-git('foo.git')
+// TODO: git.merge(), git.pull(), git.push(), git.status(), git.diff(), git.tag(), git.branch(), etc
 
-// And if you really need an escape hatch here are the
+// And if you need to work with bare repos there are
 // equivalents to the `--git-dir` and `--work-tree` options
-git('').gitdir('my-bare-repo').workdir('/var/www/website')
+git().gitdir('my-bare-repo').workdir('/var/www/website')
 ```
 
 ## Low-level API (also unstable)
@@ -91,7 +96,7 @@ checkout({
 
 ### Individual objects
 
-Only be interested in parsing commits? Import just the GitCommit class. And so on:
+Only interested in commit objects? Import just the GitCommit class. And so on:
 
 ```js
 const GitBlob = require('esgit/lib/models/GitBlob.js')
