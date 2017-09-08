@@ -201,7 +201,7 @@ export default class GitCommit {
     let headers = GitCommit.justHeaders(this._commit)
     let message = GitCommit.justMessage(this._commit)
     let privKeyObj = openpgp.key.readArmored(privateKey).keys
-    let {signature} = await openpgp.sign({
+    let { signature } = await openpgp.sign({
       data: openpgp.util.str2Uint8Array(commit),
       privateKeys: privKeyObj,
       detached: true,
@@ -217,7 +217,10 @@ export default class GitCommit {
 
   async verifySignature (publicKeys /*: Array<string> */) {
     let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
-    let msg = openpgp.message.readSignedContent(this.withoutSignature(), this.isolateSignature())
+    let msg = openpgp.message.readSignedContent(
+      this.withoutSignature(),
+      this.isolateSignature()
+    )
     var result = msg.verify(pubKeyObj)
     return result[0].valid
   }
