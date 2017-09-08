@@ -7,6 +7,7 @@ import list from './commands/list.js'
 import add from './commands/add.js'
 import remove from './commands/remove.js'
 import commit from './commands/commit.js'
+import verify from './commands/verify.js'
 import getConfig from './commands/getConfig.js'
 
 // Class is merely a fluent command/query builder
@@ -48,9 +49,15 @@ export class Git {
   }
   datetime (date) {
     this.operateAuthorDateTime = date
+    return this
   }
   signingKey (asciiarmor) {
     this.privateKey = asciiarmor
+    return this
+  }
+  verificationKey (asciiarmor) {
+    this.publicKey = asciiarmor
+    return this
   }
   async init () {
     await init(this.gitdir)
@@ -123,6 +130,13 @@ export class Git {
       },
       message,
       privateKey: this.privateKey
+    })
+  }
+  async verify (ref) {
+    return verify({
+      gitdir: this.gitdir,
+      publicKey: this.publicKey,
+      ref
     })
   }
   async getConfig (path) {
