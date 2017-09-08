@@ -54,6 +54,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",
+    "jsonfile": "^3.0.1",
     "prettier-standard": "^6.0.0",
     "standard": "^10.0.3",
     "temp": "^0.8.3"

@@ -66,7 +66,7 @@ export default class GitCommit {
   /*::
   _commit : string
   */
-  constructor (commit /*: string|Buffer */) {
+  constructor (commit /*: string|Buffer|Object */) {
     if (typeof commit === 'string') {
       this._commit = commit
     } else if (Buffer.isBuffer(commit)) {
@@ -106,7 +106,7 @@ export default class GitCommit {
   }
 
   static justMessage (commit) {
-    return commit.slice(commit.indexOf('\n\n') + 2)
+    return normalize(commit.slice(commit.indexOf('\n\n') + 2))
   }
 
   static justHeaders (commit) {
@@ -169,7 +169,7 @@ export default class GitCommit {
   }
 
   static render (obj) {
-    return GitCommit.renderHeaders(obj) + '\n' + obj.message
+    return GitCommit.renderHeaders(obj) + '\n' + normalize(obj.message)
   }
 
   render () {
@@ -195,101 +195,30 @@ export default class GitCommit {
     )
     return outdent(signature)
   }
-  // Temporarily disabled
-  
-  /*
-  // Verify `message` with detached `signature` using the public key for `email`
-  static async verifyDetachedSignature (email, message, signature) {
-    locallookup(email)
-    console.log('email, message, signature =', email, message, signature)
-    let msg = openpgp.message.readSignedContent(message, signature)
-    console.log('msg =', msg)
-    var result = msg.verify(keyring.publicKeys.keys)
-    console.log('result[0] =', result[0])
-    console.log('keyid =', printKeyid(result[0].keyid))
-    return result[0].valid
-  }
-*/
-/*
-  // Sign `plaintext` using the private key for `email'
-  static async createBinaryDetachedSignature (email, plaintext) {
-    // Load keypair from localstorage
-    let privateKey = PGP.lookupPrivateKey(email)
-    if (privateKey) {
-      // Is the only difference between cleartext signatures and detached binary the text normalization?
-      // If so, I could probably add that functionality to openpgpjs - I'd just need a little guidance
-      // on how to encode the PacketType and add the functionality to export to armor.js
-      let bytes = openpgp.util.str2Uint8Array(plaintext)
-      let message = openpgp.message.fromBinary(bytes)
-      let signedMessage = message.sign([privateKey])
-      let signature = signedMessage.packets.filterByTag(
-        openpgp.enums.packet.signature
-      )
-      let armoredMessage = openpgp.armor.encode(
-        openpgp.enums.armor.message,
-        signature.write()
-      )
-      // Github won't recognize the signature unless we rename the headers (Tested 2017-01-04)
-      armoredMessage = armoredMessage.replace(
-        '-----BEGIN PGP MESSAGE-----\r\n',
-        '-----BEGIN PGP SIGNATURE-----\r\n'
-      )
-      armoredMessage = armoredMessage.replace(
-        '-----END PGP MESSAGE-----\r\n',
-        '-----END PGP SIGNATURE-----\r\n'
-      )
-      return armoredMessage
-    } else {
-      throw new Error(
-        'No PrivateKey in the OpenPGP keyring for the email address: ' + email
-      )
-    }
-  }
-  */
 
   async addSignature (privateKey /*: string */) {
     let commit = this.withoutSignature()
     let headers = GitCommit.justHeaders(this._commit)
     let message = GitCommit.justMessage(this._commit)
-    let header = this.parseHeaders()
     let privKeyObj = openpgp.key.readArmored(privateKey).keys
     let {signature} = await openpgp.sign({
-      data: commit,
+      data: openpgp.util.str2Uint8Array(commit),
       privateKeys: privKeyObj,
       detached: true,
       armor: true
     })
-    
-    //let signedmsg = await pgp.createBinaryDetachedSignature(
-    //  header.committer.email,
-    //  commit
-    //)
-    
     // renormalize the line endings to the one true line-ending
     signature = normalize(signature)
     let signedCommit =
       headers + '\n' + 'gpgsig' + indent(signature) + '\n' + message
-    console.log(signedCommit)
     // return a new commit object
     return GitCommit.from(signedCommit)
   }
-  
+
   async verifySignature (publicKeys /*: Array<string> */) {
-    // let header = this.parseHeaders()
     let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
-    let verified = await openpgp.verify({
-      publicKeys: pubKeyObj,
-      message: this.withoutSignature(),
-      signature: this.isolateSignature
-    })
-    /*
-    let verified = await pgp.verifyDetachedSignature(
-      header.committer.email,
-      this.withoutSignature(),
-      this.isolateSignature()
-    )
-    */
-    console.log(verified)
-    return verified
+    let msg = openpgp.message.readSignedContent(this.withoutSignature(), this.isolateSignature())
+    var result = msg.verify(pubKeyObj)
+    return result[0].valid
   }
 }
