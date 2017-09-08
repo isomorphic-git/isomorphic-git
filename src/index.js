@@ -51,6 +51,11 @@ export class Git {
     this.operateAuthorDateTime = date
     return this
   }
+  timestamp (seconds) {
+    // seconds since unix epoch
+    this.operateAuthorTimestamp = seconds
+    return this
+  }
   signingKey (asciiarmor) {
     this.privateKey = asciiarmor
     return this
@@ -121,11 +126,13 @@ export class Git {
       author: {
         name: this.operateAuthorName || (await this.getConfig('user.name')),
         email: this.operateAuthorEmail || (await this.getConfig('user.email')),
+        timestamp: this.operateAuthorTimestamp,
         date: this.operateAuthorDateTime
       },
       committer: {
         name: this.operateAuthorName || (await this.getConfig('user.name')),
         email: this.operateAuthorEmail || (await this.getConfig('user.email')),
+        timestamp: this.operateAuthorTimestamp,
         date: this.operateAuthorDateTime
       },
       message,

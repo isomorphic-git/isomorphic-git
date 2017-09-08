@@ -12,7 +12,7 @@ function formatTimezoneOffset (minutes /*: number */) {
   let strMinutes = String(minutes)
   if (strHours.length < 2) strHours = '0' + strHours
   if (strMinutes.length < 2) strMinutes = '0' + strMinutes
-  return (sign === -1 ? '+' : '-') + strHours + strMinutes
+  return (sign === 1 ? '-' : '+') + strHours + strMinutes
 }
 
 function parseTimezoneOffset (offset) {

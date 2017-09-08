@@ -26,14 +26,14 @@ export default async function commit ({ gitdir, author, committer, message, priv
     author: {
       name: author.name,
       email: author.email,
-      timestamp: Math.floor(authorDateTime.valueOf() / 1000),
-      timezoneOffset: authorDateTime.getTimezoneOffset()
+      timestamp: author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
+      timezoneOffset: author.timezoneOffset || 0
     },
     committer: {
       name: committer.name,
       email: committer.email,
-      timestamp: Math.floor(committerDateTime.valueOf() / 1000),
-      timezoneOffset: committerDateTime.getTimezoneOffset()
+      timestamp: committer.timestamp || Math.floor(committerDateTime.valueOf() / 1000),
+      timezoneOffset: committer.timezoneOffset || 0
     },
     message
   })
