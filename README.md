@@ -62,6 +62,43 @@ git('.')
 git().gitdir('my-bare-repo').workdir('/var/www/website')
 ```
 
+### CLI
+
+I realized I could "translate" command line options into JavaScript chained commands
+without hard-coding any knowledge of the API if I kept the chained commands very predictable.
+I built a purely a generic translator and it worked surprisingly well.
+So you can do *any* current or future esgit commands using the included `esgit` CLI.
+It always starts assuming `git('.')` but you can override that of course.
+
+```
+// Create a new empty repo
+esgit --gitdir=test init
+
+// Clone from a Github repository to the current working directory.
+// Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
+esgit --githubToken=$GITHUB_TOKEN clone https://github.com/wmhilton/esgit
+
+// Checkout a commitish
+esgit checkout master
+
+// List files in the index
+esgit list
+
+// Add files to the index
+esgit add README.md
+
+// Remove files from the index
+esgit remove .env
+
+// Create a new commit (there's actually several more options for date, committer)
+esgit add a.txt
+esgit --author='Mr. Test' --email=mrtest@example.com --signingKey="$(cat private.key)" commit 'Added the a.txt file'
+
+// And if you need to work with bare repos there are
+// equivalents to the `--git-dir` and `--work-tree` options
+esgit --gitdir=my-bare-repo --workdir=/var/www/website
+```
+
 ## Low-level API (also unstable)
 
 The high-level makes some assumptions (like you have a file-system and network access) that might not be well suited
