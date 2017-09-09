@@ -4,6 +4,7 @@ import pako from 'pako'
 import shasum from 'shasum'
 import read from '../utils/read'
 import write from '../utils/write'
+import exists from '../utils/exists'
 
 function wrapObject ({ type, object } /*: {type: string, object: Buffer} */) {
   let buffer = Buffer.concat([
@@ -54,9 +55,13 @@ export default class GitObjectManager {
     return { type, object }
   }
 
-  static async write ({ gitdir, type, object }) {
+  static async write ({ gitdir, type, object } /*: {gitdir: string, type: string, object: Buffer} */) /*: Promise<string> */{
     let { file, oid } = wrapObject({ type, object })
-    await write(`${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`, file)
+    let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
+    // Don't overwrite existing git objects - this helps avoid EPERM errors.
+    // Although I don't know how we'd fix corrupted objects then. Perhaps delete them
+    // on read?
+    if (!(await exists(filepath))) await write(filepath, file)
     return oid
-  } /*: {gitdir: string, type: string, object: Buffer} */
+  }
 }
