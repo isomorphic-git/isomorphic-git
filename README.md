@@ -7,15 +7,15 @@ Node library for interacting with git repositories, circa 2017
   - [x] Github API protocol (only signed commits)
   - [ ] HTTP smart protocol + cors-buster
 - [x] git checkout
-- [/] git index
-  - [x] git list (ls-files)
-  - [x] git add
-  - [x] git remove
-  - [ ] git status
+- [x] git list (ls-files)
+- [x] git add
+- [x] git remove
+- [ ] git status
 - [x] git commit
 - [ ] git push
 - [ ] git diff
 - [ ] git merge
+- [x] `esgit` CLI
 
 Note: There appears to be no a way to *push* signed commits back to Github using their API (v3 or v4), so I think we will have to use smart HTTP, packfiles, and an anti-CORS proxy.
 
@@ -68,7 +68,8 @@ I realized I could "translate" command line options into JavaScript chained comm
 without hard-coding any knowledge of the API if I kept the chained commands very predictable.
 I built a purely a generic translator and it worked surprisingly well.
 So you can do *any* current or future esgit commands using the included `esgit` CLI.
-It always starts assuming `git('.')` but you can override that of course.
+It always starts with an implicit `git('.')` so it defaults to working in the
+current working directory.
 
 ```
 // Create a new empty repo
