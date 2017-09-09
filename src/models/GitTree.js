@@ -15,9 +15,9 @@ function parseBuffer (buffer) /*: Array<TreeEntry> */ {
   let cursor = 0
   while (cursor < buffer.length) {
     let space = buffer.indexOf(32, cursor)
-    // TODO: assert space > -1
+    if (space === -1) throw new Error(`GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`)
     let nullchar = buffer.indexOf(0, cursor)
-    // TODO: assert nullchar > -1
+    if (nullchar === -1) throw new Error(`GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`)
     let mode = buffer.slice(cursor, space).toString('utf8')
     if (mode === '40000') mode = '040000' // makes it line up neater in printed output
     let path = buffer.slice(space + 1, nullchar).toString('utf8')
