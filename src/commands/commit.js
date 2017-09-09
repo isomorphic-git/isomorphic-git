@@ -7,13 +7,13 @@ import flatFileListToDirectoryStructure from '../utils/flatFileListToDirectorySt
 import write from '../utils/write'
 import path from 'path'
 
-async function constructTree ({gitdir, inode}) /*: string */ {
+async function constructTree ({ gitdir, inode }) /*: string */ {
   // use depth first traversal
   let children = inode.children
   for (let inode of children) {
     if (inode.type === 'tree') {
       inode.metadata.mode = '040000'
-      inode.metadata.oid = await constructTree({gitdir, inode})
+      inode.metadata.oid = await constructTree({ gitdir, inode })
     }
   }
   let entries = children.map(inode => ({
@@ -44,7 +44,7 @@ export default async function commit ({
   let committerDateTime = committer.date || authorDateTime
   const index = await GitIndexManager.acquire(`${gitdir}/index`)
   const inode = flatFileListToDirectoryStructure(index.entries)
-  const treeRef = await constructTree({gitdir, inode})
+  const treeRef = await constructTree({ gitdir, inode })
   GitIndexManager.release(`${gitdir}/index`)
   const parent = await resolveRef({ gitdir, ref: 'HEAD' })
   let comm = GitCommit.from({
