@@ -12,11 +12,13 @@ type Node = {
 }
 */
 
-export default function flatFileListToDirectoryStructure (files /*: Array<{path: string}> */) /*: Node|void */{
-  const inodes /*: Map<string, Node> */= new Map()
-  const mkdir = function (name) /*: Node|void */{
+export default function flatFileListToDirectoryStructure (
+  files /*: Array<{path: string}> */
+) /*: Node|void */ {
+  const inodes /*: Map<string, Node> */ = new Map()
+  const mkdir = function (name) /*: Node|void */ {
     if (!inodes.has(name)) {
-      let dir /*: Node */= {
+      let dir /*: Node */ = {
         type: 'tree',
         fullpath: name,
         basename: path.posix.basename(name),
@@ -33,9 +35,9 @@ export default function flatFileListToDirectoryStructure (files /*: Array<{path:
     return inodes.get(name)
   }
 
-  const mkfile = function (name, metadata) /*: Node|void */{
+  const mkfile = function (name, metadata) /*: Node|void */ {
     if (!inodes.has(name)) {
-      let file /*: Node */= {
+      let file /*: Node */ = {
         type: 'blob',
         fullpath: name,
         basename: path.posix.basename(name),
