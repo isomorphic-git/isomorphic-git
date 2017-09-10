@@ -36,7 +36,7 @@ export default async function commit ({
   author,
   committer,
   message,
-  privateKey
+  privateKeys
 }) {
   // Fill in missing arguments with default values
   committer = committer || author
@@ -66,8 +66,8 @@ export default async function commit ({
     },
     message
   })
-  if (privateKey) {
-    comm = await comm.addSignature(privateKey)
+  if (privateKeys) {
+    comm = await comm.sign(privateKeys)
   }
   console.log('comm =', comm)
   let oid = await GitObjectManager.write({

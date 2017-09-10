@@ -57,11 +57,11 @@ export class Git {
     return this
   }
   signingKey (asciiarmor) {
-    this.privateKey = asciiarmor
+    this.privateKeys = asciiarmor
     return this
   }
   verificationKey (asciiarmor) {
-    this.publicKey = asciiarmor
+    this.publicKeys = asciiarmor
     return this
   }
   async init () {
@@ -136,13 +136,13 @@ export class Git {
         date: this.operateAuthorDateTime
       },
       message,
-      privateKey: this.privateKey
+      privateKeys: this.privateKeys
     })
   }
   async verify (ref) {
     return verify({
       gitdir: this.gitdir,
-      publicKey: this.publicKey,
+      publicKeys: this.publicKeys,
       ref
     })
   }

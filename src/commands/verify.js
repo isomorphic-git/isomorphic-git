@@ -1,8 +1,10 @@
 import GitCommit from '../models/GitCommit'
 import GitObjectManager from '../managers/GitObjectManager'
 import resolveRef from '../utils/resolveRef'
+import { HKP } from 'openpgp'
+const HttpKeyServer = new HKP()
 
-export default async function verify ({ gitdir, ref, publicKey }) {
+export default async function verify ({ gitdir, ref, publicKeys }) {
   const oid = await resolveRef({ gitdir, ref })
   const { type, object } = await GitObjectManager.read({ gitdir, oid })
   if (type !== 'commit') {
@@ -11,7 +13,17 @@ export default async function verify ({ gitdir, ref, publicKey }) {
     )
   }
   let commit = GitCommit.from(object)
-  let verified = await commit.verifySignature(publicKey)
-  console.log('verified =', verified)
-  return verified
+  let author = commit.headers().author
+  let keys = await commit.listSigningKeys()
+  if (!publicKeys) {
+    let keyArray = await Promise.all(
+      keys.map(
+        id => HttpKeyServer.lookup({keyId: id})
+      )
+    )
+    publicKeys = keyArray.join('\n')
+  }
+  let validity = await commit.verify(publicKeys)
+  if (!validity) return false
+  return { author, keys }
 }
