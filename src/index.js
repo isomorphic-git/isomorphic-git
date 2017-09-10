@@ -86,7 +86,7 @@ export class Git {
     })
   }
   async clone (url) {
-    await init(this.workdir)
+    await init(this.gitdir)
     await fetch({
       gitdir: this.gitdir,
       user: ghurl(url).user,
