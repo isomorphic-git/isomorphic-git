@@ -38,5 +38,5 @@ test('git.signingKey() and git.verificationKey()', async t => {
   const publicKeys = await pify(jsonfile.readFile)('fixtures/openpgp-public-keys.json')
   let verified = await repo.verificationKey(publicKeys[0]).verify('HEAD')
   console.log('verified =', verified)
-  t.true(verified)
+  t.true(verified.keys[0] === 'a01edd29ac0f3952')
 })
