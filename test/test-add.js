@@ -1,9 +1,6 @@
 import test from 'ava'
 import git from '../lib'
-import read from '../lib/utils/read'
 import rm from '../lib/utils/delete'
-import GitIndexManager from '../lib/managers/GitIndexManager'
-import {tmpdir, cleanup} from './_helpers'
 
 test.beforeEach(async t => {
   await rm('fixtures/test-add/.git/index')

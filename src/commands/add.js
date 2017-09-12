@@ -11,9 +11,9 @@ export default async function add ({ gitdir, workdir, filepath }) {
   const type = 'blob'
   const object = await read(path.join(workdir, filepath))
   const oid = await GitObjectManager.write({ gitdir, type, object })
-  const index = await GitIndexManager.acquire(`${gitdir}/index`)
-  let stats = await lstat(path.join(workdir, filepath))
-  index.insert({ filepath, stats, oid })
-  await GitIndexManager.release(`${gitdir}/index`)
+  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
+    let stats = await lstat(path.join(workdir, filepath))
+    index.insert({ filepath, stats, oid })
+  })
   // TODO: return oid?
 }

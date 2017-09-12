@@ -1,6 +1,5 @@
 import test from 'ava'
 import git from '../lib'
-import GitIndexManager from '../lib/managers/GitIndexManager'
 import read from '../lib/utils/read'
 import write from '../lib/utils/write'
 
