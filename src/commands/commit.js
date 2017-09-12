@@ -42,41 +42,42 @@ export default async function commit ({
   committer = committer || author
   let authorDateTime = author.date || new Date()
   let committerDateTime = committer.date || authorDateTime
-  const index = await GitIndexManager.acquire(`${gitdir}/index`)
-  const inode = flatFileListToDirectoryStructure(index.entries)
-  const treeRef = await constructTree({ gitdir, inode })
-  GitIndexManager.release(`${gitdir}/index`)
-  const parent = await resolveRef({ gitdir, ref: 'HEAD' })
-  let comm = GitCommit.from({
-    tree: treeRef,
-    parent: [parent],
-    author: {
-      name: author.name,
-      email: author.email,
-      timestamp:
-        author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
-      timezoneOffset: author.timezoneOffset || 0
-    },
-    committer: {
-      name: committer.name,
-      email: committer.email,
-      timestamp:
-        committer.timestamp || Math.floor(committerDateTime.valueOf() / 1000),
-      timezoneOffset: committer.timezoneOffset || 0
-    },
-    message
+  let oid
+  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
+    const inode = flatFileListToDirectoryStructure(index.entries)
+    const treeRef = await constructTree({ gitdir, inode })
+    const parent = await resolveRef({ gitdir, ref: 'HEAD' })
+    let comm = GitCommit.from({
+      tree: treeRef,
+      parent: [parent],
+      author: {
+        name: author.name,
+        email: author.email,
+        timestamp:
+          author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
+        timezoneOffset: author.timezoneOffset || 0
+      },
+      committer: {
+        name: committer.name,
+        email: committer.email,
+        timestamp:
+          committer.timestamp || Math.floor(committerDateTime.valueOf() / 1000),
+        timezoneOffset: committer.timezoneOffset || 0
+      },
+      message
+    })
+    if (privateKeys) {
+      comm = await comm.sign(privateKeys)
+    }
+    console.log('comm =', comm)
+    oid = await GitObjectManager.write({
+      gitdir,
+      type: 'commit',
+      object: comm.toObject()
+    })
+    // Update branch pointer
+    const branch = await resolveRef({ gitdir, ref: 'HEAD', depth: 2 })
+    await write(path.join(gitdir, branch), oid + '\n')
   })
-  if (privateKeys) {
-    comm = await comm.sign(privateKeys)
-  }
-  console.log('comm =', comm)
-  let oid = await GitObjectManager.write({
-    gitdir,
-    type: 'commit',
-    object: comm.toObject()
-  })
-  // Update branch pointer
-  const branch = await resolveRef({ gitdir, ref: 'HEAD', depth: 2 })
-  await write(path.join(gitdir, branch), oid + '\n')
   return oid
 }

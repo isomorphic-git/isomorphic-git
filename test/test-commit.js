@@ -31,7 +31,6 @@ test('git.signingKey() and git.verificationKey()', async t => {
   repo.email('mrtest@example.com')
   repo.timestamp(1504842425)
   const privateKeys = await pify(jsonfile.readFile)('fixtures/openpgp-private-keys.json')
-  console.log('privateKeys =', privateKeys)
   repo.signingKey(privateKeys[0])
   let sha = await repo.commit('Initial commit')
   console.log('sha =', sha)
