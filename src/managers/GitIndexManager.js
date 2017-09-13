@@ -37,6 +37,11 @@ export default class GitIndexManager {
         await write(filepath, buffer)
         index._dirty = false
       }
+      // For now, discard our cached object so that external index
+      // manipulation is picked up. TODO: use lstat and compare
+      // file times to determine if our cached object should be
+      // discarded.
+      map.delete(filepath)
     })
   }
 }

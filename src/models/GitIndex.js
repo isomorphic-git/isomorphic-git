@@ -98,7 +98,7 @@ export default class GitIndex {
       yield entry
     }
   }
-  insert ({ filepath, stats, oid }) {
+  insert ({ filepath, stats, oid } /*: {filepath: string, stats: Stats, oid: string } */) {
     let entry = {
       ctime: stats.ctime,
       mtime: stats.mtime,
@@ -114,7 +114,7 @@ export default class GitIndex {
     }
     this._entries.set(entry.path, entry)
     this._dirty = true
-  } /*: {filepath: string, stats: Stats, oid: string } */
+  }
   delete ({ filepath } /*: {filepath: string} */) {
     if (this._entries.has(filepath)) {
       this._entries.delete(filepath)
