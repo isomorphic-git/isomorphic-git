@@ -3,7 +3,7 @@ import GitIndex from '../lib/models/GitIndex'
 import read from '../lib/utils/read'
 
 test('GitIndex.from(buffer) - Simple', async t => {
-  let buffer = await read('fixtures/simple-index')
+  let buffer = await read('fixtures/test-GitIndex/simple-index')
   let index = GitIndex.from(buffer)
   let rendering = index.render()
   t.snapshot(rendering)
@@ -12,7 +12,7 @@ test('GitIndex.from(buffer) - Simple', async t => {
 })
 
 test('GitIndex.from(buffer)', async t => {
-  let buffer = await read('fixtures/index')
+  let buffer = await read('fixtures/test-GitIndex/index')
   let index = GitIndex.from(buffer)
   let rendering = index.render()
   t.snapshot(rendering)
