@@ -55,13 +55,7 @@ export default class GitObjectManager {
     return { type, object }
   }
 
-  static async write (
-    {
-      gitdir,
-      type,
-      object
-    } /*: {gitdir: string, type: string, object: Buffer} */
-  ) /*: Promise<string> */ {
+  static async write ({ gitdir, type, object }) /*: Promise<string> */ {
     let { file, oid } = wrapObject({ type, object })
     let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     // Don't overwrite existing git objects - this helps avoid EPERM errors.
@@ -69,5 +63,5 @@ export default class GitObjectManager {
     // on read?
     if (!await exists(filepath)) await write(filepath, file)
     return oid
-  }
+  } /*: {gitdir: string, type: string, object: Buffer} */
 }

@@ -17,9 +17,7 @@ export default async function verify ({ gitdir, ref, publicKeys }) {
   let keys = await commit.listSigningKeys()
   if (!publicKeys) {
     let keyArray = await Promise.all(
-      keys.map(
-        id => HttpKeyServer.lookup({keyId: id})
-      )
+      keys.map(id => HttpKeyServer.lookup({ keyId: id }))
     )
     publicKeys = keyArray.join('\n')
   }

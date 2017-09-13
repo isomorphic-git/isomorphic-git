@@ -8,14 +8,21 @@ const delayedReleases = new Map()
 const mkdir = pify(fs.mkdir)
 const rmdir = pify(fs.rmdir)
 
-export async function lock (filename /*: string */, triesLeft /*: number */= 3) {
+export async function lock (
+  filename /*: string */,
+  triesLeft /*: number */ = 3
+) {
   // check to see if we still have it
   if (delayedReleases.has(filename)) {
     clearTimeout(delayedReleases.get(filename))
     delayedReleases.delete(filename)
     return
   }
-  if (triesLeft === 0) throw new Error(`Unable to acquire lockfile '${filename}'. Exhausted tries.`)
+  if (triesLeft === 0) {
+    throw new Error(
+      `Unable to acquire lockfile '${filename}'. Exhausted tries.`
+    )
+  }
   try {
     await mkdir(`${filename}.lock`)
   } catch (err) {
@@ -27,12 +34,18 @@ export async function lock (filename /*: string */, triesLeft /*: number */= 3) 
   }
 }
 
-export async function unlock (filename /*: string */, delayRelease /*: number */= 50) {
-  if (delayedReleases.has(filename)) throw new Error('Cannot double-release lockfile')
+export async function unlock (
+  filename /*: string */,
+  delayRelease /*: number */ = 50
+) {
+  if (delayedReleases.has(filename)) { throw new Error('Cannot double-release lockfile') }
   // Basically, we lie and say it was deleted ASAP.
   // But really we wait a bit to see if you want to acquire it again.
-  delayedReleases.set(filename, setTimeout(async () => {
-    delayedReleases.delete(filename)
-    await rmdir(`${filename}.lock`)
-  }))
+  delayedReleases.set(
+    filename,
+    setTimeout(async () => {
+      delayedReleases.delete(filename)
+      await rmdir(`${filename}.lock`)
+    })
+  )
 }
