@@ -1,46 +1,38 @@
 // @flow
 // This is modeled after the lockfile strategy used by the git source code.
 import pify from 'pify'
-import lockFile from 'lockfile'
-import writeFileAtomic from 'write-file-atomic'
-const lockfile = pify(lockFile)
-const writeAtomic = pify(writeFileAtomic)
+import fs from 'fs'
+import sleep from './sleep'
+const delayedReleases = new Map()
 
-class Lockfile {
-  /*::
-  _filename : string;
-  */
-  constructor ({ filename }) {
-    this._filename = filename
+const mkdir = pify(fs.mkdir)
+const rmdir = pify(fs.rmdir)
+
+export async function lock (filename /*: string */, triesLeft /*: number */= 3) {
+  // check to see if we still have it
+  if (delayedReleases.has(filename)) {
+    clearTimeout(delayedReleases.get(filename))
+    delayedReleases.delete(filename)
+    return
   }
-  async cancel () {
-    console.log(`${this._filename}.lock`, 'unlocking...')
-    await lockfile.unlock(`${this._filename}.lock`)
-    console.log(`${this._filename}.lock`, 'unlocked.')
-  }
-  async update (buffer /*: Buffer */) {
-    // TODO: support streams?
-    try {
-      console.log(this._filename, 'updating...')
-      await writeAtomic(this._filename, buffer)
-      console.log(this._filename, 'updated.')
-      console.log(`${this._filename}.lock`, 'unlocking...')
-      await lockfile.unlock(`${this._filename}.lock`)
-      console.log(`${this._filename}.lock`, 'unlocked.')
-    } catch (err) {
-      console.log(err)
-      throw err
+  if (triesLeft === 0) throw new Error(`Unable to acquire lockfile '${filename}'. Exhausted tries.`)
+  try {
+    await mkdir(`${filename}.lock`)
+  } catch (err) {
+    if (err.code === 'EEXIST') {
+      console.log(`Unable to acquire lockfile. (${triesLeft} tries left)`)
+      await sleep(100)
+      await lock(filename, triesLeft - 1)
     }
   }
 }
 
-export default async function Lock (filename /*: string */) {
-  const lockfileOpts = {
-    retries: 100,
-    retryWait: 100
-  }
-  console.log(`${filename}.lock`, 'locking...')
-  await lockfile.lock(`${filename}.lock`, lockfileOpts)
-  console.log(`${filename}.lock`, 'locked.')
-  return new Lockfile({ filename })
+export async function unlock (filename /*: string */, delayRelease /*: number */= 50) {
+  if (delayedReleases.has(filename)) throw new Error('Cannot double-release lockfile')
+  // Basically, we lie and say it was deleted ASAP.
+  // But really we wait a bit to see if you want to acquire it again.
+  delayedReleases.set(filename, setTimeout(async () => {
+    delayedReleases.delete(filename)
+    await rmdir(`${filename}.lock`)
+  }))
 }
