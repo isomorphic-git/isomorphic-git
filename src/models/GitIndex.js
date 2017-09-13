@@ -98,7 +98,13 @@ export default class GitIndex {
       yield entry
     }
   }
-  insert ({ filepath, stats, oid } /*: {filepath: string, stats: Stats, oid: string } */) {
+  insert (
+    {
+      filepath,
+      stats,
+      oid
+    } /*: {filepath: string, stats: Stats, oid: string } */
+  ) {
     let entry = {
       ctime: stats.ctime,
       mtime: stats.mtime,

@@ -230,7 +230,7 @@ export default class GitCommit {
       this.isolateSignature()
     )
     let results = msg.verify(pubKeyObj)
-    let validity = results.reduce((a, b) => a.valid && b.valid, {valid: true})
+    let validity = results.reduce((a, b) => a.valid && b.valid, { valid: true })
     return validity
   }
 }
