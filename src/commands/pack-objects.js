@@ -32,7 +32,6 @@ export default async function pack (
     if (type === undefined) throw new Error('Unrecognized type: ' + stype)
     // The length encoding get complicated.
     length = object.length
-    console.log('length =', length)
     // Whether the next byte is part of the variable-length encoded number
     // is encoded in bit 7
     multibyte = length > 0b1111 ? 0b10000000 : 0b0
@@ -61,12 +60,10 @@ export default async function pack (
   write(pad(8, oids.length.toString(16), '0'), 'hex')
   for (let oid of oids) {
     let { type, object } = await GitObjectManager.read({ gitdir, oid })
-    console.log('oid, type, object =', oid, type, object)
     writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum
   let digest = hash.digest()
-  console.log('hash.digest() =', digest)
   stream.end(digest)
   return stream
 }

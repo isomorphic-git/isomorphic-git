@@ -2,14 +2,13 @@ import test from 'ava'
 import git from '../lib'
 import fs from 'fs'
 import path from 'path'
-import sleep from '../lib/utils/sleep'
-import {exists, tmpdir, cleanup} from './_helpers'
+import stream from 'stream'
+import streamEqual from 'stream-equal'
 
 test('git.pack', async t => {
-  let dir = await tmpdir()
-  let fstream = fs.createWriteStream(`./foobar.pack`)
-  console.log(`${dir}/foobar.pack`)
-  let stream = await git().gitdir(path.join(__dirname, '..', '.git')).outputStream(fstream).pack([
+  let fixture = fs.createReadStream(`fixtures/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack`)
+  let fstream = new stream.PassThrough()
+  git().gitdir(path.join(__dirname, '..', '.git')).outputStream(fstream).pack([
     '5a9da3272badb2d3c8dbab463aed5741acb15a33',
     '0bfe8fa3764089465235461624f2ede1533e74ec',
     '414a0afa7e20452d90ab52de1c024182531c5c52',
@@ -23,9 +22,6 @@ test('git.pack', async t => {
     'e5abf40a5b37382c700f51ac5c2aeefdadb8e184',
     '5477471ab5a6a8f2c217023532475044117a8f2c'
   ])
-  // TODO: compare against the fixture.
-  await sleep(3000)
-  fstream.end()
-  t.true(exists(`${dir}/foobar.pack`))
-  // await cleanup()
+  let areEqual = await streamEqual(fixture, fstream)
+  t.true(areEqual)
 })

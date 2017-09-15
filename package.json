@@ -58,6 +58,7 @@
     "jsonfile": "^3.0.1",
     "prettier-standard": "^6.0.0",
     "standard": "^10.0.3",
+    "stream-equal": "^1.0.1",
     "temp": "^0.8.3"
   },
   "ava": {
