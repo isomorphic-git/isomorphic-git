@@ -1,9 +1,11 @@
 // @flow
 import GitObjectManager from '../managers/GitObjectManager'
-import fs from 'fs'
 import pad from 'pad'
 import pako from 'pako'
 import crypto from 'crypto'
+/*::
+import type {Writable} from 'stream'
+*/
 
 const types = {
   commit: 0b0010000,
@@ -17,7 +19,7 @@ export default async function pack (
     oids,
     gitdir,
     outputStream
-  } /*: {oids: Array<string>, gitdir: string, outputStream: WriteableStream} */
+  } /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
 ) {
   let hash = crypto.createHash('sha1')
   let stream = outputStream
