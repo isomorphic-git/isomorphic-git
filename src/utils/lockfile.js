@@ -38,7 +38,9 @@ export async function unlock (
   filename /*: string */,
   delayRelease /*: number */ = 50
 ) {
-  if (delayedReleases.has(filename)) { throw new Error('Cannot double-release lockfile') }
+  if (delayedReleases.has(filename)) {
+    throw new Error('Cannot double-release lockfile')
+  }
   // Basically, we lie and say it was deleted ASAP.
   // But really we wait a bit to see if you want to acquire it again.
   delayedReleases.set(
