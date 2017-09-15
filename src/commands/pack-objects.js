@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import GitObjectManager from '../managers/GitObjectManager'
 import fs from 'fs'
 import pad from 'pad'
@@ -12,23 +12,26 @@ const types = {
   tag: 0b1000000
 }
 
-export default async function pack ({oids, gitdir} /*: {oids: Array<string>, gitdir: string} */) {
+export default async function pack (
+  { oids, gitdir, outputStream } /*: {oids: Array<string>, gitdir: string, outputStream: WriteableStream} */
+) {
   let hash = crypto.createHash('sha1')
-  let stream = fs.createWriteStream('output')
+  let stream = outputStream
   function write (chunk, enc) {
     stream.write(chunk, enc)
     hash.update(chunk, enc)
   }
-  function writeObject ({stype, object}) {
+  function writeObject ({ stype, object }) {
     let lastFour, multibyte, length
     // Object type is encoded in bits 654
     let type = types[stype]
     if (type === undefined) throw new Error('Unrecognized type: ' + stype)
     // The length encoding get complicated.
     length = object.length
+    console.log('length =', length)
     // Whether the next byte is part of the variable-length encoded number
     // is encoded in bit 7
-    multibyte = (length > 0b1111) ? 0b10000000 : 0b0
+    multibyte = length > 0b1111 ? 0b10000000 : 0b0
     // Last four bits of length is encoded in bits 3210
     lastFour = length & 0b1111
     // Discard those bits
@@ -39,9 +42,9 @@ export default async function pack ({oids, gitdir} /*: {oids: Array<string>, git
     // Now we keep chopping away at length 7-bits at a time until its zero,
     // writing out the bytes in what amounts to little-endian order.
     while (multibyte) {
-      multibyte = (length > 0b01111111) ? 0b10000000 : 0b0
-      byte = multibyte | length & 0b01111111
-      write(byte.toString(16), 'hex')
+      multibyte = length > 0b01111111 ? 0b10000000 : 0b0
+      byte = multibyte | (length & 0b01111111)
+      write(pad(2, byte.toString(16), '0'), 'hex')
       length = length >>> 7
     }
     // Lastly, we can compress and write the object.
@@ -53,14 +56,13 @@ export default async function pack ({oids, gitdir} /*: {oids: Array<string>, git
   // Write a 4 byte (32-bit) int
   write(pad(8, oids.length.toString(16), '0'), 'hex')
   for (let oid of oids) {
-    let {type, object} = GitObjectManager.read({ gitdir, oid })
+    let { type, object } = await GitObjectManager.read({ gitdir, oid })
     console.log('oid, type, object =', oid, type, object)
-    writeObject({write, object, stype: type})
+    writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum
   let digest = hash.digest()
   console.log('hash.digest() =', digest)
-  stream.write(digest)
-  stream.end()
+  stream.end(digest)
   return stream
 }

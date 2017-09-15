@@ -65,6 +65,10 @@ export class Git {
     this.publicKeys = asciiarmor
     return this
   }
+  outputStream (stream) {
+    this.outputStream = stream
+    return this
+  }
   async init () {
     await init(this.gitdir)
   }
@@ -150,6 +154,7 @@ export class Git {
   async pack (oids) {
     return pack({
       gitdir: this.gitdir,
+      outputStream: this.outputStream,
       oids
     })
   }
