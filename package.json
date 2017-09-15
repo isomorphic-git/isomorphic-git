@@ -39,6 +39,7 @@
     "lodash.sortby": "^4.7.0",
     "minimisted": "^2.0.0",
     "openpgp": "^2.5.10",
+    "pad": "^1.1.0",
     "pako": "^1.0.5",
     "parse-link-header": "^1.0.1",
     "pify": "^3.0.0",
