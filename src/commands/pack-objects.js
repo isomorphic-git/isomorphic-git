@@ -13,7 +13,11 @@ const types = {
 }
 
 export default async function pack (
-  { oids, gitdir, outputStream } /*: {oids: Array<string>, gitdir: string, outputStream: WriteableStream} */
+  {
+    oids,
+    gitdir,
+    outputStream
+  } /*: {oids: Array<string>, gitdir: string, outputStream: WriteableStream} */
 ) {
   let hash = crypto.createHash('sha1')
   let stream = outputStream
