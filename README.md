@@ -13,6 +13,13 @@ Node library for interacting with git repositories, circa 2017
 - [ ] git status
 - [x] git commit
 - [ ] git push
+  - [ ] git rev-list
+  - [ ] git pack-objects
+  - [ ] git list packed objects (verify-pack)
+  - [ ] git send-pack
+- [ ] git pull
+  - [ ] git unpack-objects
+  - [ ] git fetch-pack
 - [ ] git diff
 - [ ] git merge
 - [x] `esgit` CLI

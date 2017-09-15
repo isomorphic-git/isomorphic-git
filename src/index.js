@@ -8,6 +8,7 @@ import add from './commands/add.js'
 import remove from './commands/remove.js'
 import commit from './commands/commit.js'
 import verify from './commands/verify.js'
+import pack from './commands/pack-objects.js'
 import getConfig from './commands/getConfig.js'
 
 // Class is merely a fluent command/query builder
@@ -144,6 +145,12 @@ export class Git {
       gitdir: this.gitdir,
       publicKeys: this.publicKeys,
       ref
+    })
+  }
+  async pack (oids) {
+    return pack({
+      gitdir: this.gitdir,
+      oids
     })
   }
   async getConfig (path) {
