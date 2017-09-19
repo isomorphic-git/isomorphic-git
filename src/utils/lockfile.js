@@ -27,7 +27,6 @@ export async function lock (
     await mkdir(`${filename}.lock`)
   } catch (err) {
     if (err.code === 'EEXIST') {
-      console.log(`Unable to acquire lockfile. (${triesLeft} tries left)`)
       await sleep(100)
       await lock(filename, triesLeft - 1)
     }

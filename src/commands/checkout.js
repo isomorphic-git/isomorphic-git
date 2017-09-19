@@ -11,7 +11,6 @@ async function writeTreeToDisk ({ gitdir, dirpath, tree }) {
       oid: entry.oid
     })
     let entrypath = `${dirpath}/${entry.path}`
-    console.log(`I'm writing out ${entrypath}`)
     switch (type) {
       case 'blob':
         await write(entrypath, object)
@@ -43,11 +42,9 @@ export default async function checkout ({ workdir, gitdir, remote, ref }) {
   }
   let comm = GitCommit.from(commit.object.toString('utf8'))
   let sha = comm.headers().tree
-  console.log('tree: ', sha)
   // Get top-level tree
   let { type, object } = await GitObjectManager.read({ gitdir, oid: sha })
   if (type !== 'tree') throw new Error(`Unexpected type: ${type}`)
-  console.log(type, object.toString('utf8'))
   let tree = GitTree.from(object)
   // Write files. TODO: Write them atomically
   await writeTreeToDisk({ gitdir, dirpath: workdir, tree })
