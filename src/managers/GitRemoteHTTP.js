@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import axios from 'axios'
 import assert from 'assert'
 import PktLineReader from '../utils/pkt-line-reader'
@@ -17,7 +17,9 @@ export default class GitRemoteHTTP {
   async discover () {
     this.capabilities = new Set()
     this.refs = new Map()
-    let res = await axios.get(`${this.GIT_URL}/info/refs?service=git-upload-pack`)
+    let res = await axios.get(
+      `${this.GIT_URL}/info/refs?service=git-upload-pack`
+    )
     console.log(res.data)
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
@@ -25,7 +27,10 @@ export default class GitRemoteHTTP {
     assert(read().toString('utf8') === '# service=git-upload-pack\n')
     let lineTwo = read()
     while (lineTwo === null) lineTwo = read()
-    let [firstRef, capabilities] = lineTwo.toString('utf8').trim().split('\0')
+    let [firstRef, capabilities] = lineTwo
+      .toString('utf8')
+      .trim()
+      .split('\0')
     console.log(firstRef)
     console.log(capabilities)
     capabilities.split(' ').map(x => this.capabilities.add(x))
@@ -36,7 +41,10 @@ export default class GitRemoteHTTP {
       let line = read()
       if (line === true) break
       if (line !== null) {
-        let [ref, name] = line.toString('utf8').trim().split(' ')
+        let [ref, name] = line
+          .toString('utf8')
+          .trim()
+          .split(' ')
         this.refs.set(name, ref)
       }
     }

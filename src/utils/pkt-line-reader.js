@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import BufferCursor from 'buffercursor'
 
 // Technically, this happens to be a pull-stream compatible source.

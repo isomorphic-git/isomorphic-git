@@ -12,7 +12,7 @@
     "test": "npm run build && ava",
     "on-pull-request": "npm run format && npm run lint && npm run test",
     "ban": "ban",
-    "precommit": "npm run ban"
+    "precommit": "npm run ban && npm run format"
   },
   "repository": {
     "type": "git",
@@ -55,6 +55,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",
+    "husky": "^0.14.3",
     "jsonfile": "^3.0.1",
     "prettier-standard": "^6.0.0",
     "standard": "^10.0.3",

@@ -1,4 +1,4 @@
-//@flow
+// @flow
 /**
 pkt-line Format
 ---------------
