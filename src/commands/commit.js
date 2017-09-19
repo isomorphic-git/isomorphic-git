@@ -69,7 +69,6 @@ export default async function commit ({
     if (privateKeys) {
       comm = await comm.sign(privateKeys)
     }
-    console.log('comm =', comm)
     oid = await GitObjectManager.write({
       gitdir,
       type: 'commit',
