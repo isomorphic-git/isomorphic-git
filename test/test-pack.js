@@ -1,14 +1,13 @@
 import test from 'ava'
 import git from '../lib'
 import fs from 'fs'
-import path from 'path'
 import stream from 'stream'
 import streamEqual from 'stream-equal'
 
 test('git.pack', async t => {
-  let fixture = fs.createReadStream(`fixtures/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack`)
+  let fixture = fs.createReadStream('fixtures/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
   let fstream = new stream.PassThrough()
-  git().gitdir(path.join(__dirname, '..', '.git')).outputStream(fstream).pack([
+  git().gitdir('fixtures/test-pack.git').outputStream(fstream).pack([
     '5a9da3272badb2d3c8dbab463aed5741acb15a33',
     '0bfe8fa3764089465235461624f2ede1533e74ec',
     '414a0afa7e20452d90ab52de1c024182531c5c52',
