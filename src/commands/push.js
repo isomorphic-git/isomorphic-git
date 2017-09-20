@@ -1,6 +1,6 @@
 import GitRemoteHTTP from '../managers/GitRemoteHTTP'
-import listCommits from '../listCommits'
-import listObjects from '../listObjects' // TODO
+import listCommits from './listCommits'
+import listObjects from './listObjects'
 
 export default async function push ({ gitdir, ref = 'HEAD', url }) {
   let remote = new GitRemoteHTTP(url)
@@ -10,7 +10,7 @@ export default async function push ({ gitdir, ref = 'HEAD', url }) {
     start: [ref],
     finish: remote.refs.values()
   })
-  let objects = await listObjects({ gitdir, refs: commits })
+  let objects = await listObjects({ gitdir, oids: commits })
   let packstream = new stream.PassThrough()
   git()
     .gitdir('fixtures/test-pack.git')
