@@ -28,10 +28,11 @@ function parseBuffer (buffer) /*: Array<TreeEntry> */ {
     }
     let mode = buffer.slice(cursor, space).toString('utf8')
     if (mode === '40000') mode = '040000' // makes it line up neater in printed output
+    let type = mode === '040000' ? 'tree' : 'blob'
     let path = buffer.slice(space + 1, nullchar).toString('utf8')
     let oid = buffer.slice(nullchar + 1, nullchar + 21).toString('hex')
     cursor = nullchar + 21
-    _entries.push({ mode, path, oid })
+    _entries.push({ mode, path, oid, type })
   }
   return _entries
 }
