@@ -27,6 +27,9 @@ export default class GitRemoteHTTP {
     assert(read().toString('utf8') === '# service=git-upload-pack\n')
     let lineTwo = read()
     while (lineTwo === null) lineTwo = read()
+    // In the edge case of a brand new repo, zero refs (and zero capabilities)
+    // are returned.
+    if (lineTwo === true) return
     let [firstRef, capabilities] = lineTwo
       .toString('utf8')
       .trim()
