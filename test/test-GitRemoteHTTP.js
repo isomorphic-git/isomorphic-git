@@ -10,17 +10,16 @@ test('GitRemoteHTTP', async t => {
 })
 
 test('GitRemoteHTTP', async t => {
-  
   nock('http://example.dev')
-  .get('/test-push.git/info/refs?service=git-upload-pack')
-  // .get(/.*/)
-  .reply(200, `001e# service=git-upload-pack\n00000000`, {
-    'Expires': 'Fri, 01 Jan 1980 00:00:00 GMT',
-    'Pragma': 'no-cache',
-    'Cache-Control': 'no-cache, max-age=0, must-revalidate',
-    'Content-Type': 'application/x-git-upload-pack-advertisement'
-  })
-  
+    .get('/test-push.git/info/refs?service=git-upload-pack')
+    // .get(/.*/)
+    .reply(200, `001e# service=git-upload-pack\n00000000`, {
+      Expires: 'Fri, 01 Jan 1980 00:00:00 GMT',
+      Pragma: 'no-cache',
+      'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      'Content-Type': 'application/x-git-upload-pack-advertisement'
+    })
+
   let remote = new GitRemoteHTTP('http://example.dev/test-push')
   await remote.discover()
   console.log(remote)

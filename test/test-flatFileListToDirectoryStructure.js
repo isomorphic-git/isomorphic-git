@@ -2,9 +2,7 @@ import test from 'ava'
 import flatFileListToDirectoryStructure from '../lib/utils/flatFileListToDirectoryStructure'
 
 test('flatFileListToDirectoryStructure', async t => {
-  let inode = flatFileListToDirectoryStructure([
-    {path: 'hello/there.txt'}
-  ])
+  let inode = flatFileListToDirectoryStructure([{ path: 'hello/there.txt' }])
   t.true(inode.fullpath === '.')
   t.true(inode.type === 'tree')
   t.true(inode.children.length === 1)
@@ -53,9 +51,9 @@ test('flatFileListToDirectoryStructure advanced', async t => {
     'test/test-clone.js',
     'test/test-config.js',
     'test/test-init.js',
-    'test/test-resolveRef.js',
+    'test/test-resolveRef.js'
   ]
-  let files = filelist.map(f => ({path: f, someMeta: f.length}))
+  let files = filelist.map(f => ({ path: f, someMeta: f.length }))
   let inodes = flatFileListToDirectoryStructure(files)
   t.snapshot(inodes)
 })
