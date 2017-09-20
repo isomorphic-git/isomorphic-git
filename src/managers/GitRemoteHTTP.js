@@ -24,25 +24,21 @@ export default class GitRemoteHTTP {
     this.capabilities = new Set()
     this.refs = new Map()
     let res = await axios.get(`${this.GIT_URL}/info/refs?service=${service}`)
-    console.log(res.data)
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
     let read = new PktLineReader(res.data)
-    assert(read().toString('utf8') === `# service=${service}\n`)
+    let lineOne = read()
+    assert(lineOne.toString('utf8') === `# service=${service}\n`)
     let lineTwo = read()
     while (lineTwo === null) lineTwo = read()
     // In the edge case of a brand new repo, zero refs (and zero capabilities)
     // are returned.
     if (lineTwo === true) return
-    console.log(lineTwo)
     let [firstRef, capabilities] = lineTwo
       .toString('utf8')
       .trim()
       .split('\0')
-    console.log(firstRef)
-    console.log(capabilities)
     capabilities.split(' ').map(x => this.capabilities.add(x))
-    console.log('this.capabilities =', this.capabilities)
     let [ref, name] = firstRef.split(' ')
     this.refs.set(name, ref)
     while (true) {
@@ -59,6 +55,16 @@ export default class GitRemoteHTTP {
   }
   async push (stream /*: WritableStream */) {
     const service = 'git-receive-pack'
+    let res = await axios.post(`${this.GIT_URL}/info/refs?service=${service}`, {
+      data: stream,
+      headers: {
+        'Content-Type': 'application/x-git-receive-pack-request'
+      }
+    })
+    assert(res.status === 200)
+  }
+  async pull ({ stream, refs } /*: { stream: WritableStream } */) {
+    const service = 'git-upload-pack'
     let res = await axios.post(`${this.GIT_URL}/info/refs?service=${service}`, {
       data: stream,
       headers: {
