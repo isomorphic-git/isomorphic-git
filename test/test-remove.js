@@ -4,7 +4,10 @@ import read from '../lib/utils/read'
 import write from '../lib/utils/write'
 
 test.serial('gitIndex.remove(file)', async t => {
-  await write('fixtures/test-remove-file.git/index', await read('fixtures/test-remove-file.git/index.orig'))
+  await write(
+    'fixtures/test-remove-file.git/index',
+    await read('fixtures/test-remove-file.git/index.orig')
+  )
   const repo = git().gitdir('fixtures/test-remove-file.git')
   let before = await repo.list()
   t.snapshot(before)
@@ -15,7 +18,10 @@ test.serial('gitIndex.remove(file)', async t => {
 })
 
 test.serial('gitIndex.remove(dir)', async t => {
-  await write('fixtures/test-remove-dir.git/index', await read('fixtures/test-remove-dir.git/index.orig'))
+  await write(
+    'fixtures/test-remove-dir.git/index',
+    await read('fixtures/test-remove-dir.git/index.orig')
+  )
   const repo = git().gitdir('fixtures/test-remove-dir.git')
   let before = await repo.list()
   t.snapshot(before)

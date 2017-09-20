@@ -1,5 +1,5 @@
 import test from 'ava'
-import {encode, flush} from '../lib/utils/pkt-line-encoder.js'
+import { encode, flush } from '../lib/utils/pkt-line-encoder.js'
 
 test('pkt-line-encode string', async t => {
   let foo = encode('hello world\n')
