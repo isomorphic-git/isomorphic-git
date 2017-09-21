@@ -10,6 +10,7 @@ import commit from './commands/commit.js'
 import verify from './commands/verify.js'
 import pack from './commands/pack-objects.js'
 import getConfig from './commands/getConfig.js'
+import setConfig from './commands/setConfig.js'
 
 // Class is merely a fluent command/query builder
 export default function git (dir) {
@@ -162,6 +163,13 @@ export class Git {
     return getConfig({
       gitdir: this.gitdir,
       path
+    })
+  }
+  async setConfig (path, value) {
+    return setConfig({
+      gitdir: this.gitdir,
+      path,
+      value
     })
   }
 }
