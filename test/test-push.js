@@ -10,10 +10,10 @@ import path from 'path'
 import { mkdir } from '../lib/utils/mkdirs'
 import { exists, tmpdir, cleanup } from './_helpers'
 
-test.skip('push', async t => {
+test('push (to local git-http-backend)', async t => {
   // Setup
   let dir = await tmpdir()
-  const { get, post } = server(dir)
+  const { get, postReceivePackRequest } = server(dir)
   let gitdir = path.join(dir, 'foo.git')
   await mkdir(gitdir)
   let repo = git().gitdir(gitdir)
@@ -30,22 +30,27 @@ test.skip('push', async t => {
   nock('http://example.dev')
     // .get('/test-push.git/info/refs?service=git-receive-pack')
     .get(/.*/)
-    .post(/.*/)
     .reply(200, get)
-    .reply(200, post)
+    .post(/.*/)
+    .reply(200, postReceivePackRequest)
 
   let res = await push({
     gitdir: 'fixtures/test-push.git',
-    ref: 'master',
+    ref: 'refs/heads/master',
     url: 'http://example.dev/foo.git'
   })
-  console.log(res)
   t.truthy(res)
-  t.true(res.status === 200)
-  // await cleanup()
+  let body = await pify(concat)(res)
+  t.is(
+    body.toString(),
+    `000eunpack ok
+0019ok refs/heads/master
+0000`
+  )
+  await cleanup()
 })
 
-test('push (to Github)', async t => {
+test.skip('push (to Github)', async t => {
   let res = await git()
     .gitdir('fixtures/test-push.git')
     .githubToken(process.env.GITHUB_TOKEN)
