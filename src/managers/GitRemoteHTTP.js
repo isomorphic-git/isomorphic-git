@@ -2,8 +2,8 @@
 import axios from 'axios'
 import assert from 'assert'
 import PktLineReader from '../utils/pkt-line-reader'
-import superagent from 'superagent'
-import request from 'request'
+import simpleGet from 'simple-get'
+import pify from 'pify'
 
 export default class GitRemoteHTTP {
   /*::
@@ -69,34 +69,73 @@ export default class GitRemoteHTTP {
   async push (stream /*: ReadableStream */) {
     console.log('this.auth =', this.auth)
     const service = 'git-receive-pack'
+    // // Axios didn't work
+    // // Superagent didn't work either
     // let req = superagent.post(`${this.GIT_URL}/${service}`)
     // req.auth(this.auth.username, this.auth.password)
     // req.accept(`application/x-${service}-result`)
     // req.type(`application/x-${service}-request`)
     // stream.pipe(req)
-    let self = this
-    return new Promise(function (resolve, reject) {
-      let req = request(
-        {
-          method: 'POST',
-          url: `${self.GIT_URL}/${service}`,
-          auth: {
-            user: self.auth.username,
-            pass: self.auth.password
-          },
-          headers: {
-            'Content-Type': `application/x-${service}-request`,
-            Accept: `application/x-${service}-result`
-          }
-        },
-        (err, response, body) => {
-          if (err) return reject(err)
-          else resolve(body)
-        }
-      )
-      stream.pipe(req)
-      console.log('req =', req)
+    // // Request works!
+    // let self = this
+    // return new Promise(function (resolve, reject) {
+    //   let req = request(
+    //     {
+    //       method: 'POST',
+    //       url: `${self.GIT_URL}/${service}`,
+    //       auth: {
+    //         user: self.auth.username,
+    //         pass: self.auth.password
+    //       },
+    //       headers: {
+    //         'Content-Type': `application/x-${service}-request`,
+    //         Accept: `application/x-${service}-result`
+    //       }
+    //     },
+    //     (err, response, body) => {
+    //       if (err) return reject(err)
+    //       else resolve(body)
+    //     }
+    //   )
+    //   stream.pipe(req)
+    //   console.log('req =', req)
+    // })
+    // // Simple-get works!
+    // let self = this
+    // return new Promise(function (resolve, reject) {
+    //   let req = simpleGet.concat(
+    //     {
+    //       method: 'POST',
+    //       url: `${self.GIT_URL}/${service}`,
+    //       body: stream,
+    //       headers: {
+    //         'Content-Type': `application/x-${service}-request`,
+    //         Accept: `application/x-${service}-result`,
+    //         Authorization: `Basic ${Buffer.from(self.auth.username + ':' + self.auth.password).toString('base64')}`
+    //       }
+    //     },
+    //     (err, res, body) => {
+    //       console.log('res =', res)
+    //       if (err) return reject(err)
+    //       else resolve(body.toString())
+    //     }
+    //   )
+    //   console.log('req =', req)
+    // })
+    let res = await pify(simpleGet)({
+      method: 'POST',
+      url: `${this.GIT_URL}/${service}`,
+      body: stream,
+      headers: {
+        'Content-Type': `application/x-${service}-request`,
+        Accept: `application/x-${service}-result`,
+        Authorization: `Basic ${Buffer.from(
+          this.auth.username + ':' + this.auth.password
+        ).toString('base64')}`
+      }
     })
+    console.log(res)
+    return res
   }
   async pull ({ stream, refs } /*: { stream: WritableStream } */) {
     const service = 'git-upload-pack'
