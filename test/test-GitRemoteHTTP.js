@@ -1,7 +1,9 @@
 import test from 'ava'
 import GitRemoteHTTP from '../lib/managers/GitRemoteHTTP'
 import nock from 'nock'
-import { nockback } from './_real-http-backend'
+import server from './_real-http-backend'
+
+const { get, post } = server('fixtures')
 
 test.skip('GitRemoteHTTP', async t => {
   let remote = new GitRemoteHTTP('https://github.com/wmhilton/esgit')
@@ -12,7 +14,7 @@ test.skip('GitRemoteHTTP', async t => {
 
 test('preparePull (mock response)', async t => {
   nock('http://example.dev')
-    .get('/test-push.git/info/refs?service=git-upload-pack')
+    .get('/test-GitRemoteHTTP.git/info/refs?service=git-upload-pack')
     // .get(/.*/)
     .reply(
       200,
@@ -26,7 +28,7 @@ test('preparePull (mock response)', async t => {
     }
     )
 
-  let remote = new GitRemoteHTTP('http://example.dev/test-push')
+  let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
   await remote.preparePull()
   console.log(remote)
   t.truthy(remote)
@@ -34,10 +36,10 @@ test('preparePull (mock response)', async t => {
 
 test.skip('preparePull (real git-http-backend response)', async t => {
   nock('http://example.dev')
-    .get('/test-push.git/info/refs?service=git-upload-pack')
-    .reply(200, nockback)
+    .get('/test-GitRemoteHTTP.git/info/refs?service=git-upload-pack')
+    .reply(200, get)
 
-  let remote = new GitRemoteHTTP('http://example.dev/test-push')
+  let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
   await remote.preparePull()
   console.log(remote)
   // console.log(remote.capabilities)
@@ -46,7 +48,7 @@ test.skip('preparePull (real git-http-backend response)', async t => {
 
 test('preparePush (mock response)', async t => {
   nock('http://example.dev')
-    .get('/test-push.git/info/refs?service=git-receive-pack')
+    .get('/test-GitRemoteHTTP.git/info/refs?service=git-receive-pack')
     // .get(/.*/)
     .reply(
       200,
@@ -61,7 +63,7 @@ test('preparePush (mock response)', async t => {
     }
     )
 
-  let remote = new GitRemoteHTTP('http://example.dev/test-push')
+  let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
   await remote.preparePush()
   // console.log(remote)
   t.truthy(remote)
@@ -69,10 +71,10 @@ test('preparePush (mock response)', async t => {
 
 test.skip('preparePush (real git-http-backend response)', async t => {
   nock('http://example.dev')
-    .get('/test-push.git/info/refs?service=git-receive-pack')
-    .reply(200, nockback)
+    .get('/test-GitRemoteHTTP.git/info/refs?service=git-receive-pack')
+    .reply(200, get)
 
-  let remote = new GitRemoteHTTP('http://example.dev/test-push')
+  let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
   await remote.preparePush()
   console.log(remote)
   t.truthy(remote)

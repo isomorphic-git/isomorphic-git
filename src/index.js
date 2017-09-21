@@ -9,6 +9,7 @@ import remove from './commands/remove.js'
 import commit from './commands/commit.js'
 import verify from './commands/verify.js'
 import pack from './commands/pack-objects.js'
+import push from './commands/push.js'
 import getConfig from './commands/getConfig.js'
 import setConfig from './commands/setConfig.js'
 
@@ -157,6 +158,22 @@ export class Git {
       gitdir: this.gitdir,
       outputStream: this.outputStream,
       oids
+    })
+  }
+  async push (ref) {
+    let url = await getConfig({
+      gitdir: this.gitdir,
+      path: `remote "${this.operateRemote}".url`
+    })
+    console.log('url =', url)
+    return push({
+      gitdir: this.gitdir,
+      ref,
+      url,
+      auth: {
+        username: this.operateToken,
+        password: this.operateToken
+      }
     })
   }
   async getConfig (path) {

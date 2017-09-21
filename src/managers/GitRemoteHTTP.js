@@ -2,12 +2,15 @@
 import axios from 'axios'
 import assert from 'assert'
 import PktLineReader from '../utils/pkt-line-reader'
+import superagent from 'superagent'
+import request from 'request'
 
 export default class GitRemoteHTTP {
   /*::
   GIT_URL : string
   refs : Map<string, string>
   capabilities : Set<string>
+  auth : { username : string, password : string }
   */
   constructor (url /*: string */) {
     // Auto-append the (necessary) .git if it's missing.
@@ -23,12 +26,22 @@ export default class GitRemoteHTTP {
   async discover (service /*: string */) {
     this.capabilities = new Set()
     this.refs = new Map()
-    let res = await axios.get(`${this.GIT_URL}/info/refs?service=${service}`)
+    console.log('this.auth =', this.auth)
+    let res = await axios.get(`${this.GIT_URL}/info/refs?service=${service}`, {
+      auth: this.auth
+    })
+    console.log('res =', res)
+    assert(res.status === 200, `Bad status code from server: ${res.status}`)
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
     let read = new PktLineReader(res.data)
     let lineOne = read()
-    assert(lineOne.toString('utf8') === `# service=${service}\n`)
+    assert(lineOne !== true, 'Bad response from git server.')
+    console.log('lineOne =', lineOne)
+    assert(
+      lineOne.toString('utf8') === `# service=${service}\n`,
+      lineOne.toString('utf8')
+    )
     let lineTwo = read()
     while (lineTwo === null) lineTwo = read()
     // In the edge case of a brand new repo, zero refs (and zero capabilities)
@@ -53,24 +66,49 @@ export default class GitRemoteHTTP {
       }
     }
   }
-  async push (stream /*: WritableStream */) {
+  async push (stream /*: ReadableStream */) {
+    console.log('this.auth =', this.auth)
     const service = 'git-receive-pack'
-    let res = await axios.post(`${this.GIT_URL}/info/refs?service=${service}`, {
-      data: stream,
-      headers: {
-        'Content-Type': 'application/x-git-receive-pack-request'
-      }
+    // let req = superagent.post(`${this.GIT_URL}/${service}`)
+    // req.auth(this.auth.username, this.auth.password)
+    // req.accept(`application/x-${service}-result`)
+    // req.type(`application/x-${service}-request`)
+    // stream.pipe(req)
+    let self = this
+    return new Promise(function (resolve, reject) {
+      let req = request(
+        {
+          method: 'POST',
+          url: `${self.GIT_URL}/${service}`,
+          auth: {
+            user: self.auth.username,
+            pass: self.auth.password
+          },
+          headers: {
+            'Content-Type': `application/x-${service}-request`,
+            Accept: `application/x-${service}-result`
+          }
+        },
+        (err, response, body) => {
+          if (err) return reject(err)
+          else resolve(body)
+        }
+      )
+      stream.pipe(req)
+      console.log('req =', req)
     })
-    assert(res.status === 200)
   }
   async pull ({ stream, refs } /*: { stream: WritableStream } */) {
     const service = 'git-upload-pack'
-    let res = await axios.post(`${this.GIT_URL}/info/refs?service=${service}`, {
+    let res = await axios.post(`${this.GIT_URL}/${service}`, {
       data: stream,
       headers: {
-        'Content-Type': 'application/x-git-receive-pack-request'
-      }
+        'Content-Type': `application/x-${service}-request`,
+        Accept: `application/x-${service}-result`
+      },
+      auth: this.auth
     })
     assert(res.status === 200)
+    return res
   }
 }
