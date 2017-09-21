@@ -2,6 +2,8 @@ import test from 'ava'
 import push from '../lib/commands/push'
 import server from './_real-http-backend'
 import nock from 'nock'
+import concat from 'simple-concat'
+import pify from 'pify'
 import git from '..'
 import write from '../lib/utils/write'
 import path from 'path'
@@ -51,8 +53,9 @@ test('push (to Github)', async t => {
     .push('refs/heads/master')
   console.log(res)
   t.truthy(res)
+  let body = await pify(concat)(res)
   t.is(
-    res,
+    body.toString(),
     `000eunpack ok
 0019ok refs/heads/master
 00000000`

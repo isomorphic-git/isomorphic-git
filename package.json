@@ -44,9 +44,9 @@
     "pako": "^1.0.5",
     "parse-link-header": "^1.0.1",
     "pify": "^3.0.0",
-    "request": "^2.82.0",
     "shasum": "^1.0.2",
-    "superagent": "^3.6.0",
+    "simple-concat": "^1.0.0",
+    "simple-get": "^2.7.0",
     "write-file-atomic": "^2.3.0"
   },
   "devDependencies": {
