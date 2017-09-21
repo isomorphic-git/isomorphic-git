@@ -1,5 +1,6 @@
 import ini from 'ini'
 import get from 'lodash.get'
+import set from 'lodash.set'
 
 export default class GitConfig {
   constructor (text) {
@@ -10,5 +11,11 @@ export default class GitConfig {
   }
   async get (path) {
     return get(this.ini, path)
+  }
+  async set (path, value) {
+    return set(this.ini, path, value)
+  }
+  toString () {
+    return ini.encode(this.ini, { whitespace: true })
   }
 }
