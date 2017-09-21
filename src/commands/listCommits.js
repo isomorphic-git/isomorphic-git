@@ -15,7 +15,11 @@ export default async function listCommits ({
     startingSet.add(await resolveRef({ gitdir, ref }))
   }
   for (let ref of finish) {
-    finishingSet.add(await resolveRef({ gitdir, ref }))
+    // We may not have these refs locally so we must try/catch
+    try {
+      let oid = await resolveRef({ gitdir, ref })
+      finishingSet.add(oid)
+    } catch (err) {}
   }
   let visited = new Set() /*: Set<string> */
 
