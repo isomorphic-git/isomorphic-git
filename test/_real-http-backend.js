@@ -5,7 +5,7 @@ const parseHeaderStream = require('parse-header-stream')
 const path = require('path')
 
 module.exports = function (rootDir) {
-  async function request (method, rawUrl, postStream) {
+  async function request (method, rawUrl, postStream, requestHeaders) {
     let parsedUrl = url.parse(rawUrl)
     let options = {
       env: {
@@ -14,12 +14,13 @@ module.exports = function (rootDir) {
         PATH_INFO: parsedUrl.pathname, // '/test-GitRemoteHTTP.git/info/refs',
         REMOTE_USER: 'mrtest@example.com',
         // REMOTE_ADDR,
-        // CONTENT_TYPE
+        CONTENT_TYPE: requestHeaders['Content-Type'],
         QUERY_STRING: parsedUrl.query // 'service=git-receive-pack'
       }
     }
     let proc = exec('git http-backend', options)
     if (postStream && typeof postStream.pipe === 'function') {
+      console.log('STREAMING INTO STDIN PIPE')
       postStream.pipe(proc.stdin)
     }
     const body = new stream.PassThrough()
@@ -27,6 +28,7 @@ module.exports = function (rootDir) {
       proc.stdout
         .pipe(
           parseHeaderStream(function (err, headers) {
+            console.log('headers =', headers)
             if (err) reject(err)
             else resolve(headers)
           })
@@ -41,22 +43,36 @@ module.exports = function (rootDir) {
 
   // Note: we lose the headers :(
   function get (uri, requestBody, cb) {
-    console.log('requestBody =', requestBody)
-    request('GET', uri, requestBody).then(({ body, headers }) => cb(null, body))
+    request('GET', uri, requestBody, {}).then(({ body, headers }) =>
+      cb(null, body)
+    )
   }
 
   // Note: we lose the headers :(
-  function post (uri, requestBody, cb) {
-    console.log('requestBody =', requestBody)
-    request('POST', uri, requestBody).then(({ body, headers }) =>
-      cb(null, body)
-    )
+  function postReceivePackRequest (uri, requestBody, cb) {
+    let buf = Buffer.from(requestBody, 'hex')
+    let postStream = new stream.PassThrough()
+    postStream.end(buf)
+    request('POST', uri, postStream, {
+      'Content-Type': 'application/x-git-receive-pack-request'
+    }).then(({ body, headers }) => cb(null, body))
+  }
+
+  // Note: we lose the headers :(
+  function postUploadPackRequest (uri, requestBody, cb) {
+    let buf = Buffer.from(requestBody, 'hex')
+    let postStream = new stream.PassThrough()
+    postStream.end(buf)
+    request('POST', uri, postStream, {
+      'Content-Type': 'application/x-git-upload-pack-request'
+    }).then(({ body, headers }) => cb(null, body))
   }
 
   return {
     request,
     get,
-    post
+    postReceivePackRequest,
+    postUploadPackRequest
   }
 }
 

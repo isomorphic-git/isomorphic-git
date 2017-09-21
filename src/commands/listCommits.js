@@ -4,11 +4,17 @@ import GitCommit from '../models/GitCommit'
 import resolveRef from '../utils/resolveRef'
 import GitObjectManager from '../managers/GitObjectManager'
 
-export default async function listCommits ({
-  gitdir /*: string */,
-  start /*: Array<string> */,
-  finish /*: Array<string> */
-}) {
+export default async function listCommits (
+  {
+    gitdir,
+    start,
+    finish
+  } /*: {
+  gitdir: string,
+  start: Array<string>,
+  finish: Array<string>
+} */
+) {
   let startingSet = new Set()
   let finishingSet = new Set()
   for (let ref of start) {

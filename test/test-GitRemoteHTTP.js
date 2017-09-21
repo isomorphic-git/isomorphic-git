@@ -3,7 +3,7 @@ import GitRemoteHTTP from '../lib/managers/GitRemoteHTTP'
 import nock from 'nock'
 import server from './_real-http-backend'
 
-const { get, post } = server('fixtures')
+const { get } = server('fixtures')
 
 test.skip('GitRemoteHTTP', async t => {
   let remote = new GitRemoteHTTP('https://github.com/wmhilton/esgit')

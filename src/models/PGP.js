@@ -143,7 +143,6 @@ export default class PGP {
       publicKeys: publicKeys,
       message: openpgp.cleartext.readArmored(msg)
     })
-    console.log(verified)
     let signature = verified.signatures.map(getFullSignature)
     signature = signature.filter(x => x.email === email)
     if (signature.length !== 1) {

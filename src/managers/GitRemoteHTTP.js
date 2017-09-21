@@ -5,6 +5,12 @@ import PktLineReader from '../utils/pkt-line-reader'
 import simpleGet from 'simple-get'
 import pify from 'pify'
 
+function basicAuth (auth) {
+  return `Basic ${Buffer.from(auth.username + ':' + auth.password).toString(
+    'base64'
+  )}`
+}
+
 export default class GitRemoteHTTP {
   /*::
   GIT_URL : string
@@ -26,23 +32,23 @@ export default class GitRemoteHTTP {
   async discover (service /*: string */) {
     this.capabilities = new Set()
     this.refs = new Map()
-    console.log('this.auth =', this.auth)
     let res = await axios.get(`${this.GIT_URL}/info/refs?service=${service}`, {
       auth: this.auth
     })
-    console.log('res =', res)
     assert(res.status === 200, `Bad status code from server: ${res.status}`)
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
     let read = new PktLineReader(res.data)
     let lineOne = read()
+    // skip past any flushes
+    while (lineOne === null) lineOne = read()
     assert(lineOne !== true, 'Bad response from git server.')
-    console.log('lineOne =', lineOne)
     assert(
       lineOne.toString('utf8') === `# service=${service}\n`,
       lineOne.toString('utf8')
     )
     let lineTwo = read()
+    // skip past any flushes
     while (lineTwo === null) lineTwo = read()
     // In the edge case of a brand new repo, zero refs (and zero capabilities)
     // are returned.
@@ -66,78 +72,23 @@ export default class GitRemoteHTTP {
       }
     }
   }
-  async push (stream /*: ReadableStream */) {
-    console.log('this.auth =', this.auth)
+  async push (stream) {
     const service = 'git-receive-pack'
-    // // Axios didn't work
-    // // Superagent didn't work either
-    // let req = superagent.post(`${this.GIT_URL}/${service}`)
-    // req.auth(this.auth.username, this.auth.password)
-    // req.accept(`application/x-${service}-result`)
-    // req.type(`application/x-${service}-request`)
-    // stream.pipe(req)
-    // // Request works!
-    // let self = this
-    // return new Promise(function (resolve, reject) {
-    //   let req = request(
-    //     {
-    //       method: 'POST',
-    //       url: `${self.GIT_URL}/${service}`,
-    //       auth: {
-    //         user: self.auth.username,
-    //         pass: self.auth.password
-    //       },
-    //       headers: {
-    //         'Content-Type': `application/x-${service}-request`,
-    //         Accept: `application/x-${service}-result`
-    //       }
-    //     },
-    //     (err, response, body) => {
-    //       if (err) return reject(err)
-    //       else resolve(body)
-    //     }
-    //   )
-    //   stream.pipe(req)
-    //   console.log('req =', req)
-    // })
-    // // Simple-get works!
-    // let self = this
-    // return new Promise(function (resolve, reject) {
-    //   let req = simpleGet.concat(
-    //     {
-    //       method: 'POST',
-    //       url: `${self.GIT_URL}/${service}`,
-    //       body: stream,
-    //       headers: {
-    //         'Content-Type': `application/x-${service}-request`,
-    //         Accept: `application/x-${service}-result`,
-    //         Authorization: `Basic ${Buffer.from(self.auth.username + ':' + self.auth.password).toString('base64')}`
-    //       }
-    //     },
-    //     (err, res, body) => {
-    //       console.log('res =', res)
-    //       if (err) return reject(err)
-    //       else resolve(body.toString())
-    //     }
-    //   )
-    //   console.log('req =', req)
-    // })
+    let headers = {}
+    headers['Content-Type'] = `application/x-${service}-request`
+    headers['Accept'] = `application/x-${service}-result`
+    if (this.auth) {
+      headers['Authorization'] = basicAuth(this.auth)
+    }
     let res = await pify(simpleGet)({
       method: 'POST',
       url: `${this.GIT_URL}/${service}`,
       body: stream,
-      headers: {
-        'Content-Type': `application/x-${service}-request`,
-        Accept: `application/x-${service}-result`,
-        Authorization: `Basic ${Buffer.from(
-          this.auth.username + ':' + this.auth.password
-        ).toString('base64')}`
-      }
+      headers
     })
-    console.log(res)
     return res
   }
-  async pull ({ stream, refs } /*: { stream: WritableStream } */) {
+  async pull ({ stream, refs }) {
     const service = 'git-upload-pack'
     let res = await axios.post(`${this.GIT_URL}/${service}`, {
       data: stream,
