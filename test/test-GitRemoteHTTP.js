@@ -32,7 +32,7 @@ test('preparePull (mock response)', async t => {
   t.truthy(remote)
 })
 
-test('preparePull (real git-http-backend response)', async t => {
+test.skip('preparePull (real git-http-backend response)', async t => {
   nock('http://example.dev')
     .get('/test-push.git/info/refs?service=git-upload-pack')
     .reply(200, nockback)
@@ -67,7 +67,7 @@ test('preparePush (mock response)', async t => {
   t.truthy(remote)
 })
 
-test('preparePush (real git-http-backend response)', async t => {
+test.skip('preparePush (real git-http-backend response)', async t => {
   nock('http://example.dev')
     .get('/test-push.git/info/refs?service=git-receive-pack')
     .reply(200, nockback)
