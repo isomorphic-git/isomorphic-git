@@ -60,6 +60,7 @@
     "ban-sensitive-files": "^1.9.0",
     "husky": "^0.14.3",
     "jsonfile": "^3.0.1",
+    "ncp": "^2.0.0",
     "nock": "^9.0.17",
     "parse-header-stream": "^1.1.1",
     "prettier-standard": "^6.0.0",

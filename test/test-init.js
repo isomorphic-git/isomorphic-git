@@ -1,6 +1,6 @@
 import test from 'ava'
 import git from '../lib'
-import { exists, tmpdir, cleanup } from './_helpers'
+import { exists, tmpdir } from './_helpers'
 
 test(async t => {
   let dir = await tmpdir()
@@ -9,5 +9,4 @@ test(async t => {
   t.true(exists(`${dir}/.git/objects`))
   t.true(exists(`${dir}/.git/refs/heads`))
   t.true(exists(`${dir}/.git/HEAD`))
-  await cleanup()
 })

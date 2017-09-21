@@ -4,21 +4,18 @@ import read from '../lib/utils/read'
 import write from '../lib/utils/write'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-process.env.TZ = 'utc'
+import path from 'path'
+import ncp from 'ncp'
+import { tmpdir } from './_helpers'
 
 test('git.commit()', async t => {
+  // Setup
+  let dir = await tmpdir()
+  console.log('dir =', dir)
+  await pify(ncp)('fixtures/test-commit.git', dir)
+  // Test
   const repo = git()
-  repo.gitdir('fixtures/test-commit.git')
-  await repo.init()
-  await write(
-    'fixtures/test-commit.git/index',
-    await read('fixtures/test-commit/index-1')
-  )
-  await write(
-    'fixtures/test-commit.git/refs/heads/master',
-    '1386e77b0a7afa8333663a9e4cbf8e6158e625c1\n'
-  )
-  await write('fixtures/test-commit.git/HEAD', 'ref: refs/heads/master\n')
+  repo.gitdir(dir)
   repo.author('Mr. Test')
   repo.email('mrtest@example.com')
   repo.timestamp(1262356920)
@@ -27,18 +24,13 @@ test('git.commit()', async t => {
 })
 
 test('git.signingKey() and git.verificationKey()', async t => {
+  // Setup
+  let dir = await tmpdir()
+  console.log('dir =', dir)
+  await pify(ncp)('fixtures/test-commit.git', dir)
+  // Test
   const repo = git()
-  repo.gitdir('fixtures/test-commit.git')
-  await repo.init()
-  await write(
-    'fixtures/test-commit.git/index',
-    await read('fixtures/test-commit/index-1')
-  )
-  await write(
-    'fixtures/test-commit.git/refs/heads/master',
-    '1386e77b0a7afa8333663a9e4cbf8e6158e625c1\n'
-  )
-  await write('fixtures/test-commit.git/HEAD', 'ref: refs/heads/master\n')
+  repo.gitdir(dir)
   repo.author('Mr. Test')
   repo.email('mrtest@example.com')
   repo.timestamp(1504842425)

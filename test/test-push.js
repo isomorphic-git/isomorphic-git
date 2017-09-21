@@ -8,7 +8,7 @@ import git from '..'
 import write from '../lib/utils/write'
 import path from 'path'
 import { mkdir } from '../lib/utils/mkdirs'
-import { exists, tmpdir, cleanup } from './_helpers'
+import { exists, tmpdir } from './_helpers'
 
 test('push (to local git-http-backend)', async t => {
   // Setup
@@ -47,7 +47,6 @@ test('push (to local git-http-backend)', async t => {
 0019ok refs/heads/master
 0000`
   )
-  await cleanup()
 })
 
 test.skip('push (to Github)', async t => {
