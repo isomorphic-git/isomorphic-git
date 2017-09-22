@@ -1,4 +1,5 @@
 // @flow
+import { Buffer } from 'buffer'
 import axios from 'axios'
 import assert from 'assert'
 import PktLineReader from '../utils/pkt-line-reader'

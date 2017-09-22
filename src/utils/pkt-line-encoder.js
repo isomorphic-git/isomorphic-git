@@ -50,6 +50,7 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
+import { Buffer } from 'buffer'
 import pad from 'pad'
 
 export function flush () {
