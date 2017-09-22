@@ -1,4 +1,11 @@
 import babel from 'rollup-plugin-babel'
+import commonjs from 'rollup-plugin-commonjs'
+import resolve from 'rollup-plugin-node-resolve'
+import builtins from 'rollup-plugin-node-builtins'
+import globals from 'rollup-plugin-node-globals'
+
+import json from 'rollup-plugin-json'
+
 import pkg from './package.json'
 
 export default [
@@ -41,11 +48,7 @@ export default [
     input: 'src/index.js',
     external: [
       'fs',
-      'path',
-      'crypto',
-      'stream',
-      'assert',
-      ...Object.keys(pkg.dependencies)
+      'openpgp'
     ],
     output: [
       { format: 'umd', name: 'git', file: 'dist/browser-umd.js' }
@@ -66,6 +69,22 @@ export default [
           'external-helpers',
           'transform-object-rest-spread'
         ]
+      }),
+      resolve({
+        browser: true,
+        extensions: [
+          '.js',
+          '.json'
+        ]
+      }),
+      json({
+        include: 'node_modules/**',
+        preferConst: true
+      }),
+      commonjs(),
+      globals(),
+      builtins({
+        crypto: true
       })
     ]
   }
