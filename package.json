@@ -1,6 +1,6 @@
 {
   "name": "isomorphic-git",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Node library for interacting with git repositories, circa 2017",
   "main": "lib/index.js",
   "bin": "lib/cli.js",
@@ -12,8 +12,7 @@
     "test": "npm run build && ava",
     "on-pull-request": "npm run format && npm run lint && npm run test",
     "ban": "ban",
-    "precommit": "ban && prettier-standard src/**/*.js test/**/*.js",
-    "prepare": "npm run build"
+    "precommit": "ban && prettier-standard src/**/*.js test/**/*.js"
   },
   "repository": {
     "type": "git",
