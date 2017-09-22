@@ -14,8 +14,8 @@ export default [
       ...Object.keys(pkg.dependencies)
     ],
     output: [
-      { format: 'es', name: 'git', file: 'dist/isomorphic-git.es2017.js' },
-      { format: 'cjs', name: 'git', file: 'dist/isomorphic-git.node.js' }
+      { format: 'es', name: 'git', file: 'dist/bundle-esm.js' },
+      { format: 'cjs', name: 'git', file: 'dist/node-cjs.js' }
     ],
     plugins: [
       babel({
@@ -48,8 +48,7 @@ export default [
       ...Object.keys(pkg.dependencies)
     ],
     output: [
-      { format: 'cjs', name: 'git', file: 'dist/isomorphic-git.browserify.js' },
-      { format: 'umd', name: 'git', file: 'dist/isomorphic-git.umd.js' }
+      { format: 'umd', name: 'git', file: 'dist/browser-umd.js' }
     ],
     plugins: [
       babel({
