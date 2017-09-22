@@ -2,27 +2,33 @@
 Node library for interacting with git repositories, circa 2017
 
 # Progress
+
+Porcelain:
+
 - [x] git init
 - [x] git clone
   - [x] Github API protocol (only signed commits)
   - [ ] HTTP smart protocol + cors-buster
 - [x] git checkout
+  - [ ] update index correctly when checking out
 - [x] git list (ls-files)
 - [x] git add
 - [x] git remove
 - [ ] git status
 - [x] git commit
-- [ ] git push
-  - [ ] git listCommits (rev-list)
-  - [ ] git pack-objects
-  - [ ] git list packed objects (verify-pack)
-  - [ ] git send-pack
+- [x] git push (due to CORS, use https://github-cors.now.sh instead of https://github.com)
 - [ ] git pull
-  - [ ] git unpack-objects
-  - [ ] git fetch-pack
 - [ ] git diff
 - [ ] git merge
 - [x] `esgit` CLI
+
+Plumbing:
+
+- [ ] read-tree
+- [x] git listCommits (rev-list)
+- [x] git pack (pack-objects)
+- [ ] git list packed objects (verify-pack)
+- [ ] git unpack-objects
 
 Note: There appears to be no a way to *push* signed commits back to Github using their API (v3 or v4), so I think we will have to use smart HTTP, packfiles, and an anti-CORS proxy.
 
@@ -62,7 +68,17 @@ git('.')
   .signingKey('-----BEGIN PGP PRIVATE KEY BLOCK-----...')
   .commit('Added the a.txt file')
 
-// TODO: git.merge(), git.pull(), git.push(), git.status(), git.diff(), git.tag(), git.branch(), etc
+// Manually add a remote (git clone should be doing this but it doesn't (yet))
+git('.')
+  .setConfig('remote "origin".url', 'https://github-cors.now.sh/wmhilton/test.empty')
+
+// Push a branch back to Github
+git('.')
+  .githubToken(process.env.GITHUB_TOKEN)
+  .remote('origin')
+  .push('refs/heads/master')
+
+// TODO: git.merge(), git.pull(), git.status(), git.diff(), git.tag(), git.branch(), etc
 
 // And if you need to work with bare repos there are
 // equivalents to the `--git-dir` and `--work-tree` options

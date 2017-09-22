@@ -1,5 +1,4 @@
 // @flow
-import { Buffer } from 'buffer'
 import path from 'path'
 import pify from 'pify'
 import { mkdir } from './mkdirs'
