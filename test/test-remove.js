@@ -1,5 +1,5 @@
 import test from 'ava'
-import git from '../lib'
+import git from '..'
 import { read } from '../lib/utils/read'
 import { write } from '../lib/utils/write'
 

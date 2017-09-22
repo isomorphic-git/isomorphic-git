@@ -34,6 +34,7 @@ test('push (to local git-http-backend)', async t => {
     .post(/.*/)
     .reply(200, postReceivePackRequest)
 
+  // TODO: use the fluent command builder instead of directly
   let res = await push({
     gitdir: 'fixtures/test-push.git',
     ref: 'refs/heads/master',

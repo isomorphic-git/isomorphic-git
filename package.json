@@ -3,14 +3,17 @@
   "version": "0.0.2",
   "description": "Node library for interacting with git repositories, circa 2017",
   "main": "dist/isomorphic-git.node.js",
-  "bin": "lib/cli.js",
+  "bin": {
+    "esgit": "./cli.js"
+  },
   "scripts": {
     "format": "prettier-standard src/**/*.js test/**/*.js",
     "lint": "standard src/**/*.js",
     "watch": "babel src --watch --out-dir lib --source-maps inline",
+    "watch2": "rollup -cw",
     "build": "babel src --out-dir lib --source-maps",
     "bundle": "rollup -c",
-    "test": "npm run build && ava",
+    "test": "npm run build && npm run bundle && ava",
     "on-pull-request": "npm run format && npm run lint && npm run test",
     "ban": "ban",
     "precommit": "ban && prettier-standard src/**/*.js test/**/*.js"
@@ -73,7 +76,8 @@
   },
   "ava": {
     "source": [
-      "lib/**"
+      "lib/**",
+      "dist"
     ]
   }
 }

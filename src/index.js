@@ -12,11 +12,11 @@ import { push } from './commands/push.js'
 import { getConfig } from './commands/getConfig.js'
 import { setConfig } from './commands/setConfig.js'
 
-// Class is merely a fluent command/query builder
 export default function git (dir) {
   return new Git(dir)
 }
 
+// The class is merely a fluent command/query builder
 class Git {
   constructor (dir) {
     if (dir) {
@@ -76,6 +76,7 @@ class Git {
   async fetch (url) {
     await fetch({
       gitdir: this.gitdir,
+      // TODO: make this not Github-specific
       user: ghurl(url).user,
       repo: ghurl(url).repo,
       ref: ghurl(url).branch,
@@ -95,6 +96,7 @@ class Git {
     await init(this.gitdir)
     await fetch({
       gitdir: this.gitdir,
+      // TODO: make this not Github-specific
       user: ghurl(url).user,
       repo: ghurl(url).repo,
       ref: ghurl(url).branch,
@@ -104,6 +106,7 @@ class Git {
     await checkout({
       workdir: this.workdir,
       gitdir: this.gitdir,
+      // TODO: make this not Github-specific
       ref: ghurl(url).branch,
       remote: this.operateRemote
     })

@@ -1,5 +1,5 @@
 import test from 'ava'
-import git from '../lib'
+import git from '..'
 import { exists, tmpdir } from './_helpers'
 
 // TODO: Add logic to use X-RateLimit-Remaining to throttle requests

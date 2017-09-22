@@ -1,5 +1,5 @@
 import test from 'ava'
-import git from '../lib'
+import git from '..'
 import { rm } from '../lib/utils/delete'
 
 test.beforeEach(async t => {

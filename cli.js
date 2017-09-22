@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-import minimisted from 'minimisted'
-import git from '.'
+const minimisted = require('minimisted')
+const git = require('.')
+
+// This really isn't much of a CLI. It's mostly for testing.
+// But it's very versatile and works surprisingly well.
 
 minimisted(async function ({ _: [command, arg, ...args], ...opts }) {
   const dir = process.cwd()

@@ -1,5 +1,5 @@
 import test from 'ava'
-import git from '../lib'
+import git from '..'
 
 // TODO: Use lockfiles and whatever so we stop getting
 // race conditions and can remove the .serial hack
