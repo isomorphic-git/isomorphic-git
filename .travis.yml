@@ -1,3 +1,12 @@
 language: node_js
 node_js:
   - "node"
+deploy:
+- provider: npm
+  email: wmhilton@gmail.com
+  api_key: "$NPM_PUBLISH_TOKEN"
+  on:
+    skip_cleanup: true
+    tags: true
+    branch: master
+    repo: wmhilton/esgit
