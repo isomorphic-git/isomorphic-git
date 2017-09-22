@@ -1,7 +1,7 @@
 // @flow
 // import LockManager from 'travix-lock-manager'
-import read from '../utils/read'
-import write from '../utils/write'
+import { read } from '../utils/read'
+import { write } from '../utils/write'
 import GitIndex from '../models/GitIndex'
 import AsyncLock from 'async-lock'
 // import Lock from '../utils/lockfile'

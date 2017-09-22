@@ -2,8 +2,8 @@
 import GitCommit from '../models/GitCommit'
 import GitObjectManager from '../managers/GitObjectManager'
 import GitTree from '../models/GitTree'
-
-export default async function listObjects (
+// TODO: Move this to 'plumbing'
+export async function listObjects (
   { gitdir, oids } /*: {
   gitdir: string,
   oids: Array<string>

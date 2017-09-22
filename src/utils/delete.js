@@ -1,7 +1,7 @@
 import fs from 'fs'
 import pify from 'pify'
 const unlink = pify(fs.unlink)
-export default async function (filepath) {
+export async function rm (filepath) {
   try {
     await unlink(filepath)
   } catch (err) {

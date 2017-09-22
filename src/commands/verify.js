@@ -1,10 +1,10 @@
 import GitCommit from '../models/GitCommit'
 import GitObjectManager from '../managers/GitObjectManager'
-import resolveRef from '../utils/resolveRef'
+import { resolveRef } from '../utils/resolveRef'
 import { HKP } from 'openpgp'
 const HttpKeyServer = new HKP()
 
-export default async function verify ({ gitdir, ref, publicKeys }) {
+export async function verify ({ gitdir, ref, publicKeys }) {
   const oid = await resolveRef({ gitdir, ref })
   const { type, object } = await GitObjectManager.read({ gitdir, oid })
   if (type !== 'commit') {

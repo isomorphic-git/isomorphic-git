@@ -5,8 +5,8 @@ import parseLinkHeader from 'parse-link-header'
 import GitObjectManager from '../managers/GitObjectManager'
 import GitCommit from '../models/GitCommit'
 import GitTree from '../models/GitTree'
-import write from '../utils/write'
-import resolveRef from '../utils/resolveRef'
+import { write } from '../utils/write'
+import { resolveRef } from '../utils/resolveRef'
 
 async function request ({ url, token, headers }) {
   let res = await axios.get(url, {
@@ -169,15 +169,7 @@ async function fetchBlob ({ gitdir, url, user, repo, sha, since, token }) {
   }
 }
 
-export default async function fetch ({
-  gitdir,
-  token,
-  user,
-  repo,
-  ref,
-  remote,
-  since
-}) {
+export async function fetch ({ gitdir, token, user, repo, ref, remote, since }) {
   let json
 
   if (!ref) {

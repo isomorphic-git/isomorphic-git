@@ -1,5 +1,4 @@
 // @flow
-'use strict'
 import { Buffer } from 'buffer'
 import * as openpgp from 'openpgp'
 

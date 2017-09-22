@@ -2,13 +2,14 @@
   "name": "isomorphic-git",
   "version": "0.0.2",
   "description": "Node library for interacting with git repositories, circa 2017",
-  "main": "lib/index.js",
+  "main": "dist/isomorphic-git.node.js",
   "bin": "lib/cli.js",
   "scripts": {
     "format": "prettier-standard src/**/*.js test/**/*.js",
     "lint": "standard src/**/*.js",
     "watch": "babel src --watch --out-dir lib --source-maps inline",
     "build": "babel src --out-dir lib --source-maps",
+    "bundle": "rollup -c",
     "test": "npm run build && ava",
     "on-pull-request": "npm run format && npm run lint && npm run test",
     "ban": "ban",
@@ -50,11 +51,12 @@
     "write-file-atomic": "^2.3.0"
   },
   "devDependencies": {
+    "@std/esm": "^0.10.2",
     "ava": "^0.21.0",
     "babel-cli": "^6.24.1",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",
@@ -64,6 +66,7 @@
     "nock": "^9.0.17",
     "parse-header-stream": "^1.1.1",
     "prettier-standard": "^6.0.0",
+    "rollup-plugin-babel": "^3.0.2",
     "standard": "^10.0.3",
     "stream-equal": "^1.0.1",
     "temp": "^0.8.3"

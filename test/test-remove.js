@@ -1,7 +1,7 @@
 import test from 'ava'
 import git from '../lib'
-import read from '../lib/utils/read'
-import write from '../lib/utils/write'
+import { read } from '../lib/utils/read'
+import { write } from '../lib/utils/write'
 
 test.serial('gitIndex.remove(file)', async t => {
   await write(

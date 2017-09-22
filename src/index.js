@@ -1,24 +1,23 @@
 import ghurl from 'github-url-to-object'
-
-import init from './commands/init.js'
-import fetch from './commands/fetch.js'
-import checkout from './commands/checkout.js'
-import list from './commands/list.js'
-import add from './commands/add.js'
-import remove from './commands/remove.js'
-import commit from './commands/commit.js'
-import verify from './commands/verify.js'
-import pack from './commands/pack-objects.js'
-import push from './commands/push.js'
-import getConfig from './commands/getConfig.js'
-import setConfig from './commands/setConfig.js'
+import { init } from './commands/init'
+import { fetch } from './commands/fetch'
+import { checkout } from './commands/checkout.js'
+import { list } from './commands/list.js'
+import { add } from './commands/add.js'
+import { remove } from './commands/remove.js'
+import { commit } from './commands/commit.js'
+import { verify } from './commands/verify.js'
+import { pack } from './commands/pack-objects.js'
+import { push } from './commands/push.js'
+import { getConfig } from './commands/getConfig.js'
+import { setConfig } from './commands/setConfig.js'
 
 // Class is merely a fluent command/query builder
 export default function git (dir) {
   return new Git(dir)
 }
 
-export class Git {
+class Git {
   constructor (dir) {
     if (dir) {
       this.workdir = dir

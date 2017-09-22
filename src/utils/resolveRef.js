@@ -1,7 +1,7 @@
-import exists from './exists'
-import read from './read'
+import { exists } from './exists'
+import { read } from './read'
 
-export default async function resolveRef ({ gitdir, ref, depth }) {
+export async function resolveRef ({ gitdir, ref, depth }) {
   if (depth !== undefined) {
     depth--
     if (depth === -1) {

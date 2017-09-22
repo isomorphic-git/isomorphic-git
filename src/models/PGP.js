@@ -1,4 +1,3 @@
-'use strict'
 import * as openpgp from 'openpgp'
 openpgp.config.aead_protect = false
 openpgp.config.prefer_hash_algorithm = 2 // SHA1

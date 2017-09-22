@@ -2,9 +2,9 @@ import GitTree from '../models/GitTree'
 import GitCommit from '../models/GitCommit'
 import GitObjectManager from '../managers/GitObjectManager'
 import GitIndexManager from '../managers/GitIndexManager'
-import resolveRef from '../utils/resolveRef'
+import { resolveRef } from '../utils/resolveRef'
 import flatFileListToDirectoryStructure from '../utils/flatFileListToDirectoryStructure'
-import write from '../utils/write'
+import { write } from '../utils/write'
 import path from 'path'
 
 async function constructTree ({ gitdir, inode }) /*: string */ {
@@ -31,7 +31,7 @@ async function constructTree ({ gitdir, inode }) /*: string */ {
   return oid
 }
 
-export default async function commit ({
+export async function commit ({
   gitdir,
   author,
   committer,

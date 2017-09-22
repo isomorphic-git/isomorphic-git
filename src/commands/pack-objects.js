@@ -14,8 +14,8 @@ const types = {
   blob: 0b0110000,
   tag: 0b1000000
 }
-
-export default async function pack (
+// TODO: Move this to 'plumbing'
+export async function pack (
   {
     oids,
     gitdir,

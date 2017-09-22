@@ -1,8 +1,8 @@
 import GitCommit from '../models/GitCommit'
 import GitTree from '../models/GitTree'
 import GitObjectManager from '../managers/GitObjectManager'
-import write from '../utils/write'
-import resolveRef from '../utils/resolveRef'
+import { write } from '../utils/write'
+import { resolveRef } from '../utils/resolveRef'
 
 async function writeTreeToDisk ({ gitdir, dirpath, tree }) {
   for (let entry of tree) {
@@ -27,7 +27,7 @@ async function writeTreeToDisk ({ gitdir, dirpath, tree }) {
   }
 }
 
-export default async function checkout ({ workdir, gitdir, remote, ref }) {
+export async function checkout ({ workdir, gitdir, remote, ref }) {
   // Get tree oid
   let oid
   try {

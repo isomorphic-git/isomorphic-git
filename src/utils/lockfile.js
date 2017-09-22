@@ -2,7 +2,7 @@
 // This is modeled after the lockfile strategy used by the git source code.
 import pify from 'pify'
 import fs from 'fs'
-import sleep from './sleep'
+import { sleep } from './sleep'
 const delayedReleases = new Map()
 
 const mkdir = pify(fs.mkdir)

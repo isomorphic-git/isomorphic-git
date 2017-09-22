@@ -1,10 +1,10 @@
 // @flow
 import assert from 'assert'
 import GitCommit from '../models/GitCommit'
-import resolveRef from '../utils/resolveRef'
+import { resolveRef } from '../utils/resolveRef'
 import GitObjectManager from '../managers/GitObjectManager'
-
-export default async function listCommits (
+// TODO: Move this to 'plumbing'
+export async function listCommits (
   {
     gitdir,
     start,
