@@ -12,7 +12,8 @@
     "test": "npm run build && ava",
     "on-pull-request": "npm run format && npm run lint && npm run test",
     "ban": "ban",
-    "precommit": "ban && prettier-standard src/**/*.js test/**/*.js"
+    "precommit": "ban && prettier-standard src/**/*.js test/**/*.js",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",

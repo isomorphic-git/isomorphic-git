@@ -1,5 +1,8 @@
-# esgit [![Build Status](https://travis-ci.org/wmhilton/esgit.svg?branch=master)](https://travis-ci.org/wmhilton/esgit)
+# isomorphic-git [![Build Status](https://travis-ci.org/wmhilton/esgit.svg?branch=master)](https://travis-ci.org/wmhilton/esgit)
 Node library for interacting with git repositories, circa 2017
+
+(Originally I was going to call it `esgit` but the name is too similar to another
+project called [`es-git`](https://github.com/es-git/es-git).)
 
 # Progress
 
