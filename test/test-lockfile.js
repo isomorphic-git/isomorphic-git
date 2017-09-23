@@ -1,8 +1,8 @@
 import test from 'ava'
 import fs from 'fs'
 import { tmpdir, exists } from './_helpers.js'
-import { lock, unlock } from '../lib/utils/lockfile'
-import { sleep } from '../lib/utils/sleep'
+import { lock, unlock } from '../lib/managers/models/utils/lockfile'
+import { sleep } from '../lib/managers/models/utils/sleep'
 
 test('make lockfile', async t => {
   let dir = await tmpdir()

@@ -4,11 +4,11 @@ import pify from 'pify'
 import simpleGet from 'simple-get'
 import concat from 'simple-concat'
 import parseLinkHeader from 'parse-link-header'
-import GitObjectManager from '../managers/GitObjectManager'
-import GitCommit from '../models/GitCommit'
-import GitTree from '../models/GitTree'
-import { write } from '../utils/write'
-import { resolveRef } from '../utils/resolveRef'
+import GitObjectManager from './managers/GitObjectManager'
+import GitCommit from './managers/models/GitCommit'
+import GitTree from './managers/models/GitTree'
+import { write } from './managers/models/utils/write'
+import { resolveRef } from './managers/models/utils/resolveRef'
 
 async function request ({ url, token, headers }) {
   let res = await pify(simpleGet)({

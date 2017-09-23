@@ -1,4 +1,4 @@
-import GitConfigManager from '../managers/GitConfigManager'
+import GitConfigManager from './managers/GitConfigManager'
 
 export async function getConfig ({ gitdir, path }) {
   const config = await GitConfigManager.get({ gitdir })

@@ -1,7 +1,7 @@
 // @flow
 import fs from 'fs'
 import pify from 'pify'
-import GitConfig from '../models/GitConfig'
+import GitConfig from './models/GitConfig'
 
 export default class GitConfigManager {
   static async get ({ gitdir }) {

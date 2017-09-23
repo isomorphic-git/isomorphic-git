@@ -1,9 +1,9 @@
 import fs from 'fs'
 import path from 'omnipath'
 import pify from 'pify'
-import GitIndexManager from '../managers/GitIndexManager'
-import GitObjectManager from '../managers/GitObjectManager'
-import { read } from '../utils/read'
+import GitIndexManager from './managers/GitIndexManager'
+import GitObjectManager from './managers/GitObjectManager'
+import { read } from './managers/models/utils/read'
 
 const lstat = pify(fs.lstat)
 

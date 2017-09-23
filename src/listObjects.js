@@ -1,7 +1,7 @@
 // @flow
-import GitCommit from '../models/GitCommit'
-import GitObjectManager from '../managers/GitObjectManager'
-import GitTree from '../models/GitTree'
+import GitCommit from './managers/models/GitCommit'
+import GitObjectManager from './managers/GitObjectManager'
+import GitTree from './managers/models/GitTree'
 // TODO: Move this to 'plumbing'
 export async function listObjects (
   { gitdir, oids } /*: {

@@ -1,5 +1,5 @@
 import test from 'ava'
-import { resolveRef } from '../lib/utils/resolveRef'
+import { resolveRef } from '../lib/managers/models/utils/resolveRef'
 
 test('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async t => {
   let ref = await resolveRef({

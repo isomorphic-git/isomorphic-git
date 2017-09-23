@@ -1,13 +1,13 @@
 import test from 'ava'
-import { push } from '../lib/commands/push'
+import { push } from '../lib/push'
 import server from './_real-http-backend'
 import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
 import git from '..'
-import { write } from '../lib/utils/write'
+import { write } from '../lib/managers/models/utils/write'
 import path from 'omnipath'
-import { mkdir } from '../lib/utils/mkdirs'
+import { mkdir } from '../lib/managers/models/utils/mkdirs'
 import { exists, tmpdir } from './_helpers'
 
 test('push (to local git-http-backend)', async t => {

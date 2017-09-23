@@ -1,10 +1,10 @@
-import GitTree from '../models/GitTree'
-import GitCommit from '../models/GitCommit'
-import GitObjectManager from '../managers/GitObjectManager'
-import GitIndexManager from '../managers/GitIndexManager'
-import { resolveRef } from '../utils/resolveRef'
-import flatFileListToDirectoryStructure from '../utils/flatFileListToDirectoryStructure'
-import { write } from '../utils/write'
+import GitTree from './managers/models/GitTree'
+import GitCommit from './managers/models/GitCommit'
+import GitObjectManager from './managers/GitObjectManager'
+import GitIndexManager from './managers/GitIndexManager'
+import { resolveRef } from './managers/models/utils/resolveRef'
+import flatFileListToDirectoryStructure from './managers/models/utils/flatFileListToDirectoryStructure'
+import { write } from './managers/models/utils/write'
 import path from 'omnipath'
 
 async function constructTree ({ gitdir, inode }) /*: string */ {

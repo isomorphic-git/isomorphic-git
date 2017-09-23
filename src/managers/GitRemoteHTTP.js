@@ -1,6 +1,6 @@
 // @flow
 import { Buffer } from 'buffer'
-import PktLineReader from '../utils/pkt-line-reader'
+import PktLineReader from './models/utils/pkt-line-reader'
 import simpleGet from 'simple-get'
 import concat from 'simple-concat'
 import pify from 'pify'

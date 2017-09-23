@@ -1,6 +1,6 @@
-import GitCommit from '../models/GitCommit'
-import GitObjectManager from '../managers/GitObjectManager'
-import { resolveRef } from '../utils/resolveRef'
+import GitCommit from './managers/models/GitCommit'
+import GitObjectManager from './managers/GitObjectManager'
+import { resolveRef } from './managers/models/utils/resolveRef'
 import { HKP } from 'openpgp'
 const HttpKeyServer = new HKP()
 

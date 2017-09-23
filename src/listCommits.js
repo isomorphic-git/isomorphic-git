@@ -1,7 +1,7 @@
 // @flow
-import GitCommit from '../models/GitCommit'
-import { resolveRef } from '../utils/resolveRef'
-import GitObjectManager from '../managers/GitObjectManager'
+import GitCommit from './managers/models/GitCommit'
+import { resolveRef } from './managers/models/utils/resolveRef'
+import GitObjectManager from './managers/GitObjectManager'
 // TODO: Move this to 'plumbing'
 export async function listCommits (
   {

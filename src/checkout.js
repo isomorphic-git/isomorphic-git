@@ -1,8 +1,8 @@
-import GitCommit from '../models/GitCommit'
-import GitTree from '../models/GitTree'
-import GitObjectManager from '../managers/GitObjectManager'
-import { write } from '../utils/write'
-import { resolveRef } from '../utils/resolveRef'
+import GitCommit from './managers/models/GitCommit'
+import GitTree from './managers/models/GitTree'
+import GitObjectManager from './managers/GitObjectManager'
+import { write } from './managers/models/utils/write'
+import { resolveRef } from './managers/models/utils/resolveRef'
 
 async function writeTreeToDisk ({ gitdir, dirpath, tree }) {
   for (let entry of tree) {

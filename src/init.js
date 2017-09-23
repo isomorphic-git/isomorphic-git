@@ -1,6 +1,6 @@
 // @flow
-import { write } from '../utils/write'
-import { mkdirs } from '../utils/mkdirs'
+import { write } from './managers/models/utils/write'
+import { mkdirs } from './managers/models/utils/mkdirs'
 
 export async function init (gitdir /*: string */) {
   let folders = [
