@@ -2,7 +2,9 @@
   "name": "isomorphic-git",
   "version": "0.0.2",
   "description": "Node library for interacting with git repositories, circa 2017",
-  "main": "dist/node-cjs.js",
+  "main": "dist/for-node.js",
+  "browser": "dist/for-browserify.js",
+  "module": "dist/for-future.js",
   "bin": {
     "esgit": "./cli.js"
   },
