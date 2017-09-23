@@ -1,6 +1,8 @@
 // We're implementing a non-standard clone based on the Github API first, because of CORS.
 // And because we already have the code.
-import axios from 'axios'
+import pify from 'pify'
+import simpleGet from 'simple-get'
+import concat from 'simple-concat'
 import parseLinkHeader from 'parse-link-header'
 import GitObjectManager from '../managers/GitObjectManager'
 import GitCommit from '../models/GitCommit'
@@ -9,14 +11,16 @@ import { write } from '../utils/write'
 import { resolveRef } from '../utils/resolveRef'
 
 async function request ({ url, token, headers }) {
-  let res = await axios.get(url, {
+  let res = await pify(simpleGet)({
+    url,
     headers: {
       Accept: 'application/vnd.github.v3+json',
       Authorization: 'token ' + token,
       ...headers
     }
   })
-  return res.data
+  let data = await pify(concat)(res)
+  return JSON.parse(data.toString('utf8'))
 }
 
 async function fetchRemoteBranches ({ gitdir, remote, user, repo, token }) {
@@ -61,13 +65,15 @@ async function fetchCommits ({ gitdir, url, user, repo, ref, since, token }) {
       url += `&since=${date}`
     }
   }
-  let res = await axios.get(url, {
+  let res = await pify(simpleGet)({
+    url,
     headers: {
       Accept: 'application/vnd.github.cryptographer-preview',
       Authorization: 'token ' + token
     }
   })
-  let json = res.data
+  let data = await concat(res)
+  let json = JSON.parse(data.toString('utf8'))
   let link = parseLinkHeader(res.headers['link'])
 
   for (let commit of json) {
@@ -149,20 +155,18 @@ async function fetchTree ({ gitdir, url, user, repo, sha, since, token }) {
 }
 
 async function fetchBlob ({ gitdir, url, user, repo, sha, since, token }) {
-  let res = await axios.get(
-    `https://api.github.com/repos/${user}/${repo}/git/blobs/${sha}`,
-    {
-      headers: {
-        Accept: 'application/vnd.github.raw',
-        Authorization: 'token ' + token
-      },
-      responseType: 'arraybuffer'
+  let res = await pify(simpleGet)({
+    url: `https://api.github.com/repos/${user}/${repo}/git/blobs/${sha}`,
+    headers: {
+      Accept: 'application/vnd.github.raw',
+      Authorization: 'token ' + token
     }
-  )
+  })
+  let data = await concat(res)
   let oid = await GitObjectManager.write({
     gitdir,
     type: 'blob',
-    object: res.data
+    object: data
   })
   if (sha !== oid) {
     console.log("AHOY! MATEY! THAR BE TROUBLE WITH 'EM HASHES!")

@@ -33,7 +33,6 @@
   "homepage": "https://github.com/wmhilton/esgit#readme",
   "dependencies": {
     "async-lock": "^1.0.0",
-    "axios": "^0.16.2",
     "buffer": "^5.0.7",
     "buffercursor": "0.0.12",
     "github-url-to-object": "^4.0.2",

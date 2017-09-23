@@ -1,6 +1,6 @@
 // @flow
-import sortby from 'lodash.sortby'
 import { Buffer } from 'buffer'
+import sortby from 'lodash.sortby'
 import BufferCursor from 'buffercursor'
 
 /*::
