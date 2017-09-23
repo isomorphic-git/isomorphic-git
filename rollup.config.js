@@ -7,7 +7,6 @@ const external = [
   'fs',
   'crypto',
   'stream',
-  'assert',
   ...Object.keys(pkg.dependencies)
 ]
 

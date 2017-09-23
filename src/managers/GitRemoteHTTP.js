@@ -1,6 +1,5 @@
 // @flow
 import { Buffer } from 'buffer'
-import assert from 'assert'
 import PktLineReader from '../utils/pkt-line-reader'
 import simpleGet from 'simple-get'
 import concat from 'simple-concat'
@@ -43,10 +42,9 @@ export default class GitRemoteHTTP {
       url: `${this.GIT_URL}/info/refs?service=${service}`,
       headers
     })
-    assert(
-      res.statusCode === 200,
-      `Bad status code from server: ${res.statusCode}`
-    )
+    if (res.statusCode !== 200) {
+      throw new Error(`Bad status code from server: ${res.statusCode}`)
+    }
     let data = await pify(concat)(res)
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
@@ -54,11 +52,14 @@ export default class GitRemoteHTTP {
     let lineOne = read()
     // skip past any flushes
     while (lineOne === null) lineOne = read()
-    assert(lineOne !== true, 'Bad response from git server.')
-    assert(
-      lineOne.toString('utf8') === `# service=${service}\n`,
-      lineOne.toString('utf8')
-    )
+    if (lineOne === true) throw new Error('Bad response from git server.')
+    if (lineOne.toString('utf8') !== `# service=${service}\n`) {
+      throw new Error(
+        `Expected '# service=${service}\\n' but got '${lineOne.toString(
+          'utf8'
+        )}'`
+      )
+    }
     let lineTwo = read()
     // skip past any flushes
     while (lineTwo === null) lineTwo = read()

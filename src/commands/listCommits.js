@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import GitCommit from '../models/GitCommit'
 import { resolveRef } from '../utils/resolveRef'
 import GitObjectManager from '../managers/GitObjectManager'
@@ -35,7 +34,9 @@ export async function listCommits (
   async function walk (oid) {
     visited.add(oid)
     let { type, object } = await GitObjectManager.read({ gitdir, oid })
-    assert(type === 'commit')
+    if (type !== 'commit') {
+      throw new Error(`Expected type commit but type is ${type}`)
+    }
     let commit = GitCommit.from(object)
     let parents = commit.headers().parent
     for (oid of parents) {
