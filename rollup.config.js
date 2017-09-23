@@ -1,28 +1,41 @@
 import babel from 'rollup-plugin-babel'
-import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
-import builtins from 'rollup-plugin-node-builtins'
-import globals from 'rollup-plugin-node-globals'
-
 import json from 'rollup-plugin-json'
 
 import pkg from './package.json'
 
+const external = [
+  'fs',
+  'path',
+  'crypto',
+  'stream',
+  'assert',
+  ...Object.keys(pkg.dependencies)
+]
+
 export default [
+  {
+    // Bleeding edge
+    input: 'src/index.js',
+    external,
+    output: [
+      { format: 'es', name: 'git', file: 'dist/for-future.js' }
+    ],
+    plugins: [
+      babel({
+        'babelrc': false,
+        'exclude': 'node_modules/**',
+        'plugins': [
+          'transform-object-rest-spread'
+        ]
+      })
+    ]
+  },
   {
     // Node.js
     input: 'src/index.js',
-    external: [
-      'fs',
-      'path',
-      'crypto',
-      'stream',
-      'assert',
-      ...Object.keys(pkg.dependencies)
-    ],
+    external,
     output: [
-      { format: 'es', name: 'git', file: 'dist/bundle-esm.js' },
-      { format: 'cjs', name: 'git', file: 'dist/node-cjs.js' }
+      { format: 'cjs', name: 'git', file: 'dist/for-node.js' }
     ],
     plugins: [
       babel({
@@ -44,14 +57,11 @@ export default [
     ]
   },
   {
-    // Browsers
+    // Browserify
     input: 'src/index.js',
-    external: [
-      'fs',
-      'openpgp'
-    ],
+    external,
     output: [
-      { format: 'umd', name: 'git', file: 'dist/browser-umd.js' }
+      { format: 'cjs', name: 'git', file: 'dist/for-browserify.js' }
     ],
     plugins: [
       babel({
@@ -69,22 +79,6 @@ export default [
           'external-helpers',
           'transform-object-rest-spread'
         ]
-      }),
-      resolve({
-        browser: true,
-        extensions: [
-          '.js',
-          '.json'
-        ]
-      }),
-      json({
-        include: 'node_modules/**',
-        preferConst: true
-      }),
-      commonjs(),
-      globals(),
-      builtins({
-        crypto: true
       })
     ]
   }
