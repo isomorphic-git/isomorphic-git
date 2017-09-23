@@ -4,7 +4,7 @@ import { read } from '../lib/utils/read'
 import { write } from '../lib/utils/write'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-import path from 'path'
+import path from 'omnipath'
 import ncp from 'ncp'
 import { tmpdir } from './_helpers'
 

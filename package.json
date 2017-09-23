@@ -42,6 +42,7 @@
     "lodash.set": "^4.3.2",
     "lodash.sortby": "^4.7.0",
     "minimisted": "^2.0.0",
+    "omnipath": "^1.1.5",
     "openpgp": "^2.5.10",
     "pad": "^1.1.0",
     "pako": "^1.0.5",
