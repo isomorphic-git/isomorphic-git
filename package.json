@@ -68,6 +68,7 @@
     "nock": "^9.0.17",
     "parse-header-stream": "^1.1.1",
     "prettier-standard": "^6.0.0",
+    "rollup": "^0.50.0",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-commonjs": "^8.2.1",
     "rollup-plugin-json": "^2.3.0",
