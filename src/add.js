@@ -1,5 +1,5 @@
 import fs from 'fs'
-import path from 'omnipath'
+import path from 'path'
 import pify from 'pify'
 import GitIndexManager from './managers/GitIndexManager'
 import GitObjectManager from './managers/GitObjectManager'

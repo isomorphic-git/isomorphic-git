@@ -1,6 +1,6 @@
 // @flow
 import { Buffer } from 'buffer'
-import * as openpgp from 'openpgp'
+import * as openpgp from 'openpgp/dist/openpgp.min.js'
 
 function formatTimezoneOffset (minutes /*: number */) {
   let sign = Math.sign(minutes) || 1

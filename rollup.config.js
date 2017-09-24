@@ -5,6 +5,7 @@ import pkg from './package.json'
 
 const external = [
   'fs',
+  'path',
   'crypto',
   'stream',
   ...Object.keys(pkg.dependencies)

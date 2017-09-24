@@ -5,7 +5,7 @@ import GitIndexManager from './managers/GitIndexManager'
 import { resolveRef } from './managers/models/utils/resolveRef'
 import flatFileListToDirectoryStructure from './managers/models/utils/flatFileListToDirectoryStructure'
 import { write } from './managers/models/utils/write'
-import path from 'omnipath'
+import path from 'path'
 
 async function constructTree ({ gitdir, inode }) /*: string */ {
   // use depth first traversal

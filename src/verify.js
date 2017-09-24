@@ -1,7 +1,7 @@
 import GitCommit from './managers/models/GitCommit'
 import GitObjectManager from './managers/GitObjectManager'
 import { resolveRef } from './managers/models/utils/resolveRef'
-import { HKP } from 'openpgp'
+import { HKP } from 'openpgp/dist/openpgp.min.js'
 const HttpKeyServer = new HKP()
 
 export async function verify ({ gitdir, ref, publicKeys }) {

@@ -1,5 +1,5 @@
 // @flow
-import path from 'omnipath'
+import path from 'path'
 import pify from 'pify'
 import fs from 'fs'
 
