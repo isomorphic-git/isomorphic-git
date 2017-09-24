@@ -75,7 +75,6 @@ export default [
           }]
         ],
         'plugins': [
-          'external-helpers',
           'transform-object-rest-spread'
         ]
       })
