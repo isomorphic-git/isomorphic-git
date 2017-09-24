@@ -14,7 +14,7 @@ export async function mkdir (dirpath /*: string */) {
     if (err.code === 'EEXIST') return
     // If we got a "no such file or directory error" backup and try again.
     if (err.code === 'ENOENT') {
-      let parent = path.posix.dirname(dirpath)
+      let parent = path.dirname(dirpath)
       // Check to see if we've gone too far
       if (parent === '.' || parent === '/' || parent === dirpath) throw err
       // Infinite recursion, what could go wrong?

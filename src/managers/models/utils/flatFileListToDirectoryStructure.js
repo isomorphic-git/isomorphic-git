@@ -21,7 +21,7 @@ export default function flatFileListToDirectoryStructure (
       let dir /*: Node */ = {
         type: 'tree',
         fullpath: name,
-        basename: path.posix.basename(name),
+        basename: path.basename(name),
         metadata: {},
         children: []
       }
@@ -29,7 +29,7 @@ export default function flatFileListToDirectoryStructure (
       // This recursively generates any missing parent folders.
       // We do it after we've added the inode to the set so that
       // we don't recurse infinitely trying to create the root '.' dirname.
-      dir.parent = mkdir(path.posix.dirname(name))
+      dir.parent = mkdir(path.dirname(name))
       if (dir.parent && dir.parent !== dir) dir.parent.children.push(dir)
     }
     return inodes.get(name)
@@ -40,10 +40,10 @@ export default function flatFileListToDirectoryStructure (
       let file /*: Node */ = {
         type: 'blob',
         fullpath: name,
-        basename: path.posix.basename(name),
+        basename: path.basename(name),
         metadata: metadata,
         // This recursively generates any missing parent folders.
-        parent: mkdir(path.posix.dirname(name)),
+        parent: mkdir(path.dirname(name)),
         children: []
       }
       if (file.parent) file.parent.children.push(file)
