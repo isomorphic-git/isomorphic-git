@@ -23,9 +23,11 @@ var ini = _interopDefault(require('ini'));
 var _get = _interopDefault(require('lodash/get'));
 var _set = _interopDefault(require('lodash/set'));
 
+function _asyncToGenerator$3(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // @flow
 var mkdir = function () {
-  var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(dirpath /*: string */) {
+  var _ref = _asyncToGenerator$3(regeneratorRuntime.mark(function _callee(dirpath /*: string */) {
     var parent;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -95,7 +97,7 @@ var mkdir = function () {
 }();
 
 var mkdirs = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(dirlist /*: string[] */) {
+  var _ref2 = _asyncToGenerator$3(regeneratorRuntime.mark(function _callee2(dirlist /*: string[] */) {
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -115,11 +117,13 @@ var mkdirs = function () {
   };
 }();
 
+function _asyncToGenerator$2(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // @flow
 // An async writeFile variant that automatically creates missing directories,
 // and returns null instead of throwing errors.
 var write = function () {
-  var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(filepath /*: string */
+  var _ref = _asyncToGenerator$2(regeneratorRuntime.mark(function _callee(filepath /*: string */
   , contents /*: string|Buffer */
   ) {
     return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -156,9 +160,11 @@ var write = function () {
   };
 }();
 
+function _asyncToGenerator$1(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // @flow
 var init = function () {
-  var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(gitdir /*: string */) {
+  var _ref = _asyncToGenerator$1(regeneratorRuntime.mark(function _callee(gitdir /*: string */) {
     var folders;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -193,9 +199,11 @@ var init = function () {
   };
 }();
 
+function _asyncToGenerator$6(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // An async readFile variant that returns null instead of throwing errors
 var read = function () {
-  var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(file, options) {
+  var _ref = _asyncToGenerator$6(regeneratorRuntime.mark(function _callee(file, options) {
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
@@ -219,9 +227,11 @@ var read = function () {
   };
 }();
 
+function _asyncToGenerator$7(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // An async exists variant
 var exists = function () {
-  var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(file, options) {
+  var _ref = _asyncToGenerator$7(regeneratorRuntime.mark(function _callee(file, options) {
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
@@ -245,6 +255,12 @@ var exists = function () {
     return _ref.apply(this, arguments);
   };
 }();
+
+var _createClass$1 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _asyncToGenerator$5(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // @flow
 function wrapObject(_ref /*: {type: string, object: Buffer} */) {
@@ -287,13 +303,13 @@ function unwrapObject(_ref2 /*: {oid: string, file: Buffer} */) {
 
 var GitObjectManager = function () {
   function GitObjectManager() {
-    babelHelpers.classCallCheck(this, GitObjectManager);
+    _classCallCheck$1(this, GitObjectManager);
   }
 
-  babelHelpers.createClass(GitObjectManager, null, [{
+  _createClass$1(GitObjectManager, null, [{
     key: 'read',
     value: function () {
-      var _ref4 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref3 /*: {gitdir: string, oid: string} */) {
+      var _ref4 = _asyncToGenerator$5(regeneratorRuntime.mark(function _callee(_ref3 /*: {gitdir: string, oid: string} */) {
         var gitdir = _ref3.gitdir,
             oid = _ref3.oid;
 
@@ -337,7 +353,7 @@ var GitObjectManager = function () {
   }, {
     key: 'write',
     value: function () {
-      var _ref6 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref5) {
+      var _ref6 = _asyncToGenerator$5(regeneratorRuntime.mark(function _callee2(_ref5) {
         var gitdir = _ref5.gitdir,
             type = _ref5.type,
             object = _ref5.object;
@@ -385,8 +401,19 @@ var GitObjectManager = function () {
     }() /*: {gitdir: string, type: string, object: Buffer} */
 
   }]);
+
   return GitObjectManager;
 }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass$2 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+function _asyncToGenerator$8(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // @flow
 function formatTimezoneOffset(minutes /*: number */) {
@@ -403,7 +430,7 @@ function formatTimezoneOffset(minutes /*: number */) {
 
 function parseTimezoneOffset(offset) {
   var _offset$match = offset.match(/(\+|-)(\d\d)(\d\d)/),
-      _offset$match2 = babelHelpers.slicedToArray(_offset$match, 4),
+      _offset$match2 = _slicedToArray(_offset$match, 4),
       sign$$1 = _offset$match2[1],
       hours = _offset$match2[2],
       minutes = _offset$match2[3];
@@ -414,7 +441,7 @@ function parseTimezoneOffset(offset) {
 
 function parseAuthor(author) {
   var _author$match = author.match(/^(.*) <(.*)> (.*) (.*)$/),
-      _author$match2 = babelHelpers.slicedToArray(_author$match, 5),
+      _author$match2 = _slicedToArray(_author$match, 5),
       name = _author$match2[1],
       email = _author$match2[2],
       timestamp = _author$match2[3],
@@ -457,20 +484,20 @@ var GitCommit = function () {
   _commit : string
   */
   function GitCommit(commit /*: string|Buffer|Object */) {
-    babelHelpers.classCallCheck(this, GitCommit);
+    _classCallCheck$2(this, GitCommit);
 
     if (typeof commit === 'string') {
       this._commit = commit;
     } else if (buffer.Buffer.isBuffer(commit)) {
       this._commit = commit.toString('utf8');
-    } else if ((typeof commit === 'undefined' ? 'undefined' : babelHelpers.typeof(commit)) === 'object') {
+    } else if ((typeof commit === 'undefined' ? 'undefined' : _typeof(commit)) === 'object') {
       this._commit = GitCommit.render(commit);
     } else {
       throw new Error('invalid type passed to GitCommit constructor');
     }
   }
 
-  babelHelpers.createClass(GitCommit, [{
+  _createClass$2(GitCommit, [{
     key: 'toObject',
     value: function toObject() {
       return buffer.Buffer.from(this._commit, 'utf8');
@@ -586,7 +613,7 @@ var GitCommit = function () {
   }, {
     key: 'sign',
     value: function () {
-      var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(privateKeys /*: string */) {
+      var _ref = _asyncToGenerator$8(regeneratorRuntime.mark(function _callee(privateKeys /*: string */) {
         var commit, headers, message$$1, privKeyObj, _ref2, signature, signedCommit;
 
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -633,7 +660,7 @@ var GitCommit = function () {
   }, {
     key: 'listSigningKeys',
     value: function () {
-      var _ref3 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      var _ref3 = _asyncToGenerator$8(regeneratorRuntime.mark(function _callee2() {
         var msg;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -661,7 +688,7 @@ var GitCommit = function () {
   }, {
     key: 'verify',
     value: function () {
-      var _ref4 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3(publicKeys /*: string */) {
+      var _ref4 = _asyncToGenerator$8(regeneratorRuntime.mark(function _callee3(publicKeys /*: string */) {
         var pubKeyObj, msg, results, validity;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -768,8 +795,13 @@ var GitCommit = function () {
       return GitCommit.renderHeaders(obj) + '\n' + normalize(obj.message);
     }
   }]);
+
   return GitCommit;
 }();
+
+var _createClass$3 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // @flow
 /*::
@@ -822,7 +854,7 @@ var GitTree = function () {
   _entries: Array<TreeEntry>
   */
   function GitTree(entries /*: any */) {
-    babelHelpers.classCallCheck(this, GitTree);
+    _classCallCheck$3(this, GitTree);
 
     if (buffer.Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries);
@@ -833,7 +865,7 @@ var GitTree = function () {
     }
   }
 
-  babelHelpers.createClass(GitTree, [{
+  _createClass$3(GitTree, [{
     key: 'render',
     value: function render() {
       return this._entries.map(function (entry) {
@@ -936,11 +968,14 @@ var GitTree = function () {
       return new GitTree(tree);
     }
   }]);
+
   return GitTree;
 }();
 
+function _asyncToGenerator$9(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var resolveRef = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$9(regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         ref = _ref.ref,
         depth = _ref.depth;
@@ -1088,8 +1123,10 @@ var resolveRef = function () {
   };
 }();
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key$$1 in source) { if (Object.prototype.hasOwnProperty.call(source, key$$1)) { target[key$$1] = source[key$$1]; } } } return target; };
+
 var request = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee(_ref) {
     var url = _ref.url,
         token = _ref.token,
         headers = _ref.headers;
@@ -1101,7 +1138,7 @@ var request = function () {
             _context.next = 2;
             return pify(simpleGet)({
               url: url,
-              headers: babelHelpers.extends({
+              headers: _extends({
                 Accept: 'application/vnd.github.v3+json',
                 Authorization: 'token ' + token
               }, headers)
@@ -1130,7 +1167,7 @@ var request = function () {
 }();
 
 var fetchRemoteBranches = function () {
-  var _ref4 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref3) {
+  var _ref4 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee2(_ref3) {
     var gitdir = _ref3.gitdir,
         remote = _ref3.remote,
         user = _ref3.user,
@@ -1163,7 +1200,7 @@ var fetchRemoteBranches = function () {
 }();
 
 var fetchTags = function () {
-  var _ref6 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3(_ref5) {
+  var _ref6 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee3(_ref5) {
     var gitdir = _ref5.gitdir,
         user = _ref5.user,
         repo = _ref5.repo,
@@ -1200,7 +1237,7 @@ var fetchTags = function () {
 }();
 
 var fetchCommits = function () {
-  var _ref8 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4(_ref7) {
+  var _ref8 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee4(_ref7) {
     var gitdir = _ref7.gitdir,
         url = _ref7.url,
         user = _ref7.user,
@@ -1355,7 +1392,7 @@ var fetchCommits = function () {
 }();
 
 var fetchTree = function () {
-  var _ref10 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee6(_ref9) {
+  var _ref10 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee6(_ref9) {
     var _this = this;
 
     var gitdir = _ref9.gitdir,
@@ -1394,7 +1431,7 @@ var fetchTree = function () {
             }
             console.log(tree.render());
             return _context6.abrupt('return', Promise.all(json.tree.map(function () {
-              var _ref11 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5(entry) {
+              var _ref11 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee5(entry) {
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                   while (1) {
                     switch (_context5.prev = _context5.next) {
@@ -1463,7 +1500,7 @@ var fetchTree = function () {
 }();
 
 var fetchBlob = function () {
-  var _ref13 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee7(_ref12) {
+  var _ref13 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee7(_ref12) {
     var gitdir = _ref12.gitdir,
         url = _ref12.url,
         user = _ref12.user,
@@ -1519,10 +1556,12 @@ var fetchBlob = function () {
   };
 }();
 
+function _asyncToGenerator$4(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // We're implementing a non-standard clone based on the Github API first, because of CORS.
 // And because we already have the code.
 var fetch = function () {
-  var _ref15 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee8(_ref14) {
+  var _ref15 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee8(_ref14) {
     var gitdir = _ref14.gitdir,
         token = _ref14.token,
         user = _ref14.user,
@@ -1614,7 +1653,7 @@ var fetch = function () {
 }();
 
 var writeTreeToDisk = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$10(regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         dirpath = _ref.dirpath,
         tree = _ref.tree;
@@ -1723,8 +1762,10 @@ var writeTreeToDisk = function () {
   };
 }();
 
+function _asyncToGenerator$10(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var checkout = function () {
-  var _ref5 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref4) {
+  var _ref5 = _asyncToGenerator$10(regeneratorRuntime.mark(function _callee2(_ref4) {
     var workdir = _ref4.workdir,
         gitdir = _ref4.gitdir,
         remote = _ref4.remote,
@@ -1816,6 +1857,12 @@ var checkout = function () {
   };
 }();
 
+var _createClass$5 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 // @flow
 /*::
 import type {Stats} from 'fs'
@@ -1893,7 +1940,7 @@ var GitIndex = function () {
    _dirty: boolean // Used to determine if index needs to be saved to filesystem
    */
   function GitIndex(index /*: any */) {
-    babelHelpers.classCallCheck(this, GitIndex);
+    _classCallCheck$5(this, GitIndex);
 
     this._dirty = false;
     if (buffer.Buffer.isBuffer(index)) {
@@ -1905,7 +1952,7 @@ var GitIndex = function () {
     }
   }
 
-  babelHelpers.createClass(GitIndex, [{
+  _createClass$5(GitIndex, [{
     key: Symbol.iterator,
     value: regeneratorRuntime.mark(function value() {
       var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, entry;
@@ -2083,7 +2130,7 @@ var GitIndex = function () {
   }, {
     key: 'entries',
     get: function get() /*: Array<CacheEntry> */{
-      return sortby([].concat(babelHelpers.toConsumableArray(this._entries.values())), 'path');
+      return sortby([].concat(_toConsumableArray(this._entries.values())), 'path');
     }
   }], [{
     key: 'from',
@@ -2091,8 +2138,15 @@ var GitIndex = function () {
       return new GitIndex(buffer$$1);
     }
   }]);
+
   return GitIndex;
 }();
+
+var _createClass$4 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _asyncToGenerator$12(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // @flow
 // import LockManager from 'travix-lock-manager'
@@ -2105,19 +2159,19 @@ var lock = new AsyncLock();
 
 var GitIndexManager = function () {
   function GitIndexManager() {
-    babelHelpers.classCallCheck(this, GitIndexManager);
+    _classCallCheck$4(this, GitIndexManager);
   }
 
-  babelHelpers.createClass(GitIndexManager, null, [{
+  _createClass$4(GitIndexManager, null, [{
     key: 'acquire',
     value: function () {
-      var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(filepath, closure) {
+      var _ref = _asyncToGenerator$12(regeneratorRuntime.mark(function _callee2(filepath, closure) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return lock.acquire(filepath, babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                return lock.acquire(filepath, _asyncToGenerator$12(regeneratorRuntime.mark(function _callee() {
                   var index, rawIndexFile, buffer$$1;
                   return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
@@ -2193,11 +2247,14 @@ var GitIndexManager = function () {
       return acquire;
     }()
   }]);
+
   return GitIndexManager;
 }();
 
+function _asyncToGenerator$11(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var list = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref) {
+  var _ref2 = _asyncToGenerator$11(regeneratorRuntime.mark(function _callee2(_ref) {
     var gitdir = _ref.gitdir;
     var filenames;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -2207,7 +2264,7 @@ var list = function () {
             filenames = void 0;
             _context2.next = 3;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref3 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(index) {
+              var _ref3 = _asyncToGenerator$11(regeneratorRuntime.mark(function _callee(index) {
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                   while (1) {
                     switch (_context.prev = _context.next) {
@@ -2245,10 +2302,12 @@ var list = function () {
   };
 }();
 
+function _asyncToGenerator$13(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var lstat = pify(fs.lstat);
 
 var add = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref) {
+  var _ref2 = _asyncToGenerator$13(regeneratorRuntime.mark(function _callee2(_ref) {
     var gitdir = _ref.gitdir,
         workdir = _ref.workdir,
         filepath = _ref.filepath;
@@ -2279,7 +2338,7 @@ var add = function () {
             oid = _context2.sent;
             _context2.next = 11;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref3 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(index) {
+              var _ref3 = _asyncToGenerator$13(regeneratorRuntime.mark(function _callee(index) {
                 var stats;
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                   while (1) {
@@ -2319,8 +2378,10 @@ var add = function () {
   };
 }();
 
+function _asyncToGenerator$14(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var remove = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref) {
+  var _ref2 = _asyncToGenerator$14(regeneratorRuntime.mark(function _callee2(_ref) {
     var gitdir = _ref.gitdir,
         filepath = _ref.filepath;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -2329,7 +2390,7 @@ var remove = function () {
           case 0:
             _context2.next = 2;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref3 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(index) {
+              var _ref3 = _asyncToGenerator$14(regeneratorRuntime.mark(function _callee(index) {
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                   while (1) {
                     switch (_context.prev = _context.next) {
@@ -2442,7 +2503,7 @@ function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
 }
 
 var constructTree = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$15(regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         inode = _ref.inode;
 
@@ -2553,8 +2614,10 @@ var constructTree = function () {
   };
 }();
 
+function _asyncToGenerator$15(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var commit = function () {
-  var _ref4 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3(_ref3) {
+  var _ref4 = _asyncToGenerator$15(regeneratorRuntime.mark(function _callee3(_ref3) {
     var gitdir = _ref3.gitdir,
         author = _ref3.author,
         committer = _ref3.committer,
@@ -2572,7 +2635,7 @@ var commit = function () {
             oid = void 0;
             _context3.next = 6;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref5 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(index) {
+              var _ref5 = _asyncToGenerator$15(regeneratorRuntime.mark(function _callee2(index) {
                 var inode, treeRef, parent, comm, branch;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                   while (1) {
@@ -2665,10 +2728,12 @@ var commit = function () {
   };
 }();
 
+function _asyncToGenerator$16(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var HttpKeyServer = new openpgp.HKP();
 
 var verify = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$16(regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         ref = _ref.ref,
         publicKeys = _ref.publicKeys;
@@ -2753,6 +2818,8 @@ var verify = function () {
   };
 }();
 
+function _asyncToGenerator$17(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // @flow
 /*::
 import type {Writable} from 'stream'
@@ -2765,7 +2832,7 @@ var types = {
   tag: 64
   // TODO: Move this to 'plumbing'
 };var pack = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
+  var _ref2 = _asyncToGenerator$17(regeneratorRuntime.mark(function _callee(_ref /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
   ) {
     var oids = _ref.oids,
         gitdir = _ref.gitdir,
@@ -2918,6 +2985,14 @@ function reader(buffer$$1 /*: Buffer */) {
   };
 }
 
+var _slicedToArray$1 = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass$6 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _asyncToGenerator$19(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 // @flow
 function basicAuth(auth) {
   return 'Basic ' + buffer.Buffer.from(auth.username + ':' + auth.password).toString('base64');
@@ -2931,17 +3006,17 @@ var GitRemoteHTTP = function () {
   auth : { username : string, password : string }
   */
   function GitRemoteHTTP(url /*: string */) {
-    babelHelpers.classCallCheck(this, GitRemoteHTTP);
+    _classCallCheck$6(this, GitRemoteHTTP);
 
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git')) url = url += '.git';
     this.GIT_URL = url;
   }
 
-  babelHelpers.createClass(GitRemoteHTTP, [{
+  _createClass$6(GitRemoteHTTP, [{
     key: 'preparePull',
     value: function () {
-      var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      var _ref = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee() {
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -2966,7 +3041,7 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'preparePush',
     value: function () {
-      var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+      var _ref2 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee2() {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -2991,7 +3066,7 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'discover',
     value: function () {
-      var _ref3 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3(service /*: string */) {
+      var _ref3 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee3(service /*: string */) {
         var _this = this;
 
         var headers, res, data, read, lineOne, lineTwo, _lineTwo$toString$tri, _lineTwo$toString$tri2, firstRef, capabilities, _firstRef$split, _firstRef$split2, ref, name, line, _line$toString$trim$s, _line$toString$trim$s2, _ref4, _name;
@@ -3073,12 +3148,12 @@ var GitRemoteHTTP = function () {
                 return _context3.abrupt('return');
 
               case 23:
-                _lineTwo$toString$tri = lineTwo.toString('utf8').trim().split('\0'), _lineTwo$toString$tri2 = babelHelpers.slicedToArray(_lineTwo$toString$tri, 2), firstRef = _lineTwo$toString$tri2[0], capabilities = _lineTwo$toString$tri2[1];
+                _lineTwo$toString$tri = lineTwo.toString('utf8').trim().split('\0'), _lineTwo$toString$tri2 = _slicedToArray$1(_lineTwo$toString$tri, 2), firstRef = _lineTwo$toString$tri2[0], capabilities = _lineTwo$toString$tri2[1];
 
                 capabilities.split(' ').map(function (x) {
                   return _this.capabilities.add(x);
                 });
-                _firstRef$split = firstRef.split(' '), _firstRef$split2 = babelHelpers.slicedToArray(_firstRef$split, 2), ref = _firstRef$split2[0], name = _firstRef$split2[1];
+                _firstRef$split = firstRef.split(' '), _firstRef$split2 = _slicedToArray$1(_firstRef$split, 2), ref = _firstRef$split2[0], name = _firstRef$split2[1];
 
                 this.refs.set(name, ref);
 
@@ -3096,7 +3171,7 @@ var GitRemoteHTTP = function () {
 
               case 31:
                 if (line !== null) {
-                  _line$toString$trim$s = line.toString('utf8').trim().split(' '), _line$toString$trim$s2 = babelHelpers.slicedToArray(_line$toString$trim$s, 2), _ref4 = _line$toString$trim$s2[0], _name = _line$toString$trim$s2[1];
+                  _line$toString$trim$s = line.toString('utf8').trim().split(' '), _line$toString$trim$s2 = _slicedToArray$1(_line$toString$trim$s, 2), _ref4 = _line$toString$trim$s2[0], _name = _line$toString$trim$s2[1];
 
                   this.refs.set(_name, _ref4);
                 }
@@ -3120,7 +3195,7 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'push',
     value: function () {
-      var _ref5 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4(stream$$1) {
+      var _ref5 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee4(stream$$1) {
         var service, headers, res;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -3163,7 +3238,7 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'pull',
     value: function () {
-      var _ref7 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5(_ref6) {
+      var _ref7 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee5(_ref6) {
         var stream$$1 = _ref6.stream;
         var service, headers, res;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
@@ -3205,17 +3280,20 @@ var GitRemoteHTTP = function () {
       return pull;
     }()
   }]);
+
   return GitRemoteHTTP;
 }();
+
+function _asyncToGenerator$20(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 // @flow
 // TODO: Move this to 'plumbing'
 var listCommits = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref /*: {
-                                                                                           gitdir: string,
-                                                                                           start: Array<string>,
-                                                                                           finish: Array<string>
-                                                                                           } */
+  var _ref2 = _asyncToGenerator$20(regeneratorRuntime.mark(function _callee2(_ref /*: {
+                                                                               gitdir: string,
+                                                                               start: Array<string>,
+                                                                               finish: Array<string>
+                                                                               } */
   ) {
     /*: Set<string> */
 
@@ -3223,7 +3301,7 @@ var listCommits = function () {
     // way to construct a cycle. Therefore we won't worry about
     // setting a default recursion limit.
     var walk = function () {
-      var _ref4 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(oid) {
+      var _ref4 = _asyncToGenerator$20(regeneratorRuntime.mark(function _callee(oid) {
         var _ref5, type, object, commit, parents, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3;
 
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -3540,20 +3618,22 @@ var listCommits = function () {
   };
 }();
 
+function _asyncToGenerator$21(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // @flow
 // TODO: Move this to 'plumbing'
 var listObjects = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref /*: {
-                                                                                           gitdir: string,
-                                                                                           oids: Array<string>
-                                                                                           } */
+  var _ref2 = _asyncToGenerator$21(regeneratorRuntime.mark(function _callee2(_ref /*: {
+                                                                               gitdir: string,
+                                                                               oids: Array<string>
+                                                                               } */
   ) {
 
     // We don't do the purest simplest recursion, because we can
     // avoid reading Blob objects entirely since the Tree objects
     // tell us which oids are Blobs and which are Trees.
     var walk = function () {
-      var _ref3 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(oid) {
+      var _ref3 = _asyncToGenerator$21(regeneratorRuntime.mark(function _callee(oid) {
         var _ref4, type, object, commit, tree, _tree, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, entry;
 
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -3816,9 +3896,13 @@ function encode(line /*: string|Buffer */) /*: Buffer */{
   return buffer.Buffer.concat([buffer.Buffer.from(hexlength, 'utf8'), line]);
 }
 
+function _toConsumableArray$1(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _asyncToGenerator$18(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 // @flow
 var push = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$18(regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         _ref$ref = _ref.ref,
         ref = _ref$ref === undefined ? 'HEAD' : _ref$ref,
@@ -3862,7 +3946,7 @@ var push = function () {
             packstream.write(flush());
             pack({
               gitdir: gitdir,
-              oids: [].concat(babelHelpers.toConsumableArray(objects)),
+              oids: [].concat(_toConsumableArray$1(objects)),
               outputStream: packstream
             });
             _context.next = 20;
@@ -3885,17 +3969,23 @@ var push = function () {
   };
 }();
 
+var _createClass$8 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _asyncToGenerator$24(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var GitConfig = function () {
   function GitConfig(text) {
-    babelHelpers.classCallCheck(this, GitConfig);
+    _classCallCheck$8(this, GitConfig);
 
     this.ini = ini.decode(text);
   }
 
-  babelHelpers.createClass(GitConfig, [{
+  _createClass$8(GitConfig, [{
     key: 'get',
     value: function () {
-      var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(path$$1) {
+      var _ref = _asyncToGenerator$24(regeneratorRuntime.mark(function _callee(path$$1) {
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -3919,7 +4009,7 @@ var GitConfig = function () {
   }, {
     key: 'set',
     value: function () {
-      var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(path$$1, value) {
+      var _ref2 = _asyncToGenerator$24(regeneratorRuntime.mark(function _callee2(path$$1, value) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -3951,19 +4041,26 @@ var GitConfig = function () {
       return new GitConfig(text);
     }
   }]);
+
   return GitConfig;
 }();
+
+var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _asyncToGenerator$23(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // @flow
 var GitConfigManager = function () {
   function GitConfigManager() {
-    babelHelpers.classCallCheck(this, GitConfigManager);
+    _classCallCheck$7(this, GitConfigManager);
   }
 
-  babelHelpers.createClass(GitConfigManager, null, [{
+  _createClass$7(GitConfigManager, null, [{
     key: 'get',
     value: function () {
-      var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+      var _ref2 = _asyncToGenerator$23(regeneratorRuntime.mark(function _callee(_ref) {
         var gitdir = _ref.gitdir;
         var text;
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -3994,7 +4091,7 @@ var GitConfigManager = function () {
   }, {
     key: 'save',
     value: function () {
-      var _ref4 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(_ref3) {
+      var _ref4 = _asyncToGenerator$23(regeneratorRuntime.mark(function _callee2(_ref3) {
         var gitdir = _ref3.gitdir,
             config = _ref3.config;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -4022,11 +4119,14 @@ var GitConfigManager = function () {
     }() /*: { gitdir: string, config: GitConfig } */
 
   }]);
+
   return GitConfigManager;
 }();
 
+function _asyncToGenerator$22(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var getConfig = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$22(regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         path$$1 = _ref.path;
     var config, value;
@@ -4059,8 +4159,10 @@ var getConfig = function () {
   };
 }();
 
+function _asyncToGenerator$25(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var setConfig = function () {
-  var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator$25(regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         path$$1 = _ref.path,
         value = _ref.value;
@@ -4094,6 +4196,12 @@ var setConfig = function () {
   };
 }();
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function git(dir) {
   return new Git(dir);
 }
@@ -4102,7 +4210,7 @@ function git(dir) {
 
 var Git = function () {
   function Git(dir) {
-    babelHelpers.classCallCheck(this, Git);
+    _classCallCheck(this, Git);
 
     if (dir) {
       this.workdir = dir;
@@ -4111,7 +4219,7 @@ var Git = function () {
     this.operateRemote = 'origin';
   }
 
-  babelHelpers.createClass(Git, [{
+  _createClass(Git, [{
     key: 'workdir',
     value: function workdir(dir) {
       this.workdir = dir;
@@ -4181,7 +4289,7 @@ var Git = function () {
   }, {
     key: 'init',
     value: function () {
-      var _ref = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -4206,7 +4314,7 @@ var Git = function () {
   }, {
     key: 'fetch',
     value: function () {
-      var _ref2 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee2(url) {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(url) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -4239,7 +4347,7 @@ var Git = function () {
   }, {
     key: 'checkout',
     value: function () {
-      var _ref3 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee3(ref) {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(ref) {
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -4269,7 +4377,7 @@ var Git = function () {
   }, {
     key: 'clone',
     value: function () {
-      var _ref4 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee4(url) {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(url) {
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -4316,7 +4424,7 @@ var Git = function () {
   }, {
     key: 'list',
     value: function () {
-      var _ref5 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -4342,7 +4450,7 @@ var Git = function () {
   }, {
     key: 'add',
     value: function () {
-      var _ref6 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee6(filepath) {
+      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(filepath) {
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -4370,7 +4478,7 @@ var Git = function () {
   }, {
     key: 'remove',
     value: function () {
-      var _ref7 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee7(filepath) {
+      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(filepath) {
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
@@ -4397,7 +4505,7 @@ var Git = function () {
   }, {
     key: 'commit',
     value: function () {
-      var _ref8 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee8(message$$1) {
+      var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(message$$1) {
         return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
@@ -4508,7 +4616,7 @@ var Git = function () {
   }, {
     key: 'verify',
     value: function () {
-      var _ref9 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee9(ref) {
+      var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(ref) {
         return regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
@@ -4536,7 +4644,7 @@ var Git = function () {
   }, {
     key: 'pack',
     value: function () {
-      var _ref10 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee10(oids) {
+      var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(oids) {
         return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
@@ -4564,7 +4672,7 @@ var Git = function () {
   }, {
     key: 'push',
     value: function () {
-      var _ref11 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee11(ref) {
+      var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(ref) {
         var url;
         return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
@@ -4607,7 +4715,7 @@ var Git = function () {
   }, {
     key: 'getConfig',
     value: function () {
-      var _ref12 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee12(path$$1) {
+      var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(path$$1) {
         return regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
@@ -4634,7 +4742,7 @@ var Git = function () {
   }, {
     key: 'setConfig',
     value: function () {
-      var _ref13 = babelHelpers.asyncToGenerator(regeneratorRuntime.mark(function _callee13(path$$1, value) {
+      var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(path$$1, value) {
         return regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
@@ -4660,6 +4768,7 @@ var Git = function () {
       return setConfig$$1;
     }()
   }]);
+
   return Git;
 }();
 
