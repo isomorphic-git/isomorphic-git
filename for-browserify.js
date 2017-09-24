@@ -2,34 +2,46 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var _regeneratorRuntime = _interopDefault(require('babel-runtime/regenerator'));
+var _asyncToGenerator = _interopDefault(require('babel-runtime/helpers/asyncToGenerator'));
+var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCheck'));
+var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
 var ghurl = _interopDefault(require('github-url-to-object'));
 var path = _interopDefault(require('path'));
 var pify = _interopDefault(require('pify'));
+var _Promise = _interopDefault(require('babel-runtime/core-js/promise'));
 var fs = _interopDefault(require('fs'));
+var _getIterator = _interopDefault(require('babel-runtime/core-js/get-iterator'));
+var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
 var simpleGet = _interopDefault(require('simple-get'));
 var concat = _interopDefault(require('simple-concat'));
 var parseLinkHeader = _interopDefault(require('parse-link-header'));
 var buffer = require('buffer');
 var pako = _interopDefault(require('pako'));
 var shasum = _interopDefault(require('shasum'));
+var _typeof = _interopDefault(require('babel-runtime/helpers/typeof'));
+var _slicedToArray = _interopDefault(require('babel-runtime/helpers/slicedToArray'));
+var _Math$sign = _interopDefault(require('babel-runtime/core-js/math/sign'));
 var openpgp = require('openpgp/dist/openpgp.min.js');
+var _Symbol$iterator = _interopDefault(require('babel-runtime/core-js/symbol/iterator'));
+var _Map = _interopDefault(require('babel-runtime/core-js/map'));
+var _toConsumableArray = _interopDefault(require('babel-runtime/helpers/toConsumableArray'));
 var sortby = _interopDefault(require('lodash/sortBy'));
 var BufferCursor = _interopDefault(require('buffercursor'));
 var AsyncLock = _interopDefault(require('async-lock'));
 var pad = _interopDefault(require('pad'));
 var crypto = _interopDefault(require('crypto'));
 var stream = _interopDefault(require('stream'));
+var _Set = _interopDefault(require('babel-runtime/core-js/set'));
 var ini = _interopDefault(require('ini'));
 var _get = _interopDefault(require('lodash/get'));
 var _set = _interopDefault(require('lodash/set'));
 
-function _asyncToGenerator$3(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // @flow
 var mkdir = function () {
-  var _ref = _asyncToGenerator$3(regeneratorRuntime.mark(function _callee(dirpath /*: string */) {
+  var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(dirpath /*: string */) {
     var parent;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -97,12 +109,12 @@ var mkdir = function () {
 }();
 
 var mkdirs = function () {
-  var _ref2 = _asyncToGenerator$3(regeneratorRuntime.mark(function _callee2(dirlist /*: string[] */) {
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(dirlist /*: string[] */) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            return _context2.abrupt('return', Promise.all(dirlist.map(mkdir)));
+            return _context2.abrupt('return', _Promise.all(dirlist.map(mkdir)));
 
           case 1:
           case 'end':
@@ -117,16 +129,14 @@ var mkdirs = function () {
   };
 }();
 
-function _asyncToGenerator$2(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // @flow
 // An async writeFile variant that automatically creates missing directories,
 // and returns null instead of throwing errors.
 var write = function () {
-  var _ref = _asyncToGenerator$2(regeneratorRuntime.mark(function _callee(filepath /*: string */
+  var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(filepath /*: string */
   , contents /*: string|Buffer */
   ) {
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -160,13 +170,11 @@ var write = function () {
   };
 }();
 
-function _asyncToGenerator$1(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // @flow
 var init = function () {
-  var _ref = _asyncToGenerator$1(regeneratorRuntime.mark(function _callee(gitdir /*: string */) {
+  var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(gitdir /*: string */) {
     var folders;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -199,16 +207,14 @@ var init = function () {
   };
 }();
 
-function _asyncToGenerator$6(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // An async readFile variant that returns null instead of throwing errors
 var read = function () {
-  var _ref = _asyncToGenerator$6(regeneratorRuntime.mark(function _callee(file, options) {
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+  var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(file, options) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            return _context.abrupt('return', new Promise(function (resolve, reject) {
+            return _context.abrupt('return', new _Promise(function (resolve, reject) {
               fs.readFile(file, options, function (err, file) {
                 return err ? resolve(null) : resolve(file);
               });
@@ -227,16 +233,14 @@ var read = function () {
   };
 }();
 
-function _asyncToGenerator$7(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // An async exists variant
 var exists = function () {
-  var _ref = _asyncToGenerator$7(regeneratorRuntime.mark(function _callee(file, options) {
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+  var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(file, options) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            return _context.abrupt('return', new Promise(function (resolve, reject) {
+            return _context.abrupt('return', new _Promise(function (resolve, reject) {
               fs.stat(file, function (err, stats) {
                 if (err) return err.code === 'ENOENT' ? resolve(false) : reject(err);
                 resolve(true);
@@ -255,12 +259,6 @@ var exists = function () {
     return _ref.apply(this, arguments);
   };
 }();
-
-var _createClass$1 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _asyncToGenerator$5(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // @flow
 function wrapObject(_ref /*: {type: string, object: Buffer} */) {
@@ -303,19 +301,19 @@ function unwrapObject(_ref2 /*: {oid: string, file: Buffer} */) {
 
 var GitObjectManager = function () {
   function GitObjectManager() {
-    _classCallCheck$1(this, GitObjectManager);
+    _classCallCheck(this, GitObjectManager);
   }
 
-  _createClass$1(GitObjectManager, null, [{
+  _createClass(GitObjectManager, null, [{
     key: 'read',
     value: function () {
-      var _ref4 = _asyncToGenerator$5(regeneratorRuntime.mark(function _callee(_ref3 /*: {gitdir: string, oid: string} */) {
+      var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref3 /*: {gitdir: string, oid: string} */) {
         var gitdir = _ref3.gitdir,
             oid = _ref3.oid;
 
         var file, _unwrapObject, type, object;
 
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -353,14 +351,14 @@ var GitObjectManager = function () {
   }, {
     key: 'write',
     value: function () {
-      var _ref6 = _asyncToGenerator$5(regeneratorRuntime.mark(function _callee2(_ref5) {
+      var _ref6 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref5) {
         var gitdir = _ref5.gitdir,
             type = _ref5.type,
             object = _ref5.object;
 
         var _wrapObject, file, oid, filepath;
 
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -405,19 +403,9 @@ var GitObjectManager = function () {
   return GitObjectManager;
 }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _createClass$2 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-function _asyncToGenerator$8(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 // @flow
 function formatTimezoneOffset(minutes /*: number */) {
-  var sign$$1 = Math.sign(minutes) || 1;
+  var sign$$1 = _Math$sign(minutes) || 1;
   minutes = Math.abs(minutes);
   var hours = Math.floor(minutes / 60);
   minutes -= hours * 60;
@@ -484,7 +472,7 @@ var GitCommit = function () {
   _commit : string
   */
   function GitCommit(commit /*: string|Buffer|Object */) {
-    _classCallCheck$2(this, GitCommit);
+    _classCallCheck(this, GitCommit);
 
     if (typeof commit === 'string') {
       this._commit = commit;
@@ -497,7 +485,7 @@ var GitCommit = function () {
     }
   }
 
-  _createClass$2(GitCommit, [{
+  _createClass(GitCommit, [{
     key: 'toObject',
     value: function toObject() {
       return buffer.Buffer.from(this._commit, 'utf8');
@@ -528,7 +516,7 @@ var GitCommit = function () {
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = headers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = _getIterator(headers), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var h = _step.value;
 
           if (h[0] === ' ') {
@@ -559,7 +547,7 @@ var GitCommit = function () {
       var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator2 = hs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        for (var _iterator2 = _getIterator(hs), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var _h = _step2.value;
 
           var key$$1 = _h.slice(0, _h.indexOf(' '));
@@ -613,10 +601,10 @@ var GitCommit = function () {
   }, {
     key: 'sign',
     value: function () {
-      var _ref = _asyncToGenerator$8(regeneratorRuntime.mark(function _callee(privateKeys /*: string */) {
+      var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(privateKeys /*: string */) {
         var commit, headers, message$$1, privKeyObj, _ref2, signature, signedCommit;
 
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -660,9 +648,9 @@ var GitCommit = function () {
   }, {
     key: 'listSigningKeys',
     value: function () {
-      var _ref3 = _asyncToGenerator$8(regeneratorRuntime.mark(function _callee2() {
+      var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2() {
         var msg;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -688,9 +676,9 @@ var GitCommit = function () {
   }, {
     key: 'verify',
     value: function () {
-      var _ref4 = _asyncToGenerator$8(regeneratorRuntime.mark(function _callee3(publicKeys /*: string */) {
+      var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee3(publicKeys /*: string */) {
         var pubKeyObj, msg, results, validity;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
@@ -758,7 +746,7 @@ var GitCommit = function () {
         var _iteratorError3 = undefined;
 
         try {
-          for (var _iterator3 = obj.parent[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          for (var _iterator3 = _getIterator(obj.parent), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
             var p = _step3.value;
 
             headers += ' ' + p;
@@ -798,10 +786,6 @@ var GitCommit = function () {
 
   return GitCommit;
 }();
-
-var _createClass$3 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // @flow
 /*::
@@ -854,7 +838,7 @@ var GitTree = function () {
   _entries: Array<TreeEntry>
   */
   function GitTree(entries /*: any */) {
-    _classCallCheck$3(this, GitTree);
+    _classCallCheck(this, GitTree);
 
     if (buffer.Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries);
@@ -865,7 +849,7 @@ var GitTree = function () {
     }
   }
 
-  _createClass$3(GitTree, [{
+  _createClass(GitTree, [{
     key: 'render',
     value: function render() {
       return this._entries.map(function (entry) {
@@ -892,11 +876,11 @@ var GitTree = function () {
       return this._entries;
     }
   }, {
-    key: Symbol.iterator,
-    value: regeneratorRuntime.mark(function value() {
+    key: _Symbol$iterator,
+    value: _regeneratorRuntime.mark(function value() {
       var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, entry;
 
-      return regeneratorRuntime.wrap(function value$(_context) {
+      return _regeneratorRuntime.wrap(function value$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
@@ -904,7 +888,7 @@ var GitTree = function () {
               _didIteratorError = false;
               _iteratorError = undefined;
               _context.prev = 3;
-              _iterator = this._entries[Symbol.iterator]();
+              _iterator = _getIterator(this._entries);
 
             case 5:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -972,15 +956,13 @@ var GitTree = function () {
   return GitTree;
 }();
 
-function _asyncToGenerator$9(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var resolveRef = function () {
-  var _ref2 = _asyncToGenerator$9(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         ref = _ref.ref,
         depth = _ref.depth;
     var sha;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -1123,15 +1105,13 @@ var resolveRef = function () {
   };
 }();
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key$$1 in source) { if (Object.prototype.hasOwnProperty.call(source, key$$1)) { target[key$$1] = source[key$$1]; } } } return target; };
-
 var request = function () {
-  var _ref2 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var url = _ref.url,
         token = _ref.token,
         headers = _ref.headers;
     var res, data;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -1167,13 +1147,13 @@ var request = function () {
 }();
 
 var fetchRemoteBranches = function () {
-  var _ref4 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee2(_ref3) {
+  var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref3) {
     var gitdir = _ref3.gitdir,
         remote = _ref3.remote,
         user = _ref3.user,
         repo = _ref3.repo,
         token = _ref3.token;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
@@ -1181,7 +1161,7 @@ var fetchRemoteBranches = function () {
               token: token,
               url: 'https://api.github.com/repos/' + user + '/' + repo + '/branches'
             }).then(function (json) {
-              return Promise.all(json.map(function (branch) {
+              return _Promise.all(json.map(function (branch) {
                 return write(gitdir + '/refs/remotes/' + remote + '/' + branch.name, branch.commit.sha + '\n', { encoding: 'utf8' });
               }));
             }));
@@ -1200,12 +1180,12 @@ var fetchRemoteBranches = function () {
 }();
 
 var fetchTags = function () {
-  var _ref6 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee3(_ref5) {
+  var _ref6 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee3(_ref5) {
     var gitdir = _ref5.gitdir,
         user = _ref5.user,
         repo = _ref5.repo,
         token = _ref5.token;
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+    return _regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
@@ -1213,7 +1193,7 @@ var fetchTags = function () {
               token: token,
               url: 'https://api.github.com/repos/' + user + '/' + repo + '/tags'
             }).then(function (json) {
-              return Promise.all(json.map(function (tag) {
+              return _Promise.all(json.map(function (tag) {
                 return (
                   // Curiously, tags are not separated between remotes like branches
                   write(gitdir + '/refs/tags/' + tag.name, tag.commit.sha + '\n', {
@@ -1237,7 +1217,7 @@ var fetchTags = function () {
 }();
 
 var fetchCommits = function () {
-  var _ref8 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee4(_ref7) {
+  var _ref8 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee4(_ref7) {
     var gitdir = _ref7.gitdir,
         url = _ref7.url,
         user = _ref7.user,
@@ -1248,7 +1228,7 @@ var fetchCommits = function () {
 
     var date, res, data, json, link, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, commit, comm, oid;
 
-    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+    return _regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
@@ -1283,7 +1263,7 @@ var fetchCommits = function () {
             _didIteratorError = false;
             _iteratorError = undefined;
             _context4.prev = 12;
-            _iterator = json[Symbol.iterator]();
+            _iterator = _getIterator(json);
 
           case 14:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -1392,7 +1372,7 @@ var fetchCommits = function () {
 }();
 
 var fetchTree = function () {
-  var _ref10 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee6(_ref9) {
+  var _ref10 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee6(_ref9) {
     var _this = this;
 
     var gitdir = _ref9.gitdir,
@@ -1403,7 +1383,7 @@ var fetchTree = function () {
         since = _ref9.since,
         token = _ref9.token;
     var json, tree, oid;
-    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+    return _regeneratorRuntime.wrap(function _callee6$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
@@ -1430,9 +1410,9 @@ var fetchTree = function () {
               console.log("AHOY! MATEY! THAR BE TROUBLE WITH 'EM HASHES!");
             }
             console.log(tree.render());
-            return _context6.abrupt('return', Promise.all(json.tree.map(function () {
-              var _ref11 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee5(entry) {
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            return _context6.abrupt('return', _Promise.all(json.tree.map(function () {
+              var _ref11 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee5(entry) {
+                return _regeneratorRuntime.wrap(function _callee5$(_context5) {
                   while (1) {
                     switch (_context5.prev = _context5.next) {
                       case 0:
@@ -1500,7 +1480,7 @@ var fetchTree = function () {
 }();
 
 var fetchBlob = function () {
-  var _ref13 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee7(_ref12) {
+  var _ref13 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee7(_ref12) {
     var gitdir = _ref12.gitdir,
         url = _ref12.url,
         user = _ref12.user,
@@ -1509,7 +1489,7 @@ var fetchBlob = function () {
         since = _ref12.since,
         token = _ref12.token;
     var res, data, oid;
-    return regeneratorRuntime.wrap(function _callee7$(_context7) {
+    return _regeneratorRuntime.wrap(function _callee7$(_context7) {
       while (1) {
         switch (_context7.prev = _context7.next) {
           case 0:
@@ -1556,12 +1536,10 @@ var fetchBlob = function () {
   };
 }();
 
-function _asyncToGenerator$4(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // We're implementing a non-standard clone based on the Github API first, because of CORS.
 // And because we already have the code.
 var fetch = function () {
-  var _ref15 = _asyncToGenerator$4(regeneratorRuntime.mark(function _callee8(_ref14) {
+  var _ref15 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee8(_ref14) {
     var gitdir = _ref14.gitdir,
         token = _ref14.token,
         user = _ref14.user,
@@ -1571,7 +1549,7 @@ var fetch = function () {
 
     var json, getBranches, getTags, getCommits, oid, _ref16, type, object, comm, sha;
 
-    return regeneratorRuntime.wrap(function _callee8$(_context8) {
+    return _regeneratorRuntime.wrap(function _callee8$(_context8) {
       while (1) {
         switch (_context8.prev = _context8.next) {
           case 0:
@@ -1607,7 +1585,7 @@ var fetch = function () {
             console.log('Receiving commits');
             getCommits = fetchCommits({ gitdir: gitdir, user: user, repo: repo, token: token, ref: ref });
             _context8.next = 15;
-            return Promise.all([getBranches, getTags, getCommits]);
+            return _Promise.all([getBranches, getTags, getCommits]);
 
           case 15:
             _context8.next = 17;
@@ -1653,14 +1631,14 @@ var fetch = function () {
 }();
 
 var writeTreeToDisk = function () {
-  var _ref2 = _asyncToGenerator$10(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         dirpath = _ref.dirpath,
         tree = _ref.tree;
 
     var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, entry, _ref3, type, object, entrypath, _tree;
 
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -1668,7 +1646,7 @@ var writeTreeToDisk = function () {
             _didIteratorError = false;
             _iteratorError = undefined;
             _context.prev = 3;
-            _iterator = tree[Symbol.iterator]();
+            _iterator = _getIterator(tree);
 
           case 5:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -1762,10 +1740,8 @@ var writeTreeToDisk = function () {
   };
 }();
 
-function _asyncToGenerator$10(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var checkout = function () {
-  var _ref5 = _asyncToGenerator$10(regeneratorRuntime.mark(function _callee2(_ref4) {
+  var _ref5 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref4) {
     var workdir = _ref4.workdir,
         gitdir = _ref4.gitdir,
         remote = _ref4.remote,
@@ -1773,7 +1749,7 @@ var checkout = function () {
 
     var oid, commit, comm, sha, _ref6, type, object, tree;
 
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
@@ -1857,12 +1833,6 @@ var checkout = function () {
   };
 }();
 
-var _createClass$5 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 // @flow
 /*::
 import type {Stats} from 'fs'
@@ -1886,7 +1856,7 @@ type CacheEntry = {
 
 function parseBuffer$1(buffer$$1) {
   var reader = new BufferCursor(buffer$$1);
-  var _entries /*: Map<string, CacheEntry> */ = new Map();
+  var _entries /*: Map<string, CacheEntry> */ = new _Map();
   var magic = reader.toString('utf8', 4);
   if (magic !== 'DIRC') {
     throw new Error('Inavlid dircache magic file number: ' + magic);
@@ -1940,24 +1910,24 @@ var GitIndex = function () {
    _dirty: boolean // Used to determine if index needs to be saved to filesystem
    */
   function GitIndex(index /*: any */) {
-    _classCallCheck$5(this, GitIndex);
+    _classCallCheck(this, GitIndex);
 
     this._dirty = false;
     if (buffer.Buffer.isBuffer(index)) {
       this._entries = parseBuffer$1(index);
     } else if (index === null) {
-      this._entries = new Map();
+      this._entries = new _Map();
     } else {
       throw new Error('invalid type passed to GitIndex constructor');
     }
   }
 
-  _createClass$5(GitIndex, [{
-    key: Symbol.iterator,
-    value: regeneratorRuntime.mark(function value() {
+  _createClass(GitIndex, [{
+    key: _Symbol$iterator,
+    value: _regeneratorRuntime.mark(function value() {
       var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, entry;
 
-      return regeneratorRuntime.wrap(function value$(_context) {
+      return _regeneratorRuntime.wrap(function value$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
@@ -1965,7 +1935,7 @@ var GitIndex = function () {
               _didIteratorError = false;
               _iteratorError = undefined;
               _context.prev = 3;
-              _iterator = this.entries[Symbol.iterator]();
+              _iterator = _getIterator(this.entries);
 
             case 5:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -2060,7 +2030,7 @@ var GitIndex = function () {
         var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator2 = this._entries.keys()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          for (var _iterator2 = _getIterator(this._entries.keys()), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var key$$1 = _step2.value;
 
             if (key$$1.startsWith(filepath + '/')) {
@@ -2142,38 +2112,32 @@ var GitIndex = function () {
   return GitIndex;
 }();
 
-var _createClass$4 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _asyncToGenerator$12(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 // @flow
 // import LockManager from 'travix-lock-manager'
 // import Lock from './models/utils/lockfile'
 
 // TODO: replace with an LRU cache?
-var map /*: Map<string, GitIndex> */ = new Map();
+var map /*: Map<string, GitIndex> */ = new _Map();
 // const lm = new LockManager()
 var lock = new AsyncLock();
 
 var GitIndexManager = function () {
   function GitIndexManager() {
-    _classCallCheck$4(this, GitIndexManager);
+    _classCallCheck(this, GitIndexManager);
   }
 
-  _createClass$4(GitIndexManager, null, [{
+  _createClass(GitIndexManager, null, [{
     key: 'acquire',
     value: function () {
-      var _ref = _asyncToGenerator$12(regeneratorRuntime.mark(function _callee2(filepath, closure) {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(filepath, closure) {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return lock.acquire(filepath, _asyncToGenerator$12(regeneratorRuntime.mark(function _callee() {
+                return lock.acquire(filepath, _asyncToGenerator(_regeneratorRuntime.mark(function _callee() {
                   var index, rawIndexFile, buffer$$1;
-                  return regeneratorRuntime.wrap(function _callee$(_context) {
+                  return _regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                       switch (_context.prev = _context.next) {
                         case 0:
@@ -2251,21 +2215,19 @@ var GitIndexManager = function () {
   return GitIndexManager;
 }();
 
-function _asyncToGenerator$11(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var list = function () {
-  var _ref2 = _asyncToGenerator$11(regeneratorRuntime.mark(function _callee2(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref) {
     var gitdir = _ref.gitdir;
     var filenames;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             filenames = void 0;
             _context2.next = 3;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref3 = _asyncToGenerator$11(regeneratorRuntime.mark(function _callee(index) {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
+              var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(index) {
+                return _regeneratorRuntime.wrap(function _callee$(_context) {
                   while (1) {
                     switch (_context.prev = _context.next) {
                       case 0:
@@ -2302,17 +2264,15 @@ var list = function () {
   };
 }();
 
-function _asyncToGenerator$13(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var lstat = pify(fs.lstat);
 
 var add = function () {
-  var _ref2 = _asyncToGenerator$13(regeneratorRuntime.mark(function _callee2(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref) {
     var gitdir = _ref.gitdir,
         workdir = _ref.workdir,
         filepath = _ref.filepath;
     var type, object, oid;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
@@ -2338,9 +2298,9 @@ var add = function () {
             oid = _context2.sent;
             _context2.next = 11;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref3 = _asyncToGenerator$13(regeneratorRuntime.mark(function _callee(index) {
+              var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(index) {
                 var stats;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
+                return _regeneratorRuntime.wrap(function _callee$(_context) {
                   while (1) {
                     switch (_context.prev = _context.next) {
                       case 0:
@@ -2378,20 +2338,18 @@ var add = function () {
   };
 }();
 
-function _asyncToGenerator$14(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var remove = function () {
-  var _ref2 = _asyncToGenerator$14(regeneratorRuntime.mark(function _callee2(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref) {
     var gitdir = _ref.gitdir,
         filepath = _ref.filepath;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.next = 2;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref3 = _asyncToGenerator$14(regeneratorRuntime.mark(function _callee(index) {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
+              var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(index) {
+                return _regeneratorRuntime.wrap(function _callee$(_context) {
                   while (1) {
                     switch (_context.prev = _context.next) {
                       case 0:
@@ -2437,7 +2395,7 @@ type Node = {
 
 function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
 ) /*: Node|void */{
-  var inodes /*: Map<string, Node> */ = new Map();
+  var inodes /*: Map<string, Node> */ = new _Map();
   var mkdir = function mkdir(name) /*: Node|void */{
     if (!inodes.has(name)) {
       var dir /*: Node */ = {
@@ -2479,7 +2437,7 @@ function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
   var _iteratorError = undefined;
 
   try {
-    for (var _iterator = files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+    for (var _iterator = _getIterator(files), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var file = _step.value;
 
       mkfile(file.path, file);
@@ -2503,13 +2461,13 @@ function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
 }
 
 var constructTree = function () {
-  var _ref2 = _asyncToGenerator$15(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         inode = _ref.inode;
 
     var children, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _inode, entries, tree, oid;
 
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -2519,7 +2477,7 @@ var constructTree = function () {
             _didIteratorError = false;
             _iteratorError = undefined;
             _context.prev = 4;
-            _iterator = children[Symbol.iterator]();
+            _iterator = _getIterator(children);
 
           case 6:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -2614,17 +2572,15 @@ var constructTree = function () {
   };
 }();
 
-function _asyncToGenerator$15(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var commit = function () {
-  var _ref4 = _asyncToGenerator$15(regeneratorRuntime.mark(function _callee3(_ref3) {
+  var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee3(_ref3) {
     var gitdir = _ref3.gitdir,
         author = _ref3.author,
         committer = _ref3.committer,
         message$$1 = _ref3.message,
         privateKeys = _ref3.privateKeys;
     var authorDateTime, committerDateTime, oid;
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+    return _regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
@@ -2635,9 +2591,9 @@ var commit = function () {
             oid = void 0;
             _context3.next = 6;
             return GitIndexManager.acquire(gitdir + '/index', function () {
-              var _ref5 = _asyncToGenerator$15(regeneratorRuntime.mark(function _callee2(index) {
+              var _ref5 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(index) {
                 var inode, treeRef, parent, comm, branch;
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                return _regeneratorRuntime.wrap(function _callee2$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
                       case 0:
@@ -2728,19 +2684,17 @@ var commit = function () {
   };
 }();
 
-function _asyncToGenerator$16(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var HttpKeyServer = new openpgp.HKP();
 
 var verify = function () {
-  var _ref2 = _asyncToGenerator$16(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         ref = _ref.ref,
         publicKeys = _ref.publicKeys;
 
     var oid, _ref3, type, object, commit, author, keys, keyArray, validity;
 
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -2779,7 +2733,7 @@ var verify = function () {
             }
 
             _context.next = 18;
-            return Promise.all(keys.map(function (id) {
+            return _Promise.all(keys.map(function (id) {
               return HttpKeyServer.lookup({ keyId: id });
             }));
 
@@ -2818,8 +2772,6 @@ var verify = function () {
   };
 }();
 
-function _asyncToGenerator$17(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // @flow
 /*::
 import type {Writable} from 'stream'
@@ -2832,7 +2784,7 @@ var types = {
   tag: 64
   // TODO: Move this to 'plumbing'
 };var pack = function () {
-  var _ref2 = _asyncToGenerator$17(regeneratorRuntime.mark(function _callee(_ref /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
   ) {
     var oids = _ref.oids,
         gitdir = _ref.gitdir,
@@ -2840,7 +2792,7 @@ var types = {
 
     var hash, stream$$1, write, writeObject, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, oid, _ref4, type, object, digest;
 
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -2895,7 +2847,7 @@ var types = {
             _didIteratorError = false;
             _iteratorError = undefined;
             _context.prev = 10;
-            _iterator = oids[Symbol.iterator]();
+            _iterator = _getIterator(oids);
 
           case 12:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -2985,14 +2937,6 @@ function reader(buffer$$1 /*: Buffer */) {
   };
 }
 
-var _slicedToArray$1 = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _createClass$6 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _asyncToGenerator$19(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 // @flow
 function basicAuth(auth) {
   return 'Basic ' + buffer.Buffer.from(auth.username + ':' + auth.password).toString('base64');
@@ -3006,18 +2950,18 @@ var GitRemoteHTTP = function () {
   auth : { username : string, password : string }
   */
   function GitRemoteHTTP(url /*: string */) {
-    _classCallCheck$6(this, GitRemoteHTTP);
+    _classCallCheck(this, GitRemoteHTTP);
 
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git')) url = url += '.git';
     this.GIT_URL = url;
   }
 
-  _createClass$6(GitRemoteHTTP, [{
+  _createClass(GitRemoteHTTP, [{
     key: 'preparePull',
     value: function () {
-      var _ref = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee() {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+      var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee() {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -3041,8 +2985,8 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'preparePush',
     value: function () {
-      var _ref2 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee2() {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2() {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -3066,17 +3010,17 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'discover',
     value: function () {
-      var _ref3 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee3(service /*: string */) {
+      var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee3(service /*: string */) {
         var _this = this;
 
         var headers, res, data, read, lineOne, lineTwo, _lineTwo$toString$tri, _lineTwo$toString$tri2, firstRef, capabilities, _firstRef$split, _firstRef$split2, ref, name, line, _line$toString$trim$s, _line$toString$trim$s2, _ref4, _name;
 
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                this.capabilities = new Set();
-                this.refs = new Map();
+                this.capabilities = new _Set();
+                this.refs = new _Map();
                 headers = {};
                 // headers['Accept'] = `application/x-${service}-advertisement`
 
@@ -3148,12 +3092,12 @@ var GitRemoteHTTP = function () {
                 return _context3.abrupt('return');
 
               case 23:
-                _lineTwo$toString$tri = lineTwo.toString('utf8').trim().split('\0'), _lineTwo$toString$tri2 = _slicedToArray$1(_lineTwo$toString$tri, 2), firstRef = _lineTwo$toString$tri2[0], capabilities = _lineTwo$toString$tri2[1];
+                _lineTwo$toString$tri = lineTwo.toString('utf8').trim().split('\0'), _lineTwo$toString$tri2 = _slicedToArray(_lineTwo$toString$tri, 2), firstRef = _lineTwo$toString$tri2[0], capabilities = _lineTwo$toString$tri2[1];
 
                 capabilities.split(' ').map(function (x) {
                   return _this.capabilities.add(x);
                 });
-                _firstRef$split = firstRef.split(' '), _firstRef$split2 = _slicedToArray$1(_firstRef$split, 2), ref = _firstRef$split2[0], name = _firstRef$split2[1];
+                _firstRef$split = firstRef.split(' '), _firstRef$split2 = _slicedToArray(_firstRef$split, 2), ref = _firstRef$split2[0], name = _firstRef$split2[1];
 
                 this.refs.set(name, ref);
 
@@ -3171,7 +3115,7 @@ var GitRemoteHTTP = function () {
 
               case 31:
                 if (line !== null) {
-                  _line$toString$trim$s = line.toString('utf8').trim().split(' '), _line$toString$trim$s2 = _slicedToArray$1(_line$toString$trim$s, 2), _ref4 = _line$toString$trim$s2[0], _name = _line$toString$trim$s2[1];
+                  _line$toString$trim$s = line.toString('utf8').trim().split(' '), _line$toString$trim$s2 = _slicedToArray(_line$toString$trim$s, 2), _ref4 = _line$toString$trim$s2[0], _name = _line$toString$trim$s2[1];
 
                   this.refs.set(_name, _ref4);
                 }
@@ -3195,9 +3139,9 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'push',
     value: function () {
-      var _ref5 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee4(stream$$1) {
+      var _ref5 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee4(stream$$1) {
         var service, headers, res;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
@@ -3238,10 +3182,10 @@ var GitRemoteHTTP = function () {
   }, {
     key: 'pull',
     value: function () {
-      var _ref7 = _asyncToGenerator$19(regeneratorRuntime.mark(function _callee5(_ref6) {
+      var _ref7 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee5(_ref6) {
         var stream$$1 = _ref6.stream;
         var service, headers, res;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
@@ -3284,16 +3228,14 @@ var GitRemoteHTTP = function () {
   return GitRemoteHTTP;
 }();
 
-function _asyncToGenerator$20(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // @flow
 // TODO: Move this to 'plumbing'
 var listCommits = function () {
-  var _ref2 = _asyncToGenerator$20(regeneratorRuntime.mark(function _callee2(_ref /*: {
-                                                                               gitdir: string,
-                                                                               start: Array<string>,
-                                                                               finish: Array<string>
-                                                                               } */
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref /*: {
+                                                                                gitdir: string,
+                                                                                start: Array<string>,
+                                                                                finish: Array<string>
+                                                                                } */
   ) {
     /*: Set<string> */
 
@@ -3301,10 +3243,10 @@ var listCommits = function () {
     // way to construct a cycle. Therefore we won't worry about
     // setting a default recursion limit.
     var walk = function () {
-      var _ref4 = _asyncToGenerator$20(regeneratorRuntime.mark(function _callee(oid) {
+      var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(oid) {
         var _ref5, type, object, commit, parents, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3;
 
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -3331,7 +3273,7 @@ var listCommits = function () {
                 _didIteratorError3 = false;
                 _iteratorError3 = undefined;
                 _context.prev = 13;
-                _iterator3 = parents[Symbol.iterator]();
+                _iterator3 = _getIterator(parents);
 
               case 15:
                 if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
@@ -3410,17 +3352,17 @@ var listCommits = function () {
 
     var startingSet, finishingSet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, ref, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _ref3, _oid, visited, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, oid;
 
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            startingSet = new Set();
-            finishingSet = new Set();
+            startingSet = new _Set();
+            finishingSet = new _Set();
             _iteratorNormalCompletion = true;
             _didIteratorError = false;
             _iteratorError = undefined;
             _context2.prev = 5;
-            _iterator = start[Symbol.iterator]();
+            _iterator = _getIterator(start);
 
           case 7:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -3482,7 +3424,7 @@ var listCommits = function () {
             _didIteratorError2 = false;
             _iteratorError2 = undefined;
             _context2.prev = 34;
-            _iterator2 = finish[Symbol.iterator]();
+            _iterator2 = _getIterator(finish);
 
           case 36:
             if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
@@ -3546,12 +3488,12 @@ var listCommits = function () {
             return _context2.finish(56);
 
           case 64:
-            visited = new Set();
+            visited = new _Set();
             _iteratorNormalCompletion4 = true;
             _didIteratorError4 = false;
             _iteratorError4 = undefined;
             _context2.prev = 68;
-            _iterator4 = startingSet[Symbol.iterator]();
+            _iterator4 = _getIterator(startingSet);
 
           case 70:
             if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
@@ -3618,25 +3560,23 @@ var listCommits = function () {
   };
 }();
 
-function _asyncToGenerator$21(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // @flow
 // TODO: Move this to 'plumbing'
 var listObjects = function () {
-  var _ref2 = _asyncToGenerator$21(regeneratorRuntime.mark(function _callee2(_ref /*: {
-                                                                               gitdir: string,
-                                                                               oids: Array<string>
-                                                                               } */
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref /*: {
+                                                                                gitdir: string,
+                                                                                oids: Array<string>
+                                                                                } */
   ) {
 
     // We don't do the purest simplest recursion, because we can
     // avoid reading Blob objects entirely since the Tree objects
     // tell us which oids are Blobs and which are Trees.
     var walk = function () {
-      var _ref3 = _asyncToGenerator$21(regeneratorRuntime.mark(function _callee(oid) {
+      var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(oid) {
         var _ref4, type, object, commit, tree, _tree, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, entry;
 
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -3674,7 +3614,7 @@ var listObjects = function () {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context.prev = 18;
-                _iterator = /*: TreeEntry */_tree[Symbol.iterator]();
+                _iterator = _getIterator( /*: TreeEntry */_tree);
 
               case 20:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -3755,16 +3695,16 @@ var listObjects = function () {
 
     var visited, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, oid;
 
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            visited /*: Set<string> */ = new Set();
+            visited /*: Set<string> */ = new _Set();
             _iteratorNormalCompletion2 = true;
             _didIteratorError2 = false;
             _iteratorError2 = undefined;
             _context2.prev = 4;
-            _iterator2 = oids[Symbol.iterator]();
+            _iterator2 = _getIterator(oids);
 
           case 6:
             if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
@@ -3896,20 +3836,16 @@ function encode(line /*: string|Buffer */) /*: Buffer */{
   return buffer.Buffer.concat([buffer.Buffer.from(hexlength, 'utf8'), line]);
 }
 
-function _toConsumableArray$1(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _asyncToGenerator$18(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 // @flow
 var push = function () {
-  var _ref2 = _asyncToGenerator$18(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         _ref$ref = _ref.ref,
         ref = _ref$ref === undefined ? 'HEAD' : _ref$ref,
         url = _ref.url,
         auth = _ref.auth;
     var oid, remote, commits, objects, packstream, oldoid, response;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -3946,7 +3882,7 @@ var push = function () {
             packstream.write(flush());
             pack({
               gitdir: gitdir,
-              oids: [].concat(_toConsumableArray$1(objects)),
+              oids: [].concat(_toConsumableArray(objects)),
               outputStream: packstream
             });
             _context.next = 20;
@@ -3969,24 +3905,18 @@ var push = function () {
   };
 }();
 
-var _createClass$8 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _asyncToGenerator$24(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var GitConfig = function () {
   function GitConfig(text) {
-    _classCallCheck$8(this, GitConfig);
+    _classCallCheck(this, GitConfig);
 
     this.ini = ini.decode(text);
   }
 
-  _createClass$8(GitConfig, [{
+  _createClass(GitConfig, [{
     key: 'get',
     value: function () {
-      var _ref = _asyncToGenerator$24(regeneratorRuntime.mark(function _callee(path$$1) {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+      var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(path$$1) {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -4009,8 +3939,8 @@ var GitConfig = function () {
   }, {
     key: 'set',
     value: function () {
-      var _ref2 = _asyncToGenerator$24(regeneratorRuntime.mark(function _callee2(path$$1, value) {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(path$$1, value) {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -4045,25 +3975,19 @@ var GitConfig = function () {
   return GitConfig;
 }();
 
-var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _asyncToGenerator$23(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 // @flow
 var GitConfigManager = function () {
   function GitConfigManager() {
-    _classCallCheck$7(this, GitConfigManager);
+    _classCallCheck(this, GitConfigManager);
   }
 
-  _createClass$7(GitConfigManager, null, [{
+  _createClass(GitConfigManager, null, [{
     key: 'get',
     value: function () {
-      var _ref2 = _asyncToGenerator$23(regeneratorRuntime.mark(function _callee(_ref) {
+      var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
         var gitdir = _ref.gitdir;
         var text;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -4091,10 +4015,10 @@ var GitConfigManager = function () {
   }, {
     key: 'save',
     value: function () {
-      var _ref4 = _asyncToGenerator$23(regeneratorRuntime.mark(function _callee2(_ref3) {
+      var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref3) {
         var gitdir = _ref3.gitdir,
             config = _ref3.config;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -4123,14 +4047,12 @@ var GitConfigManager = function () {
   return GitConfigManager;
 }();
 
-function _asyncToGenerator$22(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var getConfig = function () {
-  var _ref2 = _asyncToGenerator$22(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         path$$1 = _ref.path;
     var config, value;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -4159,15 +4081,13 @@ var getConfig = function () {
   };
 }();
 
-function _asyncToGenerator$25(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
 var setConfig = function () {
-  var _ref2 = _asyncToGenerator$25(regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
         path$$1 = _ref.path,
         value = _ref.value;
     var config;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -4195,12 +4115,6 @@ var setConfig = function () {
     return _ref2.apply(this, arguments);
   };
 }();
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key$$1, arg) { try { var info = gen[key$$1](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function git(dir) {
   return new Git(dir);
@@ -4289,8 +4203,8 @@ var Git = function () {
   }, {
     key: 'init',
     value: function () {
-      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+      var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee() {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -4314,8 +4228,8 @@ var Git = function () {
   }, {
     key: 'fetch',
     value: function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(url) {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(url) {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -4347,8 +4261,8 @@ var Git = function () {
   }, {
     key: 'checkout',
     value: function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(ref) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee3(ref) {
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
@@ -4377,8 +4291,8 @@ var Git = function () {
   }, {
     key: 'clone',
     value: function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(url) {
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee4(url) {
+        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
@@ -4424,8 +4338,8 @@ var Git = function () {
   }, {
     key: 'list',
     value: function () {
-      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      var _ref5 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee5() {
+        return _regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
@@ -4450,8 +4364,8 @@ var Git = function () {
   }, {
     key: 'add',
     value: function () {
-      var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(filepath) {
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      var _ref6 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee6(filepath) {
+        return _regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
@@ -4478,8 +4392,8 @@ var Git = function () {
   }, {
     key: 'remove',
     value: function () {
-      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(filepath) {
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+      var _ref7 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee7(filepath) {
+        return _regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
@@ -4505,8 +4419,8 @@ var Git = function () {
   }, {
     key: 'commit',
     value: function () {
-      var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(message$$1) {
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+      var _ref8 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee8(message$$1) {
+        return _regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
@@ -4616,8 +4530,8 @@ var Git = function () {
   }, {
     key: 'verify',
     value: function () {
-      var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(ref) {
-        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+      var _ref9 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee9(ref) {
+        return _regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
@@ -4644,8 +4558,8 @@ var Git = function () {
   }, {
     key: 'pack',
     value: function () {
-      var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(oids) {
-        return regeneratorRuntime.wrap(function _callee10$(_context10) {
+      var _ref10 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee10(oids) {
+        return _regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
@@ -4672,9 +4586,9 @@ var Git = function () {
   }, {
     key: 'push',
     value: function () {
-      var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(ref) {
+      var _ref11 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee11(ref) {
         var url;
-        return regeneratorRuntime.wrap(function _callee11$(_context11) {
+        return _regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
@@ -4715,8 +4629,8 @@ var Git = function () {
   }, {
     key: 'getConfig',
     value: function () {
-      var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(path$$1) {
-        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+      var _ref12 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee12(path$$1) {
+        return _regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
@@ -4742,8 +4656,8 @@ var Git = function () {
   }, {
     key: 'setConfig',
     value: function () {
-      var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(path$$1, value) {
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+      var _ref13 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee13(path$$1, value) {
+        return _regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
