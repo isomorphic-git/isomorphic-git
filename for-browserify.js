@@ -1253,7 +1253,7 @@ var fetchCommits = function () {
           case 3:
             res = _context4.sent;
             _context4.next = 6;
-            return concat(res);
+            return pify(concat)(res);
 
           case 6:
             data = _context4.sent;
@@ -1505,7 +1505,7 @@ var fetchBlob = function () {
           case 2:
             res = _context7.sent;
             _context7.next = 5;
-            return concat(res);
+            return pify(concat)(res);
 
           case 5:
             data = _context7.sent;

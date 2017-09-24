@@ -520,7 +520,7 @@ async function fetchCommits({ gitdir, url, user, repo, ref, since, token }) {
       Authorization: 'token ' + token
     }
   });
-  let data = await concat(res);
+  let data = await pify(concat)(res);
   let json = JSON.parse(data.toString('utf8'));
   let link = parseLinkHeader(res.headers['link']);
 
@@ -606,7 +606,7 @@ async function fetchBlob({ gitdir, url, user, repo, sha, since, token }) {
       Authorization: 'token ' + token
     }
   });
-  let data = await concat(res);
+  let data = await pify(concat)(res);
   let oid = await GitObjectManager.write({
     gitdir,
     type: 'blob',
