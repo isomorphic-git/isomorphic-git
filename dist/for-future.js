@@ -1,5 +1,5 @@
 import ghurl from 'github-url-to-object';
-import path from 'omnipath';
+import path from 'path';
 import pify from 'pify';
 import fs from 'fs';
 import simpleGet from 'simple-get';
@@ -8,16 +8,16 @@ import parseLinkHeader from 'parse-link-header';
 import { Buffer } from 'buffer';
 import pako from 'pako';
 import shasum from 'shasum';
-import { HKP, key, message, sign, util } from 'openpgp';
-import sortby from 'lodash.sortby';
+import { HKP, key, message, sign, util } from 'openpgp/dist/openpgp.min.js';
+import sortby from 'lodash/sortBy';
 import BufferCursor from 'buffercursor';
 import AsyncLock from 'async-lock';
 import pad from 'pad';
 import crypto from 'crypto';
 import stream from 'stream';
 import ini from 'ini';
-import get from 'lodash.get';
-import set from 'lodash.set';
+import get from 'lodash/get';
+import set from 'lodash/set';
 
 // @flow
 async function mkdir(dirpath /*: string */) {

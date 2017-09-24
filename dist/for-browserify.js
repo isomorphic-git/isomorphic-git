@@ -3,7 +3,7 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var ghurl = _interopDefault(require('github-url-to-object'));
-var path = _interopDefault(require('omnipath'));
+var path = _interopDefault(require('path'));
 var pify = _interopDefault(require('pify'));
 var fs = _interopDefault(require('fs'));
 var simpleGet = _interopDefault(require('simple-get'));
@@ -12,16 +12,16 @@ var parseLinkHeader = _interopDefault(require('parse-link-header'));
 var buffer = require('buffer');
 var pako = _interopDefault(require('pako'));
 var shasum = _interopDefault(require('shasum'));
-var openpgp = require('openpgp');
-var sortby = _interopDefault(require('lodash.sortby'));
+var openpgp = require('openpgp/dist/openpgp.min.js');
+var sortby = _interopDefault(require('lodash/sortBy'));
 var BufferCursor = _interopDefault(require('buffercursor'));
 var AsyncLock = _interopDefault(require('async-lock'));
 var pad = _interopDefault(require('pad'));
 var crypto = _interopDefault(require('crypto'));
 var stream = _interopDefault(require('stream'));
 var ini = _interopDefault(require('ini'));
-var _get = _interopDefault(require('lodash.get'));
-var _set = _interopDefault(require('lodash.set'));
+var _get = _interopDefault(require('lodash/get'));
+var _set = _interopDefault(require('lodash/set'));
 
 // @flow
 var mkdir = function () {
