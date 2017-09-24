@@ -35,7 +35,7 @@ async function mkdir(dirpath /*: string */) {
     if (err.code === 'EEXIST') return;
     // If we got a "no such file or directory error" backup and try again.
     if (err.code === 'ENOENT') {
-      let parent = path.posix.dirname(dirpath);
+      let parent = path.dirname(dirpath);
       // Check to see if we've gone too far
       if (parent === '.' || parent === '/' || parent === dirpath) throw err;
       // Infinite recursion, what could go wrong?
@@ -954,7 +954,7 @@ function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
       let dir /*: Node */ = {
         type: 'tree',
         fullpath: name,
-        basename: path.posix.basename(name),
+        basename: path.basename(name),
         metadata: {},
         children: []
       };
@@ -962,7 +962,7 @@ function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
       // This recursively generates any missing parent folders.
       // We do it after we've added the inode to the set so that
       // we don't recurse infinitely trying to create the root '.' dirname.
-      dir.parent = mkdir(path.posix.dirname(name));
+      dir.parent = mkdir(path.dirname(name));
       if (dir.parent && dir.parent !== dir) dir.parent.children.push(dir);
     }
     return inodes.get(name);
@@ -973,10 +973,10 @@ function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
       let file /*: Node */ = {
         type: 'blob',
         fullpath: name,
-        basename: path.posix.basename(name),
+        basename: path.basename(name),
         metadata: metadata,
         // This recursively generates any missing parent folders.
-        parent: mkdir(path.posix.dirname(name)),
+        parent: mkdir(path.dirname(name)),
         children: []
       };
       if (file.parent) file.parent.children.push(file);
