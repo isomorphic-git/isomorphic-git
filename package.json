@@ -15,7 +15,7 @@
     "watch2": "rollup -cw",
     "build": "babel src --out-dir lib --source-maps",
     "bundle": "rollup -c",
-    "browserify": "browserify --entry dist/for-browserify.js --standalone git --external fs | uglifyjs > dist/bundle.umd.min.js",
+    "browserify": "browserify --entry dist/for-browserify.js --standalone git | uglifyjs > dist/bundle.umd.min.js",
     "test": "npm run build && npm run bundle && ava",
     "on-pull-request": "npm run format && npm run lint && npm run test",
     "ban": "ban",
@@ -64,6 +64,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",
+    "browserify-shim": "^3.8.14",
     "husky": "^0.14.3",
     "jsonfile": "^3.0.1",
     "lodash": "^4.17.4",
@@ -83,5 +84,11 @@
       "lib/**",
       "dist"
     ]
+  },
+  "browserify": {
+    "transform": [ "browserify-shim" ]
+  },
+  "browserify-shim": {
+    "fs": "global:fs"
   }
 }
