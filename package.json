@@ -36,6 +36,7 @@
   "homepage": "https://github.com/wmhilton/esgit#readme",
   "dependencies": {
     "async-lock": "^1.0.0",
+    "babel-runtime": "^6.26.0",
     "buffer": "^5.0.7",
     "buffercursor": "0.0.12",
     "github-url-to-object": "^4.0.2",
@@ -59,6 +60,7 @@
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",

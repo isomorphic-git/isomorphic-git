@@ -8,6 +8,24 @@ const external = [
   'path',
   'crypto',
   'stream',
+  'lodash/get',
+  'lodash/set',
+  'lodash/sortBy',
+  'openpgp/dist/openpgp.min.js',
+  'babel-runtime/regenerator',
+  'babel-runtime/helpers/asyncToGenerator',
+  'babel-runtime/helpers/classCallCheck',
+  'babel-runtime/helpers/createClass',
+  'babel-runtime/core-js/promise',
+  'babel-runtime/core-js/get-iterator',
+  'babel-runtime/helpers/extends',
+  'babel-runtime/helpers/typeof',
+  'babel-runtime/helpers/slicedToArray',
+  'babel-runtime/core-js/math/sign',
+  'babel-runtime/core-js/symbol/iterator',
+  'babel-runtime/core-js/map',
+  'babel-runtime/helpers/toConsumableArray',
+  'babel-runtime/core-js/set',
   ...Object.keys(pkg.dependencies)
 ]
 
@@ -74,7 +92,9 @@ export default [
             }
           }]
         ],
+        'runtimeHelpers': true,
         'plugins': [
+          'transform-runtime',
           'transform-object-rest-spread'
         ]
       })
