@@ -37,6 +37,10 @@
     "url": "https://github.com/wmhilton/esgit/issues"
   },
   "homepage": "https://github.com/wmhilton/esgit#readme",
+  "files": [
+    "./dist",
+    "cli.js"
+  ],
   "dependencies": {
     "async-lock": "^1.0.0",
     "babel-runtime": "^6.26.0",
