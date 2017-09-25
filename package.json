@@ -68,9 +68,15 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",
+    "browserify": "^14.4.0",
     "browserify-shim": "^3.8.14",
     "husky": "^0.14.3",
     "jsonfile": "^3.0.1",
+    "karma": "^1.7.1",
+    "karma-browserify": "^5.1.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-firefox-launcher": "^1.0.1",
+    "karma-tap": "^3.1.1",
     "lodash": "^4.17.4",
     "ncp": "^2.0.0",
     "nock": "^9.0.17",
@@ -82,7 +88,8 @@
     "standard": "^10.0.3",
     "stream-equal": "^1.0.1",
     "tape": "^4.8.0",
-    "temp": "^0.8.3"
+    "temp": "^0.8.3",
+    "watchify": "^3.9.0"
   },
   "ava": {
     "source": [
