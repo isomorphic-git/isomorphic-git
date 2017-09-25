@@ -8,6 +8,9 @@
   "bin": {
     "esgit": "./cli.js"
   },
+  "engines": {
+    "node": ">=7.6.0"
+  },
   "scripts": {
     "format": "prettier-standard src/**/*.js test/**/*.js",
     "lint": "standard src/**/*.js",
@@ -77,6 +80,7 @@
     "rollup-plugin-json": "^2.3.0",
     "standard": "^10.0.3",
     "stream-equal": "^1.0.1",
+    "tape": "^4.8.0",
     "temp": "^0.8.3"
   },
   "ava": {
@@ -86,9 +90,19 @@
     ]
   },
   "browserify": {
-    "transform": [ "browserify-shim" ]
+    "transform": [
+      "browserify-shim"
+    ]
   },
   "browserify-shim": {
     "fs": "global:fs"
+  },
+  "testling": {
+    "files": "testling/basic-test.js",
+    "browsers": [
+      "chrome/latest",
+      "firefox/latest",
+      "ie/latest"
+    ]
   }
 }
