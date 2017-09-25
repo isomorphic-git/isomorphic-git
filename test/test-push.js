@@ -6,7 +6,7 @@ import concat from 'simple-concat'
 import pify from 'pify'
 import git from '..'
 import { write } from '../lib/managers/models/utils/write'
-import path from 'omnipath'
+import path from 'path'
 import { mkdir } from '../lib/managers/models/utils/mkdirs'
 import { exists, tmpdir } from './_helpers'
 
