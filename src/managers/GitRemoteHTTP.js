@@ -1,9 +1,8 @@
 // @flow
 import { Buffer } from 'buffer'
-import axios from 'axios'
-import assert from 'assert'
-import PktLineReader from '../utils/pkt-line-reader'
+import PktLineReader from './models/utils/pkt-line-reader'
 import simpleGet from 'simple-get'
+import concat from 'simple-concat'
 import pify from 'pify'
 
 function basicAuth (auth) {
@@ -33,21 +32,34 @@ export default class GitRemoteHTTP {
   async discover (service /*: string */) {
     this.capabilities = new Set()
     this.refs = new Map()
-    let res = await axios.get(`${this.GIT_URL}/info/refs?service=${service}`, {
-      auth: this.auth
+    let headers = {}
+    // headers['Accept'] = `application/x-${service}-advertisement`
+    if (this.auth) {
+      headers['Authorization'] = basicAuth(this.auth)
+    }
+    let res = await pify(simpleGet)({
+      method: 'GET',
+      url: `${this.GIT_URL}/info/refs?service=${service}`,
+      headers
     })
-    assert(res.status === 200, `Bad status code from server: ${res.status}`)
+    if (res.statusCode !== 200) {
+      throw new Error(`Bad status code from server: ${res.statusCode}`)
+    }
+    let data = await pify(concat)(res)
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
-    let read = new PktLineReader(res.data)
+    let read = new PktLineReader(data)
     let lineOne = read()
     // skip past any flushes
     while (lineOne === null) lineOne = read()
-    assert(lineOne !== true, 'Bad response from git server.')
-    assert(
-      lineOne.toString('utf8') === `# service=${service}\n`,
-      lineOne.toString('utf8')
-    )
+    if (lineOne === true) throw new Error('Bad response from git server.')
+    if (lineOne.toString('utf8') !== `# service=${service}\n`) {
+      throw new Error(
+        `Expected '# service=${service}\\n' but got '${lineOne.toString(
+          'utf8'
+        )}'`
+      )
+    }
     let lineTwo = read()
     // skip past any flushes
     while (lineTwo === null) lineTwo = read()
@@ -91,15 +103,18 @@ export default class GitRemoteHTTP {
   }
   async pull ({ stream, refs }) {
     const service = 'git-upload-pack'
-    let res = await axios.post(`${this.GIT_URL}/${service}`, {
-      data: stream,
-      headers: {
-        'Content-Type': `application/x-${service}-request`,
-        Accept: `application/x-${service}-result`
-      },
-      auth: this.auth
+    let headers = {}
+    headers['Content-Type'] = `application/x-${service}-request`
+    headers['Accept'] = `application/x-${service}-result`
+    if (this.auth) {
+      headers['Authorization'] = basicAuth(this.auth)
+    }
+    let res = await pify(simpleGet)({
+      method: 'POST',
+      url: `${this.GIT_URL}/${service}`,
+      body: stream,
+      headers
     })
-    assert(res.status === 200)
     return res
   }
 }

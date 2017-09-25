@@ -5,7 +5,7 @@ import server from './_real-http-backend'
 
 const { get } = server('fixtures')
 
-test.skip('GitRemoteHTTP', async t => {
+test.skip('preparePull (Github response)', async t => {
   let remote = new GitRemoteHTTP('https://github.com/wmhilton/esgit')
   await remote.preparePull()
   console.log(remote)

@@ -1,5 +1,5 @@
 import test from 'ava'
-import git from '../lib'
+import git from '..'
 import fs from 'fs'
 import stream from 'stream'
 import streamEqual from 'stream-equal'

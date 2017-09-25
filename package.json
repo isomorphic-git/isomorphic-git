@@ -2,14 +2,24 @@
   "name": "isomorphic-git",
   "version": "0.0.2",
   "description": "Node library for interacting with git repositories, circa 2017",
-  "main": "lib/index.js",
-  "bin": "lib/cli.js",
+  "main": "dist/for-node.js",
+  "browser": "dist/for-browserify.js",
+  "module": "dist/for-future.js",
+  "bin": {
+    "esgit": "./cli.js"
+  },
+  "engines": {
+    "node": ">=7.6.0"
+  },
   "scripts": {
     "format": "prettier-standard src/**/*.js test/**/*.js",
     "lint": "standard src/**/*.js",
     "watch": "babel src --watch --out-dir lib --source-maps inline",
+    "watch2": "rollup -cw",
     "build": "babel src --out-dir lib --source-maps",
-    "test": "npm run build && ava",
+    "bundle": "rollup -c",
+    "browserify": "browserify --entry dist/for-browserify.js --standalone git | uglifyjs > dist/bundle.umd.min.js",
+    "test": "npm run build && npm run bundle && ava",
     "on-pull-request": "npm run format && npm run lint && npm run test",
     "ban": "ban",
     "precommit": "ban && prettier-standard src/**/*.js test/**/*.js"
@@ -27,17 +37,17 @@
     "url": "https://github.com/wmhilton/esgit/issues"
   },
   "homepage": "https://github.com/wmhilton/esgit#readme",
+  "files": [
+    "./dist",
+    "cli.js"
+  ],
   "dependencies": {
     "async-lock": "^1.0.0",
-    "axios": "^0.16.2",
+    "babel-runtime": "^6.26.0",
     "buffer": "^5.0.7",
     "buffercursor": "0.0.12",
     "github-url-to-object": "^4.0.2",
     "ini": "^1.3.4",
-    "lockfile": "^1.0.3",
-    "lodash.get": "^4.4.2",
-    "lodash.set": "^4.3.2",
-    "lodash.sortby": "^4.7.0",
     "minimisted": "^2.0.0",
     "openpgp": "^2.5.10",
     "pad": "^1.1.0",
@@ -46,31 +56,54 @@
     "pify": "^3.0.0",
     "shasum": "^1.0.2",
     "simple-concat": "^1.0.0",
-    "simple-get": "^2.7.0",
-    "write-file-atomic": "^2.3.0"
+    "simple-get": "^2.7.0"
   },
   "devDependencies": {
     "ava": "^0.21.0",
     "babel-cli": "^6.24.1",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",
+    "browserify-shim": "^3.8.14",
     "husky": "^0.14.3",
     "jsonfile": "^3.0.1",
+    "lodash": "^4.17.4",
     "ncp": "^2.0.0",
     "nock": "^9.0.17",
     "parse-header-stream": "^1.1.1",
     "prettier-standard": "^6.0.0",
+    "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-json": "^2.3.0",
     "standard": "^10.0.3",
     "stream-equal": "^1.0.1",
+    "tape": "^4.8.0",
     "temp": "^0.8.3"
   },
   "ava": {
     "source": [
-      "lib/**"
+      "lib/**",
+      "dist"
+    ]
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "fs": "global:fs"
+  },
+  "testling": {
+    "files": "testling/basic-test.js",
+    "browsers": [
+      "chrome/latest",
+      "firefox/latest",
+      "ie/latest"
     ]
   }
 }

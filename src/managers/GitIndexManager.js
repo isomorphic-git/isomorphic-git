@@ -1,10 +1,10 @@
 // @flow
 // import LockManager from 'travix-lock-manager'
-import read from '../utils/read'
-import write from '../utils/write'
-import GitIndex from '../models/GitIndex'
+import { read } from './models/utils/read'
+import { write } from './models/utils/write'
+import GitIndex from './models/GitIndex'
 import AsyncLock from 'async-lock'
-// import Lock from '../utils/lockfile'
+// import Lock from './models/utils/lockfile'
 
 // TODO: replace with an LRU cache?
 const map /*: Map<string, GitIndex> */ = new Map()

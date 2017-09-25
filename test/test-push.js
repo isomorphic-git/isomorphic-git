@@ -1,13 +1,13 @@
 import test from 'ava'
-import push from '../lib/commands/push'
+import { push } from '../lib/push'
 import server from './_real-http-backend'
 import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
 import git from '..'
-import write from '../lib/utils/write'
+import { write } from '../lib/managers/models/utils/write'
 import path from 'path'
-import { mkdir } from '../lib/utils/mkdirs'
+import { mkdir } from '../lib/managers/models/utils/mkdirs'
 import { exists, tmpdir } from './_helpers'
 
 test('push (to local git-http-backend)', async t => {
@@ -34,6 +34,7 @@ test('push (to local git-http-backend)', async t => {
     .post(/.*/)
     .reply(200, postReceivePackRequest)
 
+  // TODO: use the fluent command builder instead of directly
   let res = await push({
     gitdir: 'fixtures/test-push.git',
     ref: 'refs/heads/master',

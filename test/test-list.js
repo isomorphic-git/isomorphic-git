@@ -1,5 +1,5 @@
 import test from 'ava'
-import git from '../lib'
+import git from '..'
 
 test.serial('gitIndex.list', async t => {
   const files = await git()
