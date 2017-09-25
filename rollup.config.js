@@ -1,6 +1,4 @@
 import babel from 'rollup-plugin-babel'
-import json from 'rollup-plugin-json'
-
 import pkg from './package.json'
 
 const external = [
