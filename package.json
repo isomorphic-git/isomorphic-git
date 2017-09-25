@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/wmhilton/esgit#readme",
   "files": [
-    "./dist",
+    "dist",
     "cli.js"
   ],
   "dependencies": {
