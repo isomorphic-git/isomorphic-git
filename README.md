@@ -1,11 +1,10 @@
 # isomorphic-git [![Build Status](https://travis-ci.org/wmhilton/esgit.svg?branch=master)](https://travis-ci.org/wmhilton/esgit)
-Node library for interacting with git repositories, circa 2017
+JavaScript library for interacting with git repositories, circa 2017
 
 (Originally I was going to call it `esgit` but the name is too similar to another
-project called [`es-git`](https://github.com/es-git/es-git).)
+project called [es-git](https://github.com/es-git/es-git).)
 
-[![browser support](https://ci.testling.com/wmhilton/esgit.png)
-](https://ci.testling.com/wmhilton/esgit)
+[![browser support](https://ci.testling.com/wmhilton/esgit.png)](https://ci.testling.com/wmhilton/esgit)
 
 # Progress
 
@@ -45,7 +44,7 @@ This is analogous to the "porcelain" git commands. There is a single function `g
 Examples:
 
 ```js
-import git from 'esgit'
+import git from 'isomorphic-git'
 
 // Create a new empty repo
 git('test').init()
@@ -136,81 +135,29 @@ to your embedded git-based concept thingy. Fear not! I am
 purposefully building this library as a series of small modules
 so you can pick and choose features as you need them.
 
-### Individual commands
+### Commands
 
 Each command is available as its own file, so hopefully with
-a bit of finagling you will be able to do:
+a bit of finagling you will be able to import individual commands
+if you only need a few and can benefit from tree-shaking.
 
-```js
-const add = require('esgit/lib/commands/add.js')
-const checkout = require('esgit/lib/commands/checkout.js')
-const config = require('esgit/lib/commands/config.js')
-const fetch = require('esgit/lib/commands/fetch.js')
-const init = require('esgit/lib/commands/init.js')
-const list = require('esgit/lib/commands/list.js')
-const remove = require('esgit/lib/commands/remove.js')
+### Managers
 
-// Example
-checkout({
-  workdir: '.',
-  gitdir: '.git',
-  ref: 'master',
-  remote: 'origin'
-})
-.then()
+Managers are a level above models. They take care of implementation performance details like
 
-```
+- batching reads to and from the file system
+- in-process concurrency locks
+- lockfiles
+- caching files and invalidating cached results
+- reusing objects
+- object memory pools
 
-### Individual objects
+### Models
 
-Only interested in commit objects? Import just the GitCommit class. And so on:
+Models are the lowest level building blocks.
+They generally have very few or no dependencies except for `'buffer'`.
+This makes them portable to many different environments so they can be a useful lowest common denominator.
 
-```js
-const GitBlob = require('esgit/lib/models/GitBlob.js')
-const GitCommit = require('esgit/lib/models/GitCommit.js')
-const GitTree = require('esgit/lib/models/GitTree.js')
-const GitObject = require('esgit/lib/models/GitObject.js')
+### Utils
 
-// Example
-const commit = GitCommit.from(`tree 0370383003493b845c73fb4316355a18f0e346fe
-parent c9efafe888804a58e333ec1b64ca58f9c4c92414
-author Will Hilton <wmhilton@gmail.com> 1503898987 -0400
-committer Will Hilton <wmhilton@gmail.com> 1503899426 -0400
-gpgsig -----BEGIN PGP SIGNATURE-----
- Version: GnuPG v1
-
- iQIcBAABAgAGBQJZo68iAAoJEJYJuKWSi6a5WesP/31Ie7uNJcLU1+yEch1ubuhS
- J9PfAna2iUflQANNq8BCyufW8Nq3ZA+nyRvaA499VqLkiuEI6nMUwWVPdhuYUG4s
- P7QP85NXn1w1DRNfbb2K6USz40P3a108GqhOpDCLP55kRfcxyJZIymD/WtHKji7T
- 3ubE0meMYHOsx9a76Roo9DOHiqy3gAZsiwqvvqToD/IrmPmRv3qCqFBPrKKMW7la
- DZGPFHV9bhJfaGTT42lu0vTjv5itdLwfCLReh3LuQ1TAq5b6hhvwguE+M+X8qA11
- KXxxyQf06wt3+o8pjxxUHttVsuiS68yxzeTQOWe8pk/E5oaEqOx6O9stDvSfZatm
- 2LvFR++0axDMANluuStAoDhTMrqUqLQ3iWeay+xpivrP7mWnLM/bzrPShQVSkFPP
- VkKedKiaaCGKTEY4xa/RBQvQ3WqDnNogY5t6bOolPvC5/D5n3grkzOpI7WQqh8EN
- +6eYOOYTTPShi5gnBTSwFdSBKG4aWJI5moQtQJ1wQtc4Zhm4jKbp7OLPn1GJEET6
- QwnURymv4mkDuvyPUki5nsP5U+xzWObp8PlqE4SCbSiV4D5FqF5uVmeh4E15WsTP
- y2l3fT2JUVecDXOLot3MSceiakrgoKNsYQlM+e/+XHwuZ41nZ/OuSCBGjhRn0UDI
- 1qMqffk5gWiTsZFwLjBV
- =gsxy
- -----END PGP SIGNATURE-----
-
-Add a .git/index parserializer`)
-
-commit.parseHeaders()
-/*
-{ tree: '0370383003493b845c73fb4316355a18f0e346fe',
-  parent: [ 'c9efafe888804a58e333ec1b64ca58f9c4c92414' ],
-  author:
-   { name: 'Will Hilton',
-     email: 'wmhilton@gmail.com',
-     timestamp: 1503898987,
-     timezoneOffset: 240 },
-  committer:
-   { name: 'Will Hilton',
-     email: 'wmhilton@gmail.com',
-     timestamp: 1503899426,
-     timezoneOffset: 240 },
-  gpgsig: '-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1' }
-*/
-```
-
+I lied. Utils are actually the lowest level building blocks.
