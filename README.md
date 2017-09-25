@@ -4,6 +4,7 @@ JavaScript library for interacting with git repositories, circa 2017
 (Originally I was going to call it `esgit` but the name is too similar to another
 project called [es-git](https://github.com/es-git/es-git).)
 
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
 [![browser support](https://ci.testling.com/wmhilton/esgit.png)](https://ci.testling.com/wmhilton/esgit)
 
 # Progress
