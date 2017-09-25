@@ -1,6 +1,6 @@
 import test from 'ava'
-import git from '../lib'
-import rm from '../lib/utils/delete'
+import git from '..'
+import { rm } from '../lib/managers/models/utils/delete'
 
 test.beforeEach(async t => {
   await rm('fixtures/test-add/.git/index')

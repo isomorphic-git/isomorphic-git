@@ -1,5 +1,5 @@
 import test from 'ava'
-import PktLineReader from '../lib/utils/pkt-line-reader.js'
+import PktLineReader from '../lib/managers/models/utils/pkt-line-reader.js'
 
 test('pkt-line-reader string', async t => {
   let read = PktLineReader(Buffer.from('0010hello world\n'))
