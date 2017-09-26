@@ -46,10 +46,17 @@ export async function commit ({
   await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
     const inode = flatFileListToDirectoryStructure(index.entries)
     const treeRef = await constructTree({ gitdir, inode })
-    const parent = await resolveRef({ gitdir, ref: 'HEAD' })
+    let parents
+    try {
+      let parent = await resolveRef({ gitdir, ref: 'HEAD' })
+      parents = [parent]
+    } catch (err) {
+      // Probably an initial commit
+      parents = []
+    }
     let comm = GitCommit.from({
       tree: treeRef,
-      parent: [parent],
+      parent: parents,
       author: {
         name: author.name,
         email: author.email,

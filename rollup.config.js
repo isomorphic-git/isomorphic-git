@@ -32,16 +32,12 @@ export default [
     // Bleeding edge
     input: 'src/index.js',
     external,
-    output: [
-      { format: 'es', name: 'git', file: 'dist/for-future.js' }
-    ],
+    output: [{ format: 'es', name: 'git', file: 'dist/for-future.js' }],
     plugins: [
       babel({
-        'babelrc': false,
-        'exclude': 'node_modules/**',
-        'plugins': [
-          'transform-object-rest-spread'
-        ]
+        babelrc: false,
+        exclude: 'node_modules/**',
+        plugins: ['transform-object-rest-spread']
       })
     ]
   },
@@ -49,25 +45,23 @@ export default [
     // Node.js
     input: 'src/index.js',
     external,
-    output: [
-      { format: 'cjs', name: 'git', file: 'dist/for-node.js' }
-    ],
+    output: [{ format: 'cjs', name: 'git', file: 'dist/for-node.js' }],
     plugins: [
       babel({
-        'babelrc': false,
-        'exclude': 'node_modules/**',
-        'presets': [
-          ['env', {
-            'modules': false,
-            'targets': {
-              'node': 'current'
+        babelrc: false,
+        exclude: 'node_modules/**',
+        presets: [
+          [
+            'env',
+            {
+              modules: false,
+              targets: {
+                node: 'current'
+              }
             }
-          }]
+          ]
         ],
-        'plugins': [
-          'external-helpers',
-          'transform-object-rest-spread'
-        ]
+        plugins: ['external-helpers', 'transform-object-rest-spread']
       })
     ]
   },
@@ -75,26 +69,24 @@ export default [
     // Browserify
     input: 'src/index.js',
     external,
-    output: [
-      { format: 'cjs', name: 'git', file: 'dist/for-browserify.js' }
-    ],
+    output: [{ format: 'cjs', name: 'git', file: 'dist/for-browserify.js' }],
     plugins: [
       babel({
-        'babelrc': false,
-        'exclude': 'node_modules/**',
-        'presets': [
-          ['env', {
-            'modules': false,
-            'targets': {
-              'browsers': 'last 1 version'
+        babelrc: false,
+        exclude: 'node_modules/**',
+        presets: [
+          [
+            'env',
+            {
+              modules: false,
+              targets: {
+                browsers: 'last 1 version'
+              }
             }
-          }]
+          ]
         ],
-        'runtimeHelpers': true,
-        'plugins': [
-          'transform-runtime',
-          'transform-object-rest-spread'
-        ]
+        runtimeHelpers: true,
+        plugins: ['transform-runtime', 'transform-object-rest-spread']
       })
     ]
   }

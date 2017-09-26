@@ -24,4 +24,5 @@ export async function init (gitdir /*: string */) {
       '\tignorecase = true\n'
   )
   await write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
+  // await write(gitdir + '/refs/heads/master', '')
 }

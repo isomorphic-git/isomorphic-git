@@ -23,13 +23,11 @@ module.exports = function (config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['browserify', 'tap'],
     // list of files / patterns to load in the browser
-    files: [
-      'testling/*.js'
-    ],
+    files: ['testling/*.js'],
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'testling/*.js': [ 'browserify' ]
+      'testling/*.js': ['browserify']
     },
     // test results reporter to use
     // possible values: 'dots', 'progress'

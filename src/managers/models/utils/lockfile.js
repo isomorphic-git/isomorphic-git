@@ -1,12 +1,9 @@
 // @flow
 // This is modeled after the lockfile strategy used by the git source code.
 import pify from 'pify'
-import fs from 'fs'
+import fs from './fs'
 import { sleep } from './sleep'
 const delayedReleases = new Map()
-
-const mkdir = pify(fs.mkdir)
-const rmdir = pify(fs.rmdir)
 
 export async function lock (
   filename /*: string */,
@@ -24,7 +21,7 @@ export async function lock (
     )
   }
   try {
-    await mkdir(`${filename}.lock`)
+    await pify(fs().mkdir)(`${filename}.lock`)
   } catch (err) {
     if (err.code === 'EEXIST') {
       await sleep(100)
@@ -46,7 +43,7 @@ export async function unlock (
     filename,
     setTimeout(async () => {
       delayedReleases.delete(filename)
-      await rmdir(`${filename}.lock`)
+      await pify(fs().rmdir)(`${filename}.lock`)
     })
   )
 }
