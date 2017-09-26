@@ -9,4 +9,4 @@ deploy:
   on:
     tags: true
     branch: master
-    repo: wmhilton/esgit
+    repo: wmhilton/isomorphic-git
