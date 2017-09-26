@@ -12,11 +12,32 @@ module.exports = function (config) {
       sl_firefox: {
         base: 'SauceLabs',
         browserName: 'firefox'
+      },
+      sl_edge: {
+        base: 'SauceLabs',
+        browserName: 'MicrosoftEdge'
+      },
+      sl_ie: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer'
+      },
+      sl_safari: {
+        base: 'SauceLabs',
+        browserName: 'safari'
+      },
+      sl_ios_safari: {
+        base: 'SauceLabs',
+        browserName: 'iphone'
+      },
+      sl_android_chrome: {
+        base: 'SauceLabs',
+        browserName: 'Chrome',
+        platform: 'Android'
       }
     },
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['sl_chrome', 'sl_firefox'],
+    browsers: ['sl_chrome', 'sl_firefox', 'sl_edge', 'sl_ie', 'sl_safari', 'sl_ios_safari', 'sl_android_chrome'],
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
     // frameworks to use
