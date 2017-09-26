@@ -1,4 +1,4 @@
-# isomorphic-git [![Build Status](https://travis-ci.org/wmhilton/esgit.svg?branch=master)](https://travis-ci.org/wmhilton/esgit) [![codecov](https://codecov.io/gh/wmhilton/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/wmhilton/isomorphic-git)
+# isomorphic-git [![Build Status](https://travis-ci.org/wmhilton/isomorphic-git.svg?branch=master)](https://travis-ci.org/wmhilton/isomorphic-git) [![codecov](https://codecov.io/gh/wmhilton/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/wmhilton/isomorphic-git)
 JavaScript library for interacting with git repositories, circa 2017
 
 (Originally I was going to call it `esgit` but the name is too similar to another
