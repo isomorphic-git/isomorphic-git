@@ -99,6 +99,7 @@
     "stream-equal": "^1.0.1",
     "tape": "^4.8.0",
     "temp": "^0.8.3",
+    "uglify-es": "^3.1.2",
     "watchify": "^3.9.0"
   },
   "ava": {
