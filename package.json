@@ -12,7 +12,7 @@
     "node": ">=7.6.0"
   },
   "scripts": {
-    "format": "prettier-standard src/**/*.js test/**/*.js",
+    "format": "prettier-standard src/**/*.js test/**/*.js testling/**/*.js *.js",
     "lint": "standard src/**/*.js",
     "watch": "babel src --watch --out-dir lib --source-maps inline",
     "watch2": "rollup -cw",
@@ -68,6 +68,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.0",
+    "browserfs": "^1.4.3",
     "browserify": "^14.4.0",
     "browserify-shim": "^3.8.14",
     "husky": "^0.14.3",

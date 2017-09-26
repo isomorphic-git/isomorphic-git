@@ -1,11 +1,11 @@
 // @flow
 import path from 'path'
 import pify from 'pify'
-import fs from 'fs'
+import fs from './fs'
 
 export async function mkdir (dirpath /*: string */) {
   try {
-    await pify(fs.mkdir)(dirpath)
+    await pify(fs().mkdir)(dirpath)
     return
   } catch (err) {
     // If err is null then operation succeeded!
