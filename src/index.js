@@ -1,6 +1,6 @@
 import ghurl from 'github-url-to-object'
 import { init } from './init'
-import { fetch } from './fetch'
+import { fetch } from './github-api-fetch'
 import { checkout } from './checkout.js'
 import { list } from './list.js'
 import { add } from './add.js'
