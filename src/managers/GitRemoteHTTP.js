@@ -4,6 +4,7 @@ import PktLineReader from './models/utils/pkt-line-reader'
 import simpleGet from 'simple-get'
 import concat from 'simple-concat'
 import pify from 'pify'
+import { name as pkgName, version as pkgVersion } from '../../package.json'
 
 function basicAuth (auth) {
   return `Basic ${Buffer.from(auth.username + ':' + auth.password).toString(
@@ -87,27 +88,29 @@ export default class GitRemoteHTTP {
   }
   async push (stream /*: ReadableStream */) {
     const service = 'git-receive-pack'
-    return this.stream({ stream, service })
+    let res = await this.stream({ stream, service })
+    return res
   }
   async pull (stream /*: ReadableStream */) {
     const service = 'git-upload-pack'
-    return this.stream({ stream, service })
+    let res = await this.stream({ stream, service })
+    return res
   }
   async stream ({ stream, service }) {
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
-    headers['user-agent'] = `git/2.10.1.windows.1`
+    headers['user-agent'] = `git/${pkgName}@${pkgVersion}`
     if (this.auth) {
       headers['authorization'] = basicAuth(this.auth)
     }
+    console.log('headers =', headers)
     let res = await pify(simpleGet)({
       method: 'POST',
       url: `${this.GIT_URL}/${service}`,
       body: stream,
       headers
     })
-    res.on('data', console.log)
     return res
   } /*: {stream: ReadableStream, service: string} */
 }
