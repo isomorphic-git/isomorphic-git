@@ -1,6 +1,6 @@
 import ghurl from 'github-url-to-object'
 import { init } from './init'
-import { fetch } from './github-api-fetch'
+import { fetch as fetchGithubApi } from './github-api-fetch'
 import { checkout } from './checkout.js'
 import { list } from './list.js'
 import { add } from './add.js'
@@ -9,6 +9,7 @@ import { commit } from './commit.js'
 import { verify } from './verify.js'
 import { pack } from './pack-objects.js'
 import { push } from './push.js'
+import { fetch } from './fetch.js'
 import { getConfig } from './getConfig.js'
 import { setConfig } from './setConfig.js'
 
@@ -74,7 +75,7 @@ class Git {
     await init(this.gitdir)
   }
   async fetch (url) {
-    await fetch({
+    await fetchGithubApi({
       gitdir: this.gitdir,
       // TODO: make this not Github-specific
       user: ghurl(url).user,
@@ -177,6 +178,23 @@ class Git {
         password: this.operateToken
       }
     })
+  }
+  async pull (ref) {
+    let params = {}
+    params.url = await getConfig({
+      gitdir: this.gitdir,
+      path: `remote "${this.operateRemote}".url`
+    })
+    console.log('url =', params.url)
+    if (this.operateToken) {
+      params.auth = {
+        username: this.operateToken,
+        password: this.operateToken
+      }
+    }
+    params.gitdir = this.gitdir
+    params.ref = ref
+    return fetch(params)
   }
   async getConfig (path) {
     return getConfig({

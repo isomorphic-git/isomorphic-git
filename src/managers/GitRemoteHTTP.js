@@ -95,10 +95,11 @@ export default class GitRemoteHTTP {
   }
   async stream ({ stream, service }) {
     let headers = {}
-    headers['Content-Type'] = `application/x-${service}-request`
-    headers['Accept'] = `application/x-${service}-result`
+    headers['content-type'] = `application/x-${service}-request`
+    headers['accept'] = `application/x-${service}-result`
+    headers['user-agent'] = `git/2.10.1.windows.1`
     if (this.auth) {
-      headers['Authorization'] = basicAuth(this.auth)
+      headers['authorization'] = basicAuth(this.auth)
     }
     let res = await pify(simpleGet)({
       method: 'POST',
@@ -106,6 +107,7 @@ export default class GitRemoteHTTP {
       body: stream,
       headers
     })
+    res.on('data', console.log)
     return res
   } /*: {stream: ReadableStream, service: string} */
 }
