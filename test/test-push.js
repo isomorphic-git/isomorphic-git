@@ -1,32 +1,24 @@
 import test from 'ava'
-import { push } from '../lib/push'
 import server from './_real-http-backend'
 import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
 import git from '..'
-import { write } from '../lib/managers/models/utils/write'
 import path from 'path'
-import { mkdir } from '../lib/managers/models/utils/mkdirs'
-import { exists, tmpdir } from './_helpers'
+import { tmpdir } from './_helpers'
+import ncp from 'ncp'
 
 test('push (to local git-http-backend)', async t => {
   // Setup
-  let dir = await tmpdir()
-  const { get, postReceivePackRequest } = server(dir)
-  let gitdir = path.join(dir, 'foo.git')
-  await mkdir(gitdir)
-  let repo = git().gitdir(gitdir)
-  await repo.init()
-  await repo.setConfig('core.bare', true)
-  await write(path.join(gitdir, 'git-daemon-export-ok'), '')
-  console.log('gitdir =', gitdir)
-  // await repo.setConfig('remote "origin".url', 'http://example.dev/test-push')
-  t.true(exists(gitdir))
-  t.true(exists(path.join(gitdir, 'objects')))
-  t.true(exists(path.join(gitdir, 'refs/heads')))
-  t.true(exists(path.join(gitdir, 'HEAD')))
+  let serverDir = await tmpdir()
+  let clientDir = await tmpdir()
+  await pify(ncp)(
+    'fixtures/test-push-server.git',
+    path.join(serverDir, 'foo.git')
+  )
+  await pify(ncp)('fixtures/test-push-client.git', clientDir)
   // Test
+  const { get, postReceivePackRequest } = server(serverDir)
   nock('http://example.dev')
     // .get('/test-push.git/info/refs?service=git-receive-pack')
     .get(/.*/)
@@ -34,12 +26,10 @@ test('push (to local git-http-backend)', async t => {
     .post(/.*/)
     .reply(200, postReceivePackRequest)
 
-  // TODO: use the fluent command builder instead of directly
-  let res = await push({
-    gitdir: 'fixtures/test-push.git',
-    ref: 'refs/heads/master',
-    url: 'http://example.dev/foo.git'
-  })
+  let res = await git()
+    .gitdir('fixtures/test-push-client.git')
+    .remote('pseudo')
+    .push('refs/heads/master')
   t.truthy(res)
   let body = await pify(concat)(res)
   t.is(
@@ -52,7 +42,7 @@ test('push (to local git-http-backend)', async t => {
 
 test.skip('push (to Github)', async t => {
   let res = await git()
-    .gitdir('fixtures/test-push.git')
+    .gitdir('fixtures/test-push-client.git')
     .githubToken(process.env.GITHUB_TOKEN)
     .remote('origin')
     .push('refs/heads/master')

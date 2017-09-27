@@ -85,24 +85,15 @@ export default class GitRemoteHTTP {
       }
     }
   }
-  async push (stream) {
+  async push (stream /*: ReadableStream */) {
     const service = 'git-receive-pack'
-    let headers = {}
-    headers['Content-Type'] = `application/x-${service}-request`
-    headers['Accept'] = `application/x-${service}-result`
-    if (this.auth) {
-      headers['Authorization'] = basicAuth(this.auth)
-    }
-    let res = await pify(simpleGet)({
-      method: 'POST',
-      url: `${this.GIT_URL}/${service}`,
-      body: stream,
-      headers
-    })
-    return res
+    return this.stream({ stream, service })
   }
-  async pull ({ stream, refs }) {
+  async pull (stream /*: ReadableStream */) {
     const service = 'git-upload-pack'
+    return this.stream({ stream, service })
+  }
+  async stream ({ stream, service }) {
     let headers = {}
     headers['Content-Type'] = `application/x-${service}-request`
     headers['Accept'] = `application/x-${service}-result`
@@ -116,5 +107,5 @@ export default class GitRemoteHTTP {
       headers
     })
     return res
-  }
+  } /*: {stream: ReadableStream, service: string} */
 }

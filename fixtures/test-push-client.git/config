@@ -7,3 +7,6 @@
 [remote "origin"]
 	url = https://github.com/wmhilton/test.empty.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "pseudo"]
+  url = http://example.dev/foo.git
+  fetch = +refs/heads/*:refs/remotes/pseudo/*
