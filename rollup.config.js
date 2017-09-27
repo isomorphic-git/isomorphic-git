@@ -1,4 +1,5 @@
 import babel from 'rollup-plugin-babel'
+import json from 'rollup-plugin-json'
 import pkg from './package.json'
 
 const external = [
@@ -34,6 +35,7 @@ export default [
     external,
     output: [{ format: 'es', name: 'git', file: 'dist/for-future.js' }],
     plugins: [
+      json(),
       babel({
         babelrc: false,
         exclude: 'node_modules/**',
@@ -47,6 +49,7 @@ export default [
     external,
     output: [{ format: 'cjs', name: 'git', file: 'dist/for-node.js' }],
     plugins: [
+      json(),
       babel({
         babelrc: false,
         exclude: 'node_modules/**',
@@ -71,6 +74,7 @@ export default [
     external,
     output: [{ format: 'cjs', name: 'git', file: 'dist/for-browserify.js' }],
     plugins: [
+      json(),
       babel({
         babelrc: false,
         exclude: 'node_modules/**',
