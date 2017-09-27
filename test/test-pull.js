@@ -8,30 +8,30 @@ import path from 'path'
 import { tmpdir } from './_helpers'
 import ncp from 'ncp'
 
-test('push (to local git-http-backend)', async t => {
+test.skip('fetch (from local git-http-backend)', async t => {
   // Setup
   let serverDir = await tmpdir()
   let clientDir = await tmpdir()
   await pify(ncp)(
-    'fixtures/test-push-server.git',
+    'fixtures/test-pull-server.git',
     path.join(serverDir, 'foo.git')
   )
-  await pify(ncp)('fixtures/test-push-client.git', clientDir)
+  await pify(ncp)('fixtures/test-pull-client.git', clientDir)
+  const { get, postUploadPackRequest } = server(serverDir)
   // Test
-  const { get, postReceivePackRequest } = server(serverDir)
   nock('http://example.dev')
-    // .get('/test-push.git/info/refs?service=git-receive-pack')
     .get(/.*/)
     .reply(200, get)
     .post(/.*/)
-    .reply(200, postReceivePackRequest)
+    .reply(200, postUploadPackRequest)
 
   let res = await git()
-    .gitdir('fixtures/test-push-client.git')
+    .gitdir(clientDir)
     .remote('pseudo')
-    .push('refs/heads/master')
+    .pull('refs/heads/master')
   t.truthy(res)
   let body = await pify(concat)(res)
+  console.log('body.toString() =', body.toString())
   t.is(
     body.toString(),
     `000eunpack ok
@@ -40,18 +40,20 @@ test('push (to local git-http-backend)', async t => {
   )
 })
 
-test('push (to Github)', async t => {
+test('pull (from Github)', async t => {
+  // Setup
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-push-client.git', clientDir)
+  await pify(ncp)('fixtures/test-pull-client.git', clientDir)
 
   let res = await git()
     .gitdir(clientDir)
-    .githubToken(process.env.GITHUB_TOKEN)
     .remote('origin')
-    .push('refs/heads/master')
-  console.log(res)
+    .pull('refs/heads/master')
+  console.log(res.statusCode)
+  console.log(res.headers)
   t.truthy(res)
   let body = await pify(concat)(res)
+  console.log('body.toString() =', body.toString('utf8'))
   t.is(
     body.toString(),
     `000eunpack ok
