@@ -1,5 +1,5 @@
 import test from 'ava'
-import { listObjects } from '../lib/listObjects'
+import { listObjects } from '../lib/commands'
 
 test('listObjects', async t => {
   let objects = await listObjects({
