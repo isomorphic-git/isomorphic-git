@@ -18,13 +18,10 @@ const types = {
 
 // TODO: Move this to 'plumbing'
 export async function unpack (
-  {
-    gitdir,
-    inputStream
-  } /*: {oids: Array<string>, gitdir: string, inputStream: ReadableStream} */
+  { gitdir, inputStream } /*: {gitdir: string, inputStream: ReadableStream} */
 ) {
   return new Promise(function (resolve, reject) {
-    // git-list-pack doesn't return a proper stream, and
+    // git-list-pack returns an EventEmitter not a proper stream, and
     // doesn't provide a count of how many objects to expect.
     // So for now I'm hacking around that.
 

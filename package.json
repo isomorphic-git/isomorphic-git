@@ -53,6 +53,7 @@
     "buffer": "^5.0.7",
     "buffer-peek-stream": "^1.0.1",
     "buffercursor": "0.0.12",
+    "gartal": "^1.1.2",
     "git-list-pack": "0.0.10",
     "github-url-to-object": "^4.0.2",
     "ini": "^1.3.4",

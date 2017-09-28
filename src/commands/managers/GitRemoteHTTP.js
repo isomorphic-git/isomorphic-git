@@ -5,6 +5,7 @@ import simpleGet from 'simple-get'
 import concat from 'simple-concat'
 import pify from 'pify'
 import { pkg } from './models/utils'
+import { PassThrough } from 'stream'
 
 function basicAuth (auth) {
   return `Basic ${Buffer.from(auth.username + ':' + auth.password).toString(
@@ -96,7 +97,10 @@ export class GitRemoteHTTP {
     let res = await this.stream({ stream, service })
     return res
   }
-  async stream ({ stream, service }) {
+  async stream ({
+    stream,
+    service
+  }) /*: {packfile: ReadableStream, progress: ReadableStream } */ {
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
@@ -111,6 +115,48 @@ export class GitRemoteHTTP {
       body: stream,
       headers
     })
-    return res
+    // Don't try to parse git pushes for now.
+    if (service === 'git-receive-pack') return res
+    // Parse the response!
+    let read = GitPktLine.streamReader(res)
+    // And now for the ridiculous side-band-64k protocol
+    let packetlines = new PassThrough()
+    let packfile = new PassThrough()
+    let progress = new PassThrough()
+    // TODO: Use a real paradigm when your brain is less exhausted
+    const nextBit = async function () {
+      let line = await read()
+      if (line === null) {
+        console.log('line === null')
+        packfile.end()
+        progress.end()
+        packetlines.end()
+        return
+      }
+      // Examine first byte to determine which "stream"
+      switch (line[0]) {
+        case 1: // pack data
+          packfile.write(line.slice(1))
+          break
+        case 2: // progress message
+          progress.write(line.slice(1))
+          break
+        case 3: // fatal error message just before stream aborts
+          let error = line.slice(1)
+          progress.write(error)
+          packfile.destroy(new Error(error.toString('utf8')))
+          return
+        default:
+          // Not part of the side-band-64k protocol
+          packetlines.write(line.slice(1))
+      }
+      process.nextTick(nextBit)
+    }
+    nextBit()
+    return {
+      packetlines,
+      packfile,
+      progress
+    }
   } /*: {stream: ReadableStream, service: string} */
 }
