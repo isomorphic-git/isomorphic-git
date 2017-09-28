@@ -1,15 +1,26 @@
 // @flow
 import stream from 'stream'
-import { GitRemoteHTTP } from './managers'
+import { getConfig } from './getConfig'
+import { unpack } from './unpack'
+import { GitRemoteHTTP, GitRefsManager } from './managers'
 import { GitPktLine } from './managers/models'
 import { resolveRef, pkg } from './managers/models/utils'
 
-export async function fetch ({ gitdir, ref = 'HEAD', url, auth }) {
+export async function fetch ({ gitdir, ref = 'HEAD', remote, auth }) {
   let have = await resolveRef({ gitdir, ref })
-  let remote = new GitRemoteHTTP(url)
-  remote.auth = auth
-  await remote.preparePull()
-  let want = remote.refs.get(ref)
+  let url = await getConfig({
+    gitdir,
+    path: `remote "${remote}".url`
+  })
+  let remoteHTTP = new GitRemoteHTTP(url)
+  remoteHTTP.auth = auth
+  await remoteHTTP.preparePull()
+  await GitRefsManager.updateRemoteRefs({
+    gitdir,
+    remote,
+    refs: remoteHTTP.refs
+  })
+  let want = remoteHTTP.refs.get(ref)
   console.log('want =', want)
   console.log('have =', have)
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/${pkg.name}@${pkg.version}`
@@ -19,6 +30,7 @@ export async function fetch ({ gitdir, ref = 'HEAD', url, auth }) {
   packstream.write(GitPktLine.encode(`have ${have}\n`))
   packstream.write(GitPktLine.flush())
   packstream.end(GitPktLine.encode(`done\n`))
-  let response = await remote.pull(packstream)
+  let response = await remoteHTTP.pull(packstream)
+  // await unpack({gitdir, inputStream: response.packfile})
   return response
 }

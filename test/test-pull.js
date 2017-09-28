@@ -82,20 +82,17 @@ test('pull (from Github)', async t => {
   let clientDir = await tmpdir()
   await pify(ncp)('fixtures/test-pull-client.git', clientDir)
 
-  let res = await git()
+  let { packfile, progress } = await git()
     .gitdir(clientDir)
     .remote('origin')
     .pull('refs/heads/master')
-  console.log(res.statusCode)
-  console.log(res.headers)
-  t.truthy(res)
-  let body = await pify(concat)(res)
-  console.log('body.toString() =', body.toString('utf8'))
-  t.true(
-    body.toString()
-      .startsWith(`0038ACK 5a8905a02e181fe1821068b8c0f48cb6633d5b81 common
-0037ACK 5a8905a02e181fe1821068b8c0f48cb6633d5b81 ready
-0008NAK
-0031ACK 5a8905a02e181fe1821068b8c0f48cb6633d5b81`)
-  )
+  t.truthy(packfile)
+  t.truthy(progress)
+  progress.on('data', data => console.log(data.toString('utf8')))
+  // console.log('progress =', progress)
+  // console.log('packfile =', packfile)
+  // let bprogress = await pify(concat)(progress)
+  let bpackfile = await pify(concat)(packfile)
+  console.log('packfile =', bpackfile.toString('utf8'))
+  t.true(bpackfile.toString().startsWith(`PACK`))
 })

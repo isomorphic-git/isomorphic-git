@@ -194,11 +194,7 @@ class Git {
   }
   async pull (ref) {
     let params = {}
-    params.url = await getConfig({
-      gitdir: this.gitdir,
-      path: `remote "${this.operateRemote}".url`
-    })
-    console.log('url =', params.url)
+    params.remote = this.operateRemote
     if (this.operateToken) {
       params.auth = {
         username: this.operateToken,
