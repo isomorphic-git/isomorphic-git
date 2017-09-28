@@ -49,7 +49,7 @@ test('push (to Github)', async t => {
     .githubToken(process.env.GITHUB_TOKEN)
     .remote('origin')
     .push('refs/heads/master')
-  console.log(res)
+
   t.truthy(res)
   let body = await pify(concat)(res)
   t.is(
