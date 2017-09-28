@@ -1,18 +1,20 @@
 import ghurl from 'github-url-to-object'
-import { init } from './init'
-import { fetch as fetchGithubApi } from './github-api-fetch'
-import { checkout } from './checkout.js'
-import { list } from './list.js'
-import { add } from './add.js'
-import { remove } from './remove.js'
-import { commit } from './commit.js'
-import { verify } from './verify.js'
-import { pack } from './pack-objects.js'
-import { unpack } from './unpack-objects.js'
-import { push } from './push.js'
-import { fetch } from './fetch.js'
-import { getConfig } from './getConfig.js'
-import { setConfig } from './setConfig.js'
+import {
+  init,
+  GithubFetch,
+  checkout,
+  list,
+  add,
+  remove,
+  commit,
+  verify,
+  pack,
+  unpack,
+  push,
+  fetch,
+  getConfig,
+  setConfig
+} from './commands'
 
 export default function git (dir) {
   return new Git(dir)
@@ -80,7 +82,7 @@ class Git {
     await init(this.gitdir)
   }
   async fetch (url) {
-    await fetchGithubApi({
+    await GithubFetch({
       gitdir: this.gitdir,
       // TODO: make this not Github-specific
       user: ghurl(url).user,

@@ -23,6 +23,10 @@ Porcelain:
 - [x] git commit
 - [x] git push (due to CORS, use https://github-cors.now.sh instead of https://github.com)
 - [ ] git pull
+  - [x] Negotiate packfile
+  - [x] Download packfile
+  - [x] Unpack packfile
+  - [ ] Update refs and HEAD
 - [ ] git diff
 - [ ] git merge
 - [x] `esgit` CLI
@@ -33,7 +37,7 @@ Plumbing:
 - [x] git listCommits (rev-list)
 - [x] git pack (pack-objects)
 - [ ] git list packed objects (verify-pack)
-- [ ] git unpack-objects
+- [x] git unpack-objects
 
 Note: There appears to be no a way to *push* signed commits back to Github using their API (v3 or v4), so I think we will have to use smart HTTP, packfiles, and an anti-CORS proxy.
 
@@ -137,11 +141,19 @@ so you can pick and choose features as you need them.
 
 ### Commands
 
+```
+import * as managers from 'isomorphic-git/src/commands'
+```
+
 Each command is available as its own file, so hopefully with
 a bit of finagling you will be able to import individual commands
 if you only need a few and can benefit from tree-shaking.
 
 ### Managers
+
+```
+import * as managers from 'isomorphic-git/src/managers'
+```
 
 Managers are a level above models. They take care of implementation performance details like
 
@@ -154,10 +166,18 @@ Managers are a level above models. They take care of implementation performance 
 
 ### Models
 
+```
+import * as models from 'isomorphic-git/src/models'
+```
+
 Models are the lowest level building blocks.
 They generally have very few or no dependencies except for `'buffer'`.
 This makes them portable to many different environments so they can be a useful lowest common denominator.
 
 ### Utils
+
+```
+import * as utils from 'isomorphic-git/src/utils'
+```
 
 I lied. Utils are actually the lowest level building blocks.

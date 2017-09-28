@@ -1,8 +1,8 @@
 import test from 'ava'
-import PktLineReader from '../lib/managers/models/utils/pkt-line-reader.js'
+import { GitPktLine } from '../lib/models'
 
 test('pkt-line-reader string', async t => {
-  let read = PktLineReader(Buffer.from('0010hello world\n'))
+  let read = GitPktLine.reader(Buffer.from('0010hello world\n'))
   t.true(typeof read === 'function')
   t.true(read().toString('utf8') === 'hello world\n')
   t.true(read())
@@ -19,7 +19,7 @@ test('pkt-line-reader response', async t => {
 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
 0000`)
-  let read = PktLineReader(buffer)
+  let read = GitPktLine.reader(buffer)
   t.true(read().toString('utf8') === '# service=git-upload-pack\n')
   t.true(read() === null)
   t.true(
