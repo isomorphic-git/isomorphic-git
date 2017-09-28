@@ -8,6 +8,7 @@ import { remove } from './remove.js'
 import { commit } from './commit.js'
 import { verify } from './verify.js'
 import { pack } from './pack-objects.js'
+import { unpack } from './unpack-objects.js'
 import { push } from './push.js'
 import { fetch } from './fetch.js'
 import { getConfig } from './getConfig.js'
@@ -69,6 +70,10 @@ class Git {
   }
   outputStream (stream) {
     this.outputStream = stream
+    return this
+  }
+  inputStream (stream) {
+    this.inputStream = stream
     return this
   }
   async init () {
@@ -161,6 +166,12 @@ class Git {
       gitdir: this.gitdir,
       outputStream: this.outputStream,
       oids
+    })
+  }
+  async unpack (oids) {
+    return unpack({
+      gitdir: this.gitdir,
+      inputStream: this.inputStream
     })
   }
   async push (ref) {
