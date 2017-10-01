@@ -53,7 +53,7 @@ Examples (as C-style strings):
 import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import pad from 'pad'
-import gartal from 'gartal'
+import * as gartal from 'gartal'
 
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line
@@ -85,7 +85,8 @@ export class GitPktLine {
       let hexlength = await gartal.readBytes(stream, 4)
       let length = parseInt(hexlength.toString('utf8'), 16)
       if (length === 0) return null
-      return gartal.readBytes(stream, length - 4)
+      let bytes = await gartal.readBytes(stream, length - 4)
+      return bytes
     }
   }
 }

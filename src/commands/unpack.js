@@ -2,7 +2,9 @@
 import { Buffer } from 'buffer'
 import { GitObjectManager } from './managers'
 import listpack from 'git-list-pack'
+import thru from 'thru'
 import peek from 'buffer-peek-stream'
+import applyDelta from 'git-apply-delta'
 /*::
 import type {Writable} from 'stream'
 */
@@ -16,15 +18,23 @@ const types = {
   7: 'ref-delta'
 }
 
+function parseVarInt (buffer /*: Buffer */) {
+  let n = 0
+  for (var i = 0; i < buffer.byteLength; i++) {
+    n = (buffer[i] & 0b01111111) + (n << 7)
+    if ((buffer[i] & 0b10000000) === 0) {
+      if (i !== buffer.byteLength - 1) throw new Error('Invalid varint buffer')
+      return n
+    }
+  }
+  throw new Error('Invalid varint buffer')
+}
+
 // TODO: Move this to 'plumbing'
 export async function unpack (
   { gitdir, inputStream } /*: {gitdir: string, inputStream: ReadableStream} */
 ) {
   return new Promise(function (resolve, reject) {
-    // git-list-pack returns an EventEmitter not a proper stream, and
-    // doesn't provide a count of how many objects to expect.
-    // So for now I'm hacking around that.
-
     // Read header
     peek(inputStream, 12, (err, data, inputStream) => {
       if (err) return reject(err)
@@ -39,20 +49,70 @@ export async function unpack (
       // Read a 4 byte (32-bit) int
       let numObjects = data.readInt32BE(8)
       console.log(`unpacking ${numObjects} objects`)
+      if (numObjects === 0) return
       // And on our merry way
-      let seenSoFar = 0
+      let offsetMap = new Map()
       inputStream
         .pipe(listpack())
-        .on('data', async ({ data, type, reference, offset, num }) => {
-          let obj = {
-            gitdir,
-            type: types[type],
-            object: data
-          }
-          await GitObjectManager.write(obj)
-          seenSoFar++
-          if (seenSoFar === numObjects) return resolve()
-        })
+        .pipe(
+          thru(async ({ data, type, reference, offset, num }, next) => {
+            type = types[type]
+            if (type === 'ref-delta') {
+              let oid = reference.toString('hex')
+              try {
+                let { object, type } = await GitObjectManager.read({
+                  gitdir,
+                  oid
+                })
+                let result = applyDelta(data, object)
+                let newoid = await GitObjectManager.write({
+                  gitdir,
+                  type,
+                  object: result
+                })
+                console.log(`${type} ${newoid} ref-delta ${oid}`)
+                offsetMap.set(offset, oid)
+              } catch (err) {
+                throw new Error(
+                  `Could not find object ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`
+                )
+              }
+            } else if (type === 'ofs-delta') {
+              // Note: this might be not working because offsets might not be
+              // guaranteed to be on object boundaries? In which case we'd need
+              // to write the packfile to disk first, I think.
+              // For now I've "solved" it by simply not advertising ofs-delta as a capability
+              // during the HTTP request, so Github will only send ref-deltas not ofs-deltas.
+              let absoluteOffset = offset - parseVarInt(reference)
+              let referenceOid = offsetMap.get(absoluteOffset)
+              console.log(
+                `${offset} ofs-delta ${absoluteOffset} ${referenceOid}`
+              )
+              let { type, object } = await GitObjectManager.read({
+                gitdir,
+                oid: referenceOid
+              })
+              let result = applyDelta(data, object)
+              let oid = await GitObjectManager.write({
+                gitdir,
+                type,
+                object: result
+              })
+              console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
+              offsetMap.set(offset, oid)
+            } else {
+              let oid = await GitObjectManager.write({
+                gitdir,
+                type,
+                object: data
+              })
+              console.log(`${offset} ${type} ${oid}`)
+              offsetMap.set(offset, oid)
+            }
+            if (num === 0) return resolve()
+            next(null)
+          })
+        )
         .on('error', reject)
         .on('finish', resolve)
     })
