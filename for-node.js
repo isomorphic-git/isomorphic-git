@@ -5,143 +5,29 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var ghurl = _interopDefault(require('github-url-to-object'));
 var path = _interopDefault(require('path'));
 var pify = _interopDefault(require('pify'));
-var fs = _interopDefault(require('fs'));
-var simpleGet = _interopDefault(require('simple-get'));
-var concat = _interopDefault(require('simple-concat'));
-var parseLinkHeader = _interopDefault(require('parse-link-header'));
 var buffer = require('buffer');
-var pako = _interopDefault(require('pako'));
-var shasum = _interopDefault(require('shasum'));
 var openpgp = require('openpgp/dist/openpgp.min.js');
-var sortby = _interopDefault(require('lodash/sortBy'));
-var BufferCursor = _interopDefault(require('buffercursor'));
-var AsyncLock = _interopDefault(require('async-lock'));
-var pad = _interopDefault(require('pad'));
-var crypto = _interopDefault(require('crypto'));
-var stream = _interopDefault(require('stream'));
 var ini = _interopDefault(require('ini'));
 var get = _interopDefault(require('lodash/get'));
 var set = _interopDefault(require('lodash/set'));
-
-// @flow
-async function mkdir(dirpath /*: string */) {
-  try {
-    await pify(fs.mkdir)(dirpath);
-    return;
-  } catch (err) {
-    // If err is null then operation succeeded!
-    if (err === null) return;
-    // If the directory already exists, that's OK!
-    if (err.code === 'EEXIST') return;
-    // If we got a "no such file or directory error" backup and try again.
-    if (err.code === 'ENOENT') {
-      let parent = path.dirname(dirpath);
-      // Check to see if we've gone too far
-      if (parent === '.' || parent === '/' || parent === dirpath) throw err;
-      // Infinite recursion, what could go wrong?
-      await mkdir(parent);
-      await mkdir(dirpath);
-    }
-  }
-}
-
-async function mkdirs(dirlist /*: string[] */) {
-  return Promise.all(dirlist.map(mkdir));
-}
-
-// @flow
-// An async writeFile variant that automatically creates missing directories,
-// and returns null instead of throwing errors.
-async function write(filepath /*: string */
-, contents /*: string|Buffer */
-) {
-  try {
-    await pify(fs.writeFile)(filepath, contents);
-    return;
-  } catch (err) {
-    // Hmm. Let's try mkdirp and try again.
-    await mkdir(path.dirname(filepath));
-    await pify(fs.writeFile)(filepath, contents);
-  }
-}
-
-// @flow
-async function init(gitdir /*: string */) {
-  let folders = ['hooks', 'info', 'objects/info', 'objects/pack', 'refs/heads', 'refs/tags'];
-  folders = folders.map(dir => gitdir + '/' + dir);
-  await mkdirs(folders);
-  await write(gitdir + '/config', '[core]\n' + '\trepositoryformatversion = 0\n' + '\tfilemode = false\n' + '\tbare = false\n' + '\tlogallrefupdates = true\n' + '\tsymlinks = false\n' + '\tignorecase = true\n');
-  await write(gitdir + '/HEAD', 'ref: refs/heads/master\n');
-}
-
-// An async readFile variant that returns null instead of throwing errors
-async function read(file, options) {
-  return new Promise(function (resolve, reject) {
-    fs.readFile(file, options, (err, file) => err ? resolve(null) : resolve(file));
-  });
-}
-
-// An async exists variant
-async function exists(file, options) {
-  return new Promise(function (resolve, reject) {
-    fs.stat(file, (err, stats) => {
-      if (err) return err.code === 'ENOENT' ? resolve(false) : reject(err);
-      resolve(true);
-    });
-  });
-}
-
-// @flow
-function wrapObject({ type, object /*: {type: string, object: Buffer} */ }) {
-  let buffer$$1 = buffer.Buffer.concat([buffer.Buffer.from(type + ' '), buffer.Buffer.from(object.byteLength.toString()), buffer.Buffer.from([0]), buffer.Buffer.from(object)]);
-  let oid = shasum(buffer$$1);
-  return {
-    oid,
-    file: buffer.Buffer.from(pako.deflate(buffer$$1))
-  };
-}
-
-function unwrapObject({ oid, file /*: {oid: string, file: Buffer} */ }) {
-  let inflated = buffer.Buffer.from(pako.inflate(file));
-  if (oid) {
-    let sha = shasum(inflated);
-    if (sha !== oid) {
-      throw new Error(`SHA check failed! Expected ${oid}, computed ${sha}`);
-    }
-  }
-  let s = inflated.indexOf(32); // first space
-  let i = inflated.indexOf(0); // first null value
-  let type = inflated.slice(0, s).toString('utf8'); // get type of object
-  let length = inflated.slice(s + 1, i).toString('utf8'); // get type of object
-  let actualLength = inflated.length - (i + 1);
-  // verify length
-  if (parseInt(length) !== actualLength) {
-    throw new Error(`Length mismatch: expected ${length} bytes but got ${actualLength} instead.`);
-  }
-  return {
-    type,
-    object: buffer.Buffer.from(inflated.slice(i + 1))
-  };
-}
-
-class GitObjectManager {
-  static async read({ gitdir, oid /*: {gitdir: string, oid: string} */ }) {
-    let file = await read(`${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`);
-    if (!file) throw new Error(`Git object with oid ${oid} not found`);
-    let { type, object } = unwrapObject({ oid, file });
-    return { type, object };
-  }
-
-  static async write({ gitdir, type, object }) /*: Promise<string> */{
-    let { file, oid } = wrapObject({ type, object });
-    let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`;
-    // Don't overwrite existing git objects - this helps avoid EPERM errors.
-    // Although I don't know how we'd fix corrupted objects then. Perhaps delete them
-    // on read?
-    if (!(await exists(filepath))) await write(filepath, file);
-    return oid;
-  } /*: {gitdir: string, type: string, object: Buffer} */
-}
+var BufferCursor = _interopDefault(require('buffercursor'));
+var pad = _interopDefault(require('pad'));
+var gartal = require('gartal');
+var sortby = _interopDefault(require('lodash/sortBy'));
+var systemfs = _interopDefault(require('fs'));
+var AsyncLock = _interopDefault(require('async-lock'));
+var pako = _interopDefault(require('pako'));
+var shasum = _interopDefault(require('shasum'));
+var simpleGet = _interopDefault(require('simple-get'));
+var concat = _interopDefault(require('simple-concat'));
+var stream = require('stream');
+var stream__default = _interopDefault(stream);
+var listpack = _interopDefault(require('git-list-pack'));
+var thru = _interopDefault(require('thru'));
+var peek = _interopDefault(require('buffer-peek-stream'));
+var applyDelta = _interopDefault(require('git-apply-delta'));
+var parseLinkHeader = _interopDefault(require('parse-link-header'));
+var crypto = _interopDefault(require('crypto'));
 
 // @flow
 function formatTimezoneOffset(minutes /*: number */) {
@@ -345,17 +231,256 @@ class GitCommit {
   }
 }
 
-// @flow
-/*::
-type TreeEntry = {
-  mode: string,
-  path: string,
-  oid: string,
-  type?: string
+class GitConfig {
+  constructor(text) {
+    this.ini = ini.decode(text);
+  }
+  static from(text) {
+    return new GitConfig(text);
+  }
+  async get(path$$1) {
+    return get(this.ini, path$$1);
+  }
+  async set(path$$1, value) {
+    return set(this.ini, path$$1, value);
+  }
+  toString() {
+    return ini.encode(this.ini, { whitespace: true });
+  }
 }
-*/
 
-function parseBuffer(buffer$$1) /*: Array<TreeEntry> */{
+// @flow
+/**
+pkt-line Format
+---------------
+
+Much (but not all) of the payload is described around pkt-lines.
+
+A pkt-line is a variable length binary string.  The first four bytes
+of the line, the pkt-len, indicates the total length of the line,
+in hexadecimal.  The pkt-len includes the 4 bytes used to contain
+the length's hexadecimal representation.
+
+A pkt-line MAY contain binary data, so implementors MUST ensure
+pkt-line parsing/formatting routines are 8-bit clean.
+
+A non-binary line SHOULD BE terminated by an LF, which if present
+MUST be included in the total length. Receivers MUST treat pkt-lines
+with non-binary data the same whether or not they contain the trailing
+LF (stripping the LF if present, and not complaining when it is
+missing).
+
+The maximum length of a pkt-line's data component is 65516 bytes.
+Implementations MUST NOT send pkt-line whose length exceeds 65520
+(65516 bytes of payload + 4 bytes of length data).
+
+Implementations SHOULD NOT send an empty pkt-line ("0004").
+
+A pkt-line with a length field of 0 ("0000"), called a flush-pkt,
+is a special case and MUST be handled differently than an empty
+pkt-line ("0004").
+
+----
+  pkt-line     =  data-pkt / flush-pkt
+
+  data-pkt     =  pkt-len pkt-payload
+  pkt-len      =  4*(HEXDIG)
+  pkt-payload  =  (pkt-len - 4)*(OCTET)
+
+  flush-pkt    = "0000"
+----
+
+Examples (as C-style strings):
+
+----
+  pkt-line          actual value
+  ---------------------------------
+  "0006a\n"         "a\n"
+  "0005a"           "a"
+  "000bfoobar\n"    "foobar\n"
+  "0004"            ""
+----
+*/
+class GitPktLine {
+  static flush() {
+    return buffer.Buffer.from('0000', 'utf8');
+  }
+
+  static encode(line /*: string|Buffer */) /*: Buffer */{
+    if (typeof line === 'string') {
+      line = buffer.Buffer.from(line);
+    }
+    let length = line.length + 4;
+    let hexlength = pad(4, length.toString(16), '0');
+    return buffer.Buffer.concat([buffer.Buffer.from(hexlength, 'utf8'), line]);
+  }
+
+  static reader(buffer$$1 /*: Buffer */) {
+    let buffercursor = new BufferCursor(buffer$$1);
+    return function read() {
+      if (buffercursor.eof()) return true;
+      let length = parseInt(buffercursor.slice(4).toString('utf8'), 16);
+      if (length === 0) return null;
+      return buffercursor.slice(length - 4).buffer;
+    };
+  }
+  static streamReader(stream$$1 /*: ReadableStream */) {
+    return async function read() {
+      let hexlength = await gartal.readBytes(stream$$1, 4);
+      let length = parseInt(hexlength.toString('utf8'), 16);
+      if (length === 0) return null;
+      let bytes = await gartal.readBytes(stream$$1, length - 4);
+      return bytes;
+    };
+  }
+}
+
+// @flow
+function parseBuffer(buffer$$1) {
+  let reader = new BufferCursor(buffer$$1);
+  let _entries /*: Map<string, CacheEntry> */ = new Map();
+  let magic = reader.toString('utf8', 4);
+  if (magic !== 'DIRC') {
+    throw new Error(`Inavlid dircache magic file number: ${magic}`);
+  }
+  let version = reader.readUInt32BE();
+  if (version !== 2) throw new Error(`Unsupported dircache version: ${version}`);
+  let numEntries = reader.readUInt32BE();
+  let i = 0;
+  while (!reader.eof() && i < numEntries) {
+    let entry = {};
+    let ctimeSeconds = reader.readUInt32BE();
+    let ctimeNanoseconds = reader.readUInt32BE();
+    entry.ctime = new Date(ctimeSeconds * 1000 + ctimeNanoseconds / 1000000);
+    entry.ctimeNanoseconds = ctimeNanoseconds;
+    let mtimeSeconds = reader.readUInt32BE();
+    let mtimeNanoseconds = reader.readUInt32BE();
+    entry.mtime = new Date(mtimeSeconds * 1000 + mtimeNanoseconds / 1000000);
+    entry.mtimeNanoseconds = mtimeNanoseconds;
+    entry.dev = reader.readUInt32BE();
+    entry.ino = reader.readUInt32BE();
+    entry.mode = reader.readUInt32BE();
+    entry.uid = reader.readUInt32BE();
+    entry.gid = reader.readUInt32BE();
+    entry.size = reader.readUInt32BE();
+    entry.oid = reader.slice(20).toString('hex');
+    entry.flags = reader.readUInt16BE(); // TODO: extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
+    // TODO: handle if (version === 3 && entry.flags.extended)
+    let pathlength = buffer$$1.indexOf(0, reader.tell() + 1) - reader.tell();
+    if (pathlength < 1) throw new Error(`Got a path length of: ${pathlength}`);
+    entry.path = reader.toString('utf8', pathlength);
+    // The next bit is awkward. We expect 1 to 8 null characters
+    let tmp = reader.readUInt8();
+    if (tmp !== 0) {
+      throw new Error(`Expected 1-8 null characters but got '${tmp}'`);
+    }
+    let numnull = 1;
+    while (!reader.eof() && reader.readUInt8() === 0 && numnull < 9) numnull++;
+    reader.seek(reader.tell() - 1);
+    // end of awkward part
+    _entries.set(entry.path, entry);
+    i++;
+  }
+
+  return _entries;
+}
+
+class GitIndex {
+  /*::
+   _entries: Map<string, CacheEntry>
+   _dirty: boolean // Used to determine if index needs to be saved to filesystem
+   */
+  constructor(index /*: any */) {
+    this._dirty = false;
+    if (buffer.Buffer.isBuffer(index)) {
+      this._entries = parseBuffer(index);
+    } else if (index === null) {
+      this._entries = new Map();
+    } else {
+      throw new Error('invalid type passed to GitIndex constructor');
+    }
+  }
+  static from(buffer$$1) {
+    return new GitIndex(buffer$$1);
+  }
+  get entries() /*: Array<CacheEntry> */{
+    return sortby([...this._entries.values()], 'path');
+  }
+  *[Symbol.iterator]() {
+    for (let entry of this.entries) {
+      yield entry;
+    }
+  }
+  insert({ filepath, stats, oid }) {
+    let entry = {
+      ctime: stats.ctime,
+      mtime: stats.mtime,
+      dev: stats.dev,
+      ino: stats.ino,
+      mode: stats.mode,
+      uid: stats.uid,
+      gid: stats.gid,
+      size: stats.size,
+      path: filepath,
+      oid: oid,
+      flags: 0
+    };
+    this._entries.set(entry.path, entry);
+    this._dirty = true;
+  } /*: {filepath: string, stats: Stats, oid: string } */
+  delete({ filepath /*: {filepath: string} */ }) {
+    if (this._entries.has(filepath)) {
+      this._entries.delete(filepath);
+    } else {
+      for (let key$$1 of this._entries.keys()) {
+        if (key$$1.startsWith(filepath + '/')) {
+          this._entries.delete(key$$1);
+        }
+      }
+    }
+    this._dirty = true;
+  }
+  render() {
+    return this.entries.map(entry => `${entry.mode.toString(8)} ${entry.oid}    ${entry.path}`).join('\n');
+  }
+  toObject() {
+    let header = buffer.Buffer.alloc(12);
+    let writer = new BufferCursor(header);
+    writer.write('DIRC', 4, 'utf8');
+    writer.writeUInt32BE(2);
+    writer.writeUInt32BE(this.entries.length);
+    let body = buffer.Buffer.concat(this.entries.map(entry => {
+      // the fixed length + the filename + at least one null char => align by 8
+      let length = Math.ceil((62 + entry.path.length + 1) / 8) * 8;
+      let written = buffer.Buffer.alloc(length);
+      let writer = new BufferCursor(written);
+      let ctimeMilliseconds = entry.ctime.valueOf();
+      let ctimeSeconds = Math.floor(ctimeMilliseconds / 1000);
+      let ctimeNanoseconds = entry.ctimeNanoseconds || ctimeMilliseconds * 1000000 - ctimeSeconds * 1000000 * 1000;
+      let mtimeMilliseconds = entry.mtime.valueOf();
+      let mtimeSeconds = Math.floor(mtimeMilliseconds / 1000);
+      let mtimeNanoseconds = entry.mtimeNanoseconds || mtimeMilliseconds * 1000000 - mtimeSeconds * 1000000 * 1000;
+      writer.writeUInt32BE(ctimeSeconds);
+      writer.writeUInt32BE(ctimeNanoseconds);
+      writer.writeUInt32BE(mtimeSeconds);
+      writer.writeUInt32BE(mtimeNanoseconds);
+      writer.writeUInt32BE(entry.dev);
+      writer.writeUInt32BE(entry.ino);
+      writer.writeUInt32BE(entry.mode);
+      writer.writeUInt32BE(entry.uid);
+      writer.writeUInt32BE(entry.gid);
+      writer.writeUInt32BE(entry.size);
+      writer.write(entry.oid, 20, 'hex');
+      writer.writeUInt16BE(entry.flags);
+      writer.write(entry.path, entry.path.length, 'utf8');
+      return written;
+    }));
+    return buffer.Buffer.concat([header, body]);
+  }
+}
+
+// @flow
+function parseBuffer$1(buffer$$1) /*: Array<TreeEntry> */{
   let _entries = [];
   let cursor = 0;
   while (cursor < buffer$$1.length) {
@@ -397,7 +522,7 @@ class GitTree {
   */
   constructor(entries /*: any */) {
     if (buffer.Buffer.isBuffer(entries)) {
-      this._entries = parseBuffer(entries);
+      this._entries = parseBuffer$1(entries);
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape);
     } else {
@@ -428,6 +553,100 @@ class GitTree {
       yield entry;
     }
   }
+}
+
+var fs = function () {
+  return global.fs || systemfs;
+};
+
+async function exists(file, options) {
+  return new Promise(function (resolve, reject) {
+    fs().stat(file, (err, stats) => {
+      if (err) return err.code === 'ENOENT' ? resolve(false) : reject(err);
+      resolve(true);
+    });
+  });
+}
+
+// @flow
+function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
+) /*: Node|void */{
+  const inodes /*: Map<string, Node> */ = new Map();
+  const mkdir = function (name) /*: Node|void */{
+    if (!inodes.has(name)) {
+      let dir /*: Node */ = {
+        type: 'tree',
+        fullpath: name,
+        basename: path.basename(name),
+        metadata: {},
+        children: []
+      };
+      inodes.set(name, dir);
+      // This recursively generates any missing parent folders.
+      // We do it after we've added the inode to the set so that
+      // we don't recurse infinitely trying to create the root '.' dirname.
+      dir.parent = mkdir(path.dirname(name));
+      if (dir.parent && dir.parent !== dir) dir.parent.children.push(dir);
+    }
+    return inodes.get(name);
+  };
+
+  const mkfile = function (name, metadata) /*: Node|void */{
+    if (!inodes.has(name)) {
+      let file /*: Node */ = {
+        type: 'blob',
+        fullpath: name,
+        basename: path.basename(name),
+        metadata: metadata,
+        // This recursively generates any missing parent folders.
+        parent: mkdir(path.dirname(name)),
+        children: []
+      };
+      if (file.parent) file.parent.children.push(file);
+      inodes.set(name, file);
+    }
+    return inodes.get(name);
+  };
+
+  for (let file of files) {
+    mkfile(file.path, file);
+  }
+  return inodes.get('.');
+}
+
+// @flow
+// This is modeled after the lockfile strategy used by the git source code.
+
+// @flow
+async function mkdir(dirpath /*: string */) {
+  try {
+    await pify(fs().mkdir)(dirpath);
+    return;
+  } catch (err) {
+    // If err is null then operation succeeded!
+    if (err === null) return;
+    // If the directory already exists, that's OK!
+    if (err.code === 'EEXIST') return;
+    // If we got a "no such file or directory error" backup and try again.
+    if (err.code === 'ENOENT') {
+      let parent = path.dirname(dirpath);
+      // Check to see if we've gone too far
+      if (parent === '.' || parent === '/' || parent === dirpath) throw err;
+      // Infinite recursion, what could go wrong?
+      await mkdir(parent);
+      await mkdir(dirpath);
+    }
+  }
+}
+
+async function mkdirs(dirlist /*: string[] */) {
+  return Promise.all(dirlist.map(mkdir));
+}
+
+async function read(file, options) {
+  return new Promise(function (resolve, reject) {
+    fs().readFile(file, options, (err, file) => err ? resolve(null) : resolve(file));
+  });
 }
 
 async function resolveRef({ gitdir, ref, depth }) {
@@ -470,6 +689,588 @@ async function resolveRef({ gitdir, ref, depth }) {
   if (sha) return resolveRef({ gitdir, ref: sha.trim(), depth });
   // Do we give up?
   throw new Error(`Could not resolve reference ${ref}`);
+}
+
+// @flow
+async function write(filepath /*: string */
+, contents /*: string|Buffer */
+, options /*: Object */ = {}) {
+  try {
+    await pify(fs().writeFile)(filepath, contents, options);
+    return;
+  } catch (err) {
+    // Hmm. Let's try mkdirp and try again.
+    await mkdir(path.dirname(filepath));
+    await pify(fs().writeFile)(filepath, contents, options);
+  }
+}
+
+var name = "isomorphic-git";
+var version = "0.0.5";
+
+// @flow
+class GitConfigManager {
+  static async get({ gitdir }) {
+    // We can improve efficiency later if needed.
+    // TODO: read from full list of git config files
+    let text = await read(`${gitdir}/config`, { encoding: 'utf8' });
+    return GitConfig.from(text);
+  }
+  static async save({ gitdir, config }) {
+    // We can improve efficiency later if needed.
+    // TODO: handle saving to the correct global/user/repo location
+    await write(`${gitdir}/config`, config.toString(), {
+      encoding: 'utf8'
+    });
+  }
+}
+
+// @flow
+// import LockManager from 'travix-lock-manager'
+const map /*: Map<string, GitIndex> */ = new Map();
+// const lm = new LockManager()
+const lock$1 = new AsyncLock();
+
+class GitIndexManager {
+  static async acquire(filepath, closure) {
+    await lock$1.acquire(filepath, async function () {
+      let index = map.get(filepath);
+      if (index === undefined) {
+        // Acquire a file lock while we're reading the index
+        // to make sure other processes aren't writing to it
+        // simultaneously, which could result in a corrupted index.
+        // const fileLock = await Lock(filepath)
+        const rawIndexFile = await read(filepath);
+        index = GitIndex.from(rawIndexFile);
+        // cache the GitIndex object so we don't need to re-read it
+        // every time.
+        // TODO: save the stat data for the index so we know whether
+        // the cached file is stale (modified by an outside process).
+        map.set(filepath, index);
+        // await fileLock.cancel()
+      }
+      await closure(index);
+      if (index._dirty) {
+        // Acquire a file lock while we're writing the index file
+        // let fileLock = await Lock(filepath)
+        const buffer$$1 = index.toObject();
+        await write(filepath, buffer$$1);
+        index._dirty = false;
+      }
+      // For now, discard our cached object so that external index
+      // manipulation is picked up. TODO: use lstat and compare
+      // file times to determine if our cached object should be
+      // discarded.
+      map.delete(filepath);
+    });
+  }
+}
+
+// @flow
+function wrapObject({ type, object /*: {type: string, object: Buffer} */ }) {
+  let buffer$$1 = buffer.Buffer.concat([buffer.Buffer.from(type + ' '), buffer.Buffer.from(object.byteLength.toString()), buffer.Buffer.from([0]), buffer.Buffer.from(object)]);
+  let oid = shasum(buffer$$1);
+  return {
+    oid,
+    file: buffer.Buffer.from(pako.deflate(buffer$$1))
+  };
+}
+
+function unwrapObject({ oid, file /*: {oid: string, file: Buffer} */ }) {
+  let inflated = buffer.Buffer.from(pako.inflate(file));
+  if (oid) {
+    let sha = shasum(inflated);
+    if (sha !== oid) {
+      throw new Error(`SHA check failed! Expected ${oid}, computed ${sha}`);
+    }
+  }
+  let s = inflated.indexOf(32); // first space
+  let i = inflated.indexOf(0); // first null value
+  let type = inflated.slice(0, s).toString('utf8'); // get type of object
+  let length = inflated.slice(s + 1, i).toString('utf8'); // get type of object
+  let actualLength = inflated.length - (i + 1);
+  // verify length
+  if (parseInt(length) !== actualLength) {
+    throw new Error(`Length mismatch: expected ${length} bytes but got ${actualLength} instead.`);
+  }
+  return {
+    type,
+    object: buffer.Buffer.from(inflated.slice(i + 1))
+  };
+}
+
+class GitObjectManager {
+  static async read({ gitdir, oid /*: {gitdir: string, oid: string} */ }) {
+    let file = await read(`${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`);
+    if (!file) throw new Error(`Git object with oid ${oid} not found`);
+    let { type, object } = unwrapObject({ oid, file });
+    return { type, object };
+  }
+
+  static async write({ gitdir, type, object }) /*: Promise<string> */{
+    let { file, oid } = wrapObject({ type, object });
+    let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`;
+    // Don't overwrite existing git objects - this helps avoid EPERM errors.
+    // Although I don't know how we'd fix corrupted objects then. Perhaps delete them
+    // on read?
+    if (!(await exists(filepath))) await write(filepath, file);
+    return oid;
+  } /*: {gitdir: string, type: string, object: Buffer} */
+}
+
+// @flow
+// This is a convenience wrapper for reading and writing files in the 'refs' directory.
+class GitRefsManager {
+  static async updateRemoteRefs({ gitdir, remote, refs }) {
+    // Validate input
+    for (let [key$$1, value] of refs) {
+      if (!value.match(/[0-9a-f]{40}/)) {
+        throw new Error(`Unexpected ref contents: '${value}'`);
+      }
+    }
+    // Update files
+    const normalizeValue = value => value.trim() + '\n';
+    for (let [key$$1, value] of refs) {
+      await write(path.join(gitdir, 'refs', 'remotes', remote, key$$1), normalizeValue(value), 'utf8');
+    }
+  } /*: { gitdir: string, remote: string, refs: Map<string, string> } */
+}
+
+// @flow
+function basicAuth(auth) {
+  return `Basic ${buffer.Buffer.from(auth.username + ':' + auth.password).toString('base64')}`;
+}
+
+class GitRemoteHTTP {
+  /*::
+  GIT_URL : string
+  refs : Map<string, string>
+  capabilities : Set<string>
+  auth : { username : string, password : string }
+  */
+  constructor(url /*: string */) {
+    // Auto-append the (necessary) .git if it's missing.
+    if (!url.endsWith('.git')) url = url += '.git';
+    this.GIT_URL = url;
+  }
+  async preparePull() {
+    await this.discover('git-upload-pack');
+  }
+  async preparePush() {
+    await this.discover('git-receive-pack');
+  }
+  async discover(service /*: string */) {
+    this.capabilities = new Set();
+    this.refs = new Map();
+    let headers = {};
+    // headers['Accept'] = `application/x-${service}-advertisement`
+    if (this.auth) {
+      headers['Authorization'] = basicAuth(this.auth);
+    }
+    let res = await pify(simpleGet)({
+      method: 'GET',
+      url: `${this.GIT_URL}/info/refs?service=${service}`,
+      headers
+    });
+    if (res.statusCode !== 200) {
+      throw new Error(`Bad status code from server: ${res.statusCode}`);
+    }
+    let data = await pify(concat)(res);
+    // There is probably a better way to do this, but for now
+    // let's just throw the result parser inline here.
+    let read = GitPktLine.reader(data);
+    let lineOne = read();
+    // skip past any flushes
+    while (lineOne === null) lineOne = read();
+    if (lineOne === true) throw new Error('Bad response from git server.');
+    if (lineOne.toString('utf8') !== `# service=${service}\n`) {
+      throw new Error(`Expected '# service=${service}\\n' but got '${lineOne.toString('utf8')}'`);
+    }
+    let lineTwo = read();
+    // skip past any flushes
+    while (lineTwo === null) lineTwo = read();
+    // In the edge case of a brand new repo, zero refs (and zero capabilities)
+    // are returned.
+    if (lineTwo === true) return;
+    let [firstRef, capabilities] = lineTwo.toString('utf8').trim().split('\0');
+    capabilities.split(' ').map(x => this.capabilities.add(x));
+    let [ref, name] = firstRef.split(' ');
+    this.refs.set(name, ref);
+    while (true) {
+      let line = read();
+      if (line === true) break;
+      if (line !== null) {
+        let [ref, name] = line.toString('utf8').trim().split(' ');
+        this.refs.set(name, ref);
+      }
+    }
+  }
+  async push(stream$$1 /*: ReadableStream */) {
+    const service = 'git-receive-pack';
+    let res = await this.stream({ stream: stream$$1, service });
+    return res;
+  }
+  async pull(stream$$1 /*: ReadableStream */) {
+    const service = 'git-upload-pack';
+    let res = await this.stream({ stream: stream$$1, service });
+    return res;
+  }
+  async stream({
+    stream: stream$$1,
+    service
+  }) /*: Promise<{packfile: ReadableStream, progress: ReadableStream }> */{
+    let headers = {};
+    headers['content-type'] = `application/x-${service}-request`;
+    headers['accept'] = `application/x-${service}-result`;
+    headers['user-agent'] = `git/${name}@${version}`;
+    if (this.auth) {
+      headers['authorization'] = basicAuth(this.auth);
+    }
+    console.log('headers =', headers);
+    let res = await pify(simpleGet)({
+      method: 'POST',
+      url: `${this.GIT_URL}/${service}`,
+      body: stream$$1,
+      headers
+    });
+    // Don't try to parse git pushes for now.
+    if (service === 'git-receive-pack') return res;
+    // Parse the response!
+    let read = GitPktLine.streamReader(res);
+    // And now for the ridiculous side-band-64k protocol
+    let packetlines = new stream.PassThrough();
+    let packfile = new stream.PassThrough();
+    let progress = new stream.PassThrough();
+    // TODO: Use a proper through stream?
+    const nextBit = async function () {
+      let line = await read();
+      // A made up convention to signal there's no more to read.
+      if (line === null) {
+        packfile.end();
+        progress.end();
+        packetlines.end();
+        return;
+      }
+      // Examine first byte to determine which output "stream" to use
+      switch (line[0]) {
+        case 1:
+          // pack data
+          packfile.write(line.slice(1));
+          break;
+        case 2:
+          // progress message
+          progress.write(line.slice(1));
+          break;
+        case 3:
+          // fatal error message just before stream aborts
+          let error = line.slice(1);
+          progress.write(error);
+          packfile.destroy(new Error(error.toString('utf8')));
+          return;
+        default:
+          // Not part of the side-band-64k protocol
+          packetlines.write(line.slice(1));
+      }
+      process.nextTick(nextBit);
+    };
+    process.nextTick(nextBit);
+    return {
+      packetlines,
+      packfile,
+      progress
+    };
+  } /*: {
+    stream: ReadableStream,
+    service: string}
+    */
+}
+
+async function add({ gitdir, workdir, filepath }) {
+  const type = 'blob';
+  const object = await read(path.join(workdir, filepath));
+  if (object === null) throw new Error(`Could not read file '${filepath}'`);
+  const oid = await GitObjectManager.write({ gitdir, type, object });
+  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
+    let stats = await pify(fs().lstat)(path.join(workdir, filepath));
+    index.insert({ filepath, stats, oid });
+  });
+  // TODO: return oid?
+}
+
+async function writeTreeToDisk({ gitdir, dirpath, tree }) {
+  for (let entry of tree) {
+    let { type, object } = await GitObjectManager.read({
+      gitdir,
+      oid: entry.oid
+    });
+    let entrypath = `${dirpath}/${entry.path}`;
+    switch (type) {
+      case 'blob':
+        await write(entrypath, object);
+        break;
+      case 'tree':
+        let tree = GitTree.from(object);
+        await writeTreeToDisk({ gitdir, dirpath: entrypath, tree });
+        break;
+      default:
+        throw new Error(`Unexpected object type ${type} found in tree for '${dirpath}'`);
+    }
+  }
+}
+
+async function checkout({ workdir, gitdir, remote, ref }) {
+  // Get tree oid
+  let oid;
+  try {
+    oid = await resolveRef({ gitdir, ref });
+  } catch (e) {
+    oid = await resolveRef({ gitdir, ref: `${remote}/${ref}` });
+    await write(`${gitdir}/refs/heads/${ref}`, oid + '\n');
+  }
+  let commit = await GitObjectManager.read({ gitdir, oid });
+  if (commit.type !== 'commit') {
+    throw new Error(`Unexpected type: ${commit.type}`);
+  }
+  let comm = GitCommit.from(commit.object.toString('utf8'));
+  let sha = comm.headers().tree;
+  // Get top-level tree
+  let { type, object } = await GitObjectManager.read({ gitdir, oid: sha });
+  if (type !== 'tree') throw new Error(`Unexpected type: ${type}`);
+  let tree = GitTree.from(object);
+  // Write files. TODO: Write them atomically
+  await writeTreeToDisk({ gitdir, dirpath: workdir, tree });
+  // Update HEAD TODO: Handle non-branch cases
+  write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`);
+}
+
+async function constructTree({ gitdir, inode }) /*: string */{
+  // use depth first traversal
+  let children = inode.children;
+  for (let inode of children) {
+    if (inode.type === 'tree') {
+      inode.metadata.mode = '040000';
+      inode.metadata.oid = await constructTree({ gitdir, inode });
+    }
+  }
+  let entries = children.map(inode => ({
+    mode: inode.metadata.mode,
+    path: inode.basename,
+    oid: inode.metadata.oid,
+    type: inode.type
+  }));
+  const tree = GitTree.from(entries);
+  let oid = await GitObjectManager.write({
+    gitdir,
+    type: 'tree',
+    object: tree.toObject()
+  });
+  return oid;
+}
+
+async function commit({
+  gitdir,
+  author,
+  committer,
+  message: message$$1,
+  privateKeys
+}) {
+  // Fill in missing arguments with default values
+  committer = committer || author;
+  let authorDateTime = author.date || new Date();
+  let committerDateTime = committer.date || authorDateTime;
+  let oid;
+  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
+    const inode = flatFileListToDirectoryStructure(index.entries);
+    const treeRef = await constructTree({ gitdir, inode });
+    let parents;
+    try {
+      let parent = await resolveRef({ gitdir, ref: 'HEAD' });
+      parents = [parent];
+    } catch (err) {
+      // Probably an initial commit
+      parents = [];
+    }
+    let comm = GitCommit.from({
+      tree: treeRef,
+      parent: parents,
+      author: {
+        name: author.name,
+        email: author.email,
+        timestamp: author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
+        timezoneOffset: author.timezoneOffset || 0
+      },
+      committer: {
+        name: committer.name,
+        email: committer.email,
+        timestamp: committer.timestamp || Math.floor(committerDateTime.valueOf() / 1000),
+        timezoneOffset: committer.timezoneOffset || 0
+      },
+      message: message$$1
+    });
+    if (privateKeys) {
+      comm = await comm.sign(privateKeys);
+    }
+    oid = await GitObjectManager.write({
+      gitdir,
+      type: 'commit',
+      object: comm.toObject()
+    });
+    // Update branch pointer
+    const branch = await resolveRef({ gitdir, ref: 'HEAD', depth: 2 });
+    await write(path.join(gitdir, branch), oid + '\n');
+  });
+  return oid;
+}
+
+async function getConfig({ gitdir, path: path$$1 }) {
+  const config = await GitConfigManager.get({ gitdir });
+  const value = await config.get(path$$1);
+  return value;
+}
+
+// @flow
+const types = {
+  1: 'commit',
+  2: 'tree',
+  3: 'blob',
+  4: 'tag',
+  6: 'ofs-delta',
+  7: 'ref-delta'
+};
+
+function parseVarInt(buffer$$1 /*: Buffer */) {
+  let n = 0;
+  for (var i = 0; i < buffer$$1.byteLength; i++) {
+    n = (buffer$$1[i] & 0b01111111) + (n << 7);
+    if ((buffer$$1[i] & 0b10000000) === 0) {
+      if (i !== buffer$$1.byteLength - 1) throw new Error('Invalid varint buffer');
+      return n;
+    }
+  }
+  throw new Error('Invalid varint buffer');
+}
+
+// TODO: Move this to 'plumbing'
+async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: ReadableStream} */
+}) {
+  return new Promise(function (resolve, reject) {
+    // Read header
+    peek(inputStream, 12, (err, data, inputStream) => {
+      if (err) return reject(err);
+      let iden = data.slice(0, 4).toString('utf8');
+      if (iden !== 'PACK') {
+        throw new Error(`Packfile started with '${iden}'. Expected 'PACK'`);
+      }
+      let ver = data.slice(4, 8).toString('hex');
+      if (ver !== '00000002') {
+        throw new Error(`Unknown packfile version '${ver}'. Expected 00000002.`);
+      }
+      // Read a 4 byte (32-bit) int
+      let numObjects = data.readInt32BE(8);
+      console.log(`unpacking ${numObjects} objects`);
+      if (numObjects === 0) return;
+      // And on our merry way
+      let offsetMap = new Map();
+      inputStream.pipe(listpack()).pipe(thru(async ({ data, type, reference, offset, num }, next) => {
+        type = types[type];
+        if (type === 'ref-delta') {
+          let oid = reference.toString('hex');
+          try {
+            let { object, type } = await GitObjectManager.read({
+              gitdir,
+              oid
+            });
+            let result = applyDelta(data, object);
+            let newoid = await GitObjectManager.write({
+              gitdir,
+              type,
+              object: result
+            });
+            console.log(`${type} ${newoid} ref-delta ${oid}`);
+            offsetMap.set(offset, oid);
+          } catch (err) {
+            throw new Error(`Could not find object ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`);
+          }
+        } else if (type === 'ofs-delta') {
+          // Note: this might be not working because offsets might not be
+          // guaranteed to be on object boundaries? In which case we'd need
+          // to write the packfile to disk first, I think.
+          // For now I've "solved" it by simply not advertising ofs-delta as a capability
+          // during the HTTP request, so Github will only send ref-deltas not ofs-deltas.
+          let absoluteOffset = offset - parseVarInt(reference);
+          let referenceOid = offsetMap.get(absoluteOffset);
+          console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`);
+          let { type, object } = await GitObjectManager.read({
+            gitdir,
+            oid: referenceOid
+          });
+          let result = applyDelta(data, object);
+          let oid = await GitObjectManager.write({
+            gitdir,
+            type,
+            object: result
+          });
+          console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`);
+          offsetMap.set(offset, oid);
+        } else {
+          let oid = await GitObjectManager.write({
+            gitdir,
+            type,
+            object: data
+          });
+          console.log(`${offset} ${type} ${oid}`);
+          offsetMap.set(offset, oid);
+        }
+        if (num === 0) return resolve();
+        next(null);
+      })).on('error', reject).on('finish', resolve);
+    });
+  });
+}
+
+// @flow
+async function fetchPackfile({ gitdir, ref = 'HEAD', remote, auth }) {
+  let url = await getConfig({
+    gitdir,
+    path: `remote "${remote}".url`
+  });
+  let remoteHTTP = new GitRemoteHTTP(url);
+  remoteHTTP.auth = auth;
+  await remoteHTTP.preparePull();
+  await GitRefsManager.updateRemoteRefs({
+    gitdir,
+    remote,
+    refs: remoteHTTP.refs
+  });
+  let want = remoteHTTP.refs.get(ref);
+  console.log('want =', want);
+  // Note: I removed "ofs-delta" from the capabilities list and now
+  // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
+  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${name}@${version}`;
+  let packstream = new stream__default.PassThrough();
+  packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`));
+  packstream.write(GitPktLine.flush());
+  let have = null;
+  try {
+    have = await resolveRef({ gitdir, ref });
+    console.log('have =', have);
+  } catch (err) {
+    console.log("Looks like we don't have that ref yet.");
+  }
+  if (have) {
+    packstream.write(GitPktLine.encode(`have ${have}\n`));
+    packstream.write(GitPktLine.flush());
+  }
+  packstream.end(GitPktLine.encode(`done\n`));
+  let response = await remoteHTTP.pull(packstream);
+  return response;
+}
+
+async function fetch({ gitdir, ref = 'HEAD', remote, auth }) {
+  let response = await fetchPackfile({ gitdir, ref, remote, auth });
+  // response.packetlines.pipe(process.stdout)
+  response.progress.pipe(process.stdout);
+  await unpack({ gitdir, inputStream: response.packfile });
 }
 
 // We're implementing a non-standard clone based on the Github API first, because of CORS.
@@ -617,7 +1418,15 @@ async function fetchBlob({ gitdir, url, user, repo, sha, since, token }) {
   }
 }
 
-async function fetch({ gitdir, token, user, repo, ref, remote, since }) {
+async function GithubFetch({
+  gitdir,
+  token,
+  user,
+  repo,
+  ref,
+  remote,
+  since
+}) {
   let json;
 
   if (!ref) {
@@ -651,258 +1460,14 @@ async function fetch({ gitdir, token, user, repo, ref, remote, since }) {
   await fetchTree({ gitdir, user, repo, token, sha });
 }
 
-async function writeTreeToDisk({ gitdir, dirpath, tree }) {
-  for (let entry of tree) {
-    let { type, object } = await GitObjectManager.read({
-      gitdir,
-      oid: entry.oid
-    });
-    let entrypath = `${dirpath}/${entry.path}`;
-    switch (type) {
-      case 'blob':
-        await write(entrypath, object);
-        break;
-      case 'tree':
-        let tree = GitTree.from(object);
-        await writeTreeToDisk({ gitdir, dirpath: entrypath, tree });
-        break;
-      default:
-        throw new Error(`Unexpected object type ${type} found in tree for '${dirpath}'`);
-    }
-  }
-}
-
-async function checkout({ workdir, gitdir, remote, ref }) {
-  // Get tree oid
-  let oid;
-  try {
-    oid = await resolveRef({ gitdir, ref });
-  } catch (e) {
-    oid = await resolveRef({ gitdir, ref: `${remote}/${ref}` });
-    await write(`${gitdir}/refs/heads/${ref}`, oid + '\n');
-  }
-  let commit = await GitObjectManager.read({ gitdir, oid });
-  if (commit.type !== 'commit') {
-    throw new Error(`Unexpected type: ${commit.type}`);
-  }
-  let comm = GitCommit.from(commit.object.toString('utf8'));
-  let sha = comm.headers().tree;
-  // Get top-level tree
-  let { type, object } = await GitObjectManager.read({ gitdir, oid: sha });
-  if (type !== 'tree') throw new Error(`Unexpected type: ${type}`);
-  let tree = GitTree.from(object);
-  // Write files. TODO: Write them atomically
-  await writeTreeToDisk({ gitdir, dirpath: workdir, tree });
-  // Update HEAD TODO: Handle non-branch cases
-  write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`);
-}
-
 // @flow
-/*::
-import type {Stats} from 'fs'
-
-type CacheEntry = {
-  ctime: Date,
-  ctimeNanoseconds?: number,
-  mtime: Date,
-  mtimeNanoseconds?: number,
-  dev: number,
-  ino: number,
-  mode: number,
-  uid: number,
-  gid: number,
-  size: number,
-  oid: string,
-  flags: number,
-  path: string
-}
-*/
-
-function parseBuffer$1(buffer$$1) {
-  let reader = new BufferCursor(buffer$$1);
-  let _entries /*: Map<string, CacheEntry> */ = new Map();
-  let magic = reader.toString('utf8', 4);
-  if (magic !== 'DIRC') {
-    throw new Error(`Inavlid dircache magic file number: ${magic}`);
-  }
-  let version = reader.readUInt32BE();
-  if (version !== 2) throw new Error(`Unsupported dircache version: ${version}`);
-  let numEntries = reader.readUInt32BE();
-  let i = 0;
-  while (!reader.eof() && i < numEntries) {
-    let entry = {};
-    let ctimeSeconds = reader.readUInt32BE();
-    let ctimeNanoseconds = reader.readUInt32BE();
-    entry.ctime = new Date(ctimeSeconds * 1000 + ctimeNanoseconds / 1000000);
-    entry.ctimeNanoseconds = ctimeNanoseconds;
-    let mtimeSeconds = reader.readUInt32BE();
-    let mtimeNanoseconds = reader.readUInt32BE();
-    entry.mtime = new Date(mtimeSeconds * 1000 + mtimeNanoseconds / 1000000);
-    entry.mtimeNanoseconds = mtimeNanoseconds;
-    entry.dev = reader.readUInt32BE();
-    entry.ino = reader.readUInt32BE();
-    entry.mode = reader.readUInt32BE();
-    entry.uid = reader.readUInt32BE();
-    entry.gid = reader.readUInt32BE();
-    entry.size = reader.readUInt32BE();
-    entry.oid = reader.slice(20).toString('hex');
-    entry.flags = reader.readUInt16BE(); // TODO: extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
-    // TODO: handle if (version === 3 && entry.flags.extended)
-    let pathlength = buffer$$1.indexOf(0, reader.tell() + 1) - reader.tell();
-    if (pathlength < 1) throw new Error(`Got a path length of: ${pathlength}`);
-    entry.path = reader.toString('utf8', pathlength);
-    // The next bit is awkward. We expect 1 to 8 null characters
-    let tmp = reader.readUInt8();
-    if (tmp !== 0) {
-      throw new Error(`Expected 1-8 null characters but got '${tmp}'`);
-    }
-    let numnull = 1;
-    while (!reader.eof() && reader.readUInt8() === 0 && numnull < 9) numnull++;
-    reader.seek(reader.tell() - 1);
-    // end of awkward part
-    _entries.set(entry.path, entry);
-    i++;
-  }
-
-  return _entries;
-}
-
-class GitIndex {
-  /*::
-   _entries: Map<string, CacheEntry>
-   _dirty: boolean // Used to determine if index needs to be saved to filesystem
-   */
-  constructor(index /*: any */) {
-    this._dirty = false;
-    if (buffer.Buffer.isBuffer(index)) {
-      this._entries = parseBuffer$1(index);
-    } else if (index === null) {
-      this._entries = new Map();
-    } else {
-      throw new Error('invalid type passed to GitIndex constructor');
-    }
-  }
-  static from(buffer$$1) {
-    return new GitIndex(buffer$$1);
-  }
-  get entries() /*: Array<CacheEntry> */{
-    return sortby([...this._entries.values()], 'path');
-  }
-  *[Symbol.iterator]() {
-    for (let entry of this.entries) {
-      yield entry;
-    }
-  }
-  insert({ filepath, stats, oid }) {
-    let entry = {
-      ctime: stats.ctime,
-      mtime: stats.mtime,
-      dev: stats.dev,
-      ino: stats.ino,
-      mode: stats.mode,
-      uid: stats.uid,
-      gid: stats.gid,
-      size: stats.size,
-      path: filepath,
-      oid: oid,
-      flags: 0
-    };
-    this._entries.set(entry.path, entry);
-    this._dirty = true;
-  } /*: {filepath: string, stats: Stats, oid: string } */
-  delete({ filepath /*: {filepath: string} */ }) {
-    if (this._entries.has(filepath)) {
-      this._entries.delete(filepath);
-    } else {
-      for (let key$$1 of this._entries.keys()) {
-        if (key$$1.startsWith(filepath + '/')) {
-          this._entries.delete(key$$1);
-        }
-      }
-    }
-    this._dirty = true;
-  }
-  render() {
-    return this.entries.map(entry => `${entry.mode.toString(8)} ${entry.oid}    ${entry.path}`).join('\n');
-  }
-  toObject() {
-    let header = buffer.Buffer.alloc(12);
-    let writer = new BufferCursor(header);
-    writer.write('DIRC', 4, 'utf8');
-    writer.writeUInt32BE(2);
-    writer.writeUInt32BE(this.entries.length);
-    let body = buffer.Buffer.concat(this.entries.map(entry => {
-      // the fixed length + the filename + at least one null char => align by 8
-      let length = Math.ceil((62 + entry.path.length + 1) / 8) * 8;
-      let written = buffer.Buffer.alloc(length);
-      let writer = new BufferCursor(written);
-      let ctimeMilliseconds = entry.ctime.valueOf();
-      let ctimeSeconds = Math.floor(ctimeMilliseconds / 1000);
-      let ctimeNanoseconds = entry.ctimeNanoseconds || ctimeMilliseconds * 1000000 - ctimeSeconds * 1000000 * 1000;
-      let mtimeMilliseconds = entry.mtime.valueOf();
-      let mtimeSeconds = Math.floor(mtimeMilliseconds / 1000);
-      let mtimeNanoseconds = entry.mtimeNanoseconds || mtimeMilliseconds * 1000000 - mtimeSeconds * 1000000 * 1000;
-      writer.writeUInt32BE(ctimeSeconds);
-      writer.writeUInt32BE(ctimeNanoseconds);
-      writer.writeUInt32BE(mtimeSeconds);
-      writer.writeUInt32BE(mtimeNanoseconds);
-      writer.writeUInt32BE(entry.dev);
-      writer.writeUInt32BE(entry.ino);
-      writer.writeUInt32BE(entry.mode);
-      writer.writeUInt32BE(entry.uid);
-      writer.writeUInt32BE(entry.gid);
-      writer.writeUInt32BE(entry.size);
-      writer.write(entry.oid, 20, 'hex');
-      writer.writeUInt16BE(entry.flags);
-      writer.write(entry.path, entry.path.length, 'utf8');
-      return written;
-    }));
-    return buffer.Buffer.concat([header, body]);
-  }
-}
-
-// @flow
-// import LockManager from 'travix-lock-manager'
-// import Lock from './models/utils/lockfile'
-
-// TODO: replace with an LRU cache?
-const map /*: Map<string, GitIndex> */ = new Map();
-// const lm = new LockManager()
-const lock = new AsyncLock();
-
-class GitIndexManager {
-  static async acquire(filepath, closure) {
-    await lock.acquire(filepath, async function () {
-      let index = map.get(filepath);
-      if (index === undefined) {
-        // Acquire a file lock while we're reading the index
-        // to make sure other processes aren't writing to it
-        // simultaneously, which could result in a corrupted index.
-        // const fileLock = await Lock(filepath)
-        const rawIndexFile = await read(filepath);
-        index = GitIndex.from(rawIndexFile);
-        // cache the GitIndex object so we don't need to re-read it
-        // every time.
-        // TODO: save the stat data for the index so we know whether
-        // the cached file is stale (modified by an outside process).
-        map.set(filepath, index);
-        // await fileLock.cancel()
-      }
-      await closure(index);
-      if (index._dirty) {
-        // Acquire a file lock while we're writing the index file
-        // let fileLock = await Lock(filepath)
-        const buffer$$1 = index.toObject();
-        await write(filepath, buffer$$1);
-        index._dirty = false;
-      }
-      // For now, discard our cached object so that external index
-      // manipulation is picked up. TODO: use lstat and compare
-      // file times to determine if our cached object should be
-      // discarded.
-      map.delete(filepath);
-    });
-  }
+async function init(gitdir /*: string */) {
+  let folders = ['hooks', 'info', 'objects/info', 'objects/pack', 'refs/heads', 'refs/tags'];
+  folders = folders.map(dir => gitdir + '/' + dir);
+  await mkdirs(folders);
+  await write(gitdir + '/config', '[core]\n' + '\trepositoryformatversion = 0\n' + '\tfilemode = false\n' + '\tbare = false\n' + '\tlogallrefupdates = true\n' + '\tsymlinks = false\n' + '\tignorecase = true\n');
+  await write(gitdir + '/HEAD', 'ref: refs/heads/master\n');
+  // await write(gitdir + '/refs/heads/master', '')
 }
 
 async function list({ gitdir }) {
@@ -913,358 +1478,7 @@ async function list({ gitdir }) {
   return filenames;
 }
 
-const lstat = pify(fs.lstat);
-
-async function add({ gitdir, workdir, filepath }) {
-  const type = 'blob';
-  const object = await read(path.join(workdir, filepath));
-  if (object === null) throw new Error(`Could not read file '${filepath}'`);
-  const oid = await GitObjectManager.write({ gitdir, type, object });
-  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
-    let stats = await lstat(path.join(workdir, filepath));
-    index.insert({ filepath, stats, oid });
-  });
-  // TODO: return oid?
-}
-
-async function remove({ gitdir, filepath }) {
-  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
-    index.delete({ filepath });
-  });
-  // TODO: return oid?
-}
-
 // @flow
-/*::
-type Node = {
-  type: string,
-  fullpath: string,
-  basename: string,
-  metadata: Object, // mode, oid
-  parent?: Node,
-  children: Array<Node>
-}
-*/
-
-function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
-) /*: Node|void */{
-  const inodes /*: Map<string, Node> */ = new Map();
-  const mkdir = function (name) /*: Node|void */{
-    if (!inodes.has(name)) {
-      let dir /*: Node */ = {
-        type: 'tree',
-        fullpath: name,
-        basename: path.basename(name),
-        metadata: {},
-        children: []
-      };
-      inodes.set(name, dir);
-      // This recursively generates any missing parent folders.
-      // We do it after we've added the inode to the set so that
-      // we don't recurse infinitely trying to create the root '.' dirname.
-      dir.parent = mkdir(path.dirname(name));
-      if (dir.parent && dir.parent !== dir) dir.parent.children.push(dir);
-    }
-    return inodes.get(name);
-  };
-
-  const mkfile = function (name, metadata) /*: Node|void */{
-    if (!inodes.has(name)) {
-      let file /*: Node */ = {
-        type: 'blob',
-        fullpath: name,
-        basename: path.basename(name),
-        metadata: metadata,
-        // This recursively generates any missing parent folders.
-        parent: mkdir(path.dirname(name)),
-        children: []
-      };
-      if (file.parent) file.parent.children.push(file);
-      inodes.set(name, file);
-    }
-    return inodes.get(name);
-  };
-
-  for (let file of files) {
-    mkfile(file.path, file);
-  }
-  return inodes.get('.');
-}
-
-async function constructTree({ gitdir, inode }) /*: string */{
-  // use depth first traversal
-  let children = inode.children;
-  for (let inode of children) {
-    if (inode.type === 'tree') {
-      inode.metadata.mode = '040000';
-      inode.metadata.oid = await constructTree({ gitdir, inode });
-    }
-  }
-  let entries = children.map(inode => ({
-    mode: inode.metadata.mode,
-    path: inode.basename,
-    oid: inode.metadata.oid,
-    type: inode.type
-  }));
-  const tree = GitTree.from(entries);
-  let oid = await GitObjectManager.write({
-    gitdir,
-    type: 'tree',
-    object: tree.toObject()
-  });
-  return oid;
-}
-
-async function commit({
-  gitdir,
-  author,
-  committer,
-  message: message$$1,
-  privateKeys
-}) {
-  // Fill in missing arguments with default values
-  committer = committer || author;
-  let authorDateTime = author.date || new Date();
-  let committerDateTime = committer.date || authorDateTime;
-  let oid;
-  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
-    const inode = flatFileListToDirectoryStructure(index.entries);
-    const treeRef = await constructTree({ gitdir, inode });
-    const parent = await resolveRef({ gitdir, ref: 'HEAD' });
-    let comm = GitCommit.from({
-      tree: treeRef,
-      parent: [parent],
-      author: {
-        name: author.name,
-        email: author.email,
-        timestamp: author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
-        timezoneOffset: author.timezoneOffset || 0
-      },
-      committer: {
-        name: committer.name,
-        email: committer.email,
-        timestamp: committer.timestamp || Math.floor(committerDateTime.valueOf() / 1000),
-        timezoneOffset: committer.timezoneOffset || 0
-      },
-      message: message$$1
-    });
-    if (privateKeys) {
-      comm = await comm.sign(privateKeys);
-    }
-    oid = await GitObjectManager.write({
-      gitdir,
-      type: 'commit',
-      object: comm.toObject()
-    });
-    // Update branch pointer
-    const branch = await resolveRef({ gitdir, ref: 'HEAD', depth: 2 });
-    await write(path.join(gitdir, branch), oid + '\n');
-  });
-  return oid;
-}
-
-const HttpKeyServer = new openpgp.HKP();
-
-async function verify({ gitdir, ref, publicKeys }) {
-  const oid = await resolveRef({ gitdir, ref });
-  const { type, object } = await GitObjectManager.read({ gitdir, oid });
-  if (type !== 'commit') {
-    throw new Error(`git.verify() was expecting a ref type 'commit' but got type '${type}'`);
-  }
-  let commit = GitCommit.from(object);
-  let author = commit.headers().author;
-  let keys = await commit.listSigningKeys();
-  if (!publicKeys) {
-    let keyArray = await Promise.all(keys.map(id => HttpKeyServer.lookup({ keyId: id })));
-    publicKeys = keyArray.join('\n');
-  }
-  let validity = await commit.verify(publicKeys);
-  if (!validity) return false;
-  return { author, keys };
-}
-
-// @flow
-/*::
-import type {Writable} from 'stream'
-*/
-
-const types = {
-  commit: 0b0010000,
-  tree: 0b0100000,
-  blob: 0b0110000,
-  tag: 0b1000000
-  // TODO: Move this to 'plumbing'
-};async function pack({
-  oids,
-  gitdir,
-  outputStream /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
-}) {
-  let hash = crypto.createHash('sha1');
-  let stream$$1 = outputStream;
-  function write(chunk, enc) {
-    stream$$1.write(chunk, enc);
-    hash.update(chunk, enc);
-  }
-  function writeObject({ stype, object }) {
-    let lastFour, multibyte, length;
-    // Object type is encoded in bits 654
-    let type = types[stype];
-    if (type === undefined) throw new Error('Unrecognized type: ' + stype);
-    // The length encoding get complicated.
-    length = object.length;
-    // Whether the next byte is part of the variable-length encoded number
-    // is encoded in bit 7
-    multibyte = length > 0b1111 ? 0b10000000 : 0b0;
-    // Last four bits of length is encoded in bits 3210
-    lastFour = length & 0b1111;
-    // Discard those bits
-    length = length >>> 4;
-    // The first byte is then (1-bit multibyte?), (3-bit type), (4-bit least sig 4-bits of length)
-    let byte = (multibyte | type | lastFour).toString(16);
-    write(byte, 'hex');
-    // Now we keep chopping away at length 7-bits at a time until its zero,
-    // writing out the bytes in what amounts to little-endian order.
-    while (multibyte) {
-      multibyte = length > 0b01111111 ? 0b10000000 : 0b0;
-      byte = multibyte | length & 0b01111111;
-      write(pad(2, byte.toString(16), '0'), 'hex');
-      length = length >>> 7;
-    }
-    // Lastly, we can compress and write the object.
-    write(buffer.Buffer.from(pako.deflate(object)));
-  }
-
-  write('PACK');
-  write('00000002', 'hex');
-  // Write a 4 byte (32-bit) int
-  write(pad(8, oids.length.toString(16), '0'), 'hex');
-  for (let oid of oids) {
-    let { type, object } = await GitObjectManager.read({ gitdir, oid });
-    writeObject({ write, object, stype: type });
-  }
-  // Write SHA1 checksum
-  let digest = hash.digest();
-  stream$$1.end(digest);
-  return stream$$1;
-}
-
-// @flow
-// Technically, this happens to be a pull-stream compatible source.
-function reader(buffer$$1 /*: Buffer */) {
-  let buffercursor = new BufferCursor(buffer$$1);
-  return function read() {
-    if (buffercursor.eof()) return true;
-    let length = parseInt(buffercursor.slice(4).toString('utf8'), 16);
-    if (length === 0) return null;
-    return buffercursor.slice(length - 4).buffer;
-  };
-}
-
-// @flow
-function basicAuth(auth) {
-  return `Basic ${buffer.Buffer.from(auth.username + ':' + auth.password).toString('base64')}`;
-}
-
-class GitRemoteHTTP {
-  /*::
-  GIT_URL : string
-  refs : Map<string, string>
-  capabilities : Set<string>
-  auth : { username : string, password : string }
-  */
-  constructor(url /*: string */) {
-    // Auto-append the (necessary) .git if it's missing.
-    if (!url.endsWith('.git')) url = url += '.git';
-    this.GIT_URL = url;
-  }
-  async preparePull() {
-    await this.discover('git-upload-pack');
-  }
-  async preparePush() {
-    await this.discover('git-receive-pack');
-  }
-  async discover(service /*: string */) {
-    this.capabilities = new Set();
-    this.refs = new Map();
-    let headers = {};
-    // headers['Accept'] = `application/x-${service}-advertisement`
-    if (this.auth) {
-      headers['Authorization'] = basicAuth(this.auth);
-    }
-    let res = await pify(simpleGet)({
-      method: 'GET',
-      url: `${this.GIT_URL}/info/refs?service=${service}`,
-      headers
-    });
-    if (res.statusCode !== 200) {
-      throw new Error(`Bad status code from server: ${res.statusCode}`);
-    }
-    let data = await pify(concat)(res);
-    // There is probably a better way to do this, but for now
-    // let's just throw the result parser inline here.
-    let read = new reader(data);
-    let lineOne = read();
-    // skip past any flushes
-    while (lineOne === null) lineOne = read();
-    if (lineOne === true) throw new Error('Bad response from git server.');
-    if (lineOne.toString('utf8') !== `# service=${service}\n`) {
-      throw new Error(`Expected '# service=${service}\\n' but got '${lineOne.toString('utf8')}'`);
-    }
-    let lineTwo = read();
-    // skip past any flushes
-    while (lineTwo === null) lineTwo = read();
-    // In the edge case of a brand new repo, zero refs (and zero capabilities)
-    // are returned.
-    if (lineTwo === true) return;
-    let [firstRef, capabilities] = lineTwo.toString('utf8').trim().split('\0');
-    capabilities.split(' ').map(x => this.capabilities.add(x));
-    let [ref, name] = firstRef.split(' ');
-    this.refs.set(name, ref);
-    while (true) {
-      let line = read();
-      if (line === true) break;
-      if (line !== null) {
-        let [ref, name] = line.toString('utf8').trim().split(' ');
-        this.refs.set(name, ref);
-      }
-    }
-  }
-  async push(stream$$1) {
-    const service = 'git-receive-pack';
-    let headers = {};
-    headers['Content-Type'] = `application/x-${service}-request`;
-    headers['Accept'] = `application/x-${service}-result`;
-    if (this.auth) {
-      headers['Authorization'] = basicAuth(this.auth);
-    }
-    let res = await pify(simpleGet)({
-      method: 'POST',
-      url: `${this.GIT_URL}/${service}`,
-      body: stream$$1,
-      headers
-    });
-    return res;
-  }
-  async pull({ stream: stream$$1, refs }) {
-    const service = 'git-upload-pack';
-    let headers = {};
-    headers['Content-Type'] = `application/x-${service}-request`;
-    headers['Accept'] = `application/x-${service}-result`;
-    if (this.auth) {
-      headers['Authorization'] = basicAuth(this.auth);
-    }
-    let res = await pify(simpleGet)({
-      method: 'POST',
-      url: `${this.GIT_URL}/${service}`,
-      body: stream$$1,
-      headers
-    });
-    return res;
-  }
-}
-
-// @flow
-// TODO: Move this to 'plumbing'
 async function listCommits({
   gitdir,
   start,
@@ -1314,7 +1528,6 @@ async function listCommits({
 }
 
 // @flow
-// TODO: Move this to 'plumbing'
 async function listObjects({ gitdir, oids /*: {
                                                  gitdir: string,
                                                  oids: Array<string>
@@ -1352,68 +1565,64 @@ async function listObjects({ gitdir, oids /*: {
 }
 
 // @flow
-/**
-pkt-line Format
----------------
-
-Much (but not all) of the payload is described around pkt-lines.
-
-A pkt-line is a variable length binary string.  The first four bytes
-of the line, the pkt-len, indicates the total length of the line,
-in hexadecimal.  The pkt-len includes the 4 bytes used to contain
-the length's hexadecimal representation.
-
-A pkt-line MAY contain binary data, so implementors MUST ensure
-pkt-line parsing/formatting routines are 8-bit clean.
-
-A non-binary line SHOULD BE terminated by an LF, which if present
-MUST be included in the total length. Receivers MUST treat pkt-lines
-with non-binary data the same whether or not they contain the trailing
-LF (stripping the LF if present, and not complaining when it is
-missing).
-
-The maximum length of a pkt-line's data component is 65516 bytes.
-Implementations MUST NOT send pkt-line whose length exceeds 65520
-(65516 bytes of payload + 4 bytes of length data).
-
-Implementations SHOULD NOT send an empty pkt-line ("0004").
-
-A pkt-line with a length field of 0 ("0000"), called a flush-pkt,
-is a special case and MUST be handled differently than an empty
-pkt-line ("0004").
-
-----
-  pkt-line     =  data-pkt / flush-pkt
-
-  data-pkt     =  pkt-len pkt-payload
-  pkt-len      =  4*(HEXDIG)
-  pkt-payload  =  (pkt-len - 4)*(OCTET)
-
-  flush-pkt    = "0000"
-----
-
-Examples (as C-style strings):
-
-----
-  pkt-line          actual value
-  ---------------------------------
-  "0006a\n"         "a\n"
-  "0005a"           "a"
-  "000bfoobar\n"    "foobar\n"
-  "0004"            ""
-----
-*/
-function flush() {
-  return buffer.Buffer.from('0000', 'utf8');
-}
-
-function encode(line /*: string|Buffer */) /*: Buffer */{
-  if (typeof line === 'string') {
-    line = buffer.Buffer.from(line);
+const types$1 = {
+  commit: 0b0010000,
+  tree: 0b0100000,
+  blob: 0b0110000,
+  tag: 0b1000000
+  // TODO: Move this to 'plumbing'
+};async function pack({
+  oids,
+  gitdir,
+  outputStream /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
+}) {
+  let hash = crypto.createHash('sha1');
+  let stream$$1 = outputStream;
+  function write(chunk, enc) {
+    stream$$1.write(chunk, enc);
+    hash.update(chunk, enc);
   }
-  let length = line.length + 4;
-  let hexlength = pad(4, length.toString(16), '0');
-  return buffer.Buffer.concat([buffer.Buffer.from(hexlength, 'utf8'), line]);
+  function writeObject({ stype, object }) {
+    let lastFour, multibyte, length;
+    // Object type is encoded in bits 654
+    let type = types$1[stype];
+    if (type === undefined) throw new Error('Unrecognized type: ' + stype);
+    // The length encoding get complicated.
+    length = object.length;
+    // Whether the next byte is part of the variable-length encoded number
+    // is encoded in bit 7
+    multibyte = length > 0b1111 ? 0b10000000 : 0b0;
+    // Last four bits of length is encoded in bits 3210
+    lastFour = length & 0b1111;
+    // Discard those bits
+    length = length >>> 4;
+    // The first byte is then (1-bit multibyte?), (3-bit type), (4-bit least sig 4-bits of length)
+    let byte = (multibyte | type | lastFour).toString(16);
+    write(byte, 'hex');
+    // Now we keep chopping away at length 7-bits at a time until its zero,
+    // writing out the bytes in what amounts to little-endian order.
+    while (multibyte) {
+      multibyte = length > 0b01111111 ? 0b10000000 : 0b0;
+      byte = multibyte | length & 0b01111111;
+      write(pad(2, byte.toString(16), '0'), 'hex');
+      length = length >>> 7;
+    }
+    // Lastly, we can compress and write the object.
+    write(buffer.Buffer.from(pako.deflate(object)));
+  }
+
+  write('PACK');
+  write('00000002', 'hex');
+  // Write a 4 byte (32-bit) int
+  write(pad(8, oids.length.toString(16), '0'), 'hex');
+  for (let oid of oids) {
+    let { type, object } = await GitObjectManager.read({ gitdir, oid });
+    writeObject({ write, object, stype: type });
+  }
+  // Write SHA1 checksum
+  let digest = hash.digest();
+  stream$$1.end(digest);
+  return stream$$1;
 }
 
 // @flow
@@ -1428,10 +1637,10 @@ async function push({ gitdir, ref = 'HEAD', url, auth }) {
     finish: remote.refs.values()
   });
   let objects = await listObjects({ gitdir, oids: commits });
-  let packstream = new stream.PassThrough();
+  let packstream = new stream__default.PassThrough();
   let oldoid = remote.refs.get(ref) || '0000000000000000000000000000000000000000';
-  packstream.write(encode(`${oldoid} ${oid} ${ref}\0 report-status\n`));
-  packstream.write(flush());
+  packstream.write(GitPktLine.encode(`${oldoid} ${oid} ${ref}\0 report-status\n`));
+  packstream.write(GitPktLine.flush());
   pack({
     gitdir,
     oids: [...objects],
@@ -1441,51 +1650,37 @@ async function push({ gitdir, ref = 'HEAD', url, auth }) {
   return response;
 }
 
-class GitConfig {
-  constructor(text) {
-    this.ini = ini.decode(text);
-  }
-  static from(text) {
-    return new GitConfig(text);
-  }
-  async get(path$$1) {
-    return get(this.ini, path$$1);
-  }
-  async set(path$$1, value) {
-    return set(this.ini, path$$1, value);
-  }
-  toString() {
-    return ini.encode(this.ini, { whitespace: true });
-  }
-}
-
-// @flow
-class GitConfigManager {
-  static async get({ gitdir }) {
-    // We can improve efficiency later if needed.
-    // TODO: read from full list of git config files
-    let text = await pify(fs.readFile)(`${gitdir}/config`, { encoding: 'utf8' });
-    return GitConfig.from(text);
-  }
-  static async save({ gitdir, config }) {
-    // We can improve efficiency later if needed.
-    // TODO: handle saving to the correct global/user/repo location
-    await pify(fs.writeFile)(`${gitdir}/config`, config.toString(), {
-      encoding: 'utf8'
-    });
-  } /*: { gitdir: string, config: GitConfig } */
-}
-
-async function getConfig({ gitdir, path: path$$1 }) {
-  const config = await GitConfigManager.get({ gitdir });
-  const value = await config.get(path$$1);
-  return value;
+async function remove({ gitdir, filepath }) {
+  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
+    index.delete({ filepath });
+  });
+  // TODO: return oid?
 }
 
 async function setConfig({ gitdir, path: path$$1, value }) {
   const config = await GitConfigManager.get({ gitdir });
   await config.set(path$$1, value);
   await GitConfigManager.save({ gitdir, config });
+}
+
+const HttpKeyServer = new openpgp.HKP();
+
+async function verify({ gitdir, ref, publicKeys }) {
+  const oid = await resolveRef({ gitdir, ref });
+  const { type, object } = await GitObjectManager.read({ gitdir, oid });
+  if (type !== 'commit') {
+    throw new Error(`git.verify() was expecting a ref type 'commit' but got type '${type}'`);
+  }
+  let commit = GitCommit.from(object);
+  let author = commit.headers().author;
+  let keys = await commit.listSigningKeys();
+  if (!publicKeys) {
+    let keyArray = await Promise.all(keys.map(id => HttpKeyServer.lookup({ keyId: id })));
+    publicKeys = keyArray.join('\n');
+  }
+  let validity = await commit.verify(publicKeys);
+  if (!validity) return false;
+  return { author, keys };
 }
 
 function git(dir) {
@@ -1546,19 +1741,26 @@ class Git {
     this.outputStream = stream$$1;
     return this;
   }
+  inputStream(stream$$1) {
+    this.inputStream = stream$$1;
+    return this;
+  }
   async init() {
     await init(this.gitdir);
   }
-  async fetch(url) {
-    await fetch({
-      gitdir: this.gitdir,
-      // TODO: make this not Github-specific
-      user: ghurl(url).user,
-      repo: ghurl(url).repo,
-      ref: ghurl(url).branch,
-      remote: this.operateRemote,
-      token: this.operateToken
-    });
+  async fetch(ref) {
+    // TODO replace "auth" with just basicAuthUser and basicAuthPassword
+    let params = {};
+    params.remote = this.operateRemote;
+    if (this.operateToken) {
+      params.auth = {
+        username: this.operateToken,
+        password: this.operateToken
+      };
+    }
+    params.gitdir = this.gitdir;
+    params.ref = ref;
+    await fetch(params);
   }
   async checkout(ref) {
     await checkout({
@@ -1570,7 +1772,8 @@ class Git {
   }
   async clone(url) {
     await init(this.gitdir);
-    await fetch({
+    // await addRemote()
+    await GithubFetch({
       gitdir: this.gitdir,
       // TODO: make this not Github-specific
       user: ghurl(url).user,
@@ -1638,6 +1841,12 @@ class Git {
       oids
     });
   }
+  async unpack(oids) {
+    return unpack({
+      gitdir: this.gitdir,
+      inputStream: this.inputStream
+    });
+  }
   async push(ref) {
     let url = await getConfig({
       gitdir: this.gitdir,
@@ -1653,6 +1862,19 @@ class Git {
         password: this.operateToken
       }
     });
+  }
+  async pull(ref) {
+    let params = {};
+    params.remote = this.operateRemote;
+    if (this.operateToken) {
+      params.auth = {
+        username: this.operateToken,
+        password: this.operateToken
+      };
+    }
+    params.gitdir = this.gitdir;
+    params.ref = ref;
+    return fetch(params);
   }
   async getConfig(path$$1) {
     return getConfig({
