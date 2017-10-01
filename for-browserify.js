@@ -43,6 +43,7 @@ var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
 var parseLinkHeader = _interopDefault(require('parse-link-header'));
 var crypto = _interopDefault(require('crypto'));
 
+// @flow
 function formatTimezoneOffset(minutes /*: number */) {
   var sign$$1 = _Math$sign(minutes) || 1;
   minutes = Math.abs(minutes);
@@ -496,6 +497,60 @@ var GitConfig = function () {
   return GitConfig;
 }();
 
+// @flow
+/**
+pkt-line Format
+---------------
+
+Much (but not all) of the payload is described around pkt-lines.
+
+A pkt-line is a variable length binary string.  The first four bytes
+of the line, the pkt-len, indicates the total length of the line,
+in hexadecimal.  The pkt-len includes the 4 bytes used to contain
+the length's hexadecimal representation.
+
+A pkt-line MAY contain binary data, so implementors MUST ensure
+pkt-line parsing/formatting routines are 8-bit clean.
+
+A non-binary line SHOULD BE terminated by an LF, which if present
+MUST be included in the total length. Receivers MUST treat pkt-lines
+with non-binary data the same whether or not they contain the trailing
+LF (stripping the LF if present, and not complaining when it is
+missing).
+
+The maximum length of a pkt-line's data component is 65516 bytes.
+Implementations MUST NOT send pkt-line whose length exceeds 65520
+(65516 bytes of payload + 4 bytes of length data).
+
+Implementations SHOULD NOT send an empty pkt-line ("0004").
+
+A pkt-line with a length field of 0 ("0000"), called a flush-pkt,
+is a special case and MUST be handled differently than an empty
+pkt-line ("0004").
+
+----
+  pkt-line     =  data-pkt / flush-pkt
+
+  data-pkt     =  pkt-len pkt-payload
+  pkt-len      =  4*(HEXDIG)
+  pkt-payload  =  (pkt-len - 4)*(OCTET)
+
+  flush-pkt    = "0000"
+----
+
+Examples (as C-style strings):
+
+----
+  pkt-line          actual value
+  ---------------------------------
+  "0006a\n"         "a\n"
+  "0005a"           "a"
+  "000bfoobar\n"    "foobar\n"
+  "0004"            ""
+----
+*/
+// I'm really using this more as a namespace.
+// There's not a lot of "state" in a pkt-line
 var GitPktLine = function () {
   function GitPktLine() {
     _classCallCheck(this, GitPktLine);
@@ -578,6 +633,27 @@ var GitPktLine = function () {
 
   return GitPktLine;
 }();
+
+// @flow
+/*::
+import type {Stats} from 'fs'
+
+type CacheEntry = {
+  ctime: Date,
+  ctimeNanoseconds?: number,
+  mtime: Date,
+  mtimeNanoseconds?: number,
+  dev: number,
+  ino: number,
+  mode: number,
+  uid: number,
+  gid: number,
+  size: number,
+  oid: string,
+  flags: number,
+  path: string
+}
+*/
 
 function parseBuffer(buffer$$1) {
   var reader = new BufferCursor(buffer$$1);
@@ -837,6 +913,16 @@ var GitIndex = function () {
   return GitIndex;
 }();
 
+// @flow
+/*::
+type TreeEntry = {
+  mode: string,
+  path: string,
+  oid: string,
+  type?: string
+}
+*/
+
 function parseBuffer$1(buffer$$1) /*: Array<TreeEntry> */{
   var _entries = [];
   var cursor = 0;
@@ -1038,6 +1124,7 @@ var rm = function () {
   };
 }();
 
+// An async exists variant
 var exists = function () {
   var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(file, options) {
     return _regeneratorRuntime.wrap(function _callee$(_context) {
@@ -1063,6 +1150,18 @@ var exists = function () {
     return _ref.apply(this, arguments);
   };
 }();
+
+// @flow
+/*::
+type Node = {
+  type: string,
+  fullpath: string,
+  basename: string,
+  metadata: Object, // mode, oid
+  parent?: Node,
+  children: Array<Node>
+}
+*/
 
 function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
 ) /*: Node|void */{
@@ -1154,6 +1253,8 @@ var sleep = function () {
   };
 }();
 
+// @flow
+// This is modeled after the lockfile strategy used by the git source code.
 var delayedReleases = new _Map();
 
 var lock = function () {
@@ -1268,6 +1369,7 @@ var unlock = function () {
   };
 }();
 
+// @flow
 var mkdir = function () {
   var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(dirpath /*: string */) {
     var parent;
@@ -1359,6 +1461,7 @@ var mkdirs = function () {
   };
 }();
 
+// An async readFile variant that returns null instead of throwing errors
 var read = function () {
   var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(file, options) {
     return _regeneratorRuntime.wrap(function _callee$(_context) {
@@ -1533,6 +1636,9 @@ var resolveRef = function () {
   };
 }();
 
+// @flow
+// An async writeFile variant that automatically creates missing directories,
+// and returns null instead of throwing errors.
 var write = function () {
   var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(filepath /*: string */
   , contents /*: string|Buffer */
@@ -1575,6 +1681,7 @@ var write = function () {
 var name = "isomorphic-git";
 var version = "0.0.5";
 
+// @flow
 var GitConfigManager = function () {
   function GitConfigManager() {
     _classCallCheck(this, GitConfigManager);
@@ -1645,6 +1752,11 @@ var GitConfigManager = function () {
   return GitConfigManager;
 }();
 
+// @flow
+// import LockManager from 'travix-lock-manager'
+// import Lock from './models/utils/lockfile'
+
+// TODO: replace with an LRU cache?
 var map /*: Map<string, GitIndex> */ = new _Map();
 // const lm = new LockManager()
 var lock$1 = new AsyncLock();
@@ -1743,6 +1855,7 @@ var GitIndexManager = function () {
   return GitIndexManager;
 }();
 
+// @flow
 function wrapObject(_ref /*: {type: string, object: Buffer} */) {
   var type = _ref.type,
       object = _ref.object;
@@ -1885,6 +1998,8 @@ var GitObjectManager = function () {
   return GitObjectManager;
 }();
 
+// @flow
+// This is a convenience wrapper for reading and writing files in the 'refs' directory.
 var GitRefsManager = function () {
   function GitRefsManager() {
     _classCallCheck(this, GitRefsManager);
@@ -2332,8 +2447,7 @@ var GitRemoteHTTP = function () {
                 if (this.auth) {
                   headers['authorization'] = basicAuth(this.auth);
                 }
-                console.log('headers =', headers);
-                _context7.next = 8;
+                _context7.next = 7;
                 return pify(simpleGet)({
                   method: 'POST',
                   url: this.GIT_URL + '/' + service,
@@ -2341,17 +2455,17 @@ var GitRemoteHTTP = function () {
                   headers: headers
                 });
 
-              case 8:
+              case 7:
                 res = _context7.sent;
 
                 if (!(service === 'git-receive-pack')) {
-                  _context7.next = 11;
+                  _context7.next = 10;
                   break;
                 }
 
                 return _context7.abrupt('return', res);
 
-              case 11:
+              case 10:
                 // Parse the response!
                 read = GitPktLine.streamReader(res);
                 // And now for the ridiculous side-band-64k protocol
@@ -2412,7 +2526,9 @@ var GitRemoteHTTP = function () {
                             packetlines.write(line.slice(1));
 
                           case 20:
-                            process.nextTick(nextBit);
+                            // Careful not to blow up the stack.
+                            // I think Promises in a tail-call position should be OK.
+                            nextBit();
 
                           case 21:
                           case 'end':
@@ -2427,14 +2543,14 @@ var GitRemoteHTTP = function () {
                   };
                 }();
 
-                process.nextTick(nextBit);
+                nextBit();
                 return _context7.abrupt('return', {
                   packetlines: packetlines,
                   packfile: packfile,
                   progress: progress
                 });
 
-              case 18:
+              case 17:
               case 'end':
                 return _context7.stop();
             }
@@ -3005,6 +3121,11 @@ var getConfig = function () {
   };
 }();
 
+// @flow
+/*::
+import type {Writable} from 'stream'
+*/
+
 var types = {
   1: 'commit',
   2: 'tree',
@@ -3073,7 +3194,7 @@ var unpack = function () {
                             type = types[type];
 
                             if (!(type === 'ref-delta')) {
-                              _context.next = 22;
+                              _context.next = 21;
                               break;
                             }
 
@@ -3098,25 +3219,25 @@ var unpack = function () {
                             });
 
                           case 12:
-                            newoid = _context.sent;
+                            
 
-                            console.log(_type + ' ' + newoid + ' ref-delta ' + oid);
+                            // console.log(`${type} ${newoid} ref-delta ${oid}`)
                             offsetMap.set(offset, oid);
-                            _context.next = 20;
+                            _context.next = 19;
                             break;
 
-                          case 17:
-                            _context.prev = 17;
+                          case 16:
+                            _context.prev = 16;
                             _context.t0 = _context['catch'](3);
                             throw new Error('Could not find object ' + oid + ' that is referenced by a ref-delta object in packfile at byte offset ' + offset + '.');
 
-                          case 20:
-                            _context.next = 44;
+                          case 19:
+                            _context.next = 40;
                             break;
 
-                          case 22:
+                          case 21:
                             if (!(type === 'ofs-delta')) {
-                              _context.next = 39;
+                              _context.next = 36;
                               break;
                             }
 
@@ -3127,65 +3248,65 @@ var unpack = function () {
                             // during the HTTP request, so Github will only send ref-deltas not ofs-deltas.
                             absoluteOffset = offset - parseVarInt(reference);
                             referenceOid = offsetMap.get(absoluteOffset);
+                            // console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`)
 
-                            console.log(offset + ' ofs-delta ' + absoluteOffset + ' ' + referenceOid);
-                            _context.next = 28;
+                            _context.next = 26;
                             return GitObjectManager.read({
                               gitdir: gitdir,
                               oid: referenceOid
                             });
 
-                          case 28:
+                          case 26:
                             _ref6 = _context.sent;
                             _type2 = _ref6.type;
                             _object = _ref6.object;
                             _result = applyDelta(data, _object);
-                            _context.next = 34;
+                            _context.next = 32;
                             return GitObjectManager.write({
                               gitdir: gitdir,
                               type: _type2,
                               object: _result
                             });
 
-                          case 34:
+                          case 32:
                             _oid = _context.sent;
 
-                            console.log(offset + ' ' + _type2 + ' ' + _oid + ' ofs-delta ' + referenceOid);
+                            // console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
                             offsetMap.set(offset, _oid);
-                            _context.next = 44;
+                            _context.next = 40;
                             break;
 
-                          case 39:
-                            _context.next = 41;
+                          case 36:
+                            _context.next = 38;
                             return GitObjectManager.write({
                               gitdir: gitdir,
                               type: type,
                               object: data
                             });
 
-                          case 41:
+                          case 38:
                             _oid2 = _context.sent;
 
-                            console.log(offset + ' ' + type + ' ' + _oid2);
+                            // console.log(`${offset} ${type} ${oid}`)
                             offsetMap.set(offset, _oid2);
 
-                          case 44:
+                          case 40:
                             if (!(num === 0)) {
-                              _context.next = 46;
+                              _context.next = 42;
                               break;
                             }
 
                             return _context.abrupt('return', resolve());
 
-                          case 46:
+                          case 42:
                             next(null);
 
-                          case 47:
+                          case 43:
                           case 'end':
                             return _context.stop();
                         }
                       }
-                    }, _callee, _this, [[3, 17]]);
+                    }, _callee, _this, [[3, 16]]);
                   }));
 
                   return function (_x2, _x3) {
@@ -3208,6 +3329,7 @@ var unpack = function () {
   };
 }();
 
+// @flow
 var fetchPackfile = function () {
   var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,
@@ -3858,6 +3980,7 @@ var GithubFetch = function () {
   };
 }();
 
+// @flow
 var init = function () {
   var _ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(gitdir /*: string */) {
     var folders;
@@ -3943,6 +4066,8 @@ var list = function () {
   };
 }();
 
+// @flow
+// TODO: Move this to 'plumbing'
 var listCommits = function () {
   var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref /*: {
                                                                                 gitdir: string,
@@ -4273,6 +4398,8 @@ var listCommits = function () {
   };
 }();
 
+// @flow
+// TODO: Move this to 'plumbing'
 var listObjects = function () {
   var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref /*: {
                                                                                 gitdir: string,
@@ -4482,6 +4609,11 @@ var listObjects = function () {
   };
 }();
 
+// @flow
+/*::
+import type {Writable} from 'stream'
+*/
+
 var types$1 = {
   commit: 16,
   tree: 32,
@@ -4630,6 +4762,7 @@ var types$1 = {
   };
 }();
 
+// @flow
 var push = function () {
   var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
     var gitdir = _ref.gitdir,

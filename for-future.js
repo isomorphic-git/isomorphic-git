@@ -296,6 +296,8 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
+// I'm really using this more as a namespace.
+// There's not a lot of "state" in a pkt-line
 class GitPktLine {
   static flush() {
     return Buffer.from('0000', 'utf8');
@@ -331,6 +333,26 @@ class GitPktLine {
 }
 
 // @flow
+/*::
+import type {Stats} from 'fs'
+
+type CacheEntry = {
+  ctime: Date,
+  ctimeNanoseconds?: number,
+  mtime: Date,
+  mtimeNanoseconds?: number,
+  dev: number,
+  ino: number,
+  mode: number,
+  uid: number,
+  gid: number,
+  size: number,
+  oid: string,
+  flags: number,
+  path: string
+}
+*/
+
 function parseBuffer(buffer$$1) {
   let reader = new BufferCursor(buffer$$1);
   let _entries /*: Map<string, CacheEntry> */ = new Map();
@@ -475,6 +497,15 @@ class GitIndex {
 }
 
 // @flow
+/*::
+type TreeEntry = {
+  mode: string,
+  path: string,
+  oid: string,
+  type?: string
+}
+*/
+
 function parseBuffer$1(buffer$$1) /*: Array<TreeEntry> */{
   let _entries = [];
   let cursor = 0;
@@ -554,6 +585,7 @@ var fs = function () {
   return global.fs || systemfs;
 };
 
+// An async exists variant
 async function exists(file, options) {
   return new Promise(function (resolve, reject) {
     fs().stat(file, (err, stats) => {
@@ -564,6 +596,17 @@ async function exists(file, options) {
 }
 
 // @flow
+/*::
+type Node = {
+  type: string,
+  fullpath: string,
+  basename: string,
+  metadata: Object, // mode, oid
+  parent?: Node,
+  children: Array<Node>
+}
+*/
+
 function flatFileListToDirectoryStructure(files /*: Array<{path: string}> */
 ) /*: Node|void */{
   const inodes /*: Map<string, Node> */ = new Map();
@@ -638,6 +681,7 @@ async function mkdirs(dirlist /*: string[] */) {
   return Promise.all(dirlist.map(mkdir));
 }
 
+// An async readFile variant that returns null instead of throwing errors
 async function read(file, options) {
   return new Promise(function (resolve, reject) {
     fs().readFile(file, options, (err, file) => err ? resolve(null) : resolve(file));
@@ -687,6 +731,8 @@ async function resolveRef({ gitdir, ref, depth }) {
 }
 
 // @flow
+// An async writeFile variant that automatically creates missing directories,
+// and returns null instead of throwing errors.
 async function write(filepath /*: string */
 , contents /*: string|Buffer */
 , options /*: Object */ = {}) {
@@ -722,6 +768,9 @@ class GitConfigManager {
 
 // @flow
 // import LockManager from 'travix-lock-manager'
+// import Lock from './models/utils/lockfile'
+
+// TODO: replace with an LRU cache?
 const map /*: Map<string, GitIndex> */ = new Map();
 // const lm = new LockManager()
 const lock$1 = new AsyncLock();
@@ -921,7 +970,6 @@ class GitRemoteHTTP {
     if (this.auth) {
       headers['authorization'] = basicAuth(this.auth);
     }
-    console.log('headers =', headers);
     let res = await pify(simpleGet)({
       method: 'POST',
       url: `${this.GIT_URL}/${service}`,
@@ -966,9 +1014,11 @@ class GitRemoteHTTP {
           // Not part of the side-band-64k protocol
           packetlines.write(line.slice(1));
       }
-      process.nextTick(nextBit);
+      // Careful not to blow up the stack.
+      // I think Promises in a tail-call position should be OK.
+      nextBit();
     };
-    process.nextTick(nextBit);
+    nextBit();
     return {
       packetlines,
       packfile,
@@ -1124,6 +1174,10 @@ async function getConfig({ gitdir, path: path$$1 }) {
 }
 
 // @flow
+/*::
+import type {Writable} from 'stream'
+*/
+
 const types = {
   1: 'commit',
   2: 'tree',
@@ -1181,7 +1235,7 @@ async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: Re
               type,
               object: result
             });
-            console.log(`${type} ${newoid} ref-delta ${oid}`);
+            // console.log(`${type} ${newoid} ref-delta ${oid}`)
             offsetMap.set(offset, oid);
           } catch (err) {
             throw new Error(`Could not find object ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`);
@@ -1194,7 +1248,7 @@ async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: Re
           // during the HTTP request, so Github will only send ref-deltas not ofs-deltas.
           let absoluteOffset = offset - parseVarInt(reference);
           let referenceOid = offsetMap.get(absoluteOffset);
-          console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`);
+          // console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`)
           let { type, object } = await GitObjectManager.read({
             gitdir,
             oid: referenceOid
@@ -1205,7 +1259,7 @@ async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: Re
             type,
             object: result
           });
-          console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`);
+          // console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
           offsetMap.set(offset, oid);
         } else {
           let oid = await GitObjectManager.write({
@@ -1213,7 +1267,7 @@ async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: Re
             type,
             object: data
           });
-          console.log(`${offset} ${type} ${oid}`);
+          // console.log(`${offset} ${type} ${oid}`)
           offsetMap.set(offset, oid);
         }
         if (num === 0) return resolve();
@@ -1476,6 +1530,7 @@ async function list({ gitdir }) {
 }
 
 // @flow
+// TODO: Move this to 'plumbing'
 async function listCommits({
   gitdir,
   start,
@@ -1525,6 +1580,7 @@ async function listCommits({
 }
 
 // @flow
+// TODO: Move this to 'plumbing'
 async function listObjects({ gitdir, oids /*: {
                                                  gitdir: string,
                                                  oids: Array<string>
@@ -1562,6 +1618,10 @@ async function listObjects({ gitdir, oids /*: {
 }
 
 // @flow
+/*::
+import type {Writable} from 'stream'
+*/
+
 const types$1 = {
   commit: 0b0010000,
   tree: 0b0100000,
