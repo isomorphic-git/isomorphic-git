@@ -70,7 +70,7 @@ export async function unpack (
                   type,
                   object: result
                 })
-                console.log(`${type} ${newoid} ref-delta ${oid}`)
+                // console.log(`${type} ${newoid} ref-delta ${oid}`)
                 offsetMap.set(offset, oid)
               } catch (err) {
                 throw new Error(
@@ -85,9 +85,7 @@ export async function unpack (
               // during the HTTP request, so Github will only send ref-deltas not ofs-deltas.
               let absoluteOffset = offset - parseVarInt(reference)
               let referenceOid = offsetMap.get(absoluteOffset)
-              console.log(
-                `${offset} ofs-delta ${absoluteOffset} ${referenceOid}`
-              )
+              // console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`)
               let { type, object } = await GitObjectManager.read({
                 gitdir,
                 oid: referenceOid
@@ -98,7 +96,7 @@ export async function unpack (
                 type,
                 object: result
               })
-              console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
+              // console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
               offsetMap.set(offset, oid)
             } else {
               let oid = await GitObjectManager.write({
@@ -106,7 +104,7 @@ export async function unpack (
                 type,
                 object: data
               })
-              console.log(`${offset} ${type} ${oid}`)
+              // console.log(`${offset} ${type} ${oid}`)
               offsetMap.set(offset, oid)
             }
             if (num === 0) return resolve()

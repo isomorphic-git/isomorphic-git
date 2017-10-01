@@ -108,7 +108,6 @@ export class GitRemoteHTTP {
     if (this.auth) {
       headers['authorization'] = basicAuth(this.auth)
     }
-    console.log('headers =', headers)
     let res = await pify(simpleGet)({
       method: 'POST',
       url: `${this.GIT_URL}/${service}`,
@@ -150,9 +149,11 @@ export class GitRemoteHTTP {
           // Not part of the side-band-64k protocol
           packetlines.write(line.slice(1))
       }
-      process.nextTick(nextBit)
+      // Careful not to blow up the stack.
+      // I think Promises in a tail-call position should be OK.
+      nextBit()
     }
-    process.nextTick(nextBit)
+    nextBit()
     return {
       packetlines,
       packfile,
