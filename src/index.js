@@ -81,16 +81,19 @@ class Git {
   async init () {
     await init(this.gitdir)
   }
-  async fetch (url) {
-    await GithubFetch({
-      gitdir: this.gitdir,
-      // TODO: make this not Github-specific
-      user: ghurl(url).user,
-      repo: ghurl(url).repo,
-      ref: ghurl(url).branch,
-      remote: this.operateRemote,
-      token: this.operateToken
-    })
+  async fetch (ref) {
+    // TODO replace "auth" with just basicAuthUser and basicAuthPassword
+    let params = {}
+    params.remote = this.operateRemote
+    if (this.operateToken) {
+      params.auth = {
+        username: this.operateToken,
+        password: this.operateToken
+      }
+    }
+    params.gitdir = this.gitdir
+    params.ref = ref
+    await fetch(params)
   }
   async checkout (ref) {
     await checkout({
@@ -102,7 +105,8 @@ class Git {
   }
   async clone (url) {
     await init(this.gitdir)
-    await fetch({
+    // await addRemote()
+    await GithubFetch({
       gitdir: this.gitdir,
       // TODO: make this not Github-specific
       user: ghurl(url).user,

@@ -100,7 +100,7 @@ export class GitRemoteHTTP {
   async stream ({
     stream,
     service
-  }) /*: {packfile: ReadableStream, progress: ReadableStream } */ {
+  }) /*: Promise<{packfile: ReadableStream, progress: ReadableStream }> */ {
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
@@ -123,17 +123,17 @@ export class GitRemoteHTTP {
     let packetlines = new PassThrough()
     let packfile = new PassThrough()
     let progress = new PassThrough()
-    // TODO: Use a real paradigm when your brain is less exhausted
+    // TODO: Use a proper through stream?
     const nextBit = async function () {
       let line = await read()
+      // A made up convention to signal there's no more to read.
       if (line === null) {
-        console.log('line === null')
         packfile.end()
         progress.end()
         packetlines.end()
         return
       }
-      // Examine first byte to determine which "stream"
+      // Examine first byte to determine which output "stream" to use
       switch (line[0]) {
         case 1: // pack data
           packfile.write(line.slice(1))
@@ -152,11 +152,14 @@ export class GitRemoteHTTP {
       }
       process.nextTick(nextBit)
     }
-    nextBit()
+    process.nextTick(nextBit)
     return {
       packetlines,
       packfile,
       progress
     }
-  } /*: {stream: ReadableStream, service: string} */
+  } /*: {
+    stream: ReadableStream,
+    service: string}
+  */
 }
