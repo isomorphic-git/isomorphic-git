@@ -16,7 +16,7 @@ test('clone', t => {
 
         git('.')
           .setConfig(
-            'remote "origin".url',
+            'remote.origin.url',
             'https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git'
           )
           .then(function () {
