@@ -18,12 +18,13 @@ Porcelain:
 - [x] git remove
 - [ ] git status
 - [x] git commit
-- [x] git push (due to CORS, use https://github-cors.now.sh instead of https://github.com)
+- [x] git push (due to CORS, use https://cors-anywhere.herokuapp.com/https://github.com instead of https://github.com)
+- [x] git fetch (due to CORS, use https://cors-anywhere.herokuapp.com/https://github.com instead of https://github.com)
+  - [x] ref-deltas
+  - [ ] ofs-deltas
 - [ ] git pull
-  - [x] Negotiate packfile
-  - [x] Download packfile
-  - [x] Unpack packfile
   - [ ] Update refs and HEAD
+- [ ] git tag
 - [ ] git diff
 - [ ] git merge
 - [x] `esgit` CLI
@@ -52,7 +53,7 @@ git('test').init()
 
 // Manually add a remote (git clone should be doing this automatically but it doesn't (yet))
 git('.')
-  .setConfig('remote "origin".url', 'https://github.com/wmhilton/isomorphic-git')
+  .setConfig('remote "origin".url', 'https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git')
 
 // Fetch the latest version from a Github repository using a shallow clone
 git('.')
