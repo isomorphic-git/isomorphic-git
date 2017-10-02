@@ -189,7 +189,7 @@ class Git {
   async push (ref) {
     let url = await getConfig({
       gitdir: this.gitdir,
-      path: `remote "${this.operateRemote}".url`
+      path: `remote.${this.operateRemote}.url`
     })
     console.log('url =', url)
     return push({

@@ -11,6 +11,7 @@ project called [es-git](https://github.com/es-git/es-git).)
 Porcelain:
 
 - [x] git init
+- [ ] git config
 - [x] git checkout
   - [ ] update index correctly when checking out
 - [x] git list (ls-files)
@@ -53,7 +54,7 @@ git('test').init()
 
 // Manually add a remote (git clone should be doing this automatically but it doesn't (yet))
 git('.')
-  .setConfig('remote "origin".url', 'https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git')
+  .setConfig('remote.origin.url', 'https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git')
 
 // Fetch the latest version from a Github repository using a shallow clone
 git('.')

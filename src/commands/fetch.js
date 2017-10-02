@@ -16,7 +16,7 @@ export async function fetchPackfile ({
 }) {
   let url = await getConfig({
     gitdir,
-    path: `remote "${remote}".url`
+    path: `remote.${remote}.url`
   })
   let remoteHTTP = new GitRemoteHTTP(url)
   remoteHTTP.auth = auth
