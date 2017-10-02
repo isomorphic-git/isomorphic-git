@@ -82,10 +82,18 @@ export class GitPktLine {
   }
   static streamReader (stream /*: ReadableStream */) {
     return async function read () {
-      let hexlength = await gartal.readBytes(stream, 4)
-      let length = parseInt(hexlength.toString('utf8'), 16)
-      if (length === 0) return null
-      let bytes = await gartal.readBytes(stream, length - 4)
+      let hexlength, length, bytes
+      try {
+        hexlength = await gartal.readBytes(stream, 4)
+      } catch (err) {
+        // No more file to read
+        return null
+      }
+      length = parseInt(hexlength.toString('utf8'), 16)
+      // skip over flush packets
+      if (length === 0) return read()
+      // otherwise return the packet content
+      bytes = await gartal.readBytes(stream, length - 4)
       return bytes
     }
   }
