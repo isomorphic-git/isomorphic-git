@@ -14,6 +14,9 @@ export class GitRefsManager {
     // Update files
     const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of refs) {
+      // For some reason we trim these
+      key = key.replace(/^refs\/heads\//, '')
+      key = key.replace(/^refs\/tags\//, '')
       await write(
         path.join(gitdir, 'refs', 'remotes', remote, key),
         normalizeValue(value),
