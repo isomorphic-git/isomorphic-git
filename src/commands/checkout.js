@@ -1,8 +1,9 @@
+import pify from 'pify'
 import { GitCommit, GitTree } from './managers/models'
-import { GitObjectManager } from './managers'
-import { write, resolveRef } from './managers/models/utils'
+import { GitObjectManager, GitIndexManager } from './managers'
+import { write, resolveRef, fs } from './managers/models/utils'
 
-async function writeTreeToDisk ({ gitdir, dirpath, tree }) {
+async function writeTreeToDisk ({ gitdir, index, dirpath, tree }) {
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
       gitdir,
@@ -12,10 +13,12 @@ async function writeTreeToDisk ({ gitdir, dirpath, tree }) {
     switch (type) {
       case 'blob':
         await write(entrypath, object)
+        let stats = await pify(fs().lstat)(entrypath)
+        index.insert({ filepath: entrypath, stats, oid: entry.oid })
         break
       case 'tree':
         let tree = GitTree.from(object)
-        await writeTreeToDisk({ gitdir, dirpath: entrypath, tree })
+        await writeTreeToDisk({ gitdir, index, dirpath: entrypath, tree })
         break
       default:
         throw new Error(
@@ -44,8 +47,12 @@ export async function checkout ({ workdir, gitdir, remote, ref }) {
   let { type, object } = await GitObjectManager.read({ gitdir, oid: sha })
   if (type !== 'tree') throw new Error(`Unexpected type: ${type}`)
   let tree = GitTree.from(object)
-  // Write files. TODO: Write them atomically
-  await writeTreeToDisk({ gitdir, dirpath: workdir, tree })
-  // Update HEAD TODO: Handle non-branch cases
-  write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
+  // Acquire a lock on the index
+  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
+    index.clear()
+    // Write files. TODO: Write them atomically
+    await writeTreeToDisk({ gitdir, index, dirpath: workdir, tree })
+    // Update HEAD TODO: Handle non-branch cases
+    write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
+  })
 }
