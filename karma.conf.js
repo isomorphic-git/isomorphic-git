@@ -37,6 +37,11 @@ module.exports = function (config) {
     singleRun: false,
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+    // Increase timeouts since some actions take quite a while.
+    // browserDisconnectTimeout: 10000, // default 2000
+    // browserDisconnectTolerance: 1, // default 0
+    browserNoActivityTimeout: 4 * 60 * 1000 // default 10000
+    // captureTimeout: 4 * 60 * 1000 // default 60000
   })
 }
