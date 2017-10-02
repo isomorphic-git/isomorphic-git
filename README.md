@@ -11,9 +11,6 @@ project called [es-git](https://github.com/es-git/es-git).)
 Porcelain:
 
 - [x] git init
-- [x] git clone
-  - [x] Github API protocol (only signed commits)
-  - [ ] HTTP smart protocol + cors-buster
 - [x] git checkout
   - [ ] update index correctly when checking out
 - [x] git list (ls-files)
@@ -53,9 +50,15 @@ import git from 'isomorphic-git'
 // Create a new empty repo
 git('test').init()
 
-// Clone from a Github repository to the current working directory.
-// Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
-git('.').githubToken(process.env.GITHUB_TOKEN).clone('https://github.com/wmhilton/esgit')
+// Manually add a remote (git clone should be doing this automatically but it doesn't (yet))
+git('.')
+  .setConfig('remote "origin".url', 'https://github.com/wmhilton/isomorphic-git')
+
+// Fetch the latest version from a Github repository using a shallow clone
+git('.')
+  .remote('origin')
+  .depth(1)
+  .fetch('refs/heads/master')
 
 // Checkout a commitish
 git('.').checkout('master')
@@ -76,10 +79,6 @@ git('.')
   .email('mrtest@example.com')
   .signingKey('-----BEGIN PGP PRIVATE KEY BLOCK-----...')
   .commit('Added the a.txt file')
-
-// Manually add a remote (git clone should be doing this but it doesn't (yet))
-git('.')
-  .setConfig('remote "origin".url', 'https://github-cors.now.sh/wmhilton/test.empty')
 
 // Push a branch back to Github
 git('.')

@@ -100,7 +100,7 @@ export class GitRemoteHTTP {
   async stream ({
     stream,
     service
-  }) /*: Promise<{packfile: ReadableStream, progress: ReadableStream }> */ {
+  }) /*: Promise<{ packfile: ReadableStream, progress: ReadableStream }> */ {
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
@@ -127,9 +127,9 @@ export class GitRemoteHTTP {
       let line = await read()
       // A made up convention to signal there's no more to read.
       if (line === null) {
-        packfile.end()
-        progress.end()
         packetlines.end()
+        progress.end()
+        packfile.end()
         return
       }
       // Examine first byte to determine which output "stream" to use
@@ -147,7 +147,7 @@ export class GitRemoteHTTP {
           return
         default:
           // Not part of the side-band-64k protocol
-          packetlines.write(line.slice(1))
+          packetlines.write(line.slice(0))
       }
       // Careful not to blow up the stack.
       // I think Promises in a tail-call position should be OK.
@@ -161,6 +161,6 @@ export class GitRemoteHTTP {
     }
   } /*: {
     stream: ReadableStream,
-    service: string}
-  */
+    service: string
+  } */
 }

@@ -28,6 +28,7 @@ class Git {
       this.gitdir = `${dir}/.git`
     }
     this.operateRemote = 'origin'
+    this.operateDepth = 0
   }
   workdir (dir) {
     this.workdir = dir
@@ -55,6 +56,10 @@ class Git {
   }
   datetime (date) {
     this.operateAuthorDateTime = date
+    return this
+  }
+  depth (depth) {
+    this.operateDepth = parseInt(depth)
     return this
   }
   timestamp (seconds) {
@@ -93,6 +98,7 @@ class Git {
     }
     params.gitdir = this.gitdir
     params.ref = ref
+    params.depth = this.operateDepth
     await fetch(params)
   }
   async checkout (ref) {
