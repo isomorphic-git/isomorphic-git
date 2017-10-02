@@ -58,7 +58,7 @@ export async function unpack (
           thru(async ({ data, type, reference, offset, num }, next) => {
             type = types[type]
             if (type === 'ref-delta') {
-              let oid = reference.toString('hex')
+              let oid = Buffer.from(reference).toString('hex')
               try {
                 let { object, type } = await GitObjectManager.read({
                   gitdir,
@@ -71,10 +71,10 @@ export async function unpack (
                   object: result
                 })
                 // console.log(`${type} ${newoid} ref-delta ${oid}`)
-                offsetMap.set(offset, oid)
+                offsetMap.set(offset, newoid)
               } catch (err) {
                 throw new Error(
-                  `Could not find object ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`
+                  `Could not find object ${reference} ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`
                 )
               }
             } else if (type === 'ofs-delta') {

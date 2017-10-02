@@ -84,8 +84,6 @@ export async function fetchPackfile ({
 
 export async function fetch ({ gitdir, ref = 'HEAD', remote, auth, depth = 0 }) {
   let response = await fetchPackfile({ gitdir, ref, remote, auth, depth })
-  if (process && process.stdout) {
-    response.progress.pipe(process.stdout)
-  }
+  response.progress.on('data', data => console.log(data.toString('utf8')))
   await unpack({ gitdir, inputStream: response.packfile })
 }
