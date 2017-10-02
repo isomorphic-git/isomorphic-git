@@ -27,16 +27,16 @@ var _Map = _interopDefault(require('babel-runtime/core-js/map'));
 var sortby = _interopDefault(require('lodash/sortBy'));
 var systemfs = _interopDefault(require('fs'));
 var _Promise = _interopDefault(require('babel-runtime/core-js/promise'));
+var _Set = _interopDefault(require('babel-runtime/core-js/set'));
 var AsyncLock = _interopDefault(require('async-lock'));
 var pako = _interopDefault(require('pako'));
 var shasum = _interopDefault(require('shasum'));
-var _Set = _interopDefault(require('babel-runtime/core-js/set'));
 var simpleGet = _interopDefault(require('simple-get'));
 var concat = _interopDefault(require('simple-concat'));
 var stream = require('stream');
 var stream__default = _interopDefault(stream);
-var listpack = _interopDefault(require('git-list-pack'));
 var thru = _interopDefault(require('thru'));
+var listpack = _interopDefault(require('git-list-pack'));
 var peek = _interopDefault(require('buffer-peek-stream'));
 var applyDelta = _interopDefault(require('git-apply-delta'));
 var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
@@ -592,34 +592,46 @@ var GitPktLine = function () {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _context.next = 2;
+                  hexlength = void 0, length = void 0, bytes = void 0;
+                  _context.prev = 1;
+                  _context.next = 4;
                   return gartal.readBytes(stream$$1, 4);
 
-                case 2:
+                case 4:
                   hexlength = _context.sent;
+                  _context.next = 10;
+                  break;
+
+                case 7:
+                  _context.prev = 7;
+                  _context.t0 = _context['catch'](1);
+                  return _context.abrupt('return', null);
+
+                case 10:
                   length = parseInt(hexlength.toString('utf8'), 16);
+                  // skip over flush packets
 
                   if (!(length === 0)) {
-                    _context.next = 6;
+                    _context.next = 13;
                     break;
                   }
 
-                  return _context.abrupt('return', null);
+                  return _context.abrupt('return', read());
 
-                case 6:
-                  _context.next = 8;
+                case 13:
+                  _context.next = 15;
                   return gartal.readBytes(stream$$1, length - 4);
 
-                case 8:
+                case 15:
                   bytes = _context.sent;
                   return _context.abrupt('return', bytes);
 
-                case 10:
+                case 17:
                 case 'end':
                   return _context.stop();
               }
             }
-          }, _callee, this);
+          }, _callee, this, [[1, 7]]);
         }));
 
         function read() {
@@ -1753,6 +1765,139 @@ var GitConfigManager = function () {
 }();
 
 // @flow
+// TODO: Add file locks.
+var GitShallowManager = function () {
+  function GitShallowManager() {
+    _classCallCheck(this, GitShallowManager);
+  }
+
+  _createClass(GitShallowManager, null, [{
+    key: 'read',
+    value: function () {
+      var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
+        var gitdir = _ref.gitdir;
+        var oids, text;
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                oids = new _Set();
+                _context.next = 3;
+                return read(path.join(gitdir, 'shallow'), { encoding: 'utf8' });
+
+              case 3:
+                text = _context.sent;
+
+                if (!(text === null)) {
+                  _context.next = 6;
+                  break;
+                }
+
+                return _context.abrupt('return', oids);
+
+              case 6:
+                text.trim().split('\n').map(function (oid) {
+                  return oids.add(oid);
+                });
+                return _context.abrupt('return', oids);
+
+              case 8:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function read$$1(_x) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return read$$1;
+    }()
+  }, {
+    key: 'write',
+    value: function () {
+      var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref3) {
+        var gitdir = _ref3.gitdir,
+            oids = _ref3.oids;
+
+        var text, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, oid;
+
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                text = '';
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context2.prev = 4;
+
+                for (_iterator = _getIterator(oids); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  oid = _step.value;
+
+                  text += oid + '\n';
+                }
+                _context2.next = 12;
+                break;
+
+              case 8:
+                _context2.prev = 8;
+                _context2.t0 = _context2['catch'](4);
+                _didIteratorError = true;
+                _iteratorError = _context2.t0;
+
+              case 12:
+                _context2.prev = 12;
+                _context2.prev = 13;
+
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                  _iterator.return();
+                }
+
+              case 15:
+                _context2.prev = 15;
+
+                if (!_didIteratorError) {
+                  _context2.next = 18;
+                  break;
+                }
+
+                throw _iteratorError;
+
+              case 18:
+                return _context2.finish(15);
+
+              case 19:
+                return _context2.finish(12);
+
+              case 20:
+                _context2.next = 22;
+                return write(path.join(gitdir, 'shallow'), text, {
+                  encoding: 'utf8'
+                });
+
+              case 22:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[4, 8, 12, 20], [13,, 15, 19]]);
+      }));
+
+      function write$$1(_x2) {
+        return _ref4.apply(this, arguments);
+      }
+
+      return write$$1;
+    }()
+  }]);
+
+  return GitShallowManager;
+}();
+
+// @flow
 // import LockManager from 'travix-lock-manager'
 // import Lock from './models/utils/lockfile'
 
@@ -2493,9 +2638,9 @@ var GitRemoteHTTP = function () {
                               break;
                             }
 
-                            packfile.end();
-                            progress.end();
                             packetlines.end();
+                            progress.end();
+                            packfile.end();
                             return _context6.abrupt('return');
 
                           case 8:
@@ -2523,7 +2668,7 @@ var GitRemoteHTTP = function () {
 
                           case 19:
                             // Not part of the side-band-64k protocol
-                            packetlines.write(line.slice(1));
+                            packetlines.write(line.slice(0));
 
                           case 20:
                             // Careful not to blow up the stack.
@@ -2565,8 +2710,8 @@ var GitRemoteHTTP = function () {
       return stream$$1;
     }() /*: {
         stream: ReadableStream,
-        service: string}
-        */
+        service: string
+        } */
 
   }]);
 
@@ -3198,7 +3343,7 @@ var unpack = function () {
                               break;
                             }
 
-                            oid = reference.toString('hex');
+                            oid = buffer.Buffer.from(reference).toString('hex');
                             _context.prev = 3;
                             _context.next = 6;
                             return GitObjectManager.read({
@@ -3219,17 +3364,17 @@ var unpack = function () {
                             });
 
                           case 12:
-                            
+                            newoid = _context.sent;
 
                             // console.log(`${type} ${newoid} ref-delta ${oid}`)
-                            offsetMap.set(offset, oid);
+                            offsetMap.set(offset, newoid);
                             _context.next = 19;
                             break;
 
                           case 16:
                             _context.prev = 16;
                             _context.t0 = _context['catch'](3);
-                            throw new Error('Could not find object ' + oid + ' that is referenced by a ref-delta object in packfile at byte offset ' + offset + '.');
+                            throw new Error('Could not find object ' + reference + ' ' + oid + ' that is referenced by a ref-delta object in packfile at byte offset ' + offset + '.');
 
                           case 19:
                             _context.next = 40;
@@ -3331,87 +3476,225 @@ var unpack = function () {
 
 // @flow
 var fetchPackfile = function () {
-  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(_ref) {
+  var _ref2 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref) {
+    var _this = this;
+
     var gitdir = _ref.gitdir,
         _ref$ref = _ref.ref,
         ref = _ref$ref === undefined ? 'HEAD' : _ref$ref,
         remote = _ref.remote,
-        auth = _ref.auth;
-    var url, remoteHTTP, want, capabilities, packstream, have, response;
-    return _regeneratorRuntime.wrap(function _callee$(_context) {
+        auth = _ref.auth,
+        _ref$depth = _ref.depth,
+        depth = _ref$depth === undefined ? 0 : _ref$depth;
+
+    var url, remoteHTTP, want, capabilities, packstream, oids, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, oid, have, response;
+
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
-        switch (_context.prev = _context.next) {
+        switch (_context2.prev = _context2.next) {
           case 0:
-            _context.next = 2;
+            _context2.next = 2;
             return getConfig({
               gitdir: gitdir,
               path: 'remote "' + remote + '".url'
             });
 
           case 2:
-            url = _context.sent;
+            url = _context2.sent;
             remoteHTTP = new GitRemoteHTTP(url);
 
             remoteHTTP.auth = auth;
-            _context.next = 7;
+            _context2.next = 7;
             return remoteHTTP.preparePull();
 
           case 7:
-            _context.next = 9;
+            if (!(depth > 0 && !remoteHTTP.capabilities.has('shallow'))) {
+              _context2.next = 9;
+              break;
+            }
+
+            throw new Error('Remote does not support shallow fetching');
+
+          case 9:
+            _context2.next = 11;
             return GitRefsManager.updateRemoteRefs({
               gitdir: gitdir,
               remote: remote,
               refs: remoteHTTP.refs
             });
 
-          case 9:
+          case 11:
             want = remoteHTTP.refs.get(ref);
-
-            console.log('want =', want);
             // Note: I removed "ofs-delta" from the capabilities list and now
             // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
+
             capabilities = 'multi_ack_detailed no-done side-band-64k thin-pack agent=git/' + name + '@' + version;
             packstream = new stream__default.PassThrough();
 
             packstream.write(GitPktLine.encode('want ' + want + ' ' + capabilities + '\n'));
-            packstream.write(GitPktLine.flush());
-            have = null;
-            _context.prev = 16;
-            _context.next = 19;
-            return resolveRef({ gitdir: gitdir, ref: ref });
+            _context2.next = 17;
+            return GitShallowManager.read({ gitdir: gitdir });
 
-          case 19:
-            have = _context.sent;
+          case 17:
+            oids = _context2.sent;
 
-            console.log('have =', have);
-            _context.next = 26;
+            if (!(oids.size > 0 && remoteHTTP.capabilities.has('shallow'))) {
+              _context2.next = 38;
+              break;
+            }
+
+            _iteratorNormalCompletion = true;
+            _didIteratorError = false;
+            _iteratorError = undefined;
+            _context2.prev = 22;
+
+            for (_iterator = _getIterator(oids); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              oid = _step.value;
+
+              packstream.write(GitPktLine.encode('shallow ' + oid + '\n'));
+            }
+            _context2.next = 30;
             break;
 
-          case 23:
-            _context.prev = 23;
-            _context.t0 = _context['catch'](16);
+          case 26:
+            _context2.prev = 26;
+            _context2.t0 = _context2['catch'](22);
+            _didIteratorError = true;
+            _iteratorError = _context2.t0;
+
+          case 30:
+            _context2.prev = 30;
+            _context2.prev = 31;
+
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+
+          case 33:
+            _context2.prev = 33;
+
+            if (!_didIteratorError) {
+              _context2.next = 36;
+              break;
+            }
+
+            throw _iteratorError;
+
+          case 36:
+            return _context2.finish(33);
+
+          case 37:
+            return _context2.finish(30);
+
+          case 38:
+            if (depth !== 0) {
+              packstream.write(GitPktLine.encode('deepen ' + parseInt(depth) + '\n'));
+            }
+            packstream.write(GitPktLine.flush());
+            have = null;
+            _context2.prev = 41;
+            _context2.next = 44;
+            return resolveRef({ gitdir: gitdir, ref: ref });
+
+          case 44:
+            have = _context2.sent;
+            _context2.next = 50;
+            break;
+
+          case 47:
+            _context2.prev = 47;
+            _context2.t1 = _context2['catch'](41);
 
             console.log("Looks like we don't have that ref yet.");
 
-          case 26:
+          case 50:
             if (have) {
               packstream.write(GitPktLine.encode('have ' + have + '\n'));
               packstream.write(GitPktLine.flush());
             }
             packstream.end(GitPktLine.encode('done\n'));
-            _context.next = 30;
+            _context2.next = 54;
             return remoteHTTP.pull(packstream);
 
-          case 30:
-            response = _context.sent;
-            return _context.abrupt('return', response);
+          case 54:
+            response = _context2.sent;
 
-          case 32:
+            response.packetlines.pipe(thru(function () {
+              var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(data, next) {
+                var line, _oid, _oid2;
+
+                return _regeneratorRuntime.wrap(function _callee$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        line = data.toString('utf8');
+
+                        if (!line.startsWith('shallow')) {
+                          _context.next = 10;
+                          break;
+                        }
+
+                        _oid = line.slice(-41).trim();
+
+                        if (!(_oid.length !== 40)) {
+                          _context.next = 5;
+                          break;
+                        }
+
+                        throw new Error('non-40 character \'shallow\' oid: ' + _oid);
+
+                      case 5:
+                        oids.add(_oid);
+                        _context.next = 8;
+                        return GitShallowManager.write({ gitdir: gitdir, oids: oids });
+
+                      case 8:
+                        _context.next = 17;
+                        break;
+
+                      case 10:
+                        if (!line.startsWith('unshallow')) {
+                          _context.next = 17;
+                          break;
+                        }
+
+                        _oid2 = line.slice(-41).trim();
+
+                        if (!(_oid2.length !== 40)) {
+                          _context.next = 14;
+                          break;
+                        }
+
+                        throw new Error('non-40 character \'shallow\' oid: ' + _oid2);
+
+                      case 14:
+                        oids.delete(_oid2);
+                        _context.next = 17;
+                        return GitShallowManager.write({ gitdir: gitdir, oids: oids });
+
+                      case 17:
+                        next(null, data);
+
+                      case 18:
+                      case 'end':
+                        return _context.stop();
+                    }
+                  }
+                }, _callee, _this);
+              }));
+
+              return function (_x2, _x3) {
+                return _ref3.apply(this, arguments);
+              };
+            }()));
+            return _context2.abrupt('return', response);
+
+          case 57:
           case 'end':
-            return _context.stop();
+            return _context2.stop();
         }
       }
-    }, _callee, this, [[16, 23]]);
+    }, _callee2, this, [[22, 26, 30, 38], [31,, 33, 37], [41, 47]]);
   }));
 
   return function fetchPackfile(_x) {
@@ -3420,38 +3703,41 @@ var fetchPackfile = function () {
 }();
 
 var fetch = function () {
-  var _ref4 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(_ref3) {
-    var gitdir = _ref3.gitdir,
-        _ref3$ref = _ref3.ref,
-        ref = _ref3$ref === undefined ? 'HEAD' : _ref3$ref,
-        remote = _ref3.remote,
-        auth = _ref3.auth;
+  var _ref5 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee3(_ref4) {
+    var gitdir = _ref4.gitdir,
+        _ref4$ref = _ref4.ref,
+        ref = _ref4$ref === undefined ? 'HEAD' : _ref4$ref,
+        remote = _ref4.remote,
+        auth = _ref4.auth,
+        _ref4$depth = _ref4.depth,
+        depth = _ref4$depth === undefined ? 0 : _ref4$depth;
     var response;
-    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context3.prev = _context3.next) {
           case 0:
-            _context2.next = 2;
-            return fetchPackfile({ gitdir: gitdir, ref: ref, remote: remote, auth: auth });
+            _context3.next = 2;
+            return fetchPackfile({ gitdir: gitdir, ref: ref, remote: remote, auth: auth, depth: depth });
 
           case 2:
-            response = _context2.sent;
+            response = _context3.sent;
 
-            // response.packetlines.pipe(process.stdout)
-            response.progress.pipe(process.stdout);
-            _context2.next = 6;
+            response.progress.on('data', function (data) {
+              return console.log(data.toString('utf8'));
+            });
+            _context3.next = 6;
             return unpack({ gitdir: gitdir, inputStream: response.packfile });
 
           case 6:
           case 'end':
-            return _context2.stop();
+            return _context3.stop();
         }
       }
-    }, _callee2, this);
+    }, _callee3, this);
   }));
 
-  return function fetch(_x2) {
-    return _ref4.apply(this, arguments);
+  return function fetch(_x4) {
+    return _ref5.apply(this, arguments);
   };
 }();
 
@@ -5012,6 +5298,7 @@ var Git = function () {
       this.gitdir = dir + '/.git';
     }
     this.operateRemote = 'origin';
+    this.operateDepth = 0;
   }
 
   _createClass(Git, [{
@@ -5054,6 +5341,12 @@ var Git = function () {
     key: 'datetime',
     value: function datetime(date) {
       this.operateAuthorDateTime = date;
+      return this;
+    }
+  }, {
+    key: 'depth',
+    value: function depth(_depth) {
+      this.operateDepth = parseInt(_depth);
       return this;
     }
   }, {
@@ -5133,10 +5426,11 @@ var Git = function () {
                 }
                 params.gitdir = this.gitdir;
                 params.ref = ref;
-                _context2.next = 7;
+                params.depth = this.operateDepth;
+                _context2.next = 8;
                 return fetch(params);
 
-              case 7:
+              case 8:
               case 'end':
                 return _context2.stop();
             }

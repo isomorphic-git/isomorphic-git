@@ -17,8 +17,8 @@ import shasum from 'shasum';
 import simpleGet from 'simple-get';
 import concat from 'simple-concat';
 import stream, { PassThrough } from 'stream';
-import listpack from 'git-list-pack';
 import thru from 'thru';
+import listpack from 'git-list-pack';
 import peek from 'buffer-peek-stream';
 import applyDelta from 'git-apply-delta';
 import parseLinkHeader from 'parse-link-header';
@@ -323,10 +323,18 @@ class GitPktLine {
   }
   static streamReader(stream$$1 /*: ReadableStream */) {
     return async function read() {
-      let hexlength = await readBytes(stream$$1, 4);
-      let length = parseInt(hexlength.toString('utf8'), 16);
-      if (length === 0) return null;
-      let bytes = await readBytes(stream$$1, length - 4);
+      let hexlength, length, bytes;
+      try {
+        hexlength = await readBytes(stream$$1, 4);
+      } catch (err) {
+        // No more file to read
+        return null;
+      }
+      length = parseInt(hexlength.toString('utf8'), 16);
+      // skip over flush packets
+      if (length === 0) return read();
+      // otherwise return the packet content
+      bytes = await readBytes(stream$$1, length - 4);
       return bytes;
     };
   }
@@ -767,6 +775,27 @@ class GitConfigManager {
 }
 
 // @flow
+// TODO: Add file locks.
+class GitShallowManager {
+  static async read({ gitdir }) {
+    let oids = new Set();
+    let text = await read(path.join(gitdir, 'shallow'), { encoding: 'utf8' });
+    if (text === null) return oids;
+    text.trim().split('\n').map(oid => oids.add(oid));
+    return oids;
+  }
+  static async write({ gitdir, oids }) {
+    let text = '';
+    for (let oid of oids) {
+      text += `${oid}\n`;
+    }
+    await write(path.join(gitdir, 'shallow'), text, {
+      encoding: 'utf8'
+    });
+  }
+}
+
+// @flow
 // import LockManager from 'travix-lock-manager'
 // import Lock from './models/utils/lockfile'
 
@@ -962,7 +991,7 @@ class GitRemoteHTTP {
   async stream({
     stream: stream$$1,
     service
-  }) /*: Promise<{packfile: ReadableStream, progress: ReadableStream }> */{
+  }) /*: Promise<{ packfile: ReadableStream, progress: ReadableStream }> */{
     let headers = {};
     headers['content-type'] = `application/x-${service}-request`;
     headers['accept'] = `application/x-${service}-result`;
@@ -989,9 +1018,9 @@ class GitRemoteHTTP {
       let line = await read();
       // A made up convention to signal there's no more to read.
       if (line === null) {
-        packfile.end();
-        progress.end();
         packetlines.end();
+        progress.end();
+        packfile.end();
         return;
       }
       // Examine first byte to determine which output "stream" to use
@@ -1012,7 +1041,7 @@ class GitRemoteHTTP {
           return;
         default:
           // Not part of the side-band-64k protocol
-          packetlines.write(line.slice(1));
+          packetlines.write(line.slice(0));
       }
       // Careful not to blow up the stack.
       // I think Promises in a tail-call position should be OK.
@@ -1026,8 +1055,8 @@ class GitRemoteHTTP {
     };
   } /*: {
     stream: ReadableStream,
-    service: string}
-    */
+    service: string
+    } */
 }
 
 async function add({ gitdir, workdir, filepath }) {
@@ -1223,7 +1252,7 @@ async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: Re
       inputStream.pipe(listpack()).pipe(thru(async ({ data, type, reference, offset, num }, next) => {
         type = types[type];
         if (type === 'ref-delta') {
-          let oid = reference.toString('hex');
+          let oid = Buffer.from(reference).toString('hex');
           try {
             let { object, type } = await GitObjectManager.read({
               gitdir,
@@ -1236,9 +1265,9 @@ async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: Re
               object: result
             });
             // console.log(`${type} ${newoid} ref-delta ${oid}`)
-            offsetMap.set(offset, oid);
+            offsetMap.set(offset, newoid);
           } catch (err) {
-            throw new Error(`Could not find object ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`);
+            throw new Error(`Could not find object ${reference} ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`);
           }
         } else if (type === 'ofs-delta') {
           // Note: this might be not working because offsets might not be
@@ -1278,7 +1307,13 @@ async function unpack({ gitdir, inputStream /*: {gitdir: string, inputStream: Re
 }
 
 // @flow
-async function fetchPackfile({ gitdir, ref = 'HEAD', remote, auth }) {
+async function fetchPackfile({
+  gitdir,
+  ref = 'HEAD',
+  remote,
+  auth,
+  depth = 0
+}) {
   let url = await getConfig({
     gitdir,
     path: `remote "${remote}".url`
@@ -1286,23 +1321,34 @@ async function fetchPackfile({ gitdir, ref = 'HEAD', remote, auth }) {
   let remoteHTTP = new GitRemoteHTTP(url);
   remoteHTTP.auth = auth;
   await remoteHTTP.preparePull();
+  // Check server supports shallow cloning
+  if (depth > 0 && !remoteHTTP.capabilities.has('shallow')) {
+    throw new Error(`Remote does not support shallow fetching`);
+  }
   await GitRefsManager.updateRemoteRefs({
     gitdir,
     remote,
     refs: remoteHTTP.refs
   });
   let want = remoteHTTP.refs.get(ref);
-  console.log('want =', want);
   // Note: I removed "ofs-delta" from the capabilities list and now
   // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${name}@${version}`;
   let packstream = new stream.PassThrough();
   packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`));
+  let oids = await GitShallowManager.read({ gitdir });
+  if (oids.size > 0 && remoteHTTP.capabilities.has('shallow')) {
+    for (let oid of oids) {
+      packstream.write(GitPktLine.encode(`shallow ${oid}\n`));
+    }
+  }
+  if (depth !== 0) {
+    packstream.write(GitPktLine.encode(`deepen ${parseInt(depth)}\n`));
+  }
   packstream.write(GitPktLine.flush());
   let have = null;
   try {
     have = await resolveRef({ gitdir, ref });
-    console.log('have =', have);
   } catch (err) {
     console.log("Looks like we don't have that ref yet.");
   }
@@ -1312,13 +1358,31 @@ async function fetchPackfile({ gitdir, ref = 'HEAD', remote, auth }) {
   }
   packstream.end(GitPktLine.encode(`done\n`));
   let response = await remoteHTTP.pull(packstream);
+  response.packetlines.pipe(thru(async (data, next) => {
+    let line = data.toString('utf8');
+    if (line.startsWith('shallow')) {
+      let oid = line.slice(-41).trim();
+      if (oid.length !== 40) {
+        throw new Error(`non-40 character 'shallow' oid: ${oid}`);
+      }
+      oids.add(oid);
+      await GitShallowManager.write({ gitdir, oids });
+    } else if (line.startsWith('unshallow')) {
+      let oid = line.slice(-41).trim();
+      if (oid.length !== 40) {
+        throw new Error(`non-40 character 'shallow' oid: ${oid}`);
+      }
+      oids.delete(oid);
+      await GitShallowManager.write({ gitdir, oids });
+    }
+    next(null, data);
+  }));
   return response;
 }
 
-async function fetch({ gitdir, ref = 'HEAD', remote, auth }) {
-  let response = await fetchPackfile({ gitdir, ref, remote, auth });
-  // response.packetlines.pipe(process.stdout)
-  response.progress.pipe(process.stdout);
+async function fetch({ gitdir, ref = 'HEAD', remote, auth, depth = 0 }) {
+  let response = await fetchPackfile({ gitdir, ref, remote, auth, depth });
+  response.progress.on('data', data => console.log(data.toString('utf8')));
   await unpack({ gitdir, inputStream: response.packfile });
 }
 
@@ -1752,6 +1816,7 @@ class Git {
       this.gitdir = `${dir}/.git`;
     }
     this.operateRemote = 'origin';
+    this.operateDepth = 0;
   }
   workdir(dir) {
     this.workdir = dir;
@@ -1779,6 +1844,10 @@ class Git {
   }
   datetime(date) {
     this.operateAuthorDateTime = date;
+    return this;
+  }
+  depth(depth) {
+    this.operateDepth = parseInt(depth);
     return this;
   }
   timestamp(seconds) {
@@ -1817,6 +1886,7 @@ class Git {
     }
     params.gitdir = this.gitdir;
     params.ref = ref;
+    params.depth = this.operateDepth;
     await fetch(params);
   }
   async checkout(ref) {
