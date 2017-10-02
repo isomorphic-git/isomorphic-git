@@ -1,6 +1,6 @@
 import test from 'ava'
-import { GitIndex } from '../lib/models'
-import { read } from '../lib/utils'
+import { GitIndex } from '../dist/for-node/models'
+import { read } from '../dist/for-node/utils'
 
 test('GitIndex.from(buffer) - Simple', async t => {
   let buffer = await read('fixtures/test-GitIndex/simple-index')

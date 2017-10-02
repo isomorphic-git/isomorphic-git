@@ -1,4 +1,4 @@
-import { GitIndexManager } from './managers'
+import { GitIndexManager } from '../managers'
 
 export async function list ({ gitdir }) {
   let filenames

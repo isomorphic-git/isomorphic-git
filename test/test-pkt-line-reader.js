@@ -1,5 +1,5 @@
 import test from 'ava'
-import { GitPktLine } from '../lib/models'
+import { GitPktLine } from '../dist/for-node/models'
 
 test('pkt-line-reader string', async t => {
   let read = GitPktLine.reader(Buffer.from('0010hello world\n'))

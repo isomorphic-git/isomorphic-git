@@ -1,6 +1,6 @@
 // @flow
 import { Buffer } from 'buffer'
-import { GitObjectManager } from './managers'
+import { GitObjectManager } from '../managers'
 import pad from 'pad'
 import pako from 'pako'
 import crypto from 'crypto'

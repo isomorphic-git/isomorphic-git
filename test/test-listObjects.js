@@ -1,5 +1,5 @@
 import test from 'ava'
-import { listObjects } from '../lib/commands'
+import { listObjects } from '../dist/for-node/commands'
 
 test('listObjects', async t => {
   let objects = await listObjects({

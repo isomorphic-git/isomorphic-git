@@ -1,7 +1,7 @@
 import path from 'path'
 import pify from 'pify'
-import { GitIndexManager, GitObjectManager } from './managers'
-import { fs, read } from './managers/models/utils'
+import { GitIndexManager, GitObjectManager } from '../managers'
+import { fs, read } from '../utils'
 
 export async function add ({ gitdir, workdir, filepath }) {
   const type = 'blob'

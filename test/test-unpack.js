@@ -1,7 +1,7 @@
 import test from 'ava'
 import git from '..'
 import fs from 'fs'
-import { GitObjectManager } from '../lib/managers'
+import { GitObjectManager } from '../dist/for-node/managers'
 import path from 'path'
 import { exists, tmpdir } from './_helpers'
 

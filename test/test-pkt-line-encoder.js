@@ -1,5 +1,5 @@
 import test from 'ava'
-import { GitPktLine } from '../lib/models'
+import { GitPktLine } from '../dist/for-node/models'
 
 test('pkt-line encode string', async t => {
   let foo = GitPktLine.encode('hello world\n')

@@ -1,7 +1,7 @@
 import pify from 'pify'
-import { GitCommit, GitTree } from './managers/models'
-import { GitObjectManager, GitIndexManager } from './managers'
-import { write, resolveRef, fs } from './managers/models/utils'
+import { GitCommit, GitTree } from '../models'
+import { GitObjectManager, GitIndexManager } from '../managers'
+import { write, resolveRef, fs } from '../utils'
 
 async function writeTreeToDisk ({ gitdir, index, dirpath, tree }) {
   for (let entry of tree) {

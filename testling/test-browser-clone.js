@@ -1,4 +1,4 @@
-const git = require('../dist/for-browserify.js')
+const git = require('../dist/for-browserify')
 const test = require('tape')
 const BrowserFS = require('browserfs')
 window.git = git
