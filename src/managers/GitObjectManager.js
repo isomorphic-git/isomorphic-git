@@ -2,7 +2,7 @@
 import { Buffer } from 'buffer'
 import pako from 'pako'
 import shasum from 'shasum'
-import { read, write, exists } from './models/utils'
+import { read, write, exists } from '../utils'
 
 function wrapObject ({ type, object } /*: {type: string, object: Buffer} */) {
   let buffer = Buffer.concat([

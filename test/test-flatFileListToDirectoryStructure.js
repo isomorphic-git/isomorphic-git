@@ -1,5 +1,5 @@
 import test from 'ava'
-import { flatFileListToDirectoryStructure } from '../lib/utils'
+import { flatFileListToDirectoryStructure } from '../dist/for-node/utils'
 
 test('flatFileListToDirectoryStructure', async t => {
   let inode = flatFileListToDirectoryStructure([{ path: 'hello/there.txt' }])

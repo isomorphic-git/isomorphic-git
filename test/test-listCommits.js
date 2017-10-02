@@ -1,5 +1,5 @@
 import test from 'ava'
-import { listCommits } from '../lib/commands'
+import { listCommits } from '../dist/for-node/commands'
 
 test('listCommits', async t => {
   let commits = await listCommits({

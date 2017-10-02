@@ -1,6 +1,6 @@
 // @flow
-import { GitConfig } from './models'
-import { read, write } from './models/utils'
+import { GitConfig } from '../models'
+import { read, write } from '../utils'
 
 export class GitConfigManager {
   static async get ({ gitdir }) {

@@ -1,7 +1,7 @@
 // @flow
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import path from 'path'
-import { write } from './models/utils'
+import { write } from '../utils'
 
 export class GitRefsManager {
   static async updateRemoteRefs ({ gitdir, remote, refs }) {
@@ -23,5 +23,9 @@ export class GitRefsManager {
         'utf8'
       )
     }
-  } /*: { gitdir: string, remote: string, refs: Map<string, string> } */
+  } /*: {
+    gitdir: string,
+    remote: string,
+    refs: Map<string, string>
+  } */
 }

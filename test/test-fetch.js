@@ -2,7 +2,7 @@ import test from 'ava'
 import git from '..'
 import pify from 'pify'
 import ncp from 'ncp'
-import { read } from '../lib/utils'
+import { read } from '../dist/for-node/utils'
 import { tmpdir, exists } from './_helpers'
 
 test('fetch (from Github)', async t => {

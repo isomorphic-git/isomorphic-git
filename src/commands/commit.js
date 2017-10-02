@@ -1,10 +1,6 @@
-import { GitCommit, GitTree } from './managers/models'
-import { GitObjectManager, GitIndexManager } from './managers'
-import {
-  write,
-  resolveRef,
-  flatFileListToDirectoryStructure
-} from './managers/models/utils'
+import { GitCommit, GitTree } from '../models'
+import { GitObjectManager, GitIndexManager } from '../managers'
+import { write, resolveRef, flatFileListToDirectoryStructure } from '../utils'
 import path from 'path'
 
 async function constructTree ({ gitdir, inode }) /*: string */ {

@@ -1,5 +1,5 @@
 import test from 'ava'
-import { GitRemoteHTTP } from '../lib/managers'
+import { GitRemoteHTTP } from '../dist/for-node/managers'
 import nock from 'nock'
 import server from './_real-http-backend'
 

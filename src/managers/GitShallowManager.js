@@ -1,6 +1,6 @@
 // @flow
 import path from 'path'
-import { read, write } from './models/utils'
+import { read, write } from '../utils'
 // TODO: Add file locks.
 export class GitShallowManager {
   static async read ({ gitdir }) {

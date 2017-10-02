@@ -2,9 +2,9 @@
   "name": "isomorphic-git",
   "version": "0.0.6",
   "description": "Node library for interacting with git repositories, circa 2017",
-  "main": "dist/for-node.js",
-  "browser": "dist/for-browserify.js",
-  "module": "dist/for-future.js",
+  "main": "dist/for-node/",
+  "browser": "dist/for-browserify/",
+  "module": "dist/for-future/",
   "bin": {
     "esgit": "./cli.js"
   },
@@ -14,14 +14,10 @@
   "scripts": {
     "format": "prettier-standard src/**/*.js test/**/*.js testling/**/*.js *.js",
     "lint": "standard src/**/*.js",
-    "watch": "npm-run-all -p watch:*",
-    "watch:lib": "babel src --watch --out-dir lib --source-maps inline",
-    "watch:dist": "rollup -cw",
-    "build": "npm-run-all -p build:lib build:dist",
-    "build:lib": "babel src --out-dir lib --source-maps",
-    "build:dist": "npm-run-all -s build:rollup build:umd",
+    "watch": "rollup -cw",
+    "build": "npm-run-all -s build:rollup build:umd",
     "build:rollup": "rollup -c",
-    "build:umd": "browserify --entry dist/for-browserify.js --standalone git | uglifyjs > dist/bundle.umd.min.js",
+    "build:umd": "browserify --entry dist/for-browserify/index.js --standalone git | uglifyjs > dist/bundle.umd.min.js",
     "test": "npm-run-all -s build -p test:travis test:travis:karma",
     "test:travis": "npm-run-all -s test:travis:ava test:travis:nyc test:travis:codecov",
     "test:travis:ava": "ava",
@@ -72,7 +68,6 @@
   },
   "devDependencies": {
     "ava": "^0.21.0",
-    "babel-cli": "^6.24.1",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
@@ -111,7 +106,7 @@
   },
   "ava": {
     "source": [
-      "dist/for-node.js"
+      "dist/for-node/*"
     ]
   },
   "browserify": {

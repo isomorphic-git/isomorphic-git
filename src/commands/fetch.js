@@ -3,9 +3,9 @@ import stream from 'stream'
 import thru from 'thru'
 import { getConfig } from './getConfig'
 import { unpack } from './unpack'
-import { GitRemoteHTTP, GitRefsManager, GitShallowManager } from './managers'
-import { GitPktLine } from './managers/models'
-import { resolveRef, pkg } from './managers/models/utils'
+import { GitRemoteHTTP, GitRefsManager, GitShallowManager } from '../managers'
+import { GitPktLine } from '../models'
+import { resolveRef, pkg } from '../utils'
 
 export async function fetchPackfile ({
   gitdir,

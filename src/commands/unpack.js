@@ -1,6 +1,6 @@
 // @flow
 import { Buffer } from 'buffer'
-import { GitObjectManager } from './managers'
+import { GitObjectManager } from '../managers'
 import listpack from 'git-list-pack'
 import thru from 'thru'
 import peek from 'buffer-peek-stream'

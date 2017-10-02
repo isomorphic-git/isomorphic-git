@@ -1,10 +1,10 @@
 // @flow
 import { Buffer } from 'buffer'
-import { GitPktLine } from './models'
+import { GitPktLine } from '../models'
 import simpleGet from 'simple-get'
 import concat from 'simple-concat'
 import pify from 'pify'
-import { pkg } from './models/utils'
+import { pkg } from '../utils'
 import { PassThrough } from 'stream'
 
 function basicAuth (auth) {

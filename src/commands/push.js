@@ -1,11 +1,11 @@
 // @flow
 import stream from 'stream'
-import { GitRemoteHTTP } from './managers'
+import { GitRemoteHTTP } from '../managers'
 import { listCommits } from './listCommits'
 import { listObjects } from './listObjects'
 import { pack } from './pack'
-import { GitPktLine } from './managers/models'
-import { resolveRef } from './managers/models/utils'
+import { GitPktLine } from '../models'
+import { resolveRef } from '../utils'
 
 export async function push ({ gitdir, ref = 'HEAD', url, auth }) {
   let oid = await resolveRef({ gitdir, ref })
