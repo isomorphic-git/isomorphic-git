@@ -1,28 +1,40 @@
+import path from 'path'
 import pify from 'pify'
 import { GitCommit, GitTree } from '../models'
 import { GitObjectManager, GitIndexManager } from '../managers'
 import { write, resolveRef, fs } from '../utils'
 
-async function writeTreeToDisk ({ gitdir, index, dirpath, tree }) {
+async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
       gitdir,
       oid: entry.oid
     })
-    let entrypath = `${dirpath}/${entry.path}`
+    let entrypath = path.posix.join(prefix, entry.path)
+    let filepath = path.join(workdir, prefix, entry.path)
     switch (type) {
       case 'blob':
-        await write(entrypath, object)
-        let stats = await pify(fs().lstat)(entrypath)
-        index.insert({ filepath: entrypath, stats, oid: entry.oid })
+        await write(filepath, object)
+        let stats = await pify(fs().lstat)(filepath)
+        index.insert({
+          filepath: entrypath,
+          stats,
+          oid: entry.oid
+        })
         break
       case 'tree':
         let tree = GitTree.from(object)
-        await writeTreeToDisk({ gitdir, index, dirpath: entrypath, tree })
+        await writeTreeToDisk({
+          gitdir,
+          workdir,
+          index,
+          prefix: entrypath,
+          tree
+        })
         break
       default:
         throw new Error(
-          `Unexpected object type ${type} found in tree for '${dirpath}'`
+          `Unexpected object type ${type} found in tree for '${entrypath}'`
         )
     }
   }
@@ -51,7 +63,7 @@ export async function checkout ({ workdir, gitdir, remote, ref }) {
   await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
     index.clear()
     // Write files. TODO: Write them atomically
-    await writeTreeToDisk({ gitdir, index, dirpath: workdir, tree })
+    await writeTreeToDisk({ gitdir, workdir, index, prefix: '', tree })
     // Update HEAD TODO: Handle non-branch cases
     write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
   })
