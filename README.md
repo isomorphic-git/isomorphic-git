@@ -105,7 +105,7 @@ git().gitdir('my-bare-repo').workdir('/var/www/website')
 I realized I could "translate" command line options into JavaScript chained commands
 without hard-coding any knowledge of the API if I kept the chained commands very predictable.
 I built a purely a generic translator and it worked surprisingly well.
-So you can do *any* current or future esgit commands using the included `esgit` CLI.
+So you can do *any* current or future isomorphic-git commands using the included `esgit` CLI.
 It always starts with an implicit `git('.')` so it defaults to working in the
 current working directory.
 
@@ -115,7 +115,7 @@ esgit --gitdir=test init
 
 // Clone from a Github repository to the current working directory.
 // Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
-esgit clone https://github.com/wmhilton/esgit
+esgit clone https://github.com/wmhilton/isomorphic-git
 
 // Checkout a commitish
 esgit checkout master

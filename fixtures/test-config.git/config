@@ -7,7 +7,7 @@ symlinks = false
 ignorecase = true
 
 [remote "origin"]
-url = https://github.com/wmhilton/esgit
+url = https://github.com/wmhilton/isomorphic-git
 fetch = +refs/heads/*:refs/remotes/origin/*
 
 [branch "master"]
