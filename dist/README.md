@@ -1,4 +1,4 @@
-# [isomorphic-git](https://github.com/wmhilton/esgit)
+# [isomorphic-git](https://github.com/wmhilton/isomorphic-git)
 
 These are the "distributable" versions i.e. what's installed by npm.
 There are a few variations, you can pick which makes sense for your use case.

@@ -17,7 +17,7 @@ test('getConfig', async t => {
   let rfv = await repo.getConfig('core.repositoryformatversion')
   let url = await repo.getConfig('remote.origin.url')
   t.is(sym, false)
-  t.is(url, 'https://github.com/wmhilton/esgit')
+  t.is(url, 'https://github.com/wmhilton/isomorphic-git')
   t.is(rfv, '0')
 })
 

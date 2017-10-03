@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wmhilton/esgit.git"
+    "url": "git+https://github.com/wmhilton/isomorphic-git.git"
   },
   "keywords": [
     "git"
@@ -36,9 +36,9 @@
   "author": "William Hilton <wmhilton@gmail.com>",
   "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/wmhilton/esgit/issues"
+    "url": "https://github.com/wmhilton/isomorphic-git/issues"
   },
-  "homepage": "https://github.com/wmhilton/esgit#readme",
+  "homepage": "https://github.com/wmhilton/isomorphic-git#readme",
   "files": [
     "dist",
     "cli.js"
