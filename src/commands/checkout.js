@@ -10,7 +10,7 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
       gitdir,
       oid: entry.oid
     })
-    let entrypath = path.posix.join(prefix, entry.path)
+    let entrypath = prefix === '' ? entry.path : `${prefix}/${entry.path}`
     let filepath = path.join(workdir, prefix, entry.path)
     switch (type) {
       case 'blob':
