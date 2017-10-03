@@ -10,21 +10,20 @@ project called [es-git](https://github.com/es-git/es-git).)
 
 Porcelain:
 
-- [x] git init
-- [ ] git config
-- [x] git checkout
-  - [ ] update index correctly when checking out
+- [x] git clone
+  - [x] git init
+  - [x] git config
+  - [x] git fetch (due to CORS, use https://cors-anywhere.herokuapp.com/https://github.com instead of https://github.com)
+    - [x] ref-deltas
+    - [ ] ofs-deltas
+  - [x] git checkout
+    - [ ] update index SHA correctly
 - [x] git list (ls-files)
 - [x] git add
 - [x] git remove
 - [ ] git status
 - [x] git commit
 - [x] git push (due to CORS, use https://cors-anywhere.herokuapp.com/https://github.com instead of https://github.com)
-- [x] git fetch (due to CORS, use https://cors-anywhere.herokuapp.com/https://github.com instead of https://github.com)
-  - [x] ref-deltas
-  - [ ] ofs-deltas
-- [ ] git pull
-  - [ ] Update refs and HEAD
 - [ ] git tag
 - [ ] git diff
 - [ ] git merge
@@ -49,14 +48,20 @@ Examples:
 ```js
 import git from 'isomorphic-git'
 
-// Create a new empty repo
-git('test').init()
+// Clone a repository
+git('.')
+  .depth(1)
+  .branch('master')
+  .clone('https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git')
 
-// Manually add a remote (git clone should be doing this automatically but it doesn't (yet))
+// Setup an new repository
+git('.').init()
+
+// Manually add a remote
 git('.')
   .setConfig('remote.origin.url', 'https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git')
 
-// Fetch the latest version from a Github repository using a shallow clone
+// Fetch the latest commit using a shallow clone
 git('.')
   .remote('origin')
   .depth(1)
@@ -110,7 +115,7 @@ esgit --gitdir=test init
 
 // Clone from a Github repository to the current working directory.
 // Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
-esgit --githubToken=$GITHUB_TOKEN clone https://github.com/wmhilton/esgit
+esgit clone https://github.com/wmhilton/esgit
 
 // Checkout a commitish
 esgit checkout master
