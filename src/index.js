@@ -1,7 +1,5 @@
-import ghurl from 'github-url-to-object'
 import {
   init,
-  GithubFetch,
   checkout,
   list,
   add,
@@ -29,6 +27,7 @@ class Git {
     }
     this.operateRemote = 'origin'
     this.operateDepth = 0
+    this.operateBranch = 'master'
   }
   workdir (dir) {
     this.workdir = dir
@@ -48,6 +47,10 @@ class Git {
   }
   author (name) {
     this.operateAuthorName = name
+    return this
+  }
+  branch (name) {
+    this.operateBranch = name
     return this
   }
   email (email) {
@@ -111,21 +114,30 @@ class Git {
   }
   async clone (url) {
     await init(this.gitdir)
-    // await addRemote()
-    await GithubFetch({
+    // Add remote
+    await setConfig({
       gitdir: this.gitdir,
-      // TODO: make this not Github-specific
-      user: ghurl(url).user,
-      repo: ghurl(url).repo,
-      ref: ghurl(url).branch,
-      remote: this.operateRemote,
-      token: this.operateToken
+      path: 'remote.origin.url',
+      value: url
     })
+    // Fetch commits
+    let params = {}
+    params.remote = this.operateRemote
+    if (this.operateToken) {
+      params.auth = {
+        username: this.operateToken,
+        password: this.operateToken
+      }
+    }
+    params.gitdir = this.gitdir
+    params.ref = `refs/heads/${this.operateBranch}`
+    params.depth = this.operateDepth
+    await fetch(params)
+    // Checkout branch
     await checkout({
       workdir: this.workdir,
       gitdir: this.gitdir,
-      // TODO: make this not Github-specific
-      ref: ghurl(url).branch,
+      ref: this.operateBranch,
       remote: this.operateRemote
     })
   }
