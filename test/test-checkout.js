@@ -11,7 +11,7 @@ test(async t => {
   await pify(ncp)('fixtures/test-checkout.git', path.join(dir, '.git'))
   await git(dir).checkout('test-branch')
   let files = await pify(fs.readdir)(dir)
-  t.snapshot(files)
+  t.snapshot(files.sort())
   let index = await git(dir).list()
   t.snapshot(index)
 })
