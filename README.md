@@ -13,7 +13,7 @@ Porcelain:
 - [x] git clone
   - [x] git init
   - [x] git config
-  - [x] git fetch (due to CORS, use https://cors-anywhere.herokuapp.com/https://github.com instead of https://github.com)
+  - [x] git fetch (due to CORS, use https://cors-buster-jfpactjnem.now.sh/github.com instead of https://github.com)
     - [x] ref-deltas
     - [ ] ofs-deltas
   - [x] git checkout
@@ -23,7 +23,7 @@ Porcelain:
 - [x] git remove
 - [ ] git status
 - [x] git commit
-- [x] git push (due to CORS, use https://cors-anywhere.herokuapp.com/https://github.com instead of https://github.com)
+- [x] git push (due to CORS, use https://cors-buster-jfpactjnem.now.sh/github.com instead of https://github.com)
 - [ ] git tag
 - [ ] git diff
 - [ ] git merge
@@ -37,11 +37,10 @@ Plumbing:
 - [ ] git list packed objects (verify-pack)
 - [x] git unpack-objects
 
-Note: There appears to be no a way to *push* signed commits back to Github using their API (v3 or v4), so I think we will have to use smart HTTP, packfiles, and an anti-CORS proxy.
-
 ## High-level API (unstable)
 
-This is analogous to the "porcelain" git commands. There is a single function `git()` that serves as a fluent command builder.
+This is analogous to the "porcelain" git commands.
+There is a single function `git()` that serves as a fluent command builder.
 
 Examples:
 
@@ -49,17 +48,18 @@ Examples:
 import git from 'isomorphic-git'
 
 // Clone a repository
+// Tip: use depth(1) for smaller, faster downloads unless you need the full history.
 git('.')
   .depth(1)
   .branch('master')
-  .clone('https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git')
+  .clone('https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
 
 // Setup an new repository
 git('.').init()
 
 // Manually add a remote
 git('.')
-  .setConfig('remote.origin.url', 'https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git')
+  .setConfig('remote.origin.url', 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
 
 // Fetch the latest commit using a shallow clone
 git('.')
@@ -81,7 +81,6 @@ git('.').remove('.env')
 
 // Create a new commit (there's actually several more options for date, committer)
 git('.')
-  .add('a.txt')
   .author('Mr. Test')
   .email('mrtest@example.com')
   .signingKey('-----BEGIN PGP PRIVATE KEY BLOCK-----...')
@@ -97,7 +96,9 @@ git('.')
 
 // And if you need to work with bare repos there are
 // equivalents to the `--git-dir` and `--work-tree` options
-git().gitdir('my-bare-repo').workdir('/var/www/website')
+git()
+  .gitdir('my-bare-repo')
+  .workdir('/var/www/website')
 ```
 
 ### CLI
@@ -138,17 +139,22 @@ esgit --author='Mr. Test' --email=mrtest@example.com --signingKey="$(cat private
 esgit --gitdir=my-bare-repo --workdir=/var/www/website
 ```
 
-## Low-level API (also unstable)
+## Lower-level API (also unstable)
 
 The high-level makes some assumptions (like you have a file-system and network access) that might not be well suited
-to your embedded git-based concept thingy. Fear not! I am
-purposefully building this library as a series of small modules
-so you can pick and choose features as you need them.
+to your embedded git-based concept thingy. Fear not! I have written this library
+as a series of layers that should tree-shake very well:
+
+- index.js (~5kb uncompressed)
+- commands.js (~19kb uncompressed)
+- managers.js (~11kb uncompressed)
+- models.js (~19kb uncompressed)
+- utils.js (~11kb uncompressed)
 
 ### Commands
 
 ```
-import * as managers from 'isomorphic-git/src/commands'
+import * as managers from 'isomorphic-git/dist/for-node/commands'
 ```
 
 Each command is available as its own file, so hopefully with
@@ -158,7 +164,7 @@ if you only need a few and can benefit from tree-shaking.
 ### Managers
 
 ```
-import * as managers from 'isomorphic-git/src/managers'
+import * as managers from 'isomorphic-git/dist/for-node/managers'
 ```
 
 Managers are a level above models. They take care of implementation performance details like
@@ -173,7 +179,7 @@ Managers are a level above models. They take care of implementation performance 
 ### Models
 
 ```
-import * as models from 'isomorphic-git/src/models'
+import * as models from 'isomorphic-git/dist/for-node/models'
 ```
 
 Models are the lowest level building blocks.
@@ -183,7 +189,7 @@ This makes them portable to many different environments so they can be a useful 
 ### Utils
 
 ```
-import * as utils from 'isomorphic-git/src/utils'
+import * as utils from 'isomorphic-git/dist/for-node/utils'
 ```
 
 I lied. Utils are actually the lowest level building blocks.
