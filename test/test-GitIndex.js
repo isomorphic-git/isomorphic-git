@@ -8,7 +8,7 @@ test('GitIndex.from(buffer) - Simple', async t => {
   let rendering = index.render()
   t.snapshot(rendering)
   let buffer2 = index.toObject()
-  t.deepEqual(buffer.slice(0, buffer2.length), buffer2)
+  t.deepEqual(buffer.slice(0, buffer2.length - 20), buffer2.slice(0, -20))
 })
 
 test('GitIndex.from(buffer)', async t => {
@@ -17,5 +17,14 @@ test('GitIndex.from(buffer)', async t => {
   let rendering = index.render()
   t.snapshot(rendering)
   let buffer2 = index.toObject()
-  t.deepEqual(buffer.slice(0, buffer2.length), buffer2)
+  t.deepEqual(buffer.slice(0, buffer2.length - 20), buffer2.slice(0, -20))
+})
+
+test('GitIndex round trip', async t => {
+  let buffer = await read('fixtures/test-GitIndex/index')
+  let index = GitIndex.from(buffer)
+  let buffer2 = index.toObject()
+  let index2 = GitIndex.from(buffer2)
+  let buffer3 = index2.toObject()
+  t.deepEqual(buffer2, buffer3)
 })

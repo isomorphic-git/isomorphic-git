@@ -1,7 +1,7 @@
 [core]
 	repositoryformatversion = 0
 	filemode = false
-	bare = true
+	bare = false
 	symlinks = false
 	ignorecase = true
 [remote "origin"]
