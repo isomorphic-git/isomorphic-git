@@ -2,9 +2,17 @@
 import { Buffer } from 'buffer'
 import sortby from 'lodash/sortBy'
 import BufferCursor from 'buffercursor'
+import shasum from 'shasum'
 
 /*::
 import type {Stats} from 'fs'
+
+type CacheEntryFlags = {
+  assumeValid: boolean,
+  extended: boolean,
+  stage: number,
+  nameLength: number
+}
 
 type CacheEntry = {
   ctime: Date,
@@ -18,12 +26,39 @@ type CacheEntry = {
   gid: number,
   size: number,
   oid: string,
-  flags: number,
+  flags: CacheEntryFlags,
   path: string
 }
 */
 
+// Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
+function parseCacheEntryFlags (bits /*: number */) /*: CacheEntryFlags */ {
+  return {
+    assumeValid: Boolean(bits & 0b1000000000000000),
+    extended: Boolean(bits & 0b0100000000000000),
+    stage: (bits & 0b0011000000000000) >> 12,
+    nameLength: bits & 0b0000111111111111
+  }
+}
+
+function renderCacheEntryFlags (flags /*: CacheEntryFlags */) /*: number */ {
+  return (
+    (flags.assumeValid ? 0b1000000000000000 : 0) +
+    (flags.extended ? 0b0100000000000000 : 0) +
+    ((flags.stage & 0b11) << 12) +
+    (flags.nameLength & 0b111111111111)
+  )
+}
+
 function parseBuffer (buffer) {
+  // Verify shasum
+  let shaComputed = shasum(buffer.slice(0, -20))
+  let shaClaimed = buffer.slice(-20).toString('hex')
+  if (shaClaimed !== shaComputed) {
+    throw new Error(
+      `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
+    )
+  }
   let reader = new BufferCursor(buffer)
   let _entries /*: Map<string, CacheEntry> */ = new Map()
   let magic = reader.toString('utf8', 4)
@@ -51,7 +86,8 @@ function parseBuffer (buffer) {
     entry.gid = reader.readUInt32BE()
     entry.size = reader.readUInt32BE()
     entry.oid = reader.slice(20).toString('hex')
-    entry.flags = reader.readUInt16BE() // TODO: extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
+    let flags = reader.readUInt16BE()
+    entry.flags = parseCacheEntryFlags(flags)
     // TODO: handle if (version === 3 && entry.flags.extended)
     let pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
     if (pathlength < 1) throw new Error(`Got a path length of: ${pathlength}`)
@@ -68,7 +104,6 @@ function parseBuffer (buffer) {
     _entries.set(entry.path, entry)
     i++
   }
-
   return _entries
 }
 
@@ -114,7 +149,12 @@ export class GitIndex {
       size: stats.size,
       path: filepath,
       oid: oid,
-      flags: 0
+      flags: {
+        assumeValid: false,
+        extended: false,
+        stage: 0,
+        nameLength: filepath.length < 0xfff ? filepath.length : 0xfff
+      }
     }
     this._entries.set(entry.path, entry)
     this._dirty = true
@@ -173,11 +213,13 @@ export class GitIndex {
         writer.writeUInt32BE(entry.gid)
         writer.writeUInt32BE(entry.size)
         writer.write(entry.oid, 20, 'hex')
-        writer.writeUInt16BE(entry.flags)
+        writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
         writer.write(entry.path, entry.path.length, 'utf8')
         return written
       })
     )
-    return Buffer.concat([header, body])
+    let main = Buffer.concat([header, body])
+    let sum = shasum(main)
+    return Buffer.concat([main, Buffer.from(sum, 'hex')])
   }
 }
