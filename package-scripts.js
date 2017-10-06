@@ -18,21 +18,14 @@ module.exports = {
         'browserify --entry dist/for-browserify/index.js --standalone git | uglifyjs > dist/bundle.umd.min.js'
     },
     test: {
-      default: series.nps('build', 'test.parallel_tests'),
-      parallel_tests: concurrent.nps('test.travis', 'test.travis.karma'),
-      travis: {
-        default: series.nps(
-          'test.travis.ava',
-          'test.travis.nyc',
-          'test.travis.codecov'
-        ),
-        ava: 'ava --tap',
-        nyc: "nyc ava --tap || echo 'nyc failed, no big deal'",
-        codecov:
-          "nyc report --reporter=lcov > coverage.lcov && codecov || echo 'codecov failed, no big deal'",
-        karma:
-          "karma start ci.karma.conf.js || echo 'saucelabs failed, no big deal'"
-      }
+      default: process.env.CI ? 'nps test.travis' : 'nps test.local',
+      travis: series.nps('build', 'test.parallel'),
+      local: 'nps test.jest',
+      parallel_tests: concurrent.nps('test.jest', 'test.karma'),
+      jest: process.env.CI ? 'jest --coverage && codecov' : 'jest',
+      karma: process.env.CI
+        ? "karma start ci.karma.conf.js || echo 'saucelabs failed, no big deal'"
+        : 'karma'
     }
   }
 }
