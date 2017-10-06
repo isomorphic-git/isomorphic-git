@@ -1,13 +1,10 @@
 import git from '..'
-import pify from 'pify'
-import ncp from 'ncp'
-import { tmpdir, exists } from './__helpers__'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('config', () => {
   test('getConfig', async () => {
     // Setup
-    let clientDir = await tmpdir()
-    await pify(ncp)('__tests__/__fixtures__/test-config.git', clientDir)
+    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
     // Test
     let repo = git().gitdir(clientDir)
     let sym = await repo.getConfig('core.symlinks')
@@ -20,8 +17,7 @@ describe('config', () => {
 
   test('setConfig', async () => {
     // Setup
-    let clientDir = await tmpdir()
-    await pify(ncp)('__tests__/__fixtures__/test-config.git', clientDir)
+    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
     // Test
     let repo = git().gitdir(clientDir)
     let bare

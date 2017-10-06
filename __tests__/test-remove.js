@@ -1,13 +1,10 @@
 import git from '..'
-import pify from 'pify'
-import ncp from 'ncp'
-import { tmpdir } from './__helpers__'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('remove', () => {
   test('file', async () => {
     // Setup
-    let clientDir = await tmpdir()
-    await pify(ncp)('__tests__/__fixtures__/test-remove.git', clientDir)
+    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
     // Test
     const repo = git().gitdir(clientDir)
     let before = await repo.list()
@@ -20,8 +17,7 @@ describe('remove', () => {
 
   test('dir', async () => {
     // Setup
-    let clientDir = await tmpdir()
-    await pify(ncp)('__tests__/__fixtures__/test-remove.git', clientDir)
+    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
     // Test
     const repo = git().gitdir(clientDir)
     let before = await repo.list()

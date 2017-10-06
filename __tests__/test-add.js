@@ -1,14 +1,10 @@
 import git from '..'
-import pify from 'pify'
-import ncp from 'ncp'
-import { tmpdir } from './__helpers__'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('add', () => {
   test('file', async () => {
     // Setup
-    let dir = await tmpdir()
-    console.log('dir =', dir)
-    await pify(ncp)('__tests__/__fixtures__/test-add', dir)
+    let dir = await copyFixtureIntoTempDir(__dirname, 'test-add')
     // Test
     const repo = git(dir)
     await repo.init()

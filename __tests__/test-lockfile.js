@@ -1,18 +1,19 @@
 import fs from 'fs'
-import { tmpdir, exists } from './__helpers__'
+import { existsSync } from 'fs'
 import { lock, unlock, sleep } from '../dist/for-node/utils'
+import { createTempDir } from 'jest-fixtures'
 
 describe('lockfile', () => {
   test('make lockfile', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await lock(dir)
-    expect(exists(`${dir}.lock`)).toBe(true)
+    expect(existsSync(`${dir}.lock`)).toBe(true)
   })
 
   test('cannot double-acquire lockfile', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await lock(dir)
-    expect(exists(`${dir}.lock`)).toBe(true)
+    expect(existsSync(`${dir}.lock`)).toBe(true)
     try {
       await lock(dir)
       throw new Error('Double-acquired lock')
@@ -20,21 +21,21 @@ describe('lockfile', () => {
   })
 
   test('can release lockfile', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await lock(dir)
-    expect(exists(`${dir}.lock`)).toBe(true)
+    expect(existsSync(`${dir}.lock`)).toBe(true)
     await unlock(dir)
     await lock(dir)
-    expect(exists(`${dir}.lock`)).toBe(true)
+    expect(existsSync(`${dir}.lock`)).toBe(true)
     await unlock(dir)
     await sleep(100)
-    expect(exists(`${dir}.lock`)).toBe(false)
+    expect(existsSync(`${dir}.lock`)).toBe(false)
   })
 
   test('cannot double-release lockfile', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await lock(dir)
-    expect(exists(`${dir}.lock`)).toBe(true)
+    expect(existsSync(`${dir}.lock`)).toBe(true)
     await unlock(dir)
     try {
       await unlock(dir)
@@ -43,9 +44,9 @@ describe('lockfile', () => {
   })
 
   test('can retry until acquire lockfile', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await lock(dir)
-    expect(exists(`${dir}.lock`)).toBe(true)
+    expect(existsSync(`${dir}.lock`)).toBe(true)
     setTimeout(() => fs.rmdir(`${dir}.lock`), 100)
     try {
       await lock(dir)

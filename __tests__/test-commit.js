@@ -1,17 +1,14 @@
 import git from '..'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-import ncp from 'ncp'
-import { tmpdir } from './__helpers__'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 jest.setTimeout(30000)
 
 describe('commit', () => {
   test('commit', async () => {
     // Setup
-    let dir = await tmpdir()
-    console.log('dir =', dir)
-    await pify(ncp)('__tests__/__fixtures__/test-commit.git', dir)
+    let dir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
     // Test
     const repo = git()
     repo.gitdir(dir)
@@ -24,9 +21,7 @@ describe('commit', () => {
 
   test('GPG signing', async () => {
     // Setup
-    let dir = await tmpdir()
-    console.log('dir =', dir)
-    await pify(ncp)('__tests__/__fixtures__/test-commit.git', dir)
+    let dir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
     // Test
     const repo = git()
     repo.gitdir(dir)

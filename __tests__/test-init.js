@@ -1,13 +1,14 @@
 import git from '..'
-import { exists, tmpdir } from './__helpers__'
+import { existsSync } from 'fs'
+import { createTempDir } from 'jest-fixtures'
 
 describe('init', () => {
   test('init', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await git(dir).init()
-    expect(exists(dir)).toBe(true)
-    expect(exists(`${dir}/.git/objects`)).toBe(true)
-    expect(exists(`${dir}/.git/refs/heads`)).toBe(true)
-    expect(exists(`${dir}/.git/HEAD`)).toBe(true)
+    expect(existsSync(dir)).toBe(true)
+    expect(existsSync(`${dir}/.git/objects`)).toBe(true)
+    expect(existsSync(`${dir}/.git/refs/heads`)).toBe(true)
+    expect(existsSync(`${dir}/.git/HEAD`)).toBe(true)
   })
 })
