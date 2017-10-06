@@ -1,17 +1,18 @@
 import git from '..'
-import { exists, tmpdir } from './__helpers__'
+import { createTempDir } from 'jest-fixtures'
+import { existsSync } from 'fs'
 
 jest.setTimeout(30000)
 
 describe('clone', () => {
   test('clone', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await git(`${dir}`)
       .depth(1)
       .branch('master')
       .clone(`https://github.com/wmhilton/isomorphic-git`)
-    expect(exists(`${dir}`)).toBe(true)
-    expect(exists(`${dir}/.git/objects`)).toBe(true)
-    expect(exists(`${dir}/.git/refs/remotes/origin/master`)).toBe(true)
+    expect(existsSync(`${dir}`)).toBe(true)
+    expect(existsSync(`${dir}/.git/objects`)).toBe(true)
+    expect(existsSync(`${dir}/.git/refs/remotes/origin/master`)).toBe(true)
   })
 })

@@ -2,11 +2,11 @@ import git from '..'
 import fs from 'fs'
 import { GitObjectManager } from '../dist/for-node/managers'
 import path from 'path'
-import { exists, tmpdir } from './__helpers__'
+import { createTempDir } from 'jest-fixtures'
 
 describe('unpack', () => {
   test('unpack', async () => {
-    let dir = await tmpdir()
+    let dir = await createTempDir()
     await git(dir).init()
     let fixture = fs.createReadStream(
       '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
@@ -36,7 +36,7 @@ describe('unpack', () => {
         oid.slice(0, 2),
         oid.slice(2)
       )
-      let e = await exists(filepath)
+      let e = fs.existsSync(filepath)
       expect(e).toBe(true)
       let { type, object } = await GitObjectManager.read({
         gitdir: path.join(dir, '.git'),

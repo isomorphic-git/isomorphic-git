@@ -1,18 +1,22 @@
 import git from '..'
 import pify from 'pify'
-import ncp from 'ncp'
-import path from 'path'
 import fs from 'fs'
-import { tmpdir } from './__helpers__'
+import { createTempDir, copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('checkout', () => {
   test('checkout', async () => {
-    let dir = await tmpdir()
-    await pify(ncp)('__tests__/__fixtures__/test-checkout.git', path.join(dir, '.git'))
-    await git(dir).checkout('test-branch')
-    let files = await pify(fs.readdir)(dir)
+    let workdir = await createTempDir()
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-checkout.git')
+    await git()
+      .gitdir(gitdir)
+      .workdir(workdir)
+      .checkout('test-branch')
+    let files = await pify(fs.readdir)(workdir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await git(dir).list()
+    let index = await git()
+      .gitdir(gitdir)
+      .workdir(workdir)
+      .list()
     expect(index).toMatchSnapshot()
   })
 })

@@ -3,20 +3,16 @@ import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
 import git from '..'
-import path from 'path'
-import { tmpdir } from './__helpers__'
-import ncp from 'ncp'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('push', () => {
   test('to local git-http-backend', async () => {
     // Setup
-    let serverDir = await tmpdir()
-    let clientDir = await tmpdir()
-    await pify(ncp)(
-      '__tests__/__fixtures__/test-push-server.git',
-      path.join(serverDir, 'foo.git')
+    let serverDir = await copyFixtureIntoTempDir(__dirname, 'test-push-server')
+    let clientDir = await copyFixtureIntoTempDir(
+      __dirname,
+      'test-push-client.git'
     )
-    await pify(ncp)('__tests__/__fixtures__/test-push-client.git', clientDir)
     // Test
     const { get, postReceivePackRequest } = server(serverDir)
     nock('http://example.dev')
@@ -38,8 +34,10 @@ describe('push', () => {
   })
 
   test('to Github', async () => {
-    let clientDir = await tmpdir()
-    await pify(ncp)('__tests__/__fixtures__/test-push-client.git', clientDir)
+    let clientDir = await copyFixtureIntoTempDir(
+      __dirname,
+      'test-push-client.git'
+    )
 
     let res = await git()
       .gitdir(clientDir)

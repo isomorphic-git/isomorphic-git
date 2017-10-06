@@ -4,7 +4,8 @@ const { concurrent, series, runInNewWindow } = require('nps-utils')
 
 module.exports = {
   scripts: {
-    format: 'prettier-standard src/**/*.js test/**/*.js testling/**/*.js *.js',
+    format:
+      'prettier-standard src/**/*.js __tests__/**/*.js testling/**/*.js *.js',
     lint: 'standard src/**/*.js',
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),

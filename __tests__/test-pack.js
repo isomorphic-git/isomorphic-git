@@ -2,16 +2,12 @@ import git from '..'
 import fs from 'fs'
 import stream from 'stream'
 import streamEqual from 'stream-equal'
-import pify from 'pify'
-import ncp from 'ncp'
-import { tmpdir } from './__helpers__'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('pack', () => {
   test('git.pack', async () => {
     // Setup
-    let dir = await tmpdir()
-    console.log('dir =', dir)
-    await pify(ncp)('__tests__/__fixtures__/test-pack.git', dir)
+    let dir = await copyFixtureIntoTempDir(__dirname, 'test-pack.git')
     // Test
     let fixture = fs.createReadStream(
       '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
