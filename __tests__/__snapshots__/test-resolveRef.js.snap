@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`resolveRef 1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9 1`] = `"1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9"`;
+
+exports[`resolveRef test-HEAD 1`] = `"033417ae18b174f078f2f44232cb7a374f4c60ce"`;
+
+exports[`resolveRef test-HEAD depth 1`] = `"refs/heads/master"`;
+
+exports[`resolveRef test-branch 1`] = `"e10ebb90d03eaacca84de1af0a59b444232da99e"`;
+
+exports[`resolveRef test-tag 1`] = `"1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9"`;

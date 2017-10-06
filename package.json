@@ -52,7 +52,7 @@
     "shasum": "^1.0.2",
     "simple-concat": "^1.0.0",
     "simple-get": "^2.7.0",
-    "thru": "0.0.2"
+    "thru": "git+https://github.com/wmhilton-contrib/thru.git#master"
   },
   "devDependencies": {
     "ava": "^0.21.0",
@@ -114,6 +114,11 @@
       "chrome/latest",
       "firefox/latest",
       "ie/latest"
+    ]
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "__helpers__"
     ]
   }
 }

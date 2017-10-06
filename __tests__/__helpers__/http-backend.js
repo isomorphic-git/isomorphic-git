@@ -75,22 +75,3 @@ module.exports = function (rootDir) {
     postUploadPackRequest
   }
 }
-
-if (!module.parent) {
-  // module.exports('test/fixtures').request('/test-GitRemoteHTTP.git/info/refs?service=git-upload-pack').then(
-  let asdf = path.resolve(
-    process.cwd(),
-    'C:\\Users\\Will\\AppData\\Local\\Temp\\d-117820-4048-1ygmtfz.7gt5'
-  )
-  console.log('asdf =', asdf)
-  module
-    .exports(asdf)
-    .request('GET', '/foo/info/refs?service=git-upload-pack')
-    .then(
-      // request('/test-GitRemoteHTTP.git/info/refs?service=git-receive-pack').then(
-      ({ headers, body }) => {
-        console.log(headers)
-        body.pipe(process.stdout)
-      }
-    )
-}
