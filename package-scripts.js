@@ -7,9 +7,9 @@ module.exports = {
     format: 'prettier-standard src/**/*.js test/**/*.js testling/**/*.js *.js',
     lint: 'standard src/**/*.js',
     watch: {
-      default: concurrent.nps('watch.rollup', 'watch.ava'),
+      default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),
-      ava: runInNewWindow('ava -w')
+      jest: runInNewWindow('jest --watch')
     },
     build: {
       default: series.nps('build.rollup', 'build.umd'),
