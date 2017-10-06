@@ -4,11 +4,11 @@ import pify from 'pify'
 import ncp from 'ncp'
 import path from 'path'
 import fs from 'fs'
-import { tmpdir } from './_helpers'
+import { tmpdir } from './helpers'
 
 test(async t => {
   let dir = await tmpdir()
-  await pify(ncp)('fixtures/test-checkout.git', path.join(dir, '.git'))
+  await pify(ncp)('test/fixtures/test-checkout.git', path.join(dir, '.git'))
   await git(dir).checkout('test-branch')
   let files = await pify(fs.readdir)(dir)
   t.snapshot(files.sort())

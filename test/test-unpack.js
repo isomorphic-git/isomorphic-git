@@ -3,13 +3,13 @@ import git from '..'
 import fs from 'fs'
 import { GitObjectManager } from '../dist/for-node/managers'
 import path from 'path'
-import { exists, tmpdir } from './_helpers'
+import { exists, tmpdir } from './helpers'
 
 test('git.unpack', async t => {
   let dir = await tmpdir()
   await git(dir).init()
   let fixture = fs.createReadStream(
-    'fixtures/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
+    'test/fixtures/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
   )
   await git(dir)
     .inputStream(fixture)

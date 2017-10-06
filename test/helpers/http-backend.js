@@ -77,7 +77,7 @@ module.exports = function (rootDir) {
 }
 
 if (!module.parent) {
-  // module.exports('fixtures').request('/test-GitRemoteHTTP.git/info/refs?service=git-upload-pack').then(
+  // module.exports('test/fixtures').request('/test-GitRemoteHTTP.git/info/refs?service=git-upload-pack').then(
   let asdf = path.resolve(
     process.cwd(),
     'C:\\Users\\Will\\AppData\\Local\\Temp\\d-117820-4048-1ygmtfz.7gt5'

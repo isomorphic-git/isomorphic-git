@@ -1,13 +1,16 @@
 import test from 'ava'
 import git from '..'
-import { rm } from '../dist/for-node/utils'
-
-test.beforeEach(async t => {
-  await rm('fixtures/test-add/.git/index')
-})
+import pify from 'pify'
+import ncp from 'ncp'
+import { tmpdir } from './helpers'
 
 test('gitIndex.add(file)', async t => {
-  const repo = git('fixtures/test-add')
+  // Setup
+  let dir = await tmpdir()
+  console.log('dir =', dir)
+  await pify(ncp)('test/fixtures/test-add', dir)
+  // Test
+  const repo = git(dir)
   await repo.init()
   let orig = (await repo.list()).length
   await repo.add('a.txt')

@@ -1,6 +1,6 @@
 import test from 'ava'
 import git from '..'
-import { exists, tmpdir } from './_helpers'
+import { exists, tmpdir } from './helpers'
 
 test(async t => {
   let dir = await tmpdir()

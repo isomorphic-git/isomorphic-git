@@ -3,14 +3,22 @@ import git from '..'
 import fs from 'fs'
 import stream from 'stream'
 import streamEqual from 'stream-equal'
+import pify from 'pify'
+import ncp from 'ncp'
+import { tmpdir } from './helpers'
 
 test('git.pack', async t => {
+  // Setup
+  let dir = await tmpdir()
+  console.log('dir =', dir)
+  await pify(ncp)('test/fixtures/test-pack.git', dir)
+  // Test
   let fixture = fs.createReadStream(
-    'fixtures/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
+    'test/fixtures/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
   )
   let fstream = new stream.PassThrough()
   git()
-    .gitdir('fixtures/test-pack.git')
+    .gitdir(dir)
     .outputStream(fstream)
     .pack([
       '5a9da3272badb2d3c8dbab463aed5741acb15a33',

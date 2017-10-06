@@ -1,9 +1,9 @@
 import test from 'ava'
 import { GitRemoteHTTP } from '../dist/for-node/managers'
 import nock from 'nock'
-import server from './_real-http-backend'
+import server from './helpers/http-backend'
 
-const { get } = server('fixtures')
+const { get } = server('test/fixtures')
 
 test.skip('preparePull (Github response)', async t => {
   let remote = new GitRemoteHTTP('https://github.com/wmhilton/isomorphic-git')

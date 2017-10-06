@@ -17,7 +17,6 @@ Porcelain:
     - [x] ref-deltas
     - [ ] ofs-deltas
   - [x] git checkout
-    - [ ] update index SHA correctly
 - [x] git list (ls-files)
 - [x] git add
 - [x] git remove
@@ -25,7 +24,7 @@ Porcelain:
 - [x] git commit
 - [x] git push (due to CORS, use https://cors-buster-jfpactjnem.now.sh/github.com instead of https://github.com)
 - [ ] git tag
-- [ ] git diff
+- [ ] git diff (should we outsource this and just list files that differ?)
 - [ ] git merge
 - [x] `esgit` CLI
 
