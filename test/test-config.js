@@ -2,7 +2,7 @@ import test from 'ava'
 import git from '..'
 import pify from 'pify'
 import ncp from 'ncp'
-import { tmpdir, exists } from './_helpers'
+import { tmpdir, exists } from './helpers'
 
 // TODO: Use lockfiles and whatever so we stop getting
 // race conditions and can remove the .serial hack
@@ -10,7 +10,7 @@ import { tmpdir, exists } from './_helpers'
 test('getConfig', async t => {
   // Setup
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-config.git', clientDir)
+  await pify(ncp)('test/fixtures/test-config.git', clientDir)
   // Test
   let repo = git().gitdir(clientDir)
   let sym = await repo.getConfig('core.symlinks')
@@ -24,7 +24,7 @@ test('getConfig', async t => {
 test('setConfig', async t => {
   // Setup
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-config.git', clientDir)
+  await pify(ncp)('test/fixtures/test-config.git', clientDir)
   // Test
   let repo = git().gitdir(clientDir)
   let bare

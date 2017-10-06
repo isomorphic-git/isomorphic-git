@@ -1,11 +1,11 @@
 import test from 'ava'
-import server from './_real-http-backend'
+import server from './helpers/http-backend'
 import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
 import git from '..'
 import path from 'path'
-import { tmpdir } from './_helpers'
+import { tmpdir } from './helpers'
 import ncp from 'ncp'
 
 test('push (to local git-http-backend)', async t => {
@@ -13,10 +13,10 @@ test('push (to local git-http-backend)', async t => {
   let serverDir = await tmpdir()
   let clientDir = await tmpdir()
   await pify(ncp)(
-    'fixtures/test-push-server.git',
+    'test/fixtures/test-push-server.git',
     path.join(serverDir, 'foo.git')
   )
-  await pify(ncp)('fixtures/test-push-client.git', clientDir)
+  await pify(ncp)('test/fixtures/test-push-client.git', clientDir)
   // Test
   const { get, postReceivePackRequest } = server(serverDir)
   nock('http://example.dev')
@@ -27,7 +27,7 @@ test('push (to local git-http-backend)', async t => {
     .reply(200, postReceivePackRequest)
 
   let res = await git()
-    .gitdir('fixtures/test-push-client.git')
+    .gitdir(clientDir)
     .remote('pseudo')
     .push('refs/heads/master')
   t.truthy(res)
@@ -42,7 +42,7 @@ test('push (to local git-http-backend)', async t => {
 
 test('push (to Github)', async t => {
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-push-client.git', clientDir)
+  await pify(ncp)('test/fixtures/test-push-client.git', clientDir)
 
   let res = await git()
     .gitdir(clientDir)

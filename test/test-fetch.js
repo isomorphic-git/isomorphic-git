@@ -3,12 +3,12 @@ import git from '..'
 import pify from 'pify'
 import ncp from 'ncp'
 import { read } from '../dist/for-node/utils'
-import { tmpdir, exists } from './_helpers'
+import { tmpdir, exists } from './helpers'
 
 test('fetch (from Github)', async t => {
   // Setup
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-fetch.git', clientDir)
+  await pify(ncp)('test/fixtures/test-fetch.git', clientDir)
   // Test
   await git()
     .gitdir(clientDir)
@@ -20,7 +20,7 @@ test('fetch (from Github)', async t => {
 test('shallow fetch (from Github)', async t => {
   // Setup
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-fetch.git', clientDir)
+  await pify(ncp)('test/fixtures/test-fetch.git', clientDir)
   // Test
   await git()
     .gitdir(clientDir)

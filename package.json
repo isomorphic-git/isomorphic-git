@@ -12,19 +12,9 @@
     "node": ">=7.6.0"
   },
   "scripts": {
-    "format": "prettier-standard src/**/*.js test/**/*.js testling/**/*.js *.js",
-    "lint": "standard src/**/*.js",
-    "watch": "rollup -cw",
-    "build": "npm-run-all -s build:rollup build:umd",
-    "build:rollup": "rollup -c",
-    "build:umd": "browserify --entry dist/for-browserify/index.js --standalone git | uglifyjs > dist/bundle.umd.min.js",
-    "test": "npm-run-all -s build -p test:travis test:travis:karma",
-    "test:travis": "npm-run-all -s test:travis:ava test:travis:nyc test:travis:codecov",
-    "test:travis:ava": "ava",
-    "test:travis:nyc": "nyc ava || echo 'nyc failed, no big deal'",
-    "test:travis:codecov": "nyc report --reporter=lcov > coverage.lcov && codecov || echo 'codecov failed, no big deal'",
-    "test:travis:karma": "karma start ci.karma.conf.js || echo 'saucelabs failed, no big deal'",
-    "precommit": "npm run format"
+    "start": "nps",
+    "test": "nps test",
+    "precommit": "nps format"
   },
   "repository": {
     "type": "git",
@@ -89,6 +79,8 @@
     "ncp": "^2.0.0",
     "nock": "^9.0.17",
     "npm-run-all": "^4.1.1",
+    "nps": "^5.7.1",
+    "nps-utils": "^1.4.0",
     "nyc": "^11.2.1",
     "parse-header-stream": "^1.1.1",
     "prettier-standard": "^6.0.0",

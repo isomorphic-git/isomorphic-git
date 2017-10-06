@@ -3,13 +3,13 @@ import git from '..'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
 import ncp from 'ncp'
-import { tmpdir } from './_helpers'
+import { tmpdir } from './helpers'
 
 test('git.commit()', async t => {
   // Setup
   let dir = await tmpdir()
   console.log('dir =', dir)
-  await pify(ncp)('fixtures/test-commit.git', dir)
+  await pify(ncp)('test/fixtures/test-commit.git', dir)
   // Test
   const repo = git()
   repo.gitdir(dir)
@@ -24,7 +24,7 @@ test('git.signingKey() and git.verificationKey()', async t => {
   // Setup
   let dir = await tmpdir()
   console.log('dir =', dir)
-  await pify(ncp)('fixtures/test-commit.git', dir)
+  await pify(ncp)('test/fixtures/test-commit.git', dir)
   // Test
   const repo = git()
   repo.gitdir(dir)
@@ -32,12 +32,12 @@ test('git.signingKey() and git.verificationKey()', async t => {
   repo.email('mrtest@example.com')
   repo.timestamp(1504842425)
   const privateKeys = await pify(jsonfile.readFile)(
-    'fixtures/openpgp-private-keys.json'
+    'test/fixtures/openpgp-private-keys.json'
   )
   repo.signingKey(privateKeys[0])
   let sha = await repo.commit('Initial commit')
   const publicKeys = await pify(jsonfile.readFile)(
-    'fixtures/openpgp-public-keys.json'
+    'test/fixtures/openpgp-public-keys.json'
   )
   let verified = await repo.verificationKey(publicKeys[0]).verify('HEAD')
   t.true(verified.keys[0] === 'a01edd29ac0f3952')

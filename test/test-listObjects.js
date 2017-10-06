@@ -3,7 +3,7 @@ import { listObjects } from '../dist/for-node/commands'
 
 test('listObjects', async t => {
   let objects = await listObjects({
-    gitdir: 'fixtures/test-listObjects.git',
+    gitdir: 'test/fixtures/test-listObjects.git',
     oids: [
       'c60bbbe99e96578105c57c4b3f2b6ebdf863edbc',
       'e05547ea87ea55eff079de295ff56f483e5b4439',

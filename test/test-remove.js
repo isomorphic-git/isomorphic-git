@@ -2,12 +2,12 @@ import test from 'ava'
 import git from '..'
 import pify from 'pify'
 import ncp from 'ncp'
-import { tmpdir } from './_helpers'
+import { tmpdir } from './helpers'
 
 test('remove(file)', async t => {
   // Setup
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-remove.git', clientDir)
+  await pify(ncp)('test/fixtures/test-remove.git', clientDir)
   // Test
   const repo = git().gitdir(clientDir)
   let before = await repo.list()
@@ -21,7 +21,7 @@ test('remove(file)', async t => {
 test('remove(dir)', async t => {
   // Setup
   let clientDir = await tmpdir()
-  await pify(ncp)('fixtures/test-remove.git', clientDir)
+  await pify(ncp)('test/fixtures/test-remove.git', clientDir)
   // Test
   const repo = git().gitdir(clientDir)
   let before = await repo.list()
