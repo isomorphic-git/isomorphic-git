@@ -68,6 +68,7 @@
     "browserify-shim": "^3.8.14",
     "codecov": "^2.3.0",
     "husky": "^0.14.3",
+    "jest": "^21.2.1",
     "jsonfile": "^3.0.1",
     "karma": "^1.7.1",
     "karma-browserify": "^5.1.1",
