@@ -21,10 +21,12 @@ Porcelain:
 - [x] git add
 - [x] git remove
 - [ ] git status
+  - [x] for an individual file
+  - [ ] for directories
 - [x] git commit
 - [x] git push (due to CORS, use https://cors-buster-jfpactjnem.now.sh/github.com instead of https://github.com)
+- [ ] git ignore
 - [ ] git tag
-- [ ] git diff (should we outsource this and just list files that differ?)
 - [ ] git merge
 - [x] `esgit` CLI
 

@@ -11,7 +11,8 @@ import {
   push,
   fetch,
   getConfig,
-  setConfig
+  setConfig,
+  status
 } from './commands'
 
 export default function git (dir) {
@@ -238,6 +239,13 @@ class Git {
       gitdir: this.gitdir,
       path,
       value
+    })
+  }
+  async status (pathname) {
+    return status({
+      gitdir: this.gitdir,
+      workdir: this.workdir,
+      pathname
     })
   }
 }
