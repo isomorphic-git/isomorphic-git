@@ -12,7 +12,8 @@ import {
   fetch,
   getConfig,
   setConfig,
-  status
+  status,
+  findRoot
 } from './commands'
 
 export default function git (dir) {
@@ -121,6 +122,9 @@ class Git {
   inputStream (stream) {
     this.inputStream = stream
     return this
+  }
+  async findRoot (dir) {
+    return findRoot(dir)
   }
   async init () {
     await init(this.gitdir)

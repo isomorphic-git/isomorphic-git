@@ -112,6 +112,9 @@ git('.').oauth2('github', 'token')
 git('.').oauth2('gitlab', 'token')
 git('.').oauth2('bitbucket', 'token')
 
+// Given a file path, find the nearest parent directory containing a .git folder
+git().findRoot('/path/to/some/gitrepo/path/to/some/file.txt') // '/path/to/some/gitrepo'
+
 // TODO: git.merge(), git.pull(), git.status(), git.diff(), git.tag(), git.branch(), etc
 
 // And if you need to work with bare repos there are
