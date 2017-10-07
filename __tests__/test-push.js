@@ -41,7 +41,7 @@ describe('push', () => {
 
     let res = await git()
       .gitdir(clientDir)
-      .githubToken(process.env.GITHUB_TOKEN)
+      .auth(process.env.GITHUB_TOKEN)
       .remote('origin')
       .push('refs/heads/master')
 

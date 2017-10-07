@@ -38,8 +38,43 @@ class Git {
     this.gitdir = dir
     return this
   }
-  githubToken (token) {
-    this.operateToken = token
+  // This form works for basic username / password auth, or
+  // the newer username / token auth that is often required if
+  // 2FA is enabled.
+  auth (username, password) {
+    // Allow specifying it as one argument (mostly for CLI inputability)
+    if (password === undefined) {
+      let i = username.indexOf(':')
+      if (i > -1) {
+        password = username.slice(i + 1)
+        username = username.slice(0, i)
+      }
+    }
+    this.operateUsername = username
+    this.operatePassword = password || '' // Enables the .auth(GITHUB_TOKEN) no-username shorthand
+    return this
+  }
+  // This for is for actual OAuth2 uses. Unfortunately, the
+  // major players all have different conventions.
+  oauth2 (company, token) {
+    switch (company) {
+      case 'github':
+        this.operateUsername = token
+        this.operatePassword = 'x-oauth-basic'
+        break
+      case 'bitbucket':
+        this.operateUsername = 'x-token-auth'
+        this.operatePassword = token
+        break
+      case 'gitlab':
+        this.operateUsername = 'oauth2'
+        this.operatePassword = token
+        break
+      default:
+        throw new Error(
+          `I don't know how ${company} expects its Basic Auth headers to be formatted for OAuth2 usage. If you do, you can use the regular '.auth(username, password)' to set the basic auth header yourself.`
+        )
+    }
     return this
   }
   remote (name) {
@@ -91,19 +126,14 @@ class Git {
     await init(this.gitdir)
   }
   async fetch (ref) {
-    // TODO replace "auth" with just basicAuthUser and basicAuthPassword
-    let params = {}
-    params.remote = this.operateRemote
-    if (this.operateToken) {
-      params.auth = {
-        username: this.operateToken,
-        password: this.operateToken
-      }
-    }
-    params.gitdir = this.gitdir
-    params.ref = ref
-    params.depth = this.operateDepth
-    await fetch(params)
+    await fetch({
+      gitdir: this.gitdir,
+      ref,
+      depth: this.operateDepth,
+      remote: this.operateRemote,
+      authUsername: this.operateUsername,
+      authPassword: this.operatePassword
+    })
   }
   async checkout (ref) {
     await checkout({
@@ -122,18 +152,14 @@ class Git {
       value: url
     })
     // Fetch commits
-    let params = {}
-    params.remote = this.operateRemote
-    if (this.operateToken) {
-      params.auth = {
-        username: this.operateToken,
-        password: this.operateToken
-      }
-    }
-    params.gitdir = this.gitdir
-    params.ref = `refs/heads/${this.operateBranch}`
-    params.depth = this.operateDepth
-    await fetch(params)
+    await fetch({
+      gitdir: this.gitdir,
+      ref: `refs/heads/${this.operateBranch}`,
+      depth: this.operateDepth,
+      remote: this.operateRemote,
+      authUsername: this.operateUsername,
+      authPassword: this.operatePassword
+    })
     // Checkout branch
     await checkout({
       workdir: this.workdir,
@@ -209,24 +235,18 @@ class Git {
       gitdir: this.gitdir,
       ref,
       url,
-      auth: {
-        username: this.operateToken,
-        password: this.operateToken
-      }
+      authUsername: this.operateUsername,
+      authPassword: this.operatePassword
     })
   }
   async pull (ref) {
-    let params = {}
-    params.remote = this.operateRemote
-    if (this.operateToken) {
-      params.auth = {
-        username: this.operateToken,
-        password: this.operateToken
-      }
-    }
-    params.gitdir = this.gitdir
-    params.ref = ref
-    return fetch(params)
+    return fetch({
+      gitdir: this.gitdir,
+      ref,
+      remote: this.operateRemote,
+      authUsername: this.operateUsername,
+      authPassword: this.operatePassword
+    })
   }
   async getConfig (path) {
     return getConfig({

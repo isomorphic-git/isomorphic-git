@@ -11,7 +11,8 @@ export async function fetchPackfile ({
   gitdir,
   ref = 'HEAD',
   remote,
-  auth,
+  authUsername,
+  authPassword,
   depth = 0
 }) {
   let url = await getConfig({
@@ -19,7 +20,12 @@ export async function fetchPackfile ({
     path: `remote.${remote}.url`
   })
   let remoteHTTP = new GitRemoteHTTP(url)
-  remoteHTTP.auth = auth
+  if (authUsername !== undefined && authPassword !== undefined) {
+    remoteHTTP.auth = {
+      username: authUsername,
+      password: authPassword
+    }
+  }
   await remoteHTTP.preparePull()
   // Check server supports shallow cloning
   if (depth > 0 && !remoteHTTP.capabilities.has('shallow')) {
@@ -82,8 +88,22 @@ export async function fetchPackfile ({
   return response
 }
 
-export async function fetch ({ gitdir, ref = 'HEAD', remote, auth, depth = 0 }) {
-  let response = await fetchPackfile({ gitdir, ref, remote, auth, depth })
+export async function fetch ({
+  gitdir,
+  ref = 'HEAD',
+  remote,
+  authUsername,
+  authPassword,
+  depth = 0
+}) {
+  let response = await fetchPackfile({
+    gitdir,
+    ref,
+    remote,
+    authUsername,
+    authPassword,
+    depth
+  })
   response.progress.on('data', data => console.log(data.toString('utf8')))
   await unpack({ gitdir, inputStream: response.packfile })
 }
