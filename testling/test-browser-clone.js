@@ -3,35 +3,20 @@ const test = require('tape')
 const BrowserFS = require('browserfs')
 window.git = git
 test('clone', t => {
-  t.plan(4)
+  t.plan(1)
   BrowserFS.install(window)
   BrowserFS.configure({ fs: 'LocalStorage' }, function (err) {
     if (err) return t.fail(err)
     window.fs = window.require('fs')
     t.ok(window.fs, 'Loaded window.fs')
     git('.')
-      .init()
+      .depth(1)
+      .branch('master')
+      .clone(
+        'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git'
+      )
       .then(function () {
-        t.pass('init')
-
-        git('.')
-          .setConfig(
-            'remote.origin.url',
-            'https://cors-anywhere.herokuapp.com/https://github.com/wmhilton/isomorphic-git'
-          )
-          .then(function () {
-            t.pass('add remote')
-
-            git('.')
-              .remote('origin')
-              .depth(1)
-              .fetch('refs/heads/master')
-              .then(function () {
-                t.pass('fetch')
-              })
-              .catch(t.fail)
-          })
-          .catch(t.fail)
+        t.pass('clone')
       })
       .catch(t.fail)
   })
