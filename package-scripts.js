@@ -26,7 +26,7 @@ module.exports = {
       jest: process.env.CI ? 'jest --coverage && codecov' : 'jest',
       karma: process.env.CI
         ? "karma start ci.karma.conf.js || echo 'saucelabs failed, no big deal'"
-        : 'karma'
+        : 'karma start'
     }
   }
 }
