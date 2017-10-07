@@ -53,6 +53,17 @@ export class GitObjectManager {
     return { type, object }
   }
 
+  static async hash ({ gitdir, type, object }) /*: Promise<string> */ {
+    let buffer = Buffer.concat([
+      Buffer.from(type + ' '),
+      Buffer.from(object.byteLength.toString()),
+      Buffer.from([0]),
+      Buffer.from(object)
+    ])
+    let oid = shasum(buffer)
+    return oid
+  }
+
   static async write ({ gitdir, type, object }) /*: Promise<string> */ {
     let { file, oid } = wrapObject({ type, object })
     let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
