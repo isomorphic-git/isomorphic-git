@@ -89,9 +89,28 @@ git('.')
 
 // Push a branch back to Github
 git('.')
-  .githubToken(process.env.GITHUB_TOKEN)
+  .auth(process.env.GITHUB_TOKEN)
   .remote('origin')
   .push('refs/heads/master')
+
+// Basic Authentication - may not work if 2FA is enabled on your account!
+git('.').auth('username', 'password')
+
+// a one-argument version is also supported
+git('.').auth('username:password')
+
+// Personal Access Token Authentication
+// (note Bitbucket calls theirs App Passwords instead for some reason)
+git('.').auth('username', 'personal access token')
+git('.').auth('username', 'app password')
+git('.').auth('personal access token') // Github (only) lets you leave out the username
+
+// OAuth2 Token Authentication
+// (each of the major players formats OAuth2 headers slightly differently
+// so you must pass the name of the company as the first argument)
+git('.').oauth2('github', 'token')
+git('.').oauth2('gitlab', 'token')
+git('.').oauth2('bitbucket', 'token')
 
 // TODO: git.merge(), git.pull(), git.status(), git.diff(), git.tag(), git.branch(), etc
 

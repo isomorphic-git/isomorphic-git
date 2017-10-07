@@ -7,10 +7,21 @@ import { pack } from './pack'
 import { GitPktLine } from '../models'
 import { resolveRef } from '../utils'
 
-export async function push ({ gitdir, ref = 'HEAD', url, auth }) {
+export async function push ({
+  gitdir,
+  ref = 'HEAD',
+  url,
+  authUsername,
+  authPassword
+}) {
   let oid = await resolveRef({ gitdir, ref })
   let remote = new GitRemoteHTTP(url)
-  remote.auth = auth
+  if (authUsername !== undefined && authPassword !== undefined) {
+    remote.auth = {
+      username: authUsername,
+      password: authPassword
+    }
+  }
   await remote.preparePush()
   let commits = await listCommits({
     gitdir,
