@@ -8,7 +8,6 @@ describe('GitRemoteHTTP', () => {
   test.skip('preparePull (Github response)', async () => {
     let remote = new GitRemoteHTTP('https://github.com/wmhilton/isomorphic-git')
     await remote.preparePull()
-    console.log(remote)
     expect(remote).toBeTruthy()
   })
 
@@ -30,7 +29,6 @@ describe('GitRemoteHTTP', () => {
 
     let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
     await remote.preparePull()
-    console.log(remote)
     expect(remote).toBeTruthy()
   })
 
@@ -41,7 +39,6 @@ describe('GitRemoteHTTP', () => {
 
     let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
     await remote.preparePull()
-    console.log(remote)
     // console.log(remote.capabilities)
     expect(remote).toBeTruthy()
   })
