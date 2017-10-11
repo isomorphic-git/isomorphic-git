@@ -78,6 +78,7 @@ const browserifyConfig = input => ({
   output: [
     { format: 'cjs', name: 'git', file: `dist/for-browserify/${input}` }
   ],
+  sourcemap: true,
   plugins: [
     json(),
     babel({
