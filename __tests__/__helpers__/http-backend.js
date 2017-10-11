@@ -20,7 +20,6 @@ module.exports = function (rootDir) {
     }
     let proc = exec('git http-backend', options)
     if (postStream && typeof postStream.pipe === 'function') {
-      console.log('STREAMING INTO STDIN PIPE')
       postStream.pipe(proc.stdin)
     }
     const body = new stream.PassThrough()
@@ -28,7 +27,6 @@ module.exports = function (rootDir) {
       proc.stdout
         .pipe(
           parseHeaderStream(function (err, headers) {
-            console.log('headers =', headers)
             if (err) reject(err)
             else resolve(headers)
           })
