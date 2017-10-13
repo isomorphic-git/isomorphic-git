@@ -5,10 +5,12 @@ import server from './__helpers__/http-backend'
 const { get } = server('__tests__/__fixtures__')
 
 describe('GitRemoteHTTP', () => {
-  test.skip('preparePull (Github response)', async () => {
+  test('preparePull (Github response)', async () => {
     let remote = new GitRemoteHTTP('https://github.com/wmhilton/isomorphic-git')
     await remote.preparePull()
     expect(remote).toBeTruthy()
+    expect(remote.symrefs.size > 0)
+    expect(remote.symrefs.get('HEAD')).toBe('refs/heads/master')
   })
 
   test('preparePull (mock response)', async () => {

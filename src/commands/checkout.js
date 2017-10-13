@@ -43,11 +43,22 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
 export async function checkout ({ workdir, gitdir, remote, ref }) {
   // Get tree oid
   let oid
-  try {
-    oid = await resolveRef({ gitdir, ref })
-  } catch (e) {
-    oid = await resolveRef({ gitdir, ref: `${remote}/${ref}` })
+  if (remote) {
+    let remoteRef
+    if (ref === undefined) {
+      remoteRef = await resolveRef({ gitdir, ref: `${remote}/HEAD`, depth: 2 })
+      ref = path.basename(remoteRef)
+    } else {
+      remoteRef = `${remote}/${ref}`
+    }
+    oid = await resolveRef({ gitdir, ref: remoteRef })
+    // Make the remote ref our own!
     await write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
+  } else {
+    if (ref === undefined) {
+      throw new Error('Cannot checkout ref "undefined"')
+    }
+    oid = await resolveRef({ gitdir, ref })
   }
   let commit = await GitObjectManager.read({ gitdir, oid })
   if (commit.type !== 'commit') {

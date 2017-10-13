@@ -17,6 +17,7 @@ export class GitRemoteHTTP {
   /*::
   GIT_URL : string
   refs : Map<string, string>
+  symrefs : Map<string, string>
   capabilities : Set<string>
   auth : { username : string, password : string }
   */
@@ -34,6 +35,7 @@ export class GitRemoteHTTP {
   async discover (service /*: string */) {
     this.capabilities = new Set()
     this.refs = new Map()
+    this.symrefs = new Map()
     let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
     if (this.auth) {
@@ -84,6 +86,15 @@ export class GitRemoteHTTP {
           .trim()
           .split(' ')
         this.refs.set(name, ref)
+      }
+    }
+    // Symrefs are thrown into the "capabilities" unfortunately.
+    for (let cap of this.capabilities) {
+      if (cap.startsWith('symref=')) {
+        let m = cap.match(/symref=([^:]+):(.*)/)
+        if (m.length === 3) {
+          this.symrefs.set(m[1], `ref: ${m[2]}`)
+        }
       }
     }
   }
