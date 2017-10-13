@@ -52,7 +52,6 @@ import git from 'isomorphic-git'
 // Tip: use depth(1) for smaller, faster downloads unless you need the full history.
 git('.')
   .depth(1)
-  .branch('master')
   .clone('https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
 
 // Setup an new repository
@@ -66,7 +65,7 @@ git('.')
 git('.')
   .remote('origin')
   .depth(1)
-  .fetch('refs/heads/master')
+  .fetch('master')
 
 // Checkout a commitish
 git('.').checkout('master')
