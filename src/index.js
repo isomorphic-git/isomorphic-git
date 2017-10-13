@@ -27,7 +27,6 @@ class Git {
       this.workdir = dir
       this.gitdir = `${dir}/.git`
     }
-    this.operateRemote = 'origin'
     this.operateDepth = 0
   }
   workdir (dir) {
@@ -133,7 +132,7 @@ class Git {
       gitdir: this.gitdir,
       ref,
       depth: this.operateDepth,
-      remote: this.operateRemote,
+      remote: this.operateRemote || 'origin',
       authUsername: this.operateUsername,
       authPassword: this.operatePassword
     })
@@ -159,7 +158,7 @@ class Git {
       gitdir: this.gitdir,
       ref: this.operateBranch,
       depth: this.operateDepth,
-      remote: this.operateRemote,
+      remote: this.operateRemote || 'origin',
       authUsername: this.operateUsername,
       authPassword: this.operatePassword
     })
@@ -168,7 +167,7 @@ class Git {
       workdir: this.workdir,
       gitdir: this.gitdir,
       ref: this.operateBranch,
-      remote: this.operateRemote
+      remote: this.operateRemote || 'origin'
     })
   }
   async list () {
@@ -231,7 +230,7 @@ class Git {
   async push (ref) {
     let url = await getConfig({
       gitdir: this.gitdir,
-      path: `remote.${this.operateRemote}.url`
+      path: `remote.${this.operateRemote || 'origin'}.url`
     })
     console.log('url =', url)
     return push({
@@ -246,7 +245,7 @@ class Git {
     return fetch({
       gitdir: this.gitdir,
       ref,
-      remote: this.operateRemote,
+      remote: this.operateRemote || 'origin',
       authUsername: this.operateUsername,
       authPassword: this.operatePassword
     })
