@@ -9,7 +9,7 @@ import { resolveRef, pkg } from '../utils'
 
 export async function fetchPackfile ({
   gitdir,
-  ref = 'HEAD',
+  ref,
   remote,
   authUsername,
   authPassword,
@@ -34,9 +34,10 @@ export async function fetchPackfile ({
   await GitRefsManager.updateRemoteRefs({
     gitdir,
     remote,
-    refs: remoteHTTP.refs
+    refs: remoteHTTP.refs,
+    symrefs: remoteHTTP.symrefs
   })
-  let want = remoteHTTP.refs.get(ref)
+  let want = await resolveRef({ gitdir, ref: `refs/remotes/${remote}/${ref}` })
   // Note: I removed "ofs-delta" from the capabilities list and now
   // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${pkg.name}@${pkg.version}`
@@ -56,7 +57,6 @@ export async function fetchPackfile ({
   try {
     have = await resolveRef({ gitdir, ref })
   } catch (err) {
-    console.log("Looks like we don't have that ref yet.")
   }
   if (have) {
     packstream.write(GitPktLine.encode(`have ${have}\n`))

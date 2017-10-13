@@ -29,7 +29,6 @@ class Git {
     }
     this.operateRemote = 'origin'
     this.operateDepth = 0
-    this.operateBranch = 'master'
   }
   workdir (dir) {
     this.workdir = dir
@@ -158,7 +157,7 @@ class Git {
     // Fetch commits
     await fetch({
       gitdir: this.gitdir,
-      ref: `refs/heads/${this.operateBranch}`,
+      ref: this.operateBranch,
       depth: this.operateDepth,
       remote: this.operateRemote,
       authUsername: this.operateUsername,

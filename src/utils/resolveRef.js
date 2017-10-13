@@ -15,10 +15,8 @@ export async function resolveRef ({ gitdir, ref, depth }) {
     return resolveRef({ gitdir, ref, depth })
   }
   // Is it a complete and valid SHA?
-  if (ref.length === 40) {
-    if (await exists(`${gitdir}/objects/${ref.slice(0, 2)}/${ref.slice(2)}`)) {
-      return ref
-    }
+  if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
+    return ref
   }
   // Is it a special ref?
   if (ref === 'HEAD' || ref === 'MERGE_HEAD') {
