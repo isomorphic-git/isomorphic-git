@@ -14,7 +14,7 @@ describe('fetch', () => {
     await git()
       .gitdir(clientDir)
       .remote('origin')
-      .fetch('refs/heads/master')
+      .fetch('master')
   })
 
   test('shallow fetch (from Github)', async () => {
@@ -25,7 +25,7 @@ describe('fetch', () => {
       .gitdir(clientDir)
       .depth(1)
       .remote('origin')
-      .fetch('refs/heads/test-branch-shallow-clone')
+      .fetch('test-branch-shallow-clone')
     expect(existsSync(`${clientDir}/shallow`)).toBe(true)
     let shallow = await read(`${clientDir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
@@ -34,7 +34,7 @@ describe('fetch', () => {
       .gitdir(clientDir)
       .depth(2)
       .remote('origin')
-      .fetch('refs/heads/test-branch-shallow-clone')
+      .fetch('test-branch-shallow-clone')
     shallow = await read(`${clientDir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '86ec153c7b48e02f92930d07542680f60d104d31\n').toBe(true)
   })
