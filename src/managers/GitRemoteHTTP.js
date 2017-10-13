@@ -93,7 +93,7 @@ export class GitRemoteHTTP {
       if (cap.startsWith('symref=')) {
         let m = cap.match(/symref=([^:]+):(.*)/)
         if (m.length === 3) {
-          this.symrefs.set(m[1], `ref: ${m[2]}`)
+          this.symrefs.set(m[1], m[2])
         }
       }
     }
