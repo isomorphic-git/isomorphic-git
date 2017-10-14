@@ -5,22 +5,21 @@ JavaScript library for interacting with git repositories, circa 2017
 
 Isomorphic-git is a pure ECMAScript 2017+ re-implementation of [git](https://git-scm.com/)
 that works on the desktop and on the web. On the desktop (or laptop, whatever) it
-uses Node and its core `fs` library. On the web, it works with any modern browser
+uses Node and its core "fs" library. On the web, it works with any modern browser
 (see list above) and the [BrowserFS](https://www.npmjs.com/package/browserfs)
-library. This means you can do all the same things in the browser
-- git pull, git commit, git push -
-that you are used to doing on your desktop.
+library. This means you can do all the same things you are used to doing on
+your desktop - git pull, git commit, git push - in the browser.
 
-This changes everything. Git is the lingua fraca of source code control, and
+**This is a big deal.** Git is the lingua fraca of source code control, and
 the web is made out of source code. Client-side JavaScript can now be used to read
 *and write* to the web the same way you've been editing websites on your desktop
 since 2008 - using git.
 
 Isomorphic-git does not impliment every feature found in the canonical git
 implementation. But it does aim to be 100% compatible with it. This means it
-does all its operations by modifying files in a `.git` directory just like the
+does all its operations by modifying files in a ".git" directory just like the
 git you are used to. You can use the `isogit` CLI to operate on existing git
-repositories you may already have on your desktop or server.
+repositories on your desktop or server.
 
 ## High-level API (unstable)
 
@@ -243,3 +242,16 @@ import * as utils from 'isomorphic-git/dist/for-node/utils'
 ```
 
 I lied. Utils are actually the lowest level building blocks.
+
+## Similar projects
+
+- [js-git](https://github.com/creationix/js-git)
+- [es-git](https://github.com/es-git/es-git)
+
+## Credits
+
+Isomorphic-git would not have been possible without the pioneering work by
+@creationix and @chrisdickinson. Git is a tricky binary mess, and without
+their examples (and their modules!) I would not have been able to come even
+close to finishing this. They are geniuses ahead of their time.
+
