@@ -42,6 +42,7 @@ Plumbing:
 
 This is analogous to the "porcelain" git commands.
 There is a single function `git()` that serves as a fluent command builder.
+All of these commands return a Promise, so in practice you would `await` them.
 
 Examples:
 
@@ -85,6 +86,10 @@ git('.')
   .email('mrtest@example.com')
   .signingKey('-----BEGIN PGP PRIVATE KEY BLOCK-----...')
   .commit('Added the a.txt file')
+
+// Save the author details to .git/config so you don't have to specify them each time.
+git('.').setConfig('user.name', 'Mr. Test')
+git('.').setConfig('user.email', 'mrtest@example.com')
 
 // Push a branch back to Github
 git('.')
@@ -130,34 +135,67 @@ without hard-coding any knowledge of the API if I kept the chained commands very
 I built a purely a generic translator and it worked surprisingly well.
 So you can do *any* current or future isomorphic-git commands using the included `esgit` CLI.
 It always starts with an implicit `git('.')` so it defaults to working in the
-current working directory.
+current working directory. (Note I may change that soon, now that I have a `findRoot`
+function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 
-```
-// Create a new empty repo
-esgit --gitdir=test init
+```bash
+# Create a new empty repo
+esgit init
 
-// Clone from a Github repository to the current working directory.
-// Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
-esgit clone https://github.com/wmhilton/isomorphic-git
+# Clone from a Github repository to the current working directory.
+# Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
+esgit --depth=1 clone https://github.com/wmhilton/isomorphic-git
 
-// Checkout a commitish
+# Manually add a remote
+esgit setConfig remote.origin.url https://github.com/wmhilton/isomorphic-git
+
+# Fetch the latest commit using a shallow clone
+esgit --remote=origin --depth=1 fetch master
+  
+# Checkout a commitish
 esgit checkout master
 
-// List files in the index
+# List files in the index
 esgit list
 
-// Add files to the index
+# Add files to the index
 esgit add README.md
 
-// Remove files from the index
+# Remove files from the index
 esgit remove .env
 
-// Create a new commit (there's actually several more options for date, committer)
+# Create a new commit (there's actually several more options for date, committer)
 esgit add a.txt
 esgit --author='Mr. Test' --email=mrtest@example.com --signingKey="$(cat private.key)" commit 'Added the a.txt file'
 
-// And if you need to work with bare repos there are
-// equivalents to the `--git-dir` and `--work-tree` options
+# Save the author details to .git/config so you don't have to specify them each time.
+esgit setConfig user.name 'Mr. Test'
+esgit setConfig user.email mrtest@example.com
+
+# Push a branch back to Github
+esgit --auth="$GITHUB_TOKEN" --remote=origin push master
+  
+# Basic Authentication - may not work if 2FA is enabled on your account!
+esgit --auth='username:password'
+
+# Personal Access Token Authentication
+# (note Bitbucket calls theirs App Passwords instead for some reason)
+esgit --auth="username:$TOKEN"
+
+# OAuth2 Token Authentication
+# (each of the major players formats OAuth2 headers slightly differently
+# so you must pass the name of the company as the first argument)
+# Also, the CLI version is a little wonky since this is the odd function
+# I made that takes two arguments, boo hoo.
+esgit --oauth2 github --oauth2 $TOKEN
+esgit --oauth2 gitlab --oauth2 $TOKEN
+esgit --oauth2 bitbucket --oauth2 $TOKEN
+
+# Given a file path, find the nearest parent directory containing a .git folder
+esgit findRoot /path/to/some/gitrepo/path/to/some/file.txt  # /path/to/some/gitrepo
+
+# And if you need to work with bare repos there are
+# equivalents to the `--git-dir` and `--work-tree` options
 esgit --gitdir=my-bare-repo --workdir=/var/www/website
 ```
 
