@@ -7,13 +7,7 @@ import { pack } from './pack'
 import { GitPktLine } from '../models'
 import { resolveRef } from '../utils'
 
-export async function push ({
-  gitdir,
-  ref,
-  url,
-  authUsername,
-  authPassword
-}) {
+export async function push ({ gitdir, ref, url, authUsername, authPassword }) {
   // TODO: Figure out how pushing tags works. (This only works for branches.)
   let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
   let oid = await resolveRef({ gitdir, ref })
