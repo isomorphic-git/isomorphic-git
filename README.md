@@ -90,7 +90,7 @@ git('.')
 git('.')
   .auth(process.env.GITHUB_TOKEN)
   .remote('origin')
-  .push('refs/heads/master')
+  .push('master')
 
 // Basic Authentication - may not work if 2FA is enabled on your account!
 git('.').auth('username', 'password')
