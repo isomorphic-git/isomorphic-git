@@ -6,7 +6,7 @@
   "browser": "dist/for-browserify/",
   "module": "dist/for-future/",
   "bin": {
-    "esgit": "./cli.js"
+    "isogit": "./cli.js"
   },
   "engines": {
     "node": ">=7.6.0"
