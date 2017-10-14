@@ -3,37 +3,24 @@ JavaScript library for interacting with git repositories, circa 2017
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
 
-# Progress
+Isomorphic-git is a pure ECMAScript 2017+ re-implementation of [git](https://git-scm.com/)
+that works on the desktop and on the web. On the desktop (or laptop, whatever) it
+uses Node and its core `fs` library. On the web, it works with any modern browser
+(see list above) and the [BrowserFS](https://www.npmjs.com/package/browserfs)
+library. This means you can do all the same things in the browser
+- git pull, git commit, git push -
+that you are used to doing on your desktop.
 
-Porcelain:
+This changes everything. Git is the lingua fraca of source code control, and
+the web is made out of source code. Client-side JavaScript can now be used to read
+*and write* to the web the same way you've been editing websites on your desktop
+since 2008 - using git.
 
-- [x] git clone
-  - [x] git init
-  - [x] git config
-  - [x] git fetch (due to CORS, use https://cors-buster-jfpactjnem.now.sh/github.com instead of https://github.com)
-    - [x] ref-deltas
-    - [ ] ofs-deltas
-  - [x] git checkout
-- [x] git list (ls-files)
-- [x] git add
-- [x] git remove
-- [ ] git status
-  - [x] for an individual file
-  - [ ] for directories
-- [x] git commit
-- [x] git push (due to CORS, use https://cors-buster-jfpactjnem.now.sh/github.com instead of https://github.com)
-- [ ] git ignore
-- [ ] git tag
-- [ ] git merge
-- [x] `isogit` CLI
-
-Plumbing:
-
-- [ ] read-tree
-- [x] git listCommits (rev-list)
-- [x] git pack (pack-objects)
-- [ ] git list packed objects (verify-pack)
-- [x] git unpack-objects
+Isomorphic-git does not impliment every feature found in the canonical git
+implementation. But it does aim to be 100% compatible with it. This means it
+does all its operations by modifying files in a `.git` directory just like the
+git you are used to. You can use the `isogit` CLI to operate on existing git
+repositories you may already have on your desktop or server.
 
 ## High-level API (unstable)
 
