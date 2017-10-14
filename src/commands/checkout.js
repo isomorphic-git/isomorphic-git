@@ -2,7 +2,7 @@ import path from 'path'
 import pify from 'pify'
 import { GitCommit, GitTree } from '../models'
 import { GitObjectManager, GitIndexManager } from '../managers'
-import { write, resolveRef, fs } from '../utils'
+import { rm, write, resolveRef, fs } from '../utils'
 
 async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
   for (let entry of tree) {
@@ -72,6 +72,15 @@ export async function checkout ({ workdir, gitdir, remote, ref }) {
   let tree = GitTree.from(object)
   // Acquire a lock on the index
   await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
+    // TODO: Big optimization possible here.
+    // Instead of deleting and rewriting everything, only delete files
+    // that are not present in the new branch, and only write files that
+    // are not in the index or are in the index but have the wrong SHA.
+    for (let entry of index) {
+      try {
+        await rm(path.join(workdir, entry.path))
+      } catch (err) {}
+    }
     index.clear()
     // Write files. TODO: Write them atomically
     await writeTreeToDisk({ gitdir, workdir, index, prefix: '', tree })
