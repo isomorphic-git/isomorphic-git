@@ -13,7 +13,8 @@ import {
   getConfig,
   setConfig,
   status,
-  findRoot
+  findRoot,
+  listBranches
 } from './commands'
 
 export default function git (dir) {
@@ -268,6 +269,11 @@ class Git {
       gitdir: this.gitdir,
       workdir: this.workdir,
       pathname
+    })
+  }
+  async listBranches () {
+    return listBranches({
+      gitdir: this.gitdir
     })
   }
 }
