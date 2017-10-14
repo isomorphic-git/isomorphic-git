@@ -116,6 +116,9 @@ git('.').oauth2('bitbucket', 'token')
 // Given a file path, find the nearest parent directory containing a .git folder
 git().findRoot('/path/to/some/gitrepo/path/to/some/file.txt') // '/path/to/some/gitrepo'
 
+// List local branches
+git('.').listBranches()
+
 // TODO: git.merge(), git.pull(), git.status(), git.diff(), git.tag(), git.branch(), etc
 
 // And if you need to work with bare repos there are
@@ -190,6 +193,9 @@ isogit --oauth2 bitbucket --oauth2 $TOKEN
 
 # Given a file path, find the nearest parent directory containing a .git folder
 isogit findRoot /path/to/some/gitrepo/path/to/some/file.txt  # /path/to/some/gitrepo
+
+# List local branches
+isogit listBranches
 
 # And if you need to work with bare repos there are
 # equivalents to the `--git-dir` and `--work-tree` options
