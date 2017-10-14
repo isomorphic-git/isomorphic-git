@@ -9,11 +9,13 @@ import { resolveRef } from '../utils'
 
 export async function push ({
   gitdir,
-  ref = 'HEAD',
+  ref,
   url,
   authUsername,
   authPassword
 }) {
+  // TODO: Figure out how pushing tags works. (This only works for branches.)
+  let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
   let oid = await resolveRef({ gitdir, ref })
   let remote = new GitRemoteHTTP(url)
   if (authUsername !== undefined && authPassword !== undefined) {
@@ -31,9 +33,9 @@ export async function push ({
   let objects = await listObjects({ gitdir, oids: commits })
   let packstream = new stream.PassThrough()
   let oldoid =
-    remote.refs.get(ref) || '0000000000000000000000000000000000000000'
+    remote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
   packstream.write(
-    GitPktLine.encode(`${oldoid} ${oid} ${ref}\0 report-status\n`)
+    GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 report-status\n`)
   )
   packstream.write(GitPktLine.flush())
   pack({
