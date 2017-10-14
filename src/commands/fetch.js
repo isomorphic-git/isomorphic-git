@@ -56,8 +56,7 @@ export async function fetchPackfile ({
   let have = null
   try {
     have = await resolveRef({ gitdir, ref })
-  } catch (err) {
-  }
+  } catch (err) {}
   if (have) {
     packstream.write(GitPktLine.encode(`have ${have}\n`))
     packstream.write(GitPktLine.flush())

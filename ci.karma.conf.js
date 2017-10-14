@@ -23,8 +23,11 @@ module.exports = function (config) {
     },
     sl_android_chrome: {
       base: 'SauceLabs',
+      deviceName: 'Android Emulator',
+      platformName: 'Android',
+      platformVersion: '6.0',
       browserName: 'Chrome',
-      platformName: 'Android'
+      appiumVersion: '1.6.3'
     }
   }
   config.set({
