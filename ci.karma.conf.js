@@ -24,7 +24,7 @@ module.exports = function (config) {
     sl_android_chrome: {
       base: 'SauceLabs',
       browserName: 'Chrome',
-      platform: 'Android'
+      platformName: 'Android'
     }
   }
   config.set({
