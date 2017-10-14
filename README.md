@@ -1,9 +1,6 @@
 # isomorphic-git [![Build Status](https://travis-ci.org/wmhilton/isomorphic-git.svg?branch=master)](https://travis-ci.org/wmhilton/isomorphic-git) [![codecov](https://codecov.io/gh/wmhilton/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/wmhilton/isomorphic-git)
 JavaScript library for interacting with git repositories, circa 2017
 
-(Originally I was going to call it `esgit` but the name is too similar to another
-project called [es-git](https://github.com/es-git/es-git).)
-
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
 
 # Progress
@@ -28,7 +25,7 @@ Porcelain:
 - [ ] git ignore
 - [ ] git tag
 - [ ] git merge
-- [x] `esgit` CLI
+- [x] `isogit` CLI
 
 Plumbing:
 
@@ -133,70 +130,70 @@ git()
 I realized I could "translate" command line options into JavaScript chained commands
 without hard-coding any knowledge of the API if I kept the chained commands very predictable.
 I built a purely a generic translator and it worked surprisingly well.
-So you can do *any* current or future isomorphic-git commands using the included `esgit` CLI.
+So you can do *any* current or future isomorphic-git commands using the included `isogit` CLI.
 It always starts with an implicit `git('.')` so it defaults to working in the
 current working directory. (Note I may change that soon, now that I have a `findRoot`
 function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 
 ```bash
 # Create a new empty repo
-esgit init
+isogit init
 
 # Clone from a Github repository to the current working directory.
 # Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
-esgit --depth=1 clone https://github.com/wmhilton/isomorphic-git
+isogit --depth=1 clone https://github.com/wmhilton/isomorphic-git
 
 # Manually add a remote
-esgit setConfig remote.origin.url https://github.com/wmhilton/isomorphic-git
+isogit setConfig remote.origin.url https://github.com/wmhilton/isomorphic-git
 
 # Fetch the latest commit using a shallow clone
-esgit --remote=origin --depth=1 fetch master
+isogit --remote=origin --depth=1 fetch master
   
 # Checkout a commitish
-esgit checkout master
+isogit checkout master
 
 # List files in the index
-esgit list
+isogit list
 
 # Add files to the index
-esgit add README.md
+isogit add README.md
 
 # Remove files from the index
-esgit remove .env
+isogit remove .env
 
 # Create a new commit (there's actually several more options for date, committer)
-esgit add a.txt
-esgit --author='Mr. Test' --email=mrtest@example.com --signingKey="$(cat private.key)" commit 'Added the a.txt file'
+isogit add a.txt
+isogit --author='Mr. Test' --email=mrtest@example.com --signingKey="$(cat private.key)" commit 'Added the a.txt file'
 
 # Save the author details to .git/config so you don't have to specify them each time.
-esgit setConfig user.name 'Mr. Test'
-esgit setConfig user.email mrtest@example.com
+isogit setConfig user.name 'Mr. Test'
+isogit setConfig user.email mrtest@example.com
 
 # Push a branch back to Github
-esgit --auth="$GITHUB_TOKEN" --remote=origin push master
+isogit --auth="$GITHUB_TOKEN" --remote=origin push master
   
 # Basic Authentication - may not work if 2FA is enabled on your account!
-esgit --auth='username:password'
+isogit --auth='username:password'
 
 # Personal Access Token Authentication
 # (note Bitbucket calls theirs App Passwords instead for some reason)
-esgit --auth="username:$TOKEN"
+isogit --auth="username:$TOKEN"
 
 # OAuth2 Token Authentication
 # (each of the major players formats OAuth2 headers slightly differently
 # so you must pass the name of the company as the first argument)
 # Also, the CLI version is a little wonky since this is the odd function
 # I made that takes two arguments, boo hoo.
-esgit --oauth2 github --oauth2 $TOKEN
-esgit --oauth2 gitlab --oauth2 $TOKEN
-esgit --oauth2 bitbucket --oauth2 $TOKEN
+isogit --oauth2 github --oauth2 $TOKEN
+isogit --oauth2 gitlab --oauth2 $TOKEN
+isogit --oauth2 bitbucket --oauth2 $TOKEN
 
 # Given a file path, find the nearest parent directory containing a .git folder
-esgit findRoot /path/to/some/gitrepo/path/to/some/file.txt  # /path/to/some/gitrepo
+isogit findRoot /path/to/some/gitrepo/path/to/some/file.txt  # /path/to/some/gitrepo
 
 # And if you need to work with bare repos there are
 # equivalents to the `--git-dir` and `--work-tree` options
-esgit --gitdir=my-bare-repo --workdir=/var/www/website
+isogit --gitdir=my-bare-repo --workdir=/var/www/website
 ```
 
 ## Lower-level API (also unstable)

@@ -4,19 +4,12 @@ import path from 'path'
 import { write } from '../utils'
 
 export class GitRefsManager {
-  static async updateRemoteRefs (
-    {
-      gitdir,
-      remote,
-      refs,
-      symrefs
-    } /*: {
+  static async updateRemoteRefs ({ gitdir, remote, refs, symrefs } /*: {
       gitdir: string,
       remote: string,
       refs: Map<string, string>,
       symrefs: Map<string, string>
-    } */
-  ) {
+    } */) {
     // Validate input
     for (let [key, value] of refs) {
       if (!value.match(/[0-9a-f]{40}/)) {
