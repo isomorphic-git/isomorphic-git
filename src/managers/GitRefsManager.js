@@ -11,11 +11,11 @@ export class GitRefsManager {
       refs,
       symrefs
     } /*: {
-    gitdir: string,
-    remote: string,
-    refs: Map<string, string>,
-    symrefs: Map<string, string>
-  } */
+      gitdir: string,
+      remote: string,
+      refs: Map<string, string>,
+      symrefs: Map<string, string>
+    } */
   ) {
     // Validate input
     for (let [key, value] of refs) {
