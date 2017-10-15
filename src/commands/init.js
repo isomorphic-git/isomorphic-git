@@ -1,7 +1,7 @@
 // @flow
 import { write, mkdirs } from '../utils'
 
-export async function init (gitdir /*: string */) {
+export async function init ({ gitdir } /*: { gitdir: string } */) {
   let folders = [
     'hooks',
     'info',

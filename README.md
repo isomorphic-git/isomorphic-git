@@ -21,64 +21,455 @@ does all its operations by modifying files in a ".git" directory just like the
 git you are used to. You can use the `isogit` CLI to operate on existing git
 repositories on your desktop or server.
 
-## High-level API (unstable)
+## CLI
 
-This is analogous to the "porcelain" git commands.
-There is a single function `git()` that serves as a fluent command builder.
-All of these commands return a Promise, so in practice you would `await` them.
+I realized I could "translate" command line options into JavaScript chained commands
+without hard-coding any knowledge of the API if I kept the chained commands very predictable.
+I built a purely a generic translator and it worked surprisingly well.
+So you can do *any* current or future isomorphic-git commands using the included `isogit` CLI.
+It always starts with an implicit `git('.')` so it defaults to working in the
+current working directory. (Note I may change that soon, now that I have a `findRoot`
+function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 
-Examples:
+## API docs
+
+I may continue to make small changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
+
+### Initialize a new repository
 
 ```js
+// Fluent API example
 import git from 'isomorphic-git'
+git('.').init()
+```
 
-// Clone a repository
-// Tip: use depth(1) for smaller, faster downloads unless you need the full history.
+```sh
+# CLI example
+isogit init
+```
+
+```js
+// Complete JS API
+import { init } from 'isomorphic-git/commands'
+init({
+  gitdir
+})
+// Fluent equivalent
+git()
+  .gitdir(gitdir)
+  .init()
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @returns `Promise<void>`
+
+### Clone a repository
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
 git('.')
   .depth(1)
   .clone('https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
+```
 
-// Setup an new repository
-git('.').init()
+```sh
+# CLI example
+isogit --depth=1 clone https://github.com/wmhilton/isomorphic-git
+```
 
-// Manually add a remote
-git('.')
-  .setConfig('remote.origin.url', 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
+```js
+// Complete JS API
+import { clone } from 'isomorphic-git/commands'
+clone({
+  workdir,
+  gitdir,
+  depth,
+  ref,
+  authUsername,
+  authPassword,
+  remote,
+  url
+})
+// Fluent equivalent
+git()
+  .workdir(workdir)
+  .gitdir(gitdir)
+  .depth(depth)
+  .branch(ref)
+  .auth(authUsername, authPassword)
+  .remote(remote)
+  .clone(url)
+```
 
-// Fetch the latest commit using a shallow clone
+- @param {string} `workdir` - The path to the working directory.
+- @param {string} `gitdir` - The path to the git directory.
+- @param {integer} [`depth=0`] - Determines how much of the git repository's history to retrieve. If not specified it defaults to 0 which means the entire repo history.
+- @param {string} [`ref=undefined`] - Which branch to clone. By default this is the designated "main branch" of the repository.
+- @param {string} [`authUsername=undefined`] - The username to use with Basic Auth
+- @param {string} [`authPassword=undefined`] - The password to use with Basic Auth
+- @param {string} [`remote='origin'`] - What to name the remote that is created. The default is 'origin'.
+- @param {string} `url` - The URL of the remote repository.
+- @returns `Promise<void>`
+
+### Fetch commits
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
 git('.')
   .remote('origin')
   .depth(1)
   .fetch('master')
+```
 
-// Checkout a commitish
-git('.').checkout('master')
+```sh
+# CLI example
+isogit --remote=origin --depth=1 fetch master
+```
 
-// List files in the index
-git('.').list()
+```js
+// Complete JS API
+import { fetch } from 'isomorphic-git/commands'
+fetch({
+  gitdir,
+  depth,
+  ref,
+  authUsername,
+  authPassword,
+  remote,
+  url
+})
+// Fluent equivalent
+git()
+  .gitdir(gitdir)
+  .depth(depth)
+  .auth(authUsername, authPassword)
+  .url(url)
+  .fetch(ref)
+```
 
-// Add files to the index
-git('.').add('README.md')
+- @param {string} `gitdir` - The path to the git directory.
+- @param {integer} [`depth=0`] - Determines how much of the git repository's history to retrieve. If not specified it defaults to 0 which means the entire repo history.
+- @param {string} [`ref=undefined`] - Which branch to fetch from. By default this is the currently checked out branch.
+- @param {string} [`authUsername=undefined`] - The username to use with Basic Auth
+- @param {string} [`authPassword=undefined`] - The password to use with Basic Auth
+- @param {string} [`url=undefined`] - The URL of the remote git server. The default is the value set in the git config for that remote.
+- @param {string} [`remote='origin'`] - If URL is not specified, determines which remote to use.
+- @returns `Promise<void>`
 
-// Remove files from the index
-git('.').remove('.env')
+## Checkout a branch
 
-// Create a new commit (there's actually several more options for date, committer)
+```js
+// Fluent API example
+import git from 'isomorphic-git'
+git('.')
+  .checkout('master')
+```
+
+```sh
+# CLI example
+isogit checkout master
+```
+
+```js
+// Complete JS API
+import { checkout } from 'isomorphic-git/commands'
+checkout({
+  workdir,
+  gitdir,
+  ref,
+  remote
+})
+// Fluent equivalent
+git()
+  .workdir(workdir)
+  .gitdir(gitdir)
+  .remote(remote)
+  .checkout(ref)
+```
+
+- @param {string} `workdir` - The path to the working directory.
+- @param {string} `gitdir` - The path to the git directory.
+- @param {string} [`ref=undefined`] - Which branch to clone. By default this is the designated "main branch" of the repository.
+- @param {string} [`remote='origin'`] - What to name the remote that is created. The default is 'origin'.
+- @returns `Promise<void>`
+
+### List all the tracked files in a repo
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
+git('.')
+  .list()
+```
+
+```sh
+# CLI example
+isogit list
+```
+
+```js
+// Complete JS API
+import { list } from 'isomorphic-git/commands'
+list({
+  gitdir
+})
+// Fluent equivalent
+git()
+  .gitdir(gitdir)
+  .list()
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @returns `Promise<string[]>` - A list of file paths.
+
+### Add files to the git index (aka staging area)
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
+git('.')
+  .add('README.md')
+```
+
+```sh
+# CLI example
+isogit add README.md
+```
+
+```js
+// Complete JS API
+import { add } from 'isomorphic-git/commands'
+add({
+  workdir,
+  gitdir,
+  filepath
+})
+// Fluent equivalent
+git()
+  .workdir(workdir)
+  .gitdir(gitdir)
+  .add(filepath)
+```
+
+- @param {string} `workdir` - The path to the working directory.
+- @param {string} `gitdir` - The path to the git directory.
+- @param {string} `filepath` - The path to the file to add to the index.
+- @returns `Promise<void>`
+
+### Remove files from the git index (aka staging area)
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
+git('.')
+  .remove('README.md')
+```
+
+```sh
+# CLI example
+isogit remove README.md
+```
+
+```js
+// Complete JS API
+import { remove } from 'isomorphic-git/commands'
+remove({
+  gitdir,
+  filepath
+})
+// Fluent equivalent
+git()
+  .gitdir(gitdir)
+  .remove(filepath)
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @param {string} `filepath` - The path to the file to add to the index.
+- @returns `Promise<void>`
+
+### Create a new commit
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
 git('.')
   .author('Mr. Test')
   .email('mrtest@example.com')
   .signingKey('-----BEGIN PGP PRIVATE KEY BLOCK-----...')
   .commit('Added the a.txt file')
+```
 
-// Save the author details to .git/config so you don't have to specify them each time.
-git('.').setConfig('user.name', 'Mr. Test')
-git('.').setConfig('user.email', 'mrtest@example.com')
+```sh
+# CLI example
+isogit --author='Mr. Test' \
+       --email=mrtest@example.com \
+       --signingKey="$(cat private.key)" \
+       commit 'Added the a.txt file'
+```
 
-// Push a branch back to Github
+```js
+// Complete JS API
+import { commit } from 'isomorphic-git/commands'
+commit({
+  gitdir,
+  author: {
+    name,
+    email,
+    timestamp,
+    date
+  },
+  committer: {
+    name,
+    email,
+    timestamp,
+    date
+  },
+  message,
+  privateKeys
+})
+// Fluent equivalent
+git()
+  .gitdir(gitdir)
+  .author(author.name)
+  .email(author.email)
+  .timestamp(author.timestamp)
+  .datetime(author.date)
+  .signingKey(privateKeys)
+  .commit(message)
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @param {Object} `author` - The details about the commit author.
+- @param {string} [`author.name=undefined`] - Default is `user.name` config.
+- @param {string} [`author.email=undefined`] - Default is `user.email` config.
+- @param {Date} [`author.date=new Date()`] - Set the author timestamp field. Default is the current date.
+- @param {integer} [`author.timestamp=undefined`] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+- @param {Object} [`committer=author`] - The details about the commit author. If not specified, the author details are used.
+- @param {string} `message` - The commit message to use.
+- @param {string} [`privateKeys=undefined`] - A PGP private key in ASCII armor format.
+- @returns `Promise<void>`
+
+### Push a branch
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
 git('.')
   .auth(process.env.GITHUB_TOKEN)
   .remote('origin')
   .push('master')
+```
+
+```sh
+# CLI example
+isogit --auth="$GITHUB_TOKEN" --remote=origin push master
+```
+
+```js
+// Complete JS API
+import { push } from 'isomorphic-git/commands'
+push({
+  gitdir,
+  depth,
+  ref,
+  remote,
+  url,
+  authUsername,
+  authPassword,
+  remote
+})
+// Fluent equivalent
+git()
+  .gitdir(gitdir)
+  .depth(depth)
+  .remote(remote)
+  .url(url)
+  .auth(authUsername, authPassword)
+  .push(ref)
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @param {integer} [`depth=0`] - Determines how much of the git repository's history to retrieve. If not specified it defaults to 0 which means the entire repo history.
+- @param {string} [`ref=undefined`] - Which branch to push. By default this is the currently checked out branch of the repository.
+- @param {string} [`authUsername=undefined`] - The username to use with Basic Auth
+- @param {string} [`authPassword=undefined`] - The password to use with Basic Auth
+- @param {string} [`url=undefined`] - The URL of the remote git server. The default is the value set in the git config for that remote.
+- @param {string} [`remote='origin'`] - If URL is not specified, determines which remote to use.
+- @returns `Promise<void>`
+
+### Find the root git directory
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
+git()
+  .findRoot('/path/to/some/gitrepo/path/to/some/file.txt')
+// returns '/path/to/some/gitrepo'
+```
+
+```sh
+# CLI example
+isogit findRoot /path/to/some/gitrepo/path/to/some/file.txt
+# prints /path/to/some/gitrepo
+```
+
+```js
+// Complete JS API
+import { findRoot } from 'isomorphic-git/commands'
+findRoot(dir)
+// Fluent equivalent
+git()
+  .findRoot(dir)
+```
+
+- @param {string} `dir` - Starting at directory {dir}, walk upwards until you find a directory that contains a '.git' directory.
+- @returns `Promise<rootdir>` that directory, which is presumably the root directory of the git repository containing {dir}.
+
+### List all local branches
+
+```js
+// Fluent API example
+import git from 'isomorphic-git'
+git('.').listBranches()
+```
+
+```sh
+# CLI example
+isogit listBranches
+```
+
+```js
+// Complete JS API
+import { listBranches } from 'isomorphic-git/commands'
+listBranches({
+  gitdir
+})
+// Fluent equivalent
+git()
+  .gitdir(gitdir)
+  .listBranches()
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @returns `Promise<branches[]>` an array of branch names.
+
+### Using git config
+
+```js
+// Save the author details to .git/config so you don't have to specify them each time.
+git('.').setConfig('user.name', 'Mr. Test')
+git('.').setConfig('user.email', 'mrtest@example.com')
+
+// Manually add a remote
+git('.')
+  .setConfig('remote.origin.url', 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
+```
+
+### All authentication options
+
+```js
 
 // Basic Authentication - may not work if 2FA is enabled on your account!
 git('.').auth('username', 'password')
@@ -98,95 +489,32 @@ git('.').auth('personal access token') // Github (only) lets you leave out the u
 git('.').oauth2('github', 'token')
 git('.').oauth2('gitlab', 'token')
 git('.').oauth2('bitbucket', 'token')
+```
 
-// Given a file path, find the nearest parent directory containing a .git folder
-git().findRoot('/path/to/some/gitrepo/path/to/some/file.txt') // '/path/to/some/gitrepo'
+### Using a non-standard working tree or git directory
 
-// List local branches
-git('.').listBranches()
-
-// TODO: git.merge(), git.pull(), git.status(), git.diff(), git.tag(), git.branch(), etc
-
-// And if you need to work with bare repos there are
-// equivalents to the `--git-dir` and `--work-tree` options
+```js
+// Fluent API example
+import git from 'isomorphic-git'
 git()
   .gitdir('my-bare-repo')
   .workdir('/var/www/website')
 ```
 
-### CLI
-
-I realized I could "translate" command line options into JavaScript chained commands
-without hard-coding any knowledge of the API if I kept the chained commands very predictable.
-I built a purely a generic translator and it worked surprisingly well.
-So you can do *any* current or future isomorphic-git commands using the included `isogit` CLI.
-It always starts with an implicit `git('.')` so it defaults to working in the
-current working directory. (Note I may change that soon, now that I have a `findRoot`
-function. I may change the default to `git(git().findRoot(process.cwd()))`.)
-
-```bash
-# Create a new empty repo
-isogit init
-
-# Clone from a Github repository to the current working directory.
-# Just like it's counterpart, clone is really just shorthand for git.init(); git.fetch(); git.checkout();
-isogit --depth=1 clone https://github.com/wmhilton/isomorphic-git
-
-# Manually add a remote
-isogit setConfig remote.origin.url https://github.com/wmhilton/isomorphic-git
-
-# Fetch the latest commit using a shallow clone
-isogit --remote=origin --depth=1 fetch master
-  
-# Checkout a commitish
-isogit checkout master
-
-# List files in the index
-isogit list
-
-# Add files to the index
-isogit add README.md
-
-# Remove files from the index
-isogit remove .env
-
-# Create a new commit (there's actually several more options for date, committer)
-isogit add a.txt
-isogit --author='Mr. Test' --email=mrtest@example.com --signingKey="$(cat private.key)" commit 'Added the a.txt file'
-
-# Save the author details to .git/config so you don't have to specify them each time.
-isogit setConfig user.name 'Mr. Test'
-isogit setConfig user.email mrtest@example.com
-
-# Push a branch back to Github
-isogit --auth="$GITHUB_TOKEN" --remote=origin push master
-  
-# Basic Authentication - may not work if 2FA is enabled on your account!
-isogit --auth='username:password'
-
-# Personal Access Token Authentication
-# (note Bitbucket calls theirs App Passwords instead for some reason)
-isogit --auth="username:$TOKEN"
-
-# OAuth2 Token Authentication
-# (each of the major players formats OAuth2 headers slightly differently
-# so you must pass the name of the company as the first argument)
-# Also, the CLI version is a little wonky since this is the odd function
-# I made that takes two arguments, boo hoo.
-isogit --oauth2 github --oauth2 $TOKEN
-isogit --oauth2 gitlab --oauth2 $TOKEN
-isogit --oauth2 bitbucket --oauth2 $TOKEN
-
-# Given a file path, find the nearest parent directory containing a .git folder
-isogit findRoot /path/to/some/gitrepo/path/to/some/file.txt  # /path/to/some/gitrepo
-
-# List local branches
-isogit listBranches
-
-# And if you need to work with bare repos there are
-# equivalents to the `--git-dir` and `--work-tree` options
+```sh
+# CLI example
 isogit --gitdir=my-bare-repo --workdir=/var/www/website
 ```
+
+- @param {string} `workdir` - The path to the working directory.
+
+The working directory is where your files are checked out.
+Usually this is the parent directory of ".git" but it doesn't have to be.
+
+- @param {string} `gitdir` - The path to the git directory.
+
+The git directory is where your git repository history is stored.
+Usually this is a directory called ".git" inside your working directory.
 
 ## Lower-level API (also unstable)
 
@@ -208,7 +536,8 @@ import * as managers from 'isomorphic-git/dist/for-node/commands'
 
 Each command is available as its own file, so hopefully with
 a bit of finagling you will be able to import individual commands
-if you only need a few and can benefit from tree-shaking.
+if you only need a few and are willint to sacrifice the fluent API
+in order to optimize your bundle size.
 
 ### Managers
 
@@ -254,4 +583,3 @@ Isomorphic-git would not have been possible without the pioneering work by
 @creationix and @chrisdickinson. Git is a tricky binary mess, and without
 their examples (and their modules!) I would not have been able to come even
 close to finishing this. They are geniuses ahead of their time.
-
