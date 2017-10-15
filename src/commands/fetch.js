@@ -11,14 +11,19 @@ export async function fetchPackfile ({
   gitdir,
   ref,
   remote,
+  url,
   authUsername,
   authPassword,
   depth = 0
 }) {
-  let url = await getConfig({
-    gitdir,
-    path: `remote.${remote}.url`
-  })
+  depth = parseInt(depth)
+  remote = remote || 'origin'
+  if (url === undefined) {
+    url = await getConfig({
+      gitdir,
+      path: `remote.${remote}.url`
+    })
+  }
   let remoteHTTP = new GitRemoteHTTP(url)
   if (authUsername !== undefined && authPassword !== undefined) {
     remoteHTTP.auth = {
@@ -91,6 +96,7 @@ export async function fetch ({
   gitdir,
   ref = 'HEAD',
   remote,
+  url,
   authUsername,
   authPassword,
   depth = 0
@@ -99,6 +105,7 @@ export async function fetch ({
     gitdir,
     ref,
     remote,
+    url,
     authUsername,
     authPassword,
     depth

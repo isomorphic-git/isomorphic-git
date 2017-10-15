@@ -16,7 +16,7 @@ module.exports = {
       default: series.nps('build.rollup', 'build.umd'),
       rollup: 'rollup -c',
       umd:
-        'browserify --entry dist/for-browserify/index.js --standalone git --debug | uglifyjs --compress --mangle --source-map "content=inline" -o dist/bundle.umd.min.js'
+        'browserify --entry dist/for-browserify/index.js --standalone git --debug --exclude fliplog | uglifyjs --compress --mangle --source-map "content=inline" -o dist/bundle.umd.min.js'
     },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',

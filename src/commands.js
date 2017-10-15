@@ -1,4 +1,5 @@
 export { add } from './commands/add'
+export { clone } from './commands/clone'
 export { checkout } from './commands/checkout'
 export { commit } from './commands/commit'
 export { fetch } from './commands/fetch'
