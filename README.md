@@ -1,8 +1,7 @@
 # isomorphic-git [![Build Status](https://travis-ci.org/wmhilton/isomorphic-git.svg?branch=master)](https://travis-ci.org/wmhilton/isomorphic-git) [![codecov](https://codecov.io/gh/wmhilton/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/wmhilton/isomorphic-git)
+A pure JavaScript implementation of git for node and browsers!
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
-
-A pure JavaScript implementation of git for node and browsers!
 
 It works with any modern browser (see list above) and uses [BrowserFS](https://www.npmjs.com/package/browserfs) to emulate the node 'fs' module. This means client-side JavaScript can be used to read *and write* to the web the same way you've been editing websites on your desktop since 2008 - using git.
 
