@@ -27,6 +27,9 @@ const external = [
   'babel-runtime/core-js/object/keys',
   'babel-runtime/helpers/toConsumableArray',
   'babel-runtime/core-js/set',
+  'babel-runtime/core-js/object/get-prototype-of',
+  'babel-runtime/helpers/possibleConstructorReturn',
+  'babel-runtime/helpers/inherits',
   ...Object.keys(pkg.dependencies)
 ]
 

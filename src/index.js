@@ -18,20 +18,24 @@ import {
   listBranches
 } from './commands'
 
-import ChainedMap from 'flipchain'
-
 export default function git (dir) {
   return dir === undefined
     ? new Git()
     : new Git().workdir(dir).gitdir(`${dir}/.git`)
 }
 
+const extend = (self, array) => {
+  for (let fn of array) {
+    self[fn] = val => self.set(fn, val)
+  }
+}
+
 // The class is merely a fluent command/query builder
-class Git extends ChainedMap {
+class Git extends Map {
   // @constructor
   constructor (parent) {
     super(parent)
-    this.extend([
+    extend(this, [
       'workdir',
       'gitdir',
       'remote',
