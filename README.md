@@ -1,47 +1,32 @@
 # isomorphic-git [![Build Status](https://travis-ci.org/wmhilton/isomorphic-git.svg?branch=master)](https://travis-ci.org/wmhilton/isomorphic-git) [![codecov](https://codecov.io/gh/wmhilton/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/wmhilton/isomorphic-git)
-JavaScript library for interacting with git repositories, circa 2017
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
 
-Isomorphic-git is a pure ECMAScript 2017+ re-implementation of [git](https://git-scm.com/)
-that works on the desktop and on the web. On the desktop (or laptop, whatever) it
-uses Node and its core "fs" library. On the web, it works with any modern browser
-(see list above) and the [BrowserFS](https://www.npmjs.com/package/browserfs)
-library. This means you can do all the same things you are used to doing on
-your desktop - git pull, git commit, git push - in the browser.
+A pure JavaScript implementation of git for node and browsers!
 
-**This is a big deal.** Git is the lingua fraca of source code control, and
-the web is made out of source code. Client-side JavaScript can now be used to read
-*and write* to the web the same way you've been editing websites on your desktop
-since 2008 - using git.
+It works with any modern browser (see list above) and uses [BrowserFS](https://www.npmjs.com/package/browserfs) to emulate the node 'fs' module. This means client-side JavaScript can be used to read *and write* to the web the same way you've been editing websites on your desktop since 2008 - using git.
 
-Isomorphic-git does not impliment every feature found in the canonical git
-implementation. But it does aim to be 100% compatible with it. This means it
-does all its operations by modifying files in a ".git" directory just like the
-git you are used to. You can use the `isogit` CLI to operate on existing git
-repositories on your desktop or server.
+Isomorphic-git does not impliment every feature found in the canonical git implementation. But it does aim for 100% compatibility. This means it does all its operations by modifying files in a ".git" directory just like the git you are used to. You can even use the `isogit` CLI to operate on existing git repositories on your desktop or server.
 
-## Installing
+## Getting Started
 
-Just your standard
+### Use a CDN script tag
 
-```
-npm install --save isomorphic-git
-```
-
-## Using
-
-### CDN script tag
-
-You can grab the UMD build directly from `unpkg`.
+If you want, you can just throw in a script tag with the UMD build directly from `unpkg`. It will add a single variable `git` to the global object.
 
 ```html
 <script src="https://unpkg.com/isomorphic-git@0.0.15/dist/bundle.umd.min.js"></script>
 ```
 
-### With Node or a module bundler
+### Using as an npm module
 
-In the package.json you'll see there are 3 different versions. The "main" version is for node. The "browser" version is for browserify. If you are using rollup or bleeding edge ES2017+ stuff, you might want to use the "module" version. For more details see [./dist/README.md](https://github.com/wmhilton/isomorphic-git/blob/master/dist/README.md)
+You can install it from npm.
+
+```
+npm install --save isomorphic-git
+```
+
+In the package.json you'll see there are actually 3 different versions. The "main" version is for node. The "browser" version is for browserify. If you are doing your own transpiling and tree-shaking or are simply living on the bleeding edge, you can try the "module" version. For more details see [./dist/README.md](https://github.com/wmhilton/isomorphic-git/blob/master/dist/README.md)
 
 ```json
   "main": "dist/for-node/",
@@ -55,6 +40,11 @@ Isomorphic-git comes with a simple CLI tool, named `isogit` because `isomorphic-
 It always starts with an implicit `git('.')` so it defaults to working in the
 current working directory. (Note I may change that soon, now that I have a `findRoot`
 function. I may change the default to `git(git().findRoot(process.cwd()))`.)
+
+## Who is using `isomorphic-git`?
+
+- [nde](https://nde.now.sh) - a futuristic next-generation web IDE
+- [git-app-manager](https://git-app-manager-tcibxepsta.now.sh) - install "unhosted" websites locally by git cloning them
 
 ## API docs
 
