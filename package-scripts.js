@@ -7,6 +7,7 @@ module.exports = {
     format:
       'prettier-standard src/**/*.js __tests__/**/*.js testling/**/*.js *.js',
     lint: 'standard src/**/*.js',
+    toc: 'doctoc README.md',
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),

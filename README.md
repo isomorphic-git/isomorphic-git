@@ -7,6 +7,47 @@ It works with any modern browser (see list above) and uses [BrowserFS](https://w
 
 Isomorphic-git does not impliment every feature found in the canonical git implementation. But it does aim for 100% compatibility. This means it does all its operations by modifying files in a ".git" directory just like the git you are used to. You can even use the `isogit` CLI to operate on existing git repositories on your desktop or server.
 
+<hr>
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Getting Started](#getting-started)
+  - [Use a CDN script tag](#use-a-cdn-script-tag)
+  - [Using as an npm module](#using-as-an-npm-module)
+  - [`isogit` CLI](#isogit-cli)
+- [High-level `git()` API](#high-level-git-api)
+  - [.init()](#init)
+  - [.clone(url)](#cloneurl)
+  - [.fetch(branch)](#fetchbranch)
+  - [.checkout(branch)](#checkoutbranch)
+  - [.list()](#list)
+  - [.add(file)](#addfile)
+  - [.remove(file)](#removefile)
+  - [.commit(msg)](#commitmsg)
+  - [.push(branch)](#pushbranch)
+  - [.findRoot(dir)](#findrootdir)
+  - [.listBranches()](#listbranches)
+  - [.config(path)](#configpath)
+  - [.config(path, value)](#configpath-value)
+  - [.auth(username, password_or_token)](#authusername-password_or_token)
+  - [.oauth2(company, token)](#oauth2company-token)
+  - [.gitdir(dir) and .workdir(dir)](#gitdirdir-and-workdirdir)
+- [Lower-level API](#lower-level-api)
+  - [Commands](#commands)
+  - [Managers](#managers)
+  - [Models](#models)
+  - [Utils](#utils)
+- [Who is using `isomorphic-git`?](#who-is-using-isomorphic-git)
+- [Similar projects](#similar-projects)
+- [Acknowledgments](#acknowledgments)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+<hr>
+
 ## Getting Started
 
 ### Use a CDN script tag
@@ -33,23 +74,19 @@ In the package.json you'll see there are actually 3 different versions. The "mai
   "module": "dist/for-future/",
 ```
 
-## `isogit` CLI
+### `isogit` CLI
 
 Isomorphic-git comes with a simple CLI tool, named `isogit` because `isomorphic-git` is a lot to type. It is really just a thin shell that translates command line arguments into the equivalent JS API commands. So you should be able to run *any* current or future isomorphic-git commands using the CLI.
 It always starts with an implicit `git('.')` so it defaults to working in the
 current working directory. (Note I may change that soon, now that I have a `findRoot`
 function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 
-## Who is using `isomorphic-git`?
-
-- [nde](https://nde.now.sh) - a futuristic next-generation web IDE
-- [git-app-manager](https://git-app-manager-tcibxepsta.now.sh) - install "unhosted" websites locally by git cloning them
-
-## API docs
+## High-level `git()` API
 
 I may continue to make small changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
 
-### Initialize a new repository
+### .init()
+Initialize a new repository
 
 ```js
 // JS example
@@ -72,7 +109,8 @@ git()
 - @param {string} `gitdir` - The path to the git directory.
 - @returns `Promise<void>`
 
-### Clone a repository
+### .clone(url)
+Clone a repository
 
 ```js
 // JS example
@@ -109,7 +147,8 @@ git()
 - @param {string} `url` - The URL of the remote repository.
 - @returns `Promise<void>`
 
-### Fetch commits
+### .fetch(branch)
+Fetch commits
 
 ```js
 // JS example
@@ -145,7 +184,8 @@ git()
 - @param {string} [`remote='origin'`] - If URL is not specified, determines which remote to use.
 - @returns `Promise<void>`
 
-## Checkout a branch
+### .checkout(branch)
+Checkout a branch
 
 ```js
 // JS example
@@ -174,7 +214,8 @@ git()
 - @param {string} [`remote='origin'`] - What to name the remote that is created. The default is 'origin'.
 - @returns `Promise<void>`
 
-### List all the tracked files in a repo
+### .list()
+List all the tracked files in a repo
 
 ```js
 // JS example
@@ -198,7 +239,8 @@ git()
 - @param {string} `gitdir` - The path to the git directory.
 - @returns `Promise<string[]>` - A list of file paths.
 
-### Add files to the git index (aka staging area)
+### .add(file)
+Add files to the git index (aka staging area)
 
 ```js
 // JS example
@@ -225,7 +267,8 @@ git()
 - @param {string} `filepath` - The path to the file to add to the index.
 - @returns `Promise<void>`
 
-### Remove files from the git index (aka staging area)
+### .remove(file)
+Remove files from the git index (aka staging area)
 
 ```js
 // JS example
@@ -250,7 +293,8 @@ git()
 - @param {string} `filepath` - The path to the file to add to the index.
 - @returns `Promise<void>`
 
-### Create a new commit
+### .commit(msg)
+Create a new commit
 
 ```js
 // JS example
@@ -293,7 +337,8 @@ git()
 - @param {string} [`privateKeys=undefined`] - A PGP private key in ASCII armor format.
 - @returns `Promise<void>`
 
-### Push a branch
+### .push(branch)
+Push a branch
 
 ```js
 // JS example
@@ -329,7 +374,8 @@ git()
 - @param {string} [`remote='origin'`] - If URL is not specified, determines which remote to use.
 - @returns `Promise<void>`
 
-### Find the root git directory
+### .findRoot(dir)
+Find the root git directory
 
 ```js
 // JS example
@@ -354,7 +400,8 @@ git()
 - @param {string} `dir` - Starting at directory {dir}, walk upwards until you find a directory that contains a '.git' directory.
 - @returns `Promise<rootdir>` that directory, which is presumably the root directory of the git repository containing {dir}.
 
-### List all local branches
+### .listBranches()
+List all local branches
 
 ```js
 // JS example
@@ -377,7 +424,8 @@ git()
 - @param {string} `gitdir` - The path to the git directory.
 - @returns `Promise<branches[]>` an array of branch names.
 
-### Reading from git config
+### .config(path)
+Reading from git config
 
 ```js
 // JS example
@@ -403,7 +451,8 @@ git()
 - @param {string} `path` - The key of the git config entry.
 - @returns `Promise<value>` - the config value
 
-### Writing to git config
+### .config(path, value)
+Writing to git config
 
 ```js
 // JS example
@@ -428,8 +477,7 @@ git()
 - @param {string} `value` - A value to store at that path.
 - @returns `Promise<void>`
 
-### All authentication options
-
+### .auth(username, password_or_token)
 Authentication is normally required for pushing to a git repository.
 It may also be required to clone or fetch from a private repository.
 Git does all its authentication using HTTPS Basic Authentication.
@@ -439,11 +487,6 @@ If you have two-factor authentication (2FA) enabled on your account, you
 probably cannot push or pull using your regular username and password.
 Instead, you may have to create a Personal Access Token (or an App
 Password in Bitbucket lingo) and use that to authenticate.
-
-If you are using OAuth2 for token-based authentication, then the form
-that the Basic Auth headers take is slightly different. To help with
-those cases, there is an `oauth2()` method that is available as an
-alternative to the `auth()` method.
 
 ```js
 // This works for basic username / password auth, or the newer username / token auth
@@ -458,7 +501,15 @@ git('.').auth('username:password')
 git('.').auth('username', 'personal access token')
 git('.').auth('username', 'app password')
 git('.').auth('personal access token') // Github (only) lets you leave out the username
+```
 
+### .oauth2(company, token)
+If you are using OAuth2 for token-based authentication, then the form
+that the Basic Auth headers take is slightly different. To help with
+those cases, there is an `oauth2()` method that is available as an
+alternative to the `auth()` method.
+
+```js
 // OAuth2 Token Authentication
 // This for is for *actual* OAuth2 tokens (not "personal access tokens").
 // Unfortunately, all the major git hosting companies have chosen different conventions!
@@ -474,7 +525,8 @@ git('.').oauth2('gitlab', 'token')
 git('.').oauth2('bitbucket', 'token')
 ```
 
-### Using a non-standard working tree or git directory
+### .gitdir(dir) and .workdir(dir)
+Using a non-standard working tree or git directory
 
 If you are working with bare repos, you may have situations where
 the git directory is not `path.join(workdir, '.git')`.
@@ -503,7 +555,7 @@ Usually this is the parent directory of ".git" but it doesn't have to be.
 The git directory is where your git repository history is stored.
 Usually this is a directory called ".git" inside your working directory.
 
-## Lower-level API (also unstable)
+## Lower-level API
 
 The high-level makes some assumptions (like you have a file-system and network access) that might not be well suited
 to your embedded git-based concept thingy. Fear not! I have written this library
@@ -559,12 +611,17 @@ import * as utils from 'isomorphic-git/dist/for-node/utils'
 
 I lied. Utils are actually the lowest level building blocks.
 
+## Who is using `isomorphic-git`?
+
+- [nde](https://nde.now.sh) - a futuristic next-generation web IDE
+- [git-app-manager](https://git-app-manager-tcibxepsta.now.sh) - install "unhosted" websites locally by git cloning them
+
 ## Similar projects
 
 - [js-git](https://github.com/creationix/js-git)
 - [es-git](https://github.com/es-git/es-git)
 
-## Credits
+## Acknowledgments
 
 Isomorphic-git would not have been possible without the pioneering work by
 @creationix and @chrisdickinson. Git is a tricky binary mess, and without
