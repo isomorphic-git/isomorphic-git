@@ -1,7 +1,7 @@
 {
   "name": "isomorphic-git",
   "version": "0.0.16",
-  "description": "Node library for interacting with git repositories, circa 2017",
+  "description": "A pure JavaScript implementation of git for node and browsers!",
   "main": "dist/for-node/",
   "browser": "dist/for-browserify/",
   "module": "dist/for-future/",
