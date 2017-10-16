@@ -21,12 +21,37 @@ does all its operations by modifying files in a ".git" directory just like the
 git you are used to. You can use the `isogit` CLI to operate on existing git
 repositories on your desktop or server.
 
-## CLI
+## Installing
 
-I realized I could "translate" command line options into JavaScript chained commands
-without hard-coding any knowledge of the API if I kept the chained commands very predictable.
-I built a purely a generic translator and it worked surprisingly well.
-So you can do *any* current or future isomorphic-git commands using the included `isogit` CLI.
+Just your standard
+
+```
+npm install --save isomorphic-git
+```
+
+## Using
+
+### CDN script tag
+
+You can grab the UMD build directly from `unpkg`.
+
+```html
+<script src="https://unpkg.com/isomorphic-git@0.0.15/dist/bundle.umd.min.js"></script>
+```
+
+### With Node or a module bundler
+
+In the package.json you'll see there are 3 different versions. The "main" version is for node. The "browser" version is for browserify. If you are using rollup or bleeding edge ES2017+ stuff, you might want to use the "module" version. For more details see [./dist/README.md](https://github.com/wmhilton/isomorphic-git/blob/master/dist/README.md)
+
+```json
+  "main": "dist/for-node/",
+  "browser": "dist/for-browserify/",
+  "module": "dist/for-future/",
+```
+
+## `isogit` CLI
+
+Isomorphic-git comes with a simple CLI tool, named `isogit` because `isomorphic-git` is a lot to type. It is really just a thin shell that translates command line arguments into the equivalent JS API commands. So you should be able to run *any* current or future isomorphic-git commands using the CLI.
 It always starts with an implicit `git('.')` so it defaults to working in the
 current working directory. (Note I may change that soon, now that I have a `findRoot`
 function. I may change the default to `git(git().findRoot(process.cwd()))`.)
@@ -38,7 +63,7 @@ I may continue to make small changes to the API until the 1.0 release, after whi
 ### Initialize a new repository
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.').init()
 ```
@@ -49,12 +74,7 @@ isogit init
 ```
 
 ```js
-// Complete JS API
-import { init } from 'isomorphic-git/commands'
-init({
-  gitdir
-})
-// Fluent equivalent
+// Complete API
 git()
   .gitdir(gitdir)
   .init()
@@ -66,7 +86,7 @@ git()
 ### Clone a repository
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .depth(1)
@@ -79,19 +99,7 @@ isogit --depth=1 clone https://github.com/wmhilton/isomorphic-git
 ```
 
 ```js
-// Complete JS API
-import { clone } from 'isomorphic-git/commands'
-clone({
-  workdir,
-  gitdir,
-  depth,
-  ref,
-  authUsername,
-  authPassword,
-  remote,
-  url
-})
-// Fluent equivalent
+// Complete API
 git()
   .workdir(workdir)
   .gitdir(gitdir)
@@ -115,7 +123,7 @@ git()
 ### Fetch commits
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .remote('origin')
@@ -129,23 +137,13 @@ isogit --remote=origin --depth=1 fetch master
 ```
 
 ```js
-// Complete JS API
-import { fetch } from 'isomorphic-git/commands'
-fetch({
-  gitdir,
-  depth,
-  ref,
-  authUsername,
-  authPassword,
-  remote,
-  url
-})
-// Fluent equivalent
+// Complete API
 git()
   .gitdir(gitdir)
   .depth(depth)
   .auth(authUsername, authPassword)
   .url(url)
+  .remote(remote)
   .fetch(ref)
 ```
 
@@ -161,7 +159,7 @@ git()
 ## Checkout a branch
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .checkout('master')
@@ -173,15 +171,7 @@ isogit checkout master
 ```
 
 ```js
-// Complete JS API
-import { checkout } from 'isomorphic-git/commands'
-checkout({
-  workdir,
-  gitdir,
-  ref,
-  remote
-})
-// Fluent equivalent
+// Complete API
 git()
   .workdir(workdir)
   .gitdir(gitdir)
@@ -198,7 +188,7 @@ git()
 ### List all the tracked files in a repo
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .list()
@@ -210,12 +200,7 @@ isogit list
 ```
 
 ```js
-// Complete JS API
-import { list } from 'isomorphic-git/commands'
-list({
-  gitdir
-})
-// Fluent equivalent
+// Complete API
 git()
   .gitdir(gitdir)
   .list()
@@ -227,7 +212,7 @@ git()
 ### Add files to the git index (aka staging area)
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .add('README.md')
@@ -239,14 +224,7 @@ isogit add README.md
 ```
 
 ```js
-// Complete JS API
-import { add } from 'isomorphic-git/commands'
-add({
-  workdir,
-  gitdir,
-  filepath
-})
-// Fluent equivalent
+// Complete API
 git()
   .workdir(workdir)
   .gitdir(gitdir)
@@ -261,7 +239,7 @@ git()
 ### Remove files from the git index (aka staging area)
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .remove('README.md')
@@ -273,13 +251,7 @@ isogit remove README.md
 ```
 
 ```js
-// Complete JS API
-import { remove } from 'isomorphic-git/commands'
-remove({
-  gitdir,
-  filepath
-})
-// Fluent equivalent
+// Complete API
 git()
   .gitdir(gitdir)
   .remove(filepath)
@@ -292,7 +264,7 @@ git()
 ### Create a new commit
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .author('Mr. Test')
@@ -310,26 +282,7 @@ isogit --author='Mr. Test' \
 ```
 
 ```js
-// Complete JS API
-import { commit } from 'isomorphic-git/commands'
-commit({
-  gitdir,
-  author: {
-    name,
-    email,
-    timestamp,
-    date
-  },
-  committer: {
-    name,
-    email,
-    timestamp,
-    date
-  },
-  message,
-  privateKeys
-})
-// Fluent equivalent
+// Complete API
 git()
   .gitdir(gitdir)
   .author(author.name)
@@ -354,7 +307,7 @@ git()
 ### Push a branch
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.')
   .auth(process.env.GITHUB_TOKEN)
@@ -368,19 +321,7 @@ isogit --auth="$GITHUB_TOKEN" --remote=origin push master
 ```
 
 ```js
-// Complete JS API
-import { push } from 'isomorphic-git/commands'
-push({
-  gitdir,
-  depth,
-  ref,
-  remote,
-  url,
-  authUsername,
-  authPassword,
-  remote
-})
-// Fluent equivalent
+// Complete API
 git()
   .gitdir(gitdir)
   .depth(depth)
@@ -402,7 +343,7 @@ git()
 ### Find the root git directory
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git()
   .findRoot('/path/to/some/gitrepo/path/to/some/file.txt')
@@ -416,10 +357,7 @@ isogit findRoot /path/to/some/gitrepo/path/to/some/file.txt
 ```
 
 ```js
-// Complete JS API
-import { findRoot } from 'isomorphic-git/commands'
-findRoot(dir)
-// Fluent equivalent
+// Complete API
 git()
   .findRoot(dir)
 ```
@@ -430,7 +368,7 @@ git()
 ### List all local branches
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git('.').listBranches()
 ```
@@ -441,12 +379,7 @@ isogit listBranches
 ```
 
 ```js
-// Complete JS API
-import { listBranches } from 'isomorphic-git/commands'
-listBranches({
-  gitdir
-})
-// Fluent equivalent
+// Complete API
 git()
   .gitdir(gitdir)
   .listBranches()
@@ -494,7 +427,7 @@ git('.').oauth2('bitbucket', 'token')
 ### Using a non-standard working tree or git directory
 
 ```js
-// Fluent API example
+// JS example
 import git from 'isomorphic-git'
 git()
   .gitdir('my-bare-repo')
@@ -583,3 +516,7 @@ Isomorphic-git would not have been possible without the pioneering work by
 @creationix and @chrisdickinson. Git is a tricky binary mess, and without
 their examples (and their modules!) I would not have been able to come even
 close to finishing this. They are geniuses ahead of their time.
+
+## License
+
+This work is released under [The Unlicense](http://unlicense.org/)
