@@ -388,23 +388,77 @@ git()
 - @param {string} `gitdir` - The path to the git directory.
 - @returns `Promise<branches[]>` an array of branch names.
 
-### Using git config
+### Reading from git config
 
 ```js
-// Save the author details to .git/config so you don't have to specify them each time.
-git('.').setConfig('user.name', 'Mr. Test')
-git('.').setConfig('user.email', 'mrtest@example.com')
-
-// Manually add a remote
-git('.')
-  .setConfig('remote.origin.url', 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
+// JS example
+import git from 'isomorphic-git'
+git('.').config('user.name')
+// 'Mr. Test'
 ```
+
+```sh
+# CLI example
+isogit config user.name
+# Mr. Test
+```
+
+```js
+// Complete API
+git()
+  .gitdir(gitdir)
+  .config(path)
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @param {string} `path` - The key of the git config entry.
+- @returns `Promise<value>` - the config value
+
+### Writing to git config
+
+```js
+// JS example
+import git from 'isomorphic-git'
+git('.').config('user.name', 'Mr. Test')
+```
+
+```sh
+# CLI example
+isogit config user.name 'Mr. Test'
+```
+
+```js
+// Complete API
+git()
+  .gitdir(gitdir)
+  .config(path, value)
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @param {string} `path` - The key of the git config entry.
+- @param {string} `value` - A value to store at that path.
+- @returns `Promise<void>`
 
 ### All authentication options
 
-```js
+Authentication is normally required for pushing to a git repository.
+It may also be required to clone or fetch from a private repository.
+Git does all its authentication using HTTPS Basic Authentication.
+Usually this is straightforward, but there are some things to watch out for.
 
-// Basic Authentication - may not work if 2FA is enabled on your account!
+If you have two-factor authentication (2FA) enabled on your account, you
+probably cannot push or pull using your regular username and password.
+Instead, you may have to create a Personal Access Token (or an App
+Password in Bitbucket lingo) and use that to authenticate.
+
+If you are using OAuth2 for token-based authentication, then the form
+that the Basic Auth headers take is slightly different. To help with
+those cases, there is an `oauth2()` method that is available as an
+alternative to the `auth()` method.
+
+```js
+// This works for basic username / password auth, or the newer username / token auth
+// that is often required if 2FA is enabled.
 git('.').auth('username', 'password')
 
 // a one-argument version is also supported
@@ -417,14 +471,25 @@ git('.').auth('username', 'app password')
 git('.').auth('personal access token') // Github (only) lets you leave out the username
 
 // OAuth2 Token Authentication
-// (each of the major players formats OAuth2 headers slightly differently
-// so you must pass the name of the company as the first argument)
+// This for is for *actual* OAuth2 tokens (not "personal access tokens").
+// Unfortunately, all the major git hosting companies have chosen different conventions!
+// Lucky for you, I already looked up and codified it for you.
+//
+// - oauth2('github', token) - Github uses `token` as the username, and 'x-oauth-basic' as the password.
+// - oauth2('bitbucket', token) - Bitbucket uses 'x-token-auth' as the username, and `token` as the password.
+// - oauth2('gitlab', token) - Gitlab uses 'oauth2' as the username, and `token` as the password.
+//
+// I will gladly accept pull requests for more companies' conventions.
 git('.').oauth2('github', 'token')
 git('.').oauth2('gitlab', 'token')
 git('.').oauth2('bitbucket', 'token')
 ```
 
 ### Using a non-standard working tree or git directory
+
+If you are working with bare repos, you may have situations where
+the git directory is not `path.join(workdir, '.git')`.
+If that is the case, you can specify the two directories explicitly.
 
 ```js
 // JS example

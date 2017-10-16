@@ -1,5 +1,5 @@
 import { init } from './init'
-import { setConfig } from './setConfig'
+import { config } from './config'
 import { fetch } from './fetch'
 import { checkout } from './checkout'
 
@@ -16,7 +16,7 @@ export async function clone ({
   remote = remote || 'origin'
   await init({ gitdir })
   // Add remote
-  await setConfig({
+  await config({
     gitdir,
     path: `remote.${remote}.url`,
     value: url

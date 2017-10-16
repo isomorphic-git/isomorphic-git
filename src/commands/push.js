@@ -1,6 +1,6 @@
 // @flow
 import stream from 'stream'
-import { getConfig } from './getConfig'
+import { config } from './config'
 import { GitRemoteHTTP } from '../managers'
 import { listCommits } from './listCommits'
 import { listObjects } from './listObjects'
@@ -19,7 +19,7 @@ export async function push ({
   // TODO: Figure out how pushing tags works. (This only works for branches.)
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await getConfig({
+    url = await config({
       gitdir,
       path: `remote.${remote}.url`
     })
