@@ -14,6 +14,7 @@ Isomorphic-git does not impliment every feature found in the canonical git imple
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Getting Started](#getting-started)
+  - [Set up your filesystem](#set-up-your-filesystem)
   - [Use a CDN script tag](#use-a-cdn-script-tag)
   - [Using as an npm module](#using-as-an-npm-module)
   - [`isogit` CLI](#isogit-cli)
@@ -49,6 +50,28 @@ Isomorphic-git does not impliment every feature found in the canonical git imple
 <hr>
 
 ## Getting Started
+
+### Set up your filesystem
+
+If you're only using `isomorphic-git` in Node, you already have a `fs` module, so you can skip this step. If you're writing code for the browser though, you'll need something that emulates the `fs` API. `isomorphic-git` will look for a global "fs" variable. At the time of writing, the most complete option is [BrowserFS](https://github.com/jvilk/BrowserFS).
+
+Here's a quick config that works well in most cases:
+
+```html
+<script src="https://unpkg.com/browserfs"></script>
+<script>
+BrowserFS.install(window);
+BrowserFS.configure({ fs: "IndexedDB", options: {} }, err => {
+  if (err) {
+    alert(err);
+  } else {
+    window.fs = window.require("fs");
+  }
+});
+</script>
+```
+
+Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
 
 ### Use a CDN script tag
 
