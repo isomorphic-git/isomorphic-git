@@ -1,7 +1,7 @@
 // @flow
 import stream from 'stream'
 import thru from 'thru'
-import { getConfig } from './getConfig'
+import { config } from './config'
 import { unpack } from './unpack'
 import { GitRemoteHTTP, GitRefsManager, GitShallowManager } from '../managers'
 import { GitPktLine } from '../models'
@@ -19,7 +19,7 @@ export async function fetchPackfile ({
   depth = parseInt(depth)
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await getConfig({
+    url = await config({
       gitdir,
       path: `remote.${remote}.url`
     })

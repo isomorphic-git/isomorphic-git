@@ -1,4 +1,4 @@
-import { getConfig } from './getConfig'
+import { config } from './config'
 import { GitCommit, GitTree } from '../models'
 import { GitObjectManager, GitIndexManager } from '../managers'
 import { write, resolveRef, flatFileListToDirectoryStructure } from '../utils'
@@ -38,10 +38,10 @@ export async function commit ({
   // Fill in missing arguments with default values
   if (author === undefined) author = {}
   if (author.name === undefined) {
-    author.name = await getConfig({ gitdir, path: 'user.name' })
+    author.name = await config({ gitdir, path: 'user.name' })
   }
   if (author.email === undefined) {
-    author.email = await getConfig({ gitdir, path: 'user.email' })
+    author.email = await config({ gitdir, path: 'user.email' })
   }
   committer = committer || author
   let authorDateTime = author.date || new Date()

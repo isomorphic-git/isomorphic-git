@@ -11,8 +11,7 @@ import {
   unpack,
   push,
   fetch,
-  getConfig,
-  setConfig,
+  config,
   status,
   findRoot,
   listBranches
@@ -232,18 +231,19 @@ class Git extends Map {
       authPassword: this.get('password')
     })
   }
-  async getConfig (path) {
-    return getConfig({
-      gitdir: this.get('gitdir'),
-      path
-    })
-  }
-  async setConfig (path, value) {
-    return setConfig({
-      gitdir: this.get('gitdir'),
-      path,
-      value
-    })
+  async config (path, value) {
+    if (arguments.length === 1) {
+      return config({
+        gitdir: this.get('gitdir'),
+        path
+      })
+    } else {
+      return config({
+        gitdir: this.get('gitdir'),
+        path,
+        value
+      })
+    }
   }
   async status (pathname) {
     return status({
