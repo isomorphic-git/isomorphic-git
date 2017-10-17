@@ -5,6 +5,7 @@
   "main": "dist/for-node/",
   "browser": "dist/for-browserify/",
   "module": "dist/for-future/",
+  "unpkg": "dist/bundle.umd.min.js",
   "bin": {
     "isogit": "./cli.js"
   },
