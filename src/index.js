@@ -14,7 +14,8 @@ import {
   config,
   status,
   findRoot,
-  listBranches
+  listBranches,
+  version
 } from './commands'
 
 export default function git (dir) {
@@ -54,6 +55,9 @@ class Git extends Map {
       'outputStream',
       'inputStream'
     ])
+  }
+  version () {
+    return version()
   }
   /**
    * @param {string} username

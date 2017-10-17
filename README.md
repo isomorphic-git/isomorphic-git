@@ -19,6 +19,7 @@ Isomorphic-git does not impliment every feature found in the canonical git imple
   - [Using as an npm module](#using-as-an-npm-module)
   - [`isogit` CLI](#isogit-cli)
 - [High-level `git()` API](#high-level-git-api)
+  - [git(dir) vs .gitdir(dir) and .workdir(dir)](#gitdir-vs-gitdirdir-and-workdirdir)
   - [.init()](#init)
   - [.clone(url)](#cloneurl)
   - [.fetch(branch)](#fetchbranch)
@@ -34,7 +35,7 @@ Isomorphic-git does not impliment every feature found in the canonical git imple
   - [.config(path, value)](#configpath-value)
   - [.auth(username, password_or_token)](#authusername-password_or_token)
   - [.oauth2(company, token)](#oauth2company-token)
-  - [.gitdir(dir) and .workdir(dir)](#gitdirdir-and-workdirdir)
+  - [.version()](#version)
 - [Lower-level API](#lower-level-api)
   - [Commands](#commands)
   - [Managers](#managers)
@@ -123,6 +124,51 @@ function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 ## High-level `git()` API
 
 I may continue to make small changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
+
+### git(dir) vs .gitdir(dir) and .workdir(dir)
+Setting the working directory and git directory
+
+For regular repositories (with a `.git` directory inside them) you simply pass the directory as the initial argument to `git()`.
+In this case, the git directory is set implicitly to `path.join(workdir, '.git')`.
+
+However, if you are working with bare repositories, that assumption is wrong. In this case, you can use the second version to specify the directories explicitly.
+
+```js
+// JS example
+import git from 'isomorphic-git'
+git('./path/to/repo')
+// second way
+git()
+  .gitdir('my-bare-repo')
+  .workdir('/var/www/website')
+```
+
+```sh
+# CLI example
+cd ./path/to/repo
+isogit
+# second way
+isogit --gitdir=my-bare-repo --workdir=/var/www/website
+```
+
+```js
+// Complete API
+git(workdir)
+// second way
+git()
+  .gitdir(gitdir)
+  .workdir(workdir)
+```
+
+- @param {string} `workdir` - The path to the working directory.
+
+The working directory is where your files are checked out.
+Usually this is the parent directory of ".git" but it doesn't have to be.
+
+- @param {string} `gitdir` - The path to the git directory.
+
+The git directory is where your git repository history is stored.
+Usually this is a directory called ".git" inside your working directory.
 
 ### .init()
 Initialize a new repository
@@ -564,35 +610,15 @@ git('.').oauth2('gitlab', 'token')
 git('.').oauth2('bitbucket', 'token')
 ```
 
-### .gitdir(dir) and .workdir(dir)
-Using a non-standard working tree or git directory
-
-If you are working with bare repos, you may have situations where
-the git directory is not `path.join(workdir, '.git')`.
-If that is the case, you can specify the two directories explicitly.
+### .version()
 
 ```js
 // JS example
 import git from 'isomorphic-git'
-git()
-  .gitdir('my-bare-repo')
-  .workdir('/var/www/website')
+console.log(git().version())
 ```
 
-```sh
-# CLI example
-isogit --gitdir=my-bare-repo --workdir=/var/www/website
-```
-
-- @param {string} `workdir` - The path to the working directory.
-
-The working directory is where your files are checked out.
-Usually this is the parent directory of ".git" but it doesn't have to be.
-
-- @param {string} `gitdir` - The path to the git directory.
-
-The git directory is where your git repository history is stored.
-Usually this is a directory called ".git" inside your working directory.
+- @returns {string} `version` - the version string  from package.json
 
 ## Lower-level API
 
