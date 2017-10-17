@@ -15,7 +15,7 @@ Isomorphic-git does not impliment every feature found in the canonical git imple
 
 - [Getting Started](#getting-started)
   - [Set up your filesystem](#set-up-your-filesystem)
-  - [Use a CDN script tag](#use-a-cdn-script-tag)
+  - [Using a CDN script tag](#using-a-cdn-script-tag)
   - [Using as an npm module](#using-as-an-npm-module)
   - [`isogit` CLI](#isogit-cli)
 - [High-level `git()` API](#high-level-git-api)
@@ -60,12 +60,11 @@ Here's a quick config that works well in most cases:
 ```html
 <script src="https://unpkg.com/browserfs"></script>
 <script>
-BrowserFS.install(window);
 BrowserFS.configure({ fs: "IndexedDB", options: {} }, err => {
   if (err) {
     alert(err);
   } else {
-    window.fs = window.require("fs");
+    window.fs = BrowserFS.BFSRequire("fs");
   }
 });
 </script>
@@ -73,12 +72,19 @@ BrowserFS.configure({ fs: "IndexedDB", options: {} }, err => {
 
 Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
 
-### Use a CDN script tag
+### Using a CDN script tag
 
-If you want, you can just throw in a script tag with the UMD build directly from `unpkg`. It will add a single variable `git` to the global object.
+If you want, you can just throw in a script tag with the UMD build directly from `unpkg`. This will result in three global variables: `BrowserFS`, `fs`, and `git`.
 
 ```html
-<script src="https://unpkg.com/isomorphic-git@0.0.15/dist/bundle.umd.min.js"></script>
+<script src="https://unpkg.com/browserfs"></script>
+<script>
+BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
+  if (err) return console.log(err);
+  window.fs = BrowserFS.BFSRequire("fs");
+});
+</script>
+<script src="https://unpkg.com/isomorphic-git"></script>
 ```
 
 ### Using as an npm module
@@ -89,13 +95,23 @@ You can install it from npm.
 npm install --save isomorphic-git
 ```
 
-In the package.json you'll see there are actually 3 different versions. The "main" version is for node. The "browser" version is for browserify. If you are doing your own transpiling and tree-shaking or are simply living on the bleeding edge, you can try the "module" version. For more details see [./dist/README.md](https://github.com/wmhilton/isomorphic-git/blob/master/dist/README.md)
+In the package.json you'll see there are actually 4 different versions:
 
 ```json
   "main": "dist/for-node/",
   "browser": "dist/for-browserify/",
   "module": "dist/for-future/",
+  "unpkg": "dist/bundle.umd.min.js",
 ```
+
+This probably deserves a brief explanation.
+
+- the "main" version is for node.
+- the "browser" version is for browserify.
+- the "module" version is for native ES6 module loaders when they arrive.
+- the "unpkg" version is the UMD build.
+
+For more details about each build see [./dist/README.md](https://github.com/wmhilton/isomorphic-git/blob/master/dist/README.md)
 
 ### `isogit` CLI
 
