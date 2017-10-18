@@ -215,21 +215,27 @@ isogit --depth=1 clone https://github.com/wmhilton/isomorphic-git
 git()
   .workdir(workdir)
   .gitdir(gitdir)
-  .depth(depth)
   .branch(ref)
   .auth(authUsername, authPassword)
   .remote(remote)
+  .depth(depth)
+  .since(since)
+  .exclude(exclude)
+  .relative(relative)
   .clone(url)
 ```
 
 - @param {string} `workdir` - The path to the working directory.
 - @param {string} `gitdir` - The path to the git directory.
-- @param {integer} [`depth=0`] - Determines how much of the git repository's history to retrieve. If not specified it defaults to 0 which means the entire repo history.
 - @param {string} [`ref=undefined`] - Which branch to clone. By default this is the designated "main branch" of the repository.
 - @param {string} [`authUsername=undefined`] - The username to use with Basic Auth
 - @param {string} [`authPassword=undefined`] - The password to use with Basic Auth
 - @param {string} [`remote='origin'`] - What to name the remote that is created. The default is 'origin'.
 - @param {string} `url` - The URL of the remote repository.
+- @param {integer} [`depth=undefined`] - Determines how much of the git repository's history to retrieve.
+- @param {Date} [`since=undefined`] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+- @param {string[]} [`exclude=[]`] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+- @param {boolean} [`relative=false`] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
 - @returns `Promise<void>`
 
 ### .fetch(branch)
@@ -253,20 +259,26 @@ isogit --remote=origin --depth=1 fetch master
 // Complete API
 git()
   .gitdir(gitdir)
-  .depth(depth)
   .auth(authUsername, authPassword)
   .url(url)
   .remote(remote)
+  .depth(depth)
+  .since(since)
+  .exclude(exclude)
+  .relative(relative)
   .fetch(ref)
 ```
 
 - @param {string} `gitdir` - The path to the git directory.
-- @param {integer} [`depth=0`] - Determines how much of the git repository's history to retrieve. If not specified it defaults to 0 which means the entire repo history.
 - @param {string} [`ref=undefined`] - Which branch to fetch from. By default this is the currently checked out branch.
 - @param {string} [`authUsername=undefined`] - The username to use with Basic Auth
 - @param {string} [`authPassword=undefined`] - The password to use with Basic Auth
 - @param {string} [`url=undefined`] - The URL of the remote git server. The default is the value set in the git config for that remote.
 - @param {string} [`remote='origin'`] - If URL is not specified, determines which remote to use.
+- @param {integer} [`depth=undefined`] - Determines how much of the git repository's history to retrieve.
+- @param {Date} [`since=undefined`] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+- @param {string[]} [`exclude=[]`] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+- @param {boolean} [`relative=false`] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
 - @returns `Promise<void>`
 
 ### .checkout(branch)

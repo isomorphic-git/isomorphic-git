@@ -14,9 +14,17 @@ export async function fetchPackfile ({
   url,
   authUsername,
   authPassword,
-  depth = 0
+  depth = null,
+  since = null,
+  exclude = [],
+  relative = false
 }) {
-  depth = parseInt(depth)
+  if (depth !== null) {
+    if (Number.isNaN(parseInt(depth))) {
+      throw new Error(`Invalid value for depth argument: ${depth}`)
+    }
+    depth = parseInt(depth)
+  }
   remote = remote || 'origin'
   if (url === undefined) {
     url = await config({
@@ -33,8 +41,21 @@ export async function fetchPackfile ({
   }
   await remoteHTTP.preparePull()
   // Check server supports shallow cloning
-  if (depth > 0 && !remoteHTTP.capabilities.has('shallow')) {
-    throw new Error(`Remote does not support shallow fetching`)
+  if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
+    throw new Error(`Remote does not support shallow fetches`)
+  }
+  if (since !== null && !remoteHTTP.capabilities.has('deepen-since')) {
+    throw new Error(`Remote does not support shallow fetches by date`)
+  }
+  if (exclude.length > 0 && !remoteHTTP.capabilities.has('deepen-not')) {
+    throw new Error(
+      `Remote does not support shallow fetches excluding commits reachable by refs`
+    )
+  }
+  if (relative === true && !remoteHTTP.capabilities.has('deepen-relative')) {
+    throw new Error(
+      `Remote does not support shallow fetches relative to the current shallow depth`
+    )
   }
   await GitRefsManager.updateRemoteRefs({
     gitdir,
@@ -45,7 +66,9 @@ export async function fetchPackfile ({
   let want = await resolveRef({ gitdir, ref: `refs/remotes/${remote}/${ref}` })
   // Note: I removed "ofs-delta" from the capabilities list and now
   // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
-  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${pkg.name}@${pkg.version}`
+  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${pkg.name}@${pkg.version}${relative
+    ? ' deepen-relative'
+    : ''}`
   let packstream = new stream.PassThrough()
   packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`))
   let oids = await GitShallowManager.read({ gitdir })
@@ -54,8 +77,16 @@ export async function fetchPackfile ({
       packstream.write(GitPktLine.encode(`shallow ${oid}\n`))
     }
   }
-  if (depth !== 0) {
-    packstream.write(GitPktLine.encode(`deepen ${parseInt(depth)}\n`))
+  if (depth !== null) {
+    packstream.write(GitPktLine.encode(`deepen ${depth}\n`))
+  }
+  if (since !== null) {
+    packstream.write(
+      GitPktLine.encode(`deepen-since ${Math.floor(since.valueOf() / 1000)}\n`)
+    )
+  }
+  for (let x of exclude) {
+    packstream.write(GitPktLine.encode(`deepen-not ${x}\n`))
   }
   packstream.write(GitPktLine.flush())
   let have = null
@@ -99,7 +130,10 @@ export async function fetch ({
   url,
   authUsername,
   authPassword,
-  depth = 0
+  depth,
+  since,
+  exclude,
+  relative
 }) {
   let response = await fetchPackfile({
     gitdir,
@@ -108,7 +142,10 @@ export async function fetch ({
     url,
     authUsername,
     authPassword,
-    depth
+    depth,
+    since,
+    exclude,
+    relative
   })
   response.progress.on('data', data => console.log(data.toString('utf8')))
   await unpack({ gitdir, inputStream: response.packfile })

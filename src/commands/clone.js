@@ -9,9 +9,12 @@ export async function clone ({
   url,
   remote,
   ref,
-  depth,
   authUsername,
-  authPassword
+  authPassword,
+  depth,
+  since,
+  exclude,
+  relative
 }) {
   remote = remote || 'origin'
   await init({ gitdir })
@@ -25,10 +28,13 @@ export async function clone ({
   await fetch({
     gitdir,
     ref,
-    depth,
     remote,
     authUsername,
-    authPassword
+    authPassword,
+    depth,
+    since,
+    exclude,
+    relative
   })
   // Checkout branch
   await checkout({
