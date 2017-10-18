@@ -30,6 +30,14 @@ const extend = (self, array) => {
   }
 }
 
+// This is so git().relative() is the same as git().relative(true)
+// but you can still undo the flag later with git().relative(false)
+const extendBool = (self, array) => {
+  for (let fn of array) {
+    self[fn] = val => self.set(fn, val !== false)
+  }
+}
+
 // The class is merely a fluent command/query builder
 class Git extends Map {
   // @constructor
@@ -44,17 +52,18 @@ class Git extends Map {
       'email',
       'datetime',
       'depth',
+      'since',
+      'exclude',
       'timestamp',
       'signingKey',
       'verificationKey',
-      'outputStream',
-      'inputStream',
       'username',
       'password',
       'url',
       'outputStream',
       'inputStream'
     ])
+    extendBool(this, ['relative'])
   }
   version () {
     return version()
@@ -133,10 +142,13 @@ class Git extends Map {
       gitdir: this.get('gitdir'),
       ref,
       url: this.get('url'),
-      depth: this.get('depth'),
       remote: this.get('remote'),
       authUsername: this.get('username'),
-      authPassword: this.get('password')
+      authPassword: this.get('password'),
+      depth: this.get('depth'),
+      since: this.get('since'),
+      exclude: this.get('exclude'),
+      relative: this.get('relative')
     })
   }
   async checkout (ref) {
@@ -154,9 +166,12 @@ class Git extends Map {
       url,
       remote: this.get('remote'),
       ref: this.get('branch'),
-      depth: this.get('depth'),
       authUsername: this.get('username'),
-      authPassword: this.get('password')
+      authPassword: this.get('password'),
+      depth: this.get('depth'),
+      since: this.get('since'),
+      exclude: this.get('exclude'),
+      relative: this.get('relative')
     })
   }
   async list () {
