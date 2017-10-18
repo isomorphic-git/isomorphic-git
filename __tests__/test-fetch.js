@@ -45,7 +45,7 @@ describe('fetch', () => {
     // Test
     await git()
       .gitdir(clientDir)
-      .since(new Date('2017-09-28:00:00:00'))
+      .since(new Date(1506571200000))
       .remote('origin')
       .fetch('test-branch-shallow-clone')
     expect(existsSync(`${clientDir}/shallow`)).toBe(true)
