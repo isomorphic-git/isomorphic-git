@@ -25,6 +25,7 @@ Isomorphic-git does not impliment every feature found in the canonical git imple
   - [.fetch(branch)](#fetchbranch)
   - [.checkout(branch)](#checkoutbranch)
   - [.list()](#list)
+  - [.log(ref)](#logref)
   - [.add(file)](#addfile)
   - [.remove(file)](#removefile)
   - [.commit(msg)](#commitmsg)
@@ -335,6 +336,60 @@ git()
 
 - @param {string} `gitdir` - The path to the git directory.
 - @returns `Promise<string[]>` - A list of file paths.
+
+### .log(ref)
+Get commit descriptions from the git history
+
+```js
+// JS example
+import git from 'isomorphic-git'
+let commits = await git('.')
+  .depth(5)
+  .log('master')
+commits.map(c => console.log(JSON.stringify(c))
+```
+
+```sh
+# CLI example
+isogit --depth=5 log master
+```
+
+```js
+// Complete API
+git()
+  .gitdir(gitdir)
+  .depth(depth)
+  .since(since)
+  .log(ref)
+```
+
+- @param {string} `gitdir` - The path to the git directory.
+- @param {integer} [`depth=undefined`] - Return at most this many commits.
+- @param {Date} [`since=undefined`] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
+- @param {string} [`ref=HEAD`] - The commit to begin walking backwards through the history from.
+- @returns `Promise<CommitDescription[]>`
+
+```js
+type CommitDescription = {
+  oid: string,             // SHA1 oid of this commit
+  message: string,         // Commit message
+  tree: string,            // SHA1 oid or corresponding file tree
+  parent: string[],        // array of zero or more SHA1 oids
+  author: {
+    name: string,
+    email: string,
+    timestamp: number,     // UTC Unix timestamp in seconds
+    timezoneOffset: number // Timezone difference from UTC in minutes
+  },
+  committer: {
+    name: string,
+    email: string,
+    timestamp: number,     // UTC Unix timestamp in seconds
+    timezoneOffset: number // Timezone difference from UTC in minutes
+  },
+  gpgsig: ?string          // PGP signature (if present)
+}
+```
 
 ### .add(file)
 Add files to the git index (aka staging area)
