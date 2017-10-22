@@ -60,3 +60,5 @@ typings/
 .env
 
 openpgp.store/
+dist
+private.key
