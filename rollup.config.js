@@ -70,8 +70,7 @@ const nodeConfig = input => ({
           }
         ]
       ],
-      runtimeHelpers: true,
-      plugins: ['transform-runtime', 'transform-object-rest-spread']
+      plugins: ['transform-object-rest-spread']
     })
   ]
 })
