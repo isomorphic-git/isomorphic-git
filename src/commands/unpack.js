@@ -49,7 +49,7 @@ export async function unpack (
       // Read a 4 byte (32-bit) int
       let numObjects = data.readInt32BE(8)
       console.log(`unpacking ${numObjects} objects`)
-      if (numObjects === 0) return
+      if (numObjects === 0) return resolve()
       // And on our merry way
       let offsetMap = new Map()
       inputStream
