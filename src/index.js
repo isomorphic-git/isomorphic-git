@@ -3,6 +3,7 @@ import {
   clone,
   checkout,
   list,
+  log,
   add,
   remove,
   commit,
@@ -177,6 +178,14 @@ class Git extends Map {
   async list () {
     return list({
       gitdir: this.get('gitdir')
+    })
+  }
+  async log (ref) {
+    return log({
+      gitdir: this.get('gitdir'),
+      ref,
+      depth: this.get('depth'),
+      since: this.get('since')
     })
   }
   async add (filepath) {

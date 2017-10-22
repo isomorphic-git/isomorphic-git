@@ -104,6 +104,10 @@ export class GitCommit {
     return GitCommit.justMessage(this._commit)
   }
 
+  parse () {
+    return { message: this.message(), ...this.headers() }
+  }
+
   static justMessage (commit) {
     return normalize(commit.slice(commit.indexOf('\n\n') + 2))
   }

@@ -30,6 +30,7 @@ const external = [
   'babel-runtime/core-js/object/get-prototype-of',
   'babel-runtime/helpers/possibleConstructorReturn',
   'babel-runtime/helpers/inherits',
+  'babel-runtime/core-js/number/is-nan',
   ...Object.keys(pkg.dependencies)
 ]
 
@@ -69,7 +70,8 @@ const nodeConfig = input => ({
           }
         ]
       ],
-      plugins: ['external-helpers', 'transform-object-rest-spread']
+      runtimeHelpers: true,
+      plugins: ['transform-runtime', 'transform-object-rest-spread']
     })
   ]
 })
