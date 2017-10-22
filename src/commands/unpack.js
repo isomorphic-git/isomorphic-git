@@ -32,7 +32,11 @@ function parseVarInt (buffer /*: Buffer */) {
 
 // TODO: Move this to 'plumbing'
 export async function unpack (
-  { gitdir, inputStream } /*: {gitdir: string, inputStream: ReadableStream} */
+  {
+    gitdir,
+    inputStream,
+    onprogress
+  } /*: {gitdir: string, inputStream: ReadableStream, onprogress: Function} */
 ) {
   return new Promise(function (resolve, reject) {
     // Read header
@@ -48,7 +52,9 @@ export async function unpack (
       }
       // Read a 4 byte (32-bit) int
       let numObjects = data.readInt32BE(8)
-      console.log(`unpacking ${numObjects} objects`)
+      if (onprogress !== undefined) {
+        onprogress({ loaded: 0, total: numObjects, lengthComputable: true })
+      }
       if (numObjects === 0) return resolve()
       // And on our merry way
       let offsetMap = new Map()
@@ -106,6 +112,13 @@ export async function unpack (
               })
               // console.log(`${offset} ${type} ${oid}`)
               offsetMap.set(offset, oid)
+            }
+            if (onprogress !== undefined) {
+              onprogress({
+                loaded: numObjects - num,
+                total: numObjects,
+                lengthComputable: true
+              })
             }
             if (num === 0) return resolve()
             next(null)

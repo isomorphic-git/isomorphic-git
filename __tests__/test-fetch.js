@@ -7,7 +7,7 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 jest.setTimeout(60000)
 
 describe('fetch', () => {
-  test('fetch (from Github)', async () => {
+  ;(process.env.CI ? test : test.skip)('fetch (from Github)', async () => {
     // Setup
     let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
@@ -20,13 +20,16 @@ describe('fetch', () => {
   test('shallow fetch (from Github)', async () => {
     // Setup
     let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
+    let output = []
     // Test
     await git()
       .gitdir(clientDir)
       .depth(1)
       .remote('origin')
+      .onprogress(output.push.bind(output))
       .fetch('test-branch-shallow-clone')
     expect(existsSync(`${clientDir}/shallow`)).toBe(true)
+    expect(output).toMatchSnapshot()
     let shallow = await read(`${clientDir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
