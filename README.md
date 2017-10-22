@@ -223,6 +223,7 @@ git()
   .since(since)
   .exclude(exclude)
   .relative(relative)
+  .onprogress(progressHandler)
   .clone(url)
 ```
 
@@ -237,6 +238,7 @@ git()
 - @param {Date} [`since=undefined`] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
 - @param {string[]} [`exclude=[]`] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
 - @param {boolean} [`relative=false`] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+- @param {Function} [`progressHandler=undefined`] - Callback to receive [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent)s for the operation.
 - @returns `Promise<void>`
 
 ### .fetch(branch)
@@ -267,6 +269,7 @@ git()
   .since(since)
   .exclude(exclude)
   .relative(relative)
+  .onprogress(progressHandler)
   .fetch(ref)
 ```
 
@@ -280,6 +283,7 @@ git()
 - @param {Date} [`since=undefined`] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
 - @param {string[]} [`exclude=[]`] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
 - @param {boolean} [`relative=false`] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+- @param {Function} [`progressHandler=undefined`] - Callback to receive [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent)s for the operation.
 - @returns `Promise<void>`
 
 ### .checkout(branch)

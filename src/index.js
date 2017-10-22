@@ -62,7 +62,8 @@ class Git extends Map {
       'password',
       'url',
       'outputStream',
-      'inputStream'
+      'inputStream',
+      'onprogress'
     ])
     extendBool(this, ['relative'])
   }
@@ -149,7 +150,8 @@ class Git extends Map {
       depth: this.get('depth'),
       since: this.get('since'),
       exclude: this.get('exclude'),
-      relative: this.get('relative')
+      relative: this.get('relative'),
+      onprogress: this.get('onprogress')
     })
   }
   async checkout (ref) {
@@ -172,7 +174,8 @@ class Git extends Map {
       depth: this.get('depth'),
       since: this.get('since'),
       exclude: this.get('exclude'),
-      relative: this.get('relative')
+      relative: this.get('relative'),
+      onprogress: this.get('onprogress')
     })
   }
   async list () {

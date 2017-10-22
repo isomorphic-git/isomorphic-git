@@ -14,7 +14,8 @@ export async function clone ({
   depth,
   since,
   exclude,
-  relative
+  relative,
+  onprogress
 }) {
   remote = remote || 'origin'
   await init({ gitdir })
@@ -34,7 +35,8 @@ export async function clone ({
     depth,
     since,
     exclude,
-    relative
+    relative,
+    onprogress
   })
   // Checkout branch
   await checkout({

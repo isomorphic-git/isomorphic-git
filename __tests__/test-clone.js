@@ -5,7 +5,7 @@ import { existsSync } from 'fs'
 jest.setTimeout(30000)
 
 describe('clone', () => {
-  test('clone', async () => {
+  ;(process.env.CI ? test : test.skip)('clone', async () => {
     let dir = await createTempDir()
     await git(`${dir}`)
       .depth(1)

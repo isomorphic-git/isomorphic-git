@@ -133,7 +133,8 @@ export async function fetch ({
   depth,
   since,
   exclude,
-  relative
+  relative,
+  onprogress
 }) {
   let response = await fetchPackfile({
     gitdir,
@@ -147,6 +148,5 @@ export async function fetch ({
     exclude,
     relative
   })
-  response.progress.on('data', data => console.log(data.toString('utf8')))
-  await unpack({ gitdir, inputStream: response.packfile })
+  await unpack({ gitdir, inputStream: response.packfile, onprogress })
 }
