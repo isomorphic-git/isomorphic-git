@@ -1,7 +1,7 @@
 // @flow
+import { resolveRef } from './resolveRef'
 import { GitObjectManager } from '../managers'
 import { GitCommit } from '../models'
-import { resolveRef } from '../utils'
 
 export async function log ({
   gitdir,

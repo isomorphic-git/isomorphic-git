@@ -1,5 +1,4 @@
-import { exists } from './exists'
-import { read } from './read'
+import { read } from '../utils'
 
 export async function resolveRef ({ gitdir, ref, depth }) {
   if (depth !== undefined) {

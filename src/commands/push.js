@@ -2,9 +2,9 @@
 import stream from 'stream'
 import { config } from './config'
 import { pack } from './pack'
+import { resolveRef } from './resolveRef'
 import { GitObjectManager, GitRemoteHTTP } from '../managers'
 import { GitCommit, GitTree, GitPktLine } from '../models'
-import { resolveRef } from '../utils'
 
 export async function listCommits (
   {

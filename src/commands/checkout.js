@@ -1,8 +1,9 @@
 import path from 'path'
 import pify from 'pify'
+import { resolveRef } from './resolveRef'
 import { GitCommit, GitTree } from '../models'
 import { GitObjectManager, GitIndexManager } from '../managers'
-import { rm, write, resolveRef, fs } from '../utils'
+import { rm, write, fs } from '../utils'
 
 async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
   for (let entry of tree) {

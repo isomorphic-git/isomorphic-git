@@ -3,9 +3,13 @@ A pure JavaScript implementation of git for node and browsers!
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
 
-It works with any modern browser (see list above) and uses [BrowserFS](https://www.npmjs.com/package/browserfs) to emulate the node 'fs' module. This means client-side JavaScript can be used to read *and write* to the web the same way you've been editing websites on your desktop since 2008 - using git.
+`isomorphic-git` is a pure JavaScript implementation of git that works in node and browser environments (including WebWorkers and ServiceWorkers). This means it can be used to read and write to to git repositories, as well as fetch from and push to git remotes like Github.
 
-Isomorphic-git does not impliment every feature found in the canonical git implementation. But it does aim for 100% compatibility. This means it does all its operations by modifying files in a ".git" directory just like the git you are used to. You can even use the `isogit` CLI to operate on existing git repositories on your desktop or server.
+Isomorphic-git aims for 100% interoperability with the canonical git implementation. This means it does all its operations by modifying files in a ".git" directory just like the git you are used to. The included `isogit` CLI can operate on git repositories on your desktop or server.
+
+Unlike earlier git-in-js solutions that were hypermodular, `isomorphic-git` aims to be a complete solution with no assembly required.
+The [high-level API](#high-level-git-api) is a [fluent](https://en.wikipedia.org/wiki/Fluent_interface) interface modeled after the git CLI and should feel natural to read and write.
+However, one size does not always fit. That's why `isomorphic-git` also has a [layered API](#lower-level-api) that frees you to build a solution using only the exact features you need.
 
 <hr>
 
@@ -40,8 +44,7 @@ Isomorphic-git does not impliment every feature found in the canonical git imple
 - [Lower-level API](#lower-level-api)
   - [Commands](#commands)
   - [Managers](#managers)
-  - [Models](#models)
-  - [Utils](#utils)
+  - [Models and Utils](#models-and-utils)
 - [Who is using `isomorphic-git`?](#who-is-using-isomorphic-git)
 - [Similar projects](#similar-projects)
 - [Acknowledgments](#acknowledgments)
@@ -706,18 +709,46 @@ as a series of layers that should tree-shake very well:
 ### Commands
 
 ```
-import * as managers from 'isomorphic-git/dist/for-node/commands'
+import {
+  add,
+  clone,
+  checkout,
+  commit,
+  fetch,
+  init,
+  list,
+  listCommits,
+  listObjects,
+  log,
+  pack,
+  push,
+  remove,
+  resolveRef,
+  config,
+  unpack,
+  verify,
+  status,
+  findRoot,
+  listBranches,
+  version
+} from 'isomorphic-git/dist/for-node/commands'
 ```
 
-Each command is available as its own file, so hopefully with
-a bit of finagling you will be able to import individual commands
-if you only need a few and are willint to sacrifice the fluent API
+Each command is available as its own file, so you are able to import individual commands
+if you only need a few and are willing to sacrifice the fluent API
 in order to optimize your bundle size.
 
 ### Managers
 
 ```
-import * as managers from 'isomorphic-git/dist/for-node/managers'
+import {
+  GitConfigManager,
+  GitShallowManager,
+  GitIndexManager,
+  GitObjectManager,
+  GitRefsManager,
+  GitRemoteHTTP
+} from 'isomorphic-git/dist/for-node/managers'
 ```
 
 Managers are a level above models. They take care of implementation performance details like
@@ -729,23 +760,39 @@ Managers are a level above models. They take care of implementation performance 
 - reusing objects
 - object memory pools
 
-### Models
+### Models and Utils
 
 ```
-import * as models from 'isomorphic-git/dist/for-node/models'
+import {
+  GitCommit,
+  GitConfig,
+  GitPktLine,
+  GitIndex,
+  GitTree
+} from 'isomorphic-git/dist/for-node/models'
 ```
 
-Models are the lowest level building blocks.
-They generally have very few or no dependencies except for `'buffer'`.
+Models and utils are the lowest level building blocks.
+Models generally have very few or no dependencies except for `'buffer'`.
 This makes them portable to many different environments so they can be a useful lowest common denominator.
-
-### Utils
+They do not rely on Utils.
 
 ```
-import * as utils from 'isomorphic-git/dist/for-node/utils'
+import {
+  rm,
+  flatFileListToDirectoryStructure,
+  default,
+  lock,
+  mkdirs,
+  read,
+  sleep,
+  write,
+  pkg
+} from 'isomorphic-git/dist/for-node/utils'
 ```
 
-I lied. Utils are actually the lowest level building blocks.
+Utils are basically miscellaneous functions.
+Some are convenience wrappers for common filesystem operations.
 
 ## Who is using `isomorphic-git`?
 
