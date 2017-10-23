@@ -3,7 +3,11 @@ import path from 'path'
 import pify from 'pify'
 import { resolveRef } from './resolveRef'
 import { GitCommit, GitTree } from '../models'
-import { GitObjectManager, GitIndexManager } from '../managers'
+import {
+  GitObjectManager,
+  GitIndexManager,
+  GitIgnoreManager
+} from '../managers'
 import { read, fs } from '../utils'
 /*::
 import type { Stats } from 'fs'
@@ -88,6 +92,10 @@ export async function status (
     pathname: string
   } */
 ) {
+  let ignored = await GitIgnoreManager.isIgnored({ gitdir, workdir, pathname })
+  if (ignored) {
+    return 'ignored'
+  }
   let headTree = await getHeadTree({ gitdir })
   let treeOid = await getOidAtPath({ gitdir, tree: headTree, path: pathname })
   let indexEntry = null

@@ -1,3 +1,4 @@
+/* global test describe expect */
 import git from '..'
 import path from 'path'
 import { read, write, rm } from '../dist/for-node/utils'
@@ -47,5 +48,15 @@ describe('status', () => {
     await rm(path.join(workdir, 'e.txt'))
     let e3 = await repo.status('e.txt')
     expect(e3).toEqual('*absent')
+
+    // Yay .gitignore!
+    let f = await repo.status('f.txt')
+    let g = await repo.status('g/g.txt')
+    let h = await repo.status('h/h.txt')
+    let i = await repo.status('i/i.txt')
+    expect(f).toEqual('ignored')
+    expect(g).toEqual('ignored')
+    expect(h).toEqual('ignored')
+    expect(i).toEqual('*added')
   })
 })
