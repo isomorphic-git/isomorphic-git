@@ -32,6 +32,7 @@ However, one size does not always fit. That's why `isomorphic-git` also has a [l
   - [.log(ref)](#logref)
   - [.add(file)](#addfile)
   - [.remove(file)](#removefile)
+  - [.status(file)](#statusfile)
   - [.commit(msg)](#commitmsg)
   - [.push(branch)](#pushbranch)
   - [.findRoot(dir)](#findrootdir)
@@ -451,6 +452,48 @@ git()
 - @param {string} `gitdir` - The path to the git directory.
 - @param {string} `filepath` - The path to the file to add to the index.
 - @returns `Promise<void>`
+
+### .status(file)
+Tell whether a file has been changed
+
+```js
+// JS example
+import git from 'isomorphic-git'
+git('.')
+  .status('README.md')
+```
+
+```sh
+# CLI example
+isogit status README.md
+```
+
+```js
+// Complete API
+git()
+  .workdir(workdir)
+  .gitdir(gitdir)
+  .status(filepath)
+```
+
+- @param {string} `workdir` - The path to the working directory.
+- @param {string} `gitdir` - The path to the git directory.
+- @param {string} `filepath` - The path to the file to query.
+- @returns `Promise<String>`
+
+The possible return values are:
+
+- `"ignored"` file ignored by a .gitignore rule
+- `"unmodified"` file unchanged from HEAD commit
+- `"*modified"` file has modifications, not yet staged
+- `"*deleted"` file has been removed, but the removal is not yet staged
+- `"*added"` file is untracked, not yet staged
+- `"absent"` file not present in HEAD commit, staging area, or working dir
+- `"modified"` file has modifications, staged
+- `"deleted"` file has been removed, staged
+- `"added"` previously untracked file, staged
+- `"*unmodified"` working dir and HEAD commit match, but index differs
+- `"*absent"` file not present in working dir or HEAD commit, but present in the index
 
 ### .commit(msg)
 Create a new commit
