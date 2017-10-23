@@ -1,9 +1,10 @@
 // @flow
 import path from 'path'
 import pify from 'pify'
+import { resolveRef } from './resolveRef'
 import { GitCommit, GitTree } from '../models'
 import { GitObjectManager, GitIndexManager } from '../managers'
-import { read, resolveRef, fs } from '../utils'
+import { read, fs } from '../utils'
 /*::
 import type { Stats } from 'fs'
 import type { CacheEntry } from '../models/GitIndex'

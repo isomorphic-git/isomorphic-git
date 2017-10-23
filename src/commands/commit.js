@@ -1,7 +1,8 @@
 import { config } from './config'
+import { resolveRef } from './resolveRef'
 import { GitCommit, GitTree } from '../models'
 import { GitObjectManager, GitIndexManager } from '../managers'
-import { write, resolveRef, flatFileListToDirectoryStructure } from '../utils'
+import { write, flatFileListToDirectoryStructure } from '../utils'
 import path from 'path'
 
 async function constructTree ({ gitdir, inode }) /*: string */ {

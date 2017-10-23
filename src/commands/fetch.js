@@ -3,9 +3,10 @@ import stream from 'stream'
 import thru from 'thru'
 import { config } from './config'
 import { unpack } from './unpack'
+import { resolveRef } from './resolveRef'
 import { GitRemoteHTTP, GitRefsManager, GitShallowManager } from '../managers'
 import { GitPktLine } from '../models'
-import { resolveRef, pkg } from '../utils'
+import { pkg } from '../utils'
 
 export async function fetchPackfile ({
   gitdir,
