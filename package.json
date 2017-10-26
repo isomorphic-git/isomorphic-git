@@ -1,6 +1,6 @@
 {
   "name": "isomorphic-git",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "A pure JavaScript implementation of git for node and browsers!",
   "main": "dist/for-node/",
   "browser": "dist/for-browserify/",
