@@ -19,11 +19,20 @@ import {
   version
 } from './commands'
 
+import * as commands from './commands'
+import * as managers from './managers'
+import * as models from './models'
+import * as utils from './utils'
+
 export default function git (dir) {
   return dir === undefined
     ? new Git()
     : new Git().workdir(dir).gitdir(`${dir}/.git`)
 }
+git.commands = commands
+git.managers = managers
+git.models = models
+git.utils = utils
 
 const extend = (self, array) => {
   for (let fn of array) {

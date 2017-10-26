@@ -105,6 +105,36 @@ const browserifyConfig = input => ({
   ]
 })
 
+// Also for Browserify
+const serviceworkerConfig = input => ({
+  input: `src/${input}`,
+  external: [...external],
+  output: [
+    { format: 'cjs', name: 'git', file: `dist/for-serviceworker/${input}` }
+  ],
+  sourcemap: true,
+  plugins: [
+    json(),
+    babel({
+      babelrc: false,
+      exclude: 'node_modules/**',
+      presets: [
+        [
+          'env',
+          {
+            modules: false,
+            targets: {
+              browsers: 'Chrome 62'
+            }
+          }
+        ]
+      ],
+      runtimeHelpers: true,
+      plugins: ['transform-runtime', 'transform-object-rest-spread']
+    })
+  ]
+})
+
 const inputs = [
   'index.js',
   'commands.js',
@@ -121,5 +151,6 @@ const codeSplitting = input =>
 export default [
   ...inputs.map(moduleConfig),
   ...inputs.map(nodeConfig),
-  ...inputs.map(browserifyConfig)
+  ...inputs.map(browserifyConfig),
+  serviceworkerConfig('index.js')
 ]

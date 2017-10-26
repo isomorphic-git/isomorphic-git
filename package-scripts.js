@@ -14,10 +14,12 @@ module.exports = {
       jest: runInNewWindow('jest --watch')
     },
     build: {
-      default: series.nps('build.rollup', 'build.umd'),
+      default: series.nps('build.rollup', 'build.sw', 'build.umd'),
       rollup: 'rollup -c',
       umd:
-        'browserify --entry dist/for-browserify/index.js --standalone git --debug | uglifyjs --compress --mangle --source-map "content=inline,url=bundle.umd.min.js.map" -o dist/bundle.umd.min.js'
+        'browserify --entry dist/for-browserify/index.js --standalone git --debug | uglifyjs --compress --mangle --source-map "content=inline,url=bundle.umd.min.js.map" -o dist/bundle.umd.min.js',
+      sw:
+        'browserify --entry dist/for-serviceworker/index.js --standalone git --debug > dist/service-worker-bundle.umd.min.js'
     },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
