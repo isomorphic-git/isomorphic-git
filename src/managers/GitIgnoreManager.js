@@ -6,12 +6,14 @@ import { read } from '../utils'
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of cacheing.
 
+// TODO: Implement .git/info/exclude
+
 export class GitIgnoreManager {
   static async isIgnored ({
     gitdir,
     workdir,
     pathname
-  }) /*: Promise<Boolean> */ {
+  }) /*: Promise<boolean> */ {
     let pairs = [
       {
         gitignore: path.join(workdir, '.gitignore'),
@@ -36,6 +38,7 @@ export class GitIgnoreManager {
         if (err.code === 'NOENT') continue
       }
       let ign = ignore().add(file)
+      let unign = ignore().add(`**\n${file}`)
       // If the parent directory is excluded, we are done.
       // "It is not possible to re-include a file if a parent directory of that file is excluded. Git doesn’t list excluded directories for performance reasons, so any patterns on contained files have no effect, no matter where they are defined."
       // source: https://git-scm.com/docs/gitignore
@@ -43,13 +46,7 @@ export class GitIgnoreManager {
       if (ign.ignores(parentdir)) return true
       // If the file is currently ignored, test for UNignoring.
       if (ignoredStatus) {
-        if (
-          !ignore()
-            .add(`**\n${file}`)
-            .ignores(p.pathname)
-        ) {
-          ignoredStatus = false
-        }
+        ignoredStatus = unign.ignores(p.pathname)
       } else {
         ignoredStatus = ign.ignores(p.pathname)
       }
