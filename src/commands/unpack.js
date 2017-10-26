@@ -5,6 +5,7 @@ import listpack from 'git-list-pack'
 import thru from 'thru'
 import peek from 'buffer-peek-stream'
 import applyDelta from 'git-apply-delta'
+import marky from 'marky'
 /*::
 import type {Writable} from 'stream'
 */
@@ -57,25 +58,36 @@ export async function unpack (
       }
       if (numObjects === 0) return resolve()
       // And on our merry way
+      let totalTime = 0
+      let totalApplyDeltaTime = 0
+      let totalWriteFileTime = 0
+      let totalReadFileTime = 0
       let offsetMap = new Map()
       inputStream
         .pipe(listpack())
         .pipe(
           thru(async ({ data, type, reference, offset, num }, next) => {
             type = types[type]
+            marky.mark(`${type} #${num} ${data.length}B`)
             if (type === 'ref-delta') {
               let oid = Buffer.from(reference).toString('hex')
               try {
+                marky.mark(`readFile`)
                 let { object, type } = await GitObjectManager.read({
                   gitdir,
                   oid
                 })
+                totalReadFileTime += marky.stop(`readFile`).duration
+                marky.mark(`applyDelta`)
                 let result = applyDelta(data, object)
+                totalApplyDeltaTime += marky.stop(`applyDelta`).duration
+                marky.mark(`writeFile`)
                 let newoid = await GitObjectManager.write({
                   gitdir,
                   type,
                   object: result
                 })
+                totalWriteFileTime += marky.stop(`writeFile`).duration
                 // console.log(`${type} ${newoid} ref-delta ${oid}`)
                 offsetMap.set(offset, newoid)
               } catch (err) {
@@ -105,11 +117,13 @@ export async function unpack (
               // console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
               offsetMap.set(offset, oid)
             } else {
+              marky.mark(`writeFile`)
               let oid = await GitObjectManager.write({
                 gitdir,
                 type,
                 object: data
               })
+              totalWriteFileTime += marky.stop(`writeFile`).duration
               // console.log(`${offset} ${type} ${oid}`)
               offsetMap.set(offset, oid)
             }
@@ -120,7 +134,15 @@ export async function unpack (
                 lengthComputable: true
               })
             }
-            if (num === 0) return resolve()
+            let perfentry = marky.stop(`${type} #${num} ${data.length}B`)
+            totalTime += perfentry.duration
+            if (num === 0) {
+              console.log(`Total time unpacking objects: ${totalTime}`)
+              console.log(`Total time applying deltas: ${totalApplyDeltaTime}`)
+              console.log(`Total time reading files: ${totalReadFileTime}`)
+              console.log(`Total time writing files: ${totalWriteFileTime}`)
+              return resolve()
+            }
             next(null)
           })
         )
