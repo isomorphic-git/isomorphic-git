@@ -48,7 +48,17 @@ export class GitObjectManager {
     let file = await read(
       `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     )
-    if (!file) throw new Error(`Git object with oid ${oid} not found`)
+    if (!file) {
+      // Check to see if it's in shallow commits.
+      let text = await read(`${gitdir}/shallow`, { encoding: 'utf8' })
+      if (text !== null && text.includes(oid)) {
+        throw new Error(
+          `Failed to read git object with oid ${oid} because it is a shallow commit`
+        )
+      } else {
+        throw new Error(`Failed to read git object with oid ${oid}`)
+      }
+    }
     let { type, object } = unwrapObject({ oid, file })
     return { type, object }
   }
