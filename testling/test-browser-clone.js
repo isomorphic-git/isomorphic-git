@@ -3,7 +3,7 @@ const test = require('tape')
 const BrowserFS = require('browserfs')
 window.git = git
 test('clone', t => {
-  t.plan(1)
+  t.plan(2)
   BrowserFS.install(window)
   BrowserFS.configure({ fs: 'LocalStorage' }, function (err) {
     if (err) return t.fail(err)
