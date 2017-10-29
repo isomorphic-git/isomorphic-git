@@ -1,8 +1,7 @@
 import path from 'path'
 import pify from 'pify'
-import { resolveRef } from './resolveRef'
 import { GitCommit, GitTree } from '../models'
-import { GitObjectManager, GitIndexManager } from '../managers'
+import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { rm, write, fs } from '../utils'
 
 async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
@@ -47,19 +46,23 @@ export async function checkout ({ workdir, gitdir, remote, ref }) {
   if (remote) {
     let remoteRef
     if (ref === undefined) {
-      remoteRef = await resolveRef({ gitdir, ref: `${remote}/HEAD`, depth: 2 })
+      remoteRef = await GitRefManager.resolve({
+        gitdir,
+        ref: `${remote}/HEAD`,
+        depth: 2
+      })
       ref = path.basename(remoteRef)
     } else {
       remoteRef = `${remote}/${ref}`
     }
-    oid = await resolveRef({ gitdir, ref: remoteRef })
+    oid = await GitRefManager.resolve({ gitdir, ref: remoteRef })
     // Make the remote ref our own!
     await write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
   } else {
     if (ref === undefined) {
       throw new Error('Cannot checkout ref "undefined"')
     }
-    oid = await resolveRef({ gitdir, ref })
+    oid = await GitRefManager.resolve({ gitdir, ref })
   }
   let commit = await GitObjectManager.read({ gitdir, oid })
   if (commit.type !== 'commit') {

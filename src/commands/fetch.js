@@ -3,8 +3,7 @@ import stream from 'stream'
 import thru from 'thru'
 import { config } from './config'
 import { unpack } from './unpack'
-import { resolveRef } from './resolveRef'
-import { GitRemoteHTTP, GitRefsManager, GitShallowManager } from '../managers'
+import { GitRemoteHTTP, GitRefManager, GitShallowManager } from '../managers'
 import { GitPktLine } from '../models'
 import { pkg } from '../utils'
 
@@ -58,13 +57,16 @@ export async function fetchPackfile ({
       `Remote does not support shallow fetches relative to the current shallow depth`
     )
   }
-  await GitRefsManager.updateRemoteRefs({
+  await GitRefManager.updateRemoteRefs({
     gitdir,
     remote,
     refs: remoteHTTP.refs,
     symrefs: remoteHTTP.symrefs
   })
-  let want = await resolveRef({ gitdir, ref: `refs/remotes/${remote}/${ref}` })
+  let want = await GitRefManager.resolve({
+    gitdir,
+    ref: `refs/remotes/${remote}/${ref}`
+  })
   // Note: I removed "ofs-delta" from the capabilities list and now
   // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${pkg.name}@${pkg.version}${relative
@@ -92,7 +94,7 @@ export async function fetchPackfile ({
   packstream.write(GitPktLine.flush())
   let have = null
   try {
-    have = await resolveRef({ gitdir, ref })
+    have = await GitRefManager.resolve({ gitdir, ref })
   } catch (err) {}
   if (have) {
     packstream.write(GitPktLine.encode(`have ${have}\n`))

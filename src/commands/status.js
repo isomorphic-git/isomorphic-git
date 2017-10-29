@@ -1,9 +1,9 @@
 // @flow
 import path from 'path'
 import pify from 'pify'
-import { resolveRef } from './resolveRef'
 import { GitCommit, GitTree } from '../models'
 import {
+  GitRefManager,
   GitObjectManager,
   GitIndexManager,
   GitIgnoreManager
@@ -69,7 +69,7 @@ async function getOidAtPath (
 
 async function getHeadTree ({ gitdir }) {
   // Get the tree from the HEAD commit.
-  let oid = await resolveRef({ gitdir, ref: 'HEAD' })
+  let oid = await GitRefManager.resolve({ gitdir, ref: 'HEAD' })
   let { object: cobject } = await GitObjectManager.read({ gitdir, oid })
   let commit = GitCommit.from(cobject)
   let { object: tobject } = await GitObjectManager.read({

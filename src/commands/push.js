@@ -2,8 +2,7 @@
 import stream from 'stream'
 import { config } from './config'
 import { pack } from './pack'
-import { resolveRef } from './resolveRef'
-import { GitObjectManager, GitRemoteHTTP } from '../managers'
+import { GitRefManager, GitObjectManager, GitRemoteHTTP } from '../managers'
 import { GitCommit, GitTree, GitPktLine } from '../models'
 
 export async function listCommits (
@@ -20,12 +19,12 @@ export async function listCommits (
   let startingSet = new Set()
   let finishingSet = new Set()
   for (let ref of start) {
-    startingSet.add(await resolveRef({ gitdir, ref }))
+    startingSet.add(await GitRefManager.resolve({ gitdir, ref }))
   }
   for (let ref of finish) {
     // We may not have these refs locally so we must try/catch
     try {
-      let oid = await resolveRef({ gitdir, ref })
+      let oid = await GitRefManager.resolve({ gitdir, ref })
       finishingSet.add(oid)
     } catch (err) {}
   }
@@ -110,7 +109,7 @@ export async function push ({
     })
   }
   let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
-  let oid = await resolveRef({ gitdir, ref })
+  let oid = await GitRefManager.resolve({ gitdir, ref })
   let httpRemote = new GitRemoteHTTP(url)
   if (authUsername !== undefined && authPassword !== undefined) {
     httpRemote.auth = {
