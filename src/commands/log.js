@@ -27,11 +27,23 @@ export async function log ({
     if (depth !== undefined && commits.length === depth) break
     if (currentCommit.parent.length === 0) break
     let oid = currentCommit.parent[0]
-    let { type, object } = await GitObjectManager.read({ gitdir, oid })
+    let gitobject
+    try {
+      gitobject = await GitObjectManager.read({ gitdir, oid })
+    } catch (err) {
+      commits.push({
+        oid,
+        error: err
+      })
+      break
+    }
+    let { type, object } = gitobject
     if (type !== 'commit') {
-      throw new Error(
-        `Invalid commit parent ${currentCommit.parent[0]} is of type ${type}`
-      )
+      commits.push({
+        oid,
+        error: new Error(`Invalid commit parent ${oid} is of type ${type}`)
+      })
+      break
     }
     currentCommit = { oid, ...GitCommit.from(object).parse() }
     if (

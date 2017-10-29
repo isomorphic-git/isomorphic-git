@@ -23,20 +23,12 @@ describe('log', () => {
       .log('HEAD')
     expect(commits.length).toBe(2)
   })
-  // test('test-branch', async () => {
-  //   let ref = await resolveRef({
-  //     gitdir: '__tests__/__fixtures__/test-resolveRef.git',
-  //     ref: 'origin/test-branch'
-  //   })
-  //   expect(ref).toMatchSnapshot()
-  // })
-  // test('test-tag', async () => {
-  //   let ref = await resolveRef({
-  //     gitdir: '__tests__/__fixtures__/test-resolveRef.git',
-  //     ref: 'test-tag'
-  //   })
-  //   expect(ref).toMatchSnapshot()
-  // })
+  test('test-branch', async () => {
+    let commits = await git()
+      .gitdir('__tests__/__fixtures__/test-resolveRef.git')
+      .log('origin/test-branch')
+    expect(commits).toMatchSnapshot()
+  })
   // test('test-HEAD', async () => {
   //   let ref = await resolveRef({
   //     gitdir: '__tests__/__fixtures__/test-resolveRef.git',

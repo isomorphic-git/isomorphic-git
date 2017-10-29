@@ -1,3 +1,4 @@
+/* global test describe expect */
 import { resolveRef } from '../dist/for-node/commands'
 
 describe('resolveRef', () => {
