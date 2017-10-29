@@ -1,6 +1,5 @@
 // @flow
-import { resolveRef } from './resolveRef'
-import { GitObjectManager } from '../managers'
+import { GitRefManager, GitObjectManager } from '../managers'
 import { GitCommit } from '../models'
 
 export async function log ({
@@ -14,7 +13,7 @@ export async function log ({
   // TODO: In the future, we may want to have an API where we return a
   // async iterator that emits commits.
   let commits = []
-  let start = await resolveRef({ gitdir, ref })
+  let start = await GitRefManager.resolve({ gitdir, ref })
   let { type, object } = await GitObjectManager.read({ gitdir, oid: start })
   if (type !== 'commit') {
     throw new Error(

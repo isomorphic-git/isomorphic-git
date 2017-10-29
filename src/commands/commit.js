@@ -1,7 +1,6 @@
 import { config } from './config'
-import { resolveRef } from './resolveRef'
 import { GitCommit, GitTree } from '../models'
-import { GitObjectManager, GitIndexManager } from '../managers'
+import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { write, flatFileListToDirectoryStructure } from '../utils'
 import path from 'path'
 
@@ -53,7 +52,7 @@ export async function commit ({
     const treeRef = await constructTree({ gitdir, inode })
     let parents
     try {
-      let parent = await resolveRef({ gitdir, ref: 'HEAD' })
+      let parent = await GitRefManager.resolve({ gitdir, ref: 'HEAD' })
       parents = [parent]
     } catch (err) {
       // Probably an initial commit
@@ -87,7 +86,11 @@ export async function commit ({
       object: comm.toObject()
     })
     // Update branch pointer
-    const branch = await resolveRef({ gitdir, ref: 'HEAD', depth: 2 })
+    const branch = await GitRefManager.resolve({
+      gitdir,
+      ref: 'HEAD',
+      depth: 2
+    })
     await write(path.join(gitdir, branch), oid + '\n')
   })
   return oid

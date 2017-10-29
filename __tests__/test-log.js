@@ -25,7 +25,7 @@ describe('log', () => {
   })
   test('test-branch', async () => {
     let commits = await git()
-      .gitdir('__tests__/__fixtures__/test-resolveRef.git')
+      .gitdir('__tests__/__fixtures__/test-GitRefManager.git')
       .log('origin/test-branch')
     expect(commits).toMatchSnapshot()
   })
