@@ -1,5 +1,7 @@
 export { GitCommit } from './models/GitCommit'
 export { GitConfig } from './models/GitConfig'
+export { GitObject } from './models/GitObject'
 export { GitPktLine } from './models/GitPktLine'
+export { GitPackfile } from './models/GitPackfile'
 export { GitIndex } from './models/GitIndex'
 export { GitTree } from './models/GitTree'
