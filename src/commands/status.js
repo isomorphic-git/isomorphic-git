@@ -28,7 +28,7 @@ function cacheIsStale (
     entry.ctime.valueOf() !== stats.ctime.valueOf() ||
     entry.uid !== stats.uid ||
     entry.gid !== stats.gid ||
-    entry.ino !== stats.ino ||
+    entry.ino !== stats.ino >> 0 ||
     entry.size !== stats.size
   )
 }
@@ -140,6 +140,15 @@ export async function status (
         object
       })
       return workdirOid === indexEntry.oid ? 'added' : '*added'
+    }
+  } else if (
+    indexEntry !== null &&
+    !cacheIsStale({ entry: indexEntry, stats })
+  ) {
+    if (indexEntry.oid === treeOid) {
+      return 'unmodified'
+    } else {
+      return 'modified'
     }
   } else {
     let object = await read(path.join(workdir, pathname))
