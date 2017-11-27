@@ -35,17 +35,7 @@ export class GitObjectManager {
     return oid
   }
 
-  static async write (
-    {
-      gitdir,
-      type,
-      object
-    } /*: {
-      gitdir: string,
-      type: string,
-      object: Buffer
-    } */
-  ) /*: Promise<string> */ {
+  static async write ({ gitdir, type, object }) /*: Promise<string> */ {
     let { file, oid } = GitObject.wrap({ type, object })
     let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     // Don't overwrite existing git objects - this helps avoid EPERM errors.
