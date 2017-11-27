@@ -117,21 +117,13 @@ export async function status (
     }
   }
 
-  if (treeOid === null && stats === null) {
-    if (indexEntry === null) {
-      return 'absent'
-    } else {
-      return '*absent'
-    }
-  } else if (treeOid !== null && stats === null) {
-    if (indexEntry === null) {
-      return 'deleted'
-    } else {
-      return '*deleted'
-    }
-  } else if (treeOid === null && stats !== null) {
-    if (indexEntry === null) {
-      return '*added'
+  let H = treeOid !== null // head
+  let I = indexEntry !== null // index
+  let W = stats !== null // working dir
+
+  const getWorkdirOid = async () => {
+    if (I && !cacheIsStale({ entry: indexEntry, stats })) {
+      return indexEntry.oid
     } else {
       let object = await read(path.join(workdir, pathname))
       let workdirOid = await GitObjectManager.hash({
@@ -139,32 +131,47 @@ export async function status (
         type: 'blob',
         object
       })
-      return workdirOid === indexEntry.oid ? 'added' : '*added'
+      return workdirOid
     }
-  } else if (treeOid !== null && indexEntry === null) {
-    // stats !== null by process of elimination
-    return '*undeleted'
-  } else if (
-    indexEntry !== null &&
-    !cacheIsStale({ entry: indexEntry, stats })
-  ) {
-    if (indexEntry.oid === treeOid) {
-      return 'unmodified'
-    } else {
-      return 'modified'
-    }
-  } else {
-    let object = await read(path.join(workdir, pathname))
-    let workdirOid = await GitObjectManager.hash({
-      gitdir,
-      type: 'blob',
-      object
-    })
-    if (workdirOid === treeOid) {
-      if (indexEntry === null) return '*unmodified'
-      return workdirOid === indexEntry.oid ? 'unmodified' : '*unmodified'
-    }
-    if (indexEntry === null) return '*modified'
-    return workdirOid === indexEntry.oid ? 'modified' : '*modified'
   }
+
+  if (!H && !W && !I) return 'absent' // ---
+  if (!H && !W && I) return '*absent' // -A-
+  if (!H && W && !I) return '*added' // --A
+  if (!H && W && I) {
+    let workdirOid = await getWorkdirOid()
+    return workdirOid === indexEntry.oid ? 'added' : '*added' // -AA : -AB
+  }
+  if (H && !W && !I) return 'deleted' // A--
+  if (H && !W && I) {
+    return treeOid === indexEntry.oid ? '*deleted' : '*deleted' // AA- : AB-
+  }
+  if (H && W && !I) {
+    let workdirOid = await getWorkdirOid()
+    return workdirOid === treeOid ? '*undeleted' : '*undeletemodified' // A-A : A-B
+  }
+  if (H && W && I) {
+    let workdirOid = await getWorkdirOid()
+    if (workdirOid === treeOid) {
+      return workdirOid === indexEntry.oid ? 'unmodified' : '*unmodified' // AAA : ABA
+    } else {
+      return workdirOid === indexEntry.oid ? 'modified' : '*modified' // ABB : AAB
+    }
+  }
+  /*
+  ---
+  -A-
+  --A
+  -AA
+  -AB
+  A--
+  AA-
+  AB-
+  A-A
+  A-B
+  AAA
+  ABA
+  ABB
+  AAB
+  */
 }
