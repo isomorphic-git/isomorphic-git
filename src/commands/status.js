@@ -141,6 +141,9 @@ export async function status (
       })
       return workdirOid === indexEntry.oid ? 'added' : '*added'
     }
+  } else if (treeOid !== null && indexEntry === null) {
+    // stats !== null by process of elimination
+    return '*undeleted'
   } else if (
     indexEntry !== null &&
     !cacheIsStale({ entry: indexEntry, stats })

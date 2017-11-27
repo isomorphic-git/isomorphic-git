@@ -43,6 +43,10 @@ describe('status', () => {
     let a3 = await repo.status('a.txt')
     expect(a3).toEqual('*unmodified')
 
+    await repo.remove('a.txt')
+    let a4 = await repo.status('a.txt')
+    expect(a4).toEqual('*undeleted')
+
     await write(path.join(workdir, 'e.txt'), 'Hi')
     await repo.add('e.txt')
     await rm(path.join(workdir, 'e.txt'))
