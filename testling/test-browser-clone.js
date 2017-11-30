@@ -1,4 +1,4 @@
-const git = require('../dist/for-browserify').default
+const git = require('../dist/bundle.umd.min.js')
 const test = require('tape')
 const BrowserFS = require('browserfs')
 window.git = git

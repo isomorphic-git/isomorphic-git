@@ -80,7 +80,7 @@ const nodeConfig = input => ({
 // Browserify
 const browserifyConfig = input => ({
   input: `src/${input}`,
-  external: [...external, ...codeSplitting(input)],
+  external: [...external],
   output: [
     { format: 'cjs', name: 'git', file: `dist/for-browserify/${input}` }
   ],
@@ -145,14 +145,6 @@ const inputs = [
   'utils.js'
 ]
 
-const umdInputs = [
-  'index-umd.js',
-  'commands.js',
-  'managers.js',
-  'models.js',
-  'utils.js'
-]
-
 const codeSplitting = input =>
   inputs
     .map(x => path.resolve(`src/${x}`))
@@ -161,6 +153,6 @@ const codeSplitting = input =>
 export default [
   ...inputs.map(moduleConfig),
   ...inputs.map(nodeConfig),
-  ...umdInputs.map(browserifyConfig),
+  browserifyConfig('index-umd.js'),
   serviceworkerConfig('index-umd.js')
 ]
