@@ -24,7 +24,7 @@ import * as managers from './managers'
 import * as models from './models'
 import * as utils from './utils'
 
-export default function git (dir) {
+export function git (dir) {
   return dir === undefined
     ? new Git()
     : new Git().workdir(dir).gitdir(`${dir}/.git`)
@@ -49,10 +49,10 @@ const extendBool = (self, array) => {
 }
 
 // The class is merely a fluent command/query builder
-class Git extends Map {
+export class Git extends Map {
   // @constructor
-  constructor (parent) {
-    super(parent)
+  constructor ({ fs, dir, workdir, gitdir } = {}) {
+    super()
     extend(this, [
       'workdir',
       'gitdir',
@@ -72,9 +72,24 @@ class Git extends Map {
       'url',
       'outputStream',
       'inputStream',
-      'onprogress'
+      'onprogress',
+      'fs'
     ])
     extendBool(this, ['relative'])
+    if (fs) {
+      this.set('fs', fs)
+      utils.setfs(fs)
+    }
+    if (dir) {
+      this.set('workdir', dir)
+      this.set('gitdir', `${dir}/.git`)
+    }
+    if (workdir) {
+      this.set('workdir', workdir)
+    }
+    if (gitdir) {
+      this.set('gitdir', gitdir)
+    }
   }
   version () {
     return version()
@@ -141,11 +156,15 @@ class Git extends Map {
     return this
   }
   async findRoot (dir) {
-    return findRoot(dir)
+    return findRoot({
+      filepath: dir,
+      fs: this.get('fs')
+    })
   }
   async init () {
     await init({
-      gitdir: this.get('gitdir')
+      gitdir: this.get('gitdir'),
+      fs: this.get('fs')
     })
   }
   async fetch (ref) {
@@ -160,7 +179,8 @@ class Git extends Map {
       since: this.get('since'),
       exclude: this.get('exclude'),
       relative: this.get('relative'),
-      onprogress: this.get('onprogress')
+      onprogress: this.get('onprogress'),
+      fs: this.get('fs')
     })
   }
   async checkout (ref) {
@@ -168,7 +188,8 @@ class Git extends Map {
       workdir: this.get('workdir'),
       gitdir: this.get('gitdir'),
       ref,
-      remote: this.get('remote')
+      remote: this.get('remote'),
+      fs: this.get('fs')
     })
   }
   async clone (url) {
@@ -184,12 +205,14 @@ class Git extends Map {
       since: this.get('since'),
       exclude: this.get('exclude'),
       relative: this.get('relative'),
-      onprogress: this.get('onprogress')
+      onprogress: this.get('onprogress'),
+      fs: this.get('fs')
     })
   }
   async list () {
     return list({
-      gitdir: this.get('gitdir')
+      gitdir: this.get('gitdir'),
+      fs: this.get('fs')
     })
   }
   async log (ref) {
@@ -197,20 +220,23 @@ class Git extends Map {
       gitdir: this.get('gitdir'),
       ref,
       depth: this.get('depth'),
-      since: this.get('since')
+      since: this.get('since'),
+      fs: this.get('fs')
     })
   }
   async add (filepath) {
     return add({
       gitdir: this.get('gitdir'),
       workdir: this.get('workdir'),
-      filepath
+      filepath,
+      fs: this.get('fs')
     })
   }
   async remove (filepath) {
     return remove({
       gitdir: this.get('gitdir'),
-      filepath
+      filepath,
+      fs: this.get('fs')
     })
   }
   async commit (message) {
@@ -229,27 +255,31 @@ class Git extends Map {
         date: this.get('datetime')
       },
       message,
-      privateKeys: this.get('signingKey')
+      privateKeys: this.get('signingKey'),
+      fs: this.get('fs')
     })
   }
   async verify (ref) {
     return verify({
       gitdir: this.get('gitdir'),
       publicKeys: this.get('verificationKey'),
-      ref
+      ref,
+      fs: this.get('fs')
     })
   }
   async pack (oids) {
     return pack({
       gitdir: this.get('gitdir'),
       outputStream: this.get('outputStream'),
-      oids
+      oids,
+      fs: this.get('fs')
     })
   }
   async unpack (oids) {
     return unpack({
       gitdir: this.get('gitdir'),
-      inputStream: this.get('inputStream')
+      inputStream: this.get('inputStream'),
+      fs: this.get('fs')
     })
   }
   async push (ref) {
@@ -259,7 +289,8 @@ class Git extends Map {
       remote: this.get('remote'),
       url: this.get('url'),
       authUsername: this.get('username'),
-      authPassword: this.get('password')
+      authPassword: this.get('password'),
+      fs: this.get('fs')
     })
   }
   async pull (ref) {
@@ -268,20 +299,23 @@ class Git extends Map {
       ref,
       remote: this.get('remote'),
       authUsername: this.get('username'),
-      authPassword: this.get('password')
+      authPassword: this.get('password'),
+      fs: this.get('fs')
     })
   }
   async config (path, value) {
     if (arguments.length === 1) {
       return config({
         gitdir: this.get('gitdir'),
-        path
+        path,
+        fs: this.get('fs')
       })
     } else {
       return config({
         gitdir: this.get('gitdir'),
         path,
-        value
+        value,
+        fs: this.get('fs')
       })
     }
   }
@@ -289,12 +323,16 @@ class Git extends Map {
     return status({
       gitdir: this.get('gitdir'),
       workdir: this.get('workdir'),
-      pathname
+      pathname,
+      fs: this.get('fs')
     })
   }
   async listBranches () {
     return listBranches({
-      gitdir: this.get('gitdir')
+      gitdir: this.get('gitdir'),
+      fs: this.get('fs')
     })
   }
 }
+
+git.Git = Git

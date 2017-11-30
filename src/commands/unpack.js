@@ -6,6 +6,7 @@ import thru from 'thru'
 import peek from 'buffer-peek-stream'
 import applyDelta from 'git-apply-delta'
 import marky from 'marky'
+import { fs as defaultfs, setfs } from '../utils'
 /*::
 import type {Writable} from 'stream'
 */
@@ -36,9 +37,11 @@ export async function unpack (
   {
     gitdir,
     inputStream,
-    onprogress
+    onprogress,
+    fs = defaultfs()
   } /*: {gitdir: string, inputStream: ReadableStream, onprogress: Function} */
 ) {
+  setfs(fs)
   return new Promise(function (resolve, reject) {
     // Read header
     peek(inputStream, 12, (err, data, inputStream) => {

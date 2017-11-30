@@ -1,6 +1,9 @@
 /* globals describe test expect */
-import { GitPackfile, GitObject } from '../dist/for-node/models'
-import { read } from '../dist/for-node/utils'
+import { GitPackfile } from '../dist/for-node/models'
+import fs from 'fs'
+import { read, setfs } from '../dist/for-node/utils'
+
+setfs(fs)
 
 describe('GitPackfile', () => {
   test('size', async () => {

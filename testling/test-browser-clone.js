@@ -1,4 +1,4 @@
-const git = require('../dist/for-browserify')
+const git = require('../dist/for-browserify').default
 const test = require('tape')
 const BrowserFS = require('browserfs')
 window.git = git
@@ -9,6 +9,8 @@ test('clone', t => {
     if (err) return t.fail(err)
     window.fs = window.require('fs')
     t.ok(window.fs, 'Loaded window.fs')
+    git.utils.setfs(window.fs)
+
     git('.')
       .depth(1)
       .branch('master')

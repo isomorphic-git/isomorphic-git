@@ -1,3 +1,4 @@
+/* global test describe expect */
 import { GitRemoteHTTP } from '../dist/for-node/managers'
 import nock from 'nock'
 import server from './__helpers__/http-backend'

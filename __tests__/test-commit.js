@@ -1,4 +1,5 @@
-import git from '..'
+import fs from 'fs'
+import { Git } from '..'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
@@ -8,10 +9,9 @@ jest.setTimeout(30000)
 describe('commit', () => {
   test('commit', async () => {
     // Setup
-    let dir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
     // Test
-    const repo = git()
-    repo.gitdir(dir)
+    const repo = new Git({ fs, gitdir })
     repo.author('Mr. Test')
     repo.email('mrtest@example.com')
     repo.timestamp(1262356920)
@@ -21,10 +21,9 @@ describe('commit', () => {
 
   test('GPG signing', async () => {
     // Setup
-    let dir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
     // Test
-    const repo = git()
-    repo.gitdir(dir)
+    const repo = new Git({ fs, gitdir })
     repo.author('Mr. Test')
     repo.email('mrtest@example.com')
     repo.timestamp(1504842425)

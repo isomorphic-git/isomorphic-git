@@ -5,7 +5,7 @@ import { config } from './config'
 import { unpack } from './unpack'
 import { GitRemoteHTTP, GitRefManager, GitShallowManager } from '../managers'
 import { GitPktLine } from '../models'
-import { pkg } from '../utils'
+import { pkg, fs as defaultfs, setfs } from '../utils'
 
 export async function fetchPackfile ({
   gitdir,
@@ -17,8 +17,10 @@ export async function fetchPackfile ({
   depth = null,
   since = null,
   exclude = [],
-  relative = false
+  relative = false,
+  fs = defaultfs()
 }) {
+  setfs(fs)
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
       throw new Error(`Invalid value for depth argument: ${depth}`)
@@ -137,7 +139,8 @@ export async function fetch ({
   since,
   exclude,
   relative,
-  onprogress
+  onprogress,
+  fs
 }) {
   let response = await fetchPackfile({
     gitdir,
@@ -149,7 +152,8 @@ export async function fetch ({
     depth,
     since,
     exclude,
-    relative
+    relative,
+    fs
   })
   await unpack({ gitdir, inputStream: response.packfile, onprogress })
 }

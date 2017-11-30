@@ -1,12 +1,14 @@
-import git from '..'
+/* global test describe expect */
+import fs from 'fs'
+import { Git } from '..'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('remove', () => {
   test('file', async () => {
     // Setup
-    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
     // Test
-    const repo = git().gitdir(clientDir)
+    const repo = new Git({ fs, gitdir })
     let before = await repo.list()
     expect(before).toMatchSnapshot()
     await repo.remove('LICENSE.md')
@@ -17,9 +19,9 @@ describe('remove', () => {
 
   test('dir', async () => {
     // Setup
-    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
     // Test
-    const repo = git().gitdir(clientDir)
+    const repo = new Git({ fs, gitdir })
     let before = await repo.list()
     expect(before).toMatchSnapshot()
     await repo.remove('src/models')

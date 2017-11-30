@@ -1,8 +1,10 @@
+/* global test describe expect */
 import server from './__helpers__/http-backend'
 import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
-import git from '..'
+import fs from 'fs'
+import { Git } from '..'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('push', () => {
@@ -22,10 +24,8 @@ describe('push', () => {
       .post(/.*/)
       .reply(200, postReceivePackRequest)
 
-    let res = await git()
-      .gitdir(clientDir)
-      .remote('pseudo')
-      .push('refs/heads/master')
+    let repo = new Git({ fs, gitdir: clientDir })
+    let res = await repo.remote('pseudo').push('refs/heads/master')
     expect(res).toBeTruthy()
     let body = await pify(concat)(res)
     expect(body.toString()).toBe(`000eunpack ok
@@ -47,11 +47,8 @@ describe('push', () => {
       .reply(200, get)
       .post(/.*/)
       .reply(200, postReceivePackRequest)
-
-    let res = await git()
-      .gitdir(clientDir)
-      .remote('pseudo')
-      .push('master')
+    let repo = new Git({ fs, gitdir: clientDir })
+    let res = await repo.remote('pseudo').push('master')
     expect(res).toBeTruthy()
     let body = await pify(concat)(res)
     expect(body.toString()).toBe(`000eunpack ok
@@ -64,9 +61,8 @@ describe('push', () => {
       __dirname,
       'test-push-client.git'
     )
-
-    let res = await git()
-      .gitdir(clientDir)
+    let repo = new Git({ fs, gitdir: clientDir })
+    let res = await repo
       .auth(process.env.GITHUB_TOKEN)
       .remote('origin')
       .push('refs/heads/master')
@@ -82,9 +78,8 @@ describe('push', () => {
       __dirname,
       'test-push-client.git'
     )
-
-    let res = await git()
-      .gitdir(clientDir)
+    let repo = new Git({ fs, gitdir: clientDir })
+    let res = await repo
       .auth(process.env.GITHUB_TOKEN)
       .remote('origin')
       .push('master')

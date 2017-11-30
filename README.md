@@ -18,8 +18,6 @@ However, one size does not always fit. That's why `isomorphic-git` also has a [l
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Getting Started](#getting-started)
-  - [Set up your filesystem](#set-up-your-filesystem)
-  - [Using a CDN script tag](#using-a-cdn-script-tag)
   - [Using as an npm module](#using-as-an-npm-module)
   - [`isogit` CLI](#isogit-cli)
 - [High-level `git()` API](#high-level-git-api)
@@ -57,41 +55,37 @@ However, one size does not always fit. That's why `isomorphic-git` also has a [l
 
 ## Getting Started
 
-### Set up your filesystem
+The "isomorphic" in `isomorphic-git` means it works equally well on the server or the browser.
+That's tricky to do since git uses the file system, and browsers don't have an 'fs' module.
+So rather than relying on the 'fs' module, `isomorphic-git` is BYOFS (Bring Your Own File System).
+The `git.utils.setfs( fs )` line tells git what module to use for file system operations.
 
-If you're only using `isomorphic-git` in Node, you already have a `fs` module, so you can skip this step. If you're writing code for the browser though, you'll need something that emulates the `fs` API. `isomorphic-git` will look for a global "fs" variable. At the time of writing, the most complete option is [BrowserFS](https://github.com/jvilk/BrowserFS).
+If you're only using `isomorphic-git` in Node, you can just use the native `fs` module.
 
-Here's a quick config that works well in most cases:
+```js
+const { git } = require('isomorphic-git')
+const fs = require('fs')
+git.utils.setfs(fs)
+```
+
+If you're writing code for the browser though, you'll need something that emulates the `fs` API.
+At the time of writing, the most complete option is [BrowserFS](https://github.com/jvilk/BrowserFS).
+It has a few more steps involved to set up than in Node, as seen below:
 
 ```html
 <script src="https://unpkg.com/browserfs"></script>
+<script src="https://unpkg.com/isomorphic-git"></script>
 <script>
-BrowserFS.configure({ fs: "IndexedDB", options: {} }, err => {
-  if (err) {
-    alert(err);
-  } else {
-    window.fs = BrowserFS.BFSRequire("fs");
-  }
+BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
+  if (err) return console.log(err);
+  window.fs = BrowserFS.BFSRequire("fs");
+  git.utils.setfs(window.fs)
+  // Now we have three global variables: `BrowserFS`, `fs`, and `git`.
 });
 </script>
 ```
 
 Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
-
-### Using a CDN script tag
-
-If you want, you can just throw in a script tag with the UMD build directly from `unpkg`. This will result in three global variables: `BrowserFS`, `fs`, and `git`.
-
-```html
-<script src="https://unpkg.com/browserfs"></script>
-<script>
-BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
-  if (err) return console.log(err);
-  window.fs = BrowserFS.BFSRequire("fs");
-});
-</script>
-<script src="https://unpkg.com/isomorphic-git"></script>
-```
 
 ### Using as an npm module
 
@@ -128,7 +122,9 @@ function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 
 ## High-level `git()` API
 
-I may continue to make small changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
+I may continue to make ~~small~~ changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
+
+**I HAVE DECIDED THAT FLUENT INTERFACE WAS A MISTAKE, AND WILL BE REPLACING IT WITH A SIMPLER API VERY SOON.**
 
 ### git(dir) vs .gitdir(dir) and .workdir(dir)
 Setting the working directory and git directory

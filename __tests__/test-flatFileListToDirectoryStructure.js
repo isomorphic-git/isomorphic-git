@@ -1,3 +1,4 @@
+/* global test describe expect */
 import { flatFileListToDirectoryStructure } from '../dist/for-node/utils'
 
 describe('flatFileListToDirectoryStructure', () => {

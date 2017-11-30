@@ -1,5 +1,9 @@
 /* global test describe expect */
 import { GitRefManager } from '../dist/for-node/managers'
+import fs from 'fs'
+import { setfs } from '../dist/for-node/utils'
+
+setfs(fs)
 
 describe('GitRefManager', () => {
   test('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {

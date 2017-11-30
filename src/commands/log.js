@@ -1,13 +1,16 @@
 // @flow
 import { GitRefManager, GitObjectManager } from '../managers'
 import { GitCommit } from '../models'
+import { fs as defaultfs, setfs } from '../utils'
 
 export async function log ({
   gitdir,
   ref = 'HEAD',
   depth,
-  since // Date
+  since, // Date
+  fs = defaultfs()
 }) {
+  setfs(fs)
   let sinceTimestamp =
     since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
   // TODO: In the future, we may want to have an API where we return a

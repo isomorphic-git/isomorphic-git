@@ -1,4 +1,7 @@
-import systemfs from 'fs'
+var fs
 export default function () {
-  return global.fs || systemfs
+  return fs
+}
+export function setfs (newFs) {
+  fs = newFs
 }

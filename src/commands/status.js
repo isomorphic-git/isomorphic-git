@@ -8,7 +8,7 @@ import {
   GitIndexManager,
   GitIgnoreManager
 } from '../managers'
-import { read, fs } from '../utils'
+import { read, fs as defaultfs, setfs } from '../utils'
 /*::
 import type { Stats } from 'fs'
 import type { CacheEntry } from '../models/GitIndex'
@@ -85,13 +85,15 @@ export async function status (
   {
     workdir,
     gitdir,
-    pathname
+    pathname,
+    fs = defaultfs()
   } /*: {
-    workdir: string,
-    gitdir: string,
-    pathname: string
-  } */
+  workdir: string,
+  gitdir: string,
+  pathname: string
+} */
 ) {
+  setfs(fs)
   let ignored = await GitIgnoreManager.isIgnored({ gitdir, workdir, pathname })
   if (ignored) {
     return 'ignored'
@@ -110,7 +112,7 @@ export async function status (
   })
   let stats = null
   try {
-    stats = await pify(fs().lstat)(path.join(workdir, pathname))
+    stats = await pify(fs.lstat)(path.join(workdir, pathname))
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err
