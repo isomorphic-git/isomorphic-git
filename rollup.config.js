@@ -21,9 +21,11 @@ const external = [
   'babel-runtime/helpers/extends',
   'babel-runtime/helpers/typeof',
   'babel-runtime/helpers/slicedToArray',
+  'babel-runtime/core-js/array/from',
   'babel-runtime/core-js/math/sign',
   'babel-runtime/core-js/symbol/iterator',
   'babel-runtime/core-js/map',
+  'babel-runtime/core-js/object/assign',
   'babel-runtime/core-js/object/keys',
   'babel-runtime/helpers/toConsumableArray',
   'babel-runtime/core-js/set',
@@ -143,6 +145,14 @@ const inputs = [
   'utils.js'
 ]
 
+const umdInputs = [
+  'index-umd.js',
+  'commands.js',
+  'managers.js',
+  'models.js',
+  'utils.js'
+]
+
 const codeSplitting = input =>
   inputs
     .map(x => path.resolve(`src/${x}`))
@@ -151,6 +161,6 @@ const codeSplitting = input =>
 export default [
   ...inputs.map(moduleConfig),
   ...inputs.map(nodeConfig),
-  ...inputs.map(browserifyConfig),
-  serviceworkerConfig('index.js')
+  ...umdInputs.map(browserifyConfig),
+  serviceworkerConfig('index-umd.js')
 ]

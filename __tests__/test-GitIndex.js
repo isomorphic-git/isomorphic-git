@@ -1,5 +1,9 @@
+/* global test describe expect */
 import { GitIndex } from '../dist/for-node/models'
-import { read } from '../dist/for-node/utils'
+import fs from 'fs'
+import { read, setfs } from '../dist/for-node/utils'
+
+setfs(fs)
 
 describe('GitIndex', () => {
   test('GitIndex.from(buffer) - Simple', async () => {

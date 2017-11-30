@@ -1,7 +1,7 @@
-// @flow
-import { write, mkdirs } from '../utils'
+import { write, mkdirs, fs as defaultfs, setfs } from '../utils'
 
-export async function init ({ gitdir } /*: { gitdir: string } */) {
+export async function init ({ gitdir, fs = defaultfs() }) {
+  setfs(fs)
   let folders = [
     'hooks',
     'info',

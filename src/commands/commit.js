@@ -1,7 +1,12 @@
 import { config } from './config'
 import { GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
-import { write, flatFileListToDirectoryStructure } from '../utils'
+import {
+  write,
+  flatFileListToDirectoryStructure,
+  fs as defaultfs,
+  setfs
+} from '../utils'
 import path from 'path'
 
 async function constructTree ({ gitdir, inode }) /*: string */ {
@@ -33,8 +38,10 @@ export async function commit ({
   author,
   committer,
   message,
-  privateKeys
+  privateKeys,
+  fs = defaultfs()
 }) {
+  setfs(fs)
   // Fill in missing arguments with default values
   if (author === undefined) author = {}
   if (author.name === undefined) {

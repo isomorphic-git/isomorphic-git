@@ -1,5 +1,6 @@
 /* global test describe expect */
-import git from '..'
+import fs from 'fs'
+import { Git } from '..'
 import path from 'path'
 import { read, write, rm } from '../dist/for-node/utils'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
@@ -8,9 +9,7 @@ describe('status', () => {
   test('status', async () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-status.git')
     let workdir = await copyFixtureIntoTempDir(__dirname, 'test-status')
-    const repo = git()
-      .gitdir(gitdir)
-      .workdir(workdir)
+    const repo = new Git({ fs, gitdir, workdir })
     const a = await repo.status('a.txt')
     const b = await repo.status('b.txt')
     const c = await repo.status('c.txt')

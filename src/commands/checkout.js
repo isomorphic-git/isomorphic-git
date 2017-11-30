@@ -2,9 +2,17 @@ import path from 'path'
 import pify from 'pify'
 import { GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
-import { rm, write, fs } from '../utils'
+import { rm, write, fs as defaultfs, setfs } from '../utils'
 
-async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
+async function writeTreeToDisk ({
+  gitdir,
+  workdir,
+  index,
+  prefix,
+  tree,
+  fs = defaultfs()
+}) {
+  setfs(fs)
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
       gitdir,
@@ -15,7 +23,7 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree }) {
     switch (type) {
       case 'blob':
         await write(filepath, object)
-        let stats = await pify(fs().lstat)(filepath)
+        let stats = await pify(fs.lstat)(filepath)
         index.insert({
           filepath: entrypath,
           stats,

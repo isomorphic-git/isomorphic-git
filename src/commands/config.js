@@ -1,7 +1,10 @@
 import { GitConfigManager } from '../managers'
+import { fs as defaultfs, setfs } from '../utils'
 
 export async function config (args) {
-  let { gitdir, path, value } = args
+  let { gitdir, path, value, fs } = args
+  fs = fs || defaultfs()
+  setfs(fs)
   const config = await GitConfigManager.get({ gitdir })
   // This carefully distinguishes between
   // 1) there is no 'value' argument (do a "get")

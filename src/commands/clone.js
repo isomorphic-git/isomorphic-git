@@ -2,6 +2,7 @@ import { init } from './init'
 import { config } from './config'
 import { fetch } from './fetch'
 import { checkout } from './checkout'
+import { fs as defaultfs, setfs } from '../utils'
 
 export async function clone ({
   workdir,
@@ -15,8 +16,10 @@ export async function clone ({
   since,
   exclude,
   relative,
-  onprogress
+  onprogress,
+  fs = defaultfs()
 }) {
+  setfs(fs)
   remote = remote || 'origin'
   await init({ gitdir })
   // Add remote

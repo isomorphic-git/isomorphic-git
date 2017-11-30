@@ -1,32 +1,31 @@
 /* global test describe expect */
-import git from '..'
+import fs from 'fs'
+import { Git } from '..'
 
 describe('log', () => {
   test('HEAD', async () => {
-    let commits = await git()
-      .gitdir('__tests__/__fixtures__/test-log.git')
-      .log('HEAD')
+    let gitdir = '__tests__/__fixtures__/test-log.git'
+    let repo = new Git({ fs, gitdir })
+    let commits = await repo.log('HEAD')
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
   })
   test('HEAD depth', async () => {
-    let commits = await git()
-      .gitdir('__tests__/__fixtures__/test-log.git')
-      .depth(1)
-      .log('HEAD')
+    let gitdir = '__tests__/__fixtures__/test-log.git'
+    let repo = new Git({ fs, gitdir })
+    let commits = await repo.depth(1).log('HEAD')
     expect(commits.length).toBe(1)
   })
   test('HEAD since', async () => {
-    let commits = await git()
-      .gitdir('__tests__/__fixtures__/test-log.git')
-      .since(new Date(1501462174000))
-      .log('HEAD')
+    let gitdir = '__tests__/__fixtures__/test-log.git'
+    let repo = new Git({ fs, gitdir })
+    let commits = await repo.since(new Date(1501462174000)).log('HEAD')
     expect(commits.length).toBe(2)
   })
   test('test-branch', async () => {
-    let commits = await git()
-      .gitdir('__tests__/__fixtures__/test-GitRefManager.git')
-      .log('origin/test-branch')
+    let gitdir = '__tests__/__fixtures__/test-GitRefManager.git'
+    let repo = new Git({ fs, gitdir })
+    let commits = await repo.log('origin/test-branch')
     expect(commits).toMatchSnapshot()
   })
   // test('test-HEAD', async () => {

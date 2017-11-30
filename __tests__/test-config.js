@@ -1,12 +1,14 @@
-import git from '..'
+/* global test describe expect */
+import fs from 'fs'
+import { Git } from '..'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('config', () => {
   test('getting', async () => {
     // Setup
-    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
     // Test
-    let repo = git().gitdir(clientDir)
+    let repo = new Git({ fs, gitdir })
     let sym = await repo.config('core.symlinks')
     let rfv = await repo.config('core.repositoryformatversion')
     let url = await repo.config('remote.origin.url')
@@ -17,9 +19,9 @@ describe('config', () => {
 
   test('setting', async () => {
     // Setup
-    let clientDir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
     // Test
-    let repo = git().gitdir(clientDir)
+    let repo = new Git({ fs, gitdir })
     let bare
     // set to true
     await repo.config('core.bare', true)

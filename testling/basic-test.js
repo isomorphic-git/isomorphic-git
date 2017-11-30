@@ -1,4 +1,4 @@
-const git = require('../dist/for-browserify')
+const git = require('../dist/for-browserify').default
 const test = require('tape')
 const BrowserFS = require('browserfs')
 
@@ -9,6 +9,8 @@ test('things do not explode', t => {
     if (err) return t.fail(err)
     window.fs = window.require('fs')
     t.ok(window.fs, 'Loaded window.fs')
+    git.utils.setfs(window.fs)
+
     git('.')
       .init()
       .then(function () {

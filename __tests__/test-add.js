@@ -1,4 +1,6 @@
-import git from '..'
+/* globals describe test expect */
+import fs from 'fs'
+import { Git } from '..'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 describe('add', () => {
@@ -6,7 +8,7 @@ describe('add', () => {
     // Setup
     let dir = await copyFixtureIntoTempDir(__dirname, 'test-add')
     // Test
-    const repo = git(dir)
+    const repo = new Git({ fs, dir })
     await repo.init()
     let orig = (await repo.list()).length
     await repo.add('a.txt')

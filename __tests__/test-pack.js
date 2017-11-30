@@ -1,4 +1,4 @@
-import git from '..'
+import { Git } from '..'
 import fs from 'fs'
 import stream from 'stream'
 import streamEqual from 'stream-equal'
@@ -7,14 +7,14 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 describe('pack', () => {
   test('git.pack', async () => {
     // Setup
-    let dir = await copyFixtureIntoTempDir(__dirname, 'test-pack.git')
+    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-pack.git')
     // Test
     let fixture = fs.createReadStream(
       '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
     )
     let fstream = new stream.PassThrough()
-    git()
-      .gitdir(dir)
+    let repo = new Git({ fs, gitdir })
+    await repo
       .outputStream(fstream)
       .pack([
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',

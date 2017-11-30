@@ -1,5 +1,9 @@
 /* global test describe expect */
 import { GitObjectManager } from '../dist/for-node/managers'
+import fs from 'fs'
+import { setfs } from '../dist/for-node/utils'
+
+setfs(fs)
 
 describe('GitObjectManager', () => {
   test('test missing', async () => {

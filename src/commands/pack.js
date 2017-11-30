@@ -1,9 +1,9 @@
-// @flow
 import { Buffer } from 'buffer'
 import { GitObjectManager } from '../managers'
 import pad from 'pad'
 import pako from 'pako'
 import crypto from 'crypto'
+import { fs as defaultfs, setfs } from '../utils'
 /*::
 import type {Writable} from 'stream'
 */
@@ -15,13 +15,8 @@ const types = {
   tag: 0b1000000
 }
 // TODO: Move this to 'plumbing'
-export async function pack (
-  {
-    oids,
-    gitdir,
-    outputStream
-  } /*: {oids: Array<string>, gitdir: string, outputStream: Writable} */
-) {
+export async function pack ({ oids, gitdir, outputStream, fs = defaultfs() }) {
+  setfs(fs)
   let hash = crypto.createHash('sha1')
   let stream = outputStream
   function write (chunk, enc) {

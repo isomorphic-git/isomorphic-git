@@ -1,8 +1,9 @@
+/* global test describe expect */
 import fs from 'fs'
 import { existsSync } from 'fs'
-import { lock, unlock, sleep } from '../dist/for-node/utils'
+import { lock, unlock, sleep, setfs } from '../dist/for-node/utils'
 import { createTempDir } from 'jest-fixtures'
-
+setfs(fs)
 describe('lockfile', () => {
   test('make lockfile', async () => {
     let dir = await createTempDir()
