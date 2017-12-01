@@ -23,11 +23,14 @@ import * as commands from './commands'
 import * as managers from './managers'
 import * as models from './models'
 import * as utils from './utils'
+import { createClass } from './utils'
+
+export const Git = createClass(commands)
 
 export function git (dir) {
   return dir === undefined
-    ? new Git()
-    : new Git().workdir(dir).gitdir(`${dir}/.git`)
+    ? new OldGit()
+    : new OldGit().workdir(dir).gitdir(`${dir}/.git`)
 }
 git.commands = commands
 git.managers = managers
@@ -49,7 +52,7 @@ const extendBool = (self, array) => {
 }
 
 // The class is merely a fluent command/query builder
-export class Git extends Map {
+export class OldGit extends Map {
   // @constructor
   constructor ({ fs, dir, workdir, gitdir } = {}) {
     super()
@@ -319,11 +322,11 @@ export class Git extends Map {
       })
     }
   }
-  async status (pathname) {
+  async status (filepath) {
     return status({
       gitdir: this.get('gitdir'),
       workdir: this.get('workdir'),
-      pathname,
+      filepath,
       fs: this.get('fs')
     })
   }
@@ -335,4 +338,4 @@ export class Git extends Map {
   }
 }
 
-git.Git = Git
+git.Git = OldGit

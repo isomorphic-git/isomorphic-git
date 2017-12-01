@@ -4,15 +4,7 @@ import { GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { rm, write, fs as defaultfs, setfs } from '../utils'
 
-async function writeTreeToDisk ({
-  gitdir,
-  workdir,
-  index,
-  prefix,
-  tree,
-  fs = defaultfs()
-}) {
-  setfs(fs)
+async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
       gitdir,
@@ -37,7 +29,8 @@ async function writeTreeToDisk ({
           workdir,
           index,
           prefix: entrypath,
-          tree
+          tree,
+          fs
         })
         break
       default:
@@ -48,7 +41,14 @@ async function writeTreeToDisk ({
   }
 }
 
-export async function checkout ({ workdir, gitdir, remote, ref }) {
+export async function checkout ({
+  workdir,
+  gitdir,
+  remote,
+  ref,
+  fs = defaultfs()
+}) {
+  setfs(fs)
   // Get tree oid
   let oid
   if (remote) {
@@ -95,7 +95,7 @@ export async function checkout ({ workdir, gitdir, remote, ref }) {
     }
     index.clear()
     // Write files. TODO: Write them atomically
-    await writeTreeToDisk({ gitdir, workdir, index, prefix: '', tree })
+    await writeTreeToDisk({ fs, gitdir, workdir, index, prefix: '', tree })
     // Update HEAD TODO: Handle non-branch cases
     write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
   })

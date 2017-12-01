@@ -85,26 +85,31 @@ export async function status (
   {
     workdir,
     gitdir,
-    pathname,
+    filepath,
     fs = defaultfs()
   } /*: {
   workdir: string,
   gitdir: string,
-  pathname: string
+  filepath: string
 } */
 ) {
   setfs(fs)
-  let ignored = await GitIgnoreManager.isIgnored({ gitdir, workdir, pathname })
+  let ignored = await GitIgnoreManager.isIgnored({
+    gitdir,
+    workdir,
+    filepath,
+    fs
+  })
   if (ignored) {
     return 'ignored'
   }
   let headTree = await getHeadTree({ gitdir })
-  let treeOid = await getOidAtPath({ gitdir, tree: headTree, path: pathname })
+  let treeOid = await getOidAtPath({ gitdir, tree: headTree, path: filepath })
   let indexEntry = null
   // Acquire a lock on the index
   await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
     for (let entry of index) {
-      if (entry.path === pathname) {
+      if (entry.path === filepath) {
         indexEntry = entry
         break
       }
@@ -112,7 +117,7 @@ export async function status (
   })
   let stats = null
   try {
-    stats = await pify(fs.lstat)(path.join(workdir, pathname))
+    stats = await pify(fs.lstat)(path.join(workdir, filepath))
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err
@@ -127,7 +132,7 @@ export async function status (
     if (I && !cacheIsStale({ entry: indexEntry, stats })) {
       return indexEntry.oid
     } else {
-      let object = await read(path.join(workdir, pathname))
+      let object = await read(path.join(workdir, filepath))
       let workdirOid = await GitObjectManager.hash({
         gitdir,
         type: 'blob',
