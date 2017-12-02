@@ -1,9 +1,8 @@
 import { GitConfigManager } from '../managers'
 import { fs as defaultfs, setfs } from '../utils'
 
-export async function config (args) {
-  let { gitdir, path, value, fs } = args
-  fs = fs || defaultfs()
+export async function config ({ gitdir, fs = defaultfs() }, args) {
+  let { path, value } = args
   setfs(fs)
   const config = await GitConfigManager.get({ gitdir })
   // This carefully distinguishes between

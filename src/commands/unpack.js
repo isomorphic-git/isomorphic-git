@@ -34,11 +34,10 @@ function parseVarInt (buffer /*: Buffer */) {
 
 // TODO: Move this to 'plumbing'
 export async function unpack (
+  { gitdir, fs = defaultfs() },
   {
-    gitdir,
     inputStream,
-    onprogress,
-    fs = defaultfs()
+    onprogress
   } /*: {gitdir: string, inputStream: ReadableStream, onprogress: Function} */
 ) {
   setfs(fs)

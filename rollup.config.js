@@ -80,7 +80,7 @@ const nodeConfig = input => ({
 // Browserify
 const browserifyConfig = input => ({
   input: `src/${input}`,
-  external: [...external],
+  external: [...external, ...codeSplitting(input)],
   output: [
     { format: 'cjs', name: 'git', file: `dist/for-browserify/${input}` }
   ],
@@ -153,6 +153,6 @@ const codeSplitting = input =>
 export default [
   ...inputs.map(moduleConfig),
   ...inputs.map(nodeConfig),
-  browserifyConfig('index-umd.js'),
-  serviceworkerConfig('index-umd.js')
+  ...inputs.map(browserifyConfig),
+  serviceworkerConfig('index.js')
 ]

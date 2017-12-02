@@ -1,19 +1,21 @@
 /* global test describe expect */
-import { Git } from '..'
 import fs from 'fs'
 import { GitObjectManager } from '../dist/for-node/managers'
 import path from 'path'
 import { createTempDir } from 'jest-fixtures'
 
+import { Git } from '..'
+import { init, unpack } from '../dist/for-node/commands'
+
 describe('unpack', () => {
   test('unpack', async () => {
     let dir = await createTempDir()
     let repo = new Git({ fs, dir })
-    await repo.init()
+    await init(repo)
     let fixture = fs.createReadStream(
       '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
     )
-    await repo.inputStream(fixture).unpack()
+    await unpack(repo, { inputStream: fixture })
     const oids = [
       '5a9da3272badb2d3c8dbab463aed5741acb15a33',
       '0bfe8fa3764089465235461624f2ede1533e74ec',

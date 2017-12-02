@@ -11,10 +11,10 @@ async function test (filepath) {
   }
 }
 // TODO: Detect base repositories?
-export async function findRoot ({ filepath, fs = defaultfs() }) {
+export async function findRoot ({ fs = defaultfs() }, { filepath }) {
   setfs(fs)
   if (await test(filepath)) return filepath
   let parent = path.dirname(filepath)
   if (parent === filepath) throw new Error('Unable to find git root')
-  return findRoot({ filepath: parent })
+  return findRoot({ fs }, { filepath: parent })
 }

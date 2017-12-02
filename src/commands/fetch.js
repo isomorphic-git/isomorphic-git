@@ -1,4 +1,3 @@
-// @flow
 import stream from 'stream'
 import thru from 'thru'
 import { config } from './config'
@@ -7,19 +6,20 @@ import { GitRemoteHTTP, GitRefManager, GitShallowManager } from '../managers'
 import { GitPktLine } from '../models'
 import { pkg, fs as defaultfs, setfs } from '../utils'
 
-export async function fetchPackfile ({
-  gitdir,
-  ref,
-  remote,
-  url,
-  authUsername,
-  authPassword,
-  depth = null,
-  since = null,
-  exclude = [],
-  relative = false,
-  fs = defaultfs()
-}) {
+export async function fetchPackfile (
+  { gitdir, fs = defaultfs() },
+  {
+    ref,
+    remote,
+    url,
+    authUsername,
+    authPassword,
+    depth = null,
+    since = null,
+    exclude = [],
+    relative = false
+  }
+) {
   setfs(fs)
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
@@ -29,10 +29,14 @@ export async function fetchPackfile ({
   }
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await config({
-      gitdir,
-      path: `remote.${remote}.url`
-    })
+    url = await config(
+      {
+        gitdir
+      },
+      {
+        path: `remote.${remote}.url`
+      }
+    )
   }
   let remoteHTTP = new GitRemoteHTTP(url)
   if (authUsername !== undefined && authPassword !== undefined) {
@@ -128,23 +132,10 @@ export async function fetchPackfile ({
   return response
 }
 
-export async function fetch ({
-  gitdir,
-  ref = 'HEAD',
-  remote,
-  url,
-  authUsername,
-  authPassword,
-  depth,
-  since,
-  exclude,
-  relative,
-  onprogress,
-  fs
-}) {
-  let response = await fetchPackfile({
-    gitdir,
-    ref,
+export async function fetch (
+  { gitdir, fs = defaultfs() },
+  {
+    ref = 'HEAD',
     remote,
     url,
     authUsername,
@@ -153,7 +144,25 @@ export async function fetch ({
     since,
     exclude,
     relative,
-    fs
-  })
-  await unpack({ gitdir, inputStream: response.packfile, onprogress })
+    onprogress
+  }
+) {
+  let response = await fetchPackfile(
+    {
+      gitdir,
+      fs
+    },
+    {
+      ref,
+      remote,
+      url,
+      authUsername,
+      authPassword,
+      depth,
+      since,
+      exclude,
+      relative
+    }
+  )
+  await unpack({ gitdir, fs }, { inputStream: response.packfile, onprogress })
 }

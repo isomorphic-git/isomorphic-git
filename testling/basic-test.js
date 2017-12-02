@@ -1,4 +1,4 @@
-const git = require('../dist/bundle.umd.min.js')
+const { Git, init, add, commit } = require('../dist/bundle.umd.min.js')
 const test = require('tape')
 const BrowserFS = require('browserfs')
 
@@ -7,26 +7,27 @@ test('things do not explode', t => {
   BrowserFS.install(window)
   BrowserFS.configure({ fs: 'InMemory' }, function (err) {
     if (err) return t.fail(err)
-    window.fs = window.require('fs')
-    t.ok(window.fs, 'Loaded window.fs')
-    git.utils.setfs(window.fs)
+    var fs = window.require('fs')
+    t.ok(fs, 'Loaded fs')
 
-    git('.')
-      .init()
+    let repo = new Git({ fs: fs, dir: '.' })
+    init(repo)
       .then(function () {
         t.pass('init')
 
-        window.fs.writeFileSync('a.txt', 'Hello', 'utf8')
-        git('.')
-          .add('a.txt')
+        fs.writeFileSync('a.txt', 'Hello', 'utf8')
+        add(repo, { filepath: 'a.txt' })
           .then(function () {
             t.pass('add a.txt')
 
-            git('.')
-              .author('Mr. Test')
-              .email('mrtest@example.com')
-              .timestamp(1262356920)
-              .commit('Initial commit')
+            commit(repo, {
+              author: {
+                name: 'Mr. Test',
+                email: 'mrtest@example.com',
+                timestamp: 1262356920
+              },
+              message: 'Initial commit'
+            })
               .then(function (oid) {
                 t.pass('commit')
 

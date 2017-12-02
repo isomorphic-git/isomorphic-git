@@ -41,13 +41,10 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
   }
 }
 
-export async function checkout ({
-  workdir,
-  gitdir,
-  remote,
-  ref,
-  fs = defaultfs()
-}) {
+export async function checkout (
+  { workdir, gitdir, fs = defaultfs() },
+  { remote, ref }
+) {
   setfs(fs)
   // Get tree oid
   let oid

@@ -3,13 +3,14 @@ import { GitRefManager, GitObjectManager } from '../managers'
 import { GitCommit } from '../models'
 import { fs as defaultfs, setfs } from '../utils'
 
-export async function log ({
-  gitdir,
-  ref = 'HEAD',
-  depth,
-  since, // Date
-  fs = defaultfs()
-}) {
+export async function log (
+  { gitdir, fs = defaultfs() },
+  {
+    ref = 'HEAD',
+    depth,
+    since // Date
+  }
+) {
   setfs(fs)
   let sinceTimestamp =
     since === undefined ? undefined : Math.floor(since.valueOf() / 1000)

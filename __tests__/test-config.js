@@ -1,7 +1,9 @@
 /* global test describe expect */
 import fs from 'fs'
-import { Git } from '..'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
+
+import { Git } from '..'
+import { config } from '../dist/for-node/commands'
 
 describe('config', () => {
   test('getting', async () => {
@@ -9,9 +11,9 @@ describe('config', () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
     // Test
     let repo = new Git({ fs, gitdir })
-    let sym = await repo.config('core.symlinks')
-    let rfv = await repo.config('core.repositoryformatversion')
-    let url = await repo.config('remote.origin.url')
+    let sym = await config(repo, { path: 'core.symlinks' })
+    let rfv = await config(repo, { path: 'core.repositoryformatversion' })
+    let url = await config(repo, { path: 'remote.origin.url' })
     expect(sym).toBe(false)
     expect(url).toBe('https://github.com/wmhilton/isomorphic-git')
     expect(rfv).toBe('0')
@@ -24,19 +26,19 @@ describe('config', () => {
     let repo = new Git({ fs, gitdir })
     let bare
     // set to true
-    await repo.config('core.bare', true)
-    bare = await repo.config('core.bare')
+    await config(repo, { path: 'core.bare', value: true })
+    bare = await config(repo, { path: 'core.bare' })
     expect(bare).toBe(true)
     // set to false
-    await repo.config('core.bare', false)
-    bare = await repo.config('core.bare')
+    await config(repo, { path: 'core.bare', value: false })
+    bare = await config(repo, { path: 'core.bare' })
     expect(bare).toBe(false)
     // change a remote
-    await repo.config(
-      'remote.origin.url',
-      'https://github.com/wmhilton/isomorphic-git'
-    )
-    let url = await repo.config('remote.origin.url')
+    await config(repo, {
+      path: 'remote.origin.url',
+      value: 'https://github.com/wmhilton/isomorphic-git'
+    })
+    let url = await config(repo, { path: 'remote.origin.url' })
     expect(url).toBe('https://github.com/wmhilton/isomorphic-git')
   })
 })
