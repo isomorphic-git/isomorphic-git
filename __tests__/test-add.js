@@ -2,6 +2,7 @@
 import fs from 'fs'
 import { Git } from '..'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
+import { init, add, list } from '../dist/for-node/commands'
 
 describe('add', () => {
   test('file', async () => {
@@ -9,15 +10,15 @@ describe('add', () => {
     let dir = await copyFixtureIntoTempDir(__dirname, 'test-add')
     // Test
     const repo = new Git({ fs, dir })
-    await repo.init()
-    let orig = (await repo.list()).length
-    await repo.add('a.txt')
-    expect((await repo.list()).length === 1).toBe(true)
-    await repo.add('a.txt')
-    expect((await repo.list()).length === 1).toBe(true)
-    await repo.add('a-copy.txt')
-    expect((await repo.list()).length === 2).toBe(true)
-    await repo.add('b.txt')
-    expect((await repo.list()).length === 3).toBe(true)
+    await init(repo)
+    let orig = (await list(repo)).length
+    await add(repo, { filepath: 'a.txt' })
+    expect((await list(repo)).length === 1).toBe(true)
+    await add(repo, { filepath: 'a.txt' })
+    expect((await list(repo)).length === 1).toBe(true)
+    await add(repo, { filepath: 'a-copy.txt' })
+    expect((await list(repo)).length === 2).toBe(true)
+    await add(repo, { filepath: 'b.txt' })
+    expect((await list(repo)).length === 3).toBe(true)
   })
 })

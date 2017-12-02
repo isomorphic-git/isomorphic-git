@@ -9,3 +9,17 @@ export async function list ({ gitdir, fs = defaultfs() }) {
   })
   return filenames
 }
+
+export function mixinList (BaseClass) {
+  return class extends BaseClass {
+    constructor (...args) {
+      super(...args)
+    }
+    async list () {
+      return list({
+        gitdir: this.gitdir,
+        fs: this.fs
+      })
+    }
+  }
+}

@@ -1,22 +1,25 @@
-/* global jest test describe expect */
+/* global test describe expect */
 import path from 'path'
 import fs from 'fs'
 import { Git } from '..'
+import { findRoot } from '../dist/for-node/commands'
 
-describe('findRoot', () => {
+const dir = '.'
+
+describe('createClass.findRoot', () => {
   test('__dirname', async () => {
-    let git = new Git({ fs })
-    let root = await git.findRoot(__dirname)
+    let repo = new Git({ fs, dir })
+    let root = await findRoot(repo, { filepath: __dirname })
     expect(path.basename(root)).toBe('isomorphic-git')
   })
   test('.', async () => {
-    let git = new Git({ fs })
-    let root = await git.findRoot(path.resolve('.'))
+    let repo = new Git({ fs, dir })
+    let root = await findRoot(repo, { filepath: path.resolve('.') })
     expect(path.basename(root)).toBe('isomorphic-git')
   })
   test('..', async () => {
-    let git = new Git({ fs })
-    let root = git.findRoot(path.resolve('..'))
+    let repo = new Git({ fs, dir })
+    let root = findRoot(repo, { filepath: path.resolve('..') })
     expect(root).rejects.toBeDefined
   })
 })

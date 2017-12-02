@@ -17,13 +17,13 @@ module.exports = {
       default: series.nps('build.rollup', 'build.sw', 'build.umd'),
       rollup: 'rollup -c',
       discify: `browserify \
-            --entry dist/for-browserify/index-umd.js \
+            --entry dist/for-browserify/index.js \
             --standalone git \
             --fullpaths | uglifyjs \
                           --compress \
                           --mangle | discify -O`,
       umd: `browserify \
-            --entry dist/for-browserify/index-umd.js \
+            --entry dist/for-browserify/index.js \
             --standalone git \
             --debug | uglifyjs \
                       --compress \
@@ -31,7 +31,7 @@ module.exports = {
                       --source-map "content=inline,url=bundle.umd.min.js.map" \
                       -o dist/bundle.umd.min.js`,
       sw: `browserify \
-           --entry dist/for-serviceworker/index-umd.js \
+           --entry dist/for-serviceworker/index.js \
            --standalone git \
            --debug | uglifyjs \
                      --compress \

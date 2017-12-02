@@ -33,14 +33,10 @@ async function constructTree ({ gitdir, inode }) /*: string */ {
   return oid
 }
 
-export async function commit ({
-  gitdir,
-  author,
-  committer,
-  message,
-  privateKeys,
-  fs = defaultfs()
-}) {
+export async function commit (
+  { gitdir, fs = defaultfs() },
+  { author, committer, message, privateKeys }
+) {
   setfs(fs)
   // Fill in missing arguments with default values
   if (author === undefined) author = {}

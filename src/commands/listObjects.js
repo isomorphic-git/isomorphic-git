@@ -4,11 +4,8 @@ import { GitCommit, GitTree } from '../models'
 import { fs as defaultfs, setfs } from '../utils'
 
 export async function listObjects (
-  {
-    gitdir,
-    oids,
-    fs = defaultfs()
-  } /*: {
+  { gitdir, fs = defaultfs() },
+  { oids } /*: {
   gitdir: string,
   oids: Array<string>
 } */

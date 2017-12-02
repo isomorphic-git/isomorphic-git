@@ -82,11 +82,9 @@ async function getHeadTree ({ gitdir }) {
 
 // For now we're just diffing individual files
 export async function status (
+  { workdir, gitdir, fs = defaultfs() },
   {
-    workdir,
-    gitdir,
-    filepath,
-    fs = defaultfs()
+    filepath
   } /*: {
   workdir: string,
   gitdir: string,

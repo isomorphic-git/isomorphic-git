@@ -8,23 +8,22 @@ import { GitRefManager, GitObjectManager, GitRemoteHTTP } from '../managers'
 import { GitCommit, GitTree, GitPktLine } from '../models'
 import { fs as defaultfs, setfs } from '../utils'
 
-export async function push ({
-  gitdir,
-  ref,
-  remote,
-  url,
-  authUsername,
-  authPassword,
-  fs = defaultfs()
-}) {
+export async function push (
+  { gitdir, fs = defaultfs() },
+  { ref, remote, url, authUsername, authPassword }
+) {
   setfs(fs)
   // TODO: Figure out how pushing tags works. (This only works for branches.)
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await config({
-      gitdir,
-      path: `remote.${remote}.url`
-    })
+    url = await config(
+      {
+        gitdir
+      },
+      {
+        path: `remote.${remote}.url`
+      }
+    )
   }
   let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
   let oid = await GitRefManager.resolve({ gitdir, ref })
@@ -36,13 +35,17 @@ export async function push ({
     }
   }
   await httpRemote.preparePush()
-  let commits = await listCommits({
-    gitdir,
-    start: [oid],
-    finish: httpRemote.refs.values(),
-    fs
-  })
-  let objects = await listObjects({ gitdir, oids: commits, fs })
+  let commits = await listCommits(
+    {
+      gitdir,
+      fs
+    },
+    {
+      start: [oid],
+      finish: httpRemote.refs.values()
+    }
+  )
+  let objects = await listObjects({ gitdir, fs }, { oids: commits })
   let packstream = new stream.PassThrough()
   let oldoid =
     httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
@@ -50,11 +53,16 @@ export async function push ({
     GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 report-status\n`)
   )
   packstream.write(GitPktLine.flush())
-  pack({
-    gitdir,
-    oids: [...objects],
-    outputStream: packstream
-  })
+  pack(
+    {
+      gitdir,
+      fs
+    },
+    {
+      oids: [...objects],
+      outputStream: packstream
+    }
+  )
   let response = await httpRemote.push(packstream)
   return response
 }

@@ -15,7 +15,10 @@ const types = {
   tag: 0b1000000
 }
 // TODO: Move this to 'plumbing'
-export async function pack ({ oids, gitdir, outputStream, fs = defaultfs() }) {
+export async function pack (
+  { gitdir, fs = defaultfs() },
+  { oids, outputStream }
+) {
   setfs(fs)
   let hash = crypto.createHash('sha1')
   let stream = outputStream

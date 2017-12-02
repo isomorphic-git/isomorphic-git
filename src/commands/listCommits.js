@@ -2,7 +2,10 @@ import { GitRefManager, GitObjectManager } from '../managers'
 import { GitCommit } from '../models'
 import { fs as defaultfs, setfs } from '../utils'
 
-export async function listCommits ({ gitdir, start, finish, fs = defaultfs() }) {
+export async function listCommits (
+  { gitdir, fs = defaultfs() },
+  { start, finish }
+) {
   setfs(fs)
   let startingSet = new Set()
   let finishingSet = new Set()

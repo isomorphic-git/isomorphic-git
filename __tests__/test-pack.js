@@ -1,8 +1,11 @@
-import { Git } from '..'
+/* global test describe expect */
 import fs from 'fs'
 import stream from 'stream'
 import streamEqual from 'stream-equal'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
+
+import { Git } from '..'
+import { pack } from '../dist/for-node/commands'
 
 describe('pack', () => {
   test('git.pack', async () => {
@@ -14,9 +17,9 @@ describe('pack', () => {
     )
     let fstream = new stream.PassThrough()
     let repo = new Git({ fs, gitdir })
-    await repo
-      .outputStream(fstream)
-      .pack([
+    await pack(repo, {
+      outputStream: fstream,
+      oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',
         '0bfe8fa3764089465235461624f2ede1533e74ec',
         '414a0afa7e20452d90ab52de1c024182531c5c52',
@@ -29,7 +32,8 @@ describe('pack', () => {
         'a59efbcd7640e659ec81887a2599711f8d9ef801',
         'e5abf40a5b37382c700f51ac5c2aeefdadb8e184',
         '5477471ab5a6a8f2c217023532475044117a8f2c'
-      ])
+      ]
+    })
     let areEqual = await streamEqual(fixture, fstream)
     expect(areEqual).toBe(true)
   })

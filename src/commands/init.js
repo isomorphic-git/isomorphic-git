@@ -25,3 +25,24 @@ export async function init ({ gitdir, fs = defaultfs() }) {
   await write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
   // await write(gitdir + '/refs/heads/master', '')
 }
+
+export function mixinInit (BaseClass) {
+  return class extends BaseClass {
+    constructor (...args) {
+      super(...args)
+    }
+    async init () {
+      return await init({
+        gitdir: this.gitdir,
+        fs: this.fs
+      })
+    }
+  }
+}
+
+export async function methodInit () {
+  return await init({
+    gitdir: this.gitdir,
+    fs: this.fs
+  })
+}
