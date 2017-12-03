@@ -1,6 +1,33 @@
 import { GitConfigManager } from '../managers'
 import { fs as defaultfs, setfs } from '../utils'
 
+/**
+ * Read and/or write to the git config file(s)
+ * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
+ * @param {Object} args - An options object
+ * @param {string} args.path -  The key of the git config entry.
+ * @param {string} [args.value] - A value to store at that path.
+ * @returns {Promise<any>} - Resolves with the config value
+ *
+ * If no `value` is provided, it does a read.
+ * If a `value` is provided, it does a write.
+ *
+ * @example
+ * import fs from 'fs'
+ * import { Git, config } from 'isomorphic-git'
+ * let repo = new Git({fs, dir: '.'})
+ *
+ * // Write config value
+ * await config(repo, {
+ *   path: 'user.name',
+ *   value: 'Mr. Test'
+ * })
+ *
+ * // Read config value
+ * let value = await config(repo, {
+ *   path: 'user.name'
+ * })
+ */
 export async function config ({ gitdir, fs = defaultfs() }, args) {
   let { path, value } = args
   setfs(fs)

@@ -33,9 +33,37 @@ async function constructTree ({ gitdir, inode }) /*: string */ {
   return oid
 }
 
+/**
+ * Create a new commit
+ * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
+ * @param {Object} args - An options object
+ * @param {string} args.message - The commit message to use.
+ * @param {Object} [args.author] - The details about the commit author.
+ * @param {string} [args.author.name=undefined] - Default is `user.name` config.
+ * @param {string} [args.author.email=undefined] - Default is `user.email` config.
+ * @param {Date} [args.author.date=new Date()] - Set the author timestamp field. Default is the current date.
+ * @param {integer} [args.author.timestamp=undefined] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+ * @param {Object} [args.committer=author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
+ * @param {string} [args.privateKeys=undefined] - A PGP private key in ASCII armor format.
+ * @returns {Promise<string>} - The object ID of the newly created commit.
+ * @todo Move the PGP signing to a separte signCommit function for better code splitting.
+ *
+ * @example
+ * import fs from 'fs'
+ * import { Git, commit } from 'isomorphic-git'
+ * let repo = new Git({fs, dir: '.'})
+ * let sha = await commit(repo, {
+ *   author: {
+ *     name: 'Mr. Test',
+ *     email: 'mrtest@example.com'
+ *   },
+ *   privateKeys: '-----BEGIN PGP PRIVATE KEY BLOCK-----...',
+ *   message: 'Added the a.txt file'
+ * })
+ */
 export async function commit (
   { gitdir, fs = defaultfs() },
-  { author, committer, message, privateKeys }
+  { message, author, committer, privateKeys }
 ) {
   setfs(fs)
   // Fill in missing arguments with default values
