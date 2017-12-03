@@ -2,6 +2,12 @@ language: node_js
 node_js:
   - "node"
 deploy:
+- provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: doc
+  on:
+    branch: master
 - provider: npm
   email: wmhilton@gmail.com
   api_key: "$NPM_PUBLISH_TOKEN"
