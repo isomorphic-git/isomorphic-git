@@ -13,10 +13,10 @@ module.exports = {
       rollup: runInNewWindow('rollup -cw'),
       jest: runInNewWindow('jest --watch')
     },
-    doc: 'esdoc',
     build: {
-      default: series.nps('build.rollup', 'build.sw', 'build.umd'),
+      default: series.nps('build.doc', 'build.rollup', 'build.browserify'),
       rollup: 'rollup -c',
+      browserify: concurrent.nps('build.sw', 'build.umd'),
       doc: 'esdoc',
       discify: `browserify \
             --entry dist/for-browserify/index.js \
@@ -41,9 +41,14 @@ module.exports = {
                      --source-map "content=inline,url=service-workder-bundle.umd.min.js.map" \
                      -o dist/service-worker-bundle.umd.min.js`
     },
+    doc: {
+      default: series.nps('doc.esdoc', 'doc.copy'),
+      esdoc: 'esdoc',
+      copy: 'cp -R dist/* doc/'
+    },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
-      travis: series.nps('build', 'test.parallel'),
+      travis: series.nps('build', 'doc', 'test.parallel'),
       local: 'nps test.jest',
       parallel_tests: concurrent.nps('test.jest', 'test.karma'),
       jest: process.env.CI ? 'jest --coverage && codecov' : 'jest',

@@ -1,6 +1,6 @@
 {
   "source": "./src/commands",
-  "destination": "./dist/doc",
+  "destination": "./doc",
   "plugins": [
     {
       "name": "esdoc-standard-plugin"
