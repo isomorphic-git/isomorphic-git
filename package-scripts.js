@@ -14,10 +14,9 @@ module.exports = {
       jest: runInNewWindow('jest --watch')
     },
     build: {
-      default: series.nps('build.doc', 'build.rollup', 'build.browserify'),
+      default: series.nps('build.rollup', 'build.browserify'),
       rollup: 'rollup -c',
       browserify: concurrent.nps('build.sw', 'build.umd'),
-      doc: 'esdoc',
       discify: `browserify \
             --entry dist/for-browserify/index.js \
             --standalone git \

@@ -26,12 +26,8 @@ I am working on adding type definitions so you can enjoy static type-checking an
   - [.log(ref)](#logref)
   - [.remove(file)](#removefile)
   - [.status(file)](#statusfile)
-  - [.commit(msg)](#commitmsg)
   - [.push(branch)](#pushbranch)
-  - [.findRoot(dir)](#findrootdir)
   - [.listBranches()](#listbranches)
-  - [.config(path)](#configpath)
-  - [.config(path, value)](#configpath-value)
   - [.auth(username, password_or_token)](#authusername-password_or_token)
   - [.oauth2(company, token)](#oauth2company-token)
   - [.version()](#version)
@@ -119,6 +115,10 @@ function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 I may continue to make ~~small~~ changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
 
 **I HAVE DECIDED THAT FLUENT INTERFACE WAS A MISTAKE, AND WILL BE REPLACING IT WITH A SIMPLER API VERY SOON.**
+
+**[NEW API DOC](https://wmhilton.github.io/isomorphic-git)**
+
+Leftover crud below:
 
 ### .log(ref)
 Get commit descriptions from the git history
@@ -242,50 +242,6 @@ The possible return values are:
 - `"*unmodified"` working dir and HEAD commit match, but index differs
 - `"*absent"` file not present in working dir or HEAD commit, but present in the index
 
-### .commit(msg)
-Create a new commit
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.')
-  .author('Mr. Test')
-  .email('mrtest@example.com')
-  .signingKey('-----BEGIN PGP PRIVATE KEY BLOCK-----...')
-  .commit('Added the a.txt file')
-```
-
-```sh
-# CLI example
-isogit --author='Mr. Test' \
-       --email=mrtest@example.com \
-       --signingKey="$(cat private.key)" \
-       commit 'Added the a.txt file'
-```
-
-```js
-// Complete API
-git()
-  .gitdir(gitdir)
-  .author(author.name)
-  .email(author.email)
-  .timestamp(author.timestamp)
-  .datetime(author.date)
-  .signingKey(privateKeys)
-  .commit(message)
-```
-
-- @param {string} `gitdir` - The path to the git directory.
-- @param {Object} `author` - The details about the commit author.
-- @param {string} [`author.name=undefined`] - Default is `user.name` config.
-- @param {string} [`author.email=undefined`] - Default is `user.email` config.
-- @param {Date} [`author.date=new Date()`] - Set the author timestamp field. Default is the current date.
-- @param {integer} [`author.timestamp=undefined`] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
-- @param {Object} [`committer=author`] - The details about the commit author. If not specified, the author details are used.
-- @param {string} `message` - The commit message to use.
-- @param {string} [`privateKeys=undefined`] - A PGP private key in ASCII armor format.
-- @returns `Promise<void>`
-
 ### .push(branch)
 Push a branch
 
@@ -323,32 +279,6 @@ git()
 - @param {string} [`remote='origin'`] - If URL is not specified, determines which remote to use.
 - @returns `Promise<void>`
 
-### .findRoot(dir)
-Find the root git directory
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git()
-  .findRoot('/path/to/some/gitrepo/path/to/some/file.txt')
-// returns '/path/to/some/gitrepo'
-```
-
-```sh
-# CLI example
-isogit findRoot /path/to/some/gitrepo/path/to/some/file.txt
-# prints /path/to/some/gitrepo
-```
-
-```js
-// Complete API
-git()
-  .findRoot(dir)
-```
-
-- @param {string} `dir` - Starting at directory {dir}, walk upwards until you find a directory that contains a '.git' directory.
-- @returns `Promise<rootdir>` that directory, which is presumably the root directory of the git repository containing {dir}.
-
 ### .listBranches()
 List all local branches
 
@@ -372,59 +302,6 @@ git()
 
 - @param {string} `gitdir` - The path to the git directory.
 - @returns `Promise<branches[]>` an array of branch names.
-
-### .config(path)
-Reading from git config
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.').config('user.name')
-// 'Mr. Test'
-```
-
-```sh
-# CLI example
-isogit config user.name
-# Mr. Test
-```
-
-```js
-// Complete API
-git()
-  .gitdir(gitdir)
-  .config(path)
-```
-
-- @param {string} `gitdir` - The path to the git directory.
-- @param {string} `path` - The key of the git config entry.
-- @returns `Promise<value>` - the config value
-
-### .config(path, value)
-Writing to git config
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.').config('user.name', 'Mr. Test')
-```
-
-```sh
-# CLI example
-isogit config user.name 'Mr. Test'
-```
-
-```js
-// Complete API
-git()
-  .gitdir(gitdir)
-  .config(path, value)
-```
-
-- @param {string} `gitdir` - The path to the git directory.
-- @param {string} `path` - The key of the git config entry.
-- @param {string} `value` - A value to store at that path.
-- @returns `Promise<void>`
 
 ### .auth(username, password_or_token)
 Authentication is normally required for pushing to a git repository.
