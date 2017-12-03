@@ -3,7 +3,7 @@ import { existsSync } from 'fs'
 import { createTempDir } from 'jest-fixtures'
 
 import { Git } from '..'
-import { init } from '../dist/for-node/commands'
+import { init } from '..'
 
 describe('init', () => {
   test('init', async () => {

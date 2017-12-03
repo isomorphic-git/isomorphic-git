@@ -13,9 +13,11 @@ module.exports = {
       rollup: runInNewWindow('rollup -cw'),
       jest: runInNewWindow('jest --watch')
     },
+    doc: 'esdoc',
     build: {
       default: series.nps('build.rollup', 'build.sw', 'build.umd'),
       rollup: 'rollup -c',
+      doc: 'esdoc',
       discify: `browserify \
             --entry dist/for-browserify/index.js \
             --standalone git \

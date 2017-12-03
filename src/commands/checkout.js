@@ -41,6 +41,21 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
   }
 }
 
+/**
+ * Checkout a branch
+ * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
+ * @param {Object} args - An options object
+ * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
+ * @param {string} [args.ref=undefined] - Which branch to clone. By default this is the designated "main branch" of the repository.
+ * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
+ *
+ * @example
+ * import fs from 'fs'
+ * import { Git, checkout } from 'isomorphic-git'
+ *
+ * let repo = new Git({fs, dir: '.'})
+ * await checkout(repo, {ref: 'master'})
+ */
 export async function checkout (
   { workdir, gitdir, fs = defaultfs() },
   { remote, ref }

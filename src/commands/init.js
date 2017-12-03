@@ -1,5 +1,18 @@
 import { write, mkdirs, fs as defaultfs, setfs } from '../utils'
 
+/**
+ * Initialize a new repository
+ *
+ * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
+ * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
+ *
+ * @example
+ * import fs from 'fs'
+ * import { Git, init } from 'isomorphic-git'
+ *
+ * let repo = new Git({fs, dir: './path/to/repo'})
+ * await init(repo)
+ */
 export async function init ({ gitdir, fs = defaultfs() }) {
   setfs(fs)
   let folders = [
@@ -23,26 +36,4 @@ export async function init ({ gitdir, fs = defaultfs() }) {
       '\tignorecase = true\n'
   )
   await write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
-  // await write(gitdir + '/refs/heads/master', '')
-}
-
-export function mixinInit (BaseClass) {
-  return class extends BaseClass {
-    constructor (...args) {
-      super(...args)
-    }
-    async init () {
-      return await init({
-        gitdir: this.gitdir,
-        fs: this.fs
-      })
-    }
-  }
-}
-
-export async function methodInit () {
-  return await init({
-    gitdir: this.gitdir,
-    fs: this.fs
-  })
 }

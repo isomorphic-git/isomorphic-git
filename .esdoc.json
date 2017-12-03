@@ -1,0 +1,24 @@
+{
+  "source": "./src/commands",
+  "destination": "./dist/doc",
+  "plugins": [
+    {
+      "name": "esdoc-standard-plugin"
+    },
+    {
+      "name": "esdoc-ecmascript-proposal-plugin",
+      "option": {
+        "all": true
+      }
+    },
+    {
+      "name": "esdoc-importpath-plugin",
+      "option": {
+        "stripPackageName": true,
+        "replaces": [
+          {"from": ".*", "to": "isomorphic-git"}
+        ]
+      }
+    }
+  ]
+}

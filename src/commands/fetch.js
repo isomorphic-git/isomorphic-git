@@ -6,6 +6,32 @@ import { GitRemoteHTTP, GitRefManager, GitShallowManager } from '../managers'
 import { GitPktLine } from '../models'
 import { pkg, fs as defaultfs, setfs } from '../utils'
 
+/**
+ * Fetch commits
+ *
+ * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
+ * @param {Object} args - An options object
+ * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
+ * @param {string} [args.remote='origin'] - If `url` is not specified, determines which remote to use.
+ * @param {string} [args.ref=undefined] - Which branch to fetch from. By default this is the currently checked out branch.
+ * @param {string} [args.authUsername=undefined] - The username to use with Basic Auth
+ * @param {string} [args.authPassword=undefined] - The password to use with Basic Auth
+ * @param {integer} [args.depth=undefined] - Determines how much of the git repository's history to retrieve.
+ * @param {Date} [args.since=undefined] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+ * @param {string[]} [args.exclude=[]] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+ * @param {boolean} [args.relative=false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+ * @param {Function} [args.onprogress=undefined] - Callback to receive [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent)s for the operation.
+ * @returns {Promise<void>} - Resolves successfully when clone completes
+ *
+ * @example
+ * import fs from 'fs'
+ * import { Git, fetch } from 'isomorphic-git'
+ * let repo = new Git({fs, dir: '.'})
+ * fetch(repo, {
+ *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
+ *   depth: 1
+ * })
+ */
 export async function fetchPackfile (
   { gitdir, fs = defaultfs() },
   {
