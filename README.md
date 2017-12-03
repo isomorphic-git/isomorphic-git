@@ -7,9 +7,11 @@ A pure JavaScript implementation of git for node and browsers!
 
 Isomorphic-git aims for 100% interoperability with the canonical git implementation. This means it does all its operations by modifying files in a ".git" directory just like the git you are used to. The included `isogit` CLI can operate on git repositories on your desktop or server.
 
-Unlike earlier git-in-js solutions that were hypermodular, `isomorphic-git` aims to be a complete solution with no assembly required.
-The [high-level API](#high-level-git-api) is a [fluent](https://en.wikipedia.org/wiki/Fluent_interface) interface modeled after the git CLI and should feel natural to read and write.
-However, one size does not always fit. That's why `isomorphic-git` also has a [layered API](#lower-level-api) that frees you to build a solution using only the exact features you need.
+`isomorphic-git` aims to be a complete solution with no assembly required.
+I've tried carefully to design the API so it is easy to use all the features, without paying a penalty in bundle size.
+By providing functionality as separate functions instead of an object oriented API, code bundlers like Webpack will only include the functionality your application actually uses. (Or at least that's the goal.)
+
+I am working on adding type definitions so you can enjoy static type-checking and intelligent code completion in editors like [CodeSandbox](https://codesandbox.io).
 
 <hr>
 
@@ -20,15 +22,8 @@ However, one size does not always fit. That's why `isomorphic-git` also has a [l
 - [Getting Started](#getting-started)
   - [Using as an npm module](#using-as-an-npm-module)
   - [`isogit` CLI](#isogit-cli)
-- [High-level `git()` API](#high-level-git-api)
-  - [git(dir) vs .gitdir(dir) and .workdir(dir)](#gitdir-vs-gitdirdir-and-workdirdir)
-  - [.init()](#init)
-  - [.clone(url)](#cloneurl)
-  - [.fetch(branch)](#fetchbranch)
-  - [.checkout(branch)](#checkoutbranch)
-  - [.list()](#list)
+- [API](#api)
   - [.log(ref)](#logref)
-  - [.add(file)](#addfile)
   - [.remove(file)](#removefile)
   - [.status(file)](#statusfile)
   - [.commit(msg)](#commitmsg)
@@ -63,9 +58,9 @@ The `git.utils.setfs( fs )` line tells git what module to use for file system op
 If you're only using `isomorphic-git` in Node, you can just use the native `fs` module.
 
 ```js
-const { git } = require('isomorphic-git')
+const { Git } = require('isomorphic-git')
 const fs = require('fs')
-git.utils.setfs(fs)
+let repo = new Git({fs, dir: __dirname})
 ```
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
@@ -79,8 +74,7 @@ It has a few more steps involved to set up than in Node, as seen below:
 BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
   if (err) return console.log(err);
   window.fs = BrowserFS.BFSRequire("fs");
-  git.utils.setfs(window.fs)
-  // Now we have three global variables: `BrowserFS`, `fs`, and `git`.
+  var repo = new Git({fs: window.fs, dir: '/'})
 });
 </script>
 ```
@@ -120,226 +114,11 @@ It always starts with an implicit `git('.')` so it defaults to working in the
 current working directory. (Note I may change that soon, now that I have a `findRoot`
 function. I may change the default to `git(git().findRoot(process.cwd()))`.)
 
-## High-level `git()` API
+## API
 
 I may continue to make ~~small~~ changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
 
 **I HAVE DECIDED THAT FLUENT INTERFACE WAS A MISTAKE, AND WILL BE REPLACING IT WITH A SIMPLER API VERY SOON.**
-
-### git(dir) vs .gitdir(dir) and .workdir(dir)
-Setting the working directory and git directory
-
-For regular repositories (with a `.git` directory inside them) you simply pass the directory as the initial argument to `git()`.
-In this case, the git directory is set implicitly to `path.join(workdir, '.git')`.
-
-However, if you are working with bare repositories, that assumption is wrong. In this case, you can use the second version to specify the directories explicitly.
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('./path/to/repo')
-// second way
-git()
-  .gitdir('my-bare-repo')
-  .workdir('/var/www/website')
-```
-
-```sh
-# CLI example
-cd ./path/to/repo
-isogit
-# second way
-isogit --gitdir=my-bare-repo --workdir=/var/www/website
-```
-
-```js
-// Complete API
-git(workdir)
-// second way
-git()
-  .gitdir(gitdir)
-  .workdir(workdir)
-```
-
-- @param {string} `workdir` - The path to the working directory.
-
-The working directory is where your files are checked out.
-Usually this is the parent directory of ".git" but it doesn't have to be.
-
-- @param {string} `gitdir` - The path to the git directory.
-
-The git directory is where your git repository history is stored.
-Usually this is a directory called ".git" inside your working directory.
-
-### .init()
-Initialize a new repository
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.').init()
-```
-
-```sh
-# CLI example
-isogit init
-```
-
-```js
-// Complete API
-git()
-  .gitdir(gitdir)
-  .init()
-```
-
-- @param {string} `gitdir` - The path to the git directory.
-- @returns `Promise<void>`
-
-### .clone(url)
-Clone a repository
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.')
-  .depth(1)
-  .clone('https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git')
-```
-
-```sh
-# CLI example
-isogit --depth=1 clone https://github.com/wmhilton/isomorphic-git
-```
-
-```js
-// Complete API
-git()
-  .workdir(workdir)
-  .gitdir(gitdir)
-  .branch(ref)
-  .auth(authUsername, authPassword)
-  .remote(remote)
-  .depth(depth)
-  .since(since)
-  .exclude(exclude)
-  .relative(relative)
-  .onprogress(progressHandler)
-  .clone(url)
-```
-
-- @param {string} `workdir` - The path to the working directory.
-- @param {string} `gitdir` - The path to the git directory.
-- @param {string} [`ref=undefined`] - Which branch to clone. By default this is the designated "main branch" of the repository.
-- @param {string} [`authUsername=undefined`] - The username to use with Basic Auth
-- @param {string} [`authPassword=undefined`] - The password to use with Basic Auth
-- @param {string} [`remote='origin'`] - What to name the remote that is created. The default is 'origin'.
-- @param {string} `url` - The URL of the remote repository.
-- @param {integer} [`depth=undefined`] - Determines how much of the git repository's history to retrieve.
-- @param {Date} [`since=undefined`] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
-- @param {string[]} [`exclude=[]`] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
-- @param {boolean} [`relative=false`] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
-- @param {Function} [`progressHandler=undefined`] - Callback to receive [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent)s for the operation.
-- @returns `Promise<void>`
-
-### .fetch(branch)
-Fetch commits
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.')
-  .remote('origin')
-  .depth(1)
-  .fetch('master')
-```
-
-```sh
-# CLI example
-isogit --remote=origin --depth=1 fetch master
-```
-
-```js
-// Complete API
-git()
-  .gitdir(gitdir)
-  .auth(authUsername, authPassword)
-  .url(url)
-  .remote(remote)
-  .depth(depth)
-  .since(since)
-  .exclude(exclude)
-  .relative(relative)
-  .onprogress(progressHandler)
-  .fetch(ref)
-```
-
-- @param {string} `gitdir` - The path to the git directory.
-- @param {string} [`ref=undefined`] - Which branch to fetch from. By default this is the currently checked out branch.
-- @param {string} [`authUsername=undefined`] - The username to use with Basic Auth
-- @param {string} [`authPassword=undefined`] - The password to use with Basic Auth
-- @param {string} [`url=undefined`] - The URL of the remote git server. The default is the value set in the git config for that remote.
-- @param {string} [`remote='origin'`] - If URL is not specified, determines which remote to use.
-- @param {integer} [`depth=undefined`] - Determines how much of the git repository's history to retrieve.
-- @param {Date} [`since=undefined`] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
-- @param {string[]} [`exclude=[]`] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
-- @param {boolean} [`relative=false`] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
-- @param {Function} [`progressHandler=undefined`] - Callback to receive [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent)s for the operation.
-- @returns `Promise<void>`
-
-### .checkout(branch)
-Checkout a branch
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.')
-  .checkout('master')
-```
-
-```sh
-# CLI example
-isogit checkout master
-```
-
-```js
-// Complete API
-git()
-  .workdir(workdir)
-  .gitdir(gitdir)
-  .remote(remote)
-  .checkout(ref)
-```
-
-- @param {string} `workdir` - The path to the working directory.
-- @param {string} `gitdir` - The path to the git directory.
-- @param {string} [`ref=undefined`] - Which branch to clone. By default this is the designated "main branch" of the repository.
-- @param {string} [`remote='origin'`] - What to name the remote that is created. The default is 'origin'.
-- @returns `Promise<void>`
-
-### .list()
-List all the tracked files in a repo
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.')
-  .list()
-```
-
-```sh
-# CLI example
-isogit list
-```
-
-```js
-// Complete API
-git()
-  .gitdir(gitdir)
-  .list()
-```
-
-- @param {string} `gitdir` - The path to the git directory.
-- @returns `Promise<string[]>` - A list of file paths.
 
 ### .log(ref)
 Get commit descriptions from the git history
@@ -394,34 +173,6 @@ type CommitDescription = {
   gpgsig: ?string          // PGP signature (if present)
 }
 ```
-
-### .add(file)
-Add files to the git index (aka staging area)
-
-```js
-// JS example
-import git from 'isomorphic-git'
-git('.')
-  .add('README.md')
-```
-
-```sh
-# CLI example
-isogit add README.md
-```
-
-```js
-// Complete API
-git()
-  .workdir(workdir)
-  .gitdir(gitdir)
-  .add(filepath)
-```
-
-- @param {string} `workdir` - The path to the working directory.
-- @param {string} `gitdir` - The path to the git directory.
-- @param {string} `filepath` - The path to the file to add to the index.
-- @returns `Promise<void>`
 
 ### .remove(file)
 Remove files from the git index (aka staging area)

@@ -3,6 +3,21 @@ import pify from 'pify'
 import { GitIndexManager, GitObjectManager } from '../managers'
 import { fs as defaultfs, setfs, read } from '../utils'
 
+/**
+ * Add files to the git index (aka staging area)
+ *
+ * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
+ * @param {Object} args - An options object
+ * @param {string} args.filepath - The path to the file to add to the index.
+ * @returns {Promise<void>} - Resolves successfully when add is complete.
+ *
+ * @example
+ * import fs from 'fs'
+ * import { Git, add } from 'isomorphic-git'
+ *
+ * let repo = new Git({fs, dir: '.'})
+ * await add(repo, {filepath: 'README.md'})
+ */
 export async function add ({ gitdir, workdir, fs = defaultfs() }, { filepath }) {
   setfs(fs)
   const type = 'blob'
@@ -15,43 +30,3 @@ export async function add ({ gitdir, workdir, fs = defaultfs() }, { filepath }) 
   })
   // TODO: return oid?
 }
-
-// export function mixinAdd (BaseClass) {
-//   return class extends BaseClass {
-//     constructor (...args) {
-//       super(...args)
-//     }
-//     async add ({filepath}) {
-//       return add({
-//         gitdir: this.gitdir,
-//         workdir: this.workdir,
-//         filepath,
-//         fs: this.fs
-//       })
-//     }
-//   }
-// }
-
-// function makeMethod (fn) {
-//   return async function (args) {
-//     return fn({
-//       gitdir: this.gitdir,
-//       workdir: this.workdir,
-//       fs: this.fs,
-//       ...args
-//     })
-//   }
-// }
-
-// export const methodAdd = makeMethod(add)
-
-// function makeSelfArg (fn) {
-//   return async function (self, args) {
-//     return fn({
-//       gitdir: self.gitdir,
-//       workdir: self.workdir,
-//       fs: self.fs,
-//       ...args
-//     })
-//   }
-// }

@@ -1,6 +1,19 @@
 import { GitIndexManager } from '../managers'
 import { fs as defaultfs, setfs } from '../utils'
 
+/**
+ * List all the tracked files in a repo
+ *
+ * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
+ * @returns {Promise<string[]>} - Resolves successfully with an array of file paths.
+ *
+ * @example
+ * import fs from 'fs'
+ * import { Git, list } from 'isomorphic-git'
+ *
+ * let repo = new Git({fs, dir: '.'})
+ * let files = await list(repo)
+ */
 export async function list ({ gitdir, fs = defaultfs() }) {
   setfs(fs)
   let filenames
@@ -8,18 +21,4 @@ export async function list ({ gitdir, fs = defaultfs() }) {
     filenames = index.entries.map(x => x.path)
   })
   return filenames
-}
-
-export function mixinList (BaseClass) {
-  return class extends BaseClass {
-    constructor (...args) {
-      super(...args)
-    }
-    async list () {
-      return list({
-        gitdir: this.gitdir,
-        fs: this.fs
-      })
-    }
-  }
 }
