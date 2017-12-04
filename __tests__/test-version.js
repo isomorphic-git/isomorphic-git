@@ -1,10 +1,11 @@
 /* global test describe expect */
 import pkg from '../package.json'
-import { Git } from '..'
+import { version } from '..'
 
+/** @test {version} */
 describe('version', () => {
   test('version', () => {
-    let v = Git.version()
+    let v = version()
     expect(v).toEqual(pkg.version)
   })
 })

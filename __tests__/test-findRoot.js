@@ -6,7 +6,8 @@ import { findRoot } from '../dist/for-node/commands'
 
 const dir = '.'
 
-describe('createClass.findRoot', () => {
+/** @test {findRoot} */
+describe('findRoot', () => {
   test('__dirname', async () => {
     let repo = new Git({ fs, dir })
     let root = await findRoot(repo, { filepath: __dirname })

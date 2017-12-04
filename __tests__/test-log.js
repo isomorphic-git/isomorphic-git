@@ -3,6 +3,7 @@ import fs from 'fs'
 import { Git } from '..'
 import { log } from '../dist/for-node/commands'
 
+/** @test {log} */
 describe('log', () => {
   test('HEAD', async () => {
     let gitdir = '__tests__/__fixtures__/test-log.git'

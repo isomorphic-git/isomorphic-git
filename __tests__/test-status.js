@@ -7,6 +7,7 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { Git } from '..'
 import { status, add, remove } from '../dist/for-node/commands'
 
+/** @test {status} */
 describe('status', () => {
   test('status', async () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-status.git')
