@@ -4,17 +4,14 @@ import { GitIndexManager, GitObjectManager } from '../managers'
 import { fs as defaultfs, setfs, read } from '../utils'
 
 /**
- * Add files to the git index (aka staging area)
+ * Add a file to the git index (aka staging area)
  *
  * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
- * @param {Object} args - An options object
+ * @param {Object} args - Arguments object
  * @param {string} args.filepath - The path to the file to add to the index.
- * @returns {Promise<void>} - Resolves successfully when add is complete.
+ * @returns {Promise<void>} - Resolves successfully once the git index has been updated.
  *
  * @example
- * import fs from 'fs'
- * import { Git, add } from 'isomorphic-git'
- *
  * let repo = new Git({fs, dir: '.'})
  * await add(repo, {filepath: 'README.md'})
  */

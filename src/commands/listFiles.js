@@ -8,13 +8,10 @@ import { fs as defaultfs, setfs } from '../utils'
  * @returns {Promise<string[]>} - Resolves successfully with an array of file paths.
  *
  * @example
- * import fs from 'fs'
- * import { Git, list } from 'isomorphic-git'
- *
  * let repo = new Git({fs, dir: '.'})
- * let files = await list(repo)
+ * let files = await listFiles(repo)
  */
-export async function list ({ gitdir, fs = defaultfs() }) {
+export async function listFiles ({ gitdir, fs = defaultfs() }) {
   setfs(fs)
   let filenames
   await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {

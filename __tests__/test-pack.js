@@ -5,7 +5,7 @@ import streamEqual from 'stream-equal'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
 import { Git } from '..'
-import { pack } from '../dist/for-node/commands'
+import { pack } from '../dist/for-node/internal-apis'
 
 describe('pack', () => {
   test('git.pack', async () => {

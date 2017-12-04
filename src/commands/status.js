@@ -80,16 +80,35 @@ async function getHeadTree ({ gitdir }) {
   return tree
 }
 
-// For now we're just diffing individual files
+/**
+ * Tell whether a file has been changed
+ *
+ * The possible resolve values are:
+ *
+ * - `"ignored"` file ignored by a .gitignore rule
+ * - `"unmodified"` file unchanged from HEAD commit
+ * - `"*modified"` file has modifications, not yet staged
+ * - `"*deleted"` file has been removed, but the removal is not yet staged
+ * - `"*added"` file is untracked, not yet staged
+ * - `"absent"` file not present in HEAD commit, staging area, or working dir
+ * - `"modified"` file has modifications, staged
+ * - `"deleted"` file has been removed, staged
+ * - `"added"` previously untracked file, staged
+ * - `"*unmodified"` working dir and HEAD commit match, but index differs
+ * - `"*absent"` file not present in working dir or HEAD commit, but present in the index
+ *
+ * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
+ * @param {Object} args - Arguments object
+ * @param {string} args.filepath - The path to the file to query.
+ * @returns {Promise<string>} - Resolves successfully with the file's git status.
+ *
+ * @example
+ * let repo = new Git({fs, dir: '.'})
+ * await status(repo, {filepath: 'README.md'})
+ */
 export async function status (
   { workdir, gitdir, fs = defaultfs() },
-  {
-    filepath
-  } /*: {
-  workdir: string,
-  gitdir: string,
-  filepath: string
-} */
+  { filepath }
 ) {
   setfs(fs)
   let ignored = await GitIgnoreManager.isIgnored({

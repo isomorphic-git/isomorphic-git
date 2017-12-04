@@ -142,7 +142,8 @@ const inputs = [
   'commands.js',
   'managers.js',
   'models.js',
-  'utils.js'
+  'utils.js',
+  'internal-apis.js'
 ]
 
 const codeSplitting = input =>

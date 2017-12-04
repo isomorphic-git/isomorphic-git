@@ -7,10 +7,7 @@ import { write, mkdirs, fs as defaultfs, setfs } from '../utils'
  * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
  *
  * @example
- * import fs from 'fs'
- * import { Git, init } from 'isomorphic-git'
- *
- * let repo = new Git({fs, dir: './path/to/repo'})
+ * let repo = new Git({fs, dir: '.'})
  * await init(repo)
  */
 export async function init ({ gitdir, fs = defaultfs() }) {
