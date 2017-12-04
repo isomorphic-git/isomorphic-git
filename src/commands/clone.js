@@ -23,7 +23,7 @@ import { fs as defaultfs, setfs } from '../utils'
  *
  * @example
  * let repo = new Git({fs, dir: '.'})
- * clone(repo, {
+ * await clone(repo, {
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
  *   depth: 1
  * })

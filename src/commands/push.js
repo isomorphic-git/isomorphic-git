@@ -29,6 +29,7 @@ const types = {
  * @returns {Promise<void>} - Resolves successfully when push completes
  *
  * @example
+ * let repo = new Git({fs, dir: '.'})
  * await push(repo, {
  *   remote: 'origin',
  *   ref: 'master',
