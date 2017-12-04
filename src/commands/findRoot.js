@@ -14,7 +14,7 @@ async function test (filepath) {
 /**
  * Find the root git directory
  * @param {GitRepo} repo - A {@link Git} object matching `{fs}`
- * @param {Object} args - An options object
+ * @param {Object} args - Arguments object
  * @param {string} args.filepath - The file directory to start searching in.
  * @returns {Promise<string>} - a directory name
  * @throws {Error} - Error('Unable to find git root')
@@ -22,10 +22,7 @@ async function test (filepath) {
  * Starting at `filepath`, will walk upwards until it finds a directory that contains a directory called '.git'.
  *
  * @example
- * import fs from 'fs'
- * import { Git, findRoot } from 'isomorphic-git'
  * let repo = new Git({fs, dir: '.'})
- *
  * let gitroot = await findRoot(repo, {
  *   filepath: '/path/to/some/gitrepo/path/to/some/file.txt'
  * })

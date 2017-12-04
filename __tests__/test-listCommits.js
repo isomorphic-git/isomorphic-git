@@ -1,7 +1,7 @@
 /* global test describe expect */
 import fs from 'fs'
 import { Git } from '..'
-import { listCommits } from '../dist/for-node/commands'
+import { listCommits } from '../dist/for-node/internal-apis'
 
 describe('listCommits', () => {
   test('listCommits', async () => {

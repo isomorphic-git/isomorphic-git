@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`list list 1`] = `
+exports[`listFiles listFiles 1`] = `
 Array [
   ".babelrc",
   ".editorconfig",

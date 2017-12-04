@@ -43,7 +43,8 @@ module.exports = {
     doc: {
       default: series.nps('doc.esdoc', 'doc.copy'),
       esdoc: 'esdoc',
-      copy: 'cp -R dist/* doc/'
+      copy: 'cp -R dist/* doc/',
+      watch: 'watch "nps doc.esdoc" src'
     },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',

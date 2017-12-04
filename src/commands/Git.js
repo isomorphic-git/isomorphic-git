@@ -5,31 +5,11 @@ import { pkg } from '../utils'
  */
 
 /**
- * @interface @class GitRepo
+ * @typedef {Object} GitRepo
  * @property {FSModule} fs
  * @property {string} workdir
  * @property {string} gitdir
  */
-class GitRepo {
-  /**
-   * @type {FSModule}
-   */
-  get fs () {}
-  /**
-   * The directory where your files are checked out.
-   * Usually this is the parent directory of ".git" but it doesn't have to be.
-   *
-   * @type {string}
-   */
-  get workdir () {}
-  /**
-   * The directory where your git repository history is stored.
-   * Usually this is a directory called ".git" inside your working directory.
-   *
-   * @type {string}
-   */
-  get gitdir () {}
-}
 
 /**
  *

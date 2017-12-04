@@ -8,7 +8,7 @@ import { fs as defaultfs, setfs } from '../utils'
  * Clone a repository
  *
  * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
- * @param {Object} args - An options object
+ * @param {Object} args - Arguments object
  * @param {string} args.url - The URL of the remote repository.
  * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
  * @param {string} [args.ref=undefined] - Which branch to clone. By default this is the designated "main branch" of the repository.
@@ -22,8 +22,6 @@ import { fs as defaultfs, setfs } from '../utils'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * import fs from 'fs'
- * import { Git, clone } from 'isomorphic-git'
  * let repo = new Git({fs, dir: '.'})
  * clone(repo, {
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',

@@ -5,7 +5,8 @@ import path from 'path'
 import { createTempDir } from 'jest-fixtures'
 
 import { Git } from '..'
-import { init, unpack } from '../dist/for-node/commands'
+import { init } from '../dist/for-node/commands'
+import { unpack } from '../dist/for-node/internal-apis'
 
 describe('unpack', () => {
   test('unpack', async () => {

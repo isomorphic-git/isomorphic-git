@@ -1,7 +1,7 @@
 /**
  * @param {string} company
  * @param {string} token
- * @returns {Git} this
+ * @returns {username, password}
  *
  * Use with {@link #gitpush .push} and {@link #gitpull .pull} to set Basic Authentication headers.
  * This for is for *actual* OAuth2 tokens (not "personal access tokens").

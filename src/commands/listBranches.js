@@ -1,7 +1,15 @@
 import { read, readDirAsFlatFileList, fs as defaultfs, setfs } from '../utils'
 
-// Note: this function will get more interesting once we add support for
-// packed-refs.
+/**
+ * List all local branches
+ *
+ * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
+ * @returns {Promise<string[]>} - Resolves successfully with an array of branch names.
+ *
+ * @example
+ * let repo = new Git({fs, dir: '.'})
+ * let branches = await listBranches(repo)
+ */
 export async function listBranches ({ gitdir, fs = defaultfs() }) {
   setfs(fs)
   let files = await readDirAsFlatFileList(`${gitdir}/refs/heads`)
