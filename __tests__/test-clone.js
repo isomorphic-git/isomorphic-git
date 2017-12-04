@@ -7,6 +7,7 @@ import { clone } from '../dist/for-node/commands'
 
 jest.setTimeout(30000)
 
+/** @test {clone} */
 describe('clone', () => {
   ;(process.env.CI ? test : test.skip)('clone', async () => {
     let dir = await createTempDir()

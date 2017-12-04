@@ -3,8 +3,9 @@ import { createTempDir, copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
 import pify from 'pify'
 import { Git } from '..'
-import { checkout, list } from '../dist/for-node/commands'
+import { checkout, listFiles } from '../dist/for-node/commands'
 
+/** @test {checkout} */
 describe('checkout', () => {
   test('checkout', async () => {
     let workdir = await createTempDir()
@@ -13,7 +14,7 @@ describe('checkout', () => {
     await checkout(repo, { ref: 'test-branch' })
     let files = await pify(fs.readdir)(workdir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await list(repo)
+    let index = await listFiles(repo)
     expect(index).toMatchSnapshot()
   })
 })

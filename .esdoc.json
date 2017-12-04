@@ -3,7 +3,14 @@
   "destination": "./doc",
   "plugins": [
     {
-      "name": "esdoc-standard-plugin"
+      "name": "esdoc-standard-plugin",
+      "option": {
+        "test": {
+          "source": "./__tests__/",
+          "interfaces": ["describe", "test"],
+          "includes": ["^test-(.*)\\.js$"]
+        }
+      }
     },
     {
       "name": "esdoc-ecmascript-proposal-plugin",

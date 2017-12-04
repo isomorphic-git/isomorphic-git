@@ -5,6 +5,7 @@ import { createTempDir } from 'jest-fixtures'
 import { Git } from '..'
 import { init } from '..'
 
+/** @test {init} */
 describe('init', () => {
   test('init', async () => {
     let dir = await createTempDir()

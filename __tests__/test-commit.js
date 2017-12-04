@@ -8,6 +8,7 @@ import { commit, verify } from '../dist/for-node/commands'
 
 jest.setTimeout(30000)
 
+/** @test {commit} */
 describe('commit', () => {
   test('commit', async () => {
     // Setup

@@ -9,6 +9,7 @@ import { fetch } from '../dist/for-node/commands'
 
 jest.setTimeout(60000)
 
+/** @test {fetch} */
 describe('fetch', () => {
   ;(process.env.CI ? test : test.skip)('fetch (from Github)', async () => {
     // Setup

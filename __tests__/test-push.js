@@ -9,6 +9,7 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { Git } from '..'
 import { push } from '../dist/for-node/commands'
 
+/** @test {push} */
 describe('push', () => {
   test('"refs/heads/master" to local git-http-backend', async () => {
     // Setup

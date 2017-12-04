@@ -3,6 +3,7 @@ import fs from 'fs'
 import { Git } from '..'
 import { listBranches } from '../dist/for-node/commands'
 
+/** @test {listBranches} */
 describe('listBranches', () => {
   test('listBranches', async () => {
     let repo = new Git({

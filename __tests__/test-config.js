@@ -5,6 +5,7 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { Git } from '..'
 import { config } from '../dist/for-node/commands'
 
+/** @test {config} */
 describe('config', () => {
   test('getting', async () => {
     // Setup
