@@ -33,10 +33,8 @@ import { pkg, fs as defaultfs, setfs } from '../utils'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * import fs from 'fs'
- * import { Git, fetch } from 'isomorphic-git'
  * let repo = new Git({fs, dir: '.'})
- * fetch(repo, {
+ * await fetch(repo, {
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
  *   depth: 1
  * })

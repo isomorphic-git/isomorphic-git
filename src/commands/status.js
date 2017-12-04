@@ -104,7 +104,8 @@ async function getHeadTree ({ gitdir }) {
  *
  * @example
  * let repo = new Git({fs, dir: '.'})
- * await status(repo, {filepath: 'README.md'})
+ * let gitstatus = await status(repo, {filepath: 'README.md'})
+ * console.log(gitstatus)
  */
 export async function status (
   { workdir, gitdir, fs = defaultfs() },

@@ -4,6 +4,7 @@ import { HKP } from 'openpgp/dist/openpgp.min.js'
 import { fs as defaultfs, setfs } from '../utils'
 const HttpKeyServer = new HKP()
 
+/** @ignore */
 export async function verify (
   { gitdir, fs = defaultfs() },
   { ref, publicKeys }
