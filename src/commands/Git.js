@@ -1,4 +1,5 @@
-import { pkg } from '../utils'
+import path from 'path'
+import { pkg, setfs } from '../utils'
 
 /**
  * @external {FSModule} http://ghub.io/browserfs
@@ -44,7 +45,7 @@ export class Git {
    * @param {FSModule} args.fs - The filesystem holding the git repo
    * @param {string} args.dir
    * @param {string} [args.gitdir=dir]
-   * @param {string} [args.workdir=path.join(dir, '/.git')]
+   * @param {string} [args.workdir=path.join(dir, '.git')]
    */
   constructor ({ fs, dir, workdir, gitdir }) {
     if (fs) {
@@ -52,6 +53,7 @@ export class Git {
        * @type {FSModule}
        */
       this.fs = fs
+      setfs(fs)
     }
     if (dir) {
       /**
@@ -67,7 +69,7 @@ export class Git {
        *
        * @type {string}
        */
-      this.gitdir = `${dir}/.git`
+      this.gitdir = path.join(dir, '.git')
     }
     if (workdir) this.workdir = workdir
     if (gitdir) this.gitdir = gitdir

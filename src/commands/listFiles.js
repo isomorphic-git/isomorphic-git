@@ -1,5 +1,5 @@
-import { GitIndexManager } from '../managers'
 import { fs as defaultfs, setfs } from '../utils'
+import { GitIndexManager } from '../managers'
 
 /**
  * List all the tracked files in a repo
