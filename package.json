@@ -56,7 +56,7 @@
     "shasum": "^1.0.2",
     "simple-concat": "^1.0.0",
     "simple-get": "^2.7.0",
-    "thru": "git+https://github.com/wmhilton-contrib/thru.git#master"
+    "through2": "^2.0.3"
   },
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",

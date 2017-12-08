@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
 import { PassThrough } from 'stream'
-import thru from 'thru'
+import through2 from 'through2'
 import listpack from 'git-list-pack'
 import peek from 'buffer-peek-stream'
 import applyDelta from 'git-apply-delta'
@@ -177,7 +177,7 @@ async function fetchPackfile (
   packstream.end(GitPktLine.encode(`done\n`))
   let response = await remoteHTTP.pull(packstream)
   response.packetlines.pipe(
-    thru(async (data, next) => {
+    through2(async (data, enc, next) => {
       let line = data.toString('utf8')
       if (line.startsWith('shallow')) {
         let oid = line.slice(-41).trim()
@@ -260,85 +260,89 @@ export async function unpack (
       inputStream
         .pipe(listpack())
         .pipe(
-          thru(async ({ data, type, reference, offset, num }, next) => {
-            type = types[type]
-            marky.mark(`${type} #${num} ${data.length}B`)
-            if (type === 'ref-delta') {
-              let oid = Buffer.from(reference).toString('hex')
-              try {
-                marky.mark(`readFile`)
-                let { object, type } = await GitObjectManager.read({
+          through2.obj(
+            async ({ data, type, reference, offset, num }, enc, next) => {
+              type = types[type]
+              marky.mark(`${type} #${num} ${data.length}B`)
+              if (type === 'ref-delta') {
+                let oid = Buffer.from(reference).toString('hex')
+                try {
+                  marky.mark(`readFile`)
+                  let { object, type } = await GitObjectManager.read({
+                    gitdir,
+                    oid
+                  })
+                  totalReadFileTime += marky.stop(`readFile`).duration
+                  marky.mark(`applyDelta`)
+                  let result = applyDelta(data, object)
+                  totalApplyDeltaTime += marky.stop(`applyDelta`).duration
+                  marky.mark(`writeFile`)
+                  let newoid = await GitObjectManager.write({
+                    gitdir,
+                    type,
+                    object: result
+                  })
+                  totalWriteFileTime += marky.stop(`writeFile`).duration
+                  // console.log(`${type} ${newoid} ref-delta ${oid}`)
+                  offsetMap.set(offset, newoid)
+                } catch (err) {
+                  throw new Error(
+                    `Could not find object ${reference} ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`
+                  )
+                }
+              } else if (type === 'ofs-delta') {
+                // Note: this might be not working because offsets might not be
+                // guaranteed to be on object boundaries? In which case we'd need
+                // to write the packfile to disk first, I think.
+                // For now I've "solved" it by simply not advertising ofs-delta as a capability
+                // during the HTTP request, so Github will only send ref-deltas not ofs-deltas.
+                let absoluteOffset = offset - parseVarInt(reference)
+                let referenceOid = offsetMap.get(absoluteOffset)
+                // console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`)
+                let { type, object } = await GitObjectManager.read({
                   gitdir,
-                  oid
+                  oid: referenceOid
                 })
-                totalReadFileTime += marky.stop(`readFile`).duration
-                marky.mark(`applyDelta`)
                 let result = applyDelta(data, object)
-                totalApplyDeltaTime += marky.stop(`applyDelta`).duration
-                marky.mark(`writeFile`)
-                let newoid = await GitObjectManager.write({
+                let oid = await GitObjectManager.write({
                   gitdir,
                   type,
                   object: result
                 })
+                // console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
+                offsetMap.set(offset, oid)
+              } else {
+                marky.mark(`writeFile`)
+                let oid = await GitObjectManager.write({
+                  gitdir,
+                  type,
+                  object: data
+                })
                 totalWriteFileTime += marky.stop(`writeFile`).duration
-                // console.log(`${type} ${newoid} ref-delta ${oid}`)
-                offsetMap.set(offset, newoid)
-              } catch (err) {
-                throw new Error(
-                  `Could not find object ${reference} ${oid} that is referenced by a ref-delta object in packfile at byte offset ${offset}.`
-                )
+                // console.log(`${offset} ${type} ${oid}`)
+                offsetMap.set(offset, oid)
               }
-            } else if (type === 'ofs-delta') {
-              // Note: this might be not working because offsets might not be
-              // guaranteed to be on object boundaries? In which case we'd need
-              // to write the packfile to disk first, I think.
-              // For now I've "solved" it by simply not advertising ofs-delta as a capability
-              // during the HTTP request, so Github will only send ref-deltas not ofs-deltas.
-              let absoluteOffset = offset - parseVarInt(reference)
-              let referenceOid = offsetMap.get(absoluteOffset)
-              // console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`)
-              let { type, object } = await GitObjectManager.read({
-                gitdir,
-                oid: referenceOid
-              })
-              let result = applyDelta(data, object)
-              let oid = await GitObjectManager.write({
-                gitdir,
-                type,
-                object: result
-              })
-              // console.log(`${offset} ${type} ${oid} ofs-delta ${referenceOid}`)
-              offsetMap.set(offset, oid)
-            } else {
-              marky.mark(`writeFile`)
-              let oid = await GitObjectManager.write({
-                gitdir,
-                type,
-                object: data
-              })
-              totalWriteFileTime += marky.stop(`writeFile`).duration
-              // console.log(`${offset} ${type} ${oid}`)
-              offsetMap.set(offset, oid)
+              if (onprogress !== undefined) {
+                onprogress({
+                  loaded: numObjects - num,
+                  total: numObjects,
+                  lengthComputable: true
+                })
+              }
+              let perfentry = marky.stop(`${type} #${num} ${data.length}B`)
+              totalTime += perfentry.duration
+              if (num === 0) {
+                console.log(`Total time unpacking objects: ${totalTime}`)
+                console.log(
+                  `Total time applying deltas: ${totalApplyDeltaTime}`
+                )
+                console.log(`Total time reading files: ${totalReadFileTime}`)
+                console.log(`Total time writing files: ${totalWriteFileTime}`)
+                return resolve()
+              }
+              next(null)
             }
-            if (onprogress !== undefined) {
-              onprogress({
-                loaded: numObjects - num,
-                total: numObjects,
-                lengthComputable: true
-              })
-            }
-            let perfentry = marky.stop(`${type} #${num} ${data.length}B`)
-            totalTime += perfentry.duration
-            if (num === 0) {
-              console.log(`Total time unpacking objects: ${totalTime}`)
-              console.log(`Total time applying deltas: ${totalApplyDeltaTime}`)
-              console.log(`Total time reading files: ${totalReadFileTime}`)
-              console.log(`Total time writing files: ${totalWriteFileTime}`)
-              return resolve()
-            }
-            next(null)
-          })
+          )
         )
         .on('error', reject)
         .on('finish', resolve)
