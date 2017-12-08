@@ -98,9 +98,13 @@ For more details about each build see [./dist/README.md](https://github.com/wmhi
 ### `isogit` CLI
 
 Isomorphic-git comes with a simple CLI tool, named `isogit` because `isomorphic-git` is a lot to type. It is really just a thin shell that translates command line arguments into the equivalent JS API commands. So you should be able to run *any* current or future isomorphic-git commands using the CLI.
-It always starts with an implicit `git('.')` so it defaults to working in the
-current working directory. (Note I may change that soon, now that I have a `findRoot`
-function. I may change the default to `git(git().findRoot(process.cwd()))`.)
+
+It always starts with an the assumption that the current working directory is a git root.
+E.g. `repo = new Git({fs, dir: '.'})`.
+
+It uses `minimisted` to parse command line options.
+
+TODO: Document this more. Also write some tests? IDK the CLI is more of a lark for testing really.
 
 ## API - New website for docs!
 
