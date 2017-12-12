@@ -1,7 +1,6 @@
 // @flow
 // import LockManager from 'travix-lock-manager'
-import { read, write } from '../utils'
-import { GitIndex } from '../models'
+import { FileSystem, GitIndex } from '../models'
 import AsyncLock from 'async-lock'
 // import Lock from '../utils'
 
@@ -11,7 +10,8 @@ const map /*: Map<string, GitIndex> */ = new Map()
 const lock = new AsyncLock()
 
 export class GitIndexManager {
-  static async acquire (filepath, closure) {
+  static async acquire ({ fs: _fs, filepath }, closure) {
+    const fs = new FileSystem(_fs)
     await lock.acquire(filepath, async function () {
       let index = map.get(filepath)
       if (index === undefined) {
@@ -19,7 +19,7 @@ export class GitIndexManager {
         // to make sure other processes aren't writing to it
         // simultaneously, which could result in a corrupted index.
         // const fileLock = await Lock(filepath)
-        const rawIndexFile = await read(filepath)
+        const rawIndexFile = await fs.read(filepath)
         index = GitIndex.from(rawIndexFile)
         // cache the GitIndex object so we don't need to re-read it
         // every time.
@@ -33,7 +33,7 @@ export class GitIndexManager {
         // Acquire a file lock while we're writing the index file
         // let fileLock = await Lock(filepath)
         const buffer = index.toObject()
-        await write(filepath, buffer)
+        await fs.write(filepath, buffer)
         index._dirty = false
       }
       // For now, discard our cached object so that external index

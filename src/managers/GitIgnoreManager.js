@@ -1,7 +1,7 @@
 // @flow
 import ignore from 'ignore'
 import path from 'path'
-import { read, setfs, fs as defaultfs } from '../utils'
+import { FileSystem } from '../models'
 
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of cacheing.
@@ -10,12 +10,12 @@ import { read, setfs, fs as defaultfs } from '../utils'
 
 export class GitIgnoreManager {
   static async isIgnored ({
+    fs: _fs,
     gitdir,
     workdir,
-    filepath,
-    fs = defaultfs()
+    filepath
   }) /*: Promise<boolean> */ {
-    setfs(fs)
+    const fs = new FileSystem(_fs)
     let pairs = [
       {
         gitignore: path.join(workdir, '.gitignore'),
@@ -35,7 +35,7 @@ export class GitIgnoreManager {
     for (let p of pairs) {
       let file
       try {
-        file = await read(p.gitignore, 'utf8')
+        file = await fs.read(p.gitignore, 'utf8')
       } catch (err) {
         if (err.code === 'NOENT') continue
       }

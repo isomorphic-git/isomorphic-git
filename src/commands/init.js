@@ -1,4 +1,4 @@
-import { write, mkdirs, fs as defaultfs, setfs } from '../utils'
+import { FileSystem } from '../models'
 
 /**
  * Initialize a new repository
@@ -10,8 +10,8 @@ import { write, mkdirs, fs as defaultfs, setfs } from '../utils'
  * let repo = new Git({fs, dir: '.'})
  * await init(repo)
  */
-export async function init ({ gitdir, fs = defaultfs() }) {
-  setfs(fs)
+export async function init ({ gitdir, fs: _fs }) {
+  const fs = new FileSystem(_fs)
   let folders = [
     'hooks',
     'info',
@@ -21,8 +21,8 @@ export async function init ({ gitdir, fs = defaultfs() }) {
     'refs/tags'
   ]
   folders = folders.map(dir => gitdir + '/' + dir)
-  await mkdirs(folders)
-  await write(
+  await fs.mkdirs(folders)
+  await fs.write(
     gitdir + '/config',
     '[core]\n' +
       '\trepositoryformatversion = 0\n' +
@@ -32,5 +32,5 @@ export async function init ({ gitdir, fs = defaultfs() }) {
       '\tsymlinks = false\n' +
       '\tignorecase = true\n'
   )
-  await write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
+  await fs.write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
 }

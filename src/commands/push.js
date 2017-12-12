@@ -5,8 +5,7 @@ import pako from 'pako'
 import crypto from 'crypto'
 import { config } from './config'
 import { GitRefManager, GitObjectManager, GitRemoteHTTP } from '../managers'
-import { GitCommit, GitTree, GitPktLine } from '../models'
-import { fs as defaultfs, setfs } from '../utils'
+import { FileSystem, GitCommit, GitTree, GitPktLine } from '../models'
 
 const types = {
   commit: 0b0010000,
@@ -38,24 +37,17 @@ const types = {
  * })
  */
 export async function push (
-  { gitdir, fs = defaultfs() },
+  { gitdir, fs: _fs },
   { ref, remote, url, authUsername, authPassword }
 ) {
-  setfs(fs)
+  const fs = new FileSystem(_fs)
   // TODO: Figure out how pushing tags works. (This only works for branches.)
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await config(
-      {
-        gitdir
-      },
-      {
-        path: `remote.${remote}.url`
-      }
-    )
+    url = await config({ fs, gitdir }, { path: `remote.${remote}.url` })
   }
   let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
-  let oid = await GitRefManager.resolve({ gitdir, ref })
+  let oid = await GitRefManager.resolve({ fs, gitdir, ref })
   let httpRemote = new GitRemoteHTTP(url)
   if (authUsername !== undefined && authPassword !== undefined) {
     httpRemote.auth = {
@@ -65,16 +57,13 @@ export async function push (
   }
   await httpRemote.preparePush()
   let commits = await listCommits(
-    {
-      gitdir,
-      fs
-    },
+    { fs, gitdir },
     {
       start: [oid],
       finish: httpRemote.refs.values()
     }
   )
-  let objects = await listObjects({ gitdir, fs }, { oids: commits })
+  let objects = await listObjects({ fs, gitdir }, { oids: commits })
   let packstream = new PassThrough()
   let oldoid =
     httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
@@ -83,10 +72,7 @@ export async function push (
   )
   packstream.write(GitPktLine.flush())
   pack(
-    {
-      gitdir,
-      fs
-    },
+    { fs, gitdir },
     {
       oids: [...objects],
       outputStream: packstream
@@ -99,20 +85,17 @@ export async function push (
 /**
  * @ignore
  */
-export async function listCommits (
-  { gitdir, fs = defaultfs() },
-  { start, finish }
-) {
-  setfs(fs)
+export async function listCommits ({ gitdir, fs: _fs }, { start, finish }) {
+  const fs = new FileSystem(_fs)
   let startingSet = new Set()
   let finishingSet = new Set()
   for (let ref of start) {
-    startingSet.add(await GitRefManager.resolve({ gitdir, ref }))
+    startingSet.add(await GitRefManager.resolve({ fs, gitdir, ref }))
   }
   for (let ref of finish) {
     // We may not have these refs locally so we must try/catch
     try {
-      let oid = await GitRefManager.resolve({ gitdir, ref })
+      let oid = await GitRefManager.resolve({ fs, gitdir, ref })
       finishingSet.add(oid)
     } catch (err) {}
   }
@@ -123,7 +106,7 @@ export async function listCommits (
   // setting a default recursion limit.
   async function walk (oid) {
     visited.add(oid)
-    let { type, object } = await GitObjectManager.read({ gitdir, oid })
+    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type !== 'commit') {
       throw new Error(`Expected type commit but type is ${type}`)
     }
@@ -147,10 +130,10 @@ export async function listCommits (
  * @ignore
  */
 export async function listObjects (
-  { gitdir, fs = defaultfs() },
+  { gitdir, fs: _fs },
   { oids } /*: { oids: Set<string> } */
 ) {
-  setfs(fs)
+  const fs = new FileSystem(_fs)
   let visited /*: Set<string> */ = new Set()
 
   // We don't do the purest simplest recursion, because we can
@@ -158,7 +141,7 @@ export async function listObjects (
   // tell us which oids are Blobs and which are Trees.
   async function walk (oid) {
     visited.add(oid)
-    let { type, object } = await GitObjectManager.read({ gitdir, oid })
+    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type === 'commit') {
       let commit = GitCommit.from(object)
       let tree = commit.headers().tree
@@ -185,11 +168,8 @@ export async function listObjects (
 /**
  * @ignore
  */
-export async function pack (
-  { gitdir, fs = defaultfs() },
-  { oids, outputStream }
-) {
-  setfs(fs)
+export async function pack ({ gitdir, fs: _fs }, { oids, outputStream }) {
+  const fs = new FileSystem(_fs)
   let hash = crypto.createHash('sha1')
   function write (chunk, enc) {
     outputStream.write(chunk, enc)
@@ -229,7 +209,7 @@ export async function pack (
   // Write a 4 byte (32-bit) int
   write(pad(8, oids.length.toString(16), '0'), 'hex')
   for (let oid of oids) {
-    let { type, object } = await GitObjectManager.read({ gitdir, oid })
+    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum

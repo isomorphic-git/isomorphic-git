@@ -1,17 +1,16 @@
-// @flow
 import { Buffer } from 'buffer'
 import shasum from 'shasum'
-import { GitObject } from '../models'
-import { read, write, exists } from '../utils'
+import { FileSystem, GitObject } from '../models'
 
 export class GitObjectManager {
-  static async read ({ gitdir, oid } /*: {gitdir: string, oid: string} */) {
-    let file = await read(
+  static async read ({ fs: _fs, gitdir, oid }) {
+    const fs = new FileSystem(_fs)
+    let file = await fs.read(
       `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     )
     if (!file) {
       // Check to see if it's in shallow commits.
-      let text = await read(`${gitdir}/shallow`, { encoding: 'utf8' })
+      let text = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
       if (text !== null && text.includes(oid)) {
         throw new Error(
           `Failed to read git object with oid ${oid} because it is a shallow commit`
@@ -35,13 +34,14 @@ export class GitObjectManager {
     return oid
   }
 
-  static async write ({ gitdir, type, object }) /*: Promise<string> */ {
+  static async write ({ fs: _fs, gitdir, type, object }) /*: Promise<string> */ {
+    const fs = new FileSystem(_fs)
     let { file, oid } = GitObject.wrap({ type, object })
     let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     // Don't overwrite existing git objects - this helps avoid EPERM errors.
     // Although I don't know how we'd fix corrupted objects then. Perhaps delete them
     // on read?
-    if (!await exists(filepath)) await write(filepath, file)
+    if (!await fs.exists(filepath)) await fs.write(filepath, file)
     return oid
   }
 }

@@ -1,15 +1,5 @@
-import { fs as defaultfs, setfs } from '../utils'
+import { FileSystem } from '../models'
 import path from 'path'
-import pify from 'pify'
-
-async function test (filepath) {
-  try {
-    await pify(defaultfs().lstat)(path.join(filepath, '.git'))
-    return true
-  } catch (err) {
-    return false
-  }
-}
 
 /**
  * Find the root git directory
@@ -28,10 +18,17 @@ async function test (filepath) {
  * })
  * // gitroot = '/path/to/some/gitrepo'
  */
-export async function findRoot ({ fs = defaultfs() }, { filepath }) {
-  setfs(fs)
-  if (await test(filepath)) return filepath
-  let parent = path.dirname(filepath)
-  if (parent === filepath) throw new Error('Unable to find git root')
-  return findRoot({ fs }, { filepath: parent })
+export async function findRoot ({ fs: _fs }, { filepath }) {
+  const fs = new FileSystem(_fs)
+  return _findRoot(fs, filepath)
+}
+
+async function _findRoot (fs, filepath) {
+  if (await fs.exists(path.join(filepath, '.git'))) {
+    return filepath
+  } else {
+    let parent = path.dirname(filepath)
+    if (parent === filepath) throw new Error('Unable to find git root')
+    return _findRoot(fs, parent)
+  }
 }

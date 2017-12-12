@@ -1,18 +1,17 @@
 /* global test describe expect */
-import fs from 'fs'
 import path from 'path'
-import { read, write, rm } from '../dist/for-node/utils'
+import { FileSystem } from '../dist/for-node/models'
+import _fs from 'fs'
+const fs = new FileSystem(_fs)
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-
-import { Git } from '..'
-import { status, add, remove } from '../dist/for-node/commands'
+import { Git, status, add, remove } from '..'
 
 /** @test {status} */
 describe('status', () => {
   test('status', async () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-status.git')
     let workdir = await copyFixtureIntoTempDir(__dirname, 'test-status')
-    const repo = new Git({ fs, gitdir, workdir })
+    const repo = new Git({ fs: _fs, gitdir, workdir })
     const a = await status(repo, { filepath: 'a.txt' })
     const b = await status(repo, { filepath: 'b.txt' })
     const c = await status(repo, { filepath: 'c.txt' })
@@ -38,10 +37,10 @@ describe('status', () => {
     expect(d2).toEqual('added')
 
     // And finally the weirdo cases
-    let acontent = await read(path.join(workdir, 'a.txt'))
-    await write(path.join(workdir, 'a.txt'), 'Hi')
+    let acontent = await fs.read(path.join(workdir, 'a.txt'))
+    await fs.write(path.join(workdir, 'a.txt'), 'Hi')
     await add(repo, { filepath: 'a.txt' })
-    await write(path.join(workdir, 'a.txt'), acontent)
+    await fs.write(path.join(workdir, 'a.txt'), acontent)
     let a3 = await status(repo, { filepath: 'a.txt' })
     expect(a3).toEqual('*unmodified')
 
@@ -49,9 +48,9 @@ describe('status', () => {
     let a4 = await status(repo, { filepath: 'a.txt' })
     expect(a4).toEqual('*undeleted')
 
-    await write(path.join(workdir, 'e.txt'), 'Hi')
+    await fs.write(path.join(workdir, 'e.txt'), 'Hi')
     await add(repo, { filepath: 'e.txt' })
-    await rm(path.join(workdir, 'e.txt'))
+    await fs.rm(path.join(workdir, 'e.txt'))
     let e3 = await status(repo, { filepath: 'e.txt' })
     expect(e3).toEqual('*absent')
 

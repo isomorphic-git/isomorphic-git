@@ -4,8 +4,7 @@ import { GitObjectManager } from '../dist/for-node/managers'
 import path from 'path'
 import { createTempDir } from 'jest-fixtures'
 
-import { Git } from '..'
-import { init } from '../dist/for-node/commands'
+import { Git, init } from '..'
 import { unpack } from '../dist/for-node/internal-apis'
 
 describe('unpack', () => {
@@ -42,6 +41,7 @@ describe('unpack', () => {
       let e = fs.existsSync(filepath)
       expect(e).toBe(true)
       let { type, object } = await GitObjectManager.read({
+        fs,
         gitdir: path.join(dir, '.git'),
         oid
       })

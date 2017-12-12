@@ -1,13 +1,13 @@
 /* global test describe expect */
-import { GitIndex } from '../dist/for-node/models'
-import fs from 'fs'
-import { read, setfs } from '../dist/for-node/utils'
-
-setfs(fs)
+import { FileSystem, GitIndex } from '../dist/for-node/models'
+import _fs from 'fs'
+const fs = new FileSystem(_fs)
 
 describe('GitIndex', () => {
   test('GitIndex.from(buffer) - Simple', async () => {
-    let buffer = await read('__tests__/__fixtures__/test-GitIndex/simple-index')
+    let buffer = await fs.read(
+      '__tests__/__fixtures__/test-GitIndex/simple-index'
+    )
     let index = GitIndex.from(buffer)
     let rendering = index.render()
     expect(rendering).toMatchSnapshot()
@@ -16,7 +16,7 @@ describe('GitIndex', () => {
   })
 
   test('GitIndex.from(buffer)', async () => {
-    let buffer = await read('__tests__/__fixtures__/test-GitIndex/index')
+    let buffer = await fs.read('__tests__/__fixtures__/test-GitIndex/index')
     let index = GitIndex.from(buffer)
     let rendering = index.render()
     expect(rendering).toMatchSnapshot()
@@ -25,7 +25,7 @@ describe('GitIndex', () => {
   })
 
   test('GitIndex round trip', async () => {
-    let buffer = await read('__tests__/__fixtures__/test-GitIndex/index')
+    let buffer = await fs.read('__tests__/__fixtures__/test-GitIndex/index')
     let index = GitIndex.from(buffer)
     let buffer2 = index.toObject()
     let index2 = GitIndex.from(buffer2)

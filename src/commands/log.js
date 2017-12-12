@@ -1,7 +1,6 @@
 // @flow
 import { GitRefManager, GitObjectManager } from '../managers'
-import { GitCommit } from '../models'
-import { fs as defaultfs, setfs } from '../utils'
+import { FileSystem, GitCommit } from '../models'
 
 /**
  * @typedef {Object} CommitDescription
@@ -38,21 +37,21 @@ import { fs as defaultfs, setfs } from '../utils'
  * console.log(commits)
  */
 export async function log (
-  { gitdir, fs = defaultfs() },
+  { gitdir, fs: _fs },
   {
     ref = 'HEAD',
     depth,
     since // Date
   }
 ) {
-  setfs(fs)
+  const fs = new FileSystem(_fs)
   let sinceTimestamp =
     since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
   // TODO: In the future, we may want to have an API where we return a
   // async iterator that emits commits.
   let commits = []
-  let start = await GitRefManager.resolve({ gitdir, ref })
-  let { type, object } = await GitObjectManager.read({ gitdir, oid: start })
+  let start = await GitRefManager.resolve({ fs, gitdir, ref })
+  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: start })
   if (type !== 'commit') {
     throw new Error(
       `The given ref ${ref} did not resolve to a commit but to a ${type}`
@@ -66,7 +65,7 @@ export async function log (
     let oid = currentCommit.parent[0]
     let gitobject
     try {
-      gitobject = await GitObjectManager.read({ gitdir, oid })
+      gitobject = await GitObjectManager.read({ fs, gitdir, oid })
     } catch (err) {
       commits.push({
         oid,

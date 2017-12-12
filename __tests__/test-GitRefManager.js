@@ -1,13 +1,13 @@
 /* global test describe expect */
 import { GitRefManager } from '../dist/for-node/managers'
-import fs from 'fs'
-import { setfs } from '../dist/for-node/utils'
-
-setfs(fs)
+import { FileSystem } from '../dist/for-node/models'
+import _fs from 'fs'
+const fs = new FileSystem(_fs)
 
 describe('GitRefManager', () => {
   test('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {
     let ref = await GitRefManager.resolve({
+      fs,
       gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
       ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9'
     })
@@ -15,6 +15,7 @@ describe('GitRefManager', () => {
   })
   test('test-branch', async () => {
     let ref = await GitRefManager.resolve({
+      fs,
       gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
       ref: 'origin/test-branch'
     })
@@ -22,6 +23,7 @@ describe('GitRefManager', () => {
   })
   test('test-tag', async () => {
     let ref = await GitRefManager.resolve({
+      fs,
       gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
       ref: 'test-tag'
     })
@@ -29,6 +31,7 @@ describe('GitRefManager', () => {
   })
   test('HEAD', async () => {
     let ref = await GitRefManager.resolve({
+      fs,
       gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
       ref: 'HEAD'
     })
@@ -36,6 +39,7 @@ describe('GitRefManager', () => {
   })
   test('HEAD depth', async () => {
     let ref = await GitRefManager.resolve({
+      fs,
       gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
       ref: 'HEAD',
       depth: 2
@@ -44,6 +48,7 @@ describe('GitRefManager', () => {
   })
   test('packed-refs', async () => {
     let ref = await GitRefManager.resolve({
+      fs,
       gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
       ref: 'v0.0.1'
     })
