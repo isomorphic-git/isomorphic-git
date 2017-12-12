@@ -1,5 +1,5 @@
+import { FileSystem } from '../models'
 import { GitConfigManager } from '../managers'
-import { fs as defaultfs, setfs } from '../utils'
 
 /**
  * Read and/or write to the git config file(s)
@@ -26,10 +26,10 @@ import { fs as defaultfs, setfs } from '../utils'
  *   path: 'user.name'
  * })
  */
-export async function config ({ gitdir, fs = defaultfs() }, args) {
+export async function config ({ gitdir, fs: _fs }, args) {
+  const fs = new FileSystem(_fs)
   let { path, value } = args
-  setfs(fs)
-  const config = await GitConfigManager.get({ gitdir })
+  const config = await GitConfigManager.get({ fs, gitdir })
   // This carefully distinguishes between
   // 1) there is no 'value' argument (do a "get")
   // 2) there is a 'value' argument with a value of undefined (do a "set")
@@ -39,6 +39,6 @@ export async function config ({ gitdir, fs = defaultfs() }, args) {
     return value
   } else {
     await config.set(path, value)
-    await GitConfigManager.save({ gitdir, config })
+    await GitConfigManager.save({ fs, gitdir, config })
   }
 }

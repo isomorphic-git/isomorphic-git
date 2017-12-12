@@ -1,3 +1,4 @@
+export { FileSystem } from './models/FileSystem'
 export { GitCommit } from './models/GitCommit'
 export { GitConfig } from './models/GitConfig'
 export { GitObject } from './models/GitObject'

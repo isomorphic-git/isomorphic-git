@@ -1,7 +1,6 @@
 /* global jest test describe expect */
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
-import { existsSync } from 'fs'
 import { read } from '../dist/for-node/utils'
 
 import { Git } from '..'
@@ -34,7 +33,7 @@ describe('fetch', () => {
       onprogress: output.push.bind(output),
       ref: 'test-branch-shallow-clone'
     })
-    expect(existsSync(`${gitdir}/shallow`)).toBe(true)
+    expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
     expect(output).toMatchSnapshot()
     let shallow = await read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
@@ -58,7 +57,7 @@ describe('fetch', () => {
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
-    expect(existsSync(`${gitdir}/shallow`)).toBe(true)
+    expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
     let shallow = await read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow).toEqual('36d201c8fea9d87128e7fccd32c21643f355540d\n')
   })
@@ -73,7 +72,7 @@ describe('fetch', () => {
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
-    expect(existsSync(`${gitdir}/shallow`)).toBe(true)
+    expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
     let shallow = await read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow).toEqual('0094dadf9804971c851e99b13845d10c8849db12\n')
   })
@@ -88,7 +87,7 @@ describe('fetch', () => {
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
-    expect(existsSync(`${gitdir}/shallow`)).toBe(true)
+    expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
     let shallow = await read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen

@@ -1,7 +1,6 @@
 import path from 'path'
-import pify from 'pify'
 import { GitIndexManager, GitObjectManager } from '../managers'
-import { fs as defaultfs, setfs, read } from '../utils'
+import { FileSystem } from '../models'
 
 /**
  * Add a file to the git index (aka staging area)
@@ -15,15 +14,18 @@ import { fs as defaultfs, setfs, read } from '../utils'
  * let repo = new Git({fs, dir: '.'})
  * await add(repo, {filepath: 'README.md'})
  */
-export async function add ({ gitdir, workdir, fs = defaultfs() }, { filepath }) {
-  setfs(fs)
+export async function add ({ gitdir, workdir, fs: _fs }, { filepath }) {
+  const fs = new FileSystem(_fs)
   const type = 'blob'
-  const object = await read(path.join(workdir, filepath))
+  const object = await fs.read(path.join(workdir, filepath))
   if (object === null) throw new Error(`Could not read file '${filepath}'`)
-  const oid = await GitObjectManager.write({ gitdir, type, object })
-  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
-    let stats = await pify(fs.lstat)(path.join(workdir, filepath))
-    index.insert({ filepath, stats, oid })
-  })
+  const oid = await GitObjectManager.write({ fs, gitdir, type, object })
+  await GitIndexManager.acquire(
+    { fs, filepath: `${gitdir}/index` },
+    async function (index) {
+      let stats = await fs._lstat(path.join(workdir, filepath))
+      index.insert({ filepath, stats, oid })
+    }
+  )
   // TODO: return oid?
 }

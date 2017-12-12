@@ -1,5 +1,5 @@
 import { GitIndexManager } from '../managers'
-import { fs as defaultfs, setfs } from '../utils'
+import { FileSystem } from '../models'
 
 /**
  * Remove a file from the git index (aka staging area)
@@ -15,10 +15,13 @@ import { fs as defaultfs, setfs } from '../utils'
  * let repo = new Git({fs, dir: '.'})
  * await remove(repo, {filepath: 'README.md'})
  */
-export async function remove ({ gitdir, fs = defaultfs() }, { filepath }) {
-  setfs(fs)
-  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
-    index.delete({ filepath })
-  })
+export async function remove ({ gitdir, fs: _fs }, { filepath }) {
+  const fs = new FileSystem(_fs)
+  await GitIndexManager.acquire(
+    { fs, filepath: `${gitdir}/index` },
+    async function (index) {
+      index.delete({ filepath })
+    }
+  )
   // TODO: return oid?
 }

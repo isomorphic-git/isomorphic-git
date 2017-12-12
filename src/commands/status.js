@@ -1,14 +1,12 @@
 // @flow
 import path from 'path'
-import pify from 'pify'
-import { GitCommit, GitTree } from '../models'
+import { FileSystem, GitCommit, GitTree } from '../models'
 import {
   GitRefManager,
   GitObjectManager,
   GitIndexManager,
   GitIgnoreManager
 } from '../managers'
-import { read, fs as defaultfs, setfs } from '../utils'
 /*::
 import type { Stats } from 'fs'
 import type { CacheEntry } from '../models/GitIndex'
@@ -33,17 +31,7 @@ function cacheIsStale (
   )
 }
 
-async function getOidAtPath (
-  {
-    gitdir,
-    tree,
-    path
-  } /*: {
-    gitdir: string,
-    tree: GitTree,
-    path: string|Array<string>
-  } */
-) {
+async function getOidAtPath ({ fs, gitdir, tree, path }) {
   if (typeof path === 'string') path = path.split('/')
   let dirname = path.shift()
   for (let entry of tree) {
@@ -52,12 +40,13 @@ async function getOidAtPath (
         return entry.oid
       }
       let { type, object } = await GitObjectManager.read({
+        fs,
         gitdir,
         oid: entry.oid
       })
       if (type === 'tree') {
         let tree = GitTree.from(object)
-        return getOidAtPath({ gitdir, tree, path })
+        return getOidAtPath({ fs, gitdir, tree, path })
       }
       if (type === 'blob') {
         throw new Error(`Blob found where tree expected.`)
@@ -67,12 +56,13 @@ async function getOidAtPath (
   return null
 }
 
-async function getHeadTree ({ gitdir }) {
+async function getHeadTree ({ fs, gitdir }) {
   // Get the tree from the HEAD commit.
-  let oid = await GitRefManager.resolve({ gitdir, ref: 'HEAD' })
-  let { object: cobject } = await GitObjectManager.read({ gitdir, oid })
+  let oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+  let { object: cobject } = await GitObjectManager.read({ fs, gitdir, oid })
   let commit = GitCommit.from(cobject)
   let { object: tobject } = await GitObjectManager.read({
+    fs,
     gitdir,
     oid: commit.parseHeaders().tree
   })
@@ -107,11 +97,8 @@ async function getHeadTree ({ gitdir }) {
  * let gitstatus = await status(repo, {filepath: 'README.md'})
  * console.log(gitstatus)
  */
-export async function status (
-  { workdir, gitdir, fs = defaultfs() },
-  { filepath }
-) {
-  setfs(fs)
+export async function status ({ workdir, gitdir, fs: _fs }, { filepath }) {
+  const fs = new FileSystem(_fs)
   let ignored = await GitIgnoreManager.isIgnored({
     gitdir,
     workdir,
@@ -121,21 +108,29 @@ export async function status (
   if (ignored) {
     return 'ignored'
   }
-  let headTree = await getHeadTree({ gitdir })
-  let treeOid = await getOidAtPath({ gitdir, tree: headTree, path: filepath })
+  let headTree = await getHeadTree({ fs, gitdir })
+  let treeOid = await getOidAtPath({
+    fs,
+    gitdir,
+    tree: headTree,
+    path: filepath
+  })
   let indexEntry = null
   // Acquire a lock on the index
-  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
-    for (let entry of index) {
-      if (entry.path === filepath) {
-        indexEntry = entry
-        break
+  await GitIndexManager.acquire(
+    { fs, filepath: `${gitdir}/index` },
+    async function (index) {
+      for (let entry of index) {
+        if (entry.path === filepath) {
+          indexEntry = entry
+          break
+        }
       }
     }
-  })
+  )
   let stats = null
   try {
-    stats = await pify(fs.lstat)(path.join(workdir, filepath))
+    stats = await fs._lstat(path.join(workdir, filepath))
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err
@@ -150,7 +145,7 @@ export async function status (
     if (I && !cacheIsStale({ entry: indexEntry, stats })) {
       return indexEntry.oid
     } else {
-      let object = await read(path.join(workdir, filepath))
+      let object = await fs.read(path.join(workdir, filepath))
       let workdirOid = await GitObjectManager.hash({
         gitdir,
         type: 'blob',

@@ -12,8 +12,8 @@ import {
   GitShallowManager,
   GitObjectManager
 } from '../managers'
-import { GitPktLine } from '../models'
-import { pkg, fs as defaultfs, setfs } from '../utils'
+import { FileSystem, GitPktLine } from '../models'
+import { pkg } from '../utils'
 
 /**
  * Fetch commits
@@ -40,7 +40,7 @@ import { pkg, fs as defaultfs, setfs } from '../utils'
  * })
  */
 export async function fetch (
-  { gitdir, fs = defaultfs() },
+  { gitdir, fs },
   {
     ref = 'HEAD',
     remote,
@@ -71,11 +71,11 @@ export async function fetch (
       relative
     }
   )
-  await unpack({ gitdir, fs }, { inputStream: response.packfile, onprogress })
+  await unpack({ fs, gitdir }, { inputStream: response.packfile, onprogress })
 }
 
 async function fetchPackfile (
-  { gitdir, fs = defaultfs() },
+  { gitdir, fs: _fs },
   {
     ref,
     remote,
@@ -88,7 +88,7 @@ async function fetchPackfile (
     relative = false
   }
 ) {
-  setfs(fs)
+  const fs = new FileSystem(_fs)
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
       throw new Error(`Invalid value for depth argument: ${depth}`)
@@ -98,9 +98,7 @@ async function fetchPackfile (
   remote = remote || 'origin'
   if (url === undefined) {
     url = await config(
-      {
-        gitdir
-      },
+      { fs, gitdir },
       {
         path: `remote.${remote}.url`
       }
@@ -132,12 +130,14 @@ async function fetchPackfile (
     )
   }
   await GitRefManager.updateRemoteRefs({
+    fs,
     gitdir,
     remote,
     refs: remoteHTTP.refs,
     symrefs: remoteHTTP.symrefs
   })
   let want = await GitRefManager.resolve({
+    fs,
     gitdir,
     ref: `refs/remotes/${remote}/${ref}`
   })
@@ -148,7 +148,7 @@ async function fetchPackfile (
     : ''}`
   let packstream = new PassThrough()
   packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`))
-  let oids = await GitShallowManager.read({ gitdir })
+  let oids = await GitShallowManager.read({ fs, gitdir })
   if (oids.size > 0 && remoteHTTP.capabilities.has('shallow')) {
     for (let oid of oids) {
       packstream.write(GitPktLine.encode(`shallow ${oid}\n`))
@@ -168,7 +168,7 @@ async function fetchPackfile (
   packstream.write(GitPktLine.flush())
   let have = null
   try {
-    have = await GitRefManager.resolve({ gitdir, ref })
+    have = await GitRefManager.resolve({ fs, gitdir, ref })
   } catch (err) {}
   if (have) {
     packstream.write(GitPktLine.encode(`have ${have}\n`))
@@ -185,14 +185,14 @@ async function fetchPackfile (
           throw new Error(`non-40 character 'shallow' oid: ${oid}`)
         }
         oids.add(oid)
-        await GitShallowManager.write({ gitdir, oids })
+        await GitShallowManager.write({ fs, gitdir, oids })
       } else if (line.startsWith('unshallow')) {
         let oid = line.slice(-41).trim()
         if (oid.length !== 40) {
           throw new Error(`non-40 character 'shallow' oid: ${oid}`)
         }
         oids.delete(oid)
-        await GitShallowManager.write({ gitdir, oids })
+        await GitShallowManager.write({ fs, gitdir, oids })
       }
       next(null, data)
     })
@@ -228,11 +228,8 @@ function parseVarInt (buffer /*: Buffer */) {
  * @param {ReadableStream} args.inputStream
  * @param {Function} args.onprogress
  */
-export async function unpack (
-  { gitdir, fs = defaultfs() },
-  { inputStream, onprogress }
-) {
-  setfs(fs)
+export async function unpack ({ gitdir, fs: _fs }, { inputStream, onprogress }) {
+  const fs = new FileSystem(_fs)
   return new Promise(function (resolve, reject) {
     // Read header
     peek(inputStream, 12, (err, data, inputStream) => {
@@ -269,6 +266,7 @@ export async function unpack (
                 try {
                   marky.mark(`readFile`)
                   let { object, type } = await GitObjectManager.read({
+                    fs,
                     gitdir,
                     oid
                   })
@@ -278,6 +276,7 @@ export async function unpack (
                   totalApplyDeltaTime += marky.stop(`applyDelta`).duration
                   marky.mark(`writeFile`)
                   let newoid = await GitObjectManager.write({
+                    fs,
                     gitdir,
                     type,
                     object: result
@@ -300,11 +299,13 @@ export async function unpack (
                 let referenceOid = offsetMap.get(absoluteOffset)
                 // console.log(`${offset} ofs-delta ${absoluteOffset} ${referenceOid}`)
                 let { type, object } = await GitObjectManager.read({
+                  fs,
                   gitdir,
                   oid: referenceOid
                 })
                 let result = applyDelta(data, object)
                 let oid = await GitObjectManager.write({
+                  fs,
                   gitdir,
                   type,
                   object: result
@@ -314,6 +315,7 @@ export async function unpack (
               } else {
                 marky.mark(`writeFile`)
                 let oid = await GitObjectManager.write({
+                  fs,
                   gitdir,
                   type,
                   object: data

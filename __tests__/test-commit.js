@@ -3,8 +3,7 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-import { Git } from '..'
-import { commit, verify } from '../dist/for-node/commands'
+import { Git, commit, verify } from '..'
 
 jest.setTimeout(30000)
 

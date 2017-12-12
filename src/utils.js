@@ -3,7 +3,6 @@ export { exists } from './utils/exists'
 export {
   flatFileListToDirectoryStructure
 } from './utils/flatFileListToDirectoryStructure'
-export { readDirAsFlatFileList } from './utils/readDirAsFlatFileList'
 export { default as fs } from './utils/fs'
 export { setfs } from './utils/fs'
 export { lock, unlock } from './utils/lockfile'

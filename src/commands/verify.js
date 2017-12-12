@@ -1,17 +1,13 @@
-import { GitCommit } from '../models'
+import { FileSystem, GitCommit } from '../models'
 import { GitRefManager, GitObjectManager } from '../managers'
 import { HKP } from 'openpgp/dist/openpgp.min.js'
-import { fs as defaultfs, setfs } from '../utils'
 const HttpKeyServer = new HKP()
 
 /** @ignore */
-export async function verify (
-  { gitdir, fs = defaultfs() },
-  { ref, publicKeys }
-) {
-  setfs(fs)
-  const oid = await GitRefManager.resolve({ gitdir, ref })
-  const { type, object } = await GitObjectManager.read({ gitdir, oid })
+export async function verify ({ gitdir, fs: _fs }, { ref, publicKeys }) {
+  const fs = new FileSystem(_fs)
+  const oid = await GitRefManager.resolve({ fs, gitdir, ref })
+  const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
   if (type !== 'commit') {
     throw new Error(
       `git.verify() was expecting a ref type 'commit' but got type '${type}'`

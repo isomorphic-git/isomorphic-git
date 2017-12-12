@@ -1,12 +1,11 @@
 import path from 'path'
-import pify from 'pify'
-import { GitCommit, GitTree } from '../models'
+import { FileSystem, GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
-import { rm, write, fs as defaultfs, setfs } from '../utils'
 
 async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
+      fs,
       gitdir,
       oid: entry.oid
     })
@@ -14,8 +13,8 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
     let filepath = path.join(workdir, prefix, entry.path)
     switch (type) {
       case 'blob':
-        await write(filepath, object)
-        let stats = await pify(fs.lstat)(filepath)
+        await fs.write(filepath, object)
+        let stats = await fs._lstat(filepath)
         index.insert({
           filepath: entrypath,
           stats,
@@ -53,17 +52,15 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
  * let repo = new Git({fs, dir: '.'})
  * await checkout(repo, {ref: 'master'})
  */
-export async function checkout (
-  { workdir, gitdir, fs = defaultfs() },
-  { remote, ref }
-) {
-  setfs(fs)
+export async function checkout ({ workdir, gitdir, fs: _fs }, { remote, ref }) {
+  const fs = new FileSystem(_fs)
   // Get tree oid
   let oid
   if (remote) {
     let remoteRef
     if (ref === undefined) {
       remoteRef = await GitRefManager.resolve({
+        fs,
         gitdir,
         ref: `${remote}/HEAD`,
         depth: 2
@@ -72,40 +69,43 @@ export async function checkout (
     } else {
       remoteRef = `${remote}/${ref}`
     }
-    oid = await GitRefManager.resolve({ gitdir, ref: remoteRef })
+    oid = await GitRefManager.resolve({ fs, gitdir, ref: remoteRef })
     // Make the remote ref our own!
-    await write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
+    await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
   } else {
     if (ref === undefined) {
       throw new Error('Cannot checkout ref "undefined"')
     }
-    oid = await GitRefManager.resolve({ gitdir, ref })
+    oid = await GitRefManager.resolve({ fs, gitdir, ref })
   }
-  let commit = await GitObjectManager.read({ gitdir, oid })
+  let commit = await GitObjectManager.read({ fs, gitdir, oid })
   if (commit.type !== 'commit') {
     throw new Error(`Unexpected type: ${commit.type}`)
   }
   let comm = GitCommit.from(commit.object.toString('utf8'))
   let sha = comm.headers().tree
   // Get top-level tree
-  let { type, object } = await GitObjectManager.read({ gitdir, oid: sha })
+  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: sha })
   if (type !== 'tree') throw new Error(`Unexpected type: ${type}`)
   let tree = GitTree.from(object)
   // Acquire a lock on the index
-  await GitIndexManager.acquire(`${gitdir}/index`, async function (index) {
-    // TODO: Big optimization possible here.
-    // Instead of deleting and rewriting everything, only delete files
-    // that are not present in the new branch, and only write files that
-    // are not in the index or are in the index but have the wrong SHA.
-    for (let entry of index) {
-      try {
-        await rm(path.join(workdir, entry.path))
-      } catch (err) {}
+  await GitIndexManager.acquire(
+    { fs, filepath: `${gitdir}/index` },
+    async function (index) {
+      // TODO: Big optimization possible here.
+      // Instead of deleting and rewriting everything, only delete files
+      // that are not present in the new branch, and only write files that
+      // are not in the index or are in the index but have the wrong SHA.
+      for (let entry of index) {
+        try {
+          await fs.rm(path.join(workdir, entry.path))
+        } catch (err) {}
+      }
+      index.clear()
+      // Write files. TODO: Write them atomically
+      await writeTreeToDisk({ fs, gitdir, workdir, index, prefix: '', tree })
+      // Update HEAD TODO: Handle non-branch cases
+      fs.write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
     }
-    index.clear()
-    // Write files. TODO: Write them atomically
-    await writeTreeToDisk({ fs, gitdir, workdir, index, prefix: '', tree })
-    // Update HEAD TODO: Handle non-branch cases
-    write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
-  })
+  )
 }
