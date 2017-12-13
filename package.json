@@ -1,6 +1,6 @@
 {
   "name": "isomorphic-git",
-  "version": "0.0.27",
+  "version": "0.0.0-development",
   "description": "A pure JavaScript implementation of git for node and browsers!",
   "typings": "./src/index.d.ts",
   "main": "dist/for-node/",
@@ -16,11 +16,12 @@
   "scripts": {
     "start": "nps",
     "test": "nps test",
-    "precommit": "nps format toc"
+    "precommit": "nps format toc",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wmhilton/isomorphic-git.git"
+    "url": "https://github.com/wmhilton/isomorphic-git.git"
   },
   "keywords": [
     "git"
@@ -100,7 +101,8 @@
     "tape": "^4.8.0",
     "uglify-es": "^3.1.2",
     "watch": "^1.0.2",
-    "watchify": "^3.9.0"
+    "watchify": "^3.9.0",
+    "semantic-release": "^8.2.0"
   },
   "ava": {
     "source": [

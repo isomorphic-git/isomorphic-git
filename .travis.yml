@@ -1,6 +1,16 @@
 language: node_js
+cache:
+  directories:
+    - ~/.npm
+notifications:
+  email: false
 node_js:
   - "node"
+after_success:
+  - npm run semantic-release
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
 deploy:
 - provider: pages
   skip_cleanup: true
@@ -8,11 +18,3 @@ deploy:
   local_dir: doc
   on:
     branch: master
-- provider: npm
-  email: wmhilton@gmail.com
-  api_key: "$NPM_PUBLISH_TOKEN"
-  skip_cleanup: true
-  on:
-    tags: true
-    branch: master
-    repo: wmhilton/isomorphic-git
