@@ -48,7 +48,7 @@ module.exports = {
     },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
-      travis: series.nps('build', 'doc', 'test.parallel'),
+      travis: series.nps('lint', 'build', 'doc', 'test.parallel'),
       local: 'nps test.jest',
       parallel_tests: concurrent.nps('test.jest', 'test.karma'),
       jest: process.env.CI ? 'jest --coverage && codecov' : 'jest',

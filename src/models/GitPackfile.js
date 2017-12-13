@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import shasum from 'shasum'
 
@@ -85,6 +84,7 @@ export class GitPackfile {
   async read ({ oid } /*: {oid: string} */) {
     if (!this.slices.has(oid)) return null
     let raw = this.pack.slice(...this.slices.get(oid))
+    console.log(raw)
     /*
     - The header is followed by number of object entries, each of
      which looks like this:
@@ -96,8 +96,8 @@ export class GitPackfile {
      (deltified representation)
      n-byte type and length (3-bit type, (n-1)*7+4-bit length)
      20-byte base object name if OBJ_REF_DELTA or a negative relative
-	 offset from the delta object's position in the pack if this
-	 is an OBJ_OFS_DELTA object
+     offset from the delta object's position in the pack if this
+     is an OBJ_OFS_DELTA object
      compressed delta data
 
      Observation: length of each object is encoded in a variable
