@@ -14,7 +14,7 @@ export class GitRefManager {
   static async updateRemoteRefs ({ fs: _fs, gitdir, remote, refs, symrefs }) {
     const fs = new FileSystem(_fs)
     // Validate input
-    for (let [key, value] of refs) {
+    for (let value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
         throw new Error(`Unexpected ref contents: '${value}'`)
       }
