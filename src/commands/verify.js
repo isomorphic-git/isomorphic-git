@@ -1,4 +1,4 @@
-import { FileSystem, GitCommit } from '../models'
+import { FileSystem, SignedGitCommit } from '../models'
 import { GitRefManager, GitObjectManager } from '../managers'
 import { HKP } from 'openpgp/dist/openpgp.min.js'
 const HttpKeyServer = new HKP()
@@ -13,7 +13,7 @@ export async function verify ({ gitdir, fs: _fs }, { ref, publicKeys }) {
       `git.verify() was expecting a ref type 'commit' but got type '${type}'`
     )
   }
-  let commit = GitCommit.from(object)
+  let commit = SignedGitCommit.from(object)
   let author = commit.headers().author
   let keys = await commit.listSigningKeys()
   if (!publicKeys) {
