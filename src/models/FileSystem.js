@@ -1,5 +1,7 @@
 import path from 'path'
 import pify from 'pify'
+import { sleep } from '../utils'
+const delayedReleases = new Map()
 /**
  * This is just a collection of helper functions really. At least that's how it started.
  */
@@ -9,6 +11,7 @@ export class FileSystem {
     this._readFile = pify(fs.readFile.bind(fs))
     this._writeFile = pify(fs.writeFile.bind(fs))
     this._mkdir = pify(fs.mkdir.bind(fs))
+    this._rmdir = pify(fs.rmdir.bind(fs))
     this._unlink = pify(fs.unlink.bind(fs))
     this._stat = pify(fs.stat.bind(fs))
     this._lstat = pify(fs.lstat.bind(fs))
@@ -115,5 +118,42 @@ export class FileSystem {
       })
     )
     return files.reduce((a, f) => a.concat(f), [])
+  }
+
+  async lock (filename, triesLeft = 3) {
+    // check to see if we still have it
+    if (delayedReleases.has(filename)) {
+      clearTimeout(delayedReleases.get(filename))
+      delayedReleases.delete(filename)
+      return
+    }
+    if (triesLeft === 0) {
+      throw new Error(
+        `Unable to acquire lockfile '${filename}'. Exhausted tries.`
+      )
+    }
+    try {
+      await this.mkdir(`${filename}.lock`)
+    } catch (err) {
+      if (err.code === 'EEXIST') {
+        await sleep(100)
+        await this.lock(filename, triesLeft - 1)
+      }
+    }
+  }
+
+  async unlock (filename, delayRelease = 50) {
+    if (delayedReleases.has(filename)) {
+      throw new Error('Cannot double-release lockfile')
+    }
+    // Basically, we lie and say it was deleted ASAP.
+    // But really we wait a bit to see if you want to acquire it again.
+    delayedReleases.set(
+      filename,
+      setTimeout(async () => {
+        delayedReleases.delete(filename)
+        await this._rmdir(`${filename}.lock`)
+      }, delayRelease)
+    )
   }
 }

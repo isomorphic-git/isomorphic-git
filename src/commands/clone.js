@@ -2,7 +2,7 @@ import { init } from './init'
 import { config } from './config'
 import { fetch } from './fetch'
 import { checkout } from './checkout'
-import { fs as defaultfs, setfs } from '../utils'
+import { FileSystem } from '../models'
 
 /**
  * Clone a repository
@@ -29,7 +29,7 @@ import { fs as defaultfs, setfs } from '../utils'
  * })
  */
 export async function clone (
-  { workdir, gitdir, fs = defaultfs() },
+  { workdir, gitdir, fs: _fs },
   {
     url,
     remote,
@@ -43,7 +43,7 @@ export async function clone (
     onprogress
   }
 ) {
-  setfs(fs)
+  const fs = new FileSystem(_fs)
   remote = remote || 'origin'
   await init({ gitdir, fs })
   // Add remote
