@@ -1,17 +1,15 @@
 /* globals describe test expect */
-import { GitPackfile } from '../dist/for-node/models'
-import fs from 'fs'
-import { read, setfs } from '../dist/for-node/utils'
-
-setfs(fs)
+import { FileSystem, GitPackfile } from '../dist/for-node/models'
+import _fs from 'fs'
+const fs = new FileSystem(_fs)
 
 describe('GitPackfile', () => {
   test('size', async () => {
     let p = await GitPackfile.fromIDX({
-      idx: await read(
+      idx: await fs.read(
         '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       ),
-      pack: await read(
+      pack: await fs.read(
         '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
       )
     })

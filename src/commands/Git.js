@@ -1,5 +1,5 @@
 import path from 'path'
-import { pkg, setfs } from '../utils'
+import { pkg } from '../utils'
 
 /**
  * @external {FSModule} http://ghub.io/browserfs
@@ -53,7 +53,6 @@ export class Git {
        * @type {FSModule}
        */
       this.fs = fs
-      setfs(fs)
     }
     if (dir) {
       /**

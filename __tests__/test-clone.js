@@ -20,5 +20,6 @@ describe('clone', () => {
     expect(existsSync(`${dir}`)).toBe(true)
     expect(existsSync(`${dir}/.git/objects`)).toBe(true)
     expect(existsSync(`${dir}/.git/refs/remotes/origin/master`)).toBe(true)
+    expect(existsSync(`${dir}/package.json`)).toBe(true)
   })
 })
