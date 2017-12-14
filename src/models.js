@@ -1,5 +1,6 @@
 export { FileSystem } from './models/FileSystem'
 export { GitCommit } from './models/GitCommit'
+export { SignedGitCommit } from './models/SignedGitCommit'
 export { GitConfig } from './models/GitConfig'
 export { GitObject } from './models/GitObject'
 export { GitPktLine } from './models/GitPktLine'

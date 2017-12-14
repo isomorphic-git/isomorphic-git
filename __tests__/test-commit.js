@@ -1,4 +1,4 @@
-/* globals describe test expect */
+/* globals jest describe test expect */
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
 import jsonfile from 'jsonfile'
@@ -33,7 +33,7 @@ describe('commit', () => {
     const privateKeys = await pify(jsonfile.readFile)(
       '__tests__/__fixtures__/openpgp-private-keys.json'
     )
-    let sha = await commit(repo, {
+    await commit(repo, {
       message: 'Initial commit',
       author: {
         name: 'Mr. Test',

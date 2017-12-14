@@ -1,5 +1,5 @@
 import { config } from './config'
-import { FileSystem, GitCommit, GitTree } from '../models'
+import { FileSystem, SignedGitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { flatFileListToDirectoryStructure } from '../utils'
 import path from 'path'
@@ -85,7 +85,7 @@ export async function commit (
         // Probably an initial commit
         parents = []
       }
-      let comm = GitCommit.from({
+      let comm = SignedGitCommit.from({
         tree: treeRef,
         parent: parents,
         author: {
