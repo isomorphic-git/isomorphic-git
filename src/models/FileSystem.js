@@ -86,13 +86,6 @@ export class FileSystem {
     }
   }
   /**
-   * A convenience helper that makes a bunch of directories at once.
-   */
-  async mkdirs (filepaths /*: string[] */) {
-    return Promise.all(filepaths.map(filepath => this.mkdir(filepath)))
-  }
-
-  /**
    * Delete a file without throwing an error if it is already deleted.
    */
   async rm (filepath) {
