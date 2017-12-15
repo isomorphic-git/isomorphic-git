@@ -21,7 +21,9 @@ export async function init ({ gitdir, fs: _fs }) {
     'refs/tags'
   ]
   folders = folders.map(dir => gitdir + '/' + dir)
-  await fs.mkdirs(folders)
+  for (let folder of folders) {
+    await fs.mkdir(folder)
+  }
   await fs.write(
     gitdir + '/config',
     '[core]\n' +
