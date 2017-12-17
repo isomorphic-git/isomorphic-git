@@ -55,10 +55,14 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  *   message: 'Added the a.txt file'
  * })
  */
-export async function commit (
-  { gitdir, fs: _fs },
-  { message, author, committer, privateKeys }
-) {
+export async function commit ({
+  gitdir,
+  fs: _fs,
+  message,
+  author,
+  committer,
+  privateKeys
+}) {
   const fs = new FileSystem(_fs)
   // Fill in missing arguments with default values
   if (author === undefined) author = {}

@@ -36,15 +36,20 @@ const types = {
  *   authPassword: process.env.GITHUB_TOKEN
  * })
  */
-export async function push (
-  { gitdir, fs: _fs },
-  { ref, remote, url, authUsername, authPassword }
-) {
+export async function push ({
+  gitdir,
+  fs: _fs,
+  ref,
+  remote,
+  url,
+  authUsername,
+  authPassword
+}) {
   const fs = new FileSystem(_fs)
   // TODO: Figure out how pushing tags works. (This only works for branches.)
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await config({ fs, gitdir }, { path: `remote.${remote}.url` })
+    url = await config({ fs, gitdir, path: `remote.${remote}.url` })
   }
   let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
   let oid = await GitRefManager.resolve({ fs, gitdir, ref })
@@ -56,14 +61,13 @@ export async function push (
     }
   }
   await httpRemote.preparePush()
-  let commits = await listCommits(
-    { fs, gitdir },
-    {
-      start: [oid],
-      finish: httpRemote.refs.values()
-    }
-  )
-  let objects = await listObjects({ fs, gitdir }, { oids: commits })
+  let commits = await listCommits({
+    fs,
+    gitdir,
+    start: [oid],
+    finish: httpRemote.refs.values()
+  })
+  let objects = await listObjects({ fs, gitdir, oids: commits })
   let packstream = new PassThrough()
   let oldoid =
     httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
@@ -71,13 +75,12 @@ export async function push (
     GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 report-status\n`)
   )
   packstream.write(GitPktLine.flush())
-  pack(
-    { fs, gitdir },
-    {
-      oids: [...objects],
-      outputStream: packstream
-    }
-  )
+  pack({
+    fs,
+    gitdir,
+    oids: [...objects],
+    outputStream: packstream
+  })
   let response = await httpRemote.push(packstream)
   return response
 }
@@ -85,7 +88,7 @@ export async function push (
 /**
  * @ignore
  */
-export async function listCommits ({ gitdir, fs: _fs }, { start, finish }) {
+export async function listCommits ({ gitdir, fs: _fs, start, finish }) {
   const fs = new FileSystem(_fs)
   let startingSet = new Set()
   let finishingSet = new Set()
@@ -129,10 +132,11 @@ export async function listCommits ({ gitdir, fs: _fs }, { start, finish }) {
 /**
  * @ignore
  */
-export async function listObjects (
-  { gitdir, fs: _fs },
-  { oids } /*: { oids: Set<string> } */
-) {
+export async function listObjects ({
+  gitdir,
+  fs: _fs,
+  oids
+}) {
   const fs = new FileSystem(_fs)
   let visited /*: Set<string> */ = new Set()
 
@@ -168,7 +172,7 @@ export async function listObjects (
 /**
  * @ignore
  */
-export async function pack ({ gitdir, fs: _fs }, { oids, outputStream }) {
+export async function pack ({ gitdir, fs: _fs, oids, outputStream }) {
   const fs = new FileSystem(_fs)
   let hash = crypto.createHash('sha1')
   function write (chunk, enc) {

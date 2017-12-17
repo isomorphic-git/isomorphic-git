@@ -17,7 +17,8 @@ describe('pack', () => {
     )
     let fstream = new stream.PassThrough()
     let repo = new Git({ fs, gitdir })
-    await pack(repo, {
+    await pack({
+      ...repo,
       outputStream: fstream,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',

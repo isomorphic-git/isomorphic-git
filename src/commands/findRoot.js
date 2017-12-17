@@ -18,7 +18,7 @@ import path from 'path'
  * })
  * // gitroot = '/path/to/some/gitrepo'
  */
-export async function findRoot ({ fs: _fs }, { filepath }) {
+export async function findRoot ({ fs: _fs, filepath }) {
   const fs = new FileSystem(_fs)
   return _findRoot(fs, filepath)
 }

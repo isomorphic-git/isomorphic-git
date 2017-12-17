@@ -28,12 +28,37 @@ import { FileSystem } from '../models'
  *   depth: 1
  * })
  */
-export async function clone (
-  { workdir, gitdir, fs: _fs },
-  {
-    url,
-    remote,
+export async function clone ({
+  workdir,
+  gitdir,
+  fs: _fs,
+  url,
+  remote,
+  ref,
+  authUsername,
+  authPassword,
+  depth,
+  since,
+  exclude,
+  relative,
+  onprogress
+}) {
+  const fs = new FileSystem(_fs)
+  remote = remote || 'origin'
+  await init({ gitdir, fs })
+  // Add remote
+  await config({
+    gitdir,
+    fs,
+    path: `remote.${remote}.url`,
+    value: url
+  })
+  // Fetch commits
+  await fetch({
+    gitdir,
+    fs,
     ref,
+    remote,
     authUsername,
     authPassword,
     depth,
@@ -41,50 +66,13 @@ export async function clone (
     exclude,
     relative,
     onprogress
-  }
-) {
-  const fs = new FileSystem(_fs)
-  remote = remote || 'origin'
-  await init({ gitdir, fs })
-  // Add remote
-  await config(
-    {
-      gitdir,
-      fs
-    },
-    {
-      path: `remote.${remote}.url`,
-      value: url
-    }
-  )
-  // Fetch commits
-  await fetch(
-    {
-      gitdir,
-      fs
-    },
-    {
-      ref,
-      remote,
-      authUsername,
-      authPassword,
-      depth,
-      since,
-      exclude,
-      relative,
-      onprogress
-    }
-  )
+  })
   // Checkout branch
-  await checkout(
-    {
-      workdir,
-      gitdir,
-      fs
-    },
-    {
-      ref,
-      remote
-    }
-  )
+  await checkout({
+    workdir,
+    gitdir,
+    fs,
+    ref,
+    remote
+  })
 }

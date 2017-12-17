@@ -14,7 +14,7 @@ import { FileSystem } from '../models'
  * let repo = new Git({fs, dir: '.'})
  * await add(repo, {filepath: 'README.md'})
  */
-export async function add ({ gitdir, workdir, fs: _fs }, { filepath }) {
+export async function add ({ gitdir, workdir, fs: _fs, filepath }) {
   const fs = new FileSystem(_fs)
   const type = 'blob'
   const object = await fs.read(path.join(workdir, filepath))

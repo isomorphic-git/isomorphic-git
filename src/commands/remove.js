@@ -15,7 +15,7 @@ import { FileSystem } from '../models'
  * let repo = new Git({fs, dir: '.'})
  * await remove(repo, {filepath: 'README.md'})
  */
-export async function remove ({ gitdir, fs: _fs }, { filepath }) {
+export async function remove ({ gitdir, fs: _fs, filepath }) {
   const fs = new FileSystem(_fs)
   await GitIndexManager.acquire(
     { fs, filepath: `${gitdir}/index` },

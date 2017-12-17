@@ -4,7 +4,7 @@ import { HKP } from 'openpgp/dist/openpgp.min.js'
 const HttpKeyServer = new HKP()
 
 /** @ignore */
-export async function verify ({ gitdir, fs: _fs }, { ref, publicKeys }) {
+export async function verify ({ gitdir, fs: _fs, ref, publicKeys }) {
   const fs = new FileSystem(_fs)
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })

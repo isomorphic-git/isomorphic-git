@@ -1,6 +1,7 @@
 import ini from 'ini'
 import get from 'lodash/get'
 import set from 'lodash/set'
+import unset from 'lodash/unset'
 
 const complexKeys = ['remote', 'branch']
 
@@ -37,7 +38,13 @@ export class GitConfig {
     return get(this.ini, path)
   }
   async set (path, value) {
-    return set(this.ini, path, value)
+    console.log('path =', path)
+    console.log('value =', value)
+    if (value === undefined) {
+      unset(this.ini, path)
+    } else {
+      set(this.ini, path, value)
+    }
   }
   toString () {
     // de-mangle complex keys

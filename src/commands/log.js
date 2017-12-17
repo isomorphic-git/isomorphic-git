@@ -36,14 +36,13 @@ import { FileSystem, GitCommit } from '../models'
  * let commits = await log(repo, {depth: 5, ref: 'master'})
  * console.log(commits)
  */
-export async function log (
-  { gitdir, fs: _fs },
-  {
-    ref = 'HEAD',
-    depth,
-    since // Date
-  }
-) {
+export async function log ({
+  gitdir,
+  fs: _fs,
+  ref = 'HEAD',
+  depth,
+  since // Date
+}) {
   const fs = new FileSystem(_fs)
   let sinceTimestamp =
     since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
