@@ -9,8 +9,8 @@ import { unpack } from '../dist/for-node/internal-apis'
 
 describe('unpack', () => {
   test('unpack', async () => {
-    let workdir = await createTempDir()
-    let repo = { fs, workdir }
+    let dir = await createTempDir()
+    let repo = { fs, dir }
     await init(repo)
     let fixture = fs.createReadStream(
       '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
@@ -32,7 +32,7 @@ describe('unpack', () => {
     ]
     for (let oid of oids) {
       let filepath = path.join(
-        workdir,
+        dir,
         '.git',
         'objects',
         oid.slice(0, 2),
@@ -42,7 +42,7 @@ describe('unpack', () => {
       expect(e).toBe(true)
       let { type, object } = await GitObjectManager.read({
         fs,
-        gitdir: path.join(workdir, '.git'),
+        gitdir: path.join(dir, '.git'),
         oid
       })
       expect(typeof type === 'string').toBe(true)

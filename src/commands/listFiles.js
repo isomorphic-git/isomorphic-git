@@ -13,8 +13,8 @@ import { FileSystem } from '../models'
  * let files = await listFiles(repo)
  */
 export async function listFiles ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs
 }) {
   const fs = new FileSystem(_fs)

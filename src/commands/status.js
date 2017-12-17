@@ -86,7 +86,7 @@ async function getHeadTree ({ fs, gitdir }) {
  * - `"*unmodified"` working dir and HEAD commit match, but index differs
  * - `"*absent"` file not present in working dir or HEAD commit, but present in the index
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
+ * @param {GitRepo} repo - A {@link Git} object matching `{dir, gitdir, fs}`
  * @param {Object} args - Arguments object
  * @param {string} args.filepath - The path to the file to query.
  * @returns {Promise<string>} - Resolves successfully with the file's git status.
@@ -97,15 +97,15 @@ async function getHeadTree ({ fs, gitdir }) {
  * console.log(gitstatus)
  */
 export async function status ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   filepath
 }) {
   const fs = new FileSystem(_fs)
   let ignored = await GitIgnoreManager.isIgnored({
     gitdir,
-    workdir,
+    dir,
     filepath,
     fs
   })
@@ -134,7 +134,7 @@ export async function status ({
   )
   let stats = null
   try {
-    stats = await fs._lstat(path.join(workdir, filepath))
+    stats = await fs._lstat(path.join(dir, filepath))
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err
@@ -149,7 +149,7 @@ export async function status ({
     if (I && !cacheIsStale({ entry: indexEntry, stats })) {
       return indexEntry.oid
     } else {
-      let object = await fs.read(path.join(workdir, filepath))
+      let object = await fs.read(path.join(dir, filepath))
       let workdirOid = await GitObjectManager.hash({
         gitdir,
         type: 'blob',

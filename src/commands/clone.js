@@ -8,7 +8,7 @@ import { FileSystem } from '../models'
 /**
  * Clone a repository
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
+ * @param {GitRepo} repo - A {@link Git} object matching `{dir, gitdir, fs}`
  * @param {Object} args - Arguments object
  * @param {string} args.url - The URL of the remote repository.
  * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
@@ -30,8 +30,8 @@ import { FileSystem } from '../models'
  * })
  */
 export async function clone ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   url,
   remote,
@@ -70,7 +70,7 @@ export async function clone ({
   })
   // Checkout branch
   await checkout({
-    workdir,
+    dir,
     gitdir,
     fs,
     ref,

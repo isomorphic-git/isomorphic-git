@@ -7,9 +7,9 @@ import { init, add, listFiles } from '../dist/for-node/commands'
 describe('add', () => {
   test('file', async () => {
     // Setup
-    let workdir = await copyFixtureIntoTempDir(__dirname, 'test-add')
+    let dir = await copyFixtureIntoTempDir(__dirname, 'test-add')
     // Test
-    const repo = { fs, workdir }
+    const repo = { fs, dir }
     await init(repo)
     let orig = (await listFiles(repo)).length
     await add({ ...repo, filepath: 'a.txt' })

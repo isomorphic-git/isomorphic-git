@@ -19,7 +19,7 @@ import { pkg } from '../utils'
 /**
  * Fetch commits
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
+ * @param {GitRepo} repo - A {@link Git} object matching `{dir, gitdir, fs}`
  * @param {Object} args - Arguments object
  * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
  * @param {string} [args.remote='origin'] - If `url` is not specified, determines which remote to use.
@@ -41,8 +41,8 @@ import { pkg } from '../utils'
  * })
  */
 export async function fetch ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs,
   ref = 'HEAD',
   remote,
@@ -224,8 +224,8 @@ function parseVarInt (buffer /*: Buffer */) {
  * @param {Function} args.onprogress
  */
 export async function unpack ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   inputStream,
   onprogress

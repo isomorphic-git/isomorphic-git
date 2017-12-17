@@ -12,8 +12,8 @@ import { FileSystem } from '../models'
  * await init(repo)
  */
 export async function init ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs
 }) {
   const fs = new FileSystem(_fs)

@@ -17,8 +17,8 @@ import { FileSystem } from '../models'
  * await remove(repo, {filepath: 'README.md'})
  */
 export async function remove ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   filepath
 }) {

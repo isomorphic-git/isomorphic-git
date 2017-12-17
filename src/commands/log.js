@@ -37,8 +37,8 @@ import { FileSystem, GitCommit } from '../models'
  * console.log(commits)
  */
 export async function log ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   ref = 'HEAD',
   depth,

@@ -12,8 +12,8 @@ import { FileSystem } from '../models'
  * let branches = await listBranches(repo)
  */
 export async function listBranches ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs
 }) {
   const fs = new FileSystem(_fs)
