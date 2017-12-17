@@ -18,19 +18,21 @@ const types = {
 /**
  * Push a branch
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
  * @param {Object} args - Arguments object
- * @param {integer} [args.depth=0] - Determines how much of the git repository's history to retrieve. If not specified it defaults to 0 which means the entire repo history.
- * @param {string} [args.ref=undefined] - Which branch to push. By default this is the currently checked out branch of the repository.
- * @param {string} [args.authUsername=undefined] - The username to use with Basic Auth
- * @param {string} [args.authPassword=undefined] - The password to use with Basic Auth
- * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
+ * @param {string} [args.ref] - Which branch to push. By default this is the currently checked out branch of the repository.
  * @param {string} [args.remote='origin'] - If URL is not specified, determines which remote to use.
+ * @param {string} [args.url] - The URL of the remote git server. The default is the value set in the git config for that remote.
+ * @param {string} [args.authUsername] - The username to use with Basic Auth
+ * @param {string} [args.authPassword] - The password to use with Basic Auth
  * @returns {Promise<void>} - Resolves successfully when push completes
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * await push(repo, {
+ * let repo = {fs, dir: '.'}
+ * await push({
+ *   ...repo,
  *   remote: 'origin',
  *   ref: 'master',
  *   authUsername: process.env.GITHUB_TOKEN,
@@ -38,18 +40,17 @@ const types = {
  * })
  */
 export async function push ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
   fs: _fs,
+  dir,
+  gitdir = path.join(dir, '.git'),
   ref,
-  remote,
+  remote = 'origin',
   url,
   authUsername,
   authPassword
 }) {
   const fs = new FileSystem(_fs)
   // TODO: Figure out how pushing tags works. (This only works for branches.)
-  remote = remote || 'origin'
   if (url === undefined) {
     url = await config({ fs, gitdir, path: `remote.${remote}.url` })
   }
@@ -91,8 +92,8 @@ export async function push ({
  * @ignore
  */
 export async function listCommits ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   start,
   finish
@@ -141,8 +142,8 @@ export async function listCommits ({
  * @ignore
  */
 export async function listObjects ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   oids
 }) {
@@ -182,8 +183,8 @@ export async function listObjects ({
  * @ignore
  */
 export async function pack ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   oids,
   outputStream

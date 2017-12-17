@@ -2,6 +2,7 @@ import { Buffer } from 'buffer'
 import pako from 'pako'
 import shasum from 'shasum'
 
+/** @ignore */
 export class GitObject {
   static wrap ({ type, object } /*: {type: string, object: Buffer} */) {
     let buffer = Buffer.concat([

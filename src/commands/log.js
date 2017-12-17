@@ -24,16 +24,18 @@ import { FileSystem, GitCommit } from '../models'
 /**
  * Get commit descriptions from the git history
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {number} [args.depth=undefined] - Limit the number of commits returned. No limit by default.
  * @param {Date} [args.since=undefined] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
  * @param {string} [args.ref=HEAD] - The commit to begin walking backwards through the history from.
  * @returns {Promise<CommitDescription[]>} - Resolves to an array of {@link CommitDescription} objects
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * let commits = await log(repo, {depth: 5, ref: 'master'})
+ * let repo = {fs, dir: '.'}
+ * let commits = await log({...repo, depth: 5, ref: 'master'})
  * console.log(commits)
  */
 export async function log ({

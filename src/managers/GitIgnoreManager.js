@@ -8,6 +8,7 @@ import { FileSystem } from '../models'
 
 // TODO: Implement .git/info/exclude
 
+/** @ignore */
 export class GitIgnoreManager {
   static async isIgnored ({
     fs: _fs,

@@ -9,6 +9,7 @@ const map /*: Map<string, GitIndex> */ = new Map()
 // const lm = new LockManager()
 const lock = new AsyncLock()
 
+/** @ignore */
 export class GitIndexManager {
   static async acquire ({ fs: _fs, filepath }, closure) {
     const fs = new FileSystem(_fs)

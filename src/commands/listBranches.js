@@ -4,11 +4,14 @@ import { FileSystem } from '../models'
 /**
  * List all local branches
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
+ * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @returns {Promise<string[]>} - Resolves successfully with an array of branch names.
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
+ * let repo = {fs, dir: '.'}
  * let branches = await listBranches(repo)
  */
 export async function listBranches ({
