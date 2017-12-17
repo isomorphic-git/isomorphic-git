@@ -8,20 +8,21 @@ describe('log', () => {
   test('HEAD', async () => {
     let gitdir = '__tests__/__fixtures__/test-log.git'
     let repo = new Git({ fs, gitdir })
-    let commits = await log(repo, { ref: 'HEAD' })
+    let commits = await log({ ...repo, ref: 'HEAD' })
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
   })
   test('HEAD depth', async () => {
     let gitdir = '__tests__/__fixtures__/test-log.git'
     let repo = new Git({ fs, gitdir })
-    let commits = await log(repo, { ref: 'HEAD', depth: 1 })
+    let commits = await log({ ...repo, ref: 'HEAD', depth: 1 })
     expect(commits.length).toBe(1)
   })
   test('HEAD since', async () => {
     let gitdir = '__tests__/__fixtures__/test-log.git'
     let repo = new Git({ fs, gitdir })
-    let commits = await log(repo, {
+    let commits = await log({
+      ...repo,
       ref: 'HEAD',
       since: new Date(1501462174000)
     })
@@ -30,7 +31,7 @@ describe('log', () => {
   test('test-branch', async () => {
     let gitdir = '__tests__/__fixtures__/test-GitRefManager.git'
     let repo = new Git({ fs, gitdir })
-    let commits = await log(repo, { ref: 'origin/test-branch' })
+    let commits = await log({ ...repo, ref: 'origin/test-branch' })
     expect(commits).toMatchSnapshot()
   })
 })

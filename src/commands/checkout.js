@@ -52,7 +52,7 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
  * let repo = new Git({fs, dir: '.'})
  * await checkout(repo, {ref: 'master'})
  */
-export async function checkout ({ workdir, gitdir, fs: _fs }, { remote, ref }) {
+export async function checkout ({ workdir, gitdir, fs: _fs, remote, ref }) {
   const fs = new FileSystem(_fs)
   // Get tree oid
   let oid

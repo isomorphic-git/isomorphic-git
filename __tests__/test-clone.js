@@ -12,7 +12,8 @@ describe('clone', () => {
   ;(process.env.CI ? test : test.skip)('clone', async () => {
     let dir = await createTempDir()
     let repo = new Git({ fs, dir })
-    await clone(repo, {
+    await clone({
+      ...repo,
       depth: 1,
       ref: 'master',
       url: `https://github.com/wmhilton/isomorphic-git`

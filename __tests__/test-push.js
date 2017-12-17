@@ -28,7 +28,8 @@ describe('push', () => {
       .reply(200, postReceivePackRequest)
 
     let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let res = await push({
+      ...repo,
       remote: 'pseudo',
       ref: 'refs/heads/master'
     })
@@ -55,7 +56,8 @@ describe('push', () => {
       .post(/.*/)
       .reply(200, postReceivePackRequest)
     let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let res = await push({
+      ...repo,
       remote: 'pseudo',
       ref: 'master'
     })
@@ -72,7 +74,8 @@ describe('push', () => {
       'test-push-client.git'
     )
     let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let res = await push({
+      ...repo,
       authUsername: process.env.GITHUB_TOKEN,
       authPassword: process.env.GITHUB_TOKEN,
       remote: 'origin',
@@ -91,7 +94,8 @@ describe('push', () => {
       'test-push-client.git'
     )
     let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let res = await push({
+      ...repo,
       authUsername: process.env.GITHUB_TOKEN,
       authPassword: process.env.GITHUB_TOKEN,
       remote: 'origin',

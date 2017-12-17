@@ -26,7 +26,7 @@ import { GitConfigManager } from '../managers'
  *   path: 'user.name'
  * })
  */
-export async function config ({ gitdir, fs: _fs }, args) {
+export async function config ({ gitdir, fs: _fs, ...args }) {
   const fs = new FileSystem(_fs)
   let { path, value } = args
   const config = await GitConfigManager.get({ fs, gitdir })

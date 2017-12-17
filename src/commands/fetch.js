@@ -39,10 +39,24 @@ import { pkg } from '../utils'
  *   depth: 1
  * })
  */
-export async function fetch (
-  { gitdir, fs },
-  {
-    ref = 'HEAD',
+export async function fetch ({
+  gitdir,
+  fs,
+  ref = 'HEAD',
+  remote,
+  url,
+  authUsername,
+  authPassword,
+  depth,
+  since,
+  exclude,
+  relative,
+  onprogress
+}) {
+  let response = await fetchPackfile({
+    gitdir,
+    fs,
+    ref,
     remote,
     url,
     authUsername,
@@ -50,44 +64,24 @@ export async function fetch (
     depth,
     since,
     exclude,
-    relative,
-    onprogress
-  }
-) {
-  let response = await fetchPackfile(
-    {
-      gitdir,
-      fs
-    },
-    {
-      ref,
-      remote,
-      url,
-      authUsername,
-      authPassword,
-      depth,
-      since,
-      exclude,
-      relative
-    }
-  )
-  await unpack({ fs, gitdir }, { inputStream: response.packfile, onprogress })
+    relative
+  })
+  await unpack({ fs, gitdir, inputStream: response.packfile, onprogress })
 }
 
-async function fetchPackfile (
-  { gitdir, fs: _fs },
-  {
-    ref,
-    remote,
-    url,
-    authUsername,
-    authPassword,
-    depth = null,
-    since = null,
-    exclude = [],
-    relative = false
-  }
-) {
+async function fetchPackfile ({
+  gitdir,
+  fs: _fs,
+  ref,
+  remote,
+  url,
+  authUsername,
+  authPassword,
+  depth = null,
+  since = null,
+  exclude = [],
+  relative = false
+}) {
   const fs = new FileSystem(_fs)
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
@@ -97,12 +91,11 @@ async function fetchPackfile (
   }
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await config(
-      { fs, gitdir },
-      {
-        path: `remote.${remote}.url`
-      }
-    )
+    url = await config({
+      fs,
+      gitdir,
+      path: `remote.${remote}.url`
+    })
   }
   let remoteHTTP = new GitRemoteHTTP(url)
   if (authUsername !== undefined && authPassword !== undefined) {
@@ -228,7 +221,7 @@ function parseVarInt (buffer /*: Buffer */) {
  * @param {ReadableStream} args.inputStream
  * @param {Function} args.onprogress
  */
-export async function unpack ({ gitdir, fs: _fs }, { inputStream, onprogress }) {
+export async function unpack ({ gitdir, fs: _fs, inputStream, onprogress }) {
   const fs = new FileSystem(_fs)
   return new Promise(function (resolve, reject) {
     // Read header

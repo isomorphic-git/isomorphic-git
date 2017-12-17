@@ -11,7 +11,7 @@ describe('checkout', () => {
     let workdir = await createTempDir()
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-checkout.git')
     let repo = new Git({ fs, workdir, gitdir })
-    await checkout(repo, { ref: 'test-branch' })
+    await checkout({ ...repo, ref: 'test-branch' })
     let files = await pify(fs.readdir)(workdir)
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles(repo)
