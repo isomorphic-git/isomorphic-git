@@ -2,7 +2,6 @@
 import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
-import { Git } from '..'
 import { remove, listFiles } from '../dist/for-node/commands'
 
 /** @test {remove} */
@@ -11,7 +10,7 @@ describe('remove', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
     // Test
-    const repo = new Git({ fs, gitdir })
+    const repo = { fs, gitdir }
     let before = await listFiles(repo)
     expect(before).toMatchSnapshot()
     await remove({ ...repo, filepath: 'LICENSE.md' })
@@ -24,7 +23,7 @@ describe('remove', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-remove.git')
     // Test
-    const repo = new Git({ fs, gitdir })
+    const repo = { fs, gitdir }
     let before = await listFiles(repo)
     expect(before).toMatchSnapshot()
     await remove({ ...repo, filepath: 'src/models' })

@@ -6,7 +6,6 @@ import pify from 'pify'
 import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
-import { Git } from '..'
 import { push } from '../dist/for-node/commands'
 
 /** @test {push} */
@@ -27,7 +26,7 @@ describe('push', () => {
       .post(/.*/)
       .reply(200, postReceivePackRequest)
 
-    let repo = new Git({ fs, gitdir: clientDir })
+    let repo = { fs, gitdir: clientDir }
     let res = await push({
       ...repo,
       remote: 'pseudo',
@@ -55,7 +54,7 @@ describe('push', () => {
       .reply(200, get)
       .post(/.*/)
       .reply(200, postReceivePackRequest)
-    let repo = new Git({ fs, gitdir: clientDir })
+    let repo = { fs, gitdir: clientDir }
     let res = await push({
       ...repo,
       remote: 'pseudo',
@@ -73,7 +72,7 @@ describe('push', () => {
       __dirname,
       'test-push-client.git'
     )
-    let repo = new Git({ fs, gitdir: clientDir })
+    let repo = { fs, gitdir: clientDir }
     let res = await push({
       ...repo,
       authUsername: process.env.GITHUB_TOKEN,
@@ -93,7 +92,7 @@ describe('push', () => {
       __dirname,
       'test-push-client.git'
     )
-    let repo = new Git({ fs, gitdir: clientDir })
+    let repo = { fs, gitdir: clientDir }
     let res = await push({
       ...repo,
       authUsername: process.env.GITHUB_TOKEN,

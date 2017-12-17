@@ -1,11 +1,9 @@
 /* global jest test describe expect */
+import { fetch } from '../dist/for-node/commands'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
 const fs = new FileSystem(_fs)
-
-import { Git } from '..'
-import { fetch } from '../dist/for-node/commands'
 
 jest.setTimeout(60000)
 
@@ -15,7 +13,7 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     await fetch({
       ...repo,
       remote: 'origin',
@@ -28,7 +26,7 @@ describe('fetch', () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     let output = []
     // Test
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     await fetch({
       ...repo,
       depth: 1,
@@ -55,7 +53,7 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     await fetch({
       ...repo,
       since: new Date(1506571200000),
@@ -71,7 +69,7 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     await fetch({
       ...repo,
       exclude: ['v0.0.5'],
@@ -87,7 +85,7 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     await fetch({
       ...repo,
       depth: 1,

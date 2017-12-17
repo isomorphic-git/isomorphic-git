@@ -1,4 +1,4 @@
-// @flow
+import path from 'path'
 import { GitRefManager, GitObjectManager } from '../managers'
 import { FileSystem, GitCommit } from '../models'
 
@@ -37,7 +37,8 @@ import { FileSystem, GitCommit } from '../models'
  * console.log(commits)
  */
 export async function log ({
-  gitdir,
+  workdir,
+  gitdir = path.join(workdir, '.git'),
   fs: _fs,
   ref = 'HEAD',
   depth,

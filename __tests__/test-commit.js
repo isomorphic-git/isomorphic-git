@@ -3,7 +3,7 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-import { Git, commit, verify } from '..'
+import { commit, verify } from '..'
 
 jest.setTimeout(30000)
 
@@ -13,7 +13,7 @@ describe('commit', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
     // Test
-    const repo = new Git({ fs, gitdir })
+    const repo = { fs, gitdir }
     let sha = await commit({
       ...repo,
       author: {
@@ -30,7 +30,7 @@ describe('commit', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
     // Test
-    const repo = new Git({ fs, gitdir })
+    const repo = { fs, gitdir }
     const privateKeys = await pify(jsonfile.readFile)(
       '__tests__/__fixtures__/openpgp-private-keys.json'
     )

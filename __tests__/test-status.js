@@ -4,14 +4,14 @@ import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
 const fs = new FileSystem(_fs)
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { Git, status, add, remove } from '..'
+import { status, add, remove } from '..'
 
 /** @test {status} */
 describe('status', () => {
   test('status', async () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-status.git')
     let workdir = await copyFixtureIntoTempDir(__dirname, 'test-status')
-    const repo = new Git({ fs: _fs, gitdir, workdir })
+    const repo = { fs: _fs, gitdir, workdir }
     const a = await status({ ...repo, filepath: 'a.txt' })
     const b = await status({ ...repo, filepath: 'b.txt' })
     const c = await status({ ...repo, filepath: 'c.txt' })

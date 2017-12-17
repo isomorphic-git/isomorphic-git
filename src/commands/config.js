@@ -1,3 +1,4 @@
+import path from 'path'
 import { FileSystem } from '../models'
 import { GitConfigManager } from '../managers'
 
@@ -26,7 +27,12 @@ import { GitConfigManager } from '../managers'
  *   path: 'user.name'
  * })
  */
-export async function config ({ gitdir, fs: _fs, ...args }) {
+export async function config ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs,
+  ...args
+}) {
   const fs = new FileSystem(_fs)
   let { path, value } = args
   const config = await GitConfigManager.get({ fs, gitdir })
