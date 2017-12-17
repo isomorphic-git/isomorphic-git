@@ -1,4 +1,4 @@
-import path from 'path'
+import pathModule from 'path'
 import { FileSystem } from '../models'
 import { GitConfigManager } from '../managers'
 
@@ -28,8 +28,8 @@ import { GitConfigManager } from '../managers'
  * })
  */
 export async function config ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = pathModule.join(dir, '.git'),
   fs: _fs,
   ...args
 }) {

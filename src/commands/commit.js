@@ -56,8 +56,8 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  * })
  */
 export async function commit ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   message,
   author,

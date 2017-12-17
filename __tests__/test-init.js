@@ -8,12 +8,12 @@ import { init } from '..'
 /** @test {init} */
 describe('init', () => {
   test('init', async () => {
-    let workdir = await createTempDir()
-    let repo = { fs, workdir }
+    let dir = await createTempDir()
+    let repo = { fs, dir }
     await init(repo)
-    expect(existsSync(workdir)).toBe(true)
-    expect(existsSync(`${workdir}/.git/objects`)).toBe(true)
-    expect(existsSync(`${workdir}/.git/refs/heads`)).toBe(true)
-    expect(existsSync(`${workdir}/.git/HEAD`)).toBe(true)
+    expect(existsSync(dir)).toBe(true)
+    expect(existsSync(`${dir}/.git/objects`)).toBe(true)
+    expect(existsSync(`${dir}/.git/refs/heads`)).toBe(true)
+    expect(existsSync(`${dir}/.git/HEAD`)).toBe(true)
   })
 })

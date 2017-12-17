@@ -6,8 +6,8 @@ const HttpKeyServer = new HKP()
 
 /** @ignore */
 export async function verify ({
-  workdir,
-  gitdir = path.join(workdir, '.git'),
+  dir,
+  gitdir = path.join(dir, '.git'),
   fs: _fs,
   ref,
   publicKeys

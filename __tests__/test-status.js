@@ -10,8 +10,8 @@ import { status, add, remove } from '..'
 describe('status', () => {
   test('status', async () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-status.git')
-    let workdir = await copyFixtureIntoTempDir(__dirname, 'test-status')
-    const repo = { fs: _fs, gitdir, workdir }
+    let dir = await copyFixtureIntoTempDir(__dirname, 'test-status')
+    const repo = { fs: _fs, dir, gitdir }
     const a = await status({ ...repo, filepath: 'a.txt' })
     const b = await status({ ...repo, filepath: 'b.txt' })
     const c = await status({ ...repo, filepath: 'c.txt' })
@@ -37,10 +37,10 @@ describe('status', () => {
     expect(d2).toEqual('added')
 
     // And finally the weirdo cases
-    let acontent = await fs.read(path.join(workdir, 'a.txt'))
-    await fs.write(path.join(workdir, 'a.txt'), 'Hi')
+    let acontent = await fs.read(path.join(dir, 'a.txt'))
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
     await add({ ...repo, filepath: 'a.txt' })
-    await fs.write(path.join(workdir, 'a.txt'), acontent)
+    await fs.write(path.join(dir, 'a.txt'), acontent)
     let a3 = await status({ ...repo, filepath: 'a.txt' })
     expect(a3).toEqual('*unmodified')
 
@@ -48,9 +48,9 @@ describe('status', () => {
     let a4 = await status({ ...repo, filepath: 'a.txt' })
     expect(a4).toEqual('*undeleted')
 
-    await fs.write(path.join(workdir, 'e.txt'), 'Hi')
+    await fs.write(path.join(dir, 'e.txt'), 'Hi')
     await add({ ...repo, filepath: 'e.txt' })
-    await fs.rm(path.join(workdir, 'e.txt'))
+    await fs.rm(path.join(dir, 'e.txt'))
     let e3 = await status({ ...repo, filepath: 'e.txt' })
     expect(e3).toEqual('*absent')
 
