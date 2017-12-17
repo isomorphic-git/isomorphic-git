@@ -1,3 +1,4 @@
+import path from 'path'
 import { Buffer } from 'buffer'
 import { PassThrough } from 'stream'
 import pad from 'pad'
@@ -37,7 +38,8 @@ const types = {
  * })
  */
 export async function push ({
-  gitdir,
+  workdir,
+  gitdir = path.join(workdir, '.git'),
   fs: _fs,
   ref,
   remote,
@@ -88,7 +90,13 @@ export async function push ({
 /**
  * @ignore
  */
-export async function listCommits ({ gitdir, fs: _fs, start, finish }) {
+export async function listCommits ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs,
+  start,
+  finish
+}) {
   const fs = new FileSystem(_fs)
   let startingSet = new Set()
   let finishingSet = new Set()
@@ -133,7 +141,8 @@ export async function listCommits ({ gitdir, fs: _fs, start, finish }) {
  * @ignore
  */
 export async function listObjects ({
-  gitdir,
+  workdir,
+  gitdir = path.join(workdir, '.git'),
   fs: _fs,
   oids
 }) {
@@ -172,7 +181,13 @@ export async function listObjects ({
 /**
  * @ignore
  */
-export async function pack ({ gitdir, fs: _fs, oids, outputStream }) {
+export async function pack ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs,
+  oids,
+  outputStream
+}) {
   const fs = new FileSystem(_fs)
   let hash = crypto.createHash('sha1')
   function write (chunk, enc) {

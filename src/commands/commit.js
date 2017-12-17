@@ -1,8 +1,8 @@
+import path from 'path'
 import { config } from './config'
 import { FileSystem, SignedGitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { flatFileListToDirectoryStructure } from '../utils'
-import path from 'path'
 
 async function constructTree ({ fs, gitdir, inode }) /*: string */ {
   // use depth first traversal
@@ -56,7 +56,8 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  * })
  */
 export async function commit ({
-  gitdir,
+  workdir,
+  gitdir = path.join(workdir, '.git'),
   fs: _fs,
   message,
   author,

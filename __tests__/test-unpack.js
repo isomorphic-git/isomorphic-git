@@ -4,13 +4,13 @@ import { GitObjectManager } from '../dist/for-node/managers'
 import path from 'path'
 import { createTempDir } from 'jest-fixtures'
 
-import { Git, init } from '..'
+import { init } from '..'
 import { unpack } from '../dist/for-node/internal-apis'
 
 describe('unpack', () => {
   test('unpack', async () => {
-    let dir = await createTempDir()
-    let repo = new Git({ fs, dir })
+    let workdir = await createTempDir()
+    let repo = { fs, workdir }
     await init(repo)
     let fixture = fs.createReadStream(
       '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
@@ -32,7 +32,7 @@ describe('unpack', () => {
     ]
     for (let oid of oids) {
       let filepath = path.join(
-        dir,
+        workdir,
         '.git',
         'objects',
         oid.slice(0, 2),
@@ -42,7 +42,7 @@ describe('unpack', () => {
       expect(e).toBe(true)
       let { type, object } = await GitObjectManager.read({
         fs,
-        gitdir: path.join(dir, '.git'),
+        gitdir: path.join(workdir, '.git'),
         oid
       })
       expect(typeof type === 'string').toBe(true)

@@ -1,3 +1,4 @@
+import path from 'path'
 import { GitIndexManager } from '../managers'
 import { FileSystem } from '../models'
 
@@ -11,7 +12,11 @@ import { FileSystem } from '../models'
  * let repo = new Git({fs, dir: '.'})
  * let files = await listFiles(repo)
  */
-export async function listFiles ({ gitdir, fs: _fs }) {
+export async function listFiles ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs
+}) {
   const fs = new FileSystem(_fs)
   let filenames
   await GitIndexManager.acquire(

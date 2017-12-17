@@ -1,6 +1,5 @@
 /* globals describe test expect */
 import fs from 'fs'
-import { Git } from '..'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { init, add, listFiles } from '../dist/for-node/commands'
 
@@ -8,9 +7,9 @@ import { init, add, listFiles } from '../dist/for-node/commands'
 describe('add', () => {
   test('file', async () => {
     // Setup
-    let dir = await copyFixtureIntoTempDir(__dirname, 'test-add')
+    let workdir = await copyFixtureIntoTempDir(__dirname, 'test-add')
     // Test
-    const repo = new Git({ fs, dir })
+    const repo = { fs, workdir }
     await init(repo)
     let orig = (await listFiles(repo)).length
     await add({ ...repo, filepath: 'a.txt' })

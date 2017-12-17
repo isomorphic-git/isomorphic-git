@@ -2,7 +2,6 @@
 import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
-import { Git } from '..'
 import { config } from '../dist/for-node/commands'
 
 /** @test {config} */
@@ -11,7 +10,7 @@ describe('config', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
     // Test
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     let sym = await config({ ...repo, path: 'core.symlinks' })
     let rfv = await config({ ...repo, path: 'core.repositoryformatversion' })
     let url = await config({ ...repo, path: 'remote.origin.url' })
@@ -24,7 +23,7 @@ describe('config', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-config.git')
     // Test
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     let bare
     // set to true
     await config({ ...repo, path: 'core.bare', value: true })

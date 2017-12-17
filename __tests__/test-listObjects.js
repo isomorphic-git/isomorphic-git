@@ -1,14 +1,13 @@
 /* global test describe expect */
 import fs from 'fs'
-import { Git } from '..'
 import { listObjects } from '../dist/for-node/internal-apis'
 
 describe('listObjects', () => {
   test('listObjects', async () => {
-    let repo = new Git({
+    let repo = {
       fs,
       gitdir: '__tests__/__fixtures__/test-listObjects.git'
-    })
+    }
     let objects = await listObjects({
       ...repo,
       oids: [

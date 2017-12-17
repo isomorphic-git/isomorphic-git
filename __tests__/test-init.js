@@ -1,19 +1,19 @@
+/* globals describe test expect */
 import fs from 'fs'
 import { existsSync } from 'fs'
 import { createTempDir } from 'jest-fixtures'
 
-import { Git } from '..'
 import { init } from '..'
 
 /** @test {init} */
 describe('init', () => {
   test('init', async () => {
-    let dir = await createTempDir()
-    let repo = new Git({ fs, dir })
+    let workdir = await createTempDir()
+    let repo = { fs, workdir }
     await init(repo)
-    expect(existsSync(dir)).toBe(true)
-    expect(existsSync(`${dir}/.git/objects`)).toBe(true)
-    expect(existsSync(`${dir}/.git/refs/heads`)).toBe(true)
-    expect(existsSync(`${dir}/.git/HEAD`)).toBe(true)
+    expect(existsSync(workdir)).toBe(true)
+    expect(existsSync(`${workdir}/.git/objects`)).toBe(true)
+    expect(existsSync(`${workdir}/.git/refs/heads`)).toBe(true)
+    expect(existsSync(`${workdir}/.git/HEAD`)).toBe(true)
   })
 })

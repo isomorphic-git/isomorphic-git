@@ -4,7 +4,6 @@ import stream from 'stream'
 import streamEqual from 'stream-equal'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
-import { Git } from '..'
 import { pack } from '../dist/for-node/internal-apis'
 
 describe('pack', () => {
@@ -16,7 +15,7 @@ describe('pack', () => {
       '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
     )
     let fstream = new stream.PassThrough()
-    let repo = new Git({ fs, gitdir })
+    let repo = { fs, gitdir }
     await pack({
       ...repo,
       outputStream: fstream,

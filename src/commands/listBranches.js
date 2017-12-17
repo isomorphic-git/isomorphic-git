@@ -1,3 +1,4 @@
+import path from 'path'
 import { FileSystem } from '../models'
 
 /**
@@ -10,7 +11,11 @@ import { FileSystem } from '../models'
  * let repo = new Git({fs, dir: '.'})
  * let branches = await listBranches(repo)
  */
-export async function listBranches ({ gitdir, fs: _fs }) {
+export async function listBranches ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs
+}) {
   const fs = new FileSystem(_fs)
   let files = await fs.readdirDeep(`${gitdir}/refs/heads`)
   files = files.map(x => x.replace(`${gitdir}/refs/heads/`, ''))

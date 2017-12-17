@@ -1,3 +1,4 @@
+import path from 'path'
 import { init } from './init'
 import { config } from './config'
 import { fetch } from './fetch'
@@ -30,7 +31,7 @@ import { FileSystem } from '../models'
  */
 export async function clone ({
   workdir,
-  gitdir,
+  gitdir = path.join(workdir, '.git'),
   fs: _fs,
   url,
   remote,

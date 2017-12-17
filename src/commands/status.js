@@ -96,7 +96,12 @@ async function getHeadTree ({ fs, gitdir }) {
  * let gitstatus = await status(repo, {filepath: 'README.md'})
  * console.log(gitstatus)
  */
-export async function status ({ workdir, gitdir, fs: _fs, filepath }) {
+export async function status ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs,
+  filepath
+}) {
   const fs = new FileSystem(_fs)
   let ignored = await GitIgnoreManager.isIgnored({
     gitdir,

@@ -1,3 +1,4 @@
+import path from 'path'
 import { Buffer } from 'buffer'
 import { PassThrough } from 'stream'
 import through2 from 'through2'
@@ -40,7 +41,8 @@ import { pkg } from '../utils'
  * })
  */
 export async function fetch ({
-  gitdir,
+  workdir,
+  gitdir = path.join(workdir, '.git'),
   fs,
   ref = 'HEAD',
   remote,
@@ -221,7 +223,13 @@ function parseVarInt (buffer /*: Buffer */) {
  * @param {ReadableStream} args.inputStream
  * @param {Function} args.onprogress
  */
-export async function unpack ({ gitdir, fs: _fs, inputStream, onprogress }) {
+export async function unpack ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs,
+  inputStream,
+  onprogress
+}) {
   const fs = new FileSystem(_fs)
   return new Promise(function (resolve, reject) {
     // Read header

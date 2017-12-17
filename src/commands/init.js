@@ -1,3 +1,4 @@
+import path from 'path'
 import { FileSystem } from '../models'
 
 /**
@@ -10,7 +11,11 @@ import { FileSystem } from '../models'
  * let repo = new Git({fs, dir: '.'})
  * await init(repo)
  */
-export async function init ({ gitdir, fs: _fs }) {
+export async function init ({
+  workdir,
+  gitdir = path.join(workdir, '.git'),
+  fs: _fs
+}) {
   const fs = new FileSystem(_fs)
   let folders = [
     'hooks',
