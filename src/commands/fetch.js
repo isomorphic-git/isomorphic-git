@@ -19,8 +19,10 @@ import { pkg } from '../utils'
 /**
  * Fetch commits
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{dir, gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
  * @param {string} [args.remote='origin'] - If `url` is not specified, determines which remote to use.
  * @param {string} [args.ref=undefined] - Which branch to fetch from. By default this is the currently checked out branch.
@@ -34,8 +36,9 @@ import { pkg } from '../utils'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * await fetch(repo, {
+ * let repo = {fs, dir: '.'}
+ * await fetch({
+ *   ...repo,
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
  *   depth: 1
  * })
@@ -218,8 +221,10 @@ function parseVarInt (buffer /*: Buffer */) {
 
 /**
  * @ignore
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {ReadableStream} args.inputStream
  * @param {Function} args.onprogress
  */

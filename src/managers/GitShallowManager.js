@@ -1,6 +1,8 @@
 // @flow
 import path from 'path'
 // TODO: Add file locks.
+
+/** @ignore */
 export class GitShallowManager {
   static async read ({ fs, gitdir }) {
     let oids = new Set()

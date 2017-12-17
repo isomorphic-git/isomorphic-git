@@ -3,8 +3,8 @@ import path from 'path'
 
 /**
  * Find the root git directory
- * @param {GitRepo} repo - A {@link Git} object matching `{fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
  * @param {string} args.filepath - The file directory to start searching in.
  * @returns {Promise<string>} - a directory name
  * @throws {Error} - Error('Unable to find git root')
@@ -12,8 +12,8 @@ import path from 'path'
  * Starting at `filepath`, will walk upwards until it finds a directory that contains a directory called '.git'.
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * let gitroot = await findRoot(repo, {
+ * let gitroot = await findRoot( {
+ *   fs,
  *   filepath: '/path/to/some/gitrepo/path/to/some/file.txt'
  * })
  * // gitroot = '/path/to/some/gitrepo'

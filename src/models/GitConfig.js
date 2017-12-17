@@ -16,6 +16,7 @@ const splitComplexKey = key =>
 
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
+/** @ignore */
 export class GitConfig {
   constructor (text) {
     this.ini = ini.decode(text)

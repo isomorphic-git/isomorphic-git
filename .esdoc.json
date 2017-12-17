@@ -1,5 +1,5 @@
 {
-  "source": "./src/commands",
+  "source": "./src",
   "destination": "./doc",
   "plugins": [
     {
@@ -9,6 +9,12 @@
           "source": "./__tests__/",
           "interfaces": ["describe", "test"],
           "includes": ["^test-(.*)\\.js$"]
+        },
+        "brand": {
+          "title": "isomorphic-git",
+          "description": "A pure JavaScript implementation of git for node and browsers",
+          "site": "https://wmhilton.github.io/isomorphic-git",
+          "author": "https://twitter.com/wmhilton"
         }
       }
     },
