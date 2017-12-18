@@ -1,4 +1,4 @@
-const { Git, init, add, commit } = require('../dist/bundle.umd.min.js')
+const { init, add, commit } = require('../dist/bundle.umd.min.js')
 const test = require('tape')
 const BrowserFS = require('browserfs')
 
@@ -10,17 +10,18 @@ test('things do not explode', t => {
     var fs = window.require('fs')
     t.ok(fs, 'Loaded fs')
 
-    let repo = new Git({ fs: fs, dir: '.' })
-    init(repo)
+    init({ fs: fs, dir: '.' })
       .then(function () {
         t.pass('init')
 
         fs.writeFileSync('a.txt', 'Hello', 'utf8')
-        add(repo, { filepath: 'a.txt' })
+        add({ fs: fs, dir: '.', filepath: 'a.txt' })
           .then(function () {
             t.pass('add a.txt')
 
-            commit(repo, {
+            commit({
+              fs: fs,
+              dir: '.',
               author: {
                 name: 'Mr. Test',
                 email: 'mrtest@example.com',

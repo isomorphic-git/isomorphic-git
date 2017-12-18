@@ -39,8 +39,6 @@ export class GitConfig {
     return get(this.ini, path)
   }
   async set (path, value) {
-    console.log('path =', path)
-    console.log('value =', value)
     if (value === undefined) {
       unset(this.ini, path)
     } else {
