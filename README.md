@@ -20,14 +20,9 @@ I am working on adding type definitions so you can enjoy static type-checking an
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Getting Started](#getting-started)
-  - [Using as an npm module](#using-as-an-npm-module)
-  - [`isogit` CLI](#isogit-cli)
-- [API - New website for docs!](#api---new-website-for-docs)
+- [Supported Git commands](#supported-git-commands)
 - [Internal code architecture](#internal-code-architecture)
-  - [Commands](#commands)
-  - [Managers](#managers)
-  - [Models and Utils](#models-and-utils)
-- [Who is using `isomorphic-git`?](#who-is-using-isomorphic-git)
+- [Who is using isomorphic-git?](#who-is-using-isomorphic-git)
 - [Similar projects](#similar-projects)
 - [Acknowledgments](#acknowledgments)
 - [License](#license)
@@ -46,9 +41,9 @@ When creating a new Git object, you pass it the fs module to use.
 If you're only using `isomorphic-git` in Node, you can just use the native `fs` module.
 
 ```js
-const { Git } = require('isomorphic-git')
-const fs = require('fs')
-let repo = new Git({fs, dir: __dirname})
+const git = require('isomorphic-git');
+const fs = require('fs');
+git.listFiles({fs, dir: __dirname});
 ```
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
@@ -62,7 +57,7 @@ It has a few more steps involved to set up than in Node, as seen below:
 BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
   if (err) return console.log(err);
   window.fs = BrowserFS.BFSRequire("fs");
-  var repo = new Git({fs: window.fs, dir: '/'})
+  git.listFiles({fs: window.fs, dir: '/'});
 });
 </script>
 ```
@@ -106,11 +101,51 @@ It uses `minimisted` to parse command line options.
 
 TODO: Document this more. Also write some tests? IDK the CLI is more of a lark for testing really.
 
-## API - New website for docs!
+## Supported Git commands
 
 I may continue to make changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
 
 **[NEW DOCS WEBSITE](https://wmhilton.github.io/isomorphic-git)**
+
+### commands
+
+- [add](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-add)
+- [checkout](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-checkout)
+- [clone](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-clone)
+- [commit](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-commit)
+- [config](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-config)
+- [fetch](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-fetch)
+- [findRoot](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-findRoot)
+- [init](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-init)
+- [listBranches](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-listBranches)
+- [listFiles](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-listFiles)
+- [log](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-log)
+- [push](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-push)
+- [remove](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-remove)
+- [status](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-status)
+- [verify](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-verify)
+- [version](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-version)
+
+### utils
+
+- [auth](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-auth)
+- [oauth2](https://wmhilton.github.io/isomorphic-git/doc/function/index.html#static-function-oauth2)
+
+### dir vs gitdir
+I looked hard and wide for a good explanation of the "working tree" and the "git directory" and the best I found was [this one](https://stackoverflow.com/a/5283457) from Stack Overflow:
+
+If you have a non-bare git repository, there are two parts to it: the *git directory* and the *working tree*:
+
+- The *working tree* has your checked out source code, with any changes you might have made.
+- The *git directory* is normally named `.git`, and is in the top level of your working tree - this contains all the history of your project, configuration settings, pointers to branches, the index (staging area) and so on.
+
+> While this is the default layout of a git repository, you can actually set any directories in the filesystem to be your git directory and working tree. You can change these directories from their defaults either with the --work-tree and --git-dir options to git or by using the GIT_DIR and GIT_WORK_TREE environment variables. Usually, however, you shouldn't need to set these.
+
+In isomorphic-git the equivalent of `--work-tree` is the **`dir`** argument.
+
+In isomorphic-git the equivalent of `--git-dir` is the **`gitdir`** argument.
+
+This is really only important when working with bare repositories.
 
 ## Internal code architecture
 
@@ -137,12 +172,11 @@ Managers are a level above models. They take care of implementation performance 
 Models and utils are the lowest level building blocks.
 Models generally have very few or no dependencies except for `'buffer'`.
 This makes them portable to many different environments so they can be a useful lowest common denominator.
-They do not rely on Utils.
 
 Utils are basically miscellaneous functions.
 Some are convenience wrappers for common filesystem operations.
 
-## Who is using `isomorphic-git`?
+## Who is using isomorphic-git?
 
 - [nde](https://nde.now.sh) - a futuristic next-generation web IDE
 - [git-app-manager](https://git-app-manager-tcibxepsta.now.sh) - install "unhosted" websites locally by git cloning them

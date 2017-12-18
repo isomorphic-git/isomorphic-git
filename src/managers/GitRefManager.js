@@ -2,6 +2,7 @@
 import path from 'path'
 import { FileSystem } from '../models'
 
+/** @ignore */
 export class GitRefManager {
   /* ::
   updateRemoteRefs : ({

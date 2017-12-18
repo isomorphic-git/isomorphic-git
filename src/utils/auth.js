@@ -1,6 +1,6 @@
 /**
  *
- * Use with {@link #gitpush .push} and {@link #gitpull .pull} to set Basic Authentication headers.
+ * Use with {@link push} and {@link fetch} to set Basic Authentication headers.
  * This works for basic username / password auth, or the newer username / token auth
  * that is often required if 2FA is enabled.
  *

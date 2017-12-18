@@ -1,3 +1,4 @@
+import path from 'path'
 import { Buffer } from 'buffer'
 import { PassThrough } from 'stream'
 import through2 from 'through2'
@@ -18,8 +19,10 @@ import { pkg } from '../utils'
 /**
  * Fetch commits
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
  * @param {string} [args.remote='origin'] - If `url` is not specified, determines which remote to use.
  * @param {string} [args.ref=undefined] - Which branch to fetch from. By default this is the currently checked out branch.
@@ -33,16 +36,32 @@ import { pkg } from '../utils'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * await fetch(repo, {
+ * let repo = {fs, dir: '.'}
+ * await fetch({
+ *   ...repo,
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
  *   depth: 1
  * })
  */
-export async function fetch (
-  { gitdir, fs },
-  {
-    ref = 'HEAD',
+export async function fetch ({
+  dir,
+  gitdir = path.join(dir, '.git'),
+  fs,
+  ref = 'HEAD',
+  remote,
+  url,
+  authUsername,
+  authPassword,
+  depth,
+  since,
+  exclude,
+  relative,
+  onprogress
+}) {
+  let response = await fetchPackfile({
+    gitdir,
+    fs,
+    ref,
     remote,
     url,
     authUsername,
@@ -50,44 +69,24 @@ export async function fetch (
     depth,
     since,
     exclude,
-    relative,
-    onprogress
-  }
-) {
-  let response = await fetchPackfile(
-    {
-      gitdir,
-      fs
-    },
-    {
-      ref,
-      remote,
-      url,
-      authUsername,
-      authPassword,
-      depth,
-      since,
-      exclude,
-      relative
-    }
-  )
-  await unpack({ fs, gitdir }, { inputStream: response.packfile, onprogress })
+    relative
+  })
+  await unpack({ fs, gitdir, inputStream: response.packfile, onprogress })
 }
 
-async function fetchPackfile (
-  { gitdir, fs: _fs },
-  {
-    ref,
-    remote,
-    url,
-    authUsername,
-    authPassword,
-    depth = null,
-    since = null,
-    exclude = [],
-    relative = false
-  }
-) {
+async function fetchPackfile ({
+  gitdir,
+  fs: _fs,
+  ref,
+  remote,
+  url,
+  authUsername,
+  authPassword,
+  depth = null,
+  since = null,
+  exclude = [],
+  relative = false
+}) {
   const fs = new FileSystem(_fs)
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
@@ -97,12 +96,11 @@ async function fetchPackfile (
   }
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await config(
-      { fs, gitdir },
-      {
-        path: `remote.${remote}.url`
-      }
-    )
+    url = await config({
+      fs,
+      gitdir,
+      path: `remote.${remote}.url`
+    })
   }
   let remoteHTTP = new GitRemoteHTTP(url)
   if (authUsername !== undefined && authPassword !== undefined) {
@@ -223,12 +221,20 @@ function parseVarInt (buffer /*: Buffer */) {
 
 /**
  * @ignore
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {ReadableStream} args.inputStream
  * @param {Function} args.onprogress
  */
-export async function unpack ({ gitdir, fs: _fs }, { inputStream, onprogress }) {
+export async function unpack ({
+  dir,
+  gitdir = path.join(dir, '.git'),
+  fs: _fs,
+  inputStream,
+  onprogress
+}) {
   const fs = new FileSystem(_fs)
   return new Promise(function (resolve, reject) {
     // Read header

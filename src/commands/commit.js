@@ -1,8 +1,8 @@
+import path from 'path'
 import { config } from './config'
 import { FileSystem, SignedGitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { flatFileListToDirectoryStructure } from '../utils'
-import path from 'path'
 
 async function constructTree ({ fs, gitdir, inode }) /*: string */ {
   // use depth first traversal
@@ -31,8 +31,10 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
 
 /**
  * Create a new commit
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} args.message - The commit message to use.
  * @param {Object} [args.author] - The details about the commit author.
  * @param {string} [args.author.name=undefined] - Default is `user.name` config.
@@ -45,8 +47,9 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  * @todo Move the PGP signing to a separte signCommit function for better code splitting.
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * let sha = await commit(repo, {
+ * let repo = {fs, dir: '.'}
+ * let sha = await commit({
+ *   ...repo,
  *   author: {
  *     name: 'Mr. Test',
  *     email: 'mrtest@example.com'
@@ -55,10 +58,15 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  *   message: 'Added the a.txt file'
  * })
  */
-export async function commit (
-  { gitdir, fs: _fs },
-  { message, author, committer, privateKeys }
-) {
+export async function commit ({
+  dir,
+  gitdir = path.join(dir, '.git'),
+  fs: _fs,
+  message,
+  author,
+  committer,
+  privateKeys
+}) {
   const fs = new FileSystem(_fs)
   // Fill in missing arguments with default values
   if (author === undefined) author = {}

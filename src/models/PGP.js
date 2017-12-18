@@ -40,6 +40,7 @@ function locallookup (email) {
   return keys[0]
 }
 
+/** @ignore */
 export class PGP {
   // Find the public key(s) for `email` on a server (note - how can you trust the PGP server?) add them to the browser keyring.
   static async lookup (email) {

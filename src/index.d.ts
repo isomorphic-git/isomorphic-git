@@ -15,27 +15,10 @@
 export as namespace git;
 
 /*~ You can declare types that are available via importing the module */
-export interface GitRepo {
-  fs: any;
-  gitdir?: string;
-  workdir?: string;
-}
-type GitRepoShorthand = {
-  fs: any;
-  dir?: string;
-  workdir?: string;
-  gitdir?: string
-}
-export class Git {
-  fs: any;
-  gitdir?: string;
-  workdir?: string;
-  constructor(args: GitRepoShorthand)
-}
 
 /*~ If this module has methods, declare them as functions like so.
  */
-export function init (repo: GitRepo): Promise<void>;
-export function add (repo: GitRepo, {filepath}: {filepath: string}): Promise<void>;
-export function checkout(repo: GitRepo, {remote, ref}: {remote?: string, ref?: string}): Promise<void>;
-export function list(repo: GitRepo): [string];
+export function init ({fs, dir, gitdir}: {fs: any, dir: string, gitdir?: string}): Promise<void>;
+export function add ({fs, dir, gitdir, filepath}: {fs: any, dir: string, gitdir?: string, filepath: string}): Promise<void>;
+export function checkout({fs, dir, gitdir, filepath, remote, ref}: {fs: any, dir: string, gitdir?: string, filepath: string, remote?: string, ref?: string}): Promise<void>;
+export function listFiles({fs, dir, gitdir}: {fs: any, dir: string, gitdir?: string}): Promise<[string]>;

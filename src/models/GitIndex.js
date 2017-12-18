@@ -107,6 +107,7 @@ function parseBuffer (buffer) {
   return _entries
 }
 
+/** @ignore */
 export class GitIndex {
   /*::
    _entries: Map<string, CacheEntry>

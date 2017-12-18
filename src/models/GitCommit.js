@@ -60,6 +60,7 @@ function outdent (str) {
 
 // TODO: Make all functions have static async signature?
 
+/** @ignore */
 export class GitCommit {
   /*::
   _commit : string

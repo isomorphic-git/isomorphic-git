@@ -1,4 +1,3 @@
-// @flow
 import path from 'path'
 import { FileSystem, GitCommit, GitTree } from '../models'
 import {
@@ -87,21 +86,28 @@ async function getHeadTree ({ fs, gitdir }) {
  * - `"*unmodified"` working dir and HEAD commit match, but index differs
  * - `"*absent"` file not present in working dir or HEAD commit, but present in the index
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} args.filepath - The path to the file to query.
  * @returns {Promise<string>} - Resolves successfully with the file's git status.
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * let gitstatus = await status(repo, {filepath: 'README.md'})
+ * let repo = {fs, dir: '.'}
+ * let gitstatus = await status({...repo, filepath: 'README.md'})
  * console.log(gitstatus)
  */
-export async function status ({ workdir, gitdir, fs: _fs }, { filepath }) {
+export async function status ({
+  dir,
+  gitdir = path.join(dir, '.git'),
+  fs: _fs,
+  filepath
+}) {
   const fs = new FileSystem(_fs)
   let ignored = await GitIgnoreManager.isIgnored({
     gitdir,
-    workdir,
+    dir,
     filepath,
     fs
   })
@@ -130,7 +136,7 @@ export async function status ({ workdir, gitdir, fs: _fs }, { filepath }) {
   )
   let stats = null
   try {
-    stats = await fs._lstat(path.join(workdir, filepath))
+    stats = await fs._lstat(path.join(dir, filepath))
   } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err
@@ -145,7 +151,7 @@ export async function status ({ workdir, gitdir, fs: _fs }, { filepath }) {
     if (I && !cacheIsStale({ entry: indexEntry, stats })) {
       return indexEntry.oid
     } else {
-      let object = await fs.read(path.join(workdir, filepath))
+      let object = await fs.read(path.join(dir, filepath))
       let workdirOid = await GitObjectManager.hash({
         gitdir,
         type: 'blob',

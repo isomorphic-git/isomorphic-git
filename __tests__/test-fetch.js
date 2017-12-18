@@ -1,11 +1,9 @@
 /* global jest test describe expect */
+import { fetch } from '../dist/for-node/commands'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
 const fs = new FileSystem(_fs)
-
-import { Git } from '..'
-import { fetch } from '../dist/for-node/commands'
 
 jest.setTimeout(60000)
 
@@ -15,8 +13,9 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
-    await fetch(repo, {
+    let repo = { fs, gitdir }
+    await fetch({
+      ...repo,
       remote: 'origin',
       ref: 'master'
     })
@@ -27,8 +26,9 @@ describe('fetch', () => {
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     let output = []
     // Test
-    let repo = new Git({ fs, gitdir })
-    await fetch(repo, {
+    let repo = { fs, gitdir }
+    await fetch({
+      ...repo,
       depth: 1,
       remote: 'origin',
       onprogress: output.push.bind(output),
@@ -39,7 +39,8 @@ describe('fetch', () => {
     let shallow = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
-    await fetch(repo, {
+    await fetch({
+      ...repo,
       depth: 2,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -52,8 +53,9 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
-    await fetch(repo, {
+    let repo = { fs, gitdir }
+    await fetch({
+      ...repo,
       since: new Date(1506571200000),
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -67,8 +69,9 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
-    await fetch(repo, {
+    let repo = { fs, gitdir }
+    await fetch({
+      ...repo,
       exclude: ['v0.0.5'],
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -82,8 +85,9 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     // Test
-    let repo = new Git({ fs, gitdir })
-    await fetch(repo, {
+    let repo = { fs, gitdir }
+    await fetch({
+      ...repo,
       depth: 1,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -92,7 +96,8 @@ describe('fetch', () => {
     let shallow = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
-    await fetch(repo, {
+    await fetch({
+      ...repo,
       relative: true,
       depth: 1,
       remote: 'origin',

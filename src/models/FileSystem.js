@@ -3,6 +3,7 @@ import pify from 'pify'
 import { sleep } from '../utils'
 const delayedReleases = new Map()
 /**
+ * @ignore
  * This is just a collection of helper functions really. At least that's how it started.
  */
 export class FileSystem {

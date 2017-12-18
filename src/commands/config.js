@@ -1,10 +1,13 @@
+import pathModule from 'path'
 import { FileSystem } from '../models'
 import { GitConfigManager } from '../managers'
 
 /**
  * Read and/or write to the git config file(s)
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} args.path -  The key of the git config entry.
  * @param {string} [args.value] - A value to store at that path.
  * @returns {Promise<any>} - Resolves with the config value
@@ -13,20 +16,27 @@ import { GitConfigManager } from '../managers'
  * If a `value` is provided, it does a write.
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
+ * let repo = {fs, dir: '.'}
  *
  * // Write config value
- * await config(repo, {
+ * await config({
+ *   ...repo,
  *   path: 'user.name',
  *   value: 'Mr. Test'
  * })
  *
  * // Read config value
- * let value = await config(repo, {
+ * let value = await config({
+ *   ...repo,
  *   path: 'user.name'
  * })
  */
-export async function config ({ gitdir, fs: _fs }, args) {
+export async function config ({
+  dir,
+  gitdir = pathModule.join(dir, '.git'),
+  fs: _fs,
+  ...args
+}) {
   const fs = new FileSystem(_fs)
   let { path, value } = args
   const config = await GitConfigManager.get({ fs, gitdir })

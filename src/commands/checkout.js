@@ -2,7 +2,7 @@ import path from 'path'
 import { FileSystem, GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 
-async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
+async function writeTreeToDisk ({ gitdir, dir, index, prefix, tree, fs }) {
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
       fs,
@@ -10,7 +10,7 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
       oid: entry.oid
     })
     let entrypath = prefix === '' ? entry.path : `${prefix}/${entry.path}`
-    let filepath = path.join(workdir, prefix, entry.path)
+    let filepath = path.join(dir, prefix, entry.path)
     switch (type) {
       case 'blob':
         await fs.write(filepath, object)
@@ -25,7 +25,7 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
         let tree = GitTree.from(object)
         await writeTreeToDisk({
           gitdir,
-          workdir,
+          dir,
           index,
           prefix: entrypath,
           tree,
@@ -42,17 +42,25 @@ async function writeTreeToDisk ({ gitdir, workdir, index, prefix, tree, fs }) {
 
 /**
  * Checkout a branch
- * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
  * @param {string} [args.ref=undefined] - Which branch to clone. By default this is the designated "main branch" of the repository.
  * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * await checkout(repo, {ref: 'master'})
+ * let repo = {fs, dir: '.'}
+ * await checkout({...repo, ref: 'master'})
  */
-export async function checkout ({ workdir, gitdir, fs: _fs }, { remote, ref }) {
+export async function checkout ({
+  dir,
+  gitdir = path.join(dir, '.git'),
+  fs: _fs,
+  remote,
+  ref
+}) {
   const fs = new FileSystem(_fs)
   // Get tree oid
   let oid
@@ -98,12 +106,12 @@ export async function checkout ({ workdir, gitdir, fs: _fs }, { remote, ref }) {
       // are not in the index or are in the index but have the wrong SHA.
       for (let entry of index) {
         try {
-          await fs.rm(path.join(workdir, entry.path))
+          await fs.rm(path.join(dir, entry.path))
         } catch (err) {}
       }
       index.clear()
       // Write files. TODO: Write them atomically
-      await writeTreeToDisk({ fs, gitdir, workdir, index, prefix: '', tree })
+      await writeTreeToDisk({ fs, gitdir, dir, index, prefix: '', tree })
       // Update HEAD TODO: Handle non-branch cases
       fs.write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
     }

@@ -8,26 +8,27 @@ import { FileSystem } from '../models'
 
 // TODO: Implement .git/info/exclude
 
+/** @ignore */
 export class GitIgnoreManager {
   static async isIgnored ({
     fs: _fs,
-    gitdir,
-    workdir,
+    dir,
+    gitdir = path.join(dir, '.git'),
     filepath
   }) /*: Promise<boolean> */ {
     const fs = new FileSystem(_fs)
     let pairs = [
       {
-        gitignore: path.join(workdir, '.gitignore'),
+        gitignore: path.join(dir, '.gitignore'),
         filepath
       }
     ]
     let pieces = filepath.split('/')
     for (let i = 1; i < pieces.length; i++) {
-      let dir = pieces.slice(0, i).join('/')
+      let folder = pieces.slice(0, i).join('/')
       let file = pieces.slice(i).join('/')
       pairs.push({
-        gitignore: path.join(workdir, dir, '.gitignore'),
+        gitignore: path.join(dir, folder, '.gitignore'),
         filepath: file
       })
     }
