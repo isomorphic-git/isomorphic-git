@@ -1,6 +1,7 @@
 import ini from 'ini'
 import get from 'lodash/get'
 import set from 'lodash/set'
+import unset from 'lodash/unset'
 
 const complexKeys = ['remote', 'branch']
 
@@ -15,6 +16,7 @@ const splitComplexKey = key =>
 
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
+/** @ignore */
 export class GitConfig {
   constructor (text) {
     this.ini = ini.decode(text)
@@ -37,7 +39,11 @@ export class GitConfig {
     return get(this.ini, path)
   }
   async set (path, value) {
-    return set(this.ini, path, value)
+    if (value === undefined) {
+      unset(this.ini, path)
+    } else {
+      set(this.ini, path, value)
+    }
   }
   toString () {
     // de-mangle complex keys

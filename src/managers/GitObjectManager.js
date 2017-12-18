@@ -2,6 +2,7 @@ import { Buffer } from 'buffer'
 import shasum from 'shasum'
 import { FileSystem, GitObject } from '../models'
 
+/** @ignore */
 export class GitObjectManager {
   static async read ({ fs: _fs, gitdir, oid }) {
     const fs = new FileSystem(_fs)

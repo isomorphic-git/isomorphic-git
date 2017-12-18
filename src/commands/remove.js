@@ -1,3 +1,4 @@
+import path from 'path'
 import { GitIndexManager } from '../managers'
 import { FileSystem } from '../models'
 
@@ -6,16 +7,23 @@ import { FileSystem } from '../models'
  *
  * Note that this does NOT delete the file in the working directory.
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} args.filepath - The path to the file to remove to the index.
  * @returns {Promise<void>} - Resolves successfully once the git index has been updated.
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * await remove(repo, {filepath: 'README.md'})
+ * let repo = {fs, dir: '.'}
+ * await remove({...repo, filepath: 'README.md'})
  */
-export async function remove ({ gitdir, fs: _fs }, { filepath }) {
+export async function remove ({
+  dir,
+  gitdir = path.join(dir, '.git'),
+  fs: _fs,
+  filepath
+}) {
   const fs = new FileSystem(_fs)
   await GitIndexManager.acquire(
     { fs, filepath: `${gitdir}/index` },

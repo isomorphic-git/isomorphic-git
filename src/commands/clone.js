@@ -1,3 +1,4 @@
+import path from 'path'
 import { init } from './init'
 import { config } from './config'
 import { fetch } from './fetch'
@@ -7,8 +8,10 @@ import { FileSystem } from '../models'
 /**
  * Clone a repository
  *
- * @param {GitRepo} repo - A {@link Git} object matching `{workdir, gitdir, fs}`
  * @param {Object} args - Arguments object
+ * @param {FSModule} args.fs - The filesystem holding the git repo
+ * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
+ * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} args.url - The URL of the remote repository.
  * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
  * @param {string} [args.ref=undefined] - Which branch to clone. By default this is the designated "main branch" of the repository.
@@ -22,18 +25,44 @@ import { FileSystem } from '../models'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * let repo = new Git({fs, dir: '.'})
- * await clone(repo, {
+ * let repo = {fs, dir: '.'}
+ * await clone({
+ *   ...repo,
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
  *   depth: 1
  * })
  */
-export async function clone (
-  { workdir, gitdir, fs: _fs },
-  {
-    url,
-    remote,
+export async function clone ({
+  dir,
+  gitdir = path.join(dir, '.git'),
+  fs: _fs,
+  url,
+  remote,
+  ref,
+  authUsername,
+  authPassword,
+  depth,
+  since,
+  exclude,
+  relative,
+  onprogress
+}) {
+  const fs = new FileSystem(_fs)
+  remote = remote || 'origin'
+  await init({ gitdir, fs })
+  // Add remote
+  await config({
+    gitdir,
+    fs,
+    path: `remote.${remote}.url`,
+    value: url
+  })
+  // Fetch commits
+  await fetch({
+    gitdir,
+    fs,
     ref,
+    remote,
     authUsername,
     authPassword,
     depth,
@@ -41,50 +70,13 @@ export async function clone (
     exclude,
     relative,
     onprogress
-  }
-) {
-  const fs = new FileSystem(_fs)
-  remote = remote || 'origin'
-  await init({ gitdir, fs })
-  // Add remote
-  await config(
-    {
-      gitdir,
-      fs
-    },
-    {
-      path: `remote.${remote}.url`,
-      value: url
-    }
-  )
-  // Fetch commits
-  await fetch(
-    {
-      gitdir,
-      fs
-    },
-    {
-      ref,
-      remote,
-      authUsername,
-      authPassword,
-      depth,
-      since,
-      exclude,
-      relative,
-      onprogress
-    }
-  )
+  })
   // Checkout branch
-  await checkout(
-    {
-      workdir,
-      gitdir,
-      fs
-    },
-    {
-      ref,
-      remote
-    }
-  )
+  await checkout({
+    dir,
+    gitdir,
+    fs,
+    ref,
+    remote
+  })
 }

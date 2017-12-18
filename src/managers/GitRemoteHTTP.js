@@ -13,6 +13,7 @@ function basicAuth (auth) {
   )}`
 }
 
+/** @ignore */
 export class GitRemoteHTTP {
   /*::
   GIT_URL : string

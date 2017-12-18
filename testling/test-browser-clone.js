@@ -8,8 +8,9 @@ test('clone', t => {
     if (err) return t.fail(err)
     var fs = window.require('fs')
     t.ok(fs, 'Loaded fs')
-    repo = new Git({ fs: fs, dir: '.' })
-    clone(repo, {
+    clone({
+      fs: fs,
+      dir: '.',
       depth: 1,
       branch: 'master',
       url:

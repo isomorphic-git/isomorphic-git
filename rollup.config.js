@@ -10,6 +10,7 @@ const external = [
   'stream',
   'lodash/get',
   'lodash/set',
+  'lodash/unset',
   'lodash/sortBy',
   'openpgp/dist/openpgp.min.js',
   'babel-runtime/regenerator',
@@ -31,6 +32,7 @@ const external = [
   'babel-runtime/core-js/set',
   'babel-runtime/core-js/object/get-prototype-of',
   'babel-runtime/helpers/possibleConstructorReturn',
+  'babel-runtime/helpers/objectWithoutProperties',
   'babel-runtime/helpers/inherits',
   'babel-runtime/core-js/number/is-nan',
   ...Object.keys(pkg.dependencies)

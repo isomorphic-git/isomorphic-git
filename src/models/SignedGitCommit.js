@@ -21,6 +21,7 @@ function indent (str) {
   )
 }
 
+/** @ignore */
 export class SignedGitCommit extends GitCommit {
   static from (commit) {
     return new SignedGitCommit(commit)

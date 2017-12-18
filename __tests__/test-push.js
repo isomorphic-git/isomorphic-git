@@ -6,7 +6,6 @@ import pify from 'pify'
 import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 
-import { Git } from '..'
 import { push } from '../dist/for-node/commands'
 
 /** @test {push} */
@@ -27,8 +26,9 @@ describe('push', () => {
       .post(/.*/)
       .reply(200, postReceivePackRequest)
 
-    let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let repo = { fs, gitdir: clientDir }
+    let res = await push({
+      ...repo,
       remote: 'pseudo',
       ref: 'refs/heads/master'
     })
@@ -54,8 +54,9 @@ describe('push', () => {
       .reply(200, get)
       .post(/.*/)
       .reply(200, postReceivePackRequest)
-    let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let repo = { fs, gitdir: clientDir }
+    let res = await push({
+      ...repo,
       remote: 'pseudo',
       ref: 'master'
     })
@@ -71,8 +72,9 @@ describe('push', () => {
       __dirname,
       'test-push-client.git'
     )
-    let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let repo = { fs, gitdir: clientDir }
+    let res = await push({
+      ...repo,
       authUsername: process.env.GITHUB_TOKEN,
       authPassword: process.env.GITHUB_TOKEN,
       remote: 'origin',
@@ -90,8 +92,9 @@ describe('push', () => {
       __dirname,
       'test-push-client.git'
     )
-    let repo = new Git({ fs, gitdir: clientDir })
-    let res = await push(repo, {
+    let repo = { fs, gitdir: clientDir }
+    let res = await push({
+      ...repo,
       authUsername: process.env.GITHUB_TOKEN,
       authPassword: process.env.GITHUB_TOKEN,
       remote: 'origin',

@@ -59,6 +59,7 @@ function parseIDX (buffer) {
   return { size, fanout, hashes, crcs, packfileSha, slices }
 }
 
+/** @ignore */
 export class GitPackfile {
   constructor ({ size, fanout, hashes, crcs, packfileSha, slices, pack }) {
     // Compare checksums

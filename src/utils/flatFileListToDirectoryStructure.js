@@ -12,6 +12,7 @@ type Node = {
 }
 */
 
+/** @ignore */
 export function flatFileListToDirectoryStructure (
   files /*: Array<{path: string}> */
 ) /*: Node|void */ {
