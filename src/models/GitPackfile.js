@@ -1,5 +1,15 @@
 import BufferCursor from 'buffercursor'
 import shasum from 'shasum'
+import pako from 'pako'
+import applyDelta from 'git-apply-delta'
+const types = {
+  0b0010000: 'commit',
+  0b0100000: 'tree',
+  0b0110000: 'blob',
+  0b1000000: 'tag',
+  0b1010000: 'ofs_delta',
+  0b1100000: 'ref_delta'
+}
 
 function parseIDX (buffer) {
   let reader = new BufferCursor(buffer)
@@ -46,7 +56,8 @@ function parseIDX (buffer) {
     offsets.set(hashes[i], reader.readUInt32BE())
   }
   let packfileSha = reader.slice(20).toString('hex')
-  // This part is gratuitous, but since we lack good unzipping arbitrary streams with extra at the end in the browser...
+  // Knowing the length of each slice isn't strictly needed, but it is
+  // nice to have.
   let lengths = Array.from(offsets)
   lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
   let sizes = new Map()
@@ -82,10 +93,53 @@ export class GitPackfile {
   static async fromIDX ({ idx, pack }) {
     return new GitPackfile({ pack, ...parseIDX(idx) })
   }
+  // NOTE:
+  // Currently, the code for CREATING a pack file is in `src/commands/push.js`
+  // I forget why it's there instead of here. Maybe the GitPackfile model was created after the fact?
+  // anyway, look there for the inverse, e.g. how to serialize to a packfile.
   async read ({ oid } /*: {oid: string} */) {
     if (!this.slices.has(oid)) return null
     let raw = this.pack.slice(...this.slices.get(oid))
-    console.log(raw)
+    let reader = new BufferCursor(raw)
+    let byte = reader.readUInt8()
+    // Object type is encoded in bits 654
+    let btype = byte & 0b1110000
+    let type = types[btype]
+    if (type === undefined) {
+      throw new Error('Unrecognized type: 0b' + btype.toString(2))
+    }
+    // The length encoding get complicated.
+    // Whether the next byte is part of the variable-length encoded number
+    // is encoded in bit 7
+    let multibyte = byte & 0b10000000
+    // Last four bits of length is encoded in bits 3210
+    let lastFour = byte & 0b1111
+    let length = lastFour
+    let lastSeven = 0
+    // Now we keep chopping away at the buffer 7-bits at a time,
+    // accumulating the bits in what amounts to little-endian order.
+    let n = 0
+    while (multibyte) {
+      byte = reader.readUInt8()
+      multibyte = byte & 0b10000000
+      lastSeven = byte & 0b01111111
+      length = (lastSeven << (4 + 7 * n)) | length
+      n++
+    }
+    // Handle deltified objects
+    if (type === 'ref_delta') {
+      let reference = reader.slice(20).toString('hex')
+      let data = raw.slice(reader.tell())
+      console.log('reference =', reference)
+      console.log('data =', data)
+      let { object, type } = await this.read({ oid: reference })
+      let result = applyDelta(data, object)
+      return { type, object: result }
+    }
+    // Handle undeltified objects
+    let buffer = raw.slice(reader.tell())
+    let object = Buffer.from(pako.inflate(buffer))
+    return { type, object }
     /*
     - The header is followed by number of object entries, each of
      which looks like this:
