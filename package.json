@@ -102,7 +102,7 @@
     "uglify-es": "^3.1.2",
     "watch": "^1.0.2",
     "watchify": "^3.9.0",
-    "semantic-release": "^8.2.0"
+    "semantic-release": "^11.0.2"
   },
   "ava": {
     "source": [
