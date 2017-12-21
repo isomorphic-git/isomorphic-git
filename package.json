@@ -92,7 +92,7 @@
     "nps": "^5.7.1",
     "nps-utils": "^1.4.0",
     "parse-header-stream": "^1.1.1",
-    "prettier-standard": "^7.0.3",
+    "prettier-standard": "^8.0.0",
     "rollup": "^0.51.6",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-json": "^2.3.0",
