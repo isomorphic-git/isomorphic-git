@@ -7,9 +7,61 @@ const types = {
   0b0100000: 'tree',
   0b0110000: 'blob',
   0b1000000: 'tag',
-  0b1010000: 'ofs_delta',
-  0b1100000: 'ref_delta'
+  0b1100000: 'ofs_delta',
+  0b1110000: 'ref_delta'
 }
+
+function decodeVarInt (reader) {
+  let bytes = []
+  let byte = 0
+  let multibyte = 0
+  do {
+    byte = reader.readUInt8()
+    // We keep bits 6543210
+    const lastSeven = byte & 0b01111111
+    bytes.push(lastSeven)
+    // Whether the next byte is part of the variable-length encoded number
+    // is encoded in bit 7
+    multibyte = byte & 0b10000000
+  } while (multibyte)
+  // Now that all the bytes are in big-endian order,
+  // alternate shifting the bits left by 7 and OR-ing the next byte.
+  // And... do a weird increment-by-one thing that I don't quite understand.
+  return bytes.reduce((a, b) => ((a + 1) << 7) | b, -1)
+}
+
+// I'm pretty much copying this one from the git C source code,
+// because it makes no sense.
+function otherVarIntDecode (reader, startWith) {
+  let result = startWith
+  let shift = 4
+  let byte = null
+  do {
+    byte = reader.readUInt8()
+    result |= (byte & 0b01111111) << shift
+    shift += 7
+  } while (byte & 0b10000000)
+  return result
+}
+
+// function encodeVarInt (value) {
+//   let bytes = []
+//   do {
+//     // We keep bits 6543210 and add them to the FRONT of an array,
+//     // because we are seeing them in little-endian order, but want
+//     // to return them in big-endian order.
+//     const lastSeven = value & 0b01111111
+//     bytes.unshift(lastSeven)
+//     // Shift those seven bits off the edge of a cliff.
+//     // NOTE: DO THE WEIRD INCREMENT THING.
+//     value = (value >>> 7) - 1
+//   } while (value > 0)
+//   // Now that all the bytes are in big-endian order,
+//   // set the MSB on all but the last byte.
+//   bytes = bytes.map(byte => byte | 0b10000000)
+//   bytes[bytes.length - 1] = bytes[bytes.length - 1] & 0b01111111
+//   return bytes
+// }
 
 function parseIDX (buffer) {
   let reader = new BufferCursor(buffer)
@@ -56,6 +108,11 @@ function parseIDX (buffer) {
     offsets.set(hashes[i], reader.readUInt32BE())
   }
   let packfileSha = reader.slice(20).toString('hex')
+  // We might also want a reverse mapping from offsets to oids for debugging.
+  let reverseOffsets = new Map()
+  for (let [key, value] of offsets) {
+    reverseOffsets.set(value, key)
+  }
   // Knowing the length of each slice isn't strictly needed, but it is
   // nice to have.
   let lengths = Array.from(offsets)
@@ -67,12 +124,91 @@ function parseIDX (buffer) {
     slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
   }
   slices.set(lengths[size - 1][0], [lengths[size - 1][1], undefined])
-  return { size, fanout, hashes, crcs, packfileSha, slices }
+  return {
+    size,
+    fanout,
+    hashes,
+    crcs,
+    offsets,
+    packfileSha,
+    slices,
+    reverseOffsets
+  }
+}
+
+// for now we'll just write it in memory.
+// TODO: make a streaming version?
+function writeIDX ({
+  size,
+  fanout,
+  hashes,
+  crcs,
+  offsets,
+  packfileSha,
+  slices,
+  reverseOffsets
+}) {
+  let buffers = []
+  let write = (str, encoding) => {
+    buffers.push(Buffer.from(str, encoding))
+  }
+  // Write out IDX v2 magic number
+  write('ff744f63', 'hex')
+  // Write out version number 2
+  write('00000002', 'hex')
+  // Write fanout table
+  let fanoutBuffer = new BufferCursor(Buffer.alloc(256 * 4))
+  for (let i = 0; i < 256; i++) {
+    let count = 0
+    console.log(parseInt(hashes[i].slice(0, 1), 16))
+    for (let hash of hashes) {
+      if (parseInt(hash.slice(0, 2), 16) <= i) count++
+    }
+    fanoutBuffer.writeUInt32BE(count)
+  }
+  console.log(fanoutBuffer)
+  buffers.push(fanoutBuffer.buffer)
+  // Write out hashes
+  for (let hash of hashes) {
+    write(hash, 'hex')
+  }
+  // Write out crcs
+  let crcsBuffer = new BufferCursor(Buffer.alloc(size * 4))
+  for (let hash of hashes) {
+    crcsBuffer.writeUInt32BE(crcs.get(hash))
+  }
+  buffers.push(crcsBuffer.buffer)
+  // Write out offsets
+  let offsetsBuffer = new BufferCursor(Buffer.alloc(size * 4))
+  for (let hash of hashes) {
+    offsetsBuffer.writeUInt32BE(offsets.get(hash))
+  }
+  buffers.push(offsetsBuffer.buffer)
+  // Write out packfile checksum
+  write(packfileSha, 'hex')
+  // Write out shasum
+  console.log(buffers.length)
+  let totalBuffer = Buffer.concat(buffers)
+  let sha = shasum(totalBuffer)
+  console.log(sha)
+  let shaBuffer = Buffer.alloc(20)
+  shaBuffer.write(sha, 'hex')
+  return Buffer.concat([totalBuffer, shaBuffer])
 }
 
 /** @ignore */
 export class GitPackfile {
-  constructor ({ size, fanout, hashes, crcs, packfileSha, slices, pack }) {
+  constructor ({
+    pack,
+    size,
+    fanout,
+    hashes,
+    crcs,
+    offsets,
+    packfileSha,
+    slices,
+    reverseOffsets
+  }) {
     // Compare checksums
     let shaClaimed = pack.slice(-20).toString('hex')
     if (packfileSha !== shaClaimed) {
@@ -81,17 +217,22 @@ export class GitPackfile {
       )
     }
     Object.assign(this, {
+      pack,
       size,
       fanout,
       hashes,
       crcs,
+      offsets,
       packfileSha,
       slices,
-      pack
+      reverseOffsets
     })
   }
   static async fromIDX ({ idx, pack }) {
     return new GitPackfile({ pack, ...parseIDX(idx) })
+  }
+  async writeIDX () {
+    return writeIDX(this)
   }
   // NOTE:
   // Currently, the code for CREATING a pack file is in `src/commands/push.js`
@@ -99,7 +240,11 @@ export class GitPackfile {
   // anyway, look there for the inverse, e.g. how to serialize to a packfile.
   async read ({ oid } /*: {oid: string} */) {
     if (!this.slices.has(oid)) return null
-    let raw = this.pack.slice(...this.slices.get(oid))
+    let [start, end] = this.slices.get(oid)
+    return this.readSlice({ start, end })
+  }
+  async readSlice ({ start, end }) {
+    let raw = this.pack.slice(start, end)
     let reader = new BufferCursor(raw)
     let byte = reader.readUInt8()
     // Object type is encoded in bits 654
@@ -109,36 +254,42 @@ export class GitPackfile {
       throw new Error('Unrecognized type: 0b' + btype.toString(2))
     }
     // The length encoding get complicated.
-    // Whether the next byte is part of the variable-length encoded number
-    // is encoded in bit 7
-    let multibyte = byte & 0b10000000
     // Last four bits of length is encoded in bits 3210
     let lastFour = byte & 0b1111
     let length = lastFour
-    let lastSeven = 0
-    // Now we keep chopping away at the buffer 7-bits at a time,
-    // accumulating the bits in what amounts to little-endian order.
-    let n = 0
-    while (multibyte) {
-      byte = reader.readUInt8()
-      multibyte = byte & 0b10000000
-      lastSeven = byte & 0b01111111
-      length = (lastSeven << (4 + 7 * n)) | length
-      n++
+    // Whether the next byte is part of the variable-length encoded number
+    // is encoded in bit 7
+    let multibyte = byte & 0b10000000
+    if (multibyte) {
+      length = otherVarIntDecode(reader, lastFour)
     }
+    // console.log('length =', length)
+    let base = null
+    let object = null
     // Handle deltified objects
+    if (type === 'ofs_delta') {
+      let offset = decodeVarInt(reader)
+      let position = start - offset
+      // console.log('base oid =', this.reverseOffsets.get(position))
+      ;({ object: base, type } = await this.readSlice({ start: position }))
+    }
     if (type === 'ref_delta') {
-      let reference = reader.slice(20).toString('hex')
-      let data = raw.slice(reader.tell())
-      console.log('reference =', reference)
-      console.log('data =', data)
-      let { object, type } = await this.read({ oid: reference })
-      let result = applyDelta(data, object)
-      return { type, object: result }
+      let oid = reader.slice(20).toString('hex')
+      // console.log('base oid =', oid)
+      ;({ base: object, type } = await this.read({ oid }))
     }
     // Handle undeltified objects
     let buffer = raw.slice(reader.tell())
-    let object = Buffer.from(pako.inflate(buffer))
+    object = Buffer.from(pako.inflate(buffer))
+    // Assert that the object length is as expected.
+    if (object.byteLength !== length) {
+      throw new Error(
+        `Packfile told us object would have length ${length} but it had length ${object.byteLength}`
+      )
+    }
+    if (base) {
+      object = applyDelta(object, base)
+    }
     return { type, object }
     /*
     - The header is followed by number of object entries, each of
