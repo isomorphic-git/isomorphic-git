@@ -2,6 +2,11 @@ import BufferCursor from 'buffercursor'
 import shasum from 'shasum'
 import pako from 'pako'
 import applyDelta from 'git-apply-delta'
+import listpack from 'git-list-pack'
+import through2 from 'through2'
+import crypto from 'crypto'
+import { GitObject } from './GitObject'
+
 const types = {
   0b0010000: 'commit',
   0b0100000: 'tree',
@@ -139,15 +144,12 @@ function parseIDX (buffer) {
 // for now we'll just write it in memory.
 // TODO: make a streaming version?
 function writeIDX ({
-  size,
-  fanout,
   hashes,
   crcs,
   offsets,
-  packfileSha,
-  slices,
-  reverseOffsets
+  packfileSha
 }) {
+  let size = hashes.length
   let buffers = []
   let write = (str, encoding) => {
     buffers.push(Buffer.from(str, encoding))
@@ -160,7 +162,6 @@ function writeIDX ({
   let fanoutBuffer = new BufferCursor(Buffer.alloc(256 * 4))
   for (let i = 0; i < 256; i++) {
     let count = 0
-    console.log(parseInt(hashes[i].slice(0, 1), 16))
     for (let hash of hashes) {
       if (parseInt(hash.slice(0, 2), 16) <= i) count++
     }
@@ -194,6 +195,18 @@ function writeIDX ({
   let shaBuffer = Buffer.alloc(20)
   shaBuffer.write(sha, 'hex')
   return Buffer.concat([totalBuffer, shaBuffer])
+}
+
+function shastream () {
+  const hash = crypto.createHash('sha1')
+  return {
+    passThroughSha: through2(function (chunk, enc, next) {
+      hash.update(chunk)
+      this.push(chunk)
+      next()
+    }),
+    digest: () => hash.digest('hex')
+  }
 }
 
 /** @ignore */
@@ -230,6 +243,81 @@ export class GitPackfile {
   }
   static async fromIDX ({ idx, pack }) {
     return new GitPackfile({ pack, ...parseIDX(idx) })
+  }
+  static async createIDX ({ packfileStream }) {
+    let hashes = []
+    let datas = new Map()
+    let crcs = new Map()
+    let offsets = new Map()
+    let types = new Map()
+    let reverseOffsets = new Map()
+    let {passThroughSha, digest} = shastream()
+    const listpackTypes = {
+      1: 'commit',
+      2: 'tree',
+      3: 'blob',
+      4: 'tag',
+      6: 'ofs-delta',
+      7: 'ref-delta'
+    }
+    await new Promise((resolve, reject) => {
+      packfileStream
+      .pipe(passThroughSha)
+      .pipe(listpack())
+      .on('data', ({ data, type, reference, offset, num }) => {
+        type = listpackTypes[type]
+        if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
+          let {oid} = GitObject.wrap({type, object: data})
+          hashes.push(oid)
+          datas.set(oid, data)
+          types.set(oid, type)
+          crcs.set(oid, 0)
+          offsets.set(oid, offset)
+          reverseOffsets.set(offset, oid)
+        } else if (type === 'ofs-delta') {
+          console.log('reference =', reference)
+          let offsetAsNumber = decodeVarInt(new BufferCursor(reference))
+          console.log('offsetAsNumber =', offsetAsNumber)
+          let position = offset - offsetAsNumber
+          let baseoid = reverseOffsets.get(position)
+          console.log('baseoid =', baseoid)
+          let basedata = datas.get(baseoid)
+          let basetype = types.get(baseoid)
+          type = basetype
+          data = applyDelta(data, basedata)
+          let {oid} = GitObject.wrap({type, object: data})
+          hashes.push(oid)
+          datas.set(oid, data)
+          types.set(oid, basetype)
+          crcs.set(oid, 0)
+          offsets.set(oid, offset)
+          reverseOffsets.set(offset, oid)
+        } else if (type === 'ref-delta') {
+          let baseoid = Buffer.from(reference).toString('hex')
+          let basedata = datas.get(baseoid)
+          let basetype = types.get(baseoid)
+          type = basetype
+          data = applyDelta(data, basedata)
+          let {oid} = GitObject.wrap({type, object: data})
+          hashes.push(oid)
+          datas.set(oid, data)
+          types.set(oid, basetype)
+          crcs.set(oid, 0)
+          offsets.set(oid, offset)
+          reverseOffsets.set(offset, oid)
+        }
+        console.log(num, type, hashes[hashes.length - 1])
+        if (num === 0) resolve()
+      })
+    })
+    hashes.sort()
+    let idx = await writeIDX({
+      hashes,
+      crcs,
+      offsets,
+      packfileSha: digest()
+    })
+    return idx
   }
   async writeIDX () {
     return writeIDX(this)
