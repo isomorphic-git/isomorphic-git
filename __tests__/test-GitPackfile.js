@@ -87,9 +87,6 @@ describe('GitPackfile', () => {
       '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
     )
     let idx = await GitPackfile.createIDX({
-      packfileStream: _fs.createReadStream(
-        '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
-      ),
       pack: await fs.read(
         '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
       )
