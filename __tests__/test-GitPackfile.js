@@ -3,6 +3,8 @@ import { FileSystem, GitPackfile, GitObject } from '../dist/for-node/models'
 import _fs from 'fs'
 const fs = new FileSystem(_fs)
 
+jest.setTimeout(60000)
+
 const loadPackfile = async () =>
   GitPackfile.fromIDX({
     idx: await fs.read(
@@ -77,6 +79,19 @@ describe('GitPackfile', () => {
     })
     let idx = await packfile.writeIDX()
     await fs.write('IDXFILE.idx', idx)
+    expect(idx.byteLength).toBe(originalIDX.byteLength)
+    expect(idx.equals(originalIDX)).toBe(true)
+  })
+  test('create IDX', async () => {
+    let originalIDX = await fs.read(
+      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+    )
+    let idx = await GitPackfile.createIDX({
+      packfileStream: _fs.createReadStream(
+        '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      )
+    })
+    await fs.write('IDXFILE2.idx', idx)
     expect(idx.byteLength).toBe(originalIDX.byteLength)
     expect(idx.equals(originalIDX)).toBe(true)
   })
