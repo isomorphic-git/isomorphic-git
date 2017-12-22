@@ -7,6 +7,7 @@ import through2 from 'through2'
 import crypto from 'crypto'
 import { GitObject } from './GitObject'
 import crc32 from 'crc/lib/crc32.js'
+import { PassThrough } from 'stream'
 
 const types = {
   0b0010000: 'commit',
@@ -15,6 +16,12 @@ const types = {
   0b1000000: 'tag',
   0b1100000: 'ofs_delta',
   0b1110000: 'ref_delta'
+}
+
+function buffer2stream (buffer) {
+  let stream = new PassThrough()
+  stream.end(buffer)
+  return stream
 }
 
 function decodeVarInt (reader) {
@@ -239,7 +246,8 @@ export class GitPackfile {
   static async fromIDX ({ idx, pack }) {
     return new GitPackfile({ pack, ...parseIDX(idx) })
   }
-  static async createIDX ({ packfileStream, pack }) {
+  static async createIDX ({ pack }) {
+    let packfileStream = buffer2stream(pack)
     let hashes = []
     let datas = new Map()
     let crcs = new Map()
@@ -313,7 +321,10 @@ export class GitPackfile {
       sizes.set(lengths[i][0], lengths[i + 1][1] - lengths[i][1])
       slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
     }
-    slices.set(lengths[size - 1][0], [lengths[size - 1][1], pack.byteLength - 20])
+    slices.set(lengths[size - 1][0], [
+      lengths[size - 1][1],
+      pack.byteLength - 20
+    ])
     console.log(slices.get(lengths[size - 1][0]))
     let idx = await writeIDX({
       hashes,
@@ -385,23 +396,5 @@ export class GitPackfile {
       object = applyDelta(object, base)
     }
     return { type, object }
-    /*
-    - The header is followed by number of object entries, each of
-     which looks like this:
-
-     (undeltified representation)
-     n-byte type and length (3-bit type, (n-1)*7+4-bit length)
-     compressed data
-
-     (deltified representation)
-     n-byte type and length (3-bit type, (n-1)*7+4-bit length)
-     20-byte base object name if OBJ_REF_DELTA or a negative relative
-     offset from the delta object's position in the pack if this
-     is an OBJ_OFS_DELTA object
-     compressed delta data
-
-     Observation: length of each object is encoded in a variable
-     length format and is not constrained to 32-bit or anything.
-    */
   }
 }
