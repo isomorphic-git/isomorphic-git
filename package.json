@@ -43,6 +43,7 @@
     "buffer": "^5.0.7",
     "buffer-peek-stream": "^1.0.1",
     "buffercursor": "0.0.12",
+    "crc": "^3.5.0",
     "gartal": "^1.1.2",
     "git-apply-delta": "0.0.7",
     "git-list-pack": "0.0.10",

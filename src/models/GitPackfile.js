@@ -6,6 +6,7 @@ import listpack from 'git-list-pack'
 import through2 from 'through2'
 import crypto from 'crypto'
 import { GitObject } from './GitObject'
+import crc32 from 'crc/lib/crc32.js'
 
 const types = {
   0b0010000: 'commit',
@@ -143,12 +144,7 @@ function parseIDX (buffer) {
 
 // for now we'll just write it in memory.
 // TODO: make a streaming version?
-function writeIDX ({
-  hashes,
-  crcs,
-  offsets,
-  packfileSha
-}) {
+function writeIDX ({ hashes, crcs, offsets, slices, packfileSha, pack }) {
   let size = hashes.length
   let buffers = []
   let write = (str, encoding) => {
@@ -167,7 +163,6 @@ function writeIDX ({
     }
     fanoutBuffer.writeUInt32BE(count)
   }
-  console.log(fanoutBuffer)
   buffers.push(fanoutBuffer.buffer)
   // Write out hashes
   for (let hash of hashes) {
@@ -176,7 +171,9 @@ function writeIDX ({
   // Write out crcs
   let crcsBuffer = new BufferCursor(Buffer.alloc(size * 4))
   for (let hash of hashes) {
-    crcsBuffer.writeUInt32BE(crcs.get(hash))
+    let crc = crc32(pack.slice(...slices.get(hash)))
+    // console.log('expected =', crcs.get(hash), 'actual =', crc)
+    crcsBuffer.writeUInt32BE(crc)
   }
   buffers.push(crcsBuffer.buffer)
   // Write out offsets
@@ -188,10 +185,8 @@ function writeIDX ({
   // Write out packfile checksum
   write(packfileSha, 'hex')
   // Write out shasum
-  console.log(buffers.length)
   let totalBuffer = Buffer.concat(buffers)
   let sha = shasum(totalBuffer)
-  console.log(sha)
   let shaBuffer = Buffer.alloc(20)
   shaBuffer.write(sha, 'hex')
   return Buffer.concat([totalBuffer, shaBuffer])
@@ -244,14 +239,14 @@ export class GitPackfile {
   static async fromIDX ({ idx, pack }) {
     return new GitPackfile({ pack, ...parseIDX(idx) })
   }
-  static async createIDX ({ packfileStream }) {
+  static async createIDX ({ packfileStream, pack }) {
     let hashes = []
     let datas = new Map()
     let crcs = new Map()
     let offsets = new Map()
     let types = new Map()
     let reverseOffsets = new Map()
-    let {passThroughSha, digest} = shastream()
+    let { passThroughSha, digest } = shastream()
     const listpackTypes = {
       1: 'commit',
       2: 'tree',
@@ -262,60 +257,71 @@ export class GitPackfile {
     }
     await new Promise((resolve, reject) => {
       packfileStream
-      .pipe(passThroughSha)
-      .pipe(listpack())
-      .on('data', ({ data, type, reference, offset, num }) => {
-        type = listpackTypes[type]
-        if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
-          let {oid} = GitObject.wrap({type, object: data})
-          hashes.push(oid)
-          datas.set(oid, data)
-          types.set(oid, type)
-          crcs.set(oid, 0)
-          offsets.set(oid, offset)
-          reverseOffsets.set(offset, oid)
-        } else if (type === 'ofs-delta') {
-          console.log('reference =', reference)
-          let offsetAsNumber = decodeVarInt(new BufferCursor(reference))
-          console.log('offsetAsNumber =', offsetAsNumber)
-          let position = offset - offsetAsNumber
-          let baseoid = reverseOffsets.get(position)
-          console.log('baseoid =', baseoid)
-          let basedata = datas.get(baseoid)
-          let basetype = types.get(baseoid)
-          type = basetype
-          data = applyDelta(data, basedata)
-          let {oid} = GitObject.wrap({type, object: data})
-          hashes.push(oid)
-          datas.set(oid, data)
-          types.set(oid, basetype)
-          crcs.set(oid, 0)
-          offsets.set(oid, offset)
-          reverseOffsets.set(offset, oid)
-        } else if (type === 'ref-delta') {
-          let baseoid = Buffer.from(reference).toString('hex')
-          let basedata = datas.get(baseoid)
-          let basetype = types.get(baseoid)
-          type = basetype
-          data = applyDelta(data, basedata)
-          let {oid} = GitObject.wrap({type, object: data})
-          hashes.push(oid)
-          datas.set(oid, data)
-          types.set(oid, basetype)
-          crcs.set(oid, 0)
-          offsets.set(oid, offset)
-          reverseOffsets.set(offset, oid)
-        }
-        console.log(num, type, hashes[hashes.length - 1])
-        if (num === 0) resolve()
-      })
+        .pipe(passThroughSha)
+        .pipe(listpack())
+        .on('data', ({ data, type, reference, offset, num }) => {
+          type = listpackTypes[type]
+          if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
+            let { oid } = GitObject.wrap({ type, object: data })
+            hashes.push(oid)
+            datas.set(oid, data)
+            types.set(oid, type)
+            crcs.set(oid, crc32(data))
+            offsets.set(oid, offset)
+            reverseOffsets.set(offset, oid)
+          } else if (type === 'ofs-delta') {
+            let offsetAsNumber = decodeVarInt(new BufferCursor(reference))
+            let position = offset - offsetAsNumber
+            let baseoid = reverseOffsets.get(position)
+            let basedata = datas.get(baseoid)
+            let basetype = types.get(baseoid)
+            type = basetype
+            data = applyDelta(data, basedata)
+            let { oid } = GitObject.wrap({ type, object: data })
+            hashes.push(oid)
+            datas.set(oid, data)
+            types.set(oid, basetype)
+            crcs.set(oid, crc32(data))
+            offsets.set(oid, offset)
+            reverseOffsets.set(offset, oid)
+          } else if (type === 'ref-delta') {
+            let baseoid = Buffer.from(reference).toString('hex')
+            let basedata = datas.get(baseoid)
+            let basetype = types.get(baseoid)
+            type = basetype
+            data = applyDelta(data, basedata)
+            let { oid } = GitObject.wrap({ type, object: data })
+            hashes.push(oid)
+            datas.set(oid, data)
+            types.set(oid, basetype)
+            crcs.set(oid, crc32(data))
+            offsets.set(oid, offset)
+            reverseOffsets.set(offset, oid)
+          }
+          if (num === 0) resolve()
+        })
     })
     hashes.sort()
+    // Knowing the length of each slice isn't strictly needed, but it is
+    // nice to have.
+    let size = hashes.length
+    let lengths = Array.from(offsets)
+    lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
+    let sizes = new Map()
+    let slices = new Map()
+    for (let i = 0; i < size - 1; i++) {
+      sizes.set(lengths[i][0], lengths[i + 1][1] - lengths[i][1])
+      slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
+    }
+    slices.set(lengths[size - 1][0], [lengths[size - 1][1], pack.byteLength - 20])
+    console.log(slices.get(lengths[size - 1][0]))
     let idx = await writeIDX({
       hashes,
       crcs,
       offsets,
-      packfileSha: digest()
+      slices,
+      packfileSha: digest(),
+      pack
     })
     return idx
   }
