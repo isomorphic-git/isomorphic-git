@@ -78,7 +78,7 @@
     "esdoc-importpath-plugin": "^1.0.1",
     "esdoc-standard-plugin": "^1.0.0",
     "husky": "^0.14.3",
-    "jest": "^21.2.1",
+    "jest": "^22.0.4",
     "jest-fixtures": "^0.6.0",
     "jsonfile": "^4.0.0",
     "karma": "^2.0.0",
