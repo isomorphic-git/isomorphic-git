@@ -73,9 +73,8 @@ describe('GitPackIndex', () => {
     )
     let p = await GitPackIndex.fromIdx(idxbuffer)
     let idx = p.toBuffer()
-    await fs.write('IDXFILE.idx', idx)
     expect(idx.byteLength).toBe(idxbuffer.byteLength)
-    // expect(idx.equals(idxbuffer)).toBe(true)
+    expect(idx.equals(idxbuffer)).toBe(true)
   })
   test('to .idx file from .pack', async () => {
     let idxbuffer = await fs.read(
@@ -86,8 +85,7 @@ describe('GitPackIndex', () => {
     )
     let p = await GitPackIndex.fromPack(packbuffer)
     let idx = p.toBuffer()
-    await fs.write('IDXFILE2.idx', idx)
     expect(idx.byteLength).toBe(idxbuffer.byteLength)
-    // expect(idx.equals(idxbuffer)).toBe(true)
+    expect(idx.equals(idxbuffer)).toBe(true)
   })
 })
