@@ -144,7 +144,9 @@ export class GitPackfile {
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
       throw new Error(
-        `Packfile told us object would have length ${length} but it had length ${object.byteLength}`
+        `Packfile told us object would have length ${length} but it had length ${
+          object.byteLength
+        }`
       )
     }
     if (base) {
