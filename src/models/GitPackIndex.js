@@ -2,8 +2,6 @@ import BufferCursor from 'buffercursor'
 import shasum from 'shasum'
 import applyDelta from 'git-apply-delta'
 import listpack from 'git-list-pack'
-import through2 from 'through2'
-import crypto from 'crypto'
 import { GitObject } from './GitObject'
 import crc32 from 'crc/lib/crc32.js'
 import { PassThrough } from 'stream'
@@ -31,18 +29,6 @@ function decodeVarInt (reader) {
   // alternate shifting the bits left by 7 and OR-ing the next byte.
   // And... do a weird increment-by-one thing that I don't quite understand.
   return bytes.reduce((a, b) => ((a + 1) << 7) | b, -1)
-}
-
-function shastream () {
-  const hash = crypto.createHash('sha1')
-  return {
-    passThroughSha: through2(function (chunk, enc, next) {
-      hash.update(chunk)
-      this.push(chunk)
-      next()
-    }),
-    digest: () => hash.digest('hex')
-  }
 }
 
 /** @ignore */
@@ -129,7 +115,6 @@ export class GitPackIndex {
     let offsets = new Map()
     let types = new Map()
     let reverseOffsets = new Map()
-    let { passThroughSha, digest } = shastream()
     const listpackTypes = {
       1: 'commit',
       2: 'tree',
@@ -140,7 +125,6 @@ export class GitPackIndex {
     }
     await new Promise((resolve, reject) => {
       packfileStream
-        .pipe(passThroughSha)
         .pipe(listpack())
         .on('data', ({ data, type, reference, offset, num }) => {
           type = listpackTypes[type]
@@ -149,7 +133,6 @@ export class GitPackIndex {
             hashes.push(oid)
             datas.set(oid, data)
             types.set(oid, type)
-            crcs.set(oid, crc32(data))
             offsets.set(oid, offset)
             reverseOffsets.set(offset, oid)
           } else if (type === 'ofs-delta') {
@@ -164,7 +147,6 @@ export class GitPackIndex {
             hashes.push(oid)
             datas.set(oid, data)
             types.set(oid, basetype)
-            crcs.set(oid, crc32(data))
             offsets.set(oid, offset)
             reverseOffsets.set(offset, oid)
           } else if (type === 'ref-delta') {
@@ -177,7 +159,6 @@ export class GitPackIndex {
             hashes.push(oid)
             datas.set(oid, data)
             types.set(oid, basetype)
-            crcs.set(oid, crc32(data))
             offsets.set(oid, offset)
             reverseOffsets.set(offset, oid)
           }
@@ -201,6 +182,10 @@ export class GitPackIndex {
       lengths[size - 1][1],
       pack.byteLength - 20
     ])
+    for (let hash of hashes) {
+      let crc = crc32(pack.slice(...slices.get(hash)))
+      crcs.set(hash, crc)
+    }
     // Older packfiles do NOT use the shasum of the pack itself,
     // so it is recommended to just use whatever bytes are in the trailer.
     // Source: https://github.com/git/git/commit/1190a1acf800acdcfd7569f87ac1560e2d077414

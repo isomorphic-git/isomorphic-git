@@ -86,7 +86,7 @@ export class GitPackfile {
     // If an .idx file is available, use it.
     if (idx) {
       idx = await GitPackIndex.fromIdx(idx)
-    // Else generate an index by scanning.
+      // Else generate an index by scanning.
     } else {
       idx = await GitPackIndex.fromPack(pack)
       // Note: The caller is responsible for saving the result back to disk using
