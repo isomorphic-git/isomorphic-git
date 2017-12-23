@@ -1,13 +1,7 @@
 import BufferCursor from 'buffercursor'
-import shasum from 'shasum'
 import pako from 'pako'
 import applyDelta from 'git-apply-delta'
-import listpack from 'git-list-pack'
-import through2 from 'through2'
-import crypto from 'crypto'
-import { GitObject } from './GitObject'
-import crc32 from 'crc/lib/crc32.js'
-import { PassThrough } from 'stream'
+import { GitPackIndex } from './GitPackIndex'
 
 const types = {
   0b0010000: 'commit',
@@ -16,12 +10,6 @@ const types = {
   0b1000000: 'tag',
   0b1100000: 'ofs_delta',
   0b1110000: 'ref_delta'
-}
-
-function buffer2stream (buffer) {
-  let stream = new PassThrough()
-  stream.end(buffer)
-  return stream
 }
 
 function decodeVarInt (reader) {
@@ -76,276 +64,43 @@ function otherVarIntDecode (reader, startWith) {
 //   return bytes
 // }
 
-function parseIDX (buffer) {
-  let reader = new BufferCursor(buffer)
-  let magic = reader.slice(4).toString('hex')
-  // Check for IDX v2 magic number
-  if (magic !== 'ff744f63') {
-    return // undefined
-  }
-  let version = reader.readUInt32BE()
-  if (version !== 2) {
-    throw new Error(
-      `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
-    )
-  }
-  // Verify checksums
-  let shaComputed = shasum(buffer.slice(0, -20))
-  let shaClaimed = buffer.slice(-20).toString('hex')
-  if (shaClaimed !== shaComputed) {
-    throw new Error(
-      `Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
-    )
-  }
-  if (buffer.byteLength > 2048 * 1024 * 1024) {
-    throw new Error(
-      `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
-    )
-  }
-  let fanout = []
-  for (let i = 0; i < 256; i++) {
-    fanout.push(reader.readUInt32BE())
-  }
-  let size = fanout[255]
-  // For now we'll parse the whole thing. We can optimize later if we need to.
-  let hashes = []
-  for (let i = 0; i < size; i++) {
-    hashes.push(reader.slice(20).toString('hex'))
-  }
-  let crcs = new Map()
-  for (let i = 0; i < size; i++) {
-    crcs.set(hashes[i], reader.readUInt32BE())
-  }
-  let offsets = new Map()
-  for (let i = 0; i < size; i++) {
-    offsets.set(hashes[i], reader.readUInt32BE())
-  }
-  let packfileSha = reader.slice(20).toString('hex')
-  // We might also want a reverse mapping from offsets to oids for debugging.
-  let reverseOffsets = new Map()
-  for (let [key, value] of offsets) {
-    reverseOffsets.set(value, key)
-  }
-  // Knowing the length of each slice isn't strictly needed, but it is
-  // nice to have.
-  let lengths = Array.from(offsets)
-  lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
-  let sizes = new Map()
-  let slices = new Map()
-  for (let i = 0; i < size - 1; i++) {
-    sizes.set(lengths[i][0], lengths[i + 1][1] - lengths[i][1])
-    slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
-  }
-  slices.set(lengths[size - 1][0], [lengths[size - 1][1], undefined])
-  return {
-    size,
-    fanout,
-    hashes,
-    crcs,
-    offsets,
-    packfileSha,
-    slices,
-    reverseOffsets
-  }
-}
-
-// for now we'll just write it in memory.
-// TODO: make a streaming version?
-function writeIDX ({ hashes, crcs, offsets, slices, packfileSha, pack }) {
-  let size = hashes.length
-  let buffers = []
-  let write = (str, encoding) => {
-    buffers.push(Buffer.from(str, encoding))
-  }
-  // Write out IDX v2 magic number
-  write('ff744f63', 'hex')
-  // Write out version number 2
-  write('00000002', 'hex')
-  // Write fanout table
-  let fanoutBuffer = new BufferCursor(Buffer.alloc(256 * 4))
-  for (let i = 0; i < 256; i++) {
-    let count = 0
-    for (let hash of hashes) {
-      if (parseInt(hash.slice(0, 2), 16) <= i) count++
-    }
-    fanoutBuffer.writeUInt32BE(count)
-  }
-  buffers.push(fanoutBuffer.buffer)
-  // Write out hashes
-  for (let hash of hashes) {
-    write(hash, 'hex')
-  }
-  // Write out crcs
-  let crcsBuffer = new BufferCursor(Buffer.alloc(size * 4))
-  for (let hash of hashes) {
-    let crc = crc32(pack.slice(...slices.get(hash)))
-    // console.log('expected =', crcs.get(hash), 'actual =', crc)
-    crcsBuffer.writeUInt32BE(crc)
-  }
-  buffers.push(crcsBuffer.buffer)
-  // Write out offsets
-  let offsetsBuffer = new BufferCursor(Buffer.alloc(size * 4))
-  for (let hash of hashes) {
-    offsetsBuffer.writeUInt32BE(offsets.get(hash))
-  }
-  buffers.push(offsetsBuffer.buffer)
-  // Write out packfile checksum
-  write(packfileSha, 'hex')
-  // Write out shasum
-  let totalBuffer = Buffer.concat(buffers)
-  let sha = shasum(totalBuffer)
-  let shaBuffer = Buffer.alloc(20)
-  shaBuffer.write(sha, 'hex')
-  return Buffer.concat([totalBuffer, shaBuffer])
-}
-
-function shastream () {
-  const hash = crypto.createHash('sha1')
-  return {
-    passThroughSha: through2(function (chunk, enc, next) {
-      hash.update(chunk)
-      this.push(chunk)
-      next()
-    }),
-    digest: () => hash.digest('hex')
-  }
-}
-
 /** @ignore */
 export class GitPackfile {
-  constructor ({
-    pack,
-    size,
-    fanout,
-    hashes,
-    crcs,
-    offsets,
-    packfileSha,
-    slices,
-    reverseOffsets
-  }) {
-    // Compare checksums
-    let shaClaimed = pack.slice(-20).toString('hex')
-    if (packfileSha !== shaClaimed) {
-      throw new Error(
-        `Invalid packfile shasum in IDX buffer: expected ${packfileSha} but saw ${shaClaimed}`
-      )
-    }
+  constructor ({ pack, idx }) {
     Object.assign(this, {
       pack,
-      size,
-      fanout,
-      hashes,
-      crcs,
-      offsets,
-      packfileSha,
-      slices,
-      reverseOffsets
+      idx
     })
   }
-  static async fromIDX ({ idx, pack }) {
-    return new GitPackfile({ pack, ...parseIDX(idx) })
-  }
-  static async createIDX ({ pack }) {
-    let packfileStream = buffer2stream(pack)
-    let hashes = []
-    let datas = new Map()
-    let crcs = new Map()
-    let offsets = new Map()
-    let types = new Map()
-    let reverseOffsets = new Map()
-    let { passThroughSha, digest } = shastream()
-    const listpackTypes = {
-      1: 'commit',
-      2: 'tree',
-      3: 'blob',
-      4: 'tag',
-      6: 'ofs-delta',
-      7: 'ref-delta'
+  static async from ({ pack, idx = null }) {
+    // Packfiles do not store a list of the object ids (SHA1 hashes) they contain.
+    // Therefore, reading individual objects from a packfile can only be done
+    // after scanning and unzipping all of the objects in a packfile to discover
+    // the oids.
+    //
+    // For efficiency's sake, after the scan we hold onto the results, which tell us
+    // what objects are in the packfile and where in the file (measured as the starting
+    // and ending indices of the bytes for that object). This is canonically saved in
+    // a .idx file next to the .pack file in .git/objects/pack.
+    //
+    // If an .idx file is available, use it.
+    if (idx) {
+      idx = await GitPackIndex.fromIdx(idx)
+    // Else generate an index by scanning.
+    } else {
+      idx = await GitPackIndex.fromPack(pack)
+      // Note: The caller is responsible for saving the result back to disk using
+      // this.idx.toBuffer()
     }
-    await new Promise((resolve, reject) => {
-      packfileStream
-        .pipe(passThroughSha)
-        .pipe(listpack())
-        .on('data', ({ data, type, reference, offset, num }) => {
-          type = listpackTypes[type]
-          if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
-            let { oid } = GitObject.wrap({ type, object: data })
-            hashes.push(oid)
-            datas.set(oid, data)
-            types.set(oid, type)
-            crcs.set(oid, crc32(data))
-            offsets.set(oid, offset)
-            reverseOffsets.set(offset, oid)
-          } else if (type === 'ofs-delta') {
-            let offsetAsNumber = decodeVarInt(new BufferCursor(reference))
-            let position = offset - offsetAsNumber
-            let baseoid = reverseOffsets.get(position)
-            let basedata = datas.get(baseoid)
-            let basetype = types.get(baseoid)
-            type = basetype
-            data = applyDelta(data, basedata)
-            let { oid } = GitObject.wrap({ type, object: data })
-            hashes.push(oid)
-            datas.set(oid, data)
-            types.set(oid, basetype)
-            crcs.set(oid, crc32(data))
-            offsets.set(oid, offset)
-            reverseOffsets.set(offset, oid)
-          } else if (type === 'ref-delta') {
-            let baseoid = Buffer.from(reference).toString('hex')
-            let basedata = datas.get(baseoid)
-            let basetype = types.get(baseoid)
-            type = basetype
-            data = applyDelta(data, basedata)
-            let { oid } = GitObject.wrap({ type, object: data })
-            hashes.push(oid)
-            datas.set(oid, data)
-            types.set(oid, basetype)
-            crcs.set(oid, crc32(data))
-            offsets.set(oid, offset)
-            reverseOffsets.set(offset, oid)
-          }
-          if (num === 0) resolve()
-        })
-    })
-    hashes.sort()
-    // Knowing the length of each slice isn't strictly needed, but it is
-    // nice to have.
-    let size = hashes.length
-    let lengths = Array.from(offsets)
-    lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
-    let sizes = new Map()
-    let slices = new Map()
-    for (let i = 0; i < size - 1; i++) {
-      sizes.set(lengths[i][0], lengths[i + 1][1] - lengths[i][1])
-      slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
-    }
-    slices.set(lengths[size - 1][0], [
-      lengths[size - 1][1],
-      pack.byteLength - 20
-    ])
-    console.log(slices.get(lengths[size - 1][0]))
-    let idx = await writeIDX({
-      hashes,
-      crcs,
-      offsets,
-      slices,
-      packfileSha: digest(),
-      pack
-    })
-    return idx
-  }
-  async writeIDX () {
-    return writeIDX(this)
+    return new GitPackfile({ pack, idx })
   }
   // NOTE:
-  // Currently, the code for CREATING a pack file is in `src/commands/push.js`
-  // I forget why it's there instead of here. Maybe the GitPackfile model was created after the fact?
+  // Currently, the code for WRITING a pack file is in `src/commands/push.js`
+  // I forget why it is there instead of here. Maybe the GitPackfile model was created after the fact?
   // anyway, look there for the inverse, e.g. how to serialize to a packfile.
   async read ({ oid } /*: {oid: string} */) {
-    if (!this.slices.has(oid)) return null
-    let [start, end] = this.slices.get(oid)
+    if (!this.idx.slices.has(oid)) return null
+    let [start, end] = this.idx.slices.get(oid)
     return this.readSlice({ start, end })
   }
   async readSlice ({ start, end }) {
