@@ -93,17 +93,17 @@
     "nps": "^5.7.1",
     "nps-utils": "^1.4.0",
     "parse-header-stream": "^1.1.1",
-    "prettier-standard": "^7.0.3",
+    "prettier-standard": "^8.0.0",
     "rollup": "^0.51.6",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-json": "^2.3.0",
+    "semantic-release": "^8.2.0",
     "standard": "^10.0.3",
     "stream-equal": "^1.0.1",
     "tape": "^4.8.0",
     "uglify-es": "^3.1.2",
     "watch": "^1.0.2",
-    "watchify": "^3.9.0",
-    "semantic-release": "^8.2.0"
+    "watchify": "^3.9.0"
   },
   "ava": {
     "source": [

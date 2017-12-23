@@ -158,13 +158,13 @@ export class GitCommit {
       headers += '\n'
     }
     let author = obj.author
-    headers += `author ${author.name} <${author.email}> ${author.timestamp} ${formatTimezoneOffset(
-      author.timezoneOffset
-    )}\n`
+    headers += `author ${author.name} <${author.email}> ${
+      author.timestamp
+    } ${formatTimezoneOffset(author.timezoneOffset)}\n`
     let committer = obj.committer || obj.author
-    headers += `committer ${committer.name} <${committer.email}> ${committer.timestamp} ${formatTimezoneOffset(
-      committer.timezoneOffset
-    )}\n`
+    headers += `committer ${committer.name} <${committer.email}> ${
+      committer.timestamp
+    } ${formatTimezoneOffset(committer.timezoneOffset)}\n`
     if (obj.gpgsig) {
       headers += 'gpgsig' + indent(obj.gpgsig)
     }
