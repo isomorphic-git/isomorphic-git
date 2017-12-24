@@ -8,9 +8,14 @@ const git = require('.')
 
 minimisted(async function ({ _: [command, ...args], ...opts }) {
   // What's the command?
-  let cmd = `git.${command}({fs, dir: '.', ${JSON.stringify(opts).slice(1)})`
+  let cmd = `>> git.${command}({fs, dir: '.', ${JSON.stringify(opts).slice(1)})`
   console.log(cmd)
-  let result = await git[command](Object.assign({ fs, dir: '.' }, opts))
-  if (result === undefined) return
-  console.log(JSON.stringify(result, null, 2))
+  try {
+    let result = await git[command](Object.assign({ fs, dir: '.' }, opts))
+    if (result === undefined) return
+    console.log(JSON.stringify(result, null, 2))
+  } catch (err) {
+    process.stderr.write(err.message + '\n')
+    process.exit(1)
+  }
 })
