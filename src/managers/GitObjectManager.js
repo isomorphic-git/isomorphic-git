@@ -49,7 +49,7 @@ export class GitObjectManager {
             await p.load({ pack })
           }
           // Get the resolved git object from the packfile
-          return await p.read({ oid, getExternalRefDelta })
+          return p.read({ oid, getExternalRefDelta })
         }
       }
     }

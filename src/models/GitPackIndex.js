@@ -123,13 +123,6 @@ export class GitPackIndex {
     })
   }
   static async fromPack ({ pack, getExternalRefDelta }) {
-    let packfileStream = buffer2stream(pack)
-    let hashes = []
-    let datas = new Map()
-    let crcs = new Map()
-    let offsets = new Map()
-    let types = new Map()
-    let reverseOffsets = new Map()
     const listpackTypes = {
       1: 'commit',
       2: 'tree',
@@ -138,88 +131,163 @@ export class GitPackIndex {
       6: 'ofs-delta',
       7: 'ref-delta'
     }
+    let packfileStream = buffer2stream(pack)
+    let offsetToObject = new Map()
+    let oidToObject = new Map()
+
+    let hashes = []
+    let datas = new Map()
+    let crcs = new Map()
+    let offsets = new Map()
+    let types = new Map()
+    let reverseOffsets = new Map()
     let backlog = []
     let totalObjectCount = null
     let lastPercent = null
+    console.log('Indexing objects')
     await new Promise((resolve, reject) => {
       packfileStream
         .pipe(listpack())
         .on('data', async ({ data, type, reference, offset, num }) => {
-          // packfileStream.pause()
           if (totalObjectCount === null) totalObjectCount = num
           let percent = Math.floor(
             (totalObjectCount - num) * 100 / totalObjectCount
           )
           if (percent !== lastPercent) console.log(`${percent}%`)
           lastPercent = percent
+          // Change type from a number to a meaningful string
           type = listpackTypes[type]
           if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
-            let { oid } = GitObject.wrap({ type, object: data })
-            hashes.push(oid)
-            datas.set(oid, data)
-            types.set(oid, type)
-            offsets.set(oid, offset)
-            reverseOffsets.set(offset, oid)
+            offsetToObject.set(offset, {
+              type,
+              offset,
+              data
+            })
+            
+            // let { oid } = GitObject.wrap({ type, object: data })
+            // hashes.push(oid)
+            // datas.set(oid, data)
+            // types.set(oid, type)
+            // offsets.set(oid, offset)
+            // reverseOffsets.set(offset, oid)
           } else if (type === 'ofs-delta') {
             let offsetAsNumber = decodeVarInt(new BufferCursor(reference))
-            let position = offset - offsetAsNumber
-            let baseoid = reverseOffsets.get(position)
-            let basedata = datas.get(baseoid)
-            let basetype = types.get(baseoid)
-            type = basetype
-            data = applyDelta(data, basedata)
-            let { oid } = GitObject.wrap({ type, object: data })
-            hashes.push(oid)
-            datas.set(oid, data)
-            types.set(oid, basetype)
-            offsets.set(oid, offset)
-            reverseOffsets.set(offset, oid)
+            let baseOffset = offset - offsetAsNumber
+            offsetToObject.set(offset, {
+              type,
+              offset,
+              delta: data,
+              baseOffset
+            })
+            // let baseOid = reverseOffsets.get(baseOffset)
+            // let basedata = datas.get(baseOid)
+            // let basetype = types.get(baseOid)
+            // type = basetype
+            // data = applyDelta(data, basedata)
+            // let { oid } = GitObject.wrap({ type, object: data })
+            // hashes.push(oid)
+            // datas.set(oid, data)
+            // types.set(oid, basetype)
+            // offsets.set(oid, offset)
+            // reverseOffsets.set(offset, oid)
           } else if (type === 'ref-delta') {
-            let baseoid = Buffer.from(reference).toString('hex')
-            // console.log('ref-delta', baseoid)
-            let basedata = null
-            let basetype = null
-            if (hashes.includes(baseoid)) {
-              basedata = datas.get(baseoid)
-              basetype = types.get(baseoid)
-            } else {
-              ;({
-                type: basetype,
-                object: basedata
-              } = await getExternalRefDelta(oid))
-            }
-            type = basetype
-            // console.log(data === undefined, basedata === undefined)
-            if (basedata !== undefined) {
-              data = applyDelta(data, basedata)
-              let { oid } = GitObject.wrap({ type, object: data })
-              hashes.push(oid)
-              datas.set(oid, data)
-              types.set(oid, basetype)
-              offsets.set(oid, offset)
-              reverseOffsets.set(offset, oid)
-            } else {
-              backlog.push({
-                baseoid,
-                offset,
-                data
-              })
-            }
+            let baseOid = Buffer.from(reference).toString('hex')
+            offsetToObject.set(offset, {
+              type,
+              offset,
+              delta: data,
+              baseOid
+            })
+            // console.log('ref-delta', baseOid)
+            // let basedata = null
+            // let basetype = null
+            // if (hashes.includes(baseOid)) {
+            //   basedata = datas.get(baseOid)
+            //   basetype = types.get(baseOid)
+            // } else {
+            //   ;({
+            //     type: basetype,
+            //     object: basedata
+            //   } = await getExternalRefDelta(oid))
+            // }
+            // type = basetype
+            // // console.log(data === undefined, basedata === undefined)
+            // if (basedata !== undefined) {
+            //   data = applyDelta(data, basedata)
+            //   let { oid } = GitObject.wrap({ type, object: data })
+            //   hashes.push(oid)
+            //   datas.set(oid, data)
+            //   types.set(oid, basetype)
+            //   offsets.set(oid, offset)
+            //   reverseOffsets.set(offset, oid)
+            // } else {
+            //   backlog.push({
+            //     baseOid,
+            //     offset,
+            //     data
+            //   })
+            // }
           }
-          // packfileStream.resume()
           if (num === 0) resolve()
         })
     })
-    if (backlog.length > 0) {
-      throw new Error(`fatal: pack has ${backlog.length} unresolved deltas`)
+
+    let oidToOffset = new Map()
+    
+    async function resolveDeltas (o) {
+      if (o.data) {
+        return
+      } else {
+        let base
+        if (o.type === 'ofs-delta') {
+          base = offsetToObject.get(o.baseOffset)
+        } else if (o.type === 'ref-delta') {
+          base = oidToObject.get(o.baseOid)
+          if (!base) {
+            let { type, object } = await getExternalRefDelta(o.baseOid)
+            base = { type, data: object }
+          }
+        }
+        await resolveDeltas(base)
+        o.type = base.type
+        o.data = applyDelta(o.delta, base.data)
+        let { oid } = GitObject.wrap({ type: o.type, object: o.data })
+        o.oid = oid
+        oidToObject.set(oid, o)
+      }
+
     }
+    console.log('Resolving deltas')
+    lastPercent = null
+    let count = 0
+    for (let [offset, o] of offsetToObject) {
+      let percent = Math.floor(
+        count++ * 100 / totalObjectCount
+      )
+      if (percent !== lastPercent) console.log(`${percent}%`)
+      lastPercent = percent
+      if (['commit', 'tree', 'blob', 'tag'].includes(o.type)) {
+        let { oid } = GitObject.wrap({ type: o.type, object: o.data })
+        o.oid = oid
+        oidToObject.set(oid, o)
+      } else if (o.type === 'ofs-delta') {
+        await resolveDeltas(o)
+      } else if (o.type === 'ref-delta') {
+        await resolveDeltas(o)
+      }
+      offsets.set(o.oid, offset)
+    }
+    hashes = Array.from(oidToObject.keys())
+    // if (backlog.length > 0) {
+    //   throw new Error(`fatal: pack has ${backlog.length} unresolved deltas`)
+    // }
     // // Finish backlog
     // while (backlog.length > 0) {
     //   console.log(backlog.length)
-    //   let { baseoid, offset, data } = backlog.shift()
-    //   // console.log('ref-delta', baseoid)
-    //   let basedata = datas.get(baseoid)
-    //   let basetype = types.get(baseoid)
+    //   let { baseOid, offset, data } = backlog.shift()
+    //   // console.log('ref-delta', baseOid)
+    //   let basedata = datas.get(baseOid)
+    //   let basetype = types.get(baseOid)
     //   let type = basetype
     //   // console.log(data === undefined, basedata === undefined)
     //   if (basedata !== undefined) {
@@ -232,7 +300,7 @@ export class GitPackIndex {
     //     reverseOffsets.set(offset, oid)
     //   } else {
     //     backlog.push({
-    //       baseoid,
+    //       baseOid,
     //       data
     //     })
     //   }
@@ -244,10 +312,8 @@ export class GitPackIndex {
     let size = hashes.length
     let lengths = Array.from(offsets)
     lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
-    let sizes = new Map()
     let slices = new Map()
     for (let i = 0; i < size - 1; i++) {
-      sizes.set(lengths[i][0], lengths[i + 1][1] - lengths[i][1])
       slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
     }
     slices.set(lengths[size - 1][0], [
@@ -325,7 +391,7 @@ export class GitPackIndex {
   }
   async read ({ oid, getExternalRefDelta } /*: {oid: string} */) {
     if (!this.slices.has(oid)) {
-      return await getExternalRefDelta(oid)
+      return getExternalRefDelta(oid)
     }
     let [start, end] = this.slices.get(oid)
     return this.readSlice({ start, end })
@@ -369,9 +435,9 @@ export class GitPackIndex {
     // Handle deltified objects
     if (type === 'ofs_delta') {
       let offset = decodeVarInt(reader)
-      let position = start - offset
-      // console.log('base oid =', this.reverseOffsets.get(position))
-      ;({ object: base, type } = await this.readSlice({ start: position }))
+      let baseOffset = start - offset
+      // console.log('base oid =', this.reverseOffsets.get(baseOffset))
+      ;({ object: base, type } = await this.readSlice({ start: baseOffset }))
     }
     if (type === 'ref_delta') {
       let oid = reader.slice(20).toString('hex')
