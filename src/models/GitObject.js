@@ -4,12 +4,18 @@ import shasum from 'shasum'
 
 /** @ignore */
 export class GitObject {
+  static hash ({ type, object }) /*: Promise<string> */ {
+    let buffer = Buffer.concat([
+      Buffer.from(`${type} ${object.byteLength.toString()}\0`),
+      Buffer.from(object)
+    ])
+    let oid = shasum(buffer)
+    return oid
+  }
   static wrap ({ type, object } /*: {type: string, object: Buffer} */) {
     let buffer = Buffer.concat([
-      Buffer.from(type + ' '),
-      Buffer.from(object.byteLength.toString()),
-      Buffer.from([0]),
-      Buffer.from(object)
+      Buffer.from(`${type} ${object.byteLength.toString()}\0`),
+      object
     ])
     let oid = shasum(buffer)
     return {

@@ -127,7 +127,13 @@ export class GitPackIndex {
     let offsets = {}
     let totalObjectCount = null
     let lastPercent = null
-    let times = {}
+    let times = {
+      hash: 0,
+      readSlice: 0,
+      offsets: 0,
+      crcs: 0,
+      sort: 0
+    }
     let histogram = {
       commit: 0,
       tree: 0,
@@ -137,10 +143,12 @@ export class GitPackIndex {
       'ref-delta': 0
     }
     let bytesProcessed = 0
-    times.wrap = 0
 
     console.log('Indexing objects')
-    console.log(`percent\tmilliseconds\tkilobytes\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`)
+    console.log(
+      `percent\tmilliseconds\tkilobytes\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`
+    )
+    marky.mark('total')
     marky.mark('offsets')
     marky.mark('percent')
     await new Promise((resolve, reject) => {
@@ -152,7 +160,17 @@ export class GitPackIndex {
             (totalObjectCount - num) * 100 / totalObjectCount
           )
           if (percent !== lastPercent) {
-            console.log(`${percent}%\t${Math.floor(marky.stop('percent').duration)}\t${Math.floor(process.memoryUsage().rss/1000)}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${histogram.blob}\t${histogram.tag}\t${histogram['ofs-delta']}\t${histogram['ref-delta']}`)
+            console.log(
+              `${percent}%\t${Math.floor(
+                marky.stop('percent').duration
+              )}\t${Math.floor(
+                process.memoryUsage().rss / 1000
+              )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
+                histogram.blob
+              }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
+                histogram['ref-delta']
+              }`
+            )
 
             histogram = {
               commit: 0,
@@ -223,8 +241,9 @@ export class GitPackIndex {
 
     // Resolve deltas and compute the oids
     console.log('Resolving deltas')
-    console.log(`percent2\tmilliseconds2\tkilobytes2\tcallsToReadSlice\tcallsToGetExternal`)
-    marky.mark('deltas')
+    console.log(
+      `percent2\tmilliseconds2\tkilobytes2\tcallsToReadSlice\tcallsToGetExternal`
+    )
     marky.mark('percent')
     lastPercent = null
     let count = 0
@@ -234,7 +253,13 @@ export class GitPackIndex {
       offset = Number(offset)
       let percent = Math.floor(count++ * 100 / totalObjectCount)
       if (percent !== lastPercent) {
-        console.log(`${percent}%\t${Math.floor(marky.stop('percent').duration)}\t${Math.floor(process.memoryUsage().rss/1000)}\t${callsToReadSlice}\t${callsToGetExternal}`)
+        console.log(
+          `${percent}%\t${Math.floor(
+            marky.stop('percent').duration
+          )}\t${Math.floor(
+            process.memoryUsage().rss / 1000
+          )}\t${callsToReadSlice}\t${callsToGetExternal}`
+        )
         marky.mark('percent')
         callsToReadSlice = 0
         callsToGetExternal = 0
@@ -246,12 +271,14 @@ export class GitPackIndex {
       try {
         p.readDepth = 0
         p.externalReadDepth = 0
+        marky.mark('readSlice')
         let { type, object } = await p.readSlice({ start: offset })
+        times.readSlice += marky.stop('readSlice').duration
         callsToReadSlice += p.readDepth
         callsToGetExternal += p.externalReadDepth
-        marky.mark('wrap')
-        let { oid } = GitObject.wrap({ type, object })
-        times.wrap += marky.stop('wrap').duration
+        marky.mark('hash')
+        let oid = GitObject.hash({ type, object })
+        times.hash += marky.stop('hash').duration
         o.oid = oid
         hashes.push(oid)
         offsets[oid] = offset
@@ -261,14 +288,19 @@ export class GitPackIndex {
         continue
       }
     }
-    times['deltas'] = Math.floor(marky.stop('deltas').duration)
 
     marky.mark('sort')
     hashes.sort()
     times['sort'] = Math.floor(marky.stop('sort').duration)
-    times.wrap = Math.floor(times.wrap)
-    console.log(Object.keys(times).join('\t'))
-    console.log(Object.values(times).join('\t'))
+    let totalElapsedTime = marky.stop('total').duration
+    times.hash = Math.floor(times.hash)
+    times.readSlice = Math.floor(times.readSlice)
+    times.misc = Math.floor(times.misc)
+    console.log(Object.keys(times).join('\t') + '\tmisc')
+    console.log(Object.values(times).join('\t') + `\t${totalElapsedTime - Object.values(times).reduce((a, b) => a + b, 0)}`)
+
+    // CONTINUE HERE: Probably we need an LRU cache to speed up deltas.
+    // We could plot a histogram of oids to see how many oids we need to cache to have a big impact.
 
     return p
   }
