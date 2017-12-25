@@ -51,8 +51,8 @@ export class GitPackIndex {
   constructor (stuff) {
     Object.assign(this, stuff)
   }
-  static async fromIdx (buffer) {
-    let reader = new BufferCursor(buffer)
+  static async fromIdx ({ idx, getExternalRefDelta }) {
+    let reader = new BufferCursor(idx)
     let magic = reader.slice(4).toString('hex')
     // Check for IDX v2 magic number
     if (magic !== 'ff744f63') {
@@ -65,14 +65,14 @@ export class GitPackIndex {
       )
     }
     // Verify checksums
-    let shaComputed = shasum(buffer.slice(0, -20))
-    let shaClaimed = buffer.slice(-20).toString('hex')
+    let shaComputed = shasum(idx.slice(0, -20))
+    let shaClaimed = idx.slice(-20).toString('hex')
     if (shaClaimed !== shaComputed) {
       throw new Error(
         `Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
       )
     }
-    if (buffer.byteLength > 2048 * 1024 * 1024) {
+    if (idx.byteLength > 2048 * 1024 * 1024) {
       throw new Error(
         `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
       )
@@ -105,21 +105,17 @@ export class GitPackIndex {
     // nice to have.
     let lengths = Array.from(offsets)
     lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
-    let sizes = new Map()
     let slices = new Map()
     for (let i = 0; i < size - 1; i++) {
-      sizes.set(lengths[i][0], lengths[i + 1][1] - lengths[i][1])
       slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
     }
     slices.set(lengths[size - 1][0], [lengths[size - 1][1], undefined])
     return new GitPackIndex({
-      size,
       hashes,
       crcs,
       offsets,
       packfileSha,
-      slices,
-      reverseOffsets
+      getExternalRefDelta
     })
   }
   static async fromPack ({ pack, getExternalRefDelta }) {
@@ -131,9 +127,14 @@ export class GitPackIndex {
       6: 'ofs-delta',
       7: 'ref-delta'
     }
-    let packfileStream = buffer2stream(pack)
     let offsetToObject = new Map()
     let oidToObject = new Map()
+
+    // Older packfiles do NOT use the shasum of the pack itself,
+    // so it is recommended to just use whatever bytes are in the trailer.
+    // Source: https://github.com/git/git/commit/1190a1acf800acdcfd7569f87ac1560e2d077414
+    // let packfileSha = shasum(pack.slice(0, -20))
+    let packfileSha = pack.slice(-20).toString('hex')
 
     let hashes = []
     let datas = new Map()
@@ -146,7 +147,7 @@ export class GitPackIndex {
     let lastPercent = null
     console.log('Indexing objects')
     await new Promise((resolve, reject) => {
-      packfileStream
+      buffer2stream(pack)
         .pipe(listpack())
         .on('data', async ({ data, type, reference, offset, num }) => {
           if (totalObjectCount === null) totalObjectCount = num
@@ -161,9 +162,9 @@ export class GitPackIndex {
             offsetToObject.set(offset, {
               type,
               offset,
-              data
+              // data
             })
-            
+
             // let { oid } = GitObject.wrap({ type, object: data })
             // hashes.push(oid)
             // datas.set(oid, data)
@@ -176,8 +177,8 @@ export class GitPackIndex {
             offsetToObject.set(offset, {
               type,
               offset,
-              delta: data,
-              baseOffset
+              // delta: data,
+              // baseOffset
             })
             // let baseOid = reverseOffsets.get(baseOffset)
             // let basedata = datas.get(baseOid)
@@ -195,8 +196,8 @@ export class GitPackIndex {
             offsetToObject.set(offset, {
               type,
               offset,
-              delta: data,
-              baseOid
+              // delta: data,
+              // baseOid
             })
             // console.log('ref-delta', baseOid)
             // let basedata = null
@@ -232,112 +233,99 @@ export class GitPackIndex {
         })
     })
 
-    let oidToOffset = new Map()
-    
-    async function resolveDeltas (o) {
-      if (o.data) {
-        return
-      } else {
-        let base
-        if (o.type === 'ofs-delta') {
-          base = offsetToObject.get(o.baseOffset)
-        } else if (o.type === 'ref-delta') {
-          base = oidToObject.get(o.baseOid)
-          if (!base) {
-            let { type, object } = await getExternalRefDelta(o.baseOid)
-            base = { type, data: object }
-          }
-        }
-        await resolveDeltas(base)
-        o.type = base.type
-        o.data = applyDelta(o.delta, base.data)
-        let { oid } = GitObject.wrap({ type: o.type, object: o.data })
-        o.oid = oid
-        oidToObject.set(oid, o)
-      }
-
+    console.log('Computing CRCs')
+    // We need to know the lengths of the slices to compute the CRCs.
+    let size = offsetToObject.size
+    let offsetArray = Array.from(offsetToObject.keys())
+    for (let [i, start] of offsetArray.entries()) {
+      let end = (i + 1 === offsetArray.length) ? pack.byteLength - 20 : offsetArray[i + 1]
+      let o = offsetToObject.get(start)
+      let crc = crc32(pack.slice(start, end))
+      o.end = end
+      o.crc = crc
     }
+
+    // We don't have the hashes yet. But we can generate them using the .readSlice function!
+    const p = new GitPackIndex({
+      pack,
+      packfileSha,
+      crcs,
+      hashes,
+      offsets,
+      getExternalRefDelta
+    })
+
+    // Resolve deltas and compute the oids
     console.log('Resolving deltas')
     lastPercent = null
     let count = 0
     for (let [offset, o] of offsetToObject) {
-      let percent = Math.floor(
-        count++ * 100 / totalObjectCount
-      )
+      let percent = Math.floor(count++ * 100 / totalObjectCount)
       if (percent !== lastPercent) console.log(`${percent}%`)
       lastPercent = percent
-      if (['commit', 'tree', 'blob', 'tag'].includes(o.type)) {
-        let { oid } = GitObject.wrap({ type: o.type, object: o.data })
+      try {
+        let { type, object } = await p.readSlice({ start: offset })
+        let { oid } = GitObject.wrap({ type, object })
         o.oid = oid
-        oidToObject.set(oid, o)
-      } else if (o.type === 'ofs-delta') {
-        await resolveDeltas(o)
-      } else if (o.type === 'ref-delta') {
-        await resolveDeltas(o)
+        hashes.push(oid)
+        offsets.set(oid, offset)
+        crcs.set(oid, o.crc)
+      } catch (err) {
+        console.log('ERROR', err)
+        continue
       }
-      offsets.set(o.oid, offset)
     }
-    hashes = Array.from(oidToObject.keys())
-    // if (backlog.length > 0) {
-    //   throw new Error(`fatal: pack has ${backlog.length} unresolved deltas`)
-    // }
-    // // Finish backlog
-    // while (backlog.length > 0) {
-    //   console.log(backlog.length)
-    //   let { baseOid, offset, data } = backlog.shift()
-    //   // console.log('ref-delta', baseOid)
-    //   let basedata = datas.get(baseOid)
-    //   let basetype = types.get(baseOid)
-    //   let type = basetype
-    //   // console.log(data === undefined, basedata === undefined)
-    //   if (basedata !== undefined) {
-    //     data = applyDelta(data, basedata)
-    //     let { oid } = GitObject.wrap({ type, object: data })
-    //     hashes.push(oid)
-    //     datas.set(oid, data)
-    //     types.set(oid, basetype)
-    //     offsets.set(oid, offset)
-    //     reverseOffsets.set(offset, oid)
+
+    // async function resolveDeltas (o) {
+    //   if (o.data) {
+    //     return
     //   } else {
-    //     backlog.push({
-    //       baseOid,
-    //       data
-    //     })
+    //     let base
+    //     if (o.type === 'ofs-delta') {
+    //       base = offsetToObject.get(o.baseOffset)
+    //     } else if (o.type === 'ref-delta') {
+    //       base = oidToObject.get(o.baseOid)
+    //       if (!base) {
+    //         let { type, object } = await getExternalRefDelta(o.baseOid)
+    //         base = { type, data: object }
+    //       }
+    //     }
+    //     await resolveDeltas(base)
+    //     o.type = base.type
+    //     o.data = applyDelta(o.delta, base.data)
+    //     let { oid } = GitObject.wrap({ type: o.type, object: o.data })
+    //     o.oid = oid
+    //     oidToObject.set(oid, o)
     //   }
     // }
-    // let packfileSha = shasum(Buffer.from(hashes.join(''), 'hex'))
+    // console.log('Resolving deltas')
+    // lastPercent = null
+    // let count = 0
+    // for (let [offset, o] of offsetToObject) {
+    //   let percent = Math.floor(count++ * 100 / totalObjectCount)
+    //   if (percent !== lastPercent) console.log(`${percent}%`)
+    //   lastPercent = percent
+    //   if (['commit', 'tree', 'blob', 'tag'].includes(o.type)) {
+    //     let { oid } = GitObject.wrap({ type: o.type, object: o.data })
+    //     o.oid = oid
+    //     oidToObject.set(oid, o)
+    //   } else if (o.type === 'ofs-delta') {
+    //     await resolveDeltas(o)
+    //   } else if (o.type === 'ref-delta') {
+    //     await resolveDeltas(o)
+    //   }
+    //   offsets.set(o.oid, offset)
+    // }
+
+    // hashes = Array.from(oidToObject.keys())
     hashes.sort()
-    // Knowing the length of each slice isn't strictly needed, but it is
-    // nice to have.
-    let size = hashes.length
-    let lengths = Array.from(offsets)
-    lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
-    let slices = new Map()
-    for (let i = 0; i < size - 1; i++) {
-      slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
-    }
-    slices.set(lengths[size - 1][0], [
-      lengths[size - 1][1],
-      pack.byteLength - 20
-    ])
-    for (let hash of hashes) {
-      let crc = crc32(pack.slice(...slices.get(hash)))
-      crcs.set(hash, crc)
-    }
-    // Older packfiles do NOT use the shasum of the pack itself,
-    // so it is recommended to just use whatever bytes are in the trailer.
-    // Source: https://github.com/git/git/commit/1190a1acf800acdcfd7569f87ac1560e2d077414
-    // let packfileSha = shasum(pack.slice(0, -20))
-    let packfileSha = pack.slice(-20).toString('hex')
-    return new GitPackIndex({
-      size,
-      hashes,
-      crcs,
-      offsets,
-      packfileSha,
-      slices,
-      reverseOffsets
-    })
+
+    // for (let offset of offsetToObject.keys()) {
+    //   let o = offsetToObject.get(offset)
+    //   crcs.set(o.oid, o.crc)
+    // }
+
+    return p
   }
   toBuffer () {
     let buffers = []
@@ -389,14 +377,18 @@ export class GitPackIndex {
   async unload () {
     this.pack = null
   }
-  async read ({ oid, getExternalRefDelta } /*: {oid: string} */) {
-    if (!this.slices.has(oid)) {
-      return getExternalRefDelta(oid)
+  async read ({ oid } /*: {oid: string} */) {
+    if (!this.offsets.has(oid)) {
+      if (this.getExternalRefDelta) {
+        return this.getExternalRefDelta(oid)
+      } else {
+        throw new Error(`Could not read object ${oid} from packfile`)
+      }
     }
-    let [start, end] = this.slices.get(oid)
-    return this.readSlice({ start, end })
+    let start = this.offsets.get(oid)
+    return this.readSlice({ start })
   }
-  async readSlice ({ start, end }) {
+  async readSlice ({ start }) {
     const types = {
       0b0010000: 'commit',
       0b0100000: 'tree',
@@ -410,7 +402,7 @@ export class GitPackIndex {
         'Tried to read from a GitPackIndex with no packfile loaded into memory'
       )
     }
-    let raw = this.pack.slice(start, end)
+    let raw = this.pack.slice(start)
     let reader = new BufferCursor(raw)
     let byte = reader.readUInt8()
     // Object type is encoded in bits 654
