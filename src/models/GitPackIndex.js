@@ -6,6 +6,7 @@ import { GitObject } from './GitObject'
 import crc32 from 'crc/lib/crc32.js'
 import { PassThrough } from 'stream'
 import pako from 'pako'
+import marky from 'marky'
 
 function buffer2stream (buffer) {
   let stream = new PassThrough()
@@ -126,7 +127,22 @@ export class GitPackIndex {
     let offsets = {}
     let totalObjectCount = null
     let lastPercent = null
+    let times = {}
+    let histogram = {
+      commit: 0,
+      tree: 0,
+      blob: 0,
+      tag: 0,
+      'ofs-delta': 0,
+      'ref-delta': 0
+    }
+    let bytesProcessed = 0
+    times.wrap = 0
+
     console.log('Indexing objects')
+    console.log(`percent\tmilliseconds\tkilobytes\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`)
+    marky.mark('offsets')
+    marky.mark('percent')
     await new Promise((resolve, reject) => {
       buffer2stream(pack)
         .pipe(listpack())
@@ -135,10 +151,27 @@ export class GitPackIndex {
           let percent = Math.floor(
             (totalObjectCount - num) * 100 / totalObjectCount
           )
-          if (percent !== lastPercent) console.log(`${percent}%`)
+          if (percent !== lastPercent) {
+            console.log(`${percent}%\t${Math.floor(marky.stop('percent').duration)}\t${Math.floor(process.memoryUsage().rss/1000)}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${histogram.blob}\t${histogram.tag}\t${histogram['ofs-delta']}\t${histogram['ref-delta']}`)
+
+            histogram = {
+              commit: 0,
+              tree: 0,
+              blob: 0,
+              tag: 0,
+              'ofs-delta': 0,
+              'ref-delta': 0
+            }
+            bytesProcessed = 0
+            marky.mark('percent')
+          }
           lastPercent = percent
           // Change type from a number to a meaningful string
           type = listpackTypes[type]
+
+          histogram[type]++
+          bytesProcessed += data.byteLength
+
           if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
             offsetToObject[offset] = {
               type,
@@ -161,8 +194,10 @@ export class GitPackIndex {
           if (num === 0) resolve()
         })
     })
+    times['offsets'] = Math.floor(marky.stop('offsets').duration)
 
     console.log('Computing CRCs')
+    marky.mark('crcs')
     // We need to know the lengths of the slices to compute the CRCs.
     let offsetArray = Object.keys(offsetToObject).map(Number)
     let size = offsetArray.length
@@ -174,6 +209,7 @@ export class GitPackIndex {
       o.end = end
       o.crc = crc
     }
+    times['crcs'] = Math.floor(marky.stop('crcs').duration)
 
     // We don't have the hashes yet. But we can generate them using the .readSlice function!
     const p = new GitPackIndex({
@@ -187,17 +223,35 @@ export class GitPackIndex {
 
     // Resolve deltas and compute the oids
     console.log('Resolving deltas')
+    console.log(`percent2\tmilliseconds2\tkilobytes2\tcallsToReadSlice\tcallsToGetExternal`)
+    marky.mark('deltas')
+    marky.mark('percent')
     lastPercent = null
     let count = 0
+    let callsToReadSlice = 0
+    let callsToGetExternal = 0
     for (let offset in offsetToObject) {
-      let o = offsetToObject[offset]
       offset = Number(offset)
       let percent = Math.floor(count++ * 100 / totalObjectCount)
-      if (percent !== lastPercent) console.log(`${percent}%`)
+      if (percent !== lastPercent) {
+        console.log(`${percent}%\t${Math.floor(marky.stop('percent').duration)}\t${Math.floor(process.memoryUsage().rss/1000)}\t${callsToReadSlice}\t${callsToGetExternal}`)
+        marky.mark('percent')
+        callsToReadSlice = 0
+        callsToGetExternal = 0
+      }
       lastPercent = percent
+
+      let o = offsetToObject[offset]
+      if (o.oid) continue
       try {
+        p.readDepth = 0
+        p.externalReadDepth = 0
         let { type, object } = await p.readSlice({ start: offset })
+        callsToReadSlice += p.readDepth
+        callsToGetExternal += p.externalReadDepth
+        marky.mark('wrap')
         let { oid } = GitObject.wrap({ type, object })
+        times.wrap += marky.stop('wrap').duration
         o.oid = oid
         hashes.push(oid)
         offsets[oid] = offset
@@ -207,8 +261,14 @@ export class GitPackIndex {
         continue
       }
     }
+    times['deltas'] = Math.floor(marky.stop('deltas').duration)
 
+    marky.mark('sort')
     hashes.sort()
+    times['sort'] = Math.floor(marky.stop('sort').duration)
+    times.wrap = Math.floor(times.wrap)
+    console.log(Object.keys(times).join('\t'))
+    console.log(Object.values(times).join('\t'))
 
     return p
   }
@@ -265,6 +325,7 @@ export class GitPackIndex {
   async read ({ oid } /*: {oid: string} */) {
     if (!this.offsets[oid]) {
       if (this.getExternalRefDelta) {
+        this.externalReadDepth++
         return this.getExternalRefDelta(oid)
       } else {
         throw new Error(`Could not read object ${oid} from packfile`)
@@ -274,6 +335,7 @@ export class GitPackIndex {
     return this.readSlice({ start })
   }
   async readSlice ({ start }) {
+    this.readDepth++
     const types = {
       0b0010000: 'commit',
       0b0100000: 'tree',
