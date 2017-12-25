@@ -87,29 +87,15 @@ export class GitPackIndex {
     for (let i = 0; i < size; i++) {
       hashes.push(reader.slice(20).toString('hex'))
     }
-    let crcs = new Map()
+    let crcs = {}
     for (let i = 0; i < size; i++) {
-      crcs.set(hashes[i], reader.readUInt32BE())
+      crcs[hashes[i]] = reader.readUInt32BE()
     }
-    let offsets = new Map()
+    let offsets = {}
     for (let i = 0; i < size; i++) {
-      offsets.set(hashes[i], reader.readUInt32BE())
+      offsets[hashes[i]] = reader.readUInt32BE()
     }
     let packfileSha = reader.slice(20).toString('hex')
-    // We might also want a reverse mapping from offsets to oids for debugging.
-    let reverseOffsets = new Map()
-    for (let [key, value] of offsets) {
-      reverseOffsets.set(value, key)
-    }
-    // Knowing the length of each slice isn't strictly needed, but it is
-    // nice to have.
-    let lengths = Array.from(offsets)
-    lengths.sort((a, b) => a[1] - b[1]) // List objects in order by offset
-    let slices = new Map()
-    for (let i = 0; i < size - 1; i++) {
-      slices.set(lengths[i][0], [lengths[i][1], lengths[i + 1][1]])
-    }
-    slices.set(lengths[size - 1][0], [lengths[size - 1][1], undefined])
     return new GitPackIndex({
       hashes,
       crcs,
@@ -127,8 +113,7 @@ export class GitPackIndex {
       6: 'ofs-delta',
       7: 'ref-delta'
     }
-    let offsetToObject = new Map()
-    let oidToObject = new Map()
+    let offsetToObject = {}
 
     // Older packfiles do NOT use the shasum of the pack itself,
     // so it is recommended to just use whatever bytes are in the trailer.
@@ -137,12 +122,8 @@ export class GitPackIndex {
     let packfileSha = pack.slice(-20).toString('hex')
 
     let hashes = []
-    let datas = new Map()
-    let crcs = new Map()
-    let offsets = new Map()
-    let types = new Map()
-    let reverseOffsets = new Map()
-    let backlog = []
+    let crcs = {}
+    let offsets = {}
     let totalObjectCount = null
     let lastPercent = null
     console.log('Indexing objects')
@@ -159,75 +140,23 @@ export class GitPackIndex {
           // Change type from a number to a meaningful string
           type = listpackTypes[type]
           if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
-            offsetToObject.set(offset, {
+            offsetToObject[offset] = {
               type,
-              offset,
-              // data
-            })
-
-            // let { oid } = GitObject.wrap({ type, object: data })
-            // hashes.push(oid)
-            // datas.set(oid, data)
-            // types.set(oid, type)
-            // offsets.set(oid, offset)
-            // reverseOffsets.set(offset, oid)
+              offset
+            }
           } else if (type === 'ofs-delta') {
             let offsetAsNumber = decodeVarInt(new BufferCursor(reference))
             let baseOffset = offset - offsetAsNumber
-            offsetToObject.set(offset, {
+            offsetToObject[offset] = {
               type,
-              offset,
-              // delta: data,
-              // baseOffset
-            })
-            // let baseOid = reverseOffsets.get(baseOffset)
-            // let basedata = datas.get(baseOid)
-            // let basetype = types.get(baseOid)
-            // type = basetype
-            // data = applyDelta(data, basedata)
-            // let { oid } = GitObject.wrap({ type, object: data })
-            // hashes.push(oid)
-            // datas.set(oid, data)
-            // types.set(oid, basetype)
-            // offsets.set(oid, offset)
-            // reverseOffsets.set(offset, oid)
+              offset
+            }
           } else if (type === 'ref-delta') {
             let baseOid = Buffer.from(reference).toString('hex')
-            offsetToObject.set(offset, {
+            offsetToObject[offset] = {
               type,
-              offset,
-              // delta: data,
-              // baseOid
-            })
-            // console.log('ref-delta', baseOid)
-            // let basedata = null
-            // let basetype = null
-            // if (hashes.includes(baseOid)) {
-            //   basedata = datas.get(baseOid)
-            //   basetype = types.get(baseOid)
-            // } else {
-            //   ;({
-            //     type: basetype,
-            //     object: basedata
-            //   } = await getExternalRefDelta(oid))
-            // }
-            // type = basetype
-            // // console.log(data === undefined, basedata === undefined)
-            // if (basedata !== undefined) {
-            //   data = applyDelta(data, basedata)
-            //   let { oid } = GitObject.wrap({ type, object: data })
-            //   hashes.push(oid)
-            //   datas.set(oid, data)
-            //   types.set(oid, basetype)
-            //   offsets.set(oid, offset)
-            //   reverseOffsets.set(offset, oid)
-            // } else {
-            //   backlog.push({
-            //     baseOid,
-            //     offset,
-            //     data
-            //   })
-            // }
+              offset
+            }
           }
           if (num === 0) resolve()
         })
@@ -235,11 +164,12 @@ export class GitPackIndex {
 
     console.log('Computing CRCs')
     // We need to know the lengths of the slices to compute the CRCs.
-    let size = offsetToObject.size
-    let offsetArray = Array.from(offsetToObject.keys())
+    let offsetArray = Object.keys(offsetToObject).map(Number)
+    let size = offsetArray.length
     for (let [i, start] of offsetArray.entries()) {
-      let end = (i + 1 === offsetArray.length) ? pack.byteLength - 20 : offsetArray[i + 1]
-      let o = offsetToObject.get(start)
+      let end =
+        i + 1 === offsetArray.length ? pack.byteLength - 20 : offsetArray[i + 1]
+      let o = offsetToObject[start]
       let crc = crc32(pack.slice(start, end))
       o.end = end
       o.crc = crc
@@ -259,7 +189,9 @@ export class GitPackIndex {
     console.log('Resolving deltas')
     lastPercent = null
     let count = 0
-    for (let [offset, o] of offsetToObject) {
+    for (let offset in offsetToObject) {
+      let o = offsetToObject[offset]
+      offset = Number(offset)
       let percent = Math.floor(count++ * 100 / totalObjectCount)
       if (percent !== lastPercent) console.log(`${percent}%`)
       lastPercent = percent
@@ -268,62 +200,15 @@ export class GitPackIndex {
         let { oid } = GitObject.wrap({ type, object })
         o.oid = oid
         hashes.push(oid)
-        offsets.set(oid, offset)
-        crcs.set(oid, o.crc)
+        offsets[oid] = offset
+        crcs[oid] = o.crc
       } catch (err) {
         console.log('ERROR', err)
         continue
       }
     }
 
-    // async function resolveDeltas (o) {
-    //   if (o.data) {
-    //     return
-    //   } else {
-    //     let base
-    //     if (o.type === 'ofs-delta') {
-    //       base = offsetToObject.get(o.baseOffset)
-    //     } else if (o.type === 'ref-delta') {
-    //       base = oidToObject.get(o.baseOid)
-    //       if (!base) {
-    //         let { type, object } = await getExternalRefDelta(o.baseOid)
-    //         base = { type, data: object }
-    //       }
-    //     }
-    //     await resolveDeltas(base)
-    //     o.type = base.type
-    //     o.data = applyDelta(o.delta, base.data)
-    //     let { oid } = GitObject.wrap({ type: o.type, object: o.data })
-    //     o.oid = oid
-    //     oidToObject.set(oid, o)
-    //   }
-    // }
-    // console.log('Resolving deltas')
-    // lastPercent = null
-    // let count = 0
-    // for (let [offset, o] of offsetToObject) {
-    //   let percent = Math.floor(count++ * 100 / totalObjectCount)
-    //   if (percent !== lastPercent) console.log(`${percent}%`)
-    //   lastPercent = percent
-    //   if (['commit', 'tree', 'blob', 'tag'].includes(o.type)) {
-    //     let { oid } = GitObject.wrap({ type: o.type, object: o.data })
-    //     o.oid = oid
-    //     oidToObject.set(oid, o)
-    //   } else if (o.type === 'ofs-delta') {
-    //     await resolveDeltas(o)
-    //   } else if (o.type === 'ref-delta') {
-    //     await resolveDeltas(o)
-    //   }
-    //   offsets.set(o.oid, offset)
-    // }
-
-    // hashes = Array.from(oidToObject.keys())
     hashes.sort()
-
-    // for (let offset of offsetToObject.keys()) {
-    //   let o = offsetToObject.get(offset)
-    //   crcs.set(o.oid, o.crc)
-    // }
 
     return p
   }
@@ -353,13 +238,13 @@ export class GitPackIndex {
     // Write out crcs
     let crcsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
     for (let hash of this.hashes) {
-      crcsBuffer.writeUInt32BE(this.crcs.get(hash))
+      crcsBuffer.writeUInt32BE(this.crcs[hash])
     }
     buffers.push(crcsBuffer.buffer)
     // Write out offsets
     let offsetsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
     for (let hash of this.hashes) {
-      offsetsBuffer.writeUInt32BE(this.offsets.get(hash))
+      offsetsBuffer.writeUInt32BE(this.offsets[hash])
     }
     buffers.push(offsetsBuffer.buffer)
     // Write out packfile checksum
@@ -378,14 +263,14 @@ export class GitPackIndex {
     this.pack = null
   }
   async read ({ oid } /*: {oid: string} */) {
-    if (!this.offsets.has(oid)) {
+    if (!this.offsets[oid]) {
       if (this.getExternalRefDelta) {
         return this.getExternalRefDelta(oid)
       } else {
         throw new Error(`Could not read object ${oid} from packfile`)
       }
     }
-    let start = this.offsets.get(oid)
+    let start = this.offsets[oid]
     return this.readSlice({ start })
   }
   async readSlice ({ start }) {
@@ -421,19 +306,16 @@ export class GitPackIndex {
     if (multibyte) {
       length = otherVarIntDecode(reader, lastFour)
     }
-    // console.log('length =', length)
     let base = null
     let object = null
     // Handle deltified objects
     if (type === 'ofs_delta') {
       let offset = decodeVarInt(reader)
       let baseOffset = start - offset
-      // console.log('base oid =', this.reverseOffsets.get(baseOffset))
       ;({ object: base, type } = await this.readSlice({ start: baseOffset }))
     }
     if (type === 'ref_delta') {
       let oid = reader.slice(20).toString('hex')
-      // console.log('base oid =', oid)
       ;({ object: base, type } = await this.read({ oid }))
     }
     // Handle undeltified objects

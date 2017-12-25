@@ -30,7 +30,7 @@ export class GitObjectManager {
           const idxName = filename.replace(/pack$/, 'idx')
           if (await fs.exists(`${gitdir}/objects/pack/${idxName}`)) {
             const idx = await fs.read(`${gitdir}/objects/pack/${idxName}`)
-            p = await GitPackIndex.fromIdx({idx, getExternalRefDelta})
+            p = await GitPackIndex.fromIdx({ idx, getExternalRefDelta })
           } else {
             // If the .idx file isn't available, generate one.
             const pack = await fs.read(`${gitdir}/objects/pack/${filename}`)
