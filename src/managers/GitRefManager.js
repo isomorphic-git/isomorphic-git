@@ -28,6 +28,20 @@ export class GitRefManager {
       actualRefsToWrite.set(key, `ref: refs/remotes/${remote}/${branch}`)
     }
     // Update files
+    // TODO: For large repos with a history of thousands of pull requests
+    // (i.e. gitlab-ce) it would be vastly more efficient to write them
+    // to .git/packed-refs.
+    // The trick is to make sure we a) don't write a packed ref that is
+    // already shadowed by a loose ref and b) don't loose any refs already
+    // in packed-refs. Doing this efficiently may be difficult. A
+    // solution that might work is
+    // a) load the current packed-refs file
+    // b) add actualRefsToWrite, overriding the existing values if present
+    // c) enumerate all the loose refs currently in .git/refs/remotes/${remote}
+    // d) overwrite their value with the new value.
+    // Examples of refs we need to avoid writing in loose format for efficieny's sake
+    // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
+    // and .git/refs/remotes/origin/refs/merge-requests
     const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of actualRefsToWrite) {
       // For some reason we trim these

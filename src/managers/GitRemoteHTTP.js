@@ -128,8 +128,9 @@ export class GitRemoteHTTP {
     })
     // Don't try to parse git pushes for now.
     if (service === 'git-receive-pack') return res
+    let data = await pify(concat)(res)
     // Parse the response!
-    let read = GitPktLine.streamReader(res)
+    let read = GitPktLine.reader(data)
     // And now for the ridiculous side-band-64k protocol
     let packetlines = new PassThrough()
     let packfile = new PassThrough()
@@ -137,8 +138,10 @@ export class GitRemoteHTTP {
     // TODO: Use a proper through stream?
     const nextBit = async function () {
       let line = await read()
+      // Skip over flush packets
+      if (line === null) return nextBit()
       // A made up convention to signal there's no more to read.
-      if (line === null) {
+      if (line === true) {
         packetlines.end()
         progress.end()
         packfile.end()
@@ -171,8 +174,5 @@ export class GitRemoteHTTP {
       packfile,
       progress
     }
-  } /*: {
-    stream: ReadableStream,
-    service: string
-  } */
+  }
 }

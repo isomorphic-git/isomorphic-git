@@ -6,6 +6,8 @@ import listpack from 'git-list-pack'
 import peek from 'buffer-peek-stream'
 import applyDelta from 'git-apply-delta'
 import marky from 'marky'
+import pify from 'pify'
+import concat from 'simple-concat'
 import { config } from './config'
 import {
   GitRemoteHTTP,
@@ -71,7 +73,12 @@ export async function fetch ({
     exclude,
     relative
   })
-  await unpack({ fs, gitdir, inputStream: response.packfile, onprogress })
+  let packfile = await pify(concat)(response.packfile)
+  let packfileSha = packfile.slice(-20).toString('hex')
+  await fs.write(
+    path.join(gitdir, `objects/pack/pack-${packfileSha}.pack`),
+    packfile
+  )
 }
 
 async function fetchPackfile ({

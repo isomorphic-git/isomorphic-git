@@ -16,6 +16,7 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
     console.log(JSON.stringify(result, null, 2))
   } catch (err) {
     process.stderr.write(err.message + '\n')
+    console.log(err)
     process.exit(1)
   }
 })

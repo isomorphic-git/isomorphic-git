@@ -5,6 +5,7 @@ import listpack from 'git-list-pack'
 import { GitObject } from './GitObject'
 import crc32 from 'crc/lib/crc32.js'
 import { PassThrough } from 'stream'
+import pako from 'pako'
 
 function buffer2stream (buffer) {
   let stream = new PassThrough()
@@ -29,6 +30,20 @@ function decodeVarInt (reader) {
   // alternate shifting the bits left by 7 and OR-ing the next byte.
   // And... do a weird increment-by-one thing that I don't quite understand.
   return bytes.reduce((a, b) => ((a + 1) << 7) | b, -1)
+}
+
+// I'm pretty much copying this one from the git C source code,
+// because it makes no sense.
+function otherVarIntDecode (reader, startWith) {
+  let result = startWith
+  let shift = 4
+  let byte = null
+  do {
+    byte = reader.readUInt8()
+    result |= (byte & 0b01111111) << shift
+    shift += 7
+  } while (byte & 0b10000000)
+  return result
 }
 
 /** @ignore */
@@ -107,7 +122,7 @@ export class GitPackIndex {
       reverseOffsets
     })
   }
-  static async fromPack (pack) {
+  static async fromPack ({ pack, getExternalRefDelta }) {
     let packfileStream = buffer2stream(pack)
     let hashes = []
     let datas = new Map()
@@ -123,10 +138,20 @@ export class GitPackIndex {
       6: 'ofs-delta',
       7: 'ref-delta'
     }
+    let backlog = []
+    let totalObjectCount = null
+    let lastPercent = null
     await new Promise((resolve, reject) => {
       packfileStream
         .pipe(listpack())
-        .on('data', ({ data, type, reference, offset, num }) => {
+        .on('data', async ({ data, type, reference, offset, num }) => {
+          // packfileStream.pause()
+          if (totalObjectCount === null) totalObjectCount = num
+          let percent = Math.floor(
+            (totalObjectCount - num) * 100 / totalObjectCount
+          )
+          if (percent !== lastPercent) console.log(`${percent}%`)
+          lastPercent = percent
           type = listpackTypes[type]
           if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
             let { oid } = GitObject.wrap({ type, object: data })
@@ -151,20 +176,67 @@ export class GitPackIndex {
             reverseOffsets.set(offset, oid)
           } else if (type === 'ref-delta') {
             let baseoid = Buffer.from(reference).toString('hex')
-            let basedata = datas.get(baseoid)
-            let basetype = types.get(baseoid)
+            // console.log('ref-delta', baseoid)
+            let basedata = null
+            let basetype = null
+            if (hashes.includes(baseoid)) {
+              basedata = datas.get(baseoid)
+              basetype = types.get(baseoid)
+            } else {
+              ;({
+                type: basetype,
+                object: basedata
+              } = await getExternalRefDelta(oid))
+            }
             type = basetype
-            data = applyDelta(data, basedata)
-            let { oid } = GitObject.wrap({ type, object: data })
-            hashes.push(oid)
-            datas.set(oid, data)
-            types.set(oid, basetype)
-            offsets.set(oid, offset)
-            reverseOffsets.set(offset, oid)
+            // console.log(data === undefined, basedata === undefined)
+            if (basedata !== undefined) {
+              data = applyDelta(data, basedata)
+              let { oid } = GitObject.wrap({ type, object: data })
+              hashes.push(oid)
+              datas.set(oid, data)
+              types.set(oid, basetype)
+              offsets.set(oid, offset)
+              reverseOffsets.set(offset, oid)
+            } else {
+              backlog.push({
+                baseoid,
+                offset,
+                data
+              })
+            }
           }
+          // packfileStream.resume()
           if (num === 0) resolve()
         })
     })
+    if (backlog.length > 0) {
+      throw new Error(`fatal: pack has ${backlog.length} unresolved deltas`)
+    }
+    // // Finish backlog
+    // while (backlog.length > 0) {
+    //   console.log(backlog.length)
+    //   let { baseoid, offset, data } = backlog.shift()
+    //   // console.log('ref-delta', baseoid)
+    //   let basedata = datas.get(baseoid)
+    //   let basetype = types.get(baseoid)
+    //   let type = basetype
+    //   // console.log(data === undefined, basedata === undefined)
+    //   if (basedata !== undefined) {
+    //     data = applyDelta(data, basedata)
+    //     let { oid } = GitObject.wrap({ type, object: data })
+    //     hashes.push(oid)
+    //     datas.set(oid, data)
+    //     types.set(oid, basetype)
+    //     offsets.set(oid, offset)
+    //     reverseOffsets.set(offset, oid)
+    //   } else {
+    //     backlog.push({
+    //       baseoid,
+    //       data
+    //     })
+    //   }
+    // }
     // let packfileSha = shasum(Buffer.from(hashes.join(''), 'hex'))
     hashes.sort()
     // Knowing the length of each slice isn't strictly needed, but it is
@@ -244,5 +316,82 @@ export class GitPackIndex {
     let shaBuffer = Buffer.alloc(20)
     shaBuffer.write(sha, 'hex')
     return Buffer.concat([totalBuffer, shaBuffer])
+  }
+  async load ({ pack }) {
+    this.pack = pack
+  }
+  async unload () {
+    this.pack = null
+  }
+  async read ({ oid, getExternalRefDelta } /*: {oid: string} */) {
+    if (!this.slices.has(oid)) {
+      return await getExternalRefDelta(oid)
+    }
+    let [start, end] = this.slices.get(oid)
+    return this.readSlice({ start, end })
+  }
+  async readSlice ({ start, end }) {
+    const types = {
+      0b0010000: 'commit',
+      0b0100000: 'tree',
+      0b0110000: 'blob',
+      0b1000000: 'tag',
+      0b1100000: 'ofs_delta',
+      0b1110000: 'ref_delta'
+    }
+    if (!this.pack) {
+      throw new Error(
+        'Tried to read from a GitPackIndex with no packfile loaded into memory'
+      )
+    }
+    let raw = this.pack.slice(start, end)
+    let reader = new BufferCursor(raw)
+    let byte = reader.readUInt8()
+    // Object type is encoded in bits 654
+    let btype = byte & 0b1110000
+    let type = types[btype]
+    if (type === undefined) {
+      throw new Error('Unrecognized type: 0b' + btype.toString(2))
+    }
+    // The length encoding get complicated.
+    // Last four bits of length is encoded in bits 3210
+    let lastFour = byte & 0b1111
+    let length = lastFour
+    // Whether the next byte is part of the variable-length encoded number
+    // is encoded in bit 7
+    let multibyte = byte & 0b10000000
+    if (multibyte) {
+      length = otherVarIntDecode(reader, lastFour)
+    }
+    // console.log('length =', length)
+    let base = null
+    let object = null
+    // Handle deltified objects
+    if (type === 'ofs_delta') {
+      let offset = decodeVarInt(reader)
+      let position = start - offset
+      // console.log('base oid =', this.reverseOffsets.get(position))
+      ;({ object: base, type } = await this.readSlice({ start: position }))
+    }
+    if (type === 'ref_delta') {
+      let oid = reader.slice(20).toString('hex')
+      // console.log('base oid =', oid)
+      ;({ object: base, type } = await this.read({ oid }))
+    }
+    // Handle undeltified objects
+    let buffer = raw.slice(reader.tell())
+    object = Buffer.from(pako.inflate(buffer))
+    // Assert that the object length is as expected.
+    if (object.byteLength !== length) {
+      throw new Error(
+        `Packfile told us object would have length ${length} but it had length ${
+          object.byteLength
+        }`
+      )
+    }
+    if (base) {
+      object = applyDelta(object, base)
+    }
+    return { type, object }
   }
 }
