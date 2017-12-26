@@ -197,14 +197,11 @@ export class GitPackIndex {
               offset
             }
           } else if (type === 'ofs-delta') {
-            let offsetAsNumber = decodeVarInt(new BufferCursor(reference))
-            let baseOffset = offset - offsetAsNumber
             offsetToObject[offset] = {
               type,
               offset
             }
           } else if (type === 'ref-delta') {
-            let baseOid = Buffer.from(reference).toString('hex')
             offsetToObject[offset] = {
               type,
               offset
@@ -219,7 +216,6 @@ export class GitPackIndex {
     marky.mark('crcs')
     // We need to know the lengths of the slices to compute the CRCs.
     let offsetArray = Object.keys(offsetToObject).map(Number)
-    let size = offsetArray.length
     for (let [i, start] of offsetArray.entries()) {
       let end =
         i + 1 === offsetArray.length ? pack.byteLength - 20 : offsetArray[i + 1]
