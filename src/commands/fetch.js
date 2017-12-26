@@ -148,7 +148,7 @@ async function fetchPackfile ({
   })
   // Note: I removed "ofs-delta" from the capabilities list and now
   // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
-  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${
+  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/${
     pkg.name
   }@${pkg.version}${relative ? ' deepen-relative' : ''}`
   let packstream = new PassThrough()
