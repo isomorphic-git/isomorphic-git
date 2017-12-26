@@ -51,6 +51,7 @@ function otherVarIntDecode (reader, startWith) {
 export class GitPackIndex {
   constructor (stuff) {
     Object.assign(this, stuff)
+    this.offsetCache = {}
   }
   static async fromIdx ({ idx, getExternalRefDelta }) {
     let reader = new BufferCursor(idx)
@@ -249,6 +250,8 @@ export class GitPackIndex {
     let count = 0
     let callsToReadSlice = 0
     let callsToGetExternal = 0
+    let timeByDepth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let objectsByDepth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for (let offset in offsetToObject) {
       offset = Number(offset)
       let percent = Math.floor(count++ * 100 / totalObjectCount)
@@ -273,9 +276,12 @@ export class GitPackIndex {
         p.externalReadDepth = 0
         marky.mark('readSlice')
         let { type, object } = await p.readSlice({ start: offset })
-        times.readSlice += marky.stop('readSlice').duration
+        let time = marky.stop('readSlice').duration
+        times.readSlice += time
         callsToReadSlice += p.readDepth
         callsToGetExternal += p.externalReadDepth
+        timeByDepth[p.readDepth] += time
+        objectsByDepth[p.readDepth] += 1
         marky.mark('hash')
         let oid = GitObject.hash({ type, object })
         times.hash += marky.stop('hash').duration
@@ -295,9 +301,20 @@ export class GitPackIndex {
     let totalElapsedTime = marky.stop('total').duration
     times.hash = Math.floor(times.hash)
     times.readSlice = Math.floor(times.readSlice)
-    times.misc = Math.floor(times.misc)
-    console.log(Object.keys(times).join('\t') + '\tmisc')
-    console.log(Object.values(times).join('\t') + `\t${totalElapsedTime - Object.values(times).reduce((a, b) => a + b, 0)}`)
+    times.misc = Math.floor(
+      Object.values(times).reduce((a, b) => a - b, totalElapsedTime)
+    )
+    console.log(Object.keys(times).join('\t'))
+    console.log(Object.values(times).join('\t'))
+    console.log('by depth:')
+    console.log([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].join('\t'))
+    console.log(objectsByDepth.slice(0, 12).join('\t'))
+    console.log(
+      timeByDepth
+        .map(Math.floor)
+        .slice(0, 12)
+        .join('\t')
+    )
 
     // CONTINUE HERE: Probably we need an LRU cache to speed up deltas.
     // We could plot a histogram of oids to see how many oids we need to cache to have a big impact.
@@ -367,6 +384,7 @@ export class GitPackIndex {
     return this.readSlice({ start })
   }
   async readSlice ({ start }) {
+    if (this.offsetCache[start]) return this.offsetCache[start]
     this.readDepth++
     const types = {
       0b0010000: 'commit',
@@ -425,6 +443,11 @@ export class GitPackIndex {
     }
     if (base) {
       object = applyDelta(object, base)
+    }
+    // Cache the result based on depth.
+    if (this.readDepth > 3) {
+      // hand tuned for speed / memory usage tradeoff
+      this.offsetCache[start] = { type, object }
     }
     return { type, object }
   }
