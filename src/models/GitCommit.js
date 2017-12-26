@@ -150,7 +150,7 @@ export class GitCommit {
     } else {
       headers += `tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n` // the null tree
     }
-    if (obj.parent) {
+    if (obj.parent && obj.parent.length) {
       headers += 'parent'
       for (let p of obj.parent) {
         headers += ' ' + p
