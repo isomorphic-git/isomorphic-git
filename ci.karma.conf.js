@@ -19,7 +19,11 @@ module.exports = function (config) {
     },
     sl_ios_safari: {
       base: 'SauceLabs',
-      browserName: 'iphone'
+      deviceName: 'iPhone Simulator',
+      platformName: 'iOS',
+      platformVersion: '11.0',
+      browserName: 'Safari',
+      appiumVersion: '1.7.1'
     },
     sl_android_chrome: {
       base: 'SauceLabs',
@@ -27,7 +31,7 @@ module.exports = function (config) {
       platformName: 'Android',
       platformVersion: '6.0',
       browserName: 'Chrome',
-      appiumVersion: '1.6.3'
+      appiumVersion: '1.7.1'
     }
   }
   config.set({
