@@ -52,9 +52,7 @@ module.exports = {
       local: 'nps test.jest',
       parallel_tests: concurrent.nps('test.jest', 'test.karma'),
       jest: process.env.CI ? 'jest --coverage && codecov' : 'jest',
-      karma: process.env.CI
-        ? "karma start ci.karma.conf.js || echo 'saucelabs failed, no big deal'"
-        : 'karma start'
+      karma: process.env.CI ? 'karma start ci.karma.conf.js' : 'karma start'
     }
   }
 }
