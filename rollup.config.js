@@ -13,7 +13,6 @@ const external = [
   'lodash/unset',
   'lodash/sortBy',
   'openpgp/dist/openpgp.min.js',
-  'crc/lib/crc32.js',
   'babel-runtime/regenerator',
   'babel-runtime/helpers/asyncToGenerator',
   'babel-runtime/helpers/classCallCheck',
@@ -43,13 +42,7 @@ const external = [
 const moduleConfig = input => ({
   input: `src/${input}`,
   external: [...external, ...codeSplitting(input)],
-  output: [
-    {
-      format: 'es',
-      name: 'git',
-      file: `dist/for-future/${input}`
-    }
-  ],
+  output: [{ format: 'es', name: 'git', file: `dist/for-future/${input}` }],
   plugins: [
     json(),
     babel({
@@ -64,13 +57,7 @@ const moduleConfig = input => ({
 const nodeConfig = input => ({
   input: `src/${input}`,
   external: [...external, ...codeSplitting(input)],
-  output: [
-    {
-      format: 'cjs',
-      name: 'git',
-      file: `dist/for-node/${input}`
-    }
-  ],
+  output: [{ format: 'cjs', name: 'git', file: `dist/for-node/${input}` }],
   plugins: [
     json(),
     babel({
@@ -97,13 +84,9 @@ const browserifyConfig = input => ({
   input: `src/${input}`,
   external: [...external, ...codeSplitting(input)],
   output: [
-    {
-      format: 'cjs',
-      name: 'git',
-      file: `dist/for-browserify/${input}`,
-      sourcemap: true
-    }
+    { format: 'cjs', name: 'git', file: `dist/for-browserify/${input}` }
   ],
+  sourcemap: true,
   plugins: [
     json(),
     babel({
@@ -131,13 +114,9 @@ const serviceworkerConfig = input => ({
   input: `src/${input}`,
   external: [...external],
   output: [
-    {
-      format: 'cjs',
-      name: 'git',
-      file: `dist/for-serviceworker/${input}`,
-      sourcemap: true
-    }
+    { format: 'cjs', name: 'git', file: `dist/for-serviceworker/${input}` }
   ],
+  sourcemap: true,
   plugins: [
     json(),
     babel({
