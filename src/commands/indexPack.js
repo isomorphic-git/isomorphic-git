@@ -1,8 +1,5 @@
 import path from 'path'
 import { FileSystem, GitPackIndex } from '../models'
-/**
- * @external {FSModule} http://ghub.io/browserfs
- */
 
 /**
  * Create the .idx file for a given .pack file
