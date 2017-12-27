@@ -147,7 +147,7 @@ export class GitPackIndex {
 
     console.log('Indexing objects')
     console.log(
-      `percent\tmilliseconds\tkilobytes\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`
+      `percent\tmilliseconds\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`
     )
     marky.mark('total')
     marky.mark('offsets')
@@ -164,8 +164,6 @@ export class GitPackIndex {
             console.log(
               `${percent}%\t${Math.floor(
                 marky.stop('percent').duration
-              )}\t${Math.floor(
-                process.memoryUsage().rss / 1000
               )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
                 histogram.blob
               }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
@@ -238,9 +236,7 @@ export class GitPackIndex {
 
     // Resolve deltas and compute the oids
     console.log('Resolving deltas')
-    console.log(
-      `percent2\tmilliseconds2\tkilobytes2\tcallsToReadSlice\tcallsToGetExternal`
-    )
+    console.log(`percent2\tmilliseconds2\tcallsToReadSlice\tcallsToGetExternal`)
     marky.mark('percent')
     lastPercent = null
     let count = 0
@@ -255,8 +251,6 @@ export class GitPackIndex {
         console.log(
           `${percent}%\t${Math.floor(
             marky.stop('percent').duration
-          )}\t${Math.floor(
-            process.memoryUsage().rss / 1000
           )}\t${callsToReadSlice}\t${callsToGetExternal}`
         )
         marky.mark('percent')
