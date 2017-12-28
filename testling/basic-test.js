@@ -34,8 +34,8 @@ test('things do not explode', t => {
 
                 t.equal(
                   oid,
-                  'fbe80a5f33d7876603767211bd6d53d3e308894e',
-                  "- oid is 'fbe80a5f33d7876603767211bd6d53d3e308894e'"
+                  '066daf8b7c79dca893d91ce0577dfab5ace80dbc',
+                  "- oid is '066daf8b7c79dca893d91ce0577dfab5ace80dbc'"
                 )
               })
               .catch(t.fail)

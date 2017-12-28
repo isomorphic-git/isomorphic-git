@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import shasum from 'shasum'
 import applyDelta from 'git-apply-delta'
@@ -147,7 +148,7 @@ export class GitPackIndex {
 
     console.log('Indexing objects')
     console.log(
-      `percent\tmilliseconds\tkilobytes\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`
+      `percent\tmilliseconds\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`
     )
     marky.mark('total')
     marky.mark('offsets')
@@ -164,8 +165,6 @@ export class GitPackIndex {
             console.log(
               `${percent}%\t${Math.floor(
                 marky.stop('percent').duration
-              )}\t${Math.floor(
-                process.memoryUsage().rss / 1000
               )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
                 histogram.blob
               }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
@@ -238,9 +237,7 @@ export class GitPackIndex {
 
     // Resolve deltas and compute the oids
     console.log('Resolving deltas')
-    console.log(
-      `percent2\tmilliseconds2\tkilobytes2\tcallsToReadSlice\tcallsToGetExternal`
-    )
+    console.log(`percent2\tmilliseconds2\tcallsToReadSlice\tcallsToGetExternal`)
     marky.mark('percent')
     lastPercent = null
     let count = 0
@@ -255,8 +252,6 @@ export class GitPackIndex {
         console.log(
           `${percent}%\t${Math.floor(
             marky.stop('percent').duration
-          )}\t${Math.floor(
-            process.memoryUsage().rss / 1000
           )}\t${callsToReadSlice}\t${callsToGetExternal}`
         )
         marky.mark('percent')
@@ -311,10 +306,6 @@ export class GitPackIndex {
         .slice(0, 12)
         .join('\t')
     )
-
-    // CONTINUE HERE: Probably we need an LRU cache to speed up deltas.
-    // We could plot a histogram of oids to see how many oids we need to cache to have a big impact.
-
     return p
   }
   toBuffer () {
@@ -438,7 +429,7 @@ export class GitPackIndex {
       )
     }
     if (base) {
-      object = applyDelta(object, base)
+      object = Buffer.from(applyDelta(object, base))
     }
     // Cache the result based on depth.
     if (this.readDepth > 3) {
