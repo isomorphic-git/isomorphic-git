@@ -88,7 +88,7 @@ This probably deserves a brief explanation.
 - the "module" version is for native ES6 module loaders when they arrive.
 - the "unpkg" version is the UMD build.
 
-For more details about each build see [./dist/README.md](https://github.com/wmhilton/isomorphic-git/blob/master/dist/README.md)
+For more details about each build see [./dist/README.md](https://github.com/isomorphic-git/isomorphic-git/blob/master/dist/README.md)
 
 ### `isogit` CLI
 
@@ -105,31 +105,31 @@ TODO: Document this more. Also write some tests? IDK the CLI is more of a lark f
 
 I may continue to make changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
 
-**[NEW DOCS WEBSITE](https://wmhilton.github.io/isomorphic-git)**
+**[NEW DOCS WEBSITE](https://isomorphic-git.github.io/isomorphic-git)**
 
 ### commands
 
-- [add](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-add)
-- [checkout](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-checkout)
-- [clone](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-clone)
-- [commit](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-commit)
-- [config](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-config)
-- [fetch](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-fetch)
-- [findRoot](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-findRoot)
-- [init](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-init)
-- [listBranches](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-listBranches)
-- [listFiles](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-listFiles)
-- [log](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-log)
-- [push](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-push)
-- [remove](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-remove)
-- [status](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-status)
-- [verify](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-verify)
-- [version](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-version)
+- [add](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-add)
+- [checkout](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-checkout)
+- [clone](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-clone)
+- [commit](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-commit)
+- [config](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-config)
+- [fetch](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-fetch)
+- [findRoot](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-findRoot)
+- [init](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-init)
+- [listBranches](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-listBranches)
+- [listFiles](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-listFiles)
+- [log](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-log)
+- [push](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-push)
+- [remove](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-remove)
+- [status](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-status)
+- [verify](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-verify)
+- [version](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-version)
 
 ### utils
 
-- [auth](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-auth)
-- [oauth2](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-oauth2)
+- [auth](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-auth)
+- [oauth2](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-oauth2)
 
 ### dir vs gitdir
 I looked hard and wide for a good explanation of the "working tree" and the "git directory" and the best I found was [this one](https://stackoverflow.com/a/5283457) from Stack Overflow:

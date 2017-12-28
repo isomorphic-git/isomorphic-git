@@ -15,7 +15,7 @@ describe('clone', () => {
       ...repo,
       depth: 1,
       ref: 'master',
-      url: `https://github.com/wmhilton/isomorphic-git`
+      url: `https://github.com/isomorphic-git/isomorphic-git`
     })
     expect(existsSync(`${dir}`)).toBe(true)
     expect(existsSync(`${dir}/.git/objects`)).toBe(true)

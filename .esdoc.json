@@ -18,7 +18,7 @@
         "brand": {
           "title": "isomorphic-git",
           "description": "A pure JavaScript implementation of git for node and browsers",
-          "site": "https://wmhilton.github.io/isomorphic-git",
+          "site": "https://isomorphic-git.github.io/isomorphic-git",
           "author": "https://twitter.com/wmhilton"
         }
       }

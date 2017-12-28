@@ -7,7 +7,9 @@ const { get } = server('__tests__/__fixtures__')
 
 describe('GitRemoteHTTP', () => {
   test('preparePull (Github response)', async () => {
-    let remote = new GitRemoteHTTP('https://github.com/wmhilton/isomorphic-git')
+    let remote = new GitRemoteHTTP(
+      'https://github.com/isomorphic-git/isomorphic-git'
+    )
     await remote.preparePull()
     expect(remote).toBeTruthy()
     expect(remote.symrefs.size > 0)

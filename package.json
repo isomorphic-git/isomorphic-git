@@ -33,7 +33,7 @@
   "bugs": {
     "url": "https://github.com/isomorphic-git/isomorphic-git/issues"
   },
-  "homepage": "https://wmhilton.github.io/isomorphic-git",
+  "homepage": "https://isomorphic-git.github.io/isomorphic-git",
   "files": [
     "dist",
     "cli.js"
