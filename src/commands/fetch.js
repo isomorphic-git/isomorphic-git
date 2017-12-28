@@ -48,7 +48,7 @@ import { pkg } from '../utils'
 export async function fetch ({
   dir,
   gitdir = path.join(dir, '.git'),
-  fs,
+  fs: _fs,
   ref = 'HEAD',
   remote,
   url,
@@ -60,6 +60,7 @@ export async function fetch ({
   relative,
   onprogress
 }) {
+  const fs = new FileSystem(_fs)
   let response = await fetchPackfile({
     gitdir,
     fs,
