@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import shasum from 'shasum'
 import applyDelta from 'git-apply-delta'
@@ -305,10 +306,6 @@ export class GitPackIndex {
         .slice(0, 12)
         .join('\t')
     )
-
-    // CONTINUE HERE: Probably we need an LRU cache to speed up deltas.
-    // We could plot a histogram of oids to see how many oids we need to cache to have a big impact.
-
     return p
   }
   toBuffer () {
@@ -432,7 +429,7 @@ export class GitPackIndex {
       )
     }
     if (base) {
-      object = applyDelta(object, base)
+      object = Buffer.from(applyDelta(object, base))
     }
     // Cache the result based on depth.
     if (this.readDepth > 3) {
