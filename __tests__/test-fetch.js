@@ -47,6 +47,7 @@ describe('fetch', () => {
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
+    await sleep(1000) // seems to be a problem spot
     shallow = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '86ec153c7b48e02f92930d07542680f60d104d31\n').toBe(true)
   })
