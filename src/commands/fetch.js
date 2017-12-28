@@ -41,7 +41,7 @@ import { pkg } from '../utils'
  * let repo = {fs, dir: '.'}
  * await fetch({
  *   ...repo,
- *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
+ *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git',
  *   depth: 1
  * })
  */
