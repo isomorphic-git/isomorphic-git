@@ -97,6 +97,16 @@ export class FileSystem {
     }
   }
   /**
+   * Read a directory without throwing an error is the directory doesn't exist
+   */
+  async readdir (filepath) {
+    try {
+      return await this._readdir(filepath)
+    } catch (err) {
+      return []
+    }
+  }
+  /**
    * Return a flast list of all the files nested inside a directory
    *
    * Based on an elegant concurrent recursive solution from SO

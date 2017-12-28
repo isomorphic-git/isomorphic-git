@@ -33,10 +33,9 @@ describe('push', () => {
       ref: 'refs/heads/master'
     })
     expect(res).toBeTruthy()
-    let body = await pify(concat)(res)
-    expect(body.toString()).toBe(`000eunpack ok
-0019ok refs/heads/master
-0000`)
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
   })
 
   test('"master" to local git-http-backend', async () => {
@@ -61,10 +60,9 @@ describe('push', () => {
       ref: 'master'
     })
     expect(res).toBeTruthy()
-    let body = await pify(concat)(res)
-    expect(body.toString()).toBe(`000eunpack ok
-0019ok refs/heads/master
-0000`)
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
   })
 
   test('"refs/heads/master" to Github', async () => {
@@ -81,10 +79,9 @@ describe('push', () => {
       ref: 'refs/heads/master'
     })
     expect(res).toBeTruthy()
-    let body = await pify(concat)(res)
-    expect(body.toString()).toBe(`000eunpack ok
-0019ok refs/heads/master
-00000000`)
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
   })
 
   test('"master" to Github', async () => {
@@ -101,9 +98,8 @@ describe('push', () => {
       ref: 'master'
     })
     expect(res).toBeTruthy()
-    let body = await pify(concat)(res)
-    expect(body.toString()).toBe(`000eunpack ok
-0019ok refs/heads/master
-00000000`)
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
   })
 })

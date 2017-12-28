@@ -101,8 +101,53 @@ export class GitRemoteHTTP {
   }
   async push (stream /*: ReadableStream */) {
     const service = 'git-receive-pack'
-    let res = await this.stream({ stream, service })
-    return res
+    let { packetlines, packfile } = await this.stream({
+      stream,
+      service
+    })
+    // TODO: Someday, maybe we will make this a streaming parser.
+    packfile = await pify(concat)(packfile)
+    packetlines = await pify(concat)(packetlines)
+    let result = {}
+    // Parse the response!
+    // I'm combining the side-band-64k and regular streams
+    // because Github returns the first line in the sideband while
+    // git-http-server returns it without the sideband.
+    let response = ''
+    let read = GitPktLine.reader(packfile)
+    let line = await read()
+    while (line !== null && line !== true) {
+      response += line.toString('utf8') + '\n'
+      line = await read()
+    }
+    response += packetlines.toString('utf8')
+
+    let lines = response.toString('utf8').split('\n')
+    // We're expecting "unpack {unpack-result}"
+    line = lines.shift()
+    if (!line.startsWith('unpack ')) {
+      throw new Error(
+        `Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'`
+      )
+    }
+    if (line === 'unpack ok') {
+      result.ok = ['unpack']
+    } else {
+      result.errors = [line.trim()]
+    }
+    for (let line of lines) {
+      let status = line.slice(0, 2)
+      let refAndMessage = line.slice(3)
+      if (status === 'ok') {
+        result.ok = result.ok || []
+        result.ok.push(refAndMessage)
+      } else if (status === 'ng') {
+        result.errors = result.errors || []
+        result.errors.push(refAndMessage)
+      }
+    }
+    console.log(result)
+    return result
   }
   async pull (stream /*: ReadableStream */) {
     const service = 'git-upload-pack'
@@ -126,10 +171,9 @@ export class GitRemoteHTTP {
       body: stream,
       headers
     })
-    // Don't try to parse git pushes for now.
-    if (service === 'git-receive-pack') return res
+    let data = await pify(concat)(res)
     // Parse the response!
-    let read = GitPktLine.streamReader(res)
+    let read = GitPktLine.reader(data)
     // And now for the ridiculous side-band-64k protocol
     let packetlines = new PassThrough()
     let packfile = new PassThrough()
@@ -137,8 +181,10 @@ export class GitRemoteHTTP {
     // TODO: Use a proper through stream?
     const nextBit = async function () {
       let line = await read()
+      // Skip over flush packets
+      if (line === null) return nextBit()
       // A made up convention to signal there's no more to read.
-      if (line === null) {
+      if (line === true) {
         packetlines.end()
         progress.end()
         packfile.end()
@@ -171,8 +217,5 @@ export class GitRemoteHTTP {
       packfile,
       progress
     }
-  } /*: {
-    stream: ReadableStream,
-    service: string
-  } */
+  }
 }
