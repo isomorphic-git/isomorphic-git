@@ -122,6 +122,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [log](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-log)
 - [push](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-push)
 - [remove](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-remove)
+- [sign](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-sign)
 - [status](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-status)
 - [verify](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-verify)
 - [version](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-version)
