@@ -13,7 +13,7 @@
  *
  * @param {string} company
  * @param {string} token
- * @returns {username, password}
+ * @returns {{username: string, password: string}}
  *
  */
 export function oauth2 (company, token) {

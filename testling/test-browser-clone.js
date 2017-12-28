@@ -4,7 +4,7 @@ const BrowserFS = require('browserfs')
 test('clone', t => {
   t.plan(2)
   BrowserFS.install(window)
-  BrowserFS.configure({ fs: 'LocalStorage' }, function (err) {
+  BrowserFS.configure({ fs: 'IndexedDB', options: {} }, function (err) {
     if (err) return t.fail(err)
     var fs = window.require('fs')
     t.ok(fs, 'Loaded fs')
