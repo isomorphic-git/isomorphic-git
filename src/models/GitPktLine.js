@@ -83,7 +83,14 @@ export class GitPktLine {
     }
   }
   static streamReader (stream /*: ReadableStream */) {
+    let done = false
+    stream.on('end', () => {
+      console.log('THE END I TELL YOU...')
+      done = true
+    })
+    stream.resume()
     return async function read () {
+      if (done) return null
       let hexlength, length, bytes
       try {
         hexlength = await gartal.readBytes(stream, 4)

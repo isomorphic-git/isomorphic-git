@@ -5,7 +5,7 @@ import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
 const fs = new FileSystem(_fs)
 
-jest.setTimeout(60000)
+jest.setTimeout(10000)
 
 /** @test {fetch} */
 describe('fetch', () => {
@@ -35,7 +35,8 @@ describe('fetch', () => {
       ref: 'test-branch-shallow-clone'
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
-    expect(output).toMatchSnapshot()
+    // TODO: Bring back some kind of progress monitoring.
+    // expect(output).toMatchSnapshot()
     let shallow = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
