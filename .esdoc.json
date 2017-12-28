@@ -7,8 +7,13 @@
       "option": {
         "test": {
           "source": "./__tests__/",
-          "interfaces": ["describe", "test"],
-          "includes": ["^test-(.*)\\.js$"]
+          "interfaces": [
+            "describe",
+            "test"
+          ],
+          "includes": [
+            "^test-(.*)\\.js$"
+          ]
         },
         "brand": {
           "title": "isomorphic-git",
@@ -29,7 +34,19 @@
       "option": {
         "stripPackageName": true,
         "replaces": [
-          {"from": ".*", "to": "isomorphic-git"}
+          {
+            "from": ".*",
+            "to": "isomorphic-git"
+          }
+        ]
+      }
+    },
+    {
+      "name": "esdoc-inject-script-plugin",
+      "option": {
+        "scripts": [
+          "./assets/gitter.js",
+          "./assets/sidecar.v1.js"
         ]
       }
     }

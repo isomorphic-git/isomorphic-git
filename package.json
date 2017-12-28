@@ -22,17 +22,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wmhilton/isomorphic-git.git"
+    "url": "https://github.com/isomorphic-git/isomorphic-git.git"
   },
   "keywords": [
-    "git"
+    "git",
+    "isomorphic"
   ],
   "author": "William Hilton <wmhilton@gmail.com>",
   "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/wmhilton/isomorphic-git/issues"
+    "url": "https://github.com/isomorphic-git/isomorphic-git/issues"
   },
-  "homepage": "https://github.com/wmhilton/isomorphic-git#readme",
+  "homepage": "https://wmhilton.github.io/isomorphic-git",
   "files": [
     "dist",
     "cli.js"
@@ -77,6 +78,7 @@
     "esdoc": "^1.0.4",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-importpath-plugin": "^1.0.1",
+    "esdoc-inject-script-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
     "husky": "^0.14.3",
     "jest": "^22.0.4",
