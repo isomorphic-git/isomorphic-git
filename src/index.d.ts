@@ -18,7 +18,166 @@ export as namespace git;
 
 /*~ If this module has methods, declare them as functions like so.
  */
-export function init ({fs, dir, gitdir}: {fs: any, dir: string, gitdir?: string}): Promise<void>;
-export function add ({fs, dir, gitdir, filepath}: {fs: any, dir: string, gitdir?: string, filepath: string}): Promise<void>;
-export function checkout({fs, dir, gitdir, filepath, remote, ref}: {fs: any, dir: string, gitdir?: string, filepath: string, remote?: string, ref?: string}): Promise<void>;
-export function listFiles({fs, dir, gitdir}: {fs: any, dir: string, gitdir?: string}): Promise<[string]>;
+export async function add(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  filepath: string
+}): Promise<void>;
+
+export async function checkout(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  filepath: string,
+  remote?: string,
+  ref?: string
+}): Promise<void>;
+
+export async function clone(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  url: string,
+  ref?: string,
+  remote?: string,
+  authUsername?: string,
+  authPassword?: string,
+  depth?: number,
+  since?: Date,
+  exclude?: string[],
+  relative?: boolean,
+  onprogress?: ({
+    loaded: number,
+    total: number,
+    lengthComputable: boolean
+  }) => void
+}): Promise<void>;
+
+export async function commit(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  message: string,
+  author: {
+    name?: string,
+    email?: string,
+    date?: Date,
+    timestamp?: number,
+  },
+  committer: {
+    name?: string,
+    email?: string,
+    date?: Date,
+    timestamp?: number,
+  }
+}): Promise<string>
+
+export async function config(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  path: string,
+  value?: string | undefined
+}): Promise<any>
+
+export async function fetch(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  url?: string,
+  ref?: string,
+  remote?: string,
+  authUsername?: string,
+  authPassword?: string,
+  depth?: number,
+  since?: Date,
+  exclude?: string[],
+  relative?: boolean,
+  onprogress?: ({
+    loaded: number,
+    total: number,
+    lengthComputable: boolean
+  }) => void
+}): Promise<void>;
+
+export async function findRoot(args: {
+  fs: any,
+  filepath: string
+}): Promise<string>;
+
+export async function indexPack(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  filepath: string
+}): Promise<void>
+
+export async function init(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+}): Promise<void>;
+
+export async function listBranches(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+}): Promise<Array<string>>;
+
+export async function listFiles(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+}): Promise<Array<string>>;
+
+export async function log(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  ref?: string,
+  depth?: number,
+  since?: Date
+}): Promise<Array<CommitDescription>>
+
+export async function push(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  ref?: string,
+  remote?: string,
+  url?: string,
+  authUsername?: string,
+  authPassword?: string
+}): Promise<PushResponse>
+
+export async function remove(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  filepath: string
+}): Promise<void>
+
+export async function sign(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  privateKeys: string
+}): Promise<string>
+
+export async function status(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  filepath: string
+}): Promise<string>
+
+export async function verify(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  ref: string,
+  publickKeys: string
+}): Promise<false | Array<string>>
+
+export function version(): string

@@ -61,8 +61,7 @@ export async function commit ({
   fs: _fs,
   message,
   author,
-  committer,
-  privateKeys
+  committer
 }) {
   const fs = new FileSystem(_fs)
   // Fill in missing arguments with default values
@@ -110,9 +109,6 @@ export async function commit ({
         },
         message
       })
-      if (privateKeys) {
-        comm = await comm.sign(privateKeys)
-      }
       oid = await GitObjectManager.write({
         fs,
         gitdir,
