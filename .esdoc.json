@@ -20,6 +20,12 @@
           "description": "A pure JavaScript implementation of git for node and browsers",
           "site": "https://isomorphic-git.github.io/isomorphic-git",
           "author": "https://twitter.com/wmhilton"
+        },
+        "manual": {
+          "asset": "./assets",
+          "files": [
+            "./manual/tutorial.md"
+          ]
         }
       }
     },
@@ -46,7 +52,21 @@
       "option": {
         "scripts": [
           "./assets/gitter.js",
-          "./assets/sidecar.v1.js"
+          "./assets/sidecar.v1.js",
+          "./assets/browserfs.js",
+          "./dist/bundle.umd.min.js",
+          "./assets/fs.js",
+          "./assets/object-inspector.min.js",
+          "./assets/tutorial.js"
+        ]
+      }
+    },
+    {
+      "name": "esdoc-inject-style-plugin",
+      "option": {
+        "enable": true,
+        "styles": [
+          "./assets/tutorial.css"
         ]
       }
     }
