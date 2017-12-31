@@ -1,0 +1,59 @@
+
+code {
+  overflow: auto;
+}
+.eval-button {
+  margin: 3px; /* needed for the thicker border on hover */
+  margin-top: 20px;
+  padding: 3px;
+  border: 1px solid gray;
+  background: lightgreen;
+  border-radius: 3px;
+}
+.eval-button:hover {
+  border: 3px solid rgb(51, 51, 51);
+  margin-left: 1px;
+  margin-top: 18px;
+  margin-bottom: 1px;
+  margin-right: 1px;
+}
+.eval-output {
+  margin-top: 8px;
+  padding: 10px;
+  padding-top: 20px;
+  background: white;
+  border: 3px solid lightgray;
+  position: relative;
+  overflow: auto;
+}
+.eval-output::before {
+  content: 'return value';
+  font-style: italic;
+  font-size: 90%;
+  color: lightgray;
+  position: absolute;
+  top: 0;
+  left: 3px;
+}
+.eval-log-output-box {
+  margin-top: 8px;
+  padding: 10px;
+  padding-top: 20px;
+  background: white;
+  border: 3px solid lightgray;
+  display: flex;
+  position: relative;
+  overflow: auto;
+}
+.eval-log-output-box::before {
+  content: 'console.log';
+  font-style: italic;
+  font-size: 90%;
+  color: lightgray;
+  position: absolute;
+  top: 0;
+  left: 3px;
+}
+.eval-log-output-item {
+  margin-right: 1em;
+}
