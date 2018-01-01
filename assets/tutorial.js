@@ -1,3 +1,9 @@
+function disableEnterKey (event) {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+  }
+}
+
 async function evalToFakeConsole (text, printOut) {
   // We have to sneak in the return statement ourselves.
   let lines = text.split('\n').map(x => x.trim()).filter(x => x !== '')
@@ -20,16 +26,27 @@ async function onEvalButtonClick () {
   if (this.parentNode) {
     let el = this.parentNode.querySelector('code')
     if (el) {
+      // append new results
       const printOut = results => {
         let output = createLogOutputBox(results)
+        let close = createCloseButton()
+        output.appendChild(close)
         this.parentNode.appendChild(output)
       }
       let result = await evalToFakeConsole(el.innerText, printOut)
       if (result !== undefined) {
         let output = createReturnOutput(result)
+        let close = createCloseButton()
+        output.appendChild(close)
         this.parentNode.appendChild(output)
       }
     }
+  }
+}
+
+function onCloseButtonClick (event) {
+  if (this.parentNode) {
+    this.parentNode.remove()
   }
 }
 
@@ -39,6 +56,15 @@ function createButton () {
   b.className = 'eval-button'
   b.type = 'button'
   b.onclick = onEvalButtonClick
+  return b
+}
+
+function createCloseButton () {
+  let b = document.createElement('button')
+  b.innerText = 'dismiss [X]'
+  b.className = 'close-button'
+  b.type = 'button'
+  b.onclick = onCloseButtonClick
   return b
 }
 
@@ -68,8 +94,30 @@ function createLogOutputItem (output) {
 
 document.addEventListener('DOMContentLoaded', function listener () {
   document.removeEventListener('DOMContentLoaded', listener)
+  // Add the RUN buttons
   let blocks = document.querySelectorAll('.lang-js')
   for (let block of blocks) {
     block.appendChild(createButton())
+  }
+  // Make parts of the code editable
+  let spans = document.querySelectorAll('.lang-js span')
+  for (let span of spans) {
+    let currentHTML = span.innerHTML
+    if (currentHTML.includes('@')) {
+      // Indicate multi-line placeholders with <<@Here be text@>>
+      let newHTML = currentHTML.replace(
+        /&lt;&lt;@(.+)@&gt;&gt;/g,
+        '<span contenteditable>$1</span>'
+      )
+      // Indicate single-line (no line breaks) placeholders with <@Here be text@>
+      newHTML = newHTML.replace(
+        /&lt;@(.+)@&gt;/g,
+        '<span contenteditable onkeydown="disableEnterKey(event)">$1</span>'
+      )
+      // This tries to minimize needless DOM trashing
+      if (newHTML !== currentHTML) {
+        span.innerHTML = newHTML
+      }
+    }
   }
 })
