@@ -57,3 +57,20 @@ code {
 .eval-log-output-item {
   margin-right: 1em;
 }
+[contenteditable] {
+  border-bottom: 1px dotted;
+}
+
+.close-button {
+  font-size: 90%;
+  color: lightgray;
+  position: absolute;
+  top: 0;
+  right: 3px;
+  border: none;
+  background: none;
+}
+.close-button:hover {
+  font-style: italic;
+  color: red;
+}
