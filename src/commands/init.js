@@ -12,7 +12,7 @@ import { FileSystem } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await init(repo)
+ * await git.init(repo)
  */
 export async function init ({ dir, gitdir = path.join(dir, '.git'), fs: _fs }) {
   const fs = new FileSystem(_fs)

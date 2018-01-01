@@ -66,6 +66,7 @@
       "option": {
         "enable": true,
         "styles": [
+          "./assets/custom.css",
           "./assets/tutorial.css"
         ]
       }

@@ -26,11 +26,12 @@ import { GitRefManager, GitObjectManager } from '../managers'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * let keyids = verify({
+ * let keyids = await git.verify({
  *   ...repo,
  *   ref: 'HEAD',
  *   publicKeys: '-----BEGIN PGP PUBLIC KEY BLOCK-----...'
  * })
+ * console.log(keyids)
  */
 export async function verify ({
   dir,

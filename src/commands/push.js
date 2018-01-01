@@ -43,13 +43,14 @@ const types = {
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await push({
+ * let pushResponse = await git.push({
  *   ...repo,
  *   remote: 'origin',
  *   ref: 'master',
  *   authUsername: process.env.GITHUB_TOKEN,
  *   authPassword: process.env.GITHUB_TOKEN
  * })
+ * console.log(pushResponse)
  */
 export async function push ({
   fs: _fs,

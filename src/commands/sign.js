@@ -25,7 +25,7 @@ import { GitRefManager, GitObjectManager } from '../managers'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await commit({
+ * await git.commit({
  *   ...repo,
  *   author: {
  *     name: 'Mr. Test',
@@ -33,10 +33,11 @@ import { GitRefManager, GitObjectManager } from '../managers'
  *   },
  *   message: 'Added the a.txt file'
  * })
- * let sha = sign({
+ * let sha = git.sign({
  *   ...repo,
  *   privateKeys: '-----BEGIN PGP PRIVATE KEY BLOCK-----...'
  * })
+ * console.log(sha)
  */
 export async function sign ({
   dir,

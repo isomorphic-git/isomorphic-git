@@ -12,7 +12,8 @@ import { FileSystem } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * let branches = await listBranches(repo)
+ * let branches = await git.listBranches(repo)
+ * console.log(branches)
  */
 export async function listBranches ({
   dir,

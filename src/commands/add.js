@@ -17,7 +17,7 @@ import { FileSystem } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await add({...repo, filepath: 'README.md'})
+ * await git.add({...repo, filepath: 'README.md'})
  */
 export async function add ({
   dir,

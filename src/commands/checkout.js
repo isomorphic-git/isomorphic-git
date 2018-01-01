@@ -53,7 +53,7 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await checkout({...repo, ref: 'master'})
+ * await git.checkout({...repo, ref: 'master'})
  */
 export async function checkout ({
   dir,

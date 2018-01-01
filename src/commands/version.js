@@ -7,7 +7,7 @@ import { pkg } from '../utils/pkg'
  * the correct version of the library and not a cached version.
  * @returns {string} version - the version string taken from package.json at publication time
  * @example
- * console.log(version())
+ * console.log(git.version())
  */
 export function version () {
   return pkg.version

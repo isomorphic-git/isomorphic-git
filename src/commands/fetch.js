@@ -44,6 +44,7 @@ import { pkg } from '../utils'
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git',
  *   depth: 1
  * })
+ * // returns void
  */
 export async function fetch ({
   dir,
