@@ -57,6 +57,25 @@ code {
 .eval-log-output-item {
   margin-right: 1em;
 }
+
+.eval-error-output {
+  margin-top: 8px;
+  padding: 10px;
+  padding-top: 20px;
+  background: white;
+  border: 3px solid red;
+  position: relative;
+  overflow: auto;
+}
+.eval-error-output::before {
+  content: 'Threw Error';
+  font-style: italic;
+  font-size: 90%;
+  color: red;
+  position: absolute;
+  top: 0;
+  left: 3px;
+}
 [contenteditable] {
   border-bottom: 1px dotted;
 }

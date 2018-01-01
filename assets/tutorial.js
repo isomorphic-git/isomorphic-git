@@ -26,16 +26,22 @@ async function onEvalButtonClick () {
   if (this.parentNode) {
     let el = this.parentNode.querySelector('code')
     if (el) {
-      // append new results
-      const printOut = results => {
-        let output = createLogOutputBox(results)
-        let close = createCloseButton()
-        output.appendChild(close)
-        this.parentNode.appendChild(output)
-      }
-      let result = await evalToFakeConsole(el.innerText, printOut)
-      if (result !== undefined) {
-        let output = createReturnOutput(result)
+      try {
+        const printOut = results => {
+          let output = createLogOutputBox(results)
+          let close = createCloseButton()
+          output.appendChild(close)
+          this.parentNode.appendChild(output)
+        }
+        let result = await evalToFakeConsole(el.innerText, printOut)
+        if (result !== undefined) {
+          let output = createReturnOutput(result)
+          let close = createCloseButton()
+          output.appendChild(close)
+          this.parentNode.appendChild(output)
+        }
+      } catch (err) {
+        let output = createErrorOutput(err)
         let close = createCloseButton()
         output.appendChild(close)
         this.parentNode.appendChild(output)
@@ -71,6 +77,18 @@ function createCloseButton () {
 function createReturnOutput (output) {
   let o = document.createElement('div')
   o.className = 'eval-output'
+  ObjectInspector(o, output)
+  return o
+}
+
+function createErrorOutput (err) {
+  // Because of the way ObjectInspector works, we need to set
+  // all these as instance properties to be visible.
+  let { name, message, stack, fileName, lineNumber, columnNumber } = err
+  let output = { name, message, stack, fileName, lineNumber, columnNumber }
+  Object.setPrototypeOf(output, Object.getPrototypeOf(err))
+  let o = document.createElement('div')
+  o.className = 'eval-error-output'
   ObjectInspector(o, output)
   return o
 }
