@@ -35,7 +35,7 @@ import { FileSystem, GitCommit } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * let commits = await log({...repo, depth: 5, ref: 'master'})
+ * let commits = await git.log({...repo, depth: 5, ref: 'master'})
  * console.log(commits)
  */
 export async function log ({

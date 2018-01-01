@@ -13,7 +13,8 @@ import { FileSystem } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * let files = await listFiles(repo)
+ * let files = await git.listFiles(repo)
+ * console.log(files)
  */
 export async function listFiles ({
   dir,

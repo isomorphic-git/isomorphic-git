@@ -13,7 +13,7 @@ import { FileSystem, GitPackIndex } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await indexPack({...repo, filepath: 'pack-9cbd243a1caa4cb4bef976062434a958d82721a9.pack'})
+ * await git.indexPack({...repo, filepath: 'pack-9cbd243a1caa4cb4bef976062434a958d82721a9.pack'})
  */
 export async function indexPack ({
   dir,

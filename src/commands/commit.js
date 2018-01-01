@@ -46,7 +46,7 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  *
  * @example
  * let repo = {fs, dir: '.'}
- * let sha = await commit({
+ * let sha = await git.commit({
  *   ...repo,
  *   author: {
  *     name: 'Mr. Test',
@@ -54,6 +54,7 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  *   },
  *   message: 'Added the a.txt file'
  * })
+ * console.log(sha)
  */
 export async function commit ({
   dir,

@@ -16,7 +16,7 @@ import { FileSystem } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await remove({...repo, filepath: 'README.md'})
+ * await git.remove({...repo, filepath: 'README.md'})
  */
 export async function remove ({
   dir,

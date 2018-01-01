@@ -26,11 +26,12 @@ import { FileSystem } from '../models'
  *
  * @example
  * let repo = {fs, dir: '.'}
- * await clone({
+ * await git.clone({
  *   ...repo,
  *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git',
  *   depth: 1
  * })
+ * // returns void
  */
 export async function clone ({
   dir,
