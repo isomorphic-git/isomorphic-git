@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function listener () {
     block.appendChild(createButton())
   }
   // Make parts of the code editable
-  let spans = document.querySelectorAll('.lang-js span')
+  let spans = document.querySelectorAll('code')
   for (let span of spans) {
     let currentHTML = span.innerHTML
     if (currentHTML.includes('@')) {
