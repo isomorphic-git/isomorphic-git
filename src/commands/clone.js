@@ -28,7 +28,7 @@ import { FileSystem } from '../models'
  * let repo = {fs, dir: '.'}
  * await git.clone({
  *   ...repo,
- *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git',
+ *   url: '<@https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git@>',
  *   depth: 1
  * })
  * // returns void
