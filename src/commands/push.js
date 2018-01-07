@@ -42,13 +42,13 @@ const types = {
  * @returns {Promise<PushResponse>} - Resolves successfully when push completes with a detailed description of the operation from the server.
  *
  * @example
- * let repo = {fs, dir: '.'}
+ * let repo = {fs, dir: '<@.@>'}
  * let pushResponse = await git.push({
  *   ...repo,
- *   remote: 'origin',
- *   ref: 'master',
- *   authUsername: process.env.GITHUB_TOKEN,
- *   authPassword: process.env.GITHUB_TOKEN
+ *   remote: '<@origin@>',
+ *   ref: '<@master@>',
+ *   authUsername: <@process.env.GITHUB_TOKEN@>,
+ *   authPassword: <@process.env.GITHUB_TOKEN@>
  * })
  * console.log(pushResponse)
  */

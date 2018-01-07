@@ -28,8 +28,11 @@ import { GitRefManager, GitObjectManager } from '../managers'
  * let repo = {fs, dir: '.'}
  * let keyids = await git.verify({
  *   ...repo,
- *   ref: 'HEAD',
- *   publicKeys: '-----BEGIN PGP PUBLIC KEY BLOCK-----...'
+ *   ref: '<@HEAD@>',
+ *   publicKeys: `<<@
+ * -----BEGIN PGP PUBLIC KEY BLOCK-----
+ * ...
+ * @>>`
  * })
  * console.log(keyids)
  */

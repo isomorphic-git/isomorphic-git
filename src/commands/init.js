@@ -11,8 +11,9 @@ import { FileSystem } from '../models'
  * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
  *
  * @example
- * let repo = {fs, dir: '.'}
+ * let repo = {fs, dir: '<@.@>'}
  * await git.init(repo)
+ * console.log('done')
  */
 export async function init ({ dir, gitdir = path.join(dir, '.git'), fs: _fs }) {
   const fs = new FileSystem(_fs)

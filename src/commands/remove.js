@@ -15,8 +15,9 @@ import { FileSystem } from '../models'
  * @returns {Promise<void>} - Resolves successfully once the git index has been updated.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * await git.remove({...repo, filepath: 'README.md'})
+ * let repo = {fs, dir: '<@.@>'}
+ * await git.remove({...repo, filepath: '<@README.md@>'})
+ * console.log('done')
  */
 export async function remove ({
   dir,
