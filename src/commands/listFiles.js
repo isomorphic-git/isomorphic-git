@@ -12,7 +12,7 @@ import { FileSystem } from '../models'
  * @returns {Promise<string[]>} - Resolves successfully with an array of file paths.
  *
  * @example
- * let repo = {fs, dir: '.'}
+ * let repo = {fs, dir: '<@.@>'}
  * let files = await git.listFiles(repo)
  * console.log(files)
  */

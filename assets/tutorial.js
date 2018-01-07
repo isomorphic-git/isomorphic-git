@@ -23,6 +23,7 @@ async function evalToFakeConsole (text, printOut) {
 }
 
 async function onEvalButtonClick () {
+  this.classList.add('busy')
   if (this.parentNode) {
     let el = this.parentNode.querySelector('code')
     if (el) {
@@ -48,6 +49,7 @@ async function onEvalButtonClick () {
       }
     }
   }
+  this.classList.remove('busy')
 }
 
 function onCloseButtonClick (event) {
@@ -126,12 +128,12 @@ document.addEventListener('DOMContentLoaded', function listener () {
     if (currentHTML.includes('@')) {
       // Indicate multi-line placeholders with <<@Here be text@>>
       let newHTML = currentHTML.replace(
-        /&lt;&lt;@(.+)@&gt;&gt;/g,
+        /&lt;&lt;@([\s\S]+?)@&gt;&gt;/g,
         '<span contenteditable>$1</span>'
       )
       // Indicate single-line (no line breaks) placeholders with <@Here be text@>
       newHTML = newHTML.replace(
-        /&lt;@(.+)@&gt;/g,
+        /&lt;@(.+?)@&gt;/g,
         '<span contenteditable onkeydown="disableEnterKey(event)">$1</span>'
       )
       // This tries to minimize needless DOM trashing

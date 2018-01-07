@@ -45,14 +45,14 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  * @returns {Promise<string>} - The object ID of the newly created commit.
  *
  * @example
- * let repo = {fs, dir: '.'}
+ * let repo = {fs, dir: '<@.@>'}
  * let sha = await git.commit({
  *   ...repo,
  *   author: {
- *     name: 'Mr. Test',
- *     email: 'mrtest@example.com'
+ *     name: '<@Mr. Test@>',
+ *     email: '<@mrtest@example.com@>'
  *   },
- *   message: 'Added the a.txt file'
+ *   message: '<@Added the a.txt file@>'
  * })
  * console.log(sha)
  */

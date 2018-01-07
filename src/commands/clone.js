@@ -25,13 +25,13 @@ import { FileSystem } from '../models'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * let repo = {fs, dir: '.'}
+ * let repo = {fs, dir: '<@.@>'}
  * await git.clone({
  *   ...repo,
  *   url: '<@https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git@>',
  *   depth: 1
  * })
- * // returns void
+ * console.log(done)
  */
 export async function clone ({
   dir,

@@ -24,18 +24,13 @@ import { GitRefManager, GitObjectManager } from '../managers'
  * @returns {Promise<string>} - The object ID of the newly created commit.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * await git.commit({
+ * let repo = {fs, dir: '<@.@>'}
+ * let sha = await git.sign({
  *   ...repo,
- *   author: {
- *     name: 'Mr. Test',
- *     email: 'mrtest@example.com'
- *   },
- *   message: 'Added the a.txt file'
- * })
- * let sha = git.sign({
- *   ...repo,
- *   privateKeys: '-----BEGIN PGP PRIVATE KEY BLOCK-----...'
+ *   privateKeys: `<<@
+ * -----BEGIN PGP PRIVATE KEY BLOCK-----
+ * ...
+ * @>>`
  * })
  * console.log(sha)
  */

@@ -52,8 +52,9 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
  * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * await git.checkout({...repo, ref: 'master'})
+ * let repo = {fs, dir: '<@.@>'}
+ * await git.checkout({...repo, ref: '<@master@>'})
+ * console.log('done')
  */
 export async function checkout ({
   dir,

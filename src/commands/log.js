@@ -34,8 +34,8 @@ import { FileSystem, GitCommit } from '../models'
  * @returns {Promise<CommitDescription[]>} - Resolves to an array of {@link CommitDescription} objects
  *
  * @example
- * let repo = {fs, dir: '.'}
- * let commits = await git.log({...repo, depth: 5, ref: 'master'})
+ * let repo = {fs, dir: '<@.@>'}
+ * let commits = await git.log({...repo, depth: 5, ref: '<@master@>'})
  * console.log(commits)
  */
 export async function log ({

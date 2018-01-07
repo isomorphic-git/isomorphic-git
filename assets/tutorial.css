@@ -17,6 +17,12 @@ code {
   margin-bottom: 1px;
   margin-right: 1px;
 }
+.eval-button.busy {
+  font-style: italic;
+}
+.eval-button.busy:after {
+  content: 'NING...';
+}
 .eval-output {
   margin-top: 8px;
   padding: 10px;
