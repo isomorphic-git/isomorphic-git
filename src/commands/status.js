@@ -94,9 +94,9 @@ async function getHeadTree ({ fs, gitdir }) {
  * @returns {Promise<string>} - Resolves successfully with the file's git status.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * let gitstatus = await status({...repo, filepath: 'README.md'})
- * console.log(gitstatus)
+ * let repo = {fs, dir: '<@.@>'}
+ * let status = await git.status({...repo, filepath: '<@README.md@>'})
+ * console.log(status)
  */
 export async function status ({
   dir,

@@ -6,6 +6,8 @@ import listpack from 'git-list-pack'
 import peek from 'buffer-peek-stream'
 import applyDelta from 'git-apply-delta'
 import marky from 'marky'
+import pify from 'pify'
+import concat from 'simple-concat'
 import { config } from './config'
 import {
   GitRemoteHTTP,
@@ -36,17 +38,18 @@ import { pkg } from '../utils'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * let repo = {fs, dir: '.'}
+ * let repo = {fs, dir: '<@.@>'}
  * await fetch({
  *   ...repo,
- *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
+ *   url: '<@https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git@>',
  *   depth: 1
  * })
+ * console.log('done')
  */
 export async function fetch ({
   dir,
   gitdir = path.join(dir, '.git'),
-  fs,
+  fs: _fs,
   ref = 'HEAD',
   remote,
   url,
@@ -58,6 +61,7 @@ export async function fetch ({
   relative,
   onprogress
 }) {
+  const fs = new FileSystem(_fs)
   let response = await fetchPackfile({
     gitdir,
     fs,
@@ -71,7 +75,12 @@ export async function fetch ({
     exclude,
     relative
   })
-  await unpack({ fs, gitdir, inputStream: response.packfile, onprogress })
+  let packfile = await pify(concat)(response.packfile)
+  let packfileSha = packfile.slice(-20).toString('hex')
+  await fs.write(
+    path.join(gitdir, `objects/pack/pack-${packfileSha}.pack`),
+    packfile
+  )
 }
 
 async function fetchPackfile ({
@@ -141,9 +150,9 @@ async function fetchPackfile ({
   })
   // Note: I removed "ofs-delta" from the capabilities list and now
   // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
-  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack agent=git/${pkg.name}@${pkg.version}${relative
-    ? ' deepen-relative'
-    : ''}`
+  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/${
+    pkg.name
+  }@${pkg.version}${relative ? ' deepen-relative' : ''}`
   let packstream = new PassThrough()
   packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`))
   let oids = await GitShallowManager.read({ fs, gitdir })

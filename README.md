@@ -1,4 +1,4 @@
-# isomorphic-git ![node version](https://img.shields.io/node/v/isomorphic-git.svg) [![Build Status](https://travis-ci.org/wmhilton/isomorphic-git.svg?branch=master)](https://travis-ci.org/wmhilton/isomorphic-git) [![codecov](https://codecov.io/gh/wmhilton/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/wmhilton/isomorphic-git) [![dependencies](https://david-dm.org/wmhilton/isomorphic-git/status.svg)](https://david-dm.org/wmhilton/isomorphic-git) [![Known Vulnerabilities](https://snyk.io/test/github/wmhilton/isomorphic-git/badge.svg)](https://snyk.io/test/github/wmhilton/isomorphic-git)
+# isomorphic-git ![node version](https://img.shields.io/node/v/isomorphic-git.svg) [![Build Status](https://travis-ci.org/isomorphic-git/isomorphic-git.svg?branch=master)](https://travis-ci.org/isomorphic-git/isomorphic-git) [![codecov](https://codecov.io/gh/isomorphic-git/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/isomorphic-git/isomorphic-git) [![dependencies](https://david-dm.org/isomorphic-git/isomorphic-git/status.svg)](https://david-dm.org/isomorphic-git/isomorphic-git) [![Known Vulnerabilities](https://snyk.io/test/github/isomorphic-git/isomorphic-git/badge.svg)](https://snyk.io/test/github/isomorphic-git/isomorphic-git)
 A pure JavaScript implementation of git for node and browsers!
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
@@ -64,6 +64,17 @@ BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
 
 Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
 
+### CORS support
+
+Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a [proxy](https://cors-buster-jfpactjnem.now.sh/). However, I am "being the change you want to see in the world" by making PRs to all the major git repository hosting services.
+
+- Gogs: [repo/http: add CORS headers to allow clone/push from browser agents #4970](https://github.com/gogits/gogs/pull/4970)
+- Gitlab: [Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
+- Bitbucket: TODO
+- Github: TODO
+
+It is literally just two lines of code to add the CORS headers!! Easy stuff. Surely it will happen.
+
 ### Using as an npm module
 
 You can install it from npm.
@@ -88,7 +99,7 @@ This probably deserves a brief explanation.
 - the "module" version is for native ES6 module loaders when they arrive.
 - the "unpkg" version is the UMD build.
 
-For more details about each build see [./dist/README.md](https://github.com/wmhilton/isomorphic-git/blob/master/dist/README.md)
+For more details about each build see [./dist/README.md](https://github.com/isomorphic-git/isomorphic-git/blob/master/dist/README.md)
 
 ### `isogit` CLI
 
@@ -105,31 +116,32 @@ TODO: Document this more. Also write some tests? IDK the CLI is more of a lark f
 
 I may continue to make changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
 
-**[NEW DOCS WEBSITE](https://wmhilton.github.io/isomorphic-git)**
+**[NEW DOCS WEBSITE](https://isomorphic-git.github.io/isomorphic-git)**
 
 ### commands
 
-- [add](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-add)
-- [checkout](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-checkout)
-- [clone](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-clone)
-- [commit](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-commit)
-- [config](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-config)
-- [fetch](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-fetch)
-- [findRoot](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-findRoot)
-- [init](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-init)
-- [listBranches](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-listBranches)
-- [listFiles](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-listFiles)
-- [log](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-log)
-- [push](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-push)
-- [remove](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-remove)
-- [status](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-status)
-- [verify](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-verify)
-- [version](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-version)
+- [add](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-add)
+- [checkout](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-checkout)
+- [clone](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-clone)
+- [commit](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-commit)
+- [config](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-config)
+- [fetch](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-fetch)
+- [findRoot](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-findRoot)
+- [init](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-init)
+- [listBranches](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-listBranches)
+- [listFiles](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-listFiles)
+- [log](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-log)
+- [push](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-push)
+- [remove](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-remove)
+- [sign](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-sign)
+- [status](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-status)
+- [verify](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-verify)
+- [version](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-version)
 
 ### utils
 
-- [auth](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-auth)
-- [oauth2](https://wmhilton.github.io/isomorphic-git/function/index.html#static-function-oauth2)
+- [auth](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-auth)
+- [oauth2](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-oauth2)
 
 ### dir vs gitdir
 I looked hard and wide for a good explanation of the "working tree" and the "git directory" and the best I found was [this one](https://stackoverflow.com/a/5283457) from Stack Overflow:

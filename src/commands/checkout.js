@@ -2,7 +2,8 @@ import path from 'path'
 import { FileSystem, GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 
-async function writeTreeToDisk ({ gitdir, dir, index, prefix, tree, fs }) {
+async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
+  const fs = new FileSystem(_fs)
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
       fs,
@@ -24,12 +25,12 @@ async function writeTreeToDisk ({ gitdir, dir, index, prefix, tree, fs }) {
       case 'tree':
         let tree = GitTree.from(object)
         await writeTreeToDisk({
-          gitdir,
+          fs,
           dir,
+          gitdir,
           index,
           prefix: entrypath,
-          tree,
-          fs
+          tree
         })
         break
       default:
@@ -51,8 +52,9 @@ async function writeTreeToDisk ({ gitdir, dir, index, prefix, tree, fs }) {
  * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * await checkout({...repo, ref: 'master'})
+ * let repo = {fs, dir: '<@.@>'}
+ * await git.checkout({...repo, ref: '<@master@>'})
+ * console.log('done')
  */
 export async function checkout ({
   dir,
@@ -113,7 +115,7 @@ export async function checkout ({
       // Write files. TODO: Write them atomically
       await writeTreeToDisk({ fs, gitdir, dir, index, prefix: '', tree })
       // Update HEAD TODO: Handle non-branch cases
-      fs.write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
+      await fs.write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
     }
   )
 }

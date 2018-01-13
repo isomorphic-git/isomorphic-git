@@ -11,8 +11,9 @@ import { FileSystem } from '../models'
  * @returns {Promise<string[]>} - Resolves successfully with an array of branch names.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * let branches = await listBranches(repo)
+ * let repo = {fs, dir: '<@.@>'}
+ * let branches = await git.listBranches(repo)
+ * console.log(branches)
  */
 export async function listBranches ({
   dir,

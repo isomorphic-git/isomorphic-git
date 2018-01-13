@@ -53,6 +53,7 @@ export function flatFileListToDirectoryStructure (
     return inodes.get(name)
   }
 
+  mkdir('.')
   for (let file of files) {
     mkfile(file.path, file)
   }

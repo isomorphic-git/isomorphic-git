@@ -8,7 +8,15 @@ module.exports = function (config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['browserify', 'tap'],
     // list of files / patterns to load in the browser
-    files: ['testling/*.js'],
+    files: [
+      'testling/*.js',
+      {
+        pattern: '__tests__/__fixtures__',
+        served: true,
+        watched: false,
+        included: false
+      }
+    ],
     // list of files to exclude
     exclude: [],
     // preprocess matching files before serving them to the browser

@@ -15,7 +15,7 @@ describe('config', () => {
     let rfv = await config({ ...repo, path: 'core.repositoryformatversion' })
     let url = await config({ ...repo, path: 'remote.origin.url' })
     expect(sym).toBe(false)
-    expect(url).toBe('https://github.com/wmhilton/isomorphic-git')
+    expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')
     expect(rfv).toBe('0')
   })
 
@@ -41,9 +41,9 @@ describe('config', () => {
     await config({
       ...repo,
       path: 'remote.origin.url',
-      value: 'https://github.com/wmhilton/isomorphic-git'
+      value: 'https://github.com/isomorphic-git/isomorphic-git'
     })
     let url = await config({ ...repo, path: 'remote.origin.url' })
-    expect(url).toBe('https://github.com/wmhilton/isomorphic-git')
+    expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')
   })
 })

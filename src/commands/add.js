@@ -16,8 +16,14 @@ import { FileSystem } from '../models'
  * @returns {Promise<void>} - Resolves successfully once the git index has been updated.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * await add({...repo, filepath: 'README.md'})
+ * let repo = {fs, dir: '<@.@>'}
+ * await new Promise((resolve, reject) => fs.writeFile(
+ *   '<@README.md@>',
+ *   `<<@# TEST@>>`,
+ *   (err) => err ? reject(err) : resolve()
+ * ))
+ * await git.add({...repo, filepath: '<@README.md@>'})
+ * console.log('done')
  */
 export async function add ({
   dir,

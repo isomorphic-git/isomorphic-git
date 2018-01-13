@@ -12,8 +12,20 @@ const types = {
   commit: 0b0010000,
   tree: 0b0100000,
   blob: 0b0110000,
-  tag: 0b1000000
+  tag: 0b1000000,
+  ofs_delta: 0b1100000,
+  ref_delta: 0b1110000
 }
+
+/**
+ *
+ * If there were no errors, then there will be no `errors` property.
+ * There can be a mix of `ok` messages and `errors` messages.
+ *
+ * @typedef {Object} PushResponse
+ * @property {Array<string>} [ok] - The first item is "unpack" if the overall operation was successful. The remaining items are the names of refs that were updated successfully.
+ * @property {Array<string>} [errors] - If the overall operation threw and error, the first item will be "unpack {Overall error message}". The remaining items are individual refs that failed to be updated in the format "{ref name} {error message}".
+ */
 
 /**
  * Push a branch
@@ -22,22 +34,23 @@ const types = {
  * @param {FSModule} args.fs - The filesystem holding the git repo
  * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
  * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} [args.ref] - Which branch to push. By default this is the currently checked out branch of the repository.
+ * @param {string} [args.ref=undefined] - Which branch to push. By default this is the currently checked out branch of the repository.
  * @param {string} [args.remote='origin'] - If URL is not specified, determines which remote to use.
- * @param {string} [args.url] - The URL of the remote git server. The default is the value set in the git config for that remote.
- * @param {string} [args.authUsername] - The username to use with Basic Auth
- * @param {string} [args.authPassword] - The password to use with Basic Auth
- * @returns {Promise<void>} - Resolves successfully when push completes
+ * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
+ * @param {string} [args.authUsername=undefined] - The username to use with Basic Auth
+ * @param {string} [args.authPassword=undefined] - The password to use with Basic Auth
+ * @returns {Promise<PushResponse>} - Resolves successfully when push completes with a detailed description of the operation from the server.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * await push({
+ * let repo = {fs, dir: '<@.@>'}
+ * let pushResponse = await git.push({
  *   ...repo,
- *   remote: 'origin',
- *   ref: 'master',
- *   authUsername: process.env.GITHUB_TOKEN,
- *   authPassword: process.env.GITHUB_TOKEN
+ *   remote: '<@origin@>',
+ *   ref: '<@master@>',
+ *   authUsername: <@process.env.GITHUB_TOKEN@>,
+ *   authPassword: <@process.env.GITHUB_TOKEN@>
  * })
+ * console.log(pushResponse)
  */
 export async function push ({
   fs: _fs,
@@ -88,9 +101,7 @@ export async function push ({
   return response
 }
 
-/**
- * @ignore
- */
+/** @ignore */
 export async function listCommits ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -138,9 +149,7 @@ export async function listCommits ({
   return visited
 }
 
-/**
- * @ignore
- */
+/** @ignore */
 export async function listObjects ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -179,9 +188,7 @@ export async function listObjects ({
   return visited
 }
 
-/**
- * @ignore
- */
+/** @ignore */
 export async function pack ({
   dir,
   gitdir = path.join(dir, '.git'),

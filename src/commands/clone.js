@@ -13,8 +13,8 @@ import { FileSystem } from '../models'
  * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
  * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
  * @param {string} args.url - The URL of the remote repository.
- * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
  * @param {string} [args.ref=undefined] - Which branch to clone. By default this is the designated "main branch" of the repository.
+ * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
  * @param {string} [args.authUsername=undefined] - The username to use with Basic Auth
  * @param {string} [args.authPassword=undefined] - The password to use with Basic Auth
  * @param {integer} [args.depth=undefined] - Determines how much of the git repository's history to retrieve.
@@ -25,20 +25,21 @@ import { FileSystem } from '../models'
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
  * @example
- * let repo = {fs, dir: '.'}
- * await clone({
+ * let repo = {fs, dir: '<@.@>'}
+ * await git.clone({
  *   ...repo,
- *   url: 'https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git',
+ *   url: '<@https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git@>',
  *   depth: 1
  * })
+ * console.log(done)
  */
 export async function clone ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   url,
-  remote,
   ref,
+  remote,
   authUsername,
   authPassword,
   depth,

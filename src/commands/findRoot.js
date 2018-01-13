@@ -12,11 +12,11 @@ import path from 'path'
  * Starting at `filepath`, will walk upwards until it finds a directory that contains a directory called '.git'.
  *
  * @example
- * let gitroot = await findRoot( {
+ * let gitroot = await git.findRoot({
  *   fs,
- *   filepath: '/path/to/some/gitrepo/path/to/some/file.txt'
+ *   filepath: '<@/path/to/some/gitrepo/path/to/some/file.txt@>'
  * })
- * // gitroot = '/path/to/some/gitrepo'
+ * console.log(gitroot) // '/path/to/some/gitrepo'
  */
 export async function findRoot ({ fs: _fs, filepath }) {
   const fs = new FileSystem(_fs)

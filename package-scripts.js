@@ -44,17 +44,14 @@ module.exports = {
       default: series.nps('doc.esdoc', 'doc.copy'),
       esdoc: 'esdoc',
       copy: 'cp -R dist/* doc/',
-      watch: 'watch "nps doc.esdoc" src'
+      watch: 'watch "nps doc.esdoc" src manual assets'
     },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
-      travis: series.nps('lint', 'build', 'doc', 'test.parallel'),
-      local: 'nps test.jest',
-      parallel_tests: concurrent.nps('test.jest', 'test.karma'),
+      travis: series.nps('lint', 'build', 'doc', 'test.jest', 'test.karma'),
+      local: series.nps('test.jest'),
       jest: process.env.CI ? 'jest --coverage && codecov' : 'jest',
-      karma: process.env.CI
-        ? "karma start ci.karma.conf.js || echo 'saucelabs failed, no big deal'"
-        : 'karma start'
+      karma: process.env.CI ? 'karma start ci.karma.conf.js' : 'karma start'
     }
   }
 }

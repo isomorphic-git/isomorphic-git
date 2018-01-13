@@ -3,7 +3,7 @@ import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-import { commit, verify } from '..'
+import { commit, sign, verify } from '..'
 
 jest.setTimeout(30000)
 
@@ -41,17 +41,20 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1504842425
-      },
+      }
+    })
+    await sign({
+      ...repo,
       privateKeys: privateKeys[0]
     })
     const publicKeys = await pify(jsonfile.readFile)(
       '__tests__/__fixtures__/openpgp-public-keys.json'
     )
-    let verified = await verify({
+    let keys = await verify({
       ...repo,
       ref: 'HEAD',
       publicKeys: publicKeys[0]
     })
-    expect(verified.keys[0] === 'a01edd29ac0f3952').toBe(true)
+    expect(keys[0] === 'a01edd29ac0f3952').toBe(true)
   })
 })

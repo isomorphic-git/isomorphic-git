@@ -16,7 +16,7 @@
  *
  * @param {string} username
  * @param {string} password
- * @returns {username, password}
+ * @returns {{username: string, password: string}}
  *
  * @example
  * let {username, password} = auth('username', 'password')

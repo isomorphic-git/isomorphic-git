@@ -16,20 +16,21 @@ import { GitConfigManager } from '../managers'
  * If a `value` is provided, it does a write.
  *
  * @example
- * let repo = {fs, dir: '.'}
+ * let repo = {fs, dir: '<@.@>'}
  *
  * // Write config value
- * await config({
+ * await git.config({
  *   ...repo,
- *   path: 'user.name',
- *   value: 'Mr. Test'
+ *   path: '<@user.name@>',
+ *   value: '<@Mr. Test@>'
  * })
  *
  * // Read config value
- * let value = await config({
+ * let value = await git.config({
  *   ...repo,
- *   path: 'user.name'
+ *   path: '<@user.name@>'
  * })
+ * console.log(value)
  */
 export async function config ({
   dir,

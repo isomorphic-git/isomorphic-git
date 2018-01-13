@@ -1,6 +1,6 @@
 import path from 'path'
 import { config } from './config'
-import { FileSystem, SignedGitCommit, GitTree } from '../models'
+import { FileSystem, GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { flatFileListToDirectoryStructure } from '../utils'
 
@@ -42,21 +42,19 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
  * @param {Date} [args.author.date=new Date()] - Set the author timestamp field. Default is the current date.
  * @param {number} [args.author.timestamp=undefined] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
  * @param {Object} [args.committer=author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
- * @param {string} [args.privateKeys=undefined] - A PGP private key in ASCII armor format.
  * @returns {Promise<string>} - The object ID of the newly created commit.
- * @todo Move the PGP signing to a separte signCommit function for better code splitting.
  *
  * @example
- * let repo = {fs, dir: '.'}
- * let sha = await commit({
+ * let repo = {fs, dir: '<@.@>'}
+ * let sha = await git.commit({
  *   ...repo,
  *   author: {
- *     name: 'Mr. Test',
- *     email: 'mrtest@example.com'
+ *     name: '<@Mr. Test@>',
+ *     email: '<@mrtest@example.com@>'
  *   },
- *   privateKeys: '-----BEGIN PGP PRIVATE KEY BLOCK-----...',
- *   message: 'Added the a.txt file'
+ *   message: '<@Added the a.txt file@>'
  * })
+ * console.log(sha)
  */
 export async function commit ({
   dir,
@@ -64,8 +62,7 @@ export async function commit ({
   fs: _fs,
   message,
   author,
-  committer,
-  privateKeys
+  committer
 }) {
   const fs = new FileSystem(_fs)
   // Fill in missing arguments with default values
@@ -93,7 +90,7 @@ export async function commit ({
         // Probably an initial commit
         parents = []
       }
-      let comm = SignedGitCommit.from({
+      let comm = GitCommit.from({
         tree: treeRef,
         parent: parents,
         author: {
@@ -113,9 +110,6 @@ export async function commit ({
         },
         message
       })
-      if (privateKeys) {
-        comm = await comm.sign(privateKeys)
-      }
       oid = await GitObjectManager.write({
         fs,
         gitdir,

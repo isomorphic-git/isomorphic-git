@@ -1,0 +1,28 @@
+/* Hide the import path because it is erroneous */
+[data-ice="importPathCode"] {
+  display: none;
+}
+/* Fix the tiny titles. */
+h3 *, h3 .code {
+  font-size: 20px;
+}
+/* Let the function name stand out. */
+h3 .code[data-ice="name"] {
+  font-weight: bold;
+}
+/* Hide these as they just add noise.
+ * Obviously everything is public and async.
+ */
+h3 [data-ice="access"] {
+  display: none;
+}
+h3 [data-ice="async"] {
+  display: none;
+}
+/* Hack to hide the "utils" instance variable from the TOC. */
+span.kind-variable[data-ice="kind"] {
+  display: none;
+}
+a[href="variable/index.html#static-variable-utils"] {
+  display: none;
+}
