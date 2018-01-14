@@ -11,7 +11,7 @@ module.exports = {
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),
-      jest: runInNewWindow('jest --watch')
+      jest: runInNewWindow('cross-env DEBUG=isomorphic-git jest --watch')
     },
     build: {
       default: series.nps('build.rollup', 'build.browserify'),
@@ -50,7 +50,9 @@ module.exports = {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
       travis: series.nps('lint', 'build', 'doc', 'test.jest', 'test.karma'),
       local: series.nps('test.jest'),
-      jest: process.env.CI ? 'jest --coverage && codecov' : 'jest',
+      jest: process.env.CI
+        ? 'cross-env DEBUG=isomorphic-git jest --coverage && codecov'
+        : 'cross-env DEBUG=isomorphic-git jest',
       karma: process.env.CI ? 'karma start ci.karma.conf.js' : 'karma start'
     }
   }

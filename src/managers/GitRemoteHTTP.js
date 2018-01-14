@@ -4,7 +4,7 @@ import { GitPktLine } from '../models'
 import simpleGet from 'simple-get'
 import concat from 'simple-concat'
 import pify from 'pify'
-import { pkg } from '../utils'
+import { pkg, log } from '../utils'
 import { PassThrough } from 'stream'
 
 function basicAuth (auth) {
@@ -146,7 +146,7 @@ export class GitRemoteHTTP {
         result.errors.push(refAndMessage)
       }
     }
-    console.log(result)
+    log(result)
     return result
   }
   async pull (stream /*: ReadableStream */) {

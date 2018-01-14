@@ -16,7 +16,7 @@ import {
   GitObjectManager
 } from '../managers'
 import { FileSystem, GitPktLine } from '../models'
-import { pkg } from '../utils'
+import { pkg, log } from '../utils'
 
 /**
  * Fetch commits
@@ -349,12 +349,10 @@ export async function unpack ({
               let perfentry = marky.stop(`${type} #${num} ${data.length}B`)
               totalTime += perfentry.duration
               if (num === 0) {
-                console.log(`Total time unpacking objects: ${totalTime}`)
-                console.log(
-                  `Total time applying deltas: ${totalApplyDeltaTime}`
-                )
-                console.log(`Total time reading files: ${totalReadFileTime}`)
-                console.log(`Total time writing files: ${totalWriteFileTime}`)
+                log(`Total time unpacking objects: ${totalTime}`)
+                log(`Total time applying deltas: ${totalApplyDeltaTime}`)
+                log(`Total time reading files: ${totalReadFileTime}`)
+                log(`Total time writing files: ${totalWriteFileTime}`)
                 return resolve()
               }
               next(null)
