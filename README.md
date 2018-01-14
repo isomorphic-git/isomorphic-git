@@ -116,33 +116,31 @@ TODO: Document this more. Also write some tests? IDK the CLI is more of a lark f
 
 I may continue to make changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
 
-**[NEW DOCS WEBSITE](https://isomorphic-git.github.io/isomorphic-git)**
-
 ### commands
 
-- [add](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-add)
-- [checkout](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-checkout)
-- [clone](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-clone)
-- [commit](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-commit)
-- [config](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-config)
-- [fetch](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-fetch)
-- [findRoot](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-findRoot)
-- [init](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-init)
-- [listBranches](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-listBranches)
-- [listFiles](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-listFiles)
-- [log](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-log)
-- [push](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-push)
-- [remove](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-remove)
-- [resolveRef](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-resolveRef)
-- [sign](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-sign)
-- [status](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-status)
-- [verify](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-verify)
-- [version](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-version)
+- [add](https://isomorphic-git.github.io/docs/add.html)
+- [checkout](https://isomorphic-git.github.io/docs/checkout.html)
+- [clone](https://isomorphic-git.github.io/docs/clone.html)
+- [commit](https://isomorphic-git.github.io/docs/commit.html)
+- [config](https://isomorphic-git.github.io/docs/config.html)
+- [fetch](https://isomorphic-git.github.io/docs/fetch.html)
+- [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
+- [init](https://isomorphic-git.github.io/docs/init.html)
+- [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
+- [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
+- [log](https://isomorphic-git.github.io/docs/log.html)
+- [push](https://isomorphic-git.github.io/docs/push.html)
+- [remove](https://isomorphic-git.github.io/docs/remove.html)
+- [resolveRef](https://isomorphic-git.github.io/docs/resolveRef.html)
+- [sign](https://isomorphic-git.github.io/docs/sign.html)
+- [status](https://isomorphic-git.github.io/docs/status.html)
+- [verify](https://isomorphic-git.github.io/docs/verify.html)
+- [version](https://isomorphic-git.github.io/docs/version.html)
 
 ### utils
 
-- [auth](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-auth)
-- [oauth2](https://isomorphic-git.github.io/isomorphic-git/function/index.html#static-function-oauth2)
+- [auth](https://isomorphic-git.github.io/docs/utils_auth.html)
+- [oauth2](https://isomorphic-git.github.io/docs/utils_oauth2.html)
 
 ### dir vs gitdir
 I looked hard and wide for a good explanation of the "working tree" and the "git directory" and the best I found was [this one](https://stackoverflow.com/a/5283457) from Stack Overflow:
