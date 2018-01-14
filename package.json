@@ -103,7 +103,7 @@
     "rollup": "^0.53.3",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-json": "^2.3.0",
-    "semantic-release": "^8.2.0",
+    "semantic-release": "^11.0.2",
     "standard": "^10.0.3",
     "stream-equal": "^1.1.0",
     "tape": "^4.8.0",
