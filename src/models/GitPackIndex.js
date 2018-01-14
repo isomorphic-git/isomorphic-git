@@ -8,6 +8,7 @@ import crc32 from 'crc/lib/crc32.js'
 import { PassThrough } from 'stream'
 import pako from 'pako'
 import marky from 'marky'
+import { log } from '../utils'
 
 function buffer2stream (buffer) {
   let stream = new PassThrough()
@@ -146,8 +147,8 @@ export class GitPackIndex {
     }
     let bytesProcessed = 0
 
-    console.log('Indexing objects')
-    console.log(
+    log('Indexing objects')
+    log(
       `percent\tmilliseconds\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`
     )
     marky.mark('total')
@@ -162,7 +163,7 @@ export class GitPackIndex {
             (totalObjectCount - num) * 100 / totalObjectCount
           )
           if (percent !== lastPercent) {
-            console.log(
+            log(
               `${percent}%\t${Math.floor(
                 marky.stop('percent').duration
               )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
@@ -211,7 +212,7 @@ export class GitPackIndex {
     })
     times['offsets'] = Math.floor(marky.stop('offsets').duration)
 
-    console.log('Computing CRCs')
+    log('Computing CRCs')
     marky.mark('crcs')
     // We need to know the lengths of the slices to compute the CRCs.
     let offsetArray = Object.keys(offsetToObject).map(Number)
@@ -236,8 +237,8 @@ export class GitPackIndex {
     })
 
     // Resolve deltas and compute the oids
-    console.log('Resolving deltas')
-    console.log(`percent2\tmilliseconds2\tcallsToReadSlice\tcallsToGetExternal`)
+    log('Resolving deltas')
+    log(`percent2\tmilliseconds2\tcallsToReadSlice\tcallsToGetExternal`)
     marky.mark('percent')
     lastPercent = null
     let count = 0
@@ -249,7 +250,7 @@ export class GitPackIndex {
       offset = Number(offset)
       let percent = Math.floor(count++ * 100 / totalObjectCount)
       if (percent !== lastPercent) {
-        console.log(
+        log(
           `${percent}%\t${Math.floor(
             marky.stop('percent').duration
           )}\t${callsToReadSlice}\t${callsToGetExternal}`
@@ -281,7 +282,7 @@ export class GitPackIndex {
         offsets[oid] = offset
         crcs[oid] = o.crc
       } catch (err) {
-        console.log('ERROR', err)
+        log('ERROR', err)
         continue
       }
     }
@@ -295,12 +296,12 @@ export class GitPackIndex {
     times.misc = Math.floor(
       Object.values(times).reduce((a, b) => a - b, totalElapsedTime)
     )
-    console.log(Object.keys(times).join('\t'))
-    console.log(Object.values(times).join('\t'))
-    console.log('by depth:')
-    console.log([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].join('\t'))
-    console.log(objectsByDepth.slice(0, 12).join('\t'))
-    console.log(
+    log(Object.keys(times).join('\t'))
+    log(Object.values(times).join('\t'))
+    log('by depth:')
+    log([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].join('\t'))
+    log(objectsByDepth.slice(0, 12).join('\t'))
+    log(
       timeByDepth
         .map(Math.floor)
         .slice(0, 12)

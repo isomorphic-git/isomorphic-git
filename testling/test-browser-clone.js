@@ -1,4 +1,5 @@
-const { Git, clone } = require('../dist/bundle.umd.min.js')
+localStorage.debug = 'isomorphic-git'
+const { clone } = require('../dist/bundle.umd.min.js')
 const test = require('tape')
 const BrowserFS = require('browserfs')
 test('clone', t => {

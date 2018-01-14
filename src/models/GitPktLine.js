@@ -85,7 +85,6 @@ export class GitPktLine {
   static streamReader (stream /*: ReadableStream */) {
     let done = false
     stream.on('end', () => {
-      console.log('THE END I TELL YOU...')
       done = true
     })
     stream.resume()

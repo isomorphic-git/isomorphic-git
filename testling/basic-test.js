@@ -1,3 +1,4 @@
+localStorage.debug = 'isomorphic-git'
 const { init, add, commit } = require('../dist/bundle.umd.min.js')
 const test = require('tape')
 const BrowserFS = require('browserfs')
