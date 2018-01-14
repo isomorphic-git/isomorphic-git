@@ -12,7 +12,14 @@ export class GitRefManager {
     symrefs: Map<string, string>
   }) => Promise<void>
   */
-  static async updateRemoteRefs ({ fs: _fs, gitdir, remote, refs, symrefs }) {
+  static async updateRemoteRefs ({
+    fs: _fs,
+    gitdir,
+    remote,
+    refs,
+    symrefs,
+    tags
+  }) {
     const fs = new FileSystem(_fs)
     // Validate input
     for (let value of refs.values()) {
@@ -22,7 +29,9 @@ export class GitRefManager {
     }
     // Combine refs and symrefs giving symrefs priority
     let actualRefsToWrite = new Map()
-    for (let [key, value] of refs) actualRefsToWrite.set(key, value)
+    for (let [key, value] of refs) {
+      actualRefsToWrite.set(key, value)
+    }
     for (let [key, value] of symrefs) {
       let branch = value.replace(/^refs\/heads\//, '')
       actualRefsToWrite.set(key, `ref: refs/remotes/${remote}/${branch}`)
@@ -44,14 +53,25 @@ export class GitRefManager {
     // and .git/refs/remotes/origin/refs/merge-requests
     const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of actualRefsToWrite) {
-      // For some reason we trim these
-      key = key.replace(/^refs\/heads\//, '')
-      key = key.replace(/^refs\/tags\//, '')
-      await fs.write(
-        path.join(gitdir, 'refs', 'remotes', remote, key),
-        normalizeValue(value),
-        'utf8'
-      )
+      if (key.startsWith('refs/heads') || key === 'HEAD') {
+        key = key.replace(/^refs\/heads\//, '')
+        await fs.write(
+          path.join(gitdir, 'refs', 'remotes', remote, key),
+          normalizeValue(value),
+          'utf8'
+        )
+      } else if (
+        tags === true &&
+        key.startsWith('refs/tags') &&
+        !key.endsWith('^{}')
+      ) {
+        key = key.replace(/^refs\/tags\//, '')
+        const filename = path.join(gitdir, 'refs', 'tags', key)
+        // Git's behavior is to only fetch tags that do not conflict with tags already present.
+        if (!await fs.exists(filename)) {
+          await fs.write(filename, normalizeValue(value), 'utf8')
+        }
+      }
     }
   }
   static async resolve ({ fs: _fs, gitdir, ref, depth }) {

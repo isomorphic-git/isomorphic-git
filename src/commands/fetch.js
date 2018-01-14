@@ -34,6 +34,7 @@ import { pkg, log } from '../utils'
  * @param {Date} [args.since=undefined] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
  * @param {string[]} [args.exclude=[]] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
  * @param {boolean} [args.relative=false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+ * @param {boolean} [tags=false] - Also fetch tags
  * @param {Function} [args.onprogress=undefined] - Callback to receive [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent)s for the operation.
  * @returns {Promise<void>} - Resolves successfully when clone completes
  *
@@ -59,6 +60,7 @@ export async function fetch ({
   since,
   exclude,
   relative,
+  tags,
   onprogress
 }) {
   const fs = new FileSystem(_fs)
@@ -73,7 +75,8 @@ export async function fetch ({
     depth,
     since,
     exclude,
-    relative
+    relative,
+    tags
   })
   let packfile = await pify(concat)(response.packfile)
   let packfileSha = packfile.slice(-20).toString('hex')
@@ -94,7 +97,8 @@ async function fetchPackfile ({
   depth = null,
   since = null,
   exclude = [],
-  relative = false
+  relative = false,
+  tags = false
 }) {
   const fs = new FileSystem(_fs)
   if (depth !== null) {
@@ -141,7 +145,8 @@ async function fetchPackfile ({
     gitdir,
     remote,
     refs: remoteHTTP.refs,
-    symrefs: remoteHTTP.symrefs
+    symrefs: remoteHTTP.symrefs,
+    tags
   })
   let want = await GitRefManager.resolve({
     fs,
