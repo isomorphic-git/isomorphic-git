@@ -111,7 +111,7 @@ export class GitRefManager {
     if (sha) {
       return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
     }
-    // Is it a tag?
+    // Is it a lightweight tag?
     sha = await fs.read(`${gitdir}/refs/tags/${ref}`, { encoding: 'utf8' })
     if (sha) {
       return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
@@ -138,5 +138,79 @@ export class GitRefManager {
     }
     // Do we give up?
     throw new Error(`Could not resolve reference ${ref}`)
+  }
+  static async packedRefs ({ fs: _fs, gitdir }) {
+    const refs = new Map()
+    const fs = new FileSystem(_fs)
+    const text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    if (!text) return refs
+    const lines = text
+      .trim()
+      .split('\n')
+      .filter(line => !/^\s*#/.test(line))
+    let key = null
+    for (let line of lines) {
+      const i = line.indexOf(' ')
+      if (line.startsWith('^')) {
+        // This is a oid for the commit associated with the annotated tag immediately preceding this line.
+        // Trim off the '^'
+        const value = line.slice(1, i)
+        // The tagname^{} syntax is based on the output of `git show-ref --tags -d`
+        refs.set(key + '^{}', value)
+      } else {
+        // This is an oid followed by the ref name
+        const value = line.slice(0, i)
+        key = line.slice(i + 1)
+        refs.set(key, value)
+      }
+    }
+    return refs
+  }
+  // List all the refs that match the `filepath` prefix
+  static async listRefs ({ fs: _fs, gitdir, filepath }) {
+    const fs = new FileSystem(_fs)
+    let packedMap = GitRefManager.packedRefs({ fs, gitdir })
+    let files = null
+    try {
+      files = await fs.readdirDeep(`${gitdir}/${filepath}`)
+      files = files.map(x => x.replace(`${gitdir}/${filepath}/`, ''))
+    } catch (err) {
+      files = []
+    }
+
+    for (let key of (await packedMap).keys()) {
+      // filter by prefix
+      if (key.startsWith(filepath)) {
+        // remove prefix
+        key = key.replace(filepath + '/', '')
+        // Don't include duplicates; the loose files have precedence anyway
+        if (!files.includes(key)) {
+          files.push(key)
+        }
+      }
+    }
+    return files
+  }
+  static async listBranches ({ fs: _fs, gitdir, remote }) {
+    const fs = new FileSystem(_fs)
+    if (remote) {
+      return GitRefManager.listRefs({
+        fs,
+        gitdir,
+        filepath: `refs/remotes/${remote}`
+      })
+    } else {
+      return GitRefManager.listRefs({ fs, gitdir, filepath: `refs/heads` })
+    }
+  }
+  static async listTags ({ fs: _fs, gitdir }) {
+    const fs = new FileSystem(_fs)
+    let tags = await GitRefManager.listRefs({
+      fs,
+      gitdir,
+      filepath: `refs/tags`
+    })
+    tags = tags.filter(x => !x.endsWith('^{}'))
+    return tags
   }
 }

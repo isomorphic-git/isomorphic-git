@@ -8,3 +8,5 @@ Array [
   "greenkeeper/initial",
 ]
 `;
+
+exports[`listBranches remote 1`] = `Array []`;
