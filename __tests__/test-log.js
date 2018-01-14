@@ -28,7 +28,7 @@ describe('log', () => {
     expect(commits.length).toBe(2)
   })
   test('test-branch', async () => {
-    let gitdir = '__tests__/__fixtures__/test-GitRefManager.git'
+    let gitdir = '__tests__/__fixtures__/test-log.git'
     let repo = { fs, gitdir }
     let commits = await log({ ...repo, ref: 'origin/test-branch' })
     expect(commits).toMatchSnapshot()

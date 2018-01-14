@@ -8,7 +8,7 @@ describe('GitObjectManager', () => {
   test('test missing', async () => {
     let ref = GitObjectManager.read({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
+      gitdir: '__tests__/__fixtures__/test-GitObjectManager.git',
       oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     })
     await expect(ref).rejects.toMatchSnapshot()
@@ -16,7 +16,7 @@ describe('GitObjectManager', () => {
   test('test shallow', async () => {
     let ref = GitObjectManager.read({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
+      gitdir: '__tests__/__fixtures__/test-GitObjectManager.git',
       oid: 'b8b1fcecbc6f5ea8bc915c3ac319e8c9eb204f95'
     })
     await expect(ref).rejects.toMatchSnapshot()
