@@ -1,4 +1,5 @@
 import path from 'path'
+import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
 
 /**
@@ -18,20 +19,9 @@ import { FileSystem } from '../models'
 export async function listBranches ({
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs
+  fs: _fs,
+  remote = undefined
 }) {
   const fs = new FileSystem(_fs)
-  let files = await fs.readdirDeep(`${gitdir}/refs/heads`)
-  files = files.map(x => x.replace(`${gitdir}/refs/heads/`, ''))
-  let text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
-  if (text) {
-    let refs = text
-      .trim()
-      .split('\n')
-      .filter(x => x.includes('refs/heads'))
-      .map(x => x.replace(/^.+ refs\/heads\//, '').trim())
-      .filter(x => !files.includes(x)) // remove duplicates
-    files = files.concat(refs)
-  }
-  return files
+  return GitRefManager.listBranches({ fs, gitdir, remote })
 }
