@@ -128,6 +128,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [init](https://isomorphic-git.github.io/docs/init.html)
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
+- [listTags](https://isomorphic-git.github.io/docs/listTags.html)
 - [log](https://isomorphic-git.github.io/docs/log.html)
 - [push](https://isomorphic-git.github.io/docs/push.html)
 - [remove](https://isomorphic-git.github.io/docs/remove.html)
@@ -141,22 +142,6 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 
 - [auth](https://isomorphic-git.github.io/docs/utils_auth.html)
 - [oauth2](https://isomorphic-git.github.io/docs/utils_oauth2.html)
-
-### dir vs gitdir
-I looked hard and wide for a good explanation of the "working tree" and the "git directory" and the best I found was [this one](https://stackoverflow.com/a/5283457) from Stack Overflow:
-
-If you have a non-bare git repository, there are two parts to it: the *git directory* and the *working tree*:
-
-- The *working tree* has your checked out source code, with any changes you might have made.
-- The *git directory* is normally named `.git`, and is in the top level of your working tree - this contains all the history of your project, configuration settings, pointers to branches, the index (staging area) and so on.
-
-> While this is the default layout of a git repository, you can actually set any directories in the filesystem to be your git directory and working tree. You can change these directories from their defaults either with the --work-tree and --git-dir options to git or by using the GIT_DIR and GIT_WORK_TREE environment variables. Usually, however, you shouldn't need to set these.
-
-In isomorphic-git the equivalent of `--work-tree` is the **`dir`** argument.
-
-In isomorphic-git the equivalent of `--git-dir` is the **`gitdir`** argument.
-
-This is really only important when working with bare repositories.
 
 ## Internal code architecture
 
