@@ -40,15 +40,9 @@ module.exports = {
                      --source-map "content=inline,url=service-workder-bundle.umd.min.js.map" \
                      -o dist/service-worker-bundle.umd.min.js`
     },
-    doc: {
-      default: series.nps('doc.esdoc', 'doc.copy'),
-      esdoc: 'esdoc',
-      copy: 'cp -R dist/* doc/',
-      watch: 'watch "nps doc.esdoc" src manual assets'
-    },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
-      travis: series.nps('lint', 'build', 'doc', 'test.jest', 'test.karma'),
+      travis: series.nps('lint', 'build', 'test.jest', 'test.karma'),
       local: series.nps('test.jest'),
       jest: process.env.CI
         ? 'cross-env DEBUG=isomorphic-git jest --coverage && codecov'
