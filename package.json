@@ -18,7 +18,8 @@
     "test": "nps test",
     "precommit": "nps format toc",
     "prepush": "nps lint",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release",
+    "travis-deploy-once": "travis-deploy-once"
   },
   "repository": {
     "type": "git",
@@ -103,10 +104,11 @@
     "rollup": "^0.53.3",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-json": "^2.3.0",
-    "semantic-release": "^8.2.0",
+    "semantic-release": "^12.2.2",
     "standard": "^10.0.3",
     "stream-equal": "^1.1.0",
     "tape": "^4.8.0",
+    "travis-deploy-once": "^4.3.1",
     "uglify-es": "^3.3.4",
     "watch": "^1.0.2",
     "watchify": "^3.9.0"
