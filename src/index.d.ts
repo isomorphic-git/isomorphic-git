@@ -1,4 +1,4 @@
-// Type definitions for isomorphic-git 1.0.0
+// Type definitions for isomorphic-git 0.x.x
 // Project: isomorphic-git
 // Definitions by: William Hilton <wmhilton.com>
 
@@ -15,6 +15,30 @@
 export as namespace git;
 
 /*~ You can declare types that are available via importing the module */
+export interface CommitDescription {
+  oid: string,      // SHA1 object id of this commit
+  message: string,  // Commit message
+  tree: string,     // SHA1 object id of corresponding file tree
+  parent: string[], // an array of zero or more SHA1 object ids
+  author: {
+    name: string,          // The author's name
+    email: string,         // The author's email
+    timestamp: number,     // UTC Unix timestamp in seconds
+    timezoneOffset: number // Timezone difference from UTC in minutes
+  },
+  committer: {
+    name: string,          // The committer's name
+    email: string,         // The committer's email
+    timestamp: number,     // UTC Unix timestamp in seconds
+    timezoneOffset: number // Timezone difference from UTC in minutes
+  }
+  gpgsig?: string   // PGP signature (if present)
+}
+
+export interface PushResponse {
+  ok?: string[],
+  errors?: string[]
+}
 
 /*~ If this module has methods, declare them as functions like so.
  */
@@ -29,7 +53,6 @@ export async function checkout(args: {
   fs: any,
   dir: string,
   gitdir?: string,
-  filepath: string,
   remote?: string,
   ref?: string
 }): Promise<void>;
@@ -94,6 +117,7 @@ export async function fetch(args: {
   since?: Date,
   exclude?: string[],
   relative?: boolean,
+  tags?: boolean,
   onprogress?: ({
     loaded: number,
     total: number,
@@ -122,10 +146,17 @@ export async function init(args: {
 export async function listBranches(args: {
   fs: any,
   dir: string,
-  gitdir?: string
+  gitdir?: string,
+  remote?: string
 }): Promise<Array<string>>;
 
 export async function listFiles(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+}): Promise<Array<string>>;
+
+export async function listTags(args: {
   fs: any,
   dir: string,
   gitdir?: string
@@ -158,6 +189,14 @@ export async function remove(args: {
   filepath: string
 }): Promise<void>
 
+export async function resolveRef(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  ref: string,
+  depth?: number
+}): Promise<string>
+
 export async function sign(args: {
   fs: any,
   dir: string,
@@ -171,6 +210,11 @@ export async function status(args: {
   gitdir?: string
   filepath: string
 }): Promise<string>
+
+export const utils = {
+  auth: (username: string, password: string) => ({ username: string, password: string }),
+  oauth2: (company: string, token: string) => ({ username: string, password: string })
+}
 
 export async function verify(args: {
   fs: any,
