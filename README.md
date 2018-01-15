@@ -1,4 +1,6 @@
 # isomorphic-git ![node version](https://img.shields.io/node/v/isomorphic-git.svg) [![Build Status](https://travis-ci.org/isomorphic-git/isomorphic-git.svg?branch=master)](https://travis-ci.org/isomorphic-git/isomorphic-git) [![codecov](https://codecov.io/gh/isomorphic-git/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/isomorphic-git/isomorphic-git) [![dependencies](https://david-dm.org/isomorphic-git/isomorphic-git/status.svg)](https://david-dm.org/isomorphic-git/isomorphic-git) [![Known Vulnerabilities](https://snyk.io/test/github/isomorphic-git/isomorphic-git/badge.svg)](https://snyk.io/test/github/isomorphic-git/isomorphic-git)
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/isomorphic-git/isomorphic-git.svg)](https://greenkeeper.io/)
 A pure JavaScript implementation of git for node and browsers!
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
