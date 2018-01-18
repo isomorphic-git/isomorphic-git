@@ -3,7 +3,7 @@ import { Buffer } from 'buffer'
 import { PassThrough } from 'stream'
 import pad from 'pad'
 import pako from 'pako'
-import crypto from 'crypto'
+import createHash from 'sha.js'
 import { config } from './config'
 import { GitRefManager, GitObjectManager, GitRemoteHTTP } from '../managers'
 import { FileSystem, GitCommit, GitTree, GitPktLine } from '../models'
@@ -197,7 +197,7 @@ export async function pack ({
   outputStream
 }) {
   const fs = new FileSystem(_fs)
-  let hash = crypto.createHash('sha1')
+  let hash = createHash('sha1')
   function write (chunk, enc) {
     outputStream.write(chunk, enc)
     hash.update(chunk, enc)
