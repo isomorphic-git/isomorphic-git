@@ -1,5 +1,6 @@
 /* global jest test describe expect */
-import { fetch } from '../dist/for-node/commands'
+import { fetch } from '..'
+import EventEmitter from 'events'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { FileSystem } from '../dist/for-node/models'
 import { sleep } from '../dist/for-node/utils'
@@ -26,18 +27,23 @@ describe('fetch', () => {
     // Setup
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
     let output = []
+    let progress = []
+    let emitter = new EventEmitter()
+    emitter
+      .on('message', output.push.bind(output))
+      .on('progress', progress.push.bind(progress))
     // Test
     let repo = { fs, gitdir }
     await fetch({
       ...repo,
+      emitter,
       depth: 1,
       remote: 'origin',
-      onprogress: output.push.bind(output),
       ref: 'test-branch-shallow-clone'
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
-    // TODO: Bring back some kind of progress monitoring.
-    // expect(output).toMatchSnapshot()
+    expect(output).toMatchSnapshot()
+    expect(progress).toMatchSnapshot()
     let shallow = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen

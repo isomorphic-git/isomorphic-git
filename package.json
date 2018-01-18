@@ -65,6 +65,7 @@
     "shasum": "^1.0.2",
     "simple-concat": "^1.0.0",
     "simple-get": "^2.7.0",
+    "split2": "^2.2.0",
     "through2": "^2.0.3"
   },
   "devDependencies": {
