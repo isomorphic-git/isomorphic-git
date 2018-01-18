@@ -1,3 +1,5 @@
+import { EventEmitter } from "@types/events";
+
 // Type definitions for isomorphic-git 0.x.x
 // Project: isomorphic-git
 // Definitions by: William Hilton <wmhilton.com>
@@ -61,6 +63,7 @@ export async function clone(args: {
   fs: any,
   dir: string,
   gitdir?: string,
+  emitter?: EventEmitter,
   url: string,
   ref?: string,
   remote?: string,
@@ -69,12 +72,7 @@ export async function clone(args: {
   depth?: number,
   since?: Date,
   exclude?: string[],
-  relative?: boolean,
-  onprogress?: ({
-    loaded: number,
-    total: number,
-    lengthComputable: boolean
-  }) => void
+  relative?: boolean
 }): Promise<void>;
 
 export async function commit(args: {
@@ -108,6 +106,7 @@ export async function fetch(args: {
   fs: any,
   dir: string,
   gitdir?: string,
+  emitter?: EventEmitter,
   url?: string,
   ref?: string,
   remote?: string,
@@ -117,12 +116,7 @@ export async function fetch(args: {
   since?: Date,
   exclude?: string[],
   relative?: boolean,
-  tags?: boolean,
-  onprogress?: ({
-    loaded: number,
-    total: number,
-    lengthComputable: boolean
-  }) => void
+  tags?: boolean
 }): Promise<void>;
 
 export async function findRoot(args: {
