@@ -43,11 +43,13 @@ module.exports = {
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
       travis: series.nps('lint', 'build', 'test.jest', 'test.karma'),
-      local: series.nps('test.jest'),
+      local: series.nps('test.jest', 'test.karma'),
       jest: process.env.CI
         ? 'cross-env DEBUG=isomorphic-git jest --coverage && codecov'
         : 'cross-env DEBUG=isomorphic-git jest',
-      karma: process.env.CI ? 'karma start ci.karma.conf.js' : 'karma start'
+      karma: process.env.CI
+        ? 'karma start ci.karma.conf.js'
+        : 'karma start --single-run'
     }
   }
 }

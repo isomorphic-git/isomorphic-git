@@ -8,6 +8,7 @@ import applyDelta from 'git-apply-delta'
 import marky from 'marky'
 import pify from 'pify'
 import concat from 'simple-concat'
+import split2 from 'split2'
 import { config } from './config'
 import {
   GitRemoteHTTP,
@@ -21,36 +22,13 @@ import { pkg, log } from '../utils'
 /**
  * Fetch commits
  *
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
- * @param {string} [args.remote='origin'] - If `url` is not specified, determines which remote to use.
- * @param {string} [args.ref=undefined] - Which branch to fetch from. By default this is the currently checked out branch.
- * @param {string} [args.authUsername=undefined] - The username to use with Basic Auth
- * @param {string} [args.authPassword=undefined] - The password to use with Basic Auth
- * @param {integer} [args.depth=undefined] - Determines how much of the git repository's history to retrieve.
- * @param {Date} [args.since=undefined] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
- * @param {string[]} [args.exclude=[]] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
- * @param {boolean} [args.relative=false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
- * @param {boolean} [tags=false] - Also fetch tags
- * @param {Function} [args.onprogress=undefined] - Callback to receive [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent)s for the operation.
- * @returns {Promise<void>} - Resolves successfully when clone completes
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- * await fetch({
- *   ...repo,
- *   url: '<@https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git@>',
- *   depth: 1
- * })
- * console.log('done')
+ * @link https://isomorphic-git.github.io/docs/fetch.html
  */
 export async function fetch ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs,
+  emitter,
   ref = 'HEAD',
   remote,
   url,
@@ -61,8 +39,13 @@ export async function fetch ({
   exclude,
   relative,
   tags,
-  onprogress
+  onprogress // deprecated
 }) {
+  if (onprogress !== undefined) {
+    console.warn(
+      'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
+    )
+  }
   const fs = new FileSystem(_fs)
   let response = await fetchPackfile({
     gitdir,
@@ -77,6 +60,23 @@ export async function fetch ({
     exclude,
     relative,
     tags
+  })
+  // Note: progress messages are designed to be written directly to the terminal,
+  // so they are often sent with just a carriage return to overwrite the last line of output.
+  // But there are also messages delimited with newlines.
+  // I also include CRLF just in case.
+  response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
+    if (emitter) {
+      emitter.emit('message', line.trim())
+    }
+    let matches = line.match(/\((\d+?)\/(\d+?)\)/)
+    if (matches && emitter) {
+      emitter.emit('progress', {
+        loaded: parseInt(matches[1], 10),
+        total: parseInt(matches[2], 10),
+        lengthComputable: true
+      })
+    }
   })
   let packfile = await pify(concat)(response.packfile)
   let packfileSha = packfile.slice(-20).toString('hex')
@@ -247,8 +247,14 @@ export async function unpack ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   inputStream,
-  onprogress
+  emitter,
+  onprogress // deprecated
 }) {
+  if (onprogress !== undefined) {
+    console.warn(
+      'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
+    )
+  }
   const fs = new FileSystem(_fs)
   return new Promise(function (resolve, reject) {
     // Read header
@@ -264,8 +270,12 @@ export async function unpack ({
       }
       // Read a 4 byte (32-bit) int
       let numObjects = data.readInt32BE(8)
-      if (onprogress !== undefined) {
-        onprogress({ loaded: 0, total: numObjects, lengthComputable: true })
+      if (emitter) {
+        emitter.emit('progress', {
+          loaded: 0,
+          total: numObjects,
+          lengthComputable: true
+        })
       }
       if (numObjects === 0) return resolve()
       // And on our merry way
@@ -344,8 +354,8 @@ export async function unpack ({
                 // console.log(`${offset} ${type} ${oid}`)
                 offsetMap.set(offset, oid)
               }
-              if (onprogress !== undefined) {
-                onprogress({
+              if (emitter) {
+                emitter.emit('progress', {
                   loaded: numObjects - num,
                   total: numObjects,
                   lengthComputable: true
