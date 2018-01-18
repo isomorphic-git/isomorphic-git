@@ -41,7 +41,6 @@
   ],
   "dependencies": {
     "async-lock": "^1.1.0",
-    "await-stream-ready": "^1.0.1",
     "babel-runtime": "^6.26.0",
     "buffer": "^5.0.8",
     "buffer-peek-stream": "^1.0.1",
