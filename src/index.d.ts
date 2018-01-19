@@ -17,6 +17,13 @@ import { EventEmitter } from "@types/events";
 export as namespace git;
 
 /*~ You can declare types that are available via importing the module */
+export interface GitObjectDescription {
+  type?: 'blob' | 'tree' | 'commit' | 'tag',
+  format: 'deflated' | 'wrapped' | 'content' | 'parsed',
+  object: Buffer | CommitDescription | TreeDescription,
+  source?: string
+}
+
 export interface CommitDescription {
   oid: string,      // SHA1 object id of this commit
   message: string,  // Commit message
@@ -35,6 +42,17 @@ export interface CommitDescription {
     timezoneOffset: number // Timezone difference from UTC in minutes
   }
   gpgsig?: string   // PGP signature (if present)
+}
+
+export interface TreeDescription {
+  entries: Array<TreeEntry>
+}
+
+export interface TreeEntry {
+  mode: string,
+  path: string,
+  oid: string,
+  type?: string
 }
 
 export interface PushResponse {
@@ -175,6 +193,14 @@ export async function push(args: {
   authUsername?: string,
   authPassword?: string
 }): Promise<PushResponse>
+
+export async function readObject(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  oid: string,
+  format: 'deflated' | 'wrapped' | 'content' | 'parsed'
+}): Promise<GitObjectDescription>
 
 export async function remove(args: {
   fs: any,
