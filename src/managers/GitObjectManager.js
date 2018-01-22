@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer'
 import shasum from 'shasum'
+import pako from 'pako'
 import path from 'path'
 import { FileSystem, GitObject, GitPackIndex } from '../models'
 
@@ -7,12 +8,13 @@ const PackfileCache = new Map()
 
 /** @ignore */
 export class GitObjectManager {
-  static async read ({ fs: _fs, gitdir, oid }) {
+  static async read ({ fs: _fs, gitdir, oid, format = 'content' }) {
     const fs = new FileSystem(_fs)
     // Look for it in the loose object directory.
     let file = await fs.read(
       `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     )
+    let source = `./objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     // Check to see if it's in a packfile.
     if (!file) {
       // Curry the current read method so that the packfile un-deltification
@@ -49,7 +51,9 @@ export class GitObjectManager {
             await p.load({ pack })
           }
           // Get the resolved git object from the packfile
-          return p.read({ oid, getExternalRefDelta })
+          let result = await p.read({ oid, getExternalRefDelta })
+          result.source = `./objects/pack/${filename}`
+          return result
         }
       }
     }
@@ -66,8 +70,15 @@ export class GitObjectManager {
     if (!file) {
       throw new Error(`Failed to read git object with oid ${oid}`)
     }
-    let { type, object } = GitObject.unwrap({ oid, file })
-    return { type, object }
+    if (format === 'deflated') {
+      return { format: 'deflated', object: file, source }
+    }
+    let buffer = Buffer.from(pako.inflate(file))
+    if (format === 'wrapped') {
+      return { format: 'wrapped', object: buffer, source }
+    }
+    let { type, object } = GitObject.unwrap({ oid, buffer })
+    if (format === 'content') return { type, format: 'content', object, source }
   }
 
   static async hash ({ gitdir, type, object }) /*: Promise<string> */ {
@@ -83,7 +94,8 @@ export class GitObjectManager {
 
   static async write ({ fs: _fs, gitdir, type, object }) /*: Promise<string> */ {
     const fs = new FileSystem(_fs)
-    let { file, oid } = GitObject.wrap({ type, object })
+    let { buffer, oid } = GitObject.wrap({ type, object })
+    let file = Buffer.from(pako.deflate(buffer))
     let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     // Don't overwrite existing git objects - this helps avoid EPERM errors.
     // Although I don't know how we'd fix corrupted objects then. Perhaps delete them

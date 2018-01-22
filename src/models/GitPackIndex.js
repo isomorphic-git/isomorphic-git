@@ -437,6 +437,6 @@ export class GitPackIndex {
       // hand tuned for speed / memory usage tradeoff
       this.offsetCache[start] = { type, object }
     }
-    return { type, object }
+    return { type, format: 'content', object }
   }
 }
