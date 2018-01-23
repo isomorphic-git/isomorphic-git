@@ -91,7 +91,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-firefox-launcher": "^1.1.0",
     "karma-sauce-launcher": "^1.2.0",
-    "karma-tap": "^3.1.1",
+    "karma-tap": "^4.0.0",
     "nock": "^9.1.5",
     "npm-run-all": "^4.1.2",
     "nps": "^5.7.1",
