@@ -1,6 +1,6 @@
 /* global test describe expect */
 import fs from 'fs'
-import { listBranches } from '../dist/for-node/commands'
+import { listBranches } from '..'
 
 /** @test {listBranches} */
 describe('listBranches', () => {

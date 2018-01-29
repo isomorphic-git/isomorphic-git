@@ -1,12 +1,13 @@
 /* global test describe expect */
-import * as git from '..'
-import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
+import { models } from '../dist/for-node/internal-apis'
+import { readObject } from '..'
+const { FileSystem } = models
 const fs = new FileSystem(_fs)
 
 describe('readObject', () => {
   test('test missing', async () => {
-    let ref = git.readObject({
+    let ref = readObject({
       fs,
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -14,7 +15,7 @@ describe('readObject', () => {
     await expect(ref).rejects.toMatchSnapshot()
   })
   test('test shallow', async () => {
-    let ref = git.readObject({
+    let ref = readObject({
       fs,
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: 'b8b1fcecbc6f5ea8bc915c3ac319e8c9eb204f95'
@@ -22,7 +23,7 @@ describe('readObject', () => {
     await expect(ref).rejects.toMatchSnapshot()
   })
   test('parsed', async () => {
-    let ref = await git.readObject({
+    let ref = await readObject({
       fs,
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
@@ -32,7 +33,7 @@ describe('readObject', () => {
     expect(ref.type).toBe('commit')
   })
   test('content', async () => {
-    let ref = await git.readObject({
+    let ref = await readObject({
       fs,
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
@@ -43,7 +44,7 @@ describe('readObject', () => {
     expect(ref.type).toBe('commit')
   })
   test('wrapped', async () => {
-    let ref = await git.readObject({
+    let ref = await readObject({
       fs,
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
@@ -54,7 +55,7 @@ describe('readObject', () => {
     expect(ref.type).toBe(undefined)
   })
   test('deflated', async () => {
-    let ref = await git.readObject({
+    let ref = await readObject({
       fs,
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
@@ -65,7 +66,7 @@ describe('readObject', () => {
     expect(ref.type).toBe(undefined)
   })
   test('from packfile', async () => {
-    let ref = await git.readObject({
+    let ref = await readObject({
       fs,
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: '0b8faa11b353db846b40eb064dfb299816542a46',

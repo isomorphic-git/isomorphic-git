@@ -1,10 +1,11 @@
 /* global jest test describe expect */
-import { fetch } from '..'
+import _fs from 'fs'
 import EventEmitter from 'events'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { FileSystem } from '../dist/for-node/models'
-import { sleep } from '../dist/for-node/utils'
-import _fs from 'fs'
+import { models, utils } from '../dist/for-node/internal-apis'
+import { fetch } from '..'
+const { FileSystem } = models
+const { sleep } = utils
 const fs = new FileSystem(_fs)
 
 jest.setTimeout(10000)
