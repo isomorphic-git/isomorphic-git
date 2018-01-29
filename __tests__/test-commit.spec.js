@@ -26,6 +26,8 @@ describe('commit', () => {
 
   it('GPG signing', async () => {
     // Setup
+    const openpgp = require('openpgp/dist/openpgp.min.js')
+
     let { fs, dir, gitdir } = await makeFixture('test-commit')
     // Test
     const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
@@ -42,12 +44,14 @@ describe('commit', () => {
     await sign({
       fs,
       gitdir,
+      openpgp,
       privateKeys: privateKeys[0]
     })
     const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
     let keys = await verify({
       fs,
       gitdir,
+      openpgp,
       ref: 'HEAD',
       publicKeys: publicKeys[0]
     })

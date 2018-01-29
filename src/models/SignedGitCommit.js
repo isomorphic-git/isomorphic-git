@@ -1,5 +1,4 @@
 import { GitCommit } from './GitCommit'
-import * as openpgp from 'openpgp/dist/openpgp.min.js'
 
 function normalize (str) {
   // remove all <CR>
@@ -26,7 +25,7 @@ export class SignedGitCommit extends GitCommit {
   static from (commit) {
     return new SignedGitCommit(commit)
   }
-  async sign (privateKeys /*: string */) {
+  async sign (openpgp, privateKeys /*: string */) {
     let commit = this.withoutSignature()
     let headers = GitCommit.justHeaders(this._commit)
     let message = GitCommit.justMessage(this._commit)
@@ -45,7 +44,7 @@ export class SignedGitCommit extends GitCommit {
     return GitCommit.from(signedCommit)
   }
 
-  async listSigningKeys () {
+  async listSigningKeys (openpgp) {
     let msg = openpgp.message.readSignedContent(
       this.withoutSignature(),
       this.isolateSignature()
@@ -53,7 +52,7 @@ export class SignedGitCommit extends GitCommit {
     return msg.getSigningKeyIds().map(keyid => keyid.toHex())
   }
 
-  async verify (publicKeys /*: string */) {
+  async verify (openpgp, publicKeys /*: string */) {
     let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
     let msg = openpgp.message.readSignedContent(
       this.withoutSignature(),
