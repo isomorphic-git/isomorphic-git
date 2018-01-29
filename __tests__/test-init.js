@@ -2,7 +2,6 @@
 import fs from 'fs'
 import { existsSync } from 'fs'
 import { createTempDir } from 'jest-fixtures'
-
 import { init } from '..'
 
 /** @test {init} */

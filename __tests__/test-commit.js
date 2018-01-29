@@ -1,6 +1,6 @@
 /* globals jest describe test expect */
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
 import { commit, sign, verify } from '..'

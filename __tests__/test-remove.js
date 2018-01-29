@@ -1,8 +1,7 @@
 /* global test describe expect */
 import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-
-import { remove, listFiles } from '../dist/for-node/commands'
+import { remove, listFiles } from '..'
 
 /** @test {remove} */
 describe('remove', () => {

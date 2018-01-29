@@ -1,7 +1,8 @@
 /* global test describe expect */
-import { listTags } from '..'
-import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
+import { models } from '../dist/for-node/internal-apis'
+import { listTags } from '..'
+const { FileSystem } = models
 const fs = new FileSystem(_fs)
 
 describe('listTags', () => {
