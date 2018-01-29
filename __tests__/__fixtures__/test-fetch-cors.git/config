@@ -1,0 +1,9 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://cors-buster-jfpactjnem.now.sh/github.com/wmhilton/isomorphic-git
+	fetch = +refs/heads/*:refs/remotes/origin/*
