@@ -1,5 +1,7 @@
 /* global test describe expect */
-import { GitPktLine } from '../dist/for-node/models'
+import { models } from '../dist/for-node/internal-apis'
+const { GitPktLine } = models
+
 describe('pkg-line-reader', () => {
   test('pkt-line-reader string', async () => {
     let read = GitPktLine.reader(Buffer.from('0010hello world\n'))
@@ -9,7 +11,8 @@ describe('pkg-line-reader', () => {
   })
 
   test('pkt-line-reader response', async () => {
-    let buffer = Buffer.from(`001e# service=git-upload-pack
+    let buffer = Buffer.from(
+      `001e# service=git-upload-pack
 000001059ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/github-g91c094cac
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
 003c5faa96fe725306e060386975a70e4b6eacb576ed refs/heads/js3
@@ -18,7 +21,8 @@ describe('pkg-line-reader', () => {
 0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
-0000`)
+0000`
+    )
     let read = GitPktLine.reader(buffer)
     expect(read().toString('utf8') === '# service=git-upload-pack\n').toBe(true)
     expect(read() === null).toBe(true)

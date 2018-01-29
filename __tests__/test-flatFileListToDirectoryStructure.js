@@ -1,5 +1,6 @@
 /* global test describe expect */
-import { flatFileListToDirectoryStructure } from '../dist/for-node/utils'
+import { utils } from '../dist/for-node/internal-apis'
+const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {
   test('simple', async () => {
