@@ -1,0 +1,4 @@
+module.exports = {
+  'checkout checkout 1': `[ ".babelrc", ".editorconfig", ".flowconfig", ".gitignore", "LICENSE.md", "README.md", "package.json", "shrinkwrap.yaml", "src", "test"]`,
+  'checkout checkout 2': `[ ".babelrc", ".editorconfig", ".flowconfig", ".gitignore", "LICENSE.md", "README.md", "package.json", "shrinkwrap.yaml", "src/commands/checkout.js", "src/commands/config.js", "src/commands/fetch.js", "src/commands/init.js", "src/index.js", "src/models/GitBlob.js", "src/models/GitCommit.js", "src/models/GitConfig.js", "src/models/GitTree.js", "src/utils/combinePayloadAndSignature.js", "src/utils/commitSha.js", "src/utils/exists.js", "src/utils/mkdirs.js", "src/utils/read.js", "src/utils/resolveRef.js", "src/utils/unwrapObject.js", "src/utils/wrapCommit.js", "src/utils/write.js", "test/resolveRef.js", "test/smoke.js", "test/snapshots/resolveRef.js.md", "test/snapshots/resolveRef.js.snap"]`
+}

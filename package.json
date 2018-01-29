@@ -76,13 +76,14 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.2",
-    "browserfs": "^1.4.3",
     "browserify": "^15.1.0",
     "browserify-shim": "^3.8.14",
     "codecov": "^3.0.0",
     "cross-env": "^5.1.3",
     "doctoc": "^1.3.0",
     "husky": "^0.14.3",
+    "jasmine-core": "^2.9.1",
+    "jasmine-snapshot": "^1.7.8",
     "jest": "^22.0.4",
     "jest-fixtures": "^0.6.0",
     "jsonfile": "^4.0.0",
@@ -90,8 +91,9 @@
     "karma-browserify": "^5.1.3",
     "karma-chrome-launcher": "^2.2.0",
     "karma-firefox-launcher": "^1.1.0",
+    "karma-jasmine": "^1.1.1",
     "karma-sauce-launcher": "^1.2.0",
-    "karma-tap": "^4.0.0",
+    "karma-tap-reporter": "0.0.6",
     "nock": "^9.1.5",
     "npm-run-all": "^4.1.2",
     "nps": "^5.7.1",
@@ -104,7 +106,6 @@
     "semantic-release": "^12.2.2",
     "standard": "^10.0.3",
     "stream-equal": "^1.1.0",
-    "tape": "^4.8.0",
     "travis-deploy-once": "^4.3.1",
     "uglify-es": "^3.3.4",
     "watch": "^1.0.2",
@@ -132,9 +133,7 @@
     ]
   },
   "jest": {
-    "testPathIgnorePatterns": [
-      "__helpers__"
-    ],
+    "testRegex": "/__tests__/test-(?!.*\\.(spec|snap)\\.js).*\\.js",
     "testEnvironment": "node"
   }
 }

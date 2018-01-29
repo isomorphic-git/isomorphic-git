@@ -5,24 +5,33 @@ const { concurrent, series, runInNewWindow } = require('nps-utils')
 module.exports = {
   scripts: {
     format:
-      'prettier-standard src/**/*.js __tests__/**/*.js testling/**/*.js *.js',
+      'prettier-standard src/**/*.js __tests__/**/*.js',
     lint: 'standard src/**/*.js',
     toc: 'doctoc --maxlevel=2 README.md',
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),
-      jest: runInNewWindow('cross-env DEBUG=isomorphic-git jest --watch')
+      jest: runInNewWindow('cross-env DEBUG=isomorphic-git jest --watch'),
+      karma: runInNewWindow('karma start')
     },
     build: {
       default: series.nps('build.rollup', 'build.browserify'),
       rollup: 'rollup -c',
-      browserify: concurrent.nps('build.sw', 'build.umd'),
+      browserify: concurrent.nps('build.sw', 'build.umd', 'build.internalApis'),
       discify: `browserify \
             --entry dist/for-browserify/index.js \
             --standalone git \
             --fullpaths | uglifyjs \
                           --compress \
                           --mangle | discify -O`,
+      internalApis: `browserify \
+            --entry dist/for-browserify/internal-apis.js \
+            --standalone internal \
+            --debug | uglifyjs \
+                      --compress \
+                      --mangle \
+                      --source-map "content=inline,url=internal.umd.min.js.map" \
+                      -o dist/internal.umd.min.js`,
       umd: `browserify \
             --entry dist/for-browserify/index.js \
             --standalone git \
@@ -48,8 +57,8 @@ module.exports = {
         ? 'cross-env DEBUG=isomorphic-git jest --coverage && codecov'
         : 'cross-env DEBUG=isomorphic-git jest',
       karma: process.env.CI
-        ? 'karma start ci.karma.conf.js'
-        : 'karma start --single-run'
+        ? 'karma start'
+        : 'karma start --browsers ChromeHeadless --single-run'
     }
   }
 }

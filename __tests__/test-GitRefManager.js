@@ -1,7 +1,8 @@
 /* global test describe expect */
-import { GitRefManager } from '../dist/for-node/managers'
-import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
+import { managers, models } from '../dist/for-node/internal-apis'
+const { GitRefManager } = managers
+const { FileSystem } = models
 const fs = new FileSystem(_fs)
 
 describe('GitRefManager', () => {
