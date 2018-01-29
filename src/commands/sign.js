@@ -38,7 +38,8 @@ export async function sign ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs,
-  privateKeys
+  privateKeys,
+  openpgp
 }) {
   const fs = new FileSystem(_fs)
   const oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
@@ -49,7 +50,7 @@ export async function sign ({
     )
   }
   let commit = SignedGitCommit.from(object)
-  commit = await commit.sign(privateKeys)
+  commit = await commit.sign(openpgp, privateKeys)
   const newOid = await GitObjectManager.write({
     fs,
     gitdir,
