@@ -1,6 +1,7 @@
 /* globals jest describe it expect */
-const { expectjs, registerSnapshots } = require('jasmine-snapshot')
+const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const snapshots = require('./__snapshots__/test-fetch.js.snap')
 const pify = require('pify')
 
 const EventEmitter = require('events')
@@ -12,9 +13,6 @@ const { sleep } = utils
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000
 
 describe('fetch', () => {
-  beforeAll(() => {
-    registerSnapshots(require('./test-fetch.snap'), 'fetch')
-  })
   ;(process.env.CI ? it : xit)('fetch (from Github)', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
     fs = new FileSystem(fs)
@@ -46,8 +44,8 @@ describe('fetch', () => {
       ref: 'test-branch-shallow-clone'
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
-    expectjs(output).toMatchSnapshot()
-    expectjs(progress).toMatchSnapshot()
+    assertSnapshot(output, snapshots, 'fetch shallow fetch (from Github) 1')
+    assertSnapshot(progress, snapshots, 'fetch shallow fetch (from Github) 2')
     let shallow = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen

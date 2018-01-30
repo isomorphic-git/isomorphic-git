@@ -47,6 +47,7 @@
     "buffercursor": "0.0.12",
     "crc": "^3.5.0",
     "debug": "^3.1.0",
+    "diff-lines": "^1.1.0",
     "git-apply-delta": "0.0.7",
     "git-list-pack": "0.0.10",
     "ignore": "^3.3.7",
@@ -100,6 +101,7 @@
     "nps-utils": "^1.5.0",
     "parse-header-stream": "^1.1.1",
     "prettier-standard": "^8.0.0",
+    "pretty-format": "^22.1.0",
     "rollup": "^0.54.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-json": "^2.3.0",
@@ -133,7 +135,7 @@
     ]
   },
   "jest": {
-    "testRegex": "/__tests__/test-(?!.*\\.(spec|snap)\\.js).*\\.js",
+    "testRegex": "/__tests__/test-(?!.*\\.(spec)\\.js).*\\.js",
     "testEnvironment": "node"
   }
 }

@@ -1,5 +1,4 @@
 /* global describe it expect */
-const { expectjs, registerSnapshots } = require('jasmine-snapshot')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
 const pify = require('pify')

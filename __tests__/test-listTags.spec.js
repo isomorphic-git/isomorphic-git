@@ -1,12 +1,10 @@
 /* global describe it expect */
-const { expectjs, registerSnapshots } = require('jasmine-snapshot')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { assertSnapshot } = require('./__helpers__/assertSnapshot')
+const snapshots = require('./__snapshots__/test-listTags.js.snap')
 const { listTags } = require('..')
 
 describe('listTags', () => {
-  beforeAll(() => {
-    registerSnapshots(require('./test-listTags.snap'), 'listTags')
-  })
   it('listTags', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-listTags')
@@ -15,6 +13,6 @@ describe('listTags', () => {
       fs,
       gitdir
     })
-    expectjs(refs).toMatchSnapshot()
+    assertSnapshot(refs, snapshots, `listTags listTags 1`)
   })
 })
