@@ -1,18 +1,15 @@
 /* global describe it expect */
-const { expectjs, registerSnapshots } = require('jasmine-snapshot')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { assertSnapshot } = require('./__helpers__/assertSnapshot')
+const snapshots = require('./__snapshots__/test-log.js.snap')
 const { log } = require('..')
 
 describe('log', () => {
-  beforeAll(() => {
-    registerSnapshots(require('./test-log.snap'), 'log')
-  })
   it('HEAD', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
     let commits = await log({ fs, gitdir, ref: 'HEAD' })
     expect(commits.length).toBe(5)
-    // TODO: get working snapshot
-    // expectjs(commits).toMatchSnapshot()
+    assertSnapshot(commits, snapshots, `log HEAD 1`)
   })
   it('HEAD depth', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
@@ -32,7 +29,6 @@ describe('log', () => {
   it('test-branch', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
     let commits = await log({ fs, gitdir, ref: 'origin/test-branch' })
-    // TODO: get working snapshot
-    // expectjs(commits).toMatchSnapshot()
+    assertSnapshot(commits, snapshots, `log test-branch 1`)
   })
 })
