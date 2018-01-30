@@ -1,12 +1,10 @@
 /* global describe it expect */
-const { expectjs, registerSnapshots } = require('jasmine-snapshot')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { assertSnapshot } = require('./__helpers__/assertSnapshot')
+const snapshots = require('./__snapshots__/test-listObjects.js.snap')
 const { listObjects } = require('../dist/internal.umd.min.js')
 
 describe('listObjects', () => {
-  beforeAll(() => {
-    registerSnapshots(require('./test-listObjects.snap'), 'listObjects')
-  })
   it('listObjects', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-listObjects')
@@ -21,6 +19,6 @@ describe('listObjects', () => {
         '0518502faba1c63489562641c36a989e0f574d95'
       ]
     })
-    expectjs(objects).toMatchSnapshot()
+    assertSnapshot([...objects], snapshots, `listObjects listObjects 1`)
   })
 })

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`listObjects listObjects 1`] = `
-Set {
+Array [
   "c60bbbe99e96578105c57c4b3f2b6ebdf863edbc",
   "a8103169a3cb5fb457e5232a0e36728511e736b4",
   "1db939d41956405f755e69ab570296c7ed3cec99",
@@ -174,5 +174,5 @@ Set {
   "fdba2ad440c231d15a2179f729b4b50ab5860df2",
   "018cb07aa9747e34bbd6b6f614a32f72d6e82d55",
   "549a20c0b0149a2a1a06ae433d7a29c95b800718",
-}
+]
 `;

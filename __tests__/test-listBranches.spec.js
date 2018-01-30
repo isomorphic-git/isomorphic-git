@@ -1,18 +1,16 @@
 /* global describe it expect */
-const { expectjs, registerSnapshots } = require('jasmine-snapshot')
+const { assertSnapshot } = require('./__helpers__/assertSnapshot')
+const snapshots = require('./__snapshots__/test-listBranches.js.snap')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { listBranches } = require('..')
 
 describe('listBranches', () => {
-  beforeAll(() => {
-    registerSnapshots(require('./test-listBranches.snap'), 'listBranches')
-  })
   it('listBranches', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-listBranches')
     // Test
     let commits = await listBranches({ fs, gitdir })
-    expectjs(commits).toMatchSnapshot()
+    assertSnapshot(commits, snapshots, `listBranches listBranches 1`)
   })
   it('remote', async () => {
     // Setup
@@ -23,6 +21,6 @@ describe('listBranches', () => {
       gitdir,
       remote: 'origin'
     })
-    expectjs(commits).toMatchSnapshot()
+    assertSnapshot(commits, snapshots, `listBranches remote 1`)
   })
 })
