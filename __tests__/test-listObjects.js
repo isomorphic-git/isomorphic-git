@@ -17,6 +17,6 @@ describe('listObjects', () => {
         '0518502faba1c63489562641c36a989e0f574d95'
       ]
     })
-    expect(objects).toMatchSnapshot()
+    expect([...objects]).toMatchSnapshot()
   })
 })

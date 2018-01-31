@@ -1,12 +1,13 @@
 /* global test describe expect */
-import server from './__helpers__/http-backend'
+import fs from 'fs'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
-import fs from 'fs'
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
+import server from './__helpers__/http-backend'
+import { push } from '..'
 
-import { push } from '../dist/for-node/commands'
+jest.setTimeout(20000)
 
 /** @test {push} */
 describe('push', () => {

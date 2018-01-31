@@ -1,10 +1,11 @@
 /* global test describe expect */
-import path from 'path'
-import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
-const fs = new FileSystem(_fs)
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
+import path from 'path'
+import { models } from '../dist/for-node/internal-apis'
 import { status, add, remove } from '..'
+const { FileSystem } = models
+const fs = new FileSystem(_fs)
 
 /** @test {status} */
 describe('status', () => {
