@@ -2,7 +2,7 @@
 import fs from 'fs'
 import { createTempDir } from 'jest-fixtures'
 import { existsSync } from 'fs'
-import { clone } from '../dist/for-node/commands'
+import { clone } from '..'
 
 jest.setTimeout(30000)
 

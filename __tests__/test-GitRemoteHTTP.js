@@ -1,7 +1,8 @@
 /* global test describe expect */
-import { GitRemoteHTTP } from '../dist/for-node/managers'
 import nock from 'nock'
 import server from './__helpers__/http-backend'
+import { managers } from '../dist/for-node/internal-apis'
+const { GitRemoteHTTP } = managers
 
 const { get } = server('__tests__/__fixtures__')
 

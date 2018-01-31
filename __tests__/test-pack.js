@@ -3,7 +3,6 @@ import fs from 'fs'
 import stream from 'stream'
 import streamEqual from 'stream-equal'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-
 import { pack } from '../dist/for-node/internal-apis'
 
 describe('pack', () => {

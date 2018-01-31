@@ -1,8 +1,9 @@
 /* global test describe expect */
-import { sleep } from '../dist/for-node/utils'
-import { createTempDir } from 'jest-fixtures'
-import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
+import { createTempDir } from 'jest-fixtures'
+import { models, utils } from '../dist/for-node/internal-apis'
+const { FileSystem } = models
+const { sleep } = utils
 const fs = new FileSystem(_fs)
 
 describe('lockfile', () => {
