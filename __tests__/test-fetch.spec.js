@@ -10,8 +10,6 @@ const { fetch } = require('..')
 const { FileSystem } = models
 const { sleep } = utils
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000
-
 describe('fetch', () => {
   ;(process.env.CI ? it : xit)('fetch (from Github)', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
