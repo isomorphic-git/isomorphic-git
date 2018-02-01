@@ -65,42 +65,46 @@ describe('push', () => {
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/master')
   })
-
-  test('"refs/heads/master" to Github', async () => {
-    let clientDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'test-push-client.git'
-    )
-    let repo = { fs, gitdir: clientDir }
-    let res = await push({
-      ...repo,
-      authUsername: process.env.GITHUB_TOKEN,
-      authPassword: process.env.GITHUB_TOKEN,
-      remote: 'origin',
-      ref: 'refs/heads/master'
-    })
-    expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
-  })
-
-  test('"master" to Github', async () => {
-    let clientDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'test-push-client.git'
-    )
-    let repo = { fs, gitdir: clientDir }
-    let res = await push({
-      ...repo,
-      authUsername: process.env.GITHUB_TOKEN,
-      authPassword: process.env.GITHUB_TOKEN,
-      remote: 'origin',
-      ref: 'master'
-    })
-    expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
-  })
+  ;(process.env.GITHUB_TOKEN ? test : test.skip)(
+    '"refs/heads/master" to Github',
+    async () => {
+      let clientDir = await copyFixtureIntoTempDir(
+        __dirname,
+        'test-push-client.git'
+      )
+      let repo = { fs, gitdir: clientDir }
+      let res = await push({
+        ...repo,
+        authUsername: process.env.GITHUB_TOKEN,
+        authPassword: process.env.GITHUB_TOKEN,
+        remote: 'origin',
+        ref: 'refs/heads/master'
+      })
+      expect(res).toBeTruthy()
+      expect(res.ok).toBeTruthy()
+      expect(res.ok[0]).toBe('unpack')
+      expect(res.ok[1]).toBe('refs/heads/master')
+    }
+  )
+  ;(process.env.GITHUB_TOKEN ? test : test.skip)(
+    '"master" to Github',
+    async () => {
+      let clientDir = await copyFixtureIntoTempDir(
+        __dirname,
+        'test-push-client.git'
+      )
+      let repo = { fs, gitdir: clientDir }
+      let res = await push({
+        ...repo,
+        authUsername: process.env.GITHUB_TOKEN,
+        authPassword: process.env.GITHUB_TOKEN,
+        remote: 'origin',
+        ref: 'master'
+      })
+      expect(res).toBeTruthy()
+      expect(res.ok).toBeTruthy()
+      expect(res.ok[0]).toBe('unpack')
+      expect(res.ok[1]).toBe('refs/heads/master')
+    }
+  )
 })

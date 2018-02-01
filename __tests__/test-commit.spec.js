@@ -4,8 +4,6 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const pify = require('pify')
 const { commit, sign, verify } = require('..')
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000
-
 describe('commit', () => {
   it('commit', async () => {
     // Setup
