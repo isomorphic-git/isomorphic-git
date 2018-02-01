@@ -3,8 +3,6 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { clone } = require('..')
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000
-
 describe('clone', () => {
   ;(process.env.CI ? it : xit)('clone', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
