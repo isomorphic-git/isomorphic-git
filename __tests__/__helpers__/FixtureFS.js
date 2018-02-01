@@ -35,11 +35,24 @@ async function makeFixture (dir) {
 }
 
 async function makeBrowserFixture (dir) {
+  localStorage.debug = 'isomorphic-git'
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000
+
   const { fs, writable, readable } = await FixturePromise
   writable.empty()
   let gitdir = `${dir}.git`
-  if (!fs.existsSync(dir)) await pify(fs.mkdir)(dir)
-  if (!fs.existsSync(gitdir)) await pify(fs.mkdir)(gitdir)
+  try {
+    await pify(fs.stat)(dir)
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err
+    await pify(fs.mkdir)(dir)
+  }
+  try {
+    await pify(fs.stat)(gitdir)
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err
+    await pify(fs.mkdir)(gitdir)
+  }
   return { fs, dir, gitdir }
 }
 

@@ -7,8 +7,6 @@ const pify = require('pify')
 const { models } = require('../dist/for-node/internal-apis')
 const { GitPackIndex, GitObject } = models
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
-
 describe('GitPackIndex', () => {
   it('from .idx', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
