@@ -42,13 +42,14 @@ module.exports = Object.assign({}, base, {
   sauceLabs: {
     testName: 'isomorphic-git'
   },
+  concurrency: 5,
   customLaunchers: customLaunchers,
   // start these browsers
   // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
   browsers: Object.keys(customLaunchers),
   // test results reporter to use
   // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-  reporters: ['tap', 'saucelabs'],
+  reporters: ['verbose', 'saucelabs'],
   // Continuous Integration mode
   // if true, Karma captures browsers, runs the tests and exits
   singleRun: true,

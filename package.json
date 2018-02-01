@@ -93,7 +93,7 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-jasmine": "^1.1.1",
     "karma-sauce-launcher": "^1.2.0",
-    "karma-tap-reporter": "0.0.6",
+    "karma-verbose-reporter": "0.0.6",
     "nock": "^9.1.5",
     "npm-run-all": "^4.1.2",
     "nps": "^5.7.1",
@@ -136,6 +136,11 @@
   },
   "jest": {
     "testRegex": "/__tests__/test-(?!.*\\.(spec)\\.js).*\\.js",
+    "forceCoverageMatch": ["dist/**/*.js"],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/__tests__/"
+    ],
     "testEnvironment": "node"
   }
 }
