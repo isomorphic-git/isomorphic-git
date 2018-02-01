@@ -136,6 +136,11 @@
   },
   "jest": {
     "testRegex": "/__tests__/test-(?!.*\\.(spec)\\.js).*\\.js",
+    "forceCoverageMatch": ["dist/**/*.js"],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/__tests__/"
+    ],
     "testEnvironment": "node"
   }
 }
