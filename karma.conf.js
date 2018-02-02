@@ -91,9 +91,10 @@ module.exports = function (config) {
     },
     sauceLabs: {
       testName: 'isomorphic-git',
-      connectOptions: {
-        tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
-      }
+      build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now(),
+      recordScreenshots: false,
+      recordVideo: false,
+      public: 'public restricted'
     },
     concurrency: 5,
     // Continuous Integration mode
