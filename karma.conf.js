@@ -5,7 +5,6 @@ module.exports = function (config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: [
-      'ChromeHeadless',
       'FirefoxHeadless'
     ],
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -96,7 +95,7 @@ module.exports = function (config) {
       recordVideo: false,
       public: 'public restricted'
     },
-    concurrency: 5,
+    concurrency: 6,
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: true,
@@ -118,6 +117,7 @@ module.exports = function (config) {
   }
 
   if (!process.env.CI) {
+    options.browsers.push('ChromeHeadless')
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     options.singleRun = false
