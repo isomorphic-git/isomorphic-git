@@ -90,7 +90,6 @@
     "karma": "^2.0.0",
     "karma-browserify": "^5.1.3",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-firefox-launcher": "^1.1.0",
     "karma-jasmine": "^1.1.1",
     "karma-sauce-launcher": "^1.2.0",
     "karma-verbose-reporter": "0.0.6",
@@ -136,10 +135,12 @@
   },
   "jest": {
     "testRegex": "/__tests__/test-(?!.*\\.(spec)\\.js).*\\.js",
-    "forceCoverageMatch": ["dist/**/*.js"],
+    "collectCoverageFrom": [
+      "dist/for-node/*.js"
+    ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/node_modules/",
-      "<rootDir>/__tests__/"
+      "<rootDir>/__tests__/__helpers__"
     ],
     "testEnvironment": "node"
   }
