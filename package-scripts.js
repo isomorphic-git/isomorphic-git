@@ -56,9 +56,7 @@ module.exports = {
       jest: process.env.CI
         ? 'cross-env DEBUG=isomorphic-git jest --coverage && codecov'
         : 'cross-env DEBUG=isomorphic-git jest',
-      karma: process.env.CI
-        ? 'karma start'
-        : 'karma start --browsers ChromeHeadless --single-run'
+      karma: 'karma start'
     }
   }
 }
