@@ -14,4 +14,3 @@ branches:
 addons:
   chrome: stable
   firefox: latest
-sudo: required
