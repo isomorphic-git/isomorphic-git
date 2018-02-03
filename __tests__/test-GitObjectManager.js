@@ -1,6 +1,6 @@
 /* global test describe expect */
 import _fs from 'fs'
-import { managers, models } from '../dist/for-node/internal-apis'
+import { managers, models } from 'isomorphic-git/internal-apis'
 const { GitObjectManager } = managers
 const { FileSystem } = models
 const fs = new FileSystem(_fs)

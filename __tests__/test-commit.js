@@ -3,7 +3,7 @@ import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-import { commit, sign, verify } from '..'
+import { commit, sign, verify } from 'isomorphic-git'
 
 jest.setTimeout(30000)
 

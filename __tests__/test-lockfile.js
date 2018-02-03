@@ -1,7 +1,7 @@
 /* global test describe expect */
 import _fs from 'fs'
 import { createTempDir } from 'jest-fixtures'
-import { models, utils } from '../dist/for-node/internal-apis'
+import { models, utils } from 'isomorphic-git/internal-apis'
 const { FileSystem } = models
 const { sleep } = utils
 const fs = new FileSystem(_fs)

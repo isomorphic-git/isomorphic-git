@@ -1,6 +1,6 @@
 /* global test describe expect */
 import _fs from 'fs'
-import { models } from '../dist/for-node/internal-apis'
+import { models } from 'isomorphic-git/internal-apis'
 const { FileSystem, GitIndex } = models
 const fs = new FileSystem(_fs)
 

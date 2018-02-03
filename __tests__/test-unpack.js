@@ -2,8 +2,8 @@
 import fs from 'fs'
 import path from 'path'
 import { createTempDir } from 'jest-fixtures'
-import { unpack, managers } from '../dist/for-node/internal-apis'
-import { init } from '..'
+import { unpack, managers } from 'isomorphic-git/internal-apis'
+import { init } from 'isomorphic-git'
 const { GitObjectManager } = managers
 
 describe('unpack', () => {

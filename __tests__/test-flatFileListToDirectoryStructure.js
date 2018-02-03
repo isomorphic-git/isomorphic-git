@@ -1,5 +1,5 @@
 /* global test describe expect */
-import { utils } from '../dist/for-node/internal-apis'
+import { utils } from 'isomorphic-git/internal-apis'
 const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {

@@ -51,7 +51,7 @@ module.exports = {
     },
     test: {
       default: process.env.CI ? 'nps test.travis' : 'nps test.local',
-      travis: series.nps('lint', 'build', 'test.jest', 'test.karma'),
+      travis: series.nps('lint', 'test.jest', 'build', 'test.karma'),
       local: series.nps('test.jest', 'test.karma'),
       jest: process.env.CI
         ? 'cross-env DEBUG=isomorphic-git jest --coverage && codecov'

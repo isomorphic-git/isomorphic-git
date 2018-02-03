@@ -5,7 +5,7 @@ import nock from 'nock'
 import concat from 'simple-concat'
 import pify from 'pify'
 import server from './__helpers__/http-backend'
-import { push } from '..'
+import { push } from 'isomorphic-git'
 
 jest.setTimeout(20000)
 

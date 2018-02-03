@@ -3,7 +3,7 @@ import fs from 'fs'
 import stream from 'stream'
 import streamEqual from 'stream-equal'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { pack } from '../dist/for-node/internal-apis'
+import { pack } from 'isomorphic-git/internal-apis'
 
 describe('pack', () => {
   test('git.pack', async () => {

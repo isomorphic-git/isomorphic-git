@@ -2,8 +2,8 @@
 import _fs from 'fs'
 import EventEmitter from 'events'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { models, utils } from '../dist/for-node/internal-apis'
-import { fetch } from '..'
+import { models, utils } from 'isomorphic-git/internal-apis'
+import { fetch } from 'isomorphic-git'
 const { FileSystem } = models
 const { sleep } = utils
 const fs = new FileSystem(_fs)

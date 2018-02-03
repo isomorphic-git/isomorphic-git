@@ -1,6 +1,6 @@
 /* global test describe expect */
 import pkg from '../package.json'
-import { version } from '..'
+import { version } from 'isomorphic-git'
 
 /** @test {version} */
 describe('version', () => {

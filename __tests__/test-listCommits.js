@@ -1,6 +1,6 @@
 /* global test describe expect */
 import fs from 'fs'
-import { listCommits } from '../dist/for-node/internal-apis'
+import { listCommits } from 'isomorphic-git/internal-apis'
 
 describe('listCommits', () => {
   test('listCommits', async () => {
