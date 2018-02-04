@@ -1,7 +1,7 @@
 /* global test describe expect */
 import path from 'path'
 import fs from 'fs'
-import { findRoot } from '..'
+import { findRoot } from 'isomorphic-git'
 
 const dir = '.'
 

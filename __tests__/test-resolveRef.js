@@ -1,7 +1,7 @@
 /* global test describe expect */
 import _fs from 'fs'
-import { models } from '../dist/for-node/internal-apis'
-import { resolveRef } from '..'
+import { models } from 'isomorphic-git/internal-apis'
+import { resolveRef } from 'isomorphic-git'
 const { FileSystem } = models
 const fs = new FileSystem(_fs)
 

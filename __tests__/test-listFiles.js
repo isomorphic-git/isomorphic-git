@@ -1,7 +1,7 @@
 /* global test describe expect */
 import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { listFiles } from '..'
+import { listFiles } from 'isomorphic-git'
 
 /** @test {listFiles} */
 describe('listFiles', () => {
