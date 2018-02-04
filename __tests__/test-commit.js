@@ -1,9 +1,9 @@
 /* globals jest describe test expect */
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import fs from 'fs'
+import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import jsonfile from 'jsonfile'
 import pify from 'pify'
-import { commit, sign, verify } from '..'
+import { commit, sign, verify } from 'isomorphic-git'
 
 jest.setTimeout(30000)
 
@@ -28,6 +28,7 @@ describe('commit', () => {
 
   test('GPG signing', async () => {
     // Setup
+    const openpgp = require('openpgp')
     let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
     // Test
     const repo = { fs, gitdir }
@@ -45,7 +46,8 @@ describe('commit', () => {
     })
     await sign({
       ...repo,
-      privateKeys: privateKeys[0]
+      privateKeys: privateKeys[0],
+      openpgp
     })
     const publicKeys = await pify(jsonfile.readFile)(
       '__tests__/__fixtures__/openpgp-public-keys.json'
@@ -53,7 +55,8 @@ describe('commit', () => {
     let keys = await verify({
       ...repo,
       ref: 'HEAD',
-      publicKeys: publicKeys[0]
+      publicKeys: publicKeys[0],
+      openpgp
     })
     expect(keys[0] === 'a01edd29ac0f3952').toBe(true)
   })

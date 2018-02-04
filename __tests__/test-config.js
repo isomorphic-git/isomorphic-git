@@ -1,8 +1,7 @@
 /* global test describe expect */
 import fs from 'fs'
 import { copyFixtureIntoTempDir } from 'jest-fixtures'
-
-import { config } from '../dist/for-node/commands'
+import { config } from 'isomorphic-git'
 
 /** @test {config} */
 describe('config', () => {

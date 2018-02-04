@@ -1,6 +1,6 @@
 /* global test describe expect */
 import fs from 'fs'
-import { log } from '../dist/for-node/commands'
+import { log } from 'isomorphic-git'
 
 /** @test {log} */
 describe('log', () => {

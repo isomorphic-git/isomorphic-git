@@ -1,5 +1,7 @@
 /* global test describe expect */
-import { GitPktLine } from '../dist/for-node/models'
+import { models } from 'isomorphic-git/internal-apis'
+const { GitPktLine } = models
+
 describe('pkt-line-encoder', () => {
   test('pkt-line encode string', async () => {
     let foo = GitPktLine.encode('hello world\n')

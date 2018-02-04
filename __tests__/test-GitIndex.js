@@ -1,6 +1,7 @@
 /* global test describe expect */
-import { FileSystem, GitIndex } from '../dist/for-node/models'
 import _fs from 'fs'
+import { models } from 'isomorphic-git/internal-apis'
+const { FileSystem, GitIndex } = models
 const fs = new FileSystem(_fs)
 
 describe('GitIndex', () => {

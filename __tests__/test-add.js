@@ -1,24 +1,22 @@
 /* globals describe test expect */
-import fs from 'fs'
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { init, add, listFiles } from '../dist/for-node/commands'
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { init, add, listFiles } from 'isomorphic-git'
 
 /** @test {add} */
 describe('add', () => {
   test('file', async () => {
     // Setup
-    let dir = await copyFixtureIntoTempDir(__dirname, 'test-add')
+    let { fs, dir, gitdir } = await makeFixture('test-add')
     // Test
-    const repo = { fs, dir }
-    await init(repo)
-    let orig = (await listFiles(repo)).length
-    await add({ ...repo, filepath: 'a.txt' })
-    expect((await listFiles(repo)).length === 1).toBe(true)
-    await add({ ...repo, filepath: 'a.txt' })
-    expect((await listFiles(repo)).length === 1).toBe(true)
-    await add({ ...repo, filepath: 'a-copy.txt' })
-    expect((await listFiles(repo)).length === 2).toBe(true)
-    await add({ ...repo, filepath: 'b.txt' })
-    expect((await listFiles(repo)).length === 3).toBe(true)
+    await init({ fs, dir, gitdir })
+    let orig = (await listFiles({ fs, dir, gitdir })).length
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    expect((await listFiles({ fs, dir, gitdir })).length === 1).toBe(true)
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    expect((await listFiles({ fs, dir, gitdir })).length === 1).toBe(true)
+    await add({ fs, dir, gitdir, filepath: 'a-copy.txt' })
+    expect((await listFiles({ fs, dir, gitdir })).length === 2).toBe(true)
+    await add({ fs, dir, gitdir, filepath: 'b.txt' })
+    expect((await listFiles({ fs, dir, gitdir })).length === 3).toBe(true)
   })
 })

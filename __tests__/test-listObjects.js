@@ -1,6 +1,6 @@
 /* global test describe expect */
 import fs from 'fs'
-import { listObjects } from '../dist/for-node/internal-apis'
+import { listObjects } from 'isomorphic-git/internal-apis'
 
 describe('listObjects', () => {
   test('listObjects', async () => {
@@ -17,6 +17,6 @@ describe('listObjects', () => {
         '0518502faba1c63489562641c36a989e0f574d95'
       ]
     })
-    expect(objects).toMatchSnapshot()
+    expect([...objects]).toMatchSnapshot()
   })
 })

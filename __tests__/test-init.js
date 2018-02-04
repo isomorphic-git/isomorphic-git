@@ -2,8 +2,7 @@
 import fs from 'fs'
 import { existsSync } from 'fs'
 import { createTempDir } from 'jest-fixtures'
-
-import { init } from '..'
+import { init } from 'isomorphic-git'
 
 /** @test {init} */
 describe('init', () => {

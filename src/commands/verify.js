@@ -41,7 +41,8 @@ export async function verify ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   ref,
-  publicKeys
+  publicKeys,
+  openpgp
 }) {
   const fs = new FileSystem(_fs)
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
@@ -52,8 +53,8 @@ export async function verify ({
     )
   }
   let commit = SignedGitCommit.from(object)
-  let keys = await commit.listSigningKeys()
-  let validity = await commit.verify(publicKeys)
+  let keys = await commit.listSigningKeys(openpgp)
+  let validity = await commit.verify(openpgp, publicKeys)
   if (!validity) return false
   return keys
 }

@@ -1,7 +1,8 @@
 /* global test describe expect */
-import { resolveRef } from '..'
-import { FileSystem } from '../dist/for-node/models'
 import _fs from 'fs'
+import { models } from 'isomorphic-git/internal-apis'
+import { resolveRef } from 'isomorphic-git'
+const { FileSystem } = models
 const fs = new FileSystem(_fs)
 
 describe('resolveRef', () => {

@@ -1,11 +1,10 @@
 /* global test describe expect */
 import fs from 'fs'
-import { GitObjectManager } from '../dist/for-node/managers'
 import path from 'path'
 import { createTempDir } from 'jest-fixtures'
-
-import { init } from '..'
-import { unpack } from '../dist/for-node/internal-apis'
+import { unpack, managers } from 'isomorphic-git/internal-apis'
+import { init } from 'isomorphic-git'
+const { GitObjectManager } = managers
 
 describe('unpack', () => {
   test('unpack', async () => {

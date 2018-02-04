@@ -7,7 +7,7 @@ import { GitObject } from './GitObject'
 import crc32 from 'crc/lib/crc32.js'
 import { PassThrough } from 'stream'
 import pako from 'pako'
-import marky from 'marky'
+import * as marky from 'marky'
 import { log } from '../utils'
 
 function buffer2stream (buffer) {
