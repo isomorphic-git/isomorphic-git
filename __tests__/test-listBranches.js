@@ -1,6 +1,6 @@
 /* global test describe expect */
 import fs from 'fs'
-import { listBranches } from '..'
+import { listBranches } from 'isomorphic-git'
 
 /** @test {listBranches} */
 describe('listBranches', () => {

@@ -136,9 +136,10 @@
   },
   "jest": {
     "testRegex": "/__tests__/test-(?!.*\\.(spec)\\.js).*\\.js",
-    "collectCoverageFrom": [
-      "dist/for-node/*.js"
-    ],
+    "moduleNameMapper": {
+      "^isomorphic-git$": "<rootDir>/src",
+      "^isomorphic-git/(.+)$": "<rootDir>/src/$1"
+    },
     "coveragePathIgnorePatterns": [
       "<rootDir>/node_modules/",
       "<rootDir>/__tests__/__helpers__"

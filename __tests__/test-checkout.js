@@ -3,7 +3,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 // import { createTempDir, copyFixtureIntoTempDir } from 'jest-fixtures'
 import pify from 'pify'
-import { checkout, listFiles } from '..'
+import { checkout, listFiles } from 'isomorphic-git'
 
 /** @test {checkout} */
 describe('checkout', () => {

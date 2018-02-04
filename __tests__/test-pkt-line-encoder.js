@@ -1,5 +1,5 @@
 /* global test describe expect */
-import { models } from '../dist/for-node/internal-apis'
+import { models } from 'isomorphic-git/internal-apis'
 const { GitPktLine } = models
 
 describe('pkt-line-encoder', () => {
