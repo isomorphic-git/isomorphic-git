@@ -102,7 +102,7 @@
     "parse-header-stream": "^1.1.1",
     "prettier-standard": "^8.0.0",
     "pretty-format": "^22.1.0",
-    "rollup": "^0.54.0",
+    "rollup": "^0.55.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-json": "^2.3.0",
     "semantic-release": "^12.2.2",
