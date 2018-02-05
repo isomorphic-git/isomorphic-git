@@ -1,4 +1,4 @@
-export class RefSpec {
+export class GitRefSpec {
   constructor ({ remotePath, localPath, force, matchPrefix }) {
     Object.assign(this, {
       remotePath,
@@ -21,7 +21,7 @@ export class RefSpec {
     // validate
     // TODO: Make this check more nuanced, and depend on whether this is a fetch refspec or a push refspec
     if (remoteIsGlob !== localIsGlob) throw new Error('Invalid refspec')
-    return new RefSpec({
+    return new GitRefSpec({
       remotePath,
       localPath,
       force,
@@ -41,12 +41,12 @@ export class RefSpec {
   }
 }
 
-export class RefSpecSet {
+export class GitRefSpecSet {
   constructor () {
     this.rules = []
   }
   add (refspec) {
-    const rule = RefSpec.from(refspec) // might throw
+    const rule = GitRefSpec.from(refspec) // might throw
     this.rules.push(rule)
   }
   translate (remoteRefs) {
