@@ -50,12 +50,10 @@ module.exports = {
                      -o dist/service-worker-bundle.umd.min.js`
     },
     test: {
-      default: process.env.CI ? 'nps test.travis' : 'nps test.local',
-      travis: series.nps('lint', 'test.jest', 'build', 'test.karma'),
-      local: series.nps('test.jest', 'test.karma'),
+      default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
       jest: process.env.CI
-        ? 'cross-env DEBUG=isomorphic-git jest --coverage && codecov'
-        : 'cross-env DEBUG=isomorphic-git jest',
+        ? 'cross-env DEBUG=isomorphic-git jest --ci --coverage && codecov'
+        : 'cross-env DEBUG=isomorphic-git jest --ci',
       karma: 'karma start'
     }
   }

@@ -1,63 +1,166 @@
-import ini from 'ini'
-import get from 'lodash.get'
-import set from 'lodash.set'
-import unset from 'lodash.unset'
+// This is straight from parse_unit_factor in config.c of canonical git
+const num = val => {
+  val = val.toLowerCase()
+  let n = parseInt(val)
+  if (val.endsWith('k')) n *= 1024
+  if (val.endsWith('m')) n *= 1024 * 1024
+  if (val.endsWith('g')) n *= 1024 * 1024 * 1024
+  return n
+}
 
-const complexKeys = ['remote', 'branch']
+// This is straight from git_parse_maybe_bool_text in config.c of canonical git
+const bool = val => {
+  val = val.trim().toLowerCase()
+  if (val === 'true' || val === 'yes' || val === 'on') return true
+  if (val === 'false' || val === 'no' || val === 'off') return false
+  throw Error(
+    `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
+  )
+}
 
-const isComplexKey = key =>
-  complexKeys.reduce((x, y) => x || key.startsWith(y), false)
+const schema = {
+  core: {
+    _named: false,
+    repositoryformatversion: String,
+    filemode: bool,
+    bare: bool,
+    logallrefupdates: bool,
+    symlinks: bool,
+    ignorecase: bool,
+    bigFileThreshold: num
+  },
+  remote: {
+    _named: true,
+    url: String,
+    fetch: String
+  },
+  branch: {
+    _named: true,
+    remote: String,
+    merge: String
+  }
+}
 
-const splitComplexKey = key =>
-  key
-    .split('"')
-    .map(x => x.trim())
-    .filter(x => x !== '')
+const isSection = line => line.trim().startsWith('[')
+
+const extractSection = line =>
+  line
+    .slice(
+      line.indexOf('[') + 1,
+      Math.min(line.indexOf(']'), line.indexOf(' '))
+    )
+    .trim()
+
+const isNamedSection = section => schema[section]._named
+
+const isKeyValuePair = line => line.includes('=')
+
+const extractSectionName = line =>
+  line.slice(line.indexOf('"') + 1, line.lastIndexOf('"'))
 
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
 /** @ignore */
 export class GitConfig {
   constructor (text) {
-    this.ini = ini.decode(text)
-    // Some mangling to make it easier to work with (honestly)
-    for (let key of Object.keys(this.ini)) {
-      if (isComplexKey(key)) {
-        let parts = splitComplexKey(key)
-        if (parts.length === 2) {
-          // just to be cautious
-          set(this.ini, [parts[0], parts[1]], this.ini[key])
-          delete this.ini[key]
-        }
-      }
-    }
+    this.lines = text.split('\n')
   }
   static from (text) {
     return new GitConfig(text)
   }
   async get (path) {
-    return get(this.ini, path)
+    const parts = path.split('.')
+    const section = parts.shift()
+    const sectionName = isNamedSection(section) ? parts.shift() : null
+    console.log(section, sectionName)
+    const key = parts.shift()
+
+    let currentSection = ''
+    let currentSectionName = null
+    let lastValue = null
+    for (const line of this.lines) {
+      // zero in on section
+      if (isSection(line)) {
+        currentSection = extractSection(line)
+        if (isNamedSection(currentSection)) {
+          currentSectionName = extractSectionName(line)
+        }
+      } else if (
+        currentSection === section &&
+        (sectionName === null || currentSectionName === sectionName)
+      ) {
+        if (isKeyValuePair(line)) {
+          let [_key, _value] = line.split('=', 2)
+          if (_key.trim() === key) {
+            lastValue = _value.trim()
+          }
+        }
+      }
+    }
+    if (lastValue === null) return undefined
+    // Cast value to correct type
+    let fn = schema[section][key]
+    if (fn) {
+      lastValue = fn(lastValue)
+    }
+    return lastValue
   }
   async set (path, value) {
-    if (value === undefined) {
-      unset(this.ini, path)
-    } else {
-      set(this.ini, path, value)
+    const parts = path.split('.')
+    const section = parts.shift()
+    const sectionName = isNamedSection(section) ? parts.shift() : null
+    const key = parts.shift()
+
+    let currentSection = ''
+    let currentSectionName = null
+    let lastSectionMatch = null
+    let lastMatch = null
+    for (let i = 0; i < this.lines.length; i++) {
+      const line = this.lines[i]
+      if (isSection(line)) {
+        currentSection = extractSection(line)
+        if (currentSection === section) {
+          if (sectionName) {
+            currentSectionName = extractSectionName(line)
+          }
+          if (currentSectionName === sectionName) {
+            lastSectionMatch = i
+          }
+        } else {
+          currentSectionName = null
+        }
+      } else if (
+        currentSection === section &&
+        (sectionName === null || currentSectionName === sectionName)
+      ) {
+        if (isKeyValuePair(line)) {
+          let [_key] = line.split('=', 1)
+          if (_key.trim() === key) {
+            lastMatch = i
+          }
+        }
+      }
+    }
+    if (lastMatch !== null) {
+      if (value === undefined) {
+        this.lines.splice(lastMatch, 1)
+      } else {
+        this.lines[lastMatch] = `${key} = ${value}`
+      }
+    } else if (lastSectionMatch !== null) {
+      if (value !== undefined) {
+        this.lines.splice(lastSectionMatch, 0, [`${key} = ${value}`])
+      }
+    } else if (value !== undefined) {
+      if (sectionName) {
+        this.lines.push(`[${section} "${sectionName}"]`)
+      } else {
+        this.lines.push(`[${section}]`)
+      }
+      this.lines.push([`${key} = ${value}`])
     }
   }
   toString () {
-    // de-mangle complex keys
-    for (let key of Object.keys(this.ini)) {
-      if (isComplexKey(key)) {
-        for (let childkey of Object.keys(this.ini[key])) {
-          let complexkey = `${key} "${childkey}"`
-          this.ini[complexkey] = this.ini[key][childkey]
-          delete this.ini[key][childkey]
-        }
-        delete this.ini[key]
-      }
-    }
-    let text = ini.encode(this.ini, { whitespace: true })
-    return text
+    return this.lines.join('\n')
   }
 }
