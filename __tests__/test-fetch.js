@@ -1,24 +1,21 @@
 /* global jest test describe expect */
-import _fs from 'fs'
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 import EventEmitter from 'events'
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
 import { models, utils } from 'isomorphic-git/internal-apis'
 import { fetch } from 'isomorphic-git'
 const { FileSystem } = models
 const { sleep } = utils
-const fs = new FileSystem(_fs)
-
-jest.setTimeout(10000)
 
 /** @test {fetch} */
 describe('fetch', () => {
   ;(process.env.CI ? test : test.skip)('fetch (from Github)', async () => {
     // Setup
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
+    let { fs, dir, gitdir } = await makeFixture('test-fetch')
+    fs = new FileSystem(fs)
     // Test
-    let repo = { fs, gitdir }
     await fetch({
-      ...repo,
+      fs,
+      gitdir,
       remote: 'origin',
       ref: 'master'
     })
@@ -26,7 +23,8 @@ describe('fetch', () => {
 
   test('shallow fetch (from Github)', async () => {
     // Setup
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
+    let { fs, dir, gitdir } = await makeFixture('test-fetch')
+    fs = new FileSystem(fs)
     let output = []
     let progress = []
     let emitter = new EventEmitter()
@@ -34,9 +32,9 @@ describe('fetch', () => {
       .on('message', output.push.bind(output))
       .on('progress', progress.push.bind(progress))
     // Test
-    let repo = { fs, gitdir }
     await fetch({
-      ...repo,
+      fs,
+      gitdir,
       emitter,
       depth: 1,
       remote: 'origin',
@@ -49,7 +47,8 @@ describe('fetch', () => {
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
     await fetch({
-      ...repo,
+      fs,
+      gitdir,
       depth: 2,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -61,11 +60,12 @@ describe('fetch', () => {
 
   test('shallow fetch since (from Github)', async () => {
     // Setup
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
+    let { fs, dir, gitdir } = await makeFixture('test-fetch')
+    fs = new FileSystem(fs)
     // Test
-    let repo = { fs, gitdir }
     await fetch({
-      ...repo,
+      fs,
+      gitdir,
       since: new Date(1506571200000),
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -77,11 +77,12 @@ describe('fetch', () => {
 
   test('shallow fetch exclude (from Github)', async () => {
     // Setup
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
+    let { fs, dir, gitdir } = await makeFixture('test-fetch')
+    fs = new FileSystem(fs)
     // Test
-    let repo = { fs, gitdir }
     await fetch({
-      ...repo,
+      fs,
+      gitdir,
       exclude: ['v0.0.5'],
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -93,11 +94,12 @@ describe('fetch', () => {
 
   test('shallow fetch relative (from Github)', async () => {
     // Setup
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-fetch.git')
+    let { fs, dir, gitdir } = await makeFixture('test-fetch')
+    fs = new FileSystem(fs)
     // Test
-    let repo = { fs, gitdir }
     await fetch({
-      ...repo,
+      fs,
+      gitdir,
       depth: 1,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
@@ -107,7 +109,8 @@ describe('fetch', () => {
     expect(shallow).toEqual('92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n')
     // Now test deepen
     await fetch({
-      ...repo,
+      fs,
+      gitdir,
       relative: true,
       depth: 1,
       remote: 'origin',

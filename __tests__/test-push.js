@@ -7,7 +7,7 @@ import pify from 'pify'
 import server from './__helpers__/http-backend'
 import { push } from 'isomorphic-git'
 
-jest.setTimeout(20000)
+jest.setTimeout(30000)
 
 /** @test {push} */
 describe('push', () => {

@@ -72,7 +72,6 @@ export class GitConfig {
     const parts = path.split('.')
     const section = parts.shift()
     const sectionName = isNamedSection(section) ? parts.shift() : null
-    console.log(section, sectionName)
     const key = parts.shift()
 
     let currentSection = ''
