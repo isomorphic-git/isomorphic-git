@@ -57,7 +57,7 @@ async function makeBrowserFixture (dir) {
 }
 
 async function makeNodeFixture (fixture) {
-  jest.setTimeout(30000)
+  jest.setTimeout(60000)
   const {
     getFixturePath,
     createTempDir,
