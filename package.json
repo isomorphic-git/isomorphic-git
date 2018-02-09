@@ -72,7 +72,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "ban-sensitive-files": "^1.9.2",
-    "browserify": "^15.1.0",
+    "browserify": "^16.0.0",
     "browserify-shim": "^3.8.14",
     "codecov": "^3.0.0",
     "cross-env": "^5.1.3",
