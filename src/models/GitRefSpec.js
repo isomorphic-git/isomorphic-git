@@ -42,8 +42,15 @@ export class GitRefSpec {
 }
 
 export class GitRefSpecSet {
-  constructor () {
-    this.rules = []
+  constructor (rules = []) {
+    this.rules = rules
+  }
+  static from (refspecs) {
+    const rules = []
+    for (const refspec of refspecs) {
+      rules.push(GitRefSpec.from(refspec)) // might throw
+    }
+    return new GitRefSpecSet(rules)
   }
   add (refspec) {
     const rule = GitRefSpec.from(refspec) // might throw

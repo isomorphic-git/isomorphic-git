@@ -28,7 +28,7 @@ describe('readObject', () => {
       gitdir: '__tests__/__fixtures__/test-readObject.git',
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
-    await expect(ref).toMatchSnapshot()
+    expect(ref).toMatchSnapshot()
     expect(ref.format).toBe('parsed')
     expect(ref.type).toBe('commit')
   })
@@ -39,9 +39,12 @@ describe('readObject', () => {
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'content'
     })
-    await expect(ref).toMatchSnapshot()
     expect(ref.format).toBe('content')
     expect(ref.type).toBe('commit')
+    expect(ref.source).toBe(
+      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+    )
+    expect(ref.object.toString('hex')).toMatchSnapshot()
   })
   test('wrapped', async () => {
     let ref = await readObject({
@@ -50,9 +53,12 @@ describe('readObject', () => {
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'wrapped'
     })
-    await expect(ref).toMatchSnapshot()
     expect(ref.format).toBe('wrapped')
     expect(ref.type).toBe(undefined)
+    expect(ref.source).toBe(
+      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+    )
+    expect(ref.object.toString('hex')).toMatchSnapshot()
   })
   test('deflated', async () => {
     let ref = await readObject({
@@ -61,9 +67,12 @@ describe('readObject', () => {
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'deflated'
     })
-    await expect(ref).toMatchSnapshot()
     expect(ref.format).toBe('deflated')
     expect(ref.type).toBe(undefined)
+    expect(ref.source).toBe(
+      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+    )
+    expect(ref.object.toString('hex')).toMatchSnapshot()
   })
   test('from packfile', async () => {
     let ref = await readObject({
@@ -72,8 +81,11 @@ describe('readObject', () => {
       oid: '0b8faa11b353db846b40eb064dfb299816542a46',
       format: 'deflated'
     })
-    await expect(ref).toMatchSnapshot()
     expect(ref.format).toBe('content')
     expect(ref.type).toBe('commit')
+    expect(ref.source).toBe(
+      './objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+    )
+    expect(ref.object.toString('hex')).toMatchSnapshot()
   })
 })

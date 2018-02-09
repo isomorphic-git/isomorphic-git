@@ -4,8 +4,7 @@ const { GitRefSpecSet } = models
 
 describe('GitRefSpecSet', () => {
   test('fetch = +refs/heads/*:refs/remotes/origin/*', async () => {
-    const refspec = new GitRefSpecSet()
-    refspec.add('+refs/heads/*:refs/remotes/origin/*')
+    const refspec = GitRefSpecSet.from(['+refs/heads/*:refs/remotes/origin/*'])
     const result = refspec.translate([
       'refs/heads/master',
       'refs/heads/develop'

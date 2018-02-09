@@ -17,3 +17,9 @@ merge = refs/heads/master
 [branch "dist"]
 remote = origin
 merge = refs/heads/dist
+
+[remote "upstream"]
+url = https://github.com/isomorphic-git/isomorphic-git
+fetch = +refs/heads/master:refs/remotes/upstream/master
+fetch = refs/heads/develop:refs/remotes/upstream/develop
+fetch = refs/heads/qa/*:refs/remotes/upstream/qa/*
