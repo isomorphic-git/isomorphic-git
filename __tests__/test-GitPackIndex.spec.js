@@ -4,6 +4,7 @@ const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
 const path = require('path')
 const pify = require('pify')
+const shasum = require('shasum')
 const { models } = require('../dist/for-node/internal-apis')
 const { GitPackIndex, GitObject } = models
 
@@ -17,7 +18,7 @@ describe('GitPackIndex', () => {
       )
     )
     let p = await GitPackIndex.fromIdx({ idx })
-    assertSnapshot(p.hashes, snapshots, `GitPackIndex from .idx 1`)
+    assertSnapshot(shasum(p.hashes), snapshots, `GitPackIndex from .idx 1`)
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)
@@ -35,7 +36,7 @@ describe('GitPackIndex', () => {
       )
     )
     let p = await GitPackIndex.fromPack({ pack })
-    assertSnapshot(p.hashes, snapshots, `GitPackIndex from .pack 1`)
+    assertSnapshot(shasum(p.hashes), snapshots, `GitPackIndex from .pack 1`)
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)

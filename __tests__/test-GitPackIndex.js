@@ -1,4 +1,5 @@
 /* globals describe test expect */
+const shasum = require('shasum')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 import { models } from 'isomorphic-git/internal-apis'
 const { FileSystem, GitPackIndex, GitObject } = models
@@ -11,7 +12,7 @@ describe('GitPackIndex', () => {
       '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
     )
     let p = await GitPackIndex.fromIdx({ idx })
-    expect(p.hashes).toMatchSnapshot()
+    expect(shasum(p.hashes)).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)
@@ -27,7 +28,7 @@ describe('GitPackIndex', () => {
       '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     let p = await GitPackIndex.fromPack({ pack })
-    expect(p.hashes).toMatchSnapshot()
+    expect(shasum(p.hashes)).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)
