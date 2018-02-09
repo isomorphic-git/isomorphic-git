@@ -59,9 +59,16 @@ describe('readObject', () => {
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'content'
     })
-    assertSnapshot(ref, snapshots, `readObject content 1`)
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('commit')
+    expect(ref.source).toBe(
+      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+    )
+    assertSnapshot(
+      ref.object.toString('hex'),
+      snapshots,
+      `readObject content 1`
+    )
   })
   it('wrapped', async () => {
     // Setup
@@ -73,9 +80,16 @@ describe('readObject', () => {
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'wrapped'
     })
-    assertSnapshot(ref, snapshots, `readObject wrapped 1`)
     expect(ref.format).toEqual('wrapped')
     expect(ref.type).toEqual(undefined)
+    expect(ref.source).toBe(
+      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+    )
+    assertSnapshot(
+      ref.object.toString('hex'),
+      snapshots,
+      `readObject wrapped 1`
+    )
   })
   it('deflated', async () => {
     // Setup
@@ -87,9 +101,16 @@ describe('readObject', () => {
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'deflated'
     })
-    assertSnapshot(ref, snapshots, `readObject deflated 1`)
     expect(ref.format).toEqual('deflated')
     expect(ref.type).toEqual(undefined)
+    expect(ref.source).toBe(
+      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+    )
+    assertSnapshot(
+      ref.object.toString('hex'),
+      snapshots,
+      `readObject deflated 1`
+    )
   })
   it('from packfile', async () => {
     // Setup
@@ -101,8 +122,15 @@ describe('readObject', () => {
       oid: '0b8faa11b353db846b40eb064dfb299816542a46',
       format: 'deflated'
     })
-    assertSnapshot(ref, snapshots, `readObject from packfile 1`)
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('commit')
+    expect(ref.source).toBe(
+      './objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+    )
+    assertSnapshot(
+      ref.object.toString('hex'),
+      snapshots,
+      `readObject from packfile 1`
+    )
   })
 })

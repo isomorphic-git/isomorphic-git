@@ -30,6 +30,7 @@ export async function fetch ({
   fs: _fs,
   emitter,
   ref = 'HEAD',
+  refs,
   remote,
   url,
   authUsername,
@@ -51,6 +52,7 @@ export async function fetch ({
     gitdir,
     fs,
     ref,
+    refs,
     remote,
     url,
     authUsername,
@@ -90,6 +92,7 @@ async function fetchPackfile ({
   gitdir,
   fs: _fs,
   ref,
+  refs = [ref],
   remote,
   url,
   authUsername,
@@ -148,18 +151,24 @@ async function fetchPackfile ({
     symrefs: remoteHTTP.symrefs,
     tags
   })
-  let want = await GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref: `refs/remotes/${remote}/${ref}`
-  })
   // Note: I removed "ofs-delta" from the capabilities list and now
   // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/${
     pkg.name
   }@${pkg.version}${relative ? ' deepen-relative' : ''}`
   let packstream = new PassThrough()
-  packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`))
+  const wants = await Promise.all(
+    refs.map(ref =>
+      GitRefManager.resolve({
+        fs,
+        gitdir,
+        ref: `refs/remotes/${remote}/${ref}`
+      })
+    )
+  )
+  for (const want of wants) {
+    packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`))
+  }
   let oids = await GitShallowManager.read({ fs, gitdir })
   if (oids.size > 0 && remoteHTTP.capabilities.has('shallow')) {
     for (let oid of oids) {

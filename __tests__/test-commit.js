@@ -1,21 +1,17 @@
-/* globals jest describe test expect */
-import fs from 'fs'
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import jsonfile from 'jsonfile'
-import pify from 'pify'
-import { commit, sign, verify } from 'isomorphic-git'
+/* globals jest describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-jest.setTimeout(30000)
+const pify = require('pify')
+const { commit, sign, verify } = require('isomorphic-git')
 
-/** @test {commit} */
 describe('commit', () => {
-  test('commit', async () => {
+  it('commit', async () => {
     // Setup
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
+    let { fs, dir, gitdir } = await makeFixture('test-commit')
     // Test
-    const repo = { fs, gitdir }
     let sha = await commit({
-      ...repo,
+      fs,
+      gitdir,
       author: {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
@@ -23,20 +19,19 @@ describe('commit', () => {
       },
       message: 'Initial commit'
     })
-    expect(sha === '7a51c0b1181d738198ff21c4679d3aa32eb52fe0').toBe(true)
+    expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
   })
 
-  test('GPG signing', async () => {
+  it('GPG signing', async () => {
     // Setup
-    const openpgp = require('openpgp')
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-commit.git')
+    const openpgp = require('openpgp/dist/openpgp.min.js')
+
+    let { fs, dir, gitdir } = await makeFixture('test-commit')
     // Test
-    const repo = { fs, gitdir }
-    const privateKeys = await pify(jsonfile.readFile)(
-      '__tests__/__fixtures__/openpgp-private-keys.json'
-    )
+    const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
     await commit({
-      ...repo,
+      fs,
+      gitdir,
       message: 'Initial commit',
       author: {
         name: 'Mr. Test',
@@ -45,19 +40,19 @@ describe('commit', () => {
       }
     })
     await sign({
-      ...repo,
-      privateKeys: privateKeys[0],
-      openpgp
+      fs,
+      gitdir,
+      openpgp,
+      privateKeys: privateKeys[0]
     })
-    const publicKeys = await pify(jsonfile.readFile)(
-      '__tests__/__fixtures__/openpgp-public-keys.json'
-    )
+    const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
     let keys = await verify({
-      ...repo,
+      fs,
+      gitdir,
+      openpgp,
       ref: 'HEAD',
-      publicKeys: publicKeys[0],
-      openpgp
+      publicKeys: publicKeys[0]
     })
-    expect(keys[0] === 'a01edd29ac0f3952').toBe(true)
+    expect(keys[0]).toBe('a01edd29ac0f3952')
   })
 })
