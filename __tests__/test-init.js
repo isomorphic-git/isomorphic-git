@@ -1,18 +1,15 @@
-/* globals describe test expect */
-import fs from 'fs'
-import { existsSync } from 'fs'
-import { createTempDir } from 'jest-fixtures'
-import { init } from 'isomorphic-git'
+/* globals describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-/** @test {init} */
+const { init } = require('isomorphic-git')
+
 describe('init', () => {
-  test('init', async () => {
-    let dir = await createTempDir()
-    let repo = { fs, dir }
-    await init(repo)
-    expect(existsSync(dir)).toBe(true)
-    expect(existsSync(`${dir}/.git/objects`)).toBe(true)
-    expect(existsSync(`${dir}/.git/refs/heads`)).toBe(true)
-    expect(existsSync(`${dir}/.git/HEAD`)).toBe(true)
+  it('init', async () => {
+    let { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir })
+    expect(fs.existsSync(dir)).toBe(true)
+    expect(fs.existsSync(`${dir}/.git/objects`)).toBe(true)
+    expect(fs.existsSync(`${dir}/.git/refs/heads`)).toBe(true)
+    expect(fs.existsSync(`${dir}/.git/HEAD`)).toBe(true)
   })
 })

@@ -3,7 +3,6 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { remove, listFiles } = require('isomorphic-git')
 
-
 describe('remove', () => {
   it('file', async () => {
     // Setup

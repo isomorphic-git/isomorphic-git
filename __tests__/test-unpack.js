@@ -1,20 +1,18 @@
 /* global test describe expect */
-import fs from 'fs'
-import path from 'path'
-import { createTempDir } from 'jest-fixtures'
-import { unpack, managers } from 'isomorphic-git/internal-apis'
-import { init } from 'isomorphic-git'
+const path = require('path')
+const { makeFixture } = require('./__helpers__/FixtureFS')
+const { unpack, managers } = require('isomorphic-git/internal-apis')
+const { init } = require('isomorphic-git')
 const { GitObjectManager } = managers
 
 describe('unpack', () => {
   test('unpack', async () => {
-    let dir = await createTempDir()
-    let repo = { fs, dir }
-    await init(repo)
+    let { fs, dir, gitdir } = await makeFixture('test-pack')
+    await init({ fs, dir })
     let fixture = fs.createReadStream(
-      '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
+      path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
-    await unpack({ ...repo, inputStream: fixture })
+    await unpack({ fs, dir, gitdir, inputStream: fixture })
     const oids = [
       '5a9da3272badb2d3c8dbab463aed5741acb15a33',
       '0bfe8fa3764089465235461624f2ede1533e74ec',
@@ -30,18 +28,12 @@ describe('unpack', () => {
       '5477471ab5a6a8f2c217023532475044117a8f2c'
     ]
     for (let oid of oids) {
-      let filepath = path.join(
-        dir,
-        '.git',
-        'objects',
-        oid.slice(0, 2),
-        oid.slice(2)
-      )
+      let filepath = path.join(gitdir, 'objects', oid.slice(0, 2), oid.slice(2))
       let e = fs.existsSync(filepath)
       expect(e).toBe(true)
       let { type, object } = await GitObjectManager.read({
         fs,
-        gitdir: path.join(dir, '.git'),
+        gitdir,
         oid
       })
       expect(typeof type === 'string').toBe(true)
