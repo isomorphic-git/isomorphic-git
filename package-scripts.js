@@ -52,8 +52,8 @@ module.exports = {
     test: {
       default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
       jest: process.env.CI
-        ? 'cross-env DEBUG=isomorphic-git jest --ci --coverage && codecov'
-        : 'cross-env DEBUG=isomorphic-git jest --ci',
+        ? 'jest --ci --coverage && codecov'
+        : 'jest --ci',
       karma: 'karma start'
     }
   }

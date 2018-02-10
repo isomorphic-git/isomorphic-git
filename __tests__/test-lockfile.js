@@ -6,6 +6,8 @@ const { FileSystem } = models
 const { sleep } = utils
 const fs = new FileSystem(_fs)
 
+jest.setTimeout(60000)
+
 describe('lockfile', () => {
   test('make lockfile', async () => {
     let dir = await createTempDir()

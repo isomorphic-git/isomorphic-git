@@ -1,22 +1,23 @@
-/* global test describe expect */
-import fs from 'fs'
-import stream from 'stream'
-import streamEqual from 'stream-equal'
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { pack } from 'isomorphic-git/internal-apis'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const path = require('path')
+const stream = require('stream')
+const streamEqual = require('stream-equal')
+
+const { pack } = require('isomorphic-git/internal-apis')
 
 describe('pack', () => {
-  test('git.pack', async () => {
+  it('git.pack', async () => {
     // Setup
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-pack.git')
+    let { fs, dir, gitdir } = await makeFixture('test-pack')
     // Test
     let fixture = fs.createReadStream(
-      '__tests__/__fixtures__/test-pack/foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'
+      path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
     let fstream = new stream.PassThrough()
-    let repo = { fs, gitdir }
     await pack({
-      ...repo,
+      fs,
+      gitdir,
       outputStream: fstream,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',

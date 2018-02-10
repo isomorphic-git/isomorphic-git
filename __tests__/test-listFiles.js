@@ -1,14 +1,12 @@
-/* global test describe expect */
-import fs from 'fs'
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import { listFiles } from 'isomorphic-git'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-/** @test {listFiles} */
+const { listFiles } = require('isomorphic-git')
+
 describe('listFiles', () => {
-  test('listFiles', async () => {
-    let gitdir = await copyFixtureIntoTempDir(__dirname, 'test-listFiles.git')
-    let repo = { fs, gitdir }
-    const files = await listFiles(repo)
+  it('listFiles', async () => {
+    let { fs, gitdir } = await makeFixture('test-listFiles')
+    const files = await listFiles({ fs, gitdir })
     expect(files).toMatchSnapshot()
   })
 })
