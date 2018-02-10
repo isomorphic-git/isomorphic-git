@@ -1,15 +1,13 @@
-/* global test describe expect */
-import fs from 'fs'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 import { listObjects } from 'isomorphic-git/internal-apis'
 
 describe('listObjects', () => {
-  test('listObjects', async () => {
-    let repo = {
-      fs,
-      gitdir: '__tests__/__fixtures__/test-listObjects.git'
-    }
+  it('listObjects', async () => {
+    let { fs, gitdir } = await makeFixture('test-listObjects')
     let objects = await listObjects({
-      ...repo,
+      fs,
+      gitdir,
       oids: [
         'c60bbbe99e96578105c57c4b3f2b6ebdf863edbc',
         'e05547ea87ea55eff079de295ff56f483e5b4439',

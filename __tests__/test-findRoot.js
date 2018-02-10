@@ -20,6 +20,6 @@ describe('findRoot', () => {
   test('..', async () => {
     let repo = { fs, dir }
     let root = findRoot({ ...repo, filepath: path.resolve('..') })
-    expect(root).rejects.toBeDefined
+    expect(root).rejects.toBeDefined()
   })
 })

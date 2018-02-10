@@ -1,14 +1,14 @@
 /* global test describe expect */
-import _fs from 'fs'
-import { models } from 'isomorphic-git/internal-apis'
-const { FileSystem, GitIndex } = models
-const fs = new FileSystem(_fs)
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const pify = require('pify')
+const path = require('path')
+const { models } = require('isomorphic-git/internal-apis')
+const { GitIndex } = models
 
 describe('GitIndex', () => {
-  test('GitIndex.from(buffer) - Simple', async () => {
-    let buffer = await fs.read(
-      '__tests__/__fixtures__/test-GitIndex/simple-index'
-    )
+  it('GitIndex.from(buffer) - Simple', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitIndex')
+    let buffer = await pify(fs.readFile)(path.join(dir, 'simple-index'))
     let index = GitIndex.from(buffer)
     let rendering = index.render()
     expect(rendering).toMatchSnapshot()
@@ -16,8 +16,9 @@ describe('GitIndex', () => {
     expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
   })
 
-  test('GitIndex.from(buffer)', async () => {
-    let buffer = await fs.read('__tests__/__fixtures__/test-GitIndex/index')
+  it('GitIndex.from(buffer)', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitIndex')
+    let buffer = await pify(fs.readFile)(path.join(dir, 'index'))
     let index = GitIndex.from(buffer)
     let rendering = index.render()
     expect(rendering).toMatchSnapshot()
@@ -25,8 +26,9 @@ describe('GitIndex', () => {
     expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
   })
 
-  test('GitIndex round trip', async () => {
-    let buffer = await fs.read('__tests__/__fixtures__/test-GitIndex/index')
+  it('GitIndex round trip', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitIndex')
+    let buffer = await pify(fs.readFile)(path.join(dir, 'index'))
     let index = GitIndex.from(buffer)
     let buffer2 = index.toObject()
     let index2 = GitIndex.from(buffer2)
