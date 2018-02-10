@@ -68,16 +68,16 @@ export class GitConfig {
   static from (text) {
     return new GitConfig(text)
   }
-  async get (path) {
+  async get (path, getall = false) {
     const parts = path.split('.')
     const section = parts.shift()
     const sectionName = isNamedSection(section) ? parts.shift() : null
-    console.log(section, sectionName)
     const key = parts.shift()
 
     let currentSection = ''
     let currentSectionName = null
     let lastValue = null
+    let allValues = []
     for (const line of this.lines) {
       // zero in on section
       if (isSection(line)) {
@@ -93,6 +93,9 @@ export class GitConfig {
           let [_key, _value] = line.split('=', 2)
           if (_key.trim() === key) {
             lastValue = _value.trim()
+            if (getall) {
+              allValues.push(lastValue)
+            }
           }
         }
       }
@@ -102,8 +105,14 @@ export class GitConfig {
     let fn = schema[section][key]
     if (fn) {
       lastValue = fn(lastValue)
+      if (getall) {
+        allValues = allValues.map(fn)
+      }
     }
-    return lastValue
+    return getall ? allValues : lastValue
+  }
+  async getall (path) {
+    return this.get(path, true)
   }
   async set (path, value) {
     const parts = path.split('.')

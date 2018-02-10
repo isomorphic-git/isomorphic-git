@@ -1,15 +1,14 @@
-/* global test describe expect */
-import _fs from 'fs'
-import { models } from 'isomorphic-git/internal-apis'
-import { listTags } from 'isomorphic-git'
-const { FileSystem } = models
-const fs = new FileSystem(_fs)
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+
+const { listTags } = require('isomorphic-git')
 
 describe('listTags', () => {
-  test('listTags', async () => {
+  it('listTags', async () => {
+    let { fs, gitdir } = await makeFixture('test-listTags')
     let refs = await listTags({
       fs,
-      gitdir: '__tests__/__fixtures__/test-listTags.git'
+      gitdir
     })
     expect(refs).toMatchSnapshot()
   })

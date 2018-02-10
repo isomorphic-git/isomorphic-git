@@ -36,6 +36,7 @@ export async function config ({
   dir,
   gitdir = pathModule.join(dir, '.git'),
   fs: _fs,
+  all = false,
   ...args
 }) {
   const fs = new FileSystem(_fs)
@@ -46,7 +47,7 @@ export async function config ({
   // 2) there is a 'value' argument with a value of undefined (do a "set")
   // Because setting a key to undefined is how we delete entries from the ini.
   if (value === undefined && !args.hasOwnProperty('value')) {
-    const value = await config.get(path)
+    const value = (await all) ? config.getall(path) : config.get(path)
     return value
   } else {
     await config.set(path, value)

@@ -1,23 +1,23 @@
-/* global test describe expect */
-import _fs from 'fs'
-import { managers, models } from 'isomorphic-git/internal-apis'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { managers } = require('isomorphic-git/internal-apis')
 const { GitObjectManager } = managers
-const { FileSystem } = models
-const fs = new FileSystem(_fs)
 
 describe('GitObjectManager', () => {
-  test('test missing', async () => {
+  it('test missing', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitObjectManager')
     let ref = GitObjectManager.read({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitObjectManager.git',
+      gitdir,
       oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     })
     await expect(ref).rejects.toMatchSnapshot()
   })
-  test('test shallow', async () => {
+  it('test shallow', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitObjectManager')
     let ref = GitObjectManager.read({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitObjectManager.git',
+      gitdir,
       oid: 'b8b1fcecbc6f5ea8bc915c3ac319e8c9eb204f95'
     })
     await expect(ref).rejects.toMatchSnapshot()

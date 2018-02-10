@@ -1,49 +1,51 @@
-/* global test describe expect */
-import _fs from 'fs'
-import { managers, models } from 'isomorphic-git/internal-apis'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { managers } = require('isomorphic-git/internal-apis')
 const { GitRefManager } = managers
-const { FileSystem } = models
-const fs = new FileSystem(_fs)
 
 describe('GitRefManager', () => {
-  test('packedRefs', async () => {
+  it('packedRefs', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.packedRefs({
       fs,
       gitdir: '__tests__/__fixtures__/test-GitRefManager.git'
     })
     expect(refs).toMatchSnapshot()
   })
-  test('listRefs', async () => {
+  it('listRefs', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.listRefs({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
+      gitdir,
       filepath: 'refs/remotes/origin'
     })
     expect(refs).toMatchSnapshot()
     refs = await GitRefManager.listRefs({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
+      gitdir,
       filepath: 'refs/tags'
     })
     expect(refs).toMatchSnapshot()
   })
-  test('listBranches', async () => {
+  it('listBranches', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.listBranches({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git'
+      gitdir
     })
     expect(refs).toMatchSnapshot()
     refs = await GitRefManager.listBranches({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git',
+      gitdir,
       remote: 'origin'
     })
     expect(refs).toMatchSnapshot()
   })
-  test('listTags', async () => {
+  it('listTags', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.listTags({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git'
+      gitdir
     })
     expect(refs).toMatchSnapshot()
   })

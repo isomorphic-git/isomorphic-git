@@ -11,11 +11,10 @@ describe('clone', () => {
       dir,
       gitdir,
       depth: 1,
-      branch: 'master',
+      ref: 'master',
       url:
         'https://cors-buster-jfpactjnem.now.sh/github.com/isomorphic-git/isomorphic-git'
     })
-    console.log('clone')
     expect(fs.existsSync(`${dir}`)).toBe(true)
     expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)
     expect(fs.existsSync(`${gitdir}/refs/remotes/origin/master`)).toBe(true)

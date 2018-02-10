@@ -1,56 +1,59 @@
-/* global test describe expect */
-import _fs from 'fs'
-import { models } from 'isomorphic-git/internal-apis'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 import { resolveRef } from 'isomorphic-git'
-const { FileSystem } = models
-const fs = new FileSystem(_fs)
 
 describe('resolveRef', () => {
-  test('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {
-    let ref = await resolveRef({
+  it('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {
+    const { fs, gitdir } = await makeFixture('test-resolveRef')
+    const ref = await resolveRef({
       fs,
-      gitdir: '__tests__/__fixtures__/test-resolveRef.git',
+      gitdir,
       ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9'
     })
     expect(ref).toMatchSnapshot()
   })
-  test('test-branch', async () => {
-    let ref = await resolveRef({
+  it('test-branch', async () => {
+    const { fs, gitdir } = await makeFixture('test-resolveRef')
+    const ref = await resolveRef({
       fs,
-      gitdir: '__tests__/__fixtures__/test-resolveRef.git',
+      gitdir,
       ref: 'origin/test-branch'
     })
     expect(ref).toMatchSnapshot()
   })
-  test('test-tag', async () => {
-    let ref = await resolveRef({
+  it('test-tag', async () => {
+    const { fs, gitdir } = await makeFixture('test-resolveRef')
+    const ref = await resolveRef({
       fs,
-      gitdir: '__tests__/__fixtures__/test-resolveRef.git',
+      gitdir,
       ref: 'test-tag'
     })
     expect(ref).toMatchSnapshot()
   })
-  test('HEAD', async () => {
-    let ref = await resolveRef({
+  it('HEAD', async () => {
+    const { fs, gitdir } = await makeFixture('test-resolveRef')
+    const ref = await resolveRef({
       fs,
-      gitdir: '__tests__/__fixtures__/test-resolveRef.git',
+      gitdir,
       ref: 'HEAD'
     })
     expect(ref).toMatchSnapshot()
   })
-  test('HEAD depth', async () => {
-    let ref = await resolveRef({
+  it('HEAD depth', async () => {
+    const { fs, gitdir } = await makeFixture('test-resolveRef')
+    const ref = await resolveRef({
       fs,
-      gitdir: '__tests__/__fixtures__/test-resolveRef.git',
+      gitdir,
       ref: 'HEAD',
       depth: 2
     })
     expect(ref).toMatchSnapshot()
   })
-  test('packed-refs', async () => {
-    let ref = await resolveRef({
+  it('packed-refs', async () => {
+    const { fs, gitdir } = await makeFixture('test-resolveRef')
+    const ref = await resolveRef({
       fs,
-      gitdir: '__tests__/__fixtures__/test-resolveRef.git',
+      gitdir,
       ref: 'v0.0.1'
     })
     expect(ref).toMatchSnapshot()
