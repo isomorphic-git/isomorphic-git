@@ -1,24 +1,16 @@
-/* global test describe expect */
-import fs from 'fs'
-import { listBranches } from 'isomorphic-git'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { listBranches } = require('isomorphic-git')
 
-/** @test {listBranches} */
 describe('listBranches', () => {
-  test('listBranches', async () => {
-    let repo = {
-      fs,
-      gitdir: '__tests__/__fixtures__/test-listBranches.git'
-    }
-    let commits = await listBranches(repo)
+  it('listBranches', async () => {
+    let { fs, gitdir } = await makeFixture('test-listBranches')
+    let commits = await listBranches({ fs, gitdir })
     expect(commits).toMatchSnapshot()
   })
-  test('remote', async () => {
-    let repo = {
-      fs,
-      gitdir: '__tests__/__fixtures__/test-listBranches.git',
-      remote: 'origin'
-    }
-    let commits = await listBranches(repo)
+  it('remote', async () => {
+    let { fs, gitdir } = await makeFixture('test-listBranches')
+    let commits = await listBranches({ fs, gitdir, remote: 'origin' })
     expect(commits).toMatchSnapshot()
   })
 })
