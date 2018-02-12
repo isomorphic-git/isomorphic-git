@@ -52,9 +52,11 @@ module.exports = {
     test: {
       default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
       jest: process.env.CI
-        ? 'jest --ci --coverage && codecov'
+        ? '(jest --ci --coverage && codecov) || (jest --ci --coverage && codecov) || (jest --ci --coverage && codecov)'
         : 'jest --ci',
-      karma: 'karma start'
+      karma: process.env.CI
+        ? '(karma start) || (karma start) || (karma start)'
+        : 'karma start'
     }
   }
 }
