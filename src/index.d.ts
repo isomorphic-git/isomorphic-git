@@ -60,6 +60,15 @@ export interface PushResponse {
   errors?: string[]
 }
 
+export interface RemoteDescription {
+  capabilities: string[],
+  refs?: {
+    heads?: object,
+    pull?: object,
+    tags?: object
+  }
+}
+
 /*~ If this module has methods, declare them as functions like so.
  */
 export async function add(args: {
@@ -141,6 +150,10 @@ export async function findRoot(args: {
   fs: any,
   filepath: string
 }): Promise<string>;
+
+export async function getRemoteInfo(args: {
+  url: string
+}): Promise<RemoteDescription>;
 
 export async function indexPack(args: {
   fs: any,
