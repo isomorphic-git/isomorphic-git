@@ -52,7 +52,7 @@ module.exports = {
     test: {
       default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
       jest: process.env.CI
-        ? '(jest --ci --coverage && codecov) || (jest --ci --coverage && codecov) || (jest --ci --coverage && codecov)'
+        ? '(timeout --signal=KILL 5m jest --ci --coverage && codecov) || (timeout --signal=KILL 5m jest --ci --coverage && codecov) || (timeout --signal=KILL 5m jest --ci --coverage && codecov)'
         : 'jest --ci',
       karma: process.env.CI
         ? '(karma start) || (karma start) || (karma start)'
