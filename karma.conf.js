@@ -95,7 +95,7 @@ module.exports = function (config) {
       recordVideo: false,
       public: 'public restricted'
     },
-    concurrency: 6,
+    concurrency: 5,
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: true,

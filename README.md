@@ -129,6 +129,8 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [config](https://isomorphic-git.github.io/docs/config.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
+- [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
+- [indexPack](https://isomorphic-git.github.io/docs/indexPack.html)
 - [init](https://isomorphic-git.github.io/docs/init.html)
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
