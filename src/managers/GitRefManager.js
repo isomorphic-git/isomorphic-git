@@ -1,6 +1,7 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import path from 'path'
-import { FileSystem } from '../models'
+import { GitConfigManager } from './GitConfigManager'
+import { FileSystem, GitRefSpecSet } from '../models'
 
 /** @ignore */
 export class GitRefManager {
@@ -18,7 +19,8 @@ export class GitRefManager {
     remote,
     refs,
     symrefs,
-    tags
+    tags,
+    refspecs
   }) {
     const fs = new FileSystem(_fs)
     // Validate input
@@ -27,14 +29,23 @@ export class GitRefManager {
         throw new Error(`Unexpected ref contents: '${value}'`)
       }
     }
+    const config = await GitConfigManager.get({ fs, gitdir })
+    if (!refspecs) {
+      refspecs = await config.getall(`remote.${remote}.fetch`)
+    }
+    const refspec = GitRefSpecSet.from(refspecs)
     // Combine refs and symrefs giving symrefs priority
     let actualRefsToWrite = new Map()
-    for (let [key, value] of refs) {
-      actualRefsToWrite.set(key, value)
+    let refTranslations = refspec.translate(refs.keys())
+    for (let [serverRef, translatedRef] of refTranslations) {
+      let value = refs.get(serverRef)
+      actualRefsToWrite.set(translatedRef, value)
     }
-    for (let [key, value] of symrefs) {
-      let branch = value.replace(/^refs\/heads\//, '')
-      actualRefsToWrite.set(key, `ref: refs/remotes/${remote}/${branch}`)
+    let symrefTranslations = refspec.translate(symrefs.keys())
+    for (let [serverRef, translatedRef] of symrefTranslations) {
+      let value = refs.get(serverRef)
+      let symtarget = refspec.translateOne(value)
+      actualRefsToWrite.set(translatedRef, `ref: ${symtarget}`)
     }
     // Update files
     // TODO: For large repos with a history of thousands of pull requests
@@ -53,24 +64,18 @@ export class GitRefManager {
     // and .git/refs/remotes/origin/refs/merge-requests
     const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of actualRefsToWrite) {
-      if (key.startsWith('refs/heads') || key === 'HEAD') {
-        key = key.replace(/^refs\/heads\//, '')
-        await fs.write(
-          path.join(gitdir, 'refs', 'remotes', remote, key),
-          normalizeValue(value),
-          'utf8'
-        )
-      } else if (
+      if (
         tags === true &&
         key.startsWith('refs/tags') &&
         !key.endsWith('^{}')
       ) {
-        key = key.replace(/^refs\/tags\//, '')
-        const filename = path.join(gitdir, 'refs', 'tags', key)
+        const filename = path.join(gitdir, key)
         // Git's behavior is to only fetch tags that do not conflict with tags already present.
         if (!await fs.exists(filename)) {
           await fs.write(filename, normalizeValue(value), 'utf8')
         }
+      } else if (key.startsWith('refs/') || key === 'HEAD') {
+        await fs.write(path.join(gitdir, key), normalizeValue(value), 'utf8')
       }
     }
   }

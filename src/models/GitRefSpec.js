@@ -68,4 +68,14 @@ export class GitRefSpecSet {
     }
     return result
   }
+  translateOne (remoteRef) {
+    let result = null
+    for (const rule of this.rules) {
+      const localRef = rule.translate(remoteRef)
+      if (localRef) {
+        result = localRef
+      }
+    }
+    return result
+  }
 }
