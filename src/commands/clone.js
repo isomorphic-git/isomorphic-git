@@ -41,6 +41,12 @@ export async function clone ({
     path: `remote.${remote}.url`,
     value: url
   })
+  await config({
+    gitdir,
+    fs,
+    path: `remote.${remote}.fetch`,
+    value: `+refs/heads/*:refs/remotes/${remote}/*`
+  })
   // Fetch commits
   await fetch({
     gitdir,
