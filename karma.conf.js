@@ -101,7 +101,13 @@ module.exports = function (config) {
     singleRun: true,
     // test results reporter to use
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['verbose']
+    reporters: ['verbose'],
+    browserify: {
+      transform: [
+        // Replace process.env.CI
+        'envify'
+      ]
+    }
   }
 
   if (!process.env.SAUCE_USERNAME) {

@@ -1,6 +1,17 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import path from 'path'
-import { FileSystem } from '../models'
+import { GitConfigManager } from './GitConfigManager'
+import { FileSystem, GitRefSpecSet } from '../models'
+
+// @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
+const refpaths = ref => [
+  `${ref}`,
+  `refs/${ref}`,
+  `refs/tags/${ref}`,
+  `refs/heads/${ref}`,
+  `refs/remotes/${ref}`,
+  `refs/remotes/${ref}/HEAD`
+]
 
 /** @ignore */
 export class GitRefManager {
@@ -18,7 +29,8 @@ export class GitRefManager {
     remote,
     refs,
     symrefs,
-    tags
+    tags,
+    refspecs
   }) {
     const fs = new FileSystem(_fs)
     // Validate input
@@ -27,14 +39,25 @@ export class GitRefManager {
         throw new Error(`Unexpected ref contents: '${value}'`)
       }
     }
+    const config = await GitConfigManager.get({ fs, gitdir })
+    if (!refspecs) {
+      refspecs = await config.getall(`remote.${remote}.fetch`)
+    }
+    const refspec = GitRefSpecSet.from(refspecs)
     // Combine refs and symrefs giving symrefs priority
     let actualRefsToWrite = new Map()
-    for (let [key, value] of refs) {
-      actualRefsToWrite.set(key, value)
+    let refTranslations = refspec.translate([...refs.keys()])
+    for (let [serverRef, translatedRef] of refTranslations) {
+      let value = refs.get(serverRef)
+      actualRefsToWrite.set(translatedRef, value)
     }
-    for (let [key, value] of symrefs) {
-      let branch = value.replace(/^refs\/heads\//, '')
-      actualRefsToWrite.set(key, `ref: refs/remotes/${remote}/${branch}`)
+    let symrefTranslations = refspec.translate([...symrefs.keys()])
+    for (let [serverRef, translatedRef] of symrefTranslations) {
+      let value = symrefs.get(serverRef)
+      let symtarget = refspec.translateOne(value)
+      if (symtarget) {
+        actualRefsToWrite.set(translatedRef, `ref: ${symtarget}`)
+      }
     }
     // Update files
     // TODO: For large repos with a history of thousands of pull requests
@@ -53,24 +76,18 @@ export class GitRefManager {
     // and .git/refs/remotes/origin/refs/merge-requests
     const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of actualRefsToWrite) {
-      if (key.startsWith('refs/heads') || key === 'HEAD') {
-        key = key.replace(/^refs\/heads\//, '')
-        await fs.write(
-          path.join(gitdir, 'refs', 'remotes', remote, key),
-          normalizeValue(value),
-          'utf8'
-        )
-      } else if (
+      if (
         tags === true &&
         key.startsWith('refs/tags') &&
         !key.endsWith('^{}')
       ) {
-        key = key.replace(/^refs\/tags\//, '')
-        const filename = path.join(gitdir, 'refs', 'tags', key)
+        const filename = path.join(gitdir, key)
         // Git's behavior is to only fetch tags that do not conflict with tags already present.
         if (!await fs.exists(filename)) {
           await fs.write(filename, normalizeValue(value), 'utf8')
         }
+      } else if (key.startsWith('refs/') || key === 'HEAD') {
+        await fs.write(path.join(gitdir, key), normalizeValue(value), 'utf8')
       }
     }
   }
@@ -92,47 +109,15 @@ export class GitRefManager {
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
       return ref
     }
-    // Is it a special ref?
-    if (ref === 'HEAD' || ref === 'MERGE_HEAD') {
-      sha = await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })
+    // We need to alternate between the file system and the packed-refs
+    let packedMap = await GitRefManager.packedRefs({ fs, gitdir })
+    // Look in all the proper paths, in this order
+    const allpaths = refpaths(ref)
+    for (let ref of allpaths) {
+      sha =
+        (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
+        packedMap.get(ref)
       if (sha) {
-        return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
-      }
-    }
-    // Is it a full ref?
-    if (ref.startsWith('refs/')) {
-      sha = await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })
-      if (sha) {
-        return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
-      }
-    }
-    // Is it a (local) branch?
-    sha = await fs.read(`${gitdir}/refs/heads/${ref}`, { encoding: 'utf8' })
-    if (sha) {
-      return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
-    }
-    // Is it a lightweight tag?
-    sha = await fs.read(`${gitdir}/refs/tags/${ref}`, { encoding: 'utf8' })
-    if (sha) {
-      return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
-    }
-    // Is it remote branch?
-    sha = await fs.read(`${gitdir}/refs/remotes/${ref}`, { encoding: 'utf8' })
-    if (sha) {
-      return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
-    }
-    // Is it a packed ref? (This must be last because refs in heads have priority)
-    let text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
-    if (text && text.includes(ref)) {
-      let candidates = text
-        .trim()
-        .split('\n')
-        .filter(x => x.endsWith(ref))
-        .filter(x => !x.startsWith('#'))
-      if (candidates.length > 1) {
-        throw new Error(`Could not resolve ambiguous reference ${ref}`)
-      } else if (candidates.length === 1) {
-        sha = candidates[0].split(' ')[0]
         return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
       }
     }
