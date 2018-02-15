@@ -37,6 +37,7 @@ export async function config ({
   gitdir = pathModule.join(dir, '.git'),
   fs: _fs,
   all = false,
+  append = false,
   ...args
 }) {
   const fs = new FileSystem(_fs)
@@ -47,10 +48,17 @@ export async function config ({
   // 2) there is a 'value' argument with a value of undefined (do a "set")
   // Because setting a key to undefined is how we delete entries from the ini.
   if (value === undefined && !args.hasOwnProperty('value')) {
-    const value = (await all) ? config.getall(path) : config.get(path)
-    return value
+    if (all) {
+      return config.getall(path)
+    } else {
+      return config.get(path)
+    }
   } else {
-    await config.set(path, value)
+    if (append) {
+      await config.append(path, value)
+    } else {
+      await config.set(path, value)
+    }
     await GitConfigManager.save({ fs, gitdir, config })
   }
 }

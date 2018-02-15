@@ -114,7 +114,10 @@ export class GitConfig {
   async getall (path) {
     return this.get(path, true)
   }
-  async set (path, value) {
+  async append (path, value) {
+    return this.set(path, value, true)
+  }
+  async set (path, value, append = false) {
     const parts = path.split('.')
     const section = parts.shift()
     const sectionName = isNamedSection(section) ? parts.shift() : null
@@ -153,12 +156,14 @@ export class GitConfig {
     if (lastMatch !== null) {
       if (value === undefined) {
         this.lines.splice(lastMatch, 1)
+      } else if (append) {
+        this.lines.splice(lastMatch + 1, 0, [`${key} = ${value}`])
       } else {
         this.lines[lastMatch] = `${key} = ${value}`
       }
     } else if (lastSectionMatch !== null) {
       if (value !== undefined) {
-        this.lines.splice(lastSectionMatch, 0, [`${key} = ${value}`])
+        this.lines.splice(lastSectionMatch + 1, 0, [`${key} = ${value}`])
       }
     } else if (value !== undefined) {
       if (sectionName) {
@@ -170,6 +175,6 @@ export class GitConfig {
     }
   }
   toString () {
-    return this.lines.join('\n')
+    return this.lines.join('\n') + '\n'
   }
 }
