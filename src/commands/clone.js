@@ -24,6 +24,7 @@ export async function clone ({
   since,
   exclude,
   relative,
+  singleBranch,
   onprogress
 }) {
   if (onprogress !== undefined) {
@@ -48,7 +49,7 @@ export async function clone ({
     value: `+refs/heads/*:refs/remotes/${remote}/*`
   })
   // Fetch commits
-  await fetch({
+  let { defaultBranch } = await fetch({
     gitdir,
     fs,
     emitter,
@@ -59,9 +60,12 @@ export async function clone ({
     depth,
     since,
     exclude,
-    relative
+    relative,
+    singleBranch
   })
-  // Checkout branch
+  ref = ref || defaultBranch
+  ref = ref.replace('refs/heads/', '')
+  // Checkout that branch
   await checkout({
     dir,
     gitdir,

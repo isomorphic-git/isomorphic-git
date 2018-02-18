@@ -124,6 +124,33 @@ export class GitRefManager {
     // Do we give up?
     throw new Error(`Could not resolve reference ${ref}`)
   }
+  static resolveAgainstMap ({ ref, depth, map }) {
+    if (depth !== undefined) {
+      depth--
+      if (depth === -1) {
+        return ref
+      }
+    }
+    // Is it a ref pointer?
+    if (ref.startsWith('ref: ')) {
+      ref = ref.slice('ref: '.length)
+      return GitRefManager.resolveAgainstMap({ ref, depth, map })
+    }
+    // Is it a complete and valid SHA?
+    if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
+      return ref
+    }
+    // Look in all the proper paths, in this order
+    const allpaths = refpaths(ref)
+    for (let ref of allpaths) {
+      let sha = map.get(ref)
+      if (sha) {
+        return GitRefManager.resolveAgainstMap({ ref: sha.trim(), depth, map })
+      }
+    }
+    // Do we give up?
+    throw new Error(`Could not resolve reference ${ref}`)
+  }
   static async packedRefs ({ fs: _fs, gitdir }) {
     const refs = new Map()
     const fs = new FileSystem(_fs)

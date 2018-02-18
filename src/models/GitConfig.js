@@ -157,13 +157,13 @@ export class GitConfig {
       if (value === undefined) {
         this.lines.splice(lastMatch, 1)
       } else if (append) {
-        this.lines.splice(lastMatch + 1, 0, [`${key} = ${value}`])
+        this.lines.splice(lastMatch + 1, 0, [`\t${key} = ${value}`])
       } else {
-        this.lines[lastMatch] = `${key} = ${value}`
+        this.lines[lastMatch] = `\t${key} = ${value}`
       }
     } else if (lastSectionMatch !== null) {
       if (value !== undefined) {
-        this.lines.splice(lastSectionMatch + 1, 0, [`${key} = ${value}`])
+        this.lines.splice(lastSectionMatch + 1, 0, [`\t${key} = ${value}`])
       }
     } else if (value !== undefined) {
       if (sectionName) {
@@ -171,7 +171,7 @@ export class GitConfig {
       } else {
         this.lines.push(`[${section}]`)
       }
-      this.lines.push([`${key} = ${value}`])
+      this.lines.push([`\t${key} = ${value}`])
     }
   }
   toString () {
