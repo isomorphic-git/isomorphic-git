@@ -1,26 +1,33 @@
 // @flow
 import path from 'path'
-// TODO: Add file locks.
+import { FileSystem } from '../models'
+import AsyncLock from 'async-lock'
+const lock = new AsyncLock()
 
 /** @ignore */
 export class GitShallowManager {
-  static async read ({ fs, gitdir }) {
+  static async read ({ fs: _fs, gitdir }) {
+    const fs = new FileSystem(_fs)
+    const filepath = path.join(gitdir, 'shallow')
     let oids = new Set()
-    let text = await fs.read(path.join(gitdir, 'shallow'), { encoding: 'utf8' })
-    if (text === null) return oids
-    text
-      .trim()
-      .split('\n')
-      .map(oid => oids.add(oid))
+    await lock.acquire(filepath, async function () {
+      let text = await fs.read(filepath, { encoding: 'utf8' })
+      if (text === null) return
+      text
+        .trim()
+        .split('\n')
+        .map(oid => oids.add(oid))
+    })
     return oids
   }
-  static async write ({ fs, gitdir, oids }) {
-    let text = ''
-    for (let oid of oids) {
-      text += `${oid}\n`
-    }
-    await fs.write(path.join(gitdir, 'shallow'), text, {
-      encoding: 'utf8'
+  static async write ({ fs: _fs, gitdir, oids }) {
+    const fs = new FileSystem(_fs)
+    const filepath = path.join(gitdir, 'shallow')
+    let text = [...oids].join('\n') + '\n'
+    await lock.acquire(filepath, async function () {
+      await fs.write(filepath, text, {
+        encoding: 'utf8'
+      })
     })
   }
 }

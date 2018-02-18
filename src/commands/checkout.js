@@ -1,4 +1,5 @@
 import path from 'path'
+import { config } from './config'
 import { FileSystem, GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 
@@ -60,33 +61,43 @@ export async function checkout ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs,
-  remote,
+  remote = 'origin',
   ref
 }) {
   const fs = new FileSystem(_fs)
+  if (ref === undefined) {
+    throw new Error('Cannot checkout ref "undefined"')
+  }
   // Get tree oid
   let oid
-  if (remote) {
-    let remoteRef
-    if (ref === undefined) {
-      remoteRef = await GitRefManager.resolve({
-        fs,
-        gitdir,
-        ref: `${remote}/HEAD`,
-        depth: 2
-      })
-      ref = path.basename(remoteRef)
-    } else {
-      remoteRef = `${remote}/${ref}`
-    }
-    oid = await GitRefManager.resolve({ fs, gitdir, ref: remoteRef })
-    // Make the remote ref our own!
-    await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
-  } else {
-    if (ref === undefined) {
-      throw new Error('Cannot checkout ref "undefined"')
-    }
+  try {
     oid = await GitRefManager.resolve({ fs, gitdir, ref })
+    // TODO: Figure out what to do if both 'ref' and 'remote' are specified, ref already exists,
+    // and is configured to track a different remote.
+  } catch (err) {
+    // If `ref` doesn't exist, create a new remote tracking branch
+    // Figure out the commit to checkout
+    let remoteRef = `${remote}/${ref}`
+    oid = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref: remoteRef
+    })
+    // Set up remote tracking branch
+    await config({
+      gitdir,
+      fs,
+      path: `branch.${ref}.remote`,
+      value: `${remote}`
+    })
+    await config({
+      gitdir,
+      fs,
+      path: `branch.${ref}.merge`,
+      value: `refs/heads/${ref}`
+    })
+    // Create a new branch that points at that same commit
+    await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
   }
   let commit = await GitObjectManager.read({ fs, gitdir, oid })
   if (commit.type !== 'commit') {

@@ -60,6 +60,10 @@ export interface PushResponse {
   errors?: string[]
 }
 
+export interface FetchResponse {
+  defaultBranch: string
+}
+
 export interface RemoteDescription {
   capabilities: string[],
   refs?: {
@@ -99,7 +103,8 @@ export async function clone(args: {
   depth?: number,
   since?: Date,
   exclude?: string[],
-  relative?: boolean
+  relative?: boolean,
+  singleBranch?: boolean
 }): Promise<void>;
 
 export async function commit(args: {
@@ -143,8 +148,9 @@ export async function fetch(args: {
   since?: Date,
   exclude?: string[],
   relative?: boolean,
-  tags?: boolean
-}): Promise<void>;
+  tags?: boolean,
+  singleBranch?: boolean
+}): Promise<FetchResponse>;
 
 export async function findRoot(args: {
   fs: any,
