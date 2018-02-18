@@ -16,6 +16,7 @@ describe('fetch', () => {
     await fetch({
       fs,
       gitdir,
+      singleBranch: true,
       remote: 'origin',
       ref: 'master'
     })
@@ -35,6 +36,7 @@ describe('fetch', () => {
       gitdir,
       emitter,
       depth: 1,
+      singleBranch: true,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
@@ -51,6 +53,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       depth: 2,
+      singleBranch: true,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
@@ -66,6 +69,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       since: new Date(1506571200000),
+      singleBranch: true,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
@@ -83,6 +87,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       exclude: ['v0.0.5'],
+      singleBranch: true,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
@@ -100,6 +105,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       depth: 1,
+      singleBranch: true,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
@@ -114,6 +120,7 @@ describe('fetch', () => {
       gitdir,
       relative: true,
       depth: 1,
+      singleBranch: true,
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })

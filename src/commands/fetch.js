@@ -40,6 +40,7 @@ export async function fetch ({
   exclude,
   relative,
   tags,
+  singleBranch,
   onprogress // deprecated
 }) {
   if (onprogress !== undefined) {
@@ -61,7 +62,8 @@ export async function fetch ({
     since,
     exclude,
     relative,
-    tags
+    tags,
+    singleBranch
   })
   // Note: progress messages are designed to be written directly to the terminal,
   // so they are often sent with just a carriage return to overwrite the last line of output.
@@ -86,6 +88,10 @@ export async function fetch ({
     path.join(gitdir, `objects/pack/pack-${packfileSha}.pack`),
     packfile
   )
+  // TODO: Return more metadata?
+  return {
+    defaultBranch: response.HEAD
+  }
 }
 
 async function fetchPackfile ({
@@ -101,7 +107,8 @@ async function fetchPackfile ({
   since = null,
   exclude = [],
   relative = false,
-  tags = false
+  tags = false,
+  singleBranch = false
 }) {
   const fs = new FileSystem(_fs)
   if (depth !== null) {
@@ -143,6 +150,7 @@ async function fetchPackfile ({
       `Remote does not support shallow fetches relative to the current shallow depth`
     )
   }
+  // TODO: Don't add other refs if singleBranch is specified.
   await GitRefManager.updateRemoteRefs({
     fs,
     gitdir,
@@ -157,17 +165,16 @@ async function fetchPackfile ({
     pkg.name
   }@${pkg.version}${relative ? ' deepen-relative' : ''}`
   let packstream = new PassThrough()
-  const wants = await Promise.all(
-    refs.map(ref =>
-      GitRefManager.resolve({
-        fs,
-        gitdir,
-        ref: `refs/remotes/${remote}/${ref}`
-      })
-    )
-  )
+  // Figure out the SHA for the requested ref
+  let oid = GitRefManager.resolveAgainstMap({
+    ref,
+    map: remoteHTTP.refs
+  })
+  // Start requesting oids from the remote by their SHAs
+  const [firstWant, ...wants] = singleBranch ? [oid] : remoteHTTP.refs.values()
+  packstream.write(GitPktLine.encode(`want ${firstWant} ${capabilities}\n`))
   for (const want of wants) {
-    packstream.write(GitPktLine.encode(`want ${want} ${capabilities}\n`))
+    packstream.write(GitPktLine.encode(`want ${want}\n`))
   }
   let oids = await GitShallowManager.read({ fs, gitdir })
   if (oids.size > 0 && remoteHTTP.capabilities.has('shallow')) {
@@ -197,6 +204,7 @@ async function fetchPackfile ({
   }
   packstream.end(GitPktLine.encode(`done\n`))
   let response = await remoteHTTP.pull(packstream)
+  // Apply all the 'shallow' and 'unshallow' commands
   response.packetlines.pipe(
     through2(async (data, enc, next) => {
       let line = data.toString('utf8')
@@ -218,6 +226,8 @@ async function fetchPackfile ({
       next(null, data)
     })
   )
+  // We need this value later for the `clone` command.
+  response.HEAD = remoteHTTP.symrefs.get('HEAD')
   return response
 }
 
