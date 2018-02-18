@@ -10,15 +10,15 @@ const { fetch } = require('..')
 const { sleep } = utils
 
 describe('fetch', () => {
-  ;(process.env.CI ? it : xit)('fetch (from Github)', async () => {
+  it('fetch (from Github)', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
-    // Test
+    // Smoke Test
     await fetch({
       fs,
       gitdir,
       singleBranch: true,
       remote: 'origin',
-      ref: 'master'
+      ref: 'test-branch-shallow-clone'
     })
   })
 
