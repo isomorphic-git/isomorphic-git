@@ -7,7 +7,7 @@ const FixtureFS = async function () {
   // instrument BrowserFS with coverage collection which slows
   // it down in Travis to >10min which causes Travis builds to fail.
   if (process.browser) {
-    const BrowserFS = require('../../dist/browserfs.min.js')
+    const BrowserFS = require('browserfs')
     const HTTPRequestFS = pify(BrowserFS.FileSystem.HTTPRequest.Create)
     const InMemoryFS = pify(BrowserFS.FileSystem.InMemory.Create)
     const OverlayFS = pify(BrowserFS.FileSystem.OverlayFS.Create)
