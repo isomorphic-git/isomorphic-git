@@ -103,7 +103,7 @@
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-json": "^2.3.0",
     "semantic-release": "^12.2.2",
-    "standard": "^10.0.3",
+    "standard": "^11.0.0",
     "stream-equal": "^1.1.0",
     "travis-deploy-once": "^4.3.1",
     "uglify-es": "^3.3.4",
