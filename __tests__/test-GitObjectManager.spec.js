@@ -2,7 +2,9 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-GitObjectManager.js.snap')
-const { managers } = require('../dist/internal.umd.min.js')
+const { managers } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { GitObjectManager } = managers
 
 describe('GitObjectManager', () => {

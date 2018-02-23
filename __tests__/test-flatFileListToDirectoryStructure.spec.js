@@ -1,7 +1,9 @@
 /* global describe it expect */
 const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-flatFileListToDirectoryStructure.js.snap')
-const { utils } = require('../dist/internal.umd.min.js')
+const { utils } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {

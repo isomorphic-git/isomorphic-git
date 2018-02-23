@@ -5,7 +5,9 @@ const snapshots = require('./__snapshots__/test-GitIndex.js.snap')
 const pify = require('pify')
 const path = require('path')
 
-const { models } = require('../dist/internal.umd.min.js')
+const { models } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { GitIndex } = models
 
 describe('GitIndex', () => {
