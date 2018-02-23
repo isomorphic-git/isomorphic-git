@@ -3,7 +3,9 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-listCommits.js.snap')
 
-const { listCommits } = require('../dist/internal.umd.min.js')
+const { listCommits } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 
 describe('listCommits', () => {
   it('listCommits', async () => {

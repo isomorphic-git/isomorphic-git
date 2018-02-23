@@ -5,7 +5,9 @@ const snapshots = require('./__snapshots__/test-fetch.js.snap')
 const pify = require('pify')
 
 const EventEmitter = require('events')
-const { utils } = require('../dist/internal.umd.min.js')
+const { utils } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { fetch } = require('..')
 const { sleep } = utils
 

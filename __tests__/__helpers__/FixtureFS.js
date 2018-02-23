@@ -31,12 +31,17 @@ const FixtureFS = async function () {
 const FixturePromise = FixtureFS()
 
 async function makeFixture (dir) {
+  if (typeof jest !== 'undefined') {
+    jest.setTimeout(60000)
+  }
+  if (typeof jasmine !== 'undefined') {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
+  }
   return process.browser ? makeBrowserFixture(dir) : makeNodeFixture(dir)
 }
 
 async function makeBrowserFixture (dir) {
   localStorage.debug = 'isomorphic-git'
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
 
   const { fs, writable, readable } = await FixturePromise
   writable.empty()
@@ -57,7 +62,6 @@ async function makeBrowserFixture (dir) {
 }
 
 async function makeNodeFixture (fixture) {
-  jest.setTimeout(60000)
   const {
     getFixturePath,
     createTempDir,

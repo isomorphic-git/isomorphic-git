@@ -2,7 +2,9 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-listObjects.js.snap')
-const { listObjects } = require('../dist/internal.umd.min.js')
+const { listObjects } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 
 describe('listObjects', () => {
   it('listObjects', async () => {

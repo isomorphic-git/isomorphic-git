@@ -50,7 +50,8 @@ module.exports = {
                      -o dist/service-worker-bundle.umd.min.js`
     },
     test: {
-      default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
+      default: series.nps('lint', 'test.jasmine', 'test.jest', 'build', 'test.karma'),
+      jasmine: '(jasmine) || (jasmine) || (jasmine)',
       jest: process.env.CI
         ? '(timeout --signal=KILL 5m jest --ci --coverage && codecov) || (timeout --signal=KILL 5m jest --ci --coverage && codecov) || (timeout --signal=KILL 5m jest --ci --coverage && codecov)'
         : 'jest --ci',
