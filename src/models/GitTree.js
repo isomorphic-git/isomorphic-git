@@ -37,13 +37,24 @@ function parseBuffer (buffer) /*: Array<TreeEntry> */ {
   return _entries
 }
 
+function limitModeToAllowed (mode /*: string */) {
+  if (typeof mode === 'number') {
+    mode = mode.toString(8)
+  }
+  // tree
+  if (mode.match(/^0?4.*/)) return '40000' // Directory
+  if (mode.match(/^1006.*/)) return '100644' // Regular non-executable file
+  if (mode.match(/^1007.*/)) return '100755' // Regular executable file
+  if (mode.match(/^120.*/)) return '120000' // Symbolic link
+  if (mode.match(/^160.*/)) return '160000' // Commit (git submodule reference)
+  throw new Error(`Could not understand file mode: ${mode}`)
+}
+
 function nudgeIntoShape (entry) {
   if (!entry.oid && entry.sha) {
     entry.oid = entry.sha // Github
   }
-  if (typeof entry.mode === 'number') {
-    entry.mode = entry.mode.toString(8) // index
-  }
+  entry.mode = limitModeToAllowed(entry.mode) // index
   if (!entry.type) {
     entry.type = 'blob' // index
   }
