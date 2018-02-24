@@ -1,23 +1,24 @@
 /* globals describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const pify = require('pify')
+const path = require('path')
 
 const { init, add, commit } = require('..')
 
 describe('basic test', () => {
   it('does not explode', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-basic')
+    let { fs, dir } = await makeFixture('test-basic')
     console.log('Loaded fs')
-    await init({ fs: fs, dir: '.' })
+    await init({ fs, dir })
     console.log('init')
 
-    fs.writeFileSync('a.txt', 'Hello', 'utf8')
-    await add({ fs: fs, dir: '.', filepath: 'a.txt' })
+    await pify(fs.writeFile)(path.join(dir, 'a.txt'), 'Hello')
+    await add({ fs, dir, filepath: 'a.txt' })
     console.log('add a.txt')
 
     let oid = await commit({
-      fs: fs,
-      dir: '.',
+      fs,
+      dir,
       author: {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
