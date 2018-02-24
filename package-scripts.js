@@ -2,6 +2,9 @@
 // It's like package.json scripts, but more flexible.
 const { concurrent, series, runInNewWindow } = require('nps-utils')
 
+const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
+const retry3 = retry(3)
+
 module.exports = {
   scripts: {
     format:
@@ -51,12 +54,12 @@ module.exports = {
     },
     test: {
       default: series.nps('lint', 'test.jasmine', 'test.jest', 'build', 'test.karma'),
-      jasmine: '(jasmine) || (jasmine) || (jasmine)',
+      jasmine: retry3('jasmine -v && jasmine -h && jasmine --reporter=jasmine-console-reporter --config=spec/support/jasmine.json'),
       jest: process.env.CI
-        ? '(timeout --signal=KILL 5m jest --ci --coverage && codecov) || (timeout --signal=KILL 5m jest --ci --coverage && codecov) || (timeout --signal=KILL 5m jest --ci --coverage && codecov)'
+        ? retry3('timeout --signal=KILL 5m jest --ci --coverage && codecov')
         : 'jest --ci',
       karma: process.env.CI
-        ? '(karma start) || (karma start) || (karma start)'
+        ? retry3('karma start')
         : 'karma start'
     }
   }

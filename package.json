@@ -81,6 +81,7 @@
     "envify": "^4.1.0",
     "husky": "^0.14.3",
     "jasmine": "^3.0.0",
+    "jasmine-console-reporter": "^2.0.1",
     "jasmine-core": "^3.0.0",
     "jasmine-snapshot": "^1.7.8",
     "jest": "^22.0.4",
