@@ -6,13 +6,16 @@ const { clone } = require('isomorphic-git')
 describe('clone', () => {
   it('clone', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    let url = `https://${
+      process.browser ? 'cors-buster-jfpactjnem.now.sh/' : ''
+    }github.com/isomorphic-git/isomorphic-git`
     await clone({
       fs,
       dir,
       gitdir,
       depth: 1,
       ref: 'test-branch',
-      url: `https://github.com/isomorphic-git/isomorphic-git`
+      url
     })
     expect(fs.existsSync(`${dir}`)).toBe(true)
     expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)

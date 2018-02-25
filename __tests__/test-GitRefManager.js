@@ -8,7 +8,7 @@ describe('GitRefManager', () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.packedRefs({
       fs,
-      gitdir: '__tests__/__fixtures__/test-GitRefManager.git'
+      gitdir
     })
     expect(refs).toMatchSnapshot()
   })

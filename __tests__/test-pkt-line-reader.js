@@ -1,16 +1,16 @@
-/* global test describe expect */
+/* global describe it expect */
 import { models } from 'isomorphic-git/internal-apis'
 const { GitPktLine } = models
 
 describe('pkg-line-reader', () => {
-  test('pkt-line-reader string', async () => {
+  it('pkt-line-reader string', async () => {
     let read = GitPktLine.reader(Buffer.from('0010hello world\n'))
     expect(typeof read === 'function').toBe(true)
     expect(read().toString('utf8') === 'hello world\n').toBe(true)
     expect(read()).toBe(true)
   })
 
-  test('pkt-line-reader response', async () => {
+  it('pkt-line-reader response', async () => {
     let buffer = Buffer.from(
       `001e# service=git-upload-pack
 000001059ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/github-g91c094cac

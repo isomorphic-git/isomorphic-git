@@ -1,25 +1,18 @@
-/* global test describe expect */
-import fs from 'fs'
-import { copyFixtureIntoTempDir } from 'jest-fixtures'
-import nock from 'nock'
-import concat from 'simple-concat'
-import pify from 'pify'
-import server from './__helpers__/http-backend'
-import { push } from 'isomorphic-git'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const nock = require('nock')
+const server = require('./__helpers__/http-backend')
+const setTestTimeout = require('./__helpers__/set-test-timeout')
+const { push } = require('..')
 
-jest.setTimeout(60000)
+setTestTimeout(60000)
 
-/** @test {push} */
 describe('push', () => {
-  test('"refs/heads/master" to local git-http-backend', async () => {
+  it('"refs/heads/master" to local git-http-backend', async () => {
     // Setup
-    let serverDir = await copyFixtureIntoTempDir(__dirname, 'test-push-server')
-    let clientDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'test-push-client.git'
-    )
+    let { fs, dir, gitdir } = await makeFixture('test-push')
     // Test
-    const { get, postReceivePackRequest } = server(serverDir)
+    const { get, postReceivePackRequest } = server(dir)
     nock('http://example.dev')
       // .get('/test-push.git/info/refs?service=git-receive-pack')
       .get(/.*/)
@@ -27,9 +20,9 @@ describe('push', () => {
       .post(/.*/)
       .reply(200, postReceivePackRequest)
 
-    let repo = { fs, gitdir: clientDir }
     let res = await push({
-      ...repo,
+      fs,
+      gitdir,
       remote: 'pseudo',
       ref: 'refs/heads/master'
     })
@@ -39,24 +32,20 @@ describe('push', () => {
     expect(res.ok[1]).toBe('refs/heads/master')
   })
 
-  test('"master" to local git-http-backend', async () => {
+  it('"master" to local git-http-backend', async () => {
     // Setup
-    let serverDir = await copyFixtureIntoTempDir(__dirname, 'test-push-server')
-    let clientDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'test-push-client.git'
-    )
+    let { fs, dir, gitdir } = await makeFixture('test-push')
     // Test
-    const { get, postReceivePackRequest } = server(serverDir)
+    const { get, postReceivePackRequest } = server(dir)
     nock('http://example.dev')
       // .get('/test-push.git/info/refs?service=git-receive-pack')
       .get(/.*/)
       .reply(200, get)
       .post(/.*/)
       .reply(200, postReceivePackRequest)
-    let repo = { fs, gitdir: clientDir }
     let res = await push({
-      ...repo,
+      fs,
+      gitdir,
       remote: 'pseudo',
       ref: 'master'
     })
@@ -65,16 +54,15 @@ describe('push', () => {
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/master')
   })
-  ;(process.env.GITHUB_TOKEN ? test : test.skip)(
+  ;(process.env.GITHUB_TOKEN ? it : xit)(
     '"refs/heads/master" to Github',
     async () => {
-      let clientDir = await copyFixtureIntoTempDir(
-        __dirname,
-        'test-push-client.git'
-      )
-      let repo = { fs, gitdir: clientDir }
+      // Setup
+      let { fs, gitdir } = await makeFixture('test-push')
+      // Test
       let res = await push({
-        ...repo,
+        fs,
+        gitdir,
         authUsername: process.env.GITHUB_TOKEN,
         authPassword: process.env.GITHUB_TOKEN,
         remote: 'origin',
@@ -86,25 +74,22 @@ describe('push', () => {
       expect(res.ok[1]).toBe('refs/heads/master')
     }
   )
-  ;(process.env.GITHUB_TOKEN ? test : test.skip)(
-    '"master" to Github',
-    async () => {
-      let clientDir = await copyFixtureIntoTempDir(
-        __dirname,
-        'test-push-client.git'
-      )
-      let repo = { fs, gitdir: clientDir }
-      let res = await push({
-        ...repo,
-        authUsername: process.env.GITHUB_TOKEN,
-        authPassword: process.env.GITHUB_TOKEN,
-        remote: 'origin',
-        ref: 'master'
-      })
-      expect(res).toBeTruthy()
-      expect(res.ok).toBeTruthy()
-      expect(res.ok[0]).toBe('unpack')
-      expect(res.ok[1]).toBe('refs/heads/master')
-    }
-  )
+  ;(process.env.GITHUB_TOKEN ? it : xit)('"master" to Github', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-push')
+    // Test
+    let repo = { fs, gitdir }
+    let res = await push({
+      fs,
+      gitdir,
+      authUsername: process.env.GITHUB_TOKEN,
+      authPassword: process.env.GITHUB_TOKEN,
+      remote: 'origin',
+      ref: 'master'
+    })
+    expect(res).toBeTruthy()
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
+  })
 })

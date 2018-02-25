@@ -1,6 +1,7 @@
 const path = require('path')
 const _fs = require('fs')
 const pify = require('pify')
+const setTestTimeout = require('./set-test-timeout')
 
 const FixtureFS = async function () {
   // This is all in a conditional so that Jest won't attempt to
@@ -31,12 +32,7 @@ const FixtureFS = async function () {
 const FixturePromise = FixtureFS()
 
 async function makeFixture (dir) {
-  if (typeof jest !== 'undefined') {
-    jest.setTimeout(60000)
-  }
-  if (typeof jasmine !== 'undefined') {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
-  }
+  setTestTimeout(60000)
   return process.browser ? makeBrowserFixture(dir) : makeNodeFixture(dir)
 }
 

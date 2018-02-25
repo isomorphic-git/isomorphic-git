@@ -3,7 +3,9 @@ const diff = require('diff-lines')
 
 module.exports.assertSnapshot = function (object, snapshots, testname) {
   if (!(testname in snapshots)) {
-    throw new Error(`Snapshot Test name mispelling: \`${testname}\``)
+    throw new Error(`Snapshot Test name mispelling: \`${testname}\`
+Available snapshots: ${Object.keys(snapshots).join('\n - ')}
+`)
   }
   let actual = prettyFormat(object)
   if (actual.includes('\n')) actual = `\n${actual}\n`

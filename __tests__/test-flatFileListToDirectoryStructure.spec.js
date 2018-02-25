@@ -1,12 +1,16 @@
 /* global describe it expect */
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-flatFileListToDirectoryStructure.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { utils } = process.browser
   ? require('../dist/internal.umd.min.js')
   : require('../dist/for-node/internal-apis')
 const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('simple', async () => {
     let inode = flatFileListToDirectoryStructure([{ path: 'hello/there.txt' }])
     expect(inode.fullpath).toBe('.')
@@ -61,10 +65,6 @@ describe('flatFileListToDirectoryStructure', () => {
     ]
     let files = filelist.map(f => ({ path: f, someMeta: f.length }))
     let inodes = flatFileListToDirectoryStructure(files)
-    assertSnapshot(
-      inodes,
-      snapshots,
-      'flatFileListToDirectoryStructure advanced 1'
-    )
+    expect(inodes).toMatchSnapshot2()
   })
 })

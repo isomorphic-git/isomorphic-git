@@ -1,11 +1,14 @@
 /* global test describe expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-readObject.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
 const { readObject } = require('..')
 
 describe('readObject', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
   it('test missing', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-readObject')
@@ -19,7 +22,7 @@ describe('readObject', () => {
     } catch (err) {
       var ref = err
     }
-    assertSnapshot(ref, snapshots, `readObject test missing 1`)
+    expect(ref).toMatchSnapshot2()
   })
   it('test shallow', async () => {
     // Setup
@@ -34,7 +37,7 @@ describe('readObject', () => {
     } catch (err) {
       var ref = err
     }
-    assertSnapshot(ref, snapshots, `readObject test shallow 1`)
+    expect(ref).toMatchSnapshot2()
   })
   it('parsed', async () => {
     // Setup
@@ -45,7 +48,7 @@ describe('readObject', () => {
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
-    assertSnapshot(ref, snapshots, `readObject parsed 1`)
+    expect(ref).toMatchSnapshot2()
     expect(ref.format).toEqual('parsed')
     expect(ref.type).toEqual('commit')
   })
@@ -64,11 +67,7 @@ describe('readObject', () => {
     expect(ref.source).toBe(
       './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
     )
-    assertSnapshot(
-      ref.object.toString('hex'),
-      snapshots,
-      `readObject content 1`
-    )
+    expect(ref.object.toString('hex')).toMatchSnapshot2()
   })
   it('wrapped', async () => {
     // Setup
@@ -85,11 +84,7 @@ describe('readObject', () => {
     expect(ref.source).toBe(
       './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
     )
-    assertSnapshot(
-      ref.object.toString('hex'),
-      snapshots,
-      `readObject wrapped 1`
-    )
+    expect(ref.object.toString('hex')).toMatchSnapshot2()
   })
   it('deflated', async () => {
     // Setup
@@ -106,11 +101,7 @@ describe('readObject', () => {
     expect(ref.source).toBe(
       './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
     )
-    assertSnapshot(
-      ref.object.toString('hex'),
-      snapshots,
-      `readObject deflated 1`
-    )
+    expect(ref.object.toString('hex')).toMatchSnapshot2()
   })
   it('from packfile', async () => {
     // Setup
@@ -127,10 +118,6 @@ describe('readObject', () => {
     expect(ref.source).toBe(
       './objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
-    assertSnapshot(
-      ref.object.toString('hex'),
-      snapshots,
-      `readObject from packfile 1`
-    )
+    expect(ref.object.toString('hex')).toMatchSnapshot2()
   })
 })

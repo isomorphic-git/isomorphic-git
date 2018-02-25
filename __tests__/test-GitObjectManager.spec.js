@@ -1,13 +1,17 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-GitObjectManager.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { managers } = process.browser
   ? require('../dist/internal.umd.min.js')
   : require('../dist/for-node/internal-apis')
 const { GitObjectManager } = managers
 
 describe('GitObjectManager', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('test missing', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitObjectManager')
     try {
@@ -19,7 +23,7 @@ describe('GitObjectManager', () => {
     } catch (err) {
       var ref = err
     }
-    assertSnapshot(ref, snapshots, 'GitObjectManager test missing 1')
+    expect(ref).toMatchSnapshot2()
   })
 
   it('test shallow', async () => {
@@ -33,6 +37,6 @@ describe('GitObjectManager', () => {
     } catch (err) {
       var ref = err
     }
-    assertSnapshot(ref, snapshots, 'GitObjectManager test shallow 1')
+    expect(ref).toMatchSnapshot2()
   })
 })

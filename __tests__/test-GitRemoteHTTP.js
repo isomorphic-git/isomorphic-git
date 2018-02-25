@@ -1,13 +1,15 @@
-/* global test describe expect */
-import nock from 'nock'
-import server from './__helpers__/http-backend'
-import { managers } from 'isomorphic-git/internal-apis'
+/* global describe it expect */
+const nock = require('nock')
+const server = require('./__helpers__/http-backend')
+const { managers } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { GitRemoteHTTP } = managers
 
 const { get } = server('__tests__/__fixtures__')
 
 describe('GitRemoteHTTP', () => {
-  test('preparePull (Github response)', async () => {
+  it('preparePull (Github response)', async () => {
     let remote = new GitRemoteHTTP(
       'https://github.com/isomorphic-git/isomorphic-git'
     )
@@ -17,7 +19,7 @@ describe('GitRemoteHTTP', () => {
     expect(remote.symrefs.get('HEAD')).toBe('refs/heads/master')
   })
 
-  test('preparePull (mock response)', async () => {
+  it('preparePull (mock response)', async () => {
     nock('http://example.dev')
       .get('/test-GitRemoteHTTP.git/info/refs?service=git-upload-pack')
       // .get(/.*/)
@@ -38,18 +40,7 @@ describe('GitRemoteHTTP', () => {
     expect(remote).toBeTruthy()
   })
 
-  test.skip('preparePull (real git-http-backend response)', async () => {
-    nock('http://example.dev')
-      .get('/test-GitRemoteHTTP.git/info/refs?service=git-upload-pack')
-      .reply(200, get)
-
-    let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
-    await remote.preparePull()
-    // console.log(remote.capabilities)
-    expect(remote).toBeTruthy()
-  })
-
-  test('preparePush (mock response)', async () => {
+  it('preparePush (mock response)', async () => {
     nock('http://example.dev')
       .get('/test-GitRemoteHTTP.git/info/refs?service=git-receive-pack')
       // .get(/.*/)
@@ -69,17 +60,6 @@ describe('GitRemoteHTTP', () => {
     let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
     await remote.preparePush()
     // console.log(remote)
-    expect(remote).toBeTruthy()
-  })
-
-  test.skip('preparePush (real git-http-backend response)', async () => {
-    nock('http://example.dev')
-      .get('/test-GitRemoteHTTP.git/info/refs?service=git-receive-pack')
-      .reply(200, get)
-
-    let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
-    await remote.preparePush()
-    console.log(remote)
     expect(remote).toBeTruthy()
   })
 })

@@ -1,10 +1,14 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-import { listObjects } from 'isomorphic-git/internal-apis'
+const { listObjects } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 
 describe('listObjects', () => {
   it('listObjects', async () => {
+    // Setup
     let { fs, gitdir } = await makeFixture('test-listObjects')
+    // Test
     let objects = await listObjects({
       fs,
       gitdir,

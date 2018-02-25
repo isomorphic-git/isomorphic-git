@@ -53,14 +53,14 @@ module.exports = {
                      -o dist/service-worker-bundle.umd.min.js`
     },
     test: {
-      default: series.nps('lint', 'test.jasmine', 'test.jest', 'build', 'test.karma'),
+      default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
       jasmine: retry3('jasmine -v && jasmine -h && jasmine --reporter=jasmine-console-reporter --config=spec/support/jasmine.json'),
       jest: process.env.CI
         ? retry3('timeout --signal=KILL 5m jest --ci --coverage && codecov')
         : 'jest --ci',
       karma: process.env.CI
-        ? retry3('karma start')
-        : 'karma start'
+        ? retry3('karma start --single-run')
+        : 'karma start --single-run'
     }
   }
 }

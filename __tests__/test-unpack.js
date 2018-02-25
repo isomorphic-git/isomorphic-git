@@ -1,12 +1,14 @@
-/* global test describe expect */
+/* global describe it expect */
 const path = require('path')
 const { makeFixture } = require('./__helpers__/FixtureFS')
-const { unpack, managers } = require('isomorphic-git/internal-apis')
-const { init } = require('isomorphic-git')
+const { unpack, managers } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
+const { init } = require('..')
 const { GitObjectManager } = managers
 
 describe('unpack', () => {
-  test('unpack', async () => {
+  it('unpack', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-pack')
     await init({ fs, dir })
     let fixture = fs.createReadStream(
