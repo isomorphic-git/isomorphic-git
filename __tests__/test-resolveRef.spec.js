@@ -1,10 +1,13 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-resolveRef.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { resolveRef } = require('..')
 
 describe('resolveRef', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
   it('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-resolveRef')
@@ -14,11 +17,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9'
     })
-    assertSnapshot(
-      ref,
-      snapshots,
-      `resolveRef 1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9 1`
-    )
+    expect(ref).toMatchSnapshot2()
   })
   it('test-branch', async () => {
     // Setup
@@ -29,7 +28,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'origin/test-branch'
     })
-    assertSnapshot(ref, snapshots, `resolveRef test-branch 1`)
+    expect(ref).toMatchSnapshot2()
   })
   it('test-tag', async () => {
     // Setup
@@ -40,7 +39,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'test-tag'
     })
-    assertSnapshot(ref, snapshots, `resolveRef test-tag 1`)
+    expect(ref).toMatchSnapshot2()
   })
   it('HEAD', async () => {
     // Setup
@@ -51,7 +50,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'HEAD'
     })
-    assertSnapshot(ref, snapshots, `resolveRef HEAD 1`)
+    expect(ref).toMatchSnapshot2()
   })
   it('HEAD depth', async () => {
     // Setup
@@ -63,7 +62,7 @@ describe('resolveRef', () => {
       ref: 'HEAD',
       depth: 2
     })
-    assertSnapshot(ref, snapshots, `resolveRef HEAD depth 1`)
+    expect(ref).toMatchSnapshot2()
   })
   it('packed-refs', async () => {
     // Setup
@@ -74,6 +73,6 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'v0.0.1'
     })
-    assertSnapshot(ref, snapshots, `resolveRef packed-refs 1`)
+    expect(ref).toMatchSnapshot2()
   })
 })

@@ -1,10 +1,15 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { listCommits } = require('isomorphic-git/internal-apis')
+
+const { listCommits } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 
 describe('listCommits', () => {
   it('listCommits', async () => {
+    // Setup
     let { fs, gitdir } = await makeFixture('test-listCommits')
+    // Test
     let commits = await listCommits({
       fs,
       gitdir,

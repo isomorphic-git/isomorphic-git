@@ -1,14 +1,14 @@
-/* global jest test describe expect */
+/* global jest jasmine describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-import EventEmitter from 'events'
-import { models, utils } from 'isomorphic-git/internal-apis'
-import { fetch } from 'isomorphic-git'
+const EventEmitter = require('events')
+const { models, utils } = require('isomorphic-git/internal-apis')
+const { fetch } = require('isomorphic-git')
 const { FileSystem } = models
 const { sleep } = utils
 
 /** @test {fetch} */
 describe('fetch', () => {
-  ;(process.env.CI ? test : test.skip)('fetch (from Github)', async () => {
+  it('fetch (from Github)', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-fetch')
     fs = new FileSystem(fs)
@@ -17,11 +17,11 @@ describe('fetch', () => {
       fs,
       gitdir,
       remote: 'origin',
-      ref: 'master'
+      ref: 'test-branch-shallow-clone'
     })
   })
 
-  test('shallow fetch (from Github)', async () => {
+  it('shallow fetch (from Github)', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-fetch')
     fs = new FileSystem(fs)
@@ -60,7 +60,7 @@ describe('fetch', () => {
     expect(shallow).toEqual('86ec153c7b48e02f92930d07542680f60d104d31\n')
   })
 
-  test('shallow fetch since (from Github)', async () => {
+  it('shallow fetch since (from Github)', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-fetch')
     fs = new FileSystem(fs)
@@ -78,7 +78,7 @@ describe('fetch', () => {
     expect(shallow).toEqual('36d201c8fea9d87128e7fccd32c21643f355540d\n')
   })
 
-  test('shallow fetch exclude (from Github)', async () => {
+  it('shallow fetch exclude (from Github)', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-fetch')
     fs = new FileSystem(fs)
@@ -96,7 +96,7 @@ describe('fetch', () => {
     expect(shallow).toEqual('0094dadf9804971c851e99b13845d10c8849db12\n')
   })
 
-  test('shallow fetch relative (from Github)', async () => {
+  it('shallow fetch relative (from Github)', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-fetch')
     fs = new FileSystem(fs)

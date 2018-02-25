@@ -2,6 +2,7 @@
 const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-fetch.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
 const EventEmitter = require('events')
@@ -12,6 +13,10 @@ const { fetch } = require('..')
 const { sleep } = utils
 
 describe('fetch', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('fetch (from Github)', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
     // Smoke Test
@@ -44,8 +49,8 @@ describe('fetch', () => {
     })
     await sleep(1000) // seems to be a problem spot
     expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
-    assertSnapshot(output, snapshots, 'fetch shallow fetch (from Github) 1')
-    assertSnapshot(progress, snapshots, 'fetch shallow fetch (from Github) 2')
+    expect(output).toMatchSnapshot2() //, snapshots, 'fetch shallow fetch (from Github) 1')
+    expect(progress).toMatchSnapshot2() //, snapshots, 'fetch shallow fetch (from Github) 2')
     let shallow = await pify(fs.readFile)(`${gitdir}/shallow`, {
       encoding: 'utf8'
     })

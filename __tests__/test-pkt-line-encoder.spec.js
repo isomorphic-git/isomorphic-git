@@ -1,7 +1,9 @@
 /* globals describe it expect */
 const { FixtureFS } = require('./__helpers__/FixtureFS.js')
 
-const { models } = require('../dist/for-node/internal-apis')
+const { models } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { GitPktLine } = models
 
 describe('pkt-line-encoder', () => {

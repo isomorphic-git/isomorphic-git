@@ -1,20 +1,23 @@
 /* globals describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const prettyFormat = require('pretty-format')
 const snapshots = require('./__snapshots__/test-checkout.js.snap')
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
-
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
+
 const { checkout, listFiles } = require('..')
 
 describe('checkout', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('checkout', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({ fs, dir, gitdir, ref: 'test-branch' })
     let files = await pify(fs.readdir)(dir)
-    assertSnapshot(files.sort(), snapshots, `checkout checkout 1`)
+    expect(files.sort()).toMatchSnapshot2()
     let index = await listFiles({ fs, dir, gitdir })
-    assertSnapshot(index, snapshots, `checkout checkout 2`)
+    expect(index).toMatchSnapshot2()
   })
 })

@@ -1,31 +1,33 @@
 /* global test describe expect */
-import _fs from 'fs'
-import { createTempDir } from 'jest-fixtures'
-import { models, utils } from 'isomorphic-git/internal-apis'
+const _fs = require('fs')
+const { createTempDir } = require('jest-fixtures')
+const { models, utils } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { FileSystem } = models
 const { sleep } = utils
 const fs = new FileSystem(_fs)
 
-jest.setTimeout(60000)
-
 describe('lockfile', () => {
-  test('make lockfile', async () => {
+  it('make lockfile', async () => {
     let dir = await createTempDir()
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
   })
 
-  test('cannot double-acquire lockfile', async () => {
+  it('cannot double-acquire lockfile', async () => {
     let dir = await createTempDir()
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
+    let doubleAcquire = false
     try {
       await fs.lock(dir)
-      throw new Error('Double-acquired lock')
+      doubleAcquire = true
     } catch (err) {}
+    expect(doubleAcquire).toBe(false)
   })
 
-  test('can release lockfile', async () => {
+  it('can release lockfile', async () => {
     let dir = await createTempDir()
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
@@ -37,26 +39,29 @@ describe('lockfile', () => {
     expect(await fs.exists(`${dir}.lock`)).toBe(false)
   })
 
-  test('cannot double-release lockfile', async () => {
+  it('cannot double-release lockfile', async () => {
     let dir = await createTempDir()
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
     await fs.unlock(dir)
+    let doubleRelease = false
     try {
       await fs.unlock(dir)
-      throw new Error('Was able to double-release lockfile')
+      doubleRelease = true
     } catch (err) {}
+    expect(doubleRelease).toBe(false)
   })
 
-  test('can retry until acquire lockfile', async () => {
+  it('can retry until acquire lockfile', async () => {
     let dir = await createTempDir()
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
-    setTimeout(() => fs.rm(`${dir}.lock`), 100)
+    setTimeout(() => fs.unlock(dir), 100)
+    let acquireLock = false
     try {
       await fs.lock(dir)
-    } catch (err) {
-      throw new Error('Could not acquire lock even after lockfile deleted.')
-    }
+      acquireLock = true
+    } catch (err) {}
+    expect(acquireLock).toBe(true)
   })
 })

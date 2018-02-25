@@ -1,10 +1,9 @@
-/* global test describe expect */
-import pkg from '../package.json'
-import { version } from 'isomorphic-git'
+/* global describe it expect */
+const pkg = require('../package.json')
+const { version } = require('..')
 
-/** @test {version} */
 describe('version', () => {
-  test('version', () => {
+  it('version', () => {
     let v = version()
     expect(v).toEqual(pkg.version)
   })

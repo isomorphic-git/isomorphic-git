@@ -1,7 +1,7 @@
 /* globals describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
 const pify = require('pify')
 const shasum = require('shasum')
@@ -9,6 +9,9 @@ const { models } = require('../dist/for-node/internal-apis')
 const { GitPackIndex, GitObject } = models
 
 describe('GitPackIndex', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
   it('from .idx', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
@@ -18,7 +21,7 @@ describe('GitPackIndex', () => {
       )
     )
     let p = await GitPackIndex.fromIdx({ idx })
-    assertSnapshot(shasum(p.hashes), snapshots, `GitPackIndex from .idx 1`)
+    expect(shasum(p.hashes)).toMatchSnapshot2()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)
@@ -36,7 +39,7 @@ describe('GitPackIndex', () => {
       )
     )
     let p = await GitPackIndex.fromPack({ pack })
-    assertSnapshot(shasum(p.hashes), snapshots, `GitPackIndex from .pack 1`)
+    expect(shasum(p.hashes)).toMatchSnapshot2()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)
@@ -124,8 +127,7 @@ describe('GitPackIndex', () => {
       oid: '7fb539a8e8488c3fd2793e7dda8a44693e25cce1' // 9 levels deep of deltification.
     })
     expect(type).toBe('blob')
-    // TODO: working snapshot (sheesh)
-    // expectjs(object.toString('utf8')).toMatchSnapshot()
+    expect(object.toString('utf8')).toMatchSnapshot2()
     let { oid } = GitObject.wrap({ type, object })
     expect(oid).toBe('7fb539a8e8488c3fd2793e7dda8a44693e25cce1')
   })

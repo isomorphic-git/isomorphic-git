@@ -1,4 +1,6 @@
 /* globals describe test expect */
+const path = require('path')
+const pify = require('pify')
 const shasum = require('shasum')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 import { models } from 'isomorphic-git/internal-apis'
@@ -7,9 +9,11 @@ const { FileSystem, GitPackIndex, GitObject } = models
 describe('GitPackIndex', () => {
   test('from .idx', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
-    fs = new FileSystem(fs)
-    let idx = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+    let idx = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+      )
     )
     let p = await GitPackIndex.fromIdx({ idx })
     expect(shasum(p.hashes)).toMatchSnapshot()
@@ -23,9 +27,11 @@ describe('GitPackIndex', () => {
   })
   test('from .pack', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
-    fs = new FileSystem(fs)
-    let pack = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+    let pack = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      )
     )
     let p = await GitPackIndex.fromPack({ pack })
     expect(shasum(p.hashes)).toMatchSnapshot()
@@ -40,9 +46,11 @@ describe('GitPackIndex', () => {
 
   test('to .idx file', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
-    fs = new FileSystem(fs)
-    let idx = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+    let idx = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+      )
     )
     let p = await GitPackIndex.fromIdx({ idx })
     let idxbuffer = p.toBuffer()
@@ -51,12 +59,17 @@ describe('GitPackIndex', () => {
   })
   test('to .idx file from .pack', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
-    fs = new FileSystem(fs)
-    let idx = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+    let idx = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+      )
     )
-    let pack = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+    let pack = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      )
     )
     let p = await GitPackIndex.fromPack({ pack })
     let idxbuffer = p.toBuffer()
@@ -66,12 +79,17 @@ describe('GitPackIndex', () => {
 
   test('read undeltified object', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
-    fs = new FileSystem(fs)
-    const idx = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+    let idx = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+      )
     )
-    const pack = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+    let pack = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      )
     )
     let p = await GitPackIndex.fromIdx({ idx })
     await p.load({ pack })
@@ -85,12 +103,17 @@ describe('GitPackIndex', () => {
   })
   test('read deltified object', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
-    fs = new FileSystem(fs)
-    const idx = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+    let idx = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
+      )
     )
-    const pack = await fs.read(
-      '__tests__/__fixtures__/test-packfile.git/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+    let pack = await pify(fs.readFile)(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      )
     )
     let p = await GitPackIndex.fromIdx({ idx })
     await p.load({ pack })

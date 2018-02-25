@@ -135,7 +135,7 @@
     ]
   },
   "jest": {
-    "testRegex": "/__tests__/test-(?!.*\\.(spec)\\.js).*\\.js",
+    "testRegex": "/__tests__/test-.*\\.js",
     "moduleNameMapper": {
       "^isomorphic-git$": "<rootDir>/src",
       "^isomorphic-git/(.+)$": "<rootDir>/src/$1"

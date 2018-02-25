@@ -7,19 +7,21 @@ const dir = '.'
 
 /** @test {findRoot} */
 describe('findRoot', () => {
-  test('__dirname', async () => {
+  it('__dirname', async () => {
     let repo = { fs, dir }
     let root = await findRoot({ ...repo, filepath: __dirname })
     expect(path.basename(root)).toBe('isomorphic-git')
   })
-  test('.', async () => {
+  it('.', async () => {
     let repo = { fs, dir }
     let root = await findRoot({ ...repo, filepath: path.resolve('.') })
     expect(path.basename(root)).toBe('isomorphic-git')
   })
-  test('..', async () => {
+  it('..', async () => {
     let repo = { fs, dir }
-    let root = findRoot({ ...repo, filepath: path.resolve('..') })
-    expect(root).rejects.toBeDefined()
+    try {
+      var root = await findRoot({ ...repo, filepath: path.resolve('..') })
+    } catch (err) {}
+    expect(root).not.toBeDefined()
   })
 })

@@ -1,9 +1,11 @@
-/* global test describe expect */
-import { utils } from 'isomorphic-git/internal-apis'
+/* global describe it expect */
+const { utils } = process.browser
+  ? require('../dist/internal.umd.min.js')
+  : require('../dist/for-node/internal-apis')
 const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {
-  test('simple', async () => {
+  it('simple', async () => {
     let inode = flatFileListToDirectoryStructure([{ path: 'hello/there.txt' }])
     expect(inode.fullpath === '.').toBe(true)
     expect(inode.type === 'tree').toBe(true)
@@ -20,7 +22,7 @@ describe('flatFileListToDirectoryStructure', () => {
     expect(there.basename === 'there.txt').toBe(true)
   })
 
-  test('advanced', async () => {
+  it('advanced', async () => {
     let filelist = [
       '.babelrc',
       '.editorconfig',
