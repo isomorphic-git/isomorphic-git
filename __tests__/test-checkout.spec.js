@@ -4,7 +4,7 @@ const snapshots = require('./__snapshots__/test-checkout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
-const { checkout, listFiles } = require('..')
+const { checkout, listFiles } = require('isomorphic-git')
 
 describe('checkout', () => {
   beforeAll(() => {

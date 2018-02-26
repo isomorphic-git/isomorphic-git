@@ -2,7 +2,7 @@
 const snapshots = require('./__snapshots__/test-listBranches.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { listBranches } = require('..')
+const { listBranches } = require('isomorphic-git')
 
 describe('listBranches', () => {
   beforeAll(() => {

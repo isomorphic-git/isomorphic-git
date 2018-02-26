@@ -10,7 +10,7 @@ describe('GitRefManager', () => {
       fs,
       gitdir
     })
-    expect(refs).toMatchSnapshot()
+    expect([...refs]).toMatchSnapshot()
   })
   it('listRefs', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')

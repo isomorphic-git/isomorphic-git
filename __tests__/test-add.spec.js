@@ -1,7 +1,7 @@
 /* globals describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { init, add, listFiles } = require('..')
+const { init, add, listFiles } = require('isomorphic-git')
 
 /** @test {add} */
 describe('add', () => {

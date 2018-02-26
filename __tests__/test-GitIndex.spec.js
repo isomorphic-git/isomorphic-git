@@ -5,9 +5,7 @@ const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 const path = require('path')
 
-const { models } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { models } = require('isomorphic-git/internal-apis')
 const { GitIndex } = models
 
 describe('GitIndex', () => {

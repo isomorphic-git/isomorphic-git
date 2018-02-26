@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const pify = require('pify')
-const { commit, sign, verify } = require('..')
+const { commit, sign, verify } = require('isomorphic-git')
 
 describe('commit', () => {
   it('commit', async () => {

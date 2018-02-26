@@ -1,7 +1,5 @@
 /* global describe it expect */
-const { utils } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { utils } = require('isomorphic-git/internal-apis')
 const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {

@@ -5,7 +5,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const nock = require('nock')
 const server = require('./__helpers__/http-backend')
 
-const { getRemoteInfo } = require('..')
+const { getRemoteInfo } = require('isomorphic-git')
 
 // TODO: Get nock working in browser
 xdescribe('getRemoteInfo', () => {

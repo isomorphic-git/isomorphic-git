@@ -1,9 +1,7 @@
 /* global test describe expect */
 const _fs = require('fs')
 const { createTempDir } = require('jest-fixtures')
-const { models, utils } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { models, utils } = require('isomorphic-git/internal-apis')
 const { FileSystem } = models
 const { sleep } = utils
 const fs = new FileSystem(_fs)
