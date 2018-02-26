@@ -3,9 +3,8 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript implementation of git for node and browsers!",
   "typings": "./src/index.d.ts",
-  "main": "dist/for-node/",
+  "main": "dist/for-node/isomorphic-git/",
   "browser": {
-    "./dist/for-node/": "./dist/for-browserify/",
     "isomorphic-git": "./dist/bundle.umd.min.js",
     "isomorphic-git/internal-apis": "./dist/internal.umd.min.js"
   },

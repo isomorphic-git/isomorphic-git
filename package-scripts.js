@@ -54,7 +54,7 @@ module.exports = {
     },
     test: {
       default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
-      jasmine: retry3('jasmine -v && jasmine -h && jasmine --reporter=jasmine-console-reporter --config=spec/support/jasmine.json'),
+      jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine --reporter=jasmine-console-reporter'),
       jest: process.env.CI
         ? retry3('timeout --signal=KILL 5m jest --ci --coverage && codecov')
         : 'jest --ci',
