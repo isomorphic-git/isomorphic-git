@@ -53,7 +53,7 @@ module.exports = {
                      -o dist/service-worker-bundle.umd.min.js`
     },
     test: {
-      default: series.nps('lint', 'test.jest', 'build', 'test.karma'),
+      default: series.nps('lint', 'test.jest', 'build', 'test.jasmine', 'test.karma'),
       jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine --reporter=jasmine-console-reporter'),
       jest: process.env.CI
         ? retry3('timeout --signal=KILL 5m jest --ci --coverage && codecov')
