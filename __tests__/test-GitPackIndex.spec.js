@@ -5,7 +5,7 @@ const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
 const pify = require('pify')
 const shasum = require('shasum')
-const { models } = require('../dist/for-node/internal-apis')
+const { models } = require('isomorphic-git/internal-apis')
 const { GitPackIndex, GitObject } = models
 
 describe('GitPackIndex', () => {

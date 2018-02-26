@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-readObject.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { readObject } = require('..')
+const { readObject } = require('isomorphic-git')
 
 describe('readObject', () => {
   beforeAll(() => {

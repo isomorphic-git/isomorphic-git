@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const nock = require('nock')
 const server = require('./__helpers__/http-backend')
 const setTestTimeout = require('./__helpers__/set-test-timeout')
-const { push } = require('..')
+const { push } = require('isomorphic-git')
 
 setTestTimeout(60000)
 

@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-listFiles.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { listFiles } = require('..')
+const { listFiles } = require('isomorphic-git')
 
 describe('listFiles', () => {
   beforeAll(() => {

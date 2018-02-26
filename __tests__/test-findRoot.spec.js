@@ -1,7 +1,7 @@
 /* global jasmine jest describe it expect */
 const path = require('path')
 const fs = require('fs')
-const { findRoot } = require('..')
+const { findRoot } = require('isomorphic-git')
 
 const dir = '.'
 

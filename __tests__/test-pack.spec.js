@@ -4,9 +4,7 @@ const path = require('path')
 const pify = require('pify')
 const stream = require('stream')
 const concat = require('simple-concat')
-const { pack } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { pack } = require('isomorphic-git/internal-apis')
 
 describe('pack', () => {
   it('git.pack', async () => {

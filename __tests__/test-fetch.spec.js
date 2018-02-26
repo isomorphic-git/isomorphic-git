@@ -6,10 +6,8 @@ const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
 const EventEmitter = require('events')
-const { utils } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
-const { fetch } = require('..')
+const { utils } = require('isomorphic-git/internal-apis')
+const { fetch } = require('isomorphic-git')
 const { sleep } = utils
 
 describe('fetch', () => {

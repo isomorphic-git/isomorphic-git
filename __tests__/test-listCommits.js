@@ -1,9 +1,7 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { listCommits } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { listCommits } = require('isomorphic-git/internal-apis')
 
 describe('listCommits', () => {
   it('listCommits', async () => {

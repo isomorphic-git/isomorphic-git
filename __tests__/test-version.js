@@ -1,6 +1,6 @@
 /* global describe it expect */
 const pkg = require('../package.json')
-const { version } = require('..')
+const { version } = require('isomorphic-git')
 
 describe('version', () => {
   it('version', () => {

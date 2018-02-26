@@ -1,9 +1,7 @@
 /* global describe it expect */
 const snapshots = require('./__snapshots__/test-flatFileListToDirectoryStructure.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { utils } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { utils } = require('isomorphic-git/internal-apis')
 const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {

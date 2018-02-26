@@ -1,7 +1,5 @@
 /* global describe it expect */
-const { models } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { models } = require('isomorphic-git/internal-apis')
 const { GitPktLine } = models
 
 describe('pkg-line-reader', () => {

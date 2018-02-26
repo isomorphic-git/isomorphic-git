@@ -1,9 +1,7 @@
 /* global describe it expect */
 const nock = require('nock')
 const server = require('./__helpers__/http-backend')
-const { managers } = process.browser
-  ? require('../dist/internal.umd.min.js')
-  : require('../dist/for-node/internal-apis')
+const { managers } = require('isomorphic-git/internal-apis')
 const { GitRemoteHTTP } = managers
 
 const { get } = server('__tests__/__fixtures__')

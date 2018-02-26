@@ -4,7 +4,7 @@ const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-GitRefManager.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
-const { managers } = require('../dist/for-node/internal-apis')
+const { managers } = require('isomorphic-git/internal-apis')
 const { GitRefManager } = managers
 
 describe('GitRefManager', () => {
@@ -17,7 +17,7 @@ describe('GitRefManager', () => {
       fs,
       gitdir
     })
-    expect(refs).toMatchSnapshot2()
+    expect([...refs]).toMatchSnapshot2()
   })
   it('listRefs', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
