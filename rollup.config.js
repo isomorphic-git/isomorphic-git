@@ -64,7 +64,7 @@ const nodeConfig = input => ({
     {
       format: 'cjs',
       name: 'git',
-      file: `dist/for-node/${input}`
+      file: `dist/for-node/isomorphic-git/${input}`
     }
   ],
   plugins: [
