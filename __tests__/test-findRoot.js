@@ -1,27 +1,49 @@
-/* global test describe expect */
-import path from 'path'
-import fs from 'fs'
-import { findRoot } from 'isomorphic-git'
+/* global jasmine jest describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const path = require('path')
+const pify = require('pify')
 
-const dir = '.'
+const { findRoot } = require('isomorphic-git')
 
-/** @test {findRoot} */
+// NOTE: Because ".git" is not allowed as a path name in git,
+// we can't actually store the ".git" folders in our fixture,
+// so we have to make those folders dynamically.
 describe('findRoot', () => {
-  it('__dirname', async () => {
-    let repo = { fs, dir }
-    let root = await findRoot({ ...repo, filepath: __dirname })
-    expect(path.basename(root)).toBe('isomorphic-git')
+  it('filepath has its own .git folder', async () => {
+    // Setup
+    let { fs, dir } = await makeFixture('test-findRoot')
+    await pify(fs.mkdir)(path.join(dir, 'foobar', '.git'))
+    await pify(fs.mkdir)(path.join(dir, 'foobar/bar', '.git'))
+    // Test
+    let root = await findRoot({
+      fs,
+      filepath: path.join(dir, 'foobar')
+    })
+    expect(path.basename(root)).toBe('foobar')
   })
-  it('.', async () => {
-    let repo = { fs, dir }
-    let root = await findRoot({ ...repo, filepath: path.resolve('.') })
-    expect(path.basename(root)).toBe('isomorphic-git')
+  it('filepath has ancestor with a .git folder', async () => {
+    // Setup
+    let { fs, dir } = await makeFixture('test-findRoot')
+    await pify(fs.mkdir)(path.join(dir, 'foobar', '.git'))
+    await pify(fs.mkdir)(path.join(dir, 'foobar/bar', '.git'))
+    // Test
+    let root = await findRoot({
+      fs,
+      filepath: path.join(dir, 'foobar/bar/baz/buzz')
+    })
+    expect(path.basename(root)).toBe('bar')
   })
-  it('..', async () => {
-    let repo = { fs, dir }
+  it('temp dir does not have an ancestor with a .git folder', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-findRoot')
+    // Test
+    let root = false
     try {
-      var root = await findRoot({ ...repo, filepath: path.resolve('..') })
+      root = await findRoot({
+        fs,
+        filepath: gitdir
+      })
     } catch (err) {}
-    expect(root).not.toBeDefined()
+    expect(root).toBe(false)
   })
 })
