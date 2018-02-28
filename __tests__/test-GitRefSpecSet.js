@@ -1,5 +1,5 @@
 /* global describe it expect */
-import { models } from 'isomorphic-git/internal-apis'
+const { models } = require('isomorphic-git/internal-apis')
 const { GitRefSpecSet } = models
 
 describe('GitRefSpecSet', () => {

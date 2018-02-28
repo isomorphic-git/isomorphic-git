@@ -1,23 +1,29 @@
 /* global describe it expect */
+const snapshots = require('./__snapshots__/test-flatFileListToDirectoryStructure.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { utils } = require('isomorphic-git/internal-apis')
 const { flatFileListToDirectoryStructure } = utils
 
 describe('flatFileListToDirectoryStructure', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('simple', async () => {
     let inode = flatFileListToDirectoryStructure([{ path: 'hello/there.txt' }])
-    expect(inode.fullpath === '.').toBe(true)
-    expect(inode.type === 'tree').toBe(true)
-    expect(inode.children.length === 1).toBe(true)
+    expect(inode.fullpath).toBe('.')
+    expect(inode.type).toBe('tree')
+    expect(inode.children.length).toBe(1)
     let hello = inode.children[0]
-    expect(hello.type === 'tree').toBe(true)
-    expect(hello.fullpath === 'hello').toBe(true)
-    expect(hello.basename === 'hello').toBe(true)
-    expect(hello.parent === inode).toBe(true)
-    expect(hello.children.length === 1).toBe(true)
+    expect(hello.type).toBe('tree')
+    expect(hello.fullpath).toBe('hello')
+    expect(hello.basename).toBe('hello')
+    expect(hello.parent).toBe(inode)
+    expect(hello.children.length).toBe(1)
     let there = hello.children[0]
-    expect(there.type === 'blob').toBe(true)
-    expect(there.fullpath === 'hello/there.txt').toBe(true)
-    expect(there.basename === 'there.txt').toBe(true)
+    expect(there.type).toBe('blob')
+    expect(there.fullpath).toBe('hello/there.txt')
+    expect(there.basename).toBe('there.txt')
   })
 
   it('advanced', async () => {

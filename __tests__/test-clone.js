@@ -1,4 +1,4 @@
-/* globals jest describe it expect */
+/* globals describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { clone } = require('isomorphic-git')

@@ -1,24 +1,40 @@
 /* global describe it expect */
 const snapshots = require('./__snapshots__/test-getRemoteInfo.js.snap')
-require('./__helpers__/jasmine-snapshots')(snapshots)
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const nock = require('nock')
-const server = require('./__helpers__/http-backend')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
+const fetchMock = require('fetch-mock')
 
 const { getRemoteInfo } = require('isomorphic-git')
 
+// TODO: Get nock working in browser
 describe('getRemoteInfo', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('getRemoteInfo', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-getRemoteInfo')
-    // Test
-    const { get } = server(dir)
-    nock('http://example.localhost')
-      .get(/.*/)
-      .reply(200, get)
+    fetchMock.once('*', {
+      body:
+        '001e# service=git-upload-pack\n00000108c82c412ef205ea12acfb334221d21aaa9f448c1a HEAD\u0000multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/github-g8e15c84d3743\n0040beca08a8a8878ef5875c0c9e747097e183750250 refs/heads/develop\n003da2dd810e222b7b02fc53760037d9928cb97c645d refs/heads/dist\n0044869287d8713c8e6f20c6cf928c14f1ceb4a8c04a refs/heads/jasmine-npm\n003fc82c412ef205ea12acfb334221d21aaa9f448c1a refs/heads/master\n0044e10ebb90d03eaacca84de1af0a59b444232da99e refs/heads/test-branch\n005292e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e refs/heads/test-branch-shallow-clone\n003ff8c7ccb9cc48ee447a3a51fdf698677c6d80734c refs/pull/20/head\n003ff2620691f1dbe2a3328c344385036e31856c16eb refs/pull/21/head\n003f779da5c96b2ad6c78de5a2fcd1fc58d09f9b1fe1 refs/pull/23/head\n00403de0795814f6240bb34bcf1d186a5ad2111093c2 refs/pull/23/merge\n003ff91104771f264142251cbb067ce6fdbf04c3f88c refs/pull/24/head\n003f9f3ba8af8d9531daf075dfd110f83414537f2031 refs/pull/28/head\n003f2bba50c168c5dc6899eb7bcd2e3d6f2cc151a547 refs/pull/30/head\n003f98b1df24784e16428b6d0826bd1847669d6e7f70 refs/pull/31/head\n003f665910e9294fe796499917c472b4ead573a11b06 refs/pull/33/head\n0040cd9c6d6df13c38b83bb4bcbca82feb1faf50833c refs/pull/33/merge\n003f7ea80bf019c279edca31c71b3917356085116867 refs/pull/35/head\n003f5c8823828af39fe5c9677db092d9764be56b61f7 refs/pull/36/head\n003f76e1f5a50b0432450c27d453d3ab47abb454a547 refs/pull/49/head\n003e930182105c9d144f952a191a29f40d1945bca990 refs/pull/5/head\n003f6da95c3c2a39182ea0f3adcc6ec9f4802af5b51b refs/pull/51/head\n003f7bebdae4427888a00d53102737e74e70b08b11c1 refs/pull/52/head\n003ff84b864ffa213c5b40ae2a68c631987f1eb47d62 refs/pull/53/head\n003ff7b60a562ddc23d7148f94ff5ffd4f8e893a8f27 refs/pull/54/head\n003f0154735e14287b243c557a6b173e91621c50f56d refs/pull/55/head\n00409cf06e935b81c64552749e7b3ee16707c0a37232 refs/pull/55/merge\n003f3e41916e16a95feff7d7b59683fb3b92ad8c84c3 refs/pull/56/head\n003f9489f5e94f3bcfe1ac57571ec1d939c6a456b1aa refs/pull/57/head\n003f0bfe9c1b36f7503dfc26ba01fd0c8ac948a46b4f refs/pull/58/head\n003ff42cbdaca1473faee09897af7a337f64b2378e4a refs/pull/59/head\n003fc5b95f7778bf0e334477b5adb7d9879233379d8a refs/pull/60/head\n003f95b3de82f3d4336617a69ba86891cb213544c828 refs/pull/61/head\n003ff363c05ab8bed1416e0c62bcf74a559cf9f8cc11 refs/pull/62/head\n003ffc2ef193bfbdf6a90ce22606c3ed33ab21074e39 refs/pull/63/head\n003f603f0815fd50448c852ed1b85f770646a292302e refs/pull/64/head\n003f9d7f2440542b0802b3e00964e34e3d4e94c0fab0 refs/pull/65/head\n003fe9e092b9769ad364cce57a93a4d164bedeb45b80 refs/pull/66/head\n003fcce35f57905bb97939ab27574591ac37daab19dc refs/pull/67/head\n003f8a4942e30a8e3e569307933284e22e426fbdee88 refs/pull/68/head\n003f57197ba15d5469d5f15239840e74d124a41d80ae refs/pull/69/head\n003f229833f020442f51a7faf7fe687b7c61f238d67d refs/pull/70/head\n003f075c934bc59fc3403585b010b9410f9c1773344b refs/pull/71/head\n003f5d193e5eba143ef0643f84304616f39e7915da33 refs/pull/72/head\n003f99b7b122983949ba77e9e990b13aa3fdfa946c6b refs/pull/73/head\n003f1578c6924ca9f23ea399b298fb76501864d347c8 refs/pull/74/head\n003f6f23c5b3ea3d89cca88f131cbf66c37807ed70d8 refs/pull/75/head\n003f14c431412f4874457030659f5be42c37c79e7061 refs/pull/76/head\n003f73236c17580c9717265613c4bf410f33271b3c8e refs/pull/77/head\n003fe8bfde7ed6a28654ae03492927a2d96eb1bdfc38 refs/pull/79/head\n00401e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9 refs/tags/test-tag\n003e1a2149e96a9767b281a8f10fd014835322da2d14 refs/tags/v0.0.1\n003f0a117b8378f5e5323d15694c7eb8f62c4bea152b refs/tags/v0.0.10\n0042ce03143bd6567fc7063549c204e877834cda5645 refs/tags/v0.0.10^{}\n003facd8de39da34f0f05b07f0494675afa914fadbd9 refs/tags/v0.0.11\n00428388a3d4197bf9e02bb97dfdc920fe6b6353453d refs/tags/v0.0.11^{}\n003f9dba4bc0f13b98a21a9f8c41b9dcc174df6e8dd9 refs/tags/v0.0.12\n00428d74454009b9bf7bf1df39ad31c8191bd9ac591b refs/tags/v0.0.12^{}\n003f0d7c8bcac6c824e8a857eeceeab4416427314202 refs/tags/v0.0.13\n0042af70a57e828aa1f7de829b1987915abe3aeeab85 refs/tags/v0.0.13^{}\n003f1560793d9e6c08dddb9218ec7a58a96f55664f7f refs/tags/v0.0.14\n004271cfcca36f2403662acf3390ae7654a0cb52fbfc refs/tags/v0.0.14^{}\n003f78bae74bb8d82877c703cca5da8a6ffd50facd17 refs/tags/v0.0.15\n0042f531be257f90a5211ed5f63a417b1a3bc27ab2bb refs/tags/v0.0.15^{}\n003f8c2189d3745bb88f2e34d2dbb97028a9dead1a29 refs/tags/v0.0.16\n0042252cb320650c604db9e504e0b04dea0e94922802 refs/tags/v0.0.16^{}\n003f6f09d58133a791fc3a2493471d4b3d49f9e935d6 refs/tags/v0.0.17\n00425354394fb099b5713c60fe6be2350457d6d2d658 refs/tags/v0.0.17^{}\n003f1739d0abdf493ad61caf11a10417dbf0f87bd2c9 refs/tags/v0.0.18\n00422359fff39771f72c94b8b034803c7722319a1405 refs/tags/v0.0.18^{}\n003f180c9e01421744a307fb309f79b828ef71b47f4c refs/tags/v0.0.19\n00429e4130538be3129100aecf9218a6be0fc35f9911 refs/tags/v0.0.19^{}\n003e9e3ee22249ed50acccfd3996dadb5d27019a7dad refs/tags/v0.0.2\n003f993509d291a58bc8c8dd8d23829d5294e057de22 refs/tags/v0.0.20\n004212cef164723a8ebcbbc2b9a48212a83bfcd9eecf refs/tags/v0.0.20^{}\n003f5b71480a0e679bf29cad790a78fd4df551a96097 refs/tags/v0.0.21\n0042b25b4120b1ee4fc2ec4c2016268e1e42602b6a86 refs/tags/v0.0.21^{}\n003f259ccc39944411d632189e4d7e009cd5d2485636 refs/tags/v0.0.22\n0042eb95df88672e6f258ef6b759ab341f8b99dc477a refs/tags/v0.0.22^{}\n003fc0bc224f093f93d99c6e68b6b5ceedfeecf61bb9 refs/tags/v0.0.23\n0042c81055a43f1691af59707076d78405b6d3235fea refs/tags/v0.0.23^{}\n003f463103b31c473c25e87288f564a8e73a9476777b refs/tags/v0.0.24\n0042d33eab687ba73b586239843dd8c3bc4267f1b358 refs/tags/v0.0.24^{}\n003f79d7db0650cffe24e307dd4ba881ccbdf0011e6a refs/tags/v0.0.25\n0042b2c43af335e94255839aae1f2b1a97995040f389 refs/tags/v0.0.25^{}\n003fe611dd73aeeef5add4bda82a00f7e9af7d17d9dd refs/tags/v0.0.26\n0042fae8a72f545106b2816641f5452bf7f7e99ea2a8 refs/tags/v0.0.26^{}\n003fa233f65a609c07bc6e31bfc0bc051d98c8cfe18e refs/tags/v0.0.27\n003f6398b5cb041d23de187f46c8888768d96b3cd01e refs/tags/v0.0.28\n003f24ca84f16a4bcbf8b252eb0c4250a6c818cf00d3 refs/tags/v0.0.29\n003e3e6345233bb696737784f423ace943e0eaa2b30c refs/tags/v0.0.3\n0041b3ed1e3f15c9bcab23833dbb5ef6a8e2198ec4e2 refs/tags/v0.0.3^{}\n003fc8ea7416948bdc19c1ca1b51b8897ed9201597dd refs/tags/v0.0.30\n003ff754b0f027c72695cbfd37c990559bc61bf583b6 refs/tags/v0.0.31\n003fc2dcbda8dbe0fb614de6340b273e7bba9ab52a37 refs/tags/v0.0.32\n003f8411968f6359c8ae7e85b5da7e417002477263ea refs/tags/v0.0.33\n003fdc887a60db904f58b558857ba7a6c39dd1d18f22 refs/tags/v0.0.34\n003fdd242320e5b0054c9468e4ab5cc3c4722051dd43 refs/tags/v0.0.35\n003fbc31c33f9b9dbaf6a2c15c118f9f8924600c6331 refs/tags/v0.0.36\n003fe723960dde1fa6dd1379642c80d09d2a1e5e2d16 refs/tags/v0.0.37\n003fe97c6ed41ae435991f2c4c1faaa0e72ad7b35c67 refs/tags/v0.0.38\n003e01509d00409c556c331bb278269c6ca770eb7c52 refs/tags/v0.0.4\n00413eb8f48d22cac58d8ba42237cb2227ef90bfce08 refs/tags/v0.0.4^{}\n003eff03e74259efab829557d0b3c15d6c76b9458262 refs/tags/v0.0.5\n003e20668e724eed5fffd23968793aee0592babac2ab refs/tags/v0.0.6\n0041641859e5e6bad88afab83a4a3e94903ed1d8e10b refs/tags/v0.0.6^{}\n003e6dedfbd21a0633055a93c05cc8b4b5cd89f2b708 refs/tags/v0.0.7\n003e4606f7652aba2b7e8d7c70eb0aa6cd75226f4d83 refs/tags/v0.0.8\n0041025860fcfb6af84739a924ff49bcbda036855b1a refs/tags/v0.0.8^{}\n003e6e90dfd7573404a225888071ecaa572882b4e45c refs/tags/v0.0.9\n0041af4d84a6a9fa7a74acdad07fddf9f17ff3a974ae refs/tags/v0.0.9^{}\n003edba5b92408549e55c36e16c89e2b4a4e4cbc8c8f refs/tags/v0.1.0\n003eead78cc511ca6d350f284d73c13d766d9f41cfeb refs/tags/v0.2.0\n003e408df195780cbae3b120a9a2571c2df18eec27eb refs/tags/v0.2.1\n003eed74a9b58a6972e80add8d0760f55d5fc06894d6 refs/tags/v0.3.0\n003ed436262a2a0ef3bc44909ea87b135f1970fd75c4 refs/tags/v0.4.0\n003e1969c1687c97e2cb170102d18c9c8edf78d54783 refs/tags/v0.5.0\n003e00b801bb6616cebdf7dc076023bf2377b2d068b1 refs/tags/v0.5.1\n003ee0df47b3d96529f2df5c1fec9ab30f490393643e refs/tags/v0.6.0\n003e195ebf097f6e1657e043bfe38f8362db6d72b9a6 refs/tags/v0.6.1\n003eba1f617d497da6500839c2d4c6b0d083bfc1f810 refs/tags/v0.7.0\n003e2e3404b7c08b93068ed7a542c0185e07251d67e6 refs/tags/v0.7.1\n003ef671d3de67fe7e2b14de73c350742ddfe680f14b refs/tags/v0.7.2\n003ecdfaa361f12e055c25fb7ca0cec1d506643870a8 refs/tags/v0.8.0\n003ec82c412ef205ea12acfb334221d21aaa9f448c1a refs/tags/v0.8.1\n0000',
+      status: 200,
+      headers: {
+        Server: 'GitHub Babel 2.0',
+        'Content-Type': 'application/x-git-upload-pack-advertisement',
+        'Transfer-Encoding': 'chunked',
+        Expires: 'Fri, 01 Jan 1980 00:00:00 GMT',
+        Pragma: 'no-cache',
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+        Vary: 'Accept-Encoding',
+        'X-GitHub-Request-Id': 'E867:1D72C:1AB044:30260D:5A961FDB',
+        'X-Frame-Options': 'DENY',
+        Connection: 'close'
+      },
+      includeContentLength: false
+    })
 
+    // Test
     let remote = await getRemoteInfo({
-      url: 'http://example.localhost/isomorphic-git.git'
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git'
     })
     // Note: we don't compare 'remote' in its entireity because
     // remote.capabilities includes the useragent of "git" which
