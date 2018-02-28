@@ -14,7 +14,7 @@ module.exports = function (config) {
     frameworks: ['browserify', 'jasmine'],
     // list of files / patterns to load in the browser
     files: [
-      '__tests__/*.spec.js',
+      '__tests__/*!(server).js',
       {
         pattern: '__tests__/__fixtures__/**/*',
         served: true,
@@ -33,7 +33,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '__tests__/*.spec.js': ['browserify']
+      '__tests__/*!(server).js': ['browserify']
     },
     // web server port
     port: 9876,

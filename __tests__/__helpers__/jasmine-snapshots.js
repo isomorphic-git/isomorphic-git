@@ -1,9 +1,9 @@
 /* globals jasmine describe it expect */
 const { assertSnapshot } = require('./assertSnapshot')
 
+// Jest has a toMatchSnapshot() matcher built in, so we only
+// need to run this polyfill if jest is undefined.
 module.exports = snapshots => {
-  // if (typeof jest === 'undefined' && jasmine) {
-
   /**
    * A fake reporter that lets us keep track of the current test name.
    */
@@ -11,8 +11,7 @@ module.exports = snapshots => {
   let currentSpecName = null
   const SnapshotReporter = {
     suiteStarted (meta) {
-      // console.log(meta.description)
-      // console.log(meta.fullName)
+      // console.log(meta.description, meta.fullName)
     },
     specStarted (meta) {
       // console.log(meta.description)
@@ -26,8 +25,8 @@ module.exports = snapshots => {
     }
   }
 
-  const customMatchers = snapshots => ({
-    toMatchSnapshot2 (util, customEqualityTesters) {
+  const customMatchers = snapshots => {
+    function toMatchSnapshot (util, customEqualityTesters) {
       return {
         compare (actual) {
           snapshotCounts[currentSpecName] =
@@ -51,11 +50,18 @@ module.exports = snapshots => {
         }
       }
     }
-  })
+    if (typeof jest === 'undefined' && typeof jasmine !== 'undefined') {
+      return {
+        toMatchSnapshot,
+        toMatchSnapshot2: toMatchSnapshot
+      }
+    } else if (typeof jest !== 'undefined') {
+      return {
+        toMatchSnapshot2: toMatchSnapshot
+      }
+    }
+  }
 
   jasmine.getEnv().addReporter(SnapshotReporter)
-  // jasmine.getEnv().beforeEach(() => {
   jasmine.addMatchers(customMatchers(snapshots))
-  // })
-  // }
 }

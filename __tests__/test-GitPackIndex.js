@@ -1,13 +1,18 @@
-/* globals describe test expect */
+/* globals describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
 const pify = require('pify')
 const shasum = require('shasum')
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-import { models } from 'isomorphic-git/internal-apis'
-const { FileSystem, GitPackIndex, GitObject } = models
+const { models } = require('isomorphic-git/internal-apis')
+const { GitPackIndex, GitObject } = models
 
 describe('GitPackIndex', () => {
-  test('from .idx', async () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+  it('from .idx', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
@@ -25,7 +30,7 @@ describe('GitPackIndex', () => {
     expect(p.offsets['43c49edb213748626fc363c890c01a9e55a1b8da']).toEqual(38202)
     expect(p.offsets['5f1f014326b1d7e8079d00b87fa7a9913bd91324']).toEqual(20855)
   })
-  test('from .pack', async () => {
+  it('from .pack', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
     let pack = await pify(fs.readFile)(
       path.join(
@@ -44,7 +49,7 @@ describe('GitPackIndex', () => {
     expect(p.offsets['5f1f014326b1d7e8079d00b87fa7a9913bd91324']).toEqual(20855)
   })
 
-  test('to .idx file', async () => {
+  it('to .idx file', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
@@ -57,7 +62,7 @@ describe('GitPackIndex', () => {
     expect(idxbuffer.byteLength).toBe(idx.byteLength)
     expect(idxbuffer.equals(idx)).toBe(true)
   })
-  test('to .idx file from .pack', async () => {
+  it('to .idx file from .pack', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
@@ -77,7 +82,7 @@ describe('GitPackIndex', () => {
     expect(idxbuffer.equals(idx)).toBe(true)
   })
 
-  test('read undeltified object', async () => {
+  it('read undeltified object', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
@@ -101,7 +106,7 @@ describe('GitPackIndex', () => {
     let { oid } = GitObject.wrap({ type, object })
     expect(oid).toBe('637c4e69d85e0dcc18898ec251377453d0891585')
   })
-  test('read deltified object', async () => {
+  it('read deltified object', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(

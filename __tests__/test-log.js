@@ -1,8 +1,13 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-import { log } from 'isomorphic-git'
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
+const snapshots = require('./__snapshots__/test-log.js.snap')
+const { log } = require('isomorphic-git')
 
 describe('log', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
   it('HEAD', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
     let commits = await log({ fs, gitdir, ref: 'HEAD' })
