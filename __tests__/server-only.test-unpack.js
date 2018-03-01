@@ -1,17 +1,22 @@
 /* global describe it expect */
 const path = require('path')
+const pify = require('pify')
 const { makeFixture } = require('./__helpers__/FixtureFS')
-const { unpack, managers } = require('isomorphic-git/internal-apis')
+const { unpack, managers, models } = require('isomorphic-git/internal-apis')
 const { init } = require('isomorphic-git')
 const { GitObjectManager } = managers
+const { FileSystem } = models
+const toStream = require('buffer-to-stream')
 
 describe('unpack', () => {
   it('unpack', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-pack')
+    let { fs, dir, gitdir } = await makeFixture('test-unpack')
     await init({ fs, dir })
-    let fixture = fs.createReadStream(
-      path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
-    )
+    const _fs = new FileSystem(fs)
+    // yes this is a little awkward, but BrowserFS doesn't implement fs.createReadStream at this time
+    let fixture = process.browser
+      ? toStream(await _fs.read(path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')))
+      : fs.createReadStream(path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack'))
     await unpack({ fs, dir, gitdir, inputStream: fixture })
     const oids = [
       '5a9da3272badb2d3c8dbab463aed5741acb15a33',
@@ -29,7 +34,7 @@ describe('unpack', () => {
     ]
     for (let oid of oids) {
       let filepath = path.join(gitdir, 'objects', oid.slice(0, 2), oid.slice(2))
-      let e = fs.existsSync(filepath)
+      let e = await _fs.exists(filepath)
       expect(e).toBe(true)
       let { type, object } = await GitObjectManager.read({
         fs,
