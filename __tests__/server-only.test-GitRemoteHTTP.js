@@ -15,7 +15,9 @@ describe('GitRemoteHTTP', () => {
   })
   it('preparePull (Github response)', async () => {
     // Setup
-    let { nockDone } = await nockBack('GitRemoteHTTP - preparePull (Github response).json')
+    let { nockDone } = await nockBack(
+      'GitRemoteHTTP - preparePull (Github response).json'
+    )
     // Test
     let remote = new GitRemoteHTTP(
       'https://github.com/isomorphic-git/isomorphic-git'
@@ -30,7 +32,9 @@ describe('GitRemoteHTTP', () => {
 
   it('preparePull (mock response)', async () => {
     // Setup
-    let { nockDone } = await nockBack('GitRemoteHTTP - preparePull (mock response).json')
+    let { nockDone } = await nockBack(
+      'GitRemoteHTTP - preparePull (mock response).json'
+    )
     // Test
     let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
     await remote.preparePull()
@@ -41,7 +45,9 @@ describe('GitRemoteHTTP', () => {
 
   it('preparePush (mock response)', async () => {
     // Setup
-    let { nockDone } = await nockBack('GitRemoteHTTP - preparePush (mock response).json')
+    let { nockDone } = await nockBack(
+      'GitRemoteHTTP - preparePush (mock response).json'
+    )
     // Test
     let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
     await remote.preparePush()
