@@ -1,9 +1,9 @@
-/* global test describe expect */
-import { models } from 'isomorphic-git/internal-apis'
+/* global describe it expect */
+const { models } = require('isomorphic-git/internal-apis')
 const { GitRefSpecSet } = models
 
 describe('GitRefSpecSet', () => {
-  test('fetch = +refs/heads/*:refs/remotes/origin/*', async () => {
+  it('fetch = +refs/heads/*:refs/remotes/origin/*', async () => {
     const refspec = GitRefSpecSet.from(['+refs/heads/*:refs/remotes/origin/*'])
     const result = refspec.translate([
       'refs/heads/master',
@@ -15,7 +15,7 @@ describe('GitRefSpecSet', () => {
     ])
   })
 
-  test('fetch = refs/heads/master:refs/foo/master', async () => {
+  it('fetch = refs/heads/master:refs/foo/master', async () => {
     const refspec = new GitRefSpecSet()
     refspec.add('+refs/heads/*:refs/remotes/origin/*')
     refspec.add('refs/heads/master:refs/foo/master')

@@ -1,10 +1,17 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-import { listObjects } from 'isomorphic-git/internal-apis'
+const snapshots = require('./__snapshots__/test-listObjects.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
+const { listObjects } = require('isomorphic-git/internal-apis')
 
 describe('listObjects', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
   it('listObjects', async () => {
+    // Setup
     let { fs, gitdir } = await makeFixture('test-listObjects')
+    // Test
     let objects = await listObjects({
       fs,
       gitdir,

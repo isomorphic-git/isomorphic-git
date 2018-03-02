@@ -138,7 +138,7 @@ export class FileSystem {
       )
     }
     try {
-      await this.mkdir(`${filename}.lock`)
+      await this._mkdir(`${filename}.lock`)
     } catch (err) {
       if (err.code === 'EEXIST') {
         await sleep(100)

@@ -1,8 +1,9 @@
 /* global describe it expect */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
+const pify = require('pify')
 const stream = require('stream')
-const streamEqual = require('stream-equal')
+const concat = require('simple-concat')
 
 const { pack } = require('isomorphic-git/internal-apis')
 
@@ -11,7 +12,7 @@ describe('pack', () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-pack')
     // Test
-    let fixture = fs.createReadStream(
+    let fixture = await pify(fs.readFile)(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
     let fstream = new stream.PassThrough()
@@ -34,7 +35,7 @@ describe('pack', () => {
         '5477471ab5a6a8f2c217023532475044117a8f2c'
       ]
     })
-    let areEqual = await streamEqual(fixture, fstream)
-    expect(areEqual).toBe(true)
+    let result = await pify(concat)(fstream)
+    expect(fixture.buffer).toEqual(result.buffer)
   })
 })

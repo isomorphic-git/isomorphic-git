@@ -1,36 +1,37 @@
-/* global test describe expect */
-import fs from 'fs'
-import { log } from 'isomorphic-git'
+/* global describe it expect */
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
+const snapshots = require('./__snapshots__/test-log.js.snap')
+const { log } = require('isomorphic-git')
 
-/** @test {log} */
 describe('log', () => {
-  test('HEAD', async () => {
-    let gitdir = '__tests__/__fixtures__/test-log.git'
-    let repo = { fs, gitdir }
-    let commits = await log({ ...repo, ref: 'HEAD' })
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+  it('HEAD', async () => {
+    let { fs, gitdir } = await makeFixture('test-log')
+    let commits = await log({ fs, gitdir, ref: 'HEAD' })
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
   })
-  test('HEAD depth', async () => {
-    let gitdir = '__tests__/__fixtures__/test-log.git'
-    let repo = { fs, gitdir }
-    let commits = await log({ ...repo, ref: 'HEAD', depth: 1 })
+  it('HEAD depth', async () => {
+    let { fs, gitdir } = await makeFixture('test-log')
+    let commits = await log({ fs, gitdir, ref: 'HEAD', depth: 1 })
     expect(commits.length).toBe(1)
   })
-  test('HEAD since', async () => {
-    let gitdir = '__tests__/__fixtures__/test-log.git'
-    let repo = { fs, gitdir }
+  it('HEAD since', async () => {
+    let { fs, gitdir } = await makeFixture('test-log')
     let commits = await log({
-      ...repo,
+      fs,
+      gitdir,
       ref: 'HEAD',
       since: new Date(1501462174000)
     })
     expect(commits.length).toBe(2)
   })
-  test('test-branch', async () => {
-    let gitdir = '__tests__/__fixtures__/test-log.git'
-    let repo = { fs, gitdir }
-    let commits = await log({ ...repo, ref: 'origin/test-branch' })
+  it('test-branch', async () => {
+    let { fs, gitdir } = await makeFixture('test-log')
+    let commits = await log({ fs, gitdir, ref: 'origin/test-branch' })
     expect(commits).toMatchSnapshot()
   })
 })
