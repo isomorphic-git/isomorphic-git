@@ -53,7 +53,13 @@ module.exports = {
                      -o dist/service-worker-bundle.umd.min.js`
     },
     test: {
-      default: series.nps('lint', 'test.jest', 'build', 'test.jasmine', 'test.karma'),
+      // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
+      // But by default, we skip 'jest' because I decided to make it an optionalDependency after it was
+      // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
+      // and no one should be required to install Python and a C++ compiler to contribute to this code.
+      default: process.env.CI
+        ? series.nps('lint', 'test.jest', 'build', 'test.jasmine', 'test.karma')
+        : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
       jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine --reporter=jasmine-console-reporter'),
       jest: process.env.CI
         ? retry3('timeout --signal=KILL 5m jest --ci --coverage && codecov')

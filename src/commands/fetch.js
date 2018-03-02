@@ -5,11 +5,7 @@ import pify from 'pify'
 import concat from 'simple-concat'
 import split2 from 'split2'
 import { config } from './config'
-import {
-  GitRemoteHTTP,
-  GitRefManager,
-  GitShallowManager
-} from '../managers'
+import { GitRemoteHTTP, GitRefManager, GitShallowManager } from '../managers'
 import { FileSystem, GitPktLine } from '../models'
 import { pkg } from '../utils'
 
