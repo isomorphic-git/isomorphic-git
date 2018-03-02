@@ -5,7 +5,8 @@ Object {
   "heads": Object {
     "develop": "beca08a8a8878ef5875c0c9e747097e183750250",
     "dist": "a2dd810e222b7b02fc53760037d9928cb97c645d",
-    "master": "195ebf097f6e1657e043bfe38f8362db6d72b9a6",
+    "jasmine-npm": "869287d8713c8e6f20c6cf928c14f1ceb4a8c04a",
+    "master": "c82c412ef205ea12acfb334221d21aaa9f448c1a",
     "test-branch": "e10ebb90d03eaacca84de1af0a59b444232da99e",
     "test-branch-shallow-clone": "92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e",
   },
@@ -109,6 +110,30 @@ Object {
     "70": Object {
       "head": "229833f020442f51a7faf7fe687b7c61f238d67d",
     },
+    "71": Object {
+      "head": "075c934bc59fc3403585b010b9410f9c1773344b",
+    },
+    "72": Object {
+      "head": "5d193e5eba143ef0643f84304616f39e7915da33",
+    },
+    "73": Object {
+      "head": "99b7b122983949ba77e9e990b13aa3fdfa946c6b",
+    },
+    "74": Object {
+      "head": "1578c6924ca9f23ea399b298fb76501864d347c8",
+    },
+    "75": Object {
+      "head": "6f23c5b3ea3d89cca88f131cbf66c37807ed70d8",
+    },
+    "76": Object {
+      "head": "14c431412f4874457030659f5be42c37c79e7061",
+    },
+    "77": Object {
+      "head": "73236c17580c9717265613c4bf410f33271b3c8e",
+    },
+    "79": Object {
+      "head": "e8bfde7ed6a28654ae03492927a2d96eb1bdfc38",
+    },
   },
   "tags": Object {
     "test-tag": "1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9",
@@ -181,6 +206,11 @@ Object {
     "v0.5.1": "00b801bb6616cebdf7dc076023bf2377b2d068b1",
     "v0.6.0": "e0df47b3d96529f2df5c1fec9ab30f490393643e",
     "v0.6.1": "195ebf097f6e1657e043bfe38f8362db6d72b9a6",
+    "v0.7.0": "ba1f617d497da6500839c2d4c6b0d083bfc1f810",
+    "v0.7.1": "2e3404b7c08b93068ed7a542c0185e07251d67e6",
+    "v0.7.2": "f671d3de67fe7e2b14de73c350742ddfe680f14b",
+    "v0.8.0": "cdfaa361f12e055c25fb7ca0cec1d506643870a8",
+    "v0.8.1": "c82c412ef205ea12acfb334221d21aaa9f448c1a",
   },
 }
 `;

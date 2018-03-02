@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const pify = require('pify')
 const path = require('path')
 
-const { init, add, commit } = require('..')
+const { init, add, commit } = require('isomorphic-git')
 
 describe('basic test', () => {
   it('does not explode', async () => {

@@ -1,6 +1,8 @@
 const path = require('path')
 const _fs = require('fs')
 const pify = require('pify')
+const setTestTimeout = require('./set-test-timeout')
+setTestTimeout(60000)
 
 const FixtureFS = async function () {
   // This is all in a conditional so that Jest won't attempt to
@@ -36,7 +38,6 @@ async function makeFixture (dir) {
 
 async function makeBrowserFixture (dir) {
   localStorage.debug = 'isomorphic-git'
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
 
   const { fs, writable, readable } = await FixturePromise
   writable.empty()
@@ -57,7 +58,6 @@ async function makeBrowserFixture (dir) {
 }
 
 async function makeNodeFixture (fixture) {
-  jest.setTimeout(60000)
   const {
     getFixturePath,
     createTempDir,
