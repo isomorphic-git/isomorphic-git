@@ -91,6 +91,16 @@ export class GitRefManager {
       }
     }
   }
+  // TODO: make this less crude?
+  static async writeRef ({ fs: _fs, gitdir, ref, value }) {
+    const fs = new FileSystem(_fs)
+    // Validate input
+    if (!value.match(/[0-9a-f]{40}/)) {
+      throw new Error(`Unexpected ref contents: '${value}'`)
+    }
+    const normalizeValue = value => value.trim() + '\n'
+    await fs.write(path.join(gitdir, ref), normalizeValue(value), 'utf8')
+  }
   static async resolve ({ fs: _fs, gitdir, ref, depth }) {
     const fs = new FileSystem(_fs)
     if (depth !== undefined) {
