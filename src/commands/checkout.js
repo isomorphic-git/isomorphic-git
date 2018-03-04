@@ -42,21 +42,6 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
   }
 }
 
-/**
- * Checkout a branch
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} [args.remote='origin'] - What to name the remote that is created. The default is 'origin'.
- * @param {string} [args.ref=undefined] - Which branch to clone. By default this is the designated "main branch" of the repository.
- * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete.
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- * await git.checkout({...repo, ref: '<@master@>'})
- * console.log('done')
- */
 export async function checkout ({
   dir,
   gitdir = path.join(dir, '.git'),

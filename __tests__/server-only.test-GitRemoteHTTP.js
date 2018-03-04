@@ -3,19 +3,18 @@ const server = require('./__helpers__/http-backend')
 const { managers } = require('isomorphic-git/internal-apis')
 const { GitRemoteHTTP } = managers
 
-const nockBack = require('nock').back
+const nock = require('nock')
 const path = require('path')
 
 const { get } = server('__tests__/__fixtures__')
 
 describe('GitRemoteHTTP', () => {
   beforeAll(() => {
-    nockBack.fixtures = path.join(__dirname, '__nockbacks__')
-    nockBack.setMode('record')
+    nock.back.fixtures = path.join(__dirname, '__nockbacks__')
   })
   it('preparePull (Github response)', async () => {
     // Setup
-    let { nockDone } = await nockBack(
+    let { nockDone } = await nock.back(
       'GitRemoteHTTP - preparePull (Github response).json'
     )
     // Test
@@ -32,7 +31,7 @@ describe('GitRemoteHTTP', () => {
 
   it('preparePull (mock response)', async () => {
     // Setup
-    let { nockDone } = await nockBack(
+    let { nockDone } = await nock.back(
       'GitRemoteHTTP - preparePull (mock response).json'
     )
     // Test
@@ -45,7 +44,7 @@ describe('GitRemoteHTTP', () => {
 
   it('preparePush (mock response)', async () => {
     // Setup
-    let { nockDone } = await nockBack(
+    let { nockDone } = await nock.back(
       'GitRemoteHTTP - preparePush (mock response).json'
     )
     // Test

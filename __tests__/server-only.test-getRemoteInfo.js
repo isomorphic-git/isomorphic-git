@@ -1,7 +1,7 @@
 /* global describe it expect */
 const snapshots = require('./__snapshots__/server-only.test-getRemoteInfo.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const nockBack = require('nock').back
+const nock = require('nock')
 const path = require('path')
 
 const { getRemoteInfo } = require('isomorphic-git')
@@ -10,13 +10,12 @@ const { getRemoteInfo } = require('isomorphic-git')
 describe('getRemoteInfo', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
-    nockBack.fixtures = path.join(__dirname, '__nockbacks__')
-    nockBack.setMode('record')
+    nock.back.fixtures = path.join(__dirname, '__nockbacks__')
   })
 
   it('getRemoteInfo', async () => {
     // Setup
-    let { nockDone } = await nockBack('getRemoteInfo - getRemoteInfo.json')
+    let { nockDone } = await nock.back('getRemoteInfo - getRemoteInfo.json')
     // Test
     let remote = await getRemoteInfo({
       url: 'https://github.com/isomorphic-git/isomorphic-git.git'

@@ -1,0 +1,63 @@
+[
+    {
+        "scope": "https://github.com:443",
+        "method": "GET",
+        "path": "/wmhilton/test.empty.git/info/refs?service=git-upload-pack",
+        "body": "",
+        "status": 200,
+        "response": "001e# service=git-upload-pack\n000001065a8905a02e181fe1821068b8c0f48cb6633d5b81 HEAD\u0000multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/test agent=git/github-g8e539663647e\n003f97c024f73eaab2781bf3691597bc7c833cb0e22f refs/heads/master\n003d5a8905a02e181fe1821068b8c0f48cb6633d5b81 refs/heads/test\n0000",
+        "rawHeaders": [
+            "Server",
+            "GitHub Babel 2.0",
+            "Content-Type",
+            "application/x-git-upload-pack-advertisement",
+            "Transfer-Encoding",
+            "chunked",
+            "Expires",
+            "Fri, 01 Jan 1980 00:00:00 GMT",
+            "Pragma",
+            "no-cache",
+            "Cache-Control",
+            "no-cache, max-age=0, must-revalidate",
+            "Vary",
+            "Accept-Encoding",
+            "X-GitHub-Request-Id",
+            "FBC0:1D72C:326EA37:5ACB1B7:5A9B44B3",
+            "X-Frame-Options",
+            "DENY",
+            "Connection",
+            "close"
+        ]
+    },
+    {
+        "scope": "https://github.com:443",
+        "method": "POST",
+        "path": "/wmhilton/test.empty.git/git-upload-pack",
+        "body": "009awant 5a8905a02e181fe1821068b8c0f48cb6633d5b81 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/isomorphic-git@0.0.0-development\n0032want 97c024f73eaab2781bf3691597bc7c833cb0e22f\n0032want 5a8905a02e181fe1821068b8c0f48cb6633d5b81\n00000032have 5a8905a02e181fe1821068b8c0f48cb6633d5b81\n00000009done\n",
+        "status": 200,
+        "responseIsBinary": true,
+        "response": "3030333841434b203561383930356130326531383166653138323130363862386330663438636236363333643562383120636f6d6d6f6e0a3030333741434b20356138393035613032653138316665313832313036386238633066343863623636333364356238312072656164790a303030384e414b0a3030333141434b20356138393035613032653138316665313832313036386238633066343863623636333364356238310a3030323002436f756e74696e67206f626a656374733a20362c20646f6e652e0a30316463015041434b00000002000000069a0d789c958b410a02310c00ef7d453ee09296b64941441fe0cd0fb469160557971a619fef7ec1b90c0c8c0d55a8541b72150a44895959a495160246ea595ba3e4bb2ace6ead435f06c2213149a1a63c97ea11995341c52ca5e34c99b42789d5d5afdddf03ae63829b7e0c8ecbb0dd67ddeab23e7592f772029f30638cbe0438e08edbebf230d3bf4777e95d3bc8649bb91ff4e840fc9a0d789c958b5d0ac2301084df738abd8065b7dba42948d103f8e605f2b341c1d81257e8f1cd159c8719f8f8469b08e09867a1d9fac9b1902f0b4be2422922597248c9270c89c9eca1c95bc106bfa00d3876994aaf91d0f9d8ad32f9149d63ce367a32e1ab8fadc1ad0d70978fc2b936ed7b9123d4fd2543daea0a64d121cf0b229cb0c7745a9faaf2f7d15c73960c71d043cd0fe8493f7236789c2bcf2fca4951040008f0024aa306789c3334303033315148d42ba928617899ca5275fd68456a934ded4c6d5996bc6579f72b0c210a92c00a4ebabc3ed4cf5a2cf7b5634dd20c8fe8a52ff69bb3401524831570fc5a7da7427bd2c317970bff5eb43638b0f8ab5b1900492c294033789c535454040000c90064646d789c4b769ae0040003b80178afd7b9413fb58af7518b71b07f34a586ad997e3030336102546f74616c2036202864656c74612030292c207265757365642030202864656c74612030292c207061636b2d72657573656420360a30303036010130303030",
+        "rawHeaders": [
+            "Server",
+            "GitHub Babel 2.0",
+            "Content-Type",
+            "application/x-git-upload-pack-result",
+            "Transfer-Encoding",
+            "chunked",
+            "Expires",
+            "Fri, 01 Jan 1980 00:00:00 GMT",
+            "Pragma",
+            "no-cache",
+            "Cache-Control",
+            "no-cache, max-age=0, must-revalidate",
+            "Vary",
+            "Accept-Encoding",
+            "X-GitHub-Request-Id",
+            "FBC1:1D72C:326EA42:5ACB1E0:5A9B44B3",
+            "X-Frame-Options",
+            "DENY",
+            "Connection",
+            "close"
+        ]
+    }
+]
