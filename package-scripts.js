@@ -21,6 +21,7 @@ module.exports = {
       default: series.nps('build.rollup', 'build.browserify'),
       rollup: 'rollup -c',
       browserify: concurrent.nps('build.sw', 'build.umd', 'build.internalApis'),
+      indexjson: `node __tests__/__helpers__/make_http_index.js`,
       discify: `browserify \
             --entry dist/for-browserify/index.js \
             --standalone git \
