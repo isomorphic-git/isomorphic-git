@@ -13,13 +13,16 @@ describe('merge', () => {
       gitdir,
       ref: 'master'
     })
-    await merge({
+    let m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'master',
       fastForwardOnly: true
     })
+    expect(m.oid).toEqual(desiredOid)
+    expect(m.alreadyMerged).toBeTruthy()
+    expect(m.fastForward).toBeFalsy()
     let oid = await resolveRef({
       fs,
       gitdir,
@@ -36,13 +39,16 @@ describe('merge', () => {
       gitdir,
       ref: 'medium'
     })
-    await merge({
+    let m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'medium',
       fastForwardOnly: true
     })
+    expect(m.oid).toEqual(desiredOid)
+    expect(m.alreadyMerged).toBeTruthy()
+    expect(m.fastForward).toBeFalsy()
     let oid = await resolveRef({
       fs,
       gitdir,
@@ -59,13 +65,16 @@ describe('merge', () => {
       gitdir,
       ref: 'master'
     })
-    await merge({
+    let m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'oldest',
       fastForwardOnly: true
     })
+    expect(m.oid).toEqual(desiredOid)
+    expect(m.alreadyMerged).toBeTruthy()
+    expect(m.fastForward).toBeFalsy()
     let oid = await resolveRef({
       fs,
       gitdir,
@@ -82,13 +91,16 @@ describe('merge', () => {
       gitdir,
       ref: 'newest'
     })
-    await merge({
+    let m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'newest',
       fastForwardOnly: true
     })
+    expect(m.oid).toEqual(desiredOid)
+    expect(m.alreadyMerged).toBeFalsy()
+    expect(m.fastForward).toBeTruthy()
     let oid = await resolveRef({
       fs,
       gitdir,

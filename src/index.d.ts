@@ -73,6 +73,12 @@ export interface RemoteDescription {
   }
 }
 
+export interface MergeReport {
+  oid: string,
+  createdMergeCommit?: boolean,
+  fastForward?: boolean
+}
+
 /*~ If this module has methods, declare them as functions like so.
  */
 export async function add(args: {
@@ -201,6 +207,27 @@ export async function log(args: {
   depth?: number,
   since?: Date
 }): Promise<Array<CommitDescription>>
+
+export async function merge(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  ours: string,
+  theirs: string,
+  fastForwardOnly?: boolean
+}): Promise<MergeReport>;
+
+export async function pull(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  ref?: string,
+  singleBranch?: boolean,
+  fastForwardOnly?: boolean,
+  authUsername?: string,
+  authPassword?: string,
+  emitter?: EventEmitter
+}): Promise<void>;
 
 export async function push(args: {
   fs: any,
