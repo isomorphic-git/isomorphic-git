@@ -80,7 +80,8 @@ export async function fetch ({
   )
   // TODO: Return more metadata?
   return {
-    defaultBranch: response.HEAD
+    defaultBranch: response.HEAD,
+    fetchHead: response.FETCH_HEAD
   }
 }
 
@@ -218,5 +219,6 @@ async function fetchPackfile ({
   )
   // We need this value later for the `clone` command.
   response.HEAD = remoteHTTP.symrefs.get('HEAD')
+  response.FETCH_HEAD = oid
   return response
 }
