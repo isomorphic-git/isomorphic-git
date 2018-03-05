@@ -12,7 +12,7 @@ export async function pull ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   ref,
-  fastForwardOnly = true,
+  fastForwardOnly = false,
   emitter,
   authUsername,
   authPassword,
