@@ -49,3 +49,5 @@ Array [
   "test/snapshots/resolveRef.js.snap",
 ]
 `;
+
+exports[`checkout checkout unfetched branch 1`] = `"Failed to checkout ref 'missing-branch' because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally."`;
