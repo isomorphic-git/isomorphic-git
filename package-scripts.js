@@ -2,13 +2,15 @@
 // It's like package.json scripts, but more flexible.
 const { concurrent, series, runInNewWindow } = require('nps-utils')
 
-const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
+const retry = n => cmd =>
+  Array(n)
+    .fill(`(${cmd})`)
+    .join(` || `)
 const retry3 = retry(3)
 
 module.exports = {
   scripts: {
-    format:
-      'prettier-standard src/**/*.js __tests__/**/*.js',
+    format: retry3('prettier-standard *.js src/**/*.js __tests__/**/*.js'),
     lint: 'standard src/**/*.js',
     toc: 'doctoc --maxlevel=2 README.md',
     watch: {
@@ -18,7 +20,11 @@ module.exports = {
       karma: runInNewWindow('karma start')
     },
     build: {
-      default: series.nps('build.rollup', 'build.browserify'),
+      default: series.nps(
+        'build.rollup',
+        'build.browserify',
+        'build.indexjson'
+      ),
       rollup: 'rollup -c',
       browserify: concurrent.nps('build.sw', 'build.umd', 'build.internalApis'),
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
@@ -61,7 +67,9 @@ module.exports = {
       default: process.env.CI
         ? series.nps('lint', 'test.jest', 'build', 'test.jasmine', 'test.karma')
         : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
-      jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine --reporter=jasmine-console-reporter'),
+      jasmine: retry3(
+        'cross-env NODE_PATH=./dist/for-node jasmine --reporter=jasmine-console-reporter'
+      ),
       jest: process.env.CI
         ? retry3('timeout --signal=KILL 5m jest --ci --coverage && codecov')
         : 'jest --ci',
