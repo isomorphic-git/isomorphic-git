@@ -40,7 +40,8 @@
   "homepage": "https://isomorphic-git.github.io/",
   "files": [
     "dist",
-    "cli.js"
+    "cli.js",
+    "src/index.d.ts"
   ],
   "dependencies": {
     "async-lock": "^1.1.0",
