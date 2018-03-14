@@ -4,9 +4,7 @@ module.exports = function (config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [
-      'FirefoxHeadless'
-    ],
+    browsers: ['FirefoxHeadless'],
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
     // frameworks to use
@@ -83,9 +81,7 @@ module.exports = function (config) {
       },
       FirefoxHeadless: {
         base: 'Firefox',
-        flags: [
-          '-headless'
-        ]
+        flags: ['-headless']
       }
     },
     sauceLabs: {
@@ -111,13 +107,16 @@ module.exports = function (config) {
   }
 
   if (!process.env.SAUCE_USERNAME) {
-    console.log('Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.')
+    console.log(
+      'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
+    )
   } else if (!process.env.SAUCE_ACCESS_KEY) {
-    console.log('Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.')
+    console.log(
+      'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
+    )
   } else {
     options.browsers = options.browsers.concat(
-      Object.keys(options.customLaunchers)
-        .filter(x => x.startsWith('sl_'))
+      Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
     )
     options.reporters.push('saucelabs')
   }
