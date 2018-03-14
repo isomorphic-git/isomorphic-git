@@ -1,7 +1,10 @@
 linters:
-  shellcheck:
-    shell: bash
+  standardjs:
+fixers:
+  enable: true
 files:
   ignore:
-    - 'bower_components/*'
     - 'node_modules/*'
+    - '__tests__/__fixtures__/*'
+    - '__tests__/__snapshots__/*'
+    - '__tests__/__nockbacks__/*'
