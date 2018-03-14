@@ -18,6 +18,7 @@
   },
   "scripts": {
     "start": "nps",
+    "format": "nps format",
     "test": "nps test",
     "precommit": "ban",
     "prepush": "nps lint",
@@ -40,7 +41,8 @@
   "homepage": "https://isomorphic-git.github.io/",
   "files": [
     "dist",
-    "cli.js"
+    "cli.js",
+    "src/index.d.ts"
   ],
   "dependencies": {
     "async-lock": "^1.1.0",
@@ -109,7 +111,7 @@
   "optionalDependencies": {
     "codecov": "^3.0.0",
     "jest": "^22.0.4",
-    "semantic-release": "^12.2.2",
+    "semantic-release": "^15.0.0",
     "travis-deploy-once": "^4.3.1"
   },
   "browserify": {

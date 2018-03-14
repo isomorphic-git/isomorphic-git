@@ -1,0 +1,10 @@
+linters:
+  standardjs:
+fixers:
+  enable: true
+files:
+  ignore:
+    - 'node_modules/*'
+    - '__tests__/__fixtures__/*'
+    - '__tests__/__snapshots__/*'
+    - '__tests__/__nockbacks__/*'
