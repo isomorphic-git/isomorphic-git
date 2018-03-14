@@ -1,4 +1,4 @@
-import { EventEmitter } from "@types/events";
+import { EventEmitter } from "events";
 
 // Type definitions for isomorphic-git 0.x.x
 // Project: isomorphic-git
@@ -81,14 +81,14 @@ export interface MergeReport {
 
 /*~ If this module has methods, declare them as functions like so.
  */
-export async function add(args: {
+export function add(args: {
   fs: any,
   dir: string,
   gitdir?: string,
   filepath: string
 }): Promise<void>;
 
-export async function checkout(args: {
+export function checkout(args: {
   fs: any,
   dir: string,
   gitdir?: string,
@@ -96,7 +96,7 @@ export async function checkout(args: {
   ref?: string
 }): Promise<void>;
 
-export async function clone(args: {
+export function clone(args: {
   fs: any,
   dir: string,
   gitdir?: string,
@@ -113,7 +113,7 @@ export async function clone(args: {
   singleBranch?: boolean
 }): Promise<void>;
 
-export async function commit(args: {
+export function commit(args: {
   fs: any,
   dir: string,
   gitdir?: string,
@@ -132,7 +132,7 @@ export async function commit(args: {
   }
 }): Promise<string>
 
-export async function config(args: {
+export function config(args: {
   fs: any,
   dir: string,
   gitdir?: string,
@@ -140,7 +140,7 @@ export async function config(args: {
   value?: string | undefined
 }): Promise<any>
 
-export async function fetch(args: {
+export function fetch(args: {
   fs: any,
   dir: string,
   gitdir?: string,
@@ -158,48 +158,48 @@ export async function fetch(args: {
   singleBranch?: boolean
 }): Promise<FetchResponse>;
 
-export async function findRoot(args: {
+export function findRoot(args: {
   fs: any,
   filepath: string
 }): Promise<string>;
 
-export async function getRemoteInfo(args: {
+export function getRemoteInfo(args: {
   url: string
 }): Promise<RemoteDescription>;
 
-export async function indexPack(args: {
+export function indexPack(args: {
   fs: any,
   dir: string,
   gitdir?: string,
   filepath: string
 }): Promise<void>
 
-export async function init(args: {
+export function init(args: {
   fs: any,
   dir: string,
   gitdir?: string
 }): Promise<void>;
 
-export async function listBranches(args: {
+export function listBranches(args: {
   fs: any,
   dir: string,
   gitdir?: string,
   remote?: string
 }): Promise<Array<string>>;
 
-export async function listFiles(args: {
+export function listFiles(args: {
   fs: any,
   dir: string,
   gitdir?: string
 }): Promise<Array<string>>;
 
-export async function listTags(args: {
+export function listTags(args: {
   fs: any,
   dir: string,
   gitdir?: string
 }): Promise<Array<string>>;
 
-export async function log(args: {
+export function log(args: {
   fs: any,
   dir: string,
   gitdir?: string
@@ -208,7 +208,7 @@ export async function log(args: {
   since?: Date
 }): Promise<Array<CommitDescription>>
 
-export async function merge(args: {
+export function merge(args: {
   fs: any,
   dir: string,
   gitdir?: string
@@ -217,7 +217,7 @@ export async function merge(args: {
   fastForwardOnly?: boolean
 }): Promise<MergeReport>;
 
-export async function pull(args: {
+export function pull(args: {
   fs: any,
   dir: string,
   gitdir?: string
@@ -229,7 +229,7 @@ export async function pull(args: {
   emitter?: EventEmitter
 }): Promise<void>;
 
-export async function push(args: {
+export function push(args: {
   fs: any,
   dir: string,
   gitdir?: string
@@ -240,7 +240,7 @@ export async function push(args: {
   authPassword?: string
 }): Promise<PushResponse>
 
-export async function readObject(args: {
+export function readObject(args: {
   fs: any,
   dir: string,
   gitdir?: string,
@@ -248,14 +248,14 @@ export async function readObject(args: {
   format: 'deflated' | 'wrapped' | 'content' | 'parsed'
 }): Promise<GitObjectDescription>
 
-export async function remove(args: {
+export function remove(args: {
   fs: any,
   dir: string,
   gitdir?: string
   filepath: string
 }): Promise<void>
 
-export async function resolveRef(args: {
+export function resolveRef(args: {
   fs: any,
   dir: string,
   gitdir?: string,
@@ -263,26 +263,26 @@ export async function resolveRef(args: {
   depth?: number
 }): Promise<string>
 
-export async function sign(args: {
+export function sign(args: {
   fs: any,
   dir: string,
   gitdir?: string
   privateKeys: string
 }): Promise<string>
 
-export async function status(args: {
+export function status(args: {
   fs: any,
   dir: string,
   gitdir?: string
   filepath: string
 }): Promise<string>
 
-export const utils = {
+export const utils: {
   auth: (username: string, password: string) => ({ username: string, password: string }),
   oauth2: (company: string, token: string) => ({ username: string, password: string })
-}
+};
 
-export async function verify(args: {
+export function verify(args: {
   fs: any,
   dir: string,
   gitdir?: string
