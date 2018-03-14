@@ -20,4 +20,15 @@ describe('checkout', () => {
     let index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchSnapshot()
   })
+
+  it('checkout unfetched branch', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    try {
+      await checkout({ fs, dir, gitdir, ref: 'missing-branch' })
+      throw new Error('Checkout should have failed.')
+    } catch (err) {
+      expect(err.message).toMatchSnapshot()
+    }
+  })
 })
