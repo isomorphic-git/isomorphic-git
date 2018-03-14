@@ -84,7 +84,12 @@ export async function checkout ({
     // Create a new branch that points at that same commit
     await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
   }
-  let commit = await GitObjectManager.read({ fs, gitdir, oid })
+  let commit = {}
+  try {
+    commit = await GitObjectManager.read({ fs, gitdir, oid })
+  } catch (err) {
+    throw new Error(`Failed to checkout ref '${ref}' because commit ${oid} is not available locally. Do a git fetch to make the branch available locally.`)
+  }
   if (commit.type !== 'commit') {
     throw new Error(`Unexpected type: ${commit.type}`)
   }
