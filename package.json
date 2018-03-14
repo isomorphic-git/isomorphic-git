@@ -18,6 +18,7 @@
   },
   "scripts": {
     "start": "nps",
+    "format": "nps format",
     "test": "nps test",
     "precommit": "ban",
     "prepush": "nps lint",
