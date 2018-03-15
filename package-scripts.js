@@ -11,7 +11,11 @@ const retry3 = retry(3)
 module.exports = {
   scripts: {
     format: retry3('prettier-standard *.js src/**/*.js __tests__/**/*.js'),
-    lint: 'standard src/**/*.js',
+    lint: {
+      default: series.nps('lint.js', 'lint.typescript'),
+      js: 'standard src/**/*.js',
+      typescript: 'tsc src/index.d.ts'
+    },
     toc: 'doctoc --maxlevel=2 README.md',
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
