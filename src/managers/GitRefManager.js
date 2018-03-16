@@ -44,8 +44,22 @@ export class GitRefManager {
       refspecs = await config.getall(`remote.${remote}.fetch`)
     }
     const refspec = GitRefSpecSet.from(refspecs)
-    // Combine refs and symrefs giving symrefs priority
     let actualRefsToWrite = new Map()
+    // Add all tags if the fetch tags argument is true.
+    if (tags) {
+      for (const serverRef of refs.keys()) {
+        if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
+          const filename = path.join(gitdir, serverRef)
+          // Git's behavior is to only fetch tags that do not conflict with tags already present.
+          if (!await fs.exists(filename)) {
+            // If there is a dereferenced an annotated tag value available, prefer that.
+            const oid = refs.get(serverRef + '^{}') || refs.get(serverRef)
+            actualRefsToWrite.set(serverRef, oid)
+          }
+        }
+      }
+    }
+    // Combine refs and symrefs giving symrefs priority
     let refTranslations = refspec.translate([...refs.keys()])
     for (let [serverRef, translatedRef] of refTranslations) {
       let value = refs.get(serverRef)
@@ -76,19 +90,7 @@ export class GitRefManager {
     // and .git/refs/remotes/origin/refs/merge-requests
     const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of actualRefsToWrite) {
-      if (
-        tags === true &&
-        key.startsWith('refs/tags') &&
-        !key.endsWith('^{}')
-      ) {
-        const filename = path.join(gitdir, key)
-        // Git's behavior is to only fetch tags that do not conflict with tags already present.
-        if (!await fs.exists(filename)) {
-          await fs.write(filename, normalizeValue(value), 'utf8')
-        }
-      } else if (key.startsWith('refs/') || key === 'HEAD') {
-        await fs.write(path.join(gitdir, key), normalizeValue(value), 'utf8')
-      }
+      await fs.write(path.join(gitdir, key), normalizeValue(value), 'utf8')
     }
   }
   // TODO: make this less crude?
@@ -133,6 +135,23 @@ export class GitRefManager {
     }
     // Do we give up?
     throw new Error(`Could not resolve reference ${ref}`)
+  }
+  static async expand ({ fs: _fs, gitdir, ref }) {
+    const fs = new FileSystem(_fs)
+    // Is it a complete and valid SHA?
+    if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
+      return ref
+    }
+    // We need to alternate between the file system and the packed-refs
+    let packedMap = await GitRefManager.packedRefs({ fs, gitdir })
+    // Look in all the proper paths, in this order
+    const allpaths = refpaths(ref)
+    for (let ref of allpaths) {
+      if (await fs.exists(`${gitdir}/${ref}`)) return ref
+      if (packedMap.has(ref)) return ref
+    }
+    // Do we give up?
+    throw new Error(`Could not expand ref ${ref}`)
   }
   static resolveAgainstMap ({ ref, depth, map }) {
     if (depth !== undefined) {

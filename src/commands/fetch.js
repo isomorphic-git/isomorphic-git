@@ -162,10 +162,12 @@ async function fetchPackfile ({
     map: remoteHTTP.refs
   })
   // Start requesting oids from the remote by their SHAs
-  const [firstWant, ...wants] = singleBranch ? [oid] : remoteHTTP.refs.values()
-  packstream.write(GitPktLine.encode(`want ${firstWant} ${capabilities}\n`))
+  let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
+  wants = [...new Set(wants)] // remove duplicates
+  let firstLineCapabilities = ` ${capabilities}`
   for (const want of wants) {
-    packstream.write(GitPktLine.encode(`want ${want}\n`))
+    packstream.write(GitPktLine.encode(`want ${want}${firstLineCapabilities}\n`))
+    firstLineCapabilities = ''
   }
   let oids = await GitShallowManager.read({ fs, gitdir })
   if (oids.size > 0 && remoteHTTP.capabilities.has('shallow')) {
@@ -184,15 +186,21 @@ async function fetchPackfile ({
   for (let x of exclude) {
     packstream.write(GitPktLine.encode(`deepen-not ${x}\n`))
   }
-  packstream.write(GitPktLine.flush())
-  let have = null
-  try {
-    have = await GitRefManager.resolve({ fs, gitdir, ref })
-  } catch (err) {}
-  if (have) {
-    packstream.write(GitPktLine.encode(`have ${have}\n`))
-    packstream.write(GitPktLine.flush())
+  let haves = []
+  for (let ref of refs) {
+    try {
+      ref = await GitRefManager.expand({ fs, gitdir, ref })
+      // TODO: Actually, should we test whether we have the object using readObject?
+      if (!ref.startsWith('refs/tags')) {
+        let have = await GitRefManager.resolve({ fs, gitdir, ref })
+        haves.push(have)
+      }
+    } catch (err) { }
   }
+  for (const have of haves) {
+    packstream.write(GitPktLine.encode(`have ${have}\n`))
+  }
+  packstream.write(GitPktLine.flush())
   packstream.end(GitPktLine.encode(`done\n`))
   let response = await remoteHTTP.pull(packstream)
   // Apply all the 'shallow' and 'unshallow' commands

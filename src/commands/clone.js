@@ -61,7 +61,8 @@ export async function clone ({
     since,
     exclude,
     relative,
-    singleBranch
+    singleBranch,
+    tags: true
   })
   ref = ref || defaultBranch
   ref = ref.replace('refs/heads/', '')
