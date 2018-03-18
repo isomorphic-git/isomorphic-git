@@ -133,4 +133,24 @@ describe('fetch', () => {
     shallow = await pify(fs.readFile)(`${gitdir}/shallow`, { encoding: 'utf8' })
     expect(shallow).toEqual('86ec153c7b48e02f92930d07542680f60d104d31\n')
   })
+
+  it('errors if missing refspec', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-issue-84')
+    // Test
+    let err = null
+    try {
+      await fetch({
+        fs,
+        gitdir,
+        since: new Date(1506571200000),
+        singleBranch: true,
+        remote: 'origin',
+        ref: 'test-branch-shallow-clone'
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err).toBeDefined()
+    expect(err.message).toMatchSnapshot()
+  })
 })

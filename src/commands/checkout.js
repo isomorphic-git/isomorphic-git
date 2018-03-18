@@ -88,7 +88,9 @@ export async function checkout ({
   try {
     commit = await GitObjectManager.read({ fs, gitdir, oid })
   } catch (err) {
-    throw new Error(`Failed to checkout ref '${ref}' because commit ${oid} is not available locally. Do a git fetch to make the branch available locally.`)
+    throw new Error(
+      `Failed to checkout ref '${ref}' because commit ${oid} is not available locally. Do a git fetch to make the branch available locally.`
+    )
   }
   if (commit.type !== 'commit') {
     throw new Error(`Unexpected type: ${commit.type}`)
