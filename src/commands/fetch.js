@@ -166,7 +166,9 @@ async function fetchPackfile ({
   wants = [...new Set(wants)] // remove duplicates
   let firstLineCapabilities = ` ${capabilities}`
   for (const want of wants) {
-    packstream.write(GitPktLine.encode(`want ${want}${firstLineCapabilities}\n`))
+    packstream.write(
+      GitPktLine.encode(`want ${want}${firstLineCapabilities}\n`)
+    )
     firstLineCapabilities = ''
   }
   let oids = await GitShallowManager.read({ fs, gitdir })
@@ -195,7 +197,7 @@ async function fetchPackfile ({
         let have = await GitRefManager.resolve({ fs, gitdir, ref })
         haves.push(have)
       }
-    } catch (err) { }
+    } catch (err) {}
   }
   for (const have of haves) {
     packstream.write(GitPktLine.encode(`have ${have}\n`))

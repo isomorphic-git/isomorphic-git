@@ -76,7 +76,6 @@ export class GitConfig {
 
     let currentSection = ''
     let currentSectionName = null
-    let lastValue = null
     let allValues = []
     for (const line of this.lines) {
       // zero in on section
@@ -92,24 +91,17 @@ export class GitConfig {
         if (isKeyValuePair(line)) {
           let [_key, _value] = line.split('=', 2)
           if (_key.trim() === key) {
-            lastValue = _value.trim()
-            if (getall) {
-              allValues.push(lastValue)
-            }
+            allValues.push(_value.trim())
           }
         }
       }
     }
-    if (lastValue === null) return undefined
     // Cast value to correct type
     let fn = schema[section][key]
     if (fn) {
-      lastValue = fn(lastValue)
-      if (getall) {
-        allValues = allValues.map(fn)
-      }
+      allValues = allValues.map(fn)
     }
-    return getall ? allValues : lastValue
+    return getall ? allValues : allValues.pop()
   }
   async getall (path) {
     return this.get(path, true)
