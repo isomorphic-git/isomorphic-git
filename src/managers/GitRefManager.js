@@ -42,6 +42,14 @@ export class GitRefManager {
     const config = await GitConfigManager.get({ fs, gitdir })
     if (!refspecs) {
       refspecs = await config.getall(`remote.${remote}.fetch`)
+      if (refspecs.length === 0) {
+        throw new Error(
+          `Could not find a fetch refspec fot remote '${remote}'.
+Make sure the config file has an entry like the following:
+[remote "${remote}"]
+fetch = +refs/heads/*:refs/remotes/origin/*`
+        )
+      }
     }
     const refspec = GitRefSpecSet.from(refspecs)
     let actualRefsToWrite = new Map()
