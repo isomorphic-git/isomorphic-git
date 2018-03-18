@@ -69,8 +69,9 @@ module.exports = {
       // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
-        ? series.nps('lint', 'test.jest', 'build', 'test.jasmine', 'test.karma')
+        ? series.nps('lint', 'test.jest', 'build', 'test.size', 'test.jasmine', 'test.karma')
         : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
+      size: 'bundlesize',
       jasmine: retry3(
         'cross-env NODE_PATH=./dist/for-node jasmine --reporter=jasmine-console-reporter'
       ),
