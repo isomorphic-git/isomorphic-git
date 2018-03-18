@@ -5,6 +5,13 @@ import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 
 async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
   const fs = new FileSystem(_fs)
+  // Files currently in the index but not in the tree should be deleted.
+  const currentFiles = [...index].map(entry => entry.path) //.filter(filepath => filepath.startsWith(prefix))
+  console.log('PREFIX: ' + prefix)
+  console.log(currentFiles)
+  console.log('\n')
+
+  // Write entries
   for (let entry of tree) {
     let { type, object } = await GitObjectManager.read({
       fs,
@@ -105,6 +112,8 @@ export async function checkout ({
   await GitIndexManager.acquire(
     { fs, filepath: `${gitdir}/index` },
     async function (index) {
+      // Delete any files no longer needed
+
       // TODO: Big optimization possible here.
       // Instead of deleting and rewriting everything, only delete files
       // that are not present in the new branch, and only write files that
@@ -114,7 +123,7 @@ export async function checkout ({
           await fs.rm(path.join(dir, entry.path))
         } catch (err) {}
       }
-      index.clear()
+      // index.clear()
       // Write files. TODO: Write them atomically
       await writeTreeToDisk({ fs, gitdir, dir, index, prefix: '', tree })
       // Update HEAD TODO: Handle non-branch cases
