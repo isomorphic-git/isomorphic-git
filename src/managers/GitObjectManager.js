@@ -42,7 +42,6 @@ export class GitObjectManager {
           }
           PackfileCache.set(filename, p)
         }
-        // console.log(p)
         // If the packfile DOES have the oid we're looking for...
         if (p.hashes.includes(oid)) {
           // Make sure the packfile is loaded in memory

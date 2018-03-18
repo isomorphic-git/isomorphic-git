@@ -4,6 +4,7 @@ import sortby from 'lodash.sortby'
 import BufferCursor from 'buffercursor'
 import shasum from 'shasum'
 
+const MAX_UINT32 = 2 ** 32
 /*::
 import type {Stats} from 'fs'
 
@@ -142,12 +143,12 @@ export class GitIndex {
     let entry = {
       ctime: stats.ctime,
       mtime: stats.mtime,
-      dev: stats.dev,
-      ino: stats.ino,
-      mode: stats.mode,
-      uid: stats.uid,
-      gid: stats.gid,
-      size: stats.size,
+      dev: stats.dev % MAX_UINT32,
+      ino: stats.ino % MAX_UINT32,
+      mode: stats.mode % MAX_UINT32,
+      uid: stats.uid % MAX_UINT32,
+      gid: stats.gid % MAX_UINT32,
+      size: stats.size % MAX_UINT32,
       path: filepath,
       oid: oid,
       flags: {
@@ -176,6 +177,9 @@ export class GitIndex {
     this._entries.clear()
     this._dirty = true
   }
+  get (filepath) {
+    return this._entries.get(filepath)
+  }
   render () {
     return this.entries
       .map(entry => `${entry.mode.toString(8)} ${entry.oid}    ${entry.path}`)
@@ -203,16 +207,16 @@ export class GitIndex {
         let mtimeNanoseconds =
           entry.mtimeNanoseconds ||
           mtimeMilliseconds * 1000000 - mtimeSeconds * 1000000 * 1000
-        writer.writeUInt32BE(ctimeSeconds)
-        writer.writeUInt32BE(ctimeNanoseconds)
-        writer.writeUInt32BE(mtimeSeconds)
-        writer.writeUInt32BE(mtimeNanoseconds)
-        writer.writeUInt32BE(entry.dev)
-        writer.writeUInt32BE(entry.ino)
-        writer.writeUInt32BE(entry.mode)
-        writer.writeUInt32BE(entry.uid)
-        writer.writeUInt32BE(entry.gid)
-        writer.writeUInt32BE(entry.size)
+        writer.writeUInt32BE(ctimeSeconds % MAX_UINT32)
+        writer.writeUInt32BE(ctimeNanoseconds % MAX_UINT32)
+        writer.writeUInt32BE(mtimeSeconds % MAX_UINT32)
+        writer.writeUInt32BE(mtimeNanoseconds % MAX_UINT32)
+        writer.writeUInt32BE(entry.dev % MAX_UINT32)
+        writer.writeUInt32BE(entry.ino % MAX_UINT32)
+        writer.writeUInt32BE(entry.mode % MAX_UINT32)
+        writer.writeUInt32BE(entry.uid % MAX_UINT32)
+        writer.writeUInt32BE(entry.gid % MAX_UINT32)
+        writer.writeUInt32BE(entry.size % MAX_UINT32)
         writer.write(entry.oid, 20, 'hex')
         writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
         writer.write(entry.path, entry.path.length, 'utf8')
