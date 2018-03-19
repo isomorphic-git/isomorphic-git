@@ -34,7 +34,7 @@
     "isomorphic"
   ],
   "author": "William Hilton <wmhilton@gmail.com>",
-  "license": "Unlicense",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/isomorphic-git/isomorphic-git/issues"
   },
