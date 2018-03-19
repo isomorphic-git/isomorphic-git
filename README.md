@@ -182,7 +182,7 @@ close to finishing this. They are geniuses ahead of their time.
 
 ## License
 
-This work is released under [The Unlicense](http://unlicense.org/)
+This work is released under [The MIT License](https://opensource.org/licenses/MIT)
 
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_large)
