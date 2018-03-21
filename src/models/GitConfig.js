@@ -44,7 +44,7 @@ const schema = {
 const isSection = line => line.trim().startsWith('[')
 
 const extractSection = line => {
-  const indices = [line.indexOf(']'), line.indexOf(' ')].filter(i => ~i)
+  const indices = [line.indexOf(']'), line.indexOf(' ')].filter(i => i > -1)
   return line
     .slice(
       line.indexOf('[') + 1,
