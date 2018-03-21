@@ -43,13 +43,15 @@ const schema = {
 
 const isSection = line => line.trim().startsWith('[')
 
-const extractSection = line =>
-  line
+const extractSection = line => {
+  const indices = [line.indexOf(']'), line.indexOf(' ')].filter(i => i > -1)
+  return line
     .slice(
       line.indexOf('[') + 1,
-      Math.min(line.indexOf(']'), line.indexOf(' '))
+      Math.min(...indices)
     )
     .trim()
+}
 
 const isNamedSection = section => schema[section]._named
 
