@@ -19,6 +19,7 @@
   "scripts": {
     "start": "nps",
     "format": "nps format",
+    "build": "nps build",
     "test": "nps test",
     "precommit": "ban",
     "prepush": "nps lint",

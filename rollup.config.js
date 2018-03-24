@@ -79,7 +79,8 @@ const nodeConfig = input => ({
             modules: false,
             targets: {
               node: 'current'
-            }
+            },
+            ignoreBrowserslistConfig: true
           }
         ]
       ],
@@ -109,10 +110,7 @@ const browserifyConfig = input => ({
         [
           'env',
           {
-            modules: false,
-            targets: {
-              browsers: 'last 1 version'
-            }
+            modules: false
           }
         ]
       ],
@@ -146,7 +144,8 @@ const serviceworkerConfig = input => ({
             modules: false,
             targets: {
               browsers: 'Chrome 62'
-            }
+            },
+            ignoreBrowserslistConfig: true
           }
         ]
       ],
