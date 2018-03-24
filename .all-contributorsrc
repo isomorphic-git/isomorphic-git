@@ -1,0 +1,86 @@
+{
+  "projectName": "isomorphic-git",
+  "projectOwner": "isomorphic-git",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "wmhilton",
+      "name": "William Hilton",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/587740?v=4",
+      "profile": "https://onename.com/wmhilton",
+      "contributions": [
+        "blog",
+        "bug",
+        "code",
+        "design",
+        "doc",
+        "example",
+        "test",
+        "tutorial"
+      ]
+    },
+    {
+      "login": "wDhTIG",
+      "name": "wDhTIG",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/33748231?v=4",
+      "profile": "https://github.com/wDhTIG",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "marbemac",
+      "name": "Marc MacLeod",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/847542?v=4",
+      "profile": "https://github.com/marbemac",
+      "contributions": [
+        "ideas",
+        "fundingFinding"
+      ]
+    },
+    {
+      "login": "brettz9",
+      "name": "Brett Zamir",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/20234?v=4",
+      "profile": "http://brett-zamir.me",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "mojavelinux",
+      "name": "Dan Allen",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/79351?v=4",
+      "profile": "http://mojavelinux.com",
+      "contributions": [
+        "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "TomasHubelbauer",
+      "name": "Tomáš Hübelbauer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6831144?v=4",
+      "profile": "https://TomasHubelbauer.net",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "juancampa",
+      "name": "Juan Campa",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1410520?v=4",
+      "profile": "https://github.com/juancampa",
+      "contributions": [
+        "bug"
+      ]
+    }
+  ]
+}
