@@ -71,6 +71,7 @@
   },
   "devDependencies": {
     "@types/node": "^9.4.7",
+    "all-contributors-cli": "^4.11.1",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",

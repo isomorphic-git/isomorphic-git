@@ -23,6 +23,11 @@ module.exports = {
       jest: runInNewWindow('cross-env DEBUG=isomorphic-git jest --watch'),
       karma: runInNewWindow('karma start')
     },
+    contributors: {
+      add: 'all-contributors add',
+      generate: 'all-contributors generate',
+      check: 'all-contributors check'
+    },
     build: {
       default: series.nps(
         'build.rollup',
