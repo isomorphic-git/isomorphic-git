@@ -92,4 +92,43 @@ describe('push', () => {
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/master')
   })
+  it('throws an Error if no credentials supplied', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-push')
+    // Test
+    let repo = { fs, gitdir }
+    let error = null
+    try {
+      let res = await push({
+        fs,
+        gitdir,
+        remote: 'origin',
+        ref: 'master'
+      })
+    } catch (err) {
+      console.log(err)
+      error = err.message
+    }
+    expect(error).toBe('HTTP Error: 401 Authorization Required')
+  })
+  it('throws an Error if invalid credentials supplied', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-push')
+    // Test
+    let repo = { fs, gitdir }
+    let error = null
+    try {
+      let res = await push({
+        fs,
+        gitdir,
+        authUsername: 'test',
+        authPassword: 'test',
+        remote: 'origin',
+        ref: 'master'
+      })
+    } catch (err) {
+      error = err.message
+    }
+    expect(error).toBe('HTTP Error: 401 Authorization Required')
+  })
 })
