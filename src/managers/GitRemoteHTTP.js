@@ -48,7 +48,7 @@ export class GitRemoteHTTP {
       headers
     })
     if (res.statusCode !== 200) {
-      throw new Error(`Bad status code from server: ${res.statusCode}`)
+      throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
     let data = await pify(concat)(res)
     // There is probably a better way to do this, but for now
@@ -171,6 +171,9 @@ export class GitRemoteHTTP {
       body: stream,
       headers
     })
+    if (res.statusCode !== 200) {
+      throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
+    }
     let data = await pify(concat)(res)
     // Parse the response!
     let read = GitPktLine.reader(data)
