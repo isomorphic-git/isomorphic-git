@@ -67,6 +67,7 @@
     "simple-concat": "^1.0.0",
     "simple-get": "^2.7.0",
     "split2": "^2.2.0",
+    "stream-source": "^0.3.5",
     "through2": "^2.0.3"
   },
   "devDependencies": {
@@ -96,7 +97,7 @@
     "karma-browserify": "^5.1.3",
     "karma-chrome-launcher": "^2.2.0",
     "karma-firefox-launcher": "^1.1.0",
-    "karma-git-http-server-middleware": "git+https://github.com/isomorphic-git/karma-git-http-server-middleware.git",
+    "karma-git-http-server-middleware": "^1.0.0",
     "karma-jasmine": "^1.1.1",
     "karma-sauce-launcher": "^1.2.0",
     "karma-verbose-reporter": "0.0.6",
