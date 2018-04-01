@@ -22,6 +22,43 @@ describe('commit', () => {
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
   })
 
+  it('throw error if missing author', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-commit')
+    // Test
+    let error = null
+    try {
+      let sha = await commit({
+        fs,
+        gitdir,
+        author: {
+          email: 'mrtest@example.com',
+          timestamp: 1262356920
+        },
+        message: 'Initial commit'
+      })
+    } catch (err) {
+      error = err.message
+    }
+    expect(error).toBe('Author name and email must be specified as an argument or in the .git/config file')
+    // reset for test 2
+    error = null
+    try {
+      let sha = await commit({
+        fs,
+        gitdir,
+        author: {
+          name: 'Mr. Test',
+          timestamp: 1262356920
+        },
+        message: 'Initial commit'
+      })
+    } catch (err) {
+      error = err.message
+    }
+    expect(error).toBe('Author name and email must be specified as an argument or in the .git/config file')
+  })
+
   it('GPG signing', async () => {
     // Setup
     const openpgp = require('openpgp/dist/openpgp.min.js')
