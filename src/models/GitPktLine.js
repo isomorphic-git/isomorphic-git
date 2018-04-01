@@ -53,6 +53,7 @@ Examples (as C-style strings):
 import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import pad from 'pad'
+import streamSource from 'stream-source'
 
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line
@@ -74,11 +75,29 @@ export class GitPktLine {
 
   static reader (buffer /*: Buffer */) {
     let buffercursor = new BufferCursor(buffer)
-    return function read () {
+    return async function read () {
       if (buffercursor.eof()) return true
       let length = parseInt(buffercursor.slice(4).toString('utf8'), 16)
       if (length === 0) return null
       return buffercursor.slice(length - 4).buffer
+    }
+  }
+
+  static streamReader (stream) {
+    const bufferstream = streamSource(stream)
+    return async function read () {
+      try {
+        let length = await bufferstream.slice(4)
+        if (length === null) return true
+        length = parseInt((length).toString('utf8'), 16)
+        if (length === 0) return null
+        let buffer = await bufferstream.slice(length - 4)
+        if (buffer === null) return true
+        return buffer
+      } catch (err) {
+        console.log('error', err)
+        return true
+      }
     }
   }
 }

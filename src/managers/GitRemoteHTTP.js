@@ -54,9 +54,9 @@ export class GitRemoteHTTP {
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
     let read = GitPktLine.reader(data)
-    let lineOne = read()
+    let lineOne = await read()
     // skip past any flushes
-    while (lineOne === null) lineOne = read()
+    while (lineOne === null) lineOne = await read()
     if (lineOne === true) throw new Error('Bad response from git server.')
     if (lineOne.toString('utf8') !== `# service=${service}\n`) {
       throw new Error(
@@ -65,9 +65,9 @@ export class GitRemoteHTTP {
         )}'`
       )
     }
-    let lineTwo = read()
+    let lineTwo = await read()
     // skip past any flushes
-    while (lineTwo === null) lineTwo = read()
+    while (lineTwo === null) lineTwo = await read()
     // In the edge case of a brand new repo, zero refs (and zero capabilities)
     // are returned.
     if (lineTwo === true) return
@@ -79,7 +79,7 @@ export class GitRemoteHTTP {
     let [ref, name] = firstRef.split(' ')
     this.refs.set(name, ref)
     while (true) {
-      let line = read()
+      let line = await read()
       if (line === true) break
       if (line !== null) {
         let [ref, name] = line
@@ -174,9 +174,8 @@ export class GitRemoteHTTP {
     if (res.statusCode !== 200) {
       throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
-    let data = await pify(concat)(res)
     // Parse the response!
-    let read = GitPktLine.reader(data)
+    let read = GitPktLine.streamReader(res)
     // And now for the ridiculous side-band-64k protocol
     let packetlines = new PassThrough()
     let packfile = new PassThrough()
