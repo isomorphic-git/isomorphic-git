@@ -29,33 +29,6 @@ async function constructTree ({ fs, gitdir, inode }) /*: string */ {
   return oid
 }
 
-/**
- * Create a new commit
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} args.message - The commit message to use.
- * @param {Object} [args.author] - The details about the commit author.
- * @param {string} [args.author.name=undefined] - Default is `user.name` config.
- * @param {string} [args.author.email=undefined] - Default is `user.email` config.
- * @param {Date} [args.author.date=new Date()] - Set the author timestamp field. Default is the current date.
- * @param {number} [args.author.timestamp=undefined] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
- * @param {Object} [args.committer=author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
- * @returns {Promise<string>} - The object ID of the newly created commit.
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- * let sha = await git.commit({
- *   ...repo,
- *   author: {
- *     name: '<@Mr. Test@>',
- *     email: '<@mrtest@example.com@>'
- *   },
- *   message: '<@Added the a.txt file@>'
- * })
- * console.log(sha)
- */
 export async function commit ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -72,6 +45,9 @@ export async function commit ({
   }
   if (author.email === undefined) {
     author.email = await config({ fs, gitdir, path: 'user.email' })
+  }
+  if (author.name === undefined || author.email === undefined) {
+    throw new Error('Author name and email must be specified as an argument or in the .git/config file')
   }
   committer = committer || author
   let authorDateTime = author.date || new Date()

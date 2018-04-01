@@ -53,7 +53,7 @@ const extractSection = line => {
     .trim()
 }
 
-const isNamedSection = section => schema[section]._named
+const isNamedSection = section => schema[section] && schema[section]._named
 
 const isKeyValuePair = line => line.includes('=')
 
@@ -99,7 +99,7 @@ export class GitConfig {
       }
     }
     // Cast value to correct type
-    let fn = schema[section][key]
+    let fn = schema[section] && schema[section][key]
     if (fn) {
       allValues = allValues.map(fn)
     }
