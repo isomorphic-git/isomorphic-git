@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "config:js-lib"
+  ],
+  "packageRules": [{
+    "packageNames": ["openpgp"],
+    "allowedVersions": "<3"
+  }],
+  "devDependencies": {
+    "packageRules": [{
+      "packagePatterns": [".*"],
+      "groupName": "dev-dependency"
+    }]
+  }
+}
