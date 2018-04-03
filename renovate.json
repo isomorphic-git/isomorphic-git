@@ -9,7 +9,7 @@
   "devDependencies": {
     "packageRules": [{
       "packagePatterns": [".*"],
-      "groupName": "devDeps"
+      "groupName": "dev-dependency"
     }]
   }
 }
