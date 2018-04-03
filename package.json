@@ -90,7 +90,7 @@
     "fetch-mock": "^6.0.1",
     "husky": "^0.14.3",
     "jasmine": "^3.0.0",
-    "jasmine-console-reporter": "^2.0.1",
+    "jasmine-console-reporter": "^3.0.0",
     "jasmine-core": "^3.0.0",
     "jest-fixtures": "^0.6.0",
     "karma": "^2.0.0",
