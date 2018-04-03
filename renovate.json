@@ -5,5 +5,11 @@
   "packageRules": [{
     "packageNames": ["openpgp"],
     "allowedVersions": "<3"
-  }]
+  }],
+  "devDependencies": {
+    "packageRules": [{
+      "packagePatterns": [".*"],
+      "groupName": "devDeps"
+    }]
+  }
 }
