@@ -71,7 +71,7 @@
     "through2": "^2.0.3"
   },
   "devDependencies": {
-    "@types/node": "9.4.7",
+    "@types/node": "9.6.2",
     "all-contributors-cli": "4.11.1",
     "babel-plugin-external-helpers": "6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "6.26.0",
