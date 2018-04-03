@@ -33,17 +33,4 @@ describe('findRoot', () => {
     })
     expect(path.basename(root)).toBe('bar')
   })
-  it('temp dir does not have an ancestor with a .git folder', async () => {
-    // Setup
-    let { fs, gitdir } = await makeFixture('test-findRoot')
-    // Test
-    let root = false
-    try {
-      root = await findRoot({
-        fs,
-        filepath: gitdir
-      })
-    } catch (err) {}
-    expect(root).toBe(false)
-  })
 })
