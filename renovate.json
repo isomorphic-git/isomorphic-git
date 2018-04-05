@@ -9,7 +9,8 @@
   "devDependencies": {
     "packageRules": [{
       "packagePatterns": [".*"],
-      "groupName": "dev-dependency"
+      "groupName": "dev-dependency",
+      "schedule": "on friday"
     }]
   }
 }
