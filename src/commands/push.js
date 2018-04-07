@@ -7,6 +7,7 @@ import createHash from 'sha.js'
 import { config } from './config'
 import { GitRefManager, GitObjectManager, GitRemoteHTTP } from '../managers'
 import { FileSystem, GitCommit, GitTree, GitPktLine } from '../models'
+import { log, pkg } from '../utils'
 
 const types = {
   commit: 0b0010000,
@@ -17,45 +18,11 @@ const types = {
   ref_delta: 0b1110000
 }
 
-/**
- *
- * If there were no errors, then there will be no `errors` property.
- * There can be a mix of `ok` messages and `errors` messages.
- *
- * @typedef {Object} PushResponse
- * @property {Array<string>} [ok] - The first item is "unpack" if the overall operation was successful. The remaining items are the names of refs that were updated successfully.
- * @property {Array<string>} [errors] - If the overall operation threw and error, the first item will be "unpack {Overall error message}". The remaining items are individual refs that failed to be updated in the format "{ref name} {error message}".
- */
-
-/**
- * Push a branch
- *
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} [args.ref=undefined] - Which branch to push. By default this is the currently checked out branch of the repository.
- * @param {string} [args.remote='origin'] - If URL is not specified, determines which remote to use.
- * @param {string} [args.url=undefined] - The URL of the remote git server. The default is the value set in the git config for that remote.
- * @param {string} [args.authUsername=undefined] - The username to use with Basic Auth
- * @param {string} [args.authPassword=undefined] - The password to use with Basic Auth
- * @returns {Promise<PushResponse>} - Resolves successfully when push completes with a detailed description of the operation from the server.
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- * let pushResponse = await git.push({
- *   ...repo,
- *   remote: '<@origin@>',
- *   ref: '<@master@>',
- *   authUsername: <@process.env.GITHUB_TOKEN@>,
- *   authPassword: <@process.env.GITHUB_TOKEN@>
- * })
- * console.log(pushResponse)
- */
 export async function push ({
-  fs: _fs,
   dir,
   gitdir = path.join(dir, '.git'),
+  fs: _fs,
+  emitter,
   ref,
   remote = 'origin',
   url,
@@ -87,8 +54,11 @@ export async function push ({
   let packstream = new PassThrough()
   let oldoid =
     httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
+  const capabilities = `report-status side-band-64k agent=git/${
+    pkg.name
+  }@${pkg.version}`
   packstream.write(
-    GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 report-status\n`)
+    GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 ${capabilities}\n`)
   )
   packstream.write(GitPktLine.flush())
   pack({
@@ -97,8 +67,49 @@ export async function push ({
     oids: [...objects],
     outputStream: packstream
   })
-  let response = await httpRemote.push(packstream)
-  return response
+  let { packfile, progress } = await httpRemote.push(packstream)
+  if (emitter) {
+    progress.on('data', chunk => {
+      let msg = chunk.toString('utf8')
+      emitter.emit('message', msg)
+    })
+  }
+  let result = {}
+  // Parse the response!
+  let response = ''
+  let read = GitPktLine.streamReader(packfile)
+  let line = await read()
+  while (line !== true) {
+    if (line !== null) response += line.toString('utf8') + '\n'
+    line = await read()
+  }
+
+  let lines = response.toString('utf8').split('\n')
+  // We're expecting "unpack {unpack-result}"
+  line = lines.shift()
+  if (!line.startsWith('unpack ')) {
+    throw new Error(
+      `Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'`
+    )
+  }
+  if (line === 'unpack ok') {
+    result.ok = ['unpack']
+  } else {
+    result.errors = [line.trim()]
+  }
+  for (let line of lines) {
+    let status = line.slice(0, 2)
+    let refAndMessage = line.slice(3)
+    if (status === 'ok') {
+      result.ok = result.ok || []
+      result.ok.push(refAndMessage)
+    } else if (status === 'ng') {
+      result.errors = result.errors || []
+      result.errors.push(refAndMessage)
+    }
+  }
+  log(result)
+  return result
 }
 
 /** @ignore */

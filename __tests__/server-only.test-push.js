@@ -11,7 +11,6 @@ describe('push', () => {
   it('"refs/heads/master" to local git-http-backend', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-push')
-    // Test
     const { get, postReceivePackRequest } = server(dir)
     nock('http://example.dev')
       // .get('/test-push.git/info/refs?service=git-receive-pack')
@@ -19,7 +18,7 @@ describe('push', () => {
       .reply(200, get)
       .post(/.*/)
       .reply(200, postReceivePackRequest)
-
+    // Test
     let res = await push({
       fs,
       gitdir,

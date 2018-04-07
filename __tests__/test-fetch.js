@@ -1,5 +1,4 @@
 /* globals jest describe it expect */
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-fetch.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')

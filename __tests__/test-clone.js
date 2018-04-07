@@ -52,7 +52,7 @@ describe('clone', () => {
   // when running in jest/jasmine.
   ;(process.browser ? it : xit)('clone from karma-git-http-server-middleware', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-clone-karma')
-    let url = `http://localhost:9876/__tests__/__fixtures__/test-status.git`
+    let url = `http://localhost:9876/git-server/test-status.git`
     await clone({
       fs,
       dir,
