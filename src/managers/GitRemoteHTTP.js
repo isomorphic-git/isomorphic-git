@@ -4,7 +4,7 @@ import { GitPktLine } from '../models'
 import simpleGet from 'simple-get'
 import concat from 'simple-concat'
 import pify from 'pify'
-import { pkg, log } from '../utils'
+import { pkg } from '../utils'
 import { PassThrough } from 'stream'
 
 function basicAuth (auth) {
@@ -13,15 +13,7 @@ function basicAuth (auth) {
   )}`
 }
 
-/** @ignore */
 export class GitRemoteHTTP {
-  /*::
-  GIT_URL : string
-  refs : Map<string, string>
-  symrefs : Map<string, string>
-  capabilities : Set<string>
-  auth : { username : string, password : string }
-  */
   constructor (url /*: string */) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git')) url = url += '.git'
@@ -101,63 +93,16 @@ export class GitRemoteHTTP {
   }
   async push (stream /*: ReadableStream */) {
     const service = 'git-receive-pack'
-    let { packetlines, packfile } = await this.stream({
-      stream,
-      service
-    })
-    // TODO: Someday, maybe we will make this a streaming parser.
-    packfile = await pify(concat)(packfile)
-    packetlines = await pify(concat)(packetlines)
-    let result = {}
-    // Parse the response!
-    // I'm combining the side-band-64k and regular streams
-    // because Github returns the first line in the sideband while
-    // git-http-server returns it without the sideband.
-    let response = ''
-    let read = GitPktLine.reader(packfile)
-    let line = await read()
-    while (line !== null && line !== true) {
-      response += line.toString('utf8') + '\n'
-      line = await read()
-    }
-    response += packetlines.toString('utf8')
-
-    let lines = response.toString('utf8').split('\n')
-    // We're expecting "unpack {unpack-result}"
-    line = lines.shift()
-    if (!line.startsWith('unpack ')) {
-      throw new Error(
-        `Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'`
-      )
-    }
-    if (line === 'unpack ok') {
-      result.ok = ['unpack']
-    } else {
-      result.errors = [line.trim()]
-    }
-    for (let line of lines) {
-      let status = line.slice(0, 2)
-      let refAndMessage = line.slice(3)
-      if (status === 'ok') {
-        result.ok = result.ok || []
-        result.ok.push(refAndMessage)
-      } else if (status === 'ng') {
-        result.errors = result.errors || []
-        result.errors.push(refAndMessage)
-      }
-    }
-    log(result)
-    return result
+    return this.stream({ stream, service })
   }
-  async pull (stream /*: ReadableStream */) {
+  async pull (stream) {
     const service = 'git-upload-pack'
-    let res = await this.stream({ stream, service })
-    return res
+    return this.stream({ stream, service })
   }
   async stream ({
     stream,
     service
-  }) /*: Promise<{ packfile: ReadableStream, progress: ReadableStream }> */ {
+  }) {
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`

@@ -150,8 +150,6 @@ async function fetchPackfile ({
     symrefs: remoteHTTP.symrefs,
     tags
   })
-  // Note: I removed "ofs-delta" from the capabilities list and now
-  // Github uses all ref-deltas when I fetch packfiles instead of all ofs-deltas. Nice!
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/${
     pkg.name
   }@${pkg.version}${relative ? ' deepen-relative' : ''}`

@@ -10,3 +10,6 @@
 [remote "pseudo"]
   url = http://example.dev/foo.git
   fetch = +refs/heads/*:refs/remotes/pseudo/*
+[remote "karma"]
+  url = http://localhost:9876/git-server/test-push-server.git
+  fetch = +refs/heads/*:refs/remotes/pseudo/*
