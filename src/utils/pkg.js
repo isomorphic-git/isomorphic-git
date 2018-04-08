@@ -1,3 +1,4 @@
-import * as pkg from '../../package.json'
-/** @ignore */
-export { pkg }
+export const pkg = {
+  name: 'isomorphic-git',
+  version: '0.0.0-development'
+}

@@ -23,6 +23,7 @@
     "test": "nps test",
     "precommit": "ban",
     "prepush": "nps lint",
+    "prepublishOnly": "nps prepublish",
     "semantic-release": "semantic-release",
     "travis-deploy-once": "travis-deploy-once"
   },
@@ -108,6 +109,7 @@
     "parse-header-stream": "1.1.1",
     "prettier-standard": "8.0.0",
     "pretty-format": "22.4.3",
+    "replace-in-file": "^3.4.0",
     "rollup": "0.57.1",
     "rollup-plugin-babel": "3.0.3",
     "rollup-plugin-json": "2.3.0",
