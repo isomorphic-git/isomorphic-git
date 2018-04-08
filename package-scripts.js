@@ -86,6 +86,10 @@ module.exports = {
       karma: process.env.CI
         ? retry3('karma start --single-run')
         : 'karma start --single-run'
-    }
+    },
+    prepublish: {
+      default: series.nps('prepublish.version', 'build'),
+      version: `node __tests__/__helpers__/fix-version-number.js`,
+    },
   }
 }
