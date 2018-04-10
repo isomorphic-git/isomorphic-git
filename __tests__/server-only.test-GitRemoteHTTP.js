@@ -18,10 +18,9 @@ describe('GitRemoteHTTP', () => {
       'GitRemoteHTTP - preparePull (Github response).json'
     )
     // Test
-    let remote = new GitRemoteHTTP(
-      'https://github.com/isomorphic-git/isomorphic-git'
-    )
-    await remote.preparePull()
+    let remote = await GitRemoteHTTP.preparePull({
+      url: 'https://github.com/isomorphic-git/isomorphic-git'
+    })
     expect(remote).toBeTruthy()
     expect(remote.symrefs.size > 0)
     expect(remote.symrefs.get('HEAD')).toBe('refs/heads/master')
@@ -35,8 +34,9 @@ describe('GitRemoteHTTP', () => {
       'GitRemoteHTTP - preparePull (mock response).json'
     )
     // Test
-    let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
-    await remote.preparePull()
+    let remote = await GitRemoteHTTP.preparePull({
+      url: 'http://example.dev/test-GitRemoteHTTP'
+    })
     expect(remote).toBeTruthy()
     // Teardown
     nockDone()
@@ -48,8 +48,9 @@ describe('GitRemoteHTTP', () => {
       'GitRemoteHTTP - preparePush (mock response).json'
     )
     // Test
-    let remote = new GitRemoteHTTP('http://example.dev/test-GitRemoteHTTP')
-    await remote.preparePush()
+    let remote = await GitRemoteHTTP.preparePush({
+      url: 'http://example.dev/test-GitRemoteHTTP'
+    })
     expect(remote).toBeTruthy()
     // Teardown
     nockDone()
