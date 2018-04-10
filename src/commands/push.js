@@ -36,14 +36,14 @@ export async function push ({
   }
   let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
   let oid = await GitRefManager.resolve({ fs, gitdir, ref })
-  let httpRemote = new GitRemoteHTTP(url)
+  let auth
   if (authUsername !== undefined && authPassword !== undefined) {
-    httpRemote.auth = {
+    auth = {
       username: authUsername,
       password: authPassword
     }
   }
-  await httpRemote.preparePush()
+  let httpRemote = await GitRemoteHTTP.preparePush({ url, auth })
   let commits = await listCommits({
     fs,
     gitdir,
@@ -67,7 +67,11 @@ export async function push ({
     oids: [...objects],
     outputStream: packstream
   })
-  let { packfile, progress } = await httpRemote.push(packstream)
+  let { packfile, progress } = await GitRemoteHTTP.push({
+    url,
+    auth,
+    stream: packstream
+  })
   if (emitter) {
     progress.on('data', chunk => {
       let msg = chunk.toString('utf8')

@@ -1,11 +1,9 @@
 // @flow
 import { Buffer } from 'buffer'
-import { GitPktLine } from '../models'
 import simpleGet from 'simple-get'
-import concat from 'simple-concat'
 import pify from 'pify'
 import { pkg } from '../utils'
-import { PassThrough } from 'stream'
+import { GitRemoteConnection } from './GitRemoteConnection'
 
 function basicAuth (auth) {
   return `Basic ${Buffer.from(auth.username + ':' + auth.password).toString(
@@ -14,152 +12,60 @@ function basicAuth (auth) {
 }
 
 export class GitRemoteHTTP {
-  constructor (url /*: string */) {
+  static async capabilities () {
+    return ['connect']
+  }
+  static async preparePull ({ url, auth } = {}) {
+    return GitRemoteHTTP.discover({ url, service: 'git-upload-pack', auth })
+  }
+  static async preparePush ({ url, auth } = {}) {
+    return GitRemoteHTTP.discover({ url, service: 'git-receive-pack', auth })
+  }
+  static async discover ({ url, service, auth }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git')) url = url += '.git'
-    this.GIT_URL = url
-  }
-  async preparePull () {
-    await this.discover('git-upload-pack')
-  }
-  async preparePush () {
-    await this.discover('git-receive-pack')
-  }
-  async discover (service /*: string */) {
-    this.capabilities = new Set()
-    this.refs = new Map()
-    this.symrefs = new Map()
     let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
-    if (this.auth) {
-      headers['Authorization'] = basicAuth(this.auth)
+    if (auth) {
+      headers['Authorization'] = basicAuth(auth)
     }
     let res = await pify(simpleGet)({
       method: 'GET',
-      url: `${this.GIT_URL}/info/refs?service=${service}`,
+      url: `${url}/info/refs?service=${service}`,
       headers
     })
     if (res.statusCode !== 200) {
       throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
-    let data = await pify(concat)(res)
-    // There is probably a better way to do this, but for now
-    // let's just throw the result parser inline here.
-    let read = GitPktLine.reader(data)
-    let lineOne = await read()
-    // skip past any flushes
-    while (lineOne === null) lineOne = await read()
-    if (lineOne === true) throw new Error('Bad response from git server.')
-    if (lineOne.toString('utf8') !== `# service=${service}\n`) {
-      throw new Error(
-        `Expected '# service=${service}\\n' but got '${lineOne.toString(
-          'utf8'
-        )}'`
-      )
-    }
-    let lineTwo = await read()
-    // skip past any flushes
-    while (lineTwo === null) lineTwo = await read()
-    // In the edge case of a brand new repo, zero refs (and zero capabilities)
-    // are returned.
-    if (lineTwo === true) return
-    let [firstRef, capabilities] = lineTwo
-      .toString('utf8')
-      .trim()
-      .split('\0')
-    capabilities.split(' ').map(x => this.capabilities.add(x))
-    let [ref, name] = firstRef.split(' ')
-    this.refs.set(name, ref)
-    while (true) {
-      let line = await read()
-      if (line === true) break
-      if (line !== null) {
-        let [ref, name] = line
-          .toString('utf8')
-          .trim()
-          .split(' ')
-        this.refs.set(name, ref)
-      }
-    }
-    // Symrefs are thrown into the "capabilities" unfortunately.
-    for (let cap of this.capabilities) {
-      if (cap.startsWith('symref=')) {
-        let m = cap.match(/symref=([^:]+):(.*)/)
-        if (m.length === 3) {
-          this.symrefs.set(m[1], m[2])
-        }
-      }
-    }
+    return GitRemoteConnection.discover(service, res)
   }
-  async push (stream /*: ReadableStream */) {
+  static async push ({ url, auth, stream }) {
     const service = 'git-receive-pack'
-    return this.stream({ stream, service })
+    return GitRemoteHTTP.stream({ url, auth, stream, service })
   }
-  async pull (stream) {
+  static async pull ({ url, auth, stream }) {
     const service = 'git-upload-pack'
-    return this.stream({ stream, service })
+    return GitRemoteHTTP.stream({ url, auth, stream, service })
   }
-  async stream ({ stream, service }) {
+  static async stream ({ url, auth, stream, service }) {
+    // Auto-append the (necessary) .git if it's missing.
+    if (!url.endsWith('.git')) url = url += '.git'
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
     headers['user-agent'] = `git/${pkg.name}@${pkg.version}`
-    if (this.auth) {
-      headers['authorization'] = basicAuth(this.auth)
+    if (auth) {
+      headers['authorization'] = basicAuth(auth)
     }
     let res = await pify(simpleGet)({
       method: 'POST',
-      url: `${this.GIT_URL}/${service}`,
+      url: `${url}/${service}`,
       body: stream,
       headers
     })
     if (res.statusCode !== 200) {
       throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
-    // Parse the response!
-    let read = GitPktLine.streamReader(res)
-    // And now for the ridiculous side-band-64k protocol
-    let packetlines = new PassThrough()
-    let packfile = new PassThrough()
-    let progress = new PassThrough()
-    // TODO: Use a proper through stream?
-    const nextBit = async function () {
-      let line = await read()
-      // Skip over flush packets
-      if (line === null) return nextBit()
-      // A made up convention to signal there's no more to read.
-      if (line === true) {
-        packetlines.end()
-        progress.end()
-        packfile.end()
-        return
-      }
-      // Examine first byte to determine which output "stream" to use
-      switch (line[0]) {
-        case 1: // pack data
-          packfile.write(line.slice(1))
-          break
-        case 2: // progress message
-          progress.write(line.slice(1))
-          break
-        case 3: // fatal error message just before stream aborts
-          let error = line.slice(1)
-          progress.write(error)
-          packfile.destroy(new Error(error.toString('utf8')))
-          return
-        default:
-          // Not part of the side-band-64k protocol
-          packetlines.write(line.slice(0))
-      }
-      // Careful not to blow up the stack.
-      // I think Promises in a tail-call position should be OK.
-      nextBit()
-    }
-    nextBit()
-    return {
-      packetlines,
-      packfile,
-      progress
-    }
+    return GitRemoteConnection.stream({ res })
   }
 }

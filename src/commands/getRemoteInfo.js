@@ -1,8 +1,7 @@
 import { GitRemoteHTTP } from '../managers'
 
 export async function getRemoteInfo ({ url }) {
-  const remote = new GitRemoteHTTP(url)
-  await remote.preparePull()
+  const remote = await GitRemoteHTTP.preparePull({ url })
   const result = {}
   // Note: remote.capabilities, remote.refs, and remote.symrefs are Set and Map objects,
   // but one of the objectives of the public API is to always return JSON-compatible objects
