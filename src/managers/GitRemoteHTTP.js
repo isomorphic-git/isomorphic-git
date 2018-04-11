@@ -13,15 +13,9 @@ function basicAuth (auth) {
 
 export class GitRemoteHTTP {
   static async capabilities () {
-    return ['connect']
+    return ['discover', 'connect']
   }
-  static async preparePull ({ url, auth } = {}) {
-    return GitRemoteHTTP.discover({ url, service: 'git-upload-pack', auth })
-  }
-  static async preparePush ({ url, auth } = {}) {
-    return GitRemoteHTTP.discover({ url, service: 'git-receive-pack', auth })
-  }
-  static async discover ({ url, service, auth }) {
+  static async discover ({ service, url, auth }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git')) url = url += '.git'
     let headers = {}
@@ -39,15 +33,7 @@ export class GitRemoteHTTP {
     }
     return GitRemoteConnection.discover(service, res)
   }
-  static async push ({ url, auth, stream }) {
-    const service = 'git-receive-pack'
-    return GitRemoteHTTP.stream({ url, auth, stream, service })
-  }
-  static async pull ({ url, auth, stream }) {
-    const service = 'git-upload-pack'
-    return GitRemoteHTTP.stream({ url, auth, stream, service })
-  }
-  static async stream ({ url, auth, stream, service }) {
+  static async connect ({ service, url, auth, stream }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git')) url = url += '.git'
     let headers = {}

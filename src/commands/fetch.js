@@ -5,7 +5,7 @@ import pify from 'pify'
 import concat from 'simple-concat'
 import split2 from 'split2'
 import { config } from './config'
-import { GitRemoteHTTP, GitRefManager, GitShallowManager } from '../managers'
+import { GitRemoteManager, GitRefManager, GitShallowManager } from '../managers'
 import { FileSystem, GitPktLine } from '../models'
 import { pkg } from '../utils'
 
@@ -123,7 +123,12 @@ async function fetchPackfile ({
       password: authPassword
     }
   }
-  let remoteHTTP = await GitRemoteHTTP.preparePull({ url, auth })
+  let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
+  let remoteHTTP = await GitRemoteHTTP.discover({
+    service: 'git-upload-pack',
+    url,
+    auth
+  })
   // Check server supports shallow cloning
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
     throw new Error(`Remote does not support shallow fetches`)
@@ -202,7 +207,12 @@ async function fetchPackfile ({
   }
   packstream.write(GitPktLine.flush())
   packstream.end(GitPktLine.encode(`done\n`))
-  let response = await GitRemoteHTTP.pull({ url, auth, stream: packstream })
+  let response = await GitRemoteHTTP.connect({
+    service: 'git-upload-pack',
+    url,
+    auth,
+    stream: packstream
+  })
   // Apply all the 'shallow' and 'unshallow' commands
   response.packetlines.pipe(
     through2(async (data, enc, next) => {

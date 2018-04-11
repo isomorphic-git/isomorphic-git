@@ -46,6 +46,27 @@ describe('clone', () => {
     expect(fs.existsSync(`${gitdir}/refs/tags/test-tag`)).toBe(true)
     expect(fs.existsSync(`${dir}/package.json`)).toBe(true)
   })
+  it('clone with an unregistered protocol', async () => {
+    let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    let url = `foobar://github.com/isomorphic-git/isomorphic-git`
+    let error = null
+    try {
+      await clone({
+        fs,
+        dir,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        ref: 'test-tag',
+        url
+      })
+    } catch (err) {
+      error = err.message
+    }
+    expect(error).toEqual(
+      `Git remote "${url}" uses an unrecognized transport protocol: "foobar"`
+    )
+  })
   // For now we are only running this in the browser, because the karma middleware solution only
   // works when running in Karma, and these tests also need to pass Jest and node-jasmine.
   // At some point, we need to wrap git-http-server so it can be launched pre-test and killed post-test

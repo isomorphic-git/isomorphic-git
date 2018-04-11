@@ -12,13 +12,21 @@ describe('GitRemoteHTTP', () => {
   beforeAll(() => {
     nock.back.fixtures = path.join(__dirname, '__nockbacks__')
   })
+
+  it('capabilities', async () => {
+    // Test
+    let caps = await GitRemoteHTTP.capabilities()
+    expect(caps).toEqual(expect.arrayContaining(['discover', 'connect']))
+  })
+
   it('preparePull (Github response)', async () => {
     // Setup
     let { nockDone } = await nock.back(
       'GitRemoteHTTP - preparePull (Github response).json'
     )
     // Test
-    let remote = await GitRemoteHTTP.preparePull({
+    let remote = await GitRemoteHTTP.discover({
+      service: 'git-upload-pack',
       url: 'https://github.com/isomorphic-git/isomorphic-git'
     })
     expect(remote).toBeTruthy()
@@ -34,7 +42,8 @@ describe('GitRemoteHTTP', () => {
       'GitRemoteHTTP - preparePull (mock response).json'
     )
     // Test
-    let remote = await GitRemoteHTTP.preparePull({
+    let remote = await GitRemoteHTTP.discover({
+      service: 'git-upload-pack',
       url: 'http://example.dev/test-GitRemoteHTTP'
     })
     expect(remote).toBeTruthy()
@@ -48,11 +57,28 @@ describe('GitRemoteHTTP', () => {
       'GitRemoteHTTP - preparePush (mock response).json'
     )
     // Test
-    let remote = await GitRemoteHTTP.preparePush({
+    let remote = await GitRemoteHTTP.discover({
+      service: 'git-receive-pack',
       url: 'http://example.dev/test-GitRemoteHTTP'
     })
     expect(remote).toBeTruthy()
     // Teardown
     nockDone()
+  })
+
+  it('handle HTTP error codes', async () => {
+    // Setup
+    /* Nock is broken, see https://github.com/node-nock/nock/issues/469 */
+    // Test
+    let error = null
+    try {
+      let remote = await GitRemoteHTTP.discover({
+        service: 'git-receive-pack',
+        url: 'https://github.com/isomorphic-git/not-there'
+      })
+    } catch (err) {
+      error = err.message
+    }
+    expect(error).toBe('HTTP Error: 401 Authorization Required')
   })
 })
