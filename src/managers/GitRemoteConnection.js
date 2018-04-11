@@ -1,4 +1,3 @@
-// @flow
 import { GitPktLine } from '../models'
 import concat from 'simple-concat'
 import pify from 'pify'

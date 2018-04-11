@@ -5,7 +5,7 @@ import pad from 'pad'
 import pako from 'pako'
 import createHash from 'sha.js'
 import { config } from './config'
-import { GitRefManager, GitObjectManager, GitRemoteHTTP } from '../managers'
+import { GitRefManager, GitObjectManager, GitRemoteManager } from '../managers'
 import { FileSystem, GitCommit, GitTree, GitPktLine } from '../models'
 import { log, pkg } from '../utils'
 
@@ -43,7 +43,12 @@ export async function push ({
       password: authPassword
     }
   }
-  let httpRemote = await GitRemoteHTTP.preparePush({ url, auth })
+  let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
+  let httpRemote = await GitRemoteHTTP.discover({
+    service: 'git-receive-pack',
+    url,
+    auth
+  })
   let commits = await listCommits({
     fs,
     gitdir,
@@ -67,7 +72,8 @@ export async function push ({
     oids: [...objects],
     outputStream: packstream
   })
-  let { packfile, progress } = await GitRemoteHTTP.push({
+  let { packfile, progress } = await GitRemoteHTTP.connect({
+    service: 'git-receive-pack',
     url,
     auth,
     stream: packstream
