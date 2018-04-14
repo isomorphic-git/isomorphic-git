@@ -1,4 +1,5 @@
 import path from 'path'
+
 import { GitIndexManager } from '../managers'
 import { FileSystem } from '../models'
 

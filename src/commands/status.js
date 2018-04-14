@@ -1,11 +1,13 @@
 import path from 'path'
-import { FileSystem, GitCommit, GitTree } from '../models'
+
 import {
-  GitRefManager,
-  GitObjectManager,
+  GitIgnoreManager,
   GitIndexManager,
-  GitIgnoreManager
+  GitObjectManager,
+  GitRefManager
 } from '../managers'
+import { FileSystem, GitCommit, GitTree } from '../models'
+
 /*::
 import type { Stats } from 'fs'
 import type { CacheEntry } from '../models/GitIndex'

@@ -1,7 +1,8 @@
 import { Buffer } from 'buffer'
-import shasum from 'shasum'
 import pako from 'pako'
 import path from 'path'
+import shasum from 'shasum'
+
 import { FileSystem, GitObject, GitPackIndex } from '../models'
 
 const PackfileCache = new Map()

@@ -1,4 +1,5 @@
 import path from 'path'
+
 import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
 

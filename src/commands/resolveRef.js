@@ -1,6 +1,7 @@
 import path from 'path'
-import { FileSystem } from '../models'
+
 import { GitRefManager } from '../managers'
+import { FileSystem } from '../models'
 
 /**
  * Get the value of a symbolic ref or resolve a ref to its object id.

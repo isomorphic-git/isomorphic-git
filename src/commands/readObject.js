@@ -1,6 +1,7 @@
 import path from 'path'
-import { FileSystem, GitCommit, GitTree } from '../models'
+
 import { GitObjectManager } from '../managers'
+import { FileSystem, GitCommit, GitTree } from '../models'
 
 export async function readObject ({
   dir,

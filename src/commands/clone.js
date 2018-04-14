@@ -1,9 +1,11 @@
 import path from 'path'
-import { init } from './init'
+
+import { FileSystem } from '../models'
+
+import { checkout } from './checkout'
 import { config } from './config'
 import { fetch } from './fetch'
-import { checkout } from './checkout'
-import { FileSystem } from '../models'
+import { init } from './init'
 
 /**
  * Clone a repository
