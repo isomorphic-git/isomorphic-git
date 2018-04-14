@@ -8,12 +8,14 @@ const retry = n => cmd =>
     .join(` || `)
 const retry3 = retry(3)
 
+const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
+
 module.exports = {
   scripts: {
-    format: retry3('prettier-standard *.js src/**/*.js __tests__/**/*.js'),
+    format: retry3(`prettier-standard ${srcPaths}`),
     lint: {
       default: series.nps('lint.js', 'lint.typescript'),
-      js: 'standard src/**/*.js',
+      js: `standard ${srcPaths}`,
       typescript: 'tsc src/index.d.ts'
     },
     toc: 'doctoc --maxlevel=2 README.md',

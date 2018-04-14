@@ -1,4 +1,4 @@
-/* globals jest describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-fetch.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
@@ -15,7 +15,7 @@ describe('fetch', () => {
   })
 
   it('fetch (from Github)', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+    let { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Smoke Test
     await fetch({
       fs,
@@ -27,7 +27,7 @@ describe('fetch', () => {
   })
 
   it('shallow fetch (from Github)', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+    let { fs, gitdir } = await makeFixture('test-fetch-cors')
     let output = []
     let progress = []
     let emitter = new EventEmitter()
@@ -67,7 +67,7 @@ describe('fetch', () => {
   })
 
   it('shallow fetch since (from Github)', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+    let { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Test
     await fetch({
       fs,
@@ -85,7 +85,7 @@ describe('fetch', () => {
   })
 
   it('shallow fetch exclude (from Github)', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+    let { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Test
     await fetch({
       fs,
@@ -103,7 +103,7 @@ describe('fetch', () => {
   })
 
   it('shallow fetch relative (from Github)', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+    let { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Test
     await fetch({
       fs,
@@ -134,7 +134,7 @@ describe('fetch', () => {
   })
 
   it('errors if missing refspec', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-issue-84')
+    let { fs, gitdir } = await makeFixture('test-issue-84')
     // Test
     let err = null
     try {

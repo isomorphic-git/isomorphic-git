@@ -1,4 +1,4 @@
-/* global test describe expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { models, utils } = require('isomorphic-git/internal-apis')
 const { FileSystem } = models

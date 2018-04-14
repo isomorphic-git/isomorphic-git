@@ -1,4 +1,4 @@
-/* globals jasmine describe it expect */
+/* eslint-env jasmine */
 const { assertSnapshot } = require('./assertSnapshot')
 
 // Jest has a toMatchSnapshot() matcher built in, so we only

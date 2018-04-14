@@ -1,4 +1,4 @@
-/* global describe it expect */
+/* eslint-env node, browser, jasmine */
 const snapshots = require('./__snapshots__/server-only.test-getRemoteInfo.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const nock = require('nock')

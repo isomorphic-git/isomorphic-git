@@ -1,4 +1,4 @@
-/* global describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const nock = require('nock')
 const server = require('./__helpers__/http-backend')
@@ -77,7 +77,6 @@ describe('push', () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
     // Test
-    let repo = { fs, gitdir }
     let res = await push({
       fs,
       gitdir,
@@ -95,10 +94,9 @@ describe('push', () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
     // Test
-    let repo = { fs, gitdir }
     let error = null
     try {
-      let res = await push({
+      await push({
         fs,
         gitdir,
         remote: 'origin',
@@ -114,10 +112,9 @@ describe('push', () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
     // Test
-    let repo = { fs, gitdir }
     let error = null
     try {
-      let res = await push({
+      await push({
         fs,
         gitdir,
         authUsername: 'test',

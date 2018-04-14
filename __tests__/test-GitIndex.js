@@ -1,4 +1,4 @@
-/* global describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-GitIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
@@ -14,7 +14,7 @@ describe('GitIndex', () => {
   })
 
   it('GitIndex.from(buffer) - Simple', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitIndex')
+    let { fs, dir } = await makeFixture('test-GitIndex')
     let buffer = await pify(fs.readFile)(path.join(dir, 'simple-index'))
     let index = GitIndex.from(buffer)
     let rendering = index.render()
@@ -26,7 +26,7 @@ describe('GitIndex', () => {
   })
 
   it('GitIndex.from(buffer)', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitIndex')
+    let { fs, dir } = await makeFixture('test-GitIndex')
     let buffer = await pify(fs.readFile)(path.join(dir, 'index'))
     let index = GitIndex.from(buffer)
     let rendering = index.render()
@@ -38,7 +38,7 @@ describe('GitIndex', () => {
   })
 
   it('GitIndex round trip', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitIndex')
+    let { fs, dir } = await makeFixture('test-GitIndex')
     let buffer = await pify(fs.readFile)(path.join(dir, 'index'))
     let index = GitIndex.from(buffer)
     let buffer2 = index.toObject()

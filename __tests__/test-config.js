@@ -1,4 +1,4 @@
-/* global describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { config } = require('isomorphic-git')

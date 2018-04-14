@@ -2,7 +2,6 @@ const { exec } = require('child_process')
 const url = require('url')
 const stream = require('stream')
 const parseHeaderStream = require('parse-header-stream')
-const path = require('path')
 
 module.exports = function (rootDir) {
   async function request (method, rawUrl, postStream, requestHeaders) {
