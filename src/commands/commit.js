@@ -47,7 +47,9 @@ export async function commit ({
     author.email = await config({ fs, gitdir, path: 'user.email' })
   }
   if (author.name === undefined || author.email === undefined) {
-    throw new Error('Author name and email must be specified as an argument or in the .git/config file')
+    throw new Error(
+      'Author name and email must be specified as an argument or in the .git/config file'
+    )
   }
   committer = committer || author
   let authorDateTime = author.date || new Date()

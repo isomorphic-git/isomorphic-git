@@ -54,9 +54,9 @@ export async function push ({
   let packstream = new PassThrough()
   let oldoid =
     httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
-  const capabilities = `report-status side-band-64k agent=git/${
-    pkg.name
-  }@${pkg.version}`
+  const capabilities = `report-status side-band-64k agent=git/${pkg.name}@${
+    pkg.version
+  }`
   packstream.write(
     GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 ${capabilities}\n`)
   )

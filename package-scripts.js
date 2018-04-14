@@ -74,7 +74,14 @@ module.exports = {
       // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
-        ? series.nps('lint', 'test.jest', 'build', 'test.size', 'test.jasmine', 'test.karma')
+        ? series.nps(
+          'lint',
+          'test.jest',
+          'build',
+          'test.size',
+          'test.jasmine',
+          'test.karma'
+        )
         : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
       size: 'bundlesize',
       jasmine: retry3(
@@ -89,7 +96,7 @@ module.exports = {
     },
     prepublish: {
       default: series.nps('prepublish.version', 'build'),
-      version: `node __tests__/__helpers__/fix-version-number.js`,
-    },
+      version: `node __tests__/__helpers__/fix-version-number.js`
+    }
   }
 }

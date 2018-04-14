@@ -99,10 +99,7 @@ export class GitRemoteHTTP {
     const service = 'git-upload-pack'
     return this.stream({ stream, service })
   }
-  async stream ({
-    stream,
-    service
-  }) {
+  async stream ({ stream, service }) {
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
