@@ -1,3 +1,4 @@
+/* eslint-env node, browser, jest, jasmine */
 module.exports = n => {
   if (typeof jest !== 'undefined') {
     jest.setTimeout(n)

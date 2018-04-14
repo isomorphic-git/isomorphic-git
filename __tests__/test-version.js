@@ -1,4 +1,4 @@
-/* global describe it expect */
+/* eslint-env node, browser, jasmine */
 const pkg = require('../package.json')
 const { version } = require('isomorphic-git')
 

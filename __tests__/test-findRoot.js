@@ -1,4 +1,4 @@
-/* global jasmine jest describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
 const pify = require('pify')

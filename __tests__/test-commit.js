@@ -1,13 +1,11 @@
-/* globals jest describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
-const pify = require('pify')
 const { commit, sign, verify } = require('isomorphic-git')
 
 describe('commit', () => {
   it('commit', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-commit')
+    let { fs, gitdir } = await makeFixture('test-commit')
     // Test
     let sha = await commit({
       fs,
@@ -24,11 +22,11 @@ describe('commit', () => {
 
   it('throw error if missing author', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-commit')
+    let { fs, gitdir } = await makeFixture('test-commit')
     // Test
     let error = null
     try {
-      let sha = await commit({
+      await commit({
         fs,
         gitdir,
         author: {
@@ -46,7 +44,7 @@ describe('commit', () => {
     // reset for test 2
     error = null
     try {
-      let sha = await commit({
+      await commit({
         fs,
         gitdir,
         author: {
@@ -67,7 +65,7 @@ describe('commit', () => {
     // Setup
     const openpgp = require('openpgp/dist/openpgp.min.js')
 
-    let { fs, dir, gitdir } = await makeFixture('test-commit')
+    let { fs, gitdir } = await makeFixture('test-commit')
     // Test
     const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
     await commit({

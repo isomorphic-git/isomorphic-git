@@ -1,9 +1,7 @@
-/* global describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { assertSnapshot } = require('./__helpers__/assertSnapshot')
 const snapshots = require('./__snapshots__/test-GitRefManager.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const pify = require('pify')
 const { managers } = require('isomorphic-git/internal-apis')
 const { GitRefManager } = managers
 
@@ -12,7 +10,7 @@ describe('GitRefManager', () => {
     registerSnapshots(snapshots)
   })
   it('packedRefs', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
+    let { fs, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.packedRefs({
       fs,
       gitdir
@@ -20,7 +18,7 @@ describe('GitRefManager', () => {
     expect([...refs]).toMatchSnapshot()
   })
   it('listRefs', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
+    let { fs, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.listRefs({
       fs,
       gitdir,
@@ -35,7 +33,7 @@ describe('GitRefManager', () => {
     expect(refs).toMatchSnapshot()
   })
   it('listBranches', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
+    let { fs, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.listBranches({
       fs,
       gitdir
@@ -49,7 +47,7 @@ describe('GitRefManager', () => {
     expect(refs).toMatchSnapshot()
   })
   it('listTags', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitRefManager')
+    let { fs, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.listTags({
       fs,
       gitdir

@@ -1,4 +1,4 @@
-/* globals describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { init, add, listFiles } = require('isomorphic-git')
@@ -7,10 +7,9 @@ const { init, add, listFiles } = require('isomorphic-git')
 describe('add', () => {
   it('file', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-add')
+    let { fs, dir } = await makeFixture('test-add')
     // Test
     await init({ fs, dir })
-    let orig = (await listFiles({ fs, dir })).length
     await add({ fs, dir, filepath: 'a.txt' })
     expect((await listFiles({ fs, dir })).length === 1).toBe(true)
     await add({ fs, dir, filepath: 'a.txt' })

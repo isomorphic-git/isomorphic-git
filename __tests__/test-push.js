@@ -1,4 +1,4 @@
-/* globals describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-push.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
@@ -18,7 +18,7 @@ describe('push', () => {
     'push to karma-git-http-server-middleware',
     async () => {
       // Setup
-      let { fs, dir, gitdir } = await makeFixture('test-push')
+      let { fs, gitdir } = await makeFixture('test-push')
       let output = []
       let emitter = new EventEmitter().on('message', output.push.bind(output))
       // Test

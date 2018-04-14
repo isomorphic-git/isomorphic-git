@@ -1,12 +1,9 @@
-/* global describe it expect */
-const server = require('./__helpers__/http-backend')
+/* eslint-env node, browser, jasmine */
 const { managers } = require('isomorphic-git/internal-apis')
 const { GitRemoteHTTP } = managers
 
 const nock = require('nock')
 const path = require('path')
-
-const { get } = server('__tests__/__fixtures__')
 
 describe('GitRemoteHTTP', () => {
   beforeAll(() => {
@@ -72,7 +69,7 @@ describe('GitRemoteHTTP', () => {
     // Test
     let error = null
     try {
-      let remote = await GitRemoteHTTP.discover({
+      await GitRemoteHTTP.discover({
         service: 'git-receive-pack',
         url: 'https://github.com/isomorphic-git/not-there'
       })
