@@ -1,7 +1,7 @@
 // @flow
 import { Buffer } from 'buffer'
-import sortby from 'lodash.sortby'
 import BufferCursor from 'buffercursor'
+import sortby from 'lodash.sortby'
 import shasum from 'shasum'
 
 const MAX_UINT32 = 2 ** 32

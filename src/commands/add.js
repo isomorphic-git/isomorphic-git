@@ -1,6 +1,8 @@
 import path from 'path'
+
 import { GitIndexManager, GitObjectManager } from '../managers'
 import { FileSystem } from '../models'
+
 /**
  * @external {FSModule} http://ghub.io/browserfs
  */

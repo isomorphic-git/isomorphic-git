@@ -1,6 +1,7 @@
 import path from 'path'
+
+import { GitObjectManager, GitRefManager } from '../managers'
 import { FileSystem, SignedGitCommit } from '../models'
-import { GitRefManager, GitObjectManager } from '../managers'
 
 /**
  * Create a signed commit

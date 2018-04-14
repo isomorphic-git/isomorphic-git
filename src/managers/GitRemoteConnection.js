@@ -1,7 +1,8 @@
-import { GitPktLine } from '../models'
-import concat from 'simple-concat'
 import pify from 'pify'
+import concat from 'simple-concat'
 import { PassThrough } from 'stream'
+
+import { GitPktLine } from '../models'
 
 export class GitRemoteConnection {
   static async discover (service, res /*: string */) {

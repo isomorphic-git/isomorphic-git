@@ -1,14 +1,16 @@
 import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
-import shasum from 'shasum'
+import crc32 from 'crc/lib/crc32.js'
 import applyDelta from 'git-apply-delta'
 import listpack from 'git-list-pack'
-import { GitObject } from './GitObject'
-import crc32 from 'crc/lib/crc32.js'
-import { PassThrough } from 'stream'
-import pako from 'pako'
 import * as marky from 'marky'
+import pako from 'pako'
+import shasum from 'shasum'
+import { PassThrough } from 'stream'
+
 import { log } from '../utils'
+
+import { GitObject } from './GitObject'
 
 function buffer2stream (buffer) {
   let stream = new PassThrough()

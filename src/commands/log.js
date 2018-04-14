@@ -1,5 +1,6 @@
 import path from 'path'
-import { GitRefManager, GitObjectManager } from '../managers'
+
+import { GitObjectManager, GitRefManager } from '../managers'
 import { FileSystem, GitCommit } from '../models'
 
 export async function log ({

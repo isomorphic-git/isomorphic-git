@@ -1,7 +1,9 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import path from 'path'
-import { GitConfigManager } from './GitConfigManager'
+
 import { FileSystem, GitRefSpecSet } from '../models'
+
+import { GitConfigManager } from './GitConfigManager'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [
