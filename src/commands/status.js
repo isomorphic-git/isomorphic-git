@@ -11,25 +11,6 @@ import type { Stats } from 'fs'
 import type { CacheEntry } from '../models/GitIndex'
 */
 
-function cacheIsStale (
-  { entry, stats } /*: {
-    entry: CacheEntry,
-    stats: Stats
-  } */
-) {
-  // Comparison based on the description in Paragraph 4 of
-  // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
-  return (
-    entry.mode !== stats.mode ||
-    entry.mtime.valueOf() !== stats.mtime.valueOf() ||
-    entry.ctime.valueOf() !== stats.ctime.valueOf() ||
-    entry.uid !== stats.uid ||
-    entry.gid !== stats.gid ||
-    entry.ino !== stats.ino >> 0 ||
-    entry.size !== stats.size
-  )
-}
-
 async function getOidAtPath ({ fs, gitdir, tree, path }) {
   if (typeof path === 'string') path = path.split('/')
   let dirname = path.shift()
@@ -134,21 +115,14 @@ export async function status ({
       }
     }
   )
-  let stats = null
-  try {
-    stats = await fs._lstat(path.join(dir, filepath))
-  } catch (err) {
-    if (err.code !== 'ENOENT') {
-      throw err
-    }
-  }
+  let stats = await fs.lstat(path.join(dir, filepath))
 
   let H = treeOid !== null // head
   let I = indexEntry !== null // index
   let W = stats !== null // working dir
 
   const getWorkdirOid = async () => {
-    if (I && !cacheIsStale({ entry: indexEntry, stats })) {
+    if (I && fs.statsAreEqual(indexEntry, stats)) {
       return indexEntry.oid
     } else {
       let object = await fs.read(path.join(dir, filepath))

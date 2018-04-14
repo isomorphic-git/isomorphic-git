@@ -2,6 +2,7 @@
 import path from 'path'
 import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
+import { log } from '../utils'
 import { config } from './config'
 import { fetch } from './fetch'
 import { merge } from './merge'
@@ -28,7 +29,7 @@ export async function pull ({
       depth: 1
     })
   }
-  console.log(`Using ref=${ref}`)
+  log(`Using ref=${ref}`)
   // Fetch from the correct remote.
   let remote = await config({
     gitdir,

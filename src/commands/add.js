@@ -39,7 +39,7 @@ export async function add ({
   await GitIndexManager.acquire(
     { fs, filepath: `${gitdir}/index` },
     async function (index) {
-      let stats = await fs._lstat(path.join(dir, filepath))
+      let stats = await fs.lstat(path.join(dir, filepath))
       index.insert({ filepath, stats, oid })
     }
   )

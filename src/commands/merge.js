@@ -2,6 +2,7 @@
 import path from 'path'
 import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
+import { log as debugLog } from '../utils'
 import { log } from './log'
 
 function compareAge (a, b) {
@@ -58,14 +59,14 @@ export async function merge ({
   let baseOid = await findMergeBase({ gitdir, fs, refs: [ourOid, theirOid] })
   // handle fast-forward case
   if (baseOid === theirOid) {
-    console.log(`'${theirs}' is already merged into '${ours}'`)
+    debugLog(`'${theirs}' is already merged into '${ours}'`)
     return {
       oid: ourOid,
       alreadyMerged: true
     }
   }
   if (baseOid === ourOid) {
-    console.log(`Performing a fast-forward merge...`)
+    debugLog(`Performing a fast-forward merge...`)
     await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
     return {
       oid: theirOid,

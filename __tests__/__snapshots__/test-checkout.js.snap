@@ -50,4 +50,58 @@ Array [
 ]
 `;
 
+exports[`checkout checkout over an existing branch 1`] = `
+Array [
+  "a.txt",
+  "c.txt",
+  "e.txt",
+  "f.txt",
+]
+`;
+
+exports[`checkout checkout over an existing branch 2`] = `
+Array [
+  "a.txt",
+  "c.txt",
+  "e.txt",
+  "f.txt",
+]
+`;
+
+exports[`checkout checkout over an existing branch 3`] = `
+Array [
+  "a.txt",
+  "b.txt",
+  "c.txt",
+  "d.txt",
+]
+`;
+
+exports[`checkout checkout over an existing branch 4`] = `
+Array [
+  "a.txt",
+  "b.txt",
+  "c.txt",
+  "d.txt",
+]
+`;
+
+exports[`checkout checkout over an existing branch 5`] = `
+Array [
+  "a.txt",
+  "c.txt",
+  "e.txt",
+  "f.txt",
+]
+`;
+
+exports[`checkout checkout over an existing branch 6`] = `
+Array [
+  "a.txt",
+  "c.txt",
+  "e.txt",
+  "f.txt",
+]
+`;
+
 exports[`checkout checkout unfetched branch 1`] = `"Failed to checkout ref 'missing-branch' because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally."`;

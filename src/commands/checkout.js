@@ -2,43 +2,104 @@ import path from 'path'
 import { config } from './config'
 import { FileSystem, GitCommit, GitTree } from '../models'
 import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
+import { log } from '../utils'
+
+const entryjoin = (prefix, filepath) =>
+  prefix === '' ? filepath : `${prefix}/${filepath}`
+
+async function writeFileIfChanged ({ fs, gitdir, dir, prefix, entry, index }) {
+  let oid = entry.oid
+  let entrypath = entryjoin(prefix, entry.path)
+  let filepath = path.join(dir, prefix, entry.path)
+  let stats = await fs.lstat(filepath)
+  // If the file exists...
+  if (stats) {
+    log(`comparing ${entrypath} and ${filepath}`)
+    // If the oid in the git index is not stale, use it. Otherwise compute the hash again.
+    let indexEntry = index.get(entrypath)
+    let unchanged = fs.statsAreEqual(indexEntry, stats)
+    if (!unchanged) {
+      log(`CACHE MISS! computing SHA1...`)
+    }
+    let currentOid = unchanged
+      ? indexEntry.oid
+      : await GitObjectManager.hash({
+        gitdir,
+        type: 'blob',
+        object: await fs.read(filepath)
+      })
+    // If the hash is the same...
+    if (oid === currentOid) {
+      // there's (almost) nothing to do.
+      log(entrypath + ' did not change.')
+      if (!unchanged) {
+        index.insert({
+          filepath: entrypath,
+          stats,
+          oid
+        })
+      }
+      return
+    } else {
+      log(entrypath + ' changed!')
+      log(`${currentOid} -> ${oid}`)
+    }
+  }
+  let { object } = await GitObjectManager.read({
+    fs,
+    gitdir,
+    oid
+  })
+  await fs.write(filepath, object)
+  stats = await fs.lstat(filepath)
+  index.insert({
+    filepath: entrypath,
+    stats,
+    oid
+  })
+}
 
 async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
   const fs = new FileSystem(_fs)
-  for (let entry of tree) {
-    let { type, object } = await GitObjectManager.read({
+  const treeEntries = [...tree]
+  // Files currently in the index but not in the tree should be deleted.
+  // We do deletions first in order to free up disk space.
+  const currentFiles = [...index]
+    .map(entry => entry.path)
+    .filter(filepath => filepath.startsWith(prefix))
+  const desiredFiles = treeEntries.map(entry => entryjoin(prefix, entry.path))
+  // This is potentially a little faster, and a bit more elegant, than filtering with Array.includes for each item.
+  const setOfDesiredFiles = new Set(desiredFiles)
+  const deleteFiles = currentFiles.filter(path => !setOfDesiredFiles.has(path))
+  for (const filepath of deleteFiles) {
+    await fs.rm(path.join(dir, filepath))
+    index.delete({ filepath })
+  }
+
+  // Write entries out breadth first-ish, so applications can start
+  // displaying top-level file directory data like README or package.json
+  // as soon as possible.
+  const blobs = treeEntries.filter(entry => entry.type === 'blob')
+  const trees = treeEntries.filter(entry => entry.type === 'tree')
+  for (const entry of blobs) {
+    await writeFileIfChanged({ fs, gitdir, dir, prefix, entry, index })
+  }
+  for (const entry of trees) {
+    let entrypath = entryjoin(prefix, entry.path)
+    let { object } = await GitObjectManager.read({
       fs,
       gitdir,
       oid: entry.oid
     })
-    let entrypath = prefix === '' ? entry.path : `${prefix}/${entry.path}`
-    let filepath = path.join(dir, prefix, entry.path)
-    switch (type) {
-      case 'blob':
-        await fs.write(filepath, object)
-        let stats = await fs._lstat(filepath)
-        index.insert({
-          filepath: entrypath,
-          stats,
-          oid: entry.oid
-        })
-        break
-      case 'tree':
-        let tree = GitTree.from(object)
-        await writeTreeToDisk({
-          fs,
-          dir,
-          gitdir,
-          index,
-          prefix: entrypath,
-          tree
-        })
-        break
-      default:
-        throw new Error(
-          `Unexpected object type ${type} found in tree for '${entrypath}'`
-        )
-    }
+    let tree = GitTree.from(object)
+    await writeTreeToDisk({
+      fs,
+      dir,
+      gitdir,
+      index,
+      prefix: entrypath,
+      tree
+    })
   }
 }
 
@@ -105,16 +166,6 @@ export async function checkout ({
   await GitIndexManager.acquire(
     { fs, filepath: `${gitdir}/index` },
     async function (index) {
-      // TODO: Big optimization possible here.
-      // Instead of deleting and rewriting everything, only delete files
-      // that are not present in the new branch, and only write files that
-      // are not in the index or are in the index but have the wrong SHA.
-      for (let entry of index) {
-        try {
-          await fs.rm(path.join(dir, entry.path))
-        } catch (err) {}
-      }
-      index.clear()
       // Write files. TODO: Write them atomically
       await writeTreeToDisk({ fs, gitdir, dir, index, prefix: '', tree })
       // Update HEAD TODO: Handle non-branch cases

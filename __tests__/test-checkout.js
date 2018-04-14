@@ -31,4 +31,29 @@ describe('checkout', () => {
       expect(err.message).toMatchSnapshot()
     }
   })
+
+  it('checkout over an existing branch', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture(
+      'test-checkout-overwrite-working-dir'
+    )
+    // This should be a no-op since branch-a is already checked out
+    await checkout({ fs, dir, gitdir, ref: 'branch-a' })
+    let files = await pify(fs.readdir)(dir)
+    expect(files.sort()).toMatchSnapshot()
+    let index = await listFiles({ fs, dir, gitdir })
+    expect(index).toMatchSnapshot()
+    // This should result in a.txt, b.txt, c.txt, d.txt
+    await checkout({ fs, dir, gitdir, ref: 'branch-b' })
+    files = await pify(fs.readdir)(dir)
+    expect(files.sort()).toMatchSnapshot()
+    index = await listFiles({ fs, dir, gitdir })
+    expect(index).toMatchSnapshot()
+    // For good measure, lets switch back to branch-a. Two tests for the price of one.
+    await checkout({ fs, dir, gitdir, ref: 'branch-a' })
+    files = await pify(fs.readdir)(dir)
+    expect(files.sort()).toMatchSnapshot()
+    index = await listFiles({ fs, dir, gitdir })
+    expect(index).toMatchSnapshot()
+  })
 })

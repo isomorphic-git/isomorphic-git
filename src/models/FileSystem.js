@@ -36,6 +36,42 @@ export class FileSystem {
     }
   }
   /**
+   * Return a Stat object if lstat succeeded and a null if it doesn't.
+   * Rethrows errors that aren't related to file existance.
+   */
+  async lstat (filepath /*: string */, options /*: Object */ = {}) {
+    try {
+      return await this._lstat(filepath)
+    } catch (err) {
+      if (err.code === 'ENOENT' || err.code === 'ENOTDIR') {
+        return null
+      } else {
+        console.log('Unhandled error in "FileSystem.lstat()" function', err)
+        throw err
+      }
+    }
+  }
+  statsAreEqual (entry, stats) {
+    // This is necessary because git stores inodes as 32bit integers,
+    // but they can actually be much bigger
+    const MAX_UINT32 = 2 ** 32
+    // Comparison based on the description in Paragraph 4 of
+    // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
+    return (
+      entry != null &&
+      stats != null &&
+      entry.mode % MAX_UINT32 === stats.mode % MAX_UINT32 &&
+      entry.mtime.valueOf() % MAX_UINT32 ===
+        stats.mtime.valueOf() % MAX_UINT32 &&
+      entry.ctime.valueOf() % MAX_UINT32 ===
+        stats.ctime.valueOf() % MAX_UINT32 &&
+      entry.uid % MAX_UINT32 === stats.uid % MAX_UINT32 &&
+      entry.gid % MAX_UINT32 === stats.gid % MAX_UINT32 &&
+      entry.ino % MAX_UINT32 === stats.ino % MAX_UINT32 &&
+      entry.size % MAX_UINT32 === stats.size % MAX_UINT32
+    )
+  }
+  /**
    * Return the contents of a file if it exists, otherwise returns null.
    */
   async read (filepath /*: string */, options /*: Object */ = {}) {
