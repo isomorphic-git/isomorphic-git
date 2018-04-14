@@ -1,7 +1,9 @@
 // @flow
 // import LockManager from 'travix-lock-manager'
-import { FileSystem, GitIndex } from '../models'
 import AsyncLock from 'async-lock'
+
+import { FileSystem, GitIndex } from '../models'
+
 // import Lock from '../utils'
 
 // TODO: replace with an LRU cache?

@@ -1,7 +1,9 @@
 import path from 'path'
-import { config } from './config'
+
+import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
 import { FileSystem, GitCommit, GitTree } from '../models'
-import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
+
+import { config } from './config'
 
 async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
   const fs = new FileSystem(_fs)

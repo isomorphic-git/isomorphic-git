@@ -1,6 +1,7 @@
 // @flow
 import ignore from 'ignore'
 import path from 'path'
+
 import { FileSystem } from '../models'
 
 // I'm putting this in a Manager because I reckon it could benefit

@@ -1,7 +1,9 @@
 // @flow
-import path from 'path'
-import { FileSystem } from '../models'
 import AsyncLock from 'async-lock'
+import path from 'path'
+
+import { FileSystem } from '../models'
+
 const lock = new AsyncLock()
 
 /** @ignore */

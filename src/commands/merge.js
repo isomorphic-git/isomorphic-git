@@ -1,7 +1,9 @@
 // import diff3 from 'node-diff3'
 import path from 'path'
+
 import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
+
 import { log } from './log'
 
 function compareAge (a, b) {

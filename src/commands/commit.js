@@ -1,8 +1,10 @@
 import path from 'path'
-import { config } from './config'
+
+import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
 import { FileSystem, GitCommit, GitTree } from '../models'
-import { GitRefManager, GitObjectManager, GitIndexManager } from '../managers'
 import { flatFileListToDirectoryStructure } from '../utils'
+
+import { config } from './config'
 
 async function constructTree ({ fs, gitdir, inode }) /*: string */ {
   // use depth first traversal

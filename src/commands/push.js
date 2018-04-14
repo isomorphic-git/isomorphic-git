@@ -1,13 +1,15 @@
-import path from 'path'
 import { Buffer } from 'buffer'
-import { PassThrough } from 'stream'
 import pad from 'pad'
 import pako from 'pako'
+import path from 'path'
 import createHash from 'sha.js'
-import { config } from './config'
-import { GitRefManager, GitObjectManager, GitRemoteManager } from '../managers'
-import { FileSystem, GitCommit, GitTree, GitPktLine } from '../models'
+import { PassThrough } from 'stream'
+
+import { GitObjectManager, GitRefManager, GitRemoteManager } from '../managers'
+import { FileSystem, GitCommit, GitPktLine, GitTree } from '../models'
 import { log, pkg } from '../utils'
+
+import { config } from './config'
 
 const types = {
   commit: 0b0010000,

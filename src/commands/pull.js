@@ -1,11 +1,13 @@
 // import diff3 from 'node-diff3'
 import path from 'path'
+
 import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
+
+import { checkout } from './checkout'
 import { config } from './config'
 import { fetch } from './fetch'
 import { merge } from './merge'
-import { checkout } from './checkout'
 
 export async function pull ({
   dir,

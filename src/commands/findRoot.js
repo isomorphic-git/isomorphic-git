@@ -1,5 +1,6 @@
-import { FileSystem } from '../models'
 import path from 'path'
+
+import { FileSystem } from '../models'
 
 /**
  * Find the root git directory

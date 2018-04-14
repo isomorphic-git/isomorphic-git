@@ -1,5 +1,6 @@
 // For now, to remain API compatible, we'll pre-register the GitRemoteHTTP helper
 import { GitRemoteHTTP } from './GitRemoteHTTP'
+
 export const remoteHelpers = new Map()
 remoteHelpers.set('http', GitRemoteHTTP)
 remoteHelpers.set('https', GitRemoteHTTP)

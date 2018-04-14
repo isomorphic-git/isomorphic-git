@@ -1,8 +1,10 @@
 // @flow
 import { Buffer } from 'buffer'
-import simpleGet from 'simple-get'
 import pify from 'pify'
+import simpleGet from 'simple-get'
+
 import { pkg } from '../utils'
+
 import { GitRemoteConnection } from './GitRemoteConnection'
 
 function basicAuth (auth) {
