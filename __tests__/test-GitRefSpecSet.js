@@ -1,4 +1,4 @@
-/* global describe it expect */
+/* eslint-env node, browser, jasmine */
 const { models } = require('isomorphic-git/internal-apis')
 const { GitRefSpecSet } = models
 

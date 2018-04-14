@@ -1,3 +1,4 @@
+/* eslint-env node, browser, jasmine */
 const path = require('path')
 const _fs = require('fs')
 const pify = require('pify')
@@ -37,9 +38,9 @@ async function makeFixture (dir) {
 }
 
 async function makeBrowserFixture (dir) {
-  localStorage.debug = 'isomorphic-git'
+  window.localStorage.debug = 'isomorphic-git'
 
-  const { fs, writable, readable } = await FixturePromise
+  const { fs, writable } = await FixturePromise
   writable.empty()
   let gitdir = `${dir}.git`
   try {

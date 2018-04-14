@@ -1,4 +1,4 @@
-/* globals describe it expect */
+/* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
@@ -13,7 +13,7 @@ describe('GitPackIndex', () => {
     registerSnapshots(snapshots)
   })
   it('from .idx', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
+    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
         gitdir,
@@ -31,7 +31,7 @@ describe('GitPackIndex', () => {
     expect(p.offsets['5f1f014326b1d7e8079d00b87fa7a9913bd91324']).toEqual(20855)
   })
   it('from .pack', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
+    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
     let pack = await pify(fs.readFile)(
       path.join(
         gitdir,
@@ -50,7 +50,7 @@ describe('GitPackIndex', () => {
   })
 
   it('to .idx file', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
+    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
         gitdir,
@@ -63,7 +63,7 @@ describe('GitPackIndex', () => {
     expect(idxbuffer.equals(idx)).toBe(true)
   })
   it('to .idx file from .pack', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
+    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
         gitdir,
@@ -83,7 +83,7 @@ describe('GitPackIndex', () => {
   })
 
   it('read undeltified object', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
+    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
         gitdir,
@@ -107,7 +107,7 @@ describe('GitPackIndex', () => {
     expect(oid).toBe('637c4e69d85e0dcc18898ec251377453d0891585')
   })
   it('read deltified object', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-GitPackIndex')
+    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
     let idx = await pify(fs.readFile)(
       path.join(
         gitdir,
