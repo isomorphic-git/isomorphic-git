@@ -4,13 +4,10 @@ var path = require('path')
 var pkg = require('../../package.json')
 var replace = require('replace-in-file')
 var options = {
-  files: [
-    'src/**/*.js'
-  ],
+  files: ['src/**/*.js'],
   from: /0\.0\.0-development/g,
   to: pkg.version
 }
-
 ;(async function () {
   await replace(options)
 })()

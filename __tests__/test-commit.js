@@ -40,7 +40,9 @@ describe('commit', () => {
     } catch (err) {
       error = err.message
     }
-    expect(error).toBe('Author name and email must be specified as an argument or in the .git/config file')
+    expect(error).toBe(
+      'Author name and email must be specified as an argument or in the .git/config file'
+    )
     // reset for test 2
     error = null
     try {
@@ -56,7 +58,9 @@ describe('commit', () => {
     } catch (err) {
       error = err.message
     }
-    expect(error).toBe('Author name and email must be specified as an argument or in the .git/config file')
+    expect(error).toBe(
+      'Author name and email must be specified as an argument or in the .git/config file'
+    )
   })
 
   it('GPG signing', async () => {

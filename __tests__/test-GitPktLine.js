@@ -8,7 +8,7 @@ describe('GitPktLine', () => {
     let read = GitPktLine.reader(Buffer.from('0010hello world\n'))
     expect(typeof read === 'function').toBe(true)
     expect((await read()).toString('utf8') === 'hello world\n').toBe(true)
-    expect((await read())).toBe(true)
+    expect(await read()).toBe(true)
   })
 
   it('read buffer - realistic', async () => {
@@ -25,7 +25,9 @@ describe('GitPktLine', () => {
 0000`
     )
     let read = GitPktLine.reader(buffer)
-    expect((await read()).toString('utf8') === '# service=git-upload-pack\n').toBe(true)
+    expect(
+      (await read()).toString('utf8') === '# service=git-upload-pack\n'
+    ).toBe(true)
     expect((await read()) === null).toBe(true)
     expect(
       (await read()).toString('utf8') ===
@@ -60,7 +62,7 @@ describe('GitPktLine', () => {
         'e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5\n'
     ).toBe(true)
     expect((await read()) === null).toBe(true)
-    expect((await read())).toBe(true)
+    expect(await read()).toBe(true)
   })
 
   it('read stream - simple', async () => {
@@ -68,7 +70,7 @@ describe('GitPktLine', () => {
     let read = GitPktLine.streamReader(stream)
     expect(typeof read === 'function').toBe(true)
     expect((await read()).toString('utf8') === 'hello world\n').toBe(true)
-    expect((await read())).toBe(true)
+    expect(await read()).toBe(true)
   })
 
   it('read stream - realistic', async () => {
@@ -86,7 +88,9 @@ describe('GitPktLine', () => {
     )
     let stream = bufferToStream(buffer)
     let read = GitPktLine.streamReader(stream)
-    expect((await read()).toString('utf8') === '# service=git-upload-pack\n').toBe(true)
+    expect(
+      (await read()).toString('utf8') === '# service=git-upload-pack\n'
+    ).toBe(true)
     expect((await read()) === null).toBe(true)
     expect(
       (await read()).toString('utf8') ===
@@ -121,7 +125,7 @@ describe('GitPktLine', () => {
         'e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5\n'
     ).toBe(true)
     expect((await read()) === null).toBe(true)
-    expect((await read())).toBe(true)
+    expect(await read()).toBe(true)
   })
 
   it('encode string', async () => {
