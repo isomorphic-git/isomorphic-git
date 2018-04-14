@@ -89,7 +89,7 @@ export class GitPktLine {
       try {
         let length = await bufferstream.slice(4)
         if (length === null) return true
-        length = parseInt((length).toString('utf8'), 16)
+        length = parseInt(length.toString('utf8'), 16)
         if (length === 0) return null
         let buffer = await bufferstream.slice(length - 4)
         if (buffer === null) return true
