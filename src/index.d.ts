@@ -44,6 +44,10 @@ export interface CommitDescription {
   gpgsig?: string   // PGP signature (if present)
 }
 
+export interface CommitDescriptionWithPayload extends CommitDescription {
+  payload: string
+}
+
 export interface TreeDescription {
   entries: Array<TreeEntry>
 }
@@ -207,6 +211,24 @@ export function log(args: {
   depth?: number,
   since?: Date
 }): Promise<Array<CommitDescription>>
+export function log(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  ref?: string,
+  depth?: number,
+  since?: Date,
+  signing: false
+}): Promise<Array<CommitDescription>>
+export function log(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  ref?: string,
+  depth?: number,
+  since?: Date,
+  signing: true
+}): Promise<Array<CommitDescriptionWithPayload>>
 
 export function merge(args: {
   fs: any,
