@@ -9,7 +9,8 @@ export async function log ({
   fs: _fs,
   ref = 'HEAD',
   depth,
-  since // Date
+  since, // Date
+  signing = false
 }) {
   const fs = new FileSystem(_fs)
   let sinceTimestamp =
@@ -24,7 +25,11 @@ export async function log ({
       `The given ref ${ref} did not resolve to a commit but to a ${type}`
     )
   }
-  let currentCommit = { oid: start, ...GitCommit.from(object).parse() }
+  let commit = GitCommit.from(object)
+  let currentCommit = { oid: start, ...commit.parse() }
+  if (signing) {
+    currentCommit.payload = commit.withoutSignature()
+  }
   commits.push(currentCommit)
   while (true) {
     if (depth !== undefined && commits.length === depth) break
@@ -48,7 +53,11 @@ export async function log ({
       })
       break
     }
-    currentCommit = { oid, ...GitCommit.from(object).parse() }
+    commit = GitCommit.from(object)
+    currentCommit = { oid, ...commit.parse() }
+    if (signing) {
+      currentCommit.payload = commit.withoutSignature()
+    }
     if (
       sinceTimestamp !== undefined &&
       currentCommit.author.timestamp <= sinceTimestamp
