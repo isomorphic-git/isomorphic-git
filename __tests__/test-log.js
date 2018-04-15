@@ -34,4 +34,19 @@ describe('log', () => {
     let commits = await log({ fs, gitdir, ref: 'origin/test-branch' })
     expect(commits).toMatchSnapshot()
   })
+  it('with signing payloads', async () => {
+    // Setup
+    const openpgp = require('openpgp/dist/openpgp.min.js')
+    let { fs, gitdir } = await makeFixture('test-log')
+    // Test
+    let commits = await log({ fs, gitdir, ref: 'HEAD', signing: true })
+    expect(commits.length).toBe(5)
+    expect(commits).toMatchSnapshot()
+    // Verify
+    for (const commit of commits) {
+      let msg = openpgp.message.readSignedContent(commit.payload, commit.gpgsig)
+      let keys = msg.getSigningKeyIds().map(keyid => keyid.toHex())
+      expect(keys).toEqual(['9609b8a5928ba6b9'])
+    }
+  })
 })
