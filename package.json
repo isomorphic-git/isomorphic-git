@@ -72,6 +72,7 @@
     "through2": "^2.0.3"
   },
   "devDependencies": {
+    "@isomorphic-git/openpgp-plugin": "git+https://github.com/isomorphic-git/openpgp-plugin.git",
     "@types/node": "9.6.5",
     "all-contributors-cli": "4.11.1",
     "babel-plugin-external-helpers": "6.22.0",

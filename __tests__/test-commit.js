@@ -1,6 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { commit, sign, verify } = require('isomorphic-git')
+const { GitOpenPGP } = require('@isomorphic-git/openpgp-plugin')
+const { commit, sign, verify, use } = require('isomorphic-git')
+
+use(GitOpenPGP)
 
 describe('commit', () => {
   it('commit', async () => {
@@ -63,8 +66,6 @@ describe('commit', () => {
 
   it('GPG signing', async () => {
     // Setup
-    const openpgp = require('openpgp/dist/openpgp.min.js')
-
     let { fs, gitdir } = await makeFixture('test-commit')
     // Test
     const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
@@ -78,20 +79,27 @@ describe('commit', () => {
         timestamp: 1504842425
       }
     })
-    await sign({
+    let commitDescription = await sign({
       fs,
       gitdir,
-      openpgp,
       privateKeys: privateKeys[0]
     })
+    expect(commitDescription.payload).toEqual(`tree a69b2f53db7b7ba59f43ee15f5c42166297c4262
+parent 1386e77b0a7afa8333663a9e4cbf8e6158e625c1
+author Mr. Test <mrtest@example.com> 1504842425 -0000
+committer Mr. Test <mrtest@example.com> 1504842425 -0000
+
+Initial commit
+`)
     const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
     let keys = await verify({
       fs,
       gitdir,
-      openpgp,
       ref: 'HEAD',
       publicKeys: publicKeys[0]
     })
-    expect(keys[0]).toBe('a01edd29ac0f3952')
+    expect(keys.valid).toBeDefined()
+    expect(keys.invalid).toBeUndefined()
+    expect(keys.valid[0]).toBe('a01edd29ac0f3952')
   })
 })

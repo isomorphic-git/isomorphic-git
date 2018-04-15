@@ -1,3 +1,5 @@
+import { GitSigningManager } from '../managers'
+
 import { GitCommit } from './GitCommit'
 
 function normalize (str) {
@@ -20,21 +22,17 @@ function indent (str) {
   )
 }
 
-/** @ignore */
 export class SignedGitCommit extends GitCommit {
   static from (commit) {
     return new SignedGitCommit(commit)
   }
-  async sign (openpgp, privateKeys /*: string */) {
+  async sign (privateKeys /*: string */) {
     let commit = this.withoutSignature()
     let headers = GitCommit.justHeaders(this._commit)
     let message = GitCommit.justMessage(this._commit)
-    let privKeyObj = openpgp.key.readArmored(privateKeys).keys
-    let { signature } = await openpgp.sign({
-      data: openpgp.util.str2Uint8Array(commit),
-      privateKeys: privKeyObj,
-      detached: true,
-      armor: true
+    let signature = await GitSigningManager.getSigningHelper().sign({
+      payload: commit,
+      secretKey: privateKeys
     })
     // renormalize the line endings to the one true line-ending
     signature = normalize(signature)
@@ -44,22 +42,11 @@ export class SignedGitCommit extends GitCommit {
     return GitCommit.from(signedCommit)
   }
 
-  async listSigningKeys (openpgp) {
-    let msg = openpgp.message.readSignedContent(
-      this.withoutSignature(),
-      this.isolateSignature()
-    )
-    return msg.getSigningKeyIds().map(keyid => keyid.toHex())
-  }
-
-  async verify (openpgp, publicKeys /*: string */) {
-    let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
-    let msg = openpgp.message.readSignedContent(
-      this.withoutSignature(),
-      this.isolateSignature()
-    )
-    let results = msg.verify(pubKeyObj)
-    let validity = results.reduce((a, b) => a.valid && b.valid, { valid: true })
-    return validity
+  async verify (publicKeys /*: string */) {
+    return GitSigningManager.getSigningHelper().verify({
+      payload: this.withoutSignature(),
+      signature: this.isolateSignature(),
+      publicKey: publicKeys
+    })
   }
 }

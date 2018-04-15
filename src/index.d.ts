@@ -83,6 +83,17 @@ export interface MergeReport {
   fastForward?: boolean
 }
 
+export interface Plugin {
+  name: string,
+  remoteHelper?: {},
+  signingHelper?: {}
+}
+
+export interface SigningKeys {
+  valid?: string[],
+  invalid?: string[]
+}
+
 /*~ If this module has methods, declare them as functions like so.
  */
 export function add(args: {
@@ -290,7 +301,7 @@ export function sign(args: {
   dir: string,
   gitdir?: string
   privateKeys: string
-}): Promise<string>
+}): Promise<CommitDescriptionWithPayload>
 
 export function status(args: {
   fs: any,
@@ -298,6 +309,8 @@ export function status(args: {
   gitdir?: string
   filepath: string
 }): Promise<string>
+
+export function use(plugin: Plugin): Promise<void>
 
 export const utils: {
   auth: (username: string, password: string) => ({ username: string, password: string }),
@@ -309,7 +322,7 @@ export function verify(args: {
   dir: string,
   gitdir?: string
   ref: string,
-  publickKeys: string
-}): Promise<false | Array<string>>
+  publicKeys: string
+}): Promise<SigningKeys>
 
 export function version(): string
