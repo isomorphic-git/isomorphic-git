@@ -1,19 +1,35 @@
-import pify from 'pify'
-import concat from 'simple-concat'
 import { PassThrough } from 'stream'
+import through2 from 'through2'
 
-import { GitPktLine } from '../models'
+import { GitPktLine, GitSideBand } from '../models'
+import { pkg } from '../utils'
 
 export class GitRemoteConnection {
-  static async discover (service, res /*: string */) {
+  static async sendInfoRefs (service, res, { capabilities, refs, symrefs }) {
+    // Compose capabilities string
+    let syms = ''
+    for (const [key, value] of symrefs) {
+      syms += `symref=${key}:${value} `
+    }
+    let caps = `\0${[...capabilities].join(' ')} ${syms}agent=${pkg.agent}`
+
+    res.write(GitPktLine.encode(`# service=${service}\n`))
+    res.write(GitPktLine.flush())
+    // Note: In the edge case of a brand new repo, zero refs (and zero capabilities)
+    // are returned.
+    for (const [key, value] of refs) {
+      res.write(GitPktLine.encode(`${value} ${key}${caps}\n`))
+      caps = ''
+    }
+    res.write(GitPktLine.flush())
+    res.end()
+  }
+  static async receiveInfoRefs (service, res /*: string */) {
     const capabilities = new Set()
     const refs = new Map()
     const symrefs = new Map()
 
-    let data = await pify(concat)(res)
-    // There is probably a better way to do this, but for now
-    // let's just throw the result parser inline here.
-    let read = GitPktLine.reader(data)
+    let read = GitPktLine.streamReader(res)
     let lineOne = await read()
     // skip past any flushes
     while (lineOne === null) lineOne = await read()
@@ -60,51 +76,209 @@ export class GitRemoteConnection {
     }
     return { capabilities, refs, symrefs }
   }
-  static async stream ({ res }) {
-    // Parse the response!
-    let read = GitPktLine.streamReader(res)
-    // And now for the ridiculous side-band-64k protocol
-    let packetlines = new PassThrough()
-    let packfile = new PassThrough()
-    let progress = new PassThrough()
-    // TODO: Use a proper through stream?
-    const nextBit = async function () {
+  static async sendUploadPackRequest ({
+    capabilities = [],
+    wants = [],
+    haves = [],
+    shallows = [],
+    depth = null,
+    since = null,
+    exclude = [],
+    relative = false
+  }) {
+    let packstream = new PassThrough()
+    wants = [...new Set(wants)] // remove duplicates
+    let firstLineCapabilities = ` ${capabilities.join(' ')}`
+    for (const oid of wants) {
+      packstream.write(
+        GitPktLine.encode(`want ${oid}${firstLineCapabilities}\n`)
+      )
+      firstLineCapabilities = ''
+    }
+    for (const oid of shallows) {
+      packstream.write(GitPktLine.encode(`shallow ${oid}\n`))
+    }
+    if (depth !== null) {
+      packstream.write(GitPktLine.encode(`deepen ${depth}\n`))
+    }
+    if (since !== null) {
+      packstream.write(
+        GitPktLine.encode(
+          `deepen-since ${Math.floor(since.valueOf() / 1000)}\n`
+        )
+      )
+    }
+    for (const oid of exclude) {
+      packstream.write(GitPktLine.encode(`deepen-not ${oid}\n`))
+    }
+    for (const oid of haves) {
+      packstream.write(GitPktLine.encode(`have ${oid}\n`))
+    }
+    packstream.write(GitPktLine.flush())
+    packstream.end(GitPktLine.encode(`done\n`))
+    return packstream
+  }
+  static async receiveUploadPackRequest (req) {
+    let read = GitPktLine.streamReader(req)
+    let done = false
+    let capabilities = null
+    let wants = []
+    let haves = []
+    let shallows = []
+    let depth = null
+    let since = null
+    let exclude = []
+    let relative = false
+    while (!done) {
       let line = await read()
-      // Skip over flush packets
-      if (line === null) return nextBit()
-      // A made up convention to signal there's no more to read.
-      if (line === true) {
-        packetlines.end()
-        progress.end()
-        packfile.end()
-        return
-      }
-      // Examine first byte to determine which output "stream" to use
-      switch (line[0]) {
-        case 1: // pack data
-          packfile.write(line.slice(1))
+      if (line === true) break
+      if (line === null) continue
+      let [key, value, ...rest] = line
+        .toString('utf8')
+        .trim()
+        .split(' ')
+      if (!capabilities) capabilities = rest
+      switch (key) {
+        case 'want':
+          wants.push(value)
           break
-        case 2: // progress message
-          progress.write(line.slice(1))
+        case 'have':
+          haves.push(value)
           break
-        case 3: // fatal error message just before stream aborts
-          let error = line.slice(1)
-          progress.write(error)
-          packfile.destroy(new Error(error.toString('utf8')))
-          return
-        default:
-          // Not part of the side-band-64k protocol
-          packetlines.write(line.slice(0))
+        case 'shallow':
+          shallows.push(value)
+          break
+        case 'deepen':
+          depth = parseInt(value)
+          break
+        case 'deepen-since':
+          since = parseInt(value)
+          break
+        case 'deepen-not':
+          exclude.push(value)
+          break
+        case 'deepen-relative':
+          relative = true
+          break
+        case 'done':
+          done = true
+          break
       }
-      // Careful not to blow up the stack.
-      // I think Promises in a tail-call position should be OK.
-      nextBit()
     }
-    nextBit()
     return {
-      packetlines,
-      packfile,
-      progress
+      capabilities,
+      wants,
+      haves,
+      shallows,
+      depth,
+      since,
+      exclude,
+      relative,
+      done
     }
+  }
+  static async sendUploadPackResult () {
+    // TODO: does this just forward a packfile stream?
+    // Or does it multiplex it and inject progress messages
+  }
+  static async receiveUploadPackResult (res) {
+    let { packetlines, packfile, progress } = await GitSideBand.demux(res)
+    let shallows = []
+    let unshallows = []
+    let acks = []
+    let nak = false
+    let done = false
+    return new Promise((resolve, reject) => {
+      // Parse the response
+      packetlines.pipe(
+        through2(async (data, enc, next) => {
+          let line = data.toString('utf8').trim()
+          if (line.startsWith('shallow')) {
+            let oid = line.slice(-41).trim()
+            if (oid.length !== 40) {
+              reject(new Error(`non-40 character 'shallow' oid: ${oid}`))
+            }
+            shallows.push(oid)
+          } else if (line.startsWith('unshallow')) {
+            let oid = line.slice(-41).trim()
+            if (oid.length !== 40) {
+              reject(new Error(`non-40 character 'shallow' oid: ${oid}`))
+            }
+            unshallows.push(oid)
+          } else if (line.startsWith('ACK')) {
+            let [, oid, status] = line.split(' ')
+            acks.push({ oid, status })
+            if (!status) done = true
+          } else if (line.startsWith('NAK')) {
+            nak = true
+            done = true
+          }
+          if (done) {
+            resolve({ shallows, unshallows, acks, nak, packfile, progress })
+          }
+          next(null, data)
+        })
+      )
+    })
+  }
+  static async sendReceivePackRequest ({ capabilities = [], triplets = [] }) {
+    let packstream = new PassThrough()
+    let capsFirstLine = `\0 ${capabilities.join(' ')}`
+    for (let trip of triplets) {
+      packstream.write(
+        GitPktLine.encode(
+          `${trip.oldoid} ${trip.oid} ${trip.fullRef}${capsFirstLine}\n`
+        )
+      )
+      capsFirstLine = ''
+    }
+    packstream.write(GitPktLine.flush())
+    return packstream
+  }
+  static async receiveReceivePackRequest () {
+    // TODO
+  }
+  static async sendReceivePackResult () {
+    // TODO
+  }
+  static async receiveReceivePackResult (packfile) {
+    // Parse the response!
+    let result = {}
+    let response = ''
+    let read = GitPktLine.streamReader(packfile)
+    let line = await read()
+    while (line !== true) {
+      if (line !== null) response += line.toString('utf8') + '\n'
+      line = await read()
+    }
+
+    let lines = response.toString('utf8').split('\n')
+    // We're expecting "unpack {unpack-result}"
+    line = lines.shift()
+    if (!line.startsWith('unpack ')) {
+      throw new Error(
+        `Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'`
+      )
+    }
+    if (line === 'unpack ok') {
+      result.ok = ['unpack']
+    } else {
+      result.errors = [line.trim()]
+    }
+    for (let line of lines) {
+      let status = line.slice(0, 2)
+      let refAndMessage = line.slice(3)
+      if (status === 'ok') {
+        result.ok = result.ok || []
+        result.ok.push(refAndMessage)
+      } else if (status === 'ng') {
+        result.errors = result.errors || []
+        result.errors.push(refAndMessage)
+      }
+    }
+    return result
+  }
+  static async receiveMultiplexedStreams (res) {
+    return GitSideBand.demux(res)
   }
 }

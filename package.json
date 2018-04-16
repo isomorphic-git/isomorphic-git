@@ -67,6 +67,7 @@
     "shasum": "^1.0.2",
     "simple-concat": "^1.0.0",
     "simple-get": "^2.7.0",
+    "split-buffer": "^1.0.0",
     "split2": "^2.2.0",
     "stream-source": "^0.3.5",
     "through2": "^2.0.3"
@@ -108,6 +109,7 @@
     "nps": "5.9.0",
     "nps-utils": "1.5.0",
     "openpgp": "2.6.2",
+    "organize-js-imports": "1.2.1",
     "parse-header-stream": "1.1.1",
     "prettier-standard": "8.0.1",
     "pretty-format": "22.4.3",

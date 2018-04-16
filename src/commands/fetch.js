@@ -2,11 +2,14 @@ import path from 'path'
 import pify from 'pify'
 import concat from 'simple-concat'
 import split2 from 'split2'
-import { PassThrough } from 'stream'
-import through2 from 'through2'
 
-import { GitRefManager, GitRemoteManager, GitShallowManager } from '../managers'
-import { FileSystem, GitPktLine } from '../models'
+import {
+  GitRefManager,
+  GitRemoteConnection,
+  GitRemoteManager,
+  GitShallowManager
+} from '../managers'
+import { FileSystem } from '../models'
 import { pkg } from '../utils'
 
 import { config } from './config'
@@ -104,12 +107,14 @@ async function fetchPackfile ({
   singleBranch = false
 }) {
   const fs = new FileSystem(_fs)
+  // Sanity checks
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
       throw new Error(`Invalid value for depth argument: ${depth}`)
     }
     depth = parseInt(depth)
   }
+  // Set missing values
   remote = remote || 'origin'
   if (url === undefined) {
     url = await config({
@@ -125,13 +130,14 @@ async function fetchPackfile ({
       password: authPassword
     }
   }
+  // Get list of refs from remote
   let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   let remoteHTTP = await GitRemoteHTTP.discover({
     service: 'git-upload-pack',
     url,
     auth
   })
-  // Check server supports shallow cloning
+  // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
     throw new Error(`Remote does not support shallow fetches`)
   }
@@ -157,10 +163,16 @@ async function fetchPackfile ({
     symrefs: remoteHTTP.symrefs,
     tags
   })
-  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/${
-    pkg.name
-  }@${pkg.version}${relative ? ' deepen-relative' : ''}`
-  let packstream = new PassThrough()
+  // Assemble the application/x-git-upload-pack-request
+  const capabilities = [
+    'multi_ack_detailed',
+    'no-done',
+    'side-band-64k',
+    'thin-pack',
+    'ofs-delta',
+    `agent=${pkg.agent}`
+  ]
+  if (relative) capabilities.push('deepen-relative')
   // Figure out the SHA for the requested ref
   let oid = GitRefManager.resolveAgainstMap({
     ref,
@@ -169,30 +181,6 @@ async function fetchPackfile ({
   // Start requesting oids from the remote by their SHAs
   let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
   wants = [...new Set(wants)] // remove duplicates
-  let firstLineCapabilities = ` ${capabilities}`
-  for (const want of wants) {
-    packstream.write(
-      GitPktLine.encode(`want ${want}${firstLineCapabilities}\n`)
-    )
-    firstLineCapabilities = ''
-  }
-  let oids = await GitShallowManager.read({ fs, gitdir })
-  if (oids.size > 0 && remoteHTTP.capabilities.has('shallow')) {
-    for (let oid of oids) {
-      packstream.write(GitPktLine.encode(`shallow ${oid}\n`))
-    }
-  }
-  if (depth !== null) {
-    packstream.write(GitPktLine.encode(`deepen ${depth}\n`))
-  }
-  if (since !== null) {
-    packstream.write(
-      GitPktLine.encode(`deepen-since ${Math.floor(since.valueOf() / 1000)}\n`)
-    )
-  }
-  for (let x of exclude) {
-    packstream.write(GitPktLine.encode(`deepen-not ${x}\n`))
-  }
   let haves = []
   for (let ref of refs) {
     try {
@@ -204,41 +192,43 @@ async function fetchPackfile ({
       }
     } catch (err) {}
   }
-  for (const have of haves) {
-    packstream.write(GitPktLine.encode(`have ${have}\n`))
+  let shallows = []
+  let oids = await GitShallowManager.read({ fs, gitdir })
+  if (remoteHTTP.capabilities.has('shallow')) {
+    shallows = [...oids]
   }
-  packstream.write(GitPktLine.flush())
-  packstream.end(GitPktLine.encode(`done\n`))
-  let response = await GitRemoteHTTP.connect({
+  const packstream = await GitRemoteConnection.sendUploadPackRequest({
+    capabilities,
+    wants,
+    haves,
+    shallows,
+    depth,
+    since,
+    exclude,
+    relative
+  })
+  let res = await GitRemoteHTTP.connect({
     service: 'git-upload-pack',
     url,
     auth,
     stream: packstream
   })
+  let parsedResponse = await GitRemoteConnection.receiveUploadPackResult(res)
   // Apply all the 'shallow' and 'unshallow' commands
-  response.packetlines.pipe(
-    through2(async (data, enc, next) => {
-      let line = data.toString('utf8')
-      if (line.startsWith('shallow')) {
-        let oid = line.slice(-41).trim()
-        if (oid.length !== 40) {
-          throw new Error(`non-40 character 'shallow' oid: ${oid}`)
-        }
-        oids.add(oid)
-        await GitShallowManager.write({ fs, gitdir, oids })
-      } else if (line.startsWith('unshallow')) {
-        let oid = line.slice(-41).trim()
-        if (oid.length !== 40) {
-          throw new Error(`non-40 character 'shallow' oid: ${oid}`)
-        }
-        oids.delete(oid)
-        await GitShallowManager.write({ fs, gitdir, oids })
-      }
-      next(null, data)
-    })
-  )
+  for (const oid of parsedResponse.shallows) {
+    oids.add(oid)
+  }
+  for (const oid of parsedResponse.unshallows) {
+    oids.delete(oid)
+  }
+  await GitShallowManager.write({ fs, gitdir, oids })
   // We need this value later for the `clone` command.
-  response.HEAD = remoteHTTP.symrefs.get('HEAD')
-  response.FETCH_HEAD = oid
-  return response
+  let HEAD = remoteHTTP.symrefs.get('HEAD')
+  let FETCH_HEAD = oid
+  return {
+    packfile: parsedResponse.packfile,
+    progress: parsedResponse.progress,
+    HEAD,
+    FETCH_HEAD
+  }
 }

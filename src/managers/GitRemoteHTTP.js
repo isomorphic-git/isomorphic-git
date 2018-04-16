@@ -33,7 +33,7 @@ export class GitRemoteHTTP {
     if (res.statusCode !== 200) {
       throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
-    return GitRemoteConnection.discover(service, res)
+    return GitRemoteConnection.receiveInfoRefs(service, res)
   }
   static async connect ({ service, url, auth, stream }) {
     // Auto-append the (necessary) .git if it's missing.
@@ -54,6 +54,6 @@ export class GitRemoteHTTP {
     if (res.statusCode !== 200) {
       throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
-    return GitRemoteConnection.stream({ res })
+    return res
   }
 }
