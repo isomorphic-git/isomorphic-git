@@ -86,6 +86,7 @@
     "browserify-shim": "3.8.14",
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
+    "codecov": "^3.0.0",
     "cross-env": "5.1.4",
     "envify": "4.1.0",
     "fetch-mock": "6.3.0",
@@ -93,6 +94,7 @@
     "jasmine": "3.1.0",
     "jasmine-console-reporter": "3.0.0",
     "jasmine-core": "3.1.0",
+    "jest": "^22.0.4",
     "jest-fixtures": "git+https://github.com/wmhilton-contrib/jest-fixtures.git#win32",
     "karma": "2.0.0",
     "karma-browserify": "5.2.0",
@@ -113,15 +115,11 @@
     "rollup": "0.57.1",
     "rollup-plugin-babel": "3.0.3",
     "rollup-plugin-json": "2.3.0",
+    "semantic-release": "^15.0.0",
     "standard": "11.0.1",
+    "travis-deploy-once": "^4.3.1",
     "typescript": "2.8.1",
     "uglify-es": "3.3.9"
-  },
-  "optionalDependencies": {
-    "codecov": "^3.0.0",
-    "jest": "^22.0.4",
-    "semantic-release": "^15.0.0",
-    "travis-deploy-once": "^4.3.1"
   },
   "browserify": {
     "transform": [
