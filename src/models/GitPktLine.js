@@ -53,7 +53,7 @@ Examples (as C-style strings):
 import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import pad from 'pad'
-import streamSource from 'stream-source'
+import streamSource from 'stream-source/index.node.js'
 
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line
