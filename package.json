@@ -3,12 +3,12 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript implementation of git for node and browsers!",
   "typings": "./src/index.d.ts",
-  "main": "dist/for-node/isomorphic-git/",
+  "main": "dist/for-node/isomorphic-git/index.js",
   "browser": {
     "isomorphic-git": "./dist/bundle.umd.min.js",
     "isomorphic-git/internal-apis": "./dist/internal.umd.min.js"
   },
-  "module": "dist/for-future/",
+  "module": "dist/for-future/isomorphic-git/index.js",
   "unpkg": "dist/bundle.umd.min.js",
   "bin": {
     "isogit": "./cli.js"
@@ -17,6 +17,7 @@
     "node": ">=7.6.0"
   },
   "scripts": {
+    "pack": "webpack",
     "start": "nps",
     "format": "nps format",
     "build": "nps build",
@@ -74,16 +75,11 @@
   "devDependencies": {
     "@types/node": "9.6.5",
     "all-contributors-cli": "4.11.1",
-    "babel-plugin-external-helpers": "6.22.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "6.26.0",
-    "babel-plugin-transform-object-rest-spread": "6.26.0",
-    "babel-plugin-transform-runtime": "6.23.0",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.4",
     "babel-preset-env": "1.6.1",
-    "babel-preset-flow": "6.23.0",
     "ban-sensitive-files": "1.9.2",
     "browserfs": "2.0.0",
-    "browserify": "16.2.0",
-    "browserify-shim": "3.8.14",
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
     "codecov": "3.0.0",
@@ -92,42 +88,34 @@
     "fetch-mock": "6.3.0",
     "husky": "0.14.3",
     "jasmine": "3.1.0",
-    "jasmine-console-reporter": "3.0.0",
     "jasmine-core": "3.1.0",
     "jest": "22.4.2",
-    "jest-fixtures": "git+https://github.com/wmhilton-contrib/jest-fixtures.git#win32",
+    "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
     "karma": "2.0.0",
-    "karma-browserify": "5.2.0",
     "karma-chrome-launcher": "2.2.0",
+    "karma-edge-launcher": "0.4.2",
     "karma-firefox-launcher": "1.1.0",
     "karma-git-http-server-middleware": "1.1.0",
     "karma-jasmine": "1.1.1",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
+    "karma-webpack": "3.0.0",
     "nock": "9.2.5",
     "nps": "5.9.0",
     "nps-utils": "1.5.0",
     "openpgp": "2.6.2",
+    "organize-js-imports": "1.2.1",
     "parse-header-stream": "1.1.1",
     "prettier-standard": "8.0.1",
     "pretty-format": "22.4.3",
     "replace-in-file": "3.4.0",
     "rollup": "0.57.1",
-    "rollup-plugin-babel": "3.0.3",
-    "rollup-plugin-json": "2.3.0",
     "semantic-release": "15.0.3",
     "standard": "11.0.1",
     "travis-deploy-once": "4.4.0",
     "typescript": "2.8.1",
-    "uglify-es": "3.3.9"
-  },
-  "browserify": {
-    "transform": [
-      "browserify-shim"
-    ]
-  },
-  "browserify-shim": {
-    "fs": "global:fs"
+    "webpack": "4.6.0",
+    "webpack-cli": "2.0.15"
   },
   "jest": {
     "testRegex": "/__tests__/[^\\/]+\\.js",

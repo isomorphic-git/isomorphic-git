@@ -1,4 +1,6 @@
 // Karma configuration
+const path = require('path')
+const webpack = require('webpack')
 
 module.exports = function (config) {
   const options = {
@@ -9,7 +11,7 @@ module.exports = function (config) {
     basePath: '',
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['browserify', 'jasmine'],
+    frameworks: ['jasmine'],
     beforeMiddleware: ['git-http-server'],
     gitHttpServer: {
       root: '__tests__/__fixtures__',
@@ -36,7 +38,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '__tests__/test-*.js': ['browserify']
+      '__tests__/test-*.js': ['webpack']
     },
     // web server port
     port: 9876,
@@ -70,19 +72,19 @@ module.exports = function (config) {
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone Simulator',
+        deviceName: 'iPhone X Simulator',
         platformName: 'iOS',
-        platformVersion: '11.0',
+        platformVersion: '11.2',
         browserName: 'Safari',
-        appiumVersion: '1.7.1'
+        appiumVersion: '1.7.2'
       },
       sl_android_chrome: {
         base: 'SauceLabs',
-        deviceName: 'Android Emulator',
+        deviceName: 'Android GoogleAPI Emulator',
         platformName: 'Android',
-        platformVersion: '6.0',
+        platformVersion: '7.1',
         browserName: 'Chrome',
-        appiumVersion: '1.7.1'
+        appiumVersion: '1.7.2'
       },
       FirefoxHeadless: {
         base: 'Firefox',
@@ -108,6 +110,25 @@ module.exports = function (config) {
         // Replace process.env.CI
         'envify'
       ]
+    },
+    webpack: {
+      mode: 'development',
+      devtool: 'inline-source-map',
+      plugins: [new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/)],
+      resolve: {
+        alias: {
+          'isomorphic-git/internal-apis': path.resolve(
+            __dirname,
+            'dist/internal.umd.min.js'
+            // 'src/internal-apis.js'
+          ),
+          'isomorphic-git': path.resolve(
+            __dirname,
+            'dist/bundle.umd.min.js'
+            // 'src/index.js'
+          )
+        }
+      }
     }
   }
 

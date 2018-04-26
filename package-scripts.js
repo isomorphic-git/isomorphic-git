@@ -22,7 +22,6 @@ module.exports = {
       js: `standard ${srcPaths}`,
       typescript: 'tsc src/index.d.ts'
     },
-    toc: 'doctoc --maxlevel=2 README.md',
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),
@@ -35,44 +34,10 @@ module.exports = {
       check: 'all-contributors check'
     },
     build: {
-      default: series.nps(
-        'build.rollup',
-        'build.browserify',
-        'build.indexjson'
-      ),
+      default: series.nps('build.rollup', 'build.webpack', 'build.indexjson'),
+      webpack: 'webpack',
       rollup: 'rollup -c',
-      browserify: concurrent.nps('build.sw', 'build.umd', 'build.internalApis'),
-      indexjson: `node __tests__/__helpers__/make_http_index.js`,
-      discify: `browserify \
-            --entry dist/for-browserify/index.js \
-            --standalone git \
-            --fullpaths | uglifyjs \
-                          --compress \
-                          --mangle | discify -O`,
-      internalApis: `browserify \
-            --entry dist/for-browserify/internal-apis.js \
-            --standalone internal \
-            --debug | uglifyjs \
-                      --compress \
-                      --mangle \
-                      --source-map "content=inline,url=internal.umd.min.js.map" \
-                      -o dist/internal.umd.min.js`,
-      umd: `browserify \
-            --entry dist/for-browserify/index.js \
-            --standalone git \
-            --debug | uglifyjs \
-                      --compress \
-                      --mangle \
-                      --source-map "content=inline,url=bundle.umd.min.js.map" \
-                      -o dist/bundle.umd.min.js`,
-      sw: `browserify \
-           --entry dist/for-serviceworker/index.js \
-           --standalone git \
-           --debug | uglifyjs \
-                     --compress \
-                     --mangle \
-                     --source-map "content=inline,url=service-workder-bundle.umd.min.js.map" \
-                     -o dist/service-worker-bundle.umd.min.js`
+      indexjson: `node __tests__/__helpers__/make_http_index.js`
     },
     test: {
       // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
@@ -90,12 +55,12 @@ module.exports = {
         )
         : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
       size: 'bundlesize',
-      jasmine: retry3(
-        'cross-env NODE_PATH=./dist/for-node jasmine --reporter=jasmine-console-reporter'
-      ),
+      jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine'),
       jest: process.env.CI
-        ? retry3('timeout --signal=KILL 5m jest --ci --coverage && codecov')
-        : 'jest --ci',
+        ? retry3(
+          'cross-env BABEL_ENV=jest timeout --signal=KILL 5m jest --ci --coverage && codecov'
+        )
+        : 'cross-env BABEL_ENV=jest jest --ci',
       karma: process.env.CI
         ? retry3('karma start --single-run')
         : 'karma start --single-run'
