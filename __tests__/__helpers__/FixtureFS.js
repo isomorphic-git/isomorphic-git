@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
-const _fs = require('fs')
 const pify = require('pify')
 const setTestTimeout = require('./set-test-timeout')
 setTestTimeout(60000)
@@ -59,6 +58,7 @@ async function makeBrowserFixture (dir) {
 }
 
 async function makeNodeFixture (fixture) {
+  const fs = require('fs')
   const {
     getFixturePath,
     createTempDir,
@@ -71,7 +71,7 @@ async function makeNodeFixture (fixture) {
   let gitdir = (await getFixturePath(testsDir, `${fixture}.git`))
     ? await copyFixtureIntoTempDir(testsDir, `${fixture}.git`)
     : await createTempDir()
-  return { fs: _fs, dir, gitdir }
+  return { fs, dir, gitdir }
 }
 
 module.exports.makeFixture = makeFixture
