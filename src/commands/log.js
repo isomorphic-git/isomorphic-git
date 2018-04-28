@@ -26,7 +26,7 @@ export async function log ({
     )
   }
   let commit = GitCommit.from(object)
-  let currentCommit = { oid: start, ...commit.parse() }
+  let currentCommit = Object.assign({ oid: start }, commit.parse())
   if (signing) {
     currentCommit.payload = commit.withoutSignature()
   }
@@ -54,7 +54,7 @@ export async function log ({
       break
     }
     commit = GitCommit.from(object)
-    currentCommit = { oid, ...commit.parse() }
+    currentCommit = Object.assign({ oid }, commit.parse())
     if (signing) {
       currentCommit.payload = commit.withoutSignature()
     }

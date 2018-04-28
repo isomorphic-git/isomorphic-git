@@ -105,7 +105,7 @@ export class GitCommit {
   }
 
   parse () {
-    return { message: this.message(), ...this.headers() }
+    return Object.assign({ message: this.message() }, this.headers())
   }
 
   static justMessage (commit) {
