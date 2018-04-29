@@ -8,16 +8,20 @@ import { FileSystem } from '../models'
  *
  * @link https://isomorphic-git.github.io/docs/config.html
  */
-export async function config ({
-  dir,
-  gitdir = pathModule.join(dir, '.git'),
-  fs: _fs,
-  all = false,
-  append = false,
-  ...args
-}) {
+export async function config (args) {
+  // These arguments are not in the function signature but destructured separately
+  // as a result of a bit of a design flaw that requires the un-destructured argument object
+  // in order to call args.hasOwnProperty('value') later on.
+  let {
+    dir,
+    gitdir = pathModule.join(dir, '.git'),
+    fs: _fs,
+    all = false,
+    append = false,
+    path,
+    value
+  } = args
   const fs = new FileSystem(_fs)
-  let { path, value } = args
   const config = await GitConfigManager.get({ fs, gitdir })
   // This carefully distinguishes between
   // 1) there is no 'value' argument (do a "get")
