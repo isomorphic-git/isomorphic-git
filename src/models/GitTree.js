@@ -1,4 +1,3 @@
-// @flow
 import { Buffer } from 'buffer'
 
 /*::
@@ -10,7 +9,7 @@ type TreeEntry = {
 }
 */
 
-function parseBuffer (buffer) /*: Array<TreeEntry> */ {
+function parseBuffer (buffer) {
   let _entries = []
   let cursor = 0
   while (cursor < buffer.length) {
@@ -37,7 +36,7 @@ function parseBuffer (buffer) /*: Array<TreeEntry> */ {
   return _entries
 }
 
-function limitModeToAllowed (mode /*: string */) {
+function limitModeToAllowed (mode) {
   if (typeof mode === 'number') {
     mode = mode.toString(8)
   }
@@ -61,12 +60,11 @@ function nudgeIntoShape (entry) {
   return entry
 }
 
-/** @ignore */
 export class GitTree {
   /*::
   _entries: Array<TreeEntry>
   */
-  constructor (entries /*: any */) {
+  constructor (entries) {
     if (Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
     } else if (Array.isArray(entries)) {

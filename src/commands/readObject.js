@@ -3,6 +3,11 @@ import path from 'path'
 import { GitObjectManager } from '../managers'
 import { FileSystem, GitCommit, GitTree } from '../models'
 
+/**
+ * Read a git object directly by its SHA1 object id
+ *
+ * @link https://isomorphic-git.github.io/docs/readObject.html
+ */
 export async function readObject ({
   dir,
   gitdir = path.join(dir, '.git'),

@@ -3,6 +3,11 @@ import path from 'path'
 import { GitObjectManager, GitRefManager } from '../managers'
 import { FileSystem, GitCommit } from '../models'
 
+/**
+ * Get commit descriptions from the git history
+ *
+ * @link https://isomorphic-git.github.io/docs/log.html
+ */
 export async function log ({
   dir,
   gitdir = path.join(dir, '.git'),

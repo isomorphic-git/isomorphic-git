@@ -1,4 +1,3 @@
-// @flow
 import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import sortby from 'lodash.sortby'
@@ -33,7 +32,7 @@ type CacheEntry = {
 */
 
 // Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
-function parseCacheEntryFlags (bits /*: number */) /*: CacheEntryFlags */ {
+function parseCacheEntryFlags (bits) {
   return {
     assumeValid: Boolean(bits & 0b1000000000000000),
     extended: Boolean(bits & 0b0100000000000000),
@@ -42,7 +41,7 @@ function parseCacheEntryFlags (bits /*: number */) /*: CacheEntryFlags */ {
   }
 }
 
-function renderCacheEntryFlags (flags /*: CacheEntryFlags */) /*: number */ {
+function renderCacheEntryFlags (flags) {
   return (
     (flags.assumeValid ? 0b1000000000000000 : 0) +
     (flags.extended ? 0b0100000000000000 : 0) +
@@ -61,7 +60,7 @@ function parseBuffer (buffer) {
     )
   }
   let reader = new BufferCursor(buffer)
-  let _entries /*: Map<string, CacheEntry> */ = new Map()
+  let _entries = new Map()
   let magic = reader.toString('utf8', 4)
   if (magic !== 'DIRC') {
     throw new Error(`Inavlid dircache magic file number: ${magic}`)
@@ -108,13 +107,12 @@ function parseBuffer (buffer) {
   return _entries
 }
 
-/** @ignore */
 export class GitIndex {
   /*::
    _entries: Map<string, CacheEntry>
    _dirty: boolean // Used to determine if index needs to be saved to filesystem
    */
-  constructor (index /*: any */) {
+  constructor (index) {
     this._dirty = false
     if (Buffer.isBuffer(index)) {
       this._entries = parseBuffer(index)
@@ -127,7 +125,7 @@ export class GitIndex {
   static from (buffer) {
     return new GitIndex(buffer)
   }
-  get entries () /*: Array<CacheEntry> */ {
+  get entries () {
     return sortby([...this._entries.values()], 'path')
   }
   * [Symbol.iterator] () {
@@ -139,7 +137,7 @@ export class GitIndex {
     filepath,
     stats,
     oid
-  }) /*: {filepath: string, stats: Stats, oid: string } */ {
+  }) {
     let entry = {
       ctime: stats.ctime,
       mtime: stats.mtime,
@@ -161,7 +159,7 @@ export class GitIndex {
     this._entries.set(entry.path, entry)
     this._dirty = true
   }
-  delete ({ filepath } /*: {filepath: string} */) {
+  delete ({ filepath }) {
     if (this._entries.has(filepath)) {
       this._entries.delete(filepath)
     } else {

@@ -1,4 +1,3 @@
-// @flow
 import { Buffer } from 'buffer'
 import pify from 'pify'
 import simpleGet from 'simple-get'

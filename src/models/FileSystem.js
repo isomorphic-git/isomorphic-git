@@ -5,7 +5,6 @@ import { sleep } from '../utils'
 
 const delayedReleases = new Map()
 /**
- * @ignore
  * This is just a collection of helper functions really. At least that's how it started.
  */
 export class FileSystem {
@@ -24,7 +23,7 @@ export class FileSystem {
    * Return true if a file exists, false if it doesn't exist.
    * Rethrows errors that aren't related to file existance.
    */
-  async exists (filepath /*: string */, options /*: Object */ = {}) {
+  async exists (filepath, options = {}) {
     try {
       await this._stat(filepath)
       return true
@@ -40,7 +39,7 @@ export class FileSystem {
   /**
    * Return the contents of a file if it exists, otherwise returns null.
    */
-  async read (filepath /*: string */, options /*: Object */ = {}) {
+  async read (filepath, options = {}) {
     try {
       let buffer = await this._readFile(filepath, options)
       return buffer
@@ -52,9 +51,9 @@ export class FileSystem {
    * Write a file (creating missing directories if need be) without throwing errors.
    */
   async write (
-    filepath /*: string */,
-    contents /*: string|Buffer */,
-    options /*: Object */ = {}
+    filepath,
+    contents,
+    options = {}
   ) {
     try {
       await this._writeFile(filepath, contents, options)
@@ -68,7 +67,7 @@ export class FileSystem {
   /**
    * Make a directory (or series of nested directories) without throwing an error if it already exists.
    */
-  async mkdir (filepath /*: string */) {
+  async mkdir (filepath) {
     try {
       await this._mkdir(filepath)
       return

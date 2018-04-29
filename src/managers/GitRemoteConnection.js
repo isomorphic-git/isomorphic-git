@@ -5,7 +5,7 @@ import { PassThrough } from 'stream'
 import { GitPktLine } from '../models'
 
 export class GitRemoteConnection {
-  static async discover (service, res /*: string */) {
+  static async discover (service, res) {
     const capabilities = new Set()
     const refs = new Map()
     const symrefs = new Map()

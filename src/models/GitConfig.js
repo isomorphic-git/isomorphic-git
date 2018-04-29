@@ -57,7 +57,6 @@ const extractSectionName = line =>
 
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
-/** @ignore */
 export class GitConfig {
   constructor (text) {
     this.lines = text.split('\n')

@@ -8,17 +8,7 @@ import { FileSystem } from '../models'
  *
  * Note that this does NOT delete the file in the working directory.
  *
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} args.filepath - The path to the file to remove to the index.
- * @returns {Promise<void>} - Resolves successfully once the git index has been updated.
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- * await git.remove({...repo, filepath: '<@README.md@>'})
- * console.log('done')
+ * @link https://isomorphic-git.github.io/docs/remove.html
  */
 export async function remove ({
   dir,

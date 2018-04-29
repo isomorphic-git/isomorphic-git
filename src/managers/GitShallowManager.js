@@ -1,4 +1,3 @@
-// @flow
 import AsyncLock from 'async-lock'
 import path from 'path'
 
@@ -6,7 +5,6 @@ import { FileSystem } from '../models'
 
 const lock = new AsyncLock()
 
-/** @ignore */
 export class GitShallowManager {
   static async read ({ fs: _fs, gitdir }) {
     const fs = new FileSystem(_fs)
