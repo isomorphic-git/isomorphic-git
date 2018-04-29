@@ -9,6 +9,11 @@ import { config } from './config'
 import { fetch } from './fetch'
 import { merge } from './merge'
 
+/**
+ * Fetch and merge commits from a remote repository
+ *
+ * @link https://isomorphic-git.github.io/docs/pull.html
+ */
 export async function pull ({
   dir,
   gitdir = path.join(dir, '.git'),

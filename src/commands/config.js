@@ -4,34 +4,9 @@ import { GitConfigManager } from '../managers'
 import { FileSystem } from '../models'
 
 /**
- * Read and/or write to the git config file(s)
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} args.path -  The key of the git config entry.
- * @param {string} [args.value] - A value to store at that path.
- * @returns {Promise<any>} - Resolves with the config value
+ * Read and/or write to the git config files.
  *
- * If no `value` is provided, it does a read.
- * If a `value` is provided, it does a write.
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- *
- * // Write config value
- * await git.config({
- *   ...repo,
- *   path: '<@user.name@>',
- *   value: '<@Mr. Test@>'
- * })
- *
- * // Read config value
- * let value = await git.config({
- *   ...repo,
- *   path: '<@user.name@>'
- * })
- * console.log(value)
+ * @link https://isomorphic-git.github.io/docs/config.html
  */
 export async function config ({
   dir,

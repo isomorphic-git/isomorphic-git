@@ -1,7 +1,6 @@
-// @flow
 import { Buffer } from 'buffer'
 
-function formatTimezoneOffset (minutes /*: number */) {
+function formatTimezoneOffset (minutes) {
   let sign = Math.sign(minutes) || 1
   minutes = Math.abs(minutes)
   let hours = Math.floor(minutes / 60)
@@ -60,12 +59,8 @@ function outdent (str) {
 
 // TODO: Make all functions have static async signature?
 
-/** @ignore */
 export class GitCommit {
-  /*::
-  _commit : string
-  */
-  constructor (commit /*: string|Buffer|Object */) {
+  constructor (commit) {
     if (typeof commit === 'string') {
       this._commit = commit
     } else if (Buffer.isBuffer(commit)) {

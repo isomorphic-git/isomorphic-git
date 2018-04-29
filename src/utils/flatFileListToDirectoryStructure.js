@@ -1,4 +1,3 @@
-// @flow
 import path from 'path'
 
 /*::
@@ -12,14 +11,13 @@ type Node = {
 }
 */
 
-/** @ignore */
 export function flatFileListToDirectoryStructure (
-  files /*: Array<{path: string}> */
-) /*: Node|void */ {
-  const inodes /*: Map<string, Node> */ = new Map()
-  const mkdir = function (name) /*: Node|void */ {
+  files
+) {
+  const inodes = new Map()
+  const mkdir = function (name) {
     if (!inodes.has(name)) {
-      let dir /*: Node */ = {
+      let dir = {
         type: 'tree',
         fullpath: name,
         basename: path.basename(name),
@@ -36,9 +34,9 @@ export function flatFileListToDirectoryStructure (
     return inodes.get(name)
   }
 
-  const mkfile = function (name, metadata) /*: Node|void */ {
+  const mkfile = function (name, metadata) {
     if (!inodes.has(name)) {
-      let file /*: Node */ = {
+      let file = {
         type: 'blob',
         fullpath: name,
         basename: path.basename(name),

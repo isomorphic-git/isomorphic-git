@@ -1,4 +1,3 @@
-// @flow
 import ignore from 'ignore'
 import path from 'path'
 
@@ -9,14 +8,13 @@ import { FileSystem } from '../models'
 
 // TODO: Implement .git/info/exclude
 
-/** @ignore */
 export class GitIgnoreManager {
   static async isIgnored ({
     fs: _fs,
     dir,
     gitdir = path.join(dir, '.git'),
     filepath
-  }) /*: Promise<boolean> */ {
+  }) {
     const fs = new FileSystem(_fs)
     let pairs = [
       {
