@@ -73,7 +73,7 @@
     "through2": "^2.0.3"
   },
   "devDependencies": {
-    "@types/node": "9.6.5",
+    "@types/node": "9.6.7",
     "all-contributors-cli": "4.11.1",
     "babel-core": "6.26.3",
     "babel-loader": "7.1.4",
