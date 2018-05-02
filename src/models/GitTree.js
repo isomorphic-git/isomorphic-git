@@ -69,7 +69,7 @@ export class GitTree {
   */
   constructor (entries /*: any */) {
     if (isBuffer(entries)) {
-      this._entries = parseBuffer(buffer.Buffer(entries))
+      this._entries = parseBuffer(Buffer(entries))
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {

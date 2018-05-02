@@ -118,7 +118,7 @@ export class GitIndex {
   constructor (index /*: any */) {
     this._dirty = false
     if (isBuffer(index)) {
-      this._entries = parseBuffer(buffer.Buffer(index))
+      this._entries = parseBuffer(Buffer(index))
     } else if (index === null) {
       this._entries = new Map()
     } else {
