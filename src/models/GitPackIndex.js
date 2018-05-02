@@ -51,7 +51,6 @@ function otherVarIntDecode (reader, startWith) {
   return result
 }
 
-/** @ignore */
 export class GitPackIndex {
   constructor (stuff) {
     Object.assign(this, stuff)
@@ -361,7 +360,7 @@ export class GitPackIndex {
   async unload () {
     this.pack = null
   }
-  async read ({ oid } /*: {oid: string} */) {
+  async read ({ oid }) {
     if (!this.offsets[oid]) {
       if (this.getExternalRefDelta) {
         this.externalReadDepth++

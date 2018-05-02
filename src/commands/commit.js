@@ -6,31 +6,11 @@ import { flatFileListToDirectoryStructure } from '../utils'
 
 import { config } from './config'
 
-async function constructTree ({ fs, gitdir, inode }) /*: string */ {
-  // use depth first traversal
-  let children = inode.children
-  for (let inode of children) {
-    if (inode.type === 'tree') {
-      inode.metadata.mode = '040000'
-      inode.metadata.oid = await constructTree({ fs, gitdir, inode })
-    }
-  }
-  let entries = children.map(inode => ({
-    mode: inode.metadata.mode,
-    path: inode.basename,
-    oid: inode.metadata.oid,
-    type: inode.type
-  }))
-  const tree = GitTree.from(entries)
-  let oid = await GitObjectManager.write({
-    fs,
-    gitdir,
-    type: 'tree',
-    object: tree.toObject()
-  })
-  return oid
-}
-
+/**
+ * Create a new commit
+ *
+ * @link https://isomorphic-git.github.io/docs/commit.html
+ */
 export async function commit ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -106,5 +86,30 @@ export async function commit ({
       await fs.write(path.join(gitdir, branch), oid + '\n')
     }
   )
+  return oid
+}
+
+async function constructTree ({ fs, gitdir, inode }) {
+  // use depth first traversal
+  let children = inode.children
+  for (let inode of children) {
+    if (inode.type === 'tree') {
+      inode.metadata.mode = '040000'
+      inode.metadata.oid = await constructTree({ fs, gitdir, inode })
+    }
+  }
+  let entries = children.map(inode => ({
+    mode: inode.metadata.mode,
+    path: inode.basename,
+    oid: inode.metadata.oid,
+    type: inode.type
+  }))
+  const tree = GitTree.from(entries)
+  let oid = await GitObjectManager.write({
+    fs,
+    gitdir,
+    type: 'tree',
+    object: tree.toObject()
+  })
   return oid
 }

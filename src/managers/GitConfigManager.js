@@ -1,7 +1,5 @@
-// @flow
 import { FileSystem, GitConfig } from '../models'
 
-/** @ignore */
 export class GitConfigManager {
   static async get ({ fs: _fs, gitdir }) {
     const fs = new FileSystem(_fs)

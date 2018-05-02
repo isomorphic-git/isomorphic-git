@@ -20,12 +20,11 @@ function indent (str) {
   )
 }
 
-/** @ignore */
 export class SignedGitCommit extends GitCommit {
   static from (commit) {
     return new SignedGitCommit(commit)
   }
-  async sign (openpgp, privateKeys /*: string */) {
+  async sign (openpgp, privateKeys) {
     let commit = this.withoutSignature()
     let headers = GitCommit.justHeaders(this._commit)
     let message = GitCommit.justMessage(this._commit)
@@ -52,7 +51,7 @@ export class SignedGitCommit extends GitCommit {
     return msg.getSigningKeyIds().map(keyid => keyid.toHex())
   }
 
-  async verify (openpgp, publicKeys /*: string */) {
+  async verify (openpgp, publicKeys) {
     let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
     let msg = openpgp.message.readSignedContent(
       this.withoutSignature(),

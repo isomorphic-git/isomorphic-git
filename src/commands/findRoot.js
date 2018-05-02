@@ -4,20 +4,8 @@ import { FileSystem } from '../models'
 
 /**
  * Find the root git directory
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.filepath - The file directory to start searching in.
- * @returns {Promise<string>} - a directory name
- * @throws {Error} - Error('Unable to find git root')
  *
- * Starting at `filepath`, will walk upwards until it finds a directory that contains a directory called '.git'.
- *
- * @example
- * let gitroot = await git.findRoot({
- *   fs,
- *   filepath: '<@/path/to/some/gitrepo/path/to/some/file.txt@>'
- * })
- * console.log(gitroot) // '/path/to/some/gitrepo'
+ * @link https://isomorphic-git.github.io/docs/findRoot.html
  */
 export async function findRoot ({ fs: _fs, filepath }) {
   const fs = new FileSystem(_fs)

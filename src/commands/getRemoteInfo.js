@@ -1,5 +1,10 @@
 import { GitRemoteHTTP } from '../managers'
 
+/**
+ * List a remote servers branches, tags, and capabilities.
+ *
+ * @link https://isomorphic-git.github.io/docs/getRemoteInfo.html
+ */
 export async function getRemoteInfo ({ url }) {
   const remote = await GitRemoteHTTP.discover({
     service: 'git-upload-pack',

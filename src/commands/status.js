@@ -8,97 +8,10 @@ import {
 } from '../managers'
 import { FileSystem, GitCommit, GitTree } from '../models'
 
-/*::
-import type { Stats } from 'fs'
-import type { CacheEntry } from '../models/GitIndex'
-*/
-
-function cacheIsStale (
-  { entry, stats } /*: {
-    entry: CacheEntry,
-    stats: Stats
-  } */
-) {
-  // Comparison based on the description in Paragraph 4 of
-  // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
-  return (
-    entry.mode !== stats.mode ||
-    entry.mtime.valueOf() !== stats.mtime.valueOf() ||
-    entry.ctime.valueOf() !== stats.ctime.valueOf() ||
-    entry.uid !== stats.uid ||
-    entry.gid !== stats.gid ||
-    entry.ino !== stats.ino >> 0 ||
-    entry.size !== stats.size
-  )
-}
-
-async function getOidAtPath ({ fs, gitdir, tree, path }) {
-  if (typeof path === 'string') path = path.split('/')
-  let dirname = path.shift()
-  for (let entry of tree) {
-    if (entry.path === dirname) {
-      if (path.length === 0) {
-        return entry.oid
-      }
-      let { type, object } = await GitObjectManager.read({
-        fs,
-        gitdir,
-        oid: entry.oid
-      })
-      if (type === 'tree') {
-        let tree = GitTree.from(object)
-        return getOidAtPath({ fs, gitdir, tree, path })
-      }
-      if (type === 'blob') {
-        throw new Error(`Blob found where tree expected.`)
-      }
-    }
-  }
-  return null
-}
-
-async function getHeadTree ({ fs, gitdir }) {
-  // Get the tree from the HEAD commit.
-  let oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
-  let { object: cobject } = await GitObjectManager.read({ fs, gitdir, oid })
-  let commit = GitCommit.from(cobject)
-  let { object: tobject } = await GitObjectManager.read({
-    fs,
-    gitdir,
-    oid: commit.parseHeaders().tree
-  })
-  let tree = GitTree.from(tobject).entries()
-  return tree
-}
-
 /**
  * Tell whether a file has been changed
  *
- * The possible resolve values are:
- *
- * - `"ignored"` file ignored by a .gitignore rule
- * - `"unmodified"` file unchanged from HEAD commit
- * - `"*modified"` file has modifications, not yet staged
- * - `"*deleted"` file has been removed, but the removal is not yet staged
- * - `"*added"` file is untracked, not yet staged
- * - `"absent"` file not present in HEAD commit, staging area, or working dir
- * - `"modified"` file has modifications, staged
- * - `"deleted"` file has been removed, staged
- * - `"added"` previously untracked file, staged
- * - `"*unmodified"` working dir and HEAD commit match, but index differs
- * - `"*absent"` file not present in working dir or HEAD commit, but present in the index
- *
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} args.filepath - The path to the file to query.
- * @returns {Promise<string>} - Resolves successfully with the file's git status.
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- * let status = await git.status({...repo, filepath: '<@README.md@>'})
- * console.log(status)
+ * @link https://isomorphic-git.github.io/docs/status.html
  */
 export async function status ({
   dir,
@@ -202,4 +115,59 @@ export async function status ({
   ABB
   AAB
   */
+}
+
+function cacheIsStale (
+  { entry, stats }
+) {
+  // Comparison based on the description in Paragraph 4 of
+  // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
+  return (
+    entry.mode !== stats.mode ||
+    entry.mtime.valueOf() !== stats.mtime.valueOf() ||
+    entry.ctime.valueOf() !== stats.ctime.valueOf() ||
+    entry.uid !== stats.uid ||
+    entry.gid !== stats.gid ||
+    entry.ino !== stats.ino >> 0 ||
+    entry.size !== stats.size
+  )
+}
+
+async function getOidAtPath ({ fs, gitdir, tree, path }) {
+  if (typeof path === 'string') path = path.split('/')
+  let dirname = path.shift()
+  for (let entry of tree) {
+    if (entry.path === dirname) {
+      if (path.length === 0) {
+        return entry.oid
+      }
+      let { type, object } = await GitObjectManager.read({
+        fs,
+        gitdir,
+        oid: entry.oid
+      })
+      if (type === 'tree') {
+        let tree = GitTree.from(object)
+        return getOidAtPath({ fs, gitdir, tree, path })
+      }
+      if (type === 'blob') {
+        throw new Error(`Blob found where tree expected.`)
+      }
+    }
+  }
+  return null
+}
+
+async function getHeadTree ({ fs, gitdir }) {
+  // Get the tree from the HEAD commit.
+  let oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+  let { object: cobject } = await GitObjectManager.read({ fs, gitdir, oid })
+  let commit = GitCommit.from(cobject)
+  let { object: tobject } = await GitObjectManager.read({
+    fs,
+    gitdir,
+    oid: commit.parseHeaders().tree
+  })
+  let tree = GitTree.from(tobject).entries()
+  return tree
 }

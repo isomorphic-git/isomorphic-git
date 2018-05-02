@@ -3,7 +3,6 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { init, add, listFiles } = require('isomorphic-git')
 
-/** @test {add} */
 describe('add', () => {
   it('file', async () => {
     // Setup
