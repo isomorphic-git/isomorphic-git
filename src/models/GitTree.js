@@ -1,5 +1,6 @@
 // @flow
 import { Buffer } from 'buffer'
+import isBuffer from 'is-buffer'
 
 /*::
 type TreeEntry = {
@@ -67,8 +68,8 @@ export class GitTree {
   _entries: Array<TreeEntry>
   */
   constructor (entries /*: any */) {
-    if (Buffer.isBuffer(entries)) {
-      this._entries = parseBuffer(entries)
+    if (isBuffer(entries)) {
+      this._entries = parseBuffer(buffer.Buffer(entries))
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {

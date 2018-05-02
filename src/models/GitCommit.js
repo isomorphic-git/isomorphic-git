@@ -1,5 +1,6 @@
 // @flow
 import { Buffer } from 'buffer'
+import isBuffer from 'is-buffer'
 
 function formatTimezoneOffset (minutes /*: number */) {
   let sign = Math.sign(minutes) || 1
@@ -68,7 +69,7 @@ export class GitCommit {
   constructor (commit /*: string|Buffer|Object */) {
     if (typeof commit === 'string') {
       this._commit = commit
-    } else if (Buffer.isBuffer(commit)) {
+    } else if (isBuffer(commit)) {
       this._commit = commit.toString('utf8')
     } else if (typeof commit === 'object') {
       this._commit = GitCommit.render(commit)
