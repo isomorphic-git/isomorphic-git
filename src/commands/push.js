@@ -20,6 +20,11 @@ const types = {
   ref_delta: 0b1110000
 }
 
+/**
+ * Push a branch
+ *
+ * @link https://isomorphic-git.github.io/docs/push.html
+ */
 export async function push ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -124,7 +129,6 @@ export async function push ({
   return result
 }
 
-/** @ignore */
 export async function listCommits ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -145,7 +149,7 @@ export async function listCommits ({
       finishingSet.add(oid)
     } catch (err) {}
   }
-  let visited /*: Set<string> */ = new Set()
+  let visited = new Set()
 
   // Because git commits are named by their hash, there is no
   // way to construct a cycle. Therefore we won't worry about
@@ -172,7 +176,6 @@ export async function listCommits ({
   return visited
 }
 
-/** @ignore */
 export async function listObjects ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -180,7 +183,7 @@ export async function listObjects ({
   oids
 }) {
   const fs = new FileSystem(_fs)
-  let visited /*: Set<string> */ = new Set()
+  let visited = new Set()
 
   // We don't do the purest simplest recursion, because we can
   // avoid reading Blob objects entirely since the Tree objects
@@ -194,7 +197,7 @@ export async function listObjects ({
       await walk(tree)
     } else if (type === 'tree') {
       let tree = GitTree.from(object)
-      for (let entry /*: TreeEntry */ of tree) {
+      for (let entry of tree) {
         visited.add(entry.oid)
         // only recurse for trees
         if (entry.type === 'tree') {
@@ -211,7 +214,6 @@ export async function listObjects ({
   return visited
 }
 
-/** @ignore */
 export async function pack ({
   dir,
   gitdir = path.join(dir, '.git'),

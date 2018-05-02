@@ -15,16 +15,7 @@ const refpaths = ref => [
   `refs/remotes/${ref}/HEAD`
 ]
 
-/** @ignore */
 export class GitRefManager {
-  /* ::
-  updateRemoteRefs : ({
-    gitdir: string,
-    remote: string,
-    refs: Map<string, string>,
-    symrefs: Map<string, string>
-  }) => Promise<void>
-  */
   static async updateRemoteRefs ({
     fs: _fs,
     gitdir,
