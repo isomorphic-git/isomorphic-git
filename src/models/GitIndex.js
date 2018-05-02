@@ -3,6 +3,7 @@ import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import sortby from 'lodash.sortby'
 import shasum from 'shasum'
+import isBuffer from 'is-buffer'
 
 const MAX_UINT32 = 2 ** 32
 /*::
@@ -116,8 +117,8 @@ export class GitIndex {
    */
   constructor (index /*: any */) {
     this._dirty = false
-    if (Buffer.isBuffer(index)) {
-      this._entries = parseBuffer(index)
+    if (isBuffer(index)) {
+      this._entries = parseBuffer(Buffer(index))
     } else if (index === null) {
       this._entries = new Map()
     } else {

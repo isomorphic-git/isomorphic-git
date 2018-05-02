@@ -58,6 +58,7 @@
     "git-apply-delta": "0.0.7",
     "git-list-pack": "0.0.10",
     "ignore": "^3.3.7",
+    "is-buffer": "^2.0.2",
     "lodash.sortby": "^4.7.0",
     "marky": "^1.2.0",
     "minimisted": "^2.0.0",
