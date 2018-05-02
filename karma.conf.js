@@ -59,16 +59,18 @@ module.exports = function (config) {
       sl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
+        platformName: 'Windows 10',
         extendedDebugging: true
       },
       sl_firefox: {
         base: 'SauceLabs',
         browserName: 'firefox',
-        extendedDebugging: true
+        platformName: 'Windows 10'
       },
       sl_edge: {
         base: 'SauceLabs',
-        browserName: 'MicrosoftEdge'
+        browserName: 'MicrosoftEdge',
+        platformName: 'Windows 10'
       },
       sl_safari: {
         base: 'SauceLabs',
