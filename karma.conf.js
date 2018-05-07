@@ -90,10 +90,26 @@ module.exports = function (config) {
         browserName: 'Chrome',
         appiumVersion: '1.7.2'
       },
+      bs_firefox_mac: {
+        base: 'BrowserStack',
+        browser: 'firefox',
+        browser_version: '59.0',
+        os: 'OS X',
+        os_version: 'High Sierra'
+      },
+      bs_iphone: {
+        base: 'BrowserStack',
+        device: 'iPhone X',
+        os: 'ios',
+        os_version: '11.0'
+      },
       FirefoxHeadless: {
         base: 'Firefox',
         flags: ['-headless']
       }
+    },
+    browserStack: {
+      project: 'isomorphic-git'
     },
     sauceLabs: {
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
@@ -161,6 +177,22 @@ module.exports = function (config) {
       Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
     )
     options.reporters.push('saucelabs')
+  }
+
+  if (!process.env.BROWSER_STACK_USERNAME) {
+    console.log(
+      'Skipping SauceLabs tests because BROWSER_STACK_USERNAME environment variable is not set.'
+    )
+  } else if (!process.env.BROWSER_STACK_ACCESS_KEY) {
+    console.log(
+      'Skipping BrowserStack tests because BROWSER_STACK_ACCESS_KEY environment variable is not set.'
+    )
+  } else {
+    // Add bs_ browsers
+    options.browsers = options.browsers.concat(
+      Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
+    )
+    options.reporters.push('BrowserStack')
   }
 
   if (!process.env.CI) {
