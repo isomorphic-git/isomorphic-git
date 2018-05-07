@@ -1,5 +1,3 @@
-import { Buffer } from 'buffer'
-
 function formatTimezoneOffset (minutes) {
   let sign = Math.sign(minutes) || 1
   minutes = Math.abs(minutes)

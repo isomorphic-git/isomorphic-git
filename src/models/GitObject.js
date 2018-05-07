@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import shasum from 'shasum'
 
 export class GitObject {

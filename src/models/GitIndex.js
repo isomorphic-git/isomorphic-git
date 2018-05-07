@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import sortby from 'lodash.sortby'
 import shasum from 'shasum'
