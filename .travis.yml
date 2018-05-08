@@ -6,7 +6,6 @@ notifications:
   email: false
 node_js:
   - '10'
-  - '9'
 before_script:
   - chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
   - chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
