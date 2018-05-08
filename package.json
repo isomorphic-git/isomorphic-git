@@ -81,7 +81,7 @@
     "browserfs": "2.0.0",
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
-    "codecov": "3.0.1",
+    "codecov": "3.0.2",
     "cross-env": "5.1.4",
     "envify": "4.1.0",
     "fetch-mock": "6.3.0",
