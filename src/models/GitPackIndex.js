@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import crc32 from 'crc/lib/crc32.js'
 import applyDelta from 'git-apply-delta'

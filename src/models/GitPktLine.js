@@ -49,7 +49,6 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
-import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import pad from 'pad'
 import streamSource from 'stream-source/index.node.js'

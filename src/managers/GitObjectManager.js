@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import pako from 'pako'
 import path from 'path'
 import shasum from 'shasum'
