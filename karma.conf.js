@@ -90,18 +90,59 @@ module.exports = function (config) {
         browserName: 'Chrome',
         appiumVersion: '1.7.2'
       },
+      bs_chrome_win: {
+        base: 'BrowserStack',
+        browser: 'Chrome',
+        browser_version: '62.0',
+        os: 'Windows',
+        os_version: '10'
+      },
+      bs_firefox_win: {
+        base: 'BrowserStack',
+        browser: 'Firefox',
+        browser_version: '59.0',
+        os: 'Windows',
+        os_version: '10'
+      },
+      bs_edge_win: {
+        base: 'BrowserStack',
+        browser: 'Edge',
+        browser_version: '16.0',
+        os: 'Windows',
+        os_version: '10'
+      },
+      bs_chrome_mac: {
+        base: 'BrowserStack',
+        browser: 'Chrome',
+        browser_version: '62.0',
+        os: 'OS X',
+        os_version: 'High Sierra'
+      },
       bs_firefox_mac: {
         base: 'BrowserStack',
-        browser: 'firefox',
+        browser: 'Firefox',
         browser_version: '59.0',
         os: 'OS X',
         os_version: 'High Sierra'
       },
-      bs_iphone: {
+      bs_safari_mac: {
+        base: 'BrowserStack',
+        browser: 'Safari',
+        browser_version: '11.0',
+        os: 'OS X',
+        os_version: 'High Sierra'
+      },
+      bs_safari_iphone: {
         base: 'BrowserStack',
         device: 'iPhone X',
         os: 'ios',
         os_version: '11.0'
+      },
+      bs_android: {
+        base: 'BrowserStack',
+        device: 'Google Pixel',
+        os: 'android',
+        os_version: '8.0'
       },
       FirefoxHeadless: {
         base: 'Firefox',
@@ -109,7 +150,9 @@ module.exports = function (config) {
       }
     },
     browserStack: {
-      project: 'isomorphic-git'
+      project: 'isomorphic-git',
+      name: `isomorphic-git / ${branchOrPullRequestName} / ${process.env.TRAVIS_COMMIT}`,
+      build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now()
     },
     sauceLabs: {
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
@@ -158,30 +201,30 @@ module.exports = function (config) {
     }
   }
 
-  if (!process.env.SAUCE_USERNAME) {
-    console.log(
-      'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
-    )
-  } else if (!process.env.SAUCE_ACCESS_KEY) {
-    console.log(
-      'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
-    )
-  } else {
-    console.log('---------------')
-    console.log('---------------')
-    console.log('---------------')
-    console.log(process.env.TRAVIS_PULL_REQUEST)
-    console.log(process.env.TRAVIS_BRANCH)
-    console.log(process.env.TRAVIS_PULL_REQUEST_SLUG + '/' + process.env.TRAVIS_PULL_REQUEST_BRANCH)
-    options.browsers = options.browsers.concat(
-      Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
-    )
-    options.reporters.push('saucelabs')
-  }
+  // if (!process.env.SAUCE_USERNAME) {
+  //   console.log(
+  //     'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
+  //   )
+  // } else if (!process.env.SAUCE_ACCESS_KEY) {
+  //   console.log(
+  //     'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
+  //   )
+  // } else {
+  //   console.log('---------------')
+  //   console.log('---------------')
+  //   console.log('---------------')
+  //   console.log(process.env.TRAVIS_PULL_REQUEST)
+  //   console.log(process.env.TRAVIS_BRANCH)
+  //   console.log(process.env.TRAVIS_PULL_REQUEST_SLUG + '/' + process.env.TRAVIS_PULL_REQUEST_BRANCH)
+  //   options.browsers = options.browsers.concat(
+  //     Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
+  //   )
+  //   options.reporters.push('saucelabs')
+  // }
 
   if (!process.env.BROWSER_STACK_USERNAME) {
     console.log(
-      'Skipping SauceLabs tests because BROWSER_STACK_USERNAME environment variable is not set.'
+      'Skipping BrowserStack tests because BROWSER_STACK_USERNAME environment variable is not set.'
     )
   } else if (!process.env.BROWSER_STACK_ACCESS_KEY) {
     console.log(
