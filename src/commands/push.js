@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import pad from 'pad'
 import pako from 'pako'
 import path from 'path'
