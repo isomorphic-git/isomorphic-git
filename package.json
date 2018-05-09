@@ -82,7 +82,7 @@
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
     "codecov": "3.0.1",
-    "cross-env": "5.1.4",
+    "cross-env": "5.1.5",
     "envify": "4.1.0",
     "fetch-mock": "6.3.0",
     "husky": "0.14.3",
