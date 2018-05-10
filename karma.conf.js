@@ -135,12 +135,14 @@ module.exports = function (config) {
       bs_safari_iphone: {
         base: 'BrowserStack',
         real_mobile: true,
+        device: 'iPhone SE',
         os: 'ios',
         os_version: '11.2'
       },
       bs_android: {
         base: 'BrowserStack',
         real_mobile: true,
+        device: 'Google Pixel',
         os: 'android',
         os_version: '8.0'
       },
