@@ -5,12 +5,10 @@
   "packageRules": [{
     "packageNames": ["openpgp"],
     "allowedVersions": "<3"
-  }],
-  "devDependencies": {
-    "packageRules": [{
-      "packagePatterns": [".*"],
-      "groupName": "dev-dependency",
-      "schedule": "on friday"
-    }]
-  }
+  },
+  {
+    "depTypeList": ["devDependencies"],
+    "groupName": "dev-dependency",
+    "schedule": "on friday"
+  }]
 }
