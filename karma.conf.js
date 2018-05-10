@@ -128,19 +128,19 @@ module.exports = function (config) {
       bs_safari_mac: {
         base: 'BrowserStack',
         browser: 'Safari',
-        browser_version: '11.0',
+        browser_version: '11.1',
         os: 'OS X',
         os_version: 'High Sierra'
       },
       bs_safari_iphone: {
         base: 'BrowserStack',
-        device: 'iPhone X',
+        real_mobile: true,
         os: 'ios',
-        os_version: '11.0'
+        os_version: '11.2'
       },
       bs_android: {
         base: 'BrowserStack',
-        device: 'Google Pixel',
+        real_mobile: true,
         os: 'android',
         os_version: '8.0'
       },
