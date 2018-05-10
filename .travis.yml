@@ -4,6 +4,10 @@ cache:
     - ~/.npm
 notifications:
   email: false
+before_install:
+  - npm i -g npm@latest
+install:
+  - npm ci
 node_js:
   - '10'
 before_script:
