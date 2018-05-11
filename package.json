@@ -67,7 +67,7 @@
     "sha.js": "^2.4.9",
     "shasum": "^1.0.2",
     "simple-concat": "^1.0.0",
-    "simple-get": "^2.7.0",
+    "simple-get": "^3.0.0",
     "split2": "^2.2.0",
     "stream-source": "^0.3.5",
     "through2": "^2.0.3"
