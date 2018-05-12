@@ -1,4 +1,5 @@
 // Karma configuration
+process.env.CHROME_BIN = require('puppeteer').executablePath()
 const path = require('path')
 const webpack = require('webpack')
 
@@ -10,7 +11,7 @@ module.exports = function (config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['FirefoxHeadless'],
+    browsers: ['ChromeHeadlessNoSandbox', 'FirefoxHeadless'],
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
     // frameworks to use
@@ -56,7 +57,7 @@ module.exports = function (config) {
     captureTimeout: 4 * 60 * 1000, // default 60000
     // SauceLabs browsers
     customLaunchers: {
-      sl_chrome: {
+      XXXsl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
         extendedDebugging: true
@@ -93,6 +94,10 @@ module.exports = function (config) {
       FirefoxHeadless: {
         base: 'Firefox',
         flags: ['-headless']
+      },
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
       }
     },
     sauceLabs: {
@@ -164,7 +169,6 @@ module.exports = function (config) {
   }
 
   if (!process.env.CI) {
-    options.browsers.push('ChromeHeadless')
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     options.singleRun = false

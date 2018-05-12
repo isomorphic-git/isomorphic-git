@@ -5,7 +5,7 @@
 
 A pure JavaScript implementation of git for node and browsers!
 
-[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/sauce/_wmhilton?name=master)](https://saucelabs.com/u/_wmhilton)
+[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&microsoftedge=17&safari=11&android=7.1&iphone=11.2)](https://saucelabs.com/u/_wmhilton)
 
 `isomorphic-git` is a pure JavaScript implementation of git that works in node and browser environments (including WebWorkers and ServiceWorkers). This means it can be used to read and write to to git repositories, as well as fetch from and push to git remotes like Github.
 
@@ -54,10 +54,10 @@ Besides IndexedDB, BrowserFS supports many different backends with different per
 
 Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a [proxy](https://cors-buster-jfpactjnem.now.sh/). However, I am "being the change you want to see in the world" by making PRs to all the major git repository hosting services.
 
-- Gogs: [repo/http: add CORS headers to allow clone/push from browser agents #4970](https://github.com/gogits/gogs/pull/4970)
-- Gitlab: [Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
-- Bitbucket: TODO
-- Github: TODO
+- Gogs: [Supported in v0.11.43](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)
+- Gitlab: [PR Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
+- Bitbucket: PR TODO
+- Github: PR TODO
 
 It is literally just two lines of code to add the CORS headers!! Easy stuff. Surely it will happen.
 
@@ -180,12 +180,6 @@ Isomorphic-git would not have been possible without the pioneering work by
 their examples (and their modules!) I would not have been able to come even
 close to finishing this. They are geniuses ahead of their time.
 
-## License
-
-This work is released under [The MIT License](https://opensource.org/licenses/MIT)
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_large)
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
@@ -194,6 +188,13 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
 <!-- prettier-ignore -->
 | [<img src="https://avatars2.githubusercontent.com/u/587740?v=4" width="100px;"/><br /><sub><b>William Hilton</b></sub>](https://onename.com/wmhilton)<br />[📝](#blog-wmhilton "Blogposts") [🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Awmhilton "Bug reports") [💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=wmhilton "Code") [🎨](#design-wmhilton "Design") [📖](https://github.com/isomorphic-git/isomorphic-git/commits?author=wmhilton "Documentation") [💡](#example-wmhilton "Examples") [⚠️](https://github.com/isomorphic-git/isomorphic-git/commits?author=wmhilton "Tests") [✅](#tutorial-wmhilton "Tutorials") | [<img src="https://avatars2.githubusercontent.com/u/33748231?v=4" width="100px;"/><br /><sub><b>wDhTIG</b></sub>](https://github.com/wDhTIG)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3AwDhTIG "Bug reports") | [<img src="https://avatars3.githubusercontent.com/u/847542?v=4" width="100px;"/><br /><sub><b>Marc MacLeod</b></sub>](https://github.com/marbemac)<br />[🤔](#ideas-marbemac "Ideas, Planning, & Feedback") [🔍](#fundingFinding-marbemac "Funding Finding") | [<img src="https://avatars3.githubusercontent.com/u/20234?v=4" width="100px;"/><br /><sub><b>Brett Zamir</b></sub>](http://brett-zamir.me)<br />[🤔](#ideas-brettz9 "Ideas, Planning, & Feedback") | [<img src="https://avatars2.githubusercontent.com/u/79351?v=4" width="100px;"/><br /><sub><b>Dan Allen</b></sub>](http://mojavelinux.com)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Amojavelinux "Bug reports") [🤔](#ideas-mojavelinux "Ideas, Planning, & Feedback") | [<img src="https://avatars1.githubusercontent.com/u/6831144?v=4" width="100px;"/><br /><sub><b>Tomáš Hübelbauer</b></sub>](https://TomasHubelbauer.net)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3ATomasHubelbauer "Bug reports") [💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=TomasHubelbauer "Code") | [<img src="https://avatars2.githubusercontent.com/u/1410520?v=4" width="100px;"/><br /><sub><b>Juan Campa</b></sub>](https://github.com/juancampa)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Ajuancampa "Bug reports") |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| [<img src="https://avatars2.githubusercontent.com/u/1041868?v=4" width="100px;"/><br /><sub><b>Ira Miller</b></sub>](http://iramiller.com)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Aisysd "Bug reports") | [<img src="https://avatars1.githubusercontent.com/u/6311784?v=4" width="100px;"/><br /><sub><b>Rhys Arkins</b></sub>](http://rhys.arkins.net)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=rarkins "Code") | [<img src="https://avatars1.githubusercontent.com/u/3408176?v=4" width="100px;"/><br /><sub><b>Sean Larkin</b></sub>](http://twitter.com/TheLarkInn)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=TheLarkInn "Code") | [<img src="https://avatars1.githubusercontent.com/u/827205?v=4" width="100px;"/><br /><sub><b>Daniel Ruf</b></sub>](https://daniel-ruf.de)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=DanielRuf "Code") |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
+
+## License
+
+This work is released under [The MIT License](https://opensource.org/licenses/MIT)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_large)
