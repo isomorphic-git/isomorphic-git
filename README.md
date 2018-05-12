@@ -5,7 +5,7 @@
 
 A pure JavaScript implementation of git for node and browsers!
 
-[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/sauce/_wmhilton?name=master)](https://saucelabs.com/u/_wmhilton)
+[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&microsoftedge=17&safari=11&android=7.1&iphone=11.2)](https://saucelabs.com/u/_wmhilton)
 
 `isomorphic-git` is a pure JavaScript implementation of git that works in node and browser environments (including WebWorkers and ServiceWorkers). This means it can be used to read and write to to git repositories, as well as fetch from and push to git remotes like Github.
 
