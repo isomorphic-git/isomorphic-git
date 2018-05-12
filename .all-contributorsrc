@@ -81,6 +81,42 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "isysd",
+      "name": "Ira Miller",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1041868?v=4",
+      "profile": "http://iramiller.com",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "rarkins",
+      "name": "Rhys Arkins",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6311784?v=4",
+      "profile": "http://rhys.arkins.net",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "TheLarkInn",
+      "name": "Sean Larkin",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3408176?v=4",
+      "profile": "http://twitter.com/TheLarkInn",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "DanielRuf",
+      "name": "Daniel Ruf",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/827205?v=4",
+      "profile": "https://daniel-ruf.de",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }
