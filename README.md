@@ -20,9 +20,9 @@ I am working on adding type definitions so you can enjoy static type-checking an
 ## Getting Started
 
 The "isomorphic" in `isomorphic-git` means it works equally well on the server or the browser.
-That's tricky to do since git uses the file system, and browsers don't have an 'fs' module.
-So rather than relying on the 'fs' module, `isomorphic-git` is BYOFS (Bring Your Own File System).
-When creating a new Git object, you pass it the fs module to use.
+That's tricky to do since git uses the file system, and browsers don't have an `fs` module.
+So rather than relying on the `fs` module, `isomorphic-git` is BYOFS (Bring Your Own File System).
+When creating a new Git object, you pass it the `fs` module to use.
 
 If you're only using `isomorphic-git` in Node, you can just use the native `fs` module.
 
