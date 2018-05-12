@@ -57,7 +57,7 @@ module.exports = function (config) {
     captureTimeout: 4 * 60 * 1000, // default 60000
     // SauceLabs browsers
     customLaunchers: {
-      sl_chrome: {
+      XXXsl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
         extendedDebugging: true
