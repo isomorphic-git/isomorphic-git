@@ -8,7 +8,7 @@
   },
   {
     "depTypeList": ["devDependencies"],
-    "groupName": "dev-dependency",
+    "groupName": "devDependencies",
     "schedule": "on friday"
   }]
 }
