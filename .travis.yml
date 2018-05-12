@@ -13,6 +13,9 @@ before_script:
 after_success:
   - npm run travis-deploy-once "npm run semantic-release"
 branches:
+  # Only build for PRs and the master branch (https://github.com/travis-ci/travis-ci/issues/1147#issuecomment-160820262)
+  only:
+    - "master"
   except:
     - /^v\d+\.\d+\.\d+$/
 addons:
