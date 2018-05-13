@@ -177,12 +177,40 @@ export class GitRemoteConnection {
       done
     }
   }
-  static async sendUploadPackResult () {
-    // TODO: does this just forward a packfile stream?
-    // Or does it multiplex it and inject progress messages
+  static async sendUploadPackResult ({
+    packetlines,
+    packfile,
+    progress,
+    error,
+    protocol = 'side-band-64k',
+    shallows = [],
+    unshallows = [],
+    acks = [],
+    nak = true
+  }) {
+    let stream = GitSideBand.mux({
+      protocol,
+      packetlines,
+      packfile,
+      progress,
+      error
+    })
+    for (const shallow of shallows) {
+      packetlines.write(`shallow ${shallow}\n`)
+    }
+    for (const unshallow of unshallows) {
+      packetlines.write(`unshallow ${unshallow}\n`)
+    }
+    for (const ack of acks) {
+      packetlines.write(`ACK ${ack.oid}${ack.status ? (' ' + ack.status) : ''}\n`)
+    }
+    if (nak) {
+      packetlines.write(`NAK\n`)
+    }
+    return stream
   }
   static async receiveUploadPackResult (res) {
-    let { packetlines, packfile, progress } = await GitSideBand.demux(res)
+    let { packetlines, packfile, progress } = GitSideBand.demux(res)
     let shallows = []
     let unshallows = []
     let acks = []
