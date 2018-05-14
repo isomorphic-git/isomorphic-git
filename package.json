@@ -114,6 +114,7 @@
     "semantic-release": "15.4.1",
     "standard": "11.0.1",
     "travis-deploy-once": "5.0.0",
+    "tweet-tweet": "1.0.4",
     "typescript": "2.8.3",
     "webpack": "4.8.2",
     "webpack-cli": "2.1.3"
