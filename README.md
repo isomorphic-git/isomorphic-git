@@ -103,6 +103,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 ### commands
 
 - [add](https://isomorphic-git.github.io/docs/add.html)
+- [branch](https://isomorphic-git.github.io/docs/branch.html)
 - [checkout](https://isomorphic-git.github.io/docs/checkout.html)
 - [clone](https://isomorphic-git.github.io/docs/clone.html)
 - [commit](https://isomorphic-git.github.io/docs/commit.html)

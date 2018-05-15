@@ -92,6 +92,13 @@ export function add(args: {
   filepath: string
 }): Promise<void>;
 
+export function branch(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  ref: string
+}): Promise<void>;
+
 export function checkout(args: {
   fs: any,
   dir: string,
