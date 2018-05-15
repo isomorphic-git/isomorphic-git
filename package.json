@@ -27,7 +27,8 @@
     "prepush": "nps lint",
     "prepublishOnly": "nps prepublish",
     "semantic-release": "semantic-release",
-    "travis-deploy-once": "travis-deploy-once"
+    "travis-deploy-once": "travis-deploy-once",
+    "postinstall": "opencollective postinstall"
   },
   "repository": {
     "type": "git",
@@ -61,6 +62,7 @@
     "lodash.sortby": "^4.7.0",
     "marky": "^1.2.0",
     "minimisted": "^2.0.0",
+    "opencollective": "^1.0.3",
     "pad": "^2.0.3",
     "pako": "^1.0.6",
     "pify": "^3.0.0",
@@ -136,5 +138,10 @@
     {
       "path": "./dist/bundle.umd.min.js"
     }
-  ]
+  ],
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/isomorphic-git",
+    "logo": "https://opencollective.com/isomorphic-git/logo.txt"
+  }
 }
