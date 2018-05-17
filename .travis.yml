@@ -10,6 +10,8 @@ node_js:
 before_script:
   - chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
   - chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
+script:
+  - node __tests__/__helpers__/can-i-skip-tests.js .all-contributorsrc CODE_OF_CONDUCT.md CONTRIBUTING.md LICENSE.md README.md renovate.json || npm test
 after_success:
   - npm run travis-deploy-once "npm run semantic-release"
 branches:
