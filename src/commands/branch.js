@@ -1,4 +1,5 @@
 import path from 'path'
+import { clean } from 'clean-git-ref'
 
 import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
@@ -17,6 +18,10 @@ export async function branch ({
   const fs = new FileSystem(_fs)
   if (ref === undefined) {
     throw new Error('Cannot create branch "undefined"')
+  }
+
+  if (ref !== clean(ref)) {
+    throw new Error(`Failed to create branch '${ref}' because that name would not be a valid git reference. A valid alternative would be '${clean(ref)}'.`)
   }
 
   const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)
