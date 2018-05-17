@@ -117,6 +117,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "bokuweb",
+      "name": "bokuweb",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/10220449?v=4",
+      "profile": "http://blog.bokuweb.me/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ]
 }
