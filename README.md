@@ -90,6 +90,8 @@ BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
 
 Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
 
+View the full Getting Started guide [here](https://isomorphic-git.github.io/docs/quickstart.html).
+
 ### CORS support
 
 Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a [proxy](https://cors-buster-jfpactjnem.now.sh/). However, I am "being the change you want to see in the world" by making PRs to all the major git repository hosting services.
