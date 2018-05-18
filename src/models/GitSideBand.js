@@ -86,37 +86,43 @@ export class GitSideBand {
     })
     let packfileEnded = false
     let progressEnded = false
+    let errorEnded = false
+    let goodbye = Buffer.concat([
+      GitPktLine.encode(Buffer.from('010A', 'hex')),
+      GitPktLine.flush()
+    ])
     packfile
       .on('data', data => {
         const buffers = splitBuffer(data, MAX_PACKET_LENGTH)
         for (const buffer of buffers) {
-          output.write(GitPktLine.encode(Buffer.from('1').concat([buffer])))
+          output.write(GitPktLine.encode(Buffer.concat([Buffer.from('01', 'hex'), buffer])))
         }
       })
       .on('end', () => {
         packfileEnded = true
-        if (progressEnded) output.end()
+        if (progressEnded && errorEnded) output.end(goodbye)
       })
     progress
       .on('data', data => {
         const buffers = splitBuffer(data, MAX_PACKET_LENGTH)
         for (const buffer of buffers) {
-          output.write(GitPktLine.encode(Buffer.from('2').concat([buffer])))
+          output.write(GitPktLine.encode(Buffer.concat([Buffer.from('02', 'hex'), buffer])))
         }
       })
       .on('end', () => {
         progressEnded = true
-        if (packfileEnded) output.end()
+        if (packfileEnded && errorEnded) output.end(goodbye)
       })
     error
       .on('data', data => {
         const buffers = splitBuffer(data, MAX_PACKET_LENGTH)
         for (const buffer of buffers) {
-          output.write(GitPktLine.encode(Buffer.from('3').concat([buffer])))
+          output.write(GitPktLine.encode(Buffer.concat([Buffer.from('03', 'hex'), buffer])))
         }
       })
       .on('end', () => {
-        output.end()
+        errorEnded = true
+        if (progressEnded && packfileEnded) output.end(goodbye)
       })
     return output
   }

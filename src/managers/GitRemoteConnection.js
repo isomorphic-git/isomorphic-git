@@ -125,8 +125,8 @@ export class GitRemoteConnection {
     let wants = []
     let haves = []
     let shallows = []
-    let depth = null
-    let since = null
+    let depth
+    let since
     let exclude = []
     let relative = false
     while (!done) {
