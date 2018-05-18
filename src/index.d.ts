@@ -175,7 +175,9 @@ export function findRoot(args: {
 }): Promise<string>;
 
 export function getRemoteInfo(args: {
-  url: string
+  url: string,
+  authUsername?: string,
+  authPassword?: string
 }): Promise<RemoteDescription>;
 
 export function indexPack(args: {
