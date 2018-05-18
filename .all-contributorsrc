@@ -125,7 +125,18 @@
       "profile": "http://blog.bokuweb.me/",
       "contributions": [
         "code",
+        "doc",
         "test"
+      ]
+    },
+    {
+      "login": "hirokiosame",
+      "name": "Hiroki Osame",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1075694?v=4",
+      "profile": "https://github.com/hirokiosame",
+      "contributions": [
+        "code",
+        "doc"
       ]
     }
   ]
