@@ -33,7 +33,7 @@ Social:
 
 </td><td>
 
-[![Gitter chat](https://badges.gitter.im/isomorphic-git.png)](https://gitter.im/isomorphic-git/Lobby)
+[![Gitter chat](https://badges.gitter.im/isomorphic-git.svg)](https://gitter.im/isomorphic-git/Lobby)
 [![Backers on Open Collective](https://opencollective.com/isomorphic-git/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/isomorphic-git/sponsors/badge.svg)](#sponsors)
 
