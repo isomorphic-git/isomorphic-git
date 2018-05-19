@@ -1,11 +1,11 @@
 # ⊱⋅──────⋅⊱ Contributing to isomorphic-git ⊰⋅──────⋅⊰
 
-Oh wow! Thanks for opening up the contributing file! :grin: :tada:
+Oh wow! Thanks for opening up Pull Request! :grin: :tada:
 
 You are very welcome here and any contribution is appreciated. :+1:
 
 ## New feature checklists :sparkles:️
-I'm honestly documenting these steps just so I don't forget them myself.
+(This is the same as the stuff in the CONTRIBUTING.md file)
 
 To add an argument to an existing command:
 

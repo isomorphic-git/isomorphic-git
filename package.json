@@ -28,7 +28,8 @@
     "prepublishOnly": "nps prepublish",
     "semantic-release": "semantic-release",
     "travis-deploy-once": "travis-deploy-once",
-    "postinstall": "opencollective postinstall"
+    "postinstall": "opencollective postinstall",
+    "add-contributor": "nps contributors.add"
   },
   "repository": {
     "type": "git",
