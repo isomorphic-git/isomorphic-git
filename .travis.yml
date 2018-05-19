@@ -5,6 +5,8 @@ cache:
     - node_modules
 notifications:
   email: false
+git:
+  depth: 5
 node_js:
   - '10'
 before_script:
