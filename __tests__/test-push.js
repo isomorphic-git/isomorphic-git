@@ -37,26 +37,21 @@ describe('push', () => {
     }
   )
 
-  // same test but without ref
   ;(process.browser ? it : xit)(
     'push to karma-git-http-server-middleware without ref',
     async () => {
       // Setup
       let { fs, gitdir } = await makeFixture('test-push')
-      let output = []
-      let emitter = new EventEmitter().on('message', output.push.bind(output))
       // Test
       let res = await push({
         fs,
         gitdir,
-        emitter,
         remote: 'karma'
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBeTruthy()
       expect(res.ok[0]).toBe('unpack')
       expect(res.ok[1]).toBe('refs/heads/master')
-      expect(output).toMatchSnapshot()
     }
   )
 })
