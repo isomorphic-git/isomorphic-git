@@ -1,0 +1,14 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "awesome-errors"
+  ],
+  "rules": {
+    "awesome-errors/all-errors-have-code": "error",
+    "awesome-errors/all-errors-have-filename": "error",
+    "awesome-errors/hardcoded-line-numbers": "error"
+  }
+}
