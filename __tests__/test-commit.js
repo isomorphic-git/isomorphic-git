@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { commit, sign, verify } = require('isomorphic-git')
+const { commit, sign, verify, log } = require('isomorphic-git')
 
 describe('commit', () => {
   it('commit', async () => {
@@ -13,7 +13,8 @@ describe('commit', () => {
       author: {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
-        timestamp: 1262356920
+        timestamp: 1262356920,
+        timezoneOffset: -0
       },
       message: 'Initial commit'
     })
@@ -31,7 +32,8 @@ describe('commit', () => {
         gitdir,
         author: {
           email: 'mrtest@example.com',
-          timestamp: 1262356920
+          timestamp: 1262356920,
+          timezoneOffset: 0
         },
         message: 'Initial commit'
       })
@@ -49,7 +51,8 @@ describe('commit', () => {
         gitdir,
         author: {
           name: 'Mr. Test',
-          timestamp: 1262356920
+          timestamp: 1262356920,
+          timezoneOffset: 0
         },
         message: 'Initial commit'
       })
@@ -75,7 +78,8 @@ describe('commit', () => {
       author: {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
-        timestamp: 1504842425
+        timestamp: 1504842425,
+        timezoneOffset: 0
       }
     })
     await sign({
@@ -93,5 +97,67 @@ describe('commit', () => {
       publicKeys: publicKeys[0]
     })
     expect(keys[0]).toBe('a01edd29ac0f3952')
+  })
+
+  it('with timezone', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-commit')
+    let commits
+    // Test
+    await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      },
+      message: '-0 offset'
+    })
+    commits = await log({fs, gitdir, depth: 1})
+    expect(Object.is(commits[0].author.timezoneOffset, -0)).toBeTruthy()
+
+    await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: 0
+      },
+      message: '+0 offset'
+    })
+    commits = await log({fs, gitdir, depth: 1})
+    expect(Object.is(commits[0].author.timezoneOffset, 0)).toBeTruthy()
+
+    await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: 240
+      },
+      message: '+240 offset'
+    })
+    commits = await log({fs, gitdir, depth: 1})
+    expect(Object.is(commits[0].author.timezoneOffset, 240)).toBeTruthy()
+
+    await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -240
+      },
+      message: '-240 offset'
+    })
+    commits = await log({fs, gitdir, depth: 1})
+    expect(Object.is(commits[0].author.timezoneOffset, -240)).toBeTruthy()
   })
 })
