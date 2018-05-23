@@ -36,4 +36,22 @@ describe('push', () => {
       expect(output).toMatchSnapshot()
     }
   )
+
+  ;(process.browser ? it : xit)(
+    'push to karma-git-http-server-middleware without ref',
+    async () => {
+      // Setup
+      let { fs, gitdir } = await makeFixture('test-push')
+      // Test
+      let res = await push({
+        fs,
+        gitdir,
+        remote: 'karma'
+      })
+      expect(res).toBeTruthy()
+      expect(res.ok).toBeTruthy()
+      expect(res.ok[0]).toBe('unpack')
+      expect(res.ok[1]).toBe('refs/heads/master')
+    }
+  )
 })

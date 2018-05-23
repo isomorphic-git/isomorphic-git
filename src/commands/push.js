@@ -40,7 +40,13 @@ export async function push ({
   if (url === undefined) {
     url = await config({ fs, gitdir, path: `remote.${remote}.url` })
   }
-  let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
+  let fullRef
+  if (!ref) {
+    ref = await GitRefManager.resolve({fs, gitdir, ref: 'HEAD', depth: 1})
+    fullRef = ref.replace(/^ref: /, '')
+  } else {
+    fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
+  }
   let oid = await GitRefManager.resolve({ fs, gitdir, ref })
   let auth
   if (authUsername !== undefined && authPassword !== undefined) {

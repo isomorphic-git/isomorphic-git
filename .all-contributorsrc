@@ -138,6 +138,19 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "jcubic",
+      "name": "Jakub Jankiewicz",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/280241?v=4",
+      "profile": "http://jcubic.pl/me",
+      "contributions": [
+        "question",
+        "bug",
+        "code",
+        "example",
+        "test"
+      ]
     }
   ]
 }
