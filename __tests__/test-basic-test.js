@@ -22,7 +22,8 @@ describe('basic test', () => {
       author: {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
-        timestamp: 1262356920
+        timestamp: 1262356920,
+        timezoneOffset: -0
       },
       message: 'Initial commit'
     })
