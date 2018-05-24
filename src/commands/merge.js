@@ -50,9 +50,9 @@ export async function merge ({
   } else {
     // not a simple fast-forward
     if (fastForwardOnly) {
-      throw new Error('A simple fast-forward merge was not possible.')
+      throw new Error('merge.js:53 E22 A simple fast-forward merge was not possible.')
     }
-    throw new Error('Non-fast-forward merges are not supported yet.')
+    throw new Error('merge.js:55 E23 Non-fast-forward merges are not supported yet.')
   }
 }
 
@@ -84,5 +84,5 @@ async function findMergeBase ({ gitdir, fs, refs }) {
   }
   if (candidate) return candidate.oid
   // Is...
-  throw new Error('Non-trivial merge not implemented at this time')
+  throw new Error('merge.js:87 E24 Non-trivial merge not implemented at this time')
 }

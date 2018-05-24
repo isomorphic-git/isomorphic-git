@@ -24,7 +24,7 @@ export class GitObject {
     if (oid) {
       let sha = shasum(buffer)
       if (sha !== oid) {
-        throw new Error(`SHA check failed! Expected ${oid}, computed ${sha}`)
+        throw new Error(`GitObject.js:27 E58 SHA check failed! Expected ${oid}, computed ${sha}`)
       }
     }
     let s = buffer.indexOf(32) // first space
@@ -35,7 +35,7 @@ export class GitObject {
     // verify length
     if (parseInt(length) !== actualLength) {
       throw new Error(
-        `Length mismatch: expected ${length} bytes but got ${actualLength} instead.`
+        `GitObject.js:38 E59 Length mismatch: expected ${length} bytes but got ${actualLength} instead.`
       )
     }
     return {

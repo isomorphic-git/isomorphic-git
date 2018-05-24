@@ -61,13 +61,13 @@ export class GitObjectManager {
       let text = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
       if (text !== null && text.includes(oid)) {
         throw new Error(
-          `Failed to read git object with oid ${oid} because it is a shallow commit`
+          `GitObjectManager.js:64 E33 Failed to read git object with oid ${oid} because it is a shallow commit`
         )
       }
     }
     // Finally
     if (!file) {
-      throw new Error(`Failed to read git object with oid ${oid}`)
+      throw new Error(`GitObjectManager.js:70 E34 Failed to read git object with oid ${oid}`)
     }
     if (format === 'deflated') {
       return { format: 'deflated', object: file, source }

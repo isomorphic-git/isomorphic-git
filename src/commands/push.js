@@ -105,7 +105,7 @@ export async function push ({
   line = lines.shift()
   if (!line.startsWith('unpack ')) {
     throw new Error(
-      `Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'`
+      `push.js:108 E25 Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'`
     )
   }
   if (line === 'unpack ok') {
@@ -157,7 +157,7 @@ export async function listCommits ({
     visited.add(oid)
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type !== 'commit') {
-      throw new Error(`Expected type commit but type is ${type}`)
+      throw new Error(`push.js:160 E26 Expected type commit but type is ${type}`)
     }
     let commit = GitCommit.from(object)
     let parents = commit.headers().parent
@@ -230,7 +230,7 @@ export async function pack ({
     let lastFour, multibyte, length
     // Object type is encoded in bits 654
     let type = types[stype]
-    if (type === undefined) throw new Error('Unrecognized type: ' + stype)
+    if (type === undefined) throw new Error('push.js:233 ' + 'E27 ' + 'Unrecognized type: ' + stype)
     // The length encoding get complicated.
     length = object.length
     // Whether the next byte is part of the variable-length encoded number

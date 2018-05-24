@@ -39,13 +39,13 @@ export class GitRemoteManager {
   static getRemoteHelperFor ({ url }) {
     let parts = parseRemoteUrl({ url })
     if (!parts) {
-      throw new Error(`Cannot determine protocol of remote URL: "${url}"`)
+      throw new Error(`GitRemoteManager.js:42 E46 Cannot determine protocol of remote URL: "${url}"`)
     }
     if (remoteHelpers.has(parts.transport)) {
       return remoteHelpers.get(parts.transport)
     }
     throw new Error(
-      `Git remote "${url}" uses an unrecognized transport protocol: "${
+      `GitRemoteManager.js:48 E47 Git remote "${url}" uses an unrecognized transport protocol: "${
         parts.transport
       }"`
     )

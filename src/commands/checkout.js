@@ -19,7 +19,7 @@ export async function checkout ({
 }) {
   const fs = new FileSystem(_fs)
   if (ref === undefined) {
-    throw new Error('Cannot checkout ref "undefined"')
+    throw new Error('checkout.js:22 E6 Cannot checkout ref "undefined"')
   }
   // Get tree oid
   let oid
@@ -57,17 +57,17 @@ export async function checkout ({
     commit = await GitObjectManager.read({ fs, gitdir, oid })
   } catch (err) {
     throw new Error(
-      `Failed to checkout ref '${ref}' because commit ${oid} is not available locally. Do a git fetch to make the branch available locally.`
+      `checkout.js:60 E7 Failed to checkout ref '${ref}' because commit ${oid} is not available locally. Do a git fetch to make the branch available locally.`
     )
   }
   if (commit.type !== 'commit') {
-    throw new Error(`Unexpected type: ${commit.type}`)
+    throw new Error(`checkout.js:64 E8 Unexpected type: ${commit.type}`)
   }
   let comm = GitCommit.from(commit.object.toString('utf8'))
   let sha = comm.headers().tree
   // Get top-level tree
   let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: sha })
-  if (type !== 'tree') throw new Error(`Unexpected type: ${type}`)
+  if (type !== 'tree') throw new Error(`checkout.js:70 E9 Unexpected type: ${type}`)
   let tree = GitTree.from(object)
   // Acquire a lock on the index
   await GitIndexManager.acquire(
@@ -124,7 +124,7 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
         break
       default:
         throw new Error(
-          `Unexpected object type ${type} found in tree for '${entrypath}'`
+          `checkout.js:127 E10 Unexpected object type ${type} found in tree for '${entrypath}'`
         )
     }
   }
