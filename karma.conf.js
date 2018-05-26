@@ -14,7 +14,7 @@ module.exports = function (config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['ChromeHeadlessNoSandbox', 'FirefoxHeadless'],
+    browsers: ['FirefoxHeadless'],
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
     // frameworks to use
@@ -160,6 +160,7 @@ module.exports = function (config) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
     )
+    options.browsers.push(['ChromeHeadlessNoSandbox'])
   } else {
     console.log('---------------')
     console.log('---------------')
