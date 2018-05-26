@@ -18,6 +18,7 @@ export as namespace git;
 
 /*~ You can declare types that are available via importing the module */
 export interface GitObjectDescription {
+  oid: string,
   type?: 'blob' | 'tree' | 'commit' | 'tag',
   format: 'deflated' | 'wrapped' | 'content' | 'parsed',
   object: Buffer | CommitDescription | TreeDescription,
@@ -276,7 +277,9 @@ export function readObject(args: {
   dir: string,
   gitdir?: string,
   oid: string,
-  format: 'deflated' | 'wrapped' | 'content' | 'parsed'
+  format: 'deflated' | 'wrapped' | 'content' | 'parsed',
+  filepath: string,
+  encoding: string
 }): Promise<GitObjectDescription>
 
 export function remove(args: {
