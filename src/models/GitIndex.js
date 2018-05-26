@@ -132,11 +132,7 @@ export class GitIndex {
       yield entry
     }
   }
-  insert ({
-    filepath,
-    stats,
-    oid
-  }) {
+  insert ({ filepath, stats, oid }) {
     let entry = {
       ctime: stats.ctime,
       mtime: stats.mtime,
