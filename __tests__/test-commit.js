@@ -115,7 +115,7 @@ describe('commit', () => {
       },
       message: '-0 offset'
     })
-    commits = await log({fs, gitdir, depth: 1})
+    commits = await log({ fs, gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, -0)).toBeTruthy()
 
     await commit({
@@ -129,7 +129,7 @@ describe('commit', () => {
       },
       message: '+0 offset'
     })
-    commits = await log({fs, gitdir, depth: 1})
+    commits = await log({ fs, gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, 0)).toBeTruthy()
 
     await commit({
@@ -143,7 +143,7 @@ describe('commit', () => {
       },
       message: '+240 offset'
     })
-    commits = await log({fs, gitdir, depth: 1})
+    commits = await log({ fs, gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, 240)).toBeTruthy()
 
     await commit({
@@ -157,7 +157,7 @@ describe('commit', () => {
       },
       message: '-240 offset'
     })
-    commits = await log({fs, gitdir, depth: 1})
+    commits = await log({ fs, gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, -240)).toBeTruthy()
   })
 })

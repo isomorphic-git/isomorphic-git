@@ -3,9 +3,12 @@ process.env.CHROME_BIN = require('puppeteer').executablePath()
 const path = require('path')
 const webpack = require('webpack')
 
-const branchOrPullRequestName = process.env.TRAVIS_PULL_REQUEST === 'false'
-  ? process.env.TRAVIS_BRANCH
-  : process.env.TRAVIS_PULL_REQUEST_SLUG + '/' + process.env.TRAVIS_PULL_REQUEST_BRANCH
+const branchOrPullRequestName =
+  process.env.TRAVIS_PULL_REQUEST === 'false'
+    ? process.env.TRAVIS_BRANCH
+    : process.env.TRAVIS_PULL_REQUEST_SLUG +
+      '/' +
+      process.env.TRAVIS_PULL_REQUEST_BRANCH
 
 module.exports = function (config) {
   const options = {
@@ -102,7 +105,9 @@ module.exports = function (config) {
     },
     sauceLabs: {
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
-      testName: `isomorphic-git / ${branchOrPullRequestName} / ${process.env.TRAVIS_COMMIT}`,
+      testName: `isomorphic-git / ${branchOrPullRequestName} / ${
+        process.env.TRAVIS_COMMIT
+      }`,
       // Note: I added the Date.now() bit so that when I can click "Restart" on a Travis job,
       // Sauce Labs does not simply append new test results to the old set that failed, which
       // convinces karma that it failed again and always.
@@ -161,7 +166,11 @@ module.exports = function (config) {
     console.log('---------------')
     console.log(process.env.TRAVIS_PULL_REQUEST)
     console.log(process.env.TRAVIS_BRANCH)
-    console.log(process.env.TRAVIS_PULL_REQUEST_SLUG + '/' + process.env.TRAVIS_PULL_REQUEST_BRANCH)
+    console.log(
+      process.env.TRAVIS_PULL_REQUEST_SLUG +
+        '/' +
+        process.env.TRAVIS_PULL_REQUEST_BRANCH
+    )
     options.browsers = options.browsers.concat(
       Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
     )
