@@ -42,7 +42,7 @@ export async function push ({
   }
   let fullRef
   if (!ref) {
-    ref = await GitRefManager.resolve({fs, gitdir, ref: 'HEAD', depth: 1})
+    ref = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD', depth: 1 })
     fullRef = ref.replace(/^ref: /, '')
   } else {
     fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
