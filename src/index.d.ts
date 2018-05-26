@@ -122,7 +122,8 @@ export function clone(args: {
   since?: Date,
   exclude?: string[],
   relative?: boolean,
-  singleBranch?: boolean
+  singleBranch?: boolean,
+  noCheckout?: boolean
 }): Promise<void>;
 
 export function commit(args: {
