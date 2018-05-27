@@ -153,6 +153,13 @@ export function config(args: {
   value?: string | undefined
 }): Promise<any>
 
+export function currentBranch(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  fullname?: boolean,
+}): Promise<string>
+
 export function fetch(args: {
   fs: any,
   dir: string,
