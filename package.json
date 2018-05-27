@@ -77,7 +77,7 @@
     "through2": "^2.0.3"
   },
   "devDependencies": {
-    "@semantic-release/exec": "^2.2.4",
+    "@semantic-release/exec": "2.2.4",
     "@types/node": "9.6.12",
     "all-contributors-cli": "4.11.1",
     "babel-core": "6.26.3",
