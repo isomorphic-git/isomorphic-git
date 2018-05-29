@@ -1,11 +1,51 @@
-# isomorphic-git [![current npm version](https://img.shields.io/npm/v/isomorphic-git.svg)](https://www.npmjs.com/package/isomorphic-git) ![required node version](https://img.shields.io/node/v/isomorphic-git.svg) ![written in ECMAScript 2017+](https://img.shields.io/badge/ECMAScript-2017%2B-brightgreen.svg) ![license](https://img.shields.io/npm/l/isomorphic-git.svg)
-[![Build Status](https://travis-ci.org/isomorphic-git/isomorphic-git.svg?branch=master)](https://travis-ci.org/isomorphic-git/isomorphic-git) [![codecov](https://codecov.io/gh/isomorphic-git/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/isomorphic-git/isomorphic-git) [![dependencies](https://david-dm.org/isomorphic-git/isomorphic-git/status.svg)](https://david-dm.org/isomorphic-git/isomorphic-git) [![Known Vulnerabilities](https://snyk.io/test/github/isomorphic-git/isomorphic-git/badge.svg)](https://snyk.io/test/github/isomorphic-git/isomorphic-git)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![Gitter chat](https://badges.gitter.im/isomorphic-git.png)](https://gitter.im/isomorphic-git/Lobby)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_shield)
-
+# isomorphic-git
 A pure JavaScript implementation of git for node and browsers!
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/_wmhilton.svg)](https://saucelabs.com/u/_wmhilton)
+<table><tr><td>
+
+Latest release:
+
+</td><td>
+
+[![current npm version](https://img.shields.io/npm/v/isomorphic-git.svg)](https://www.npmjs.com/package/isomorphic-git)
+![required node version](https://img.shields.io/node/v/isomorphic-git.svg)
+![written in ECMAScript 2017+](https://img.shields.io/badge/ECMAScript-2017%2B-brightgreen.svg)
+![license](https://img.shields.io/npm/l/isomorphic-git.svg)
+[![gzip size](http://img.badgesize.io/https://unpkg.com/isomorphic-git?compression=gzip)](https://unpkg.com/isomorphic-git)
+[![install size](https://packagephobia.now.sh/badge?p=isomorphic-git)](https://packagephobia.now.sh/result?p=isomorphic-git)
+
+</td></tr><tr><td>
+
+Master branch status:
+
+</td><td>
+
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![Build Status](https://travis-ci.org/isomorphic-git/isomorphic-git.svg?branch=master)](https://travis-ci.org/isomorphic-git/isomorphic-git)
+[![codecov](https://codecov.io/gh/isomorphic-git/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/isomorphic-git/isomorphic-git)
+[![dependencies](https://david-dm.org/isomorphic-git/isomorphic-git/status.svg)](https://david-dm.org/isomorphic-git/isomorphic-git)
+[![Known Vulnerabilities](https://snyk.io/test/github/isomorphic-git/isomorphic-git/badge.svg)](https://snyk.io/test/github/isomorphic-git/isomorphic-git)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_shield)
+
+</td></tr><tr><td>
+
+Social:
+
+</td><td>
+
+[![Gitter chat](https://badges.gitter.im/isomorphic-git.svg)](https://gitter.im/isomorphic-git/Lobby)
+[![Backers on Open Collective](https://opencollective.com/isomorphic-git/backers/badge.svg)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/isomorphic-git/sponsors/badge.svg)](#sponsors)
+
+</td></tr><tr><td>
+
+Browser Support:
+
+</td><td>
+
+[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&microsoftedge=17&safari=11&android=7.1&iphone=11.2)](https://saucelabs.com/u/_wmhilton)
+
+</td></tr></table>
 
 `isomorphic-git` is a pure JavaScript implementation of git that works in node and browser environments (including WebWorkers and ServiceWorkers). This means it can be used to read and write to to git repositories, as well as fetch from and push to git remotes like Github.
 
@@ -20,9 +60,9 @@ I am working on adding type definitions so you can enjoy static type-checking an
 ## Getting Started
 
 The "isomorphic" in `isomorphic-git` means it works equally well on the server or the browser.
-That's tricky to do since git uses the file system, and browsers don't have an 'fs' module.
-So rather than relying on the 'fs' module, `isomorphic-git` is BYOFS (Bring Your Own File System).
-When creating a new Git object, you pass it the fs module to use.
+That's tricky to do since git uses the file system, and browsers don't have an `fs` module.
+So rather than relying on the `fs` module, `isomorphic-git` is BYOFS (Bring Your Own File System).
+When creating a new Git object, you pass it the `fs` module to use.
 
 If you're only using `isomorphic-git` in Node, you can just use the native `fs` module.
 
@@ -50,14 +90,16 @@ BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
 
 Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
 
+View the full Getting Started guide [here](https://isomorphic-git.github.io/docs/quickstart.html).
+
 ### CORS support
 
 Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a [proxy](https://cors-buster-jfpactjnem.now.sh/). However, I am "being the change you want to see in the world" by making PRs to all the major git repository hosting services.
 
-- Gogs: [repo/http: add CORS headers to allow clone/push from browser agents #4970](https://github.com/gogits/gogs/pull/4970)
-- Gitlab: [Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
-- Bitbucket: TODO
-- Github: TODO
+- Gogs: [Supported in v0.11.43](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)
+- Gitlab: [PR Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
+- Bitbucket: PR TODO
+- Github: PR TODO
 
 It is literally just two lines of code to add the CORS headers!! Easy stuff. Surely it will happen.
 
@@ -105,10 +147,12 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 ### commands
 
 - [add](https://isomorphic-git.github.io/docs/add.html)
+- [branch](https://isomorphic-git.github.io/docs/branch.html)
 - [checkout](https://isomorphic-git.github.io/docs/checkout.html)
 - [clone](https://isomorphic-git.github.io/docs/clone.html)
 - [commit](https://isomorphic-git.github.io/docs/commit.html)
 - [config](https://isomorphic-git.github.io/docs/config.html)
+- [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
@@ -180,12 +224,6 @@ Isomorphic-git would not have been possible without the pioneering work by
 their examples (and their modules!) I would not have been able to come even
 close to finishing this. They are geniuses ahead of their time.
 
-## License
-
-This work is released under [The MIT License](https://opensource.org/licenses/MIT)
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_large)
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
@@ -194,6 +232,46 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
 <!-- prettier-ignore -->
 | [<img src="https://avatars2.githubusercontent.com/u/587740?v=4" width="100px;"/><br /><sub><b>William Hilton</b></sub>](https://onename.com/wmhilton)<br />[📝](#blog-wmhilton "Blogposts") [🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Awmhilton "Bug reports") [💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=wmhilton "Code") [🎨](#design-wmhilton "Design") [📖](https://github.com/isomorphic-git/isomorphic-git/commits?author=wmhilton "Documentation") [💡](#example-wmhilton "Examples") [⚠️](https://github.com/isomorphic-git/isomorphic-git/commits?author=wmhilton "Tests") [✅](#tutorial-wmhilton "Tutorials") | [<img src="https://avatars2.githubusercontent.com/u/33748231?v=4" width="100px;"/><br /><sub><b>wDhTIG</b></sub>](https://github.com/wDhTIG)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3AwDhTIG "Bug reports") | [<img src="https://avatars3.githubusercontent.com/u/847542?v=4" width="100px;"/><br /><sub><b>Marc MacLeod</b></sub>](https://github.com/marbemac)<br />[🤔](#ideas-marbemac "Ideas, Planning, & Feedback") [🔍](#fundingFinding-marbemac "Funding Finding") | [<img src="https://avatars3.githubusercontent.com/u/20234?v=4" width="100px;"/><br /><sub><b>Brett Zamir</b></sub>](http://brett-zamir.me)<br />[🤔](#ideas-brettz9 "Ideas, Planning, & Feedback") | [<img src="https://avatars2.githubusercontent.com/u/79351?v=4" width="100px;"/><br /><sub><b>Dan Allen</b></sub>](http://mojavelinux.com)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Amojavelinux "Bug reports") [🤔](#ideas-mojavelinux "Ideas, Planning, & Feedback") | [<img src="https://avatars1.githubusercontent.com/u/6831144?v=4" width="100px;"/><br /><sub><b>Tomáš Hübelbauer</b></sub>](https://TomasHubelbauer.net)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3ATomasHubelbauer "Bug reports") [💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=TomasHubelbauer "Code") | [<img src="https://avatars2.githubusercontent.com/u/1410520?v=4" width="100px;"/><br /><sub><b>Juan Campa</b></sub>](https://github.com/juancampa)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Ajuancampa "Bug reports") |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| [<img src="https://avatars2.githubusercontent.com/u/1041868?v=4" width="100px;"/><br /><sub><b>Ira Miller</b></sub>](http://iramiller.com)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Aisysd "Bug reports") | [<img src="https://avatars1.githubusercontent.com/u/6311784?v=4" width="100px;"/><br /><sub><b>Rhys Arkins</b></sub>](http://rhys.arkins.net)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=rarkins "Code") | [<img src="https://avatars1.githubusercontent.com/u/3408176?v=4" width="100px;"/><br /><sub><b>Sean Larkin</b></sub>](http://twitter.com/TheLarkInn)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=TheLarkInn "Code") | [<img src="https://avatars1.githubusercontent.com/u/827205?v=4" width="100px;"/><br /><sub><b>Daniel Ruf</b></sub>](https://daniel-ruf.de)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=DanielRuf "Code") | [<img src="https://avatars0.githubusercontent.com/u/10220449?v=4" width="100px;"/><br /><sub><b>bokuweb</b></sub>](http://blog.bokuweb.me/)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=bokuweb "Code") [📖](https://github.com/isomorphic-git/isomorphic-git/commits?author=bokuweb "Documentation") [⚠️](https://github.com/isomorphic-git/isomorphic-git/commits?author=bokuweb "Tests") | [<img src="https://avatars0.githubusercontent.com/u/1075694?v=4" width="100px;"/><br /><sub><b>Hiroki Osame</b></sub>](https://github.com/hirokiosame)<br />[💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=hirokiosame "Code") [📖](https://github.com/isomorphic-git/isomorphic-git/commits?author=hirokiosame "Documentation") | [<img src="https://avatars1.githubusercontent.com/u/280241?v=4" width="100px;"/><br /><sub><b>Jakub Jankiewicz</b></sub>](http://jcubic.pl/me)<br />[💬](#question-jcubic "Answering Questions") [🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Ajcubic "Bug reports") [💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=jcubic "Code") [💡](#example-jcubic "Examples") [⚠️](https://github.com/isomorphic-git/isomorphic-git/commits?author=jcubic "Tests") |
+| [<img src="https://avatars1.githubusercontent.com/u/10459637?v=4" width="100px;"/><br /><sub><b>howardgod</b></sub>](https://github.com/howardgod)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Ahowardgod "Bug reports") [💻](https://github.com/isomorphic-git/isomorphic-git/commits?author=howardgod "Code") | [<img src="https://avatars3.githubusercontent.com/u/263378?v=4" width="100px;"/><br /><sub><b>burningTyger</b></sub>](https://twitter.com/btyga)<br />[🐛](https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3AburningTyger "Bug reports") |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
+
+<!--
+### Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="graphs/contributors"><img src="https://opencollective.com/isomorphic-git/contributors.svg?width=890&button=false" /></a>
+-->
+
+### Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/isomorphic-git#backer)]
+
+<a href="https://opencollective.com/isomorphic-git#backers" target="_blank"><img src="https://opencollective.com/isomorphic-git/backers.svg?width=890"></a>
+
+
+### Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/isomorphic-git#sponsor)]
+
+<a href="https://opencollective.com/isomorphic-git/sponsor/0/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/1/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/2/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/3/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/4/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/5/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/6/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/7/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/8/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/isomorphic-git/sponsor/9/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/9/avatar.svg"></a>
+
+
+
+
+## License
+
+This work is released under [The MIT License](https://opensource.org/licenses/MIT)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_large)

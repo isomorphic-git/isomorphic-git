@@ -11,6 +11,11 @@ import { log, pkg } from '../utils'
 import { config } from './config'
 import { packObjects } from './packObjects'
 
+/**
+ * Push a branch
+ *
+ * @link https://isomorphic-git.github.io/docs/push.html
+ */
 export async function push ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -27,7 +32,13 @@ export async function push ({
   if (url === undefined) {
     url = await config({ fs, gitdir, path: `remote.${remote}.url` })
   }
-  let fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
+  let fullRef
+  if (!ref) {
+    ref = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD', depth: 1 })
+    fullRef = ref.replace(/^ref: /, '')
+  } else {
+    fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
+  }
   let oid = await GitRefManager.resolve({ fs, gitdir, ref })
   let auth
   if (authUsername !== undefined && authPassword !== undefined) {

@@ -1,8 +1,17 @@
-// @flow
-import { Buffer } from 'buffer'
+// The amount of work that went into crafting these cases to handl
+// -0 (just so we don't lose that information when parsing and reconstructing)
+// but can also default to +0 was extraordinary.
 
-function formatTimezoneOffset (minutes /*: number */) {
-  let sign = Math.sign(minutes) || 1
+function simpleSign (n) {
+  return Math.sign(n) || (Object.is(n, -0) ? -1 : 1)
+}
+
+function negateExceptForZero (n) {
+  return n === 0 ? n : -n
+}
+
+function formatTimezoneOffset (minutes) {
+  let sign = simpleSign(negateExceptForZero(minutes))
   minutes = Math.abs(minutes)
   let hours = Math.floor(minutes / 60)
   minutes -= hours * 60
@@ -10,13 +19,13 @@ function formatTimezoneOffset (minutes /*: number */) {
   let strMinutes = String(minutes)
   if (strHours.length < 2) strHours = '0' + strHours
   if (strMinutes.length < 2) strMinutes = '0' + strMinutes
-  return (sign === 1 ? '-' : '+') + strHours + strMinutes
+  return (sign === -1 ? '-' : '+') + strHours + strMinutes
 }
 
 function parseTimezoneOffset (offset) {
   let [, sign, hours, minutes] = offset.match(/(\+|-)(\d\d)(\d\d)/)
-  minutes = (sign === '-' ? 1 : -1) * Number(hours) * 60 + Number(minutes)
-  return minutes
+  minutes = (sign === '+' ? 1 : -1) * (Number(hours) * 60 + Number(minutes))
+  return negateExceptForZero(minutes)
 }
 
 function parseAuthor (author) {
@@ -60,12 +69,8 @@ function outdent (str) {
 
 // TODO: Make all functions have static async signature?
 
-/** @ignore */
 export class GitCommit {
-  /*::
-  _commit : string
-  */
-  constructor (commit /*: string|Buffer|Object */) {
+  constructor (commit) {
     if (typeof commit === 'string') {
       this._commit = commit
     } else if (Buffer.isBuffer(commit)) {
@@ -105,7 +110,7 @@ export class GitCommit {
   }
 
   parse () {
-    return { message: this.message(), ...this.headers() }
+    return Object.assign({ message: this.message() }, this.headers())
   }
 
   static justMessage (commit) {

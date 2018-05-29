@@ -15,7 +15,7 @@ import { pkg } from '../utils'
 import { config } from './config'
 
 /**
- * Fetch commits
+ * Fetch commits from a remote repository
  *
  * @link https://isomorphic-git.github.io/docs/fetch.html
  */

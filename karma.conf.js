@@ -1,4 +1,14 @@
 // Karma configuration
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+const path = require('path')
+const webpack = require('webpack')
+
+const branchOrPullRequestName =
+  process.env.TRAVIS_PULL_REQUEST === 'false'
+    ? process.env.TRAVIS_BRANCH
+    : process.env.TRAVIS_PULL_REQUEST_SLUG +
+      '/' +
+      process.env.TRAVIS_PULL_REQUEST_BRANCH
 
 module.exports = function (config) {
   const options = {
@@ -9,7 +19,7 @@ module.exports = function (config) {
     basePath: '',
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['browserify', 'jasmine'],
+    frameworks: ['jasmine'],
     beforeMiddleware: ['git-http-server'],
     gitHttpServer: {
       root: '__tests__/__fixtures__',
@@ -36,7 +46,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '__tests__/test-*.js': ['browserify']
+      '__tests__/test-*.js': ['webpack']
     },
     // web server port
     port: 9876,
@@ -50,12 +60,12 @@ module.exports = function (config) {
     captureTimeout: 4 * 60 * 1000, // default 60000
     // SauceLabs browsers
     customLaunchers: {
-      sl_chrome: {
+      XXXsl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
         extendedDebugging: true
       },
-      sl_firefox: {
+      XXXsl_firefox: {
         base: 'SauceLabs',
         browserName: 'firefox',
         extendedDebugging: true
@@ -70,28 +80,40 @@ module.exports = function (config) {
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone Simulator',
+        deviceName: 'iPhone X Simulator',
         platformName: 'iOS',
-        platformVersion: '11.0',
+        platformVersion: '11.2',
         browserName: 'Safari',
-        appiumVersion: '1.7.1'
+        appiumVersion: '1.7.2'
       },
       sl_android_chrome: {
         base: 'SauceLabs',
-        deviceName: 'Android Emulator',
+        deviceName: 'Android GoogleAPI Emulator',
         platformName: 'Android',
-        platformVersion: '6.0',
+        platformVersion: '7.1',
         browserName: 'Chrome',
-        appiumVersion: '1.7.1'
+        appiumVersion: '1.7.2'
       },
       FirefoxHeadless: {
         base: 'Firefox',
         flags: ['-headless']
+      },
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
       }
     },
     sauceLabs: {
-      testName: 'isomorphic-git',
+      // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
+      testName: `isomorphic-git / ${branchOrPullRequestName} / ${
+        process.env.TRAVIS_COMMIT
+      }`,
+      // Note: I added the Date.now() bit so that when I can click "Restart" on a Travis job,
+      // Sauce Labs does not simply append new test results to the old set that failed, which
+      // convinces karma that it failed again and always.
       build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now(),
+      // Note: it does not appear that tags are being sent correctly.
+      tags: [branchOrPullRequestName],
       recordScreenshots: false,
       recordVideo: false,
       public: 'public restricted'
@@ -108,6 +130,25 @@ module.exports = function (config) {
         // Replace process.env.CI
         'envify'
       ]
+    },
+    webpack: {
+      mode: 'development',
+      devtool: 'inline-source-map',
+      plugins: [new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/)],
+      resolve: {
+        alias: {
+          'isomorphic-git/internal-apis': path.resolve(
+            __dirname,
+            'dist/internal.umd.min.js'
+            // 'src/internal-apis.js'
+          ),
+          'isomorphic-git': path.resolve(
+            __dirname,
+            'dist/bundle.umd.min.js'
+            // 'src/index.js'
+          )
+        }
+      }
     }
   }
 
@@ -119,7 +160,18 @@ module.exports = function (config) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
     )
+    options.browsers.push(['ChromeHeadlessNoSandbox'])
   } else {
+    console.log('---------------')
+    console.log('---------------')
+    console.log('---------------')
+    console.log(process.env.TRAVIS_PULL_REQUEST)
+    console.log(process.env.TRAVIS_BRANCH)
+    console.log(
+      process.env.TRAVIS_PULL_REQUEST_SLUG +
+        '/' +
+        process.env.TRAVIS_PULL_REQUEST_BRANCH
+    )
     options.browsers = options.browsers.concat(
       Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
     )
@@ -127,7 +179,6 @@ module.exports = function (config) {
   }
 
   if (!process.env.CI) {
-    options.browsers.push('ChromeHeadless')
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     options.singleRun = false

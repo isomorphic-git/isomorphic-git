@@ -1,4 +1,3 @@
-// @flow
 /**
 pkt-line Format
 ---------------
@@ -50,21 +49,19 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
-import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import pad from 'pad'
-import streamSource from 'stream-source'
+import streamSource from 'stream-source/index.node.js'
 
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line
 
-/** @ignore */
 export class GitPktLine {
   static flush () {
     return Buffer.from('0000', 'utf8')
   }
 
-  static encode (line /*: string|Buffer */) /*: Buffer */ {
+  static encode (line) {
     if (typeof line === 'string') {
       line = Buffer.from(line)
     }
@@ -73,7 +70,7 @@ export class GitPktLine {
     return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
   }
 
-  static reader (buffer /*: Buffer */) {
+  static reader (buffer) {
     let buffercursor = new BufferCursor(buffer)
     return async function read () {
       if (buffercursor.eof()) return true

@@ -24,7 +24,7 @@ export class GitRemoteConnection {
     res.write(GitPktLine.flush())
     res.end()
   }
-  static async receiveInfoRefs (service, res /*: string */) {
+  static async receiveInfoRefs (service, res) {
     const capabilities = new Set()
     const refs = new Map()
     const symrefs = new Map()

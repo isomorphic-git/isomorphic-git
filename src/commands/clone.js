@@ -27,6 +27,7 @@ export async function clone ({
   exclude,
   relative,
   singleBranch,
+  noCheckout = false,
   onprogress
 }) {
   if (onprogress !== undefined) {
@@ -69,11 +70,13 @@ export async function clone ({
   ref = ref || defaultBranch
   ref = ref.replace('refs/heads/', '')
   // Checkout that branch
-  await checkout({
-    dir,
-    gitdir,
-    fs,
-    ref,
-    remote
-  })
+  if (!noCheckout) {
+    await checkout({
+      dir,
+      gitdir,
+      fs,
+      ref,
+      remote
+    })
+  }
 }

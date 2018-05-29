@@ -1,10 +1,19 @@
 {
-  "presets": [
-    ["env", {
-      "targets": {
-        "node": "current"
-      }
-    }]
-  ],
-  "plugins": ["transform-es2015-modules-commonjs", "transform-object-rest-spread"],
+  "plugins": ["transform-object-rest-spread"],
+  "env": {
+    "browser": {
+      "plugins": [
+        "transform-async-to-generator"
+      ]
+    },
+    "jest": {
+      "presets": [
+        ["env", {
+          "targets": {
+            "node": "current"
+          }
+        }]
+      ]
+    }
+  }
 }

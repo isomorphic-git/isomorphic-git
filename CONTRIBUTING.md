@@ -13,6 +13,7 @@ To add an argument to an existing command:
 - [ ] add parameter to [docs](https://github.com/isomorphic-git/isomorphic-git.github.io/tree/source/docs)/X.md
 - [ ] add parameter to the TypeScript library definition for X in `src/index.d.ts`
 - [ ] add a test case in `__tests__/test-X.js` if possible
+- [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] make a feature commit "feat: Added new 'bar' argument to X"
 
 To create a new command:
@@ -25,4 +26,5 @@ To create a new command:
   - [ ] add page to the [Alphabetical Index](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/docs/alphabetic.md)
   - [ ] add page to the [sidebar](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/website/sidebars.json)
 - [ ] create a test in `src/__tests__`
+- [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] make a feature commit "feat: Added 'X' command"

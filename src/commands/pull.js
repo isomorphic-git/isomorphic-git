@@ -1,14 +1,19 @@
 // import diff3 from 'node-diff3'
 import path from 'path'
 
-import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
 
+import { currentBranch } from './currentBranch'
 import { checkout } from './checkout'
 import { config } from './config'
 import { fetch } from './fetch'
 import { merge } from './merge'
 
+/**
+ * Fetch and merge commits from a remote repository
+ *
+ * @link https://isomorphic-git.github.io/docs/pull.html
+ */
 export async function pull ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -23,12 +28,7 @@ export async function pull ({
   const fs = new FileSystem(_fs)
   // If ref is undefined, use 'HEAD'
   if (!ref) {
-    ref = await GitRefManager.resolve({
-      fs,
-      gitdir,
-      ref: 'HEAD',
-      depth: 1
-    })
+    ref = await currentBranch({ fs, gitdir })
   }
   console.log(`Using ref=${ref}`)
   // Fetch from the correct remote.

@@ -1,4 +1,3 @@
-// @flow
 // import LockManager from 'travix-lock-manager'
 import AsyncLock from 'async-lock'
 
@@ -7,11 +6,10 @@ import { FileSystem, GitIndex } from '../models'
 // import Lock from '../utils'
 
 // TODO: replace with an LRU cache?
-const map /*: Map<string, GitIndex> */ = new Map()
+const map = new Map()
 // const lm = new LockManager()
 const lock = new AsyncLock()
 
-/** @ignore */
 export class GitIndexManager {
   static async acquire ({ fs: _fs, filepath }, closure) {
     const fs = new FileSystem(_fs)

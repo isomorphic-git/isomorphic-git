@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import pako from 'pako'
 import path from 'path'
 import shasum from 'shasum'
@@ -7,7 +6,6 @@ import { FileSystem, GitObject, GitPackIndex } from '../models'
 
 const PackfileCache = new Map()
 
-/** @ignore */
 export class GitObjectManager {
   static async read ({ fs: _fs, gitdir, oid, format = 'content' }) {
     const fs = new FileSystem(_fs)
@@ -82,7 +80,7 @@ export class GitObjectManager {
     if (format === 'content') return { type, format: 'content', object, source }
   }
 
-  static async hash ({ gitdir, type, object }) /*: Promise<string> */ {
+  static async hash ({ gitdir, type, object }) {
     let buffer = Buffer.concat([
       Buffer.from(type + ' '),
       Buffer.from(object.byteLength.toString()),
@@ -93,7 +91,7 @@ export class GitObjectManager {
     return oid
   }
 
-  static async write ({ fs: _fs, gitdir, type, object }) /*: Promise<string> */ {
+  static async write ({ fs: _fs, gitdir, type, object }) {
     const fs = new FileSystem(_fs)
     let { buffer, oid } = GitObject.wrap({ type, object })
     let file = Buffer.from(pako.deflate(buffer))

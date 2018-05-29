@@ -4,45 +4,24 @@ import { GitConfigManager } from '../managers'
 import { FileSystem } from '../models'
 
 /**
- * Read and/or write to the git config file(s)
- * @param {Object} args - Arguments object
- * @param {FSModule} args.fs - The filesystem holding the git repo
- * @param {string} args.dir - The path to the [working tree](index.html#dir-vs-gitdir) directory
- * @param {string} [args.gitdir=path.join(dir, '.git')] - The path to the [git directory](index.html#dir-vs-gitdir)
- * @param {string} args.path -  The key of the git config entry.
- * @param {string} [args.value] - A value to store at that path.
- * @returns {Promise<any>} - Resolves with the config value
+ * Read and/or write to the git config files.
  *
- * If no `value` is provided, it does a read.
- * If a `value` is provided, it does a write.
- *
- * @example
- * let repo = {fs, dir: '<@.@>'}
- *
- * // Write config value
- * await git.config({
- *   ...repo,
- *   path: '<@user.name@>',
- *   value: '<@Mr. Test@>'
- * })
- *
- * // Read config value
- * let value = await git.config({
- *   ...repo,
- *   path: '<@user.name@>'
- * })
- * console.log(value)
+ * @link https://isomorphic-git.github.io/docs/config.html
  */
-export async function config ({
-  dir,
-  gitdir = pathModule.join(dir, '.git'),
-  fs: _fs,
-  all = false,
-  append = false,
-  ...args
-}) {
+export async function config (args) {
+  // These arguments are not in the function signature but destructured separately
+  // as a result of a bit of a design flaw that requires the un-destructured argument object
+  // in order to call args.hasOwnProperty('value') later on.
+  let {
+    dir,
+    gitdir = pathModule.join(dir, '.git'),
+    fs: _fs,
+    all = false,
+    append = false,
+    path,
+    value
+  } = args
   const fs = new FileSystem(_fs)
-  let { path, value } = args
   const config = await GitConfigManager.get({ fs, gitdir })
   // This carefully distinguishes between
   // 1) there is no 'value' argument (do a "get")

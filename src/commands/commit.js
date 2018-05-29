@@ -6,31 +6,11 @@ import { flatFileListToDirectoryStructure } from '../utils'
 
 import { config } from './config'
 
-async function constructTree ({ fs, gitdir, inode }) /*: string */ {
-  // use depth first traversal
-  let children = inode.children
-  for (let inode of children) {
-    if (inode.type === 'tree') {
-      inode.metadata.mode = '040000'
-      inode.metadata.oid = await constructTree({ fs, gitdir, inode })
-    }
-  }
-  let entries = children.map(inode => ({
-    mode: inode.metadata.mode,
-    path: inode.basename,
-    oid: inode.metadata.oid,
-    type: inode.type
-  }))
-  const tree = GitTree.from(entries)
-  let oid = await GitObjectManager.write({
-    fs,
-    gitdir,
-    type: 'tree',
-    object: tree.toObject()
-  })
-  return oid
-}
-
+/**
+ * Create a new commit
+ *
+ * @link https://isomorphic-git.github.io/docs/commit.html
+ */
 export async function commit ({
   dir,
   gitdir = path.join(dir, '.git'),
@@ -77,16 +57,27 @@ export async function commit ({
           name: author.name,
           email: author.email,
           timestamp:
-            author.timestamp || Math.floor(authorDateTime.valueOf() / 1000),
-          timezoneOffset: author.timezoneOffset || 0
+            author.timestamp !== undefined && author.timestamp !== null
+              ? author.timestamp
+              : Math.floor(authorDateTime.valueOf() / 1000),
+          timezoneOffset:
+            author.timezoneOffset !== undefined &&
+            author.timezoneOffset !== null
+              ? author.timezoneOffset
+              : new Date().getTimezoneOffset()
         },
         committer: {
           name: committer.name,
           email: committer.email,
           timestamp:
-            committer.timestamp ||
-            Math.floor(committerDateTime.valueOf() / 1000),
-          timezoneOffset: committer.timezoneOffset || 0
+            committer.timestamp !== undefined && committer.timestamp !== null
+              ? committer.timestamp
+              : Math.floor(committerDateTime.valueOf() / 1000),
+          timezoneOffset:
+            committer.timezoneOffset !== undefined &&
+            committer.timezoneOffset !== null
+              ? committer.timezoneOffset
+              : new Date().getTimezoneOffset()
         },
         message
       })
@@ -106,5 +97,30 @@ export async function commit ({
       await fs.write(path.join(gitdir, branch), oid + '\n')
     }
   )
+  return oid
+}
+
+async function constructTree ({ fs, gitdir, inode }) {
+  // use depth first traversal
+  let children = inode.children
+  for (let inode of children) {
+    if (inode.type === 'tree') {
+      inode.metadata.mode = '040000'
+      inode.metadata.oid = await constructTree({ fs, gitdir, inode })
+    }
+  }
+  let entries = children.map(inode => ({
+    mode: inode.metadata.mode,
+    path: inode.basename,
+    oid: inode.metadata.oid,
+    type: inode.type
+  }))
+  const tree = GitTree.from(entries)
+  let oid = await GitObjectManager.write({
+    fs,
+    gitdir,
+    type: 'tree',
+    object: tree.toObject()
+  })
   return oid
 }

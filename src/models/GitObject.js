@@ -1,9 +1,7 @@
-import { Buffer } from 'buffer'
 import shasum from 'shasum'
 
-/** @ignore */
 export class GitObject {
-  static hash ({ type, object }) /*: Promise<string> */ {
+  static hash ({ type, object }) {
     let buffer = Buffer.concat([
       Buffer.from(`${type} ${object.byteLength.toString()}\0`),
       Buffer.from(object)

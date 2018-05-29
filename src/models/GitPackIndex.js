@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import BufferCursor from 'buffercursor'
 import crc32 from 'crc/lib/crc32.js'
 import applyDelta from 'git-apply-delta'
@@ -51,7 +50,6 @@ function otherVarIntDecode (reader, startWith) {
   return result
 }
 
-/** @ignore */
 export class GitPackIndex {
   constructor (stuff) {
     Object.assign(this, stuff)
@@ -361,7 +359,7 @@ export class GitPackIndex {
   async unload () {
     this.pack = null
   }
-  async read ({ oid } /*: {oid: string} */) {
+  async read ({ oid }) {
     if (!this.offsets[oid]) {
       if (this.getExternalRefDelta) {
         this.externalReadDepth++
