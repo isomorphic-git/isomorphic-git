@@ -82,7 +82,11 @@ export class GitSideBand {
     const MAX_PACKET_LENGTH = protocol === 'side-band-64k' ? 999 : 65519
     let output = new PassThrough()
     packetlines.on('data', data => {
-      output.write(GitPktLine.encode(data))
+      if (data === null) {
+        output.write(GitPktLine.flush())
+      } else {
+        output.write(GitPktLine.encode(data))
+      }
     })
     let packfileEnded = false
     let progressEnded = false

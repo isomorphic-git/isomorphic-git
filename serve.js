@@ -71,24 +71,31 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
         done
       })
       // create pack file
-      let { packstream } = await git.packObjects({
+      let { packstream, shallows: newshallows, unshallows, acks } = await git.packObjects({
         fs,
         gitdir,
         refs: wants,
         depth,
         since,
         exclude,
-        relative
+        relative,
+        haves,
+        shallows
       })
       res.setHeader('content-type', `application/x-${service}-result`)
       let packetlines = new PassThrough()
       let progress = new PassThrough()
       let error = new PassThrough()
+      console.log('newshallows', newshallows)
       let stream = await GitRemoteConnection.sendUploadPackResult({
         packetlines,
         packfile: packstream,
         progress,
-        error
+        error,
+        acks,
+        nak: false,
+        shallows: newshallows,
+        unshallows
       })
       packetlines.end()
       progress.end()

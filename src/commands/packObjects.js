@@ -33,22 +33,48 @@ export async function packObjects ({
   since,
   exclude,
   relative,
-  tags
+  tags,
+  haves,
+  shallows: oldshallows
 }) {
   const fs = new FileSystem(_fs)
   let oids = new Set()
+  let shallows = new Set()
+  let unshallows = new Set()
+  let acks = []
   for (const ref of refs) {
-    let commits = await log({
-      dir,
-      gitdir,
-      fs,
-      emitter,
-      ref,
-      depth,
-      since
-    })
-    for (const commit of commits) {
-      oids.add(commit.oid)
+    try {
+      let commits = await log({
+        dir,
+        gitdir,
+        fs,
+        emitter,
+        ref,
+        depth,
+        since
+      })
+      for (let i = 0; i < commits.length; i++) {
+        let commit = commits[i]
+        if (haves.includes(commit.oid)) {
+          acks.push({
+            oid: ref
+          })
+          break
+        }
+        oids.add(commit.oid)
+        if (i === commits.length - 1 && commit.parent.length > 0) {
+          console.log('last one', commit.oid)
+          if (!oldshallows.includes(commit.oid)) {
+            console.log('make it shallow', commit.oid)
+            shallows.add(commit.oid)
+          }
+        } else if (oldshallows.includes(commit.oid)) {
+          console.log('make it unshallow', commit.oid)
+          unshallows.add(commit.oid)
+        }
+      }
+    } catch (err) {
+      // oh well.
     }
   }
   let objects = await listObjects({ fs, gitdir, oids })
@@ -59,7 +85,7 @@ export async function packObjects ({
     oids: [...objects],
     outputStream: packstream
   })
-  return { packstream }
+  return { packstream, shallows, unshallows, acks }
 }
 
 export async function listObjects ({
