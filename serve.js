@@ -70,37 +70,75 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
         relative,
         done
       })
-      // create pack file
-      let { packstream, shallows: newshallows, unshallows, acks } = await git.packObjects({
-        fs,
-        gitdir,
-        refs: wants,
-        depth,
-        since,
-        exclude,
-        relative,
-        haves,
-        shallows
-      })
-      res.setHeader('content-type', `application/x-${service}-result`)
-      let packetlines = new PassThrough()
-      let progress = new PassThrough()
-      let error = new PassThrough()
-      console.log('newshallows', newshallows)
-      let stream = await GitRemoteConnection.sendUploadPackResult({
-        packetlines,
-        packfile: packstream,
-        progress,
-        error,
-        acks,
-        nak: false,
-        shallows: newshallows,
-        unshallows
-      })
-      packetlines.end()
-      progress.end()
-      error.end()
-      stream.pipe(res)
+      if (done) {
+        console.log('done - so send packfile')
+        // create pack file
+        let { packstream, shallows: newshallows, unshallows, acks } = await git.packObjects({
+          fs,
+          gitdir,
+          refs: wants,
+          depth,
+          since,
+          exclude,
+          relative,
+          haves,
+          shallows
+        })
+        res.setHeader('content-type', `application/x-${service}-result`)
+        let packetlines = new PassThrough()
+        let progress = new PassThrough()
+        let error = new PassThrough()
+        console.log('newshallows', newshallows)
+        let stream = await GitRemoteConnection.sendUploadPackResult({
+          packetlines,
+          packfile: packstream,
+          progress,
+          error,
+          acks,
+          nak: true,
+          shallows: newshallows,
+          unshallows
+        })
+        packetlines.end()
+        progress.end()
+        error.end()
+        stream.pipe(res)
+      } else {
+        console.log('not done - so dont send packfile')
+        let { shallows: newshallows, unshallows, acks } = await git.packObjects({
+          fs,
+          gitdir,
+          refs: wants,
+          depth,
+          since,
+          exclude,
+          relative,
+          haves,
+          shallows
+        })
+        res.setHeader('content-type', `application/x-${service}-result`)
+        let packetlines = new PassThrough()
+        let packfile = new PassThrough()
+        let progress = new PassThrough()
+        let error = new PassThrough()
+        console.log('newshallows', newshallows)
+        let stream = await GitRemoteConnection.sendUploadPackResult({
+          packetlines,
+          packfile,
+          progress,
+          error,
+          acks,
+          nak: false,
+          shallows: newshallows,
+          unshallows
+        })
+        packetlines.end()
+        packfile.end()
+        progress.end()
+        error.end()
+        stream.pipe(res)
+      }
+      console.log('finished function alright')
     }
   })
   server.listen(opts.port)

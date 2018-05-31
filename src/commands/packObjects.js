@@ -62,9 +62,9 @@ export async function packObjects ({
           break
         }
         oids.add(commit.oid)
-        if (i === commits.length - 1 && commit.parent.length > 0) {
+        if (i === commits.length - 1) {
           console.log('last one', commit.oid)
-          if (!oldshallows.includes(commit.oid)) {
+          if (!oldshallows.includes(commit.oid) && (depth !== undefined || since !== undefined)) {
             console.log('make it shallow', commit.oid)
             shallows.add(commit.oid)
           }

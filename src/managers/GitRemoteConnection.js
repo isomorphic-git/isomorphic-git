@@ -185,7 +185,8 @@ export class GitRemoteConnection {
     protocol = 'side-band-64k',
     shallows = [],
     unshallows = [],
-    acks = []
+    acks = [],
+    nak = false
   }) {
     let stream = GitSideBand.mux({
       protocol,
@@ -194,27 +195,24 @@ export class GitRemoteConnection {
       progress,
       error
     })
-    if (shallows.length || shallows.size || unshallows.length || unshallows.size) {
-      stream.write(GitPktLine.flush())
-    }
     for (const shallow of shallows) {
       packetlines.write(`shallow ${shallow}\n`)
-      console.log(`shallow ${shallow}\n`)
+      console.log(`shallow ${shallow}`)
     }
     for (const unshallow of unshallows) {
       packetlines.write(`unshallow ${unshallow}\n`)
-      console.log(`unshallow ${unshallow}\n`)
+      console.log(`unshallow ${unshallow}`)
     }
     if (shallows.length || shallows.size || unshallows.length || unshallows.size) {
       stream.write(GitPktLine.flush())
     }
     for (const ack of acks) {
       packetlines.write(`ACK ${ack.oid}${ack.status ? (' ' + ack.status) : ''}\n`)
-      console.log(`ACK ${ack.oid}${ack.status ? (' ' + ack.status) : ''}\n`)
+      console.log(`ACK ${ack.oid}${ack.status ? (' ' + ack.status) : ''}`)
     }
-    if (acks.length === 0 || acks.size === 0) {
+    if (nak && (acks.length === 0 || acks.size === 0)) {
       packetlines.write(`NAK\n`)
-      console.log(`NAK\n`)
+      console.log(`NAK`)
     }
     return stream
   }

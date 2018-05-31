@@ -88,6 +88,7 @@ export class GitSideBand {
         output.write(GitPktLine.encode(data))
       }
     })
+    let packfileWasEmpty = true
     let packfileEnded = false
     let progressEnded = false
     let errorEnded = false
@@ -97,6 +98,7 @@ export class GitSideBand {
     ])
     packfile
       .on('data', data => {
+        packfileWasEmpty = false
         const buffers = splitBuffer(data, MAX_PACKET_LENGTH)
         for (const buffer of buffers) {
           output.write(GitPktLine.encode(Buffer.concat([Buffer.from('01', 'hex'), buffer])))
@@ -104,7 +106,8 @@ export class GitSideBand {
       })
       .on('end', () => {
         packfileEnded = true
-        if (progressEnded && errorEnded) output.end(goodbye)
+        if (!packfileWasEmpty) output.write(goodbye)
+        if (progressEnded && errorEnded) output.end()
       })
     progress
       .on('data', data => {
@@ -115,7 +118,7 @@ export class GitSideBand {
       })
       .on('end', () => {
         progressEnded = true
-        if (packfileEnded && errorEnded) output.end(goodbye)
+        if (packfileEnded && errorEnded) output.end()
       })
     error
       .on('data', data => {
@@ -126,7 +129,7 @@ export class GitSideBand {
       })
       .on('end', () => {
         errorEnded = true
-        if (progressEnded && packfileEnded) output.end(goodbye)
+        if (progressEnded && packfileEnded) output.end()
       })
     return output
   }
