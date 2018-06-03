@@ -13,6 +13,11 @@ export async function listTags ({
   gitdir = path.join(dir, '.git'),
   fs: _fs
 }) {
-  const fs = new FileSystem(_fs)
-  return GitRefManager.listTags({ fs, gitdir })
+  try {
+    const fs = new FileSystem(_fs)
+    return GitRefManager.listTags({ fs, gitdir })
+  } catch (err) {
+    err.caller = 'git.listTags'
+    throw err
+  }
 }

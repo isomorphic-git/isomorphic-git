@@ -8,8 +8,13 @@ import { FileSystem } from '../models'
  * @link https://isomorphic-git.github.io/docs/findRoot.html
  */
 export async function findRoot ({ fs: _fs, filepath }) {
-  const fs = new FileSystem(_fs)
-  return _findRoot(fs, filepath)
+  try {
+    const fs = new FileSystem(_fs)
+    return _findRoot(fs, filepath)
+  } catch (err) {
+    err.caller = 'git.findRoot'
+    throw err
+  }
 }
 
 async function _findRoot (fs, filepath) {

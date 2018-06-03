@@ -25,7 +25,7 @@ describe('commit', () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-commit')
     // Test
-    let error = null
+    let error = {}
     try {
       await commit({
         fs,
@@ -38,13 +38,14 @@ describe('commit', () => {
         message: 'Initial commit'
       })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toBe(
+    expect(error.message).toBe(
       'Author name and email must be specified as an argument or in the .git/config file'
     )
+    expect(error.caller).toEqual('git.commit')
     // reset for test 2
-    error = null
+    error = {}
     try {
       await commit({
         fs,
@@ -57,11 +58,12 @@ describe('commit', () => {
         message: 'Initial commit'
       })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toBe(
+    expect(error.message).toBe(
       'Author name and email must be specified as an argument or in the .git/config file'
     )
+    expect(error.caller).toEqual('git.commit')
   })
 
   it('GPG signing', async () => {

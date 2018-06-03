@@ -29,11 +29,12 @@ describe('branch', () => {
     try {
       await branch({ fs, dir, gitdir, ref: 'inv@{id..branch.lock' })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toEqual(
+    expect(error.message).toEqual(
       `Failed to create branch 'inv@{id..branch.lock' because that name would not be a valid git reference. A valid alternative would be 'inv-id.branch'.`
     )
+    expect(error.caller).toEqual('git.branch')
   })
 
   it('missing ref argument', async () => {
@@ -44,9 +45,10 @@ describe('branch', () => {
     try {
       await branch({ fs, dir, gitdir })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toEqual('Cannot create branch "undefined"')
+    expect(error.message).toEqual('Cannot create branch "undefined"')
+    expect(error.caller).toEqual('git.branch')
   })
 
   it('empty repo', async () => {
@@ -58,10 +60,11 @@ describe('branch', () => {
     try {
       await branch({ fs, dir, gitdir, ref: 'test-branch' })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toEqual(
+    expect(error.message).toEqual(
       `Failed to create branch 'test-branch' because there are no commits in this project.`
     )
+    expect(error.caller).toEqual('git.branch')
   })
 })
