@@ -18,6 +18,7 @@ export as namespace git;
 
 /*~ You can declare types that are available via importing the module */
 export interface GitObjectDescription {
+  oid: string,
   type?: 'blob' | 'tree' | 'commit' | 'tag',
   format: 'deflated' | 'wrapped' | 'content' | 'parsed',
   object: Buffer | CommitDescription | TreeDescription,
@@ -121,7 +122,8 @@ export function clone(args: {
   since?: Date,
   exclude?: string[],
   relative?: boolean,
-  singleBranch?: boolean
+  singleBranch?: boolean,
+  noCheckout?: boolean
 }): Promise<void>;
 
 export function commit(args: {
@@ -134,12 +136,14 @@ export function commit(args: {
     email?: string,
     date?: Date,
     timestamp?: number,
+    timezoneOffset?: number,
   },
-  committer: {
+  committer?: {
     name?: string,
     email?: string,
     date?: Date,
     timestamp?: number,
+    timezoneOffset?: number,
   }
 }): Promise<string>
 
@@ -150,6 +154,13 @@ export function config(args: {
   path: string,
   value?: string | undefined
 }): Promise<any>
+
+export function currentBranch(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  fullname?: boolean,
+}): Promise<string>
 
 export function fetch(args: {
   fs: any,
@@ -276,7 +287,9 @@ export function readObject(args: {
   dir: string,
   gitdir?: string,
   oid: string,
-  format: 'deflated' | 'wrapped' | 'content' | 'parsed'
+  format: 'deflated' | 'wrapped' | 'content' | 'parsed',
+  filepath: string,
+  encoding: string
 }): Promise<GitObjectDescription>
 
 export function remove(args: {

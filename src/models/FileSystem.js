@@ -50,11 +50,7 @@ export class FileSystem {
   /**
    * Write a file (creating missing directories if need be) without throwing errors.
    */
-  async write (
-    filepath,
-    contents,
-    options = {}
-  ) {
+  async write (filepath, contents, options = {}) {
     try {
       await this._writeFile(filepath, contents, options)
       return
