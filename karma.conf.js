@@ -1,10 +1,14 @@
 // Karma configuration
+process.env.CHROME_BIN = require('puppeteer').executablePath()
 const path = require('path')
 const webpack = require('webpack')
 
-const branchOrPullRequestName = process.env.TRAVIS_PULL_REQUEST === 'false'
-  ? process.env.TRAVIS_BRANCH
-  : process.env.TRAVIS_PULL_REQUEST_SLUG + '/' + process.env.TRAVIS_PULL_REQUEST_BRANCH
+const branchOrPullRequestName =
+  process.env.TRAVIS_PULL_REQUEST === 'false'
+    ? process.env.TRAVIS_BRANCH
+    : process.env.TRAVIS_PULL_REQUEST_SLUG +
+      '/' +
+      process.env.TRAVIS_PULL_REQUEST_BRANCH
 
 module.exports = function (config) {
   const options = {
@@ -56,7 +60,7 @@ module.exports = function (config) {
     captureTimeout: 4 * 60 * 1000, // default 60000
     // SauceLabs browsers
     customLaunchers: {
-      sl_chrome: {
+      XXXsl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
         extendedDebugging: true
@@ -149,6 +153,10 @@ module.exports = function (config) {
       FirefoxHeadless: {
         base: 'Firefox',
         flags: ['-headless']
+      },
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
       }
     },
     browserStack: {
@@ -158,7 +166,9 @@ module.exports = function (config) {
     },
     sauceLabs: {
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
-      testName: `isomorphic-git / ${branchOrPullRequestName} / ${process.env.TRAVIS_COMMIT}`,
+      testName: `isomorphic-git / ${branchOrPullRequestName} / ${
+        process.env.TRAVIS_COMMIT
+      }`,
       // Note: I added the Date.now() bit so that when I can click "Restart" on a Travis job,
       // Sauce Labs does not simply append new test results to the old set that failed, which
       // convinces karma that it failed again and always.
@@ -232,8 +242,19 @@ module.exports = function (config) {
     console.log(
       'Skipping BrowserStack tests because BROWSER_STACK_ACCESS_KEY environment variable is not set.'
     )
+    options.browsers.push(['ChromeHeadlessNoSandbox'])
   } else {
     // Add bs_ browsers
+    console.log('---------------')
+    console.log('---------------')
+    console.log('---------------')
+    console.log(process.env.TRAVIS_PULL_REQUEST)
+    console.log(process.env.TRAVIS_BRANCH)
+    console.log(
+      process.env.TRAVIS_PULL_REQUEST_SLUG +
+        '/' +
+        process.env.TRAVIS_PULL_REQUEST_BRANCH
+    )
     options.browsers = options.browsers.concat(
       Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
     )
@@ -241,7 +262,6 @@ module.exports = function (config) {
   }
 
   if (!process.env.CI) {
-    options.browsers.push('ChromeHeadless')
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     options.singleRun = false

@@ -18,6 +18,7 @@ export as namespace git;
 
 /*~ You can declare types that are available via importing the module */
 export interface GitObjectDescription {
+  oid: string,
   type?: 'blob' | 'tree' | 'commit' | 'tag',
   format: 'deflated' | 'wrapped' | 'content' | 'parsed',
   object: Buffer | CommitDescription | TreeDescription,
@@ -92,6 +93,13 @@ export function add(args: {
   filepath: string
 }): Promise<void>;
 
+export function branch(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  ref: string
+}): Promise<void>;
+
 export function checkout(args: {
   fs: any,
   dir: string,
@@ -114,7 +122,8 @@ export function clone(args: {
   since?: Date,
   exclude?: string[],
   relative?: boolean,
-  singleBranch?: boolean
+  singleBranch?: boolean,
+  noCheckout?: boolean
 }): Promise<void>;
 
 export function commit(args: {
@@ -144,6 +153,13 @@ export function config(args: {
   value?: string | undefined
 }): Promise<any>
 
+export function currentBranch(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  fullname?: boolean,
+}): Promise<string>
+
 export function fetch(args: {
   fs: any,
   dir: string,
@@ -168,7 +184,9 @@ export function findRoot(args: {
 }): Promise<string>;
 
 export function getRemoteInfo(args: {
-  url: string
+  url: string,
+  authUsername?: string,
+  authPassword?: string
 }): Promise<RemoteDescription>;
 
 export function indexPack(args: {
@@ -267,7 +285,9 @@ export function readObject(args: {
   dir: string,
   gitdir?: string,
   oid: string,
-  format: 'deflated' | 'wrapped' | 'content' | 'parsed'
+  format: 'deflated' | 'wrapped' | 'content' | 'parsed',
+  filepath: string,
+  encoding: string
 }): Promise<GitObjectDescription>
 
 export function remove(args: {
