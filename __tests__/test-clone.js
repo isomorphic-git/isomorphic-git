@@ -7,7 +7,7 @@ describe('clone', () => {
   it('clone', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     let url = `https://${
-      process.browser ? 'cors-buster-jfpactjnem.now.sh/' : ''
+      process.browser ? 'cors-buster-tbgktfqyku.now.sh/' : ''
     }github.com/isomorphic-git/isomorphic-git`
     await clone({
       fs,
@@ -51,7 +51,7 @@ describe('clone', () => {
   it('clone a tag', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     let url = `https://${
-      process.browser ? 'cors-buster-jfpactjnem.now.sh/' : ''
+      process.browser ? 'cors-buster-tbgktfqyku.now.sh/' : ''
     }github.com/isomorphic-git/isomorphic-git`
     await clone({
       fs,
