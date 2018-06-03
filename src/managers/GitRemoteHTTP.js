@@ -20,6 +20,7 @@ export class GitRemoteHTTP {
     if (!url.endsWith('.git')) url = url += '.git'
     let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
+    headers['user-agent'] = `git/${pkg.name}@${pkg.version}`
     if (auth) {
       headers['Authorization'] = basicAuth(auth)
     }
