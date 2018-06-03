@@ -136,12 +136,14 @@ export function commit(args: {
     email?: string,
     date?: Date,
     timestamp?: number,
+    timezoneOffset?: number,
   },
-  committer: {
+  committer?: {
     name?: string,
     email?: string,
     date?: Date,
     timestamp?: number,
+    timezoneOffset?: number,
   }
 }): Promise<string>
 
