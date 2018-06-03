@@ -11,9 +11,7 @@ type Node = {
 }
 */
 
-export function flatFileListToDirectoryStructure (
-  files
-) {
+export function flatFileListToDirectoryStructure (files) {
   const inodes = new Map()
   const mkdir = function (name) {
     if (!inodes.has(name)) {

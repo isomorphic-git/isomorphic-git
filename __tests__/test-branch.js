@@ -31,7 +31,9 @@ describe('branch', () => {
     } catch (err) {
       error = err.message
     }
-    expect(error).toEqual(`Failed to create branch 'inv@{id..branch.lock' because that name would not be a valid git reference. A valid alternative would be 'inv-id.branch'.`)
+    expect(error).toEqual(
+      `Failed to create branch 'inv@{id..branch.lock' because that name would not be a valid git reference. A valid alternative would be 'inv-id.branch'.`
+    )
   })
 
   it('missing ref argument', async () => {
@@ -50,7 +52,7 @@ describe('branch', () => {
   it('empty repo', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-branch-empty-repo')
-    await init({fs, dir, gitdir})
+    await init({ fs, dir, gitdir })
     let error = null
     // Test
     try {
@@ -58,6 +60,8 @@ describe('branch', () => {
     } catch (err) {
       error = err.message
     }
-    expect(error).toEqual(`Failed to create branch 'test-branch' because there are no commits in this project.`)
+    expect(error).toEqual(
+      `Failed to create branch 'test-branch' because there are no commits in this project.`
+    )
   })
 })

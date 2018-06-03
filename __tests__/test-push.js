@@ -36,7 +36,6 @@ describe('push', () => {
       expect(output).toMatchSnapshot()
     }
   )
-
   ;(process.browser ? it : xit)(
     'push to karma-git-http-server-middleware without ref',
     async () => {

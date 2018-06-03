@@ -151,6 +151,25 @@
         "example",
         "test"
       ]
+    },
+    {
+      "login": "howardgod",
+      "name": "howardgod",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/10459637?v=4",
+      "profile": "https://github.com/howardgod",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "burningTyger",
+      "name": "burningTyger",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/263378?v=4",
+      "profile": "https://twitter.com/btyga",
+      "contributions": [
+        "bug"
+      ]
     }
   ]
 }

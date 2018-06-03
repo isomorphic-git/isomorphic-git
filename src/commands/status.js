@@ -117,9 +117,7 @@ export async function status ({
   */
 }
 
-function cacheIsStale (
-  { entry, stats }
-) {
+function cacheIsStale ({ entry, stats }) {
   // Comparison based on the description in Paragraph 4 of
   // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
   return (

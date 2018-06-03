@@ -65,7 +65,7 @@ export async function log ({
     }
     if (
       sinceTimestamp !== undefined &&
-      currentCommit.author.timestamp <= sinceTimestamp
+      currentCommit.committer.timestamp <= sinceTimestamp
     ) {
       break
     }
