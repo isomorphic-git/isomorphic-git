@@ -21,24 +21,29 @@ export async function config (args) {
     path,
     value
   } = args
-  const fs = new FileSystem(_fs)
-  const config = await GitConfigManager.get({ fs, gitdir })
-  // This carefully distinguishes between
-  // 1) there is no 'value' argument (do a "get")
-  // 2) there is a 'value' argument with a value of undefined (do a "set")
-  // Because setting a key to undefined is how we delete entries from the ini.
-  if (value === undefined && !args.hasOwnProperty('value')) {
-    if (all) {
-      return config.getall(path)
+  try {
+    const fs = new FileSystem(_fs)
+    const config = await GitConfigManager.get({ fs, gitdir })
+    // This carefully distinguishes between
+    // 1) there is no 'value' argument (do a "get")
+    // 2) there is a 'value' argument with a value of undefined (do a "set")
+    // Because setting a key to undefined is how we delete entries from the ini.
+    if (value === undefined && !args.hasOwnProperty('value')) {
+      if (all) {
+        return config.getall(path)
+      } else {
+        return config.get(path)
+      }
     } else {
-      return config.get(path)
+      if (append) {
+        await config.append(path, value)
+      } else {
+        await config.set(path, value)
+      }
+      await GitConfigManager.save({ fs, gitdir, config })
     }
-  } else {
-    if (append) {
-      await config.append(path, value)
-    } else {
-      await config.set(path, value)
-    }
-    await GitConfigManager.save({ fs, gitdir, config })
+  } catch (err) {
+    err.caller = 'git.config'
+    throw err
   }
 }

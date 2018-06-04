@@ -16,12 +16,17 @@ export async function remove ({
   fs: _fs,
   filepath
 }) {
-  const fs = new FileSystem(_fs)
-  await GitIndexManager.acquire(
-    { fs, filepath: `${gitdir}/index` },
-    async function (index) {
-      index.delete({ filepath })
-    }
-  )
-  // TODO: return oid?
+  try {
+    const fs = new FileSystem(_fs)
+    await GitIndexManager.acquire(
+      { fs, filepath: `${gitdir}/index` },
+      async function (index) {
+        index.delete({ filepath })
+      }
+    )
+    // TODO: return oid?
+  } catch (err) {
+    err.caller = 'git.remove'
+    throw err
+  }
 }

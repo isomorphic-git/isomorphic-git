@@ -13,8 +13,13 @@ export async function indexPack ({
   fs: _fs,
   filepath
 }) {
-  const fs = new FileSystem(_fs)
-  const pack = await fs.read(path.join(dir, filepath))
-  const idx = await GitPackIndex.fromPack({ pack })
-  await fs.write(filepath.replace(/\.pack$/, '.idx'), idx.toBuffer())
+  try {
+    const fs = new FileSystem(_fs)
+    const pack = await fs.read(path.join(dir, filepath))
+    const idx = await GitPackIndex.fromPack({ pack })
+    await fs.write(filepath.replace(/\.pack$/, '.idx'), idx.toBuffer())
+  } catch (err) {
+    err.caller = 'git.indexPack'
+    throw err
+  }
 }

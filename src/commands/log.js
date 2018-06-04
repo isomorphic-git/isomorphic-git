@@ -17,59 +17,68 @@ export async function log ({
   since, // Date
   signing = false
 }) {
-  const fs = new FileSystem(_fs)
-  let sinceTimestamp =
-    since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
-  // TODO: In the future, we may want to have an API where we return a
-  // async iterator that emits commits.
-  let commits = []
-  let start = await GitRefManager.resolve({ fs, gitdir, ref })
-  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: start })
-  if (type !== 'commit') {
-    throw new Error(
-      `The given ref ${ref} did not resolve to a commit but to a ${type}`
-    )
-  }
-  let commit = GitCommit.from(object)
-  let currentCommit = Object.assign({ oid: start }, commit.parse())
-  if (signing) {
-    currentCommit.payload = commit.withoutSignature()
-  }
-  commits.push(currentCommit)
-  while (true) {
-    if (depth !== undefined && commits.length === depth) break
-    if (currentCommit.parent.length === 0) break
-    let oid = currentCommit.parent[0]
-    let gitobject
-    try {
-      gitobject = await GitObjectManager.read({ fs, gitdir, oid })
-    } catch (err) {
-      commits.push({
-        oid,
-        error: err
-      })
-      break
-    }
-    let { type, object } = gitobject
+  try {
+    const fs = new FileSystem(_fs)
+    let sinceTimestamp =
+      since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
+    // TODO: In the future, we may want to have an API where we return a
+    // async iterator that emits commits.
+    let commits = []
+    let start = await GitRefManager.resolve({ fs, gitdir, ref })
+    let { type, object } = await GitObjectManager.read({
+      fs,
+      gitdir,
+      oid: start
+    })
     if (type !== 'commit') {
-      commits.push({
-        oid,
-        error: new Error(`Invalid commit parent ${oid} is of type ${type}`)
-      })
-      break
+      throw new Error(
+        `The given ref ${ref} did not resolve to a commit but to a ${type}`
+      )
     }
-    commit = GitCommit.from(object)
-    currentCommit = Object.assign({ oid }, commit.parse())
+    let commit = GitCommit.from(object)
+    let currentCommit = Object.assign({ oid: start }, commit.parse())
     if (signing) {
       currentCommit.payload = commit.withoutSignature()
     }
-    if (
-      sinceTimestamp !== undefined &&
-      currentCommit.committer.timestamp <= sinceTimestamp
-    ) {
-      break
-    }
     commits.push(currentCommit)
+    while (true) {
+      if (depth !== undefined && commits.length === depth) break
+      if (currentCommit.parent.length === 0) break
+      let oid = currentCommit.parent[0]
+      let gitobject
+      try {
+        gitobject = await GitObjectManager.read({ fs, gitdir, oid })
+      } catch (err) {
+        commits.push({
+          oid,
+          error: err
+        })
+        break
+      }
+      let { type, object } = gitobject
+      if (type !== 'commit') {
+        commits.push({
+          oid,
+          error: new Error(`Invalid commit parent ${oid} is of type ${type}`)
+        })
+        break
+      }
+      commit = GitCommit.from(object)
+      currentCommit = Object.assign({ oid }, commit.parse())
+      if (signing) {
+        currentCommit.payload = commit.withoutSignature()
+      }
+      if (
+        sinceTimestamp !== undefined &&
+        currentCommit.committer.timestamp <= sinceTimestamp
+      ) {
+        break
+      }
+      commits.push(currentCommit)
+    }
+    return commits
+  } catch (err) {
+    err.caller = 'git.log'
+    throw err
   }
-  return commits
 }

@@ -14,17 +14,22 @@ export async function add ({
   fs: _fs,
   filepath
 }) {
-  const fs = new FileSystem(_fs)
-  const type = 'blob'
-  const object = await fs.read(path.join(dir, filepath))
-  if (object === null) throw new Error(`Could not read file '${filepath}'`)
-  const oid = await GitObjectManager.write({ fs, gitdir, type, object })
-  await GitIndexManager.acquire(
-    { fs, filepath: `${gitdir}/index` },
-    async function (index) {
-      let stats = await fs._lstat(path.join(dir, filepath))
-      index.insert({ filepath, stats, oid })
-    }
-  )
-  // TODO: return oid?
+  try {
+    const fs = new FileSystem(_fs)
+    const type = 'blob'
+    const object = await fs.read(path.join(dir, filepath))
+    if (object === null) throw new Error(`Could not read file '${filepath}'`)
+    const oid = await GitObjectManager.write({ fs, gitdir, type, object })
+    await GitIndexManager.acquire(
+      { fs, filepath: `${gitdir}/index` },
+      async function (index) {
+        let stats = await fs._lstat(path.join(dir, filepath))
+        index.insert({ filepath, stats, oid })
+      }
+    )
+    // TODO: return oid?
+  } catch (err) {
+    err.caller = 'git.add'
+    throw err
+  }
 }

@@ -15,11 +15,17 @@ export async function resolveRef ({
   ref,
   depth
 }) {
-  const fs = new FileSystem(_fs)
-  return GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref,
-    depth
-  })
+  try {
+    const fs = new FileSystem(_fs)
+    const oid = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref,
+      depth
+    })
+    return oid
+  } catch (err) {
+    err.caller = 'git.resolveRef'
+    throw err
+  }
 }

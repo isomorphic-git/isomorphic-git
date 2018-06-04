@@ -17,21 +17,26 @@ export async function listFiles ({
   fs: _fs,
   ref
 }) {
-  const fs = new FileSystem(_fs)
-  let filenames
-  if (ref) {
-    const oid = await resolveRef({ gitdir, fs, ref })
-    filenames = []
-    await accumulateFilesFromOid({ gitdir, fs, oid, filenames, prefix: '' })
-  } else {
-    await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
-      async function (index) {
-        filenames = index.entries.map(x => x.path)
-      }
-    )
+  try {
+    const fs = new FileSystem(_fs)
+    let filenames
+    if (ref) {
+      const oid = await resolveRef({ gitdir, fs, ref })
+      filenames = []
+      await accumulateFilesFromOid({ gitdir, fs, oid, filenames, prefix: '' })
+    } else {
+      await GitIndexManager.acquire(
+        { fs, filepath: `${gitdir}/index` },
+        async function (index) {
+          filenames = index.entries.map(x => x.path)
+        }
+      )
+    }
+    return filenames
+  } catch (err) {
+    err.caller = 'git.listFiles'
+    throw err
   }
-  return filenames
 }
 
 async function accumulateFilesFromOid ({ gitdir, fs, oid, filenames, prefix }) {
@@ -53,4 +58,5 @@ async function accumulateFilesFromOid ({ gitdir, fs, oid, filenames, prefix }) {
 }
 
 // For some reason path.posix.join is undefined in webpack?
-const posixJoin = (prefix, filename) => prefix ? `${prefix}/${filename}` : filename
+const posixJoin = (prefix, filename) =>
+  prefix ? `${prefix}/${filename}` : filename

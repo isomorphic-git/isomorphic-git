@@ -14,6 +14,11 @@ export async function listBranches ({
   fs: _fs,
   remote = undefined
 }) {
-  const fs = new FileSystem(_fs)
-  return GitRefManager.listBranches({ fs, gitdir, remote })
+  try {
+    const fs = new FileSystem(_fs)
+    return GitRefManager.listBranches({ fs, gitdir, remote })
+  } catch (err) {
+    err.caller = 'git.listBranches'
+    throw err
+  }
 }
