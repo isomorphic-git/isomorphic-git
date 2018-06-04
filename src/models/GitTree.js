@@ -14,13 +14,13 @@ function parseBuffer (buffer) {
     let space = buffer.indexOf(32, cursor)
     if (space === -1) {
       throw new Error(
-        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
+        `GitTree.js:17 E68 GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
       )
     }
     let nullchar = buffer.indexOf(0, cursor)
     if (nullchar === -1) {
       throw new Error(
-        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
+        `GitTree.js:23 E69 GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
       )
     }
     let mode = buffer.slice(cursor, space).toString('utf8')
@@ -44,7 +44,7 @@ function limitModeToAllowed (mode) {
   if (mode.match(/^1007.*/)) return '100755' // Regular executable file
   if (mode.match(/^120.*/)) return '120000' // Symbolic link
   if (mode.match(/^160.*/)) return '160000' // Commit (git submodule reference)
-  throw new Error(`Could not understand file mode: ${mode}`)
+  throw new Error(`GitTree.js:47 E70 Could not understand file mode: ${mode}`)
 }
 
 function nudgeIntoShape (entry) {
@@ -68,7 +68,7 @@ export class GitTree {
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {
-      throw new Error('invalid type passed to GitTree constructor')
+      throw new Error('GitTree.js:71 E71 invalid type passed to GitTree constructor')
     }
   }
   static from (tree) {

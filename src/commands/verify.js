@@ -21,7 +21,7 @@ export async function verify ({
   const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
   if (type !== 'commit') {
     throw new Error(
-      `'ref' is not pointing to a 'commit' object but a '${type}' object`
+      `verify.js:24 E32 'ref' is not pointing to a 'commit' object but a '${type}' object`
     )
   }
   let commit = SignedGitCommit.from(object)

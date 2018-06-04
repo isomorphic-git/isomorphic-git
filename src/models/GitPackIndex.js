@@ -65,7 +65,7 @@ export class GitPackIndex {
     let version = reader.readUInt32BE()
     if (version !== 2) {
       throw new Error(
-        `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
+        `GitPackIndex.js:68 E60 Unable to read version ${version} packfile IDX. (Only version 2 supported)`
       )
     }
     // Verify checksums
@@ -73,12 +73,12 @@ export class GitPackIndex {
     let shaClaimed = idx.slice(-20).toString('hex')
     if (shaClaimed !== shaComputed) {
       throw new Error(
-        `Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
+        `GitPackIndex.js:76 E61 Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
       )
     }
     if (idx.byteLength > 2048 * 1024 * 1024) {
       throw new Error(
-        `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
+        `GitPackIndex.js:81 E62 To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
       )
     }
     let fanout = []
@@ -365,7 +365,7 @@ export class GitPackIndex {
         this.externalReadDepth++
         return this.getExternalRefDelta(oid)
       } else {
-        throw new Error(`Could not read object ${oid} from packfile`)
+        throw new Error(`GitPackIndex.js:368 E63 Could not read object ${oid} from packfile`)
       }
     }
     let start = this.offsets[oid]
@@ -384,7 +384,7 @@ export class GitPackIndex {
     }
     if (!this.pack) {
       throw new Error(
-        'Tried to read from a GitPackIndex with no packfile loaded into memory'
+        'GitPackIndex.js:387 E64 Tried to read from a GitPackIndex with no packfile loaded into memory'
       )
     }
     let raw = this.pack.slice(start)
@@ -394,7 +394,7 @@ export class GitPackIndex {
     let btype = byte & 0b1110000
     let type = types[btype]
     if (type === undefined) {
-      throw new Error('Unrecognized type: 0b' + btype.toString(2))
+      throw new Error('GitPackIndex.js:397 ' + 'E65 ' + 'Unrecognized type: 0b' + btype.toString(2))
     }
     // The length encoding get complicated.
     // Last four bits of length is encoded in bits 3210
@@ -424,7 +424,7 @@ export class GitPackIndex {
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
       throw new Error(
-        `Packfile told us object would have length ${length} but it had length ${
+        `GitPackIndex.js:427 E66 Packfile told us object would have length ${length} but it had length ${
           object.byteLength
         }`
       )

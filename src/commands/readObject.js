@@ -80,10 +80,10 @@ export async function readObject ({
         break
       case 'tag':
         throw new Error(
-          'TODO: Parsing annotated tag objects still needs to be implemented!!'
+          'readObject.js:34 E28 TODO: Parsing annotated tag objects still needs to be implemented!!'
         )
       default:
-        throw new Error(`Unrecognized git object type: '${result.type}'`)
+        throw new Error(`readObject.js:37 E29 Unrecognized git object type: '${result.type}'`)
     }
   }
   return result

@@ -20,7 +20,7 @@ export async function sign ({
   const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
   if (type !== 'commit') {
     throw new Error(
-      `HEAD is not pointing to a 'commit' object but a '${type}' object`
+      `sign.js:23 E30 HEAD is not pointing to a 'commit' object but a '${type}' object`
     )
   }
   let commit = SignedGitCommit.from(object)

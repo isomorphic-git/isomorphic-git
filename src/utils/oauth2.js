@@ -22,7 +22,7 @@ export function oauth2 (company, token) {
       }
     default:
       throw new Error(
-        `I don't know how ${company} expects its Basic Auth headers to be formatted for OAuth2 usage. If you do, you can use the regular '.auth(username, password)' to set the basic auth header yourself.`
+        `oauth2.js:25 E74 I don't know how ${company} expects its Basic Auth headers to be formatted for OAuth2 usage. If you do, you can use the regular '.auth(username, password)' to set the basic auth header yourself.`
       )
   }
 }

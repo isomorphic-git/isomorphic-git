@@ -17,10 +17,10 @@ export class GitRemoteConnection {
     let lineOne = await read()
     // skip past any flushes
     while (lineOne === null) lineOne = await read()
-    if (lineOne === true) throw new Error('Bad response from git server.')
+    if (lineOne === true) throw new Error('GitRemoteConnection.js:20 E41 Bad response from git server.')
     if (lineOne.toString('utf8') !== `# service=${service}\n`) {
       throw new Error(
-        `Expected '# service=${service}\\n' but got '${lineOne.toString(
+        `GitRemoteConnection.js:23 E42 Expected '# service=${service}\\n' but got '${lineOne.toString(
           'utf8'
         )}'`
       )
@@ -90,7 +90,7 @@ export class GitRemoteConnection {
         case 3: // fatal error message just before stream aborts
           let error = line.slice(1)
           progress.write(error)
-          packfile.destroy(new Error(error.toString('utf8')))
+          packfile.destroy(new Error('GitRemoteConnection.js:93 ' + 'E43 ' + error.toString('utf8')))
           return
         default:
           // Not part of the side-band-64k protocol

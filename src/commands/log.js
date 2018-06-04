@@ -27,7 +27,7 @@ export async function log ({
   let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: start })
   if (type !== 'commit') {
     throw new Error(
-      `The given ref ${ref} did not resolve to a commit but to a ${type}`
+      `log.js:30 E20 The given ref ${ref} did not resolve to a commit but to a ${type}`
     )
   }
   let commit = GitCommit.from(object)
@@ -54,7 +54,7 @@ export async function log ({
     if (type !== 'commit') {
       commits.push({
         oid,
-        error: new Error(`Invalid commit parent ${oid} is of type ${type}`)
+        error: new Error(`log.js:57 E21 Invalid commit parent ${oid} is of type ${type}`)
       })
       break
     }

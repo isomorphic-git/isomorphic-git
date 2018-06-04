@@ -30,7 +30,7 @@ export class GitRemoteHTTP {
       headers
     })
     if (res.statusCode !== 200) {
-      throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
+      throw new Error(`GitRemoteHTTP.js:32 E44 HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
     return GitRemoteConnection.discover(service, res)
   }
@@ -51,7 +51,7 @@ export class GitRemoteHTTP {
       headers
     })
     if (res.statusCode !== 200) {
-      throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
+      throw new Error(`GitRemoteHTTP.js:53 E45 HTTP Error: ${res.statusCode} ${res.statusMessage}`)
     }
     return GitRemoteConnection.stream({ res })
   }

@@ -30,7 +30,7 @@ export async function commit ({
   }
   if (author.name === undefined || author.email === undefined) {
     throw new Error(
-      'Author name and email must be specified as an argument or in the .git/config file'
+      'commit.js:33 E11 Author name and email must be specified as an argument or in the .git/config file'
     )
   }
   committer = committer || author

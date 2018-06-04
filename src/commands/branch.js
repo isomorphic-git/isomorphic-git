@@ -17,12 +17,12 @@ export async function branch ({
 }) {
   const fs = new FileSystem(_fs)
   if (ref === undefined) {
-    throw new Error('Cannot create branch "undefined"')
+    throw new Error('branch.js:20 E2 Cannot create branch "undefined"')
   }
 
   if (ref !== clean(ref)) {
     throw new Error(
-      `Failed to create branch '${ref}' because that name would not be a valid git reference. A valid alternative would be '${clean(
+      `branch.js:24 E3 Failed to create branch '${ref}' because that name would not be a valid git reference. A valid alternative would be '${clean(
         ref
       )}'.`
     )
@@ -31,7 +31,7 @@ export async function branch ({
   const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)
   if (exist) {
     throw new Error(
-      `Failed to create branch '${ref}' because branch '${ref}' already exists.`
+      `branch.js:29 E4 Failed to create branch '${ref}' because branch '${ref}' already exists.`
     )
   }
   // Get tree oid
@@ -40,7 +40,7 @@ export async function branch ({
     oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
   } catch (e) {
     throw new Error(
-      `Failed to create branch '${ref}' because there are no commits in this project.`
+      `branch.js:36 E5 Failed to create branch '${ref}' because there are no commits in this project.`
     )
   }
   // Create a new branch that points at that same commit

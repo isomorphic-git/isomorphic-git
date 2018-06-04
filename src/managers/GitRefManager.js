@@ -29,7 +29,7 @@ export class GitRefManager {
     // Validate input
     for (let value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
-        throw new Error(`Unexpected ref contents: '${value}'`)
+        throw new Error(`GitRefManager.js:32 E35 Unexpected ref contents: '${value}'`)
       }
     }
     const config = await GitConfigManager.get({ fs, gitdir })
@@ -37,7 +37,7 @@ export class GitRefManager {
       refspecs = await config.getall(`remote.${remote}.fetch`)
       if (refspecs.length === 0) {
         throw new Error(
-          `Could not find a fetch refspec fot remote '${remote}'.
+          `GitRefManager.js:40 E36 Could not find a fetch refspec fot remote '${remote}'.
 Make sure the config file has an entry like the following:
 [remote "${remote}"]
 fetch = +refs/heads/*:refs/remotes/origin/*`
@@ -99,7 +99,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
     const fs = new FileSystem(_fs)
     // Validate input
     if (!value.match(/[0-9a-f]{40}/)) {
-      throw new Error(`Unexpected ref contents: '${value}'`)
+      throw new Error(`GitRefManager.js:102 E37 Unexpected ref contents: '${value}'`)
     }
     const normalizeValue = value => value.trim() + '\n'
     await fs.write(path.join(gitdir, ref), normalizeValue(value), 'utf8')
@@ -135,7 +135,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       }
     }
     // Do we give up?
-    throw new Error(`Could not resolve reference ${ref}`)
+    throw new Error(`GitRefManager.js:138 E38 Could not resolve reference ${ref}`)
   }
   static async expand ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
@@ -152,7 +152,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
-    throw new Error(`Could not expand ref ${ref}`)
+    throw new Error(`GitRefManager.js:155 E39 Could not expand ref ${ref}`)
   }
   static resolveAgainstMap ({ ref, depth, map }) {
     if (depth !== undefined) {
@@ -179,7 +179,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       }
     }
     // Do we give up?
-    throw new Error(`Could not resolve reference ${ref}`)
+    throw new Error(`GitRefManager.js:182 E40 Could not resolve reference ${ref}`)
   }
   static async packedRefs ({ fs: _fs, gitdir }) {
     const refs = new Map()

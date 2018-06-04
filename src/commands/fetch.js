@@ -106,7 +106,7 @@ async function fetchPackfile ({
   const fs = new FileSystem(_fs)
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
-      throw new Error(`Invalid value for depth argument: ${depth}`)
+      throw new Error(`fetch.js:109 E12 Invalid value for depth argument: ${depth}`)
     }
     depth = parseInt(depth)
   }
@@ -133,19 +133,19 @@ async function fetchPackfile ({
   })
   // Check server supports shallow cloning
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
-    throw new Error(`Remote does not support shallow fetches`)
+    throw new Error(`fetch.js:136 E13 Remote does not support shallow fetches`)
   }
   if (since !== null && !remoteHTTP.capabilities.has('deepen-since')) {
-    throw new Error(`Remote does not support shallow fetches by date`)
+    throw new Error(`fetch.js:139 E14 Remote does not support shallow fetches by date`)
   }
   if (exclude.length > 0 && !remoteHTTP.capabilities.has('deepen-not')) {
     throw new Error(
-      `Remote does not support shallow fetches excluding commits reachable by refs`
+      `fetch.js:143 E15 Remote does not support shallow fetches excluding commits reachable by refs`
     )
   }
   if (relative === true && !remoteHTTP.capabilities.has('deepen-relative')) {
     throw new Error(
-      `Remote does not support shallow fetches relative to the current shallow depth`
+      `fetch.js:148 E16 Remote does not support shallow fetches relative to the current shallow depth`
     )
   }
   // TODO: Don't add other refs if singleBranch is specified.
@@ -222,14 +222,14 @@ async function fetchPackfile ({
       if (line.startsWith('shallow')) {
         let oid = line.slice(-41).trim()
         if (oid.length !== 40) {
-          throw new Error(`non-40 character 'shallow' oid: ${oid}`)
+          throw new Error(`fetch.js:225 E17 non-40 character 'shallow' oid: ${oid}`)
         }
         oids.add(oid)
         await GitShallowManager.write({ fs, gitdir, oids })
       } else if (line.startsWith('unshallow')) {
         let oid = line.slice(-41).trim()
         if (oid.length !== 40) {
-          throw new Error(`non-40 character 'shallow' oid: ${oid}`)
+          throw new Error(`fetch.js:232 E18 non-40 character 'shallow' oid: ${oid}`)
         }
         oids.delete(oid)
         await GitShallowManager.write({ fs, gitdir, oids })

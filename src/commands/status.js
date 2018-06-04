@@ -149,7 +149,7 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
         return getOidAtPath({ fs, gitdir, tree, path })
       }
       if (type === 'blob') {
-        throw new Error(`Blob found where tree expected.`)
+        throw new Error(`status.js:154 E31 Blob found where tree expected.`)
       }
     }
   }

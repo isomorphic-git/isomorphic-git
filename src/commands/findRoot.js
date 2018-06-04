@@ -17,7 +17,7 @@ async function _findRoot (fs, filepath) {
     return filepath
   } else {
     let parent = path.dirname(filepath)
-    if (parent === filepath) throw new Error('Unable to find git root')
+    if (parent === filepath) throw new Error('findRoot.js:20 E19 Unable to find git root')
     return _findRoot(fs, parent)
   }
 }

@@ -14,7 +14,7 @@ const bool = val => {
   if (val === 'true' || val === 'yes' || val === 'on') return true
   if (val === 'false' || val === 'no' || val === 'off') return false
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
+    `GitConfig.js:17 E51 Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
   )
 }
 

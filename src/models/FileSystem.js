@@ -131,7 +131,7 @@ export class FileSystem {
     }
     if (triesLeft === 0) {
       throw new Error(
-        `Unable to acquire lockfile '${filename}'. Exhausted tries.`
+        `FileSystem.js:138 E48 Unable to acquire lockfile '${filename}'. Exhausted tries.`
       )
     }
     try {
@@ -146,7 +146,7 @@ export class FileSystem {
 
   async unlock (filename, delayRelease = 50) {
     if (delayedReleases.has(filename)) {
-      throw new Error('Cannot double-release lockfile')
+      throw new Error('FileSystem.js:153 E49 Cannot double-release lockfile')
     }
     // Basically, we lie and say it was deleted ASAP.
     // But really we wait a bit to see if you want to acquire it again.

@@ -1,0 +1,83 @@
+E1: Could not read file '${filepath}'
+E2: Cannot create branch "undefined"
+E3: Failed to create branch '${ref}' because that name would not be a valid git reference. A valid alternative would be '${clean(ref)}'.
+E4: Failed to create branch '${ref}' because branch '${ref}' already exists.
+E5: Failed to create branch '${ref}' because there are no commits in this project.
+E6: Cannot checkout ref "undefined"
+E7: Failed to checkout ref '${ref}' because commit ${oid} is not available locally. Do a git fetch to make the branch available locally.
+E8: Unexpected type: ${commit.type}
+E9: Unexpected type: ${type}
+E10: Unexpected object type ${type} found in tree for '${entrypath}'
+E11: Author name and email must be specified as an argument or in the .git/config file
+E12: Invalid value for depth argument: ${depth}
+E13: Remote does not support shallow fetches
+E14: Remote does not support shallow fetches by date
+E15: Remote does not support shallow fetches excluding commits reachable by refs
+E16: Remote does not support shallow fetches relative to the current shallow depth
+E17: non-40 character 'shallow' oid: ${oid}
+E18: non-40 character 'shallow' oid: ${oid}
+E19: Unable to find git root
+E20: The given ref ${ref} did not resolve to a commit but to a ${type}
+E21: Invalid commit parent ${oid} is of type ${type}
+E22: A simple fast-forward merge was not possible.
+E23: Non-fast-forward merges are not supported yet.
+E24: Non-trivial merge not implemented at this time
+E25: Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'
+E26: Expected type commit but type is ${type}
+E27: 'Unrecognized type: ' + stype
+E28: TODO: Parsing annotated tag objects still needs to be implemented!!
+E29: Unrecognized git object type: '${result.type}'
+E30: HEAD is not pointing to a 'commit' object but a '${type}' object
+E31: Blob found where tree expected.
+E32: 'ref' is not pointing to a 'commit' object but a '${type}' object
+E33: Failed to read git object with oid ${oid} because it is a shallow commit
+E34: Failed to read git object with oid ${oid}
+E35: Unexpected ref contents: '${value}'
+E36: Could not find a fetch refspec fot remote '${remote}'.
+Make sure the config file has an entry like the following:
+[remote "${remote}"]
+fetch = +refs/heads/*:refs/remotes/origin/*
+E37: Unexpected ref contents: '${value}'
+E38: Could not resolve reference ${ref}
+E39: Could not expand ref ${ref}
+E40: Could not resolve reference ${ref}
+E41: Bad response from git server.
+E42: Expected '# service=${service}\\n' but got '${lineOne.toString(
+          'utf8'
+        )}'
+E43: error.toString('utf8')
+E44: HTTP Error: ${res.statusCode} ${res.statusMessage}
+E45: HTTP Error: ${res.statusCode} ${res.statusMessage}
+E46: Cannot determine protocol of remote URL: "${url}"
+E47: Git remote "${url}" uses an unrecognized transport protocol: "${
+        parts.transport
+      }"
+E48: Unable to acquire lockfile '${filename}'. Exhausted tries.
+E49: Cannot double-release lockfile
+E50: invalid type passed to GitCommit constructor
+E51: Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}
+E52: Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}
+E53: Inavlid dircache magic file number: ${magic}
+E54: Unsupported dircache version: ${version}
+E55: Got a path length of: ${pathlength}
+E56: Expected 1-8 null characters but got '${tmp}'
+E57: invalid type passed to GitIndex constructor
+E58: SHA check failed! Expected ${oid}, computed ${sha}
+E59: Length mismatch: expected ${length} bytes but got ${actualLength} instead.
+E60: Unable to read version ${version} packfile IDX. (Only version 2 supported)
+E61: Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}
+E62: To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.
+E63: Could not read object ${oid} from packfile
+E64: Tried to read from a GitPackIndex with no packfile loaded into memory
+E65: 'Unrecognized type: 0b' + btype.toString(2)
+E66: Packfile told us object would have length ${length} but it had length ${
+          object.byteLength
+        }
+E67: Invalid refspec
+E68: GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.
+E69: GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.
+E70: Could not understand file mode: ${mode}
+E71: invalid type passed to GitTree constructor
+E72: 'No PrivateKey in the OpenPGP keyring for the email address: ' + email
+E73: 'No PrivateKey in the OpenPGP keyring for the email address: ' + email
+E74: I don't know how ${company} expects its Basic Auth headers to be formatted for OAuth2 usage. If you do, you can use the regular '.auth(username, password)' to set the basic auth header yourself.

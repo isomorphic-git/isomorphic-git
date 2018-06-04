@@ -78,7 +78,7 @@ export class GitCommit {
     } else if (typeof commit === 'object') {
       this._commit = GitCommit.render(commit)
     } else {
-      throw new Error('invalid type passed to GitCommit constructor')
+      throw new Error('GitCommit.js:69 E50 invalid type passed to GitCommit constructor')
     }
   }
 
