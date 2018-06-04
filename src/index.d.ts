@@ -214,7 +214,8 @@ export function listBranches(args: {
 export function listFiles(args: {
   fs: any,
   dir: string,
-  gitdir?: string
+  gitdir?: string,
+  ref?: string
 }): Promise<Array<string>>;
 
 export function listTags(args: {

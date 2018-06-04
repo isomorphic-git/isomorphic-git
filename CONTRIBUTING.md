@@ -7,14 +7,14 @@ You are very welcome here and any contribution is appreciated. :+1:
 ## New feature checklists :sparkles:️
 I'm honestly documenting these steps just so I don't forget them myself.
 
-To add an argument to an existing command:
+To add a parameter to an existing command `X`:
 
 - [ ] add parameter to the function in `src/commands/X.js`
 - [ ] add parameter to [docs](https://github.com/isomorphic-git/isomorphic-git.github.io/tree/source/docs)/X.md
 - [ ] add parameter to the TypeScript library definition for X in `src/index.d.ts`
 - [ ] add a test case in `__tests__/test-X.js` if possible
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
-- [ ] make a feature commit "feat: Added new 'bar' argument to X"
+- [ ] make a feature commit "feat: Added 'bar' parameter to X command"
 
 To create a new command:
 

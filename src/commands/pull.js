@@ -3,9 +3,9 @@ import path from 'path'
 
 import { FileSystem } from '../models'
 
-import { currentBranch } from './currentBranch'
 import { checkout } from './checkout'
 import { config } from './config'
+import { currentBranch } from './currentBranch'
 import { fetch } from './fetch'
 import { merge } from './merge'
 
