@@ -84,11 +84,12 @@ describe('clone', () => {
         url
       })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toEqual(
+    expect(error.message).toEqual(
       `Git remote "${url}" uses an unrecognized transport protocol: "foobar"`
     )
+    expect(error.caller).toEqual('git.clone')
   })
   // For now we are only running this in the browser, because the karma middleware solution only
   // works when running in Karma, and these tests also need to pass Jest and node-jasmine.

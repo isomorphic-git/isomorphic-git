@@ -39,11 +39,14 @@ describe('checkout', () => {
   it('checkout unfetched branch', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    let error = null
     try {
       await checkout({ fs, dir, gitdir, ref: 'missing-branch' })
       throw new Error('Checkout should have failed.')
     } catch (err) {
-      expect(err.message).toMatchSnapshot()
+      error = err
     }
+    expect(error.message).toMatchSnapshot()
+    expect(error.caller).toEqual('git.checkout')
   })
 })

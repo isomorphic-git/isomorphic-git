@@ -151,5 +151,6 @@ describe('fetch', () => {
     }
     expect(err).toBeDefined()
     expect(err.message).toMatchSnapshot()
+    expect(err.caller).toEqual('git.fetch')
   })
 })

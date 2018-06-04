@@ -75,4 +75,21 @@ describe('resolveRef', () => {
     })
     expect(ref).toMatchSnapshot()
   })
+  it('non-existant refs', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-resolveRef')
+    // Test
+    let error = {}
+    try {
+      await resolveRef({
+        fs,
+        gitdir,
+        ref: 'this-is-not-a-ref'
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error.message).toBeDefined()
+    expect(error.caller).toEqual('git.resolveRef')
+  })
 })
