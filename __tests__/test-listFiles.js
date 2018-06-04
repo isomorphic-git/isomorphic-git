@@ -8,11 +8,18 @@ describe('listFiles', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
   })
-  it('listFiles', async () => {
+  it('index', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-listFiles')
     // Test
     const files = await listFiles({ fs, gitdir })
+    expect(files).toMatchSnapshot()
+  })
+  it('ref', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-checkout')
+    // Test
+    const files = await listFiles({ fs, gitdir, ref: 'test-branch' })
     expect(files).toMatchSnapshot()
   })
 })
