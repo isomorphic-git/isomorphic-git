@@ -29,4 +29,11 @@ describe('GitRefSpecSet', () => {
       ['refs/heads/master', 'refs/foo/master']
     ])
   })
+
+  it('weird HEAD implicit rule', async () => {
+    const refspec = new GitRefSpecSet()
+    refspec.add('+HEAD:refs/remotes/origin/HEAD')
+    const result = refspec.translate(['HEAD'])
+    expect(result).toEqual([['HEAD', 'refs/remotes/origin/HEAD']])
+  })
 })

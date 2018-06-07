@@ -24,7 +24,9 @@ describe('fetch', () => {
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
-    expect(fs.existsSync(`${gitdir}/refs/remotes/origin/test-branch-shallow-clone`)).toBe(true)
+    expect(
+      fs.existsSync(`${gitdir}/refs/remotes/origin/test-branch-shallow-clone`)
+    ).toBe(true)
     expect(fs.existsSync(`${gitdir}/refs/remotes/origin/master`)).toBe(false)
   })
 
