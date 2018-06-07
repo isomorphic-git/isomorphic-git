@@ -8,6 +8,14 @@ const retry = n => cmd =>
     .join(` || `)
 const retry3 = retry(3)
 
+const quote = cmd => cmd.replace(new RegExp("'", 'g'), "\\'")
+
+const optional = cmd =>
+  `${cmd} || echo "Optional command '${quote(cmd)}' failed".`
+
+const timeout = n => cmd => `timeout --signal=KILL ${n}m ${cmd}`
+const timeout5 = timeout(5)
+
 const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 
 module.exports = {
@@ -48,19 +56,19 @@ module.exports = {
         ? series.nps(
           'lint',
           'test.jest',
+          'test.uploadcoverage',
           'build',
           'test.size',
           'test.jasmine',
           'test.karma'
         )
         : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
-      size: 'bundlesize',
+      size: optional(timeout(1)('bundlesize')),
       jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine'),
       jest: process.env.CI
-        ? retry3(
-          'cross-env BABEL_ENV=jest timeout --signal=KILL 5m jest --ci --coverage && codecov'
-        )
+        ? retry3(`cross-env BABEL_ENV=jest ${timeout5('jest --ci --coverage')}`)
         : 'cross-env BABEL_ENV=jest jest --ci',
+      uploadcoverage: optional(timeout(1)('codecov')),
       karma: process.env.CI
         ? retry3('karma start --single-run')
         : 'karma start --single-run'
