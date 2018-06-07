@@ -66,7 +66,7 @@ module.exports = {
       size: optional(timeout(1)('bundlesize')),
       jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine'),
       jest: process.env.CI
-        ? retry3(`cross-env BABEL_ENV=jest ${timeout5('jest --ci --coverage')}`)
+        ? retry3(`cross-env BABEL_ENV=jest ${timeout5('jest --ci')}`)
         : 'cross-env BABEL_ENV=jest jest --ci',
       uploadcoverage: optional(timeout(1)('codecov')),
       karma: process.env.CI
