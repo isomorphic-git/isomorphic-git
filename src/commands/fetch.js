@@ -161,24 +161,16 @@ async function fetchPackfile ({
       `Remote does not support shallow fetches relative to the current shallow depth`
     )
   }
-  // TODO: Don't add other refs if singleBranch is specified.
-  await GitRefManager.updateRemoteRefs({
-    fs,
-    gitdir,
-    remote,
-    refs: remoteHTTP.refs,
-    symrefs: remoteHTTP.symrefs,
-    tags
+  // Figure out the SHA for the requested ref
+  let { oid, fullref } = GitRefManager.resolveAgainstMap({
+    ref,
+    map: remoteHTTP.refs
   })
+  // Assemble packfile request
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/${
     pkg.name
   }@${pkg.version}${relative ? ' deepen-relative' : ''}`
   let packstream = new PassThrough()
-  // Figure out the SHA for the requested ref
-  let oid = GitRefManager.resolveAgainstMap({
-    ref,
-    map: remoteHTTP.refs
-  })
   // Start requesting oids from the remote by their SHAs
   let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
   wants = [...new Set(wants)] // remove duplicates
@@ -250,6 +242,40 @@ async function fetchPackfile ({
       next(null, data)
     })
   )
+  // Update local remote refs
+  if (singleBranch) {
+    const refs = new Map([[fullref, oid]])
+    // But wait, maybe it was a symref, like 'HEAD'!
+    // We need to save all the refs in the symref chain (sigh).
+    const symrefs = new Map()
+    let bail = 10
+    let key = fullref
+    while (bail--) {
+      let value = remoteHTTP.symrefs.get(key)
+      if (value === undefined) break
+      symrefs.set(key, value)
+      key = value
+    }
+    // final value must not be a symref but a real ref
+    refs.set(key, remoteHTTP.refs.get(key))
+    await GitRefManager.updateRemoteRefs({
+      fs,
+      gitdir,
+      remote,
+      refs,
+      symrefs,
+      tags
+    })
+  } else {
+    await GitRefManager.updateRemoteRefs({
+      fs,
+      gitdir,
+      remote,
+      refs: remoteHTTP.refs,
+      symrefs: remoteHTTP.symrefs,
+      tags
+    })
+  }
   // We need this value later for the `clone` command.
   response.HEAD = remoteHTTP.symrefs.get('HEAD')
   response.FETCH_HEAD = oid

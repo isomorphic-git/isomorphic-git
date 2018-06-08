@@ -43,6 +43,8 @@ Make sure the config file has an entry like the following:
 fetch = +refs/heads/*:refs/remotes/origin/*`
         )
       }
+      // There's some interesting behavior with HEAD that doesn't follow the refspec.
+      refspecs.unshift(`+HEAD:refs/remotes/${remote}/HEAD`)
     }
     const refspec = GitRefSpecSet.from(refspecs)
     let actualRefsToWrite = new Map()
@@ -154,28 +156,33 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
     // Do we give up?
     throw new Error(`Could not expand ref ${ref}`)
   }
-  static resolveAgainstMap ({ ref, depth, map }) {
+  static resolveAgainstMap ({ ref, fullref = ref, depth, map }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {
-        return ref
+        return { fullref, oid: ref }
       }
     }
     // Is it a ref pointer?
     if (ref.startsWith('ref: ')) {
       ref = ref.slice('ref: '.length)
-      return GitRefManager.resolveAgainstMap({ ref, depth, map })
+      return GitRefManager.resolveAgainstMap({ ref, fullref, depth, map })
     }
     // Is it a complete and valid SHA?
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
-      return ref
+      return { fullref, oid: ref }
     }
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
     for (let ref of allpaths) {
       let sha = map.get(ref)
       if (sha) {
-        return GitRefManager.resolveAgainstMap({ ref: sha.trim(), depth, map })
+        return GitRefManager.resolveAgainstMap({
+          ref: sha.trim(),
+          fullref: ref,
+          depth,
+          map
+        })
       }
     }
     // Do we give up?
