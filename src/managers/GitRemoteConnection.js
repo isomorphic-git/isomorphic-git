@@ -2,7 +2,7 @@ import pify from 'pify'
 import concat from 'simple-concat'
 import { PassThrough } from 'stream'
 
-import { GitPktLine } from '../models'
+import { GitPktLine } from '../managers'
 
 export async function discover (service, res) {
   const capabilities = new Set()

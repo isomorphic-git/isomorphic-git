@@ -2,8 +2,13 @@ import { PassThrough } from 'stream'
 import through2 from 'through2'
 
 import { config } from '../commands'
-import { GitRefManager, GitRemoteManager, GitShallowManager } from '../managers'
-import { FileSystem, GitPktLine } from '../models'
+import {
+  GitPktLine,
+  GitRefManager,
+  GitRemoteManager,
+  GitShallowManager
+} from '../managers'
+import { FileSystem } from '../models'
 import { pkg } from '../utils'
 
 export async function fetchPackfile ({

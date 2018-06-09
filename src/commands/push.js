@@ -1,8 +1,8 @@
 import path from 'path'
 import { PassThrough } from 'stream'
 
-import { GitRefManager, GitRemoteManager } from '../managers'
-import { FileSystem, GitPktLine } from '../models'
+import { GitPktLine, GitRefManager, GitRemoteManager } from '../managers'
+import { FileSystem } from '../models'
 import { listCommits, listObjects, log, pack, pkg } from '../utils'
 
 import { config } from './config'

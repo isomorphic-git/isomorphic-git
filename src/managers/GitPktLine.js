@@ -56,45 +56,43 @@ import streamSource from 'stream-source/index.node.js'
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line
 
-export class GitPktLine {
-  static flush () {
-    return Buffer.from('0000', 'utf8')
-  }
+export function flush () {
+  return Buffer.from('0000', 'utf8')
+}
 
-  static encode (line) {
-    if (typeof line === 'string') {
-      line = Buffer.from(line)
-    }
-    let length = line.length + 4
-    let hexlength = pad(4, length.toString(16), '0')
-    return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
+export function encode (line) {
+  if (typeof line === 'string') {
+    line = Buffer.from(line)
   }
+  let length = line.length + 4
+  let hexlength = pad(4, length.toString(16), '0')
+  return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
+}
 
-  static reader (buffer) {
-    let buffercursor = new BufferCursor(buffer)
-    return async function read () {
-      if (buffercursor.eof()) return true
-      let length = parseInt(buffercursor.slice(4).toString('utf8'), 16)
+export function reader (buffer) {
+  let buffercursor = new BufferCursor(buffer)
+  return async function read () {
+    if (buffercursor.eof()) return true
+    let length = parseInt(buffercursor.slice(4).toString('utf8'), 16)
+    if (length === 0) return null
+    return buffercursor.slice(length - 4).buffer
+  }
+}
+
+export function streamReader (stream) {
+  const bufferstream = streamSource(stream)
+  return async function read () {
+    try {
+      let length = await bufferstream.slice(4)
+      if (length === null) return true
+      length = parseInt(length.toString('utf8'), 16)
       if (length === 0) return null
-      return buffercursor.slice(length - 4).buffer
-    }
-  }
-
-  static streamReader (stream) {
-    const bufferstream = streamSource(stream)
-    return async function read () {
-      try {
-        let length = await bufferstream.slice(4)
-        if (length === null) return true
-        length = parseInt(length.toString('utf8'), 16)
-        if (length === 0) return null
-        let buffer = await bufferstream.slice(length - 4)
-        if (buffer === null) return true
-        return buffer
-      } catch (err) {
-        console.log('error', err)
-        return true
-      }
+      let buffer = await bufferstream.slice(length - 4)
+      if (buffer === null) return true
+      return buffer
+    } catch (err) {
+      console.log('error', err)
+      return true
     }
   }
 }

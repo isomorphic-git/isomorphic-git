@@ -7,9 +7,8 @@ import pako from 'pako'
 import shasum from 'shasum'
 import { PassThrough } from 'stream'
 
+import { GitObject } from '../managers'
 import { log } from '../utils'
-
-import { GitObject } from './GitObject'
 
 function buffer2stream (buffer) {
   let stream = new PassThrough()
