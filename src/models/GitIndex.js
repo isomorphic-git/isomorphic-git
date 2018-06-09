@@ -1,6 +1,6 @@
 import BufferCursor from 'buffercursor'
-import sortby from 'lodash.sortby'
 import shasum from 'shasum'
+import { comparePath } from '../utils'
 
 const MAX_UINT32 = 2 ** 32
 /*::
@@ -125,7 +125,7 @@ export class GitIndex {
     return new GitIndex(buffer)
   }
   get entries () {
-    return sortby([...this._entries.values()], 'path')
+    return [...this._entries.values()].sort(comparePath)
   }
   * [Symbol.iterator] () {
     for (let entry of this.entries) {
