@@ -2,6 +2,7 @@ import path from 'path'
 
 import { GitObjectManager } from '../managers'
 import { FileSystem, GitCommit, GitTree } from '../models'
+import { resolveFile, resolveTree } from '../utils'
 
 /**
  * Read a git object directly by its SHA1 object id
@@ -99,43 +100,4 @@ export async function readObject ({
     err.caller = 'git.readObject'
     throw err
   }
-}
-
-async function resolveTree ({ fs, gitdir, oid }) {
-  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
-  // Resolve commits to trees
-  if (type === 'commit') {
-    oid = GitCommit.from(object).parse().tree
-    let result = await GitObjectManager.read({ fs, gitdir, oid })
-    type = result.type
-    object = result.object
-  }
-  if (type !== 'tree') {
-    throw new Error(`Could not resolve ${oid} to a tree`)
-  }
-  return { tree: GitTree.from(object), oid }
-}
-
-async function resolveFile ({ fs, gitdir, tree, pathArray }) {
-  let name = pathArray.shift()
-  for (let entry of tree) {
-    if (entry.path === name) {
-      if (pathArray.length === 0) {
-        return entry.oid
-      } else {
-        let { type, object } = await GitObjectManager.read({
-          fs,
-          gitdir,
-          oid: entry.oid
-        })
-        if (type === 'blob') throw new Error(`Unexpected blob`)
-        if (type !== 'tree') {
-          throw new Error(`Could not resolve ${entry.oid} to a tree`)
-        }
-        tree = GitTree.from(object)
-        return resolveFile({ fs, gitdir, tree, pathArray })
-      }
-    }
-  }
-  throw new Error(`No match path`)
 }

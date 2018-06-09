@@ -8,7 +8,8 @@ const retry = n => cmd =>
     .join(` || `)
 const retry3 = retry(3)
 
-const quote = cmd => cmd.replace(new RegExp("'", 'g'), "\\'").replace(new RegExp('"', 'g'), '\\"')
+const quote = cmd =>
+  cmd.replace(new RegExp("'", 'g'), "\\'").replace(new RegExp('"', 'g'), '\\"')
 
 const optional = cmd =>
   `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`

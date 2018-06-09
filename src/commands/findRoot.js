@@ -10,19 +10,15 @@ import { FileSystem } from '../models'
 export async function findRoot ({ fs: _fs, filepath }) {
   try {
     const fs = new FileSystem(_fs)
-    return _findRoot(fs, filepath)
+    if (await fs.exists(path.join(filepath, '.git'))) {
+      return filepath
+    } else {
+      let parent = path.dirname(filepath)
+      if (parent === filepath) throw new Error('Unable to find git root')
+      return findRoot({ fs, filepath: parent })
+    }
   } catch (err) {
     err.caller = 'git.findRoot'
     throw err
-  }
-}
-
-async function _findRoot (fs, filepath) {
-  if (await fs.exists(path.join(filepath, '.git'))) {
-    return filepath
-  } else {
-    let parent = path.dirname(filepath)
-    if (parent === filepath) throw new Error('Unable to find git root')
-    return _findRoot(fs, parent)
   }
 }
