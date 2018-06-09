@@ -5,16 +5,17 @@ import { GitRemoteHTTP } from '../managers'
  *
  * @link https://isomorphic-git.github.io/docs/getRemoteInfo.html
  */
-export async function getRemoteInfo ({ url, authUsername, authPassword }) {
+export async function getRemoteInfo ({
+  url,
+  authUsername,
+  authPassword,
+  username = authUsername,
+  password = authPassword,
+  token,
+  oauth2format
+}) {
   try {
-    let auth
-    if (authUsername !== undefined && authPassword !== undefined) {
-      auth = {
-        username: authUsername,
-        password: authPassword
-      }
-    }
-
+    let auth = { username, password, token, oauth2format }
     const remote = await GitRemoteHTTP.discover({
       service: 'git-upload-pack',
       url,

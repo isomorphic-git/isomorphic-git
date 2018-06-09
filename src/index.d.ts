@@ -116,8 +116,10 @@ export function clone(args: {
   url: string,
   ref?: string,
   remote?: string,
-  authUsername?: string,
-  authPassword?: string,
+  username?: string,
+  password?: string,
+  token?: string,
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
   depth?: number,
   since?: Date,
   exclude?: string[],
@@ -170,8 +172,10 @@ export function fetch(args: {
   url?: string,
   ref?: string,
   remote?: string,
-  authUsername?: string,
-  authPassword?: string,
+  username?: string,
+  password?: string,
+  token?: string,
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
   depth?: number,
   since?: Date,
   exclude?: string[],
@@ -187,8 +191,10 @@ export function findRoot(args: {
 
 export function getRemoteInfo(args: {
   url: string,
-  authUsername?: string,
-  authPassword?: string
+  username?: string,
+  password?: string,
+  token?: string,
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
 }): Promise<RemoteDescription>;
 
 export function indexPack(args: {
@@ -267,8 +273,10 @@ export function pull(args: {
   ref?: string,
   singleBranch?: boolean,
   fastForwardOnly?: boolean,
-  authUsername?: string,
-  authPassword?: string,
+  username?: string,
+  password?: string,
+  token?: string,
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
   emitter?: EventEmitter
 }): Promise<void>;
 
@@ -279,8 +287,10 @@ export function push(args: {
   ref?: string,
   remote?: string,
   url?: string,
-  authUsername?: string,
-  authPassword?: string
+  username?: string,
+  password?: string,
+  token?: string,
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
 }): Promise<PushResponse>
 
 export function readObject(args: {
@@ -321,11 +331,6 @@ export function status(args: {
   gitdir?: string
   filepath: string
 }): Promise<string>
-
-export const utils: {
-  auth: (username: string, password: string) => ({ username: string, password: string }),
-  oauth2: (company: string, token: string) => ({ username: string, password: string })
-};
 
 export function verify(args: {
   fs: any,
