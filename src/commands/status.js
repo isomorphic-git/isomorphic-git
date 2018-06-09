@@ -3,10 +3,10 @@ import path from 'path'
 import {
   GitIgnoreManager,
   GitIndexManager,
-  GitObjectManager,
-  GitRefManager
+  GitObjectManager
 } from '../managers'
-import { FileSystem, GitCommit, GitTree } from '../models'
+import { FileSystem } from '../models'
+import { cacheIsStale, getHeadTree, getOidAtPath } from '../utils'
 
 /**
  * Tell whether a file has been changed
@@ -120,57 +120,4 @@ export async function status ({
     err.caller = 'git.status'
     throw err
   }
-}
-
-function cacheIsStale ({ entry, stats }) {
-  // Comparison based on the description in Paragraph 4 of
-  // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
-  return (
-    entry.mode !== stats.mode ||
-    entry.mtime.valueOf() !== stats.mtime.valueOf() ||
-    entry.ctime.valueOf() !== stats.ctime.valueOf() ||
-    entry.uid !== stats.uid ||
-    entry.gid !== stats.gid ||
-    entry.ino !== stats.ino >> 0 ||
-    entry.size !== stats.size
-  )
-}
-
-async function getOidAtPath ({ fs, gitdir, tree, path }) {
-  if (typeof path === 'string') path = path.split('/')
-  let dirname = path.shift()
-  for (let entry of tree) {
-    if (entry.path === dirname) {
-      if (path.length === 0) {
-        return entry.oid
-      }
-      let { type, object } = await GitObjectManager.read({
-        fs,
-        gitdir,
-        oid: entry.oid
-      })
-      if (type === 'tree') {
-        let tree = GitTree.from(object)
-        return getOidAtPath({ fs, gitdir, tree, path })
-      }
-      if (type === 'blob') {
-        throw new Error(`Blob found where tree expected.`)
-      }
-    }
-  }
-  return null
-}
-
-async function getHeadTree ({ fs, gitdir }) {
-  // Get the tree from the HEAD commit.
-  let oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
-  let { object: cobject } = await GitObjectManager.read({ fs, gitdir, oid })
-  let commit = GitCommit.from(cobject)
-  let { object: tobject } = await GitObjectManager.read({
-    fs,
-    gitdir,
-    oid: commit.parseHeaders().tree
-  })
-  let tree = GitTree.from(tobject).entries()
-  return tree
 }

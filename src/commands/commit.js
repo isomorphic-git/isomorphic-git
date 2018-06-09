@@ -1,8 +1,8 @@
 import path from 'path'
 
 import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, GitCommit, GitTree } from '../models'
-import { flatFileListToDirectoryStructure } from '../utils'
+import { FileSystem, GitCommit } from '../models'
+import { constructTree, flatFileListToDirectoryStructure } from '../utils'
 
 import { config } from './config'
 
@@ -103,29 +103,4 @@ export async function commit ({
     err.caller = 'git.commit'
     throw err
   }
-}
-
-async function constructTree ({ fs, gitdir, inode }) {
-  // use depth first traversal
-  let children = inode.children
-  for (let inode of children) {
-    if (inode.type === 'tree') {
-      inode.metadata.mode = '040000'
-      inode.metadata.oid = await constructTree({ fs, gitdir, inode })
-    }
-  }
-  let entries = children.map(inode => ({
-    mode: inode.metadata.mode,
-    path: inode.basename,
-    oid: inode.metadata.oid,
-    type: inode.type
-  }))
-  const tree = GitTree.from(entries)
-  let oid = await GitObjectManager.write({
-    fs,
-    gitdir,
-    type: 'tree',
-    object: tree.toObject()
-  })
-  return oid
 }
