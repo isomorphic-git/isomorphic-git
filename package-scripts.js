@@ -8,7 +8,8 @@ const retry = n => cmd =>
     .join(` || `)
 const retry3 = retry(3)
 
-const quote = cmd => cmd.replace(new RegExp("'", 'g'), "\\'").replace(new RegExp('"', 'g'), '\\"')
+const quote = cmd =>
+  cmd.replace(new RegExp("'", 'g'), "\\'").replace(new RegExp('"', 'g'), '\\"')
 
 const optional = cmd =>
   `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`
@@ -63,7 +64,7 @@ module.exports = {
           'test.uploadcoverage',
           'test.karma'
         )
-        : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
+        : series.nps('lint', 'build', 'test.one', 'test.karma'),
       size: optional(timeout(1)('bundlesize')),
       one: retry3(or('nps test.jest', 'nps test.jasmine')),
       jasmine: process.env.CI
