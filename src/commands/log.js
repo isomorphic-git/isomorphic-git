@@ -2,7 +2,8 @@ import path from 'path'
 
 import { GitRefManager } from '../managers'
 import { FileSystem } from '../models'
-import { compareAge, logCommit } from '../utils'
+import { compareAge } from '../utils/compareAge'
+import { logCommit } from '../utils/logCommit'
 
 /**
  * Get commit descriptions from the git history
