@@ -49,4 +49,9 @@ describe('log', () => {
       expect(keys).toEqual(['9609b8a5928ba6b9'])
     }
   })
+  it('with complex merging history', async () => {
+    let { fs, gitdir } = await makeFixture('test-log-complex')
+    let commits = await log({ fs, gitdir, ref: 'master' })
+    expect(commits).toMatchSnapshot()
+  })
 })

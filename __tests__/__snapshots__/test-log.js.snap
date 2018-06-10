@@ -240,6 +240,243 @@ Qixh2bmPgr3h9nxq2Dmn
 ]
 `;
 
+exports[`log with complex merging history 1`] = `
+Array [
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605340,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605340,
+      "timezoneOffset": 240,
+    },
+    "message": "Merge branches 'foo' and 'baz'
+",
+    "oid": "9eeab5143ea4a6dde4ede004e4882e2467dde340",
+    "parent": Array [
+      "8bb702b66d8def74b2a9642309eb23a5f76779dc",
+      "ccc9ef071f1b27210fa0df2f8665f4ad550358e8",
+      "1ce759dd468c1ea830e8befbbdcf79e591346153",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605325,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605325,
+      "timezoneOffset": 240,
+    },
+    "message": "Other sixth commit
+",
+    "oid": "8bb702b66d8def74b2a9642309eb23a5f76779dc",
+    "parent": Array [
+      "f1eca35203ee2b578f23e0e7c8b8c2c48927d597",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605315,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605315,
+      "timezoneOffset": 240,
+    },
+    "message": "Sixth commit
+",
+    "oid": "1ce759dd468c1ea830e8befbbdcf79e591346153",
+    "parent": Array [
+      "f1eca35203ee2b578f23e0e7c8b8c2c48927d597",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605295,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605295,
+      "timezoneOffset": 240,
+    },
+    "message": "Fifth commit
+",
+    "oid": "f1eca35203ee2b578f23e0e7c8b8c2c48927d597",
+    "parent": Array [
+      "6cabb8ab77d3fc40858db84416dfd1a41fe1c2fd",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605245,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605245,
+      "timezoneOffset": 240,
+    },
+    "message": "Merge branch 'bar' into foo
+",
+    "oid": "ccc9ef071f1b27210fa0df2f8665f4ad550358e8",
+    "parent": Array [
+      "ad5f1992b8ff758bc9fe457acf905093dd75b7b1",
+      "ec2db34cd04249ea6c31ed6d367656b0f2ab25c6",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605228,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605228,
+      "timezoneOffset": 240,
+    },
+    "message": "Other fourth commit
+",
+    "oid": "ec2db34cd04249ea6c31ed6d367656b0f2ab25c6",
+    "parent": Array [
+      "b5129e2726d68c93ed09a3eaec9dda5e76fd4a87",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605214,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605214,
+      "timezoneOffset": 240,
+    },
+    "message": "Fourth commit
+",
+    "oid": "ad5f1992b8ff758bc9fe457acf905093dd75b7b1",
+    "parent": Array [
+      "c4e447f61fcaf49032265bfe3dea32383339d910",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605200,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605200,
+      "timezoneOffset": 240,
+    },
+    "message": "Other third commit
+",
+    "oid": "b5129e2726d68c93ed09a3eaec9dda5e76fd4a87",
+    "parent": Array [
+      "6cabb8ab77d3fc40858db84416dfd1a41fe1c2fd",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605169,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605169,
+      "timezoneOffset": 240,
+    },
+    "message": "Third commit
+",
+    "oid": "c4e447f61fcaf49032265bfe3dea32383339d910",
+    "parent": Array [
+      "6cabb8ab77d3fc40858db84416dfd1a41fe1c2fd",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605133,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605133,
+      "timezoneOffset": 240,
+    },
+    "message": "Second commit
+",
+    "oid": "6cabb8ab77d3fc40858db84416dfd1a41fe1c2fd",
+    "parent": Array [
+      "4acc58cd881f48c4662c4554ab268e77bcd34b71",
+    ],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+  Object {
+    "author": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605128,
+      "timezoneOffset": 240,
+    },
+    "committer": Object {
+      "email": "wmhilton@gmail.com",
+      "name": "William Hilton",
+      "timestamp": 1528605128,
+      "timezoneOffset": 240,
+    },
+    "message": "Initial commit
+",
+    "oid": "4acc58cd881f48c4662c4554ab268e77bcd34b71",
+    "parent": Array [],
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  },
+]
+`;
+
 exports[`log with signing payloads 1`] = `
 Array [
   Object {

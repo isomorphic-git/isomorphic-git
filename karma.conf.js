@@ -156,6 +156,7 @@ module.exports = function (config) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
     )
+    options.browsers.push(['ChromeHeadlessNoSandbox'])
   } else if (!process.env.SAUCE_ACCESS_KEY) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'

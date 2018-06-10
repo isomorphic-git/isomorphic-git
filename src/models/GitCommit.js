@@ -132,13 +132,18 @@ export class GitCommit {
         hs.push(h)
       }
     }
-    let obj = {}
+    let obj = {
+      parent: []
+    }
     for (let h of hs) {
       let key = h.slice(0, h.indexOf(' '))
       let value = h.slice(h.indexOf(' ') + 1)
-      obj[key] = value
+      if (Array.isArray(obj[key])) {
+        obj[key].push(value)
+      } else {
+        obj[key] = value
+      }
     }
-    obj.parent = obj.parent ? obj.parent.split(' ') : []
     if (obj.author) {
       obj.author = parseAuthor(obj.author)
     }
@@ -155,12 +160,13 @@ export class GitCommit {
     } else {
       headers += `tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n` // the null tree
     }
-    if (obj.parent && obj.parent.length) {
-      headers += 'parent'
-      for (let p of obj.parent) {
-        headers += ' ' + p
+    if (obj.parent) {
+      if (obj.parent.length === undefined) {
+        throw new Error(`commit 'parent' property should be an array`)
       }
-      headers += '\n'
+      for (let p of obj.parent) {
+        headers += `parent ${p}\n`
+      }
     }
     let author = obj.author
     headers += `author ${author.name} <${author.email}> ${
