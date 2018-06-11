@@ -23,6 +23,10 @@ export async function pull ({
   emitter,
   authUsername,
   authPassword,
+  username = authUsername,
+  password = authPassword,
+  token,
+  oauth2format,
   singleBranch
 }) {
   try {
@@ -45,8 +49,10 @@ export async function pull ({
       emitter,
       ref,
       remote,
-      authUsername,
-      authPassword,
+      username,
+      password,
+      token,
+      oauth2format,
       singleBranch
     })
     // Merge the remote tracking branch into the local one.
