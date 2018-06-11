@@ -27,6 +27,10 @@ export async function fetch ({
   url,
   authUsername,
   authPassword,
+  username = authUsername,
+  password = authPassword,
+  token,
+  oauth2format,
   depth,
   since,
   exclude,
@@ -49,8 +53,10 @@ export async function fetch ({
       refs,
       remote,
       url,
-      authUsername,
-      authPassword,
+      username,
+      password,
+      token,
+      oauth2format,
       depth,
       since,
       exclude,
@@ -107,8 +113,10 @@ async function fetchPackfile ({
   refs = [ref],
   remote,
   url,
-  authUsername,
-  authPassword,
+  username,
+  password,
+  token,
+  oauth2format,
   depth = null,
   since = null,
   exclude = [],
@@ -131,13 +139,7 @@ async function fetchPackfile ({
       path: `remote.${remote}.url`
     })
   }
-  let auth
-  if (authUsername !== undefined && authPassword !== undefined) {
-    auth = {
-      username: authUsername,
-      password: authPassword
-    }
-  }
+  let auth = { username, password, token, oauth2format }
   let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   let remoteHTTP = await GitRemoteHTTP.discover({
     service: 'git-upload-pack',

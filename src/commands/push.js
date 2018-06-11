@@ -33,7 +33,11 @@ export async function push ({
   remote = 'origin',
   url,
   authUsername,
-  authPassword
+  authPassword,
+  username = authUsername,
+  password = authPassword,
+  token,
+  oauth2format
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -49,13 +53,7 @@ export async function push ({
       fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
     }
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
-    let auth
-    if (authUsername !== undefined && authPassword !== undefined) {
-      auth = {
-        username: authUsername,
-        password: authPassword
-      }
-    }
+    let auth = { username, password, token, oauth2format }
     let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     let httpRemote = await GitRemoteHTTP.discover({
       service: 'git-receive-pack',

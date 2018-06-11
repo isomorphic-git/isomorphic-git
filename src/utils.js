@@ -1,4 +1,6 @@
 export { auth } from './utils/auth'
+export * from './utils/calculateBasicAuthHeader'
+export * from './utils/calculateBasicAuthUsernamePasswordPair'
 export {
   flatFileListToDirectoryStructure
 } from './utils/flatFileListToDirectoryStructure'

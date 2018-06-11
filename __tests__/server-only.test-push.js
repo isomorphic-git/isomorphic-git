@@ -62,8 +62,7 @@ describe('push', () => {
       let res = await push({
         fs,
         gitdir,
-        authUsername: process.env.GITHUB_TOKEN,
-        authPassword: process.env.GITHUB_TOKEN,
+        token: process.env.GITHUB_TOKEN,
         remote: 'origin',
         ref: 'refs/heads/master'
       })
@@ -80,8 +79,7 @@ describe('push', () => {
     let res = await push({
       fs,
       gitdir,
-      authUsername: process.env.GITHUB_TOKEN,
-      authPassword: process.env.GITHUB_TOKEN,
+      token: process.env.GITHUB_TOKEN,
       remote: 'origin',
       ref: 'master'
     })
@@ -117,8 +115,8 @@ describe('push', () => {
       await push({
         fs,
         gitdir,
-        authUsername: 'test',
-        authPassword: 'test',
+        username: 'test',
+        password: 'test',
         remote: 'origin',
         ref: 'master'
       })
