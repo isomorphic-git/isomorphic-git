@@ -203,12 +203,17 @@ export class GitRemoteConnection {
       packetlines.write(`unshallow ${unshallow}\n`)
       console.log(`unshallow ${unshallow}`)
     }
-    if (shallows.length || shallows.size || unshallows.length || unshallows.size) {
+    if (
+      shallows.length ||
+      shallows.size ||
+      unshallows.length ||
+      unshallows.size
+    ) {
       stream.write(GitPktLine.flush())
     }
     for (const ack of acks) {
-      packetlines.write(`ACK ${ack.oid}${ack.status ? (' ' + ack.status) : ''}\n`)
-      console.log(`ACK ${ack.oid}${ack.status ? (' ' + ack.status) : ''}`)
+      packetlines.write(`ACK ${ack.oid}${ack.status ? ' ' + ack.status : ''}\n`)
+      console.log(`ACK ${ack.oid}${ack.status ? ' ' + ack.status : ''}`)
     }
     if (nak && (acks.length === 0 || acks.size === 0)) {
       packetlines.write(`NAK\n`)

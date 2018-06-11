@@ -31,7 +31,11 @@ describe('log', () => {
   })
   it('test-branch', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
-    let commits = await log({ fs, gitdir, ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e' })
+    let commits = await log({
+      fs,
+      gitdir,
+      ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    })
     expect(commits).toMatchSnapshot()
   })
   it('SHA1 reference', async () => {
@@ -53,5 +57,10 @@ describe('log', () => {
       let keys = msg.getSigningKeyIds().map(keyid => keyid.toHex())
       expect(keys).toEqual(['9609b8a5928ba6b9'])
     }
+  })
+  it('with complex merging history', async () => {
+    let { fs, gitdir } = await makeFixture('test-log-complex')
+    let commits = await log({ fs, gitdir, ref: 'master' })
+    expect(commits).toMatchSnapshot()
   })
 })

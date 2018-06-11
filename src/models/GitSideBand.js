@@ -101,7 +101,9 @@ export class GitSideBand {
         packfileWasEmpty = false
         const buffers = splitBuffer(data, MAX_PACKET_LENGTH)
         for (const buffer of buffers) {
-          output.write(GitPktLine.encode(Buffer.concat([Buffer.from('01', 'hex'), buffer])))
+          output.write(
+            GitPktLine.encode(Buffer.concat([Buffer.from('01', 'hex'), buffer]))
+          )
         }
       })
       .on('end', () => {
@@ -113,7 +115,9 @@ export class GitSideBand {
       .on('data', data => {
         const buffers = splitBuffer(data, MAX_PACKET_LENGTH)
         for (const buffer of buffers) {
-          output.write(GitPktLine.encode(Buffer.concat([Buffer.from('02', 'hex'), buffer])))
+          output.write(
+            GitPktLine.encode(Buffer.concat([Buffer.from('02', 'hex'), buffer]))
+          )
         }
       })
       .on('end', () => {
@@ -124,7 +128,9 @@ export class GitSideBand {
       .on('data', data => {
         const buffers = splitBuffer(data, MAX_PACKET_LENGTH)
         for (const buffer of buffers) {
-          output.write(GitPktLine.encode(Buffer.concat([Buffer.from('03', 'hex'), buffer])))
+          output.write(
+            GitPktLine.encode(Buffer.concat([Buffer.from('03', 'hex'), buffer]))
+          )
         }
       })
       .on('end', () => {

@@ -8,6 +8,17 @@ const retry = n => cmd =>
     .join(` || `)
 const retry3 = retry(3)
 
+const quote = cmd =>
+  cmd.replace(new RegExp("'", 'g'), "\\'").replace(new RegExp('"', 'g'), '\\"')
+
+const optional = cmd =>
+  `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`
+
+const timeout = n => cmd => `timeout --signal=KILL ${n}m ${cmd}`
+const timeout5 = timeout(5)
+
+const or = (a, b) => `(${a}) || (${b})`
+
 const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 
 module.exports = {
@@ -47,20 +58,22 @@ module.exports = {
       default: process.env.CI
         ? series.nps(
           'lint',
-          'test.jest',
           'build',
           'test.size',
-          'test.jasmine',
+          'test.one',
+          'test.uploadcoverage',
           'test.karma'
         )
-        : series.nps('lint', 'build', 'test.jasmine', 'test.karma'),
-      size: 'bundlesize',
-      jasmine: retry3('cross-env NODE_PATH=./dist/for-node jasmine'),
+        : series.nps('lint', 'build', 'test.one', 'test.karma'),
+      size: optional(timeout(1)('bundlesize')),
+      one: retry3(or('nps test.jest', 'nps test.jasmine')),
+      jasmine: process.env.CI
+        ? `cross-env NODE_PATH=./dist/for-node ${timeout5('jasmine')}`
+        : `cross-env NODE_PATH=./dist/for-node jasmine`,
       jest: process.env.CI
-        ? retry3(
-          'cross-env BABEL_ENV=jest timeout --signal=KILL 5m jest --ci --coverage && codecov'
-        )
-        : 'cross-env BABEL_ENV=jest jest --ci',
+        ? `cross-env BABEL_ENV=jest ${timeout5('jest --ci')}`
+        : `cross-env BABEL_ENV=jest jest --ci`,
+      uploadcoverage: optional(timeout(1)('codecov')),
       karma: process.env.CI
         ? retry3('karma start --single-run')
         : 'karma start --single-run'

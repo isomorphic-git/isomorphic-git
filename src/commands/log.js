@@ -1,7 +1,9 @@
 import path from 'path'
 
-import { GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, GitCommit } from '../models'
+import { GitRefManager } from '../managers'
+import { FileSystem } from '../models'
+import { compareAge } from '../utils/compareAge'
+import { logCommit } from '../utils/logCommit'
 
 /**
  * Get commit descriptions from the git history
@@ -17,59 +19,56 @@ export async function log ({
   since, // Date
   signing = false
 }) {
-  const fs = new FileSystem(_fs)
-  let sinceTimestamp =
-    since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
-  // TODO: In the future, we may want to have an API where we return a
-  // async iterator that emits commits.
-  let commits = []
-  let start = await GitRefManager.resolve({ fs, gitdir, ref })
-  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: start })
-  if (type !== 'commit') {
-    throw new Error(
-      `The given ref ${ref} did not resolve to a commit but to a ${type}`
-    )
+  try {
+    const fs = new FileSystem(_fs)
+    let sinceTimestamp =
+      since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
+    // TODO: In the future, we may want to have an API where we return a
+    // async iterator that emits commits.
+    let commits = []
+    let oid = await GitRefManager.resolve({ fs, gitdir, ref })
+    let tips /*: Array */ = [await logCommit({ fs, gitdir, oid, signing })]
+
+    while (true) {
+      let commit = tips.pop()
+
+      // Stop the loop if we encounter an error
+      if (commit.error) {
+        commits.push(commit)
+        break
+      }
+
+      // Stop the log if we've hit the age limit
+      if (
+        sinceTimestamp !== undefined &&
+        commit.committer.timestamp <= sinceTimestamp
+      ) {
+        break
+      }
+
+      commits.push(commit)
+
+      // Stop the loop if we have enough commits now.
+      if (depth !== undefined && commits.length === depth) break
+
+      // Add the parents of this commit to the queue
+      // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
+      for (const oid of commit.parent) {
+        let commit = await logCommit({ fs, gitdir, oid, signing })
+        if (!tips.map(commit => commit.oid).includes(commit.oid)) {
+          tips.push(commit)
+        }
+      }
+
+      // Stop the loop if there are no more commit parents
+      if (tips.length === 0) break
+
+      // Process tips in order by age
+      tips.sort(compareAge)
+    }
+    return commits
+  } catch (err) {
+    err.caller = 'git.log'
+    throw err
   }
-  let commit = GitCommit.from(object)
-  let currentCommit = Object.assign({ oid: start }, commit.parse())
-  if (signing) {
-    currentCommit.payload = commit.withoutSignature()
-  }
-  commits.push(currentCommit)
-  while (true) {
-    if (depth !== undefined && commits.length === depth) break
-    if (currentCommit.parent.length === 0) break
-    let oid = currentCommit.parent[0]
-    let gitobject
-    try {
-      gitobject = await GitObjectManager.read({ fs, gitdir, oid })
-    } catch (err) {
-      commits.push({
-        oid,
-        error: err
-      })
-      break
-    }
-    let { type, object } = gitobject
-    if (type !== 'commit') {
-      commits.push({
-        oid,
-        error: new Error(`Invalid commit parent ${oid} is of type ${type}`)
-      })
-      break
-    }
-    commit = GitCommit.from(object)
-    currentCommit = Object.assign({ oid }, commit.parse())
-    if (signing) {
-      currentCommit.payload = commit.withoutSignature()
-    }
-    if (
-      sinceTimestamp !== undefined &&
-      currentCommit.committer.timestamp <= sinceTimestamp
-    ) {
-      break
-    }
-    commits.push(currentCommit)
-  }
-  return commits
 }

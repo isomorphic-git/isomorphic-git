@@ -1,13 +1,13 @@
-import path from 'path'
-import { PassThrough } from 'stream'
 import pad from 'pad'
 import pako from 'pako'
+import path from 'path'
 import createHash from 'sha.js'
-
-import { log } from './log'
+import { PassThrough } from 'stream'
 
 import { GitObjectManager } from '../managers'
 import { FileSystem, GitCommit, GitTree } from '../models'
+
+import { log } from './log'
 
 const types = {
   commit: 0b0010000,
@@ -64,7 +64,10 @@ export async function packObjects ({
         oids.add(commit.oid)
         if (i === commits.length - 1) {
           console.log('last one', commit.oid)
-          if (!oldshallows.includes(commit.oid) && (depth !== undefined || since !== undefined)) {
+          if (
+            !oldshallows.includes(commit.oid) &&
+            (depth !== undefined || since !== undefined)
+          ) {
             console.log('make it shallow', commit.oid)
             shallows.add(commit.oid)
           }

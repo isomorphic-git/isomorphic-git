@@ -30,6 +30,10 @@ export async function fetch ({
   url,
   authUsername,
   authPassword,
+  username = authUsername,
+  password = authPassword,
+  token,
+  oauth2format,
   depth,
   since,
   exclude,
@@ -38,55 +42,70 @@ export async function fetch ({
   singleBranch,
   onprogress // deprecated
 }) {
-  if (onprogress !== undefined) {
-    console.warn(
-      'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
-    )
-  }
-  const fs = new FileSystem(_fs)
-  let response = await fetchPackfile({
-    gitdir,
-    fs,
-    ref,
-    refs,
-    remote,
-    url,
-    authUsername,
-    authPassword,
-    depth,
-    since,
-    exclude,
-    relative,
-    tags,
-    singleBranch
-  })
-  // Note: progress messages are designed to be written directly to the terminal,
-  // so they are often sent with just a carriage return to overwrite the last line of output.
-  // But there are also messages delimited with newlines.
-  // I also include CRLF just in case.
-  response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
-    if (emitter) {
-      emitter.emit('message', line.trim())
+  try {
+    if (onprogress !== undefined) {
+      console.warn(
+        'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
+      )
     }
-    let matches = line.match(/\((\d+?)\/(\d+?)\)/)
-    if (matches && emitter) {
-      emitter.emit('progress', {
-        loaded: parseInt(matches[1], 10),
-        total: parseInt(matches[2], 10),
-        lengthComputable: true
-      })
+    const fs = new FileSystem(_fs)
+    let response = await fetchPackfile({
+      gitdir,
+      fs,
+      ref,
+      refs,
+      remote,
+      url,
+      username,
+      password,
+      token,
+      oauth2format,
+      depth,
+      since,
+      exclude,
+      relative,
+      tags,
+      singleBranch
+    })
+    // Note: progress messages are designed to be written directly to the terminal,
+    // so they are often sent with just a carriage return to overwrite the last line of output.
+    // But there are also messages delimited with newlines.
+    // I also include CRLF just in case.
+    response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
+      if (emitter) {
+        emitter.emit('message', line.trim())
+      }
+      let matches = line.match(/\((\d+?)\/(\d+?)\)/)
+      if (matches && emitter) {
+        emitter.emit('progress', {
+          loaded: parseInt(matches[1], 10),
+          total: parseInt(matches[2], 10),
+          lengthComputable: true
+        })
+      }
+    })
+    let packfile = await pify(concat)(response.packfile)
+    let packfileSha = packfile.slice(-20).toString('hex')
+    // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
+    // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
+    // TODO: Longer term, we should actually:
+    // a) NOT concatenate the entire packfile into memory (line 78),
+    // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
+    // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
+    if (packfileSha !== '') {
+      await fs.write(
+        path.join(gitdir, `objects/pack/pack-${packfileSha}.pack`),
+        packfile
+      )
     }
-  })
-  let packfile = await pify(concat)(response.packfile)
-  let packfileSha = packfile.slice(-20).toString('hex')
-  await fs.write(
-    path.join(gitdir, `objects/pack/pack-${packfileSha}.pack`),
-    packfile
-  )
-  // TODO: Return more metadata?
-  return {
-    defaultBranch: response.HEAD,
-    fetchHead: response.FETCH_HEAD
+    // TODO: Return more metadata?
+    return {
+      defaultBranch: response.HEAD,
+      fetchHead: response.FETCH_HEAD
+    }
+  } catch (err) {
+    err.caller = 'git.fetch'
+    throw err
   }
 }
 
@@ -97,8 +116,10 @@ async function fetchPackfile ({
   refs = [ref],
   remote,
   url,
-  authUsername,
-  authPassword,
+  username,
+  password,
+  token,
+  oauth2format,
   depth = null,
   since = null,
   exclude = [],
@@ -123,14 +144,7 @@ async function fetchPackfile ({
       path: `remote.${remote}.url`
     })
   }
-  let auth
-  if (authUsername !== undefined && authPassword !== undefined) {
-    auth = {
-      username: authUsername,
-      password: authPassword
-    }
-  }
-  // Get list of refs from remote
+  let auth = { username, password, token, oauth2format }
   let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   let remoteHTTP = await GitRemoteHTTP.discover({
     service: 'git-upload-pack',
@@ -154,14 +168,10 @@ async function fetchPackfile ({
       `Remote does not support shallow fetches relative to the current shallow depth`
     )
   }
-  // TODO: Don't add other refs if singleBranch is specified.
-  await GitRefManager.updateRemoteRefs({
-    fs,
-    gitdir,
-    remote,
-    refs: remoteHTTP.refs,
-    symrefs: remoteHTTP.symrefs,
-    tags
+  // Figure out the SHA for the requested ref
+  let { oid, fullref } = GitRefManager.resolveAgainstMap({
+    ref,
+    map: remoteHTTP.refs
   })
   // Assemble the application/x-git-upload-pack-request
   const capabilities = [
@@ -173,11 +183,6 @@ async function fetchPackfile ({
     `agent=${pkg.agent}`
   ]
   if (relative) capabilities.push('deepen-relative')
-  // Figure out the SHA for the requested ref
-  let oid = GitRefManager.resolveAgainstMap({
-    ref,
-    map: remoteHTTP.refs
-  })
   // Start requesting oids from the remote by their SHAs
   let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
   wants = [...new Set(wants)] // remove duplicates
@@ -222,6 +227,40 @@ async function fetchPackfile ({
     oids.delete(oid)
   }
   await GitShallowManager.write({ fs, gitdir, oids })
+  // Update local remote refs
+  if (singleBranch) {
+    const refs = new Map([[fullref, oid]])
+    // But wait, maybe it was a symref, like 'HEAD'!
+    // We need to save all the refs in the symref chain (sigh).
+    const symrefs = new Map()
+    let bail = 10
+    let key = fullref
+    while (bail--) {
+      let value = remoteHTTP.symrefs.get(key)
+      if (value === undefined) break
+      symrefs.set(key, value)
+      key = value
+    }
+    // final value must not be a symref but a real ref
+    refs.set(key, remoteHTTP.refs.get(key))
+    await GitRefManager.updateRemoteRefs({
+      fs,
+      gitdir,
+      remote,
+      refs,
+      symrefs,
+      tags
+    })
+  } else {
+    await GitRefManager.updateRemoteRefs({
+      fs,
+      gitdir,
+      remote,
+      refs: remoteHTTP.refs,
+      symrefs: remoteHTTP.symrefs,
+      tags
+    })
+  }
   // We need this value later for the `clone` command.
   let HEAD = remoteHTTP.symrefs.get('HEAD')
   let FETCH_HEAD = oid

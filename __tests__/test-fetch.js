@@ -24,6 +24,10 @@ describe('fetch', () => {
       remote: 'origin',
       ref: 'test-branch-shallow-clone'
     })
+    expect(
+      fs.existsSync(`${gitdir}/refs/remotes/origin/test-branch-shallow-clone`)
+    ).toBe(true)
+    expect(fs.existsSync(`${gitdir}/refs/remotes/origin/master`)).toBe(false)
   })
 
   it('shallow fetch (from Github)', async () => {
@@ -151,5 +155,6 @@ describe('fetch', () => {
     }
     expect(err).toBeDefined()
     expect(err.message).toMatchSnapshot()
+    expect(err.caller).toEqual('git.fetch')
   })
 })

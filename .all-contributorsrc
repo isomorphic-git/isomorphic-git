@@ -170,6 +170,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "melvincarvalho",
+      "name": "Melvin Carvalho",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/65864?v=4",
+      "profile": "https://melvincarvalho.com/#me",
+      "contributions": [
+        "doc"
+      ]
     }
   ]
 }

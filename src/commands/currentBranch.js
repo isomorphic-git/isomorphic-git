@@ -33,13 +33,18 @@ export async function currentBranch ({
   fs: _fs,
   fullname = false
 }) {
-  const fs = new FileSystem(_fs)
-  let ref = await GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref: 'HEAD',
-    depth: 2
-  })
-  if (fullname) return ref
-  return abbreviate(ref)
+  try {
+    const fs = new FileSystem(_fs)
+    let ref = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref: 'HEAD',
+      depth: 2
+    })
+    if (fullname) return ref
+    return abbreviate(ref)
+  } catch (err) {
+    err.caller = 'git.currentBranch'
+    throw err
+  }
 }

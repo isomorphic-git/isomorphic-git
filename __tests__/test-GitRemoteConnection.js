@@ -220,7 +220,8 @@ describe('GitRemoteConnection', () => {
     progress.end()
     error.end()
     let buffer = await pify(concat)(result)
-    expect(buffer.toString('utf8')).toEqual(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue
+    expect(buffer.toString('utf8'))
+      .toEqual(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue
 0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d\n`)
   })
   it('receiveUploadPackResult - simple clone', async () => {

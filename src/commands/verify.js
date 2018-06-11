@@ -16,17 +16,22 @@ export async function verify ({
   publicKeys,
   openpgp
 }) {
-  const fs = new FileSystem(_fs)
-  const oid = await GitRefManager.resolve({ fs, gitdir, ref })
-  const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
-  if (type !== 'commit') {
-    throw new Error(
-      `'ref' is not pointing to a 'commit' object but a '${type}' object`
-    )
+  try {
+    const fs = new FileSystem(_fs)
+    const oid = await GitRefManager.resolve({ fs, gitdir, ref })
+    const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    if (type !== 'commit') {
+      throw new Error(
+        `'ref' is not pointing to a 'commit' object but a '${type}' object`
+      )
+    }
+    let commit = SignedGitCommit.from(object)
+    let keys = await commit.listSigningKeys(openpgp)
+    let validity = await commit.verify(openpgp, publicKeys)
+    if (!validity) return false
+    return keys
+  } catch (err) {
+    err.caller = 'git.verify'
+    throw err
   }
-  let commit = SignedGitCommit.from(object)
-  let keys = await commit.listSigningKeys(openpgp)
-  let validity = await commit.verify(openpgp, publicKeys)
-  if (!validity) return false
-  return keys
 }

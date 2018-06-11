@@ -32,21 +32,33 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
         'allow-reachable-sha1-in-want'
       ]
       const refs = new Map()
-      let branches = await git.listBranches({fs, gitdir})
+      let branches = await git.listBranches({ fs, gitdir })
       branches = branches.map(branch => `refs/heads/${branch}`)
       branches.unshift('HEAD') // HEAD must be the first in the list
       for (const branch of branches) {
-        refs.set(branch, await git.resolveRef({fs, gitdir, ref: branch}))
+        refs.set(branch, await git.resolveRef({ fs, gitdir, ref: branch }))
       }
       const symrefs = new Map()
-      symrefs.set('HEAD', await git.resolveRef({fs, gitdir, ref: 'HEAD', depth: 2}))
+      symrefs.set(
+        'HEAD',
+        await git.resolveRef({ fs, gitdir, ref: 'HEAD', depth: 2 })
+      )
       console.log(service, { capabilities, refs, symrefs })
       res.setHeader('content-type', `application/x-${service}-advertisement`)
-      return GitRemoteConnection.sendInfoRefs(service, res, { capabilities, refs, symrefs })
+      return GitRemoteConnection.sendInfoRefs(service, res, {
+        capabilities,
+        refs,
+        symrefs
+      })
     }
-    if (req.method === 'POST' && req.headers['content-type'] === 'application/x-git-upload-pack-request') {
+    if (
+      req.method === 'POST' &&
+      req.headers['content-type'] === 'application/x-git-upload-pack-request'
+    ) {
       console.log('fetch')
-      let gitdir = u.pathname.replace(/\/git-upload-pack$/, '').replace(/^\//, '')
+      let gitdir = u.pathname
+        .replace(/\/git-upload-pack$/, '')
+        .replace(/^\//, '')
       const service = 'git-upload-pack'
       let {
         capabilities,
@@ -73,7 +85,12 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
       if (done) {
         console.log('done - so send packfile')
         // create pack file
-        let { packstream, shallows: newshallows, unshallows, acks } = await git.packObjects({
+        let {
+          packstream,
+          shallows: newshallows,
+          unshallows,
+          acks
+        } = await git.packObjects({
           fs,
           gitdir,
           refs: wants,
@@ -105,17 +122,19 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
         stream.pipe(res)
       } else {
         console.log('not done - so dont send packfile')
-        let { shallows: newshallows, unshallows, acks } = await git.packObjects({
-          fs,
-          gitdir,
-          refs: wants,
-          depth,
-          since,
-          exclude,
-          relative,
-          haves,
-          shallows
-        })
+        let { shallows: newshallows, unshallows, acks } = await git.packObjects(
+          {
+            fs,
+            gitdir,
+            refs: wants,
+            depth,
+            since,
+            exclude,
+            relative,
+            haves,
+            shallows
+          }
+        )
         res.setHeader('content-type', `application/x-${service}-result`)
         let packetlines = new PassThrough()
         let packfile = new PassThrough()
