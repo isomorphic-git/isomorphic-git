@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const http = require('http')
+const zlib = require('zlib')
 const fs = require('fs')
 const { PassThrough } = require('stream')
 const url = require('url')
@@ -19,7 +20,9 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
     var u = url.parse(req.url, true)
     if (req.method === 'GET' && u.pathname.endsWith('/info/refs')) {
       console.log('discover')
-      let gitdir = u.pathname.replace(/\/info\/refs$/, '').replace(/^\//, '')
+      const filepath = u.pathname.replace(/\/info\/refs$/, '').replace(/^\//, '')
+      const gitdir = opts.bare ? `./${filepath}` : `./${filepath}/.git`
+      console.log('gitdir =', gitdir)
       const service = u.query.service
       const capabilities = [
         'thin-pack',
@@ -33,10 +36,15 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
       ]
       const refs = new Map()
       let branches = await git.listBranches({ fs, gitdir })
+      let tags = await git.listTags({ fs, gitdir })
       branches = branches.map(branch => `refs/heads/${branch}`)
+      tags = tags.map(tag => `refs/tags/${tag}`)
       branches.unshift('HEAD') // HEAD must be the first in the list
       for (const branch of branches) {
         refs.set(branch, await git.resolveRef({ fs, gitdir, ref: branch }))
+      }
+      for (const tag of tags) {
+        refs.set(tag, await git.resolveRef({ fs, gitdir, ref: tag }))
       }
       const symrefs = new Map()
       symrefs.set(
@@ -56,9 +64,13 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
       req.headers['content-type'] === 'application/x-git-upload-pack-request'
     ) {
       console.log('fetch')
-      let gitdir = u.pathname
+      if (req.headers['content-encoding'] === 'gzip') {
+        req = req.pipe(zlib.createGunzip())
+      }
+      const filepath = u.pathname
         .replace(/\/git-upload-pack$/, '')
         .replace(/^\//, '')
+      const gitdir = opts.bare ? `./${filepath}` : `./${filepath}/.git`
       const service = 'git-upload-pack'
       let {
         capabilities,
