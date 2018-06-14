@@ -10,7 +10,6 @@ import {
   GitShallowManager
 } from '../managers'
 import { FileSystem } from '../models'
-import { pkg } from '../utils'
 
 import { config } from './config'
 
@@ -28,6 +27,7 @@ export async function fetch ({
   refs,
   remote,
   url,
+  noGitSuffix = false,
   authUsername,
   authPassword,
   username = authUsername,
@@ -56,6 +56,7 @@ export async function fetch ({
       refs,
       remote,
       url,
+      noGitSuffix,
       username,
       password,
       token,
@@ -116,6 +117,7 @@ async function fetchPackfile ({
   refs = [ref],
   remote,
   url,
+  noGitSuffix,
   username,
   password,
   token,
@@ -149,6 +151,7 @@ async function fetchPackfile ({
   let remoteHTTP = await GitRemoteHTTP.discover({
     service: 'git-upload-pack',
     url,
+    noGitSuffix,
     auth
   })
   // Check that the remote supports the requested features
@@ -179,8 +182,7 @@ async function fetchPackfile ({
     'no-done',
     'side-band-64k',
     'thin-pack',
-    'ofs-delta',
-    `agent=${pkg.agent}`
+    'ofs-delta'
   ]
   if (relative) capabilities.push('deepen-relative')
   // Start requesting oids from the remote by their SHAs
@@ -215,6 +217,7 @@ async function fetchPackfile ({
   let res = await GitRemoteHTTP.connect({
     service: 'git-upload-pack',
     url,
+    noGitSuffix,
     auth,
     stream: packstream
   })

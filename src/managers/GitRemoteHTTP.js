@@ -13,9 +13,9 @@ export class GitRemoteHTTP {
   static async capabilities () {
     return ['discover', 'connect']
   }
-  static async discover ({ service, url, auth = {} }) {
+  static async discover ({ service, url, noGitSuffix, auth }) {
     // Auto-append the (necessary) .git if it's missing.
-    if (!url.endsWith('.git')) url = url += '.git'
+    if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
     headers['user-agent'] = `git/${pkg.name}@${pkg.version}`
@@ -33,9 +33,9 @@ export class GitRemoteHTTP {
     }
     return GitRemoteConnection.receiveInfoRefs(service, res)
   }
-  static async connect ({ service, url, auth = {}, stream }) {
+  static async connect ({ service, url, noGitSuffix, auth, stream }) {
     // Auto-append the (necessary) .git if it's missing.
-    if (!url.endsWith('.git')) url = url += '.git'
+    if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`

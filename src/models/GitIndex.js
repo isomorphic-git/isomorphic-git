@@ -138,7 +138,10 @@ export class GitIndex {
       mtime: stats.mtime,
       dev: stats.dev % MAX_UINT32,
       ino: stats.ino % MAX_UINT32,
-      mode: stats.mode % MAX_UINT32,
+      // We provide a fallback value for `mode` here because not all fs
+      // implementations assign it, but we use it in GitTree.
+      // '100644' is for a "regular non-executable file"
+      mode: (stats.mode || 0o100644) % MAX_UINT32,
       uid: stats.uid % MAX_UINT32,
       gid: stats.gid % MAX_UINT32,
       size: stats.size % MAX_UINT32,
