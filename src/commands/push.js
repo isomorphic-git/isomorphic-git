@@ -32,6 +32,7 @@ export async function push ({
   ref,
   remote = 'origin',
   url,
+  noGitSuffix = false,
   authUsername,
   authPassword,
   username = authUsername,
@@ -58,6 +59,7 @@ export async function push ({
     let httpRemote = await GitRemoteHTTP.discover({
       service: 'git-receive-pack',
       url,
+      noGitSuffix,
       auth
     })
     let commits = await listCommits({
@@ -86,6 +88,7 @@ export async function push ({
     let { packfile, progress } = await GitRemoteHTTP.connect({
       service: 'git-receive-pack',
       url,
+      noGitSuffix,
       auth,
       stream: packstream
     })

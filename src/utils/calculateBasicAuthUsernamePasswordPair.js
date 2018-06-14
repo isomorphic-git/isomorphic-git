@@ -5,7 +5,7 @@ export function calculateBasicAuthUsernamePasswordPair ({
   password,
   token,
   oauth2format
-}) {
+} = {}) {
   // This checks for the presense and/or absense of each of the 4 parameters,
   // converts that to a 4-bit binary representation, and then handles
   // every possible combination (2^4 or 16 cases) with a lookup table.
