@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`fetch errors if missing refspec 1`] = `
-"Could not find a fetch refspec fot remote 'origin'.
+"Could not find a fetch refspec for remote 'origin'.
 Make sure the config file has an entry like the following:
 [remote \\"origin\\"]
 fetch = +refs/heads/*:refs/remotes/origin/*"
