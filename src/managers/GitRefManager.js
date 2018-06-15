@@ -37,7 +37,7 @@ export class GitRefManager {
       refspecs = await config.getall(`remote.${remote}.fetch`)
       if (refspecs.length === 0) {
         throw new Error(
-          `Could not find a fetch refspec fot remote '${remote}'.
+          `Could not find a fetch refspec for remote '${remote}'.
 Make sure the config file has an entry like the following:
 [remote "${remote}"]
 fetch = +refs/heads/*:refs/remotes/origin/*`
@@ -259,7 +259,6 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       gitdir,
       filepath: `refs/tags`
     })
-    tags = tags.filter(x => !x.endsWith('^{}'))
-    return tags
+    return tags.filter(x => !x.endsWith('^{}'))
   }
 }
