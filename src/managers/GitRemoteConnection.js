@@ -8,7 +8,7 @@ export class GitRemoteConnection {
   static async sendInfoRefs (service, res, { capabilities, refs, symrefs }) {
     // Compose capabilities string
     let syms = ''
-    for (const [key, value] of symrefs) {
+    for (const [key, value] of Object.entries(symrefs)) {
       syms += `symref=${key}:${value} `
     }
     let caps = `\0${[...capabilities].join(' ')} ${syms}agent=${pkg.agent}`
@@ -17,7 +17,7 @@ export class GitRemoteConnection {
     res.write(GitPktLine.flush())
     // Note: In the edge case of a brand new repo, zero refs (and zero capabilities)
     // are returned.
-    for (const [key, value] of refs) {
+    for (const [key, value] of Object.entries(refs)) {
       res.write(GitPktLine.encode(`${value} ${key}${caps}\n`))
       caps = ''
     }

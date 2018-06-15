@@ -19,13 +19,13 @@ describe('GitRefManager', () => {
   })
   it('listRefs', async () => {
     let { fs, gitdir } = await makeFixture('test-GitRefManager')
-    let refs = await GitRefManager.listRefs({
+    let refs = await GitRefManager.listRefsWithoutPrefix({
       fs,
       gitdir,
       filepath: 'refs/remotes/origin'
     })
     expect(refs).toMatchSnapshot()
-    refs = await GitRefManager.listRefs({
+    refs = await GitRefManager.listRefsWithoutPrefix({
       fs,
       gitdir,
       filepath: 'refs/tags'

@@ -20,44 +20,26 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
     var u = url.parse(req.url, true)
     if (req.method === 'GET' && u.pathname.endsWith('/info/refs')) {
       console.log('discover')
-      const filepath = u.pathname.replace(/\/info\/refs$/, '').replace(/^\//, '')
+      const filepath = u.pathname
+        .replace(/\/info\/refs$/, '')
+        .replace(/^\//, '')
       const gitdir = opts.bare ? `./${filepath}` : `./${filepath}/.git`
       console.log('gitdir =', gitdir)
       const service = u.query.service
-      const capabilities = [
-        'thin-pack',
-        'side-band',
-        'side-band-64k',
-        'shallow',
-        'deepen-since',
-        'deepen-not',
-        'allow-tip-sha1-in-want',
-        'allow-reachable-sha1-in-want'
-      ]
-      const refs = new Map()
-      let branches = await git.listBranches({ fs, gitdir })
-      let tags = await git.listTags({ fs, gitdir })
-      branches = branches.map(branch => `refs/heads/${branch}`)
-      tags = tags.map(tag => `refs/tags/${tag}`)
-      branches.unshift('HEAD') // HEAD must be the first in the list
-      for (const branch of branches) {
-        refs.set(branch, await git.resolveRef({ fs, gitdir, ref: branch }))
-      }
-      for (const tag of tags) {
-        refs.set(tag, await git.resolveRef({ fs, gitdir, ref: tag }))
-      }
-      const symrefs = new Map()
-      symrefs.set(
-        'HEAD',
-        await git.resolveRef({ fs, gitdir, ref: 'HEAD', depth: 2 })
-      )
-      console.log(service, { capabilities, refs, symrefs })
+      const {
+        capabilities,
+        refs,
+        symrefs
+      } = await git.createUploadPackAdvertisement({ fs, gitdir })
+      console.log({ service, capabilities, refs, symrefs })
       res.setHeader('content-type', `application/x-${service}-advertisement`)
-      return GitRemoteConnection.sendInfoRefs(service, res, {
+      const stream = await git.createUploadPackAdvertisementStream({
+        service,
         capabilities,
         refs,
         symrefs
       })
+      stream.pipe(res)
     }
     if (
       req.method === 'POST' &&

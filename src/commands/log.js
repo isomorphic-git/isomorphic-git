@@ -27,7 +27,7 @@ export async function log ({
     // async iterator that emits commits.
     let commits = []
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
-    let tips /*: Array */ = [await logCommit({ fs, gitdir, oid, signing })]
+    let tips /* : Array */ = [await logCommit({ fs, gitdir, oid, signing })]
 
     while (true) {
       let commit = tips.pop()

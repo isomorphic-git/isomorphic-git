@@ -3,7 +3,7 @@ import sortby from 'lodash.sortby'
 import shasum from 'shasum'
 
 const MAX_UINT32 = 2 ** 32
-/*::
+/* ::
 import type {Stats} from 'fs'
 
 type CacheEntryFlags = {
@@ -107,7 +107,7 @@ function parseBuffer (buffer) {
 }
 
 export class GitIndex {
-  /*::
+  /* ::
    _entries: Map<string, CacheEntry>
    _dirty: boolean // Used to determine if index needs to be saved to filesystem
    */

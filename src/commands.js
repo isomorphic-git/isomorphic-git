@@ -1,5 +1,11 @@
 export { add } from './commands/add'
 export { branch } from './commands/branch'
+export {
+  createUploadPackAdvertisement
+} from './commands/createUploadPackAdvertisement'
+export {
+  createUploadPackAdvertisementStream
+} from './commands/createUploadPackAdvertisementStream'
 export { checkout } from './commands/checkout'
 export { clone } from './commands/clone'
 export { commit } from './commands/commit'

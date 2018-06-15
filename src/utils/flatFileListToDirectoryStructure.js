@@ -1,6 +1,6 @@
 import path from 'path'
 
-/*::
+/* ::
 type Node = {
   type: string,
   fullpath: string,

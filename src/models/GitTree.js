@@ -1,4 +1,4 @@
-/*::
+/* ::
 type TreeEntry = {
   mode: string,
   path: string,
@@ -59,7 +59,7 @@ function nudgeIntoShape (entry) {
 }
 
 export class GitTree {
-  /*::
+  /* ::
   _entries: Array<TreeEntry>
   */
   constructor (entries) {
