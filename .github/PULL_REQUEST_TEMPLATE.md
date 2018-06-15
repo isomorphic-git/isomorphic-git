@@ -1,16 +1,11 @@
-Oh wow! Thanks for opening a pull request! :grin: :tada:
-
-You are very welcome here and any contribution is appreciated. :+1:
-
-# Instructions
-Choose one of the checklists if it applies to you and delete the rest.
-
+<!-- Oh wow! Thanks for opening a pull request! 😁 🎉 -->
+<!-- You are very welcome here and any contribution is appreciated. 👍 -->
+<!-- Choose one of the checklists if it applies to you and delete the rest. -->
 
 ## I'm fixing a bug or typo
 
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] make a fix commit "fix: [Description of fix]"
-
 
 ## I'm adding a parameter to an existing command:
 
@@ -20,7 +15,6 @@ Choose one of the checklists if it applies to you and delete the rest.
 - [ ] add a test case in `__tests__/test-X.js` if possible
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] make a feature commit "feat: Added 'bar' parameter to X command"
-
 
 ## I'm adding a new command:
 
