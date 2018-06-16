@@ -36,7 +36,7 @@ module.exports = {
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),
-      jest: runInNewWindow('cross-env DEBUG=isomorphic-git jest --watch'),
+      jest: runInNewWindow('cross-env DEBUG=* jest --watch'),
       karma: runInNewWindow('karma start')
     },
     contributors: {
@@ -71,8 +71,8 @@ module.exports = {
         ? `cross-env NODE_PATH=./dist/for-node ${timeout5('jasmine')}`
         : `cross-env NODE_PATH=./dist/for-node jasmine`,
       jest: process.env.CI
-        ? `cross-env BABEL_ENV=jest ${timeout5('jest --ci')}`
-        : `cross-env BABEL_ENV=jest jest --ci`,
+        ? `${timeout5('jest --ci')}`
+        : `jest --ci`,
       uploadcoverage: optional(timeout(1)('codecov')),
       karma: process.env.CI
         ? retry3('karma start --single-run')
