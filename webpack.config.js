@@ -1,5 +1,4 @@
 var path = require('path')
-// var nodeExternals = require('webpack-node-externals')
 
 module.exports = [
   {
@@ -24,31 +23,15 @@ module.exports = [
           use: {
             loader: 'babel-loader',
             options: {
-              forceEnv: 'browser'
+              babelrc: false,
+              plugins: [
+                'transform-object-rest-spread',
+                'transform-async-to-generator'
+              ]
             }
           }
         }
       ]
     }
-    // },
-    // {
-    //   target: 'node',
-    //   externals: [nodeExternals()],
-    //   entry: {
-    //     index: './src/index.js',
-    //     'internal-apis': './src/internal-apis.js'
-    //   },
-    //   output: {
-    //     path: path.resolve(__dirname, 'dist/for-node/isomorphic-git'),
-    //     filename: '[name].js',
-    //     libraryTarget: 'commonjs'
-    //   },
-    //   mode: 'development',
-    //   devtool: 'source-map',
-    //   resolve: {
-    //     alias: {
-    //       'stream-source': 'stream-source/index.node.js'
-    //     }
-    //   }
   }
 ]

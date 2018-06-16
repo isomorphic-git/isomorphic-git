@@ -1,19 +1,10 @@
 {
   "plugins": ["transform-object-rest-spread"],
-  "env": {
-    "browser": {
-      "plugins": [
-        "transform-async-to-generator"
-      ]
-    },
-    "jest": {
-      "presets": [
-        ["env", {
-          "targets": {
-            "node": "current"
-          }
-        }]
-      ]
-    }
-  }
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ]
 }
