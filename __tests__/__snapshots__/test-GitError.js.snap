@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GitError creates an Error 1`] = `
+Object {
+  "code": "FileReadError",
+  "data": Object {
+    "filepath": "foobar.txt",
+  },
+  "message": "Could not read file \\"foobar.txt\\"",
+}
+`;
