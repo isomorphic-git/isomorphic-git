@@ -5,11 +5,19 @@ import nick from 'nick'
 import { t } from '../utils'
 
 const messages = {
-  FileReadError: nick(t(`Could not read file "{ filepath }"`))
+  FileReadError: nick(t(`Could not read file "{ filepath }"`)),
+  MissingRequiredParameterError: nick(t(`The function "{ function }" requires a "{ parameter }" parameter but none was provided.`)),
+  InvalidRefNameError: nick(t(`Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`)),
+  RefExistsError: nick(t(`Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`)),
+  NoHeadCommitError: nick(t(`Failed to create { noun } "{ ref }" because the HEAD ref could not be resolved to a commit.`))
 }
 
 export const E = {
-  FileReadError: 'FileReadError'
+  FileReadError: 'FileReadError',
+  MissingRequiredParameterError: 'MissingRequiredParameterError',
+  InvalidRefNameError: 'InvalidRefNameError',
+  RefExistsError: 'RefExistsError',
+  NoHeadCommitError: 'NoHeadCommitError'
 }
 
 export class GitError extends Error {
@@ -25,6 +33,7 @@ export class GitError extends Error {
     return {
       code: this.code,
       data: this.data,
+      caller: this.caller,
       message: this.message
     }
   }

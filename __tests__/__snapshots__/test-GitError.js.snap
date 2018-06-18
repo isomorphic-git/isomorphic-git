@@ -2,6 +2,7 @@
 
 exports[`GitError creates an Error 1`] = `
 Object {
+  "caller": undefined,
   "code": "FileReadError",
   "data": Object {
     "filepath": "foobar.txt",
