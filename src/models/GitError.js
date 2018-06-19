@@ -23,7 +23,13 @@ const messages = translate({
   ObjectTypeAssertionInTreeFail: `Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`,
   MissingAuthorError: `Author name and email must be specified as an argument or in the .git/config file.`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
-  UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`
+  UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`,
+  InvalidDepthParameterError: `Invalid value for depth parameter: {depth}`,
+  RemoteDoesNotSupportShallowFail: `Remote does not support shallow fetches`,
+  RemoteDoesNotSupportDeepenSinceFail: `Remote does not support shallow fetches by date`,
+  RemoteDoesNotSupportDeepenNotFail: `Remote does not support shallow fetches excluding commits reachable by refs`,
+  RemoteDoesNotSupportDeepenRelativeFail: `Remote does not support shallow fetches relative to the current shallow depth`,
+  CorruptShallowOidFail: `non-40 character 'shallow' oid: { oid }`
 })
 
 export const E = {
@@ -37,7 +43,14 @@ export const E = {
   ObjectTypeAssertionInTreeFail: 'ObjectTypeAssertionInTreeFail',
   MissingAuthorError: 'MissingAuthorError',
   GitRootNotFoundError: 'GitRootNotFoundError',
-  UnparseableServerResponseFail: 'UnparseableServerResponseFail'
+  UnparseableServerResponseFail: 'UnparseableServerResponseFail',
+  InvalidDepthParameterError: 'InvalidDepthParameterError',
+  RemoteDoesNotSupportShallowFail: 'RemoteDoesNotSupportShallowFail',
+  RemoteDoesNotSupportDeepenSinceFail: 'RemoteDoesNotSupportDeepenSinceFail',
+  RemoteDoesNotSupportDeepenNotFail: 'RemoteDoesNotSupportDeepenNotFail',
+  RemoteDoesNotSupportDeepenRelativeFail:
+    'RemoteDoesNotSupportDeepenRelativeFail',
+  CorruptShallowOidFail: 'CorruptShallowOidFail'
 }
 
 export class GitError extends Error {
