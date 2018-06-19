@@ -31,6 +31,7 @@ describe('branch', () => {
     } catch (err) {
       error = err
     }
+    expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
 
@@ -44,6 +45,7 @@ describe('branch', () => {
     } catch (err) {
       error = err
     }
+    expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
 
@@ -58,6 +60,7 @@ describe('branch', () => {
     } catch (err) {
       error = err
     }
+    expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
 })

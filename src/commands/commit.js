@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, GitCommit, GitTree } from '../models'
+import { FileSystem, GitCommit, GitTree, GitError, E } from '../models'
 import { flatFileListToDirectoryStructure } from '../utils'
 
 import { config } from './config'
@@ -30,9 +30,7 @@ export async function commit ({
       author.email = await config({ fs, gitdir, path: 'user.email' })
     }
     if (author.name === undefined || author.email === undefined) {
-      throw new Error(
-        'Author name and email must be specified as an argument or in the .git/config file'
-      )
+      throw new GitError(E.MissingAuthorError)
     }
     committer = committer || author
     let authorDateTime = author.date || new Date()

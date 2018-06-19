@@ -1,8 +1,14 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const snapshots = require('./__snapshots__/test-commit.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { commit, sign, verify, log } = require('isomorphic-git')
 
 describe('commit', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('commit', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-commit')
@@ -25,7 +31,7 @@ describe('commit', () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-commit')
     // Test
-    let error = {}
+    let error = null
     try {
       await commit({
         fs,
@@ -40,12 +46,10 @@ describe('commit', () => {
     } catch (err) {
       error = err
     }
-    expect(error.message).toBe(
-      'Author name and email must be specified as an argument or in the .git/config file'
-    )
-    expect(error.caller).toEqual('git.commit')
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
     // reset for test 2
-    error = {}
+    error = null
     try {
       await commit({
         fs,
@@ -60,10 +64,8 @@ describe('commit', () => {
     } catch (err) {
       error = err
     }
-    expect(error.message).toBe(
-      'Author name and email must be specified as an argument or in the .git/config file'
-    )
-    expect(error.caller).toEqual('git.commit')
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
 
   it('GPG signing', async () => {
