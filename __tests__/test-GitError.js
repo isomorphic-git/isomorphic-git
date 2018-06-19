@@ -12,7 +12,7 @@ describe('GitError', () => {
   it('creates an Error', async () => {
     let e = null
     try {
-      throw new GitError(E.FileReadError, {filepath: 'foobar.txt'})
+      throw new GitError(E.FileReadError, { filepath: 'foobar.txt' })
     } catch (err) {
       e = err
     }
@@ -20,8 +20,8 @@ describe('GitError', () => {
     expect(e.code).toBe(E.FileReadError)
     expect(e instanceof Error).toBe(true)
     expect(e instanceof GitError).toBe(true)
-    expect((new Error()) instanceof Error).toBe(true)
-    expect((new Error()) instanceof GitError).toBe(false)
+    expect(new Error() instanceof Error).toBe(true)
+    expect(new Error() instanceof GitError).toBe(false)
     expect(e.toJSON()).toMatchSnapshot()
   })
 })

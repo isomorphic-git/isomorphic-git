@@ -2,7 +2,7 @@ import { clean } from 'clean-git-ref'
 import path from 'path'
 
 import { GitRefManager } from '../managers'
-import { FileSystem, GitError, E } from '../models'
+import { E, FileSystem, GitError } from '../models'
 
 /**
  * Create a branch
@@ -18,11 +18,19 @@ export async function branch ({
   try {
     const fs = new FileSystem(_fs)
     if (ref === undefined) {
-      throw new GitError(E.MissingRequiredParameterError, { function: 'branch', parameter: 'ref' })
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'branch',
+        parameter: 'ref'
+      })
     }
 
     if (ref !== clean(ref)) {
-      throw new GitError(E.InvalidRefNameError, { verb: 'create', noun: 'branch', ref, suggestion: clean(ref) })
+      throw new GitError(E.InvalidRefNameError, {
+        verb: 'create',
+        noun: 'branch',
+        ref,
+        suggestion: clean(ref)
+      })
     }
 
     const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)

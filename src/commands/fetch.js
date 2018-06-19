@@ -172,7 +172,9 @@ async function fetchPackfile ({
     map: remoteHTTP.refs
   })
   // Assemble packfile request
-  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta${relative ? ' deepen-relative' : ''}`
+  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta${
+    relative ? ' deepen-relative' : ''
+  }`
   let packstream = new PassThrough()
   // Start requesting oids from the remote by their SHAs
   let wants = singleBranch ? [oid] : remoteHTTP.refs.values()

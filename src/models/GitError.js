@@ -2,20 +2,28 @@
 // but with the goal of being much lighter weight.
 
 import nick from 'nick'
+
 import { t } from '../utils'
 
-const messages = {
-  FileReadError: nick(t(`Could not read file "{ filepath }".`)),
-  MissingRequiredParameterError: nick(t(`The function "{ function }" requires a "{ parameter }" parameter but none was provided.`)),
-  InvalidRefNameError: nick(t(`Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`)),
-  RefExistsError: nick(t(`Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`)),
-  NoHeadCommitError: nick(t(`Failed to create { noun } "{ ref }" because the HEAD ref could not be resolved to a commit.`)),
-  CommitNotFetchedError: nick(t(`Failed to checkout "{ ref }" because commit { oid } is not available locally. Do a git fetch to make the branch available locally.`)),
-  ObjectTypeAssertionFail: nick(t(`Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`)),
-  ObjectTypeAssertionInTreeFail: nick(t(`Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`)),
-  MissingAuthorError: nick(t(`Author name and email must be specified as an argument or in the .git/config file.`)),
-  GitRootNotFoundError: nick(t(`Unable to find git root for { filepath }.`))
+const translate = obj => {
+  for (const [key, value] of Object.entries(obj)) {
+    obj[key] = nick(t(value))
+  }
+  return obj
 }
+
+const messages = translate({
+  FileReadError: `Could not read file "{ filepath }".`,
+  MissingRequiredParameterError: `The function "{ function }" requires a "{ parameter }" parameter but none was provided.`,
+  InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
+  RefExistsError: `Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`,
+  NoHeadCommitError: `Failed to create { noun } "{ ref }" because the HEAD ref could not be resolved to a commit.`,
+  CommitNotFetchedError: `Failed to checkout "{ ref }" because commit { oid } is not available locally. Do a git fetch to make the branch available locally.`,
+  ObjectTypeAssertionFail: `Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`,
+  ObjectTypeAssertionInTreeFail: `Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`,
+  MissingAuthorError: `Author name and email must be specified as an argument or in the .git/config file.`,
+  GitRootNotFoundError: `Unable to find git root for { filepath }.`
+})
 
 export const E = {
   FileReadError: 'FileReadError',

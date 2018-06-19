@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager, GitObjectManager } from '../managers'
-import { FileSystem, GitError, E } from '../models'
+import { E, FileSystem, GitError } from '../models'
 
 /**
  * Add a file to the git index (aka staging area)

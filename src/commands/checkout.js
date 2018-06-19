@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, GitCommit, GitTree, GitError, E } from '../models'
+import { E, FileSystem, GitCommit, GitError, GitTree } from '../models'
 
 import { config } from './config'
 
@@ -20,7 +20,10 @@ export async function checkout ({
   try {
     const fs = new FileSystem(_fs)
     if (ref === undefined) {
-      throw new GitError(E.MissingRequiredParameterError, { function: 'checkout', parameter: 'ref' })
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'checkout',
+        parameter: 'ref'
+      })
     }
     // Get tree oid
     let oid
@@ -60,13 +63,23 @@ export async function checkout ({
       throw new GitError(E.CommitNotFetchedError, { ref, oid })
     }
     if (commit.type !== 'commit') {
-      throw new GitError(E.ObjectTypeAssertionFail, { type: commit.type, oid, expected: 'commit' })
+      throw new GitError(E.ObjectTypeAssertionFail, {
+        type: commit.type,
+        oid,
+        expected: 'commit'
+      })
     }
     let comm = GitCommit.from(commit.object.toString('utf8'))
     let sha = comm.headers().tree
     // Get top-level tree
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: sha })
-    if (type !== 'tree') throw new GitError(E.ObjectTypeAssertionFail, { type, oid: sha, expected: 'tree' })
+    if (type !== 'tree') {
+      throw new GitError(E.ObjectTypeAssertionFail, {
+        type,
+        oid: sha,
+        expected: 'tree'
+      })
+    }
     let tree = GitTree.from(object)
     // Acquire a lock on the index
     await GitIndexManager.acquire(
@@ -126,7 +139,11 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
         })
         break
       default:
-        throw new GitError(E.ObjectTypeAssertionInTreeFail, { type, oid: entry.oid, entrypath })
+        throw new GitError(E.ObjectTypeAssertionInTreeFail, {
+          type,
+          oid: entry.oid,
+          entrypath
+        })
     }
   }
 }

@@ -13,7 +13,5 @@ const locale = (() => {
 
 export const t = i18n({
   locale,
-  locales: [
-    'en-us'
-  ]
+  locales: ['en-us']
 })

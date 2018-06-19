@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, GitCommit, GitTree, GitError, E } from '../models'
+import { E, FileSystem, GitCommit, GitError, GitTree } from '../models'
 import { flatFileListToDirectoryStructure } from '../utils'
 
 import { config } from './config'
