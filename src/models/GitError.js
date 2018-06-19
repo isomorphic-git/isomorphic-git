@@ -22,7 +22,8 @@ const messages = translate({
   ObjectTypeAssertionFail: `Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`,
   ObjectTypeAssertionInTreeFail: `Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`,
   MissingAuthorError: `Author name and email must be specified as an argument or in the .git/config file.`,
-  GitRootNotFoundError: `Unable to find git root for { filepath }.`
+  GitRootNotFoundError: `Unable to find git root for { filepath }.`,
+  UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`
 })
 
 export const E = {
@@ -35,7 +36,8 @@ export const E = {
   ObjectTypeAssertionFail: 'ObjectTypeAssertionFail',
   ObjectTypeAssertionInTreeFail: 'ObjectTypeAssertionInTreeFail',
   MissingAuthorError: 'MissingAuthorError',
-  GitRootNotFoundError: 'GitRootNotFoundError'
+  GitRootNotFoundError: 'GitRootNotFoundError',
+  UnparseableServerResponseFail: 'UnparseableServerResponseFail'
 }
 
 export class GitError extends Error {

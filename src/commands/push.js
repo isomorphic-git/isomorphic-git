@@ -2,7 +2,7 @@ import path from 'path'
 import { PassThrough } from 'stream'
 
 import { GitRefManager, GitRemoteManager } from '../managers'
-import { FileSystem, GitPktLine } from '../models'
+import { E, FileSystem, GitError, GitPktLine } from '../models'
 import { log, pkg } from '../utils'
 
 import { config } from './config'
@@ -103,9 +103,7 @@ export async function push ({
     // We're expecting "unpack {unpack-result}"
     line = lines.shift()
     if (!line.startsWith('unpack ')) {
-      throw new Error(
-        `Unparsable response from server! Expected 'unpack ok' or 'unpack [error message]' but got '${line}'`
-      )
+      throw new GitError(E.UnparseableServerResponseFail, { line })
     }
     if (line === 'unpack ok') {
       result.ok = ['unpack']
