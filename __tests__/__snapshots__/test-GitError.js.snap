@@ -7,6 +7,6 @@ Object {
   "data": Object {
     "filepath": "foobar.txt",
   },
-  "message": "Could not read file \\"foobar.txt\\"",
+  "message": "Could not read file \\"foobar.txt\\".",
 }
 `;
