@@ -10,6 +10,6 @@ describe('exports', () => {
   })
   it('exposes only the intended API functions', async () => {
     let names = Object.keys(git)
-    expect(names).toMatchSnapshot()
+    expect(names.sort()).toMatchSnapshot()
   })
 })
