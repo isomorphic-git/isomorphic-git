@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { FileSystem } from '../models'
+import { FileSystem, GitError, E } from '../models'
 
 /**
  * Find the root git directory
@@ -22,7 +22,7 @@ async function _findRoot (fs, filepath) {
     return filepath
   } else {
     let parent = path.dirname(filepath)
-    if (parent === filepath) throw new Error('Unable to find git root')
+    if (parent === filepath) throw new GitError(E.GitRootNotFoundError, { filepath })
     return _findRoot(fs, parent)
   }
 }

@@ -5,7 +5,7 @@ Object {
   "caller": "git.commit",
   "code": "MissingAuthorError",
   "data": undefined,
-  "message": "Author name and email must be specified as an argument or in the .git/config file",
+  "message": "Author name and email must be specified as an argument or in the .git/config file.",
 }
 `;
 
@@ -14,6 +14,6 @@ Object {
   "caller": "git.commit",
   "code": "MissingAuthorError",
   "data": undefined,
-  "message": "Author name and email must be specified as an argument or in the .git/config file",
+  "message": "Author name and email must be specified as an argument or in the .git/config file.",
 }
 `;

@@ -13,7 +13,8 @@ const messages = {
   CommitNotFetchedError: nick(t(`Failed to checkout "{ ref }" because commit { oid } is not available locally. Do a git fetch to make the branch available locally.`)),
   ObjectTypeAssertionFail: nick(t(`Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`)),
   ObjectTypeAssertionInTreeFail: nick(t(`Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`)),
-  MissingAuthorError: nick(t(`Author name and email must be specified as an argument or in the .git/config file`))
+  MissingAuthorError: nick(t(`Author name and email must be specified as an argument or in the .git/config file.`)),
+  GitRootNotFoundError: nick(t(`Unable to find git root for { filepath }.`))
 }
 
 export const E = {
@@ -25,7 +26,8 @@ export const E = {
   CommitNotFetchedError: 'CommitNotFetchedError',
   ObjectTypeAssertionFail: 'ObjectTypeAssertionFail',
   ObjectTypeAssertionInTreeFail: 'ObjectTypeAssertionInTreeFail',
-  MissingAuthorError: 'MissingAuthorError'
+  MissingAuthorError: 'MissingAuthorError',
+  GitRootNotFoundError: 'GitRootNotFoundError'
 }
 
 export class GitError extends Error {
