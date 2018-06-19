@@ -24,12 +24,12 @@ const messages = translate({
   MissingAuthorError: `Author name and email must be specified as an argument or in the .git/config file.`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
   UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`,
-  InvalidDepthParameterError: `Invalid value for depth parameter: {depth}`,
+  InvalidDepthParameterError: `Invalid value for depth parameter: { depth }`,
   RemoteDoesNotSupportShallowFail: `Remote does not support shallow fetches`,
   RemoteDoesNotSupportDeepenSinceFail: `Remote does not support shallow fetches by date`,
   RemoteDoesNotSupportDeepenNotFail: `Remote does not support shallow fetches excluding commits reachable by refs`,
   RemoteDoesNotSupportDeepenRelativeFail: `Remote does not support shallow fetches relative to the current shallow depth`,
-  CorruptShallowOidFail: `non-40 character 'shallow' oid: { oid }`
+  CorruptShallowOidFail: `non-40 character shallow oid: { oid }`
 })
 
 export const E = {
