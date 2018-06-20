@@ -234,7 +234,7 @@ Qixh2bmPgr3h9nxq2Dmn
     "tree": "e0b8f3574060ee24e03e4af3896f65dd208a60cc",
   },
   Object {
-    "error": [Error: Failed to read git object with oid b4f8206d9e359416b0f34238cbeb400f7da889a8],
+    "error": [ReadObjectFail: Failed to read git object with oid b4f8206d9e359416b0f34238cbeb400f7da889a8],
     "oid": "b4f8206d9e359416b0f34238cbeb400f7da889a8",
   },
 ]

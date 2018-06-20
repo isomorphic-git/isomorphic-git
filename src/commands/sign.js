@@ -20,7 +20,7 @@ export async function sign ({
     const oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
     const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type !== 'commit') {
-      throw new GitError(E.ObjectTypeAssertionInHeadFail, { type })
+      throw new GitError(E.ObjectTypeAssertionInRefFail, { ref: 'HEAD', type })
     }
     let commit = SignedGitCommit.from(object)
     commit = await commit.sign(openpgp, privateKeys)

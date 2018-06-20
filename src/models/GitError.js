@@ -19,9 +19,10 @@ const messages = translate({
   RefExistsError: `Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`,
   NoHeadCommitError: `Failed to create { noun } "{ ref }" because the HEAD ref could not be resolved to a commit.`,
   CommitNotFetchedError: `Failed to checkout "{ ref }" because commit { oid } is not available locally. Do a git fetch to make the branch available locally.`,
+  ObjectTypeUnknownFail: `Object { oid } has unknown type "{ type }".`,
   ObjectTypeAssertionFail: `Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`,
   ObjectTypeAssertionInTreeFail: `Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`,
-  ObjectTypeAssertionInHeadFail: `HEAD is not pointing to a "commit" object but a "{ type }" object.`,
+  ObjectTypeAssertionInRefFail: `{ ref } is not pointing to a "commit" object but a "{ type }" object.`,
   ObjectTypeAssertionInPathFail: `Found a blob { oid } in the path "{ path }" where a tree was expected.`,
   MissingAuthorError: `Author name and email must be specified as an argument or in the .git/config file.`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
@@ -33,7 +34,14 @@ const messages = translate({
   RemoteDoesNotSupportDeepenRelativeFail: `Remote does not support shallow fetches relative to the current shallow depth.`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
-  MergeNotSupportedFail: `Non-fast-forward merges are not supported yet.`
+  MergeNotSupportedFail: `Non-fast-forward merges are not supported yet.`,
+  DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
+  ResolveTreeError: `Could not resolve { oid } to a tree.`,
+  DirectoryIsAFileError: `Unable to read "{ oid }:{ filepath }" because encountered a file where a directory was expected.`,
+  TreeOrBlobNotFoundError: `No file or directory found at "{ oid }:{ filepath }".`,
+  NotImplementedFail: `TODO: { thing } still needs to be implemented!`,
+  ReadObjectFail: `Failed to read git object with oid { oid }`,
+  ReadShallowObjectFail: `Failed to read git object with oid { oid } because it is a shallow commit`
 })
 
 export const E = {
@@ -43,9 +51,10 @@ export const E = {
   RefExistsError: `RefExistsError`,
   NoHeadCommitError: `NoHeadCommitError`,
   CommitNotFetchedError: `CommitNotFetchedError`,
+  ObjectTypeUnknownFail: `ObjectTypeUnknownFail`,
   ObjectTypeAssertionFail: `ObjectTypeAssertionFail`,
   ObjectTypeAssertionInTreeFail: `ObjectTypeAssertionInTreeFail`,
-  ObjectTypeAssertionInHeadFail: `ObjectTypeAssertionInHeadFail`,
+  ObjectTypeAssertionInRefFail: `ObjectTypeAssertionInRefFail`,
   ObjectTypeAssertionInPathFail: `ObjectTypeAssertionInPathFail`,
   MissingAuthorError: `MissingAuthorError`,
   GitRootNotFoundError: `GitRootNotFoundError`,
@@ -57,7 +66,14 @@ export const E = {
   RemoteDoesNotSupportDeepenRelativeFail: `RemoteDoesNotSupportDeepenRelativeFail`,
   CorruptShallowOidFail: `CorruptShallowOidFail`,
   FastForwardFail: `FastForwardFail`,
-  MergeNotSupportedFail: `MergeNotSupportedFail`
+  MergeNotSupportedFail: `MergeNotSupportedFail`,
+  DirectorySeparatorsError: `DirectorySeparatorsError`,
+  ResolveTreeError: `ResolveTreeError`,
+  DirectoryIsAFileError: `DirectoryIsAFileError`,
+  TreeOrBlobNotFoundError: `TreeOrBlobNotFoundError`,
+  NotImplementedFail: `NotImplementedFail`,
+  ReadObjectFail: `ReadObjectFail`,
+  ReadShallowObjectFail: `ReadShallowObjectFail`
 }
 
 export class GitError extends Error {
