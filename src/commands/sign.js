@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, SignedGitCommit } from '../models'
+import { E, FileSystem, GitError, SignedGitCommit } from '../models'
 
 /**
  * Create a signed commit
@@ -20,9 +20,7 @@ export async function sign ({
     const oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
     const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type !== 'commit') {
-      throw new Error(
-        `HEAD is not pointing to a 'commit' object but a '${type}' object`
-      )
+      throw new GitError(E.ObjectTypeAssertionInHeadFail, { type })
     }
     let commit = SignedGitCommit.from(object)
     commit = await commit.sign(openpgp, privateKeys)
