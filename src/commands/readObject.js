@@ -113,7 +113,9 @@ async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
           gitdir,
           oid: entry.oid
         })
-        if (type === 'blob') { throw new GitError(E.DirectoryIsAFileError, { oid, filepath }) }
+        if (type === 'blob') {
+          throw new GitError(E.DirectoryIsAFileError, { oid, filepath })
+        }
         if (type !== 'tree') {
           throw new GitError(E.ObjectTypeAssertionInTreeFail, {
             oid: entry.oid,

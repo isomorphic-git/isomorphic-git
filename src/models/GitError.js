@@ -41,7 +41,13 @@ const messages = translate({
   TreeOrBlobNotFoundError: `No file or directory found at "{ oid }:{ filepath }".`,
   NotImplementedFail: `TODO: { thing } still needs to be implemented!`,
   ReadObjectFail: `Failed to read git object with oid { oid }`,
-  ReadShallowObjectFail: `Failed to read git object with oid { oid } because it is a shallow commit`
+  ReadShallowObjectFail: `Failed to read git object with oid { oid } because it is a shallow commit`,
+  NotAnOidFail: `Expected a 40-char hex object id but saw "{ value }".`,
+  NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
+  ResolveRefError: `Could not resolve reference "{ ref }".`,
+  ExpandRefError: `Could not expand reference "{ ref }".`,
+  EmptyServerResponseFail: `Empty response from git server.`,
+  AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`
 })
 
 export const E = {
@@ -73,7 +79,13 @@ export const E = {
   TreeOrBlobNotFoundError: `TreeOrBlobNotFoundError`,
   NotImplementedFail: `NotImplementedFail`,
   ReadObjectFail: `ReadObjectFail`,
-  ReadShallowObjectFail: `ReadShallowObjectFail`
+  ReadShallowObjectFail: `ReadShallowObjectFail`,
+  NotAnOidFail: `NotAnOidFail`,
+  NoRefspecConfiguredError: `NoRefspecConfiguredError`,
+  ResolveRefError: `ResolveRefError`,
+  ExpandRefError: `ExpandRefError`,
+  EmptyServerResponseFail: `EmptyServerResponseFail`,
+  AssertServerResponseFail: `AssertServerResponseFail`
 }
 
 export class GitError extends Error {
