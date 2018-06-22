@@ -60,7 +60,7 @@
     "diff-lines": "^1.1.0",
     "git-apply-delta": "0.0.7",
     "git-list-pack": "0.0.10",
-    "ignore": "^3.3.7",
+    "ignore": "^4.0.0",
     "marky": "^1.2.0",
     "minimisted": "^2.0.0",
     "opencollective": "^1.0.3",
