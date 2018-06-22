@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, GitCommit, GitTree } from '../models'
+import { E, FileSystem, GitCommit, GitError, GitTree } from '../models'
 
 import { config } from './config'
 
@@ -20,7 +20,10 @@ export async function checkout ({
   try {
     const fs = new FileSystem(_fs)
     if (ref === undefined) {
-      throw new Error('Cannot checkout ref "undefined"')
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'checkout',
+        parameter: 'ref'
+      })
     }
     // Get tree oid
     let oid
@@ -57,18 +60,26 @@ export async function checkout ({
     try {
       commit = await GitObjectManager.read({ fs, gitdir, oid })
     } catch (err) {
-      throw new Error(
-        `Failed to checkout ref '${ref}' because commit ${oid} is not available locally. Do a git fetch to make the branch available locally.`
-      )
+      throw new GitError(E.CommitNotFetchedError, { ref, oid })
     }
     if (commit.type !== 'commit') {
-      throw new Error(`Unexpected type: ${commit.type}`)
+      throw new GitError(E.ObjectTypeAssertionFail, {
+        type: commit.type,
+        oid,
+        expected: 'commit'
+      })
     }
     let comm = GitCommit.from(commit.object.toString('utf8'))
     let sha = comm.headers().tree
     // Get top-level tree
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: sha })
-    if (type !== 'tree') throw new Error(`Unexpected type: ${type}`)
+    if (type !== 'tree') {
+      throw new GitError(E.ObjectTypeAssertionFail, {
+        type,
+        oid: sha,
+        expected: 'tree'
+      })
+    }
     let tree = GitTree.from(object)
     // Acquire a lock on the index
     await GitIndexManager.acquire(
@@ -128,9 +139,11 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
         })
         break
       default:
-        throw new Error(
-          `Unexpected object type ${type} found in tree for '${entrypath}'`
-        )
+        throw new GitError(E.ObjectTypeAssertionInTreeFail, {
+          type,
+          oid: entry.oid,
+          entrypath
+        })
     }
   }
 }

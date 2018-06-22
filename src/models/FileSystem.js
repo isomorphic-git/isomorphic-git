@@ -1,6 +1,7 @@
 import path from 'path'
 import pify from 'pify'
 
+import { E, GitError } from '../models/GitError'
 import { sleep } from '../utils'
 
 const delayedReleases = new Map()
@@ -130,9 +131,7 @@ export class FileSystem {
       return
     }
     if (triesLeft === 0) {
-      throw new Error(
-        `Unable to acquire lockfile '${filename}'. Exhausted tries.`
-      )
+      throw new GitError(E.AcquireLockFileFail, { filename })
     }
     try {
       await this._mkdir(`${filename}.lock`)
@@ -146,7 +145,7 @@ export class FileSystem {
 
   async unlock (filename, delayRelease = 50) {
     if (delayedReleases.has(filename)) {
-      throw new Error('Cannot double-release lockfile')
+      throw new GitError(E.DoubleReleaseLockFileFail, { filename })
     }
     // Basically, we lie and say it was deleted ASAP.
     // But really we wait a bit to see if you want to acquire it again.

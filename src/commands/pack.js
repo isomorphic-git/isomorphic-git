@@ -25,7 +25,6 @@ export async function pack ({
     let lastFour, multibyte, length
     // Object type is encoded in bits 654
     let type = types[stype]
-    if (type === undefined) throw new Error('Unrecognized type: ' + stype)
     // The length encoding get complicated.
     length = object.length
     // Whether the next byte is part of the variable-length encoded number

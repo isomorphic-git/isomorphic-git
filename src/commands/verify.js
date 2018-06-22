@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, SignedGitCommit } from '../models'
+import { E, FileSystem, GitError, SignedGitCommit } from '../models'
 
 /**
  * Verify a signed commit
@@ -21,9 +21,7 @@ export async function verify ({
     const oid = await GitRefManager.resolve({ fs, gitdir, ref })
     const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type !== 'commit') {
-      throw new Error(
-        `'ref' is not pointing to a 'commit' object but a '${type}' object`
-      )
+      throw new GitError(E.ObjectTypeAssertionInRefFail, { ref, type })
     }
     let commit = SignedGitCommit.from(object)
     let keys = await commit.listSigningKeys(openpgp)

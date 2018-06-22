@@ -6,7 +6,7 @@ import { PassThrough } from 'stream'
 import through2 from 'through2'
 
 import { GitRefManager, GitRemoteManager, GitShallowManager } from '../managers'
-import { FileSystem, GitPktLine } from '../models'
+import { E, FileSystem, GitError, GitPktLine } from '../models'
 
 import { config } from './config'
 
@@ -129,7 +129,7 @@ async function fetchPackfile ({
   const fs = new FileSystem(_fs)
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
-      throw new Error(`Invalid value for depth argument: ${depth}`)
+      throw new GitError(E.InvalidDepthParameterError, { depth })
     }
     depth = parseInt(depth)
   }
@@ -151,20 +151,16 @@ async function fetchPackfile ({
   })
   // Check server supports shallow cloning
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
-    throw new Error(`Remote does not support shallow fetches`)
+    throw new GitError(E.RemoteDoesNotSupportShallowFail)
   }
   if (since !== null && !remoteHTTP.capabilities.has('deepen-since')) {
-    throw new Error(`Remote does not support shallow fetches by date`)
+    throw new GitError(E.RemoteDoesNotSupportDeepenSinceFail)
   }
   if (exclude.length > 0 && !remoteHTTP.capabilities.has('deepen-not')) {
-    throw new Error(
-      `Remote does not support shallow fetches excluding commits reachable by refs`
-    )
+    throw new GitError(E.RemoteDoesNotSupportDeepenNotFail)
   }
   if (relative === true && !remoteHTTP.capabilities.has('deepen-relative')) {
-    throw new Error(
-      `Remote does not support shallow fetches relative to the current shallow depth`
-    )
+    throw new GitError(E.RemoteDoesNotSupportDeepenRelativeFail)
   }
   // Figure out the SHA for the requested ref
   let { oid, fullref } = GitRefManager.resolveAgainstMap({
@@ -172,7 +168,9 @@ async function fetchPackfile ({
     map: remoteHTTP.refs
   })
   // Assemble packfile request
-  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta${relative ? ' deepen-relative' : ''}`
+  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta${
+    relative ? ' deepen-relative' : ''
+  }`
   let packstream = new PassThrough()
   // Start requesting oids from the remote by their SHAs
   let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
@@ -231,14 +229,14 @@ async function fetchPackfile ({
       if (line.startsWith('shallow')) {
         let oid = line.slice(-41).trim()
         if (oid.length !== 40) {
-          throw new Error(`non-40 character 'shallow' oid: ${oid}`)
+          throw new GitError(E.CorruptShallowOidFail, { oid })
         }
         oids.add(oid)
         await GitShallowManager.write({ fs, gitdir, oids })
       } else if (line.startsWith('unshallow')) {
         let oid = line.slice(-41).trim()
         if (oid.length !== 40) {
-          throw new Error(`non-40 character 'shallow' oid: ${oid}`)
+          throw new GitError(E.CorruptShallowOidFail, { oid })
         }
         oids.delete(oid)
         await GitShallowManager.write({ fs, gitdir, oids })

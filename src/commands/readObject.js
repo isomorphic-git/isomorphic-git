@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitObjectManager } from '../managers'
-import { FileSystem, GitCommit, GitTree } from '../models'
+import { E, FileSystem, GitCommit, GitError, GitTree } from '../models'
 
 /**
  * Read a git object directly by its SHA1 object id
@@ -25,38 +25,23 @@ export async function readObject ({
       // auto-expands --filepath=/src/utils to --filepath=C:/Users/Will/AppData/Local/Programs/Git/src/utils
       // so I figured it would be wise to promote the behavior in the application layer not just the library layer.
       if (filepath.startsWith('/') || filepath.endsWith('/')) {
-        throw new Error(
-          `'filepath' parameter should not include leading or trailing directory separators because these can cause problems on some platforms`
-        )
+        throw new GitError(E.DirectorySeparatorsError)
       }
       const _oid = oid
-      let result
-      let tree
-      try {
-        result = await resolveTree({ fs, gitdir, oid })
-        tree = result.tree
-      } catch (err) {
-        throw new Error(`Could not resolve ${oid} to a tree.`)
-      }
-      try {
-        if (filepath === '') {
-          oid = result.oid
-        } else {
-          let pathArray = filepath.split('/')
-          oid = await resolveFile({ fs, gitdir, tree, pathArray })
-        }
-      } catch (err) {
-        if (err.message === 'Unexpected blob') {
-          throw new Error(
-            `Unable to read '${_oid}:${filepath}' because encountered a file where a directory was expected.`
-          )
-        } else if (err.message === 'No match path') {
-          throw new Error(
-            `No file or directory found at '${_oid}:${filepath}'.`
-          )
-        } else {
-          throw err
-        }
+      let result = await resolveTree({ fs, gitdir, oid })
+      let tree = result.tree
+      if (filepath === '') {
+        oid = result.oid
+      } else {
+        let pathArray = filepath.split('/')
+        oid = await resolveFile({
+          fs,
+          gitdir,
+          tree,
+          pathArray,
+          oid: _oid,
+          filepath
+        })
       }
     }
     // GitObjectManager does not know how to parse content, so we tweak that parameter before passing it.
@@ -87,11 +72,11 @@ export async function readObject ({
           }
           break
         case 'tag':
-          throw new Error(
-            'TODO: Parsing annotated tag objects still needs to be implemented!!'
-          )
+          throw new GitError(E.NotImplementedFail, {
+            thing: 'Parsing annotated tag objects'
+          })
         default:
-          throw new Error(`Unrecognized git object type: '${result.type}'`)
+          throw new GitError(E.ObjectTypeUnknownFail, { type: result.type })
       }
     }
     return result
@@ -111,12 +96,12 @@ async function resolveTree ({ fs, gitdir, oid }) {
     object = result.object
   }
   if (type !== 'tree') {
-    throw new Error(`Could not resolve ${oid} to a tree`)
+    throw new GitError(E.ResolveTreeError, { oid })
   }
   return { tree: GitTree.from(object), oid }
 }
 
-async function resolveFile ({ fs, gitdir, tree, pathArray }) {
+async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
   let name = pathArray.shift()
   for (let entry of tree) {
     if (entry.path === name) {
@@ -128,14 +113,20 @@ async function resolveFile ({ fs, gitdir, tree, pathArray }) {
           gitdir,
           oid: entry.oid
         })
-        if (type === 'blob') throw new Error(`Unexpected blob`)
+        if (type === 'blob') {
+          throw new GitError(E.DirectoryIsAFileError, { oid, filepath })
+        }
         if (type !== 'tree') {
-          throw new Error(`Could not resolve ${entry.oid} to a tree`)
+          throw new GitError(E.ObjectTypeAssertionInTreeFail, {
+            oid: entry.oid,
+            entrypath: filepath,
+            type
+          })
         }
         tree = GitTree.from(object)
-        return resolveFile({ fs, gitdir, tree, pathArray })
+        return resolveFile({ fs, gitdir, tree, pathArray, oid, filepath })
       }
     }
   }
-  throw new Error(`No match path`)
+  throw new GitError(E.TreeOrBlobNotFoundError, { oid, filepath })
 }
