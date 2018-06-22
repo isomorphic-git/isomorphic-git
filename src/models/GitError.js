@@ -50,7 +50,22 @@ const messages = translate({
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
   HTTPError: `HTTP Error: { statusCode } { statusMessage }`,
   RemoteUrlParseError: `Cannot parse remote URL: "{ url }"`,
-  UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`
+  UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`,
+  AcquireLockFileFail: `Unable to acquire lockfile "{ filename }". Exhausted tries.`,
+  DoubleReleaseLockFileFail: `Cannot double-release lockfile "{ filename }".`,
+  InternalFail: `An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: { message }`,
+  UnknownOauth2Format: `I do not know how { company } expects its Basic Auth headers to be formatted for OAuth2 usage. If you do, you can use the regular username and password parameters to set the basic auth header yourself.`,
+  MissingPasswordTokenError: `Missing password or token`,
+  MissingUsernameError: `Missing username`,
+  MixPasswordTokenError: `Cannot mix "password" with "token"`,
+  MixUsernamePasswordTokenError: `Cannot mix "username" and "password" with "token"`,
+  MissingTokenError: `Missing token`,
+  MixUsernameOauth2formatMissingTokenError: `Cannot mix "username" with "oauth2format". Missing token.`,
+  MixPasswordOauth2formatMissingTokenError: `Cannot mix "password" with "oauth2format". Missing token.`,
+  MixUsernamePasswordOauth2formatMissingTokenError: `Cannot mix "username" and "password" with "oauth2format". Missing token.`,
+  MixUsernameOauth2formatTokenError: `Cannot mix "username" with "oauth2format" and "token"`,
+  MixPasswordOauth2formatTokenError: `Cannot mix "password" with "oauth2format" and "token"`,
+  MixUsernamePasswordOauth2formatTokenError: `Cannot mix "username" and "password" with "oauth2format" and "token"`
 })
 
 export const E = {
@@ -91,7 +106,22 @@ export const E = {
   AssertServerResponseFail: `AssertServerResponseFail`,
   HTTPError: `HTTPError`,
   RemoteUrlParseError: `RemoteUrlParseError`,
-  UnknownTransportError: `UnknownTransportError`
+  UnknownTransportError: `UnknownTransportError`,
+  AcquireLockFileFail: `AcquireLockFileFail`,
+  DoubleReleaseLockFileFail: `DoubleReleaseLockFileFail`,
+  InternalFail: `InternalFail`,
+  UnknownOauth2Format: `UnknownOauth2Format`,
+  MissingPasswordTokenError: `MissingPasswordTokenError`,
+  MissingUsernameError: `MissingUsernameError`,
+  MixPasswordTokenError: `MixPasswordTokenError`,
+  MixUsernamePasswordTokenError: `MixUsernamePasswordTokenError`,
+  MissingTokenError: `MissingTokenError`,
+  MixUsernameOauth2formatMissingTokenError: `MixUsernameOauth2formatMissingTokenError`,
+  MixPasswordOauth2formatMissingTokenError: `MixPasswordOauth2formatMissingTokenError`,
+  MixUsernamePasswordOauth2formatMissingTokenError: `MixUsernamePasswordOauth2formatMissingTokenError`,
+  MixUsernameOauth2formatTokenError: `MixUsernameOauth2formatTokenError`,
+  MixPasswordOauth2formatTokenError: `MixPasswordOauth2formatTokenError`,
+  MixUsernamePasswordOauth2formatTokenError: `MixUsernamePasswordOauth2formatTokenError`
 }
 
 export class GitError extends Error {

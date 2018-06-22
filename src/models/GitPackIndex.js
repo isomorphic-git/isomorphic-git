@@ -7,6 +7,7 @@ import pako from 'pako'
 import shasum from 'shasum'
 import { PassThrough } from 'stream'
 
+import { E, GitError } from '../models/GitError'
 import { log } from '../utils'
 
 import { GitObject } from './GitObject'
@@ -64,22 +65,22 @@ export class GitPackIndex {
     }
     let version = reader.readUInt32BE()
     if (version !== 2) {
-      throw new Error(
-        `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
+      })
     }
     // Verify checksums
     let shaComputed = shasum(idx.slice(0, -20))
     let shaClaimed = idx.slice(-20).toString('hex')
     if (shaClaimed !== shaComputed) {
-      throw new Error(
-        `Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
+      })
     }
     if (idx.byteLength > 2048 * 1024 * 1024) {
-      throw new Error(
-        `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
+      })
     }
     let fanout = []
     for (let i = 0; i < 256; i++) {
@@ -365,7 +366,9 @@ export class GitPackIndex {
         this.externalReadDepth++
         return this.getExternalRefDelta(oid)
       } else {
-        throw new Error(`Could not read object ${oid} from packfile`)
+        throw new GitError(E.InternalFail, {
+          message: `Could not read object ${oid} from packfile`
+        })
       }
     }
     let start = this.offsets[oid]
@@ -383,9 +386,10 @@ export class GitPackIndex {
       0b1110000: 'ref_delta'
     }
     if (!this.pack) {
-      throw new Error(
-        'Tried to read from a GitPackIndex with no packfile loaded into memory'
-      )
+      throw new GitError(E.InternalFail, {
+        message:
+          'Tried to read from a GitPackIndex with no packfile loaded into memory'
+      })
     }
     let raw = this.pack.slice(start)
     let reader = new BufferCursor(raw)
@@ -394,7 +398,9 @@ export class GitPackIndex {
     let btype = byte & 0b1110000
     let type = types[btype]
     if (type === undefined) {
-      throw new Error('Unrecognized type: 0b' + btype.toString(2))
+      throw new GitError(E.InternalFail, {
+        message: 'Unrecognized type: 0b' + btype.toString(2)
+      })
     }
     // The length encoding get complicated.
     // Last four bits of length is encoded in bits 3210
@@ -423,11 +429,11 @@ export class GitPackIndex {
     object = Buffer.from(pako.inflate(buffer))
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
-      throw new Error(
-        `Packfile told us object would have length ${length} but it had length ${
+      throw new GitError(E.InternalFail, {
+        message: `Packfile told us object would have length ${length} but it had length ${
           object.byteLength
         }`
-      )
+      })
     }
     if (base) {
       object = Buffer.from(applyDelta(object, base))

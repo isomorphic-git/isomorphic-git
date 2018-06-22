@@ -1,3 +1,5 @@
+import { E, GitError } from '../models/GitError'
+
 // The amount of work that went into crafting these cases to handl
 // -0 (just so we don't lose that information when parsing and reconstructing)
 // but can also default to +0 was extraordinary.
@@ -78,7 +80,9 @@ export class GitCommit {
     } else if (typeof commit === 'object') {
       this._commit = GitCommit.render(commit)
     } else {
-      throw new Error('invalid type passed to GitCommit constructor')
+      throw new GitError(E.InternalFail, {
+        message: 'invalid type passed to GitCommit constructor'
+      })
     }
   }
 
@@ -162,7 +166,9 @@ export class GitCommit {
     }
     if (obj.parent) {
       if (obj.parent.length === undefined) {
-        throw new Error(`commit 'parent' property should be an array`)
+        throw new GitError(E.InternalFail, {
+          message: `commit 'parent' property should be an array`
+        })
       }
       for (let p of obj.parent) {
         headers += `parent ${p}\n`
