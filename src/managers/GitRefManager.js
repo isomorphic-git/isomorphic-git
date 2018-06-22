@@ -1,7 +1,7 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import path from 'path'
 
-import { FileSystem, GitRefSpecSet } from '../models'
+import { E, FileSystem, GitError, GitRefSpecSet } from '../models'
 
 import { GitConfigManager } from './GitConfigManager'
 
@@ -29,19 +29,14 @@ export class GitRefManager {
     // Validate input
     for (let value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
-        throw new Error(`Unexpected ref contents: '${value}'`)
+        throw new GitError(E.NotAnOidFail, { value })
       }
     }
     const config = await GitConfigManager.get({ fs, gitdir })
     if (!refspecs) {
       refspecs = await config.getall(`remote.${remote}.fetch`)
       if (refspecs.length === 0) {
-        throw new Error(
-          `Could not find a fetch refspec for remote '${remote}'.
-Make sure the config file has an entry like the following:
-[remote "${remote}"]
-fetch = +refs/heads/*:refs/remotes/origin/*`
-        )
+        throw new GitError(E.NoRefspecConfiguredError, { remote })
       }
       // There's some interesting behavior with HEAD that doesn't follow the refspec.
       refspecs.unshift(`+HEAD:refs/remotes/${remote}/HEAD`)
@@ -101,7 +96,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
     const fs = new FileSystem(_fs)
     // Validate input
     if (!value.match(/[0-9a-f]{40}/)) {
-      throw new Error(`Unexpected ref contents: '${value}'`)
+      throw new GitError(E.NotAnOidFail, { value })
     }
     const normalizeValue = value => value.trim() + '\n'
     await fs.write(path.join(gitdir, ref), normalizeValue(value), 'utf8')
@@ -137,7 +132,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       }
     }
     // Do we give up?
-    throw new Error(`Could not resolve reference ${ref}`)
+    throw new GitError(E.ResolveRefError, { ref })
   }
   static async expand ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
@@ -154,7 +149,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
-    throw new Error(`Could not expand ref ${ref}`)
+    throw new GitError(E.ExpandRefError, { ref })
   }
   static resolveAgainstMap ({ ref, fullref = ref, depth, map }) {
     if (depth !== undefined) {
@@ -186,7 +181,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       }
     }
     // Do we give up?
-    throw new Error(`Could not resolve reference ${ref}`)
+    throw new GitError(E.ResolveRefError, { ref })
   }
   static async packedRefs ({ fs: _fs, gitdir }) {
     const refs = new Map()

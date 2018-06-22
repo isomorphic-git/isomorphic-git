@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, GitCommit } from '../models'
+import { E, FileSystem, GitCommit, GitError } from '../models'
 
 export async function listCommits ({
   dir,
@@ -31,7 +31,11 @@ export async function listCommits ({
     visited.add(oid)
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type !== 'commit') {
-      throw new Error(`Expected type commit but type is ${type}`)
+      throw new GitError(E.ObjectTypeAssertionFail, {
+        oid,
+        type,
+        expected: 'commit'
+      })
     }
     let commit = GitCommit.from(object)
     let parents = commit.headers().parent

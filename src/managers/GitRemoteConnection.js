@@ -2,7 +2,7 @@ import pify from 'pify'
 import concat from 'simple-concat'
 import { PassThrough } from 'stream'
 
-import { GitPktLine } from '../models'
+import { E, GitError, GitPktLine } from '../models'
 
 export class GitRemoteConnection {
   static async discover (service, res) {
@@ -17,13 +17,12 @@ export class GitRemoteConnection {
     let lineOne = await read()
     // skip past any flushes
     while (lineOne === null) lineOne = await read()
-    if (lineOne === true) throw new Error('Bad response from git server.')
+    if (lineOne === true) throw new GitError(E.EmptyServerResponseFail)
     if (lineOne.toString('utf8') !== `# service=${service}\n`) {
-      throw new Error(
-        `Expected '# service=${service}\\n' but got '${lineOne.toString(
-          'utf8'
-        )}'`
-      )
+      throw new GitError(E.AssertServerResponseFail, {
+        expected: `# service=${service}\\n`,
+        actual: lineOne.toString('utf8')
+      })
     }
     let lineTwo = await read()
     // skip past any flushes

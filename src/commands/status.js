@@ -6,7 +6,7 @@ import {
   GitObjectManager,
   GitRefManager
 } from '../managers'
-import { FileSystem, GitCommit, GitTree } from '../models'
+import { E, FileSystem, GitCommit, GitError, GitTree } from '../models'
 
 /**
  * Tell whether a file has been changed
@@ -154,7 +154,10 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
         return getOidAtPath({ fs, gitdir, tree, path })
       }
       if (type === 'blob') {
-        throw new Error(`Blob found where tree expected.`)
+        throw new GitError(E.ObjectTypeAssertionInPathFail, {
+          oid: entry.oid,
+          path: path.join('/')
+        })
       }
     }
   }

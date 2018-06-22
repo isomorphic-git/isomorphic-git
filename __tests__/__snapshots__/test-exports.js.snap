@@ -2,7 +2,7 @@
 
 exports[`exports exposes only the intended API functions 1`] = `
 Array [
-  "utils",
+  "E",
   "add",
   "branch",
   "checkout",
@@ -27,6 +27,7 @@ Array [
   "resolveRef",
   "sign",
   "status",
+  "utils",
   "verify",
   "version",
 ]

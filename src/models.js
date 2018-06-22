@@ -1,6 +1,7 @@
 export * from './models/FileSystem'
 export * from './models/GitCommit'
 export * from './models/GitConfig'
+export * from './models/GitError'
 export * from './models/GitIndex'
 export * from './models/GitObject'
 export * from './models/GitPackIndex'
