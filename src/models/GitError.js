@@ -47,7 +47,10 @@ const messages = translate({
   ResolveRefError: `Could not resolve reference "{ ref }".`,
   ExpandRefError: `Could not expand reference "{ ref }".`,
   EmptyServerResponseFail: `Empty response from git server.`,
-  AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`
+  AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
+  HTTPError: `HTTP Error: { statusCode } { statusMessage }`,
+  RemoteUrlParseError: `Cannot parse remote URL: "{ url }"`,
+  UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`
 })
 
 export const E = {
@@ -85,7 +88,10 @@ export const E = {
   ResolveRefError: `ResolveRefError`,
   ExpandRefError: `ExpandRefError`,
   EmptyServerResponseFail: `EmptyServerResponseFail`,
-  AssertServerResponseFail: `AssertServerResponseFail`
+  AssertServerResponseFail: `AssertServerResponseFail`,
+  HTTPError: `HTTPError`,
+  RemoteUrlParseError: `RemoteUrlParseError`,
+  UnknownTransportError: `UnknownTransportError`
 }
 
 export class GitError extends Error {

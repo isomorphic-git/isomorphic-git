@@ -1,6 +1,7 @@
 import pify from 'pify'
 import simpleGet from 'simple-get'
 
+import { E, GitError } from '../models'
 import {
   calculateBasicAuthHeader,
   calculateBasicAuthUsernamePasswordPair,
@@ -29,7 +30,10 @@ export class GitRemoteHTTP {
       headers
     })
     if (res.statusCode !== 200) {
-      throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
+      throw new GitError(E.HTTPError, {
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage
+      })
     }
     return GitRemoteConnection.discover(service, res)
   }
@@ -51,7 +55,10 @@ export class GitRemoteHTTP {
       headers
     })
     if (res.statusCode !== 200) {
-      throw new Error(`HTTP Error: ${res.statusCode} ${res.statusMessage}`)
+      throw new GitError(E.HTTPError, {
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage
+      })
     }
     return GitRemoteConnection.stream({ res })
   }

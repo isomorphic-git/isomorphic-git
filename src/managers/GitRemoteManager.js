@@ -1,6 +1,8 @@
-// For now, to remain API compatible, we'll pre-register the GitRemoteHTTP helper
+import { E, GitError } from '../models'
+
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
+// For now, to remain API compatible, we'll pre-register the GitRemoteHTTP helper
 export const remoteHelpers = new Map()
 remoteHelpers.set('http', GitRemoteHTTP)
 remoteHelpers.set('https', GitRemoteHTTP)
@@ -39,15 +41,14 @@ export class GitRemoteManager {
   static getRemoteHelperFor ({ url }) {
     let parts = parseRemoteUrl({ url })
     if (!parts) {
-      throw new Error(`Cannot determine protocol of remote URL: "${url}"`)
+      throw new GitError(E.RemoteUrlParseError, { url })
     }
     if (remoteHelpers.has(parts.transport)) {
       return remoteHelpers.get(parts.transport)
     }
-    throw new Error(
-      `Git remote "${url}" uses an unrecognized transport protocol: "${
-        parts.transport
-      }"`
-    )
+    throw new GitError(E.UnknownTransportError, {
+      url,
+      transport: parts.transport
+    })
   }
 }
