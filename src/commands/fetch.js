@@ -127,12 +127,14 @@ async function fetchPackfile ({
   singleBranch = false
 }) {
   const fs = new FileSystem(_fs)
+  // Sanity checks
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
       throw new GitError(E.InvalidDepthParameterError, { depth })
     }
     depth = parseInt(depth)
   }
+  // Set missing values
   remote = remote || 'origin'
   if (url === undefined) {
     url = await config({
@@ -149,7 +151,7 @@ async function fetchPackfile ({
     noGitSuffix,
     auth
   })
-  // Check server supports shallow cloning
+  // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
     throw new GitError(E.RemoteDoesNotSupportShallowFail)
   }
@@ -167,7 +169,7 @@ async function fetchPackfile ({
     ref,
     map: remoteHTTP.refs
   })
-  // Assemble packfile request
+  // Assemble the application/x-git-upload-pack-request
   const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta${
     relative ? ' deepen-relative' : ''
   }`
