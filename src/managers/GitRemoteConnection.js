@@ -1,19 +1,16 @@
-import pify from 'pify'
-import concat from 'simple-concat'
 import { PassThrough } from 'stream'
 
 import { E, GitError, GitPktLine } from '../models'
 
 export class GitRemoteConnection {
-  static async discover (service, res) {
+  static async receiveInfoRefs (service, res) {
     const capabilities = new Set()
     const refs = new Map()
     const symrefs = new Map()
 
-    let data = await pify(concat)(res)
     // There is probably a better way to do this, but for now
     // let's just throw the result parser inline here.
-    let read = GitPktLine.reader(data)
+    let read = GitPktLine.streamReader(res)
     let lineOne = await read()
     // skip past any flushes
     while (lineOne === null) lineOne = await read()
