@@ -9,7 +9,7 @@ import {
   GitRemoteManager,
   GitShallowManager
 } from '../managers'
-import { FileSystem } from '../models'
+import { E, FileSystem, GitError, GitPktLine } from '../models'
 
 import { config } from './config'
 
@@ -133,7 +133,7 @@ async function fetchPackfile ({
   // Sanity checks
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
-      throw new Error(`Invalid value for depth argument: ${depth}`)
+      throw new GitError(E.InvalidDepthParameterError, { depth })
     }
     depth = parseInt(depth)
   }
@@ -156,20 +156,16 @@ async function fetchPackfile ({
   })
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
-    throw new Error(`Remote does not support shallow fetches`)
+    throw new GitError(E.RemoteDoesNotSupportShallowFail)
   }
   if (since !== null && !remoteHTTP.capabilities.has('deepen-since')) {
-    throw new Error(`Remote does not support shallow fetches by date`)
+    throw new GitError(E.RemoteDoesNotSupportDeepenSinceFail)
   }
   if (exclude.length > 0 && !remoteHTTP.capabilities.has('deepen-not')) {
-    throw new Error(
-      `Remote does not support shallow fetches excluding commits reachable by refs`
-    )
+    throw new GitError(E.RemoteDoesNotSupportDeepenNotFail)
   }
   if (relative === true && !remoteHTTP.capabilities.has('deepen-relative')) {
-    throw new Error(
-      `Remote does not support shallow fetches relative to the current shallow depth`
-    )
+    throw new GitError(E.RemoteDoesNotSupportDeepenRelativeFail)
   }
   // Figure out the SHA for the requested ref
   let { oid, fullref } = GitRefManager.resolveAgainstMap({

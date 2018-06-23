@@ -74,8 +74,9 @@ describe('GitRemoteHTTP', () => {
         url: 'https://github.com/isomorphic-git/not-there'
       })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toBe('HTTP Error: 401 Authorization Required')
+    expect(error).not.toBeNull()
+    expect(error.message).toBe('HTTP Error: 401 Authorization Required')
   })
 })

@@ -1,6 +1,8 @@
 import BufferCursor from 'buffercursor'
-import sortby from 'lodash.sortby'
 import shasum from 'shasum'
+
+import { E, GitError } from '../models/GitError'
+import { comparePath } from '../utils/comparePath'
 
 const MAX_UINT32 = 2 ** 32
 /* ::
@@ -54,18 +56,24 @@ function parseBuffer (buffer) {
   let shaComputed = shasum(buffer.slice(0, -20))
   let shaClaimed = buffer.slice(-20).toString('hex')
   if (shaClaimed !== shaComputed) {
-    throw new Error(
-      `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
-    )
+    throw new GitError(E.InternalFail, {
+      message: `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
+    })
   }
   let reader = new BufferCursor(buffer)
   let _entries = new Map()
   let magic = reader.toString('utf8', 4)
   if (magic !== 'DIRC') {
-    throw new Error(`Inavlid dircache magic file number: ${magic}`)
+    throw new GitError(E.InternalFail, {
+      message: `Inavlid dircache magic file number: ${magic}`
+    })
   }
   let version = reader.readUInt32BE()
-  if (version !== 2) throw new Error(`Unsupported dircache version: ${version}`)
+  if (version !== 2) {
+    throw new GitError(E.InternalFail, {
+      message: `Unsupported dircache version: ${version}`
+    })
+  }
   let numEntries = reader.readUInt32BE()
   let i = 0
   while (!reader.eof() && i < numEntries) {
@@ -89,12 +97,18 @@ function parseBuffer (buffer) {
     entry.flags = parseCacheEntryFlags(flags)
     // TODO: handle if (version === 3 && entry.flags.extended)
     let pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
-    if (pathlength < 1) throw new Error(`Got a path length of: ${pathlength}`)
+    if (pathlength < 1) {
+      throw new GitError(E.InternalFail, {
+        message: `Got a path length of: ${pathlength}`
+      })
+    }
     entry.path = reader.toString('utf8', pathlength)
     // The next bit is awkward. We expect 1 to 8 null characters
     let tmp = reader.readUInt8()
     if (tmp !== 0) {
-      throw new Error(`Expected 1-8 null characters but got '${tmp}'`)
+      throw new GitError(E.InternalFail, {
+        message: `Expected 1-8 null characters but got '${tmp}'`
+      })
     }
     let numnull = 1
     while (!reader.eof() && reader.readUInt8() === 0 && numnull < 9) numnull++
@@ -118,14 +132,16 @@ export class GitIndex {
     } else if (index === null) {
       this._entries = new Map()
     } else {
-      throw new Error('invalid type passed to GitIndex constructor')
+      throw new GitError(E.InternalFail, {
+        message: 'invalid type passed to GitIndex constructor'
+      })
     }
   }
   static from (buffer) {
     return new GitIndex(buffer)
   }
   get entries () {
-    return sortby([...this._entries.values()], 'path')
+    return [...this._entries.values()].sort(comparePath)
   }
   * [Symbol.iterator] () {
     for (let entry of this.entries) {

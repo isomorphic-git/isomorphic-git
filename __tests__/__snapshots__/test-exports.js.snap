@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`exports exposes only the intended API functions 1`] = `
+Array [
+  "E",
+  "add",
+  "branch",
+  "checkout",
+  "clone",
+  "commit",
+  "config",
+  "currentBranch",
+  "fetch",
+  "findRoot",
+  "getRemoteInfo",
+  "indexPack",
+  "init",
+  "listBranches",
+  "listFiles",
+  "listTags",
+  "log",
+  "merge",
+  "pull",
+  "push",
+  "readObject",
+  "remove",
+  "resolveRef",
+  "sign",
+  "status",
+  "utils",
+  "verify",
+  "version",
+]
+`;

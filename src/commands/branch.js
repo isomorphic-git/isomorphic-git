@@ -2,7 +2,7 @@ import { clean } from 'clean-git-ref'
 import path from 'path'
 
 import { GitRefManager } from '../managers'
-import { FileSystem } from '../models'
+import { E, FileSystem, GitError } from '../models'
 
 /**
  * Create a branch
@@ -18,31 +18,31 @@ export async function branch ({
   try {
     const fs = new FileSystem(_fs)
     if (ref === undefined) {
-      throw new Error('Cannot create branch "undefined"')
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'branch',
+        parameter: 'ref'
+      })
     }
 
     if (ref !== clean(ref)) {
-      throw new Error(
-        `Failed to create branch '${ref}' because that name would not be a valid git reference. A valid alternative would be '${clean(
-          ref
-        )}'.`
-      )
+      throw new GitError(E.InvalidRefNameError, {
+        verb: 'create',
+        noun: 'branch',
+        ref,
+        suggestion: clean(ref)
+      })
     }
 
     const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)
     if (exist) {
-      throw new Error(
-        `Failed to create branch '${ref}' because branch '${ref}' already exists.`
-      )
+      throw new GitError(E.RefExistsError, { noun: 'branch', ref })
     }
     // Get tree oid
     let oid
     try {
       oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
     } catch (e) {
-      throw new Error(
-        `Failed to create branch '${ref}' because there are no commits in this project.`
-      )
+      throw new GitError(E.NoHeadCommitError, { noun: 'branch', ref })
     }
     // Create a new branch that points at that same commit
     await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')

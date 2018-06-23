@@ -46,7 +46,8 @@ describe('checkout', () => {
     } catch (err) {
       error = err
     }
-    expect(error.message).toMatchSnapshot()
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
     expect(error.caller).toEqual('git.checkout')
   })
 })

@@ -31,10 +31,8 @@ describe('branch', () => {
     } catch (err) {
       error = err
     }
-    expect(error.message).toEqual(
-      `Failed to create branch 'inv@{id..branch.lock' because that name would not be a valid git reference. A valid alternative would be 'inv-id.branch'.`
-    )
-    expect(error.caller).toEqual('git.branch')
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
 
   it('missing ref argument', async () => {
@@ -47,8 +45,8 @@ describe('branch', () => {
     } catch (err) {
       error = err
     }
-    expect(error.message).toEqual('Cannot create branch "undefined"')
-    expect(error.caller).toEqual('git.branch')
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
 
   it('empty repo', async () => {
@@ -62,9 +60,7 @@ describe('branch', () => {
     } catch (err) {
       error = err
     }
-    expect(error.message).toEqual(
-      `Failed to create branch 'test-branch' because there are no commits in this project.`
-    )
-    expect(error.caller).toEqual('git.branch')
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
 })

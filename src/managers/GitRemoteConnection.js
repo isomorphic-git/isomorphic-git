@@ -1,7 +1,7 @@
 import { PassThrough } from 'stream'
 import through2 from 'through2'
 
-import { GitPktLine, GitSideBand } from '../models'
+import { E, GitError, GitPktLine, GitSideBand } from '../models'
 import { pkg } from '../utils'
 
 export class GitRemoteConnection {
@@ -33,13 +33,12 @@ export class GitRemoteConnection {
     let lineOne = await read()
     // skip past any flushes
     while (lineOne === null) lineOne = await read()
-    if (lineOne === true) throw new Error('Bad response from git server.')
+    if (lineOne === true) throw new GitError(E.EmptyServerResponseFail)
     if (lineOne.toString('utf8') !== `# service=${service}\n`) {
-      throw new Error(
-        `Expected '# service=${service}\\n' but got '${lineOne.toString(
-          'utf8'
-        )}'`
-      )
+      throw new GitError(E.AssertServerResponseFail, {
+        expected: `# service=${service}\\n`,
+        actual: lineOne.toString('utf8')
+      })
     }
     let lineTwo = await read()
     // skip past any flushes

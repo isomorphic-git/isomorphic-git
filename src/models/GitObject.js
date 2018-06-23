@@ -1,5 +1,7 @@
 import shasum from 'shasum'
 
+import { E, GitError } from '../models/GitError'
+
 export class GitObject {
   static hash ({ type, object }) {
     let buffer = Buffer.concat([
@@ -24,7 +26,9 @@ export class GitObject {
     if (oid) {
       let sha = shasum(buffer)
       if (sha !== oid) {
-        throw new Error(`SHA check failed! Expected ${oid}, computed ${sha}`)
+        throw new GitError(E.InternalFail, {
+          message: `SHA check failed! Expected ${oid}, computed ${sha}`
+        })
       }
     }
     let s = buffer.indexOf(32) // first space
@@ -34,9 +38,9 @@ export class GitObject {
     let actualLength = buffer.length - (i + 1)
     // verify length
     if (parseInt(length) !== actualLength) {
-      throw new Error(
-        `Length mismatch: expected ${length} bytes but got ${actualLength} instead.`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `Length mismatch: expected ${length} bytes but got ${actualLength} instead.`
+      })
     }
     return {
       type,

@@ -2,7 +2,7 @@ import pako from 'pako'
 import path from 'path'
 import shasum from 'shasum'
 
-import { FileSystem, GitObject, GitPackIndex } from '../models'
+import { E, FileSystem, GitError, GitObject, GitPackIndex } from '../models'
 
 const PackfileCache = new Map()
 
@@ -60,14 +60,12 @@ export class GitObjectManager {
     if (!file) {
       let text = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
       if (text !== null && text.includes(oid)) {
-        throw new Error(
-          `Failed to read git object with oid ${oid} because it is a shallow commit`
-        )
+        throw new GitError(E.ReadShallowObjectFail, { oid })
       }
     }
     // Finally
     if (!file) {
-      throw new Error(`Failed to read git object with oid ${oid}`)
+      throw new GitError(E.ReadObjectFail, { oid })
     }
     if (format === 'deflated') {
       return { format: 'deflated', object: file, source }

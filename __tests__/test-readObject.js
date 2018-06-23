@@ -23,7 +23,8 @@ describe('readObject', () => {
     } catch (err) {
       error = err
     }
-    expect(error).toMatchSnapshot()
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
   it('test shallow', async () => {
     // Setup
@@ -39,7 +40,8 @@ describe('readObject', () => {
     } catch (err) {
       error = err
     }
-    expect(error).toMatchSnapshot()
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
   it('parsed', async () => {
     // Setup
@@ -209,5 +211,81 @@ describe('readObject', () => {
     expect(ref.type).toEqual('tree')
     expect(ref.oid).toEqual('7704a6e8a802efcdbe6cf3dfa114c105f1d5c67a')
     expect(ref.object).toMatchSnapshot()
+  })
+  it('with erroneous filepath (directory is a file)', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-readObject')
+    // Test
+    let error = null
+    try {
+      await readObject({
+        fs,
+        gitdir,
+        oid: 'be1e63da44b26de8877a184359abace1cddcb739',
+        format: 'parsed',
+        filepath: 'src/commands/clone.js/isntafolder.txt'
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
+  })
+  it('with erroneous filepath (no such directory)', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-readObject')
+    // Test
+    let error = null
+    try {
+      await readObject({
+        fs,
+        gitdir,
+        oid: 'be1e63da44b26de8877a184359abace1cddcb739',
+        format: 'parsed',
+        filepath: 'src/isntafolder'
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
+  })
+  it('with erroneous filepath (leading slash)', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-readObject')
+    // Test
+    let error = null
+    try {
+      await readObject({
+        fs,
+        gitdir,
+        oid: 'be1e63da44b26de8877a184359abace1cddcb739',
+        format: 'parsed',
+        filepath: '/src'
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
+  })
+  it('with erroneous filepath (trailing slash)', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-readObject')
+    // Test
+    let error = null
+    try {
+      await readObject({
+        fs,
+        gitdir,
+        oid: 'be1e63da44b26de8877a184359abace1cddcb739',
+        format: 'parsed',
+        filepath: 'src/'
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
 })

@@ -2,7 +2,7 @@
 import path from 'path'
 
 import { GitRefManager } from '../managers'
-import { FileSystem } from '../models'
+import { E, FileSystem, GitError } from '../models'
 
 import { log } from './log'
 
@@ -51,9 +51,9 @@ export async function merge ({
     } else {
       // not a simple fast-forward
       if (fastForwardOnly) {
-        throw new Error('A simple fast-forward merge was not possible.')
+        throw new GitError(E.FastForwardFail)
       }
-      throw new Error('Non-fast-forward merges are not supported yet.')
+      throw new GitError(E.MergeNotSupportedFail)
     }
   } catch (err) {
     err.caller = 'git.merge'
@@ -89,5 +89,5 @@ async function findMergeBase ({ gitdir, fs, refs }) {
   }
   if (candidate) return candidate.oid
   // Is...
-  throw new Error('Non-trivial merge not implemented at this time')
+  throw new GitError(E.MergeNotSupportedFail)
 }

@@ -1,3 +1,5 @@
+import { E, GitError } from '../models/GitError'
+
 export class GitRefSpec {
   constructor ({ remotePath, localPath, force, matchPrefix }) {
     Object.assign(this, {
@@ -20,7 +22,7 @@ export class GitRefSpec {
     const localIsGlob = localGlobMatch === '*'
     // validate
     // TODO: Make this check more nuanced, and depend on whether this is a fetch refspec or a push refspec
-    if (remoteIsGlob !== localIsGlob) throw new Error('Invalid refspec')
+    if (remoteIsGlob !== localIsGlob) { throw new GitError(E.InternalFail, { message: 'Invalid refspec' }) }
     return new GitRefSpec({
       remotePath,
       localPath,
