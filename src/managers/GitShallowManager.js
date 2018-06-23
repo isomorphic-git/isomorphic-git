@@ -12,7 +12,6 @@ export class GitShallowManager {
     let oids = new Set()
     await lock.acquire(filepath, async function () {
       let text = await fs.read(filepath, { encoding: 'utf8' })
-      console.log('text', text)
       if (text === null) return oids // no file
       if (text.trim() === '') return oids // empty file
       text
@@ -26,7 +25,6 @@ export class GitShallowManager {
     const fs = new FileSystem(_fs)
     const filepath = path.join(gitdir, 'shallow')
     if (oids.size > 0) {
-      console.log(oids)
       let text = [...oids].join('\n') + '\n'
       await lock.acquire(filepath, async function () {
         await fs.write(filepath, text, {
@@ -34,7 +32,7 @@ export class GitShallowManager {
         })
       })
     } else {
-      console.log('no shallows')
+      // No shallows
       await lock.acquire(filepath, async function () {
         await fs.rm(filepath)
       })

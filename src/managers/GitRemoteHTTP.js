@@ -19,7 +19,7 @@ export class GitRemoteHTTP {
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
-    headers['user-agent'] = `git/${pkg.name}@${pkg.version}`
+    headers['user-agent'] = pkg.agent
     auth = calculateBasicAuthUsernamePasswordPair(auth)
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
@@ -43,7 +43,7 @@ export class GitRemoteHTTP {
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
-    headers['user-agent'] = `git/${pkg.name}@${pkg.version}`
+    headers['user-agent'] = pkg.agent
     auth = calculateBasicAuthUsernamePasswordPair(auth)
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
