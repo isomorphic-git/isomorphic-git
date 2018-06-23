@@ -49,7 +49,7 @@ export async function push ({
     } else {
       fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     }
-    let oid = await GitRefManager.resolve({ fs, gitdir, ref })
+    let oid = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
     let auth = { username, password, token, oauth2format }
     let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     let httpRemote = await GitRemoteHTTP.discover({
