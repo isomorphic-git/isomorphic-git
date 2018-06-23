@@ -39,10 +39,14 @@ export async function push ({
     }
     let fullRef
     if (!ref) {
-      ref = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD', depth: 1 })
-      fullRef = ref.replace(/^ref: /, '')
+      fullRef = await GitRefManager.resolve({
+        fs,
+        gitdir,
+        ref: 'HEAD',
+        depth: 2
+      })
     } else {
-      fullRef = ref.startsWith('refs/') ? ref : `refs/heads/${ref}`
+      fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     }
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
     let auth = { username, password, token, oauth2format }
@@ -63,9 +67,7 @@ export async function push ({
     let packstream = new PassThrough()
     let oldoid =
       httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
-    const capabilities = `report-status side-band-64k agent=git/${pkg.name}@${
-      pkg.version
-    }`
+    const capabilities = `report-status side-band-64k agent=${pkg.agent}`
     packstream.write(
       GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 ${capabilities}\n`)
     )
