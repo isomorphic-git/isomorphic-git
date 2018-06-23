@@ -50,8 +50,9 @@ Examples (as C-style strings):
 ----
 */
 import BufferCursor from 'buffercursor'
-import pad from 'pad'
 import streamSource from 'stream-source/index.node.js'
+
+import { padHex } from '../utils/padHex'
 
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line
@@ -66,7 +67,7 @@ export class GitPktLine {
       line = Buffer.from(line)
     }
     let length = line.length + 4
-    let hexlength = pad(4, length.toString(16), '0')
+    let hexlength = padHex(4, length)
     return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
   }
 
