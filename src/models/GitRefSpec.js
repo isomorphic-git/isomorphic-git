@@ -22,7 +22,9 @@ export class GitRefSpec {
     const localIsGlob = localGlobMatch === '*'
     // validate
     // TODO: Make this check more nuanced, and depend on whether this is a fetch refspec or a push refspec
-    if (remoteIsGlob !== localIsGlob) { throw new GitError(E.InternalFail, { message: 'Invalid refspec' }) }
+    if (remoteIsGlob !== localIsGlob) {
+      throw new GitError(E.InternalFail, { message: 'Invalid refspec' })
+    }
     return new GitRefSpec({
       remotePath,
       localPath,
