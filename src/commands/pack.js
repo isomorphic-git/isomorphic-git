@@ -1,6 +1,6 @@
 import pako from 'pako'
 import path from 'path'
-import createHash from 'sha.js'
+import Hash from 'sha.js/sha1'
 
 import { GitObjectManager } from '../managers'
 import { FileSystem } from '../models'
@@ -16,7 +16,7 @@ export async function pack ({
   outputStream
 }) {
   const fs = new FileSystem(_fs)
-  let hash = createHash('sha1')
+  let hash = new Hash()
   function write (chunk, enc) {
     outputStream.write(chunk, enc)
     hash.update(chunk, enc)

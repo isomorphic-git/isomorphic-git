@@ -8,6 +8,7 @@ const external = [
   'openpgp/dist/openpgp.min.js',
   'crc/lib/crc32.js',
   'stream-source/index.node.js',
+  'sha.js/sha1',
   ...Object.keys(pkg.dependencies)
 ]
 
