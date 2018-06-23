@@ -9,7 +9,7 @@ import {
   GitRemoteManager,
   GitShallowManager
 } from '../managers'
-import { E, FileSystem, GitError, GitPktLine } from '../models'
+import { E, FileSystem, GitError } from '../models'
 
 import { config } from './config'
 
