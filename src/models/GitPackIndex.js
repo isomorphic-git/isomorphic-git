@@ -4,11 +4,11 @@ import applyDelta from 'git-apply-delta'
 import listpack from 'git-list-pack'
 import * as marky from 'marky'
 import pako from 'pako'
-import shasum from 'shasum'
 import { PassThrough } from 'stream'
 
 import { E, GitError } from '../models/GitError'
 import { log } from '../utils'
+import { shasum } from '../utils/shasum'
 
 import { GitObject } from './GitObject'
 

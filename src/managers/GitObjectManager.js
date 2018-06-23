@@ -1,8 +1,8 @@
 import pako from 'pako'
 import path from 'path'
-import shasum from 'shasum'
 
 import { E, FileSystem, GitError, GitObject, GitPackIndex } from '../models'
+import { shasum } from '../utils/shasum'
 
 const PackfileCache = new Map()
 
