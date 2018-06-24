@@ -4,9 +4,9 @@ const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
 const pify = require('pify')
-const shasum = require('shasum')
-const { models } = require('isomorphic-git/internal-apis')
+const { models, utils } = require('isomorphic-git/internal-apis')
 const { GitPackIndex, GitObject } = models
+const { shasum } = utils
 
 describe('GitPackIndex', () => {
   beforeAll(() => {
@@ -21,7 +21,7 @@ describe('GitPackIndex', () => {
       )
     )
     let p = await GitPackIndex.fromIdx({ idx })
-    expect(shasum(p.hashes)).toMatchSnapshot()
+    expect(shasum(JSON.stringify(p.hashes))).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)
@@ -39,7 +39,7 @@ describe('GitPackIndex', () => {
       )
     )
     let p = await GitPackIndex.fromPack({ pack })
-    expect(shasum(p.hashes)).toMatchSnapshot()
+    expect(shasum(JSON.stringify(p.hashes))).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets['0b8faa11b353db846b40eb064dfb299816542a46']).toEqual(40077)
