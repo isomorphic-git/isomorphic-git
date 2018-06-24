@@ -1,4 +1,7 @@
-var path = require('path')
+const path = require('path')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
 
 module.exports = [
   {
@@ -15,6 +18,18 @@ module.exports = [
     },
     mode: 'production',
     devtool: 'source-map',
+    plugins: [
+      new BundleAnalyzerPlugin({
+        openAnalyzer: false,
+        analyzerMode: 'static',
+        reportFilename: 'size_report.html',
+        defaultSizes: 'gzip',
+        excludeAssets: 'internal\\.umd\\.min\\.js'
+      }),
+      new DuplicatePackageCheckerPlugin({
+        strict: false
+      })
+    ],
     module: {
       rules: [
         {

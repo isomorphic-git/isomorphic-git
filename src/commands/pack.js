@@ -1,10 +1,10 @@
-import pad from 'pad'
 import pako from 'pako'
 import path from 'path'
-import createHash from 'sha.js'
+import Hash from 'sha.js/sha1'
 
 import { GitObjectManager } from '../managers'
 import { FileSystem } from '../models'
+import { padHex } from '../utils/padHex'
 
 import { types } from './types'
 
@@ -16,7 +16,7 @@ export async function pack ({
   outputStream
 }) {
   const fs = new FileSystem(_fs)
-  let hash = createHash('sha1')
+  let hash = new Hash()
   function write (chunk, enc) {
     outputStream.write(chunk, enc)
     hash.update(chunk, enc)
@@ -25,7 +25,7 @@ export async function pack ({
     let lastFour, multibyte, length
     // Object type is encoded in bits 654
     let type = types[stype]
-    // The length encoding get complicated.
+    // The length encoding gets complicated.
     length = object.length
     // Whether the next byte is part of the variable-length encoded number
     // is encoded in bit 7
@@ -42,7 +42,7 @@ export async function pack ({
     while (multibyte) {
       multibyte = length > 0b01111111 ? 0b10000000 : 0b0
       byte = multibyte | (length & 0b01111111)
-      write(pad(2, byte.toString(16), '0'), 'hex')
+      write(padHex(2, byte), 'hex')
       length = length >>> 7
     }
     // Lastly, we can compress and write the object.
@@ -51,7 +51,7 @@ export async function pack ({
   write('PACK')
   write('00000002', 'hex')
   // Write a 4 byte (32-bit) int
-  write(pad(8, oids.length.toString(16), '0'), 'hex')
+  write(padHex(8, oids.length), 'hex')
   for (let oid of oids) {
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     writeObject({ write, object, stype: type })
