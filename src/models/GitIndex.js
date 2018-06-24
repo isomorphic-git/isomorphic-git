@@ -1,6 +1,5 @@
-import BufferCursor from 'buffercursor'
-
 import { E, GitError } from '../models/GitError'
+import { BufferCursor } from '../utils/BufferCursor'
 import { comparePath } from '../utils/comparePath'
 import { shasum } from '../utils/shasum'
 

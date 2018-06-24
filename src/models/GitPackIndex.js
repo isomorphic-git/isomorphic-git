@@ -1,4 +1,3 @@
-import BufferCursor from 'buffercursor'
 import crc32 from 'crc/lib/crc32.js'
 import applyDelta from 'git-apply-delta'
 import listpack from 'git-list-pack'
@@ -8,6 +7,7 @@ import { PassThrough } from 'stream'
 
 import { E, GitError } from '../models/GitError'
 import { log } from '../utils'
+import { BufferCursor } from '../utils/BufferCursor'
 import { shasum } from '../utils/shasum'
 
 import { GitObject } from './GitObject'

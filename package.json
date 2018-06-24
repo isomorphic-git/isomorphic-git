@@ -53,7 +53,6 @@
   "dependencies": {
     "async-lock": "^1.1.0",
     "babel-runtime": "^6.26.0",
-    "buffercursor": "0.0.12",
     "clean-git-ref": "1.0.3",
     "crc": "^3.5.0",
     "debug": "^3.1.0",

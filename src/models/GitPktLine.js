@@ -49,9 +49,9 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
-import BufferCursor from 'buffercursor'
 import streamSource from 'stream-source/index.node.js'
 
+import { BufferCursor } from '../utils/BufferCursor'
 import { padHex } from '../utils/padHex'
 
 // I'm really using this more as a namespace.
@@ -77,7 +77,7 @@ export class GitPktLine {
       if (buffercursor.eof()) return true
       let length = parseInt(buffercursor.slice(4).toString('utf8'), 16)
       if (length === 0) return null
-      return buffercursor.slice(length - 4).buffer
+      return buffercursor.slice(length - 4)
     }
   }
 
