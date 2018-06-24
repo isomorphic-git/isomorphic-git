@@ -57,6 +57,7 @@ export class GitPackIndex {
     this.offsetCache = {}
   }
   static async fromIdx ({ idx, getExternalRefDelta }) {
+    marky.mark('fromIdx')
     let reader = new BufferCursor(idx)
     let magic = reader.slice(4).toString('hex')
     // Check for IDX v2 magic number
@@ -69,41 +70,36 @@ export class GitPackIndex {
         message: `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
       })
     }
-    // Verify checksums
-    let shaComputed = shasum(idx.slice(0, -20))
-    let shaClaimed = idx.slice(-20).toString('hex')
-    if (shaClaimed !== shaComputed) {
-      throw new GitError(E.InternalFail, {
-        message: `Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
-      })
-    }
     if (idx.byteLength > 2048 * 1024 * 1024) {
       throw new GitError(E.InternalFail, {
         message: `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
       })
     }
-    let fanout = []
-    for (let i = 0; i < 256; i++) {
-      fanout.push(reader.readUInt32BE())
-    }
-    let size = fanout[255]
-    // For now we'll parse the whole thing. We can optimize later if we need to.
+    // Skip over fanout table
+    reader.seek(reader.tell() + 4 * 255)
+    // Get hashes
+    let size = reader.readUInt32BE()
+    marky.mark('hashes')
     let hashes = []
     for (let i = 0; i < size; i++) {
-      hashes.push(reader.slice(20).toString('hex'))
+      let hash = reader.slice(20).toString('hex')
+      hashes[i] = hash
     }
-    let crcs = {}
+    log(`hashes ${marky.stop('hashes').duration}`)
+    reader.seek(reader.tell() + 4 * size)
+    // Skip over CRCs
+    marky.mark('offsets')
+    // Get offsets
+    let offsets = new Map()
     for (let i = 0; i < size; i++) {
-      crcs[hashes[i]] = reader.readUInt32BE()
+      offsets.set(hashes[i], reader.readUInt32BE())
     }
-    let offsets = {}
-    for (let i = 0; i < size; i++) {
-      offsets[hashes[i]] = reader.readUInt32BE()
-    }
+    log(`offsets ${marky.stop('offsets').duration}`)
     let packfileSha = reader.slice(20).toString('hex')
+    log(`fromIdx ${marky.stop('fromIdx').duration}`)
     return new GitPackIndex({
       hashes,
-      crcs,
+      crcs: {},
       offsets,
       packfileSha,
       getExternalRefDelta
@@ -128,7 +124,7 @@ export class GitPackIndex {
 
     let hashes = []
     let crcs = {}
-    let offsets = {}
+    let offsets = new Map()
     let totalObjectCount = null
     let lastPercent = null
     let times = {
@@ -280,7 +276,7 @@ export class GitPackIndex {
         times.hash += marky.stop('hash').duration
         o.oid = oid
         hashes.push(oid)
-        offsets[oid] = offset
+        offsets.set(oid, offset)
         crcs[oid] = o.crc
       } catch (err) {
         log('ERROR', err)
@@ -342,7 +338,7 @@ export class GitPackIndex {
     // Write out offsets
     let offsetsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
     for (let hash of this.hashes) {
-      offsetsBuffer.writeUInt32BE(this.offsets[hash])
+      offsetsBuffer.writeUInt32BE(this.offsets.get(hash))
     }
     buffers.push(offsetsBuffer.buffer)
     // Write out packfile checksum
@@ -361,7 +357,7 @@ export class GitPackIndex {
     this.pack = null
   }
   async read ({ oid }) {
-    if (!this.offsets[oid]) {
+    if (!this.offsets.get(oid)) {
       if (this.getExternalRefDelta) {
         this.externalReadDepth++
         return this.getExternalRefDelta(oid)
@@ -371,7 +367,7 @@ export class GitPackIndex {
         })
       }
     }
-    let start = this.offsets[oid]
+    let start = this.offsets.get(oid)
     return this.readSlice({ start })
   }
   async readSlice ({ start }) {
