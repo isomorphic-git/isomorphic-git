@@ -54,7 +54,6 @@ function otherVarIntDecode (reader, startWith) {
 export class GitPackIndex {
   constructor (stuff) {
     Object.assign(this, stuff)
-    this.hashesCache = (this.hashes || []).reduce((p, i) => ((p[i] = i), p), {})
     this.offsetCache = {}
   }
   static async fromIdx ({ idx, getExternalRefDelta }) {
