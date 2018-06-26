@@ -387,7 +387,7 @@ export class GitPackIndex {
           'Tried to read from a GitPackIndex with no packfile loaded into memory'
       })
     }
-    let raw = this.pack.slice(start)
+    let raw = (await this.pack).slice(start)
     let reader = new BufferCursor(raw)
     let byte = reader.readUInt8()
     // Object type is encoded in bits 654
