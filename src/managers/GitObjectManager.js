@@ -27,12 +27,17 @@ export class GitObjectManager {
         // Try to get the packfile from the in-memory cache
         let p = PackfileCache.get(filename)
         if (!p) {
-          p = GitObjectManager.loadPack(fs, gitdir, filename, getExternalRefDelta)
+          p = GitObjectManager.loadPack(
+            fs,
+            gitdir,
+            filename,
+            getExternalRefDelta
+          )
           PackfileCache.set(filename, p)
         }
         // console.log(p)
         // If the packfile DOES have the oid we're looking for...
-        p = await p;
+        p = await p
         if (p.offsets.has(oid)) {
           // Make sure the packfile is loaded in memory
           if (!p.pack) {
@@ -66,9 +71,9 @@ export class GitObjectManager {
     let { type, object } = GitObject.unwrap({ oid, buffer })
     if (format === 'content') return { type, format: 'content', object, source }
   }
-  static async loadPack(fs, gitdir, filename, getExternalRefDelta) {
+  static async loadPack (fs, gitdir, filename, getExternalRefDelta) {
     // If not there, load it from a .idx file
-    const idxName = filename.replace(/pack$/, 'idx');
+    const idxName = filename.replace(/pack$/, 'idx')
     if (await fs.exists(`${gitdir}/objects/pack/${idxName}`)) {
       const idx = await fs.read(`${gitdir}/objects/pack/${idxName}`)
       return GitPackIndex.fromIdx({ idx, getExternalRefDelta })

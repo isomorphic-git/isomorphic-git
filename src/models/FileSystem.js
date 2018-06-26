@@ -1,7 +1,7 @@
 import debug from 'debug'
+import * as marky from 'marky'
 import path from 'path'
 import pify from 'pify'
-import * as marky from 'marky'
 
 import { E, GitError } from '../models/GitError'
 import { sleep } from '../utils'
