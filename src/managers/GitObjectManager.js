@@ -39,12 +39,8 @@ export class GitObjectManager {
         // If the packfile DOES have the oid we're looking for...
         p = await p
         if (p.offsets.has(oid)) {
-          // Make sure the packfile is loaded in memory
-          if (!p.pack) {
-            p.pack = fs.read(`${gitdir}/objects/pack/${filename}`)
-          }
           // Get the resolved git object from the packfile
-          let result = p.read({ oid, getExternalRefDelta })
+          let result = await p.read({ oid, getExternalRefDelta })
           result.source = `./objects/pack/${filename}`
           return result
         }
@@ -74,15 +70,19 @@ export class GitObjectManager {
   static async loadPack (fs, gitdir, filename, getExternalRefDelta) {
     // If not there, load it from a .idx file
     const idxName = filename.replace(/pack$/, 'idx')
+    const packFile = fs.read(`${gitdir}/objects/pack/${filename}`)
+    let p
     if (await fs.exists(`${gitdir}/objects/pack/${idxName}`)) {
       const idx = await fs.read(`${gitdir}/objects/pack/${idxName}`)
-      return GitPackIndex.fromIdx({ idx, getExternalRefDelta })
+      p = await GitPackIndex.fromIdx({ idx, getExternalRefDelta })
+    } else {
+      // If the .idx file isn't available, generate one.
+      const pack = await packFile
+      p = await GitPackIndex.fromPack({ pack, getExternalRefDelta })
+      // Save .idx file
+      fs.write(`${gitdir}/objects/pack/${idxName}`, p.toBuffer())
     }
-    // If the .idx file isn't available, generate one.
-    const pack = await fs.read(`${gitdir}/objects/pack/${filename}`)
-    const p = GitPackIndex.fromPack({ pack, getExternalRefDelta })
-    // Save .idx file
-    fs.write(`${gitdir}/objects/pack/${idxName}`, (await p).toBuffer())
+    p.pack = packFile
     return p
   }
   static async hash ({ gitdir, type, object }) {
