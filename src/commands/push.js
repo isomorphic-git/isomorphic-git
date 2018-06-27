@@ -1,14 +1,15 @@
 import path from 'path'
-import { PassThrough } from 'stream'
 
-import { GitRefManager, GitRemoteManager } from '../managers'
-import { E, FileSystem, GitError, GitPktLine } from '../models'
+import {
+  GitRefManager,
+  GitRemoteConnection,
+  GitRemoteManager
+} from '../managers'
+import { FileSystem } from '../models'
 import { log, pkg } from '../utils'
 
 import { config } from './config'
-import { listCommits } from './listCommits'
-import { listObjects } from './listObjects'
-import { pack } from './pack'
+import { packObjects } from './packObjects'
 
 /**
  * Push a branch
@@ -57,72 +58,39 @@ export async function push ({
       noGitSuffix,
       auth
     })
-    let commits = await listCommits({
-      fs,
-      gitdir,
-      start: [oid],
-      finish: httpRemote.refs.values()
-    })
-    let objects = await listObjects({ fs, gitdir, oids: commits })
-    let packstream = new PassThrough()
     let oldoid =
       httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
-    const capabilities = `report-status side-band-64k agent=${pkg.agent}`
-    packstream.write(
-      GitPktLine.encode(`${oldoid} ${oid} ${fullRef}\0 ${capabilities}\n`)
-    )
-    packstream.write(GitPktLine.flush())
-    pack({
-      fs,
-      gitdir,
-      oids: [...objects],
-      outputStream: packstream
+    let packstream = await GitRemoteConnection.sendReceivePackRequest({
+      capabilities: ['report-status', 'side-band-64k', `agent=${pkg.agent}`],
+      triplets: [{ oldoid, oid, fullRef }]
     })
-    let { packfile, progress } = await GitRemoteHTTP.connect({
+
+    let { packstream: outputStream } = await packObjects({
+      gitdir,
+      fs,
+      refs: [oid],
+      exclude: [...httpRemote.refs.values()]
+    })
+    outputStream.pipe(packstream)
+
+    let res = await GitRemoteHTTP.connect({
       service: 'git-receive-pack',
       url,
       noGitSuffix,
       auth,
       stream: packstream
     })
+    let {
+      packfile,
+      progress
+    } = await GitRemoteConnection.receiveMultiplexedStreams(res)
     if (emitter) {
       progress.on('data', chunk => {
         let msg = chunk.toString('utf8')
         emitter.emit('message', msg)
       })
     }
-    let result = {}
-    // Parse the response!
-    let response = ''
-    let read = GitPktLine.streamReader(packfile)
-    let line = await read()
-    while (line !== true) {
-      if (line !== null) response += line.toString('utf8') + '\n'
-      line = await read()
-    }
-
-    let lines = response.toString('utf8').split('\n')
-    // We're expecting "unpack {unpack-result}"
-    line = lines.shift()
-    if (!line.startsWith('unpack ')) {
-      throw new GitError(E.UnparseableServerResponseFail, { line })
-    }
-    if (line === 'unpack ok') {
-      result.ok = ['unpack']
-    } else {
-      result.errors = [line.trim()]
-    }
-    for (let line of lines) {
-      let status = line.slice(0, 2)
-      let refAndMessage = line.slice(3)
-      if (status === 'ok') {
-        result.ok = result.ok || []
-        result.ok.push(refAndMessage)
-      } else if (status === 'ng') {
-        result.errors = result.errors || []
-        result.errors.push(refAndMessage)
-      }
-    }
+    let result = await GitRemoteConnection.receiveReceivePackResult(packfile)
     log(result)
     return result
   } catch (err) {

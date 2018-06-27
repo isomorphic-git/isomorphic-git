@@ -31,6 +31,15 @@ describe('log', () => {
   })
   it('test-branch', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
+    let commits = await log({
+      fs,
+      gitdir,
+      ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    })
+    expect(commits).toMatchSnapshot()
+  })
+  it('SHA1 reference', async () => {
+    let { fs, gitdir } = await makeFixture('test-log')
     let commits = await log({ fs, gitdir, ref: 'origin/test-branch' })
     expect(commits).toMatchSnapshot()
   })

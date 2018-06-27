@@ -60,6 +60,6 @@ export class GitRemoteHTTP {
         statusMessage: res.statusMessage
       })
     }
-    return GitRemoteConnection.stream({ res })
+    return res
   }
 }

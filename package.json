@@ -70,6 +70,7 @@
     "sha.js": "^2.4.9",
     "simple-concat": "^1.0.0",
     "simple-get": "^3.0.2",
+    "split-buffer": "^1.0.0",
     "simplest-i18n": "^1.0.0",
     "split2": "^2.2.0",
     "stream-source": "^0.3.5",

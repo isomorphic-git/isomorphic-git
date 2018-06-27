@@ -217,7 +217,7 @@ export class GitRefManager {
     let files = null
     try {
       files = await fs.readdirDeep(`${gitdir}/${filepath}`)
-      files = files.map(x => x.replace(`${gitdir}/${filepath}/`, ''))
+      files = files.map(x => x.replace(`${gitdir}/`, ''))
     } catch (err) {
       files = []
     }
@@ -225,8 +225,6 @@ export class GitRefManager {
     for (let key of (await packedMap).keys()) {
       // filter by prefix
       if (key.startsWith(filepath)) {
-        // remove prefix
-        key = key.replace(filepath + '/', '')
         // Don't include duplicates; the loose files have precedence anyway
         if (!files.includes(key)) {
           files.push(key)
@@ -235,21 +233,32 @@ export class GitRefManager {
     }
     return files
   }
+  // List all the refs that match the `filepath` prefix, and remove the prefix
+  static async listRefsWithoutPrefix ({ fs: _fs, gitdir, filepath }) {
+    const fs = new FileSystem(_fs)
+    let refs = await this.listRefs({ fs, gitdir, filepath })
+    refs = refs.map(x => x.replace(filepath + '/', ''))
+    return refs
+  }
   static async listBranches ({ fs: _fs, gitdir, remote }) {
     const fs = new FileSystem(_fs)
     if (remote) {
-      return GitRefManager.listRefs({
+      return GitRefManager.listRefsWithoutPrefix({
         fs,
         gitdir,
         filepath: `refs/remotes/${remote}`
       })
     } else {
-      return GitRefManager.listRefs({ fs, gitdir, filepath: `refs/heads` })
+      return GitRefManager.listRefsWithoutPrefix({
+        fs,
+        gitdir,
+        filepath: `refs/heads`
+      })
     }
   }
   static async listTags ({ fs: _fs, gitdir }) {
     const fs = new FileSystem(_fs)
-    let tags = await GitRefManager.listRefs({
+    let tags = await GitRefManager.listRefsWithoutPrefix({
       fs,
       gitdir,
       filepath: `refs/tags`

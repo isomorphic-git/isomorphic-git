@@ -63,7 +63,7 @@ function nudgeIntoShape (entry) {
 }
 
 export class GitTree {
-  /*::
+  /* ::
   _entries: Array<TreeEntry>
   */
   constructor (entries) {
