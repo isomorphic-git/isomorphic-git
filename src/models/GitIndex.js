@@ -1,8 +1,7 @@
-import BufferCursor from 'buffercursor'
-import shasum from 'shasum'
-
 import { E, GitError } from '../models/GitError'
+import { BufferCursor } from '../utils/BufferCursor'
 import { comparePath } from '../utils/comparePath'
+import { shasum } from '../utils/shasum'
 
 const MAX_UINT32 = 2 ** 32
 /* ::

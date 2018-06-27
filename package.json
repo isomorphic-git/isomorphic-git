@@ -53,7 +53,6 @@
   "dependencies": {
     "async-lock": "^1.1.0",
     "babel-runtime": "^6.26.0",
-    "buffercursor": "0.0.12",
     "clean-git-ref": "1.0.3",
     "crc": "^3.5.0",
     "debug": "^3.1.0",
@@ -66,11 +65,9 @@
     "minimisted": "^2.0.0",
     "nick": "^0.1.3",
     "opencollective": "^1.0.3",
-    "pad": "^2.0.3",
     "pako": "^1.0.6",
     "pify": "^3.0.0",
     "sha.js": "^2.4.9",
-    "shasum": "^1.0.2",
     "simple-concat": "^1.0.0",
     "simple-get": "^3.0.2",
     "split-buffer": "^1.0.0",
@@ -94,6 +91,7 @@
     "bundlesize": "0.17.0",
     "codecov": "3.0.2",
     "cross-env": "5.2.0",
+    "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "envify": "4.1.0",
     "fetch-mock": "6.4.4",
     "husky": "0.14.3",
@@ -127,6 +125,7 @@
     "tweet-tweet": "1.0.4",
     "typescript": "2.9.2",
     "webpack": "4.12.0",
+    "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "3.0.8"
   },
   "jest": {

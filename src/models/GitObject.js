@@ -1,6 +1,5 @@
-import shasum from 'shasum'
-
 import { E, GitError } from '../models/GitError'
+import { shasum } from '../utils/shasum'
 
 export class GitObject {
   static hash ({ type, object }) {

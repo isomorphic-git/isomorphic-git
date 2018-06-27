@@ -1,8 +1,8 @@
 import pako from 'pako'
 import path from 'path'
-import shasum from 'shasum'
 
 import { E, FileSystem, GitError, GitObject, GitPackIndex } from '../models'
+import { shasum } from '../utils/shasum'
 
 const PackfileCache = new Map()
 
@@ -43,7 +43,7 @@ export class GitObjectManager {
         }
         // console.log(p)
         // If the packfile DOES have the oid we're looking for...
-        if (p.hashes.includes(oid)) {
+        if (p.offsets.has(oid)) {
           // Make sure the packfile is loaded in memory
           if (!p.pack) {
             const pack = await fs.read(`${gitdir}/objects/pack/${filename}`)
