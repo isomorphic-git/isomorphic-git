@@ -1,7 +1,7 @@
 import pathModule from 'path'
 
-import { GitConfigManager } from '../managers'
-import { FileSystem } from '../models'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { FileSystem } from '../models/FileSystem.js'
 
 /**
  * Read and/or write to the git config files.

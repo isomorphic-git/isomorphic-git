@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError'
+import { E, GitError } from '../models/GitError.js'
 
 /*::
 type TreeEntry = {

@@ -1,6 +1,7 @@
 import path from 'path'
 
-import { E, FileSystem, GitError } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
 
 /**
  * Find the root git directory

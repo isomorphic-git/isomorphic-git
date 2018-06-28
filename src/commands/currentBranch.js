@@ -1,7 +1,7 @@
 import path from 'path'
 
-import { GitRefManager } from '../managers'
-import { FileSystem } from '../models'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const regexs = [

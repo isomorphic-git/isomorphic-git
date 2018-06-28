@@ -5,8 +5,7 @@ const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 const path = require('path')
 
-const { models } = require('isomorphic-git/internal-apis')
-const { GitIndex } = models
+const { GitIndex } = require('isomorphic-git/internal-apis')
 
 describe('GitIndex', () => {
   beforeAll(() => {

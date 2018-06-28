@@ -1,12 +1,10 @@
 import pify from 'pify'
 import simpleGet from 'simple-get'
 
-import { E, GitError } from '../models'
-import {
-  calculateBasicAuthHeader,
-  calculateBasicAuthUsernamePasswordPair,
-  pkg
-} from '../utils'
+import { E, GitError } from '../models/GitError.js'
+import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
+import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
+import { pkg } from '../utils/pkg.js'
 
 import { GitRemoteConnection } from './GitRemoteConnection'
 

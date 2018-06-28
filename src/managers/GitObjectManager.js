@@ -1,8 +1,11 @@
 import pako from 'pako'
 import path from 'path'
 
-import { E, FileSystem, GitError, GitObject, GitPackIndex } from '../models'
-import { shasum } from '../utils/shasum'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { GitObject } from '../models/GitObject.js'
+import { GitPackIndex } from '../models/GitPackIndex.js'
+import { shasum } from '../utils/shasum.js'
 
 const PackfileCache = new Map()
 
@@ -28,11 +31,7 @@ export class GitObjectManager {
         let p = PackfileCache.get(filename)
         const packFile = `${gitdir}/objects/pack/${filename}`
         if (!p) {
-          p = GitObjectManager.loadPack(
-            fs,
-            packFile,
-            getExternalRefDelta
-          )
+          p = GitObjectManager.loadPack(fs, packFile, getExternalRefDelta)
           PackfileCache.set(filename, p)
         }
         // console.log(p)

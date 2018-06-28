@@ -1,7 +1,10 @@
 import path from 'path'
 
-import { GitObjectManager, GitRefManager } from '../managers'
-import { E, FileSystem, GitError, SignedGitCommit } from '../models'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { SignedGitCommit } from '../models/SignedGitCommit.js'
 
 /**
  * Create a signed commit

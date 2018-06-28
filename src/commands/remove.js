@@ -1,7 +1,7 @@
 import path from 'path'
 
-import { GitIndexManager } from '../managers'
-import { FileSystem } from '../models'
+import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { FileSystem } from '../models/FileSystem.js'
 
 /**
  * Remove a file from the git index (aka staging area)

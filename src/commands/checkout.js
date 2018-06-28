@@ -1,7 +1,12 @@
 import path from 'path'
 
-import { GitIndexManager, GitObjectManager, GitRefManager } from '../managers'
-import { E, FileSystem, GitCommit, GitError, GitTree } from '../models'
+import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
+import { E, GitError } from '../models/GitError.js'
+import { GitTree } from '../models/GitTree.js'
 
 import { config } from './config'
 

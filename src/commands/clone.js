@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { FileSystem } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
 
 import { checkout } from './checkout'
 import { config } from './config'

@@ -2,9 +2,9 @@ import pako from 'pako'
 import path from 'path'
 import Hash from 'sha.js/sha1'
 
-import { GitObjectManager } from '../managers'
-import { FileSystem } from '../models'
-import { padHex } from '../utils/padHex'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { padHex } from '../utils/padHex.js'
 
 import { types } from './types'
 

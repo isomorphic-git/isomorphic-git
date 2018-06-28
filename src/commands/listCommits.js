@@ -1,7 +1,10 @@
 import path from 'path'
 
-import { GitObjectManager, GitRefManager } from '../managers'
-import { E, FileSystem, GitCommit, GitError } from '../models'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
+import { E, GitError } from '../models/GitError.js'
 
 export async function listCommits ({
   dir,

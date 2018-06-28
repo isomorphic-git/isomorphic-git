@@ -1,7 +1,7 @@
-import { E, GitError } from '../models/GitError'
-import { BufferCursor } from '../utils/BufferCursor'
-import { comparePath } from '../utils/comparePath'
-import { shasum } from '../utils/shasum'
+import { E, GitError } from '../models/GitError.js'
+import { BufferCursor } from '../utils/BufferCursor.js'
+import { comparePath } from '../utils/comparePath.js'
+import { shasum } from '../utils/shasum.js'
 
 const MAX_UINT32 = 2 ** 32
 /*::

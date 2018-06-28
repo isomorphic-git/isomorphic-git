@@ -1,7 +1,7 @@
 import AsyncLock from 'async-lock'
 import path from 'path'
 
-import { FileSystem } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
 
 const lock = new AsyncLock()
 

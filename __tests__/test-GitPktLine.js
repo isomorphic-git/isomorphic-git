@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { models } = require('isomorphic-git/internal-apis')
-const { GitPktLine } = models
+const { GitPktLine } = require('isomorphic-git/internal-apis')
 const bufferToStream = require('buffer-to-stream')
 
 describe('GitPktLine', () => {

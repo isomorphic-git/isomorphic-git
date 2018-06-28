@@ -1,8 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { models, utils } = require('isomorphic-git/internal-apis')
-const { FileSystem } = models
-const { sleep } = utils
+const { FileSystem, sleep } = require('isomorphic-git/internal-apis')
 
 describe('lockfile', () => {
   it('make lockfile', async () => {
