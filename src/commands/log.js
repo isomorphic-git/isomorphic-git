@@ -1,9 +1,9 @@
 import path from 'path'
 
-import { GitRefManager } from '../managers'
-import { FileSystem } from '../models'
-import { compareAge } from '../utils/compareAge'
-import { logCommit } from '../utils/logCommit'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { compareAge } from '../utils/compareAge.js'
+import { logCommit } from '../utils/logCommit.js'
 
 /**
  * Get commit descriptions from the git history

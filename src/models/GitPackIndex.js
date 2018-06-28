@@ -5,10 +5,10 @@ import * as marky from 'marky'
 import pako from 'pako'
 import { PassThrough } from 'stream'
 
-import { E, GitError } from '../models/GitError'
-import { log } from '../utils'
-import { BufferCursor } from '../utils/BufferCursor'
-import { shasum } from '../utils/shasum'
+import { E, GitError } from '../models/GitError.js'
+import { BufferCursor } from '../utils/BufferCursor.js'
+import { log } from '../utils/log.js'
+import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject'
 

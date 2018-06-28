@@ -1,4 +1,4 @@
-import { E, GitError } from '../models'
+import { E, GitError } from '../models/GitError.js'
 
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 

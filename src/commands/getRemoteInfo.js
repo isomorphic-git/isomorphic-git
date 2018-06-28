@@ -1,4 +1,4 @@
-import { GitRemoteHTTP } from '../managers'
+import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
 
 /**
  * List a remote servers branches, tags, and capabilities.

@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const snapshots = require('./__snapshots__/test-flatFileListToDirectoryStructure.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { utils } = require('isomorphic-git/internal-apis')
-const { flatFileListToDirectoryStructure } = utils
+const {
+  flatFileListToDirectoryStructure
+} = require('isomorphic-git/internal-apis')
 
 describe('flatFileListToDirectoryStructure', () => {
   beforeAll(() => {

@@ -1,8 +1,9 @@
 import { clean } from 'clean-git-ref'
 import path from 'path'
 
-import { GitRefManager } from '../managers'
-import { E, FileSystem, GitError } from '../models'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
 
 /**
  * Create a branch

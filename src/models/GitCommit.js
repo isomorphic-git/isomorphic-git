@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError'
+import { E, GitError } from '../models/GitError.js'
 
 // The amount of work that went into crafting these cases to handl
 // -0 (just so we don't lose that information when parsing and reconstructing)

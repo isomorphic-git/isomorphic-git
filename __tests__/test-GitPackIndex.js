@@ -4,9 +4,11 @@ const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
 const pify = require('pify')
-const { models, utils } = require('isomorphic-git/internal-apis')
-const { GitPackIndex, GitObject } = models
-const { shasum } = utils
+const {
+  GitPackIndex,
+  GitObject,
+  shasum
+} = require('isomorphic-git/internal-apis')
 
 describe('GitPackIndex', () => {
   beforeAll(() => {

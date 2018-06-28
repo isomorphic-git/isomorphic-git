@@ -3,7 +3,7 @@
 
 import nick from 'nick'
 
-import { t } from '../utils/t'
+import { t } from '../utils/t.js'
 
 const translate = obj => {
   for (const [key, value] of Object.entries(obj)) {

@@ -1,6 +1,7 @@
 import { PassThrough } from 'stream'
 
-import { E, GitError, GitPktLine } from '../models'
+import { E, GitError } from '../models/GitError.js'
+import { GitPktLine } from '../models/GitPktLine.js'
 
 export class GitRemoteConnection {
   static async receiveInfoRefs (service, res) {

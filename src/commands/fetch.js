@@ -5,8 +5,12 @@ import split2 from 'split2'
 import { PassThrough } from 'stream'
 import through2 from 'through2'
 
-import { GitRefManager, GitRemoteManager, GitShallowManager } from '../managers'
-import { E, FileSystem, GitError, GitPktLine } from '../models'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitRemoteManager } from '../managers/GitRemoteManager.js'
+import { GitShallowManager } from '../managers/GitShallowManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { GitPktLine } from '../models/GitPktLine.js'
 
 import { config } from './config'
 

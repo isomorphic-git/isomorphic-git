@@ -1,5 +1,6 @@
-import { GitObjectManager } from '../managers'
-import { E, GitCommit, GitError } from '../models'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { GitCommit } from '../models/GitCommit.js'
+import { E, GitError } from '../models/GitError.js'
 
 export async function logCommit ({ fs, gitdir, oid, signing }) {
   try {

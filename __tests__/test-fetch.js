@@ -5,9 +5,8 @@ const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
 const EventEmitter = require('events')
-const { utils } = require('isomorphic-git/internal-apis')
+const { sleep } = require('isomorphic-git/internal-apis')
 const { fetch } = require('isomorphic-git')
-const { sleep } = utils
 
 describe('fetch', () => {
   beforeAll(() => {
