@@ -1,9 +1,10 @@
 // import LockManager from 'travix-lock-manager'
 import AsyncLock from 'async-lock'
 
-import { FileSystem, GitIndex } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
+import { GitIndex } from '../models/GitIndex.js'
 
-// import Lock from '../utils'
+// import Lock from '../utils.js'
 
 // TODO: replace with an LRU cache?
 const map = new Map()

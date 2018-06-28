@@ -1,7 +1,9 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers'
-import { FileSystem, GitCommit, GitTree } from '../models'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
+import { GitTree } from '../models/GitTree.js'
 
 export async function listObjects ({
   dir,

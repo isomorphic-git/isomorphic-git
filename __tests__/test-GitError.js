@@ -2,8 +2,8 @@
 const snapshots = require('./__snapshots__/test-GitError.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { models } = require('isomorphic-git/internal-apis')
-const { E, GitError } = models
+const { E } = require('isomorphic-git')
+const { GitError } = require('isomorphic-git/internal-apis')
 
 describe('GitError', () => {
   beforeAll(() => {

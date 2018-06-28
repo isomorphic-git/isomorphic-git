@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { managers } = require('isomorphic-git/internal-apis')
-const { GitRemoteHTTP } = managers
+const { GitRemoteHTTP } = require('isomorphic-git/internal-apis')
 
 const nock = require('nock')
 const path = require('path')

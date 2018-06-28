@@ -1,7 +1,10 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers'
-import { E, FileSystem, GitCommit, GitError, GitTree } from '../models'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
+import { E, GitError } from '../models/GitError.js'
+import { GitTree } from '../models/GitTree.js'
 
 /**
  * Read a git object directly by its SHA1 object id

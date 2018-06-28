@@ -1,9 +1,13 @@
 import path from 'path'
 import { PassThrough } from 'stream'
 
-import { GitRefManager, GitRemoteManager } from '../managers'
-import { E, FileSystem, GitError, GitPktLine } from '../models'
-import { log, pkg } from '../utils'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitRemoteManager } from '../managers/GitRemoteManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { GitPktLine } from '../models/GitPktLine.js'
+import { log } from '../utils/log.js'
+import { pkg } from '../utils/pkg.js'
 
 import { config } from './config'
 import { listCommits } from './listCommits'

@@ -1,7 +1,9 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import path from 'path'
 
-import { E, FileSystem, GitError, GitRefSpecSet } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 
 import { GitConfigManager } from './GitConfigManager'
 

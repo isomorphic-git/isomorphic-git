@@ -1,7 +1,7 @@
 import ignore from 'ignore'
 import path from 'path'
 
-import { FileSystem } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
 
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of cacheing.

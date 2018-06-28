@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { models } = require('isomorphic-git/internal-apis')
-const { GitRefSpecSet } = models
+const { GitRefSpecSet } = require('isomorphic-git/internal-apis')
 
 describe('GitRefSpecSet', () => {
   it('fetch = +refs/heads/*:refs/remotes/origin/*', async () => {

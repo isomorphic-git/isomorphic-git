@@ -1,6 +1,7 @@
 import path from 'path'
 
-import { FileSystem, GitPackIndex } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
+import { GitPackIndex } from '../models/GitPackIndex.js'
 
 /**
  * Create the .idx file for a given .pack file

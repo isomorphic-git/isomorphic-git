@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError'
+import { E, GitError } from '../models/GitError.js'
 
 /**
  * Use with push and fetch to set Basic Authentication headers.

@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { FileSystem } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
 
 /**
  * Initialize a new repository
