@@ -2,6 +2,7 @@ import path from 'path'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { E } from '../models/GitError'
 import { compareAge } from '../utils/compareAge.js'
 import { logCommit } from '../utils/logCommit.js'
 
@@ -34,7 +35,10 @@ export async function log ({
 
       // Stop the loop if we encounter an error
       if (commit.error) {
-        commits.push(commit)
+        // Append the error, except for innocent "errors" caused by shallow clones.
+        if (commit.error.code !== E.ReadShallowObjectFail || depth != null) {
+          commits.push(commit)
+        }
         break
       }
 
