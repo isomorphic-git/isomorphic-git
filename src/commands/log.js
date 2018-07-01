@@ -1,6 +1,7 @@
 import path from 'path'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { compareAge } from '../utils/compareAge.js'
 import { logCommit } from '../utils/logCommit.js'
@@ -26,6 +27,7 @@ export async function log ({
     // TODO: In the future, we may want to have an API where we return a
     // async iterator that emits commits.
     let commits = []
+    let shallowCommits = await GitShallowManager.read({ fs, gitdir })
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
     let tips /*: Array */ = [await logCommit({ fs, gitdir, oid, signing })]
 
@@ -51,12 +53,15 @@ export async function log ({
       // Stop the loop if we have enough commits now.
       if (depth !== undefined && commits.length === depth) break
 
-      // Add the parents of this commit to the queue
-      // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
-      for (const oid of commit.parent) {
-        let commit = await logCommit({ fs, gitdir, oid, signing })
-        if (!tips.map(commit => commit.oid).includes(commit.oid)) {
-          tips.push(commit)
+      // If this is not a shallow commit...
+      if (!shallowCommits.has(commit.oid)) {
+        // Add the parents of this commit to the queue
+        // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
+        for (const oid of commit.parent) {
+          let commit = await logCommit({ fs, gitdir, oid, signing })
+          if (!tips.map(commit => commit.oid).includes(commit.oid)) {
+            tips.push(commit)
+          }
         }
       }
 

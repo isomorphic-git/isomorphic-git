@@ -23,19 +23,4 @@ describe('GitObjectManager', () => {
     }
     expect(error).toMatchSnapshot()
   })
-
-  it('test shallow', async () => {
-    let { fs, gitdir } = await makeFixture('test-GitObjectManager')
-    let error = null
-    try {
-      await GitObjectManager.read({
-        fs,
-        gitdir,
-        oid: 'b8b1fcecbc6f5ea8bc915c3ac319e8c9eb204f95'
-      })
-    } catch (err) {
-      error = err
-    }
-    expect(error).toMatchSnapshot()
-  })
 })

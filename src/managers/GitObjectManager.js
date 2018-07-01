@@ -48,13 +48,6 @@ export class GitObjectManager {
         }
       }
     }
-    // Check to see if it's in shallow commits.
-    if (!file) {
-      let text = await fs.read(`${gitdir}/shallow`, { encoding: 'utf8' })
-      if (text !== null && text.includes(oid)) {
-        throw new GitError(E.ReadShallowObjectFail, { oid })
-      }
-    }
     // Finally
     if (!file) {
       throw new GitError(E.ReadObjectFail, { oid })
