@@ -22,6 +22,16 @@ export async function merge ({
 }) {
   try {
     const fs = new FileSystem(_fs)
+    ours = await GitRefManager.expand({
+      fs,
+      gitdir,
+      ref: ours
+    })
+    theirs = await GitRefManager.expand({
+      fs,
+      gitdir,
+      ref: theirs
+    })
     let ourOid = await GitRefManager.resolve({
       fs,
       gitdir,
@@ -43,7 +53,9 @@ export async function merge ({
       }
     }
     if (baseOid === ourOid) {
-      console.log(`Performing a fast-forward merge...`)
+      console.log(
+        `Performing a fast-forward merge from ${ourOid} to ${theirOid}`
+      )
       await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
       return {
         oid: theirOid,

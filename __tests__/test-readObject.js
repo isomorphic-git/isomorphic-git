@@ -26,23 +26,6 @@ describe('readObject', () => {
     expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
-  it('test shallow', async () => {
-    // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    // Test
-    let error = null
-    try {
-      await readObject({
-        fs,
-        gitdir,
-        oid: 'b8b1fcecbc6f5ea8bc915c3ac319e8c9eb204f95'
-      })
-    } catch (err) {
-      error = err
-    }
-    expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
-  })
   it('parsed', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-readObject')
