@@ -1,12 +1,12 @@
 import crc32 from 'crc/lib/crc32.js'
 import applyDelta from 'git-apply-delta'
-import listpack from 'git-list-pack'
 import * as marky from 'marky'
 import pako from 'pako'
 import { PassThrough } from 'stream'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
+import { listpack } from '../utils/git-list-pack.js'
 import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'
 
@@ -152,9 +152,9 @@ export class GitPackIndex {
     marky.mark('offsets')
     marky.mark('percent')
     await new Promise((resolve, reject) => {
-      buffer2stream(pack)
-        .pipe(listpack())
-        .on('data', async ({ data, type, reference, offset, num }) => {
+      listpack(buffer2stream(pack)).on(
+        'data',
+        async ({ data, type, reference, offset, num }) => {
           if (totalObjectCount === null) totalObjectCount = num
           let percent = Math.floor(
             (totalObjectCount - num) * 100 / totalObjectCount
@@ -205,7 +205,8 @@ export class GitPackIndex {
             }
           }
           if (num === 0) resolve()
-        })
+        }
+      )
     })
     times['offsets'] = Math.floor(marky.stop('offsets').duration)
 
