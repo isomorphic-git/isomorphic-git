@@ -8,7 +8,7 @@ const pify = require('pify')
 const concat = require('simple-concat')
 const stream = require('stream')
 
-/**
+
 A diagram might be helpful.
 
 --- OVERVIEW ---
@@ -31,22 +31,32 @@ Git Push:
 
 --- DETAILED FETCH --- TODO: REFACTOR CODE UNTIL IT LOOKS LIKE THIS
 
-  fetch                  GitRemoteHTTP                 GitLocalHTTP         serve
-  createInfoRefsReq ---> sendInfoRefsReq ------------> recvInfoRefsReq ---> handleInfoRefsReq
-                              ↑  ↓                          ↑  ↓ 
-                         writeInfoRefsReq              parseInfoRefsReq
-  
-  handleInfoRefsRes <--- recvInfoRefsRes <------------ sendInfoRefsRes <--- createInfoRefsRes
-                              ↑  ↓                          ↑  ↓ 
-                         parseInfoRefsRes              writeInfoRefsRes
+  fetch           |      GitRemoteHTTP                           | server |       GitLocalHTTP                           |
+  ----------------|----------------------------------------------|--------|----------------------------------------------|
+  option() -------|> setOption                                   |        |                                              |
+  list() ---------|> [ sendInfoRefsReq........................]--|> auth -|> [ recvInfoRefsReq........................]  |
+                  |           ↓  ↑                ↓  ↑           |        |         ↓  ↑                 ↓  ↑            |
+  -----------------------------------------------------------------------------------------------------------------------|
+    GitPluginAPI:      createInfoRefsReq    writeInfoRefsReq                  parseInfoRefsReq     handleInfoRefsReq     |
+  -----------------------------------------------------------------------------------------------------------------------|
 
-  createUploadPackReq -> sendUploadPackReq ----------> recvUploadPackReq -> handleUploadPackReq
-                              ↑  ↓                          ↑  ↓ 
-                         writeUploadPackReq            parseUploadPackReq
 
-  handleUploadPackRes <- recvUploadPackRes <---------- sendUploadPackRes <- createUploadPackRes
-                              ↑  ↓                          ↑  ↓ 
-                         parseUploadPackRes            writeUploadPackRes
+  fetch           |      GitRemoteHTTP                           |       GitLocalHTTP                           | server |
+  ----------------|----------------------------------------------|----------------------------------------------|--------|
+  [{ oid, ref }] <|--[........................recvInfoRefsRes ] <|--[........................sendInfoRefsRes ] <|---*    |
+                  |           ↑  ↓                ↑  ↓           |           ↑  ↓                 ↑  ↓          |        |
+  -----------------------------------------------------------------------------------------------------------------------|
+    GitPluginAPI:      handleInfoRefsRes     parseInfoRefsRes          writeInfoRefsRes    createInfoRefsRes             |
+  -----------------------------------------------------------------------------------------------------------------------|
+
+
+  fetch({refs}) --> createUploadPackReq -> sendUploadPackReq ----------> recvUploadPackReq -> handleUploadPackReq
+                                                ↑  ↓                          ↑  ↓ 
+                                           writeUploadPackReq            parseUploadPackReq
+
+  packfile.lock <-- handleUploadPackRes <- recvUploadPackRes <---------- sendUploadPackRes <- createUploadPackRes
+                                                ↑  ↓                          ↑  ↓ 
+                                           parseUploadPackRes            writeUploadPackRes
 
 
 --- DETAILED PUSH --- TODO: REFACTOR CODE UNTIL IT LOOKS LIKE THIS
