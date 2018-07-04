@@ -8,7 +8,7 @@ const pify = require('pify')
 const concat = require('simple-concat')
 const stream = require('stream')
 
-
+/*
 A diagram might be helpful.
 
 --- OVERVIEW ---
@@ -31,51 +31,51 @@ Git Push:
 
 --- DETAILED FETCH --- TODO: REFACTOR CODE UNTIL IT LOOKS LIKE THIS
 
-  fetch           |      GitRemoteHTTP                           | server |       GitLocalHTTP                           |
-  ----------------|----------------------------------------------|--------|----------------------------------------------|
-  option() -------|> setOption                                   |        |                                              |
-  list() ---------|> [ sendInfoRefsReq........................]--|> auth -|> [ recvInfoRefsReq........................]  |
-                  |           ↓  ↑                ↓  ↑           |        |         ↓  ↑                 ↓  ↑            |
-  -----------------------------------------------------------------------------------------------------------------------|
-    GitPluginAPI:      createInfoRefsReq    writeInfoRefsReq                  parseInfoRefsReq     handleInfoRefsReq     |
-  -----------------------------------------------------------------------------------------------------------------------|
+|-- client ----------------------------------------------------||== server ===================================================================================================||-- client --------------------------------------------------------
+|                   [fetch()...................................||                                                                                                             ||..................................................................
+|                       ↓                                      ||                                                                                                             ||                                         ↑
+|  git:             [list()....................................||      ,-> auth(), [handle()........................................................................]---,     ||........................................list] => [{ oid, ref }]
+|                            ↓                                 ||     /                ↓                               ↑       ↓                               ↑         \    ||                                      ↑
+|--------------------------------------------------------------||----/----------------------------------------------------------------------------------------------------\---||------------------------------------------------------------------
+|                   [sendInfoRefsReq........................]--||---'              [recvInfoRefsReq......................]   [sendInfoRefsRes.......................]      '--||->[........................sendInfoRefsReq]
+|  GitHTTP:                  |  ↑                |  ↑          ||  GitHTTP:               |  ↑                 |  ↑                 |  ↑                 |  ↑                 ||        ↓                       ↑
+|                            |  |                |  |          ||                         |  |                 |  |                 |  |                 |  |                 ||  [recvInfoRefsRes......................]
+|                            ↓  |                ↓  |          ||                         ↓  |                 ↓  |                 ↓  |                 ↓  |                 ||        ↓  ↑                 ↓  ↑
+|--------------------------------------------------------------||-------------------------------------------------------------------------------------------------------------||------------------------------------------------------------------
+|  GitPluginAPI:    [createInfoRefsReq]  [writeInfoRefsReq]    ||  GitPluginAPI:   [parseInfoRefsReq]  [handleInfoRefsReq]   [createInfoRefsRes]  [writeInfoRefsRes]          ||  [parseInfoRefsRes]  [handleInfoRefsRes]
+|--------------------------------------------------------------||=============================================================================================================||------------------------------------------------------------------
 
+ -- client ----------------------------------------------------||== server ===================================================================================================||-- client --------------------------------------------------------|
+...............................................................||                                                                                                             ||...............................................] => packfile.lock |
+                        ↓                                      ||                                                                                                             ||                                         ↑                        |
+   git:             [fetch({refs}).............................||      ,-> auth(), [handle()........................................................................]---,     ||........................................fetch]                    |
+                             ↓                                 ||     /                ↓                               ↑       ↓                                   ↑     \    ||                                      ↑                           |
+ --------------------------------------------------------------||----/----------------------------------------------------------------------------------------------------\---||------------------------------------------------------------------|
+                    [sendUploadPackReq......................]--||---'              [recvUploadPackReq......................]   [sendUploadPackRes...................]      '--||->[........................sendUploadPackReq]                     |
+   GitHTTP:                  |  ↑                |  ↑          ||  GitHTTP:               |  ↑                 |  ↑                 |  ↑                 |  ↑                 ||        ↓                       ↑                                 |
+                             |  |                |  |          ||                         |  |                 |  |                 |  |                 |  |                 ||  [recvUploadPackRes......................]                       |
+                             ↓  |                ↓  |          ||                         ↓  |                 ↓  |                 ↓  |                 ↓  |                 ||        ↓  ↑                 ↓  ↑                                 |
+ --------------------------------------------------------------||-------------------------------------------------------------------------------------------------------------||------------------------------------------------------------------|
+   GitPluginAPI:    [createUploadPackReq]  [writeUploadPackReq]||  GitPluginAPI:   [parseUploadPackReq]  [handleUploadPackReq]   [createUploadPackRes]  [writeUploadPackRes]  ||  [parseUploadPackRes]  [handleUploadPackRes]                     |
+ --------------------------------------------------------------||=============================================================================================================||------------------------------------------------------------------|
 
-  fetch           |      GitRemoteHTTP                           |       GitLocalHTTP                           | server |
-  ----------------|----------------------------------------------|----------------------------------------------|--------|
-  [{ oid, ref }] <|--[........................recvInfoRefsRes ] <|--[........................sendInfoRefsRes ] <|---*    |
-                  |           ↑  ↓                ↑  ↓           |           ↑  ↓                 ↑  ↓          |        |
-  -----------------------------------------------------------------------------------------------------------------------|
-    GitPluginAPI:      handleInfoRefsRes     parseInfoRefsRes          writeInfoRefsRes    createInfoRefsRes             |
-  -----------------------------------------------------------------------------------------------------------------------|
-
-
-  fetch({refs}) --> createUploadPackReq -> sendUploadPackReq ----------> recvUploadPackReq -> handleUploadPackReq
-                                                ↑  ↓                          ↑  ↓ 
-                                           writeUploadPackReq            parseUploadPackReq
-
-  packfile.lock <-- handleUploadPackRes <- recvUploadPackRes <---------- sendUploadPackRes <- createUploadPackRes
-                                                ↑  ↓                          ↑  ↓ 
-                                           parseUploadPackRes            writeUploadPackRes
-
-
---- DETAILED PUSH --- TODO: REFACTOR CODE UNTIL IT LOOKS LIKE THIS
+--- DETAILED PUSH --- TODO: Redraw with the level of detail of the FETCH diagram
 
   push                    GitRemoteHTTP                  GitLocalHTTP          serve
   createInfoRefsReq ----> sendInfoRefsReq -------------> recvInfoRefsReq ----> handleInfoRefsReq
-                               ↑  ↓                           ↑  ↓ 
+                               ↑  ↓                           ↑  ↓
                           writeInfoRefsReq               parseInfoRefsReq
-  
+
   handleInfoRefsRes <---- recvInfoRefsRes <------------- sendInfoRefsRes <---- createInfoRefsRes
-                               ↑  ↓                           ↑  ↓ 
+                               ↑  ↓                           ↑  ↓
                           parseInfoRefsRes               writeInfoRefsRes
 
   createReceivePackReq -> sendReceivePackReq ----------> recvReceivePackReq -> handleReceivePackReq
-                               ↑  ↓                           ↑  ↓ 
+                               ↑  ↓                           ↑  ↓
                           writeReceivePackReq            parseReceivePackReq
 
   handleReceivePackRes <- recvReceivePackRes <---------- sendReceivePackRes <- createReceivePackRes
-                               ↑  ↓                           ↑  ↓ 
+                               ↑  ↓                           ↑  ↓
                           parseReceivePackRes            writeReceivePackRes
  */
 describe('GitRemoteConnection', () => {
