@@ -33,6 +33,7 @@ export async function clone ({
   relative,
   singleBranch,
   noCheckout = false,
+  noTags = false,
   onprogress
 }) {
   try {
@@ -74,7 +75,7 @@ export async function clone ({
       exclude,
       relative,
       singleBranch,
-      tags: true
+      tags: !noTags
     })
     ref = ref || defaultBranch
     ref = ref.replace('refs/heads/', '')

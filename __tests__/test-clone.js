@@ -4,7 +4,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { clone } = require('isomorphic-git')
 
 describe('clone', () => {
-  it('clone', async () => {
+  it('clone with noTags', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     let url = `https://${
       process.browser ? 'cors-buster-tbgktfqyku.now.sh/' : ''
@@ -15,6 +15,7 @@ describe('clone', () => {
       gitdir,
       depth: 1,
       ref: 'test-branch',
+      noTags: true,
       url
     })
     expect(fs.existsSync(`${dir}`)).toBe(true)
@@ -24,6 +25,7 @@ describe('clone', () => {
     )
     expect(fs.existsSync(`${gitdir}/refs/heads/test-branch`)).toBe(true)
     expect(fs.existsSync(`${dir}/package.json`)).toBe(true)
+    expect(fs.existsSync(`${gitdir}/refs/tags/v0.0.1`)).toBe(false)
   })
   it('clone with noCheckout', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
