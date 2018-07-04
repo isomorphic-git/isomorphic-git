@@ -1,4 +1,5 @@
 import { PassThrough } from 'stream'
+import through2 from 'through2'
 
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
@@ -57,51 +58,94 @@ export class GitRemoteConnection {
     }
     return { capabilities, refs, symrefs }
   }
-  static async stream ({ res }) {
-    // Parse the response!
-    let read = GitPktLine.streamReader(res)
-    // And now for the ridiculous side-band-64k protocol
-    let packetlines = new PassThrough()
-    let packfile = new PassThrough()
-    let progress = new PassThrough()
-    // TODO: Use a proper through stream?
-    const nextBit = async function () {
-      let line = await read()
-      // Skip over flush packets
-      if (line === null) return nextBit()
-      // A made up convention to signal there's no more to read.
-      if (line === true) {
-        packetlines.end()
-        progress.end()
-        packfile.end()
-        return
-      }
-      // Examine first byte to determine which output "stream" to use
-      switch (line[0]) {
-        case 1: // pack data
-          packfile.write(line.slice(1))
-          break
-        case 2: // progress message
-          progress.write(line.slice(1))
-          break
-        case 3: // fatal error message just before stream aborts
-          let error = line.slice(1)
-          progress.write(error)
-          packfile.destroy(new Error(error.toString('utf8')))
-          return
-        default:
-          // Not part of the side-band-64k protocol
-          packetlines.write(line.slice(0))
-      }
-      // Careful not to blow up the stack.
-      // I think Promises in a tail-call position should be OK.
-      nextBit()
+
+  static async sendUploadPackRequest ({
+    capabilities = [],
+    wants = [],
+    haves = [],
+    shallows = [],
+    depth = null,
+    since = null,
+    exclude = [],
+    relative = false
+  }) {
+    let packstream = new PassThrough()
+    wants = [...new Set(wants)] // remove duplicates
+    let firstLineCapabilities = ` ${capabilities.join(' ')}`
+    for (const oid of wants) {
+      packstream.write(
+        GitPktLine.encode(`want ${oid}${firstLineCapabilities}\n`)
+      )
+      firstLineCapabilities = ''
     }
-    nextBit()
-    return {
-      packetlines,
-      packfile,
-      progress
+    for (const oid of shallows) {
+      packstream.write(GitPktLine.encode(`shallow ${oid}\n`))
     }
+    if (depth !== null) {
+      packstream.write(GitPktLine.encode(`deepen ${depth}\n`))
+    }
+    if (since !== null) {
+      packstream.write(
+        GitPktLine.encode(
+          `deepen-since ${Math.floor(since.valueOf() / 1000)}\n`
+        )
+      )
+    }
+    for (const oid of exclude) {
+      packstream.write(GitPktLine.encode(`deepen-not ${oid}\n`))
+    }
+    for (const oid of haves) {
+      packstream.write(GitPktLine.encode(`have ${oid}\n`))
+    }
+    packstream.write(GitPktLine.flush())
+    packstream.end(GitPktLine.encode(`done\n`))
+    return packstream
+  }
+
+  static async receiveUploadPackResult ({ packetlines, packfile, progress }) {
+    let shallows = []
+    let unshallows = []
+    let acks = []
+    let nak = false
+    let done = false
+    return new Promise((resolve, reject) => {
+      // Parse the response
+      packetlines.pipe(
+        through2(async (data, enc, next) => {
+          let line = data.toString('utf8').trim()
+          if (line.startsWith('shallow')) {
+            let oid = line.slice(-41).trim()
+            if (oid.length !== 40) {
+              reject(new GitError(E.CorruptShallowOidFail, { oid }))
+            }
+            shallows.push(oid)
+          } else if (line.startsWith('unshallow')) {
+            let oid = line.slice(-41).trim()
+            if (oid.length !== 40) {
+              reject(new GitError(E.CorruptShallowOidFail, { oid }))
+            }
+            unshallows.push(oid)
+          } else if (line.startsWith('ACK')) {
+            let [, oid, status] = line.split(' ')
+            acks.push({ oid, status })
+            if (!status) done = true
+          } else if (line.startsWith('NAK')) {
+            nak = true
+            done = true
+          }
+          if (done) {
+            resolve({ shallows, unshallows, acks, nak, packfile, progress })
+          }
+          next(null, data)
+        })
+      )
+      // For some reason, clone --depth=1 returns >300 'shallow's but no ACK or NAK
+      // This is the failsafe in case there's no ack or nak
+      packetlines.on('end', () => {
+        if (!done) {
+          resolve({ shallows, unshallows, acks, nak, packfile, progress })
+        }
+      })
+    })
   }
 }

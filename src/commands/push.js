@@ -6,6 +6,7 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
+import { GitSideBand } from '../models/GitSideBand.js'
 import { log } from '../utils/log.js'
 import { pkg } from '../utils/pkg.js'
 
@@ -82,13 +83,15 @@ export async function push ({
       oids: [...objects],
       outputStream: packstream
     })
-    let { packfile, progress } = await GitRemoteHTTP.connect({
-      service: 'git-receive-pack',
-      url,
-      noGitSuffix,
-      auth,
-      stream: packstream
-    })
+    let { packfile, progress } = await GitSideBand.demux(
+      await GitRemoteHTTP.connect({
+        service: 'git-receive-pack',
+        url,
+        noGitSuffix,
+        auth,
+        stream: packstream
+      })
+    )
     if (emitter) {
       progress.on('data', chunk => {
         let msg = chunk.toString('utf8')
