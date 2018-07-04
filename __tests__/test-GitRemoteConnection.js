@@ -13,7 +13,7 @@ A diagram might be helpful.
 
 Git Fetch:
 
-  Client                                           Server
+  Client                                            Server
   Out-of-band request /info/refs -----------------> Out of band reciever
   receiveInfoRefs <-------------------------------- sendInfoRefs
   sendUploadPackRequest --------------------------> receiveUploadPackRequest
@@ -21,7 +21,7 @@ Git Fetch:
 
 Git Push:
 
-  Client                                           Server
+  Client                                            Server
   Out-of-band request /info/refs -----------------> Out of band reciever
   receiveInfoRefs <-------------------------------- sendInfoRefs
   sendReceivePackRequest -------------------------> receiveReceivePackRequest
