@@ -8,8 +8,10 @@ const pify = require('pify')
 const concat = require('simple-concat')
 const stream = require('stream')
 
-/*
+/**
 A diagram might be helpful.
+
+--- OVERVIEW ---
 
 Git Fetch:
 
@@ -26,6 +28,45 @@ Git Push:
   receiveInfoRefs <-------------------------------- sendInfoRefs
   sendReceivePackRequest -------------------------> receiveReceivePackRequest
   receiveReceivePackResult <----------------------- sendReceivePackResult
+
+--- DETAILED FETCH --- TODO: REFACTOR CODE UNTIL IT LOOKS LIKE THIS
+
+  fetch                  GitRemoteHTTP                 GitLocalHTTP         serve
+  createInfoRefsReq ---> sendInfoRefsReq ------------> recvInfoRefsReq ---> handleInfoRefsReq
+                              ↑  ↓                          ↑  ↓ 
+                         writeInfoRefsReq              parseInfoRefsReq
+  
+  handleInfoRefsRes <--- recvInfoRefsRes <------------ sendInfoRefsRes <--- createInfoRefsRes
+                              ↑  ↓                          ↑  ↓ 
+                         parseInfoRefsRes              writeInfoRefsRes
+
+  createUploadPackReq -> sendUploadPackReq ----------> recvUploadPackReq -> handleUploadPackReq
+                              ↑  ↓                          ↑  ↓ 
+                         writeUploadPackReq            parseUploadPackReq
+
+  handleUploadPackRes <- recvUploadPackRes <---------- sendUploadPackRes <- createUploadPackRes
+                              ↑  ↓                          ↑  ↓ 
+                         parseUploadPackRes            writeUploadPackRes
+
+
+--- DETAILED PUSH --- TODO: REFACTOR CODE UNTIL IT LOOKS LIKE THIS
+
+  push                    GitRemoteHTTP                  GitLocalHTTP          serve
+  createInfoRefsReq ----> sendInfoRefsReq -------------> recvInfoRefsReq ----> handleInfoRefsReq
+                               ↑  ↓                           ↑  ↓ 
+                          writeInfoRefsReq               parseInfoRefsReq
+  
+  handleInfoRefsRes <---- recvInfoRefsRes <------------- sendInfoRefsRes <---- createInfoRefsRes
+                               ↑  ↓                           ↑  ↓ 
+                          parseInfoRefsRes               writeInfoRefsRes
+
+  createReceivePackReq -> sendReceivePackReq ----------> recvReceivePackReq -> handleReceivePackReq
+                               ↑  ↓                           ↑  ↓ 
+                          writeReceivePackReq            parseReceivePackReq
+
+  handleReceivePackRes <- recvReceivePackRes <---------- sendReceivePackRes <- createReceivePackRes
+                               ↑  ↓                           ↑  ↓ 
+                          parseReceivePackRes            writeReceivePackRes
  */
 describe('GitRemoteConnection', () => {
   xit('sendInfoRefs', async () => {
