@@ -2,6 +2,7 @@ import path from 'path'
 
 import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
@@ -75,9 +76,8 @@ export async function readObject ({
           }
           break
         case 'tag':
-          throw new GitError(E.NotImplementedFail, {
-            thing: 'Parsing annotated tag objects'
-          })
+          result.object = GitAnnotatedTag.from(result.object).parse()
+          break
         default:
           throw new GitError(E.ObjectTypeUnknownFail, { type: result.type })
       }
@@ -91,6 +91,11 @@ export async function readObject ({
 
 async function resolveTree ({ fs, gitdir, oid }) {
   let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+  // Resolve annotated tag objects to whatever
+  if (type === 'tag') {
+    oid = GitAnnotatedTag.from(object).parse().object
+    return resolveTree({ fs, gitdir, oid })
+  }
   // Resolve commits to trees
   if (type === 'commit') {
     oid = GitCommit.from(object).parse().tree

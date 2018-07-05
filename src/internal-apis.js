@@ -13,6 +13,7 @@ export * from './managers/GitRemoteManager'
 export * from './managers/GitShallowManager'
 
 export * from './models/FileSystem'
+export * from './models/GitAnnotatedTag'
 export * from './models/GitCommit'
 export * from './models/GitConfig'
 export * from './models/GitError'
