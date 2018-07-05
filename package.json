@@ -88,6 +88,7 @@
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
     "codecov": "3.0.2",
+    "cors-buster": "2.0.2",
     "cross-env": "5.2.0",
     "duplicate-package-checker-webpack-plugin": "3.0.0",
     "envify": "4.1.0",
