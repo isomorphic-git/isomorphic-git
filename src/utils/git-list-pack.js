@@ -47,7 +47,7 @@ async function _listpack (reader, push) {
       if (inflator.result) {
         if (inflator.result.length !== length) {
           throw new GitError(E.InternalFail, {
-            message: 'Inflated object size is different from that stated in packfile.'
+            message: `Inflated object size is different from that stated in packfile.`
           })
         }
 
