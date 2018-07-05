@@ -2,15 +2,14 @@ import path from 'path'
 import pify from 'pify'
 import concat from 'simple-concat'
 import split2 from 'split2'
-import { PassThrough } from 'stream'
-import through2 from 'through2'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitRemoteConnection } from '../managers/GitRemoteConnection.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { GitPktLine } from '../models/GitPktLine.js'
+import { GitSideBand } from '../models/GitSideBand.js'
 
 import { config } from './config'
 
@@ -174,37 +173,16 @@ async function fetchPackfile ({
     map: remoteHTTP.refs
   })
   // Assemble the application/x-git-upload-pack-request
-  const capabilities = `multi_ack_detailed no-done side-band-64k thin-pack ofs-delta${
-    relative ? ' deepen-relative' : ''
-  }`
-  let packstream = new PassThrough()
+  const capabilities = [
+    'multi_ack_detailed',
+    'no-done',
+    'side-band-64k',
+    'thin-pack',
+    'ofs-delta'
+  ]
+  if (relative) capabilities.push('deepen-relative')
   // Start requesting oids from the remote by their SHAs
   let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
-  wants = [...new Set(wants)] // remove duplicates
-  let firstLineCapabilities = ` ${capabilities}`
-  for (const want of wants) {
-    packstream.write(
-      GitPktLine.encode(`want ${want}${firstLineCapabilities}\n`)
-    )
-    firstLineCapabilities = ''
-  }
-  let oids = await GitShallowManager.read({ fs, gitdir })
-  if (oids.size > 0 && remoteHTTP.capabilities.has('shallow')) {
-    for (let oid of oids) {
-      packstream.write(GitPktLine.encode(`shallow ${oid}\n`))
-    }
-  }
-  if (depth !== null) {
-    packstream.write(GitPktLine.encode(`deepen ${depth}\n`))
-  }
-  if (since !== null) {
-    packstream.write(
-      GitPktLine.encode(`deepen-since ${Math.floor(since.valueOf() / 1000)}\n`)
-    )
-  }
-  for (let x of exclude) {
-    packstream.write(GitPktLine.encode(`deepen-not ${x}\n`))
-  }
   let haves = []
   for (let ref of refs) {
     try {
@@ -216,39 +194,39 @@ async function fetchPackfile ({
       }
     } catch (err) {}
   }
-  for (const have of haves) {
-    packstream.write(GitPktLine.encode(`have ${have}\n`))
-  }
-  packstream.write(GitPktLine.flush())
-  packstream.end(GitPktLine.encode(`done\n`))
-  let response = await GitRemoteHTTP.connect({
+  let oids = await GitShallowManager.read({ fs, gitdir })
+  let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
+  const packstream = await GitRemoteConnection.sendUploadPackRequest({
+    capabilities,
+    wants,
+    haves,
+    shallows,
+    depth,
+    since,
+    exclude,
+    relative
+  })
+  let raw = await GitRemoteHTTP.connect({
     service: 'git-upload-pack',
     url,
     noGitSuffix,
     auth,
     stream: packstream
   })
-  // Apply all the 'shallow' and 'unshallow' commands
-  response.packetlines.pipe(
-    through2(async (data, enc, next) => {
-      let line = data.toString('utf8')
-      if (line.startsWith('shallow')) {
-        let oid = line.slice(-41).trim()
-        if (oid.length !== 40) {
-          throw new GitError(E.CorruptShallowOidFail, { oid })
-        }
+  let response = GitSideBand.demux(raw)
+  // Normally I would await this, but for some reason I'm having trouble detecting
+  // when this header portion is over.
+  GitRemoteConnection.receiveUploadPackResult(response).then(
+    async parsedResponse => {
+      // Apply all the 'shallow' and 'unshallow' commands
+      for (const oid of parsedResponse.shallows) {
         oids.add(oid)
-        await GitShallowManager.write({ fs, gitdir, oids })
-      } else if (line.startsWith('unshallow')) {
-        let oid = line.slice(-41).trim()
-        if (oid.length !== 40) {
-          throw new GitError(E.CorruptShallowOidFail, { oid })
-        }
-        oids.delete(oid)
-        await GitShallowManager.write({ fs, gitdir, oids })
       }
-      next(null, data)
-    })
+      for (const oid of parsedResponse.unshallows) {
+        oids.delete(oid)
+      }
+      await GitShallowManager.write({ fs, gitdir, oids })
+    }
   )
   // Update local remote refs
   if (singleBranch) {

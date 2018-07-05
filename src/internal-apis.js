@@ -23,6 +23,7 @@ export * from './models/GitPackIndex'
 export * from './models/GitPktLine'
 export * from './models/GitRefSpec'
 export * from './models/GitRefSpecSet'
+export * from './models/GitSideBand'
 export * from './models/GitTree'
 export * from './models/SignedGitCommit'
 

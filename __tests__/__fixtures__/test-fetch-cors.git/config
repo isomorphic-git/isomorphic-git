@@ -5,5 +5,5 @@
 	symlinks = false
 	ignorecase = true
 [remote "origin"]
-	url = https://cors-buster-tbgktfqyku.now.sh/github.com/wmhilton/isomorphic-git
+	url = http://localhost:9999/github.com/isomorphic-git/isomorphic-git
 	fetch = +refs/heads/*:refs/remotes/origin/*
