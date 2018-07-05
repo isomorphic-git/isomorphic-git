@@ -6,9 +6,9 @@ const { clone } = require('isomorphic-git')
 describe('clone', () => {
   it('clone with noTags', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    let url = `https://${
-      process.browser ? 'cors-buster-tbgktfqyku.now.sh/' : ''
-    }github.com/isomorphic-git/isomorphic-git`
+    let url = process.browser
+      ? `http://localhost:9999/github.com/isomorphic-git/isomorphic-git`
+      : `https://github.com/isomorphic-git/isomorphic-git`
     await clone({
       fs,
       dir,
@@ -29,9 +29,9 @@ describe('clone', () => {
   })
   it('clone with noCheckout', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    let url = `https://${
-      process.browser ? 'cors-buster-jfpactjnem.now.sh/' : ''
-    }github.com/isomorphic-git/isomorphic-git`
+    let url = process.browser
+      ? `http://localhost:9999/github.com/isomorphic-git/isomorphic-git`
+      : `https://github.com/isomorphic-git/isomorphic-git`
     await clone({
       fs,
       dir,
@@ -52,9 +52,9 @@ describe('clone', () => {
   })
   it('clone a tag', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    let url = `https://${
-      process.browser ? 'cors-buster-tbgktfqyku.now.sh/' : ''
-    }github.com/isomorphic-git/isomorphic-git`
+    let url = process.browser
+      ? `http://localhost:9999/github.com/isomorphic-git/isomorphic-git`
+      : `https://github.com/isomorphic-git/isomorphic-git`
     await clone({
       fs,
       dir,
