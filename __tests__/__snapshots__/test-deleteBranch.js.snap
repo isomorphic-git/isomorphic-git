@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`deleteBranch delete branch 1`] = `
+Array [
+  "master",
+]
+`;
+
+exports[`deleteBranch invalid branch name 1`] = `
+Object {
+  "caller": "git.deleteBranch",
+  "code": "InvalidRefNameError",
+  "data": Object {
+    "noun": "branch",
+    "ref": "inv@{id..branch.lock",
+    "suggestion": "inv-id.branch",
+    "verb": "delete",
+  },
+  "message": "Failed to delete branch \\"inv@{id..branch.lock\\" because that name would not be a valid git reference. A valid alternative would be \\"inv-id.branch\\".",
+}
+`;
+
+exports[`deleteBranch branch not exist 1`] = `
+Object {
+  "caller": "git.deleteBranch",
+  "code": "RefNotExistsError",
+  "data": Object {
+    "noun": "branch",
+    "ref": "branch-not-exist",
+    "verb": "delete",
+  },
+  "message": "Failed to delete branch \\"branch-not-exist\\" because branch \\"branch-not-exist\\" does not exists.",
+}
+`;
+
+exports[`deleteBranch missing ref argument 1`] = `
+Object {
+  "caller": "git.deleteBranch",
+  "code": "MissingRequiredParameterError",
+  "data": Object {
+    "function": "deleteBranch",
+    "parameter": "ref",
+  },
+  "message": "The function \\"deleteBranch\\" requires a \\"ref\\" parameter but none was provided.",
+}
+`;
+
+exports[`deleteBranch checked out branch 1`] = `
+Object {
+  "caller": "git.deleteBranch",
+  "code": "BranchDeleteError",
+  "data": Object {
+    "ref": "master",
+  },
+  "message": "Failed to delete branch \\"master\\" because branch \\"master\\" checked out now.",
+}
+`;

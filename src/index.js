@@ -3,6 +3,7 @@ import { oauth2 } from './utils/oauth2'
 
 export * from './commands/add'
 export * from './commands/branch'
+export * from './commands/deleteBranch'
 export * from './commands/checkout'
 export * from './commands/clone'
 export * from './commands/commit'
