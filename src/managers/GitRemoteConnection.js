@@ -94,10 +94,10 @@ export class GitRemoteConnection {
     for (const oid of exclude) {
       packstream.write(GitPktLine.encode(`deepen-not ${oid}\n`))
     }
+    packstream.write(GitPktLine.flush())
     for (const oid of haves) {
       packstream.write(GitPktLine.encode(`have ${oid}\n`))
     }
-    packstream.write(GitPktLine.flush())
     packstream.end(GitPktLine.encode(`done\n`))
     return packstream
   }
