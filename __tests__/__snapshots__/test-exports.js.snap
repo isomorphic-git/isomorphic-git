@@ -10,6 +10,7 @@ Array [
   "commit",
   "config",
   "currentBranch",
+  "deleteBranch",
   "fetch",
   "findRoot",
   "getRemoteInfo",
