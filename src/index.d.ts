@@ -100,6 +100,13 @@ export function branch(args: {
   ref: string
 }): Promise<void>;
 
+export function deleteBranch(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  ref: string
+}): Promise<void>;
+
 export function checkout(args: {
   fs: any,
   dir: string,

@@ -94,7 +94,9 @@ View the full Getting Started guide [here](https://isomorphic-git.github.io/docs
 
 ### CORS support
 
-Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a [proxy](https://cors-buster-tbgktfqyku.now.sh/). However, I am "being the change you want to see in the world" by making PRs to all the major git repository hosting services.
+Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a proxy.
+
+I have created [cors-buster](https://github.com/wmhilton/cors-buster) which you can clone or [`npm install cors-buster`](https://www.npmjs.com/package/cors-buster) or deploy to Now.sh. I used to have an instance up, but it [got abused](https://isomorphic-git.github.io/blog/2019/07/05/cors-proxy-disabled.html) so be careful.
 
 - Gogs: [Supported in v0.11.43](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)
 - Gitlab: [PR Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
@@ -153,6 +155,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [commit](https://isomorphic-git.github.io/docs/commit.html)
 - [config](https://isomorphic-git.github.io/docs/config.html)
 - [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
+- [deleteBranch](https://isomorphic-git.github.io/docs/deleteBranch.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
