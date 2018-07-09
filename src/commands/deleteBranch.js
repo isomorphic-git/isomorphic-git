@@ -37,7 +37,11 @@ export async function deleteBranch ({
 
     const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)
     if (!exist) {
-      throw new GitError(E.RefNotExistsError, { verb: 'delete', noun: 'branch', ref })
+      throw new GitError(E.RefNotExistsError, {
+        verb: 'delete',
+        noun: 'branch',
+        ref
+      })
     }
 
     const currentRef = await currentBranch({ fs, gitdir })

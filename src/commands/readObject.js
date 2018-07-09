@@ -6,6 +6,7 @@ import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
+import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  * Read a git object directly by its SHA1 object id
@@ -87,26 +88,6 @@ export async function readObject ({
     err.caller = 'git.readObject'
     throw err
   }
-}
-
-async function resolveTree ({ fs, gitdir, oid }) {
-  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
-  // Resolve annotated tag objects to whatever
-  if (type === 'tag') {
-    oid = GitAnnotatedTag.from(object).parse().object
-    return resolveTree({ fs, gitdir, oid })
-  }
-  // Resolve commits to trees
-  if (type === 'commit') {
-    oid = GitCommit.from(object).parse().tree
-    let result = await GitObjectManager.read({ fs, gitdir, oid })
-    type = result.type
-    object = result.object
-  }
-  if (type !== 'tree') {
-    throw new GitError(E.ResolveTreeError, { oid })
-  }
-  return { tree: GitTree.from(object), oid }
 }
 
 async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
