@@ -168,13 +168,24 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
 async function getHeadTree ({ fs, gitdir }) {
   // Get the tree from the HEAD commit.
   let oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
-  let { object: cobject } = await GitObjectManager.read({ fs, gitdir, oid })
-  let commit = GitCommit.from(cobject)
-  let { object: tobject } = await GitObjectManager.read({
+  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+  if (type !== 'commit') {
+    throw new GitError(E.ResolveCommitError, { oid })
+  }
+  let commit = GitCommit.from(object)
+  oid = commit.parseHeaders().tree
+  return getTree({ fs, gitdir, oid })
+}
+
+async function getTree ({ fs, gitdir, oid }) {
+  let { type, object } = await GitObjectManager.read({
     fs,
     gitdir,
-    oid: commit.parseHeaders().tree
+    oid
   })
-  let tree = GitTree.from(tobject).entries()
+  if (type !== 'tree') {
+    throw new GitError(E.ResolveTreeError, { oid })
+  }
+  let tree = GitTree.from(object).entries()
   return tree
 }
