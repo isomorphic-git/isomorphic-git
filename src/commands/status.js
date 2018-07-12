@@ -8,6 +8,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
+import { compareStats } from '../utils/compareStats.js'
 
 /**
  * Tell whether a file has been changed
@@ -65,7 +66,7 @@ export async function status ({
     let W = stats !== null // working dir
 
     const getWorkdirOid = async () => {
-      if (I && !cacheIsStale({ entry: indexEntry, stats })) {
+      if (I && !compareStats({ entry: indexEntry, stats })) {
         return indexEntry.oid
       } else {
         let object = await fs.read(path.join(dir, filepath))
@@ -74,6 +75,21 @@ export async function status ({
           type: 'blob',
           object
         })
+        // If the oid in the index === working dir oid but stats differed update cache
+        if (I && indexEntry.oid === workdirOid) {
+          // and as long as our fs.stats aren't bad.
+          // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
+          // because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
+          if (stats.size !== -1) {
+            // We don't await this so we can return faster for one-off cases.
+            GitIndexManager.acquire(
+              { fs, filepath: `${gitdir}/index` },
+              async function (index) {
+                index.insert({ filepath, stats, oid: workdirOid })
+              }
+            )
+          }
+        }
         return workdirOid
       }
     }
@@ -121,20 +137,6 @@ export async function status ({
     err.caller = 'git.status'
     throw err
   }
-}
-
-function cacheIsStale ({ entry, stats }) {
-  // Comparison based on the description in Paragraph 4 of
-  // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
-  return (
-    entry.mode !== stats.mode ||
-    entry.mtime.valueOf() !== stats.mtime.valueOf() ||
-    entry.ctime.valueOf() !== stats.ctime.valueOf() ||
-    entry.uid !== stats.uid ||
-    entry.gid !== stats.gid ||
-    entry.ino !== stats.ino >> 0 ||
-    entry.size !== stats.size
-  )
 }
 
 async function getOidAtPath ({ fs, gitdir, tree, path }) {
