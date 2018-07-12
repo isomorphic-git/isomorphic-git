@@ -21,7 +21,7 @@ export interface GitObjectDescription {
   oid: string,
   type?: 'blob' | 'tree' | 'commit' | 'tag',
   format: 'deflated' | 'wrapped' | 'content' | 'parsed',
-  object: Buffer | CommitDescription | TreeDescription,
+  object: Buffer | CommitDescription | TreeDescription | TagDescription,
   source?: string
 }
 
@@ -51,6 +51,20 @@ export interface CommitDescriptionWithPayload extends CommitDescription {
 
 export interface TreeDescription {
   entries: Array<TreeEntry>
+}
+
+export interface TagDescription {
+  object: string,
+  type: 'blob' | 'tree' | 'commit' | 'tag',
+  tag: string,
+  tagger: {
+    name: string,          // The tagger's name
+    email: string,         // The tagger's email
+    timestamp: number,     // UTC Unix timestamp in seconds
+    timezoneOffset: number // Timezone difference from UTC in minutes
+  },
+  message: string,
+  signature?: string
 }
 
 export interface TreeEntry {
