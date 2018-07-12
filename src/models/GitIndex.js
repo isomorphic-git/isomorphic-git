@@ -1,9 +1,9 @@
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
+import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
 
-const MAX_UINT32 = 2 ** 32
 /*::
 import type {Stats} from 'fs'
 
@@ -77,14 +77,10 @@ function parseBuffer (buffer) {
   let i = 0
   while (!reader.eof() && i < numEntries) {
     let entry = {}
-    let ctimeSeconds = reader.readUInt32BE()
-    let ctimeNanoseconds = reader.readUInt32BE()
-    entry.ctime = new Date(ctimeSeconds * 1000 + ctimeNanoseconds / 1000000)
-    entry.ctimeNanoseconds = ctimeNanoseconds
-    let mtimeSeconds = reader.readUInt32BE()
-    let mtimeNanoseconds = reader.readUInt32BE()
-    entry.mtime = new Date(mtimeSeconds * 1000 + mtimeNanoseconds / 1000000)
-    entry.mtimeNanoseconds = mtimeNanoseconds
+    entry.ctimeSeconds = reader.readUInt32BE()
+    entry.ctimeNanoseconds = reader.readUInt32BE()
+    entry.mtimeSeconds = reader.readUInt32BE()
+    entry.mtimeNanoseconds = reader.readUInt32BE()
     entry.dev = reader.readUInt32BE()
     entry.ino = reader.readUInt32BE()
     entry.mode = reader.readUInt32BE()
@@ -148,18 +144,21 @@ export class GitIndex {
     }
   }
   insert ({ filepath, stats, oid }) {
+    stats = normalizeStats(stats)
     let entry = {
-      ctime: stats.ctime,
-      mtime: stats.mtime,
-      dev: stats.dev % MAX_UINT32,
-      ino: stats.ino % MAX_UINT32,
+      ctimeSeconds: stats.ctimeSeconds,
+      ctimeNanoseconds: stats.ctimeNanoseconds,
+      mtimeSeconds: stats.mtimeSeconds,
+      mtimeNanoseconds: stats.mtimeNanoseconds,
+      dev: stats.dev,
+      ino: stats.ino,
       // We provide a fallback value for `mode` here because not all fs
       // implementations assign it, but we use it in GitTree.
       // '100644' is for a "regular non-executable file"
-      mode: (stats.mode || 0o100644) % MAX_UINT32,
-      uid: stats.uid % MAX_UINT32,
-      gid: stats.gid % MAX_UINT32,
-      size: stats.size % MAX_UINT32,
+      mode: stats.mode || 0o100644,
+      uid: stats.uid,
+      gid: stats.gid,
+      size: stats.size,
       path: filepath,
       oid: oid,
       flags: {
@@ -205,26 +204,17 @@ export class GitIndex {
         let length = Math.ceil((62 + entry.path.length + 1) / 8) * 8
         let written = Buffer.alloc(length)
         let writer = new BufferCursor(written)
-        let ctimeMilliseconds = entry.ctime.valueOf()
-        let ctimeSeconds = Math.floor(ctimeMilliseconds / 1000)
-        let ctimeNanoseconds =
-          entry.ctimeNanoseconds ||
-          ctimeMilliseconds * 1000000 - ctimeSeconds * 1000000 * 1000
-        let mtimeMilliseconds = entry.mtime.valueOf()
-        let mtimeSeconds = Math.floor(mtimeMilliseconds / 1000)
-        let mtimeNanoseconds =
-          entry.mtimeNanoseconds ||
-          mtimeMilliseconds * 1000000 - mtimeSeconds * 1000000 * 1000
-        writer.writeUInt32BE(ctimeSeconds % MAX_UINT32)
-        writer.writeUInt32BE(ctimeNanoseconds % MAX_UINT32)
-        writer.writeUInt32BE(mtimeSeconds % MAX_UINT32)
-        writer.writeUInt32BE(mtimeNanoseconds % MAX_UINT32)
-        writer.writeUInt32BE(entry.dev % MAX_UINT32)
-        writer.writeUInt32BE(entry.ino % MAX_UINT32)
-        writer.writeUInt32BE(entry.mode % MAX_UINT32)
-        writer.writeUInt32BE(entry.uid % MAX_UINT32)
-        writer.writeUInt32BE(entry.gid % MAX_UINT32)
-        writer.writeUInt32BE(entry.size % MAX_UINT32)
+        const stat = normalizeStats(entry)
+        writer.writeUInt32BE(stat.ctimeSeconds)
+        writer.writeUInt32BE(stat.ctimeNanoseconds)
+        writer.writeUInt32BE(stat.mtimeSeconds)
+        writer.writeUInt32BE(stat.mtimeNanoseconds)
+        writer.writeUInt32BE(stat.dev)
+        writer.writeUInt32BE(stat.ino)
+        writer.writeUInt32BE(stat.mode)
+        writer.writeUInt32BE(stat.uid)
+        writer.writeUInt32BE(stat.gid)
+        writer.writeUInt32BE(stat.size)
         writer.write(entry.oid, 20, 'hex')
         writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
         writer.write(entry.path, entry.path.length, 'utf8')
