@@ -28,7 +28,6 @@
     "prepublishOnly": "nps prepublish",
     "semantic-release": "semantic-release",
     "travis-deploy-once": "travis-deploy-once",
-    "postinstall": "opencollective postinstall",
     "add-contributor": "nps contributors.add"
   },
   "repository": {
@@ -86,7 +85,7 @@
     "browserfs": "2.0.0",
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
-    "codecov": "3.0.3",
+    "codecov": "3.0.4",
     "cors-buster": "2.0.2",
     "cross-env": "5.2.0",
     "duplicate-package-checker-webpack-plugin": "3.0.0",
