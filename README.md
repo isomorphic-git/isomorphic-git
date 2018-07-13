@@ -45,6 +45,15 @@ Browser Support:
 
 [![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&microsoftedge=17&safari=11&android=7.1&iphone=11.2)](https://saucelabs.com/u/_wmhilton)
 
+</td></tr><tr><td>
+
+Most recent build:
+
+</td><td>
+  
+[![Build Status](https://saucelabs.com/buildstatus/_wmhilton)](https://saucelabs.com/beta/builds/e188d69c3e1640139b5899a5ff76f092)
+[![Build Status](https://travis-ci.org/isomorphic-git/isomorphic-git.svg)](https://travis-ci.org/isomorphic-git/isomorphic-git)
+
 </td></tr></table>
 
 `isomorphic-git` is a pure JavaScript implementation of git that works in node and browser environments (including WebWorkers and ServiceWorkers). This means it can be used to read and write to git repositories, as well as fetch from and push to git remotes like Github.
