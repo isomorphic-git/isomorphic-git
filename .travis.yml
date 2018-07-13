@@ -14,7 +14,7 @@ before_script:
   - chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
   - ./node_modules/.bin/micro --listen=tcp://0.0.0.0:9999 ./node_modules/cors-buster/index.js &
 script:
-  - node __tests__/__helpers__/can-i-skip-tests.js .all-contributorsrc CODE_OF_CONDUCT.md CONTRIBUTING.md LICENSE.md README.md renovate.json || npm test
+  - node __tests__/__helpers__/can-i-skip-tests.js .all-contributorsrc CODE_OF_CONDUCT.md CONTRIBUTING.md LICENSE.md README.md renovate.json __tests__/__fixtures__/test-push-server.git/hooks/post-receive || npm test
 after_success:
   - npm run travis-deploy-once "npm run semantic-release"
 branches:

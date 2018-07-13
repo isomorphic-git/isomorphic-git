@@ -9,6 +9,7 @@ export async function getRemoteInfo ({
   url,
   authUsername,
   authPassword,
+  noGitSuffix = false,
   username = authUsername,
   password = authPassword,
   token,
@@ -19,6 +20,7 @@ export async function getRemoteInfo ({
     const remote = await GitRemoteHTTP.discover({
       service: 'git-upload-pack',
       url,
+      noGitSuffix,
       auth
     })
     const result = {}
