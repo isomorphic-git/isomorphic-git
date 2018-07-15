@@ -63,25 +63,24 @@ filterFile: (walk, [index, workdir]) => {
     return { [index.path]: 'd' }
   } else {
     // Here we could ignore certain filenames. But we'll consider all filenames interesting.
-    return next()
-  }
-}
-
-filterRead: (next, [index, workdir]) => {
-  // We know they must both not be null, otherwise we'd have returned 'a' or 'd' already.
-  // So now the choice is between 's' and 'm'
-  // We can decide two files are the same based on the stats info
-  if (compareStats(index, workdir)) {
-    return { [index.path]: 's' }
-  } else {
-    // If that fails, we will need to compare content
-    return next()
-  }
-}
-
-filterContent: (next, [index, workdir]) => {
-  return {
-    [index.path]: index.oid === sha1(workdir.oid) ? 's' : 'm'
+    // We know they must both not be null, otherwise we'd have returned 'a' or 'd' already.
+    // So now the choice is between 's' and 'm'
+    // We can decide two files are the same based on the stats info
+    await populateStat(workdir)
+    if (index.size !== workdir.size) {
+      return { [index.path]: 'm' }
+    } if (compareStats(index, workdir)) {
+      return { [index.path]: 's' }
+    } else {
+      // If that fails, we will need to compare the SHA
+      await populateHash(workdir)
+      // Now we can compare our working dir file with our index.
+      return {
+        [index.path]: index.oid === workdir.oid ? 's' : 'm'
+      }
+      // Alternatively, if we wanted to examine the contents, we could do
+      await populateContent(workdir)
+    }
   }
 }
 
