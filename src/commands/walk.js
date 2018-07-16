@@ -2,10 +2,10 @@ import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { GitRefManager } from '../managers/GitRefManager.js';
-import { GitWalkerIndex } from '../models/GitWalkerIndex.js';
-import { GitWalkerFs } from '../models/GitWalkerFs.js';
-import { GitWalkerRepo } from '../models/GitWalkerRepo.js';
+import { GitWalkerFs } from '../models/GitWalkerFs.js'
+import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
+import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
+import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
  * Add a file to the git index (aka staging area)
@@ -25,26 +25,35 @@ export async function walk ({
   try {
     const fs = new FileSystem(_fs)
 
-    let walkers = Promise.all(trees.map(async ref => {
-      let walker
-      if (ref === 'STAGE') {
-        await GitIndexManager.acquire(
-          { fs, filepath: `${gitdir}/index` },
-          async function (index) {
-            walker = new GitWalkerIndex({index})
-          }
-        )
-      } else if (ref === 'WORKDIR') {
-        walker = new GitWalkerFs({fs, dir})
-      } else {
-        let oid = await GitRefManager.resolve(ref)
-        walker = new GitWalkerRepo({fs, gitdir, oid})
-      }
-      return walker
-    }))
+    let walkers = await Promise.all(
+      trees.map(async ref => {
+        let walker
+        if (ref === 'STAGE') {
+          walker = new GitWalkerIndex({ fs, gitdir })
+        } else if (ref === 'WORKDIR') {
+          walker = new GitWalkerFs({ fs, dir })
+        } else {
+          walker = new GitWalkerRepo({ fs, gitdir, ref })
+        }
+        return walker
+      })
+    )
 
-    console.log(walkers)
-
+    // let WORKDIR = await walkers[2].readdir('.')
+    // console.log('WORKDIR', WORKDIR.map(x => x.fullpath))
+    // let STAGE = await walkers[1].readdir('.')
+    // console.log('STAGE', STAGE.map(x => x.fullpath))
+    // let HEAD = await walkers[0].readdir('.')
+    // console.log('HEAD', HEAD.map(x => x.fullpath))
+    let roots = await Promise.all(walkers.map(walker => walker.readdir('.')))
+    console.log(roots)
+    let iterators = roots.map(array => array[Symbol.iterator]())
+    console.log(iterators)
+    let unionWalker = unionOfIterators(iterators)
+    console.log(unionWalker)
+    for (const entry of unionWalker) {
+      console.log(entry)
+    }
   } catch (err) {
     err.caller = 'git.walk'
     throw err

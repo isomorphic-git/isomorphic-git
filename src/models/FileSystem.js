@@ -4,6 +4,7 @@ import path from 'path'
 import pify from 'pify'
 
 import { E, GitError } from '../models/GitError.js'
+import { compareStrings } from '../utils/compareStrings.js'
 import { sleep } from '../utils/sleep.js'
 
 const readFileLog = debug('readFile')
@@ -105,7 +106,11 @@ export class FileSystem {
    */
   async readdir (filepath) {
     try {
-      return await this._readdir(filepath)
+      let names = await this._readdir(filepath)
+      // Ordering is not guaranteed, and system specific (Windows vs Unix)
+      // so we must sort them ourselves.
+      names.sort(compareStrings)
+      return names
     } catch (err) {
       return []
     }

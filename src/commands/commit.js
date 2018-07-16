@@ -44,7 +44,8 @@ export async function commit ({
     await GitIndexManager.acquire(
       { fs, filepath: `${gitdir}/index` },
       async function (index) {
-        const inode = flatFileListToDirectoryStructure(index.entries)
+        const inodes = flatFileListToDirectoryStructure(index.entries)
+        const inode = inodes.get('.')
         const treeRef = await constructTree({ fs, gitdir, inode })
         let parents
         try {

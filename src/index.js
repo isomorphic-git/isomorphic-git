@@ -28,6 +28,7 @@ export * from './commands/sign'
 export * from './commands/status'
 export * from './commands/verify'
 export * from './commands/version'
+export * from './commands/walk'
 
 export const utils = { auth, oauth2 }
 export { E } from './models/GitError'
