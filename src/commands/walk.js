@@ -1,7 +1,6 @@
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { GitWalkerFs } from '../models/GitWalkerFs.js'
 import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
 import { GitWalkerRepo } from '../models/GitWalkerRepo.js'

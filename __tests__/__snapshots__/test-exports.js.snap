@@ -31,5 +31,6 @@ Array [
   "utils",
   "verify",
   "version",
+  "walk",
 ]
 `;

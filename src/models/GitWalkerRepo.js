@@ -23,7 +23,9 @@ export class GitWalkerRepo {
     let map = await this.mapPromise
     let oid = map.get(filepath)
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
-    if (type !== 'tree') { throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`) }
+    if (type !== 'tree') {
+      throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
+    }
     let tree = GitTree.from(object)
     // cache all entries
     for (const entry of tree) {
@@ -51,7 +53,9 @@ export class GitWalkerRepo {
     let { fs, gitdir } = this
     let oid = map.get(entry.fullpath)
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
-    if (type === 'tree') { throw new Error(`EISDIR: illegal operation on a directory, read`) }
+    if (type === 'tree') {
+      throw new Error(`EISDIR: illegal operation on a directory, read`)
+    }
     Object.assign(entry, { content: object })
   }
   async populateHash (entry) {
