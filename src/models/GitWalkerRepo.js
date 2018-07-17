@@ -1,4 +1,4 @@
-import path from 'path'
+import { posix as path } from 'path'
 
 import { GitObjectManager } from '../managers/GitObjectManager'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -14,15 +14,19 @@ export class GitWalkerRepo {
       let map = new Map()
       let oid = await GitRefManager.resolve({ fs, gitdir, ref })
       let tree = await resolveTree({ fs, gitdir, oid })
-      map.set('.', tree.oid)
+      map.set('.', tree)
       return map
     })()
   }
   async readdir (filepath) {
     let { fs, gitdir } = this
     let map = await this.mapPromise
-    let oid = map.get(filepath)
+    let obj = map.get(filepath)
+    if (!obj) throw new Error(`No obj for ${filepath}`)
+    let oid = obj.oid
+    if (!oid) throw new Error(`No oid for obj ${JSON.stringify(obj)}`)
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    if (type === 'blob') return null
     if (type !== 'tree') {
       throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
     }
@@ -51,7 +55,10 @@ export class GitWalkerRepo {
   async populateContent (entry) {
     let map = await this.mapPromise
     let { fs, gitdir } = this
-    let oid = map.get(entry.fullpath)
+    let obj = map.get(entry.fullpath)
+    if (!obj) throw new Error(`No obj for ${entry.fullpath}`)
+    let oid = obj.oid
+    if (!oid) throw new Error(`No oid for entry ${JSON.stringify(obj)}`)
     let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
     if (type === 'tree') {
       throw new Error(`EISDIR: illegal operation on a directory, read`)

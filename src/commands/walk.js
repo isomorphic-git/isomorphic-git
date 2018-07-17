@@ -45,13 +45,19 @@ export async function walk ({
     // let HEAD = await walkers[0].readdir('.')
     // console.log('HEAD', HEAD.map(x => x.fullpath))
     let roots = await Promise.all(walkers.map(walker => walker.readdir('.')))
-    console.log(roots)
     let iterators = roots.map(array => array[Symbol.iterator]())
-    console.log(iterators)
     let unionWalker = unionOfIterators(iterators)
     console.log(unionWalker)
     for (const entry of unionWalker) {
-      console.log(entry)
+      for (let i = 0; i < walkers.length; i++) {
+        console.log(entry[i])
+        if (entry[i] !== null) {
+          const subdirs = await walkers[i].readdir(entry[i].fullpath)
+          if (subdirs !== null) {
+            console.log(subdirs)
+          }
+        }
+      }
     }
   } catch (err) {
     err.caller = 'git.walk'

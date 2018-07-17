@@ -18,6 +18,7 @@ export class GitWalkerIndex {
     let tree = await this.treePromise
     let inode = tree.get(filepath)
     if (!inode) return null
+    if (inode.type === 'blob') return null
     if (inode.type !== 'tree') {
       throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
     }

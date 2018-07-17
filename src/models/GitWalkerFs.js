@@ -1,4 +1,4 @@
-import path from 'path'
+import { posix as path } from 'path'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager'
 
@@ -12,6 +12,7 @@ export class GitWalkerFs {
   async readdir (filepath) {
     let { fs, dir } = this
     let names = await fs.readdir(path.join(this.dir, filepath))
+    if (names === null) return null
     let entries = names.map(name => ({
       fullpath: path.join(filepath, name),
       basename: name

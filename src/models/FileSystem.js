@@ -112,6 +112,7 @@ export class FileSystem {
       names.sort(compareStrings)
       return names
     } catch (err) {
+      if (err.code === 'ENOTDIR') return null
       return []
     }
   }
