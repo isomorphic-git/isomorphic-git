@@ -36,6 +36,7 @@ export function * unionOfIterators (sets) {
       min.consider(heads[i].fullpath)
     }
   }
+  if (min.value === null) return
   // Iterate
   while (true) {
     let result = []

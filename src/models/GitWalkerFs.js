@@ -9,7 +9,9 @@ export class GitWalkerFs {
     this.fs = fs
     this.dir = dir
   }
-  async readdir (filepath) {
+  async readdir (entry) {
+    if (entry === null) return []
+    let filepath = entry.fullpath
     let { fs, dir } = this
     let names = await fs.readdir(path.join(this.dir, filepath))
     if (names === null) return null

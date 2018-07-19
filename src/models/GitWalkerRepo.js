@@ -18,7 +18,9 @@ export class GitWalkerRepo {
       return map
     })()
   }
-  async readdir (filepath) {
+  async readdir (entry) {
+    if (entry === null) return []
+    let filepath = entry.fullpath
     let { fs, gitdir } = this
     let map = await this.mapPromise
     let obj = map.get(filepath)

@@ -1,4 +1,5 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { compareStrings } from '../utils/compareStrings.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure'
 
 export class GitWalkerIndex {
@@ -14,7 +15,9 @@ export class GitWalkerIndex {
       return result
     })()
   }
-  async readdir (filepath) {
+  async readdir (entry) {
+    if (entry === null) return []
+    let filepath = entry.fullpath
     let tree = await this.treePromise
     let inode = tree.get(filepath)
     if (!inode) return null
@@ -22,10 +25,14 @@ export class GitWalkerIndex {
     if (inode.type !== 'tree') {
       throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
     }
-    return inode.children.map(inode => ({
-      fullpath: inode.fullpath,
-      basename: inode.basename
-    }))
+    return inode.children
+      .map(inode => ({
+        fullpath: inode.fullpath,
+        basename: inode.basename
+        // TODO: Figure out why flatFileListToDirectoryStructure is not returning children
+        // sorted correctly for "__tests__/__fixtures__/test-push.git"
+      }))
+      .sort((a, b) => compareStrings(a.fullpath, b.fullpath))
   }
   async populateStat (entry) {
     let tree = await this.treePromise

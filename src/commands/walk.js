@@ -4,6 +4,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitWalkerFs } from '../models/GitWalkerFs.js'
 import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
 import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
+import { arrayRange } from '../utils/arrayRange.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
@@ -38,27 +39,43 @@ export async function walk ({
       })
     )
 
-    // let WORKDIR = await walkers[2].readdir('.')
-    // console.log('WORKDIR', WORKDIR.map(x => x.fullpath))
-    // let STAGE = await walkers[1].readdir('.')
-    // console.log('STAGE', STAGE.map(x => x.fullpath))
-    // let HEAD = await walkers[0].readdir('.')
-    // console.log('HEAD', HEAD.map(x => x.fullpath))
-    let roots = await Promise.all(walkers.map(walker => walker.readdir('.')))
-    let iterators = roots.map(array => array[Symbol.iterator]())
-    let unionWalker = unionOfIterators(iterators)
-    console.log(unionWalker)
-    for (const entry of unionWalker) {
-      for (let i = 0; i < walkers.length; i++) {
-        console.log(entry[i])
-        if (entry[i] !== null) {
-          const subdirs = await walkers[i].readdir(entry[i].fullpath)
-          if (subdirs !== null) {
-            console.log(subdirs)
-          }
-        }
+    let root = new Array(walkers.length).fill({
+      fullpath: '.',
+      basename: '.'
+    })
+    const range = arrayRange(0, walkers.length)
+    const unionWalkerFromReaddir = async entry => {
+      const subdirs = await Promise.all(
+        range.map(i => walkers[i].readdir(entry[i]))
+      )
+      // TODO: Here insert leaf node operation where readdir result was null
+      // Now process child directories
+      let iterators = subdirs
+        .map(array => (array === null ? [] : array))
+        .map(array => array[Symbol.iterator]())
+      return unionOfIterators(iterators)
+    }
+
+    const results = []
+    const recurse = async root => {
+      let unionWalker = await unionWalkerFromReaddir(root)
+      for (const entry of unionWalker) {
+        results.push(entry.map(e => (e === null ? null : e.fullpath)))
+        await recurse(entry)
       }
     }
+    await recurse(root)
+    console.table(results)
+    // let unionWalker = await unionWalkerFromReaddir(root)
+    // console.log(range)
+    // console.log(unionWalker)
+    // for (const entry of unionWalker) {
+    //   console.log(entry)
+    //   let unionWalker2 = await unionWalkerFromReaddir(entry)
+    //   for (const entry2 of unionWalker2) {
+    //     console.log(entry2)
+    //   }
+    // }
   } catch (err) {
     err.caller = 'git.walk'
     throw err
