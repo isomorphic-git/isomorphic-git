@@ -185,6 +185,13 @@ export function currentBranch(args: {
   fullname?: boolean,
 }): Promise<string>
 
+export function expandRef(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  ref: string
+}): Promise<string>
+
 export function fetch(args: {
   fs: any,
   dir: string,

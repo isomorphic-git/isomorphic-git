@@ -164,6 +164,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [commit](https://isomorphic-git.github.io/docs/commit.html)
 - [config](https://isomorphic-git.github.io/docs/config.html)
 - [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
+- [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
 - [deleteBranch](https://isomorphic-git.github.io/docs/deleteBranch.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
