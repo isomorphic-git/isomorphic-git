@@ -11,6 +11,7 @@ Array [
   "config",
   "currentBranch",
   "deleteBranch",
+  "expandRef",
   "fetch",
   "findRoot",
   "getRemoteInfo",
