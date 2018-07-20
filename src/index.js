@@ -30,5 +30,9 @@ export * from './commands/verify'
 export * from './commands/version'
 export * from './commands/walk'
 
+export { WORKDIR } from './models/GitWalkerFs'
+export { STAGE } from './models/GitWalkerIndex'
+export { TREE } from './models/GitWalkerRepo'
+
 export const utils = { auth, oauth2 }
 export { E } from './models/GitError'

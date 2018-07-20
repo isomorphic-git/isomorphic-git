@@ -3,6 +3,7 @@ import { posix as path } from 'path'
 import { GitObjectManager } from '../managers/GitObjectManager'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { resolveTree } from '../utils/resolveTree'
+import { GitWalkerSymbol } from '../utils/symbols'
 
 import { GitTree } from './GitTree.js'
 
@@ -78,4 +79,21 @@ export class GitWalkerRepo {
     let oid = obj.oid
     Object.assign(entry, { oid })
   }
+}
+
+const TREE = function TREE (ref) {
+  return _TREE(ref)
+}
+Object.freeze(TREE)
+export { TREE }
+
+const _TREE = function (ref) {
+  let o = Object.create(null)
+  Object.defineProperty(o, GitWalkerSymbol, {
+    value: function ({ fs, gitdir }) {
+      console.log('ref = ', ref)
+      return new GitWalkerRepo({ fs, gitdir, ref })
+    }
+  })
+  return o
 }

@@ -1,6 +1,7 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure'
+import { GitWalkerSymbol } from '../utils/symbols'
 
 export class GitWalkerIndex {
   constructor ({ fs, gitdir }) {
@@ -74,3 +75,10 @@ export class GitWalkerIndex {
     })
   }
 }
+
+const STAGE = Object.create(null)
+Object.defineProperty(STAGE, GitWalkerSymbol, {
+  value: ({ fs, gitdir }) => new GitWalkerIndex({ fs, gitdir })
+})
+Object.freeze(STAGE)
+export { STAGE }

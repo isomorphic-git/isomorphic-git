@@ -1,6 +1,7 @@
 import { posix as path } from 'path'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager'
+import { GitWalkerSymbol } from '../utils/symbols'
 
 import { GitObject } from './GitObject'
 
@@ -52,3 +53,10 @@ export class GitWalkerFs {
     Object.assign(entry, { oid })
   }
 }
+
+const WORKDIR = Object.create(null)
+Object.defineProperty(WORKDIR, GitWalkerSymbol, {
+  value: ({ fs, dir }) => new GitWalkerFs({ fs, dir })
+})
+Object.freeze(WORKDIR)
+export { WORKDIR }

@@ -1,10 +1,8 @@
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
-import { GitWalkerFs } from '../models/GitWalkerFs.js'
-import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
-import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
 import { arrayRange } from '../utils/arrayRange.js'
+import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
@@ -16,7 +14,7 @@ export async function walk ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs,
-  trees = ['HEAD', 'STAGE', 'WORKDIR'],
+  trees,
   filterDirectory,
   filterFile,
   reduce,
@@ -25,19 +23,9 @@ export async function walk ({
   try {
     const fs = new FileSystem(_fs)
 
-    let walkers = await Promise.all(
-      trees.map(async ref => {
-        let walker
-        if (ref === 'STAGE') {
-          walker = new GitWalkerIndex({ fs, gitdir })
-        } else if (ref === 'WORKDIR') {
-          walker = new GitWalkerFs({ fs, dir })
-        } else {
-          walker = new GitWalkerRepo({ fs, gitdir, ref })
-        }
-        return walker
-      })
-    )
+    let walkers = trees.map(proxy => {
+      return proxy[GitWalkerSymbol]({ fs, gitdir, dir })
+    })
 
     let root = new Array(walkers.length).fill({
       fullpath: '.',
@@ -65,17 +53,7 @@ export async function walk ({
       }
     }
     await recurse(root)
-    console.table(results)
-    // let unionWalker = await unionWalkerFromReaddir(root)
-    // console.log(range)
-    // console.log(unionWalker)
-    // for (const entry of unionWalker) {
-    //   console.log(entry)
-    //   let unionWalker2 = await unionWalkerFromReaddir(entry)
-    //   for (const entry2 of unionWalker2) {
-    //     console.log(entry2)
-    //   }
-    // }
+    return results
   } catch (err) {
     err.caller = 'git.walk'
     throw err
