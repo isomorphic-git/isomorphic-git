@@ -324,6 +324,7 @@ export function push(args: {
   ref?: string,
   remote?: string,
   url?: string,
+  force?: boolean,
   username?: string,
   password?: string,
   token?: string,
