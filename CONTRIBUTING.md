@@ -19,12 +19,13 @@ To add a parameter to an existing command `X`:
 To create a new command:
 
 - [ ] add as a new file in `src/commands`
-  - [ ] add command to `src/commands.js`
-- [ ] add command to README list of commands
+- [ ] add command to `src/index.js`
 - [ ] add TypeScript definition in `src/index.d.ts`
+- [ ] update `__tests__/__snapshots__/test-exports.js.snap`
+- [ ] add command to README list of commands
+- [ ] create a test in `src/__tests__`
 - [ ] create a new doc page [docs](https://github.com/isomorphic-git/isomorphic-git.github.io/tree/source/docs)/X.md
   - [ ] add page to the [Alphabetical Index](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/docs/alphabetic.md)
   - [ ] add page to the [sidebar](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/website/sidebars.json)
-- [ ] create a test in `src/__tests__`
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] make a feature commit "feat: Added 'X' command"
