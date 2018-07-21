@@ -68,7 +68,9 @@ const messages = translate({
   MixUsernameOauth2formatTokenError: `Cannot mix "username" with "oauth2format" and "token"`,
   MixPasswordOauth2formatTokenError: `Cannot mix "password" with "oauth2format" and "token"`,
   MixUsernamePasswordOauth2formatTokenError: `Cannot mix "username" and "password" with "oauth2format" and "token"`,
-  MaxSearchDepthExceeded: `Maximum search depth of { depth } exceeded.`
+  MaxSearchDepthExceeded: `Maximum search depth of { depth } exceeded.`,
+  PushRejectedNonFastForward: `Push rejected because it was not a simple fast-forward. Use "force: true" to override.`,
+  PushRejectedTagExists: `Push rejected because tag already exists. Use "force: true" to override.`
 })
 
 export const E = {
@@ -127,7 +129,9 @@ export const E = {
   MixUsernameOauth2formatTokenError: `MixUsernameOauth2formatTokenError`,
   MixPasswordOauth2formatTokenError: `MixPasswordOauth2formatTokenError`,
   MixUsernamePasswordOauth2formatTokenError: `MixUsernamePasswordOauth2formatTokenError`,
-  MaxSearchDepthExceeded: `MaxSearchDepthExceeded`
+  MaxSearchDepthExceeded: `MaxSearchDepthExceeded`,
+  PushRejectedNonFastForward: `PushRejectedNonFastForward`,
+  PushRejectedTagExists: `PushRejectedTagExists`
 }
 
 export class GitError extends Error {

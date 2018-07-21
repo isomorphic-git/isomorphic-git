@@ -4,16 +4,18 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteConnection } from '../managers/GitRemoteConnection.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { pkg } from '../utils/pkg.js'
 
-import { config } from './config'
-import { listCommits } from './listCommits'
-import { listObjects } from './listObjects'
-import { pack } from './pack'
+import { config } from './config.js'
+import { isDescendent } from './isDescendent.js'
+import { listCommits } from './listCommits.js'
+import { listObjects } from './listObjects.js'
+import { pack } from './pack.js'
 
 /**
- * Push a branch
+ * Push a branch or tag
  *
  * @link https://isomorphic-git.github.io/docs/push.html
  */
@@ -25,6 +27,7 @@ export async function push ({
   ref,
   remote = 'origin',
   url,
+  force = false,
   noGitSuffix = false,
   authUsername,
   authPassword,
@@ -69,6 +72,23 @@ export async function push ({
 
     let oldoid =
       httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
+    if (!force) {
+      // Is it a tag that already exists?
+      if (
+        fullRef.startsWith('refs/tags') &&
+        oldoid !== '0000000000000000000000000000000000000000'
+      ) {
+        throw new GitError(E.PushRejectedTagExists, {})
+      }
+      // Is it a non-fast-forward commit?
+      if (
+        oid !== '0000000000000000000000000000000000000000' &&
+        oldoid !== '0000000000000000000000000000000000000000' &&
+        !await isDescendent({ fs, gitdir, oid, ancestor: oldoid })
+      ) {
+        throw new GitError(E.PushRejectedNonFastForward, {})
+      }
+    }
     let packstream = await GitRemoteConnection.sendReceivePackRequest({
       capabilities: ['report-status', 'side-band-64k', `agent=${pkg.agent}`],
       triplets: [{ oldoid, oid, fullRef }]
