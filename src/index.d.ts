@@ -238,6 +238,15 @@ export function init(args: {
   gitdir?: string
 }): Promise<void>;
 
+export function isDescendent(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  oid: string,
+  ancestor: string,
+  depth?: string
+}): Promise<boolean>;
+
 export function listBranches(args: {
   fs: any,
   dir: string,

@@ -67,7 +67,8 @@ const messages = translate({
   MixUsernamePasswordOauth2formatMissingTokenError: `Cannot mix "username" and "password" with "oauth2format". Missing token.`,
   MixUsernameOauth2formatTokenError: `Cannot mix "username" with "oauth2format" and "token"`,
   MixPasswordOauth2formatTokenError: `Cannot mix "password" with "oauth2format" and "token"`,
-  MixUsernamePasswordOauth2formatTokenError: `Cannot mix "username" and "password" with "oauth2format" and "token"`
+  MixUsernamePasswordOauth2formatTokenError: `Cannot mix "username" and "password" with "oauth2format" and "token"`,
+  MaxSearchDepthExceeded: `Maximum search depth of { depth } exceeded.`
 })
 
 export const E = {
@@ -125,7 +126,8 @@ export const E = {
   MixUsernamePasswordOauth2formatMissingTokenError: `MixUsernamePasswordOauth2formatMissingTokenError`,
   MixUsernameOauth2formatTokenError: `MixUsernameOauth2formatTokenError`,
   MixPasswordOauth2formatTokenError: `MixPasswordOauth2formatTokenError`,
-  MixUsernamePasswordOauth2formatTokenError: `MixUsernamePasswordOauth2formatTokenError`
+  MixUsernamePasswordOauth2formatTokenError: `MixUsernamePasswordOauth2formatTokenError`,
+  MaxSearchDepthExceeded: `MaxSearchDepthExceeded`
 }
 
 export class GitError extends Error {
