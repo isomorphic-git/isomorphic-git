@@ -336,9 +336,9 @@ export function readObject(args: {
   dir: string,
   gitdir?: string,
   oid: string,
-  format: 'deflated' | 'wrapped' | 'content' | 'parsed',
-  filepath: string,
-  encoding: string
+  format?: 'deflated' | 'wrapped' | 'content' | 'parsed',
+  filepath?: string,
+  encoding?: string
 }): Promise<GitObjectDescription>
 
 export function remove(args: {
