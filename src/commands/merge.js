@@ -5,6 +5,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 
+import { currentBranch } from './currentBranch.js'
 import { log } from './log'
 
 /**
@@ -22,6 +23,9 @@ export async function merge ({
 }) {
   try {
     const fs = new FileSystem(_fs)
+    if (ours === undefined) {
+      ours = await currentBranch({ fs, gitdir, fullname: true })
+    }
     ours = await GitRefManager.expand({
       fs,
       gitdir,
