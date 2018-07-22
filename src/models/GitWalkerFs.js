@@ -1,14 +1,34 @@
 import { posix as path } from 'path'
 
-import { GitIgnoreManager } from '../managers/GitIgnoreManager'
-import { GitWalkerSymbol } from '../utils/symbols'
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
+import { normalizeStats } from '../utils/normalizeStats'
+import { GitWalkerSymbol } from '../utils/symbols.js'
 
-import { GitObject } from './GitObject'
+import { GitObject } from './GitObject.js'
 
 export class GitWalkerFs {
   constructor ({ fs, dir }) {
     this.fs = fs
     this.dir = dir
+    let walker = this
+    this.ConstructEntry = class FSEntry {
+      constructor (entry) {
+        if (entry === null) this.empty = true
+        Object.assign(this, entry)
+      }
+      async populateStat () {
+        if (this.empty) return
+        await walker.populateStat(this)
+      }
+      async populateContent () {
+        if (this.empty) return
+        await walker.populateContent(this)
+      }
+      async populateHash () {
+        if (this.empty) return
+        await walker.populateHash(this)
+      }
+    }
   }
   async readdir (entry) {
     if (entry === null) return []
@@ -37,18 +57,21 @@ export class GitWalkerFs {
   }
   async populateStat (entry) {
     let stats = await this.fs._lstat(`${this.dir}/${entry.fullpath}`)
+    let type = stats.isDirectory() ? 'tree' : 'blob'
     if (!stats) {
       throw new Error(
         `ENOENT: no such file or directory, lstat '${entry.fullpath}'`
       )
     }
-    Object.assign(entry, stats)
+    stats = normalizeStats(stats)
+    Object.assign(entry, { type }, stats)
   }
   async populateContent (entry) {
     let content = await this.fs.read(`${this.dir}/${entry.fullpath}`)
     Object.assign(entry, { content })
   }
   async populateHash (entry) {
+    if (!entry.content) await entry.populateContent()
     let oid = await GitObject.hash({ type: 'blob', object: entry.content })
     Object.assign(entry, { oid })
   }

@@ -1,7 +1,8 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStrings } from '../utils/compareStrings.js'
-import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure'
-import { GitWalkerSymbol } from '../utils/symbols'
+import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
+import { normalizeStats } from '../utils/normalizeStats'
+import { GitWalkerSymbol } from '../utils/symbols.js'
 
 export class GitWalkerIndex {
   constructor ({ fs, gitdir }) {
@@ -15,6 +16,25 @@ export class GitWalkerIndex {
       )
       return result
     })()
+    let walker = this
+    this.ConstructEntry = class IndexEntry {
+      constructor (entry) {
+        if (entry === null) this.empty = true
+        Object.assign(this, entry)
+      }
+      async populateStat () {
+        if (this.empty) return
+        await walker.populateStat(this)
+      }
+      async populateContent () {
+        if (this.empty) return
+        await walker.populateContent(this)
+      }
+      async populateHash () {
+        if (this.empty) return
+        await walker.populateHash(this)
+      }
+    }
   }
   async readdir (entry) {
     if (entry === null) return []
@@ -43,22 +63,8 @@ export class GitWalkerIndex {
         `ENOENT: no such file or directory, lstat '${entry.fullpath}'`
       )
     }
-    Object.assign(entry, {
-      fullpath: inode.fullpath,
-      basename: inode.basename,
-      type: inode.type,
-      ctimeSeconds: inode.metadata.ctimeSeconds,
-      ctimeNanoseconds: inode.metadata.ctimeNanoseconds,
-      mtimeSeconds: inode.metadata.mtimeSeconds,
-      mtimeNanoseconds: inode.metadata.mtimeNanoseconds,
-      dev: inode.metadata.dev,
-      ino: inode.metadata.ino,
-      mode: inode.metadata.mode,
-      uid: inode.metadata.uid,
-      gid: inode.metadata.gid,
-      size: inode.metadata.size,
-      flags: inode.metadata.flags
-    })
+    let stats = inode.type === 'tree' ? {} : normalizeStats(inode.metadata)
+    Object.assign(entry, { type: inode.type }, stats)
   }
   async populateContent (entry) {
     // Cannot get content for an index entry

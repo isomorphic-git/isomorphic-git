@@ -15,6 +15,7 @@ export async function walk ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   trees,
+  map,
   filterDirectory,
   filterFile,
   reduce,
@@ -36,19 +37,26 @@ export async function walk ({
       const subdirs = await Promise.all(
         range.map(i => walkers[i].readdir(entry[i]))
       )
-      // TODO: Here insert leaf node operation where readdir result was null
+      range.map(i => {
+        entry[i] = new walkers[i].ConstructEntry(entry[i])
+      })
       // Now process child directories
       let iterators = subdirs
         .map(array => (array === null ? [] : array))
         .map(array => array[Symbol.iterator]())
-      return unionOfIterators(iterators)
+      return {
+        entry,
+        children: unionOfIterators(iterators)
+      }
     }
 
     const results = []
     const recurse = async root => {
-      let unionWalker = await unionWalkerFromReaddir(root)
-      for (const entry of unionWalker) {
-        results.push(entry.map(e => (e === null ? null : e.fullpath)))
+      let { children, entry } = await unionWalkerFromReaddir(root)
+      // results.push(entry.map(e => (e === null ? null : e.fullpath + ' ' + e.size)))
+      results.push(await map(entry))
+      for (const entry of children) {
+        // results.push(entry.map(e => (e === null ? null : e.fullpath)))
         await recurse(entry)
       }
     }

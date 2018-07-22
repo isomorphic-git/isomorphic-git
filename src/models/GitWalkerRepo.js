@@ -2,8 +2,8 @@ import { posix as path } from 'path'
 
 import { GitObjectManager } from '../managers/GitObjectManager'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { resolveTree } from '../utils/resolveTree'
-import { GitWalkerSymbol } from '../utils/symbols'
+import { resolveTree } from '../utils/resolveTree.js'
+import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { GitTree } from './GitTree.js'
 
@@ -18,6 +18,25 @@ export class GitWalkerRepo {
       map.set('.', tree)
       return map
     })()
+    let walker = this
+    this.ConstructEntry = class RepoEntry {
+      constructor (entry) {
+        if (entry === null) this.empty = true
+        Object.assign(this, entry)
+      }
+      async populateStat () {
+        if (this.empty) return
+        await walker.populateStat(this)
+      }
+      async populateContent () {
+        if (this.empty) return
+        await walker.populateContent(this)
+      }
+      async populateHash () {
+        if (this.empty) return
+        await walker.populateHash(this)
+      }
+    }
   }
   async readdir (entry) {
     if (entry === null) return []
