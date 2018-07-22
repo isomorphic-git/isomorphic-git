@@ -298,7 +298,7 @@ export function merge(args: {
   fs: any,
   dir: string,
   gitdir?: string
-  ours: string,
+  ours?: string,
   theirs: string,
   fastForwardOnly?: boolean
 }): Promise<MergeReport>;
