@@ -110,7 +110,6 @@ const _TREE = function (ref) {
   let o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function ({ fs, gitdir }) {
-      console.log('ref = ', ref)
       return new GitWalkerRepo({ fs, gitdir, ref })
     }
   })

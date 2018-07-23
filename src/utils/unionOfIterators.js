@@ -41,7 +41,6 @@ export function * unionOfIterators (sets) {
   while (true) {
     let result = []
     minimum = min.value
-    console.log('minimum', minimum)
     min.reset()
     for (let i = 0; i < numsets; i++) {
       if (heads[i] !== undefined && heads[i].fullpath === minimum) {

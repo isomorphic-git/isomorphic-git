@@ -15,9 +15,8 @@ export async function walk ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   trees,
-  map,
-  filterDirectory,
-  filterFile,
+  map = entry => entry,
+  filter = () => true,
   reduce,
   iterate
 }) {
@@ -54,10 +53,12 @@ export async function walk ({
     const recurse = async root => {
       let { children, entry } = await unionWalkerFromReaddir(root)
       // results.push(entry.map(e => (e === null ? null : e.fullpath + ' ' + e.size)))
-      results.push(await map(entry))
-      for (const entry of children) {
-        // results.push(entry.map(e => (e === null ? null : e.fullpath)))
-        await recurse(entry)
+      if (filter(entry)) {
+        results.push(await map(entry))
+        for (const entry of children) {
+          // results.push(entry.map(e => (e === null ? null : e.fullpath)))
+          await recurse(entry)
+        }
       }
     }
     await recurse(root)

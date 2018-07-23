@@ -41,7 +41,13 @@ function parseCacheEntryFlags (bits) {
   }
 }
 
-function renderCacheEntryFlags (flags) {
+function renderCacheEntryFlags (entry) {
+  let flags = entry.flags
+  // 1-bit extended flag (must be zero in version 2)
+  flags.extended = false
+  // 12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
+  // is stored in this field.
+  flags.nameLength = Math.min(entry.path.length, 0xFFF)
   return (
     (flags.assumeValid ? 0b1000000000000000 : 0) +
     (flags.extended ? 0b0100000000000000 : 0) +
@@ -216,7 +222,7 @@ export class GitIndex {
         writer.writeUInt32BE(stat.gid)
         writer.writeUInt32BE(stat.size)
         writer.write(entry.oid, 20, 'hex')
-        writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
+        writer.writeUInt16BE(renderCacheEntryFlags(entry))
         writer.write(entry.path, entry.path.length, 'utf8')
         return written
       })
