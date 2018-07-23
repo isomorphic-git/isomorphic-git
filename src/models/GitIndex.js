@@ -47,7 +47,7 @@ function renderCacheEntryFlags (entry) {
   flags.extended = false
   // 12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
   // is stored in this field.
-  flags.nameLength = Math.min(entry.path.length, 0xFFF)
+  flags.nameLength = Math.min(entry.path.length, 0xfff)
   return (
     (flags.assumeValid ? 0b1000000000000000 : 0) +
     (flags.extended ? 0b0100000000000000 : 0) +
