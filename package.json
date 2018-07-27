@@ -94,7 +94,7 @@
     "husky": "0.14.3",
     "jasmine": "3.1.0",
     "jasmine-core": "3.1.0",
-    "jest": "23.4.1",
+    "jest": "23.4.2",
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
     "karma": "2.0.5",
     "karma-chrome-launcher": "2.2.0",
