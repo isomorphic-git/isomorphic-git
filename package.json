@@ -121,7 +121,7 @@
     "travis-deploy-once": "5.0.1",
     "tweet-tweet": "1.0.4",
     "typescript": "2.9.2",
-    "webpack": "4.16.2",
+    "webpack": "4.16.3",
     "webpack-bundle-analyzer": "2.13.1",
     "webpack-cli": "3.1.0"
   },
