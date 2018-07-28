@@ -4,33 +4,6 @@ import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
 
-/*::
-import type {Stats} from 'fs'
-
-type CacheEntryFlags = {
-  assumeValid: boolean,
-  extended: boolean,
-  stage: number,
-  nameLength: number
-}
-
-type CacheEntry = {
-  ctime: Date,
-  ctimeNanoseconds?: number,
-  mtime: Date,
-  mtimeNanoseconds?: number,
-  dev: number,
-  ino: number,
-  mode: number,
-  uid: number,
-  gid: number,
-  size: number,
-  oid: string,
-  flags: CacheEntryFlags,
-  path: string
-}
-*/
-
 // Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
 function parseCacheEntryFlags (bits) {
   return {
