@@ -20,7 +20,7 @@ function renderCacheEntryFlags (entry) {
   flags.extended = false
   // 12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
   // is stored in this field.
-  flags.nameLength = Math.min(entry.path.length, 0xfff)
+  flags.nameLength = Math.min(Buffer.from(entry.path).length, 0xfff)
   return (
     (flags.assumeValid ? 0b1000000000000000 : 0) +
     (flags.extended ? 0b0100000000000000 : 0) +
@@ -196,7 +196,7 @@ export class GitIndex {
         writer.writeUInt32BE(stat.size)
         writer.write(entry.oid, 20, 'hex')
         writer.writeUInt16BE(renderCacheEntryFlags(entry))
-        writer.write(entry.path, entry.path.length, 'utf8')
+        writer.write(entry.path, Buffer.from(entry.path).length, 'utf8')
         return written
       })
     )

@@ -185,6 +185,13 @@ export function currentBranch(args: {
   fullname?: boolean,
 }): Promise<string>
 
+export function expandRef(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  ref: string
+}): Promise<string>
+
 export function fetch(args: {
   fs: any,
   dir: string,
@@ -230,6 +237,15 @@ export function init(args: {
   dir: string,
   gitdir?: string
 }): Promise<void>;
+
+export function isDescendent(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  oid: string,
+  ancestor: string,
+  depth?: string
+}): Promise<boolean>;
 
 export function listBranches(args: {
   fs: any,
@@ -282,7 +298,7 @@ export function merge(args: {
   fs: any,
   dir: string,
   gitdir?: string
-  ours: string,
+  ours?: string,
   theirs: string,
   fastForwardOnly?: boolean
 }): Promise<MergeReport>;
@@ -308,6 +324,7 @@ export function push(args: {
   ref?: string,
   remote?: string,
   url?: string,
+  force?: boolean,
   username?: string,
   password?: string,
   token?: string,
@@ -319,9 +336,9 @@ export function readObject(args: {
   dir: string,
   gitdir?: string,
   oid: string,
-  format: 'deflated' | 'wrapped' | 'content' | 'parsed',
-  filepath: string,
-  encoding: string
+  format?: 'deflated' | 'wrapped' | 'content' | 'parsed',
+  filepath?: string,
+  encoding?: string
 }): Promise<GitObjectDescription>
 
 export function remove(args: {

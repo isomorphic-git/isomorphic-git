@@ -23,7 +23,8 @@ describe('push', () => {
       fs,
       gitdir,
       remote: 'pseudo',
-      ref: 'refs/heads/master'
+      ref: 'refs/heads/master',
+      force: true
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBeTruthy()
@@ -46,7 +47,8 @@ describe('push', () => {
       fs,
       gitdir,
       remote: 'pseudo',
-      ref: 'master'
+      ref: 'master',
+      force: true
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBeTruthy()
@@ -64,7 +66,8 @@ describe('push', () => {
         gitdir,
         token: process.env.GITHUB_TOKEN,
         remote: 'origin',
-        ref: 'refs/heads/master'
+        ref: 'refs/heads/master',
+        force: true
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBeTruthy()
@@ -81,13 +84,15 @@ describe('push', () => {
       gitdir,
       token: process.env.GITHUB_TOKEN,
       remote: 'origin',
-      ref: 'master'
+      ref: 'master',
+      force: true
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBeTruthy()
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/master')
   })
+
   it('throws an Error if no credentials supplied', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
@@ -106,6 +111,7 @@ describe('push', () => {
     }
     expect(error).toBe('HTTP Error: 401 Authorization Required')
   })
+
   it('throws an Error if invalid credentials supplied', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
