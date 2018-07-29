@@ -50,7 +50,7 @@ export async function status2 ({
           workdir.type === 'tree' ||
           stage.type === 'tree'
         ) {
-          return null
+          return
         }
         await head.populateHash()
         await stage.populateHash()
@@ -92,8 +92,7 @@ export async function status2 ({
         }
       }
     )
-    results = results.filter(x => x !== null)
-    console.table(results)
+    return results
   } catch (err) {
     err.caller = 'git.status2'
     throw err

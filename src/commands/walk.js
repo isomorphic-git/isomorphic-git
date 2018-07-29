@@ -15,10 +15,17 @@ export async function walk ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   trees,
-  map = entry => entry,
+  map = async entry => entry,
   filter = async () => true,
-  reduce,
-  iterate
+  // The default reducer is a flatmap that filters out undefineds.
+  reduce = async (parent, children) => {
+    // TODO: replace with `results.flat()` once that gets standardized
+    let flatten = children.reduce((acc, x) => acc.concat(x), [])
+    if (parent !== undefined) flatten.unshift(parent)
+    return flatten
+  },
+  // The default iterate function walks all children concurrently
+  iterate = (recurse, children) => Promise.all([...children].map(recurse))
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -50,20 +57,16 @@ export async function walk ({
       }
     }
 
-    const results = []
     const recurse = async root => {
       let { children, entry } = await unionWalkerFromReaddir(root)
-      // results.push(entry.map(e => (e === null ? null : e.fullpath + ' ' + e.size)))
       if (await filter(entry)) {
-        results.push(await map(entry))
-        for (const entry of children) {
-          // results.push(entry.map(e => (e === null ? null : e.fullpath)))
-          await recurse(entry)
-        }
+        let mappedResult = await map(entry)
+        let results = await iterate(recurse, children)
+        results = results.filter(x => x !== undefined)
+        return reduce(mappedResult, results)
       }
     }
-    await recurse(root)
-    return results
+    return recurse(root)
   } catch (err) {
     err.caller = 'git.walk'
     throw err

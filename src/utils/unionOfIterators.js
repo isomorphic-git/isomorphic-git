@@ -1,4 +1,5 @@
 import path from 'path'
+
 import { RunningMinimum } from '../models/RunningMinimum'
 
 // Take an array of length N of
