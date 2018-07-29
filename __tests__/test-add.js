@@ -31,4 +31,10 @@ describe('add', () => {
     }
     expect(err.caller).toEqual('git.add')
   })
+  it('multi byte file', async () => {
+    let { fs, dir } = await makeFixture('test-add')
+    await init({ fs, dir })
+    await add({ fs, dir, filepath: '日本語' })
+    expect((await listFiles({ fs, dir }))[0]).toBe('日本語')
+  })
 })
