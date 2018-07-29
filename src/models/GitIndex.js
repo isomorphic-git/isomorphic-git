@@ -217,7 +217,7 @@ export class GitIndex {
         writer.writeUInt32BE(stat.size)
         writer.write(entry.oid, 20, 'hex')
         writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
-        writer.write(entry.path, entry.path.length, 'utf8')
+        writer.write(entry.path, Buffer.from(entry.path).length, 'utf8')
         return written
       })
     )
