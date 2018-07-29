@@ -55,7 +55,6 @@ describe('push', () => {
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/master')
   })
-
   ;(process.env.GITHUB_TOKEN ? it : xit)(
     '"refs/heads/master" to Github',
     async () => {
