@@ -31,6 +31,10 @@ type CacheEntry = {
 }
 */
 
+function byteLength (str) {
+  return encodeURIComponent(str).replace(/%../g, 'x').length
+}
+
 // Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
 function parseCacheEntryFlags (bits) {
   return {
@@ -217,7 +221,7 @@ export class GitIndex {
         writer.writeUInt32BE(stat.size)
         writer.write(entry.oid, 20, 'hex')
         writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
-        writer.write(entry.path, entry.path.length, 'utf8')
+        writer.write(entry.path, byteLength(entry.path), 'utf8')
         return written
       })
     )
