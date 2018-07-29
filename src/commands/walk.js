@@ -16,7 +16,7 @@ export async function walk ({
   fs: _fs,
   trees,
   map = entry => entry,
-  filter = () => true,
+  filter = async () => true,
   reduce,
   iterate
 }) {
@@ -29,7 +29,8 @@ export async function walk ({
 
     let root = new Array(walkers.length).fill({
       fullpath: '.',
-      basename: '.'
+      basename: '.',
+      exists: true
     })
     const range = arrayRange(0, walkers.length)
     const unionWalkerFromReaddir = async entry => {
@@ -53,7 +54,7 @@ export async function walk ({
     const recurse = async root => {
       let { children, entry } = await unionWalkerFromReaddir(root)
       // results.push(entry.map(e => (e === null ? null : e.fullpath + ' ' + e.size)))
-      if (filter(entry)) {
+      if (await filter(entry)) {
         results.push(await map(entry))
         for (const entry of children) {
           // results.push(entry.map(e => (e === null ? null : e.fullpath)))

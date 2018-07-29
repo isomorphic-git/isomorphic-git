@@ -19,25 +19,24 @@ export class GitWalkerIndex {
     let walker = this
     this.ConstructEntry = class IndexEntry {
       constructor (entry) {
-        if (entry === null) this.empty = true
         Object.assign(this, entry)
       }
       async populateStat () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateStat(this)
       }
       async populateContent () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateContent(this)
       }
       async populateHash () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateHash(this)
       }
     }
   }
   async readdir (entry) {
-    if (entry === null) return []
+    if (!entry.exists) return []
     let filepath = entry.fullpath
     let tree = await this.treePromise
     let inode = tree.get(filepath)
@@ -49,7 +48,8 @@ export class GitWalkerIndex {
     return inode.children
       .map(inode => ({
         fullpath: inode.fullpath,
-        basename: inode.basename
+        basename: inode.basename,
+        exists: true
         // TODO: Figure out why flatFileListToDirectoryStructure is not returning children
         // sorted correctly for "__tests__/__fixtures__/test-push.git"
       }))

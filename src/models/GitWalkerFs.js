@@ -13,32 +13,32 @@ export class GitWalkerFs {
     let walker = this
     this.ConstructEntry = class FSEntry {
       constructor (entry) {
-        if (entry === null) this.empty = true
         Object.assign(this, entry)
       }
       async populateStat () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateStat(this)
       }
       async populateContent () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateContent(this)
       }
       async populateHash () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateHash(this)
       }
     }
   }
   async readdir (entry) {
-    if (entry === null) return []
+    if (!entry.exists) return []
     let filepath = entry.fullpath
     let { fs, dir } = this
     let names = await fs.readdir(path.join(this.dir, filepath))
     if (names === null) return null
     let entries = names.map(name => ({
       fullpath: path.join(filepath, name),
-      basename: name
+      basename: name,
+      exists: true
     }))
     // This does all the calls in parallel
     // by turning them into an array of Promises that will resolve

@@ -1,3 +1,4 @@
+import path from 'path'
 import { RunningMinimum } from '../models/RunningMinimum'
 
 // Take an array of length N of
@@ -47,7 +48,12 @@ export function * unionOfIterators (sets) {
         result[i] = heads[i]
         heads[i] = sets[i].next().value
       } else {
-        result[i] = null
+        // A little hacky, but eh
+        result[i] = {
+          fullpath: minimum,
+          basename: path.basename(minimum),
+          exists: false
+        }
       }
       if (heads[i] !== undefined) {
         min.consider(heads[i].fullpath)

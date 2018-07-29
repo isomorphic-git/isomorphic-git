@@ -20,7 +20,7 @@ export async function status2 ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   ref = 'HEAD',
-  filepath
+  filepath = ''
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -30,6 +30,15 @@ export async function status2 ({
       dir,
       gitdir,
       trees: [TREE(ref), WORKDIR, STAGE],
+      filter: async function ([head, ...rest]) {
+        // console.log(head)
+        if (head.fullpath === '.') return true
+        if (head.fullpath.length >= filepath.length) {
+          return head.fullpath.startsWith(filepath)
+        } else if (head.fullpath.length < filepath.length) {
+          return filepath.startsWith(head.fullpath)
+        }
+      },
       map: async function ([head, workdir, stage]) {
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
         await head.populateStat()
@@ -46,7 +55,7 @@ export async function status2 ({
         await head.populateHash()
         await stage.populateHash()
         // TODO: figure out how to move this cache-lookup logic into workdir.populateHash()
-        if (!workdir.empty && !stage.empty) {
+        if (workdir.exists && stage.exists) {
           if (compareStats(workdir, stage)) {
             log(`INDEX CACHE MISS: calculating SHA for ${workdir.fullpath}`)
             await workdir.populateHash()
@@ -62,7 +71,7 @@ export async function status2 ({
             workdir.oid = stage.oid
           }
         }
-        if (head.empty && !workdir.empty && stage.empty) {
+        if (!head.exists && workdir.exists && !stage.exists) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
           workdir.oid = 42

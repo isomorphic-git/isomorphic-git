@@ -21,25 +21,24 @@ export class GitWalkerRepo {
     let walker = this
     this.ConstructEntry = class RepoEntry {
       constructor (entry) {
-        if (entry === null) this.empty = true
         Object.assign(this, entry)
       }
       async populateStat () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateStat(this)
       }
       async populateContent () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateContent(this)
       }
       async populateHash () {
-        if (this.empty) return
+        if (!this.exists) return
         await walker.populateHash(this)
       }
     }
   }
   async readdir (entry) {
-    if (entry === null) return []
+    if (!entry.exists) return []
     let filepath = entry.fullpath
     let { fs, gitdir } = this
     let map = await this.mapPromise
@@ -59,7 +58,8 @@ export class GitWalkerRepo {
     }
     return tree.entries().map(entry => ({
       fullpath: path.join(filepath, entry.path),
-      basename: entry.path
+      basename: entry.path,
+      exists: true
     }))
   }
   async populateStat (entry) {
