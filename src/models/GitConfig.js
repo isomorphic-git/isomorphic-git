@@ -75,24 +75,6 @@ const findLastIndex = (array, callback) => {
   }, -1)
 }
 
-const deleteItem = (array, index) => {
-  const before = array.slice(0, index)
-  const after = array.slice(index + 1)
-  return [...before, ...after]
-}
-
-const replaceItem = (array, index, newItem) => {
-  const before = array.slice(0, index)
-  const after = array.slice(index + 1)
-  return [...before, newItem, ...after]
-}
-
-const insertItem = (array, index, item) => {
-  const before = array.slice(0, index + 1)
-  const after = array.slice(index + 1)
-  return [...before, item, ...after]
-}
-
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
 export class GitConfig {
@@ -144,16 +126,16 @@ export class GitConfig {
     const configIndex = findLastIndex(this.parsedConfig, (config) => config.path === path)
     if (value == null) {
       if (configIndex !== -1) {
-        this.parsedConfig = deleteItem(this.parsedConfig, configIndex)
+        this.parsedConfig.splice(configIndex, 1)
       }
     } else {
       if (configIndex !== -1) {
         const config = this.parsedConfig[configIndex]
         const modifiedConfig = {...config, value, modified: true}
         if (append) {
-          this.parsedConfig = insertItem(this.parsedConfig, configIndex, modifiedConfig)
+          this.parsedConfig.splice(configIndex + 1, 0, modifiedConfig)
         } else {
-          this.parsedConfig = replaceItem(this.parsedConfig, configIndex, modifiedConfig)
+          this.parsedConfig[configIndex] = modifiedConfig
         }
       } else {
         const sectionPath = path.split('.').slice(0, -1).join('.')
@@ -163,10 +145,10 @@ export class GitConfig {
         const newConfig = {section, subsection, name, value, modified: true}
         if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
           if (sectionIndex >= 0) {
-            this.parsedConfig = insertItem(this.parsedConfig, sectionIndex, newConfig)
+            this.parsedConfig.splice(sectionIndex + 1, 0, newConfig)
           } else {
             const newSection = {section, subsection, modified: true}
-            this.parsedConfig = [...this.parsedConfig, newSection, newConfig]
+            this.parsedConfig.push(newSection, newConfig)
           }
         }
       }
