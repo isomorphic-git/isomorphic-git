@@ -6,7 +6,7 @@ describe('GitConfig', () => {
     it('simple (foo)', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valfoo
-[bar]
+      [bar]
       keyaaa = valbar`)
       let a = await config.get('foo.keyaaa')
       expect(a).toEqual('valfoo')
@@ -15,7 +15,7 @@ describe('GitConfig', () => {
     it('simple (bar)', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valfoo
-[bar]
+      [bar]
       keyaaa = valbar`)
       let a = await config.get('bar.keyaaa')
       expect(a).toEqual('valbar')
@@ -42,7 +42,7 @@ describe('GitConfig', () => {
     it('subsection', async () => {
       const config = GitConfig.from(`[remote "foo"]
       url = https://foo.com/project.git
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git`)
       let a = await config.get('remote.bar.url')
       expect(a).toEqual('https://bar.com/project.git')
@@ -155,13 +155,13 @@ describe('GitConfig', () => {
     it('simple', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valfoo
-[bar]
+      [bar]
       keyaaa = valbar
       keybbb = valbbb`)
       await config.set('bar.keyaaa', 'newvalbar')
       expect(config.toString()).toEqual(`[foo]
       keyaaa = valfoo
-[bar]
+      [bar]
 \tkeyaaa = newvalbar
       keybbb = valbbb
 `)
@@ -183,12 +183,12 @@ describe('GitConfig', () => {
     it('subsection', async () => {
       const config = GitConfig.from(`[remote "foo"]
       url = https://foo.com/project.git
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git`)
       await config.set('remote.foo.url', 'https://foo.com/project-foo.git')
       expect(config.toString()).toEqual(`[remote "foo"]
 \turl = https://foo.com/project-foo.git
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git
 `)
     })
@@ -198,13 +198,13 @@ describe('GitConfig', () => {
     it('simple', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valfoo
-[bar]
+      [bar]
       keyaaa = valbar
       keybbb = valbbb`)
       await config.append('bar.keyaaa', 'newvalbar')
       expect(config.toString()).toEqual(`[foo]
       keyaaa = valfoo
-[bar]
+      [bar]
       keyaaa = valbar
 \tkeyaaa = newvalbar
       keybbb = valbbb
@@ -214,12 +214,12 @@ describe('GitConfig', () => {
     it('subsection', async () => {
       const config = GitConfig.from(`[remote "foo"]
       url = https://foo.com/project.git
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git`)
       await config.append('remote.baz.url', 'https://baz.com/project.git')
       expect(config.toString()).toEqual(`[remote "foo"]
       url = https://foo.com/project.git
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git
 [remote "baz"]
 \turl = https://baz.com/project.git
@@ -251,11 +251,11 @@ describe('GitConfig', () => {
     it('subsection', async () => {
       const config = GitConfig.from(`[remote "foo"]
       url = https://foo.com/project.git
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git`)
       await config.set('remote.foo.url')
       expect(config.toString()).toEqual(`[remote "foo"]
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git
 `)
     })
@@ -281,10 +281,61 @@ describe('GitConfig', () => {
     it('get unknown subsection', async () => {
       const config = GitConfig.from(`[remote "foo"]
       url = https://foo.com/project.git
-[remote "bar"]
+      [remote "bar"]
       url = https://bar.com/project.git`)
       let a = await config.get('remote.unknown.url')
       expect(a).toBeUndefined()
+    })
+
+    it('section is only alphanum _ and . (get)', async () => {
+      const config = GitConfig.from(`[fo o]
+      keyaaa = valaaa
+      [ba~r]
+      keyaaa = valaaa
+      [ba?z]
+      keyaaa = valaaa`)
+      let a = await config.get('fo o.keyaaa')
+      expect(a).toBeUndefined()
+      let b = await config.get('ba~r.keyaaa')
+      expect(b).toBeUndefined()
+      let c = await config.get('ba?z.keyaaa')
+      expect(c).toBeUndefined()
+    })
+
+    it('section is only alphanum _ and . (set)', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valfoo`)
+      await config.set('ba?r.keyaaa', 'valbar')
+      expect(config.toString()).toEqual(`[foo]
+      keyaaa = valfoo
+`)
+    })
+
+    it('variable name is only alphanum _ (get)', async () => {
+      const config = GitConfig.from(`[foo]
+      key aaa = valaaa
+      key?bbb = valbbb
+      key%ccc = valccc
+      key.ddd = valddd`)
+      let a = await config.get('foo.key aaa')
+      expect(a).toBeUndefined()
+      let b = await config.get('foo.key?bbb')
+      expect(b).toBeUndefined()
+      let c = await config.get('foo.key%ccc')
+      expect(c).toBeUndefined()
+      let d = await config.get('foo.key.ddd')
+      expect(d).toBeUndefined()
+    })
+
+    it('variable name is only alphanum _ (set)', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa`)
+      await config.set('foo.key bbb', 'valbbb')
+      await config.set('foo.key?ccc', 'valccc')
+      await config.set('foo.key%ddd', 'valddd')
+      expect(config.toString()).toEqual(`[foo]
+      keyaaa = valaaa
+`)
     })
   })
 })

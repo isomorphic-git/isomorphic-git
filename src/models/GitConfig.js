@@ -20,83 +20,118 @@ const bool = val => {
 
 const schema = {
   core: {
-    _named: false,
-    repositoryformatversion: String,
     filemode: bool,
     bare: bool,
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
     bigFileThreshold: num
-  },
-  remote: {
-    _named: true,
-    url: String,
-    fetch: String
-  },
-  branch: {
-    _named: true,
-    remote: String,
-    merge: String
   }
 }
 
-const isSection = line => line.trim().startsWith('[')
+// https://git-scm.com/docs/git-config
 
-const extractSection = line => {
-  const indices = [line.indexOf(']'), line.indexOf(' ')].filter(i => i > -1)
-  return line.slice(line.indexOf('[') + 1, Math.min(...indices)).trim()
+// section starts with [ and ends with ]
+// section is alphanumeric (ASCII) with _ and .
+// subsection is optionnal
+// subsection is specified after section and one or more spaces
+// subsection is specified between double quotes
+const SECTION_LINE_REGEX = /^\[([A-Za-z0-9_.]+)(?: "(.*)")?\]$/
+const SECTION_REGEX = /^[A-Za-z0-9_.]+$/
+
+// variable lines contain a name, and equal sign and then a value
+// variable name is alphanumeric (ASCII) with _
+// variable name starts with an alphabetic character
+const VARIABLE_LINE_REGEX = /^([A-Za-z]\w*) *= *(.*)$/
+const VARIABLE_NAME_REGEX = /^[A-Za-z]\w*$/
+
+const extractSectionLine = (line) => {
+  const matches = SECTION_LINE_REGEX.exec(line)
+  if (matches != null) {
+    const [section, subsection] = matches.slice(1)
+    return [section, subsection]
+  }
+  return null
 }
 
-const isNamedSection = section => schema[section] && schema[section]._named
+const extractVariableLine = (line) => {
+  const matches = VARIABLE_LINE_REGEX.exec(line)
+  if (matches != null) {
+    const [name, value] = matches.slice(1)
+    return [name, value]
+  }
+  return null
+}
 
-const isKeyValuePair = line => line.includes('=')
+const getPath = (section, subsection, name) => {
+  return [section, subsection, name]
+    .filter((a) => a != null)
+    .join('.')
+}
 
-const extractSectionName = line =>
-  line.slice(line.indexOf('"') + 1, line.lastIndexOf('"'))
+const findLastIndex = (array, callback) => {
+  return array.reduce((lastIndex, item, index) => {
+    return callback(item) ? index : lastIndex
+  }, -1)
+}
+
+const deleteItem = (array, index) => {
+  const before = array.slice(0, index)
+  const after = array.slice(index + 1)
+  return [...before, ...after]
+}
+
+const replaceItem = (array, index, newItem) => {
+  const before = array.slice(0, index)
+  const after = array.slice(index + 1)
+  return [...before, newItem, ...after]
+}
+
+const insertItem = (array, index, item) => {
+  const before = array.slice(0, index + 1)
+  const after = array.slice(index + 1)
+  return [...before, item, ...after]
+}
 
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
 export class GitConfig {
   constructor (text) {
-    this.lines = text.split('\n')
+    let section = null
+    let subsection = null
+    this.parsedConfig = text
+      .split('\n')
+      .map((line) => {
+        let name = null
+        let value = null
+
+        const trimmedLine = line.trim()
+        const extractedSection = extractSectionLine(trimmedLine)
+        const isSection = (extractedSection != null)
+        if (isSection) {
+          [section, subsection] = extractedSection
+        } else {
+          const extractedVariable = extractVariableLine(trimmedLine)
+          const isVariable = (extractedVariable != null)
+          if (isVariable) {
+            [name, value] = extractedVariable
+          }
+        }
+
+        const path = getPath(section, subsection, name)
+        return {line, section, subsection, name, value, path}
+      })
   }
   static from (text) {
     return new GitConfig(text)
   }
   async get (path, getall = false) {
-    const parts = path.split('.')
-    const section = parts.shift()
-    const sectionName = isNamedSection(section) ? parts.shift() : null
-    const key = parts.shift()
-
-    let currentSection = ''
-    let currentSectionName = null
-    let allValues = []
-    for (const line of this.lines) {
-      // zero in on section
-      if (isSection(line)) {
-        currentSection = extractSection(line)
-        if (isNamedSection(currentSection)) {
-          currentSectionName = extractSectionName(line)
-        }
-      } else if (
-        currentSection === section &&
-        (sectionName === null || currentSectionName === sectionName)
-      ) {
-        if (isKeyValuePair(line)) {
-          let [_key, _value] = line.split('=', 2)
-          if (_key.trim() === key) {
-            allValues.push(_value.trim())
-          }
-        }
-      }
-    }
-    // Cast value to correct type
-    let fn = schema[section] && schema[section][key]
-    if (fn) {
-      allValues = allValues.map(fn)
-    }
+    const allValues = this.parsedConfig
+      .filter((config) => config.path === path)
+      .map(({section, name, value}) => {
+        const fn = schema[section] && schema[section][name]
+        return fn ? fn(value) : value
+      })
     return getall ? allValues : allValues.pop()
   }
   async getall (path) {
@@ -106,63 +141,51 @@ export class GitConfig {
     return this.set(path, value, true)
   }
   async set (path, value, append = false) {
-    const parts = path.split('.')
-    const section = parts.shift()
-    const sectionName = isNamedSection(section) ? parts.shift() : null
-    const key = parts.shift()
-
-    let currentSection = ''
-    let currentSectionName = null
-    let lastSectionMatch = null
-    let lastMatch = null
-    for (let i = 0; i < this.lines.length; i++) {
-      const line = this.lines[i]
-      if (isSection(line)) {
-        currentSection = extractSection(line)
-        if (currentSection === section) {
-          if (sectionName) {
-            currentSectionName = extractSectionName(line)
-          }
-          if (currentSectionName === sectionName) {
-            lastSectionMatch = i
-          }
+    const configIndex = findLastIndex(this.parsedConfig, (config) => config.path === path)
+    if (value == null) {
+      if (configIndex !== -1) {
+        this.parsedConfig = deleteItem(this.parsedConfig, configIndex)
+      }
+    } else {
+      if (configIndex !== -1) {
+        const config = this.parsedConfig[configIndex]
+        const modifiedConfig = {...config, value, modified: true}
+        if (append) {
+          this.parsedConfig = insertItem(this.parsedConfig, configIndex, modifiedConfig)
         } else {
-          currentSectionName = null
+          this.parsedConfig = replaceItem(this.parsedConfig, configIndex, modifiedConfig)
         }
-      } else if (
-        currentSection === section &&
-        (sectionName === null || currentSectionName === sectionName)
-      ) {
-        if (isKeyValuePair(line)) {
-          let [_key] = line.split('=', 1)
-          if (_key.trim() === key) {
-            lastMatch = i
+      } else {
+        const sectionPath = path.split('.').slice(0, -1).join('.')
+        const sectionIndex = this.parsedConfig.findIndex((config) => config.path === sectionPath)
+        const [section, subsection] = sectionPath.split('.')
+        const name = path.split('.').pop()
+        const newConfig = {section, subsection, name, value, modified: true}
+        if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
+          if (sectionIndex >= 0) {
+            this.parsedConfig = insertItem(this.parsedConfig, sectionIndex, newConfig)
+          } else {
+            const newSection = {section, subsection, modified: true}
+            this.parsedConfig = [...this.parsedConfig, newSection, newConfig]
           }
         }
       }
-    }
-    if (lastMatch !== null) {
-      if (value === undefined) {
-        this.lines.splice(lastMatch, 1)
-      } else if (append) {
-        this.lines.splice(lastMatch + 1, 0, [`\t${key} = ${value}`])
-      } else {
-        this.lines[lastMatch] = `\t${key} = ${value}`
-      }
-    } else if (lastSectionMatch !== null) {
-      if (value !== undefined) {
-        this.lines.splice(lastSectionMatch + 1, 0, [`\t${key} = ${value}`])
-      }
-    } else if (value !== undefined) {
-      if (sectionName) {
-        this.lines.push(`[${section} "${sectionName}"]`)
-      } else {
-        this.lines.push(`[${section}]`)
-      }
-      this.lines.push([`\t${key} = ${value}`])
     }
   }
   toString () {
-    return this.lines.join('\n') + '\n'
+    return this.parsedConfig
+      .map(({line, section, subsection, name, value, modified = false}) => {
+        if (!modified) {
+          return line
+        }
+        if (name != null && value != null) {
+          return `\t${name} = ${value}`
+        }
+        if (subsection != null) {
+          return `[${section} "${subsection}"]`
+        }
+        return `[${section}]`
+      })
+      .join('\n') + '\n'
   }
 }
