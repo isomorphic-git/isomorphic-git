@@ -1,8 +1,9 @@
-import { E, GitError } from './GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
+
+import { E, GitError } from './GitError.js'
 
 // Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
 function parseCacheEntryFlags (bits) {

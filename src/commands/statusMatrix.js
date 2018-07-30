@@ -1,12 +1,10 @@
 import path from 'path'
 
-import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { WORKDIR } from '../models/GitWalkerFs.js'
 import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
-import { compareStats } from '../utils/compareStats.js'
-import { log } from '../utils/log.js'
 
 import { walk } from './walk.js'
 
@@ -24,15 +22,27 @@ export async function statusMatrix ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let updateStats = new Set()
     let results = await walk({
       fs,
       dir,
       gitdir,
       trees: [TREE(ref), WORKDIR, STAGE],
-      filter: async function ([head, ...rest]) {
-        // console.log(head)
+      filter: async function ([head, workdir, stage]) {
+        // We need an awkward exception for the root directory
         if (head.fullpath === '.') return true
+        // Ignore ignored files, but only if they are not already tracked.
+        if (!head.exists && !stage.exists && workdir.exists) {
+          if (
+            await GitIgnoreManager.isIgnored({
+              fs,
+              dir,
+              filepath: workdir.fullpath
+            })
+          ) {
+            return false
+          }
+        }
+        // match against filepath parameter
         if (head.fullpath.length >= filepath.length) {
           return head.fullpath.startsWith(filepath)
         } else if (head.fullpath.length < filepath.length) {
