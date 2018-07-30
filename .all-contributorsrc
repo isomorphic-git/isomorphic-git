@@ -179,6 +179,16 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "mizchi",
+      "name": "Koutaro Chikuba",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/73962?v=4",
+      "profile": "http://twitter.com/mizchi",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ]
 }
