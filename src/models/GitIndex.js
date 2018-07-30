@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { E, GitError } from './GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
@@ -117,6 +117,9 @@ export class GitIndex {
   get entries () {
     return [...this._entries.values()].sort(comparePath)
   }
+  get entriesMap () {
+    return this._entries
+  }
   * [Symbol.iterator] () {
     for (let entry of this.entries) {
       yield entry
@@ -124,6 +127,7 @@ export class GitIndex {
   }
   insert ({ filepath, stats, oid }) {
     stats = normalizeStats(stats)
+    let bfilepath = Buffer.from(filepath)
     let entry = {
       ctimeSeconds: stats.ctimeSeconds,
       ctimeNanoseconds: stats.ctimeNanoseconds,
@@ -144,7 +148,7 @@ export class GitIndex {
         assumeValid: false,
         extended: false,
         stage: 0,
-        nameLength: filepath.length < 0xfff ? filepath.length : 0xfff
+        nameLength: bfilepath.length < 0xfff ? bfilepath.length : 0xfff
       }
     }
     this._entries.set(entry.path, entry)

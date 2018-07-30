@@ -33,7 +33,7 @@ Array [
   "resolveRef",
   "sign",
   "status",
-  "status2",
+  "statusMatrix",
   "utils",
   "verify",
   "version",

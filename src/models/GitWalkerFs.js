@@ -1,15 +1,19 @@
 import { posix as path } from 'path'
 
+import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
-import { normalizeStats } from '../utils/normalizeStats'
+import { normalizeStats } from '../utils/normalizeStats.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
+import { log } from '../utils/log.js'
+import { compareStats } from '../utils/compareStats.js';
 
 import { GitObject } from './GitObject.js'
 
 export class GitWalkerFs {
-  constructor ({ fs, dir }) {
+  constructor ({ fs, dir, gitdir }) {
     this.fs = fs
     this.dir = dir
+    this.gitdir = gitdir
     let walker = this
     this.ConstructEntry = class FSEntry {
       constructor (entry) {
@@ -71,15 +75,37 @@ export class GitWalkerFs {
     Object.assign(entry, { content })
   }
   async populateHash (entry) {
-    if (!entry.content) await entry.populateContent()
-    let oid = await GitObject.hash({ type: 'blob', object: entry.content })
+    let { fs, gitdir } = this
+    let oid
+    // See if we can use the SHA1 hash in the index.
+    await GitIndexManager.acquire(
+      { fs, filepath: `${gitdir}/index` },
+      async function (index) {
+        let stage = index.entriesMap.get(entry.fullpath)
+        if (!stage || compareStats(entry, stage)) {
+          log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
+          if (!entry.content) await entry.populateContent()
+          oid = await GitObject.hash({ type: 'blob', object: entry.content })
+          if (stage && oid === stage.oid) {
+            index.insert({
+              filepath: entry.fullpath,
+              stats: entry,
+              oid: oid
+            })
+          }
+        } else {
+          // Use the index SHA1 rather than compute it
+          oid = stage.oid
+        }
+      }
+    )
     Object.assign(entry, { oid })
   }
 }
 
 const WORKDIR = Object.create(null)
 Object.defineProperty(WORKDIR, GitWalkerSymbol, {
-  value: ({ fs, dir }) => new GitWalkerFs({ fs, dir })
+  value: ({ fs, dir, gitdir }) => new GitWalkerFs({ fs, dir, gitdir })
 })
 Object.freeze(WORKDIR)
 export { WORKDIR }

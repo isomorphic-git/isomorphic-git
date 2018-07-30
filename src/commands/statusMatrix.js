@@ -13,9 +13,9 @@ import { walk } from './walk.js'
 /**
  * Summarize the differences between a commit, the working dir, and the stage
  *
- * @link https://isomorphic-git.github.io/docs/status.html
+ * @link https://isomorphic-git.github.io/docs/statusMatrix.html
  */
-export async function status2 ({
+export async function statusMatrix ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs,
@@ -54,22 +54,8 @@ export async function status2 ({
         }
         await head.populateHash()
         await stage.populateHash()
-        // TODO: figure out how to move this cache-lookup logic into workdir.populateHash()
         if (workdir.exists && stage.exists) {
-          if (compareStats(workdir, stage)) {
-            log(`INDEX CACHE MISS: calculating SHA for ${workdir.fullpath}`)
-            await workdir.populateHash()
-            if (workdir.oid === stage.oid) {
-              updateStats.add({
-                filepath: workdir.fullpath,
-                stats: workdir,
-                oid: workdir.oid
-              })
-            }
-          } else {
-            // Fake the oid rather than compute it
-            workdir.oid = stage.oid
-          }
+          await workdir.populateHash()
         }
         if (!head.exists && workdir.exists && !stage.exists) {
           // We don't actually NEED the sha. Any sha will do
@@ -83,18 +69,9 @@ export async function status2 ({
         return [fullpath, ...result]
       }
     })
-    // Update index
-    await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
-      async function (index) {
-        for (const entry of updateStats) {
-          index.insert(entry)
-        }
-      }
-    )
     return results
   } catch (err) {
-    err.caller = 'git.status2'
+    err.caller = 'git.statusMatrix'
     throw err
   }
 }
