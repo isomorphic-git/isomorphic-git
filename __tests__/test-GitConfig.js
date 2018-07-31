@@ -406,4 +406,22 @@ describe('GitConfig', () => {
 `)
     })
   })
+
+  describe('get subsections', () => {
+    it('simple', async () => {
+      const config = GitConfig.from(`[one]
+      keyaaa = valaaa
+          
+      [remote "foo"]
+      url = https://foo.com/project.git
+
+      [remote "bar"]
+      url = https://bar.com/project.git
+            
+      [two]
+      keyaaa = valaaa`)
+      const subsections = await config.getSubsections('remote')
+      expect(subsections).toEqual(['foo', 'bar'])
+    })
+  })
 })

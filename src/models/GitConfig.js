@@ -108,7 +108,7 @@ export class GitConfig {
         }
 
         const path = getPath(section, subsection, name)
-        return {line, section, subsection, name, value, path}
+        return {line, isSection, section, subsection, name, value, path}
       })
   }
   static from (text) {
@@ -125,6 +125,11 @@ export class GitConfig {
   }
   async getall (path) {
     return this.get(path, true)
+  }
+  async getSubsections (section) {
+    return this.parsedConfig
+      .filter((config) => config.section === section && config.isSection)
+      .map((config) => config.subsection)
   }
   async append (path, value) {
     return this.set(path, value, true)
