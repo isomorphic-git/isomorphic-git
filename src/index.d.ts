@@ -134,6 +134,13 @@ export function deleteBranch(args: {
   ref: string
 }): Promise<void>;
 
+export function deleteRemote(args: {
+    fs: any,
+    dir: string,
+    gitdir?: string,
+    remote: string
+}): Promise<void>;
+
 export function checkout(args: {
   fs: any,
   dir: string,

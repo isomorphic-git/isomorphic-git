@@ -166,6 +166,10 @@ export class GitConfig {
       .filter((config) => config.section === section && config.isSection)
       .map((config) => config.subsection)
   }
+  async deleteSection (section, subsection) {
+    this.parsedConfig = this.parsedConfig
+      .filter((config) => !(config.section === section && config.subsection === subsection))
+  }
   async append (path, value) {
     return this.set(path, value, true)
   }
