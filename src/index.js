@@ -2,6 +2,7 @@ import { auth } from './utils/auth'
 import { oauth2 } from './utils/oauth2'
 
 export * from './commands/add'
+export * from './commands/addRemote'
 export * from './commands/branch'
 export * from './commands/deleteBranch'
 export * from './commands/checkout'
