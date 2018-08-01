@@ -48,6 +48,8 @@ const SECTION_REGEX = /^[A-Za-z0-9_.]+$/
 const VARIABLE_LINE_REGEX = /^([A-Za-z]\w*)(?: *= *(.*))?$/
 const VARIABLE_NAME_REGEX = /^[A-Za-z]\w*$/
 
+const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
+
 const extractSectionLine = (line) => {
   const matches = SECTION_LINE_REGEX.exec(line)
   if (matches != null) {
@@ -60,10 +62,20 @@ const extractSectionLine = (line) => {
 const extractVariableLine = (line) => {
   const matches = VARIABLE_LINE_REGEX.exec(line)
   if (matches != null) {
-    const [name, value = 'true'] = matches.slice(1)
-    return [name, value]
+    const [name, rawValue = 'true'] = matches.slice(1)
+    const valueWithoutComments = removeComments(rawValue)
+    return [name, valueWithoutComments]
   }
   return null
+}
+
+const removeComments = (rawValue) => {
+  const commentMatches = VARIABLE_VALUE_COMMENT_REGEX.exec(rawValue)
+  if (commentMatches == null) {
+    return rawValue
+  }
+  const [valueWithoutComment] = commentMatches.slice(1)
+  return valueWithoutComment
 }
 
 const lower = (text) => {

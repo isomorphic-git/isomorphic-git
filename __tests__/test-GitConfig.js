@@ -72,6 +72,44 @@ describe('GitConfig', () => {
     })
   })
 
+  describe('handle comments', () => {
+    it('lines starting with # or ;', async () => {
+      const config = GitConfig.from(`[foo]
+      #keyaaa = valaaa
+      ;keybbb = valbbb
+      keyccc = valccc`)
+      let a = await config.get('foo.#keyaaa')
+      expect(a).toBeUndefined()
+      let b = await config.get('foo.;keybbb')
+      expect(b).toBeUndefined()
+    })
+
+    it('variable lines with # or ; at the end (get)', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa #comment #aaa
+      keybbb = valbbb ;comment ;bbb
+      keyccc = valccc`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('valaaa')
+      let b = await config.get('foo.keybbb')
+      expect(b).toEqual('valbbb')
+    })
+
+    it('variable lines with # or ; at the end (set)', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa #comment #aaa
+      keybbb = valbbb ;comment ;bbb
+      keyccc = valccc`)
+      await config.set('foo.keyaaa', 'newvalaaa')
+      await config.set('foo.keybbb', 'newvalbbb')
+      expect(config.toString()).toEqual(`[foo]
+\tkeyaaa = newvalaaa
+\tkeybbb = newvalbbb
+      keyccc = valccc
+`)
+    })
+  })
+
   describe('get cast value', () => {
     it('using schema', async () => {
       const config = GitConfig.from(`[core]
