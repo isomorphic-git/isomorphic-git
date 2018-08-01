@@ -108,6 +108,78 @@ describe('GitConfig', () => {
       keyccc = valccc
 `)
     })
+
+    it('ignore quoted # or ;', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa " #commentaaa"
+      keybbb = valbbb " ;commentbbb"
+      keyccc = valccc`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('valaaa  #commentaaa')
+      let b = await config.get('foo.keybbb')
+      expect(b).toEqual('valbbb  ;commentbbb')
+    })
+  })
+
+  describe('handle quotes', () => {
+    it('simple', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "valaaa"`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('valaaa')
+    })
+
+    it('escaped', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = \\"valaaa`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('"valaaa')
+    })
+
+    it('multiple', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "val" aaa
+      keybbb = val "a" a"a"`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('val aaa')
+      let b = await config.get('foo.keybbb')
+      expect(b).toEqual('val a aa')
+    })
+
+    it('odd number of quotes', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "val" a "aa`)
+      let a = await config.get('foo.keybbb')
+      expect(a).toBeUndefined()
+    })
+
+    it('# in quoted values', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "#valaaa"`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('#valaaa')
+    })
+
+    it('; in quoted values', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "val;a;a;a"`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('val;a;a;a')
+    })
+
+    it('# after quoted values', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "valaaa" # comment`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('valaaa')
+    })
+
+    it('; after quoted values', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "valaaa" ; comment`)
+      let a = await config.get('foo.keyaaa')
+      expect(a).toEqual('valaaa')
+    })
   })
 
   describe('get cast value', () => {

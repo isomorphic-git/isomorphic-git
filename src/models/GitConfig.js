@@ -64,7 +64,8 @@ const extractVariableLine = (line) => {
   if (matches != null) {
     const [name, rawValue = 'true'] = matches.slice(1)
     const valueWithoutComments = removeComments(rawValue)
-    return [name, valueWithoutComments]
+    const valueWithoutQuotes = removeQuotes(valueWithoutComments)
+    return [name, valueWithoutQuotes]
   }
   return null
 }
@@ -74,8 +75,30 @@ const removeComments = (rawValue) => {
   if (commentMatches == null) {
     return rawValue
   }
-  const [valueWithoutComment] = commentMatches.slice(1)
+  const [valueWithoutComment, comment] = commentMatches.slice(1)
+  // if odd number of quotes before and after comment => comment is escaped
+  if (hasOddNumberOfQuotes(valueWithoutComment) && hasOddNumberOfQuotes(comment)) {
+    return `${valueWithoutComment}${comment}`
+  }
   return valueWithoutComment
+}
+
+const hasOddNumberOfQuotes = (text) => {
+  const numberOfQuotes = (text.match(/(?:^|[^\\])"/g) || []).length
+  return (numberOfQuotes % 2 !== 0)
+}
+
+const removeQuotes = (text) => {
+  return text
+    .split('')
+    .reduce((newText, c, idx, text) => {
+      const isQuote = (c === '"' && text[idx - 1] !== '\\')
+      const isEscapeForQuote = (c === '\\' && text[idx + 1] === '"')
+      if (isQuote || isEscapeForQuote) {
+        return newText
+      }
+      return newText + c
+    }, '')
 }
 
 const lower = (text) => {
