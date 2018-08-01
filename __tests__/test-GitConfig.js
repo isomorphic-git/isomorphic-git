@@ -21,6 +21,15 @@ describe('GitConfig', () => {
       expect(a).toEqual('valbar')
     })
 
+    it('implicit boolean value', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa
+      keybbb
+      keyccc = valccc`)
+      let a = await config.get('foo.keybbb')
+      expect(a).toEqual('true')
+    })
+
     it('section case insensitive', async () => {
       const config = GitConfig.from(`[Foo]
       keyaaa = valaaa`)

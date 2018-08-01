@@ -41,10 +41,11 @@ const SECTION_LINE_REGEX = /^\[([A-Za-z0-9_.]+)(?: "(.*)")?\]$/
 const SECTION_REGEX = /^[A-Za-z0-9_.]+$/
 
 // variable lines contain a name, and equal sign and then a value
+// variable lines can also only contain a name (the implicit value is a boolean true)
 // variable name is alphanumeric (ASCII) with _
 // variable name starts with an alphabetic character
 // variable name is case insensitive
-const VARIABLE_LINE_REGEX = /^([A-Za-z]\w*) *= *(.*)$/
+const VARIABLE_LINE_REGEX = /^([A-Za-z]\w*)(?: *= *(.*))?$/
 const VARIABLE_NAME_REGEX = /^[A-Za-z]\w*$/
 
 const extractSectionLine = (line) => {
@@ -59,7 +60,7 @@ const extractSectionLine = (line) => {
 const extractVariableLine = (line) => {
   const matches = VARIABLE_LINE_REGEX.exec(line)
   if (matches != null) {
-    const [name, value] = matches.slice(1)
+    const [name, value = 'true'] = matches.slice(1)
     return [name, value]
   }
   return null
