@@ -21,6 +21,20 @@ describe('GitConfig', () => {
       expect(a).toEqual('valbar')
     })
 
+    it('section case insensitive', async () => {
+      const config = GitConfig.from(`[Foo]
+      keyaaa = valaaa`)
+      let a = await config.get('FOO.keyaaa')
+      expect(a).toEqual('valaaa')
+    })
+
+    it('variable name insensitive', async () => {
+      const config = GitConfig.from(`[foo]
+      KeyAaa = valaaa`)
+      let a = await config.get('foo.KEYaaa')
+      expect(a).toEqual('valaaa')
+    })
+
     it('last (when several)', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valaaa
@@ -118,10 +132,30 @@ describe('GitConfig', () => {
 `)
     })
 
+    it('existing section (case insensitive)', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa`)
+      await config.set('FOO.keybbb', 'valbbb')
+      expect(config.toString()).toEqual(`[foo]
+\tkeybbb = valbbb
+      keyaaa = valaaa
+`)
+    })
+
     it('existing subsection', async () => {
       const config = GitConfig.from(`[remote "foo"]
       url = https://foo.com/project.git`)
       await config.set('remote.foo.fetch', 'foo')
+      expect(config.toString()).toEqual(`[remote "foo"]
+\tfetch = foo
+      url = https://foo.com/project.git
+`)
+    })
+
+    it('existing subsection (case insensitive)', async () => {
+      const config = GitConfig.from(`[remote "foo"]
+      url = https://foo.com/project.git`)
+      await config.set('REMOTE.foo.fetch', 'foo')
       expect(config.toString()).toEqual(`[remote "foo"]
 \tfetch = foo
       url = https://foo.com/project.git
@@ -159,6 +193,21 @@ describe('GitConfig', () => {
       keyaaa = valbar
       keybbb = valbbb`)
       await config.set('bar.keyaaa', 'newvalbar')
+      expect(config.toString()).toEqual(`[foo]
+      keyaaa = valfoo
+      [bar]
+\tkeyaaa = newvalbar
+      keybbb = valbbb
+`)
+    })
+
+    it('simple (case insensitive)', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valfoo
+      [bar]
+      keyaaa = valbar
+      keybbb = valbbb`)
+      await config.set('BAR.keyaaa', 'newvalbar')
       expect(config.toString()).toEqual(`[foo]
       keyaaa = valfoo
       [bar]
@@ -233,6 +282,16 @@ describe('GitConfig', () => {
       keyaaa = valaaa
       keybbb = valbbb`)
       await config.set('foo.keyaaa')
+      expect(config.toString()).toEqual(`[foo]
+      keybbb = valbbb
+`)
+    })
+
+    it('simple (case insensitive)', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa
+      keybbb = valbbb`)
+      await config.set('FOO.keyaaa')
       expect(config.toString()).toEqual(`[foo]
       keybbb = valbbb
 `)

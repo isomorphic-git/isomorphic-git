@@ -33,6 +33,7 @@ const schema = {
 
 // section starts with [ and ends with ]
 // section is alphanumeric (ASCII) with _ and .
+// section is case insensitive
 // subsection is optionnal
 // subsection is specified after section and one or more spaces
 // subsection is specified between double quotes
@@ -42,6 +43,7 @@ const SECTION_REGEX = /^[A-Za-z0-9_.]+$/
 // variable lines contain a name, and equal sign and then a value
 // variable name is alphanumeric (ASCII) with _
 // variable name starts with an alphabetic character
+// variable name is case insensitive
 const VARIABLE_LINE_REGEX = /^([A-Za-z]\w*) *= *(.*)$/
 const VARIABLE_NAME_REGEX = /^[A-Za-z]\w*$/
 
@@ -63,8 +65,12 @@ const extractVariableLine = (line) => {
   return null
 }
 
+const lower = (text) => {
+  return (text != null) ? text.toLowerCase() : null
+}
+
 const getPath = (section, subsection, name) => {
-  return [section, subsection, name]
+  return [lower(section), subsection, lower(name)]
     .filter((a) => a != null)
     .join('.')
 }
@@ -109,7 +115,7 @@ export class GitConfig {
   }
   async get (path, getall = false) {
     const allValues = this.parsedConfig
-      .filter((config) => config.path === path)
+      .filter((config) => config.path === path.toLowerCase())
       .map(({section, name, value}) => {
         const fn = schema[section] && schema[section][name]
         return fn ? fn(value) : value
@@ -123,7 +129,7 @@ export class GitConfig {
     return this.set(path, value, true)
   }
   async set (path, value, append = false) {
-    const configIndex = findLastIndex(this.parsedConfig, (config) => config.path === path)
+    const configIndex = findLastIndex(this.parsedConfig, (config) => config.path === path.toLowerCase())
     if (value == null) {
       if (configIndex !== -1) {
         this.parsedConfig.splice(configIndex, 1)
@@ -138,7 +144,7 @@ export class GitConfig {
           this.parsedConfig[configIndex] = modifiedConfig
         }
       } else {
-        const sectionPath = path.split('.').slice(0, -1).join('.')
+        const sectionPath = path.split('.').slice(0, -1).join('.').toLowerCase()
         const sectionIndex = this.parsedConfig.findIndex((config) => config.path === sectionPath)
         const [section, subsection] = sectionPath.split('.')
         const name = path.split('.').pop()
