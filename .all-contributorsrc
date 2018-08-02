@@ -181,6 +181,35 @@
       ]
     },
     {
+      "login": "akaJes",
+      "name": "akaJes",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/3035266?v=4",
+      "profile": "",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "dsabanin",
+      "name": "Dima Sabanin",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/8316?v=4",
+      "profile": "http://twitter.com/dimasabanin",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "mizchi",
+      "name": "Koutaro Chikuba",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/73962?v=4",
+      "profile": "http://twitter.com/mizchi",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
       "login": "hsablonniere",
       "name": "Hubert SABLONNIÈRE",
       "avatar_url": "https://avatars2.githubusercontent.com/u/236342?v=4",

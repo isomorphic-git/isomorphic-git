@@ -201,7 +201,7 @@ export class GitIndex {
     let body = Buffer.concat(
       this.entries.map(entry => {
         // the fixed length + the filename + at least one null char => align by 8
-        let length = Math.ceil((62 + entry.path.length + 1) / 8) * 8
+        let length = Math.ceil((62 + Buffer.from(entry.path).length + 1) / 8) * 8
         let written = Buffer.alloc(length)
         let writer = new BufferCursor(written)
         const stat = normalizeStats(entry)
@@ -217,7 +217,7 @@ export class GitIndex {
         writer.writeUInt32BE(stat.size)
         writer.write(entry.oid, 20, 'hex')
         writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
-        writer.write(entry.path, entry.path.length, 'utf8')
+        writer.write(entry.path, Buffer.from(entry.path).length, 'utf8')
         return written
       })
     )
