@@ -179,6 +179,18 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "hsablonniere",
+      "name": "Hubert SABLONNIÈRE",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/236342?v=4",
+      "profile": "https://www.hsablonniere.com/",
+      "contributions": [
+        "code",
+        "test",
+        "ideas",
+        "fundingFinding"
+      ]
     }
   ]
 }
