@@ -174,6 +174,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [isDescendent](https://isomorphic-git.github.io/docs/isDescendent.html)
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
+- [listRemotes](https://isomorphic-git.github.io/docs/listRemotes.html)
 - [listTags](https://isomorphic-git.github.io/docs/listTags.html)
 - [log](https://isomorphic-git.github.io/docs/log.html)
 - [merge](https://isomorphic-git.github.io/docs/merge.html)
