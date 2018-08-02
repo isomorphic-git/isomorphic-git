@@ -20,6 +20,7 @@ Array [
   "isDescendent",
   "listBranches",
   "listFiles",
+  "listRemotes",
   "listTags",
   "log",
   "merge",
