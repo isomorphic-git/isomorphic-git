@@ -86,6 +86,23 @@ export class GitObjectManager {
     let oid = shasum(buffer)
     return oid
   }
+  static async expandOid ({fs: _fs, gitdir, oid}) {
+    const fs = new FileSystem(_fs)
+    const prefix = oid.slice(0, 2)
+
+    const objectsSuffixes = await fs.readdir(`${gitdir}/objects/${prefix}`)
+    const results = objectsSuffixes
+      .map((suffix) => `${prefix}${suffix}`)
+      .filter((_oid) => _oid.startsWith(oid))
+
+    if (results.length === 1) {
+      return results[0]
+    }
+    if (results.length > 1) {
+      // TODO throw AMBIGUOUS error
+    }
+    // TODO throw NOT FOUND error
+  }
 
   static async write ({ fs: _fs, gitdir, type, object }) {
     const fs = new FileSystem(_fs)
