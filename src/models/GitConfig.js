@@ -215,6 +215,6 @@ export class GitConfig {
         }
         return `[${section}]`
       })
-      .join('\n') + '\n'
+      .join('\n')
   }
 }

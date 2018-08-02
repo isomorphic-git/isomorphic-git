@@ -105,8 +105,7 @@ describe('GitConfig', () => {
       expect(config.toString()).toEqual(`[foo]
 \tkeyaaa = newvalaaa
 \tkeybbb = newvalbbb
-      keyccc = valccc
-`)
+      keyccc = valccc`)
     })
 
     it('ignore quoted # or ;', async () => {
@@ -247,8 +246,7 @@ describe('GitConfig', () => {
       await config.set('foo.keybbb', 'valbbb')
       expect(config.toString()).toEqual(`[foo]
 \tkeybbb = valbbb
-      keyaaa = valaaa
-`)
+      keyaaa = valaaa`)
     })
 
     it('existing section (case insensitive)', async () => {
@@ -257,8 +255,7 @@ describe('GitConfig', () => {
       await config.set('FOO.keybbb', 'valbbb')
       expect(config.toString()).toEqual(`[foo]
 \tkeybbb = valbbb
-      keyaaa = valaaa
-`)
+      keyaaa = valaaa`)
     })
 
     it('existing subsection', async () => {
@@ -267,8 +264,7 @@ describe('GitConfig', () => {
       await config.set('remote.foo.fetch', 'foo')
       expect(config.toString()).toEqual(`[remote "foo"]
 \tfetch = foo
-      url = https://foo.com/project.git
-`)
+      url = https://foo.com/project.git`)
     })
 
     it('existing subsection (case insensitive)', async () => {
@@ -277,8 +273,7 @@ describe('GitConfig', () => {
       await config.set('REMOTE.foo.fetch', 'foo')
       expect(config.toString()).toEqual(`[remote "foo"]
 \tfetch = foo
-      url = https://foo.com/project.git
-`)
+      url = https://foo.com/project.git`)
     })
 
     it('new section', async () => {
@@ -288,8 +283,7 @@ describe('GitConfig', () => {
       expect(config.toString()).toEqual(`[foo]
       keyaaa = valaaa
 [bar]
-\tkeyaaa = valaaa
-`)
+\tkeyaaa = valaaa`)
     })
 
     it('new subsection', async () => {
@@ -299,8 +293,7 @@ describe('GitConfig', () => {
       expect(config.toString()).toEqual(`[remote "foo"]
       url = https://foo.com/project.git
 [remote "bar"]
-\turl = https://bar.com/project.git
-`)
+\turl = https://bar.com/project.git`)
     })
   })
 
@@ -316,8 +309,7 @@ describe('GitConfig', () => {
       keyaaa = valfoo
       [bar]
 \tkeyaaa = newvalbar
-      keybbb = valbbb
-`)
+      keybbb = valbbb`)
     })
 
     it('simple (case insensitive)', async () => {
@@ -331,8 +323,7 @@ describe('GitConfig', () => {
       keyaaa = valfoo
       [bar]
 \tkeyaaa = newvalbar
-      keybbb = valbbb
-`)
+      keybbb = valbbb`)
     })
 
     it('last (when several)', async () => {
@@ -344,8 +335,7 @@ describe('GitConfig', () => {
       expect(config.toString()).toEqual(`[foo]
       keyaaa = valaaa
       keybbb = valbbb
-\tkeybbb = newvalBBB
-`)
+\tkeybbb = newvalBBB`)
     })
 
     it('subsection', async () => {
@@ -357,8 +347,7 @@ describe('GitConfig', () => {
       expect(config.toString()).toEqual(`[remote "foo"]
 \turl = https://foo.com/project-foo.git
       [remote "bar"]
-      url = https://bar.com/project.git
-`)
+      url = https://bar.com/project.git`)
     })
   })
 
@@ -375,8 +364,7 @@ describe('GitConfig', () => {
       [bar]
       keyaaa = valbar
 \tkeyaaa = newvalbar
-      keybbb = valbbb
-`)
+      keybbb = valbbb`)
     })
 
     it('subsection', async () => {
@@ -390,8 +378,7 @@ describe('GitConfig', () => {
       [remote "bar"]
       url = https://bar.com/project.git
 [remote "baz"]
-\turl = https://baz.com/project.git
-`)
+\turl = https://baz.com/project.git`)
     })
   })
 
@@ -402,8 +389,7 @@ describe('GitConfig', () => {
       keybbb = valbbb`)
       await config.set('foo.keyaaa')
       expect(config.toString()).toEqual(`[foo]
-      keybbb = valbbb
-`)
+      keybbb = valbbb`)
     })
 
     it('simple (case insensitive)', async () => {
@@ -412,8 +398,7 @@ describe('GitConfig', () => {
       keybbb = valbbb`)
       await config.set('FOO.keyaaa')
       expect(config.toString()).toEqual(`[foo]
-      keybbb = valbbb
-`)
+      keybbb = valbbb`)
     })
 
     it('last (when several)', async () => {
@@ -422,8 +407,7 @@ describe('GitConfig', () => {
       keyaaa = valtwo`)
       await config.set('foo.keyaaa')
       expect(config.toString()).toEqual(`[foo]
-      keyaaa = valone
-`)
+      keyaaa = valone`)
     })
 
     it('subsection', async () => {
@@ -434,8 +418,7 @@ describe('GitConfig', () => {
       await config.set('remote.foo.url')
       expect(config.toString()).toEqual(`[remote "foo"]
       [remote "bar"]
-      url = https://bar.com/project.git
-`)
+      url = https://bar.com/project.git`)
     })
   })
 
@@ -485,8 +468,7 @@ describe('GitConfig', () => {
       keyaaa = valfoo`)
       await config.set('ba?r.keyaaa', 'valbar')
       expect(config.toString()).toEqual(`[foo]
-      keyaaa = valfoo
-`)
+      keyaaa = valfoo`)
     })
 
     it('variable name is only alphanum _ (get)', async () => {
@@ -512,8 +494,7 @@ describe('GitConfig', () => {
       await config.set('foo.key?ccc', 'valccc')
       await config.set('foo.key%ddd', 'valddd')
       expect(config.toString()).toEqual(`[foo]
-      keyaaa = valaaa
-`)
+      keyaaa = valaaa`)
     })
   })
 
