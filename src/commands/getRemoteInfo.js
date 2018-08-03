@@ -13,12 +13,13 @@ export async function getRemoteInfo ({
   username = authUsername,
   password = authPassword,
   token,
-  oauth2format
+  oauth2format,
+  forPush = false
 }) {
   try {
     let auth = { username, password, token, oauth2format }
     const remote = await GitRemoteHTTP.discover({
-      service: 'git-upload-pack',
+      service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,
       noGitSuffix,
       auth
