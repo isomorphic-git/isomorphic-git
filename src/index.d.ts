@@ -98,6 +98,11 @@ export interface MergeReport {
   fastForward?: boolean
 }
 
+export interface RemoteDescription {
+    remote: string, // name of the remote
+    url: string,    // url of the remote
+}
+
 /*~ If this module has methods, declare them as functions like so.
  */
 export function add(args: {
@@ -260,6 +265,12 @@ export function listFiles(args: {
   gitdir?: string,
   ref?: string
 }): Promise<Array<string>>;
+
+export function listRemotes(args: {
+    fs: any,
+    dir: string,
+    gitdir?: string,
+}): Promise<Array<RemoteDescription>>;
 
 export function listTags(args: {
   fs: any,
