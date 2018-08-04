@@ -1,8 +1,13 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const snapshots = require('./__snapshots__/test-addRemote.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { addRemote, listRemotes } = require('isomorphic-git')
 
 describe('addRemote', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
   it('addRemote', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-addRemote')
