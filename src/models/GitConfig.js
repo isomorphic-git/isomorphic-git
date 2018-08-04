@@ -203,12 +203,14 @@ export class GitConfig {
         )
         const [section, subsection] = sectionPath.split('.')
         const name = path.split('.').pop()
-        const newConfig = { section, subsection, name, value, modified: true }
+        const newConfig = { section, subsection, name, value, modified: true, path: getPath(section, subsection, name) }
         if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
           if (sectionIndex >= 0) {
+            // Reuse existing section
             this.parsedConfig.splice(sectionIndex + 1, 0, newConfig)
           } else {
-            const newSection = { section, subsection, modified: true }
+            // Add a new section
+            const newSection = { section, subsection, modified: true, path: getPath(section, subsection, null) }
             this.parsedConfig.push(newSection, newConfig)
           }
         }

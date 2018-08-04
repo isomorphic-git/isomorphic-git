@@ -57,6 +57,7 @@ export async function addRemote ({
       `remote.${remote}.fetch`,
       `+refs/heads/*:refs/remotes/${remote}/*`
     )
+    console.log(config.toString())
     await GitConfigManager.save({ fs, gitdir, config })
   } catch (err) {
     err.caller = 'git.addRemote'
