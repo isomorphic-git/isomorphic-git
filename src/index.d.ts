@@ -243,6 +243,7 @@ export function getRemoteInfo(args: {
   password?: string,
   token?: string,
   oauth2format?: 'github' | 'bitbucket' | 'gitlab',
+  forPush?: boolean,
 }): Promise<RemoteDescription>;
 
 export function indexPack(args: {

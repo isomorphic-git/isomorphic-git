@@ -15,7 +15,6 @@ describe('deleteRemote', () => {
   it('missing argument', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-addRemote')
-    const url = undefined
     // Test
     let error = null
     try {
