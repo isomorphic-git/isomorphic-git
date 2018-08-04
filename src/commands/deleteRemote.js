@@ -1,6 +1,8 @@
 import path from 'path'
 
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
 
 /**
  * Delete an existing remote
@@ -10,21 +12,22 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
 export async function deleteRemote ({
   dir,
   gitdir = path.join(dir, '.git'),
-  fs,
+  fs: _fs,
   remote
 }) {
   try {
-    // TODO do I need to check remote/url args presence?
-    const config = await GitConfigManager.get({ fs, gitdir })
-    const remoteNames = await config.getSubsections('remote')
-    if (!remoteNames.includes(remote)) {
-      // TODO we need a specific error, isn't it?
-      throw new Error(`remote ${remote} does not exist`)
+    const fs = new FileSystem(_fs)
+    if (remote === undefined) {
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'deleteRemote',
+        parameter: 'remote'
+      })
     }
+    const config = await GitConfigManager.get({ fs, gitdir })
     await config.deleteSection('remote', remote)
     await GitConfigManager.save({ fs, gitdir, config })
   } catch (err) {
-    err.caller = 'git.addRemote'
+    err.caller = 'git.deleteRemote'
     throw err
   }
 }

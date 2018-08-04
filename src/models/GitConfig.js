@@ -50,7 +50,7 @@ const VARIABLE_NAME_REGEX = /^[A-Za-z]\w*$/
 
 const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
 
-const extractSectionLine = (line) => {
+const extractSectionLine = line => {
   const matches = SECTION_LINE_REGEX.exec(line)
   if (matches != null) {
     const [section, subsection] = matches.slice(1)
@@ -59,7 +59,7 @@ const extractSectionLine = (line) => {
   return null
 }
 
-const extractVariableLine = (line) => {
+const extractVariableLine = line => {
   const matches = VARIABLE_LINE_REGEX.exec(line)
   if (matches != null) {
     const [name, rawValue = 'true'] = matches.slice(1)
@@ -70,44 +70,45 @@ const extractVariableLine = (line) => {
   return null
 }
 
-const removeComments = (rawValue) => {
+const removeComments = rawValue => {
   const commentMatches = VARIABLE_VALUE_COMMENT_REGEX.exec(rawValue)
   if (commentMatches == null) {
     return rawValue
   }
   const [valueWithoutComment, comment] = commentMatches.slice(1)
   // if odd number of quotes before and after comment => comment is escaped
-  if (hasOddNumberOfQuotes(valueWithoutComment) && hasOddNumberOfQuotes(comment)) {
+  if (
+    hasOddNumberOfQuotes(valueWithoutComment) &&
+    hasOddNumberOfQuotes(comment)
+  ) {
     return `${valueWithoutComment}${comment}`
   }
   return valueWithoutComment
 }
 
-const hasOddNumberOfQuotes = (text) => {
+const hasOddNumberOfQuotes = text => {
   const numberOfQuotes = (text.match(/(?:^|[^\\])"/g) || []).length
-  return (numberOfQuotes % 2 !== 0)
+  return numberOfQuotes % 2 !== 0
 }
 
-const removeQuotes = (text) => {
-  return text
-    .split('')
-    .reduce((newText, c, idx, text) => {
-      const isQuote = (c === '"' && text[idx - 1] !== '\\')
-      const isEscapeForQuote = (c === '\\' && text[idx + 1] === '"')
-      if (isQuote || isEscapeForQuote) {
-        return newText
-      }
-      return newText + c
-    }, '')
+const removeQuotes = text => {
+  return text.split('').reduce((newText, c, idx, text) => {
+    const isQuote = c === '"' && text[idx - 1] !== '\\'
+    const isEscapeForQuote = c === '\\' && text[idx + 1] === '"'
+    if (isQuote || isEscapeForQuote) {
+      return newText
+    }
+    return newText + c
+  }, '')
 }
 
-const lower = (text) => {
-  return (text != null) ? text.toLowerCase() : null
+const lower = text => {
+  return text != null ? text.toLowerCase() : null
 }
 
 const getPath = (section, subsection, name) => {
   return [lower(section), subsection, lower(name)]
-    .filter((a) => a != null)
+    .filter(a => a != null)
     .join('.')
 }
 
@@ -123,36 +124,34 @@ export class GitConfig {
   constructor (text) {
     let section = null
     let subsection = null
-    this.parsedConfig = text
-      .split('\n')
-      .map((line) => {
-        let name = null
-        let value = null
+    this.parsedConfig = text.split('\n').map(line => {
+      let name = null
+      let value = null
 
-        const trimmedLine = line.trim()
-        const extractedSection = extractSectionLine(trimmedLine)
-        const isSection = (extractedSection != null)
-        if (isSection) {
-          [section, subsection] = extractedSection
-        } else {
-          const extractedVariable = extractVariableLine(trimmedLine)
-          const isVariable = (extractedVariable != null)
-          if (isVariable) {
-            [name, value] = extractedVariable
-          }
+      const trimmedLine = line.trim()
+      const extractedSection = extractSectionLine(trimmedLine)
+      const isSection = extractedSection != null
+      if (isSection) {
+        ;[section, subsection] = extractedSection
+      } else {
+        const extractedVariable = extractVariableLine(trimmedLine)
+        const isVariable = extractedVariable != null
+        if (isVariable) {
+          ;[name, value] = extractedVariable
         }
+      }
 
-        const path = getPath(section, subsection, name)
-        return {line, isSection, section, subsection, name, value, path}
-      })
+      const path = getPath(section, subsection, name)
+      return { line, isSection, section, subsection, name, value, path }
+    })
   }
   static from (text) {
     return new GitConfig(text)
   }
   async get (path, getall = false) {
     const allValues = this.parsedConfig
-      .filter((config) => config.path === path.toLowerCase())
-      .map(({section, name, value}) => {
+      .filter(config => config.path === path.toLowerCase())
+      .map(({ section, name, value }) => {
         const fn = schema[section] && schema[section][name]
         return fn ? fn(value) : value
       })
@@ -163,18 +162,23 @@ export class GitConfig {
   }
   async getSubsections (section) {
     return this.parsedConfig
-      .filter((config) => config.section === section && config.isSection)
-      .map((config) => config.subsection)
+      .filter(config => config.section === section && config.isSection)
+      .map(config => config.subsection)
   }
   async deleteSection (section, subsection) {
-    this.parsedConfig = this.parsedConfig
-      .filter((config) => !(config.section === section && config.subsection === subsection))
+    this.parsedConfig = this.parsedConfig.filter(
+      config =>
+        !(config.section === section && config.subsection === subsection)
+    )
   }
   async append (path, value) {
     return this.set(path, value, true)
   }
   async set (path, value, append = false) {
-    const configIndex = findLastIndex(this.parsedConfig, (config) => config.path === path.toLowerCase())
+    const configIndex = findLastIndex(
+      this.parsedConfig,
+      config => config.path === path.toLowerCase()
+    )
     if (value == null) {
       if (configIndex !== -1) {
         this.parsedConfig.splice(configIndex, 1)
@@ -182,23 +186,29 @@ export class GitConfig {
     } else {
       if (configIndex !== -1) {
         const config = this.parsedConfig[configIndex]
-        const modifiedConfig = {...config, value, modified: true}
+        const modifiedConfig = { ...config, value, modified: true }
         if (append) {
           this.parsedConfig.splice(configIndex + 1, 0, modifiedConfig)
         } else {
           this.parsedConfig[configIndex] = modifiedConfig
         }
       } else {
-        const sectionPath = path.split('.').slice(0, -1).join('.').toLowerCase()
-        const sectionIndex = this.parsedConfig.findIndex((config) => config.path === sectionPath)
+        const sectionPath = path
+          .split('.')
+          .slice(0, -1)
+          .join('.')
+          .toLowerCase()
+        const sectionIndex = this.parsedConfig.findIndex(
+          config => config.path === sectionPath
+        )
         const [section, subsection] = sectionPath.split('.')
         const name = path.split('.').pop()
-        const newConfig = {section, subsection, name, value, modified: true}
+        const newConfig = { section, subsection, name, value, modified: true }
         if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
           if (sectionIndex >= 0) {
             this.parsedConfig.splice(sectionIndex + 1, 0, newConfig)
           } else {
-            const newSection = {section, subsection, modified: true}
+            const newSection = { section, subsection, modified: true }
             this.parsedConfig.push(newSection, newConfig)
           }
         }
@@ -207,7 +217,7 @@ export class GitConfig {
   }
   toString () {
     return this.parsedConfig
-      .map(({line, section, subsection, name, value, modified = false}) => {
+      .map(({ line, section, subsection, name, value, modified = false }) => {
         if (!modified) {
           return line
         }
