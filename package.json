@@ -73,7 +73,7 @@
     "through2": "^2.0.3"
   },
   "devDependencies": {
-    "@semantic-release/exec": "2.3.0",
+    "@semantic-release/exec": "3.0.0",
     "@types/node": "9.6.12",
     "all-contributors-cli": "5.4.0",
     "babel-core": "6.26.3",
@@ -116,9 +116,9 @@
     "puppeteer": "1.6.2",
     "replace-in-file": "3.4.0",
     "rollup": "0.63.5",
-    "semantic-release": "15.9.3",
+    "semantic-release": "15.9.5",
     "standard": "11.0.1",
-    "travis-deploy-once": "5.0.1",
+    "travis-deploy-once": "5.0.2",
     "tweet-tweet": "1.0.4",
     "typescript": "3.0.1",
     "webpack": "4.16.4",
