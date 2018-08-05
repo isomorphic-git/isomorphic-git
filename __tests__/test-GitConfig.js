@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const {GitConfig} = require('isomorphic-git/internal-apis')
+const { GitConfig } = require('isomorphic-git/internal-apis')
 
 describe('GitConfig', () => {
   describe('get value', () => {
@@ -513,6 +513,36 @@ describe('GitConfig', () => {
       keyaaa = valaaa`)
       const subsections = await config.getSubsections('remote')
       expect(subsections).toEqual(['foo', 'bar'])
+    })
+  })
+
+  describe('delete section', () => {
+    it('simple', async () => {
+      const config = GitConfig.from(`[one]
+      keyaaa = valaaa
+[two]
+      keybbb = valbbb`)
+      await config.deleteSection('one')
+      expect(config.toString()).toEqual(`[two]
+      keybbb = valbbb`)
+    })
+
+    it('subsection', async () => {
+      const config = GitConfig.from(`[one]
+      keyaaa = valaaa
+      
+      [remote "foo"]
+      url = https://foo.com/project.git
+      ; this is a comment
+      
+      [remote "bar"]
+      url = https://bar.com/project.git`)
+      await config.deleteSection('remote', 'foo')
+      expect(config.toString()).toEqual(`[one]
+      keyaaa = valaaa
+      
+      [remote "bar"]
+      url = https://bar.com/project.git`)
     })
   })
 })

@@ -201,7 +201,8 @@ export class GitIndex {
     let body = Buffer.concat(
       this.entries.map(entry => {
         // the fixed length + the filename + at least one null char => align by 8
-        let length = Math.ceil((62 + Buffer.from(entry.path).length + 1) / 8) * 8
+        let length =
+          Math.ceil((62 + Buffer.from(entry.path).length + 1) / 8) * 8
         let written = Buffer.alloc(length)
         let writer = new BufferCursor(written)
         const stat = normalizeStats(entry)
