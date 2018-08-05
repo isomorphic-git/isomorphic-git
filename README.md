@@ -158,6 +158,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 ### commands
 
 - [add](https://isomorphic-git.github.io/docs/add.html)
+- [addRemote](https://isomorphic-git.github.io/docs/addRemote.html)
 - [branch](https://isomorphic-git.github.io/docs/branch.html)
 - [checkout](https://isomorphic-git.github.io/docs/checkout.html)
 - [clone](https://isomorphic-git.github.io/docs/clone.html)
@@ -166,6 +167,7 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
 - [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
 - [deleteBranch](https://isomorphic-git.github.io/docs/deleteBranch.html)
+- [deleteRemote](https://isomorphic-git.github.io/docs/deleteRemote.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)

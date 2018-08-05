@@ -4,6 +4,7 @@ exports[`exports exposes only the intended API functions 1`] = `
 Array [
   "E",
   "add",
+  "addRemote",
   "branch",
   "checkout",
   "clone",
@@ -11,6 +12,7 @@ Array [
   "config",
   "currentBranch",
   "deleteBranch",
+  "deleteRemote",
   "expandRef",
   "fetch",
   "findRoot",
