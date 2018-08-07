@@ -6,7 +6,7 @@ import { WORKDIR } from '../models/GitWalkerFs.js'
 import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
 
-import { walk } from './walk.js'
+import { walkBeta1 } from './walkBeta1.js'
 
 /**
  * Summarize the differences between a commit, the working dir, and the stage
@@ -22,7 +22,7 @@ export async function statusMatrix ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let results = await walk({
+    let results = await walkBeta1({
       fs,
       dir,
       gitdir,

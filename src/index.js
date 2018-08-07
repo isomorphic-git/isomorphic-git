@@ -32,7 +32,7 @@ export * from './commands/status'
 export * from './commands/statusMatrix'
 export * from './commands/verify'
 export * from './commands/version'
-export * from './commands/walk'
+export * from './commands/walkBeta1'
 
 export { WORKDIR } from './models/GitWalkerFs'
 export { STAGE } from './models/GitWalkerIndex'

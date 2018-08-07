@@ -10,7 +10,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * @link https://isomorphic-git.github.io/docs/add.html
  */
-export async function walk ({
+export async function walkBeta1 ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs,

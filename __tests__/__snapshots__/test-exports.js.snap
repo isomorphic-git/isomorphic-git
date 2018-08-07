@@ -38,6 +38,6 @@ Array [
   "utils",
   "verify",
   "version",
-  "walk",
+  "walkBeta1",
 ]
 `;
