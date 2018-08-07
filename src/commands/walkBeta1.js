@@ -57,16 +57,16 @@ export async function walkBeta1 ({
       }
     }
 
-    const recurse = async root => {
+    const _walk = async root => {
       let { children, entry } = await unionWalkerFromReaddir(root)
       if (await filter(entry)) {
         let mappedResult = await map(entry)
-        let results = await iterate(recurse, children)
+        let results = await iterate(_walk, children)
         results = results.filter(x => x !== undefined)
         return reduce(mappedResult, results)
       }
     }
-    return recurse(root)
+    return _walk(root)
   } catch (err) {
     err.caller = 'git.walk'
     throw err

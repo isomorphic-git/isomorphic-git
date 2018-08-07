@@ -100,18 +100,14 @@ export class GitWalkerRepo {
   }
 }
 
-const TREE = function TREE (ref) {
-  return _TREE(ref)
-}
-Object.freeze(TREE)
-export { TREE }
-
-const _TREE = function (ref) {
+const TREE = function TREE ({ fs, gitdir, ref }) {
   let o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
-    value: function ({ fs, gitdir }) {
+    value: function () {
       return new GitWalkerRepo({ fs, gitdir, ref })
     }
   })
   return o
 }
+Object.freeze(TREE)
+export { TREE }

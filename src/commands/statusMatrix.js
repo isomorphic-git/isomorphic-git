@@ -26,7 +26,11 @@ export async function statusMatrix ({
       fs,
       dir,
       gitdir,
-      trees: [TREE(ref), WORKDIR, STAGE],
+      trees: [
+        TREE({ fs, gitdir, ref }),
+        WORKDIR({ fs, dir, gitdir }),
+        STAGE({ fs, gitdir })
+      ],
       filter: async function ([head, workdir, stage]) {
         // We need an awkward exception for the root directory
         if (head.fullpath === '.') return true

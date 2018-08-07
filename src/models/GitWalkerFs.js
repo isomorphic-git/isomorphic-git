@@ -90,9 +90,14 @@ export class GitWalkerFs {
   }
 }
 
-const WORKDIR = Object.create(null)
-Object.defineProperty(WORKDIR, GitWalkerSymbol, {
-  value: ({ fs, dir, gitdir }) => new GitWalkerFs({ fs, dir, gitdir })
-})
+const WORKDIR = function WORKDIR ({ fs, dir, gitdir }) {
+  let o = Object.create(null)
+  Object.defineProperty(o, GitWalkerSymbol, {
+    value: function () {
+      return new GitWalkerFs({ fs, dir, gitdir })
+    }
+  })
+  return o
+}
 Object.freeze(WORKDIR)
 export { WORKDIR }
