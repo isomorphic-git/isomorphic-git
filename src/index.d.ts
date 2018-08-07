@@ -112,6 +112,14 @@ export function add(args: {
   filepath: string
 }): Promise<void>;
 
+export function addRemote(args: {
+    fs: any,
+    dir: string,
+    gitdir?: string,
+    remote: string,
+    url: string
+}): Promise<void>;
+
 export function branch(args: {
   fs: any,
   dir: string,
@@ -124,6 +132,13 @@ export function deleteBranch(args: {
   dir: string,
   gitdir?: string,
   ref: string
+}): Promise<void>;
+
+export function deleteRemote(args: {
+    fs: any,
+    dir: string,
+    gitdir?: string,
+    remote: string
 }): Promise<void>;
 
 export function checkout(args: {
@@ -228,6 +243,7 @@ export function getRemoteInfo(args: {
   password?: string,
   token?: string,
   oauth2format?: 'github' | 'bitbucket' | 'gitlab',
+  forPush?: boolean,
 }): Promise<RemoteDescription>;
 
 export function indexPack(args: {
