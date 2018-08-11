@@ -66,7 +66,7 @@ export async function status ({
     let W = stats !== null // working dir
 
     const getWorkdirOid = async () => {
-      if (I && !compareStats({ entry: indexEntry, stats })) {
+      if (I && !compareStats(indexEntry, stats)) {
         return indexEntry.oid
       } else {
         let object = await fs.read(path.join(dir, filepath))

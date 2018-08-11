@@ -1,35 +1,9 @@
-import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
 
-/*::
-import type {Stats} from 'fs'
-
-type CacheEntryFlags = {
-  assumeValid: boolean,
-  extended: boolean,
-  stage: number,
-  nameLength: number
-}
-
-type CacheEntry = {
-  ctime: Date,
-  ctimeNanoseconds?: number,
-  mtime: Date,
-  mtimeNanoseconds?: number,
-  dev: number,
-  ino: number,
-  mode: number,
-  uid: number,
-  gid: number,
-  size: number,
-  oid: string,
-  flags: CacheEntryFlags,
-  path: string
-}
-*/
+import { E, GitError } from './GitError.js'
 
 // Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
 function parseCacheEntryFlags (bits) {
@@ -41,7 +15,13 @@ function parseCacheEntryFlags (bits) {
   }
 }
 
-function renderCacheEntryFlags (flags) {
+function renderCacheEntryFlags (entry) {
+  let flags = entry.flags
+  // 1-bit extended flag (must be zero in version 2)
+  flags.extended = false
+  // 12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
+  // is stored in this field.
+  flags.nameLength = Math.min(Buffer.from(entry.path).length, 0xfff)
   return (
     (flags.assumeValid ? 0b1000000000000000 : 0) +
     (flags.extended ? 0b0100000000000000 : 0) +
@@ -138,6 +118,9 @@ export class GitIndex {
   get entries () {
     return [...this._entries.values()].sort(comparePath)
   }
+  get entriesMap () {
+    return this._entries
+  }
   * [Symbol.iterator] () {
     for (let entry of this.entries) {
       yield entry
@@ -145,6 +128,7 @@ export class GitIndex {
   }
   insert ({ filepath, stats, oid }) {
     stats = normalizeStats(stats)
+    let bfilepath = Buffer.from(filepath)
     let entry = {
       ctimeSeconds: stats.ctimeSeconds,
       ctimeNanoseconds: stats.ctimeNanoseconds,
@@ -165,7 +149,7 @@ export class GitIndex {
         assumeValid: false,
         extended: false,
         stage: 0,
-        nameLength: filepath.length < 0xfff ? filepath.length : 0xfff
+        nameLength: bfilepath.length < 0xfff ? bfilepath.length : 0xfff
       }
     }
     this._entries.set(entry.path, entry)
@@ -200,9 +184,9 @@ export class GitIndex {
     writer.writeUInt32BE(this.entries.length)
     let body = Buffer.concat(
       this.entries.map(entry => {
+        const bpath = Buffer.from(entry.path)
         // the fixed length + the filename + at least one null char => align by 8
-        let length =
-          Math.ceil((62 + Buffer.from(entry.path).length + 1) / 8) * 8
+        let length = Math.ceil((62 + bpath.length + 1) / 8) * 8
         let written = Buffer.alloc(length)
         let writer = new BufferCursor(written)
         const stat = normalizeStats(entry)
@@ -217,8 +201,8 @@ export class GitIndex {
         writer.writeUInt32BE(stat.gid)
         writer.writeUInt32BE(stat.size)
         writer.write(entry.oid, 20, 'hex')
-        writer.writeUInt16BE(renderCacheEntryFlags(entry.flags))
-        writer.write(entry.path, Buffer.from(entry.path).length, 'utf8')
+        writer.writeUInt16BE(renderCacheEntryFlags(entry))
+        writer.write(entry.path, bpath.length, 'utf8')
         return written
       })
     )

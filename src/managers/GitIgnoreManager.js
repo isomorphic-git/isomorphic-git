@@ -16,6 +16,9 @@ export class GitIgnoreManager {
     filepath
   }) {
     const fs = new FileSystem(_fs)
+    // ALWAYS ignore ".git" folders.
+    if (path.basename(filepath) === '.git') return true
+    // Find all the .gitignore files that could affect this file
     let pairs = [
       {
         gitignore: path.join(dir, '.gitignore'),

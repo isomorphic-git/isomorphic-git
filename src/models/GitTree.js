@@ -1,4 +1,5 @@
 import { E, GitError } from '../models/GitError.js'
+import { comparePath } from '../utils/comparePath.js'
 
 /*::
 type TreeEntry = {
@@ -69,6 +70,9 @@ export class GitTree {
   constructor (entries) {
     if (Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
+      // There appears to be an edge case (in this repo no less) where
+      // the tree is NOT sorted as expected if some directories end with ".git"
+      this._entries.sort(comparePath)
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {

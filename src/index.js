@@ -31,8 +31,14 @@ export * from './commands/remove'
 export * from './commands/resolveRef'
 export * from './commands/sign'
 export * from './commands/status'
+export * from './commands/statusMatrix'
 export * from './commands/verify'
 export * from './commands/version'
+export * from './commands/walkBeta1'
+
+export { WORKDIR } from './models/GitWalkerFs'
+export { STAGE } from './models/GitWalkerIndex'
+export { TREE } from './models/GitWalkerRepo'
 
 export const utils = { auth, oauth2 }
 export { E } from './models/GitError'

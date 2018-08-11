@@ -57,6 +57,8 @@
     "debug": "^3.1.0",
     "diff-lines": "^1.1.0",
     "git-apply-delta": "0.0.7",
+    "globalyzer": "^0.1.0",
+    "globrex": "^0.1.1",
     "ignore": "^4.0.0",
     "locale2": "^2.2.0",
     "marky": "^1.2.0",
