@@ -1,10 +1,13 @@
 import path from 'path'
+import globrex from 'globrex'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { WORKDIR } from '../models/GitWalkerFs.js'
 import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
+import { worthWalking } from '../utils/worthWalking.js'
+import { patternRoot } from '../utils/patternRoot.js'
 
 import { walkBeta1 } from './walkBeta1.js'
 
@@ -18,10 +21,12 @@ export async function statusMatrix ({
   gitdir = path.join(dir, '.git'),
   fs: _fs,
   ref = 'HEAD',
-  filepath = ''
+  pattern = null
 }) {
   try {
     const fs = new FileSystem(_fs)
+    let patternGlobrex = pattern && globrex(pattern, {globstar: true, extended: true})
+    let patternBase = pattern && patternRoot(pattern)
     let results = await walkBeta1({
       fs,
       dir,
@@ -46,26 +51,21 @@ export async function statusMatrix ({
             return false
           }
         }
-        // match against filepath parameter
-        if (head.fullpath.length >= filepath.length) {
-          return head.fullpath.startsWith(filepath)
-        } else if (head.fullpath.length < filepath.length) {
-          return filepath.startsWith(head.fullpath)
-        }
+        // match against 'pattern' parameter
+        if (pattern === null) return true
+        return worthWalking(head.fullpath, patternBase)
       },
       map: async function ([head, workdir, stage]) {
-        // Figure out the oids, using the staged oid for the working dir oid if the stats match.
-        await head.populateStat()
-        await workdir.populateStat()
-        await stage.populateStat()
+        // Late filter against file names
+        if (patternGlobrex && !patternGlobrex.regex.test(head.fullpath)) return
         // For now, just bail on directories
-        if (
-          head.type === 'tree' ||
-          workdir.type === 'tree' ||
-          stage.type === 'tree'
-        ) {
-          return
-        }
+        await head.populateStat()
+        if (head.type === 'tree') return
+        await workdir.populateStat()
+        if (workdir.type === 'tree') return
+        await stage.populateStat()
+        if (stage.type === 'tree') return
+        // Figure out the oids, using the staged oid for the working dir oid if the stats match.
         await head.populateHash()
         await stage.populateHash()
         if (workdir.exists && stage.exists) {
