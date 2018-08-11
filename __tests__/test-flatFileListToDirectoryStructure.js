@@ -11,7 +11,9 @@ describe('flatFileListToDirectoryStructure', () => {
   })
 
   it('simple', async () => {
-    let inode = flatFileListToDirectoryStructure([{ path: 'hello/there.txt' }])
+    let inode = flatFileListToDirectoryStructure([
+      { path: 'hello/there.txt' }
+    ]).get('.')
     expect(inode.fullpath).toBe('.')
     expect(inode.type).toBe('tree')
     expect(inode.children.length).toBe(1)
@@ -64,6 +66,6 @@ describe('flatFileListToDirectoryStructure', () => {
     ]
     let files = filelist.map(f => ({ path: f, someMeta: f.length }))
     let inodes = flatFileListToDirectoryStructure(files)
-    expect(inodes).toMatchSnapshot()
+    expect(inodes.get('.')).toMatchSnapshot()
   })
 })

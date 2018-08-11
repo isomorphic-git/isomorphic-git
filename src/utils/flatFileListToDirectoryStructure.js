@@ -53,5 +53,5 @@ export function flatFileListToDirectoryStructure (files) {
   for (let file of files) {
     mkfile(file.path, file)
   }
-  return inodes.get('.')
+  return inodes
 }

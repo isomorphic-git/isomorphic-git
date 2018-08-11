@@ -3,6 +3,9 @@
 exports[`exports exposes only the intended API functions 1`] = `
 Array [
   "E",
+  "STAGE",
+  "TREE",
+  "WORKDIR",
   "add",
   "addRemote",
   "branch",
@@ -33,8 +36,10 @@ Array [
   "resolveRef",
   "sign",
   "status",
+  "statusMatrix",
   "utils",
   "verify",
   "version",
+  "walkBeta1",
 ]
 `;

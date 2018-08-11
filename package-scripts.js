@@ -45,10 +45,11 @@ module.exports = {
       check: 'all-contributors check'
     },
     build: {
-      default: series.nps('build.rollup', 'build.webpack', 'build.indexjson'),
+      default: series.nps('build.rollup', 'build.webpack', 'build.indexjson', 'build.size'),
       webpack: 'webpack',
       rollup: 'rollup -c',
-      indexjson: `node __tests__/__helpers__/make_http_index.js`
+      indexjson: `node __tests__/__helpers__/make_http_index.js`,
+      size: 'bundlesize'
     },
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
     proxy: `(cd node_modules/cors-buster && micro --listen=tcp://0.0.0.0:9999)`,

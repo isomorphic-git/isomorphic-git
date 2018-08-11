@@ -1,6 +1,7 @@
-import { normalizeStats } from './normalizeStats'
+import { log } from './log.js'
+import { normalizeStats } from './normalizeStats.js'
 
-export function compareStats ({ entry, stats }) {
+export function compareStats (entry, stats) {
   // Comparison based on the description in Paragraph 4 of
   // https://www.kernel.org/pub/software/scm/git/docs/technical/racy-git.txt
   const e = normalizeStats(entry)
@@ -14,6 +15,20 @@ export function compareStats ({ entry, stats }) {
     e.ino !== s.ino ||
     e.size !== s.size
   // console.log(staleness ? 'stale:' : 'fresh:')
-  // console.table([e, s])
+  if (staleness && log.enabled) {
+    console.table([justWhatMatters(e), justWhatMatters(s)])
+  }
   return staleness
+}
+
+function justWhatMatters (e) {
+  return {
+    mode: e.mode,
+    mtimeSeconds: e.mtimeSeconds,
+    ctimeSeconds: e.ctimeSeconds,
+    uid: e.uid,
+    gid: e.gid,
+    ino: e.ino,
+    size: e.size
+  }
 }

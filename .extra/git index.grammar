@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ufwb version="1.17">
+    <grammar name="git index" start="id:3" author="William Hilton" email="wmhilton@gmail.com">
+        <description>Grammar for https://github.com/git/git/blob/master/Documentation/technical/index-format.txt</description>
+        <structure name="git index" id="3" encoding="ISO_8859-1:1987" endian="big" signed="no">
+            <binary name="MAGIC" id="5" strokecolor="FEFFFF" fillcolor="AA7941" length="4"/>
+            <number name="version" id="6" fillcolor="AA7941" type="integer" length="4"/>
+            <number name="entries_len" id="7" fillcolor="00F900" type="integer" length="4"/>
+            <structure name="entry" id="8" length="0" alignment="0" repeat="id:7" repeatmin="0" repeatmax="-1">
+                <number name="ctime" id="10" fillcolor="00FCFF" type="integer" length="4"/>
+                <number name="ctime_ns" id="11" fillcolor="00FCFF" type="integer" length="4"/>
+                <number name="mtime" id="12" fillcolor="FEFB00" type="integer" length="4"/>
+                <number name="mtime_ns" id="13" fillcolor="FEFB00" type="integer" length="4"/>
+                <number name="dev" id="20" type="integer" length="4"/>
+                <number name="ino" id="14" fillcolor="FEFFFF" type="integer" length="4"/>
+                <structure name="mode" id="15" length="4" fillcolor="FEFFFF">
+                    <binary name="unused1" id="21" length="16" lengthunit="bit"/>
+                    <binary name="type" id="17" fillcolor="FF9200" length="4" lengthunit="bit">
+                        <fixedvalues>
+                            <fixedvalue name="file" value="08"/>
+                            <fixedvalue name="symlink" value="10"/>
+                            <fixedvalue name="gitlink" value="14"/>
+                        </fixedvalues>
+                    </binary>
+                    <binary name="unused2" id="18" length="3" lengthunit="bit"/>
+                    <binary name="permissions" id="19" length="9" lengthunit="bit">
+                        <fixedvalues>
+                            <fixedvalue name="null" value="0000"/>
+                            <fixedvalue name="755" value="01ED"/>
+                            <fixedvalue name="644" value="01A4"/>
+                        </fixedvalues>
+                    </binary>
+                </structure>
+                <number name="uid" id="22" fillcolor="00D3D5" type="integer" length="4"/>
+                <number name="gid" id="23" fillcolor="00A7A9" type="integer" length="4"/>
+                <number name="size" id="24" fillcolor="00F941" type="integer" length="4"/>
+                <binary name="sha" id="25" fillcolor="D71E00" length="20"/>
+                <structure name="flags" id="28">
+                    <binary name="assume_valid" id="30" length="1" lengthunit="bit"/>
+                    <number name="extended" id="40" type="integer" length="1" lengthunit="bit"/>
+                    <binary name="stage" id="32" length="2" lengthunit="bit"/>
+                    <number name="name_length" id="33" type="integer" length="12" lengthunit="bit"/>
+                    <structure name="extended_flags" id="34" length="0" repeat="id:40" repeatmin="0">
+                        <binary name="reserved" id="36" length="1" lengthunit="bit"/>
+                        <binary name="skip_worktree" id="37" length="1" lengthunit="bit"/>
+                        <binary name="intent_to_add" id="38" length="1" lengthunit="bit"/>
+                        <binary name="unused3" id="39" length="13" lengthunit="bit"/>
+                    </structure>
+                </structure>
+                <string name="path" id="27" fillcolor="AA81FF" type="zero-terminated" encoding="UTF-8"/>
+                <binary name="&lt;Binary Fill Bytes&gt;" mustmatch="yes" id="26" unused="yes" repeatmin="0" repeatmax="7" length="1">
+                    <fixedvalues>
+                        <fixedvalue name="null" value="00"/>
+                    </fixedvalues>
+                </binary>
+            </structure>
+        </structure>
+    </grammar>
+</ufwb>
