@@ -43,17 +43,16 @@ export class GitIgnoreManager {
         if (err.code === 'NOENT') continue
       }
       let ign = ignore().add(file)
-      let unign = ignore().add(`**\n${file}`)
       // If the parent directory is excluded, we are done.
       // "It is not possible to re-include a file if a parent directory of that file is excluded. Git doesn’t list excluded directories for performance reasons, so any patterns on contained files have no effect, no matter where they are defined."
       // source: https://git-scm.com/docs/gitignore
       let parentdir = path.dirname(p.filepath)
-      if (ign.ignores(parentdir)) return true
+      if (parentdir !== '.' && ign.ignores(parentdir)) return true
       // If the file is currently ignored, test for UNignoring.
       if (ignoredStatus) {
-        ignoredStatus = unign.ignores(p.filepath)
+        ignoredStatus = !ign.test(p.filepath).unignored
       } else {
-        ignoredStatus = ign.ignores(p.filepath)
+        ignoredStatus = ign.test(p.filepath).ignored
       }
     }
     return ignoredStatus
