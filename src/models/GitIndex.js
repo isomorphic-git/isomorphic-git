@@ -77,17 +77,25 @@ function parseBuffer (buffer) {
         message: `Got a path length of: ${pathlength}`
       })
     }
+    // TODO: handle pathnames larger than 12 bits
     entry.path = reader.toString('utf8', pathlength)
     // The next bit is awkward. We expect 1 to 8 null characters
-    let tmp = reader.readUInt8()
-    if (tmp !== 0) {
-      throw new GitError(E.InternalFail, {
-        message: `Expected 1-8 null characters but got '${tmp}'`
-      })
+    // such that the total size of the entry is a multiple of 8 bits.
+    // (Hence subtract 12 bytes for the header.)
+    let padding = 8 - ((reader.tell() - 12) % 8)
+    if (padding === 0) padding = 8
+    while (padding--) {
+      let tmp = reader.readUInt8()
+      if (tmp !== 0) {
+        throw new GitError(E.InternalFail, {
+          message: `Expected 1-8 null characters but got '${tmp}' after ${entry.path}`
+        })
+      } else if (reader.eof()) {
+        throw new GitError(E.InternalFail, {
+          message: 'Unexpected end of file'
+        })
+      }
     }
-    let numnull = 1
-    while (!reader.eof() && reader.readUInt8() === 0 && numnull < 9) numnull++
-    reader.seek(reader.tell() - 1)
     // end of awkward part
     _entries.set(entry.path, entry)
     i++
