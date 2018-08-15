@@ -375,6 +375,13 @@ export function remove(args: {
   filepath: string
 }): Promise<void>
 
+export function reset(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string
+  filepath: string
+}): Promise<void>
+
 export function resolveRef(args: {
   fs: any,
   dir: string,
