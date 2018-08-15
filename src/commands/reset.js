@@ -2,7 +2,6 @@ import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 
 import { readObject } from './readObject'
 import { log } from './log'
@@ -20,15 +19,14 @@ export async function reset ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const type = 'blob'
     const tree = await log({ gitdir, fs, depth: 1 })
-    let oid = tree[0] && tree[0].tree;
+    let oid = tree[0] && tree[0].tree
     if (oid) {
       try {
         const obj = await readObject({ gitdir, fs, oid, filepath, format: 'deflated' })
-        oid = obj && obj.oid;
+        oid = obj && obj.oid
       } catch (e) {
-        oid = null;
+        oid = null
       }
     }
     await GitIndexManager.acquire(
@@ -36,7 +34,8 @@ export async function reset ({
       async function (index) {
         index.delete({ filepath })
         if (oid) {
-          const stats = { ctime: new Date(0), mtime: new Date(0), dev: 0, ino: 0, mode: 0, uid: 0, gid: 0, size: 0 };
+          // TODO: check for oid == workingfile.oid and read its stats
+          const stats = { ctime: new Date(0), mtime: new Date(0), dev: 0, ino: 0, mode: 0, uid: 0, gid: 0, size: 0 }
           index.insert({ filepath, stats, oid })
         }
       }
