@@ -1,4 +1,4 @@
-import { posix as path } from 'path'
+import { path } from '../utils/path.js'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
@@ -45,6 +45,7 @@ export class GitWalkerFs {
     }))
   }
   async populateStat (entry) {
+    if (!entry.exists) return
     let { fs, dir } = this
     let stats = await fs._lstat(`${dir}/${entry.fullpath}`)
     let type = stats.isDirectory() ? 'tree' : 'blob'
@@ -57,11 +58,15 @@ export class GitWalkerFs {
     Object.assign(entry, { type }, stats)
   }
   async populateContent (entry) {
+    if (!entry.exists) return
     let { fs, dir } = this
     let content = await fs.read(`${dir}/${entry.fullpath}`)
+    // workaround for a BrowserFS edge case
+    if (entry.size === -1) entry.size = content.length
     Object.assign(entry, { content })
   }
   async populateHash (entry) {
+    if (!entry.exists) return
     let { fs, gitdir } = this
     let oid
     // See if we can use the SHA1 hash in the index.
