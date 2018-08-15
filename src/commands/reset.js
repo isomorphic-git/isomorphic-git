@@ -1,9 +1,11 @@
 import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+
+import { readObject } from './readObject'
+import { log } from './log'
 
 /**
  * Reset a file from the git index (aka staging area)
