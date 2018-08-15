@@ -1,4 +1,4 @@
-import { posix as path } from 'path'
+import { path } from '../utils/path.js'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'

@@ -68,13 +68,12 @@ export async function statusMatrix ({
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
         await head.populateHash()
         await stage.populateHash()
-        if (workdir.exists && stage.exists) {
-          await workdir.populateHash()
-        }
         if (!head.exists && workdir.exists && !stage.exists) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
           workdir.oid = 42
+        } else if (workdir.exists) {
+          await workdir.populateHash()
         }
         let entry = [undefined, head.oid, workdir.oid, stage.oid]
         let result = entry.map(value => entry.indexOf(value))
