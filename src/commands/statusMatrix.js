@@ -8,6 +8,7 @@ import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
 import { worthWalking } from '../utils/worthWalking.js'
 import { patternRoot } from '../utils/patternRoot.js'
+import { cores } from '../utils/plugins.js'
 
 import { walkBeta1 } from './walkBeta1.js'
 
@@ -17,9 +18,10 @@ import { walkBeta1 } from './walkBeta1.js'
  * @link https://isomorphic-git.github.io/docs/statusMatrix.html
  */
 export async function statusMatrix ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
   pattern = null
 }) {

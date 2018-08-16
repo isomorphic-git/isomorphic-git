@@ -2,7 +2,7 @@
 const snapshots = require('./__snapshots__/test-listBranches.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { listBranches } = require('isomorphic-git')
+const { plugins, listBranches } = require('isomorphic-git')
 
 describe('listBranches', () => {
   beforeAll(() => {
@@ -11,16 +11,17 @@ describe('listBranches', () => {
   it('listBranches', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-listBranches')
+    plugins.set('fs', fs)
     // Test
-    let commits = await listBranches({ fs, gitdir })
+    let commits = await listBranches({ gitdir })
     expect(commits).toMatchSnapshot()
   })
   it('remote', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-listBranches')
+    plugins.set('fs', fs)
     // Test
     let commits = await listBranches({
-      fs,
       gitdir,
       remote: 'origin'
     })

@@ -15,6 +15,11 @@ const delayedReleases = new Map()
  */
 export class FileSystem {
   constructor (fs) {
+    // This is not actually the most logical place to put this, but in practice
+    // putting the check here should work great.
+    if (fs === undefined) {
+      throw new GitError(E.PluginUndefined, { plugin: 'fs' })
+    }
     if (typeof fs._readFile !== 'undefined') return fs
     this._readFile = pify(fs.readFile.bind(fs))
     this._writeFile = pify(fs.writeFile.bind(fs))

@@ -7,6 +7,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { pkg } from '../utils/pkg.js'
+import { cores } from '../utils/plugins.js'
 
 import { config } from './config.js'
 import { isDescendent } from './isDescendent.js'
@@ -20,9 +21,10 @@ import { pack } from './pack.js'
  * @link https://isomorphic-git.github.io/docs/push.html
  */
 export async function push ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   emitter,
   ref,
   remote = 'origin',

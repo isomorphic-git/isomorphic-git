@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const snapshots = require('./__snapshots__/test-log.js.snap')
-const { log } = require('isomorphic-git')
+const { plugins, log } = require('isomorphic-git')
 
 describe('log', () => {
   beforeAll(() => {
@@ -10,19 +10,21 @@ describe('log', () => {
   })
   it('HEAD', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
-    let commits = await log({ fs, gitdir, ref: 'HEAD' })
+    plugins.set('fs', fs)
+    let commits = await log({ gitdir, ref: 'HEAD' })
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
   })
   it('HEAD depth', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
-    let commits = await log({ fs, gitdir, ref: 'HEAD', depth: 1 })
+    plugins.set('fs', fs)
+    let commits = await log({ gitdir, ref: 'HEAD', depth: 1 })
     expect(commits.length).toBe(1)
   })
   it('HEAD since', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
+    plugins.set('fs', fs)
     let commits = await log({
-      fs,
       gitdir,
       ref: 'HEAD',
       since: new Date(1501462174000)
@@ -31,15 +33,17 @@ describe('log', () => {
   })
   it('test-branch', async () => {
     let { fs, gitdir } = await makeFixture('test-log')
-    let commits = await log({ fs, gitdir, ref: 'origin/test-branch' })
+    plugins.set('fs', fs)
+    let commits = await log({ gitdir, ref: 'origin/test-branch' })
     expect(commits).toMatchSnapshot()
   })
   it('with signing payloads', async () => {
     // Setup
     const openpgp = require('openpgp/dist/openpgp.min.js')
     let { fs, gitdir } = await makeFixture('test-log')
+    plugins.set('fs', fs)
     // Test
-    let commits = await log({ fs, gitdir, ref: 'HEAD', signing: true })
+    let commits = await log({ gitdir, ref: 'HEAD', signing: true })
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
     // Verify
@@ -51,7 +55,8 @@ describe('log', () => {
   })
   it('with complex merging history', async () => {
     let { fs, gitdir } = await makeFixture('test-log-complex')
-    let commits = await log({ fs, gitdir, ref: 'master' })
+    plugins.set('fs', fs)
+    let commits = await log({ gitdir, ref: 'master' })
     expect(commits).toMatchSnapshot()
   })
 })

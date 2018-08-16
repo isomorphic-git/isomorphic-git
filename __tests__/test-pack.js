@@ -5,19 +5,20 @@ const pify = require('pify')
 const stream = require('stream')
 const concat = require('simple-concat')
 
+const { plugins } = require('isomorphic-git')
 const { pack } = require('isomorphic-git/internal-apis')
 
 describe('pack', () => {
   it('git.pack', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-pack')
+    plugins.set('fs', fs)
     // Test
     let fixture = await pify(fs.readFile)(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
     let fstream = new stream.PassThrough()
     await pack({
-      fs,
       gitdir,
       outputStream: fstream,
       oids: [

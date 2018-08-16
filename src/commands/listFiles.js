@@ -2,6 +2,7 @@ import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 import { readObject } from './readObject'
 import { resolveRef } from './resolveRef'
@@ -12,9 +13,10 @@ import { resolveRef } from './resolveRef'
  * @link https://isomorphic-git.github.io/docs/listFiles.html
  */
 export async function listFiles ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref
 }) {
   try {

@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-deleteRemote.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { deleteRemote, listRemotes } = require('isomorphic-git')
+const { plugins, deleteRemote, listRemotes } = require('isomorphic-git')
 
 describe('deleteRemote', () => {
   beforeAll(() => {
@@ -11,19 +11,21 @@ describe('deleteRemote', () => {
   it('deleteRemote', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-deleteRemote')
+    plugins.set('fs', fs)
     let remote = 'foo'
     // Test
-    await deleteRemote({ fs, dir, gitdir, remote })
-    const a = await listRemotes({ fs, dir, gitdir })
+    await deleteRemote({ dir, gitdir, remote })
+    const a = await listRemotes({ dir, gitdir })
     expect(a).toEqual([{ remote: 'bar', url: 'git@github.com:bar/bar.git' }])
   })
   it('missing argument', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-addRemote')
+    plugins.set('fs', fs)
     // Test
     let error = null
     try {
-      await deleteRemote({ fs, dir, gitdir })
+      await deleteRemote({ dir, gitdir })
     } catch (err) {
       error = err
     }

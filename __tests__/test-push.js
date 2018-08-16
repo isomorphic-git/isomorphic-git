@@ -4,7 +4,7 @@ const snapshots = require('./__snapshots__/test-push.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const EventEmitter = require('events')
 
-const { push } = require('isomorphic-git')
+const { plugins, push } = require('isomorphic-git')
 
 describe('push', () => {
   beforeAll(() => {
@@ -19,11 +19,11 @@ describe('push', () => {
     async () => {
       // Setup
       let { fs, gitdir } = await makeFixture('test-push')
+      plugins.set('fs', fs)
       let output = []
       let emitter = new EventEmitter().on('message', output.push.bind(output))
       // Test
       let res = await push({
-        fs,
         gitdir,
         emitter,
         remote: 'karma',
@@ -41,9 +41,9 @@ describe('push', () => {
     async () => {
       // Setup
       let { fs, gitdir } = await makeFixture('test-push')
+      plugins.set('fs', fs)
       // Test
       let res = await push({
-        fs,
         gitdir,
         remote: 'karma'
       })
