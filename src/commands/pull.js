@@ -38,7 +38,6 @@ export async function pull ({
     if (!ref) {
       ref = await currentBranch({ fs, gitdir })
     }
-    console.log(`Using ref=${ref}`)
     // Fetch from the correct remote.
     let remote = await config({
       gitdir,
