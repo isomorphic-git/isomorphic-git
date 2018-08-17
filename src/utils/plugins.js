@@ -1,3 +1,4 @@
+import { PluginCore } from '../models/PluginCore.js'
 import { GitError, E } from '../models/GitError.js'
 
 // A collection of plugins is called a core.
@@ -10,7 +11,7 @@ import { GitError, E } from '../models/GitError.js'
 // a tool that copies git objects between different filesystems so you want two
 // cores with different filesystem modules. Anyway, it is architected that way.
 const _cores = new Map()
-const defaultCore = new Map()
+const defaultCore = new PluginCore()
 _cores.set('default', defaultCore)
 // 99.99% of the time you can simply import { plugins } instead of cores.
 export const plugins = defaultCore

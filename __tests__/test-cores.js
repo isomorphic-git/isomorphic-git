@@ -43,4 +43,30 @@ describe('cores', () => {
     expect(cores.get('third').has('fs')).toBeFalsy()
     expect(cores.get('third').get('foo')).toBeTruthy()
   })
+  it('plugin schema violation', async () => {
+    // Setup
+    let fs = {
+      readFile () {}
+    }
+    let error = null
+    try {
+      plugins.set('fs', fs)
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toEqual(E.PluginSchemaViolation)
+  })
+  it('unrecognized plugin', async () => {
+    // Setup
+    let { fs } = await makeFixture('test-cores')
+    let error = null
+    try {
+      plugins.set('fz', fs)
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toEqual(E.PluginUnrecognized)
+  })
 })

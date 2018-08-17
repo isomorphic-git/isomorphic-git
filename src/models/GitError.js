@@ -73,7 +73,9 @@ const messages = translate({
   PushRejectedTagExists: `Push rejected because tag already exists. Use "force: true" to override.`,
   AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
   PluginUndefined: `A command required the "{ plugin }" plugin but it was undefined.`,
-  CoreNotFound: `No plugin core with the name "{ core }" is registered.`
+  CoreNotFound: `No plugin core with the name "{ core }" is registered.`,
+  PluginSchemaViolation: `Schema check failed for "{ plugin }" plugin; missing { method } method.`,
+  PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`
 })
 
 export const E = {
@@ -137,7 +139,9 @@ export const E = {
   PushRejectedTagExists: `PushRejectedTagExists`,
   AddingRemoteWouldOverwrite: `AddingRemoteWouldOverwrite`,
   PluginUndefined: `PluginUndefined`,
-  CoreNotFound: `CoreNotFound`
+  CoreNotFound: `CoreNotFound`,
+  PluginSchemaViolation: `PluginSchemaViolation`,
+  PluginUnrecognized: `PluginUnrecognized`
 }
 
 export class GitError extends Error {
