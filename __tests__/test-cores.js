@@ -13,10 +13,11 @@ describe('cores', () => {
     cores.get('default').set('fs', fs)
     let error = null
     try {
-      cores.get('second').set('fs', fs)
+      cores.get('first').set('fs', fs)
     } catch (err) {
       error = err
     }
+    expect(error).not.toBeNull()
     expect(error.code).toEqual(E.CoreNotFound)
   })
   it('core.create', async () => {

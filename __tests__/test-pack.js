@@ -5,8 +5,7 @@ const pify = require('pify')
 const stream = require('stream')
 const concat = require('simple-concat')
 
-const { plugins } = require('isomorphic-git')
-const { pack } = require('isomorphic-git/internal-apis')
+const { plugins, pack } = require('isomorphic-git/internal-apis')
 
 describe('pack', () => {
   it('git.pack', async () => {

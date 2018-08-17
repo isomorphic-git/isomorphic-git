@@ -3,8 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const snapshots = require('./__snapshots__/test-listCommits.js.snap')
 
-const { plugins } = require('isomorphic-git')
-const { listCommits } = require('isomorphic-git/internal-apis')
+const { plugins, listCommits } = require('isomorphic-git/internal-apis')
 
 describe('listCommits', () => {
   beforeAll(() => {
