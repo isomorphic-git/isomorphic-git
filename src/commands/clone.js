@@ -21,6 +21,7 @@ export async function clone ({
   emitter,
   url,
   noGitSuffix = false,
+  corsProxy,
   ref,
   remote,
   authUsername,
@@ -60,6 +61,14 @@ export async function clone ({
       path: `remote.${remote}.fetch`,
       value: `+refs/heads/*:refs/remotes/${remote}/*`
     })
+    if (corsProxy) {
+      await config({
+        gitdir,
+        fs,
+        path: `http.corsProxy`,
+        value: corsProxy
+      })
+    }
     // Fetch commits
     let { defaultBranch } = await fetch({
       gitdir,
