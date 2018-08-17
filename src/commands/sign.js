@@ -5,6 +5,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { SignedGitCommit } from '../models/SignedGitCommit.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Create a signed commit
@@ -12,9 +13,10 @@ import { SignedGitCommit } from '../models/SignedGitCommit.js'
  * @link https://isomorphic-git.github.io/docs/sign.html
  */
 export async function sign ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   privateKeys,
   openpgp
 }) {

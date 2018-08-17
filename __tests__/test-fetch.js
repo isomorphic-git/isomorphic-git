@@ -6,7 +6,7 @@ const pify = require('pify')
 
 const EventEmitter = require('events')
 const { sleep } = require('isomorphic-git/internal-apis')
-const { fetch } = require('isomorphic-git')
+const { plugins, fetch } = require('isomorphic-git')
 
 describe('fetch', () => {
   beforeAll(() => {
@@ -15,9 +15,9 @@ describe('fetch', () => {
 
   it('fetch (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    plugins.set('fs', fs)
     // Smoke Test
     await fetch({
-      fs,
       gitdir,
       singleBranch: true,
       remote: 'origin',
@@ -31,6 +31,7 @@ describe('fetch', () => {
 
   it('shallow fetch (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    plugins.set('fs', fs)
     let output = []
     let progress = []
     let emitter = new EventEmitter()
@@ -39,7 +40,6 @@ describe('fetch', () => {
       .on('progress', progress.push.bind(progress))
     // Test
     await fetch({
-      fs,
       gitdir,
       emitter,
       depth: 1,
@@ -57,7 +57,6 @@ describe('fetch', () => {
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
     await fetch({
-      fs,
       gitdir,
       depth: 2,
       singleBranch: true,
@@ -71,9 +70,9 @@ describe('fetch', () => {
 
   it('shallow fetch since (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    plugins.set('fs', fs)
     // Test
     await fetch({
-      fs,
       gitdir,
       since: new Date(1506571200000),
       singleBranch: true,
@@ -89,9 +88,9 @@ describe('fetch', () => {
 
   it('shallow fetch exclude (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    plugins.set('fs', fs)
     // Test
     await fetch({
-      fs,
       gitdir,
       exclude: ['v0.0.5'],
       singleBranch: true,
@@ -107,9 +106,9 @@ describe('fetch', () => {
 
   it('shallow fetch relative (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    plugins.set('fs', fs)
     // Test
     await fetch({
-      fs,
       gitdir,
       depth: 1,
       singleBranch: true,
@@ -123,7 +122,6 @@ describe('fetch', () => {
     expect(shallow).toEqual('92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n')
     // Now test deepen
     await fetch({
-      fs,
       gitdir,
       relative: true,
       depth: 1,
@@ -138,11 +136,11 @@ describe('fetch', () => {
 
   it('errors if missing refspec', async () => {
     let { fs, gitdir } = await makeFixture('test-issue-84')
+    plugins.set('fs', fs)
     // Test
     let err = null
     try {
       await fetch({
-        fs,
         gitdir,
         since: new Date(1506571200000),
         singleBranch: true,

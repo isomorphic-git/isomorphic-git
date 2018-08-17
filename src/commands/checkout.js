@@ -7,6 +7,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
+import { cores } from '../utils/plugins.js'
 
 import { config } from './config'
 
@@ -16,9 +17,10 @@ import { config } from './config'
  * @link https://isomorphic-git.github.io/docs/checkout.html
  */
 export async function checkout ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   remote = 'origin',
   ref
 }) {

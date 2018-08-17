@@ -42,3 +42,5 @@ export { TREE } from './models/GitWalkerRepo'
 
 export const utils = { auth, oauth2 }
 export { E } from './models/GitError'
+
+export * from './utils/plugins.js'

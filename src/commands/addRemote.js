@@ -4,6 +4,7 @@ import path from 'path'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Add a new remote
@@ -11,9 +12,10 @@ import { E, GitError } from '../models/GitError.js'
  * @link https://isomorphic-git.github.io/docs/addRemote.html
  */
 export async function addRemote ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   remote,
   url,
   force = false
@@ -57,7 +59,6 @@ export async function addRemote ({
       `remote.${remote}.fetch`,
       `+refs/heads/*:refs/remotes/${remote}/*`
     )
-    console.log(config.toString())
     await GitConfigManager.save({ fs, gitdir, config })
   } catch (err) {
     err.caller = 'git.addRemote'

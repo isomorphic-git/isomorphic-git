@@ -1,6 +1,8 @@
 import path from 'path'
 
+import { FileSystem } from '../models/FileSystem.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * List remotes
@@ -8,11 +10,13 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @link https://isomorphic-git.github.io/docs/listRemotes.html
  */
 export async function listRemotes ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs
+  fs: _fs = cores.get(core).get('fs')
 }) {
   try {
+    const fs = new FileSystem(_fs)
     const config = await GitConfigManager.get({ fs, gitdir })
     const remoteNames = await config.getSubsections('remote')
     const remotes = Promise.all(

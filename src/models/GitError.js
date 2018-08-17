@@ -71,7 +71,11 @@ const messages = translate({
   MaxSearchDepthExceeded: `Maximum search depth of { depth } exceeded.`,
   PushRejectedNonFastForward: `Push rejected because it was not a simple fast-forward. Use "force: true" to override.`,
   PushRejectedTagExists: `Push rejected because tag already exists. Use "force: true" to override.`,
-  AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`
+  AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
+  PluginUndefined: `A command required the "{ plugin }" plugin but it was undefined.`,
+  CoreNotFound: `No plugin core with the name "{ core }" is registered.`,
+  PluginSchemaViolation: `Schema check failed for "{ plugin }" plugin; missing { method } method.`,
+  PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`
 })
 
 export const E = {
@@ -133,7 +137,11 @@ export const E = {
   MaxSearchDepthExceeded: `MaxSearchDepthExceeded`,
   PushRejectedNonFastForward: `PushRejectedNonFastForward`,
   PushRejectedTagExists: `PushRejectedTagExists`,
-  AddingRemoteWouldOverwrite: `AddingRemoteWouldOverwrite`
+  AddingRemoteWouldOverwrite: `AddingRemoteWouldOverwrite`,
+  PluginUndefined: `PluginUndefined`,
+  CoreNotFound: `CoreNotFound`,
+  PluginSchemaViolation: `PluginSchemaViolation`,
+  PluginUnrecognized: `PluginUnrecognized`
 }
 
 export class GitError extends Error {

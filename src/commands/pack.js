@@ -5,13 +5,15 @@ import Hash from 'sha.js/sha1'
 import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { padHex } from '../utils/padHex.js'
+import { cores } from '../utils/plugins.js'
 
 import { types } from './types'
 
 export async function pack ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   oids,
   outputStream
 }) {

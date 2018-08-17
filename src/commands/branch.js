@@ -4,6 +4,7 @@ import path from 'path'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Create a branch
@@ -11,9 +12,10 @@ import { E, GitError } from '../models/GitError.js'
  * @link https://isomorphic-git.github.io/docs/branch.html
  */
 export async function branch ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref
 }) {
   try {

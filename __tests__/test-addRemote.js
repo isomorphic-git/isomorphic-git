@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-addRemote.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { addRemote, listRemotes } = require('isomorphic-git')
+const { plugins, addRemote, listRemotes } = require('isomorphic-git')
 
 describe('addRemote', () => {
   beforeAll(() => {
@@ -11,11 +11,12 @@ describe('addRemote', () => {
   it('addRemote', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-addRemote')
+    plugins.set('fs', fs)
     const remote = 'baz'
     const url = 'git@github.com:baz/baz.git'
     // Test
-    await addRemote({ fs, dir, gitdir, remote, url })
-    const a = await listRemotes({ fs, dir, gitdir })
+    await addRemote({ dir, gitdir, remote, url })
+    const a = await listRemotes({ dir, gitdir })
     expect(a).toEqual([
       { remote: 'foo', url: 'git@github.com:foo/foo.git' },
       { remote: 'bar', url: 'git@github.com:bar/bar.git' },
@@ -25,12 +26,13 @@ describe('addRemote', () => {
   it('missing argument', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-addRemote')
+    plugins.set('fs', fs)
     const remote = 'baz'
     const url = undefined
     // Test
     let error = null
     try {
-      await addRemote({ fs, dir, gitdir, remote, url })
+      await addRemote({ dir, gitdir, remote, url })
     } catch (err) {
       error = err
     }
@@ -40,12 +42,13 @@ describe('addRemote', () => {
   it('invalid remote name', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-addRemote')
+    plugins.set('fs', fs)
     const remote = '@{HEAD~1}'
     const url = 'git@github.com:baz/baz.git'
     // Test
     let error = null
     try {
-      await addRemote({ fs, dir, gitdir, remote, url })
+      await addRemote({ dir, gitdir, remote, url })
     } catch (err) {
       error = err
     }

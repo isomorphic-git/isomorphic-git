@@ -4,6 +4,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Add a file to the git index (aka staging area)
@@ -11,9 +12,10 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @link https://isomorphic-git.github.io/docs/add.html
  */
 export async function walkBeta1 ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   trees,
   map = async entry => entry,
   filter = async () => true,

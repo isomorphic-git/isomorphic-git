@@ -2,6 +2,7 @@ import path from 'path'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const regexs = [
@@ -28,9 +29,10 @@ function abbreviate (ref) {
  * @link https://isomorphic-git.github.io/docs/currentBranch.html
  */
 export async function currentBranch ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   fullname = false
 }) {
   try {
