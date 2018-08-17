@@ -78,7 +78,7 @@ If you're only using `isomorphic-git` in Node, you can just use the native `fs` 
 ```js
 const git = require('isomorphic-git');
 const fs = require('fs');
-git.listFiles({fs, dir: __dirname});
+git.plugins.set('fs', fs)
 ```
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
@@ -92,21 +92,23 @@ It has a few more steps involved to set up than in Node, as seen below:
 BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
   if (err) return console.log(err);
   window.fs = BrowserFS.BFSRequire("fs");
-  git.listFiles({fs: window.fs, dir: '/'});
+  git.plugins.set('fs', window.fs);
 });
 </script>
 ```
 
 Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
 
-View the full Getting Started guide [here](https://isomorphic-git.github.io/docs/quickstart.html).
+View the full [Getting Started guide](https://isomorphic-git.github.io/docs/quickstart.html) on the docs website.
 
 ### CORS support
 
 Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a proxy.
 
-I have created [cors-buster](https://github.com/wmhilton/cors-buster) which you can clone or [`npm install cors-buster`](https://www.npmjs.com/package/cors-buster) or deploy to Now.sh. I used to have an instance up, but it [got abused](https://isomorphic-git.github.io/blog/2019/07/05/cors-proxy-disabled.html) so be careful.
+For this purpose [@isomorphic-git/cors-proxy](https://github.com/isomorphic-git/cors-proxy) exists which you can clone or [`npm install`](https://www.npmjs.com/package/@isomorphic-git/cor-proxy).
+For testing or small projects, you can also use [https://cors.isomorphic-git.org](https://cors.isomorphic-git.org) - a free proxy sponsored by [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git).
 
+I'm hoping to get CORS headers added to all the major Git hosting platforms eventually, and will list my progress here:
 - Gogs: [Supported in v0.11.43](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)
 - Gitlab: [PR Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
 - Bitbucket: PR TODO
@@ -131,29 +133,28 @@ In the package.json you'll see there are actually 4 different versions:
   "unpkg": "dist/bundle.umd.min.js",
 ```
 
-This probably deserves a brief explanation.
+This deserves a brief explanation.
 
 - the "main" version is for node.
 - the "browser" version is for browserify.
 - the "module" version is for native ES6 module loaders when they arrive.
 - the "unpkg" version is the UMD build.
 
-For more details about each build see [./dist/README.md](https://github.com/isomorphic-git/isomorphic-git/blob/master/dist/README.md)
-
 ### `isogit` CLI
 
 Isomorphic-git comes with a simple CLI tool, named `isogit` because `isomorphic-git` is a lot to type. It is really just a thin shell that translates command line arguments into the equivalent JS API commands. So you should be able to run *any* current or future isomorphic-git commands using the CLI.
 
 It always starts with an the assumption that the current working directory is a git root.
-E.g. `repo = new Git({fs, dir: '.'})`.
+E.g. `{ dir: '.' }`.
 
-It uses `minimisted` to parse command line options.
+It uses `minimisted` to parse command line options and will print out the equivalent JS command and pretty-print the output JSON.
 
-TODO: Document this more. Also write some tests? IDK the CLI is more of a lark for testing really.
+The CLI is more of a lark for quickly testing `isomorphic-git` and isn't really meant as a `git` CLI replacement.
 
 ## Supported Git commands
 
-I may continue to make changes to the API until the 1.0 release, after which I promise not to make any breaking changes.
+This project follows semantic versioning, so I may continue to make changes to the API but they will always be backwards compatible
+unless there is a major version bump.
 
 ### commands
 
@@ -187,15 +188,14 @@ I may continue to make changes to the API until the 1.0 release, after which I p
 - [resolveRef](https://isomorphic-git.github.io/docs/resolveRef.html)
 - [sign](https://isomorphic-git.github.io/docs/sign.html)
 - [status](https://isomorphic-git.github.io/docs/status.html)
+- [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
 
-### utils
+### plugins
+- [fs](https://isomorphic-git.github.io/docs/plugin_fs.html)
 
-- [auth](https://isomorphic-git.github.io/docs/utils_auth.html)
-- [oauth2](https://isomorphic-git.github.io/docs/utils_oauth2.html)
-
-## Internal code architecture
+## Developing `isomorphic-git`
 
 I have written this library as a series of layers that build upon one another and should tree-shake very well:
 
@@ -228,6 +228,8 @@ Some are convenience wrappers for common filesystem operations.
 
 - [nde](https://nde.now.sh) - a futuristic next-generation web IDE
 - [git-app-manager](https://git-app-manager-tcibxepsta.now.sh) - install "unhosted" websites locally by git cloning them
+- [GIT Web Terminal](https://jcubic.github.io/git/)
+- [Next Editor](https://next-editor.app/)
 
 ## Similar projects
 
@@ -283,8 +285,6 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/isomorphic-git/sponsor/7/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/isomorphic-git/sponsor/8/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/isomorphic-git/sponsor/9/website" target="_blank"><img src="https://opencollective.com/isomorphic-git/sponsor/9/avatar.svg"></a>
-
-
 
 
 ## License
