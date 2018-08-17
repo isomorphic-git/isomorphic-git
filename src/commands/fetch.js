@@ -30,6 +30,7 @@ export async function fetch ({
   remote,
   url,
   noGitSuffix = false,
+  corsProxy,
   authUsername,
   authPassword,
   username = authUsername,
@@ -59,6 +60,7 @@ export async function fetch ({
       remote,
       url,
       noGitSuffix,
+      corsProxy,
       username,
       password,
       token,
@@ -120,6 +122,7 @@ async function fetchPackfile ({
   remote,
   url,
   noGitSuffix,
+  corsProxy,
   username,
   password,
   token,
@@ -148,9 +151,13 @@ async function fetchPackfile ({
       path: `remote.${remote}.url`
     })
   }
+  if (corsProxy === undefined) {
+    corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
+  }
   let auth = { username, password, token, oauth2format }
   let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   let remoteHTTP = await GitRemoteHTTP.discover({
+    corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,
@@ -212,6 +219,7 @@ async function fetchPackfile ({
   // so we can't stream the body.
   packstream = await pify(concat)(packstream)
   let raw = await GitRemoteHTTP.connect({
+    corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,

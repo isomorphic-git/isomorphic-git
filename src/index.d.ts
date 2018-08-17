@@ -1,408 +1,457 @@
-import { EventEmitter } from "events";
-
 // Type definitions for isomorphic-git 0.x.x
 // Project: isomorphic-git
 // Definitions by: William Hilton <wmhilton.com>
 
-/*~ This is the module template file. You should rename it to index.d.ts
- *~ and place it in a folder with the same name as the module.
- *~ For example, if you were writing a file for "super-greeter", this
- *~ file should be 'super-greeter/index.d.ts'
- */
+import { EventEmitter } from 'events';
 
-/*~ If this module is a UMD module that exposes a global variable 'myLib' when
- *~ loaded outside a module loader environment, declare that global here.
- *~ Otherwise, delete this declaration.
- */
 export as namespace git;
 
-/*~ You can declare types that are available via importing the module */
 export interface GitObjectDescription {
-  oid: string,
-  type?: 'blob' | 'tree' | 'commit' | 'tag',
-  format: 'deflated' | 'wrapped' | 'content' | 'parsed',
-  object: Buffer | CommitDescription | TreeDescription | TagDescription,
-  source?: string
+  oid: string;
+  type?: 'blob' | 'tree' | 'commit' | 'tag';
+  format: 'deflated' | 'wrapped' | 'content' | 'parsed';
+  object: Buffer | CommitDescription | TreeDescription | TagDescription;
+  source?: string;
 }
 
 export interface CommitDescription {
-  oid: string,      // SHA1 object id of this commit
-  message: string,  // Commit message
-  tree: string,     // SHA1 object id of corresponding file tree
-  parent: string[], // an array of zero or more SHA1 object ids
+  oid: string; // SHA1 object id of this commit
+  message: string; // Commit message
+  tree: string; // SHA1 object id of corresponding file tree
+  parent: string[]; // an array of zero or more SHA1 object ids
   author: {
-    name: string,          // The author's name
-    email: string,         // The author's email
-    timestamp: number,     // UTC Unix timestamp in seconds
-    timezoneOffset: number // Timezone difference from UTC in minutes
-  },
+    name: string; // The author's name
+    email: string; // The author's email
+    timestamp: number; // UTC Unix timestamp in seconds
+    timezoneOffset: number; // Timezone difference from UTC in minutes
+  };
   committer: {
-    name: string,          // The committer's name
-    email: string,         // The committer's email
-    timestamp: number,     // UTC Unix timestamp in seconds
-    timezoneOffset: number // Timezone difference from UTC in minutes
-  }
-  gpgsig?: string   // PGP signature (if present)
+    name: string; // The committer's name
+    email: string; // The committer's email
+    timestamp: number; // UTC Unix timestamp in seconds
+    timezoneOffset: number; // Timezone difference from UTC in minutes
+  };
+  gpgsig?: string; // PGP signature (if present)
 }
 
 export interface CommitDescriptionWithPayload extends CommitDescription {
-  payload: string
+  payload: string;
 }
 
 export interface TreeDescription {
-  entries: Array<TreeEntry>
+  entries: Array<TreeEntry>;
 }
 
 export interface TagDescription {
-  object: string,
-  type: 'blob' | 'tree' | 'commit' | 'tag',
-  tag: string,
+  object: string;
+  type: 'blob' | 'tree' | 'commit' | 'tag';
+  tag: string;
   tagger: {
-    name: string,          // The tagger's name
-    email: string,         // The tagger's email
-    timestamp: number,     // UTC Unix timestamp in seconds
-    timezoneOffset: number // Timezone difference from UTC in minutes
-  },
-  message: string,
-  signature?: string
+    name: string; // The tagger's name
+    email: string; // The tagger's email
+    timestamp: number; // UTC Unix timestamp in seconds
+    timezoneOffset: number; // Timezone difference from UTC in minutes
+  };
+  message: string;
+  signature?: string;
 }
 
 export interface TreeEntry {
-  mode: string,
-  path: string,
-  oid: string,
-  type?: string
+  mode: string;
+  path: string;
+  oid: string;
+  type?: string;
 }
 
 export interface PushResponse {
-  ok?: string[],
-  errors?: string[]
+  ok?: string[];
+  errors?: string[];
 }
 
 export interface FetchResponse {
-  defaultBranch: string
+  defaultBranch: string;
 }
 
 export interface RemoteDescription {
-  capabilities: string[],
+  capabilities: string[];
   refs?: {
-    heads?: object,
-    pull?: object,
-    tags?: object
-  }
+    heads?: object;
+    pull?: object;
+    tags?: object;
+  };
 }
 
 export interface MergeReport {
-  oid: string,
-  createdMergeCommit?: boolean,
-  fastForward?: boolean
+  oid: string;
+  createdMergeCommit?: boolean;
+  fastForward?: boolean;
 }
 
 export interface RemoteDescription {
-    remote: string, // name of the remote
-    url: string,    // url of the remote
+  remote: string; // name of the remote
+  url: string; // url of the remote
 }
 
-/*~ If this module has methods, declare them as functions like so.
- */
+export type StatusMatrix = Array<[string, ...number[]]>;
+
+export interface GitFsPlugin {
+  readFile: any;
+  writeFile: any;
+  unlink: any;
+  readdir: any;
+  mkdir: any;
+  rmdir: any;
+  stat: any;
+  lstat: any;
+}
+
+export type AnyGitPlugin = GitFsPlugin
+
+export type GitPluginCore = Map<string, AnyGitPlugin>
+
+export const plugins: GitPluginCore
+
+export const cores: Map<string, GitPluginCore>
+
 export function add(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  filepath: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  filepath: string;
 }): Promise<void>;
 
 export function addRemote(args: {
-    fs: any,
-    dir: string,
-    gitdir?: string,
-    remote: string,
-    url: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  remote: string;
+  url: string;
 }): Promise<void>;
 
 export function branch(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  ref: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
 }): Promise<void>;
 
 export function deleteBranch(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  ref: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
 }): Promise<void>;
 
 export function deleteRemote(args: {
-    fs: any,
-    dir: string,
-    gitdir?: string,
-    remote: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  remote: string;
 }): Promise<void>;
 
 export function checkout(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  remote?: string,
-  ref?: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  remote?: string;
+  ref?: string;
 }): Promise<void>;
 
 export function clone(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  emitter?: EventEmitter,
-  url: string,
-  ref?: string,
-  remote?: string,
-  username?: string,
-  password?: string,
-  token?: string,
-  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
-  depth?: number,
-  since?: Date,
-  exclude?: string[],
-  relative?: boolean,
-  singleBranch?: boolean,
-  noCheckout?: boolean
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  emitter?: EventEmitter;
+  url: string;
+  corsProxy?: string;
+  ref?: string;
+  remote?: string;
+  username?: string;
+  password?: string;
+  token?: string;
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+  depth?: number;
+  since?: Date;
+  exclude?: string[];
+  relative?: boolean;
+  singleBranch?: boolean;
+  noCheckout?: boolean;
 }): Promise<void>;
 
 export function commit(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  message: string,
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  message: string;
   author: {
-    name?: string,
-    email?: string,
-    date?: Date,
-    timestamp?: number,
-    timezoneOffset?: number,
-  },
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
   committer?: {
-    name?: string,
-    email?: string,
-    date?: Date,
-    timestamp?: number,
-    timezoneOffset?: number,
-  }
-}): Promise<string>
-
-export function config(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  path: string,
-  value?: string | undefined
-}): Promise<any>
-
-export function currentBranch(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  fullname?: boolean,
-}): Promise<string>
-
-export function expandRef(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  ref: string
-}): Promise<string>
-
-export function fetch(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  emitter?: EventEmitter,
-  url?: string,
-  ref?: string,
-  remote?: string,
-  username?: string,
-  password?: string,
-  token?: string,
-  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
-  depth?: number,
-  since?: Date,
-  exclude?: string[],
-  relative?: boolean,
-  tags?: boolean,
-  singleBranch?: boolean
-}): Promise<FetchResponse>;
-
-export function findRoot(args: {
-  fs: any,
-  filepath: string
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
 }): Promise<string>;
 
+export function config(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  path: string;
+  value?: string | undefined;
+}): Promise<any>;
+
+export function currentBranch(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  fullname?: boolean;
+}): Promise<string>;
+
+export function expandRef(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
+}): Promise<string>;
+
+export function fetch(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  emitter?: EventEmitter;
+  url?: string;
+  corsProxy?: string;
+  ref?: string;
+  remote?: string;
+  username?: string;
+  password?: string;
+  token?: string;
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+  depth?: number;
+  since?: Date;
+  exclude?: string[];
+  relative?: boolean;
+  tags?: boolean;
+  singleBranch?: boolean;
+}): Promise<FetchResponse>;
+
+export function findRoot(args: { core?: string;
+  fs?: any; filepath: string }): Promise<string>;
+
 export function getRemoteInfo(args: {
-  url: string,
-  username?: string,
-  password?: string,
-  token?: string,
-  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
-  forPush?: boolean,
+  url: string;
+  username?: string;
+  password?: string;
+  token?: string;
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+  forPush?: boolean;
 }): Promise<RemoteDescription>;
 
 export function indexPack(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  filepath: string
-}): Promise<void>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  filepath: string;
+}): Promise<void>;
 
 export function init(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
 }): Promise<void>;
 
 export function isDescendent(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  oid: string,
-  ancestor: string,
-  depth?: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  oid: string;
+  ancestor: string;
+  depth?: string;
 }): Promise<boolean>;
 
 export function listBranches(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  remote?: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  remote?: string;
 }): Promise<Array<string>>;
 
 export function listFiles(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  ref?: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref?: string;
 }): Promise<Array<string>>;
 
 export function listRemotes(args: {
-    fs: any,
-    dir: string,
-    gitdir?: string,
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
 }): Promise<Array<RemoteDescription>>;
 
 export function listTags(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
 }): Promise<Array<string>>;
 
 export function log(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  ref?: string,
-  depth?: number,
-  since?: Date
-}): Promise<Array<CommitDescription>>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref?: string;
+  depth?: number;
+  since?: Date;
+}): Promise<Array<CommitDescription>>;
 export function log(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  ref?: string,
-  depth?: number,
-  since?: Date,
-  signing: false
-}): Promise<Array<CommitDescription>>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref?: string;
+  depth?: number;
+  since?: Date;
+  signing: false;
+}): Promise<Array<CommitDescription>>;
 export function log(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  ref?: string,
-  depth?: number,
-  since?: Date,
-  signing: true
-}): Promise<Array<CommitDescriptionWithPayload>>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref?: string;
+  depth?: number;
+  since?: Date;
+  signing: true;
+}): Promise<Array<CommitDescriptionWithPayload>>;
 
 export function merge(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  ours?: string,
-  theirs: string,
-  fastForwardOnly?: boolean
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ours?: string;
+  theirs: string;
+  fastForwardOnly?: boolean;
 }): Promise<MergeReport>;
 
 export function pull(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  ref?: string,
-  singleBranch?: boolean,
-  fastForwardOnly?: boolean,
-  username?: string,
-  password?: string,
-  token?: string,
-  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
-  emitter?: EventEmitter
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref?: string;
+  singleBranch?: boolean;
+  fastForwardOnly?: boolean;
+  username?: string;
+  password?: string;
+  token?: string;
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+  emitter?: EventEmitter;
 }): Promise<void>;
 
 export function push(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  ref?: string,
-  remote?: string,
-  url?: string,
-  force?: boolean,
-  username?: string,
-  password?: string,
-  token?: string,
-  oauth2format?: 'github' | 'bitbucket' | 'gitlab',
-}): Promise<PushResponse>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref?: string;
+  remote?: string;
+  url?: string;
+  corsProxy?: string;
+  force?: boolean;
+  username?: string;
+  password?: string;
+  token?: string;
+  oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+}): Promise<PushResponse>;
 
 export function readObject(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  oid: string,
-  format?: 'deflated' | 'wrapped' | 'content' | 'parsed',
-  filepath?: string,
-  encoding?: string
-}): Promise<GitObjectDescription>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  oid: string;
+  format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
+  filepath?: string;
+  encoding?: string;
+}): Promise<GitObjectDescription>;
 
 export function remove(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  filepath: string
-}): Promise<void>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  filepath: string;
+}): Promise<void>;
 
 export function resolveRef(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
-  ref: string,
-  depth?: number
-}): Promise<string>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
+  depth?: number;
+}): Promise<string>;
 
 export function sign(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  privateKeys: string
-}): Promise<string>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  privateKeys: string;
+}): Promise<string>;
 
 export function status(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  filepath: string
-}): Promise<string>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  filepath: string;
+}): Promise<string>;
+
+export function statusMatrix(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref?: string;
+  pattern: string;
+}): Promise<StatusMatrix>;
 
 export function verify(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string
-  ref: string,
-  publickKeys: string
-}): Promise<false | Array<string>>
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
+  publickKeys: string;
+}): Promise<false | Array<string>>;
 
-export function version(): string
+export function version(): string;

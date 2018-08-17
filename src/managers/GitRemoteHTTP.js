@@ -6,15 +6,18 @@ import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
 import { pkg } from '../utils/pkg.js'
 
-import { GitRemoteConnection } from './GitRemoteConnection'
+import { GitRemoteConnection } from './GitRemoteConnection.js'
 
 export class GitRemoteHTTP {
   static async capabilities () {
     return ['discover', 'connect']
   }
-  static async discover ({ service, url, noGitSuffix, auth }) {
+  static async discover ({ corsProxy, service, url, noGitSuffix, auth }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
+    if (corsProxy) {
+      url = `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
+    }
     let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
     headers['user-agent'] = pkg.agent
@@ -35,9 +38,12 @@ export class GitRemoteHTTP {
     }
     return GitRemoteConnection.receiveInfoRefs(service, res)
   }
-  static async connect ({ service, url, noGitSuffix, auth, stream }) {
+  static async connect ({ corsProxy, service, url, noGitSuffix, auth, stream }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
+    if (corsProxy) {
+      url = `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
+    }
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`

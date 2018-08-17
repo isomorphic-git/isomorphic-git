@@ -52,16 +52,12 @@ export async function merge ({
     let baseOid = await findMergeBase({ gitdir, fs, refs: [ourOid, theirOid] })
     // handle fast-forward case
     if (baseOid === theirOid) {
-      console.log(`'${theirs}' is already merged into '${ours}'`)
       return {
         oid: ourOid,
         alreadyMerged: true
       }
     }
     if (baseOid === ourOid) {
-      console.log(
-        `Performing a fast-forward merge from ${ourOid} to ${theirOid}`
-      )
       await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
       return {
         oid: theirOid,

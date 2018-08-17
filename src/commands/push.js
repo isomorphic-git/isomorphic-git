@@ -31,6 +31,7 @@ export async function push ({
   url,
   force = false,
   noGitSuffix = false,
+  corsProxy,
   authUsername,
   authPassword,
   username = authUsername,
@@ -43,6 +44,9 @@ export async function push ({
     // TODO: Figure out how pushing tags works. (This only works for branches.)
     if (url === undefined) {
       url = await config({ fs, gitdir, path: `remote.${remote}.url` })
+    }
+    if (corsProxy === undefined) {
+      corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
     }
     let fullRef
     if (!ref) {
@@ -59,6 +63,7 @@ export async function push ({
     let auth = { username, password, token, oauth2format }
     let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     let httpRemote = await GitRemoteHTTP.discover({
+      corsProxy,
       service: 'git-receive-pack',
       url,
       noGitSuffix,
@@ -103,6 +108,7 @@ export async function push ({
     })
     let { packfile, progress } = await GitSideBand.demux(
       await GitRemoteHTTP.connect({
+        corsProxy,
         service: 'git-receive-pack',
         url,
         noGitSuffix,
