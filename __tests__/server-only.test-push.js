@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const nock = require('nock')
 const server = require('./__helpers__/http-backend')
 const setTestTimeout = require('./__helpers__/set-test-timeout')
-const { push } = require('isomorphic-git')
+const { plugins, push } = require('isomorphic-git')
 
 setTestTimeout(60000)
 
@@ -11,6 +11,7 @@ describe('push', () => {
   it('"refs/heads/master" to local git-http-backend', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-push')
+    plugins.set('fs', fs)
     const { get, postReceivePackRequest } = server(dir)
     nock('http://example.dev')
       // .get('/test-push.git/info/refs?service=git-receive-pack')
@@ -20,7 +21,6 @@ describe('push', () => {
       .reply(200, postReceivePackRequest)
     // Test
     let res = await push({
-      fs,
       gitdir,
       remote: 'pseudo',
       ref: 'refs/heads/master',
@@ -35,6 +35,7 @@ describe('push', () => {
   it('"master" to local git-http-backend', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-push')
+    plugins.set('fs', fs)
     // Test
     const { get, postReceivePackRequest } = server(dir)
     nock('http://example.dev')
@@ -44,7 +45,6 @@ describe('push', () => {
       .post(/.*/)
       .reply(200, postReceivePackRequest)
     let res = await push({
-      fs,
       gitdir,
       remote: 'pseudo',
       ref: 'master',
@@ -60,9 +60,9 @@ describe('push', () => {
     async () => {
       // Setup
       let { fs, gitdir } = await makeFixture('test-push')
+      plugins.set('fs', fs)
       // Test
       let res = await push({
-        fs,
         gitdir,
         token: process.env.GITHUB_TOKEN,
         remote: 'origin',
@@ -78,9 +78,9 @@ describe('push', () => {
   ;(process.env.GITHUB_TOKEN ? it : xit)('"master" to Github', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
+    plugins.set('fs', fs)
     // Test
     let res = await push({
-      fs,
       gitdir,
       token: process.env.GITHUB_TOKEN,
       remote: 'origin',
@@ -96,11 +96,11 @@ describe('push', () => {
   it('throws an Error if no credentials supplied', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
+    plugins.set('fs', fs)
     // Test
     let error = null
     try {
       await push({
-        fs,
         gitdir,
         remote: 'origin',
         ref: 'master'
@@ -115,11 +115,11 @@ describe('push', () => {
   it('throws an Error if invalid credentials supplied', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
+    plugins.set('fs', fs)
     // Test
     let error = null
     try {
       await push({
-        fs,
         gitdir,
         username: 'test',
         password: 'test',

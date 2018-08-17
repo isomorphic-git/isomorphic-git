@@ -3,6 +3,7 @@ import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { cores } from '../utils/plugins.js'
 
 import { currentBranch } from './currentBranch'
 
@@ -12,9 +13,10 @@ import { currentBranch } from './currentBranch'
  * @link https://isomorphic-git.github.io/docs/deleteBranch.html
  */
 export async function deleteBranch ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref
 }) {
   try {

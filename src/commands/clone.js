@@ -1,6 +1,7 @@
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout'
 import { config } from './config'
@@ -13,9 +14,10 @@ import { init } from './init'
  * @link https://isomorphic-git.github.io/docs/clone.html
  */
 export async function clone ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   emitter,
   url,
   noGitSuffix = false,

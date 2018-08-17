@@ -5,6 +5,7 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { compareAge } from '../utils/compareAge.js'
 import { logCommit } from '../utils/logCommit.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Get commit descriptions from the git history
@@ -12,9 +13,10 @@ import { logCommit } from '../utils/logCommit.js'
  * @link https://isomorphic-git.github.io/docs/log.html
  */
 export async function log ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
   depth,
   since, // Date

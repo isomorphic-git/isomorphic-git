@@ -4,6 +4,7 @@ import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Check whether a git commit is descended from another
@@ -11,9 +12,10 @@ import { E, GitError } from '../models/GitError.js'
  * @link https://isomorphic-git.github.io/docs/isDescendent.html
  */
 export async function isDescendent ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   oid,
   ancestor,
   depth = -1
