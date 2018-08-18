@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const snapshots = require('./__snapshots__/test-remove.js.snap')
+const snapshots = require('./__snapshots__/test-resetIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { resetIndex, listFiles } = require('isomorphic-git')
 
