@@ -382,6 +382,7 @@ export function push(args: {
   dir: string;
   gitdir?: string;
   ref?: string;
+  remoteRef?: string;
   remote?: string;
   url?: string;
   corsProxy?: string;

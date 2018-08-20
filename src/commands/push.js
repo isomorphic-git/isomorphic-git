@@ -27,6 +27,7 @@ export async function push ({
   fs: _fs = cores.get(core).get('fs'),
   emitter,
   ref,
+  remoteRef,
   remote = 'origin',
   url,
   force = false,
@@ -59,6 +60,12 @@ export async function push ({
     } else {
       fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     }
+    let fullRemoteRef
+    if (!remoteRef) {
+      fullRemoteRef = fullRef
+    } else {
+      fullRemoteRef = await GitRefManager.expand({ fs, gitdir, ref: remoteRef })
+    }
     let oid = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
     let auth = { username, password, token, oauth2format }
     let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
@@ -78,7 +85,7 @@ export async function push ({
     let objects = await listObjects({ fs, gitdir, oids: commits })
 
     let oldoid =
-      httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
+      httpRemote.refs.get(fullRemoteRef) || '0000000000000000000000000000000000000000'
     if (!force) {
       // Is it a tag that already exists?
       if (
@@ -98,7 +105,7 @@ export async function push ({
     }
     let packstream = await GitRemoteConnection.sendReceivePackRequest({
       capabilities: ['report-status', 'side-band-64k', `agent=${pkg.agent}`],
-      triplets: [{ oldoid, oid, fullRef }]
+      triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
     pack({
       fs,
