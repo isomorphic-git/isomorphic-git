@@ -32,11 +32,13 @@ export async function resetIndex ({
         oid = null
       }
       const object = await fs.read(path.join(dir, filepath))
-      workdirOid = await GitObjectManager.hash({
-        gitdir,
-        type: 'blob',
-        object
-      })
+      if (object) {
+        workdirOid = await GitObjectManager.hash({
+          gitdir,
+          type: 'blob',
+          object
+        })
+      }
     }
     await GitIndexManager.acquire(
       { fs, filepath: `${gitdir}/index` },
@@ -57,7 +59,6 @@ export async function resetIndex ({
         }
       }
     )
-    // TODO: return oid?
   } catch (err) {
     err.caller = 'git.reset'
     throw err
