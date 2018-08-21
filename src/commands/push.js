@@ -60,12 +60,6 @@ export async function push ({
     } else {
       fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     }
-    let fullRemoteRef
-    if (!remoteRef) {
-      fullRemoteRef = fullRef
-    } else {
-      fullRemoteRef = await GitRefManager.expand({ fs, gitdir, ref: remoteRef })
-    }
     let oid = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
     let auth = { username, password, token, oauth2format }
     let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
@@ -83,7 +77,25 @@ export async function push ({
       finish: httpRemote.refs.values()
     })
     let objects = await listObjects({ fs, gitdir, oids: commits })
-
+    let fullRemoteRef
+    if (!remoteRef) {
+      fullRemoteRef = fullRef
+    } else {
+      try {
+        fullRemoteRef = await GitRefManager.expandAgainstMap({
+          ref: remoteRef,
+          map: httpRemote.refs
+        })
+      } catch (err) {
+        if (err.code === E.ExpandRefError) {
+          // The remote reference doesn't exist yet.
+          // If it is fully specified, use that value. Otherwise, treat it as a branch.
+          fullRemoteRef = remoteRef.startsWith('refs/') ? remoteRef : `refs/heads/${remoteRef}`
+        } else {
+          throw err
+        }
+      }
+    }
     let oldoid =
       httpRemote.refs.get(fullRemoteRef) || '0000000000000000000000000000000000000000'
     if (!force) {

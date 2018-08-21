@@ -153,6 +153,15 @@ export class GitRefManager {
     // Do we give up?
     throw new GitError(E.ExpandRefError, { ref })
   }
+  static async expandAgainstMap ({ fs: _fs, gitdir, ref, map }) {
+    // Look in all the proper paths, in this order
+    const allpaths = refpaths(ref)
+    for (let ref of allpaths) {
+      if (await map.has(ref)) return ref
+    }
+    // Do we give up?
+    throw new GitError(E.ExpandRefError, { ref })
+  }
   static resolveAgainstMap ({ ref, fullref = ref, depth, map }) {
     if (depth !== undefined) {
       depth--
