@@ -2,10 +2,10 @@ import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 
 import { readObject } from './readObject'
-import { log } from './log'
 
 /**
  * Reset a file from the git index (aka staging area)
@@ -21,8 +21,7 @@ export async function resetIndex ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const tree = await log({ gitdir, fs, ref, depth: 1 })
-    let oid = tree[0] && tree[0].tree
+    let oid = await GitRefManager.resolve({ fs, gitdir, ref })
     let workdirOid
     if (oid) {
       try {
