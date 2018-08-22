@@ -117,6 +117,11 @@ export async function checkout ({
 async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
   const fs = new FileSystem(_fs)
   for (let entry of tree) {
+    if (entry.mode === '160000') {
+      // gitlinks
+      console.log(new GitError(E.NotImplementedFail, { thing: 'submodule support' }))
+      continue
+    }
     let { type, object } = await GitObjectManager.read({
       fs,
       gitdir,
@@ -126,7 +131,23 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
     let filepath = path.join(dir, prefix, entry.path)
     switch (type) {
       case 'blob':
-        await fs.write(filepath, object)
+        if (entry.mode === '100644') {
+          // regular file
+          await fs.write(filepath, object)
+        } else if (entry.mode === '100755') {
+          // executable file
+          await fs.write(filepath, object, {mode: 0o755})
+        } else if (entry.mode === '120000') {
+          // symlink
+          await fs.writelink(filepath, object)
+        } else if (entry.mode === '160000') {
+          // gitlinks
+          // TODO
+        } else {
+          throw new GitError(E.InternalFail, {
+            message: `Invalid mode "${entry.mode}" detected in blob ${entry.oid}`
+          })
+        }
         let stats = await fs.lstat(filepath)
         index.insert({
           filepath: entrypath,

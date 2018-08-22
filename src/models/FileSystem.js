@@ -30,6 +30,7 @@ export class FileSystem {
     this._lstat = pify(fs.lstat.bind(fs))
     this._readdir = pify(fs.readdir.bind(fs))
     this._readlink = pify(fs.readlink.bind(fs))
+    this._symlink = pify(fs.symlink.bind(fs))
   }
   /**
    * Return true if a file exists, false if it doesn't exist.
@@ -170,6 +171,12 @@ export class FileSystem {
       }
       throw err
     }
+  }
+  /**
+   * Write the contents of buffer to a symlink.
+   */
+  async writelink (filename, buffer) {
+    return this._symlink(buffer.toString('utf8'), filename)
   }
 
   async lock (filename, triesLeft = 3) {
