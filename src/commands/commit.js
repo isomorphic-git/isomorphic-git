@@ -39,6 +39,12 @@ export async function commit ({
     if (author.name === undefined || author.email === undefined) {
       throw new GitError(E.MissingAuthorError)
     }
+    if (message === undefined) {
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'commit',
+        parameter: 'message'
+      })
+    }
     committer = committer || author
     let authorDateTime = author.date || new Date()
     let committerDateTime = committer.date || authorDateTime
