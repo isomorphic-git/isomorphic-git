@@ -22,7 +22,7 @@ export async function add ({
     const fs = new FileSystem(_fs)
     const type = 'blob'
     let stats = await fs.lstat(path.join(dir, filepath))
-    if (stats === null) throw new GitError(E.FileReadError, { filepath })
+    if (!stats) throw new GitError(E.FileReadError, { filepath })
     if (stats.isDirectory()) {
       throw new GitError(E.NotImplementedFail)
     }
