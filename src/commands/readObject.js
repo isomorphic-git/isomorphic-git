@@ -7,6 +7,7 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { resolveTree } from '../utils/resolveTree.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Read a git object directly by its SHA1 object id
@@ -14,9 +15,10 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @link https://isomorphic-git.github.io/docs/readObject.html
  */
 export async function readObject ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   oid,
   format = 'parsed',
   filepath = undefined,

@@ -5,6 +5,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { SignedGitCommit } from '../models/SignedGitCommit.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Verify a signed commit
@@ -12,9 +13,10 @@ import { SignedGitCommit } from '../models/SignedGitCommit.js'
  * @link https://isomorphic-git.github.io/docs/verify.html
  */
 export async function verify ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref,
   publicKeys,
   openpgp

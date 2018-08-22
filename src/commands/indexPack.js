@@ -2,6 +2,7 @@ import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Create the .idx file for a given .pack file
@@ -9,9 +10,10 @@ import { GitPackIndex } from '../models/GitPackIndex.js'
  * @link https://isomorphic-git.github.io/docs/indexPack.html
  */
 export async function indexPack ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   filepath
 }) {
   try {

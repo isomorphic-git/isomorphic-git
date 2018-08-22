@@ -4,6 +4,7 @@ import path from 'path'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { cores } from '../utils/plugins.js'
 
 import { currentBranch } from './currentBranch.js'
 import { log } from './log'
@@ -14,9 +15,10 @@ import { log } from './log'
  * @link https://isomorphic-git.github.io/docs/merge.html
  */
 export async function merge ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ours,
   theirs,
   fastForwardOnly
@@ -50,16 +52,12 @@ export async function merge ({
     let baseOid = await findMergeBase({ gitdir, fs, refs: [ourOid, theirOid] })
     // handle fast-forward case
     if (baseOid === theirOid) {
-      console.log(`'${theirs}' is already merged into '${ours}'`)
       return {
         oid: ourOid,
         alreadyMerged: true
       }
     }
     if (baseOid === ourOid) {
-      console.log(
-        `Performing a fast-forward merge from ${ourOid} to ${theirOid}`
-      )
       await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
       return {
         oid: theirOid,

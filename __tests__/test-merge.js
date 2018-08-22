@@ -1,12 +1,13 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { merge, resolveRef } = require('isomorphic-git')
+const { plugins, merge, resolveRef } = require('isomorphic-git')
 
 describe('merge', () => {
   it('merge master into master', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-merge')
+    plugins.set('fs', fs)
     // Test
     let desiredOid = await resolveRef({
       fs,
@@ -14,7 +15,6 @@ describe('merge', () => {
       ref: 'master'
     })
     let m = await merge({
-      fs,
       gitdir,
       ours: 'master',
       theirs: 'master',
@@ -24,7 +24,6 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeTruthy()
     expect(m.fastForward).toBeFalsy()
     let oid = await resolveRef({
-      fs,
       gitdir,
       ref: 'master'
     })
@@ -33,14 +32,13 @@ describe('merge', () => {
   it('merge medium into master', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-merge')
+    plugins.set('fs', fs)
     // Test
     let desiredOid = await resolveRef({
-      fs,
       gitdir,
       ref: 'medium'
     })
     let m = await merge({
-      fs,
       gitdir,
       ours: 'master',
       theirs: 'medium',
@@ -50,7 +48,6 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeTruthy()
     expect(m.fastForward).toBeFalsy()
     let oid = await resolveRef({
-      fs,
       gitdir,
       ref: 'master'
     })
@@ -59,14 +56,13 @@ describe('merge', () => {
   it('merge oldest into master', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-merge')
+    plugins.set('fs', fs)
     // Test
     let desiredOid = await resolveRef({
-      fs,
       gitdir,
       ref: 'master'
     })
     let m = await merge({
-      fs,
       gitdir,
       ours: 'master',
       theirs: 'oldest',
@@ -76,7 +72,6 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeTruthy()
     expect(m.fastForward).toBeFalsy()
     let oid = await resolveRef({
-      fs,
       gitdir,
       ref: 'master'
     })
@@ -85,14 +80,13 @@ describe('merge', () => {
   it('merge newest into master', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-merge')
+    plugins.set('fs', fs)
     // Test
     let desiredOid = await resolveRef({
-      fs,
       gitdir,
       ref: 'newest'
     })
     let m = await merge({
-      fs,
       gitdir,
       ours: 'master',
       theirs: 'newest',
@@ -102,7 +96,6 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeFalsy()
     expect(m.fastForward).toBeTruthy()
     let oid = await resolveRef({
-      fs,
       gitdir,
       ref: 'master'
     })

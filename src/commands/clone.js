@@ -1,6 +1,7 @@
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout'
 import { config } from './config'
@@ -13,12 +14,14 @@ import { init } from './init'
  * @link https://isomorphic-git.github.io/docs/clone.html
  */
 export async function clone ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   emitter,
   url,
   noGitSuffix = false,
+  corsProxy,
   ref,
   remote,
   authUsername,
@@ -58,6 +61,14 @@ export async function clone ({
       path: `remote.${remote}.fetch`,
       value: `+refs/heads/*:refs/remotes/${remote}/*`
     })
+    if (corsProxy) {
+      await config({
+        gitdir,
+        fs,
+        path: `http.corsProxy`,
+        value: corsProxy
+      })
+    }
     // Fetch commits
     let { defaultBranch } = await fetch({
       gitdir,

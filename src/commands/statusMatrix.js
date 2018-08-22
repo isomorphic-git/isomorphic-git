@@ -8,6 +8,7 @@ import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
 import { worthWalking } from '../utils/worthWalking.js'
 import { patternRoot } from '../utils/patternRoot.js'
+import { cores } from '../utils/plugins.js'
 
 import { walkBeta1 } from './walkBeta1.js'
 
@@ -17,9 +18,10 @@ import { walkBeta1 } from './walkBeta1.js'
  * @link https://isomorphic-git.github.io/docs/statusMatrix.html
  */
 export async function statusMatrix ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
   pattern = null
 }) {
@@ -68,13 +70,12 @@ export async function statusMatrix ({
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
         await head.populateHash()
         await stage.populateHash()
-        if (workdir.exists && stage.exists) {
-          await workdir.populateHash()
-        }
         if (!head.exists && workdir.exists && !stage.exists) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
           workdir.oid = 42
+        } else if (workdir.exists) {
+          await workdir.populateHash()
         }
         let entry = [undefined, head.oid, workdir.oid, stage.oid]
         let result = entry.map(value => entry.indexOf(value))

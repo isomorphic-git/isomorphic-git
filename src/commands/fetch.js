@@ -10,6 +10,7 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
+import { cores } from '../utils/plugins.js'
 
 import { config } from './config'
 
@@ -19,15 +20,17 @@ import { config } from './config'
  * @link https://isomorphic-git.github.io/docs/fetch.html
  */
 export async function fetch ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   emitter,
   ref = 'HEAD',
   refs,
   remote,
   url,
   noGitSuffix = false,
+  corsProxy,
   authUsername,
   authPassword,
   username = authUsername,
@@ -57,6 +60,7 @@ export async function fetch ({
       remote,
       url,
       noGitSuffix,
+      corsProxy,
       username,
       password,
       token,
@@ -118,6 +122,7 @@ async function fetchPackfile ({
   remote,
   url,
   noGitSuffix,
+  corsProxy,
   username,
   password,
   token,
@@ -146,9 +151,13 @@ async function fetchPackfile ({
       path: `remote.${remote}.url`
     })
   }
+  if (corsProxy === undefined) {
+    corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
+  }
   let auth = { username, password, token, oauth2format }
   let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   let remoteHTTP = await GitRemoteHTTP.discover({
+    corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,
@@ -210,6 +219,7 @@ async function fetchPackfile ({
   // so we can't stream the body.
   packstream = await pify(concat)(packstream)
   let raw = await GitRemoteHTTP.connect({
+    corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,

@@ -8,6 +8,7 @@ import { config } from './config'
 import { currentBranch } from './currentBranch'
 import { fetch } from './fetch'
 import { merge } from './merge'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Fetch and merge commits from a remote repository
@@ -15,9 +16,10 @@ import { merge } from './merge'
  * @link https://isomorphic-git.github.io/docs/pull.html
  */
 export async function pull ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref,
   fastForwardOnly = false,
   noGitSuffix = false,
@@ -36,7 +38,6 @@ export async function pull ({
     if (!ref) {
       ref = await currentBranch({ fs, gitdir })
     }
-    console.log(`Using ref=${ref}`)
     // Fetch from the correct remote.
     let remote = await config({
       gitdir,

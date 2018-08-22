@@ -1,22 +1,20 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { clone } = require('isomorphic-git')
+const { plugins, clone } = require('isomorphic-git')
 
 describe('clone', () => {
   it('clone with noTags', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    let url = process.browser
-      ? `http://localhost:9999/github.com/isomorphic-git/isomorphic-git`
-      : `https://github.com/isomorphic-git/isomorphic-git`
+    plugins.set('fs', fs)
     await clone({
-      fs,
       dir,
       gitdir,
       depth: 1,
       ref: 'test-branch',
       noTags: true,
-      url
+      url: 'https://github.com/isomorphic-git/isomorphic-git',
+      corsProxy: process.browser ? `http://localhost:9999` : undefined
     })
     expect(fs.existsSync(`${dir}`)).toBe(true)
     expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)
@@ -29,18 +27,16 @@ describe('clone', () => {
   })
   it('clone with noCheckout', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    let url = process.browser
-      ? `http://localhost:9999/github.com/isomorphic-git/isomorphic-git`
-      : `https://github.com/isomorphic-git/isomorphic-git`
+    plugins.set('fs', fs)
     await clone({
-      fs,
       dir,
       gitdir,
       depth: 1,
       ref: 'test-branch',
       singleBranch: true,
       noCheckout: true,
-      url
+      url: 'https://github.com/isomorphic-git/isomorphic-git',
+      corsProxy: process.browser ? `http://localhost:9999` : undefined
     })
     expect(fs.existsSync(`${dir}`)).toBe(true)
     expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)
@@ -52,17 +48,15 @@ describe('clone', () => {
   })
   it('clone a tag', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    let url = process.browser
-      ? `http://localhost:9999/github.com/isomorphic-git/isomorphic-git`
-      : `https://github.com/isomorphic-git/isomorphic-git`
+    plugins.set('fs', fs)
     await clone({
-      fs,
       dir,
       gitdir,
       depth: 1,
       singleBranch: true,
       ref: 'test-tag',
-      url
+      url: 'https://github.com/isomorphic-git/isomorphic-git',
+      corsProxy: process.browser ? `http://localhost:9999` : undefined
     })
     expect(fs.existsSync(`${dir}`)).toBe(true)
     expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)
@@ -73,11 +67,11 @@ describe('clone', () => {
   })
   it('clone with an unregistered protocol', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    plugins.set('fs', fs)
     let url = `foobar://github.com/isomorphic-git/isomorphic-git`
     let error = null
     try {
       await clone({
-        fs,
         dir,
         gitdir,
         depth: 1,
@@ -101,14 +95,13 @@ describe('clone', () => {
     'clone from karma-git-http-server-middleware',
     async () => {
       let { fs, dir, gitdir } = await makeFixture('test-clone-karma')
-      let url = `http://localhost:9876/git-server/test-status.git`
+      plugins.set('fs', fs)
       await clone({
-        fs,
         dir,
         gitdir,
         depth: 1,
         singleBranch: true,
-        url
+        url: 'http://localhost:9876/git-server/test-status.git'
       })
       expect(fs.existsSync(`${dir}`)).toBe(true, `'dir' exists`)
       expect(fs.existsSync(`${gitdir}/objects`)).toBe(

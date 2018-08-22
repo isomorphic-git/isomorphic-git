@@ -5,7 +5,7 @@ const snapshots = require('./__snapshots__/test-deleteBranch.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
-const { deleteBranch } = require('isomorphic-git')
+const { plugins, deleteBranch } = require('isomorphic-git')
 
 describe('deleteBranch', () => {
   beforeAll(() => {
@@ -15,8 +15,9 @@ describe('deleteBranch', () => {
   it('delete branch', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
+    plugins.set('fs', fs)
     // Test
-    await deleteBranch({ fs, dir, gitdir, ref: 'test' })
+    await deleteBranch({ dir, gitdir, ref: 'test' })
     let files = await pify(fs.readdir)(path.resolve(gitdir, 'refs', 'heads'))
     expect(files.sort()).toMatchSnapshot()
   })
@@ -24,10 +25,11 @@ describe('deleteBranch', () => {
   it('invalid branch name', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
+    plugins.set('fs', fs)
     let error = null
     // Test
     try {
-      await deleteBranch({ fs, dir, gitdir, ref: 'inv@{id..branch.lock' })
+      await deleteBranch({ dir, gitdir, ref: 'inv@{id..branch.lock' })
     } catch (err) {
       error = err
     }
@@ -38,10 +40,11 @@ describe('deleteBranch', () => {
   it('branch not exist', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
+    plugins.set('fs', fs)
     let error = null
     // Test
     try {
-      await deleteBranch({ fs, dir, gitdir, ref: 'branch-not-exist' })
+      await deleteBranch({ dir, gitdir, ref: 'branch-not-exist' })
     } catch (err) {
       error = err
     }
@@ -52,10 +55,11 @@ describe('deleteBranch', () => {
   it('missing ref argument', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
+    plugins.set('fs', fs)
     let error = null
     // Test
     try {
-      await deleteBranch({ fs, dir, gitdir })
+      await deleteBranch({ dir, gitdir })
     } catch (err) {
       error = err
     }
@@ -66,10 +70,11 @@ describe('deleteBranch', () => {
   it('checked out branch', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
+    plugins.set('fs', fs)
     let error = null
     // Test
     try {
-      await deleteBranch({ fs, dir, gitdir, ref: 'master' })
+      await deleteBranch({ dir, gitdir, ref: 'master' })
     } catch (err) {
       error = err
     }

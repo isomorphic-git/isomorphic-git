@@ -1,6 +1,6 @@
-import { posix as path } from 'path'
+import { path } from '../utils/path.js'
 
-import { GitObjectManager } from '../managers/GitObjectManager'
+import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { resolveTree } from '../utils/resolveTree.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
