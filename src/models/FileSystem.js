@@ -29,6 +29,8 @@ export class FileSystem {
     this._stat = pify(fs.stat.bind(fs))
     this._lstat = pify(fs.lstat.bind(fs))
     this._readdir = pify(fs.readdir.bind(fs))
+    this._readlink = pify(fs.readlink.bind(fs))
+    this._symlink = pify(fs.symlink.bind(fs))
   }
   /**
    * Return true if a file exists, false if it doesn't exist.
@@ -138,6 +140,43 @@ export class FileSystem {
       })
     )
     return files.reduce((a, f) => a.concat(f), [])
+  }
+  /**
+   * Return the Stats of a file/symlink if it exists, otherwise returns null.
+   * Rethrows errors that aren't related to file existance.
+   */
+  async lstat (filename) {
+    try {
+      let stats = await this._lstat(filename)
+      return stats
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null
+      }
+      throw err
+    }
+  }
+  /**
+   * Reads the contents of a symlink if it exists, otherwise returns null.
+   * Rethrows errors that aren't related to file existance.
+   */
+  async readlink (filename, opts = {encoding: 'buffer'}) {
+    // Note: FileSystem.readlink returns a buffer by default
+    // so we can dump it into GitObject.write just like any other file.
+    try {
+      return this._readlink(filename, opts)
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null
+      }
+      throw err
+    }
+  }
+  /**
+   * Write the contents of buffer to a symlink.
+   */
+  async writelink (filename, buffer) {
+    return this._symlink(buffer.toString('utf8'), filename)
   }
 
   async lock (filename, triesLeft = 3) {

@@ -47,7 +47,7 @@ export class GitWalkerFs {
   async populateStat (entry) {
     if (!entry.exists) return
     let { fs, dir } = this
-    let stats = await fs._lstat(`${dir}/${entry.fullpath}`)
+    let stats = await fs.lstat(`${dir}/${entry.fullpath}`)
     let type = stats.isDirectory() ? 'tree' : 'blob'
     if (!stats) {
       throw new Error(
