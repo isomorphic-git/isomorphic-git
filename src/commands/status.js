@@ -54,14 +54,7 @@ export async function status ({
         }
       }
     )
-    let stats = null
-    try {
-      stats = await fs._lstat(path.join(dir, filepath))
-    } catch (err) {
-      if (err.code !== 'ENOENT') {
-        throw err
-      }
-    }
+    let stats = await fs.lstat(path.join(dir, filepath))
 
     let H = treeOid !== null // head
     let I = indexEntry !== null // index

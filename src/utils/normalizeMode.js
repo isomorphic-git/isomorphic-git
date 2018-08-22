@@ -34,5 +34,7 @@ export function normalizeMode (mode) {
   } else {
     permissions = 0o644
   }
+  // If it's not a regular file, scrub all permissions
+  if (type !== 0b1000) permissions = 0
   return (type << 12) + permissions
 }

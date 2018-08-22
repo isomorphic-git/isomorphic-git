@@ -127,7 +127,7 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
     switch (type) {
       case 'blob':
         await fs.write(filepath, object)
-        let stats = await fs._lstat(filepath)
+        let stats = await fs.lstat(filepath)
         index.insert({
           filepath: entrypath,
           stats,
