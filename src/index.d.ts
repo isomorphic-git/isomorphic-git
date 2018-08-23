@@ -412,6 +412,14 @@ export function remove(args: {
   filepath: string;
 }): Promise<void>;
 
+export function resetIndex(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  filepath: string,
+  ref?: string
+}): Promise<void>
+
 export function resolveRef(args: {
   core?: string;
   fs?: any;
