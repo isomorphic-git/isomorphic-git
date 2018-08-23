@@ -21,17 +21,23 @@ export async function add ({
   try {
     const fs = new FileSystem(_fs)
     const type = 'blob'
-    const object = await fs.read(path.join(dir, filepath))
+    let stats = await fs.lstat(path.join(dir, filepath))
+    if (!stats) throw new GitError(E.FileReadError, { filepath })
+    if (stats.isDirectory()) {
+      throw new GitError(E.NotImplementedFail)
+    }
+    const object = stats.isSymbolicLink()
+      ? await fs.readlink(path.join(dir, filepath))
+      : await fs.read(path.join(dir, filepath))
     if (object === null) throw new GitError(E.FileReadError, { filepath })
     const oid = await GitObjectManager.write({ fs, gitdir, type, object })
     await GitIndexManager.acquire(
       { fs, filepath: `${gitdir}/index` },
       async function (index) {
-        let stats = await fs._lstat(path.join(dir, filepath))
         index.insert({ filepath, stats, oid })
       }
     )
-    // TODO: return oid?
+    // TODO: return all oids for all files added
   } catch (err) {
     err.caller = 'git.add'
     throw err
