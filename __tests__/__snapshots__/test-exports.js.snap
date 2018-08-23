@@ -35,6 +35,7 @@ Array [
   "push",
   "readObject",
   "remove",
+  "resetIndex",
   "resolveRef",
   "sign",
   "status",
