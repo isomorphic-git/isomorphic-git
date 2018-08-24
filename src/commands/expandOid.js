@@ -2,6 +2,7 @@ import path from 'path'
 
 import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Expand and resolve a short oid into a full oid
@@ -9,9 +10,10 @@ import { FileSystem } from '../models/FileSystem.js'
  * @link https://isomorphic-git.github.io/docs/expandOid.html
  */
 export async function expandOid ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   oid
 }) {
   try {
