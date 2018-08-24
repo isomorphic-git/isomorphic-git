@@ -54,14 +54,7 @@ export async function status ({
         }
       }
     )
-    let stats = null
-    try {
-      stats = await fs._lstat(path.join(dir, filepath))
-    } catch (err) {
-      if (err.code !== 'ENOENT') {
-        throw err
-      }
-    }
+    let stats = await fs.lstat(path.join(dir, filepath))
 
     let H = treeOid !== null // head
     let I = indexEntry !== null // index
@@ -81,7 +74,7 @@ export async function status ({
         if (I && indexEntry.oid === workdirOid) {
           // and as long as our fs.stats aren't bad.
           // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
-          // because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
+          // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
           if (stats.size !== -1) {
             // We don't await this so we can return faster for one-off cases.
             GitIndexManager.acquire(

@@ -13,7 +13,9 @@
  *  Symbolic links and gitlinks have value 0 in this field.
  */
 export function normalizeMode (mode) {
-  let type = mode >> 12
+  // Note: BrowserFS will use -1 for "unknown"
+  // I need to make it non-negative for these bitshifts to work.
+  let type = mode > 0 ? mode >> 12 : 0
   // If it isn't valid, assume it as a "regular file"
   // 0100 = directory
   // 1000 = regular file
@@ -34,5 +36,7 @@ export function normalizeMode (mode) {
   } else {
     permissions = 0o644
   }
+  // If it's not a regular file, scrub all permissions
+  if (type !== 0b1000) permissions = 0
   return (type << 12) + permissions
 }

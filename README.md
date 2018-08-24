@@ -186,6 +186,7 @@ unless there is a major version bump.
 - [push](https://isomorphic-git.github.io/docs/push.html)
 - [readObject](https://isomorphic-git.github.io/docs/readObject.html)
 - [remove](https://isomorphic-git.github.io/docs/remove.html)
+- [resetIndex](https://isomorphic-git.github.io/docs/resetIndex.html)
 - [resolveRef](https://isomorphic-git.github.io/docs/resolveRef.html)
 - [sign](https://isomorphic-git.github.io/docs/sign.html)
 - [status](https://isomorphic-git.github.io/docs/status.html)

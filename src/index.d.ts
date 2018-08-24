@@ -390,6 +390,7 @@ export function push(args: {
   dir: string;
   gitdir?: string;
   ref?: string;
+  remoteRef?: string;
   remote?: string;
   url?: string;
   corsProxy?: string;
@@ -418,6 +419,14 @@ export function remove(args: {
   gitdir?: string;
   filepath: string;
 }): Promise<void>;
+
+export function resetIndex(args: {
+  fs: any,
+  dir: string,
+  gitdir?: string,
+  filepath: string,
+  ref?: string
+}): Promise<void>
 
 export function resolveRef(args: {
   core?: string;

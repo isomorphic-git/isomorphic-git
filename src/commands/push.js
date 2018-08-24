@@ -27,6 +27,7 @@ export async function push ({
   fs: _fs = cores.get(core).get('fs'),
   emitter,
   ref,
+  remoteRef,
   remote = 'origin',
   url,
   force = false,
@@ -76,9 +77,27 @@ export async function push ({
       finish: httpRemote.refs.values()
     })
     let objects = await listObjects({ fs, gitdir, oids: commits })
-
+    let fullRemoteRef
+    if (!remoteRef) {
+      fullRemoteRef = fullRef
+    } else {
+      try {
+        fullRemoteRef = await GitRefManager.expandAgainstMap({
+          ref: remoteRef,
+          map: httpRemote.refs
+        })
+      } catch (err) {
+        if (err.code === E.ExpandRefError) {
+          // The remote reference doesn't exist yet.
+          // If it is fully specified, use that value. Otherwise, treat it as a branch.
+          fullRemoteRef = remoteRef.startsWith('refs/') ? remoteRef : `refs/heads/${remoteRef}`
+        } else {
+          throw err
+        }
+      }
+    }
     let oldoid =
-      httpRemote.refs.get(fullRef) || '0000000000000000000000000000000000000000'
+      httpRemote.refs.get(fullRemoteRef) || '0000000000000000000000000000000000000000'
     if (!force) {
       // Is it a tag that already exists?
       if (
@@ -98,7 +117,7 @@ export async function push ({
     }
     let packstream = await GitRemoteConnection.sendReceivePackRequest({
       capabilities: ['report-status', 'side-band-64k', `agent=${pkg.agent}`],
-      triplets: [{ oldoid, oid, fullRef }]
+      triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
     pack({
       fs,

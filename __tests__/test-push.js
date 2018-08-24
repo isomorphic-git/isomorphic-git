@@ -53,4 +53,23 @@ describe('push', () => {
       expect(res.ok[1]).toBe('refs/heads/master')
     }
   )
+  ;(process.browser ? it : xit)(
+    'push to karma-git-http-server-middleware with ref !== remoteRef',
+    async () => {
+      // Setup
+      let { fs, gitdir } = await makeFixture('test-push')
+      plugins.set('fs', fs)
+      // Test
+      let res = await push({
+        gitdir,
+        remote: 'karma',
+        ref: 'master',
+        remoteRef: 'foobar'
+      })
+      expect(res).toBeTruthy()
+      expect(res.ok).toBeTruthy()
+      expect(res.ok[0]).toBe('unpack')
+      expect(res.ok[1]).toBe('refs/heads/foobar')
+    }
+  )
 })
