@@ -166,6 +166,7 @@ unless there is a major version bump.
 - [commit](https://isomorphic-git.github.io/docs/commit.html)
 - [config](https://isomorphic-git.github.io/docs/config.html)
 - [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
+- [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
 - [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
 - [deleteBranch](https://isomorphic-git.github.io/docs/deleteBranch.html)
 - [deleteRemote](https://isomorphic-git.github.io/docs/deleteRemote.html)

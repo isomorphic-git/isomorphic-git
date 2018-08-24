@@ -86,6 +86,50 @@ export class GitObjectManager {
     let oid = shasum(buffer)
     return oid
   }
+  static async expandOid ({ fs: _fs, gitdir, oid: short }) {
+    const fs = new FileSystem(_fs)
+    const prefix = short.slice(0, 2)
+
+    // Iterate through all the loose objects
+    const objectsSuffixes = await fs.readdir(`${gitdir}/objects/${prefix}`)
+    const results = objectsSuffixes
+      .map((suffix) => `${prefix}${suffix}`)
+      .filter((_oid) => _oid.startsWith(short))
+
+    // Iterate through all the packfiles as well
+    // Curry the current read method so that the packfile un-deltification
+    // process can acquire external ref-deltas.
+    const getExternalRefDelta = oid =>
+      GitObjectManager.read({ fs: _fs, gitdir, oid })
+    // Iterate through all the .pack files
+    let list = await fs.readdir(path.join(gitdir, '/objects/pack'))
+    list = list.filter(x => x.endsWith('.pack'))
+    for (let filename of list) {
+      // Try to get the packfile from the in-memory cache
+      let p = PackfileCache.get(filename)
+      const packFile = `${gitdir}/objects/pack/${filename}`
+      if (!p) {
+        p = GitObjectManager.loadPack(fs, packFile, getExternalRefDelta)
+        PackfileCache.set(filename, p)
+      }
+      p = await p
+      // Search through the list of oids in the packfile
+      for (let oid of p.offsets.keys()) {
+        if (oid.startsWith(short)) results.push(oid)
+      }
+    }
+
+    if (results.length === 1) {
+      return results[0]
+    }
+    if (results.length > 1) {
+      throw new GitError(E.AmbiguousShortOid, {
+        short,
+        matches: results.join(', ')
+      })
+    }
+    throw new GitError(E.ShortOidNotFound, { short })
+  }
 
   static async write ({ fs: _fs, gitdir, type, object }) {
     const fs = new FileSystem(_fs)

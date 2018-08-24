@@ -75,7 +75,9 @@ const messages = translate({
   PluginUndefined: `A command required the "{ plugin }" plugin but it was undefined.`,
   CoreNotFound: `No plugin core with the name "{ core }" is registered.`,
   PluginSchemaViolation: `Schema check failed for "{ plugin }" plugin; missing { method } method.`,
-  PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`
+  PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`,
+  AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
+  ShortOidNotFound: `Could not find an object matching "{ short }".`
 })
 
 export const E = {
@@ -141,7 +143,9 @@ export const E = {
   PluginUndefined: `PluginUndefined`,
   CoreNotFound: `CoreNotFound`,
   PluginSchemaViolation: `PluginSchemaViolation`,
-  PluginUnrecognized: `PluginUnrecognized`
+  PluginUnrecognized: `PluginUnrecognized`,
+  AmbiguousShortOid: `AmbiguousShortOid`,
+  ShortOidNotFound: `ShortOidNotFound`
 }
 
 export class GitError extends Error {
