@@ -17,6 +17,7 @@ Array [
   "currentBranch",
   "deleteBranch",
   "deleteRemote",
+  "expandOid",
   "expandRef",
   "fetch",
   "findRoot",

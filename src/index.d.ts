@@ -232,6 +232,14 @@ export function expandRef(args: {
   ref: string;
 }): Promise<string>;
 
+export function expandOid(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  oid: string;
+}): Promise<string>;
+
 export function fetch(args: {
   core?: string;
   fs?: any;
