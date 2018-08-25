@@ -37,6 +37,7 @@ export * from './commands/statusMatrix'
 export * from './commands/verify'
 export * from './commands/version'
 export * from './commands/walkBeta1'
+export * from './commands/writeObject'
 
 export { WORKDIR } from './models/GitWalkerFs'
 export { STAGE } from './models/GitWalkerIndex'
