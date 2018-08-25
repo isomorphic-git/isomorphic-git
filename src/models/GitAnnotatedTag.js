@@ -96,4 +96,8 @@ ${obj.signature}`
     )
     return normalizeNewlines(signature)
   }
+
+  toObject () {
+    return Buffer.from(this._tag, 'utf8')
+  }
 }

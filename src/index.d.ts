@@ -472,3 +472,15 @@ export function verify(args: {
 }): Promise<false | Array<string>>;
 
 export function version(): string;
+
+export function writeObject(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  type?: 'blob' | 'tree' | 'commit' | 'tag';
+  object: Buffer | CommitDescription | TreeDescription | TagDescription;
+  format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
+  oid?: string;
+  encoding?: string;
+}): Promise<string>;

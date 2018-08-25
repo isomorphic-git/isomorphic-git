@@ -5,6 +5,7 @@ import { compareStats } from '../utils/compareStats.js'
 import { log } from '../utils/log.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
+import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject.js'
 
@@ -77,7 +78,7 @@ export class GitWalkerFs {
         if (!stage || compareStats(entry, stage)) {
           log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
           if (!entry.content) await entry.populateContent()
-          oid = await GitObject.hash({ type: 'blob', object: entry.content })
+          oid = shasum(GitObject.wrap({ type: 'blob', object: entry.content }))
           if (stage && oid === stage.oid) {
             index.insert({
               filepath: entry.fullpath,
