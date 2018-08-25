@@ -8,28 +8,24 @@ import { E, GitError } from '../models/GitError.js'
 
 import { StreamReader } from './StreamReader.js'
 
-export function listpack (stream) {
-  var onData = null
+export async function listpack (stream, onData) {
   let reader = new StreamReader(stream)
-  // Cheap-o off-brand "stream"
-  return {
-    on (event, callback) {
-      if (event === 'data') onData = callback
-      _listpack(reader, onData)
-    }
-  }
-}
-
-async function _listpack (reader, push) {
   let hash = new Hash()
   let PACK = await reader.read(4)
   hash.update(PACK)
+  PACK = PACK.toString('utf8')
+  if (PACK !== 'PACK') throw new GitError(E.InternalFail, { message: `Invalid PACK header '${PACK}'` })
+
   let version = await reader.read(4)
   hash.update(version)
   version = version.readUInt32BE(0)
+  if (version !== 2) throw new GitError(E.InternalFail, { message: `Invalid packfile version: ${version}` })
+
   let numObjects = await reader.read(4)
   hash.update(numObjects)
   numObjects = numObjects.readUInt32BE(0)
+  // If (for some godforsaken reason) this is an empty packfile, abort now.
+  if (numObjects < 1) return
 
   while (!reader.eof() && numObjects--) {
     let offset = reader.tell()
@@ -41,7 +37,7 @@ async function _listpack (reader, push) {
       inflator.push(chunk, false)
       if (inflator.err) {
         throw new GitError(E.InternalFail, {
-          message: inflator.msg
+          message: `Pako error: ${inflator.msg}`
         })
       }
       if (inflator.result) {
@@ -56,7 +52,7 @@ async function _listpack (reader, push) {
         let buf = await reader.read(chunk.length - inflator.strm.avail_in)
         hash.update(buf)
         let end = reader.tell()
-        push({
+        onData({
           data: inflator.result,
           type,
           num: numObjects,
