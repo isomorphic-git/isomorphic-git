@@ -59,7 +59,13 @@ export class GitObjectManager {
     if (format === 'wrapped') {
       return { format: 'wrapped', object: buffer, source }
     }
-    let { type, object } = GitObject.unwrap({ oid, buffer })
+    let sha = shasum(buffer)
+    if (sha !== oid) {
+      throw new GitError(E.InternalFail, {
+        message: `SHA check failed! Expected ${oid}, computed ${sha}`
+      })
+    }
+    let { object, type } = GitObject.unwrap(buffer)
     if (format === 'content') return { type, format: 'content', object, source }
   }
   static async loadPack (fs, filename, getExternalRefDelta) {
@@ -77,14 +83,7 @@ export class GitObjectManager {
     return p
   }
   static async hash ({ gitdir, type, object }) {
-    let buffer = Buffer.concat([
-      Buffer.from(type + ' '),
-      Buffer.from(object.byteLength.toString()),
-      Buffer.from([0]),
-      Buffer.from(object)
-    ])
-    let oid = shasum(buffer)
-    return oid
+    return shasum(GitObject.wrap({ type, object }))
   }
   static async expandOid ({ fs: _fs, gitdir, oid: short }) {
     const fs = new FileSystem(_fs)
@@ -131,15 +130,20 @@ export class GitObjectManager {
     throw new GitError(E.ShortOidNotFound, { short })
   }
 
-  static async write ({ fs: _fs, gitdir, type, object }) {
+  static async write ({ fs: _fs, gitdir, type, object, format = 'content', oid }) {
     const fs = new FileSystem(_fs)
-    let { buffer, oid } = GitObject.wrap({ type, object })
-    let file = Buffer.from(pako.deflate(buffer))
+    if (format !== 'deflated') {
+      if (format !== 'wrapped') {
+        object = GitObject.wrap({ type, object })
+      }
+      oid = shasum(object)
+      object = Buffer.from(pako.deflate(object))
+    }
     let filepath = `${gitdir}/objects/${oid.slice(0, 2)}/${oid.slice(2)}`
     // Don't overwrite existing git objects - this helps avoid EPERM errors.
     // Although I don't know how we'd fix corrupted objects then. Perhaps delete them
     // on read?
-    if (!await fs.exists(filepath)) await fs.write(filepath, file)
+    if (!await fs.exists(filepath)) await fs.write(filepath, object)
     return oid
   }
 }

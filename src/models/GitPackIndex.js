@@ -273,7 +273,7 @@ export class GitPackIndex {
         timeByDepth[p.readDepth] += time
         objectsByDepth[p.readDepth] += 1
         marky.mark('hash')
-        let oid = GitObject.hash({ type, object })
+        let oid = shasum(GitObject.wrap({ type, object }))
         times.hash += marky.stop('hash').duration
         o.oid = oid
         hashes.push(oid)

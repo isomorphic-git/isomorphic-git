@@ -64,14 +64,15 @@ Isomorphic-git aims for 100% interoperability with the canonical git implementat
 I've tried carefully to design the API so it is easy to use all the features, without paying a penalty in bundle size.
 By providing functionality as separate functions instead of an object oriented API, code bundlers like Webpack will only include the functionality your application actually uses. (Or at least that's the goal.)
 
-I am working on adding type definitions so you can enjoy static type-checking and intelligent code completion in editors like [CodeSandbox](https://codesandbox.io).
+The project includes type definitions so you can enjoy static type-checking and intelligent code completion in editors like VS Code and [CodeSandbox](https://codesandbox.io).
 
 ## Getting Started
 
 The "isomorphic" in `isomorphic-git` means it works equally well on the server or the browser.
 That's tricky to do since git uses the file system, and browsers don't have an `fs` module.
 So rather than relying on the `fs` module, `isomorphic-git` is BYOFS (Bring Your Own File System).
-When creating a new Git object, you pass it the `fs` module to use.
+Before you can use most `isomorphic-git` functions, you need to set the `fs` module
+via the plugin system.
 
 If you're only using `isomorphic-git` in Node, you can just use the native `fs` module.
 
@@ -83,7 +84,7 @@ git.plugins.set('fs', fs)
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
 At the time of writing, the most complete option is [BrowserFS](https://github.com/jvilk/BrowserFS).
-It has a few more steps involved to set up than in Node, as seen below:
+Compared to Node, there is an extra setup step to configure BrowserFS, as seen below:
 
 ```html
 <script src="https://unpkg.com/browserfs"></script>
@@ -97,7 +98,8 @@ BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
 </script>
 ```
 
-Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystems on top of a read-only filesystem. You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
+Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystem on top of a read-only filesystem.
+You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck using the IndexedDB backend I suggested above.
 
 View the full [Getting Started guide](https://isomorphic-git.github.io/docs/quickstart.html) on the docs website.
 
@@ -193,38 +195,37 @@ unless there is a major version bump.
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
+- [writeObject](https://isomorphic-git.github.io/docs/writeObject.html)
 
 ### plugins
 - [fs](https://isomorphic-git.github.io/docs/plugin_fs.html)
 
-## Developing `isomorphic-git`
+## Community
 
-I have written this library as a series of layers that build upon one another and should tree-shake very well:
+Share your questions and ideas with us! We love that.
+You can find us in our [Gitter chatroom](https://gitter.im/isomorphic-git/Lobby) or just create an issue here on Github!
+We are also [@IsomorphicGit](https://twitter.com/IsomorphicGit) on Twitter.
 
-### Commands
+## Contributing to `isomorphic-git`
 
-Each command is available as its own file, so you are able to import individual commands
-if you only need a few in order to optimize your bundle size.
+The development setup is similar to that of a large web application.
+The main difference is the ridiculous amount of hacks involved in the tests.
+We use Facebook's [Jest](https://jestjs.io) for testing, which make doing TDD fast and fun,
+but we also used custom hacks so that the same
+tests will also run in the browser using [Jasmine](https://jasmine.github.io/) via [Karma](https://karma-runner.github.io).
+We even have our own [karma plugin](https://github.com/isomorphic-git/karma-git-http-server-middleware) for serving
+git repository test fixtures!
 
-### Managers
+You'll need [Node.js](https://nodejs.org) installed, but everything else is a devDependency.
 
-Managers are a level above models. They take care of implementation performance details like
+```sh
+git clone https://github.com/isomorphic-git/isomorphic-git
+cd isomorphic-git
+npm install
+npm test
+```
 
-- batching reads to and from the file system
-- in-process concurrency locks
-- lockfiles
-- caching files and invalidating cached results
-- reusing objects
-- object memory pools
-
-### Models and Utils
-
-Models and utils are the lowest level building blocks.
-Models generally have very few or no dependencies except for `'buffer'`.
-This makes them portable to many different environments so they can be a useful lowest common denominator.
-
-Utils are basically miscellaneous functions.
-Some are convenience wrappers for common filesystem operations.
+Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions.
 
 ## Who is using isomorphic-git?
 
@@ -232,6 +233,7 @@ Some are convenience wrappers for common filesystem operations.
 - [git-app-manager](https://git-app-manager-tcibxepsta.now.sh) - install "unhosted" websites locally by git cloning them
 - [GIT Web Terminal](https://jcubic.github.io/git/)
 - [Next Editor](https://next-editor.app/)
+- [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git)
 
 ## Similar projects
 

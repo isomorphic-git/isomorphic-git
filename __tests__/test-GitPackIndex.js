@@ -110,7 +110,7 @@ describe('GitPackIndex', () => {
     })
     expect(type).toBe('commit')
     expect(object.toString('utf8')).toMatchSnapshot()
-    let { oid } = GitObject.wrap({ type, object })
+    let oid = shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('637c4e69d85e0dcc18898ec251377453d0891585')
   })
   it('read deltified object', async () => {
@@ -134,7 +134,7 @@ describe('GitPackIndex', () => {
     })
     expect(type).toBe('blob')
     expect(object.toString('utf8')).toMatchSnapshot()
-    let { oid } = GitObject.wrap({ type, object })
+    let oid = shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('7fb539a8e8488c3fd2793e7dda8a44693e25cce1')
   })
 })
