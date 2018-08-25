@@ -37,6 +37,7 @@ export class GitObjectManager {
         // console.log(p)
         // If the packfile DOES have the oid we're looking for...
         p = await p
+        if (p.error) throw new GitError(E.InternalFail, { message: p.error })
         if (p.offsets.has(oid)) {
           // Get the resolved git object from the packfile
           if (!p.pack) {
@@ -77,6 +78,10 @@ export class GitObjectManager {
     }
     // If the .idx file isn't available, generate one.
     const pack = await fs.read(filename)
+    // Sanity check. 12 byte header + 20 byte shasum
+    if (pack.length < 32) {
+      return { error: `Unable to load packfile ${filename}. It's suspiciously short - try deleting it; it may be corrupt.` }
+    }
     const p = await GitPackIndex.fromPack({ pack, getExternalRefDelta })
     // Save .idx file
     fs.write(idxName, p.toBuffer())
@@ -112,6 +117,7 @@ export class GitObjectManager {
         PackfileCache.set(filename, p)
       }
       p = await p
+      if (p.error) throw new GitError(E.InternalFail, { message: p.error })
       // Search through the list of oids in the packfile
       for (let oid of p.offsets.keys()) {
         if (oid.startsWith(short)) results.push(oid)
