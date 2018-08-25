@@ -277,6 +277,22 @@ async function fetchPackfile ({
   }
   // We need this value later for the `clone` command.
   response.HEAD = remoteHTTP.symrefs.get('HEAD')
+  // AWS CodeCommit doesn't list HEAD as a symref, but we can reverse engineer it
+  // Find the SHA of the branch called HEAD
+  if (response.HEAD === undefined) {
+    let { oid } = GitRefManager.resolveAgainstMap({
+      ref: 'HEAD',
+      map: remoteHTTP.refs
+    })
+    // Use the name of the first branch that's not called HEAD that has
+    // the same SHA as the branch called HEAD.
+    for (let [key, value] of remoteHTTP.refs.entries()) {
+      if (key !== 'HEAD' && value === oid) {
+        response.HEAD = key
+        break
+      }
+    }
+  }
   response.FETCH_HEAD = oid
   return response
 }
