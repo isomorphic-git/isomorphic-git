@@ -11,6 +11,8 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { cores } from '../utils/plugins.js'
+import { pkg } from '../utils/pkg.js'
+import { filterCapabilities } from '../utils/filterCapabilities.js'
 
 import { config } from './config'
 
@@ -182,13 +184,17 @@ async function fetchPackfile ({
     map: remoteHTTP.refs
   })
   // Assemble the application/x-git-upload-pack-request
-  const capabilities = [
-    'multi_ack_detailed',
-    'no-done',
-    'side-band-64k',
-    'thin-pack',
-    'ofs-delta'
-  ]
+  const capabilities = filterCapabilities(
+    [...remoteHTTP.capabilities],
+    [
+      'multi_ack_detailed',
+      'no-done',
+      'side-band-64k',
+      'thin-pack',
+      'ofs-delta',
+      `agent=${pkg.agent}`
+    ]
+  )
   if (relative) capabilities.push('deepen-relative')
   // Start requesting oids from the remote by their SHAs
   let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
@@ -277,6 +283,22 @@ async function fetchPackfile ({
   }
   // We need this value later for the `clone` command.
   response.HEAD = remoteHTTP.symrefs.get('HEAD')
+  // AWS CodeCommit doesn't list HEAD as a symref, but we can reverse engineer it
+  // Find the SHA of the branch called HEAD
+  if (response.HEAD === undefined) {
+    let { oid } = GitRefManager.resolveAgainstMap({
+      ref: 'HEAD',
+      map: remoteHTTP.refs
+    })
+    // Use the name of the first branch that's not called HEAD that has
+    // the same SHA as the branch called HEAD.
+    for (let [key, value] of remoteHTTP.refs.entries()) {
+      if (key !== 'HEAD' && value === oid) {
+        response.HEAD = key
+        break
+      }
+    }
+  }
   response.FETCH_HEAD = oid
   return response
 }

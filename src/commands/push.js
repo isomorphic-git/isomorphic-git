@@ -8,6 +8,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { filterCapabilities } from '../utils/filterCapabilities.js'
 
 import { config } from './config.js'
 import { isDescendent } from './isDescendent.js'
@@ -115,8 +116,14 @@ export async function push ({
         throw new GitError(E.PushRejectedNonFastForward, {})
       }
     }
+    // We can only safely use capabilities that the server also understands.
+    // For instance, AWS CodeCommit aborts a push if you include the `agent`!!!
+    const capabilities = filterCapabilities(
+      [...httpRemote.capabilities],
+      ['report-status', 'side-band-64k', `agent=${pkg.agent}`]
+    )
     let packstream = await GitRemoteConnection.sendReceivePackRequest({
-      capabilities: ['report-status', 'side-band-64k', `agent=${pkg.agent}`],
+      capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
     pack({
