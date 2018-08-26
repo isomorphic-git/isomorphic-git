@@ -6,6 +6,7 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  * @link https://isomorphic-git.github.io/docs/getRemoteInfo.html
  */
 export async function getRemoteInfo ({
+  core = 'default',
   corsProxy,
   url,
   authUsername,
@@ -20,6 +21,7 @@ export async function getRemoteInfo ({
   try {
     let auth = { username, password, token, oauth2format }
     const remote = await GitRemoteHTTP.discover({
+      core,
       corsProxy,
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,

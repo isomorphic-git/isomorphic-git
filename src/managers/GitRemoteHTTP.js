@@ -5,6 +5,7 @@ import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
 import { pkg } from '../utils/pkg.js'
+import { cores } from '../utils/plugins.js'
 
 import { GitRemoteConnection } from './GitRemoteConnection.js'
 
@@ -12,7 +13,7 @@ export class GitRemoteHTTP {
   static async capabilities () {
     return ['discover', 'connect']
   }
-  static async discover ({ corsProxy, service, url, noGitSuffix, auth }) {
+  static async discover ({ core, corsProxy, service, url, noGitSuffix, auth }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     if (corsProxy) {
@@ -28,7 +29,8 @@ export class GitRemoteHTTP {
     let res = await pify(simpleGet)({
       method: 'GET',
       url: `${url}/info/refs?service=${service}`,
-      headers
+      headers,
+      agent: cores.get(core).get('httpAgent')
     })
     if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
@@ -38,7 +40,7 @@ export class GitRemoteHTTP {
     }
     return GitRemoteConnection.receiveInfoRefs(service, res)
   }
-  static async connect ({ corsProxy, service, url, noGitSuffix, auth, stream }) {
+  static async connect ({ core, corsProxy, service, url, noGitSuffix, auth, stream }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     if (corsProxy) {
@@ -56,7 +58,8 @@ export class GitRemoteHTTP {
       method: 'POST',
       url: `${url}/${service}`,
       body: stream,
-      headers
+      headers,
+      agent: cores.get(core).get('httpAgent')
     })
     if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {

@@ -65,6 +65,7 @@ export async function push ({
     let auth = { username, password, token, oauth2format }
     let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     let httpRemote = await GitRemoteHTTP.discover({
+      core,
       corsProxy,
       service: 'git-receive-pack',
       url,
@@ -134,6 +135,7 @@ export async function push ({
     })
     let { packfile, progress } = await GitSideBand.demux(
       await GitRemoteHTTP.connect({
+        core,
         corsProxy,
         service: 'git-receive-pack',
         url,

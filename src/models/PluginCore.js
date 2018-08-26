@@ -1,7 +1,8 @@
 import { GitError, E } from './GitError'
 
 const pluginSchemas = {
-  'fs': ['lstat', 'mkdir', 'readdir', 'readFile', 'rmdir', 'stat', 'unlink', 'writeFile']
+  'fs': ['lstat', 'mkdir', 'readdir', 'readFile', 'rmdir', 'stat', 'unlink', 'writeFile'],
+  'httpAgent': [] // It's complicated.
 }
 
 function verifySchema (key, value) {
@@ -20,6 +21,9 @@ export class PluginCore extends Map {
     verifySchema(key, value)
     if (key === 'fs') {
       // There can be only one.
+      super.set(key, value)
+    }
+    if (key === 'httpAgent') {
       super.set(key, value)
     }
   }
