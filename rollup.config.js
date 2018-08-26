@@ -40,4 +40,4 @@ const nodeConfig = input => ({
 
 const inputs = ['index.js', 'internal-apis.js']
 
-export default [...inputs.map(moduleConfig), ...inputs.map(nodeConfig)]
+export default [...inputs.map(nodeConfig), ...inputs.map(moduleConfig)]
