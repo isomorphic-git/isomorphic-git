@@ -4,6 +4,7 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 import { readObject } from './readObject'
 
@@ -13,9 +14,10 @@ import { readObject } from './readObject'
  * @link https://isomorphic-git.github.io/docs/resetIndex.html
  */
 export async function resetIndex ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   filepath,
   ref = 'HEAD'
 }) {
