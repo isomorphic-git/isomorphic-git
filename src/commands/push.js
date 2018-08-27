@@ -64,13 +64,15 @@ export async function push ({
     let oid = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
     let auth = { username, password, token, oauth2format }
     let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
-    let httpRemote = await GitRemoteHTTP.discover({
+    const httpRemote = await GitRemoteHTTP.discover({
+      core,
       corsProxy,
       service: 'git-receive-pack',
       url,
       noGitSuffix,
       auth
     })
+    auth = httpRemote.auth // hack to get new credentials from CredentialManager API
     let commits = await listCommits({
       fs,
       gitdir,

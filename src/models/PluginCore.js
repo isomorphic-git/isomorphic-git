@@ -28,4 +28,10 @@ export class PluginCore extends Map {
       super.set(key, value)
     }
   }
+  get (key) {
+    if (!super.has(key)) {
+      throw new GitError(E.PluginUndefined, { plugin: key })
+    }
+    return super.get(key)
+  }
 }
