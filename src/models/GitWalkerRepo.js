@@ -1,6 +1,6 @@
 import { path } from '../utils/path.js'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { readObject } from '../managers/GitObjectManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { resolveTree } from '../utils/resolveTree.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
@@ -46,7 +46,7 @@ export class GitWalkerRepo {
     if (!obj) throw new Error(`No obj for ${filepath}`)
     let oid = obj.oid
     if (!oid) throw new Error(`No oid for obj ${JSON.stringify(obj)}`)
-    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    let { type, object } = await readObject({ fs, gitdir, oid })
     if (type === 'blob') return null
     if (type !== 'tree') {
       throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
@@ -81,7 +81,7 @@ export class GitWalkerRepo {
     if (!obj) throw new Error(`No obj for ${entry.fullpath}`)
     let oid = obj.oid
     if (!oid) throw new Error(`No oid for entry ${JSON.stringify(obj)}`)
-    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    let { type, object } = await readObject({ fs, gitdir, oid })
     if (type === 'tree') {
       throw new Error(`EISDIR: illegal operation on a directory, read`)
     }

@@ -1,10 +1,10 @@
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { readObject } from '../managers/GitObjectManager.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 
 export async function logCommit ({ fs, gitdir, oid, signing }) {
   try {
-    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    let { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit') {
       throw new GitError(E.ObjectTypeAssertionFail, {
         oid,

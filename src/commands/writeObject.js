@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { writeObject as _writeObject } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -47,7 +47,7 @@ export async function writeObject ({
     }
     // GitObjectManager does not know how to parse content, so we tweak that parameter before passing it.
     const _format = format === 'parsed' ? 'content' : format
-    oid = await GitObjectManager.write({
+    oid = await _writeObject({
       fs,
       gitdir,
       type,
@@ -57,7 +57,7 @@ export async function writeObject ({
     })
     return oid
   } catch (err) {
-    err.caller = 'git.readObject'
+    err.caller = 'git.writeObject'
     throw err
   }
 }

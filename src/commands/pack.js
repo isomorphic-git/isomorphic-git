@@ -2,7 +2,7 @@ import pako from 'pako'
 import path from 'path'
 import Hash from 'sha.js/sha1'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { readObject } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { padHex } from '../utils/padHex.js'
 import { cores } from '../utils/plugins.js'
@@ -55,7 +55,7 @@ export async function pack ({
   // Write a 4 byte (32-bit) int
   write(padHex(8, oids.length), 'hex')
   for (let oid of oids) {
-    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    let { type, object } = await readObject({ fs, gitdir, oid })
     writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum

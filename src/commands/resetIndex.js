@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { hash } from '../managers/GitObjectManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { cores } from '../utils/plugins.js'
@@ -49,7 +49,7 @@ export async function resetIndex ({
     const object = await fs.read(path.join(dir, filepath))
     if (object) {
       // ... and has the same hash as the desired state...
-      workdirOid = await GitObjectManager.hash({
+      workdirOid = await hash({
         gitdir,
         type: 'blob',
         object

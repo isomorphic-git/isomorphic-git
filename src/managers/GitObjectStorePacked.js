@@ -66,7 +66,6 @@ export async function write ({ fs: _fs, gitdir, type, object, format, oid }) {
   // Not supported
 }
 
-
 async function loadPack (fs, filename, getExternalRefDelta) {
   // If not there, load it from a .idx file
   const idxName = filename.replace(/pack$/, 'idx')
