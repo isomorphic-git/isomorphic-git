@@ -78,7 +78,7 @@ Qixh2bmPgr3h9nxq2Dmn
     "tree": "e0b8f3574060ee24e03e4af3896f65dd208a60cc",
   },
   "oid": "e10ebb90d03eaacca84de1af0a59b444232da99e",
-  "source": "./objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e",
+  "source": "objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e",
   "type": "commit",
 }
 `;
