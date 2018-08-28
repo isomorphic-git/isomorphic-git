@@ -36,7 +36,7 @@ export class GitRemoteHTTP {
       const credentialManager = cores.get(core).get('credentialManager')
       let {protocol, host} = new URL(url)
       protocol = protocol.trimEnd(':') // sheesh
-      auth = await credentialManager.fill({protocol, host})
+      auth = await credentialManager.fill({ protocol, host })
       let _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
@@ -46,6 +46,12 @@ export class GitRemoteHTTP {
         url: `${url}/info/refs?service=${service}`,
         headers
       })
+      // Tell credential manager if the credentials were no good
+      if (res.statusCode === 401) {
+        await credentialManager.rejected({ protocol, host, auth })
+      } else if (res.statusCode === 200) {
+        await credentialManager.approved({ protocol, host, auth })
+      }
     }
     if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
