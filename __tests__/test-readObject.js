@@ -52,7 +52,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('commit')
     expect(ref.source).toBe(
-      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+      'objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
     )
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
@@ -69,7 +69,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('wrapped')
     expect(ref.type).toEqual(undefined)
     expect(ref.source).toBe(
-      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+      'objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
     )
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
@@ -86,7 +86,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('deflated')
     expect(ref.type).toEqual(undefined)
     expect(ref.source).toBe(
-      './objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
+      'objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
     )
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
@@ -103,7 +103,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('commit')
     expect(ref.source).toBe(
-      './objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
@@ -121,7 +121,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('parsed')
     expect(ref.type).toEqual('blob')
     expect(ref.source).toBe(
-      './objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     expect(ref.object).toMatchSnapshot()
   })
@@ -139,7 +139,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('blob')
     expect(ref.source).toBe(
-      './objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     expect(ref.oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
     expect(ref.object.toString('hex')).toMatchSnapshot()
@@ -174,7 +174,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('parsed')
     expect(ref.type).toEqual('tree')
     expect(ref.source).toBe(
-      './objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     expect(ref.oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
     expect(ref.object).toMatchSnapshot()

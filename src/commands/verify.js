@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { readObject } from '../storage/readObject.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
@@ -24,7 +24,7 @@ export async function verify ({
   try {
     const fs = new FileSystem(_fs)
     const oid = await GitRefManager.resolve({ fs, gitdir, ref })
-    const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit') {
       throw new GitError(E.ObjectTypeAssertionInRefFail, { ref, type })
     }

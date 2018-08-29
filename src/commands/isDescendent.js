@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { readObject } from '../storage/readObject.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
@@ -47,7 +47,7 @@ export async function isDescendent ({
         throw new GitError(E.MaxSearchDepthExceeded, { depth })
       }
       let oid = queue.shift()
-      let { type, object } = await GitObjectManager.read({
+      let { type, object } = await readObject({
         fs,
         gitdir,
         oid

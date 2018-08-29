@@ -2,13 +2,14 @@ import path from 'path'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { compareStats } from '../utils/compareStats.js'
+import { hashObject } from '../utils/hashObject.js'
+import { readObject } from '../storage/readObject.js'
 import { cores } from '../utils/plugins.js'
 
 /**
@@ -65,7 +66,7 @@ export async function status ({
         return indexEntry.oid
       } else {
         let object = await fs.read(path.join(dir, filepath))
-        let workdirOid = await GitObjectManager.hash({
+        let workdirOid = await hashObject({
           gitdir,
           type: 'blob',
           object
@@ -142,7 +143,7 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
       if (path.length === 0) {
         return entry.oid
       }
-      let { type, object } = await GitObjectManager.read({
+      let { type, object } = await readObject({
         fs,
         gitdir,
         oid: entry.oid
@@ -165,7 +166,7 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
 async function getHeadTree ({ fs, gitdir }) {
   // Get the tree from the HEAD commit.
   let oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
-  let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+  let { type, object } = await readObject({ fs, gitdir, oid })
   if (type !== 'commit') {
     throw new GitError(E.ResolveCommitError, { oid })
   }
@@ -175,7 +176,7 @@ async function getHeadTree ({ fs, gitdir }) {
 }
 
 async function getTree ({ fs, gitdir, oid }) {
-  let { type, object } = await GitObjectManager.read({
+  let { type, object } = await readObject({
     fs,
     gitdir,
     oid

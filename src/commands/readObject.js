@@ -1,11 +1,11 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
+import { readObject as _readObject } from '../storage/readObject.js'
 import { resolveTree } from '../utils/resolveTree.js'
 import { cores } from '../utils/plugins.js'
 
@@ -53,7 +53,7 @@ export async function readObject ({
     }
     // GitObjectManager does not know how to parse content, so we tweak that parameter before passing it.
     const _format = format === 'parsed' ? 'content' : format
-    let result = await GitObjectManager.read({
+    let result = await _readObject({
       fs,
       gitdir,
       oid,
@@ -99,7 +99,7 @@ async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
       if (pathArray.length === 0) {
         return entry.oid
       } else {
-        let { type, object } = await GitObjectManager.read({
+        let { type, object } = await _readObject({
           fs,
           gitdir,
           oid: entry.oid

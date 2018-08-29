@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { writeObject } from '../storage/writeObject.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -94,7 +94,7 @@ export async function commit ({
           },
           message
         })
-        oid = await GitObjectManager.write({
+        oid = await writeObject({
           fs,
           gitdir,
           type: 'commit',
@@ -133,7 +133,7 @@ async function constructTree ({ fs, gitdir, inode }) {
     type: inode.type
   }))
   const tree = GitTree.from(entries)
-  let oid = await GitObjectManager.write({
+  let oid = await writeObject({
     fs,
     gitdir,
     type: 'tree',
