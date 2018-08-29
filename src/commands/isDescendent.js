@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { readObject } from '../managers/GitObjectManager.js'
+import { readObject } from '../utils/readObject.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'

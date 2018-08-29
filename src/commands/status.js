@@ -2,13 +2,14 @@ import path from 'path'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { hash, readObject } from '../managers/GitObjectManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { compareStats } from '../utils/compareStats.js'
+import { hashObject } from '../utils/hashObject.js'
+import { readObject } from '../utils/readObject.js'
 import { cores } from '../utils/plugins.js'
 
 /**
@@ -65,7 +66,7 @@ export async function status ({
         return indexEntry.oid
       } else {
         let object = await fs.read(path.join(dir, filepath))
-        let workdirOid = await hash({
+        let workdirOid = await hashObject({
           gitdir,
           type: 'blob',
           object

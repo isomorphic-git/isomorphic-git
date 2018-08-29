@@ -1,11 +1,11 @@
 import path from 'path'
 
-import { writeObject as _writeObject } from '../managers/GitObjectManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { E, GitError } from '../models/GitError.js'
+import { writeObject as _writeObject } from '../utils/writeObject.js'
 import { cores } from '../utils/plugins.js'
 
 /**
