@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { writeObject } from '../storage/writeObject.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { cores } from '../utils/plugins.js'
@@ -30,7 +30,7 @@ export async function add ({
       ? await fs.readlink(path.join(dir, filepath))
       : await fs.read(path.join(dir, filepath))
     if (object === null) throw new GitError(E.FileReadError, { filepath })
-    const oid = await GitObjectManager.write({ fs, gitdir, type, object })
+    const oid = await writeObject({ fs, gitdir, type, object })
     await GitIndexManager.acquire(
       { fs, filepath: `${gitdir}/index` },
       async function (index) {
