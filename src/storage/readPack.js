@@ -1,8 +1,8 @@
 import { GitPackIndex } from '../models/GitPackIndex.js'
 
-export const PackfileCache = new Map()
+const PackfileCache = new Map()
 
-export async function loadPack (fs, filename, getExternalRefDelta) {
+async function loadPack (fs, filename, getExternalRefDelta) {
   // If not there, load it from a .idx file
   const idxName = filename.replace(/pack$/, 'idx')
   if (await fs.exists(idxName)) {
@@ -18,5 +18,15 @@ export async function loadPack (fs, filename, getExternalRefDelta) {
   const p = await GitPackIndex.fromPack({ pack, getExternalRefDelta })
   // Save .idx file
   fs.write(idxName, p.toBuffer())
+  return p
+}
+
+export function readPack (fs, filename, getExternalRefDelta) {
+  // Try to get the packfile from the in-memory cache
+  let p = PackfileCache.get(filename)
+  if (!p) {
+    p = loadPack(fs, filename, getExternalRefDelta)
+    PackfileCache.set(filename, p)
+  }
   return p
 }

@@ -2,7 +2,7 @@ import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { PackfileCache, loadPack } from '../storage/PackfileCache.js'
+import { readPack } from '../storage/readPack.js'
 
 export async function readObjectPacked ({ fs: _fs, gitdir, oid, format = 'content', getExternalRefDelta }) {
   const fs = new FileSystem(_fs)
@@ -11,16 +11,10 @@ export async function readObjectPacked ({ fs: _fs, gitdir, oid, format = 'conten
   let list = await fs.readdir(path.join(gitdir, '/objects/pack'))
   list = list.filter(x => x.endsWith('.pack'))
   for (let filename of list) {
-    // Try to get the packfile from the in-memory cache
-    let p = PackfileCache.get(filename)
     const packFile = `${gitdir}/objects/pack/${filename}`
-    if (!p) {
-      p = loadPack(fs, packFile, getExternalRefDelta)
-      PackfileCache.set(filename, p)
-    }
-    // If the packfile DOES have the oid we're looking for...
-    p = await p
+    let p = await readPack(fs, packFile, getExternalRefDelta)
     if (p.error) throw new GitError(E.InternalFail, { message: p.error })
+    // If the packfile DOES have the oid we're looking for...
     if (p.offsets.has(oid)) {
       // Get the resolved git object from the packfile
       if (!p.pack) {
