@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { expandOid as _expandOid } from '../utils/expandOid.js'
+import { expandOid as _expandOid } from '../storage/expandOid.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { cores } from '../utils/plugins.js'
 

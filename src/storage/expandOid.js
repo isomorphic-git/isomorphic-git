@@ -1,8 +1,8 @@
-import { expandOid as expandOidLoose } from '../managers/GitObjectStoreLoose.js'
-import { expandOid as expandOidPacked } from '../managers/GitObjectStorePacked.js'
+import { expandOidLoose } from '../storage/expandOidLoose.js'
+import { expandOidPacked } from '../storage/expandOidPacked.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../utils/readObject.js'
+import { readObject } from '../storage/readObject.js'
 
 export async function expandOid ({ fs: _fs, gitdir, oid: short }) {
   const fs = new FileSystem(_fs)

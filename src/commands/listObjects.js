@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { readObject } from '../utils/readObject.js'
+import { readObject } from '../storage/readObject.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'

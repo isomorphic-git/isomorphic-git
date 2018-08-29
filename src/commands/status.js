@@ -9,7 +9,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { compareStats } from '../utils/compareStats.js'
 import { hashObject } from '../utils/hashObject.js'
-import { readObject } from '../utils/readObject.js'
+import { readObject } from '../storage/readObject.js'
 import { cores } from '../utils/plugins.js'
 
 /**

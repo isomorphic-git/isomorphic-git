@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { writeObject } from '../utils/writeObject.js'
+import { writeObject } from '../storage/writeObject.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { cores } from '../utils/plugins.js'

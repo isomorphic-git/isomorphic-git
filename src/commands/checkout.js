@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { readObject } from '../utils/readObject.js'
+import { readObject } from '../storage/readObject.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'

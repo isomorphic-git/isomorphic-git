@@ -1,4 +1,4 @@
-import { readObject } from '../utils/readObject.js'
+import { readObject } from '../storage/readObject.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'

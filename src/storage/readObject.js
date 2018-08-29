@@ -1,7 +1,7 @@
 import pako from 'pako'
 
-import { read as readLoose } from '../managers/GitObjectStoreLoose.js'
-import { read as readPacked } from '../managers/GitObjectStorePacked.js'
+import { readObjectLoose } from '../storage/readObjectLoose.js'
+import { readObjectPacked } from '../storage/readObjectPacked.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitObject } from '../models/GitObject.js'
@@ -14,10 +14,10 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
   const getExternalRefDelta = oid => readObject({ fs: _fs, gitdir, oid })
 
   // Look for it in the loose object directory.
-  let result = await readLoose({ fs, gitdir, oid })
+  let result = await readObjectLoose({ fs, gitdir, oid })
   // Check to see if it's in a packfile.
   if (!result) {
-    result = await readPacked({ fs, gitdir, oid, getExternalRefDelta })
+    result = await readObjectPacked({ fs, gitdir, oid, getExternalRefDelta })
   }
   // Finally
   if (!result) {

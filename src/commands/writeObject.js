@@ -5,7 +5,7 @@ import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { E, GitError } from '../models/GitError.js'
-import { writeObject as _writeObject } from '../utils/writeObject.js'
+import { writeObject as _writeObject } from '../storage/writeObject.js'
 import { cores } from '../utils/plugins.js'
 
 /**
