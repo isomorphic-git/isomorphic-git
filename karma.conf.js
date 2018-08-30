@@ -152,6 +152,11 @@ module.exports = function (config) {
     }
   }
 
+  // Speed things up
+  if (process.env.FAILFAST) {
+    options.reporters.push('fail-fast')
+  }
+
   if (!process.env.SAUCE_USERNAME) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
