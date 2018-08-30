@@ -52,7 +52,7 @@ module.exports = {
       size: optional('bundlesize')
     },
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
-    proxy: `(cd node_modules/cors-buster && micro --listen=tcp://0.0.0.0:9999)`,
+    proxy: `cd node_modules/@isomorphic-git/cors-proxy && micro --listen=tcp://0.0.0.0:9999`,
     test: {
       // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
       // But by default, we skip 'jest' because I decided to make it an optionalDependency after it was

@@ -22,6 +22,7 @@ describe('GitRemoteHTTP', () => {
     )
     // Test
     let remote = await GitRemoteHTTP.discover({
+      core: 'default',
       service: 'git-upload-pack',
       url: 'https://github.com/isomorphic-git/isomorphic-git'
     })
@@ -39,6 +40,7 @@ describe('GitRemoteHTTP', () => {
     )
     // Test
     let remote = await GitRemoteHTTP.discover({
+      core: 'default',
       service: 'git-upload-pack',
       url: 'http://example.dev/test-GitRemoteHTTP'
     })
@@ -54,6 +56,7 @@ describe('GitRemoteHTTP', () => {
     )
     // Test
     let remote = await GitRemoteHTTP.discover({
+      core: 'default',
       service: 'git-receive-pack',
       url: 'http://example.dev/test-GitRemoteHTTP'
     })
@@ -69,6 +72,7 @@ describe('GitRemoteHTTP', () => {
     let error = null
     try {
       await GitRemoteHTTP.discover({
+        core: 'default',
         service: 'git-receive-pack',
         url: 'https://github.com/isomorphic-git/not-there'
       })
