@@ -9,6 +9,13 @@ import { pkg } from '../utils/pkg.js'
 
 import { GitRemoteConnection } from './GitRemoteConnection.js'
 
+// Try to accomodate known CORS proxy implementations:
+// - https://jcubic.pl/proxy.php?  <-- uses query string
+// - https://cors.isomorphic-git.org  <-- uses path
+const corsProxify = (corsProxy, url) => corsProxy.endsWith('?')
+  ? `${corsProxy}${url}`
+  : `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
+
 export class GitRemoteHTTP {
   static async capabilities () {
     return ['discover', 'connect']
@@ -16,8 +23,9 @@ export class GitRemoteHTTP {
   static async discover ({ core, corsProxy, service, url, noGitSuffix, auth }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
+    let {protocol, host} = new URL(url)
     if (corsProxy) {
-      url = `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
+      url = corsProxify(corsProxy, url)
     }
     let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
@@ -34,7 +42,6 @@ export class GitRemoteHTTP {
     if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
       // Acquire credentials and try again
       const credentialManager = cores.get(core).get('credentialManager')
-      let {protocol, host} = new URL(url)
       protocol = protocol.trimEnd(':') // sheesh
       auth = await credentialManager.fill({ protocol, host })
       let _auth = calculateBasicAuthUsernamePasswordPair(auth)
@@ -67,7 +74,7 @@ export class GitRemoteHTTP {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     if (corsProxy) {
-      url = `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
+      url = corsProxify(corsProxy, url)
     }
     let headers = {}
     headers['content-type'] = `application/x-${service}-request`
