@@ -21,9 +21,9 @@ export class GitRemoteHTTP {
     return ['discover', 'connect']
   }
   static async discover ({ core, corsProxy, service, url, noGitSuffix, auth }) {
+    const _origUrl = url
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
-    let {protocol, host} = new URL(url)
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
@@ -42,8 +42,7 @@ export class GitRemoteHTTP {
     if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
       // Acquire credentials and try again
       const credentialManager = cores.get(core).get('credentialManager')
-      protocol = protocol.trimEnd(':') // sheesh
-      auth = await credentialManager.fill({ protocol, host })
+      auth = await credentialManager.fill({ url: _origUrl })
       let _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
@@ -55,9 +54,9 @@ export class GitRemoteHTTP {
       })
       // Tell credential manager if the credentials were no good
       if (res.statusCode === 401) {
-        await credentialManager.rejected({ protocol, host, auth })
+        await credentialManager.rejected({ url: _origUrl, auth })
       } else if (res.statusCode === 200) {
-        await credentialManager.approved({ protocol, host, auth })
+        await credentialManager.approved({ url: _origUrl, auth })
       }
     }
     if (res.statusCode !== 200) {
