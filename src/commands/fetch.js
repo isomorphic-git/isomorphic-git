@@ -55,6 +55,7 @@ export async function fetch ({
     }
     const fs = new FileSystem(_fs)
     let response = await fetchPackfile({
+      core,
       gitdir,
       fs,
       ref,
@@ -117,6 +118,7 @@ export async function fetch ({
 }
 
 async function fetchPackfile ({
+  core,
   gitdir,
   fs: _fs,
   ref,
@@ -159,12 +161,14 @@ async function fetchPackfile ({
   let auth = { username, password, token, oauth2format }
   let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   let remoteHTTP = await GitRemoteHTTP.discover({
+    core,
     corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,
     auth
   })
+  auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
     throw new GitError(E.RemoteDoesNotSupportShallowFail)
