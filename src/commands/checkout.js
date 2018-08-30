@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { readObject } from '../storage/readObject.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -65,7 +65,7 @@ export async function checkout ({
     }
     let commit = {}
     try {
-      commit = await GitObjectManager.read({ fs, gitdir, oid })
+      commit = await readObject({ fs, gitdir, oid })
     } catch (err) {
       throw new GitError(E.CommitNotFetchedError, { ref, oid })
     }
@@ -79,7 +79,7 @@ export async function checkout ({
     let comm = GitCommit.from(commit.object.toString('utf8'))
     let sha = comm.headers().tree
     // Get top-level tree
-    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid: sha })
+    let { type, object } = await readObject({ fs, gitdir, oid: sha })
     if (type !== 'tree') {
       throw new GitError(E.ObjectTypeAssertionFail, {
         type,
@@ -122,7 +122,7 @@ async function writeTreeToDisk ({ fs: _fs, dir, gitdir, index, prefix, tree }) {
       console.log(new GitError(E.NotImplementedFail, { thing: 'submodule support' }))
       continue
     }
-    let { type, object } = await GitObjectManager.read({
+    let { type, object } = await readObject({
       fs,
       gitdir,
       oid: entry.oid

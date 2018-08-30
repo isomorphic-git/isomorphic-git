@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { expandOid as _expandOid } from '../storage/expandOid.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { cores } from '../utils/plugins.js'
 
@@ -18,7 +18,7 @@ export async function expandOid ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const fullOid = await GitObjectManager.expandOid({
+    const fullOid = await _expandOid({
       fs,
       gitdir,
       oid

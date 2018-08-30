@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { GitObjectManager } from '../managers/GitObjectManager.js'
+import { readObject } from '../storage/readObject.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -34,7 +34,7 @@ export async function listCommits ({
   // setting a default recursion limit.
   async function walk (oid) {
     visited.add(oid)
-    let { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
+    let { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit') {
       throw new GitError(E.ObjectTypeAssertionFail, {
         oid,
