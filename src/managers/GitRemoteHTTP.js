@@ -65,9 +65,22 @@ export class GitRemoteHTTP {
         statusMessage: res.statusMessage
       })
     }
-    let remoteHTTP = await GitRemoteConnection.receiveInfoRefs(service, res)
-    remoteHTTP.auth = auth
-    return remoteHTTP
+    // I'm going to be nice and ignore the content-type requirement unless there is a problem.
+    try {
+      let remoteHTTP = await GitRemoteConnection.receiveInfoRefs(service, res)
+      remoteHTTP.auth = auth
+      return remoteHTTP
+    } catch (err) {
+      // Detect "dumb" HTTP protocol responses and throw more specific error message
+      if (err.code === E.AssertServerResponseFail &&
+        err.data.expected === `# service=${service}\\n` &&
+        res.headers['content-type'] !== `application/x-${service}-advertisement`
+      ) {
+        // Ooooooh that's why it failed.
+        throw new GitError(E.RemoteDoesNotSupportSmartHTTP, {})
+      }
+      throw err
+    }
   }
   static async connect ({ corsProxy, service, url, noGitSuffix, auth, stream }) {
     // Auto-append the (necessary) .git if it's missing.
