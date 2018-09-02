@@ -4,7 +4,12 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { readPack } from '../storage/readPack.js'
 
-export async function expandOidPacked ({ fs: _fs, gitdir, oid: short, getExternalRefDelta }) {
+export async function expandOidPacked ({
+  fs: _fs,
+  gitdir,
+  oid: short,
+  getExternalRefDelta
+}) {
   const fs = new FileSystem(_fs)
   // Iterate through all the .pack files
   let results = []

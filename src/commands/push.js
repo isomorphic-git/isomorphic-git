@@ -6,9 +6,9 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
+import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
-import { filterCapabilities } from '../utils/filterCapabilities.js'
 
 import { config } from './config.js'
 import { isDescendent } from './isDescendent.js'
@@ -93,14 +93,17 @@ export async function push ({
         if (err.code === E.ExpandRefError) {
           // The remote reference doesn't exist yet.
           // If it is fully specified, use that value. Otherwise, treat it as a branch.
-          fullRemoteRef = remoteRef.startsWith('refs/') ? remoteRef : `refs/heads/${remoteRef}`
+          fullRemoteRef = remoteRef.startsWith('refs/')
+            ? remoteRef
+            : `refs/heads/${remoteRef}`
         } else {
           throw err
         }
       }
     }
     let oldoid =
-      httpRemote.refs.get(fullRemoteRef) || '0000000000000000000000000000000000000000'
+      httpRemote.refs.get(fullRemoteRef) ||
+      '0000000000000000000000000000000000000000'
     if (!force) {
       // Is it a tag that already exists?
       if (

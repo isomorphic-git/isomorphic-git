@@ -1,10 +1,10 @@
 import pako from 'pako'
 
-import { readObjectLoose } from '../storage/readObjectLoose.js'
-import { readObjectPacked } from '../storage/readObjectPacked.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitObject } from '../models/GitObject.js'
+import { readObjectLoose } from '../storage/readObjectLoose.js'
+import { readObjectPacked } from '../storage/readObjectPacked.js'
 import { shasum } from '../utils/shasum.js'
 
 export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) {
