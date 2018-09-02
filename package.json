@@ -77,7 +77,7 @@
   "devDependencies": {
     "@isomorphic-git/cors-proxy": "2.1.0",
     "@semantic-release/exec": "3.1.2",
-    "@types/node": "9.6.30",
+    "@types/node": "9.6.31",
     "all-contributors-cli": "5.4.0",
     "babel-core": "6.26.3",
     "babel-loader": "7.1.5",
@@ -107,7 +107,7 @@
     "karma-jasmine": "1.1.2",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
-    "karma-webpack": "3.0.0",
+    "karma-webpack": "3.0.1",
     "nock": "9.6.1",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
