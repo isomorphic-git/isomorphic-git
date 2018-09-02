@@ -111,7 +111,7 @@
     "nock": "9.6.1",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
-    "openpgp": "2.6.2",
+    "openpgp": "4.0.0",
     "organize-js-imports": "1.2.1",
     "parse-header-stream": "1.1.1",
     "prettier-standard": "8.0.1",
