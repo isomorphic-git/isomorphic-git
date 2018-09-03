@@ -77,7 +77,7 @@
   "devDependencies": {
     "@isomorphic-git/cors-proxy": "2.1.0",
     "@semantic-release/exec": "3.1.2",
-    "@types/node": "9.6.30",
+    "@types/node": "10.9.4",
     "all-contributors-cli": "5.4.0",
     "babel-core": "6.26.3",
     "babel-loader": "7.1.5",
