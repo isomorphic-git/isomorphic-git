@@ -1,14 +1,14 @@
-import path from 'path'
 import globrex from 'globrex'
+import path from 'path'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { WORKDIR } from '../models/GitWalkerFs.js'
 import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
-import { worthWalking } from '../utils/worthWalking.js'
 import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
+import { worthWalking } from '../utils/worthWalking.js'
 
 import { walkBeta1 } from './walkBeta1.js'
 
@@ -27,7 +27,8 @@ export async function statusMatrix ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let patternGlobrex = pattern && globrex(pattern, {globstar: true, extended: true})
+    let patternGlobrex =
+      pattern && globrex(pattern, { globstar: true, extended: true })
     let patternBase = pattern && patternRoot(pattern)
     let results = await walkBeta1({
       fs,
