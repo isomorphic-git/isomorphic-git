@@ -99,6 +99,7 @@
     "jest": "23.5.0",
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
     "karma": "2.0.5",
+    "karma-browserstack-launcher": "git+https://github.com/karma-runner/karma-browserstack-launcher.git",
     "karma-chrome-launcher": "2.2.0",
     "karma-edge-launcher": "0.4.2",
     "karma-fail-fast-reporter": "1.0.5",
