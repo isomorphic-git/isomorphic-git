@@ -160,7 +160,7 @@ export class FileSystem {
    * Reads the contents of a symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
    */
-  async readlink (filename, opts = {encoding: 'buffer'}) {
+  async readlink (filename, opts = { encoding: 'buffer' }) {
     // Note: FileSystem.readlink returns a buffer by default
     // so we can dump it into GitObject.write just like any other file.
     try {

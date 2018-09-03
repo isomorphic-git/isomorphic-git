@@ -86,7 +86,6 @@ describe('commit', () => {
       }
     })
     await sign({
-
       gitdir,
       openpgp,
       privateKeys: privateKeys[0]

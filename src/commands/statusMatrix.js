@@ -27,7 +27,8 @@ export async function statusMatrix ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let patternGlobrex = pattern && globrex(pattern, {globstar: true, extended: true})
+    let patternGlobrex =
+      pattern && globrex(pattern, { globstar: true, extended: true })
     let patternBase = pattern && patternRoot(pattern)
     let results = await walkBeta1({
       fs,

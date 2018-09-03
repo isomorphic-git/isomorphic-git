@@ -14,12 +14,20 @@ export async function listpack (stream, onData) {
   let PACK = await reader.read(4)
   hash.update(PACK)
   PACK = PACK.toString('utf8')
-  if (PACK !== 'PACK') throw new GitError(E.InternalFail, { message: `Invalid PACK header '${PACK}'` })
+  if (PACK !== 'PACK') {
+    throw new GitError(E.InternalFail, {
+      message: `Invalid PACK header '${PACK}'`
+    })
+  }
 
   let version = await reader.read(4)
   hash.update(version)
   version = version.readUInt32BE(0)
-  if (version !== 2) throw new GitError(E.InternalFail, { message: `Invalid packfile version: ${version}` })
+  if (version !== 2) {
+    throw new GitError(E.InternalFail, {
+      message: `Invalid packfile version: ${version}`
+    })
+  }
 
   let numObjects = await reader.read(4)
   hash.update(numObjects)
