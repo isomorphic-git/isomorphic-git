@@ -1,4 +1,4 @@
-import { pkg } from '../utils/pkg'
+import { pkg } from '../utils/pkg.js'
 
 /**
  * Return the version number of isomorphic-git
@@ -6,5 +6,10 @@ import { pkg } from '../utils/pkg'
  * @link https://isomorphic-git.github.io/docs/version.html
  */
 export function version () {
-  return pkg.version
+  try {
+    return pkg.version
+  } catch (err) {
+    err.caller = 'git.version'
+    throw err
+  }
 }

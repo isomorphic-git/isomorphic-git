@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const snapshots = require('./__snapshots__/test-flatFileListToDirectoryStructure.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { utils } = require('isomorphic-git/internal-apis')
-const { flatFileListToDirectoryStructure } = utils
+const {
+  flatFileListToDirectoryStructure
+} = require('isomorphic-git/internal-apis')
 
 describe('flatFileListToDirectoryStructure', () => {
   beforeAll(() => {
@@ -10,7 +11,9 @@ describe('flatFileListToDirectoryStructure', () => {
   })
 
   it('simple', async () => {
-    let inode = flatFileListToDirectoryStructure([{ path: 'hello/there.txt' }])
+    let inode = flatFileListToDirectoryStructure([
+      { path: 'hello/there.txt' }
+    ]).get('.')
     expect(inode.fullpath).toBe('.')
     expect(inode.type).toBe('tree')
     expect(inode.children.length).toBe(1)
@@ -63,6 +66,6 @@ describe('flatFileListToDirectoryStructure', () => {
     ]
     let files = filelist.map(f => ({ path: f, someMeta: f.length }))
     let inodes = flatFileListToDirectoryStructure(files)
-    expect(inodes).toMatchSnapshot()
+    expect(inodes.get('.')).toMatchSnapshot()
   })
 })

@@ -4,7 +4,7 @@ const snapshots = require('./__snapshots__/test-checkout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
-const { checkout, listFiles } = require('isomorphic-git')
+const { plugins, checkout, listFiles } = require('isomorphic-git')
 
 describe('checkout', () => {
   beforeAll(() => {
@@ -14,36 +14,42 @@ describe('checkout', () => {
   it('checkout', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
+    plugins.set('fs', fs)
+    await checkout({ dir, gitdir, ref: 'test-branch' })
     let files = await pify(fs.readdir)(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ fs, dir, gitdir })
+    let index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 
   it('checkout by SHA', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    plugins.set('fs', fs)
     await checkout({
-      fs,
       dir,
       gitdir,
       ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
     let files = await pify(fs.readdir)(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ fs, dir, gitdir })
+    let index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 
   it('checkout unfetched branch', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    plugins.set('fs', fs)
+    let error = null
     try {
-      await checkout({ fs, dir, gitdir, ref: 'missing-branch' })
+      await checkout({ dir, gitdir, ref: 'missing-branch' })
       throw new Error('Checkout should have failed.')
     } catch (err) {
-      expect(err.message).toMatchSnapshot()
+      error = err
     }
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.caller).toEqual('git.checkout')
   })
 })

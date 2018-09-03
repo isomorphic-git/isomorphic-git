@@ -1,7 +1,9 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import path from 'path'
 
-import { FileSystem, GitRefSpecSet } from '../models'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 
 import { GitConfigManager } from './GitConfigManager'
 
@@ -29,20 +31,17 @@ export class GitRefManager {
     // Validate input
     for (let value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
-        throw new Error(`Unexpected ref contents: '${value}'`)
+        throw new GitError(E.NotAnOidFail, { value })
       }
     }
     const config = await GitConfigManager.get({ fs, gitdir })
     if (!refspecs) {
       refspecs = await config.getall(`remote.${remote}.fetch`)
       if (refspecs.length === 0) {
-        throw new Error(
-          `Could not find a fetch refspec fot remote '${remote}'.
-Make sure the config file has an entry like the following:
-[remote "${remote}"]
-fetch = +refs/heads/*:refs/remotes/origin/*`
-        )
+        throw new GitError(E.NoRefspecConfiguredError, { remote })
       }
+      // There's some interesting behavior with HEAD that doesn't follow the refspec.
+      refspecs.unshift(`+HEAD:refs/remotes/${remote}/HEAD`)
     }
     const refspec = GitRefSpecSet.from(refspecs)
     let actualRefsToWrite = new Map()
@@ -99,7 +98,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
     const fs = new FileSystem(_fs)
     // Validate input
     if (!value.match(/[0-9a-f]{40}/)) {
-      throw new Error(`Unexpected ref contents: '${value}'`)
+      throw new GitError(E.NotAnOidFail, { value })
     }
     const normalizeValue = value => value.trim() + '\n'
     await fs.write(path.join(gitdir, ref), normalizeValue(value), 'utf8')
@@ -135,7 +134,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       }
     }
     // Do we give up?
-    throw new Error(`Could not resolve reference ${ref}`)
+    throw new GitError(E.ResolveRefError, { ref })
   }
   static async expand ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
@@ -152,34 +151,48 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
-    throw new Error(`Could not expand ref ${ref}`)
+    throw new GitError(E.ExpandRefError, { ref })
   }
-  static resolveAgainstMap ({ ref, depth, map }) {
+  static async expandAgainstMap ({ fs: _fs, gitdir, ref, map }) {
+    // Look in all the proper paths, in this order
+    const allpaths = refpaths(ref)
+    for (let ref of allpaths) {
+      if (await map.has(ref)) return ref
+    }
+    // Do we give up?
+    throw new GitError(E.ExpandRefError, { ref })
+  }
+  static resolveAgainstMap ({ ref, fullref = ref, depth, map }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {
-        return ref
+        return { fullref, oid: ref }
       }
     }
     // Is it a ref pointer?
     if (ref.startsWith('ref: ')) {
       ref = ref.slice('ref: '.length)
-      return GitRefManager.resolveAgainstMap({ ref, depth, map })
+      return GitRefManager.resolveAgainstMap({ ref, fullref, depth, map })
     }
     // Is it a complete and valid SHA?
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
-      return ref
+      return { fullref, oid: ref }
     }
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
     for (let ref of allpaths) {
       let sha = map.get(ref)
       if (sha) {
-        return GitRefManager.resolveAgainstMap({ ref: sha.trim(), depth, map })
+        return GitRefManager.resolveAgainstMap({
+          ref: sha.trim(),
+          fullref: ref,
+          depth,
+          map
+        })
       }
     }
     // Do we give up?
-    throw new Error(`Could not resolve reference ${ref}`)
+    throw new GitError(E.ResolveRefError, { ref })
   }
   static async packedRefs ({ fs: _fs, gitdir }) {
     const refs = new Map()
@@ -252,7 +265,6 @@ fetch = +refs/heads/*:refs/remotes/origin/*`
       gitdir,
       filepath: `refs/tags`
     })
-    tags = tags.filter(x => !x.endsWith('^{}'))
-    return tags
+    return tags.filter(x => !x.endsWith('^{}'))
   }
 }

@@ -1,5 +1,7 @@
-var path = require('path')
-// var nodeExternals = require('webpack-node-externals')
+const path = require('path')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
 
 module.exports = [
   {
@@ -16,6 +18,18 @@ module.exports = [
     },
     mode: 'production',
     devtool: 'source-map',
+    plugins: [
+      new BundleAnalyzerPlugin({
+        openAnalyzer: false,
+        analyzerMode: 'static',
+        reportFilename: 'size_report.html',
+        defaultSizes: 'gzip',
+        excludeAssets: 'internal\\.umd\\.min\\.js'
+      }),
+      new DuplicatePackageCheckerPlugin({
+        strict: false
+      })
+    ],
     module: {
       rules: [
         {
@@ -24,31 +38,15 @@ module.exports = [
           use: {
             loader: 'babel-loader',
             options: {
-              forceEnv: 'browser'
+              babelrc: false,
+              plugins: [
+                'transform-object-rest-spread',
+                'transform-async-to-generator'
+              ]
             }
           }
         }
       ]
     }
-    // },
-    // {
-    //   target: 'node',
-    //   externals: [nodeExternals()],
-    //   entry: {
-    //     index: './src/index.js',
-    //     'internal-apis': './src/internal-apis.js'
-    //   },
-    //   output: {
-    //     path: path.resolve(__dirname, 'dist/for-node/isomorphic-git'),
-    //     filename: '[name].js',
-    //     libraryTarget: 'commonjs'
-    //   },
-    //   mode: 'development',
-    //   devtool: 'source-map',
-    //   resolve: {
-    //     alias: {
-    //       'stream-source': 'stream-source/index.node.js'
-    //     }
-    //   }
   }
 ]

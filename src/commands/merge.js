@@ -1,9 +1,12 @@
 // import diff3 from 'node-diff3'
 import path from 'path'
 
-import { GitRefManager } from '../managers'
-import { FileSystem } from '../models'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { cores } from '../utils/plugins.js'
 
+import { currentBranch } from './currentBranch.js'
 import { log } from './log'
 
 /**
@@ -12,47 +15,64 @@ import { log } from './log'
  * @link https://isomorphic-git.github.io/docs/merge.html
  */
 export async function merge ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ours,
   theirs,
   fastForwardOnly
 }) {
-  const fs = new FileSystem(_fs)
-  let ourOid = await GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref: ours
-  })
-  let theirOid = await GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref: theirs
-  })
-  // find most recent common ancestor of ref a and ref b
-  let baseOid = await findMergeBase({ gitdir, fs, refs: [ourOid, theirOid] })
-  // handle fast-forward case
-  if (baseOid === theirOid) {
-    console.log(`'${theirs}' is already merged into '${ours}'`)
-    return {
-      oid: ourOid,
-      alreadyMerged: true
+  try {
+    const fs = new FileSystem(_fs)
+    if (ours === undefined) {
+      ours = await currentBranch({ fs, gitdir, fullname: true })
     }
-  }
-  if (baseOid === ourOid) {
-    console.log(`Performing a fast-forward merge...`)
-    await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
-    return {
-      oid: theirOid,
-      fastForward: true
+    ours = await GitRefManager.expand({
+      fs,
+      gitdir,
+      ref: ours
+    })
+    theirs = await GitRefManager.expand({
+      fs,
+      gitdir,
+      ref: theirs
+    })
+    let ourOid = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref: ours
+    })
+    let theirOid = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref: theirs
+    })
+    // find most recent common ancestor of ref a and ref b
+    let baseOid = await findMergeBase({ gitdir, fs, refs: [ourOid, theirOid] })
+    // handle fast-forward case
+    if (baseOid === theirOid) {
+      return {
+        oid: ourOid,
+        alreadyMerged: true
+      }
     }
-  } else {
-    // not a simple fast-forward
-    if (fastForwardOnly) {
-      throw new Error('A simple fast-forward merge was not possible.')
+    if (baseOid === ourOid) {
+      await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
+      return {
+        oid: theirOid,
+        fastForward: true
+      }
+    } else {
+      // not a simple fast-forward
+      if (fastForwardOnly) {
+        throw new GitError(E.FastForwardFail)
+      }
+      throw new GitError(E.MergeNotSupportedFail)
     }
-    throw new Error('Non-fast-forward merges are not supported yet.')
+  } catch (err) {
+    err.caller = 'git.merge'
+    throw err
   }
 }
 
@@ -84,5 +104,5 @@ async function findMergeBase ({ gitdir, fs, refs }) {
   }
   if (candidate) return candidate.oid
   // Is...
-  throw new Error('Non-trivial merge not implemented at this time')
+  throw new GitError(E.MergeNotSupportedFail)
 }

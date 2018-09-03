@@ -6,3 +6,41 @@ Array [
   "test-branch",
 ]
 `;
+
+exports[`branch empty repo 1`] = `
+Object {
+  "caller": "git.branch",
+  "code": "NoHeadCommitError",
+  "data": Object {
+    "noun": "branch",
+    "ref": "test-branch",
+  },
+  "message": "Failed to create branch \\"test-branch\\" because the HEAD ref could not be resolved to a commit.",
+}
+`;
+
+exports[`branch invalid branch name 1`] = `
+Object {
+  "caller": "git.branch",
+  "code": "InvalidRefNameError",
+  "data": Object {
+    "noun": "branch",
+    "ref": "inv@{id..branch.lock",
+    "suggestion": "inv-id.branch",
+    "verb": "create",
+  },
+  "message": "Failed to create branch \\"inv@{id..branch.lock\\" because that name would not be a valid git reference. A valid alternative would be \\"inv-id.branch\\".",
+}
+`;
+
+exports[`branch missing ref argument 1`] = `
+Object {
+  "caller": "git.branch",
+  "code": "MissingRequiredParameterError",
+  "data": Object {
+    "function": "branch",
+    "parameter": "ref",
+  },
+  "message": "The function \\"branch\\" requires a \\"ref\\" parameter but none was provided.",
+}
+`;

@@ -1,7 +1,11 @@
 import path from 'path'
 
-import { GitObjectManager, GitRefManager } from '../managers'
-import { FileSystem, SignedGitCommit } from '../models'
+import { readObject } from '../storage/readObject.js'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { SignedGitCommit } from '../models/SignedGitCommit.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Verify a signed commit
@@ -9,24 +13,28 @@ import { FileSystem, SignedGitCommit } from '../models'
  * @link https://isomorphic-git.github.io/docs/verify.html
  */
 export async function verify ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   ref,
   publicKeys,
   openpgp
 }) {
-  const fs = new FileSystem(_fs)
-  const oid = await GitRefManager.resolve({ fs, gitdir, ref })
-  const { type, object } = await GitObjectManager.read({ fs, gitdir, oid })
-  if (type !== 'commit') {
-    throw new Error(
-      `'ref' is not pointing to a 'commit' object but a '${type}' object`
-    )
+  try {
+    const fs = new FileSystem(_fs)
+    const oid = await GitRefManager.resolve({ fs, gitdir, ref })
+    const { type, object } = await readObject({ fs, gitdir, oid })
+    if (type !== 'commit') {
+      throw new GitError(E.ObjectTypeAssertionInRefFail, { ref, type })
+    }
+    let commit = SignedGitCommit.from(object)
+    let keys = await commit.listSigningKeys(openpgp)
+    let validity = await commit.verify(openpgp, publicKeys)
+    if (!validity) return false
+    return keys
+  } catch (err) {
+    err.caller = 'git.verify'
+    throw err
   }
-  let commit = SignedGitCommit.from(object)
-  let keys = await commit.listSigningKeys(openpgp)
-  let validity = await commit.verify(openpgp, publicKeys)
-  if (!validity) return false
-  return keys
 }

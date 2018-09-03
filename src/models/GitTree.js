@@ -1,3 +1,6 @@
+import { E, GitError } from '../models/GitError.js'
+import { comparePath } from '../utils/comparePath.js'
+
 /*::
 type TreeEntry = {
   mode: string,
@@ -13,15 +16,15 @@ function parseBuffer (buffer) {
   while (cursor < buffer.length) {
     let space = buffer.indexOf(32, cursor)
     if (space === -1) {
-      throw new Error(
-        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
+      })
     }
     let nullchar = buffer.indexOf(0, cursor)
     if (nullchar === -1) {
-      throw new Error(
-        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
+      })
     }
     let mode = buffer.slice(cursor, space).toString('utf8')
     if (mode === '40000') mode = '040000' // makes it line up neater in printed output
@@ -44,7 +47,9 @@ function limitModeToAllowed (mode) {
   if (mode.match(/^1007.*/)) return '100755' // Regular executable file
   if (mode.match(/^120.*/)) return '120000' // Symbolic link
   if (mode.match(/^160.*/)) return '160000' // Commit (git submodule reference)
-  throw new Error(`Could not understand file mode: ${mode}`)
+  throw new GitError(E.InternalFail, {
+    message: `Could not understand file mode: ${mode}`
+  })
 }
 
 function nudgeIntoShape (entry) {
@@ -65,10 +70,15 @@ export class GitTree {
   constructor (entries) {
     if (Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
+      // There appears to be an edge case (in this repo no less) where
+      // the tree is NOT sorted as expected if some directories end with ".git"
+      this._entries.sort(comparePath)
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {
-      throw new Error('invalid type passed to GitTree constructor')
+      throw new GitError(E.InternalFail, {
+        message: 'invalid type passed to GitTree constructor'
+      })
     }
   }
   static from (tree) {

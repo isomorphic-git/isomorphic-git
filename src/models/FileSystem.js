@@ -1,7 +1,13 @@
+import debug from 'debug'
+import * as marky from 'marky'
 import path from 'path'
 import pify from 'pify'
 
-import { sleep } from '../utils'
+import { E, GitError } from '../models/GitError.js'
+import { compareStrings } from '../utils/compareStrings.js'
+import { sleep } from '../utils/sleep.js'
+
+const readFileLog = debug('readFile')
 
 const delayedReleases = new Map()
 /**
@@ -9,6 +15,11 @@ const delayedReleases = new Map()
  */
 export class FileSystem {
   constructor (fs) {
+    // This is not actually the most logical place to put this, but in practice
+    // putting the check here should work great.
+    if (fs === undefined) {
+      throw new GitError(E.PluginUndefined, { plugin: 'fs' })
+    }
     if (typeof fs._readFile !== 'undefined') return fs
     this._readFile = pify(fs.readFile.bind(fs))
     this._writeFile = pify(fs.writeFile.bind(fs))
@@ -18,6 +29,8 @@ export class FileSystem {
     this._stat = pify(fs.stat.bind(fs))
     this._lstat = pify(fs.lstat.bind(fs))
     this._readdir = pify(fs.readdir.bind(fs))
+    this._readlink = pify(fs.readlink.bind(fs))
+    this._symlink = pify(fs.symlink.bind(fs))
   }
   /**
    * Return true if a file exists, false if it doesn't exist.
@@ -41,7 +54,9 @@ export class FileSystem {
    */
   async read (filepath, options = {}) {
     try {
+      marky.mark(filepath)
       let buffer = await this._readFile(filepath, options)
+      readFileLog(`${filepath} ${marky.stop(filepath).duration}`)
       return buffer
     } catch (err) {
       return null
@@ -98,8 +113,13 @@ export class FileSystem {
    */
   async readdir (filepath) {
     try {
-      return await this._readdir(filepath)
+      let names = await this._readdir(filepath)
+      // Ordering is not guaranteed, and system specific (Windows vs Unix)
+      // so we must sort them ourselves.
+      names.sort(compareStrings)
+      return names
     } catch (err) {
+      if (err.code === 'ENOTDIR') return null
       return []
     }
   }
@@ -121,6 +141,43 @@ export class FileSystem {
     )
     return files.reduce((a, f) => a.concat(f), [])
   }
+  /**
+   * Return the Stats of a file/symlink if it exists, otherwise returns null.
+   * Rethrows errors that aren't related to file existance.
+   */
+  async lstat (filename) {
+    try {
+      let stats = await this._lstat(filename)
+      return stats
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null
+      }
+      throw err
+    }
+  }
+  /**
+   * Reads the contents of a symlink if it exists, otherwise returns null.
+   * Rethrows errors that aren't related to file existance.
+   */
+  async readlink (filename, opts = {encoding: 'buffer'}) {
+    // Note: FileSystem.readlink returns a buffer by default
+    // so we can dump it into GitObject.write just like any other file.
+    try {
+      return this._readlink(filename, opts)
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null
+      }
+      throw err
+    }
+  }
+  /**
+   * Write the contents of buffer to a symlink.
+   */
+  async writelink (filename, buffer) {
+    return this._symlink(buffer.toString('utf8'), filename)
+  }
 
   async lock (filename, triesLeft = 3) {
     // check to see if we still have it
@@ -130,9 +187,7 @@ export class FileSystem {
       return
     }
     if (triesLeft === 0) {
-      throw new Error(
-        `Unable to acquire lockfile '${filename}'. Exhausted tries.`
-      )
+      throw new GitError(E.AcquireLockFileFail, { filename })
     }
     try {
       await this._mkdir(`${filename}.lock`)
@@ -146,7 +201,7 @@ export class FileSystem {
 
   async unlock (filename, delayRelease = 50) {
     if (delayedReleases.has(filename)) {
-      throw new Error('Cannot double-release lockfile')
+      throw new GitError(E.DoubleReleaseLockFileFail, { filename })
     }
     // Basically, we lie and say it was deleted ASAP.
     // But really we wait a bit to see if you want to acquire it again.

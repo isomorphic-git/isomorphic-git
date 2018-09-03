@@ -1,13 +1,14 @@
-import BufferCursor from 'buffercursor'
 import crc32 from 'crc/lib/crc32.js'
 import applyDelta from 'git-apply-delta'
-import listpack from 'git-list-pack'
 import * as marky from 'marky'
 import pako from 'pako'
-import shasum from 'shasum'
 import { PassThrough } from 'stream'
 
-import { log } from '../utils'
+import { E, GitError } from '../models/GitError.js'
+import { BufferCursor } from '../utils/BufferCursor.js'
+import { listpack } from '../utils/git-list-pack.js'
+import { log } from '../utils/log.js'
+import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject'
 
@@ -56,6 +57,7 @@ export class GitPackIndex {
     this.offsetCache = {}
   }
   static async fromIdx ({ idx, getExternalRefDelta }) {
+    marky.mark('fromIdx')
     let reader = new BufferCursor(idx)
     let magic = reader.slice(4).toString('hex')
     // Check for IDX v2 magic number
@@ -64,45 +66,40 @@ export class GitPackIndex {
     }
     let version = reader.readUInt32BE()
     if (version !== 2) {
-      throw new Error(
-        `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
-      )
-    }
-    // Verify checksums
-    let shaComputed = shasum(idx.slice(0, -20))
-    let shaClaimed = idx.slice(-20).toString('hex')
-    if (shaClaimed !== shaComputed) {
-      throw new Error(
-        `Invalid checksum in IDX buffer: expected ${shaClaimed} but saw ${shaComputed}`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
+      })
     }
     if (idx.byteLength > 2048 * 1024 * 1024) {
-      throw new Error(
-        `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
-      )
+      throw new GitError(E.InternalFail, {
+        message: `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
+      })
     }
-    let fanout = []
-    for (let i = 0; i < 256; i++) {
-      fanout.push(reader.readUInt32BE())
-    }
-    let size = fanout[255]
-    // For now we'll parse the whole thing. We can optimize later if we need to.
+    // Skip over fanout table
+    reader.seek(reader.tell() + 4 * 255)
+    // Get hashes
+    let size = reader.readUInt32BE()
+    marky.mark('hashes')
     let hashes = []
     for (let i = 0; i < size; i++) {
-      hashes.push(reader.slice(20).toString('hex'))
+      let hash = reader.slice(20).toString('hex')
+      hashes[i] = hash
     }
-    let crcs = {}
+    log(`hashes ${marky.stop('hashes').duration}`)
+    reader.seek(reader.tell() + 4 * size)
+    // Skip over CRCs
+    marky.mark('offsets')
+    // Get offsets
+    let offsets = new Map()
     for (let i = 0; i < size; i++) {
-      crcs[hashes[i]] = reader.readUInt32BE()
+      offsets.set(hashes[i], reader.readUInt32BE())
     }
-    let offsets = {}
-    for (let i = 0; i < size; i++) {
-      offsets[hashes[i]] = reader.readUInt32BE()
-    }
+    log(`offsets ${marky.stop('offsets').duration}`)
     let packfileSha = reader.slice(20).toString('hex')
+    log(`fromIdx ${marky.stop('fromIdx').duration}`)
     return new GitPackIndex({
       hashes,
-      crcs,
+      crcs: {},
       offsets,
       packfileSha,
       getExternalRefDelta
@@ -122,12 +119,11 @@ export class GitPackIndex {
     // Older packfiles do NOT use the shasum of the pack itself,
     // so it is recommended to just use whatever bytes are in the trailer.
     // Source: https://github.com/git/git/commit/1190a1acf800acdcfd7569f87ac1560e2d077414
-    // let packfileSha = shasum(pack.slice(0, -20))
     let packfileSha = pack.slice(-20).toString('hex')
 
     let hashes = []
     let crcs = {}
-    let offsets = {}
+    let offsets = new Map()
     let totalObjectCount = null
     let lastPercent = null
     let times = {
@@ -154,62 +150,60 @@ export class GitPackIndex {
     marky.mark('total')
     marky.mark('offsets')
     marky.mark('percent')
-    await new Promise((resolve, reject) => {
-      buffer2stream(pack)
-        .pipe(listpack())
-        .on('data', async ({ data, type, reference, offset, num }) => {
-          if (totalObjectCount === null) totalObjectCount = num
-          let percent = Math.floor(
-            (totalObjectCount - num) * 100 / totalObjectCount
+    await listpack(
+      buffer2stream(pack),
+      ({ data, type, reference, offset, num }) => {
+        if (totalObjectCount === null) totalObjectCount = num
+        let percent = Math.floor(
+          (totalObjectCount - num) * 100 / totalObjectCount
+        )
+        if (percent !== lastPercent) {
+          log(
+            `${percent}%\t${Math.floor(
+              marky.stop('percent').duration
+            )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
+              histogram.blob
+            }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
+              histogram['ref-delta']
+            }`
           )
-          if (percent !== lastPercent) {
-            log(
-              `${percent}%\t${Math.floor(
-                marky.stop('percent').duration
-              )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
-                histogram.blob
-              }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
-                histogram['ref-delta']
-              }`
-            )
 
-            histogram = {
-              commit: 0,
-              tree: 0,
-              blob: 0,
-              tag: 0,
-              'ofs-delta': 0,
-              'ref-delta': 0
-            }
-            bytesProcessed = 0
-            marky.mark('percent')
+          histogram = {
+            commit: 0,
+            tree: 0,
+            blob: 0,
+            tag: 0,
+            'ofs-delta': 0,
+            'ref-delta': 0
           }
-          lastPercent = percent
-          // Change type from a number to a meaningful string
-          type = listpackTypes[type]
+          bytesProcessed = 0
+          marky.mark('percent')
+        }
+        lastPercent = percent
+        // Change type from a number to a meaningful string
+        type = listpackTypes[type]
 
-          histogram[type]++
-          bytesProcessed += data.byteLength
+        histogram[type]++
+        bytesProcessed += data.byteLength
 
-          if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
-            offsetToObject[offset] = {
-              type,
-              offset
-            }
-          } else if (type === 'ofs-delta') {
-            offsetToObject[offset] = {
-              type,
-              offset
-            }
-          } else if (type === 'ref-delta') {
-            offsetToObject[offset] = {
-              type,
-              offset
-            }
+        if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
+          offsetToObject[offset] = {
+            type,
+            offset
           }
-          if (num === 0) resolve()
-        })
-    })
+        } else if (type === 'ofs-delta') {
+          offsetToObject[offset] = {
+            type,
+            offset
+          }
+        } else if (type === 'ref-delta') {
+          offsetToObject[offset] = {
+            type,
+            offset
+          }
+        }
+      }
+    )
     times['offsets'] = Math.floor(marky.stop('offsets').duration)
 
     log('Computing CRCs')
@@ -275,11 +269,11 @@ export class GitPackIndex {
         timeByDepth[p.readDepth] += time
         objectsByDepth[p.readDepth] += 1
         marky.mark('hash')
-        let oid = GitObject.hash({ type, object })
+        let oid = shasum(GitObject.wrap({ type, object }))
         times.hash += marky.stop('hash').duration
         o.oid = oid
         hashes.push(oid)
-        offsets[oid] = offset
+        offsets.set(oid, offset)
         crcs[oid] = o.crc
       } catch (err) {
         log('ERROR', err)
@@ -341,7 +335,7 @@ export class GitPackIndex {
     // Write out offsets
     let offsetsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
     for (let hash of this.hashes) {
-      offsetsBuffer.writeUInt32BE(this.offsets[hash])
+      offsetsBuffer.writeUInt32BE(this.offsets.get(hash))
     }
     buffers.push(offsetsBuffer.buffer)
     // Write out packfile checksum
@@ -360,15 +354,17 @@ export class GitPackIndex {
     this.pack = null
   }
   async read ({ oid }) {
-    if (!this.offsets[oid]) {
+    if (!this.offsets.get(oid)) {
       if (this.getExternalRefDelta) {
         this.externalReadDepth++
         return this.getExternalRefDelta(oid)
       } else {
-        throw new Error(`Could not read object ${oid} from packfile`)
+        throw new GitError(E.InternalFail, {
+          message: `Could not read object ${oid} from packfile`
+        })
       }
     }
-    let start = this.offsets[oid]
+    let start = this.offsets.get(oid)
     return this.readSlice({ start })
   }
   async readSlice ({ start }) {
@@ -383,18 +379,21 @@ export class GitPackIndex {
       0b1110000: 'ref_delta'
     }
     if (!this.pack) {
-      throw new Error(
-        'Tried to read from a GitPackIndex with no packfile loaded into memory'
-      )
+      throw new GitError(E.InternalFail, {
+        message:
+          'Tried to read from a GitPackIndex with no packfile loaded into memory'
+      })
     }
-    let raw = this.pack.slice(start)
+    let raw = (await this.pack).slice(start)
     let reader = new BufferCursor(raw)
     let byte = reader.readUInt8()
     // Object type is encoded in bits 654
     let btype = byte & 0b1110000
     let type = types[btype]
     if (type === undefined) {
-      throw new Error('Unrecognized type: 0b' + btype.toString(2))
+      throw new GitError(E.InternalFail, {
+        message: 'Unrecognized type: 0b' + btype.toString(2)
+      })
     }
     // The length encoding get complicated.
     // Last four bits of length is encoded in bits 3210
@@ -423,11 +422,11 @@ export class GitPackIndex {
     object = Buffer.from(pako.inflate(buffer))
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
-      throw new Error(
-        `Packfile told us object would have length ${length} but it had length ${
+      throw new GitError(E.InternalFail, {
+        message: `Packfile told us object would have length ${length} but it had length ${
           object.byteLength
         }`
-      )
+      })
     }
     if (base) {
       object = Buffer.from(applyDelta(object, base))

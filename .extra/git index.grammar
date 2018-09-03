@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ufwb version="1.17">
+    <grammar name="git index" start="id:1" author="William Hilton" email="wmhilton@gmail.com">
+        <description>Grammar for https://github.com/git/git/blob/master/Documentation/technical/index-format.txt</description>
+        <structure name="git index" id="1" encoding="ISO_8859-1:1987" endian="big" signed="no">
+            <binary name="MAGIC" id="2" strokecolor="FEFFFF" fillcolor="AA7941" length="4"/>
+            <number name="version" id="3" fillcolor="AA7941" type="integer" length="4"/>
+            <number name="entries_len" id="4" fillcolor="00F900" type="integer" length="4"/>
+            <structure name="entry" id="5" length="0" alignment="4" repeat="id:4" repeatmin="0" repeatmax="-1" valueexpression="path">
+                <number name="ctime" id="6" fillcolor="00FCFF" type="integer" length="4"/>
+                <number name="ctime_ns" id="7" fillcolor="00FCFF" type="integer" length="4"/>
+                <number name="mtime" id="8" fillcolor="FEFB00" type="integer" length="4"/>
+                <number name="mtime_ns" id="9" fillcolor="FEFB00" type="integer" length="4"/>
+                <number name="dev" id="10" type="integer" length="4"/>
+                <number name="ino" id="11" fillcolor="FEFFFF" type="integer" length="4"/>
+                <structure name="mode" id="12" length="4" fillcolor="FEFFFF">
+                    <binary name="unused1" id="13" length="16" lengthunit="bit"/>
+                    <binary name="type" id="14" fillcolor="FF9200" length="4" lengthunit="bit">
+                        <fixedvalues>
+                            <fixedvalue name="file" value="08"/>
+                            <fixedvalue name="symlink" value="10"/>
+                            <fixedvalue name="gitlink" value="14"/>
+                        </fixedvalues>
+                    </binary>
+                    <binary name="unused2" id="15" length="3" lengthunit="bit"/>
+                    <number name="permissions" id="16" type="integer" length="9" lengthunit="bit" display="octal">
+                        <fixedvalues>
+                            <fixedvalue name="755" value="1363o"/>
+                            <fixedvalue name="644" value="1204o"/>
+                            <fixedvalue name="null" value="0o"/>
+                        </fixedvalues>
+                    </number>
+                </structure>
+                <number name="uid" id="18" fillcolor="00D3D5" type="integer" length="4"/>
+                <number name="gid" id="19" fillcolor="00A7A9" type="integer" length="4"/>
+                <number name="size" id="20" fillcolor="00F941" type="integer" length="4"/>
+                <binary name="sha" id="21" fillcolor="D71E00" length="20"/>
+                <number name="assume_valid" id="23" type="integer" length="1" lengthunit="bit"/>
+                <number name="extended" id="24" type="integer" length="1" lengthunit="bit"/>
+                <number name="stage" id="25" type="integer" length="2" lengthunit="bit"/>
+                <number name="name_length" id="26" type="integer" length="12" lengthunit="bit"/>
+                <structure name="extended_flags" id="27" length="0" repeat="id:24" repeatmin="0">
+                    <binary name="reserved" id="28" length="1" lengthunit="bit"/>
+                    <binary name="skip_worktree" id="29" length="1" lengthunit="bit"/>
+                    <binary name="intent_to_add" id="30" length="1" lengthunit="bit"/>
+                    <binary name="unused3" id="31" length="13" lengthunit="bit"/>
+                </structure>
+                <string name="path" id="34" fillcolor="AA81FF" type="fixed-length" length="name_length" encoding="UTF-8"/>
+                <binary name="padding" id="35" length="if(8-mod(name_length + 6, 8), 8-mod(name_length + 6, 8), 8)"/>
+            </structure>
+            <binary name="shasum" id="37" fillcolor="D74941" length="20"/>
+        </structure>
+    </grammar>
+</ufwb>

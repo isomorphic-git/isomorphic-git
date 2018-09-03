@@ -1,3 +1,5 @@
+import { E, GitError } from '../models/GitError.js'
+
 /**
  * Use with push and fetch to set Basic Authentication headers.
  *
@@ -21,8 +23,6 @@ export function oauth2 (company, token) {
         password: token
       }
     default:
-      throw new Error(
-        `I don't know how ${company} expects its Basic Auth headers to be formatted for OAuth2 usage. If you do, you can use the regular '.auth(username, password)' to set the basic auth header yourself.`
-      )
+      throw new GitError(E.UnknownOauth2Format, { company })
   }
 }

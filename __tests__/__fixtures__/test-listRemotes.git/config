@@ -1,0 +1,12 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = true
+	symlinks = false
+	ignorecase = true
+[remote "foo"]
+	url = git@github.com:foo/foo.git
+	fetch = +refs/heads/*:refs/remotes/foo/*
+[remote "bar"]
+	url = git@github.com:bar/bar.git
+	fetch = +refs/heads/*:refs/remotes/bar/*

@@ -1,7 +1,8 @@
 import path from 'path'
 
-import { GitRefManager } from '../managers'
-import { FileSystem } from '../models'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const regexs = [
@@ -28,18 +29,24 @@ function abbreviate (ref) {
  * @link https://isomorphic-git.github.io/docs/currentBranch.html
  */
 export async function currentBranch ({
+  core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
-  fs: _fs,
+  fs: _fs = cores.get(core).get('fs'),
   fullname = false
 }) {
-  const fs = new FileSystem(_fs)
-  let ref = await GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref: 'HEAD',
-    depth: 2
-  })
-  if (fullname) return ref
-  return abbreviate(ref)
+  try {
+    const fs = new FileSystem(_fs)
+    let ref = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref: 'HEAD',
+      depth: 2
+    })
+    if (fullname) return ref
+    return abbreviate(ref)
+  } catch (err) {
+    err.caller = 'git.currentBranch'
+    throw err
+  }
 }

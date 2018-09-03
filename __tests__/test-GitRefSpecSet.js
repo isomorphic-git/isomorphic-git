@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { models } = require('isomorphic-git/internal-apis')
-const { GitRefSpecSet } = models
+const { GitRefSpecSet } = require('isomorphic-git/internal-apis')
 
 describe('GitRefSpecSet', () => {
   it('fetch = +refs/heads/*:refs/remotes/origin/*', async () => {
@@ -28,5 +27,12 @@ describe('GitRefSpecSet', () => {
       ['refs/heads/develop', 'refs/remotes/origin/develop'],
       ['refs/heads/master', 'refs/foo/master']
     ])
+  })
+
+  it('weird HEAD implicit rule', async () => {
+    const refspec = new GitRefSpecSet()
+    refspec.add('+HEAD:refs/remotes/origin/HEAD')
+    const result = refspec.translate(['HEAD'])
+    expect(result).toEqual([['HEAD', 'refs/remotes/origin/HEAD']])
   })
 })

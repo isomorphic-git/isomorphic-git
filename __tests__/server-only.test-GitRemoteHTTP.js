@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { managers } = require('isomorphic-git/internal-apis')
-const { GitRemoteHTTP } = managers
+const { GitRemoteHTTP } = require('isomorphic-git/internal-apis')
 
 const nock = require('nock')
 const path = require('path')
@@ -23,6 +22,7 @@ describe('GitRemoteHTTP', () => {
     )
     // Test
     let remote = await GitRemoteHTTP.discover({
+      core: 'default',
       service: 'git-upload-pack',
       url: 'https://github.com/isomorphic-git/isomorphic-git'
     })
@@ -40,6 +40,7 @@ describe('GitRemoteHTTP', () => {
     )
     // Test
     let remote = await GitRemoteHTTP.discover({
+      core: 'default',
       service: 'git-upload-pack',
       url: 'http://example.dev/test-GitRemoteHTTP'
     })
@@ -55,6 +56,7 @@ describe('GitRemoteHTTP', () => {
     )
     // Test
     let remote = await GitRemoteHTTP.discover({
+      core: 'default',
       service: 'git-receive-pack',
       url: 'http://example.dev/test-GitRemoteHTTP'
     })
@@ -70,12 +72,14 @@ describe('GitRemoteHTTP', () => {
     let error = null
     try {
       await GitRemoteHTTP.discover({
+        core: 'default',
         service: 'git-receive-pack',
         url: 'https://github.com/isomorphic-git/not-there'
       })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toBe('HTTP Error: 401 Authorization Required')
+    expect(error).not.toBeNull()
+    expect(error.message).toBe('HTTP Error: 401 Authorization Required')
   })
 })

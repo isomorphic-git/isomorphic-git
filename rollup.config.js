@@ -7,6 +7,8 @@ const external = [
   'stream',
   'openpgp/dist/openpgp.min.js',
   'crc/lib/crc32.js',
+  'stream-source/index.node.js',
+  'sha.js/sha1',
   ...Object.keys(pkg.dependencies)
 ]
 
@@ -38,4 +40,4 @@ const nodeConfig = input => ({
 
 const inputs = ['index.js', 'internal-apis.js']
 
-export default [...inputs.map(moduleConfig), ...inputs.map(nodeConfig)]
+export default [...inputs.map(nodeConfig), ...inputs.map(moduleConfig)]

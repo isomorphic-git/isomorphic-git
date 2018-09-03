@@ -1,14 +1,20 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { commit, sign, verify, log } = require('isomorphic-git')
+const snapshots = require('./__snapshots__/test-commit.js.snap')
+const registerSnapshots = require('./__helpers__/jasmine-snapshots')
+const { plugins, commit, sign, verify, log } = require('isomorphic-git')
 
 describe('commit', () => {
+  beforeAll(() => {
+    registerSnapshots(snapshots)
+  })
+
   it('commit', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-commit')
+    plugins.set('fs', fs)
     // Test
     let sha = await commit({
-      fs,
       gitdir,
       author: {
         name: 'Mr. Test',
@@ -24,11 +30,11 @@ describe('commit', () => {
   it('throw error if missing author', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-commit')
+    plugins.set('fs', fs)
     // Test
     let error = null
     try {
       await commit({
-        fs,
         gitdir,
         author: {
           email: 'mrtest@example.com',
@@ -38,16 +44,14 @@ describe('commit', () => {
         message: 'Initial commit'
       })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toBe(
-      'Author name and email must be specified as an argument or in the .git/config file'
-    )
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
     // reset for test 2
     error = null
     try {
       await commit({
-        fs,
         gitdir,
         author: {
           name: 'Mr. Test',
@@ -57,11 +61,10 @@ describe('commit', () => {
         message: 'Initial commit'
       })
     } catch (err) {
-      error = err.message
+      error = err
     }
-    expect(error).toBe(
-      'Author name and email must be specified as an argument or in the .git/config file'
-    )
+    expect(error).not.toBeNull()
+    expect(error.toJSON()).toMatchSnapshot()
   })
 
   it('GPG signing', async () => {
@@ -69,10 +72,10 @@ describe('commit', () => {
     const openpgp = require('openpgp/dist/openpgp.min.js')
 
     let { fs, gitdir } = await makeFixture('test-commit')
+    plugins.set('fs', fs)
     // Test
     const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
     await commit({
-      fs,
       gitdir,
       message: 'Initial commit',
       author: {
@@ -83,14 +86,13 @@ describe('commit', () => {
       }
     })
     await sign({
-      fs,
+
       gitdir,
       openpgp,
       privateKeys: privateKeys[0]
     })
     const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
     let keys = await verify({
-      fs,
       gitdir,
       openpgp,
       ref: 'HEAD',
@@ -102,10 +104,10 @@ describe('commit', () => {
   it('with timezone', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-commit')
+    plugins.set('fs', fs)
     let commits
     // Test
     await commit({
-      fs,
       gitdir,
       author: {
         name: 'Mr. Test',
@@ -115,11 +117,10 @@ describe('commit', () => {
       },
       message: '-0 offset'
     })
-    commits = await log({ fs, gitdir, depth: 1 })
+    commits = await log({ gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, -0)).toBeTruthy()
 
     await commit({
-      fs,
       gitdir,
       author: {
         name: 'Mr. Test',
@@ -129,11 +130,10 @@ describe('commit', () => {
       },
       message: '+0 offset'
     })
-    commits = await log({ fs, gitdir, depth: 1 })
+    commits = await log({ gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, 0)).toBeTruthy()
 
     await commit({
-      fs,
       gitdir,
       author: {
         name: 'Mr. Test',
@@ -143,11 +143,10 @@ describe('commit', () => {
       },
       message: '+240 offset'
     })
-    commits = await log({ fs, gitdir, depth: 1 })
+    commits = await log({ gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, 240)).toBeTruthy()
 
     await commit({
-      fs,
       gitdir,
       author: {
         name: 'Mr. Test',
@@ -157,7 +156,7 @@ describe('commit', () => {
       },
       message: '-240 offset'
     })
-    commits = await log({ fs, gitdir, depth: 1 })
+    commits = await log({ gitdir, depth: 1 })
     expect(Object.is(commits[0].author.timezoneOffset, -240)).toBeTruthy()
   })
 })

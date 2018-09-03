@@ -2,8 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-GitRefManager.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { managers } = require('isomorphic-git/internal-apis')
-const { GitRefManager } = managers
+const { GitRefManager } = require('isomorphic-git/internal-apis')
 
 describe('GitRefManager', () => {
   beforeAll(() => {

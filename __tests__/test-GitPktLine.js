@@ -1,13 +1,12 @@
 /* eslint-env node, browser, jasmine */
-const { models } = require('isomorphic-git/internal-apis')
-const { GitPktLine } = models
+const { GitPktLine } = require('isomorphic-git/internal-apis')
 const bufferToStream = require('buffer-to-stream')
 
 describe('GitPktLine', () => {
   it('read buffer - simple', async () => {
     let read = GitPktLine.reader(Buffer.from('0010hello world\n'))
     expect(typeof read === 'function').toBe(true)
-    expect((await read()).toString('utf8') === 'hello world\n').toBe(true)
+    expect((await read()).toString('utf8')).toBe('hello world\n')
     expect(await read()).toBe(true)
   })
 
@@ -25,9 +24,7 @@ describe('GitPktLine', () => {
 0000`
     )
     let read = GitPktLine.reader(buffer)
-    expect(
-      (await read()).toString('utf8') === '# service=git-upload-pack\n'
-    ).toBe(true)
+    expect((await read()).toString('utf8')).toBe('# service=git-upload-pack\n')
     expect((await read()) === null).toBe(true)
     expect(
       (await read()).toString('utf8') ===

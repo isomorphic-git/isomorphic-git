@@ -1,4 +1,4 @@
 success:
   - '@semantic-release/github'
   - path: '@semantic-release/exec'
-    cmd: "node __tests__/__helpers__/tweet.js '${nextRelease.version} has been published! https://github.com/isomorphic-git/isomorphic-git/releases'"
+    cmd: "node __tests__/__helpers__/tweet.js 'v${nextRelease.version} has been published! https://github.com/isomorphic-git/isomorphic-git/releases/tag/v${nextRelease.version}'"

@@ -1,54 +1,7 @@
-// The amount of work that went into crafting these cases to handl
-// -0 (just so we don't lose that information when parsing and reconstructing)
-// but can also default to +0 was extraordinary.
-
-function simpleSign (n) {
-  return Math.sign(n) || (Object.is(n, -0) ? -1 : 1)
-}
-
-function negateExceptForZero (n) {
-  return n === 0 ? n : -n
-}
-
-function formatTimezoneOffset (minutes) {
-  let sign = simpleSign(negateExceptForZero(minutes))
-  minutes = Math.abs(minutes)
-  let hours = Math.floor(minutes / 60)
-  minutes -= hours * 60
-  let strHours = String(hours)
-  let strMinutes = String(minutes)
-  if (strHours.length < 2) strHours = '0' + strHours
-  if (strMinutes.length < 2) strMinutes = '0' + strMinutes
-  return (sign === -1 ? '-' : '+') + strHours + strMinutes
-}
-
-function parseTimezoneOffset (offset) {
-  let [, sign, hours, minutes] = offset.match(/(\+|-)(\d\d)(\d\d)/)
-  minutes = (sign === '+' ? 1 : -1) * (Number(hours) * 60 + Number(minutes))
-  return negateExceptForZero(minutes)
-}
-
-function parseAuthor (author) {
-  let [, name, email, timestamp, offset] = author.match(
-    /^(.*) <(.*)> (.*) (.*)$/
-  )
-  return {
-    name: name,
-    email: email,
-    timestamp: Number(timestamp),
-    timezoneOffset: parseTimezoneOffset(offset)
-  }
-}
-
-function normalize (str) {
-  // remove all <CR>
-  str = str.replace(/\r/g, '')
-  // no extra newlines up front
-  str = str.replace(/^\n+/, '')
-  // and a single newline at the end
-  str = str.replace(/\n+$/, '') + '\n'
-  return str
-}
+import { E, GitError } from '../models/GitError.js'
+import { formatAuthor } from '../utils/formatAuthor.js'
+import { normalizeNewlines } from '../utils/normalizeNewlines.js'
+import { parseAuthor } from '../utils/parseAuthor.js'
 
 function indent (str) {
   return (
@@ -67,8 +20,6 @@ function outdent (str) {
     .join('\n')
 }
 
-// TODO: Make all functions have static async signature?
-
 export class GitCommit {
   constructor (commit) {
     if (typeof commit === 'string') {
@@ -78,14 +29,16 @@ export class GitCommit {
     } else if (typeof commit === 'object') {
       this._commit = GitCommit.render(commit)
     } else {
-      throw new Error('invalid type passed to GitCommit constructor')
+      throw new GitError(E.InternalFail, {
+        message: 'invalid type passed to GitCommit constructor'
+      })
     }
   }
 
   static fromPayloadSignature ({ payload, signature }) {
     let headers = GitCommit.justHeaders(payload)
     let message = GitCommit.justMessage(payload)
-    let commit = normalize(
+    let commit = normalizeNewlines(
       headers + '\ngpgsig' + indent(signature) + '\n' + message
     )
     return new GitCommit(commit)
@@ -114,7 +67,7 @@ export class GitCommit {
   }
 
   static justMessage (commit) {
-    return normalize(commit.slice(commit.indexOf('\n\n') + 2))
+    return normalizeNewlines(commit.slice(commit.indexOf('\n\n') + 2))
   }
 
   static justHeaders (commit) {
@@ -132,13 +85,18 @@ export class GitCommit {
         hs.push(h)
       }
     }
-    let obj = {}
+    let obj = {
+      parent: []
+    }
     for (let h of hs) {
       let key = h.slice(0, h.indexOf(' '))
       let value = h.slice(h.indexOf(' ') + 1)
-      obj[key] = value
+      if (Array.isArray(obj[key])) {
+        obj[key].push(value)
+      } else {
+        obj[key] = value
+      }
     }
-    obj.parent = obj.parent ? obj.parent.split(' ') : []
     if (obj.author) {
       obj.author = parseAuthor(obj.author)
     }
@@ -155,21 +113,20 @@ export class GitCommit {
     } else {
       headers += `tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n` // the null tree
     }
-    if (obj.parent && obj.parent.length) {
-      headers += 'parent'
-      for (let p of obj.parent) {
-        headers += ' ' + p
+    if (obj.parent) {
+      if (obj.parent.length === undefined) {
+        throw new GitError(E.InternalFail, {
+          message: `commit 'parent' property should be an array`
+        })
       }
-      headers += '\n'
+      for (let p of obj.parent) {
+        headers += `parent ${p}\n`
+      }
     }
     let author = obj.author
-    headers += `author ${author.name} <${author.email}> ${
-      author.timestamp
-    } ${formatTimezoneOffset(author.timezoneOffset)}\n`
+    headers += `author ${formatAuthor(author)}\n`
     let committer = obj.committer || obj.author
-    headers += `committer ${committer.name} <${committer.email}> ${
-      committer.timestamp
-    } ${formatTimezoneOffset(committer.timezoneOffset)}\n`
+    headers += `committer ${formatAuthor(committer)}\n`
     if (obj.gpgsig) {
       headers += 'gpgsig' + indent(obj.gpgsig)
     }
@@ -177,7 +134,7 @@ export class GitCommit {
   }
 
   static render (obj) {
-    return GitCommit.renderHeaders(obj) + '\n' + normalize(obj.message)
+    return GitCommit.renderHeaders(obj) + '\n' + normalizeNewlines(obj.message)
   }
 
   render () {
@@ -185,14 +142,14 @@ export class GitCommit {
   }
 
   withoutSignature () {
-    let commit = normalize(this._commit)
+    let commit = normalizeNewlines(this._commit)
     if (commit.indexOf('\ngpgsig') === -1) return commit
     let headers = commit.slice(0, commit.indexOf('\ngpgsig'))
     let message = commit.slice(
       commit.indexOf('-----END PGP SIGNATURE-----\n') +
         '-----END PGP SIGNATURE-----\n'.length
     )
-    return normalize(headers + '\n' + message)
+    return normalizeNewlines(headers + '\n' + message)
   }
 
   isolateSignature () {

@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-resolveRef.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { resolveRef } = require('isomorphic-git')
+const { plugins, resolveRef } = require('isomorphic-git')
 
 describe('resolveRef', () => {
   beforeAll(() => {
@@ -11,9 +11,9 @@ describe('resolveRef', () => {
   it('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-resolveRef')
+    plugins.set('fs', fs)
     // Test
     let ref = await resolveRef({
-      fs,
       gitdir,
       ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9'
     })
@@ -22,9 +22,9 @@ describe('resolveRef', () => {
   it('test-branch', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-resolveRef')
+    plugins.set('fs', fs)
     // Test
     let ref = await resolveRef({
-      fs,
       gitdir,
       ref: 'origin/test-branch'
     })
@@ -33,9 +33,9 @@ describe('resolveRef', () => {
   it('test-tag', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-resolveRef')
+    plugins.set('fs', fs)
     // Test
     let ref = await resolveRef({
-      fs,
       gitdir,
       ref: 'test-tag'
     })
@@ -44,9 +44,9 @@ describe('resolveRef', () => {
   it('HEAD', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-resolveRef')
+    plugins.set('fs', fs)
     // Test
     let ref = await resolveRef({
-      fs,
       gitdir,
       ref: 'HEAD'
     })
@@ -55,9 +55,9 @@ describe('resolveRef', () => {
   it('HEAD depth', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-resolveRef')
+    plugins.set('fs', fs)
     // Test
     let ref = await resolveRef({
-      fs,
       gitdir,
       ref: 'HEAD',
       depth: 2
@@ -67,12 +67,29 @@ describe('resolveRef', () => {
   it('packed-refs', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-resolveRef')
+    plugins.set('fs', fs)
     // Test
     let ref = await resolveRef({
-      fs,
       gitdir,
       ref: 'v0.0.1'
     })
     expect(ref).toMatchSnapshot()
+  })
+  it('non-existant refs', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-resolveRef')
+    plugins.set('fs', fs)
+    // Test
+    let error = {}
+    try {
+      await resolveRef({
+        gitdir,
+        ref: 'this-is-not-a-ref'
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error.message).toBeDefined()
+    expect(error.caller).toEqual('git.resolveRef')
   })
 })
