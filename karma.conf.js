@@ -70,7 +70,7 @@ module.exports = function (config) {
         browserName: 'firefox',
         extendedDebugging: true
       },
-      sl_edge: {
+      XXXsl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge'
       },
@@ -94,14 +94,14 @@ module.exports = function (config) {
         browserName: 'Chrome',
         appiumVersion: '1.7.2'
       },
-      bs_chrome_win: {
+      XXXbs_chrome_win: {
         base: 'BrowserStack',
         browser: 'Chrome',
         browser_version: '62.0',
         os: 'Windows',
         os_version: '10'
       },
-      bs_firefox_win: {
+      XXXbs_firefox_win: {
         base: 'BrowserStack',
         browser: 'Firefox',
         browser_version: '59.0',
@@ -115,35 +115,35 @@ module.exports = function (config) {
         os: 'Windows',
         os_version: '10'
       },
-      bs_chrome_mac: {
+      XXXbs_chrome_mac: {
         base: 'BrowserStack',
         browser: 'Chrome',
         browser_version: '62.0',
         os: 'OS X',
         os_version: 'High Sierra'
       },
-      bs_firefox_mac: {
+      XXXbs_firefox_mac: {
         base: 'BrowserStack',
         browser: 'Firefox',
         browser_version: '59.0',
         os: 'OS X',
         os_version: 'High Sierra'
       },
-      bs_safari_mac: {
+      XXXbs_safari_mac: {
         base: 'BrowserStack',
         browser: 'Safari',
         browser_version: '11.1',
         os: 'OS X',
         os_version: 'High Sierra'
       },
-      bs_safari_iphone: {
+      XXXbs_safari_iphone: {
         base: 'BrowserStack',
         real_mobile: true,
         device: 'iPhone SE',
         os: 'ios',
         os_version: '11.2'
       },
-      bs_android: {
+      XXXbs_android: {
         base: 'BrowserStack',
         real_mobile: true,
         device: 'Google Pixel',
@@ -213,26 +213,20 @@ module.exports = function (config) {
     }
   }
 
-  // if (!process.env.SAUCE_USERNAME) {
-  //   console.log(
-  //     'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
-  //   )
-  // } else if (!process.env.SAUCE_ACCESS_KEY) {
-  //   console.log(
-  //     'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
-  //   )
-  // } else {
-  //   console.log('---------------')
-  //   console.log('---------------')
-  //   console.log('---------------')
-  //   console.log(process.env.TRAVIS_PULL_REQUEST)
-  //   console.log(process.env.TRAVIS_BRANCH)
-  //   console.log(process.env.TRAVIS_PULL_REQUEST_SLUG + '/' + process.env.TRAVIS_PULL_REQUEST_BRANCH)
-  //   options.browsers = options.browsers.concat(
-  //     Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
-  //   )
-  //   options.reporters.push('saucelabs')
-  // }
+  if (!process.env.SAUCE_USERNAME) {
+    console.log(
+      'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
+    )
+  } else if (!process.env.SAUCE_ACCESS_KEY) {
+    console.log(
+      'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
+    )
+  } else {
+    options.browsers = options.browsers.concat(
+      Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
+    )
+    options.reporters.push('saucelabs')
+  }
 
   if (!process.env.BROWSER_STACK_USERNAME) {
     console.log(
@@ -244,17 +238,6 @@ module.exports = function (config) {
     )
     options.browsers.push(['ChromeHeadlessNoSandbox'])
   } else {
-    // Add bs_ browsers
-    console.log('---------------')
-    console.log('---------------')
-    console.log('---------------')
-    console.log(process.env.TRAVIS_PULL_REQUEST)
-    console.log(process.env.TRAVIS_BRANCH)
-    console.log(
-      process.env.TRAVIS_PULL_REQUEST_SLUG +
-        '/' +
-        process.env.TRAVIS_PULL_REQUEST_BRANCH
-    )
     options.browsers = options.browsers.concat(
       Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
     )
