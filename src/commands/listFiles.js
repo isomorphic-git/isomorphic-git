@@ -26,12 +26,19 @@ export async function listFiles ({
     if (ref) {
       const oid = await resolveRef({ gitdir, fs, ref })
       filenames = []
-      await accumulateFilesFromOid({ gitdir, fs, oid, filenames, prefix: '', detailed })
+      await accumulateFilesFromOid({
+        gitdir,
+        fs,
+        oid,
+        filenames,
+        prefix: '',
+        detailed
+      })
     } else {
       await GitIndexManager.acquire(
         { fs, filepath: `${gitdir}/index` },
         async function (index) {
-          filenames = index.entries.map(x => detailed ? x : x.path)
+          filenames = index.entries.map(x => (detailed ? x : x.path))
         }
       )
     }
@@ -42,7 +49,14 @@ export async function listFiles ({
   }
 }
 
-async function accumulateFilesFromOid ({ gitdir, fs, oid, filenames, prefix, detailed }) {
+async function accumulateFilesFromOid ({
+  gitdir,
+  fs,
+  oid,
+  filenames,
+  prefix,
+  detailed
+}) {
   const { object } = await readObject({ gitdir, fs, oid, filepath: '' }) // maybe to use the format: 'deflated' for better performance ??
   // Note: this isn't parallelized because I'm too lazy to figure that out right now
   for (const entry of object.entries) {

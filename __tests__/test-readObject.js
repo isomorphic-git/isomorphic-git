@@ -51,9 +51,7 @@ describe('readObject', () => {
     })
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('commit')
-    expect(ref.source).toBe(
-      'objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
-    )
+    expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
   it('wrapped', async () => {
@@ -68,9 +66,7 @@ describe('readObject', () => {
     })
     expect(ref.format).toEqual('wrapped')
     expect(ref.type).toEqual(undefined)
-    expect(ref.source).toBe(
-      'objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
-    )
+    expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
   it('deflated', async () => {
@@ -85,9 +81,7 @@ describe('readObject', () => {
     })
     expect(ref.format).toEqual('deflated')
     expect(ref.type).toEqual(undefined)
-    expect(ref.source).toBe(
-      'objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e'
-    )
+    expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
   it('from packfile', async () => {
