@@ -12,9 +12,10 @@ import { GitRemoteConnection } from './GitRemoteConnection.js'
 // Try to accomodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string
 // - https://cors.isomorphic-git.org  <-- uses path
-const corsProxify = (corsProxy, url) => corsProxy.endsWith('?')
-  ? `${corsProxy}${url}`
-  : `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
+const corsProxify = (corsProxy, url) =>
+  corsProxy.endsWith('?')
+    ? `${corsProxy}${url}`
+    : `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
 
 export class GitRemoteHTTP {
   static async capabilities () {
@@ -72,7 +73,8 @@ export class GitRemoteHTTP {
       return remoteHTTP
     } catch (err) {
       // Detect "dumb" HTTP protocol responses and throw more specific error message
-      if (err.code === E.AssertServerResponseFail &&
+      if (
+        err.code === E.AssertServerResponseFail &&
         err.data.expected === `# service=${service}\\n` &&
         res.headers['content-type'] !== `application/x-${service}-advertisement`
       ) {

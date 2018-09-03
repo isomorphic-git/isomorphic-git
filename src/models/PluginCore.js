@@ -1,8 +1,17 @@
 import { GitError, E } from './GitError'
 
 const pluginSchemas = {
-  'fs': ['lstat', 'mkdir', 'readdir', 'readFile', 'rmdir', 'stat', 'unlink', 'writeFile'],
-  'credentialManager': ['fill', 'approved', 'rejected']
+  fs: [
+    'lstat',
+    'mkdir',
+    'readdir',
+    'readFile',
+    'rmdir',
+    'stat',
+    'unlink',
+    'writeFile'
+  ],
+  credentialManager: ['fill', 'approved', 'rejected']
 }
 
 function verifySchema (key, value) {

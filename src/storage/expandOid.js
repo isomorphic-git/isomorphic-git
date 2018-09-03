@@ -11,7 +11,12 @@ export async function expandOid ({ fs: _fs, gitdir, oid: short }) {
   const getExternalRefDelta = oid => readObject({ fs: _fs, gitdir, oid })
 
   const results1 = await expandOidLoose({ fs, gitdir, oid: short })
-  const results2 = await expandOidPacked({ fs, gitdir, oid: short, getExternalRefDelta })
+  const results2 = await expandOidPacked({
+    fs,
+    gitdir,
+    oid: short,
+    getExternalRefDelta
+  })
   const results = results1.concat(results2)
 
   if (results.length === 1) {

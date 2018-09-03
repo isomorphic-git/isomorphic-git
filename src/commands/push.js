@@ -93,14 +93,17 @@ export async function push ({
         if (err.code === E.ExpandRefError) {
           // The remote reference doesn't exist yet.
           // If it is fully specified, use that value. Otherwise, treat it as a branch.
-          fullRemoteRef = remoteRef.startsWith('refs/') ? remoteRef : `refs/heads/${remoteRef}`
+          fullRemoteRef = remoteRef.startsWith('refs/')
+            ? remoteRef
+            : `refs/heads/${remoteRef}`
         } else {
           throw err
         }
       }
     }
     let oldoid =
-      httpRemote.refs.get(fullRemoteRef) || '0000000000000000000000000000000000000000'
+      httpRemote.refs.get(fullRemoteRef) ||
+      '0000000000000000000000000000000000000000'
     if (!force) {
       // Is it a tag that already exists?
       if (
@@ -113,7 +116,7 @@ export async function push ({
       if (
         oid !== '0000000000000000000000000000000000000000' &&
         oldoid !== '0000000000000000000000000000000000000000' &&
-        !await isDescendent({ fs, gitdir, oid, ancestor: oldoid })
+        !(await isDescendent({ fs, gitdir, oid, ancestor: oldoid }))
       ) {
         throw new GitError(E.PushRejectedNonFastForward, {})
       }

@@ -5,7 +5,14 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitObject } from '../models/GitObject.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function writeObject ({ fs: _fs, gitdir, type, object, format = 'content', oid }) {
+export async function writeObject ({
+  fs: _fs,
+  gitdir,
+  type,
+  object,
+  format = 'content',
+  oid
+}) {
   const fs = new FileSystem(_fs)
   if (format !== 'deflated') {
     if (format !== 'wrapped') {
