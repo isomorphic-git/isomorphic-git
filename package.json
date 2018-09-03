@@ -68,7 +68,7 @@
     "pify": "^4.0.0",
     "sha.js": "^2.4.9",
     "simple-concat": "^1.0.0",
-    "simple-get": "^3.0.2",
+    "simple-get": "^3.0.3",
     "simplest-i18n": "^1.0.0",
     "split2": "^3.0.0",
     "stream-source": "^0.3.5",
