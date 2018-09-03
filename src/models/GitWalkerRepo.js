@@ -1,7 +1,6 @@
-import { path } from '../utils/path.js'
-
-import { readObject } from '../storage/readObject.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { readObject } from '../storage/readObject.js'
+import { path } from '../utils/path.js'
 import { resolveTree } from '../utils/resolveTree.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
