@@ -1,5 +1,5 @@
+import { E, GitError } from '../models/GitError.js'
 import { PluginCore } from '../models/PluginCore.js'
-import { GitError, E } from '../models/GitError.js'
 
 // A collection of plugins is called a core.
 // 99.99% of the time you will only need a single core,

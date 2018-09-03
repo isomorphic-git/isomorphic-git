@@ -2,9 +2,9 @@ import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
+import { cores } from '../utils/plugins.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Add a file to the git index (aka staging area)

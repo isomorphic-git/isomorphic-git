@@ -10,9 +10,9 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
-import { cores } from '../utils/plugins.js'
-import { pkg } from '../utils/pkg.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { pkg } from '../utils/pkg.js'
+import { cores } from '../utils/plugins.js'
 
 import { config } from './config'
 

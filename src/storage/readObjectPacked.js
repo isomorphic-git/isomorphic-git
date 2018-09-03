@@ -4,7 +4,13 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { readPack } from '../storage/readPack.js'
 
-export async function readObjectPacked ({ fs: _fs, gitdir, oid, format = 'content', getExternalRefDelta }) {
+export async function readObjectPacked ({
+  fs: _fs,
+  gitdir,
+  oid,
+  format = 'content',
+  getExternalRefDelta
+}) {
   const fs = new FileSystem(_fs)
   // Check to see if it's in a packfile.
   // Iterate through all the .pack files
