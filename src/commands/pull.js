@@ -2,13 +2,13 @@
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
+import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout'
 import { config } from './config'
 import { currentBranch } from './currentBranch'
 import { fetch } from './fetch'
 import { merge } from './merge'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Fetch and merge commits from a remote repository

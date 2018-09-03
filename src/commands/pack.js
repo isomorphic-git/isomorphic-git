@@ -2,8 +2,8 @@ import pako from 'pako'
 import path from 'path'
 import Hash from 'sha.js/sha1'
 
-import { readObject } from '../storage/readObject.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { readObject } from '../storage/readObject.js'
 import { padHex } from '../utils/padHex.js'
 import { cores } from '../utils/plugins.js'
 
