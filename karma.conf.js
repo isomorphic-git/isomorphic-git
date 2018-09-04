@@ -1,4 +1,5 @@
 // Karma configuration
+const fs = require('fs')
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 const path = require('path')
 const webpack = require('webpack')
@@ -9,6 +10,50 @@ const branchOrPullRequestName =
     : process.env.TRAVIS_PULL_REQUEST_SLUG +
       '/' +
       process.env.TRAVIS_PULL_REQUEST_BRANCH
+
+const BrowsersReporter = function (baseReporterDecorator, config, logger, helper, formatError) {
+  this.browserCount = 0
+  this.buildOk = false
+  this.successfulBrowsers = []
+  this.failedBrowsers = []
+  this.onRunStart = function (browsers) {
+    this.browserCount = browsers.length
+    this.buildOk = true
+    // Append to the existing list of successful browsers
+    try {
+      const browsers = require('./successful-browsers.json')
+      this.successfulBrowsers = browsers
+    } catch (err) {
+      // nothing
+    }
+  }
+  this.onBrowserComplete = function (browser) {
+    var results = browser.lastResult
+    if (results.disconnected || results.error || results.failed) {
+      this.buildOk = false
+      this.failedBrowsers.push(browser)
+    } else {
+      if (browser.name.startsWith('HeadlessChrome')) {
+        this.successfulBrowsers.push('ChromeHeadlessNoSandbox')
+      } else if (browser.name.startsWith('Firefox')) {
+        this.successfulBrowsers.push('FirefoxHeadless')
+      } else if (browser.name.startsWith('Edge')) {
+        this.successfulBrowsers.push('sl_edge')
+      } else if (browser.name.startsWith('Mobile Safari')) {
+        this.successfulBrowsers.push('sl_ios_safari')
+      } else if (browser.name.startsWith('Chrome Mobile')) {
+        this.successfulBrowsers.push('sl_android_chrome')
+      } else if (browser.name.startsWith('Safari')) {
+        this.successfulBrowsers.push('sl_safari')
+      } else {
+        console.log(JSON.stringify(browser, null, 2))
+      }
+    }
+  }
+  this.onRunComplete = function () {
+    fs.writeFileSync('successful-browsers.json', JSON.stringify(this.successfulBrowsers, null, 2), 'utf8')
+  }
+}
 
 module.exports = function (config) {
   const options = {
@@ -94,6 +139,62 @@ module.exports = function (config) {
         browserName: 'Chrome',
         appiumVersion: '1.7.2'
       },
+      XXXbs_chrome_win: {
+        base: 'BrowserStack',
+        browser: 'Chrome',
+        browser_version: '62.0',
+        os: 'Windows',
+        os_version: '10'
+      },
+      XXXbs_firefox_win: {
+        base: 'BrowserStack',
+        browser: 'Firefox',
+        browser_version: '59.0',
+        os: 'Windows',
+        os_version: '10'
+      },
+      XXXbs_edge_win: {
+        base: 'BrowserStack',
+        browser: 'Edge',
+        browser_version: '16.0',
+        os: 'Windows',
+        os_version: '10'
+      },
+      XXXbs_chrome_mac: {
+        base: 'BrowserStack',
+        browser: 'Chrome',
+        browser_version: '62.0',
+        os: 'OS X',
+        os_version: 'High Sierra'
+      },
+      XXXbs_firefox_mac: {
+        base: 'BrowserStack',
+        browser: 'Firefox',
+        browser_version: '59.0',
+        os: 'OS X',
+        os_version: 'High Sierra'
+      },
+      XXXbs_safari_mac: {
+        base: 'BrowserStack',
+        browser: 'Safari',
+        browser_version: '11.1',
+        os: 'OS X',
+        os_version: 'High Sierra'
+      },
+      XXXbs_safari_iphone: {
+        base: 'BrowserStack',
+        real_mobile: true,
+        device: 'iPhone SE',
+        os: 'ios',
+        os_version: '11.2'
+      },
+      XXXbs_android: {
+        base: 'BrowserStack',
+        real_mobile: true,
+        device: 'Google Pixel',
+        os: 'android',
+        os_version: '8.0'
+      },
       FirefoxHeadless: {
         base: 'Firefox',
         flags: ['-headless']
@@ -102,6 +203,11 @@ module.exports = function (config) {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox']
       }
+    },
+    browserStack: {
+      project: 'isomorphic-git',
+      name: `isomorphic-git / ${branchOrPullRequestName} / ${process.env.TRAVIS_COMMIT}`,
+      build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now()
     },
     sauceLabs: {
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
@@ -124,7 +230,7 @@ module.exports = function (config) {
     singleRun: true,
     // test results reporter to use
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['verbose'],
+    reporters: ['browsers', 'verbose'],
     browserify: {
       transform: [
         // Replace process.env.CI
@@ -149,7 +255,22 @@ module.exports = function (config) {
           )
         }
       }
-    }
+    },
+    plugins: [
+      'karma-browserstack-launcher',
+      'karma-chrome-launcher',
+      'karma-edge-launcher',
+      'karma-fail-fast-reporter',
+      'karma-firefox-launcher',
+      'karma-git-http-server-middleware',
+      'karma-jasmine',
+      'karma-sauce-launcher',
+      'karma-verbose-reporter',
+      'karma-webpack',
+      {
+        'reporter:browsers': ['type', BrowsersReporter]
+      }
+    ]
   }
 
   // Speed things up
@@ -161,27 +282,47 @@ module.exports = function (config) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
     )
-    options.browsers.push(['ChromeHeadlessNoSandbox'])
+    options.browsers.push('ChromeHeadlessNoSandbox')
   } else if (!process.env.SAUCE_ACCESS_KEY) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
     )
-    options.browsers.push(['ChromeHeadlessNoSandbox'])
   } else {
-    console.log('---------------')
-    console.log('---------------')
-    console.log('---------------')
-    console.log(process.env.TRAVIS_PULL_REQUEST)
-    console.log(process.env.TRAVIS_BRANCH)
-    console.log(
-      process.env.TRAVIS_PULL_REQUEST_SLUG +
-        '/' +
-        process.env.TRAVIS_PULL_REQUEST_BRANCH
-    )
     options.browsers = options.browsers.concat(
       Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
     )
     options.reporters.push('saucelabs')
+  }
+
+  if (!process.env.BROWSER_STACK_USERNAME) {
+    console.log(
+      'Skipping BrowserStack tests because BROWSER_STACK_USERNAME environment variable is not set.'
+    )
+  } else if (!process.env.BROWSER_STACK_ACCESS_KEY) {
+    console.log(
+      'Skipping BrowserStack tests because BROWSER_STACK_ACCESS_KEY environment variable is not set.'
+    )
+    options.browsers.push('ChromeHeadlessNoSandbox')
+  } else {
+    options.browsers = options.browsers.concat(
+      Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
+    )
+    options.reporters.push('BrowserStack')
+  }
+
+  // Only re-run browsers that failed in the previous run.
+  try {
+    const browsers = require('./successful-browsers.json')
+    console.log('skipping browsers:', browsers)
+    options.browsers = options.browsers.filter(b => !browsers.includes(b))
+  } catch (err) {
+    // nothing
+  }
+  console.log('running with browsers:', options.browsers)
+
+  if (options.browsers.length === 0) {
+    fs.unlinkSync('./successful-browsers.json')
+    process.exit(0)
   }
 
   if (!process.env.CI) {

@@ -28,7 +28,13 @@ export async function resetIndex ({
     let workdirOid
     try {
       // Resolve blob
-      const obj = await readObject({ gitdir, fs, oid, filepath, format: 'deflated' })
+      const obj = await readObject({
+        gitdir,
+        fs,
+        oid,
+        filepath,
+        format: 'deflated'
+      })
       oid = obj && obj.oid
     } catch (e) {
       // This means we're resetting the file to a "deleted" state
