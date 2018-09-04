@@ -13,7 +13,9 @@ async function loadPack (fs, filename, getExternalRefDelta) {
   const pack = await fs.read(filename)
   // Sanity check. 12 byte header + 20 byte shasum
   if (pack.length < 32) {
-    return { error: `Unable to load packfile ${filename}. It's suspiciously short - try deleting it; it may be corrupt.` }
+    return {
+      error: `Unable to load packfile ${filename}. It's suspiciously short - try deleting it; it may be corrupt.`
+    }
   }
   const p = await GitPackIndex.fromPack({ pack, getExternalRefDelta })
   // Save .idx file
