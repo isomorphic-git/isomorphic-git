@@ -11,7 +11,13 @@ const branchOrPullRequestName =
       '/' +
       process.env.TRAVIS_PULL_REQUEST_BRANCH
 
-const BrowsersReporter = function (baseReporterDecorator, config, logger, helper, formatError) {
+const BrowsersReporter = function (
+  baseReporterDecorator,
+  config,
+  logger,
+  helper,
+  formatError
+) {
   this.browserCount = 0
   this.buildOk = false
   this.successfulBrowsers = []
@@ -51,7 +57,11 @@ const BrowsersReporter = function (baseReporterDecorator, config, logger, helper
     }
   }
   this.onRunComplete = function () {
-    fs.writeFileSync('successful-browsers.json', JSON.stringify(this.successfulBrowsers, null, 2), 'utf8')
+    fs.writeFileSync(
+      'successful-browsers.json',
+      JSON.stringify(this.successfulBrowsers, null, 2),
+      'utf8'
+    )
   }
 }
 
@@ -206,7 +216,9 @@ module.exports = function (config) {
     },
     browserStack: {
       project: 'isomorphic-git',
-      name: `isomorphic-git / ${branchOrPullRequestName} / ${process.env.TRAVIS_COMMIT}`,
+      name: `isomorphic-git / ${branchOrPullRequestName} / ${
+        process.env.TRAVIS_COMMIT
+      }`,
       build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now()
     },
     sauceLabs: {
