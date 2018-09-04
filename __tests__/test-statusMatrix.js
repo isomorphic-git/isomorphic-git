@@ -36,22 +36,16 @@ describe('statusMatrix', () => {
     await add({ dir, gitdir, filepath: 'a.txt' })
     await pify(fs.writeFile)(path.join(dir, 'a.txt'), acontent)
     matrix = await statusMatrix({ dir, gitdir, pattern: 'a.txt' })
-    expect(matrix).toEqual([
-      ['a.txt', 1, 1, 3]
-    ])
+    expect(matrix).toEqual([['a.txt', 1, 1, 3]])
 
     await remove({ dir, gitdir, filepath: 'a.txt' })
     matrix = await statusMatrix({ dir, gitdir, pattern: 'a.txt' })
-    expect(matrix).toEqual([
-      ['a.txt', 1, 1, 0]
-    ])
+    expect(matrix).toEqual([['a.txt', 1, 1, 0]])
 
     await pify(fs.writeFile)(path.join(dir, 'e.txt'), 'Hi')
     await add({ dir, gitdir, filepath: 'e.txt' })
     await pify(fs.unlink)(path.join(dir, 'e.txt'))
     matrix = await statusMatrix({ dir, gitdir, pattern: 'e.txt' })
-    expect(matrix).toEqual([
-      ['e.txt', 0, 0, 3]
-    ])
+    expect(matrix).toEqual([['e.txt', 0, 0, 3]])
   })
 })

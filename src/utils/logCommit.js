@@ -1,6 +1,6 @@
-import { readObject } from '../storage/readObject.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
+import { readObject } from '../storage/readObject.js'
 
 export async function logCommit ({ fs, gitdir, oid, signing }) {
   try {

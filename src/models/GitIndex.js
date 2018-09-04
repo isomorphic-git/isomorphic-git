@@ -88,7 +88,9 @@ function parseBuffer (buffer) {
       let tmp = reader.readUInt8()
       if (tmp !== 0) {
         throw new GitError(E.InternalFail, {
-          message: `Expected 1-8 null characters but got '${tmp}' after ${entry.path}`
+          message: `Expected 1-8 null characters but got '${tmp}' after ${
+            entry.path
+          }`
         })
       } else if (reader.eof()) {
         throw new GitError(E.InternalFail, {

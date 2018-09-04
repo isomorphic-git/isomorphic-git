@@ -45,7 +45,12 @@ module.exports = {
       check: 'all-contributors check'
     },
     build: {
-      default: series.nps('build.rollup', 'build.webpack', 'build.indexjson', 'build.size'),
+      default: series.nps(
+        'build.rollup',
+        'build.webpack',
+        'build.indexjson',
+        'build.size'
+      ),
       webpack: 'webpack',
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
