@@ -1,18 +1,12 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const snapshots = require('./__snapshots__/test-fetch.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
 const EventEmitter = require('events')
 const { sleep } = require('isomorphic-git/internal-apis')
-const { plugins, fetch } = require('isomorphic-git')
+const { E, plugins, fetch } = require('isomorphic-git')
 
 describe('fetch', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
-
   it('fetch (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
     plugins.set('fs', fs)
@@ -49,8 +43,9 @@ describe('fetch', () => {
     })
     await sleep(1000) // seems to be a problem spot
     expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
-    expect(output).toMatchSnapshot() //, snapshots, 'fetch shallow fetch (from Github) 1')
-    expect(progress).toMatchSnapshot() //, snapshots, 'fetch shallow fetch (from Github) 2')
+    expect(output[0]).toEqual('Counting objects: 551, done.')
+    expect(output[output.length - 1].split(' ')[1]).toEqual('551')
+    expect(progress[progress.length - 1].loaded).toEqual(progress[progress.length - 1].total)
     let shallow = await pify(fs.readFile)(`${gitdir}/shallow`, {
       encoding: 'utf8'
     })
@@ -151,7 +146,6 @@ describe('fetch', () => {
       err = e
     }
     expect(err).toBeDefined()
-    expect(err.message).toMatchSnapshot()
-    expect(err.caller).toEqual('git.fetch')
+    expect(err.code).toEqual(E.NoRefspecConfiguredError)
   })
 })
