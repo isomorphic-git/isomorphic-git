@@ -11,7 +11,13 @@ const branchOrPullRequestName =
       '/' +
       process.env.TRAVIS_PULL_REQUEST_BRANCH
 
-const BrowsersReporter = function (baseReporterDecorator, config, logger, helper, formatError) {
+const BrowsersReporter = function (
+  baseReporterDecorator,
+  config,
+  logger,
+  helper,
+  formatError
+) {
   this.browserCount = 0
   this.buildOk = false
   this.successfulBrowsers = []
@@ -51,7 +57,11 @@ const BrowsersReporter = function (baseReporterDecorator, config, logger, helper
     }
   }
   this.onRunComplete = function () {
-    fs.writeFileSync('successful-browsers.json', JSON.stringify(this.successfulBrowsers, null, 2), 'utf8')
+    fs.writeFileSync(
+      'successful-browsers.json',
+      JSON.stringify(this.successfulBrowsers, null, 2),
+      'utf8'
+    )
   }
 }
 
@@ -101,7 +111,7 @@ module.exports = function (config) {
     browserNoActivityTimeout: 4 * 60 * 1000, // default 10000
     // https://support.saucelabs.com/hc/en-us/articles/225104707-Karma-Tests-Disconnect-Particularly-When-Running-Tests-on-Safari
     browserDisconnectTimeout: 10000, // default 2000
-    browserDisconnectTolerance: 1, // default 0
+    browserDisconnectTolerance: 0, // default 0
     captureTimeout: 4 * 60 * 1000, // default 60000
     // SauceLabs browsers
     customLaunchers: {
@@ -206,7 +216,9 @@ module.exports = function (config) {
     },
     browserStack: {
       project: 'isomorphic-git',
-      name: `isomorphic-git / ${branchOrPullRequestName} / ${process.env.TRAVIS_COMMIT}`,
+      name: `isomorphic-git / ${branchOrPullRequestName} / ${
+        process.env.TRAVIS_COMMIT
+      }`,
       build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now()
     },
     sauceLabs: {
@@ -230,7 +242,8 @@ module.exports = function (config) {
     singleRun: true,
     // test results reporter to use
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['browsers', 'verbose'],
+    reporters: ['browsers', 'verbose', 'longest'],
+    longestSpecsToReport: 50,
     browserify: {
       transform: [
         // Replace process.env.CI
@@ -266,6 +279,7 @@ module.exports = function (config) {
       'karma-jasmine',
       'karma-sauce-launcher',
       'karma-verbose-reporter',
+      'karma-longest-reporter',
       'karma-webpack',
       {
         'reporter:browsers': ['type', BrowsersReporter]
@@ -308,6 +322,10 @@ module.exports = function (config) {
       Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
     )
     options.reporters.push('BrowserStack')
+  }
+
+  if (process.platform === 'win32') {
+    options.browsers.push('Edge')
   }
 
   // Only re-run browsers that failed in the previous run.

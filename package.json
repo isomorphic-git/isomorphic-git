@@ -106,6 +106,7 @@
     "karma-firefox-launcher": "1.1.0",
     "karma-git-http-server-middleware": "1.1.0",
     "karma-jasmine": "1.1.2",
+    "karma-longest-reporter": "1.1.0",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
     "karma-webpack": "3.0.0",

@@ -4,7 +4,11 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { plugins, clone } = require('isomorphic-git')
 
 describe('clone', () => {
-  it('clone with noTags', async () => {
+  // Unfortunately, cloning without singleBranch: true means the test time increases
+  // linearly with the number of branches in the repo... which increases with the number
+  // of pull requests. So automated tools to update dependencies via PRs can overwhelm
+  // the system and make this test take way too long.
+  xit('clone with noTags', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     plugins.set('fs', fs)
     await clone({
