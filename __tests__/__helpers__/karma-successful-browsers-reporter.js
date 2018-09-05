@@ -17,7 +17,12 @@ const BrowsersReporter = function (
     this.buildOk = true
     // Append to the existing list of successful browsers
     try {
-      const browsers = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'successful-browsers.json'), 'utf8'))
+      const browsers = JSON.parse(
+        fs.readFileSync(
+          path.join(process.cwd(), 'successful-browsers.json'),
+          'utf8'
+        )
+      )
       this.successfulBrowsers = browsers
     } catch (err) {
       // nothing

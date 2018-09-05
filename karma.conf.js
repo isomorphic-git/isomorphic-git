@@ -228,10 +228,16 @@ module.exports = function (config) {
       'karma-longest-reporter',
       'karma-webpack',
       {
-        'reporter:browsers': ['type', require('./__tests__/__helpers__/karma-successful-browsers-reporter')]
+        'reporter:browsers': [
+          'type',
+          require('./__tests__/__helpers__/karma-successful-browsers-reporter')
+        ]
       },
       {
-        'reporter:pr-comment': ['type', require('./__tests__/__helpers__/karma-pr-comment-reporter')]
+        'reporter:pr-comment': [
+          'type',
+          require('./__tests__/__helpers__/karma-pr-comment-reporter')
+        ]
       }
     ]
   }
