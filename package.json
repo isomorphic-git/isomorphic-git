@@ -93,6 +93,7 @@
     "duplicate-package-checker-webpack-plugin": "3.0.0",
     "envify": "4.1.0",
     "fetch-mock": "6.5.2",
+    "github-comment": "^1.0.1",
     "husky": "0.14.3",
     "jasmine": "3.2.0",
     "jasmine-core": "3.2.1",

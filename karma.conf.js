@@ -11,60 +11,6 @@ const branchOrPullRequestName =
       '/' +
       process.env.TRAVIS_PULL_REQUEST_BRANCH
 
-const BrowsersReporter = function (
-  baseReporterDecorator,
-  config,
-  logger,
-  helper,
-  formatError
-) {
-  this.browserCount = 0
-  this.buildOk = false
-  this.successfulBrowsers = []
-  this.failedBrowsers = []
-  this.onRunStart = function (browsers) {
-    this.browserCount = browsers.length
-    this.buildOk = true
-    // Append to the existing list of successful browsers
-    try {
-      const browsers = require('./successful-browsers.json')
-      this.successfulBrowsers = browsers
-    } catch (err) {
-      // nothing
-    }
-  }
-  this.onBrowserComplete = function (browser) {
-    var results = browser.lastResult
-    if (results.disconnected || results.error || results.failed) {
-      this.buildOk = false
-      this.failedBrowsers.push(browser)
-    } else {
-      if (browser.name.startsWith('HeadlessChrome')) {
-        this.successfulBrowsers.push('ChromeHeadlessNoSandbox')
-      } else if (browser.name.startsWith('Firefox')) {
-        this.successfulBrowsers.push('FirefoxHeadless')
-      } else if (browser.name.startsWith('Edge')) {
-        this.successfulBrowsers.push('sl_edge')
-      } else if (browser.name.startsWith('Mobile Safari')) {
-        this.successfulBrowsers.push('sl_ios_safari')
-      } else if (browser.name.startsWith('Chrome Mobile')) {
-        this.successfulBrowsers.push('sl_android_chrome')
-      } else if (browser.name.startsWith('Safari')) {
-        this.successfulBrowsers.push('sl_safari')
-      } else {
-        console.log(JSON.stringify(browser, null, 2))
-      }
-    }
-  }
-  this.onRunComplete = function () {
-    fs.writeFileSync(
-      'successful-browsers.json',
-      JSON.stringify(this.successfulBrowsers, null, 2),
-      'utf8'
-    )
-  }
-}
-
 module.exports = function (config) {
   const options = {
     // start these browsers
@@ -242,7 +188,7 @@ module.exports = function (config) {
     singleRun: true,
     // test results reporter to use
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['browsers', 'verbose', 'longest'],
+    reporters: ['browsers', 'verbose', 'longest', 'pr-comment'],
     longestSpecsToReport: 50,
     browserify: {
       transform: [
@@ -282,7 +228,10 @@ module.exports = function (config) {
       'karma-longest-reporter',
       'karma-webpack',
       {
-        'reporter:browsers': ['type', BrowsersReporter]
+        'reporter:browsers': ['type', require('./__tests__/__helpers__/karma-successful-browsers-reporter')]
+      },
+      {
+        'reporter:pr-comment': ['type', require('./__tests__/__helpers__/karma-pr-comment-reporter')]
       }
     ]
   }
