@@ -110,7 +110,7 @@
     "karma-longest-reporter": "1.1.0",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
-    "karma-webpack": "3.0.0",
+    "karma-webpack": "3.0.2",
     "nock": "9.6.1",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
