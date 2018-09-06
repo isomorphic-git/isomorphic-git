@@ -100,7 +100,7 @@
     "jasmine-core": "3.2.1",
     "jest": "23.5.0",
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
-    "karma": "2.0.5",
+    "karma": "3.0.0",
     "karma-browserstack-launcher": "git+https://github.com/karma-runner/karma-browserstack-launcher.git",
     "karma-chrome-launcher": "2.2.0",
     "karma-edge-launcher": "0.4.2",
