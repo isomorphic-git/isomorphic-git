@@ -368,7 +368,7 @@ export class GitPackIndex {
     return this.readSlice({ start })
   }
   async readSlice ({ start }) {
-    if (this.offsetCache[start]) return Object.assign({}, this.offsetCache[start])
+    if (this.offsetCache[start]) { return Object.assign({}, this.offsetCache[start]) }
     this.readDepth++
     const types = {
       0b0010000: 'commit',
