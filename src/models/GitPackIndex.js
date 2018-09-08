@@ -155,7 +155,7 @@ export class GitPackIndex {
       ({ data, type, reference, offset, num }) => {
         if (totalObjectCount === null) totalObjectCount = num
         let percent = Math.floor(
-          ((totalObjectCount - num) * 100) / totalObjectCount
+          (totalObjectCount - num) * 100 / totalObjectCount
         )
         if (percent !== lastPercent) {
           log(
@@ -242,7 +242,7 @@ export class GitPackIndex {
     let objectsByDepth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for (let offset in offsetToObject) {
       offset = Number(offset)
-      let percent = Math.floor((count++ * 100) / totalObjectCount)
+      let percent = Math.floor(count++ * 100 / totalObjectCount)
       if (percent !== lastPercent) {
         log(
           `${percent}%\t${Math.floor(
@@ -368,7 +368,9 @@ export class GitPackIndex {
     return this.readSlice({ start })
   }
   async readSlice ({ start }) {
-    if (this.offsetCache[start]) { return Object.assign({}, this.offsetCache[start]) }
+    if (this.offsetCache[start]) {
+      return Object.assign({}, this.offsetCache[start])
+    }
     this.readDepth++
     const types = {
       0b0010000: 'commit',
