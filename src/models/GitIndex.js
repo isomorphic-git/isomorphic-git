@@ -82,7 +82,7 @@ function parseBuffer (buffer) {
     // The next bit is awkward. We expect 1 to 8 null characters
     // such that the total size of the entry is a multiple of 8 bits.
     // (Hence subtract 12 bytes for the header.)
-    let padding = 8 - (reader.tell() - 12) % 8
+    let padding = 8 - ((reader.tell() - 12) % 8)
     if (padding === 0) padding = 8
     while (padding--) {
       let tmp = reader.readUInt8()

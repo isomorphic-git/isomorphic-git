@@ -21,5 +21,5 @@ export async function writeObjectLoose ({
   // Don't overwrite existing git objects - this helps avoid EPERM errors.
   // Although I don't know how we'd fix corrupted objects then. Perhaps delete them
   // on read?
-  if (!await fs.exists(filepath)) await fs.write(filepath, object)
+  if (!(await fs.exists(filepath))) await fs.write(filepath, object)
 }
