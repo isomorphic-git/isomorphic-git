@@ -78,7 +78,9 @@ module.exports = {
       jasmine: process.env.CI
         ? `cross-env NODE_PATH=./dist/for-node ${timeout5('jasmine')}`
         : `cross-env NODE_PATH=./dist/for-node jasmine`,
-      jest: process.env.CI ? `${timeout5('jest --ci --coverage')}` : `jest --ci --coverage`,
+      jest: process.env.CI
+        ? `${timeout5('jest --ci --coverage')}`
+        : `jest --ci --coverage`,
       uploadcoverage: optional(timeout(1)('codecov')),
       karma: process.env.CI
         ? retry3('karma start --single-run')
