@@ -100,6 +100,7 @@
     "jasmine-core": "3.2.1",
     "jest": "23.5.0",
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
+    "jest-junit": "^5.1.0",
     "karma": "2.0.5",
     "karma-browserstack-launcher": "git+https://github.com/karma-runner/karma-browserstack-launcher.git",
     "karma-chrome-launcher": "2.2.0",
@@ -112,6 +113,7 @@
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
     "karma-webpack": "3.0.2",
+    "micro": "^9.3.3",
     "nock": "9.6.1",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
@@ -142,7 +144,14 @@
       "<rootDir>/node_modules/",
       "<rootDir>/__tests__/__helpers__"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
+    "coverageReporters": [
+      "cobertura"
+    ]
   },
   "bundlesize": [
     {
