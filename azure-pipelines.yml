@@ -1,0 +1,46 @@
+# Node.js
+# Build a general Node.js application with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/vsts/pipelines/languages/javascript
+
+pool:
+  vmImage: 'Ubuntu 16.04'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '8.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+  displayName: 'npm install'
+
+- script: |
+    chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
+    chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
+    ./node_modules/.bin/micro --listen=tcp://0.0.0.0:9999 ./node_modules/@isomorphic-git/cors-proxy/index.js &
+  displayName: 'start cors-proxy'
+
+- script: |
+    node __tests__/__helpers__/can-i-skip-tests.js \
+      .all-contributorsrc \
+      CODE_OF_CONDUCT.md \
+      CONTRIBUTING.md \
+      LICENSE.md \
+      README.md \
+      __tests__/__fixtures__/test-push-server.git/hooks/update \
+      __tests__/__fixtures__/test-push-server.git/hooks/post-receive \
+      || npm test
+  displayName: 'npm test'
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: JUnit
+    testResultsFile: ./junit.xml
+
+- task: PublishCodeCoverageResults@1
+  inputs: 
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
