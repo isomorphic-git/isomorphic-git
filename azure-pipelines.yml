@@ -19,7 +19,6 @@ steps:
 - script: |
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    ./node_modules/.bin/micro --listen=tcp://0.0.0.0:9999 ./node_modules/@isomorphic-git/cors-proxy/index.js &
     node __tests__/__helpers__/can-i-skip-tests.js \
       .all-contributorsrc \
       CODE_OF_CONDUCT.md \
