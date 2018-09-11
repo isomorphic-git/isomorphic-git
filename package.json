@@ -150,6 +150,7 @@
       "jest-junit"
     ],
     "coverageReporters": [
+      "lcov",
       "cobertura"
     ]
   },
