@@ -64,3 +64,4 @@ dist
 private.key
 doc
 __tests__/__fixtures__/index.json
+junit.xml
