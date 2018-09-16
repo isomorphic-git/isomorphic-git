@@ -1,7 +1,6 @@
 import path from 'path'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { GitRemoteConnection } from '../managers/GitRemoteConnection.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
@@ -9,6 +8,8 @@ import { GitSideBand } from '../models/GitSideBand.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
+import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 
 import { config } from './config.js'
 import { isDescendent } from './isDescendent.js'
@@ -127,7 +128,7 @@ export async function push ({
       [...httpRemote.capabilities],
       ['report-status', 'side-band-64k', `agent=${pkg.agent}`]
     )
-    let packstream = await GitRemoteConnection.sendReceivePackRequest({
+    let packstream = await writeReceivePackRequest({
       capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
@@ -154,7 +155,7 @@ export async function push ({
       })
     }
     // Parse the response!
-    let result = await GitRemoteConnection.receiveReceivePackResult(packfile)
+    let result = await parseReceivePackResponse(packfile)
     return result
   } catch (err) {
     err.caller = 'git.push'

@@ -34,12 +34,12 @@ To create a new command:
 
 I have written this library as a series of layers that build upon one another and should tree-shake very well:
 
-### Commands
+## commands
 
 Each command is available as its own file, so you are able to import individual commands
 if you only need a few in order to optimize your bundle size.
 
-### Managers
+## managers
 
 Managers are a level above models. They take care of implementation performance details like
 
@@ -50,11 +50,34 @@ Managers are a level above models. They take care of implementation performance 
 - reusing objects
 - object memory pools
 
-### Models and Utils
+## everything else
 
-Models and utils are the lowest level building blocks.
+These are the lowest level building blocks. They tend to be small, pure functions.
+
+### models
+
 Models generally have very few or no dependencies except for `'buffer'`.
 This makes them portable to many different environments so they can be a useful lowest common denominator.
 
+### utils
+
 Utils are basically miscellaneous functions.
-Some are convenience wrappers for common filesystem operations.
+
+### storage
+
+This folder contains code for reading and writing to the git "object store".
+I'm hoping I can abstract it into a plugin interface at some point so that the plugin system can provide
+alternative object stores that integrate seamlessly.
+
+### wire
+
+This folder contains the parsers and serializers for the Git wire protocol.
+For a given thing, like an upload-pack command, there can be up to 4 different functions.
+
+Client:
+write[*]Request: (input: Object) -> stream
+parse[*]Response: (input: stream) -> Object
+
+Server:
+parse[*]Request: (input: stream) -> Object
+write[*]Response: (input: Object) -> stream
