@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const {
-  writeRefsAdResponse,
   parseRefsAdResponse,
   parseUploadPackResponse,
+  parseUploadPackRequest,
+  writeRefsAdResponse,
   writeUploadPackRequest
 } = require('isomorphic-git/internal-apis')
 const bufferToStream = require('buffer-to-stream')
@@ -202,38 +203,38 @@ describe('git wire protocol', () => {
 00000009done
 `)
   })
-  //   xit('parseUploadPackRequest', async () => {
-  //     let req = bufferToStream(
-  //       Buffer.from(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
-  // 0032want 5faa96fe725306e060386975a70e4b6eacb576ed
-  // 0032want 9ea43b479f5fedc679e3eb37803275d727bf51b7
-  // 0032want c1751a5447a7b025e5bca507af483dde7b0b956f
-  // 0032want d85135a47c42c9c906e20c08def2fbceac4c2a4f
-  // 0032want 18f4b62440abf61285fbfdcbfd990ab8434ff35c
-  // 0032want e5c144897b64a44bd1164a0db60738452c9eaf87
-  // 00000009done
-  // `)
-  //     )
-  //     let result = await parseUploadPackRequest(req)
-  //     expect([...result.capabilities]).toEqual([
-  //       'multi_ack_detailed',
-  //       'no-done',
-  //       'side-band-64k',
-  //       'thin-pack',
-  //       'ofs-delta',
-  //       'agent=git/2.10.1.windows.1'
-  //     ])
-  //     expect([...result.wants]).toEqual([
-  //       'fb74ea1a9b6a9601df18c38d3de751c51f064bf7',
-  //       '5faa96fe725306e060386975a70e4b6eacb576ed',
-  //       '9ea43b479f5fedc679e3eb37803275d727bf51b7',
-  //       'c1751a5447a7b025e5bca507af483dde7b0b956f',
-  //       'd85135a47c42c9c906e20c08def2fbceac4c2a4f',
-  //       '18f4b62440abf61285fbfdcbfd990ab8434ff35c',
-  //       'e5c144897b64a44bd1164a0db60738452c9eaf87'
-  //     ])
-  //     expect(result.done).toBe(true)
-  //   })
+  it('parseUploadPackRequest', async () => {
+    let req = bufferToStream(
+      Buffer.from(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
+0032want 5faa96fe725306e060386975a70e4b6eacb576ed
+0032want 9ea43b479f5fedc679e3eb37803275d727bf51b7
+0032want c1751a5447a7b025e5bca507af483dde7b0b956f
+0032want d85135a47c42c9c906e20c08def2fbceac4c2a4f
+0032want 18f4b62440abf61285fbfdcbfd990ab8434ff35c
+0032want e5c144897b64a44bd1164a0db60738452c9eaf87
+00000009done
+`)
+    )
+    let result = await parseUploadPackRequest(req)
+    expect([...result.capabilities]).toEqual([
+      'multi_ack_detailed',
+      'no-done',
+      'side-band-64k',
+      'thin-pack',
+      'ofs-delta',
+      'agent=git/2.10.1.windows.1'
+    ])
+    expect([...result.wants]).toEqual([
+      'fb74ea1a9b6a9601df18c38d3de751c51f064bf7',
+      '5faa96fe725306e060386975a70e4b6eacb576ed',
+      '9ea43b479f5fedc679e3eb37803275d727bf51b7',
+      'c1751a5447a7b025e5bca507af483dde7b0b956f',
+      'd85135a47c42c9c906e20c08def2fbceac4c2a4f',
+      '18f4b62440abf61285fbfdcbfd990ab8434ff35c',
+      'e5c144897b64a44bd1164a0db60738452c9eaf87'
+    ])
+    expect(result.done).toBe(true)
+  })
   //   xit('writeUploadPackResponse - simple clone', async () => {
   //     const packetlines = new stream.PassThrough()
   //     const packfile = new stream.PassThrough()
