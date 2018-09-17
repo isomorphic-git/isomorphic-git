@@ -115,8 +115,7 @@ describe('git wire protocol', () => {
     })
     let buffer = await pify(concat)(res)
     expect(buffer.toString('utf8')).toBe(
-      `001e# service=git-upload-pack
-000001149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
+      `01149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
 003c5faa96fe725306e060386975a70e4b6eacb576ed refs/heads/js3
 003f9ea43b479f5fedc679e3eb37803275d727bf51b7 refs/heads/master
