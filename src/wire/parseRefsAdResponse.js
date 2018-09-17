@@ -1,7 +1,7 @@
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
-export async function parseRefsAdResponse (stream, {service}) {
+export async function parseRefsAdResponse (stream, { service }) {
   const capabilities = new Set()
   const refs = new Map()
   const symrefs = new Map()

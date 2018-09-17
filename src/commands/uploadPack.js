@@ -1,7 +1,7 @@
 import path from 'path'
 
-import { FileSystem } from '../models/FileSystem.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
 import { cores } from '../utils/plugins.js'
 import { writeRefsAdResponse } from '../wire/writeRefsAdResponse.js'
 

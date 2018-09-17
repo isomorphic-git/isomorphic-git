@@ -4,9 +4,9 @@ import path from 'path'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
+import { compareRefNames } from '../utils/compareRefNames.js'
 
 import { GitConfigManager } from './GitConfigManager'
-import { compareRefNames } from '../utils/compareRefNames.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [

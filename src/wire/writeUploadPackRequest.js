@@ -16,9 +16,7 @@ export async function writeUploadPackRequest ({
   wants = [...new Set(wants)] // remove duplicates
   let firstLineCapabilities = ` ${capabilities.join(' ')}`
   for (const oid of wants) {
-    packstream.write(
-      GitPktLine.encode(`want ${oid}${firstLineCapabilities}\n`)
-    )
+    packstream.write(GitPktLine.encode(`want ${oid}${firstLineCapabilities}\n`))
     firstLineCapabilities = ''
   }
   for (const oid of shallows) {
@@ -29,9 +27,7 @@ export async function writeUploadPackRequest ({
   }
   if (since !== null) {
     packstream.write(
-      GitPktLine.encode(
-        `deepen-since ${Math.floor(since.valueOf() / 1000)}\n`
-      )
+      GitPktLine.encode(`deepen-since ${Math.floor(since.valueOf() / 1000)}\n`)
     )
   }
   for (const oid of exclude) {
