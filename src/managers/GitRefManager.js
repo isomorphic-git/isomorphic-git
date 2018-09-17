@@ -6,6 +6,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 
 import { GitConfigManager } from './GitConfigManager'
+import { compareRefNames } from '../utils/compareRefNames.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [
@@ -209,7 +210,7 @@ export class GitRefManager {
       if (line.startsWith('^')) {
         // This is a oid for the commit associated with the annotated tag immediately preceding this line.
         // Trim off the '^'
-        const value = line.slice(1, i)
+        const value = line.slice(1)
         // The tagname^{} syntax is based on the output of `git show-ref --tags -d`
         refs.set(key + '^{}', value)
       } else {
@@ -244,6 +245,8 @@ export class GitRefManager {
         }
       }
     }
+    // since we just appended things onto an array, we need to sort them now
+    files.sort(compareRefNames)
     return files
   }
   static async listBranches ({ fs: _fs, gitdir, remote }) {
