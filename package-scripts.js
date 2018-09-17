@@ -56,8 +56,11 @@ module.exports = {
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       size: optional('bundlesize')
     },
-    // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
-    proxy: `cd node_modules/@isomorphic-git/cors-proxy && micro --listen=tcp://0.0.0.0:9999`,
+    proxy: {
+      default: `cors-proxy start`,
+      start: `cors-proxy start -d`,
+      stop: `cors-proxy stop`
+    },
     test: {
       // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
       // But by default, we skip 'jest' because I decided to make it an optionalDependency after it was
@@ -68,11 +71,20 @@ module.exports = {
           'lint',
           'build',
           'test.size',
+          'proxy.start',
           'test.one',
           'test.uploadcoverage',
-          'test.karma'
+          'test.karma',
+          'proxy.stop'
         )
-        : series.nps('lint', 'build', 'test.one', 'test.karma'),
+        : series.nps(
+          'lint',
+          'build',
+          'proxy.start',
+          'test.one',
+          'test.karma',
+          'proxy.stop'
+        ),
       size: optional(timeout(1)('bundlesize')),
       one: retry3(or('nps test.jest', 'nps test.jasmine')),
       jasmine: process.env.CI

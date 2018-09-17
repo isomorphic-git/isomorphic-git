@@ -9,7 +9,7 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '8.x'
+    versionSpec: '10.5.0'
   displayName: 'Install Node.js'
 
 - script: |
@@ -19,16 +19,7 @@ steps:
 - script: |
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    ./node_modules/.bin/micro --listen=tcp://0.0.0.0:9999 ./node_modules/@isomorphic-git/cors-proxy/index.js &
-    node __tests__/__helpers__/can-i-skip-tests.js \
-      .all-contributorsrc \
-      CODE_OF_CONDUCT.md \
-      CONTRIBUTING.md \
-      LICENSE.md \
-      README.md \
-      __tests__/__fixtures__/test-push-server.git/hooks/update \
-      __tests__/__fixtures__/test-push-server.git/hooks/post-receive \
-      || npm test
+    npm test
   displayName: 'npm test'
 
 - task: PublishTestResults@2
