@@ -1,5 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const {
+  writeRefsAdResponse,
   parseRefsAdResponse,
   parseUploadPackResponse,
   writeUploadPackRequest
@@ -82,50 +83,50 @@ Git Push:
                           parseReceivePackRes            writeReceivePackRes
  */
 describe('git wire protocol', () => {
-  //   xit('writeRefsAd', async () => {
-  //     let res = new stream.PassThrough()
-  //     GitRemoteConnection.writeRefsAd('git-upload-pack', res, {
-  //       capabilities: [
-  //         'multi_ack',
-  //         'thin-pack',
-  //         'side-band',
-  //         'side-band-64k',
-  //         'ofs-delta',
-  //         'shallow',
-  //         'deepen-since',
-  //         'deepen-not',
-  //         'deepen-relative',
-  //         'no-progress',
-  //         'include-tag',
-  //         'multi_ack_detailed',
-  //         'no-done'
-  //       ],
-  //       symrefs: { HEAD: 'refs/heads/master' },
-  //       refs: {
-  //         HEAD: '9ea43b479f5fedc679e3eb37803275d727bf51b7',
-  //         'refs/heads/js2': 'fb74ea1a9b6a9601df18c38d3de751c51f064bf7',
-  //         'refs/heads/js3': '5faa96fe725306e060386975a70e4b6eacb576ed',
-  //         'refs/heads/master': '9ea43b479f5fedc679e3eb37803275d727bf51b7',
-  //         'refs/heads/master2': 'c1751a5447a7b025e5bca507af483dde7b0b956f',
-  //         'refs/heads/master3': 'd85135a47c42c9c906e20c08def2fbceac4c2a4f',
-  //         'refs/heads/master4': '18f4b62440abf61285fbfdcbfd990ab8434ff35c',
-  //         'refs/heads/master5': 'e5c144897b64a44bd1164a0db60738452c9eaf87'
-  //       }
-  //     })
-  //     let buffer = await pify(concat)(res)
-  //     expect(buffer.toString('utf8')).toBe(
-  //       `001e# service=git-upload-pack
-  // 000001149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
-  // 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
-  // 003c5faa96fe725306e060386975a70e4b6eacb576ed refs/heads/js3
-  // 003f9ea43b479f5fedc679e3eb37803275d727bf51b7 refs/heads/master
-  // 0040c1751a5447a7b025e5bca507af483dde7b0b956f refs/heads/master2
-  // 0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
-  // 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
-  // 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
-  // 0000`
-  //     )
-  //   })
+  it('writeRefsAd', async () => {
+    let res = await writeRefsAdResponse({
+      service: 'git-upload-pack',
+      capabilities: [
+        'multi_ack',
+        'thin-pack',
+        'side-band',
+        'side-band-64k',
+        'ofs-delta',
+        'shallow',
+        'deepen-since',
+        'deepen-not',
+        'deepen-relative',
+        'no-progress',
+        'include-tag',
+        'multi_ack_detailed',
+        'no-done'
+      ],
+      symrefs: { HEAD: 'refs/heads/master' },
+      refs: {
+        HEAD: '9ea43b479f5fedc679e3eb37803275d727bf51b7',
+        'refs/heads/js2': 'fb74ea1a9b6a9601df18c38d3de751c51f064bf7',
+        'refs/heads/js3': '5faa96fe725306e060386975a70e4b6eacb576ed',
+        'refs/heads/master': '9ea43b479f5fedc679e3eb37803275d727bf51b7',
+        'refs/heads/master2': 'c1751a5447a7b025e5bca507af483dde7b0b956f',
+        'refs/heads/master3': 'd85135a47c42c9c906e20c08def2fbceac4c2a4f',
+        'refs/heads/master4': '18f4b62440abf61285fbfdcbfd990ab8434ff35c',
+        'refs/heads/master5': 'e5c144897b64a44bd1164a0db60738452c9eaf87'
+      }
+    })
+    let buffer = await pify(concat)(res)
+    expect(buffer.toString('utf8')).toBe(
+      `001e# service=git-upload-pack
+000001149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
+003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
+003c5faa96fe725306e060386975a70e4b6eacb576ed refs/heads/js3
+003f9ea43b479f5fedc679e3eb37803275d727bf51b7 refs/heads/master
+0040c1751a5447a7b025e5bca507af483dde7b0b956f refs/heads/master2
+0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
+004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
+0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
+0000`
+    )
+  })
   it('parseRefsAdResponse', async () => {
     let res = bufferToStream(
       Buffer.from(`001e# service=git-upload-pack
