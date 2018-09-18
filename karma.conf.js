@@ -213,6 +213,29 @@ module.exports = function (config) {
             // 'src/index.js'
           )
         }
+      },
+      // We include the same plugins we use to comopile bundle.umd.min.js
+      // so that our test files can use the same syntax support.
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            // But we make sure NOT to attempt to re-run the minified bundle through Babel,
+            // because that will just crash webpack.
+            exclude: /node_modules|isomorphic-git/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                babelrc: false,
+                plugins: [
+                  '@babel/plugin-proposal-object-rest-spread',
+                  '@babel/plugin-proposal-async-generator-functions',
+                  '@babel/plugin-transform-async-to-generator'
+                ]
+              }
+            }
+          }
+        ]
       }
     },
     plugins: [
