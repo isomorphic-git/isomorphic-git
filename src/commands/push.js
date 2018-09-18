@@ -1,4 +1,5 @@
 import path from 'path'
+import MultiStream from 'multistream'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -8,6 +9,7 @@ import { GitSideBand } from '../models/GitSideBand.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { asyncIterableToStream } from '../utils/asyncIterableToStream.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 
@@ -128,15 +130,14 @@ export async function push ({
       [...httpRemote.capabilities],
       ['report-status', 'side-band-64k', `agent=${pkg.agent}`]
     )
-    let packstream = await writeReceivePackRequest({
+    let receivePackRequest = await writeReceivePackRequest({
       capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
-    pack({
+    let packstream = await pack({
       fs,
       gitdir,
-      oids: [...objects],
-      outputStream: packstream
+      oids: [...objects]
     })
     let { packfile, progress } = await GitSideBand.demux(
       await GitRemoteHTTP.connect({
@@ -145,7 +146,10 @@ export async function push ({
         url,
         noGitSuffix,
         auth,
-        stream: packstream
+        stream: new MultiStream([
+          asyncIterableToStream(receivePackRequest),
+          packstream
+        ])
       })
     )
     if (emitter) {

@@ -41,6 +41,7 @@ module.exports = [
               babelrc: false,
               plugins: [
                 '@babel/plugin-proposal-object-rest-spread',
+                '@babel/plugin-proposal-async-generator-functions',
                 '@babel/plugin-transform-async-to-generator'
               ]
             }

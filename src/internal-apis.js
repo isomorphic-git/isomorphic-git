@@ -29,6 +29,7 @@ export * from './storage/readObject'
 export * from './storage/writeObject'
 
 export * from './utils/auth'
+export * from './utils/asyncIterableToStream'
 export * from './utils/calculateBasicAuthHeader'
 export * from './utils/calculateBasicAuthUsernamePasswordPair'
 export * from './utils/comparePath'

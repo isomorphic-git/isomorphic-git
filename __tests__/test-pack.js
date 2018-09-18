@@ -2,7 +2,6 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
 const pify = require('pify')
-const stream = require('stream')
 const concat = require('simple-concat')
 
 const { plugins, pack } = require('isomorphic-git/internal-apis')
@@ -16,10 +15,8 @@ describe('pack', () => {
     let fixture = await pify(fs.readFile)(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
-    let fstream = new stream.PassThrough()
-    await pack({
+    let fstream = await pack({
       gitdir,
-      outputStream: fstream,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',
         '0bfe8fa3764089465235461624f2ede1533e74ec',

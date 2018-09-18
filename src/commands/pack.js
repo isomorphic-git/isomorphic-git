@@ -1,5 +1,6 @@
 import pako from 'pako'
 import path from 'path'
+import { PassThrough } from 'stream'
 import Hash from 'sha.js/sha1'
 
 import { FileSystem } from '../models/FileSystem.js'
@@ -9,21 +10,28 @@ import { cores } from '../utils/plugins.js'
 
 import { types } from './types'
 
+// TODO: Generate the stream lazily, rather than buffer the entire thing.
 export async function pack ({
   core = 'default',
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  oids,
-  outputStream
+  oids
 }) {
   const fs = new FileSystem(_fs)
+  const outputStream = new PassThrough()
   let hash = new Hash()
   function write (chunk, enc) {
     outputStream.write(chunk, enc)
     hash.update(chunk, enc)
   }
-  function writeObject ({ stype, object }) {
+  function streamHeader () {
+    write('PACK')
+    write('00000002', 'hex')
+    // Write a 4 byte (32-bit) int
+    write(padHex(8, oids.length), 'hex')
+  }
+  function streamObject (stype, object) {
     let lastFour, multibyte, length
     // Object type is encoded in bits 654
     let type = types[stype]
@@ -50,16 +58,16 @@ export async function pack ({
     // Lastly, we can compress and write the object.
     write(Buffer.from(pako.deflate(object)))
   }
-  write('PACK')
-  write('00000002', 'hex')
-  // Write a 4 byte (32-bit) int
-  write(padHex(8, oids.length), 'hex')
+  function streamFooter () {
+    // Write SHA1 checksum
+    let digest = hash.digest()
+    outputStream.end(digest)
+  }
+  streamHeader()
   for (let oid of oids) {
     let { type, object } = await readObject({ fs, gitdir, oid })
-    writeObject({ write, object, stype: type })
+    streamObject(type, object)
   }
-  // Write SHA1 checksum
-  let digest = hash.digest()
-  outputStream.end(digest)
+  streamFooter()
   return outputStream
 }
