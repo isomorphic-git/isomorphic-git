@@ -1,5 +1,3 @@
-import { PassThrough } from 'stream'
-
 import { GitPktLine } from '../models/GitPktLine.js'
 
 export async function * writeReceivePackRequest ({

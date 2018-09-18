@@ -30,7 +30,7 @@ module.exports = {
     },
     lint: {
       default: series.nps('lint.js', 'lint.typescript'),
-      js: `standard ${srcPaths}`,
+      js: `standard --parser babel-eslint ${srcPaths}`,
       typescript: 'tsc src/index.d.ts --lib es6'
     },
     watch: {
