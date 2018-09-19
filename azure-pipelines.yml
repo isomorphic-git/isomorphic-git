@@ -27,8 +27,7 @@ steps:
       LICENSE.md \
       README.md \
       __tests__/__fixtures__/test-push-server.git/hooks/update \
-      __tests__/__fixtures__/test-push-server.git/hooks/post-receive \
-      || npm test
+      __tests__/__fixtures__/test-push-server.git/hooks/post-receive || npm test
   displayName: 'npm test'
 
 - task: PublishTestResults@2
