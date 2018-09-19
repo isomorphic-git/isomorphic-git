@@ -1,6 +1,7 @@
 export * from './commands/listCommits'
 export * from './commands/listObjects'
 export * from './commands/pack'
+export * from './commands/uploadPack'
 
 export * from './managers/GitConfigManager'
 export * from './managers/GitIgnoreManager'

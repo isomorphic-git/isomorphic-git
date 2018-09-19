@@ -41,7 +41,6 @@ Array [
   "sign",
   "status",
   "statusMatrix",
-  "uploadPack",
   "utils",
   "verify",
   "version",

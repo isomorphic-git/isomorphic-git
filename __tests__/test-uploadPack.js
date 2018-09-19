@@ -4,7 +4,8 @@ const concat = require('simple-concat')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, uploadPack } = require('isomorphic-git')
+const { plugins } = require('isomorphic-git')
+const { uploadPack } = require('isomorphic-git/internal-apis')
 
 describe('uploadPack', () => {
   it('advertiseRefs: true', async () => {
