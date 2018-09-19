@@ -24,8 +24,12 @@ module.exports = {
     let newbrowsers = browsers.filter(b => !successfulBrowsers.includes(b))
 
     if (newbrowsers.length === 0) {
-      console.log('All browsers already passed test suite. Deleting successful-browser-tests.json')
-      fs.unlinkSync(path.join(process.cwd(), 'dist', 'successful-browser-tests.json'))
+      console.log(
+        'All browsers already passed test suite. Deleting successful-browser-tests.json'
+      )
+      fs.unlinkSync(
+        path.join(process.cwd(), 'dist', 'successful-browser-tests.json')
+      )
       process.exit(0)
     }
     return newbrowsers

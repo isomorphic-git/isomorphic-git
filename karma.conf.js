@@ -283,7 +283,9 @@ module.exports = function (config) {
   // }
 
   // Only re-run browsers that failed in the previous run.
-  options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(options.browsers)
+  options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
+    options.browsers
+  )
   console.log('running with browsers:', options.browsers)
 
   if (!process.env.CI) {
