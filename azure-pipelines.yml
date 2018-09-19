@@ -33,8 +33,8 @@ steps:
 
 - task: PublishTestResults@2
   inputs:
-    testRunner: JUnit
-    testResultsFile: ./junit.xml
+    testResultsFormat: JUnit
+    testResultsFiles: ./junit.xml
 
 - task: PublishCodeCoverageResults@1
   inputs: 
