@@ -13,7 +13,8 @@ export async function parseRefsAdResponse (stream, { service }) {
   // skip past any flushes
   while (lineOne === null) lineOne = await read()
   if (lineOne === true) throw new GitError(E.EmptyServerResponseFail)
-  if (lineOne.toString('utf8') !== `# service=${service}\n`) {
+  // Clients MUST ignore an LF at the end of the line.
+  if (lineOne.toString('utf8').replace(/\n$/, '') !== `# service=${service}`) {
     throw new GitError(E.AssertServerResponseFail, {
       expected: `# service=${service}\\n`,
       actual: lineOne.toString('utf8')
