@@ -109,6 +109,7 @@
     "karma-firefox-launcher": "1.1.0",
     "karma-git-http-server-middleware": "1.1.0",
     "karma-jasmine": "1.1.2",
+    "karma-junit-reporter": "^1.2.0",
     "karma-longest-reporter": "1.1.0",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
@@ -133,26 +134,6 @@
     "webpack": "4.17.2",
     "webpack-bundle-analyzer": "2.13.1",
     "webpack-cli": "3.1.0"
-  },
-  "jest": {
-    "testRegex": "/__tests__/[^\\/]+\\.js",
-    "moduleNameMapper": {
-      "^isomorphic-git$": "<rootDir>/src",
-      "^isomorphic-git/(.+)$": "<rootDir>/src/$1"
-    },
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/__tests__/__helpers__"
-    ],
-    "testEnvironment": "node",
-    "reporters": [
-      "default",
-      "jest-junit"
-    ],
-    "coverageReporters": [
-      "lcov",
-      "cobertura"
-    ]
   },
   "bundlesize": [
     {

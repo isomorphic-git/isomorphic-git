@@ -25,6 +25,8 @@ const BrowsersReporter = function (
     if (results.disconnected || results.error || results.failed) {
       this.buildOk = false
       this.failedBrowsers.push(browser)
+      // a bit hacky, but provides a record of failed tests as well this way!
+      this.successfulBrowsersFullNames.push('X ' + browser.name)
     } else {
       this.successfulBrowsersFullNames.push(browser.name)
     }
