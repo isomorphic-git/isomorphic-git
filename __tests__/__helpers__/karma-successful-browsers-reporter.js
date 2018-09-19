@@ -31,6 +31,16 @@ const BrowsersReporter = function (
   }
   this.onRunComplete = function () {
     loadSuccessfulBrowsers.save(this.successfulBrowsersFullNames)
+    // workaround karma hanging in Azure
+    if (this.failedBrowsers.length === 0) {
+      setTimeout(function () {
+        process.exit(0)
+      }, 5000)
+    } else {
+      setTimeout(function () {
+        process.exit(1)
+      }, 5000)
+    }
   }
 }
 
