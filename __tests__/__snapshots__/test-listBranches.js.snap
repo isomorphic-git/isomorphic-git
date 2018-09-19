@@ -3,9 +3,9 @@
 exports[`listBranches listBranches 1`] = `
 Array [
   "feature/supercool",
+  "greenkeeper/initial",
   "master",
   "test-branch",
-  "greenkeeper/initial",
 ]
 `;
 

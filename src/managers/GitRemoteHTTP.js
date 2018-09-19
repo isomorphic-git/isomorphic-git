@@ -6,8 +6,7 @@ import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
-
-import { GitRemoteConnection } from './GitRemoteConnection.js'
+import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
 // Try to accomodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string
@@ -68,7 +67,7 @@ export class GitRemoteHTTP {
     }
     // I'm going to be nice and ignore the content-type requirement unless there is a problem.
     try {
-      let remoteHTTP = await GitRemoteConnection.receiveInfoRefs(service, res)
+      let remoteHTTP = await parseRefsAdResponse(res, { service })
       remoteHTTP.auth = auth
       return remoteHTTP
     } catch (err) {
