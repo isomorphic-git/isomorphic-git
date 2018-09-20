@@ -34,7 +34,7 @@ steps:
 - task: PublishTestResults@2
   inputs:
     testResultsFormat: JUnit
-    testResultsFiles: ./junit/*.xml
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
 
 - task: PublishCodeCoverageResults@1
   inputs: 
