@@ -44,4 +44,10 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
+    artifactName: 'dist'
     PathtoPublish: '$(System.DefaultWorkingDirectory)/dist'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    artifactName: 'bundle.umd.min.js'
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
