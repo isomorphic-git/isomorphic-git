@@ -4,9 +4,8 @@ module.exports = {
     '^isomorphic-git$': '<rootDir>/src',
     '^isomorphic-git/(.+)$': '<rootDir>/src/$1'
   },
-  'coveragePathIgnorePatterns': [
-    '<rootDir>/node_modules/',
-    '<rootDir>/__tests__/__helpers__'
+  'collectCoverageFrom': [
+    'src/**'
   ],
   'testEnvironment': 'node',
   'reporters': [
