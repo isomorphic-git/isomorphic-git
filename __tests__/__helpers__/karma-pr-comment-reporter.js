@@ -34,18 +34,20 @@ const CommentReporter = function (
 
 function postComment (body) {
   // comment(token, repo, issueId, body)
-  if (
-    process.env.TRAVIS_PULL_REQUEST &&
-    process.env.TRAVIS_PULL_REQUEST !== 'false'
-  ) {
+  const isPR = (process.env.TRAVIS_PULL_REQUEST && process.env.TRAVIS_PULL_REQUEST !== 'false') ||
+    process.env['Build.Reason'] === 'PullRequest'
+  const repo = process.env.TRAVIS_REPO_SLUG || process.env['Build.Repository.Name']
+  const issue = process.env.TRAVIS_PULL_REQUEST || process.env['System.PullRequest.PullRequestId']
+  console.log(`Detected repo: ${repo}, issue: #${issue}, is PR: ${isPR}`)
+  if (isPR) {
     comment(
       process.env.GITHUB_TOKEN,
-      process.env.TRAVIS_REPO_SLUG,
-      process.env.TRAVIS_PULL_REQUEST,
+      repo,
+      issue,
       body
     )
       .then(response =>
-        console.log(`posted results to PR #${process.env.TRAVIS_PULL_REQUEST}`)
+        console.log(`posted results to PR #${issue}`)
       )
       .catch(err => console.log('error leaving Github comment:', err))
   } else {
