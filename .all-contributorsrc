@@ -220,6 +220,15 @@
         "ideas",
         "fundingFinding"
       ]
+    },
+    {
+      "login": "DeltaEvo",
+      "name": "David Duarte",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8864716?v=4",
+      "profile": "https://github.com/DeltaEvo",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }

@@ -4,15 +4,15 @@ import concat from 'simple-concat'
 import split2 from 'split2'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { GitRemoteConnection } from '../managers/GitRemoteConnection.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { GitSideBand } from '../models/GitSideBand.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
+import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 
 import { config } from './config'
 
@@ -215,7 +215,7 @@ async function fetchPackfile ({
   }
   let oids = await GitShallowManager.read({ fs, gitdir })
   let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
-  let packstream = await GitRemoteConnection.sendUploadPackRequest({
+  let packstream = await writeUploadPackRequest({
     capabilities,
     wants,
     haves,
@@ -236,21 +236,17 @@ async function fetchPackfile ({
     auth,
     stream: packstream
   })
-  let response = GitSideBand.demux(raw)
   // Normally I would await this, but for some reason I'm having trouble detecting
   // when this header portion is over.
-  GitRemoteConnection.receiveUploadPackResult(response).then(
-    async parsedResponse => {
-      // Apply all the 'shallow' and 'unshallow' commands
-      for (const oid of parsedResponse.shallows) {
-        oids.add(oid)
-      }
-      for (const oid of parsedResponse.unshallows) {
-        oids.delete(oid)
-      }
-      await GitShallowManager.write({ fs, gitdir, oids })
-    }
-  )
+  let response = await parseUploadPackResponse(raw)
+  // Apply all the 'shallow' and 'unshallow' commands
+  for (const oid of response.shallows) {
+    oids.add(oid)
+  }
+  for (const oid of response.unshallows) {
+    oids.delete(oid)
+  }
+  await GitShallowManager.write({ fs, gitdir, oids })
   // Update local remote refs
   if (singleBranch) {
     const refs = new Map([[fullref, oid]])

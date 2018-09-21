@@ -1,12 +1,15 @@
 /* eslint-env node, browser, jasmine */
 const {
-  GitRemoteConnection,
-  GitSideBand
+  parseRefsAdResponse,
+  parseUploadPackResponse,
+  parseUploadPackRequest,
+  writeRefsAdResponse,
+  writeUploadPackRequest
 } = require('isomorphic-git/internal-apis')
 const bufferToStream = require('buffer-to-stream')
 const pify = require('pify')
 const concat = require('simple-concat')
-const stream = require('stream')
+// const stream = require('stream')
 
 /*
 A diagram might be helpful.
@@ -17,17 +20,17 @@ Git Fetch:
 
   Client                                            Server
   Out-of-band request /info/refs -----------------> Out of band reciever
-  receiveInfoRefs <-------------------------------- sendInfoRefs
-  sendUploadPackRequest --------------------------> receiveUploadPackRequest
-  receiveUploadPackResult <------------------------ sendUploadPackResult
+  parseRefsAdResponse <----------------------------- writeRefsAdResponse
+  writeUploadPackRequest --------------------------> parseUploadPackRequest
+  parseUploadPackResponse <------------------------ sendUploadPackResponse
 
 Git Push:
 
   Client                                            Server
   Out-of-band request /info/refs -----------------> Out of band reciever
-  receiveInfoRefs <-------------------------------- sendInfoRefs
-  sendReceivePackRequest -------------------------> receiveReceivePackRequest
-  receiveReceivePackResult <----------------------- sendReceivePackResult
+  parseRefsAdResponse <----------------------------- writeRefsAdResponse
+  writeReceivePackRequest -------------------------> parseReceivePackRequest
+  parseReceivePackResponse <----------------------- writeReceivePackResponse
 
 --- DETAILED FETCH --- TODO: REFACTOR CODE UNTIL IT LOOKS LIKE THIS
 
@@ -64,11 +67,11 @@ Git Push:
 --- DETAILED PUSH --- TODO: Redraw with the level of detail of the FETCH diagram
 
   push                    GitRemoteHTTP                  GitLocalHTTP          serve
-  createInfoRefsReq ----> sendInfoRefsReq -------------> recvInfoRefsReq ----> handleInfoRefsReq
+  createInfoRefsReq ----> writeRefsAdReq -------------> recvInfoRefsReq ----> handleInfoRefsReq
                                ↑  ↓                           ↑  ↓
                           writeInfoRefsReq               parseInfoRefsReq
 
-  handleInfoRefsRes <---- recvInfoRefsRes <------------- sendInfoRefsRes <---- createInfoRefsRes
+  handleInfoRefsRes <---- recvInfoRefsRes <------------- writeRefsAdRes <---- createInfoRefsRes
                                ↑  ↓                           ↑  ↓
                           parseInfoRefsRes               writeInfoRefsRes
 
@@ -80,10 +83,10 @@ Git Push:
                                ↑  ↓                           ↑  ↓
                           parseReceivePackRes            writeReceivePackRes
  */
-describe('GitRemoteConnection', () => {
-  xit('sendInfoRefs', async () => {
-    let res = new stream.PassThrough()
-    GitRemoteConnection.sendInfoRefs('git-upload-pack', res, {
+describe('git wire protocol', () => {
+  it('writeRefsAd', async () => {
+    let res = await writeRefsAdResponse({
+      service: 'git-upload-pack',
       capabilities: [
         'multi_ack',
         'thin-pack',
@@ -113,8 +116,7 @@ describe('GitRemoteConnection', () => {
     })
     let buffer = await pify(concat)(res)
     expect(buffer.toString('utf8')).toBe(
-      `001e# service=git-upload-pack
-000001149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
+      `01149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
 003c5faa96fe725306e060386975a70e4b6eacb576ed refs/heads/js3
 003f9ea43b479f5fedc679e3eb37803275d727bf51b7 refs/heads/master
@@ -125,7 +127,7 @@ describe('GitRemoteConnection', () => {
 0000`
     )
   })
-  it('receiveInfoRefs', async () => {
+  it('parseRefsAdResponse', async () => {
     let res = bufferToStream(
       Buffer.from(`001e# service=git-upload-pack
 000001149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
@@ -138,10 +140,7 @@ describe('GitRemoteConnection', () => {
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
 0000`)
     )
-    let result = await GitRemoteConnection.receiveInfoRefs(
-      'git-upload-pack',
-      res
-    )
+    let result = await parseRefsAdResponse(res, { service: 'git-upload-pack' })
     expect([...result.capabilities]).toEqual([
       'multi_ack',
       'thin-pack',
@@ -171,7 +170,7 @@ describe('GitRemoteConnection', () => {
       ['refs/heads/master5', 'e5c144897b64a44bd1164a0db60738452c9eaf87']
     ])
   })
-  it('sendUploadPackRequest', async () => {
+  it('writeUploadPackRequest', async () => {
     let req = {
       capabilities: [
         'multi_ack_detailed',
@@ -191,7 +190,7 @@ describe('GitRemoteConnection', () => {
         'e5c144897b64a44bd1164a0db60738452c9eaf87'
       ]
     }
-    let result = await GitRemoteConnection.sendUploadPackRequest(req)
+    let result = await writeUploadPackRequest(req)
     let buffer = await pify(concat)(result)
     expect(buffer.toString('utf8'))
       .toEqual(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
@@ -204,7 +203,7 @@ describe('GitRemoteConnection', () => {
 00000009done
 `)
   })
-  xit('receiveUploadPackRequest', async () => {
+  it('parseUploadPackRequest', async () => {
     let req = bufferToStream(
       Buffer.from(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
 0032want 5faa96fe725306e060386975a70e4b6eacb576ed
@@ -216,7 +215,7 @@ describe('GitRemoteConnection', () => {
 00000009done
 `)
     )
-    let result = await GitRemoteConnection.receiveUploadPackRequest(req)
+    let result = await parseUploadPackRequest(req)
     expect([...result.capabilities]).toEqual([
       'multi_ack_detailed',
       'no-done',
@@ -236,65 +235,61 @@ describe('GitRemoteConnection', () => {
     ])
     expect(result.done).toBe(true)
   })
-  xit('sendUploadPackResult - simple clone', async () => {
-    const packetlines = new stream.PassThrough()
-    const packfile = new stream.PassThrough()
-    const progress = new stream.PassThrough()
-    const error = new stream.PassThrough()
-    let result = await GitRemoteConnection.sendUploadPackResult({
-      packetlines,
-      packfile,
-      progress,
-      error
-    })
-    packetlines.end()
-    packfile.end()
-    progress.end()
-    error.end()
-    let buffer = await pify(concat)(result)
-    expect(buffer.toString('utf8')).toEqual(`0008NAK\n`)
-  })
-  xit('sendUploadPackResult - incremental update (fetch)', async () => {
-    const packetlines = new stream.PassThrough()
-    const packfile = new stream.PassThrough()
-    const progress = new stream.PassThrough()
-    const error = new stream.PassThrough()
-    let result = await GitRemoteConnection.sendUploadPackResult({
-      packetlines,
-      packfile,
-      progress,
-      error,
-      acks: [
-        { oid: '7e47fe2bd8d01d481f44d7af0531bd93d3b21c01', status: 'continue' },
-        { oid: '74730d410fcb6603ace96f1dc55ea6196122532d', status: undefined }
-      ],
-      nak: false
-    })
-    packetlines.end()
-    packfile.end()
-    progress.end()
-    error.end()
-    let buffer = await pify(concat)(result)
-    expect(buffer.toString('utf8'))
-      .toEqual(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue
-0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d\n`)
-  })
-  it('receiveUploadPackResult - simple clone', async () => {
+  //   xit('writeUploadPackResponse - simple clone', async () => {
+  //     const packetlines = new stream.PassThrough()
+  //     const packfile = new stream.PassThrough()
+  //     const progress = new stream.PassThrough()
+  //     const error = new stream.PassThrough()
+  //     let result = await writeUploadPackResponse({
+  //       packetlines,
+  //       packfile,
+  //       progress,
+  //       error
+  //     })
+  //     packetlines.end()
+  //     packfile.end()
+  //     progress.end()
+  //     error.end()
+  //     let buffer = await pify(concat)(result)
+  //     expect(buffer.toString('utf8')).toEqual(`0008NAK\n`)
+  //   })
+  //   xit('writeUploadPackResponse - incremental update (fetch)', async () => {
+  //     const packetlines = new stream.PassThrough()
+  //     const packfile = new stream.PassThrough()
+  //     const progress = new stream.PassThrough()
+  //     const error = new stream.PassThrough()
+  //     let result = await writeUploadPackResponse({
+  //       packetlines,
+  //       packfile,
+  //       progress,
+  //       error,
+  //       acks: [
+  //         { oid: '7e47fe2bd8d01d481f44d7af0531bd93d3b21c01', status: 'continue' },
+  //         { oid: '74730d410fcb6603ace96f1dc55ea6196122532d', status: undefined }
+  //       ],
+  //       nak: false
+  //     })
+  //     packetlines.end()
+  //     packfile.end()
+  //     progress.end()
+  //     error.end()
+  //     let buffer = await pify(concat)(result)
+  //     expect(buffer.toString('utf8'))
+  //       .toEqual(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue
+  // 0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d\n`)
+  //   })
+  it('parseUploadPackResponse - simple clone', async () => {
     let res = bufferToStream(Buffer.from(`0008NAK\n`))
-    let result = await GitRemoteConnection.receiveUploadPackResult(
-      GitSideBand.demux(res)
-    )
+    let result = await parseUploadPackResponse(res)
     expect(result.nak).toBe(true)
   })
-  it('receiveUploadPackResult - incremental update (fetch)', async () => {
+  it('parseUploadPackResponse - incremental update (fetch)', async () => {
     let res = bufferToStream(
       Buffer.from(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue
 0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d
 `)
     )
-    let result = await GitRemoteConnection.receiveUploadPackResult(
-      GitSideBand.demux(res)
-    )
+    let result = await parseUploadPackResponse(res)
     expect(result.nak).toBe(false)
     expect(result.acks).toEqual([
       { oid: '7e47fe2bd8d01d481f44d7af0531bd93d3b21c01', status: 'continue' },

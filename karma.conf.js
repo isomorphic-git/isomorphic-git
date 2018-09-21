@@ -1,5 +1,4 @@
 // Karma configuration
-const fs = require('fs')
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 const path = require('path')
 const webpack = require('webpack')
@@ -279,24 +278,13 @@ module.exports = function (config) {
     options.reporters.push('BrowserStack')
   }
 
-  if (process.platform === 'win32') {
-    options.browsers.push('Edge')
-  }
+  // if (process.platform === 'win32') {
+  //   options.browsers.push('Edge')
+  // }
 
   // Only re-run browsers that failed in the previous run.
-  try {
-    const browsers = require('./successful-browsers.json')
-    console.log('skipping browsers:', browsers)
-    options.browsers = options.browsers.filter(b => !browsers.includes(b))
-  } catch (err) {
-    // nothing
-  }
+  options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(options.browsers)
   console.log('running with browsers:', options.browsers)
-
-  if (options.browsers.length === 0) {
-    fs.unlinkSync('./successful-browsers.json')
-    process.exit(0)
-  }
 
   if (!process.env.CI) {
     // Continuous Integration mode

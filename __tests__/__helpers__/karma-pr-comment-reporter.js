@@ -1,5 +1,8 @@
 const comment = require('github-comment')
 
+let commit = process.env.TRAVIS_COMMIT || process.env['Build.SourceVersion']
+commit = commit ? ` for ${commit}` : ''
+
 const CommentReporter = function (
   baseReporterDecorator,
   config,
@@ -8,7 +11,7 @@ const CommentReporter = function (
   formatError
 ) {
   this.rows = [
-    `## Test Results:`,
+    `## Test Results${commit}:`,
     `| Browser | Passed | Skipped | Failed | Time | Disconnected | Error |`,
     `|---------|--------|---------|--------|------|--------------|-------|`
   ]
