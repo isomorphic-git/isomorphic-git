@@ -30,6 +30,14 @@ steps:
       __tests__/__fixtures__/test-push-server.git/hooks/post-receive || npm test
     kill %1
   displayName: 'npm test'
+  env:
+    BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
+    BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
+    BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
+    GH_TOKEN: $(Gh.Token)
+    GITHUB_TOKEN: $(Github.Token)
+    SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
+    SAUCE_USERNAME: $(Sauce.Username)
 
 - task: PublishTestResults@2
   inputs:
