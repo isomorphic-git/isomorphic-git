@@ -52,3 +52,7 @@ steps:
   inputs:
     artifactName: 'bundle.umd.min.js'
     PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
+
+- script: npm run semantic-release
+  displayName: 'semantic-release'
+  conditions: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
