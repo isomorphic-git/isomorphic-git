@@ -108,7 +108,7 @@ module.exports = function (config) {
         os: 'Windows',
         os_version: '10'
       },
-      bs_edge_win: {
+      XXXbs_edge_win: {
         base: 'BrowserStack',
         browser: 'Edge',
         browser_version: '16.0',
