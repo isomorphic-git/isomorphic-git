@@ -25,22 +25,14 @@ const BrowsersReporter = function (
     if (results.disconnected || results.error || results.failed) {
       this.buildOk = false
       this.failedBrowsers.push(browser)
+      // a bit hacky, but provides a record of failed tests as well this way!
+      this.successfulBrowsersFullNames.push('X ' + browser.name)
     } else {
       this.successfulBrowsersFullNames.push(browser.name)
     }
   }
   this.onRunComplete = function () {
     loadSuccessfulBrowsers.save(this.successfulBrowsersFullNames)
-    // workaround karma hanging in Azure
-    if (this.failedBrowsers.length === 0) {
-      setTimeout(function () {
-        process.exit(0)
-      }, 5000)
-    } else {
-      setTimeout(function () {
-        process.exit(1)
-      }, 5000)
-    }
   }
 }
 
