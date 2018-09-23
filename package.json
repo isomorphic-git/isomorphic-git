@@ -130,7 +130,7 @@
     "travis-deploy-once": "5.0.7",
     "tweet-tweet": "1.0.4",
     "typescript": "3.0.3",
-    "webpack": "4.17.2",
+    "webpack": "4.19.1",
     "webpack-bundle-analyzer": "2.13.1",
     "webpack-cli": "3.1.0"
   },
