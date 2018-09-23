@@ -59,11 +59,12 @@ module.exports = {
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       size: optional(
         `cross-env TRAVIS=true ` +
-        `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
-        `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG || process.env.BUILD_REPOSITORY_NAME} ` +
-        // TODO: Figure out what the Azure equivalent of TRAVIS_PULL_REQUEST_SHA is.
-        `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} ` +
-        `bundlesize`
+          `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
+          `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
+            process.env.BUILD_REPOSITORY_NAME} ` +
+          // TODO: Figure out what the Azure equivalent of TRAVIS_PULL_REQUEST_SHA is.
+          `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} ` +
+          `bundlesize`
       )
     },
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
@@ -78,12 +79,7 @@ module.exports = {
       // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
-        ? series.nps(
-          'lint',
-          'build',
-          'test.one',
-          'test.karma'
-        )
+        ? series.nps('lint', 'build', 'test.one', 'test.karma')
         : series.nps('lint', 'build', 'test.one', 'test.karma'),
       one: retry3(or('nps test.jest', 'nps test.jasmine')),
       jasmine: process.env.CI
