@@ -54,7 +54,7 @@ module.exports = {
       webpack: 'webpack',
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
-      size: optional(`cross-env GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} bundlesize`)
+      size: optional(`cross-env TRAVIS=true GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} TRAVIS_REPO_SLUG=${process.env.BUILD_REPOSITORY_NAME} TRAVIS_COMMIT=${process.env.BUILD_SOURCEVERSION} bundlesize`)
     },
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
     proxy: {
