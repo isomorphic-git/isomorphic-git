@@ -37,7 +37,7 @@ function postComment (body) {
   const isPR = (process.env.TRAVIS_PULL_REQUEST && process.env.TRAVIS_PULL_REQUEST !== 'false') ||
     process.env.BUILD_REASON === 'PullRequest'
   const repo = process.env.TRAVIS_REPO_SLUG || process.env.BUILD_REPOSITORY_NAME
-  const issue = process.env.TRAVIS_PULL_REQUEST || process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
+  const issue = process.env.TRAVIS_PULL_REQUEST || process.env.SYSTEM_PULLREQUEST_PULLREQUESTNUMBER || process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
   console.log(`Detected repo: ${repo}, issue: #${issue}, is PR: ${isPR}`)
   if (isPR) {
     comment(
