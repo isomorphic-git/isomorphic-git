@@ -27,9 +27,7 @@ module.exports = {
       console.log(
         'All browsers already passed test suite. Deleting ./dist/browser-tests.json'
       )
-      fs.unlinkSync(
-        path.join(process.cwd(), 'dist', 'browser-tests.json')
-      )
+      fs.unlinkSync(path.join(process.cwd(), 'dist', 'browser-tests.json'))
       process.exit(0)
     }
     return newbrowsers
