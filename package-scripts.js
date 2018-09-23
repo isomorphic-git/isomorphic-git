@@ -72,7 +72,6 @@ module.exports = {
           'lint',
           'build',
           'test.one',
-          'test.uploadcoverage',
           'test.karma'
         )
         : series.nps('lint', 'build', 'test.one', 'test.karma'),
@@ -83,7 +82,6 @@ module.exports = {
       jest: process.env.CI
         ? `${timeout5('jest --ci --coverage')}`
         : `jest --ci --coverage`,
-      uploadcoverage: optional(timeout(1)('codecov')),
       karma: process.env.CI
         ? retry3('karma start --single-run')
         : 'karma start --single-run'
