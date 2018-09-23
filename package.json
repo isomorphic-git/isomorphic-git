@@ -131,7 +131,7 @@
     "tweet-tweet": "1.0.4",
     "typescript": "3.0.3",
     "webpack": "4.19.1",
-    "webpack-bundle-analyzer": "2.13.1",
+    "webpack-bundle-analyzer": "3.0.2",
     "webpack-cli": "3.1.0"
   },
   "bundlesize": [
