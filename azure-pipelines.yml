@@ -56,3 +56,5 @@ steps:
 - script: npm run semantic-release
   displayName: 'semantic-release'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  env:
+    GH_TOKEN: $(Gh.Token)
