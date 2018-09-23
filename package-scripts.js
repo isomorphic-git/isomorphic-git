@@ -2,6 +2,9 @@
 // It's like package.json scripts, but more flexible.
 const { concurrent, series, runInNewWindow } = require('nps-utils')
 
+// Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
+require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.js')
+
 const retry = n => cmd =>
   Array(n)
     .fill(`(${cmd})`)
