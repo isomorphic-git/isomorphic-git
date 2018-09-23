@@ -187,7 +187,10 @@ module.exports = function (config) {
     singleRun: true,
     // test results reporter to use
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['browsers', 'verbose', 'longest', 'pr-comment'],
+    reporters: ['browsers', 'verbose', 'longest', 'pr-comment', 'junit'],
+    junitReporter: {
+      outputDir: './junit'
+    },
     longestSpecsToReport: 50,
     browserify: {
       transform: [
@@ -222,9 +225,10 @@ module.exports = function (config) {
       'karma-firefox-launcher',
       'karma-git-http-server-middleware',
       'karma-jasmine',
+      'karma-junit-reporter',
+      'karma-longest-reporter',
       'karma-sauce-launcher',
       'karma-verbose-reporter',
-      'karma-longest-reporter',
       'karma-webpack',
       {
         'reporter:browsers': [
@@ -283,7 +287,9 @@ module.exports = function (config) {
   // }
 
   // Only re-run browsers that failed in the previous run.
-  options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(options.browsers)
+  options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
+    options.browsers
+  )
   console.log('running with browsers:', options.browsers)
 
   if (!process.env.CI) {

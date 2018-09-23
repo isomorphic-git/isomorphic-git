@@ -43,7 +43,7 @@ describe('fetch', () => {
     })
     await sleep(1000) // seems to be a problem spot
     expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
-    expect(output[0]).toEqual('Counting objects: 551, done.')
+    // expect(output[0]).toEqual('Counting objects: 551, done.') // No longer reliable. New message seen was "Enumerating objects: 551, done."
     expect(output[output.length - 1].split(' ')[1]).toEqual('551')
     expect(progress[progress.length - 1].loaded).toEqual(
       progress[progress.length - 1].total

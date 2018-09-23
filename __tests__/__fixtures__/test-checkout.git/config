@@ -5,4 +5,4 @@
 	symlinks = false
 	ignorecase = true
 [remote "origin"]
-	url = https://github.com/wmhilton/isomorphic-git
+	url = https://github.com/isomorphic-git/isomorphic-git

@@ -79,7 +79,7 @@
     "@babel/plugin-proposal-object-rest-spread": "7.0.0",
     "@babel/plugin-transform-async-to-generator": "7.0.0",
     "@babel/preset-env": "7.0.0",
-    "@isomorphic-git/cors-proxy": "2.1.0",
+    "@isomorphic-git/cors-proxy": "2.2.3",
     "@semantic-release/exec": "3.1.2",
     "@types/node": "10.9.4",
     "all-contributors-cli": "5.4.0",
@@ -89,7 +89,6 @@
     "browserfs": "2.0.0",
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
-    "codecov": "3.1.0",
     "cross-env": "5.2.0",
     "duplicate-package-checker-webpack-plugin": "3.0.0",
     "envify": "4.1.0",
@@ -109,6 +108,7 @@
     "karma-firefox-launcher": "1.1.0",
     "karma-git-http-server-middleware": "1.1.0",
     "karma-jasmine": "1.1.2",
+    "karma-junit-reporter": "^1.2.0",
     "karma-longest-reporter": "1.1.0",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
@@ -133,26 +133,6 @@
     "webpack": "4.17.2",
     "webpack-bundle-analyzer": "2.13.1",
     "webpack-cli": "3.1.0"
-  },
-  "jest": {
-    "testRegex": "/__tests__/[^\\/]+\\.js",
-    "moduleNameMapper": {
-      "^isomorphic-git$": "<rootDir>/src",
-      "^isomorphic-git/(.+)$": "<rootDir>/src/$1"
-    },
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/__tests__/__helpers__"
-    ],
-    "testEnvironment": "node",
-    "reporters": [
-      "default",
-      "jest-junit"
-    ],
-    "coverageReporters": [
-      "lcov",
-      "cobertura"
-    ]
   },
   "bundlesize": [
     {

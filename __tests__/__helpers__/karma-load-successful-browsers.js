@@ -8,7 +8,7 @@ module.exports = {
     try {
       const browsers = JSON.parse(
         fs.readFileSync(
-          path.join(process.cwd(), 'dist', 'successful-browser-tests.json'),
+          path.join(process.cwd(), 'dist', 'browser-tests.json'),
           'utf8'
         )
       )
@@ -24,15 +24,17 @@ module.exports = {
     let newbrowsers = browsers.filter(b => !successfulBrowsers.includes(b))
 
     if (newbrowsers.length === 0) {
-      console.log('All browsers already passed test suite. Deleting successful-browser-tests.json')
-      fs.unlinkSync(path.join(process.cwd(), 'dist', 'successful-browser-tests.json'))
+      console.log(
+        'All browsers already passed test suite. Deleting ./dist/browser-tests.json'
+      )
+      fs.unlinkSync(path.join(process.cwd(), 'dist', 'browser-tests.json'))
       process.exit(0)
     }
     return newbrowsers
   },
   save (successfulBrowsersFullNames) {
     fs.writeFileSync(
-      path.join(process.cwd(), 'dist', 'successful-browser-tests.json'),
+      path.join(process.cwd(), 'dist', 'browser-tests.json'),
       JSON.stringify(successfulBrowsersFullNames, null, 2),
       'utf8'
     )

@@ -2,6 +2,9 @@
 // It's like package.json scripts, but more flexible.
 const { concurrent, series, runInNewWindow } = require('nps-utils')
 
+// Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
+require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.js')
+
 const retry = n => cmd =>
   Array(n)
     .fill(`(${cmd})`)
@@ -54,26 +57,30 @@ module.exports = {
       webpack: 'webpack',
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
-      size: optional('bundlesize')
+      size: optional(
+        `cross-env TRAVIS=true ` +
+          `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
+          `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
+            process.env.BUILD_REPOSITORY_NAME} ` +
+          // TODO: Figure out what the Azure equivalent of TRAVIS_PULL_REQUEST_SHA is.
+          `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} ` +
+          `bundlesize`
+      )
     },
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
-    proxy: `cd node_modules/@isomorphic-git/cors-proxy && micro --listen=tcp://0.0.0.0:9999`,
+    proxy: {
+      default: `cors-proxy start -p 9999`,
+      start: `cors-proxy start -p 9999 -d`,
+      stop: `cors-proxy stop`
+    },
     test: {
       // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
       // But by default, we skip 'jest' because I decided to make it an optionalDependency after it was
       // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
-        ? series.nps(
-          'lint',
-          'build',
-          'test.size',
-          'test.one',
-          'test.uploadcoverage',
-          'test.karma'
-        )
+        ? series.nps('lint', 'build', 'test.one', 'test.karma')
         : series.nps('lint', 'build', 'test.one', 'test.karma'),
-      size: optional(timeout(1)('bundlesize')),
       one: retry3(or('nps test.jest', 'nps test.jasmine')),
       jasmine: process.env.CI
         ? `cross-env NODE_PATH=./dist/for-node ${timeout5('jasmine')}`
@@ -81,7 +88,6 @@ module.exports = {
       jest: process.env.CI
         ? `${timeout5('jest --ci --coverage')}`
         : `jest --ci --coverage`,
-      uploadcoverage: optional(timeout(1)('codecov')),
       karma: process.env.CI
         ? retry3('karma start --single-run')
         : 'karma start --single-run'
