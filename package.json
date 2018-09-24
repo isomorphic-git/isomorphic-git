@@ -81,7 +81,7 @@
     "@babel/preset-env": "7.0.0",
     "@isomorphic-git/cors-proxy": "2.2.3",
     "@semantic-release/exec": "3.1.2",
-    "@types/node": "10.9.4",
+    "@types/node": "10.10.3",
     "all-contributors-cli": "5.4.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.2",
