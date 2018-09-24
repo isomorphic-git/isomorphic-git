@@ -97,7 +97,7 @@
     "husky": "0.14.3",
     "jasmine": "3.2.0",
     "jasmine-core": "3.2.1",
-    "jest": "23.5.0",
+    "jest": "23.6.0",
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
     "jest-junit": "^5.1.0",
     "karma": "2.0.5",
