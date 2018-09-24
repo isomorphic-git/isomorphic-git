@@ -124,7 +124,7 @@
     "pretty-format": "23.5.0",
     "puppeteer": "1.8.0",
     "replace-in-file": "3.4.2",
-    "rollup": "0.66.0",
+    "rollup": "0.66.2",
     "semantic-release": "15.9.16",
     "standard": "11.0.1",
     "travis-deploy-once": "5.0.7",
