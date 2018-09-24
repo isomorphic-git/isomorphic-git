@@ -114,7 +114,7 @@
     "karma-verbose-reporter": "0.0.6",
     "karma-webpack": "3.0.4",
     "micro": "^9.3.3",
-    "nock": "9.6.1",
+    "nock": "10.0.0",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "openpgp": "2.6.2",
