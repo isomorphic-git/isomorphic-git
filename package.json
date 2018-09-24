@@ -54,7 +54,7 @@
     "async-lock": "^1.1.0",
     "clean-git-ref": "1.0.3",
     "crc": "^3.5.0",
-    "debug": "^3.1.0",
+    "debug": "^4.0.1",
     "diff-lines": "^1.1.0",
     "git-apply-delta": "0.0.7",
     "globalyzer": "^0.1.0",
