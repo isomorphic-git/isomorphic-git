@@ -11,7 +11,10 @@ var tweet = TweetTweet({
   accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 })
 
-tweet(message, function (err, response) {
+let commitMessage = process.env.BUILD_SOURCEVERSIONMESSAGE
+commitMessage = commitMessage ? '\n\n' + commitMessage : ''
+
+tweet(message + commitMessage, function (err, response) {
   if (err) return console.log(err)
   console.log('Tweet id:', response.id)
 })
