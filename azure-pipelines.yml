@@ -19,9 +19,9 @@ steps:
 - script: |
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    ./node_modules/.bin/cors-proxy start &
+    ./node_modules/.bin/cors-proxy start -d
     npm test
-    kill %1
+    ./node_modules/.bin/cors-proxy stop
   displayName: 'npm test'
   env:
     BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
