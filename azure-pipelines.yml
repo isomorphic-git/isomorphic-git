@@ -43,10 +43,14 @@ steps:
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
     reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
 
+- script: |
+    npm pack
+  displayName: 'npm pack'
+
 - task: PublishBuildArtifacts@1
   inputs:
-    artifactName: 'dist'
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/dist'
+    artifactName: 'npm-tarball.tgz'
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
 
 - task: PublishBuildArtifacts@1
   inputs:
