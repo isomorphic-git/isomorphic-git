@@ -28,9 +28,11 @@ describe('fetch', () => {
     plugins.set('fs', fs)
     let output = []
     let progress = []
-    plugins.set('emitter', new EventEmitter()
-      .on('fetch.message', output.push.bind(output))
-      .on('fetch.progress', progress.push.bind(progress))
+    plugins.set(
+      'emitter',
+      new EventEmitter()
+        .on('fetch.message', output.push.bind(output))
+        .on('fetch.progress', progress.push.bind(progress))
     )
     // Test
     await fetch({
