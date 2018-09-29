@@ -28,14 +28,16 @@ describe('fetch', () => {
     plugins.set('fs', fs)
     let output = []
     let progress = []
-    let emitter = new EventEmitter()
-    emitter
-      .on('message', output.push.bind(output))
-      .on('progress', progress.push.bind(progress))
+    plugins.set(
+      'emitter',
+      new EventEmitter()
+        .on('fetch.message', output.push.bind(output))
+        .on('fetch.progress', progress.push.bind(progress))
+    )
     // Test
     await fetch({
       gitdir,
-      emitter,
+      emitterPrefix: 'fetch.',
       depth: 1,
       singleBranch: true,
       remote: 'origin',

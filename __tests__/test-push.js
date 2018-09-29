@@ -21,11 +21,14 @@ describe('push', () => {
       let { fs, gitdir } = await makeFixture('test-push')
       plugins.set('fs', fs)
       let output = []
-      let emitter = new EventEmitter().on('message', output.push.bind(output))
+      plugins.set(
+        'emitter',
+        new EventEmitter().on('push.message', output.push.bind(output))
+      )
       // Test
       let res = await push({
         gitdir,
-        emitter,
+        emitterPrefix: 'push.',
         remote: 'karma',
         ref: 'refs/heads/master'
       })
