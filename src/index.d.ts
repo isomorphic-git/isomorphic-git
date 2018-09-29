@@ -105,7 +105,17 @@ export interface GitFsPlugin {
   lstat: any;
 }
 
-export type AnyGitPlugin = GitFsPlugin
+export interface GitCredentialManagerPlugin {
+  fill: any;
+  approved: any;
+  rejected: any;
+}
+
+export interface GitEmitterPlugin {
+  emit: any;
+}
+
+export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin
 
 export type GitPluginCore = Map<string, AnyGitPlugin>
 

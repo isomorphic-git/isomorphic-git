@@ -18,7 +18,7 @@ export async function clone ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  emitter,
+  emitter = cores.get(core).get('emitter'),
   url,
   noGitSuffix = false,
   corsProxy,

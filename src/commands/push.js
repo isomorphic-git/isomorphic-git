@@ -27,7 +27,7 @@ export async function push ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  emitter,
+  emitter = cores.get(core).get('emitter'),
   ref,
   remoteRef,
   remote = 'origin',

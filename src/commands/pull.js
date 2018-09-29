@@ -23,7 +23,7 @@ export async function pull ({
   ref,
   fastForwardOnly = false,
   noGitSuffix = false,
-  emitter,
+  emitter = cores.get(core).get('emitter'),
   authUsername,
   authPassword,
   username = authUsername,

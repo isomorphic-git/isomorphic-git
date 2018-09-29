@@ -11,8 +11,11 @@ const pluginSchemas = {
     'unlink',
     'writeFile'
   ],
-  credentialManager: ['fill', 'approved', 'rejected']
+  credentialManager: ['fill', 'approved', 'rejected'],
+  emitter: ['emit']
 }
+// Critical plugins throw an error instead of returning undefined.
+const critical = new Set(['fs', 'credentialManager'])
 
 function verifySchema (key, value) {
   if (!pluginSchemas.hasOwnProperty(key)) {
@@ -36,9 +39,13 @@ export class PluginCore extends Map {
       // There can be only one.
       super.set(key, value)
     }
+    if (key === 'emitter') {
+      // There can be only one.
+      super.set(key, value)
+    }
   }
   get (key) {
-    if (!super.has(key)) {
+    if (!super.has(key) && critical.has(key)) {
       throw new GitError(E.PluginUndefined, { plugin: key })
     }
     return super.get(key)
