@@ -179,6 +179,7 @@ export function clone(args: {
   dir: string;
   gitdir?: string;
   emitter?: EventEmitter;
+  emitterPrefix?: string;
   url: string;
   corsProxy?: string;
   ref?: string;
@@ -256,6 +257,7 @@ export function fetch(args: {
   dir: string;
   gitdir?: string;
   emitter?: EventEmitter;
+  emitterPrefix?: string;
   url?: string;
   corsProxy?: string;
   ref?: string;
@@ -392,6 +394,7 @@ export function pull(args: {
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
   emitter?: EventEmitter;
+  emitterPrefix?: string;
 }): Promise<void>;
 
 export function push(args: {
@@ -409,6 +412,8 @@ export function push(args: {
   password?: string;
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+  emitter?: EventEmitter;
+  emitterPrefix?: string;
 }): Promise<PushResponse>;
 
 export function readObject(args: {

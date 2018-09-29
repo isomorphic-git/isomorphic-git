@@ -27,6 +27,7 @@ export async function fetch ({
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
+  emitterPrefix = '',
   ref = 'HEAD',
   refs,
   remote,
@@ -81,11 +82,11 @@ export async function fetch ({
     // I also include CRLF just in case.
     response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
       if (emitter) {
-        emitter.emit('message', line.trim())
+        emitter.emit(`${emitterPrefix}message`, line.trim())
       }
       let matches = line.match(/\((\d+?)\/(\d+?)\)/)
       if (matches && emitter) {
-        emitter.emit('progress', {
+        emitter.emit(`${emitterPrefix}progress`, {
           loaded: parseInt(matches[1], 10),
           total: parseInt(matches[2], 10),
           lengthComputable: true

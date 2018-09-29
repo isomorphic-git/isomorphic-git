@@ -28,6 +28,7 @@ export async function push ({
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
+  emitterPrefix = '',
   ref,
   remoteRef,
   remote = 'origin',
@@ -151,7 +152,7 @@ export async function push ({
     if (emitter) {
       progress.on('data', chunk => {
         let msg = chunk.toString('utf8')
-        emitter.emit('message', msg)
+        emitter.emit(`${emitterPrefix}message`, msg)
       })
     }
     // Parse the response!
