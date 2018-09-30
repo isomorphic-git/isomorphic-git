@@ -139,16 +139,15 @@ export async function push ({
       oids: [...objects],
       outputStream: packstream
     })
-    let { packfile, progress } = await GitSideBand.demux(
-      await GitRemoteHTTP.connect({
-        corsProxy,
-        service: 'git-receive-pack',
-        url,
-        noGitSuffix,
-        auth,
-        stream: packstream
-      })
-    )
+    let res = await GitRemoteHTTP.connect({
+      corsProxy,
+      service: 'git-receive-pack',
+      url,
+      noGitSuffix,
+      auth,
+      stream: packstream
+    })
+    let { packfile, progress } = await GitSideBand.demux(res)
     if (emitter) {
       progress.on('data', chunk => {
         let msg = chunk.toString('utf8')
@@ -157,6 +156,9 @@ export async function push ({
     }
     // Parse the response!
     let result = await parseReceivePackResponse(packfile)
+    if (res.headers) {
+      result.headers = res.headers
+    }
     return result
   } catch (err) {
     err.caller = 'git.push'

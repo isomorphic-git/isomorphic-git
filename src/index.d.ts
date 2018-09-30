@@ -66,10 +66,12 @@ export interface TreeEntry {
 export interface PushResponse {
   ok?: string[];
   errors?: string[];
+  headers?: object;
 }
 
 export interface FetchResponse {
   defaultBranch: string;
+  headers?: object;
 }
 
 export interface RemoteDescription {
