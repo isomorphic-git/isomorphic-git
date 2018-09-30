@@ -1,8 +1,4 @@
-import path from 'path'
-
-import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
-import { cores } from '../utils/plugins.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
@@ -13,15 +9,12 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  */
 export async function walkBeta1 ({
   core = 'default',
-  dir,
-  gitdir = path.join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   trees,
   map = async entry => entry,
   filter = async () => true,
   // The default reducer is a flatmap that filters out undefineds.
   reduce = async (parent, children) => {
-    // TODO: replace with `results.flat()` once that gets standardized
+    // TODO: replace with `[parent, children].flat()` once that gets standardized
     let flatten = children.reduce((acc, x) => acc.concat(x), [])
     if (parent !== undefined) flatten.unshift(parent)
     return flatten
@@ -30,11 +23,7 @@ export async function walkBeta1 ({
   iterate = (recurse, children) => Promise.all([...children].map(recurse))
 }) {
   try {
-    const fs = new FileSystem(_fs)
-
-    let walkers = trees.map(proxy => {
-      return proxy[GitWalkerSymbol]({ fs, gitdir, dir })
-    })
+    let walkers = trees.map(proxy => proxy[GitWalkerSymbol]())
 
     let root = new Array(walkers.length).fill({
       fullpath: '.',
