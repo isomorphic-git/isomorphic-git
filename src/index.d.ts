@@ -536,7 +536,7 @@ export function walkBeta1<T, Q>(args: {
   filter: (entry: WalkerEntry) => Promise<boolean>;
   map: (entry: WalkerEntry) => Promise<T | undefined>;
   reduce: (parent: T | undefined, children: Q[]) => Promise<Q>;
-  iterate: (recurse: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
+  iterate: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
 
 export function writeObject(args: {

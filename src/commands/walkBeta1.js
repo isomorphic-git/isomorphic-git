@@ -10,8 +10,8 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
 export async function walkBeta1 ({
   core = 'default',
   trees,
-  map = async entry => entry,
   filter = async () => true,
+  map = async entry => entry,
   // The default reducer is a flatmap that filters out undefineds.
   reduce = async (parent, children) => {
     // TODO: replace with `[parent, children].flat()` once that gets standardized
@@ -20,7 +20,7 @@ export async function walkBeta1 ({
     return flatten
   },
   // The default iterate function walks all children concurrently
-  iterate = (recurse, children) => Promise.all([...children].map(recurse))
+  iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
   try {
     let walkers = trees.map(proxy => proxy[GitWalkerSymbol]())
@@ -48,16 +48,16 @@ export async function walkBeta1 ({
       }
     }
 
-    const _walk = async root => {
+    const walk = async root => {
       let { children, entry } = await unionWalkerFromReaddir(root)
       if (await filter(entry)) {
-        let mappedResult = await map(entry)
-        let results = await iterate(_walk, children)
-        results = results.filter(x => x !== undefined)
-        return reduce(mappedResult, results)
+        let parent = await map(entry)
+        children = await iterate(walk, children)
+        children = children.filter(x => x !== undefined)
+        return reduce(parent, children)
       }
     }
-    return _walk(root)
+    return walk(root)
   } catch (err) {
     err.caller = 'git.walk'
     throw err
