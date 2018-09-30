@@ -108,10 +108,14 @@ export async function fetch ({
       )
     }
     // TODO: Return more metadata?
-    return {
+    let res = {
       defaultBranch: response.HEAD,
       fetchHead: response.FETCH_HEAD
     }
+    if (response.headers) {
+      res.headers = response.headers
+    }
+    return res
   } catch (err) {
     err.caller = 'git.fetch'
     throw err
@@ -240,6 +244,9 @@ async function fetchPackfile ({
   // Normally I would await this, but for some reason I'm having trouble detecting
   // when this header portion is over.
   let response = await parseUploadPackResponse(raw)
+  if (raw.headers) {
+    response.headers = raw.headers
+  }
   // Apply all the 'shallow' and 'unshallow' commands
   for (const oid of response.shallows) {
     oids.add(oid)
