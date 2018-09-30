@@ -1,8 +1,4 @@
-import path from 'path'
-
-import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
-import { cores } from '../utils/plugins.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
@@ -13,28 +9,21 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  */
 export async function walkBeta1 ({
   core = 'default',
-  dir,
-  gitdir = path.join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   trees,
-  map = async entry => entry,
   filter = async () => true,
+  map = async entry => entry,
   // The default reducer is a flatmap that filters out undefineds.
   reduce = async (parent, children) => {
-    // TODO: replace with `results.flat()` once that gets standardized
+    // TODO: replace with `[parent, children].flat()` once that gets standardized
     let flatten = children.reduce((acc, x) => acc.concat(x), [])
     if (parent !== undefined) flatten.unshift(parent)
     return flatten
   },
   // The default iterate function walks all children concurrently
-  iterate = (recurse, children) => Promise.all([...children].map(recurse))
+  iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
   try {
-    const fs = new FileSystem(_fs)
-
-    let walkers = trees.map(proxy => {
-      return proxy[GitWalkerSymbol]({ fs, gitdir, dir })
-    })
+    let walkers = trees.map(proxy => proxy[GitWalkerSymbol]())
 
     let root = new Array(walkers.length).fill({
       fullpath: '.',
@@ -59,16 +48,16 @@ export async function walkBeta1 ({
       }
     }
 
-    const _walk = async root => {
+    const walk = async root => {
       let { children, entry } = await unionWalkerFromReaddir(root)
       if (await filter(entry)) {
-        let mappedResult = await map(entry)
-        let results = await iterate(_walk, children)
-        results = results.filter(x => x !== undefined)
-        return reduce(mappedResult, results)
+        let parent = await map(entry)
+        children = await iterate(walk, children)
+        children = children.filter(x => x !== undefined)
+        return reduce(parent, children)
       }
     }
-    return _walk(root)
+    return walk(root)
   } catch (err) {
     err.caller = 'git.walk'
     throw err

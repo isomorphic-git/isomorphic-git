@@ -92,7 +92,28 @@ export interface RemoteDescription {
   url: string; // url of the remote
 }
 
-export type StatusMatrix = Array<[string, ...number[]]>;
+export interface Walker {}
+
+export interface WalkerTree {
+  fullpath: string;
+  basename: string;
+  exists: boolean;
+  populateStat: () => Promise<void>;
+  type?: 'tree' | 'blob';
+  ctimeSeconds?: number;
+  mtimeSeconds?: number;
+  mtimeNanoseconds?: number;
+  dev?: number;
+  ino?: number;
+  mode?: number;
+  uid?: number;
+  gid?: number;
+  size?: number;
+  populateContent: () => Promise<void>;
+  content?: Buffer;
+  populatHash: () => Promise<void>;
+  oid?: string;
+}
 
 export interface GitFsPlugin {
   readFile: any;
@@ -119,9 +140,30 @@ export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitter
 
 export type GitPluginCore = Map<string, AnyGitPlugin>
 
+export type StatusMatrix = Array<[string, number, number, number]>;
+
+export type WalkerEntry = WalkerTree[];
+
 export const plugins: GitPluginCore
 
 export const cores: Map<string, GitPluginCore>
+
+export function WORKDIR(args: {
+  fs: any;
+  dir: string;
+  gitdir: string;
+}): Walker;
+
+export function TREE(args: {
+  fs: any;
+  gitdir: string;
+  ref: string;
+}): Walker;
+
+export function STAGE(args: {
+  fs: any;
+  gitdir: string;
+}): Walker;
 
 export function add(args: {
   core?: string;
@@ -487,6 +529,15 @@ export function verify(args: {
 }): Promise<false | Array<string>>;
 
 export function version(): string;
+
+export function walkBeta1<T, Q>(args: {
+  core?: string;
+  trees: Walker[];
+  filter: (entry: WalkerEntry) => Promise<boolean>;
+  map: (entry: WalkerEntry) => Promise<T | undefined>;
+  reduce: (parent: T | undefined, children: Q[]) => Promise<Q>;
+  iterate: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
+}): Promise<Q|undefined>;
 
 export function writeObject(args: {
   core?: string;
