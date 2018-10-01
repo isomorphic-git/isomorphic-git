@@ -126,7 +126,7 @@
     "semantic-release": "15.9.16",
     "standard": "11.0.1",
     "tweet-tweet": "1.0.4",
-    "typescript": "3.0.3",
+    "typescript": "3.1.1",
     "webpack": "4.20.1",
     "webpack-bundle-analyzer": "3.0.2",
     "webpack-cli": "3.1.2"
