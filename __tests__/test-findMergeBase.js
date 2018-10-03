@@ -15,9 +15,7 @@ describe('findMergeBase', () => {
     // Test
     base = await findMergeBase({
       gitdir,
-      oids: [
-        '9ec6646dd454e8f530c478c26f8b06e57f880bd6'
-      ]
+      oids: ['9ec6646dd454e8f530c478c26f8b06e57f880bd6']
     })
     expect(base).toEqual(['9ec6646dd454e8f530c478c26f8b06e57f880bd6'])
 
@@ -216,6 +214,9 @@ describe('findMergeBase', () => {
         '4c658ff41121ddada50c47e4c72c092a9f7bf2be' // Z2
       ]
     })
-    expect(base).toEqual(['17aa7af08369d0e2d174df64d78fe57f9f0a60ba', '17b2c7d8ba9756c6c28e4d8cfdbed11793952270'])
+    expect(base).toEqual([
+      '17aa7af08369d0e2d174df64d78fe57f9f0a60ba',
+      '17b2c7d8ba9756c6c28e4d8cfdbed11793952270'
+    ])
   })
 })
