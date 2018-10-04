@@ -3,9 +3,8 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { plugins, findMergeBase } = require('isomorphic-git')
 
-// NOTE: Because ".git" is not allowed as a path name in git,
-// we can't actually store the ".git" folders in our fixture,
-// so we have to make those folders dynamically.
+// These have been checked with
+// GIT_DIR=__tests__/__fixtures__/test-findMergeBase.git git merge-base -a --octopus COMMITS
 describe('findMergeBase', () => {
   it('silly edge cases', async () => {
     // Setup
