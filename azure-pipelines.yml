@@ -12,16 +12,16 @@ steps:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
 
-- script: |
-    npm ci
+- script: npm ci
   displayName: 'npm ci'
 
 - script: |
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
     ./node_modules/.bin/cors-proxy start -d
-    npm test
-    ./node_modules/.bin/cors-proxy stop
+  displayName: 'cors-proxy start -d'
+
+- script: npm test
   displayName: 'npm test'
   env:
     BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
@@ -32,27 +32,35 @@ steps:
     SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
     SAUCE_USERNAME: $(Sauce.Username)
 
+- script: ./node_modules/.bin/cors-proxy stop
+  displayName: 'cors-proxy stop'
+  condition: succeededOrFailed()
+
 - task: PublishTestResults@2
+  condition: succeededOrFailed()
   inputs:
     testResultsFormat: JUnit
     testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
 
 - task: PublishCodeCoverageResults@1
+  condition: succeededOrFailed()
   inputs: 
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
     reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
 
-- script: |
-    npm pack
+- script: npm pack
   displayName: 'npm pack'
+  condition: succeededOrFailed()
 
 - task: PublishBuildArtifacts@1
+  condition: succeededOrFailed()
   inputs:
     artifactName: 'npm-tarball.tgz'
     PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
 
 - task: PublishBuildArtifacts@1
+  condition: succeededOrFailed()
   inputs:
     artifactName: 'bundle.umd.min.js'
     PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
