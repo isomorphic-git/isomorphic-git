@@ -23,7 +23,6 @@ steps:
 
 - script: npm test
   displayName: 'npm test'
-  continueOnError: true
   env:
     BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
     BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
@@ -35,14 +34,16 @@ steps:
 
 - script: ./node_modules/.bin/cors-proxy stop
   displayName: 'cors-proxy stop'
-  continueOnError: true
+  condition: succeededOrFailed()
 
 - task: PublishTestResults@2
+  condition: succeededOrFailed()
   inputs:
     testResultsFormat: JUnit
     testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
 
 - task: PublishCodeCoverageResults@1
+  condition: succeededOrFailed()
   inputs: 
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
@@ -50,13 +51,16 @@ steps:
 
 - script: npm pack
   displayName: 'npm pack'
+  condition: succeededOrFailed()
 
 - task: PublishBuildArtifacts@1
+  condition: succeededOrFailed()
   inputs:
     artifactName: 'npm-tarball.tgz'
     PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
 
 - task: PublishBuildArtifacts@1
+  condition: succeededOrFailed()
   inputs:
     artifactName: 'bundle.umd.min.js'
     PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
