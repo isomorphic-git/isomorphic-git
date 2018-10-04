@@ -20,7 +20,6 @@ Array [
   "expandOid",
   "expandRef",
   "fetch",
-  "findRoot",
   "getRemoteInfo",
   "indexPack",
   "init",
