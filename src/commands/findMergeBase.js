@@ -52,11 +52,15 @@ export async function findMergeBase ({
       // We haven't found a common ancestor yet
       let newheads = []
       for (let oid of heads) {
-        let { object } = await readObject({ fs, gitdir, oid })
-        let commit = GitCommit.from(object)
-        let { parent } = commit.parseHeaders()
-        for (let oid of parent) {
-          newheads.push(oid)
+        try {
+          let { object } = await readObject({ fs, gitdir, oid })
+          let commit = GitCommit.from(object)
+          let { parent } = commit.parseHeaders()
+          for (let oid of parent) {
+            newheads.push(oid)
+          }
+        } catch (err) {
+          // do nothing
         }
       }
       heads = newheads

@@ -12,6 +12,7 @@ import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 
 import { config } from './config.js'
+import { findMergeBase } from './findMergeBase.js'
 import { isDescendent } from './isDescendent.js'
 import { listCommits } from './listCommits.js'
 import { listObjects } from './listObjects.js'
@@ -75,13 +76,6 @@ export async function push ({
       auth
     })
     auth = httpRemote.auth // hack to get new credentials from CredentialManager API
-    let commits = await listCommits({
-      fs,
-      gitdir,
-      start: [oid],
-      finish: httpRemote.refs.values()
-    })
-    let objects = await listObjects({ fs, gitdir, oids: commits })
     let fullRemoteRef
     if (!remoteRef) {
       fullRemoteRef = fullRef
@@ -106,6 +100,17 @@ export async function push ({
     let oldoid =
       httpRemote.refs.get(fullRemoteRef) ||
       '0000000000000000000000000000000000000000'
+    let finish = [...httpRemote.refs.values()]
+    // hack to speed up common force push scenarios
+    let mergebase = findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
+    for (let oid of mergebase) finish.push(oid)
+    let commits = await listCommits({
+      fs,
+      gitdir,
+      start: [oid],
+      finish
+    })
+    let objects = await listObjects({ fs, gitdir, oids: commits })
     if (!force) {
       // Is it a tag that already exists?
       if (
