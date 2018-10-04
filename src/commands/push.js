@@ -102,7 +102,7 @@ export async function push ({
       '0000000000000000000000000000000000000000'
     let finish = [...httpRemote.refs.values()]
     // hack to speed up common force push scenarios
-    let mergebase = findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
+    let mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
     for (let oid of mergebase) finish.push(oid)
     let commits = await listCommits({
       fs,
