@@ -20,6 +20,7 @@ Array [
   "expandOid",
   "expandRef",
   "fetch",
+  "findMergeBase",
   "findRoot",
   "getRemoteInfo",
   "indexPack",
