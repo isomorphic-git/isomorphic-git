@@ -78,7 +78,7 @@ export class FileSystem {
   /**
    * Make a directory (or series of nested directories) without throwing an error if it already exists.
    */
-  async mkdir (filepath) {
+  async mkdir (filepath, _selfCall = false) {
     try {
       await this._mkdir(filepath)
       return
@@ -87,6 +87,8 @@ export class FileSystem {
       if (err === null) return
       // If the directory already exists, that's OK!
       if (err.code === 'EEXIST') return
+      // Avoid infinite loops of failure
+      if (_selfCall) throw err
       // If we got a "no such file or directory error" backup and try again.
       if (err.code === 'ENOENT') {
         let parent = path.dirname(filepath)
@@ -94,7 +96,7 @@ export class FileSystem {
         if (parent === '.' || parent === '/' || parent === filepath) throw err
         // Infinite recursion, what could go wrong?
         await this.mkdir(parent)
-        await this._mkdir(filepath)
+        await this.mkdir(filepath, true)
       }
     }
   }
