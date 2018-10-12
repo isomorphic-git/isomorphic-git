@@ -2,13 +2,13 @@
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 import { E, GitError } from '../models/GitError.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
+import { readObject } from '../storage/readObject'
 import { compareRefNames } from '../utils/compareRefNames.js'
 
 import { GitConfigManager } from './GitConfigManager'
-import { readObject } from '../storage/readObject'
-import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [
@@ -139,7 +139,13 @@ export class GitRefManager {
         (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
         packedMap.get(ref)
       if (sha) {
-        return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth, peelTag })
+        return GitRefManager.resolve({
+          fs,
+          gitdir,
+          ref: sha.trim(),
+          depth,
+          peelTag
+        })
       }
     }
     // Do we give up?
