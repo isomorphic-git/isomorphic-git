@@ -7,6 +7,8 @@ import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
 
 import { GitConfigManager } from './GitConfigManager'
+import { readObject } from '../storage/readObject'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [
@@ -104,7 +106,7 @@ export class GitRefManager {
     const normalizeValue = value => value.trim() + '\n'
     await fs.write(path.join(gitdir, ref), normalizeValue(value), 'utf8')
   }
-  static async resolve ({ fs: _fs, gitdir, ref, depth }) {
+  static async resolve ({ fs: _fs, gitdir, ref, depth, peelTag = false }) {
     const fs = new FileSystem(_fs)
     if (depth !== undefined) {
       depth--
@@ -116,10 +118,16 @@ export class GitRefManager {
     // Is it a ref pointer?
     if (ref.startsWith('ref: ')) {
       ref = ref.slice('ref: '.length)
-      return GitRefManager.resolve({ fs, gitdir, ref, depth })
+      return GitRefManager.resolve({ fs, gitdir, ref, depth, peelTag })
     }
     // Is it a complete and valid SHA?
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
+      if (peelTag) {
+        const { type, object } = await readObject({ fs, gitdir, oid: ref })
+        if (type === 'tag') {
+          return GitAnnotatedTag.from(object).parse().object
+        }
+      }
       return ref
     }
     // We need to alternate between the file system and the packed-refs
@@ -131,7 +139,7 @@ export class GitRefManager {
         (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
         packedMap.get(ref)
       if (sha) {
-        return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
+        return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth, peelTag })
       }
     }
     // Do we give up?
