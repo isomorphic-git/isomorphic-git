@@ -15,6 +15,7 @@ export async function resolveRef ({
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref,
+  peelTag = false,
   depth
 }) {
   try {
@@ -23,6 +24,7 @@ export async function resolveRef ({
       fs,
       gitdir,
       ref,
+      peelTag,
       depth
     })
     return oid
