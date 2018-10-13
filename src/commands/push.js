@@ -14,7 +14,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 import { config } from './config.js'
 import { findMergeBase } from './findMergeBase.js'
 import { isDescendent } from './isDescendent.js'
-import { listCommits } from './listCommits.js'
+import { listCommitsAndTags } from './listCommitsAndTags.js'
 import { listObjects } from './listObjects.js'
 import { pack } from './pack.js'
 
@@ -104,7 +104,7 @@ export async function push ({
     // hack to speed up common force push scenarios
     let mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
     for (let oid of mergebase) finish.push(oid)
-    let commits = await listCommits({
+    let commits = await listCommitsAndTags({
       fs,
       gitdir,
       start: [oid],
