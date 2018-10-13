@@ -1,6 +1,7 @@
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
@@ -21,7 +22,11 @@ export async function listObjects ({
   async function walk (oid) {
     visited.add(oid)
     let { type, object } = await readObject({ fs, gitdir, oid })
-    if (type === 'commit') {
+    if (type === 'tag') {
+      let tag = GitAnnotatedTag.from(object)
+      let obj = tag.headers().object
+      await walk(obj)
+    } else if (type === 'commit') {
       let commit = GitCommit.from(object)
       let tree = commit.headers().tree
       await walk(tree)
