@@ -75,4 +75,40 @@ describe('push', () => {
       expect(res.ok[1]).toBe('refs/heads/foobar')
     }
   )
+  ;(process.browser ? it : xit)(
+    'push to karma-git-http-server-middleware with lightweight tag',
+    async () => {
+      // Setup
+      let { fs, gitdir } = await makeFixture('test-push')
+      plugins.set('fs', fs)
+      // Test
+      let res = await push({
+        gitdir,
+        remote: 'karma',
+        ref: 'lightweight-tag'
+      })
+      expect(res).toBeTruthy()
+      expect(res.ok).toBeTruthy()
+      expect(res.ok[0]).toBe('unpack')
+      expect(res.ok[1]).toBe('refs/tags/lightweight-tag')
+    }
+  )
+  ;(process.browser ? it : xit)(
+    'push to karma-git-http-server-middleware with annotated tag',
+    async () => {
+      // Setup
+      let { fs, gitdir } = await makeFixture('test-push')
+      plugins.set('fs', fs)
+      // Test
+      let res = await push({
+        gitdir,
+        remote: 'karma',
+        ref: 'annotated-tag'
+      })
+      expect(res).toBeTruthy()
+      expect(res.ok).toBeTruthy()
+      expect(res.ok[0]).toBe('unpack')
+      expect(res.ok[1]).toBe('refs/tags/annotated-tag')
+    }
+  )
 })
