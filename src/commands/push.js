@@ -14,7 +14,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 import { config } from './config.js'
 import { findMergeBase } from './findMergeBase.js'
 import { isDescendent } from './isDescendent.js'
-import { listCommitsAndTags } from './listCommits.js'
+import { listCommitsAndTags } from './listCommitsAndTags.js'
 import { listObjects } from './listObjects.js'
 import { pack } from './pack.js'
 
