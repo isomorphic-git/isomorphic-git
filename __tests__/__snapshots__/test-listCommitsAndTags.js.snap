@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`listCommits listCommits 1`] = `
+exports[`listCommitsAndTags listCommitsAndTags 1`] = `
 Array [
   "c60bbbe99e96578105c57c4b3f2b6ebdf863edbc",
   "e05547ea87ea55eff079de295ff56f483e5b4439",
