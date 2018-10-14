@@ -7,9 +7,9 @@ describe('getRemoteInfo', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
   })
-  ;(process.browser ? it : xit)('getRemoteInfo', async () => {
+  it('getRemoteInfo', async () => {
     let info = await getRemoteInfo({
-      url: 'http://localhost:9876/git-server/test-dumb-http-server.git'
+      url: 'http://localhost:8174/test-dumb-http-server.git'
     })
     expect(info).not.toBeNull()
     expect(info.capabilities).not.toBeNull()

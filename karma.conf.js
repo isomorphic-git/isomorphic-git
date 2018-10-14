@@ -201,7 +201,12 @@ module.exports = function (config) {
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',
-      plugins: [new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/)],
+      plugins: [
+        new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/),
+        new webpack.DefinePlugin({
+          'process.env.TEST_PUSH_GITHUB_TOKEN': `'${process.env.TEST_PUSH_GITHUB_TOKEN}'`
+        })
+      ],
       resolve: {
         alias: {
           'isomorphic-git/internal-apis': path.resolve(

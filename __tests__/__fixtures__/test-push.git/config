@@ -5,11 +5,14 @@
 	symlinks = false
 	ignorecase = true
 [remote "origin"]
-	url = https://github.com/wmhilton/test.empty.git
+	url = https://github.com/isomorphic-git/test.empty.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [remote "pseudo"]
   url = http://example.dev/foo.git
   fetch = +refs/heads/*:refs/remotes/pseudo/*
 [remote "karma"]
-  url = http://localhost:9876/git-server/test-push-server.git
+  url = http://localhost:8174/test-push-server.git
+  fetch = +refs/heads/*:refs/remotes/pseudo/*
+[remote "auth"]
+  url = http://localhost:8174/test-push-server-auth.git
   fetch = +refs/heads/*:refs/remotes/pseudo/*

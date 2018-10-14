@@ -1,13 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`push push to karma-git-http-server-middleware 1`] = `
+exports[`push push 1`] = `
 Array [
-  "build started...\n",
-  "build completed...\n",
-  "tests started...\n",
-  "tests completed...\n",
-  "starting server...\n",
-  "server running\n",
-  "Here is a message from 'post-receive' hook.\n",
+  "build started...
+",
+  "build completed...
+",
+  "tests started...
+",
+  "tests completed...
+",
+  "starting server...
+",
+  "server running
+",
+  "Here is a message from 'post-receive' hook.
+",
 ]
 `;
