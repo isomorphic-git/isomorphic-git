@@ -4,9 +4,6 @@ const snapshots = require('./__snapshots__/test-push.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const EventEmitter = require('events')
 
-const setTestTimeout = require('./__helpers__/set-test-timeout')
-setTestTimeout(60000)
-
 const { plugins, push } = require('isomorphic-git')
 
 describe('push', () => {
