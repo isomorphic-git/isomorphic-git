@@ -132,7 +132,7 @@ describe('push', () => {
     } catch (err) {
       error = err.message
     }
-    expect(error).toBe('HTTP Error: 401 Authorization Required')
+    expect(error).toContain('401')
   })
   it('throws an Error if invalid credentials supplied', async () => {
     // Setup
@@ -151,7 +151,7 @@ describe('push', () => {
     } catch (err) {
       error = err.message
     }
-    expect(error).toBe('HTTP Error: 401 Authorization Required')
+    expect(error).toContain('401')
   })
   ;(process.env.TEST_PUSH_GITHUB_TOKEN ? it : xit)(
     'push to Github using token',
