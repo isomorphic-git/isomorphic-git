@@ -153,23 +153,25 @@ describe('push', () => {
     }
     expect(error).toBe('HTTP Error: 401 Authorization Required')
   })
-
-  ;(process.env.TEST_PUSH_GITHUB_TOKEN ? it : xit)('push to Github using token', async () => {
-    // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
-    // Test
-    let res = await push({
-      gitdir,
-      corsProxy: process.browser ? 'http://localhost:9999' : undefined,
-      token: process.env.TEST_PUSH_GITHUB_TOKEN,
-      remote: 'origin',
-      ref: 'master',
-      force: true
-    })
-    expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
-  })
+  ;(process.env.TEST_PUSH_GITHUB_TOKEN ? it : xit)(
+    'push to Github using token',
+    async () => {
+      // Setup
+      let { fs, gitdir } = await makeFixture('test-push')
+      plugins.set('fs', fs)
+      // Test
+      let res = await push({
+        gitdir,
+        corsProxy: process.browser ? 'http://localhost:9999' : undefined,
+        token: process.env.TEST_PUSH_GITHUB_TOKEN,
+        remote: 'origin',
+        ref: 'master',
+        force: true
+      })
+      expect(res).toBeTruthy()
+      expect(res.ok).toBeTruthy()
+      expect(res.ok[0]).toBe('unpack')
+      expect(res.ok[1]).toBe('refs/heads/master')
+    }
+  )
 })

@@ -84,8 +84,22 @@ module.exports = {
       // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
-        ? series.nps('lint', 'build', 'test.setup', 'test.one', 'test.karma', 'test.teardown')
-        : series.nps('lint', 'build', 'test.setup', 'test.one', 'test.karma', 'test.teardown'),
+        ? series.nps(
+          'lint',
+          'build',
+          'test.setup',
+          'test.one',
+          'test.karma',
+          'test.teardown'
+        )
+        : series.nps(
+          'lint',
+          'build',
+          'test.setup',
+          'test.one',
+          'test.karma',
+          'test.teardown'
+        ),
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
       one: retry3(or('nps test.jest', 'nps test.jasmine')),
