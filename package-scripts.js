@@ -73,14 +73,21 @@ module.exports = {
       start: `cors-proxy start -p 9999 -d`,
       stop: `cors-proxy stop`
     },
+    gitserver: {
+      default: `cross-env GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server`,
+      start: `cross-env GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server start`,
+      stop: `cross-env GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server stop`
+    },
     test: {
       // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
       // But by default, we skip 'jest' because I decided to make it an optionalDependency after it was
       // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
-        ? series.nps('lint', 'build', 'test.one', 'test.karma')
-        : series.nps('lint', 'build', 'test.one', 'test.karma'),
+        ? series.nps('lint', 'build', 'test.setup', 'test.one', 'test.karma', 'test.teardown')
+        : series.nps('lint', 'build', 'test.setup', 'test.one', 'test.karma', 'test.teardown'),
+      setup: series.nps('proxy.start', 'gitserver.start'),
+      teardown: series.nps('proxy.stop', 'gitserver.stop'),
       one: retry3(or('nps test.jest', 'nps test.jasmine')),
       jasmine: process.env.CI
         ? `cross-env NODE_PATH=./dist/for-node ${timeout5('jasmine')}`

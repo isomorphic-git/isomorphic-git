@@ -13,16 +13,15 @@ steps:
   displayName: 'Install Node.js'
 
 - script: npm ci
-  displayName: 'npm ci'
+  displayName: 'Install dependencies'
 
 - script: |
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    ./node_modules/.bin/cors-proxy start -d
-  displayName: 'cors-proxy start -d'
+  displayName: 'fix executable flag on git hooks'
 
 - script: npm test
-  displayName: 'npm test'
+  displayName: 'Run Tests'
   env:
     BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
     BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
@@ -31,10 +30,6 @@ steps:
     GITHUB_TOKEN: $(Github.Token)
     SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
     SAUCE_USERNAME: $(Sauce.Username)
-
-- script: ./node_modules/.bin/cors-proxy stop
-  displayName: 'cors-proxy stop'
-  condition: succeededOrFailed()
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
@@ -50,7 +45,7 @@ steps:
     reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
 
 - script: npm pack
-  displayName: 'npm pack'
+  displayName: 'Prepare installable tarball'
   condition: succeededOrFailed()
 
 - task: PublishBuildArtifacts@1

@@ -1,13 +1,13 @@
 #!/bin/sh
 echo "build started..."
-#sleep 4
+sleep 0.1
 echo "build completed..."
-#sleep 1
+sleep 0.1
 echo "tests started..."
-#sleep 4
+sleep 0.1
 echo "tests completed..."
-#sleep 1
+sleep 0.1
 echo "starting server..."
-#sleep 4
+sleep 0.1
 echo "server running"
 exit 0
