@@ -84,10 +84,7 @@ export async function checkout ({
             fs,
             dir,
             gitdir,
-            trees: [
-              TREE({ fs, gitdir, ref }),
-              WORKDIR({ fs, dir, gitdir })
-            ],
+            trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir })],
             map: async function ([head, workdir]) {
               if (head.fullpath === '.') return
               if (!head.exists) return
@@ -102,7 +99,9 @@ export async function checkout ({
                 case 'commit': {
                   // gitlinks
                   console.log(
-                    new GitError(E.NotImplementedFail, { thing: 'submodule support' })
+                    new GitError(E.NotImplementedFail, {
+                      thing: 'submodule support'
+                    })
                   )
                   break
                 }
