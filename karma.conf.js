@@ -253,7 +253,7 @@ module.exports = function (config) {
   }
 
   // Speed things up
-  if (process.env.FAILFAST) {
+  if (process.env.FAILFAST && process.env.FAILFAST === 'true') {
     options.reporters.push('fail-fast')
   }
 
