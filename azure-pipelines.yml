@@ -30,6 +30,7 @@ steps:
     GITHUB_TOKEN: $(Github.Token)
     SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
     SAUCE_USERNAME: $(Sauce.Username)
+    TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
