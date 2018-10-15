@@ -83,7 +83,7 @@ jobs:
       versionSpec: '8.x'
     displayName: 'Install Node.js'
 
-  - bash: npm ci
+  - script: npm install
     displayName: 'Install dependencies'
 
   - bash: |
