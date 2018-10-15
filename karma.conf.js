@@ -296,7 +296,7 @@ module.exports = function (config) {
       options.browsers.push('ChromeHeadlessNoSandbox')
       options.browsers.push('FirefoxHeadless')
     }
-  
+
     if (process.platform === 'win32') {
       options.browsers.push('ChromeHeadlessNoSandbox')
       options.browsers.push('FirefoxHeadless')
@@ -304,7 +304,7 @@ module.exports = function (config) {
         options.browsers.push('Edge')
       }
     }
-  
+
     if (process.platform === 'darwin') {
       options.browsers.push('ChromeHeadlessNoSandbox')
       if (process.env.CI) {
