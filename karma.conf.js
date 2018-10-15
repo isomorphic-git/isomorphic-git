@@ -289,23 +289,27 @@ module.exports = function (config) {
     options.reporters.push('BrowserStack')
   }
 
-  if (process.platform === 'linux') {
-    options.browsers.push('ChromeHeadlessNoSandbox')
-    options.browsers.push('FirefoxHeadless')
-  }
-
-  if (process.platform === 'win32') {
-    options.browsers.push('ChromeHeadlessNoSandbox')
-    options.browsers.push('FirefoxHeadless')
-    if (process.env.CI) {
-      options.browsers.push('Edge')
+  if (process.env.TEST_BROWSERS) {
+    options.browsers = process.env.TEST_BROWSERS.split(',')
+  } else {
+    if (process.platform === 'linux') {
+      options.browsers.push('ChromeHeadlessNoSandbox')
+      options.browsers.push('FirefoxHeadless')
     }
-  }
-
-  if (process.platform === 'darwin') {
-    options.browsers.push('ChromeHeadlessNoSandbox')
-    if (process.env.CI) {
-      options.browsers.push('Safari')
+  
+    if (process.platform === 'win32') {
+      options.browsers.push('ChromeHeadlessNoSandbox')
+      options.browsers.push('FirefoxHeadless')
+      if (process.env.CI) {
+        options.browsers.push('Edge')
+      }
+    }
+  
+    if (process.platform === 'darwin') {
+      options.browsers.push('ChromeHeadlessNoSandbox')
+      if (process.env.CI) {
+        options.browsers.push('Safari')
+      }
     }
   }
 

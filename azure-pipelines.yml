@@ -33,6 +33,7 @@ jobs:
       SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
       SAUCE_USERNAME: $(Sauce.Username)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
+      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_ios_safari,sl_android_chrome'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
@@ -72,7 +73,40 @@ jobs:
       TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
       TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
 
-- job: Windows
+- job: Windows 1
+
+  pool:
+    vmImage: 'vs2017-win2016'
+
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '8.x'
+    displayName: 'Install Node.js'
+
+  - script: npm install
+    displayName: 'Install dependencies'
+
+  - bash: |
+      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
+      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
+    displayName: 'fix executable flag on git hooks'
+
+  - bash: npm test
+    displayName: 'Run Tests'
+    env:
+      GH_TOKEN: $(Gh.Token)
+      GITHUB_TOKEN: $(Github.Token)
+      TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
+      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless'
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
+
+- job: Windows 2
 
   pool:
     vmImage: 'win1803'
@@ -97,6 +131,7 @@ jobs:
       GH_TOKEN: $(Gh.Token)
       GITHUB_TOKEN: $(Github.Token)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
+      TEST_BROWSERS: 'sl_edge'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
@@ -129,6 +164,7 @@ jobs:
       GH_TOKEN: $(Gh.Token)
       GITHUB_TOKEN: $(Github.Token)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
+      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,Safari'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
