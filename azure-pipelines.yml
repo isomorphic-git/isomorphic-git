@@ -73,7 +73,7 @@ jobs:
       TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
       TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
 
-- job: Windows 1
+- job: Windows_1
 
   pool:
     vmImage: 'vs2017-win2016'
@@ -106,7 +106,7 @@ jobs:
       testResultsFormat: JUnit
       testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
 
-- job: Windows 2
+- job: Windows_2
 
   pool:
     vmImage: 'win1803'
