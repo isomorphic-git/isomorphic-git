@@ -14,7 +14,7 @@ module.exports = function (config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['FirefoxHeadless'],
+    browsers: [],
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
     // frameworks to use
@@ -70,11 +70,11 @@ module.exports = function (config) {
         browserName: 'firefox',
         extendedDebugging: true
       },
-      sl_edge: {
+      XXXsl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge'
       },
-      sl_safari: {
+      XXXsl_safari: {
         base: 'SauceLabs',
         browserName: 'safari'
       },
@@ -228,6 +228,7 @@ module.exports = function (config) {
       'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-edge-launcher',
+      'karma-ie-launcher',
       'karma-safari-launcher',
       'karma-fail-fast-reporter',
       'karma-firefox-launcher',
@@ -262,7 +263,6 @@ module.exports = function (config) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
     )
-    options.browsers.push('ChromeHeadlessNoSandbox')
   } else if (!process.env.SAUCE_ACCESS_KEY) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
@@ -282,7 +282,6 @@ module.exports = function (config) {
     console.log(
       'Skipping BrowserStack tests because BROWSER_STACK_ACCESS_KEY environment variable is not set.'
     )
-    options.browsers.push('ChromeHeadlessNoSandbox')
   } else {
     options.browsers = options.browsers.concat(
       Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
@@ -290,12 +289,24 @@ module.exports = function (config) {
     options.reporters.push('BrowserStack')
   }
 
+  if (process.platform === 'linux') {
+    options.browsers.push('ChromeHeadlessNoSandbox')
+    options.browsers.push('FirefoxHeadless')
+  }
+
   if (process.platform === 'win32') {
-    options.browsers.push('Edge')
+    options.browsers.push('ChromeHeadlessNoSandbox')
+    options.browsers.push('FirefoxHeadless')
+    if (process.env.CI) {
+      options.browsers.push('IE')
+    }
   }
 
   if (process.platform === 'darwin') {
-    options.browsers.push('Safari')
+    options.browsers.push('ChromeHeadlessNoSandbox')
+    if (process.env.CI) {
+      options.browsers.push('Safari')
+    }
   }
 
   // Only re-run browsers that failed in the previous run.

@@ -10,7 +10,7 @@ module.exports = function translateBrowser (fullname) {
   } else if (fullname.startsWith('Chrome Mobile')) {
     return 'sl_android_chrome'
   } else if (fullname.startsWith('Safari')) {
-    return 'sl_safari'
+    return 'Safari' // 'sl_safari'
   } else {
     console.log('translateBrowser ERROR', fullname)
   }
