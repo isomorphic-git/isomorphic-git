@@ -289,9 +289,9 @@ module.exports = function (config) {
     options.reporters.push('BrowserStack')
   }
 
-  // if (process.platform === 'win32') {
-  //   options.browsers.push('Edge')
-  // }
+  if (process.platform === 'win32') {
+    options.browsers.push('Edge')
+  }
 
   // Only re-run browsers that failed in the previous run.
   options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
