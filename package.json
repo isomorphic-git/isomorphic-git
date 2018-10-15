@@ -110,6 +110,7 @@
     "karma-jasmine": "1.1.2",
     "karma-junit-reporter": "^1.2.0",
     "karma-longest-reporter": "1.1.0",
+    "karma-safari-launcher": "^1.0.0",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
     "karma-webpack": "3.0.5",

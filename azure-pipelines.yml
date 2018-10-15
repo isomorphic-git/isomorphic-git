@@ -103,3 +103,35 @@ jobs:
     inputs:
       testResultsFormat: JUnit
       testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
+
+- job: OSX
+
+  pool:
+    vmImage: 'macOS-10.13'
+
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '8.x'
+    displayName: 'Install Node.js'
+
+  - script: npm install
+    displayName: 'Install dependencies'
+
+  - bash: |
+      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
+      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
+    displayName: 'fix executable flag on git hooks'
+
+  - bash: npm test
+    displayName: 'Run Tests'
+    env:
+      GH_TOKEN: $(Gh.Token)
+      GITHUB_TOKEN: $(Github.Token)
+      TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'

@@ -228,6 +228,7 @@ module.exports = function (config) {
       'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-edge-launcher',
+      'karma-safari-launcher',
       'karma-fail-fast-reporter',
       'karma-firefox-launcher',
       'karma-git-http-server-middleware',
@@ -291,6 +292,10 @@ module.exports = function (config) {
 
   if (process.platform === 'win32') {
     options.browsers.push('Edge')
+  }
+
+  if (process.platform === 'darwin') {
+    options.browsers.push('Safari')
   }
 
   // Only re-run browsers that failed in the previous run.
