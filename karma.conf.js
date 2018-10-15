@@ -298,7 +298,7 @@ module.exports = function (config) {
     options.browsers.push('ChromeHeadlessNoSandbox')
     options.browsers.push('FirefoxHeadless')
     if (process.env.CI) {
-      options.browsers.push('IE')
+      options.browsers.push('Edge')
     }
   }
 
