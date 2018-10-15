@@ -17,7 +17,7 @@ const quote = cmd =>
 const optional = cmd =>
   `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`
 
-const timeout = n => cmd => `timeout --signal=KILL ${n}m ${cmd}`
+const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
 const timeout5 = timeout(5)
 
 const or = (a, b) => `(${a}) || (${b})`
