@@ -83,15 +83,15 @@ jobs:
       versionSpec: '8.x'
     displayName: 'Install Node.js'
 
-  - script: npm ci
+  - bash: npm ci
     displayName: 'Install dependencies'
 
-  - script: |
+  - bash: |
       chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
       chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
     displayName: 'fix executable flag on git hooks'
 
-  - script: npm test
+  - bash: npm test
     displayName: 'Run Tests'
     env:
       GH_TOKEN: $(Gh.Token)
