@@ -11,8 +11,8 @@
   url = http://example.dev/foo.git
   fetch = +refs/heads/*:refs/remotes/pseudo/*
 [remote "karma"]
-  url = http://localhost:8174/test-push-server.git
+  url = http://localhost:8888/test-push-server.git
   fetch = +refs/heads/*:refs/remotes/pseudo/*
 [remote "auth"]
-  url = http://localhost:8174/test-push-server-auth.git
+  url = http://localhost:8888/test-push-server-auth.git
   fetch = +refs/heads/*:refs/remotes/pseudo/*

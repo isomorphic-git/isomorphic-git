@@ -67,6 +67,8 @@ module.exports = {
           `bundlesize`
       )
     },
+    // ATTENTION:
+    // LIST OF SAFE PORTS FOR SAUCE LABS (Edge and Safari) https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy+FAQS#SauceConnectProxyFAQS-CanIAccessApplicationsonlocalhost?
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
     proxy: {
       default: `cors-proxy start -p 9999`,
@@ -74,9 +76,9 @@ module.exports = {
       stop: `cors-proxy stop`
     },
     gitserver: {
-      default: `cross-env GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server`,
-      start: `cross-env GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server start`,
-      stop: `cross-env GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server stop`
+      default: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server`,
+      start: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server start`,
+      stop: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server stop`
     },
     test: {
       // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
