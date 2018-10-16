@@ -3,11 +3,8 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 // const nockBack = require('nock').back
 const nock = require('nock')
 const path = require('path')
-const setTestTimeout = require('./__helpers__/set-test-timeout')
 
 const { plugins, pull, resolveRef } = require('isomorphic-git')
-
-setTestTimeout(60000)
 
 describe('pull', () => {
   beforeAll(() => {

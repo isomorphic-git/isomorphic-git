@@ -17,7 +17,7 @@ const quote = cmd =>
 const optional = cmd =>
   `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`
 
-const timeout = n => cmd => `timeout --signal=KILL ${n}m ${cmd}`
+const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
 const timeout5 = timeout(5)
 
 const or = (a, b) => `(${a}) || (${b})`
@@ -67,11 +67,18 @@ module.exports = {
           `bundlesize`
       )
     },
+    // ATTENTION:
+    // LIST OF SAFE PORTS FOR SAUCE LABS (Edge and Safari) https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy+FAQS#SauceConnectProxyFAQS-CanIAccessApplicationsonlocalhost?
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
     proxy: {
       default: `cors-proxy start -p 9999`,
       start: `cors-proxy start -p 9999 -d`,
       stop: `cors-proxy stop`
+    },
+    gitserver: {
+      default: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server`,
+      start: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server start`,
+      stop: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server stop`
     },
     test: {
       // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
@@ -79,8 +86,24 @@ module.exports = {
       // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
-        ? series.nps('lint', 'build', 'test.one', 'test.karma')
-        : series.nps('lint', 'build', 'test.one', 'test.karma'),
+        ? series.nps(
+          'lint',
+          'build',
+          'test.setup',
+          'test.one',
+          'test.karma',
+          'test.teardown'
+        )
+        : series.nps(
+          'lint',
+          'build',
+          'test.setup',
+          'test.one',
+          'test.karma',
+          'test.teardown'
+        ),
+      setup: series.nps('proxy.start', 'gitserver.start'),
+      teardown: series.nps('proxy.stop', 'gitserver.stop'),
       one: retry3(or('nps test.jest', 'nps test.jasmine')),
       jasmine: process.env.CI
         ? `cross-env NODE_PATH=./dist/for-node ${timeout5('jasmine')}`

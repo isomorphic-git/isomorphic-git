@@ -14,17 +14,12 @@ module.exports = function (config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['FirefoxHeadless'],
+    browsers: [],
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
-    beforeMiddleware: ['git-http-server'],
-    gitHttpServer: {
-      root: '__tests__/__fixtures__',
-      route: '/git-server'
-    },
     // list of files / patterns to load in the browser
     files: [
       '__tests__/test-*.js',
@@ -65,10 +60,9 @@ module.exports = function (config) {
         browserName: 'chrome',
         extendedDebugging: true
       },
-      XXXsl_firefox: {
+      sl_firefox: {
         base: 'SauceLabs',
-        browserName: 'firefox',
-        extendedDebugging: true
+        browserName: 'firefox'
       },
       sl_edge: {
         base: 'SauceLabs',
@@ -201,7 +195,14 @@ module.exports = function (config) {
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',
-      plugins: [new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/)],
+      plugins: [
+        new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/),
+        new webpack.DefinePlugin({
+          'process.env.TEST_PUSH_GITHUB_TOKEN': `'${
+            process.env.TEST_PUSH_GITHUB_TOKEN
+          }'`
+        })
+      ],
       resolve: {
         alias: {
           'isomorphic-git/internal-apis': path.resolve(
@@ -221,9 +222,10 @@ module.exports = function (config) {
       'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-edge-launcher',
+      'karma-ie-launcher',
+      'karma-safari-launcher',
       'karma-fail-fast-reporter',
       'karma-firefox-launcher',
-      'karma-git-http-server-middleware',
       'karma-jasmine',
       'karma-junit-reporter',
       'karma-longest-reporter',
@@ -246,7 +248,7 @@ module.exports = function (config) {
   }
 
   // Speed things up
-  if (process.env.FAILFAST) {
+  if (process.env.FAILFAST && process.env.FAILFAST === 'true') {
     options.reporters.push('fail-fast')
   }
 
@@ -254,7 +256,6 @@ module.exports = function (config) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
     )
-    options.browsers.push('ChromeHeadlessNoSandbox')
   } else if (!process.env.SAUCE_ACCESS_KEY) {
     console.log(
       'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
@@ -274,7 +275,6 @@ module.exports = function (config) {
     console.log(
       'Skipping BrowserStack tests because BROWSER_STACK_ACCESS_KEY environment variable is not set.'
     )
-    options.browsers.push('ChromeHeadlessNoSandbox')
   } else {
     options.browsers = options.browsers.concat(
       Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
@@ -282,9 +282,12 @@ module.exports = function (config) {
     options.reporters.push('BrowserStack')
   }
 
-  // if (process.platform === 'win32') {
-  //   options.browsers.push('Edge')
-  // }
+  if (process.env.TEST_BROWSERS) {
+    options.browsers = process.env.TEST_BROWSERS.split(',')
+  } else {
+    options.browsers.push('ChromeHeadlessNoSandbox')
+    options.browsers.push('FirefoxHeadless')
+  }
 
   // Only re-run browsers that failed in the previous run.
   options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
