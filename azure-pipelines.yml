@@ -4,6 +4,7 @@
 # https://docs.microsoft.com/vsts/pipelines/languages/javascript
 jobs:
 - job: Linux
+  dependsOn: OSX
 
   pool:
     vmImage: 'Ubuntu 16.04'
@@ -25,11 +26,11 @@ jobs:
   - script: npm test
     displayName: 'Run Tests'
     env:
-      BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
-      BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
-      BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
-      GH_TOKEN: $(Gh.Token)
-      GITHUB_TOKEN: $(Github.Token)
+      # BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
+      # BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
+      # BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
+      # GH_TOKEN: $(Gh.Token)
+      # GITHUB_TOKEN: $(Github.Token)
       SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
       SAUCE_USERNAME: $(Sauce.Username)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
@@ -74,8 +75,6 @@ jobs:
   #     TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
 
 - job: OSX
-  dependsOn: Linux
-
   pool:
     vmImage: 'macOS-10.13'
 
@@ -96,8 +95,13 @@ jobs:
   - bash: npm test
     displayName: 'Run Tests'
     env:
+      BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
+      BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
+      BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
       GH_TOKEN: $(Gh.Token)
       GITHUB_TOKEN: $(Github.Token)
+      SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
+      SAUCE_USERNAME: $(Sauce.Username)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
       TEST_BROWSERS: 'ChromeHeadlessNoSandbox,Safari,sl_firefox,sl_edge,sl_ios_safari,sl_android_chrome'
 
