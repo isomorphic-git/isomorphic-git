@@ -65,16 +65,15 @@ module.exports = function (config) {
         browserName: 'chrome',
         extendedDebugging: true
       },
-      XXXsl_firefox: {
+      sl_firefox: {
         base: 'SauceLabs',
-        browserName: 'firefox',
-        extendedDebugging: true
+        browserName: 'firefox'
       },
       sl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge'
       },
-      XXXsl_safari: {
+      sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari'
       },

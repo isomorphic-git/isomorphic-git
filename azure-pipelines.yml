@@ -33,7 +33,7 @@ jobs:
       SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
       SAUCE_USERNAME: $(Sauce.Username)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
-      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_ios_safari,sl_android_chrome'
+      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,sl_android_chrome'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
@@ -41,72 +41,40 @@ jobs:
       testResultsFormat: JUnit
       testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
 
-  - task: PublishCodeCoverageResults@1
-    condition: succeededOrFailed()
-    inputs: 
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
-      reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+  # - task: PublishCodeCoverageResults@1
+  #   condition: succeededOrFailed()
+  #   inputs: 
+  #     codeCoverageTool: Cobertura
+  #     summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+  #     reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
 
-  - script: npm pack
-    displayName: 'Prepare installable tarball'
-    condition: succeededOrFailed()
+  # - script: npm pack
+  #   displayName: 'Prepare installable tarball'
+  #   condition: succeededOrFailed()
 
-  - task: PublishBuildArtifacts@1
-    condition: succeededOrFailed()
-    inputs:
-      artifactName: 'npm-tarball.tgz'
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
+  # - task: PublishBuildArtifacts@1
+  #   condition: succeededOrFailed()
+  #   inputs:
+  #     artifactName: 'npm-tarball.tgz'
+  #     PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
 
-  - task: PublishBuildArtifacts@1
-    condition: succeededOrFailed()
-    inputs:
-      artifactName: 'bundle.umd.min.js'
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
+  # - task: PublishBuildArtifacts@1
+  #   condition: succeededOrFailed()
+  #   inputs:
+  #     artifactName: 'bundle.umd.min.js'
+  #     PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
 
-  - script: npm run semantic-release
-    displayName: 'semantic-release'
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    env:
-      GH_TOKEN: $(Gh.Token)
-      NPM_TOKEN: $(Npm.Token)
-      TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
-      TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
-
-- job: Windows_1
-
-  pool:
-    vmImage: 'vs2017-win2016'
-
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '8.x'
-    displayName: 'Install Node.js'
-
-  - script: npm install
-    displayName: 'Install dependencies'
-
-  - bash: |
-      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
-      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    displayName: 'fix executable flag on git hooks'
-
-  - bash: npm test
-    displayName: 'Run Tests'
-    env:
-      GH_TOKEN: $(Gh.Token)
-      GITHUB_TOKEN: $(Github.Token)
-      TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
-      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless'
-
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFormat: JUnit
-      testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
+  # - script: npm run semantic-release
+  #   displayName: 'semantic-release'
+  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  #   env:
+  #     GH_TOKEN: $(Gh.Token)
+  #     NPM_TOKEN: $(Npm.Token)
+  #     TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
+  #     TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
 
 - job: OSX
+  dependsOn: Linux
 
   pool:
     vmImage: 'macOS-10.13'
@@ -131,7 +99,7 @@ jobs:
       GH_TOKEN: $(Gh.Token)
       GITHUB_TOKEN: $(Github.Token)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
-      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,Safari'
+      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,Safari,sl_firefox,sl_edge,sl_ios_safari,sl_android_chrome'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
