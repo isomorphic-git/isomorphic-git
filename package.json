@@ -18,16 +18,12 @@
     "node": ">=7.6.0"
   },
   "scripts": {
-    "pack": "webpack",
     "start": "nps",
     "format": "nps format",
     "build": "nps build",
     "test": "nps test",
-    "precommit": "ban",
-    "prepush": "nps lint",
     "prepublishOnly": "nps prepublish",
     "semantic-release": "semantic-release",
-    "travis-deploy-once": "travis-deploy-once",
     "add-contributor": "nps contributors.add"
   },
   "repository": {
@@ -43,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/isomorphic-git/isomorphic-git/issues"
   },
-  "homepage": "https://isomorphic-git.github.io/",
+  "homepage": "https://isomorphic-git.org/",
   "files": [
     "dist",
     "cli.js",
@@ -85,7 +81,6 @@
     "all-contributors-cli": "5.4.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.4",
-    "ban-sensitive-files": "1.9.2",
     "browserfs": "2.0.0",
     "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
@@ -94,14 +89,12 @@
     "envify": "4.1.0",
     "git-http-mock-server": "1.1.0",
     "github-comment": "1.0.1",
-    "husky": "0.14.3",
     "jasmine": "3.2.0",
     "jasmine-core": "3.2.1",
     "jest": "23.6.0",
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
     "jest-junit": "5.2.0",
     "karma": "2.0.5",
-    "karma-browserstack-launcher": "git+https://github.com/karma-runner/karma-browserstack-launcher.git",
     "karma-chrome-launcher": "2.2.0",
     "karma-edge-launcher": "0.4.2",
     "karma-fail-fast-reporter": "1.0.5",
@@ -119,10 +112,9 @@
     "nps-utils": "1.7.0",
     "openpgp": "2.6.2",
     "organize-js-imports": "1.2.1",
-    "parse-header-stream": "1.1.1",
     "prettier-standard": "8.0.1",
     "pretty-format": "23.6.0",
-    "puppeteer": "1.8.0",
+    "puppeteer": "1.9.0",
     "replace-in-file": "3.4.2",
     "rollup": "0.66.6",
     "semantic-release": "15.9.17",
