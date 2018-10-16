@@ -4,7 +4,6 @@
 # https://docs.microsoft.com/vsts/pipelines/languages/javascript
 jobs:
 - job: Linux
-  dependsOn: OSX
 
   pool:
     vmImage: 'Ubuntu 16.04'
@@ -18,19 +17,19 @@ jobs:
   - script: npm ci
     displayName: 'Install dependencies'
 
-  - script: |
-      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
-      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    displayName: 'fix executable flag on git hooks'
+  # - script: |
+  #     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
+  #     chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
+  #   displayName: 'fix executable flag on git hooks'
 
   - script: npm test
     displayName: 'Run Tests'
     env:
-      # BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
-      # BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
-      # BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
-      # GH_TOKEN: $(Gh.Token)
-      # GITHUB_TOKEN: $(Github.Token)
+      BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
+      BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
+      BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
+      GH_TOKEN: $(Gh.Token)
+      GITHUB_TOKEN: $(Github.Token)
       SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
       SAUCE_USERNAME: $(Sauce.Username)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
@@ -42,71 +41,34 @@ jobs:
       testResultsFormat: JUnit
       testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
 
-  # - task: PublishCodeCoverageResults@1
-  #   condition: succeededOrFailed()
-  #   inputs: 
-  #     codeCoverageTool: Cobertura
-  #     summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
-  #     reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
-
-  # - script: npm pack
-  #   displayName: 'Prepare installable tarball'
-  #   condition: succeededOrFailed()
-
-  # - task: PublishBuildArtifacts@1
-  #   condition: succeededOrFailed()
-  #   inputs:
-  #     artifactName: 'npm-tarball.tgz'
-  #     PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
-
-  # - task: PublishBuildArtifacts@1
-  #   condition: succeededOrFailed()
-  #   inputs:
-  #     artifactName: 'bundle.umd.min.js'
-  #     PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
-
-  # - script: npm run semantic-release
-  #   displayName: 'semantic-release'
-  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  #   env:
-  #     GH_TOKEN: $(Gh.Token)
-  #     NPM_TOKEN: $(Npm.Token)
-  #     TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
-  #     TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
-
-- job: OSX
-  pool:
-    vmImage: 'macOS-10.13'
-
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '8.x'
-    displayName: 'Install Node.js'
-
-  - script: npm install
-    displayName: 'Install dependencies'
-
-  - bash: |
-      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
-      chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    displayName: 'fix executable flag on git hooks'
-
-  - bash: npm test
-    displayName: 'Run Tests'
-    env:
-      BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
-      BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
-      BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
-      GH_TOKEN: $(Gh.Token)
-      GITHUB_TOKEN: $(Github.Token)
-      SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
-      SAUCE_USERNAME: $(Sauce.Username)
-      TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
-      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,Safari,sl_firefox,sl_edge,sl_ios_safari,sl_android_chrome'
-
-  - task: PublishTestResults@2
+  - task: PublishCodeCoverageResults@1
     condition: succeededOrFailed()
     inputs:
-      testResultsFormat: JUnit
-      testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+
+  - script: npm pack
+    displayName: 'Prepare installable tarball'
+    condition: succeededOrFailed()
+
+  - task: PublishBuildArtifacts@1
+    condition: succeededOrFailed()
+    inputs:
+      artifactName: 'npm-tarball.tgz'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
+
+  - task: PublishBuildArtifacts@1
+    condition: succeededOrFailed()
+    inputs:
+      artifactName: 'bundle.umd.min.js'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
+
+  - script: npm run semantic-release
+    displayName: 'semantic-release'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    env:
+      GH_TOKEN: $(Gh.Token)
+      NPM_TOKEN: $(Npm.Token)
+      TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
+      TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
