@@ -2,74 +2,72 @@
 # Build a general Node.js application with npm.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/vsts/pipelines/languages/javascript
+jobs:
+- job: Linux
 
-pool:
-  vmImage: 'Ubuntu 16.04'
+  pool:
+    vmImage: 'Ubuntu 16.04'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '8.x'
-  displayName: 'Install Node.js'
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '8.x'
+    displayName: 'Install Node.js'
 
-- script: npm ci
-  displayName: 'npm ci'
+  - script: npm ci
+    displayName: 'Install dependencies'
 
-- script: |
-    chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/update
-    chmod ugo+x __tests__/__fixtures__/test-push-server.git/hooks/post-receive
-    ./node_modules/.bin/cors-proxy start -d
-  displayName: 'cors-proxy start -d'
+  - script: npm test
+    displayName: 'Run tests'
+    env:
+      BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
+      BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
+      BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
+      GH_TOKEN: $(Gh.Token)
+      GITHUB_TOKEN: $(Github.Token)
+      SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
+      SAUCE_USERNAME: $(Sauce.Username)
+      TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
+      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,sl_android_chrome'
 
-- script: npm test
-  displayName: 'npm test'
-  env:
-    BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
-    BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
-    BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
-    GH_TOKEN: $(Gh.Token)
-    GITHUB_TOKEN: $(Github.Token)
-    SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
-    SAUCE_USERNAME: $(Sauce.Username)
+  - task: PublishTestResults@2
+    displayName: 'Save test results'
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
 
-- script: ./node_modules/.bin/cors-proxy stop
-  displayName: 'cors-proxy stop'
-  condition: succeededOrFailed()
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Save code coverage'
+    condition: succeededOrFailed()
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
 
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFormat: JUnit
-    testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
+  - script: npm pack
+    displayName: 'Prepare installable tarball'
+    condition: succeededOrFailed()
 
-- task: PublishCodeCoverageResults@1
-  condition: succeededOrFailed()
-  inputs: 
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Save npm-tarball.tgz'
+    condition: succeededOrFailed()
+    inputs:
+      artifactName: 'npm-tarball.tgz'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
 
-- script: npm pack
-  displayName: 'npm pack'
-  condition: succeededOrFailed()
+  - task: PublishBuildArtifacts@1
+    displayName: 'Save bundle.umd.min.js'
+    condition: succeededOrFailed()
+    inputs:
+      artifactName: 'bundle.umd.min.js'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
 
-- task: PublishBuildArtifacts@1
-  condition: succeededOrFailed()
-  inputs:
-    artifactName: 'npm-tarball.tgz'
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
-
-- task: PublishBuildArtifacts@1
-  condition: succeededOrFailed()
-  inputs:
-    artifactName: 'bundle.umd.min.js'
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
-
-- script: npm run semantic-release
-  displayName: 'semantic-release'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  env:
-    GH_TOKEN: $(Gh.Token)
-    NPM_TOKEN: $(Npm.Token)
-    TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
-    TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
+  - script: npm run semantic-release
+    displayName: 'Publish to npm'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    env:
+      GH_TOKEN: $(Gh.Token)
+      NPM_TOKEN: $(Npm.Token)
+      TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
+      TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)

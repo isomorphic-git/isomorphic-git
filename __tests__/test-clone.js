@@ -91,32 +91,25 @@ describe('clone', () => {
     )
     expect(error.caller).toEqual('git.clone')
   })
-  // For now we are only running this in the browser, because the karma middleware solution only
-  // works when running in Karma, and these tests also need to pass Jest and node-jasmine.
-  // At some point, we need to wrap git-http-server so it can be launched pre-test and killed post-test
-  // when running in jest/jasmine.
-  ;(process.browser ? it : xit)(
-    'clone from karma-git-http-server-middleware',
-    async () => {
-      let { fs, dir, gitdir } = await makeFixture('test-clone-karma')
-      plugins.set('fs', fs)
-      await clone({
-        dir,
-        gitdir,
-        depth: 1,
-        singleBranch: true,
-        url: 'http://localhost:9876/git-server/test-status.git'
-      })
-      expect(fs.existsSync(`${dir}`)).toBe(true, `'dir' exists`)
-      expect(fs.existsSync(`${gitdir}/objects`)).toBe(
-        true,
-        `'gitdir/objects' exists`
-      )
-      expect(fs.existsSync(`${gitdir}/refs/heads/master`)).toBe(
-        true,
-        `'gitdir/refs/heads/master' exists`
-      )
-      expect(fs.existsSync(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
-    }
-  )
+  it('clone from git-http-mock-server', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-clone-karma')
+    plugins.set('fs', fs)
+    await clone({
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      url: 'http://localhost:8888/test-status.git'
+    })
+    expect(fs.existsSync(`${dir}`)).toBe(true, `'dir' exists`)
+    expect(fs.existsSync(`${gitdir}/objects`)).toBe(
+      true,
+      `'gitdir/objects' exists`
+    )
+    expect(fs.existsSync(`${gitdir}/refs/heads/master`)).toBe(
+      true,
+      `'gitdir/refs/heads/master' exists`
+    )
+    expect(fs.existsSync(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
+  })
 })

@@ -1,2 +1,3 @@
-__tests__/__fixtures__/* linguist-vendored
-
+* eol=lf
+__tests__/__fixtures__/* binary linguist-vendored
+__tests__/__snapshots__/* binary
