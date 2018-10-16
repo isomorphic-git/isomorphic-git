@@ -3,12 +3,11 @@ process.env.CHROME_BIN = require('puppeteer').executablePath()
 const path = require('path')
 const webpack = require('webpack')
 
-const branchOrPullRequestName =
-  process.env.TRAVIS_PULL_REQUEST === 'false'
-    ? process.env.TRAVIS_BRANCH
-    : process.env.TRAVIS_PULL_REQUEST_SLUG +
-      '/' +
-      process.env.TRAVIS_PULL_REQUEST_BRANCH
+const REPO = process.env.BUILD_REPOSITORY_NAME
+const ISSUE =
+      process.env.SYSTEM_PULLREQUEST_PULLREQUESTNUMBER ||
+      process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
+const COMMIT = process.env.BUILD_SOURCEVERSION
 
 module.exports = function (config) {
   const options = {
@@ -88,62 +87,6 @@ module.exports = function (config) {
         browserName: 'Chrome',
         appiumVersion: '1.7.2'
       },
-      XXXbs_chrome_win: {
-        base: 'BrowserStack',
-        browser: 'Chrome',
-        browser_version: '62.0',
-        os: 'Windows',
-        os_version: '10'
-      },
-      XXXbs_firefox_win: {
-        base: 'BrowserStack',
-        browser: 'Firefox',
-        browser_version: '59.0',
-        os: 'Windows',
-        os_version: '10'
-      },
-      XXXbs_edge_win: {
-        base: 'BrowserStack',
-        browser: 'Edge',
-        browser_version: '16.0',
-        os: 'Windows',
-        os_version: '10'
-      },
-      XXXbs_chrome_mac: {
-        base: 'BrowserStack',
-        browser: 'Chrome',
-        browser_version: '62.0',
-        os: 'OS X',
-        os_version: 'High Sierra'
-      },
-      XXXbs_firefox_mac: {
-        base: 'BrowserStack',
-        browser: 'Firefox',
-        browser_version: '59.0',
-        os: 'OS X',
-        os_version: 'High Sierra'
-      },
-      XXXbs_safari_mac: {
-        base: 'BrowserStack',
-        browser: 'Safari',
-        browser_version: '11.1',
-        os: 'OS X',
-        os_version: 'High Sierra'
-      },
-      XXXbs_safari_iphone: {
-        base: 'BrowserStack',
-        real_mobile: true,
-        device: 'iPhone SE',
-        os: 'ios',
-        os_version: '11.2'
-      },
-      XXXbs_android: {
-        base: 'BrowserStack',
-        real_mobile: true,
-        device: 'Google Pixel',
-        os: 'android',
-        os_version: '8.0'
-      },
       FirefoxHeadless: {
         base: 'Firefox',
         flags: ['-headless']
@@ -153,24 +96,15 @@ module.exports = function (config) {
         flags: ['--no-sandbox']
       }
     },
-    browserStack: {
-      project: 'isomorphic-git',
-      name: `isomorphic-git / ${branchOrPullRequestName} / ${
-        process.env.TRAVIS_COMMIT
-      }`,
-      build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now()
-    },
     sauceLabs: {
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
-      testName: `isomorphic-git / ${branchOrPullRequestName} / ${
-        process.env.TRAVIS_COMMIT
-      }`,
+      testName: `${REPO} / ${ISSUE} / ${COMMIT}`,
       // Note: I added the Date.now() bit so that when I can click "Restart" on a Travis job,
       // Sauce Labs does not simply append new test results to the old set that failed, which
       // convinces karma that it failed again and always.
-      build: process.env.TRAVIS_JOB_NUMBER + '-' + Date.now(),
+      build: process.env.BUILD_BUILDID + '-' + Date.now(),
       // Note: it does not appear that tags are being sent correctly.
-      tags: [branchOrPullRequestName],
+      tags: [ISSUE],
       recordScreenshots: false,
       recordVideo: false,
       public: 'public restricted'
@@ -219,7 +153,6 @@ module.exports = function (config) {
       }
     },
     plugins: [
-      'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-edge-launcher',
       'karma-ie-launcher',
@@ -247,7 +180,7 @@ module.exports = function (config) {
     ]
   }
 
-  // Speed things up
+  // Speed things up, at the cost of not saving the test results (except in the stdout log).
   if (process.env.FAILFAST && process.env.FAILFAST === 'true') {
     options.reporters.push('fail-fast')
   }
@@ -261,25 +194,7 @@ module.exports = function (config) {
       'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
     )
   } else {
-    options.browsers = options.browsers.concat(
-      Object.keys(options.customLaunchers).filter(x => x.startsWith('sl_'))
-    )
     options.reporters.push('saucelabs')
-  }
-
-  if (!process.env.BROWSER_STACK_USERNAME) {
-    console.log(
-      'Skipping BrowserStack tests because BROWSER_STACK_USERNAME environment variable is not set.'
-    )
-  } else if (!process.env.BROWSER_STACK_ACCESS_KEY) {
-    console.log(
-      'Skipping BrowserStack tests because BROWSER_STACK_ACCESS_KEY environment variable is not set.'
-    )
-  } else {
-    options.browsers = options.browsers.concat(
-      Object.keys(options.customLaunchers).filter(x => x.startsWith('bs_'))
-    )
-    options.reporters.push('BrowserStack')
   }
 
   if (process.env.TEST_BROWSERS) {
