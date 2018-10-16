@@ -106,7 +106,6 @@
     "karma-edge-launcher": "0.4.2",
     "karma-fail-fast-reporter": "1.0.5",
     "karma-firefox-launcher": "1.1.0",
-    "karma-git-http-server-middleware": "1.1.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-jasmine": "1.1.2",
     "karma-junit-reporter": "^1.2.0",

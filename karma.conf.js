@@ -20,11 +20,6 @@ module.exports = function (config) {
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
-    beforeMiddleware: ['git-http-server'],
-    gitHttpServer: {
-      root: '__tests__/__fixtures__',
-      route: '/git-server'
-    },
     // list of files / patterns to load in the browser
     files: [
       '__tests__/test-*.js',
@@ -231,7 +226,6 @@ module.exports = function (config) {
       'karma-safari-launcher',
       'karma-fail-fast-reporter',
       'karma-firefox-launcher',
-      'karma-git-http-server-middleware',
       'karma-jasmine',
       'karma-junit-reporter',
       'karma-longest-reporter',
