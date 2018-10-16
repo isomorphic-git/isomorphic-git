@@ -70,7 +70,7 @@ module.exports = function (config) {
         browserName: 'firefox',
         extendedDebugging: true
       },
-      XXXsl_edge: {
+      sl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge'
       },

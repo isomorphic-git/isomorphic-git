@@ -131,7 +131,7 @@ jobs:
       GH_TOKEN: $(Gh.Token)
       GITHUB_TOKEN: $(Github.Token)
       TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
-      TEST_BROWSERS: 'sl_edge'
+      TEST_BROWSERS: 'IE,sl_edge'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
