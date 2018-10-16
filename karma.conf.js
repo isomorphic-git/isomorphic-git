@@ -285,25 +285,8 @@ module.exports = function (config) {
   if (process.env.TEST_BROWSERS) {
     options.browsers = process.env.TEST_BROWSERS.split(',')
   } else {
-    if (process.platform === 'linux') {
-      options.browsers.push('ChromeHeadlessNoSandbox')
-      options.browsers.push('FirefoxHeadless')
-    }
-
-    if (process.platform === 'win32') {
-      options.browsers.push('ChromeHeadlessNoSandbox')
-      options.browsers.push('FirefoxHeadless')
-      if (process.env.CI) {
-        options.browsers.push('Edge')
-      }
-    }
-
-    if (process.platform === 'darwin') {
-      options.browsers.push('ChromeHeadlessNoSandbox')
-      if (process.env.CI) {
-        options.browsers.push('Safari')
-      }
-    }
+    options.browsers.push('ChromeHeadlessNoSandbox')
+    options.browsers.push('FirefoxHeadless')
   }
 
   // Only re-run browsers that failed in the previous run.
