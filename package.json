@@ -122,7 +122,7 @@
     "parse-header-stream": "1.1.1",
     "prettier-standard": "8.0.1",
     "pretty-format": "23.6.0",
-    "puppeteer": "1.8.0",
+    "puppeteer": "1.9.0",
     "replace-in-file": "3.4.2",
     "rollup": "0.66.6",
     "semantic-release": "15.9.17",
