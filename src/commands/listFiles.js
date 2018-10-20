@@ -2,8 +2,8 @@ import path from 'path'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { cores } from '../utils/plugins.js'
 import { pathjoin } from '../utils/pathjoin'
+import { cores } from '../utils/plugins.js'
 
 import { readObject } from './readObject'
 import { resolveRef } from './resolveRef'

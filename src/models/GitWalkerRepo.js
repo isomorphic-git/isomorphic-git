@@ -1,8 +1,8 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { readObject } from '../storage/readObject.js'
+import { pathjoin } from '../utils/pathjoin'
 import { resolveTree } from '../utils/resolveTree.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
-import { pathjoin } from '../utils/pathjoin'
 
 import { GitTree } from './GitTree.js'
 
