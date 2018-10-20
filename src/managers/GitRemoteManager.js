@@ -2,11 +2,6 @@ import { E, GitError } from '../models/GitError.js'
 
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
-// For now, to remain API compatible, we'll pre-register the GitRemoteHTTP helper
-export const remoteHelpers = new Map()
-remoteHelpers.set('http', GitRemoteHTTP)
-remoteHelpers.set('https', GitRemoteHTTP)
-
 function parseRemoteUrl ({ url }) {
   let matches = url.match(/(\w+)(:\/\/|::)(.*)/)
   if (matches === null) return
@@ -39,6 +34,11 @@ function parseRemoteUrl ({ url }) {
 
 export class GitRemoteManager {
   static getRemoteHelperFor ({ url }) {
+    // TODO: clean up the remoteHelper API and move into PluginCore
+    const remoteHelpers = new Map()
+    remoteHelpers.set('http', GitRemoteHTTP)
+    remoteHelpers.set('https', GitRemoteHTTP)
+
     let parts = parseRemoteUrl({ url })
     if (!parts) {
       throw new GitError(E.RemoteUrlParseError, { url })

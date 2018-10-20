@@ -82,14 +82,13 @@ export class GitWalkerIndex {
   }
 }
 
-const STAGE = function STAGE ({ fs, gitdir }) {
+export function STAGE ({ fs, gitdir }) {
   let o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {
       return new GitWalkerIndex({ fs, gitdir })
     }
   })
+  Object.freeze(o)
   return o
 }
-Object.freeze(STAGE)
-export { STAGE }

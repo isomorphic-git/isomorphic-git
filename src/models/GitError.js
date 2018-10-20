@@ -3,16 +3,7 @@
 
 import nick from 'nick'
 
-import { t } from '../utils/t.js'
-
-const translate = obj => {
-  for (const [key, value] of Object.entries(obj)) {
-    obj[key] = nick(t(value))
-  }
-  return obj
-}
-
-const messages = translate({
+const messages = {
   FileReadError: `Could not read file "{ filepath }".`,
   MissingRequiredParameterError: `The function "{ function }" requires a "{ parameter }" parameter but none was provided.`,
   InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
@@ -79,7 +70,7 @@ const messages = translate({
   PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`
-})
+}
 
 export const E = {
   FileReadError: `FileReadError`,
@@ -156,7 +147,7 @@ export class GitError extends Error {
     this.name = code
     this.code = code
     this.data = data
-    this.message = messages[code](data || {})
+    this.message = nick(messages[code])(data || {})
     if (Error.captureStackTrace) Error.captureStackTrace(this, this.constructor)
   }
   toJSON () {

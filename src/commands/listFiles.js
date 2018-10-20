@@ -3,6 +3,7 @@ import path from 'path'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { cores } from '../utils/plugins.js'
+import { pathjoin } from '../utils/pathjoin'
 
 import { readObject } from './readObject'
 import { resolveRef } from './resolveRef'
@@ -51,14 +52,10 @@ async function accumulateFilesFromOid ({ gitdir, fs, oid, filenames, prefix }) {
         fs,
         oid: entry.oid,
         filenames,
-        prefix: posixJoin(prefix, entry.path)
+        prefix: pathjoin(prefix, entry.path)
       })
     } else {
-      filenames.push(posixJoin(prefix, entry.path))
+      filenames.push(pathjoin(prefix, entry.path))
     }
   }
 }
-
-// For some reason path.posix.join is undefined in webpack?
-const posixJoin = (prefix, filename) =>
-  prefix ? `${prefix}/${filename}` : filename

@@ -1,4 +1,4 @@
-import { clean } from 'clean-git-ref'
+import cleanGitRef from 'clean-git-ref'
 import path from 'path'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -27,12 +27,12 @@ export async function branch ({
       })
     }
 
-    if (ref !== clean(ref)) {
+    if (ref !== cleanGitRef.clean(ref)) {
       throw new GitError(E.InvalidRefNameError, {
         verb: 'create',
         noun: 'branch',
         ref,
-        suggestion: clean(ref)
+        suggestion: cleanGitRef.clean(ref)
       })
     }
 
