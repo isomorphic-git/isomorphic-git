@@ -1,4 +1,4 @@
-import { clean } from 'clean-git-ref'
+import cleanGitRef from 'clean-git-ref'
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
@@ -28,12 +28,12 @@ export async function deleteBranch ({
       })
     }
 
-    if (ref !== clean(ref)) {
+    if (ref !== cleanGitRef.clean(ref)) {
       throw new GitError(E.InvalidRefNameError, {
         verb: 'delete',
         noun: 'branch',
         ref,
-        suggestion: clean(ref)
+        suggestion: cleanGitRef.clean(ref)
       })
     }
 

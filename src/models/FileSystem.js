@@ -7,8 +7,6 @@ import { E, GitError } from '../models/GitError.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { sleep } from '../utils/sleep.js'
 
-const readFileLog = debug('readFile')
-
 const delayedReleases = new Map()
 /**
  * This is just a collection of helper functions really. At least that's how it started.
@@ -56,7 +54,7 @@ export class FileSystem {
     try {
       marky.mark(filepath)
       let buffer = await this._readFile(filepath, options)
-      readFileLog(`${filepath} ${marky.stop(filepath).duration}`)
+      debug('readFile')(`${filepath} ${marky.stop(filepath).duration}`)
       return buffer
     } catch (err) {
       return null

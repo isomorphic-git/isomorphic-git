@@ -52,11 +52,13 @@ module.exports = {
         'build.rollup',
         'build.webpack',
         'build.indexjson',
+        'build.treeshake',
         'build.size'
       ),
       webpack: 'webpack',
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
+      treeshake: 'agadoo',
       size: optional(
         `cross-env TRAVIS=true ` +
           `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +

@@ -1,4 +1,4 @@
-import { clean } from 'clean-git-ref'
+import cleanGitRef from 'clean-git-ref'
 import path from 'path'
 
 import { GitConfigManager } from '../managers/GitConfigManager.js'
@@ -34,12 +34,12 @@ export async function addRemote ({
         parameter: 'url'
       })
     }
-    if (remote !== clean(remote)) {
+    if (remote !== cleanGitRef.clean(remote)) {
       throw new GitError(E.InvalidRefNameError, {
         verb: 'add',
         noun: 'remote',
         ref: remote,
-        suggestion: clean(remote)
+        suggestion: cleanGitRef.clean(remote)
       })
     }
     const config = await GitConfigManager.get({ fs, gitdir })

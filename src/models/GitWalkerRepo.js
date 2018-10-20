@@ -1,12 +1,12 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { readObject } from '../storage/readObject.js'
-import { path } from '../utils/path.js'
+import { pathjoin } from '../utils/pathjoin'
 import { resolveTree } from '../utils/resolveTree.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { GitTree } from './GitTree.js'
 
-export class GitWalkerRepo {
+class GitWalkerRepo {
   constructor ({ fs, gitdir, ref }) {
     this.fs = fs
     this.gitdir = gitdir
@@ -53,10 +53,10 @@ export class GitWalkerRepo {
     let tree = GitTree.from(object)
     // cache all entries
     for (const entry of tree) {
-      map.set(path.join(filepath, entry.path), entry)
+      map.set(pathjoin(filepath, entry.path), entry)
     }
     return tree.entries().map(entry => ({
-      fullpath: path.join(filepath, entry.path),
+      fullpath: pathjoin(filepath, entry.path),
       basename: entry.path,
       exists: true
     }))
@@ -99,14 +99,13 @@ export class GitWalkerRepo {
   }
 }
 
-const TREE = function TREE ({ fs, gitdir, ref }) {
+export function TREE ({ fs, gitdir, ref }) {
   let o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {
       return new GitWalkerRepo({ fs, gitdir, ref })
     }
   })
+  Object.freeze(o)
   return o
 }
-Object.freeze(TREE)
-export { TREE }

@@ -9,11 +9,12 @@ import { GitIndex } from '../models/GitIndex.js'
 // TODO: replace with an LRU cache?
 const map = new Map()
 // const lm = new LockManager()
-const lock = new AsyncLock()
+let lock = null
 
 export class GitIndexManager {
   static async acquire ({ fs: _fs, filepath }, closure) {
     const fs = new FileSystem(_fs)
+    if (lock === null) lock = new AsyncLock()
     await lock.acquire(filepath, async function () {
       let index = map.get(filepath)
       if (index === undefined) {
