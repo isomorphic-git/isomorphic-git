@@ -2,13 +2,13 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
 import { log } from '../utils/log.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
-import { path } from '../utils/path.js'
+import { pathjoin } from '../utils/pathjoin'
 import { shasum } from '../utils/shasum.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { GitObject } from './GitObject.js'
 
-export class GitWalkerFs {
+class GitWalkerFs {
   constructor ({ fs, dir, gitdir }) {
     this.fs = fs
     this.dir = dir
@@ -36,10 +36,10 @@ export class GitWalkerFs {
     if (!entry.exists) return []
     let filepath = entry.fullpath
     let { fs, dir } = this
-    let names = await fs.readdir(path.join(dir, filepath))
+    let names = await fs.readdir(pathjoin(dir, filepath))
     if (names === null) return null
     return names.map(name => ({
-      fullpath: path.join(filepath, name),
+      fullpath: pathjoin(filepath, name),
       basename: name,
       exists: true
     }))
@@ -95,14 +95,13 @@ export class GitWalkerFs {
   }
 }
 
-const WORKDIR = function WORKDIR ({ fs, dir, gitdir }) {
+export function WORKDIR ({ fs, dir, gitdir }) {
   let o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {
       return new GitWalkerFs({ fs, dir, gitdir })
     }
   })
+  Object.freeze(o)
   return o
 }
-Object.freeze(WORKDIR)
-export { WORKDIR }
