@@ -8,7 +8,7 @@ import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { GitObject } from './GitObject.js'
 
-export class GitWalkerFs {
+class GitWalkerFs {
   constructor ({ fs, dir, gitdir }) {
     this.fs = fs
     this.dir = dir

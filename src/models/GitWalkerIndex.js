@@ -4,7 +4,7 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
 import { normalizeStats } from '../utils/normalizeStats'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
-export class GitWalkerIndex {
+class GitWalkerIndex {
   constructor ({ fs, gitdir }) {
     this.treePromise = (async () => {
       let result

@@ -6,7 +6,7 @@ import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { GitTree } from './GitTree.js'
 
-export class GitWalkerRepo {
+class GitWalkerRepo {
   constructor ({ fs, gitdir, ref }) {
     this.fs = fs
     this.gitdir = gitdir

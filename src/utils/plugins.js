@@ -70,10 +70,6 @@ export const cores = {
   get (key) {
     if (_cores.has(key)) {
       return _cores.get(key)
-    } else if (key === 'default') {
-      // Instantiate on first use
-      _cores.set('default', new PluginCore())
-      return _cores.get(key)
     } else {
       throw new GitError(E.CoreNotFound, { core: key })
     }
