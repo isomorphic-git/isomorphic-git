@@ -118,7 +118,7 @@
     "puppeteer": "1.9.0",
     "replace-in-file": "3.4.2",
     "rollup": "0.66.6",
-    "semantic-release": "15.9.17",
+    "semantic-release": "15.10.5",
     "standard": "11.0.1",
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
