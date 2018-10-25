@@ -4,6 +4,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { SignedGitCommit } from '../models/SignedGitCommit.js'
+import { GitCommit } from '../models/GitCommit.js'
 import { readObject } from '../storage/readObject.js'
 import { writeObject } from '../storage/writeObject.js'
 import { cores } from '../utils/plugins.js'
@@ -28,8 +29,17 @@ export async function sign ({
     if (type !== 'commit') {
       throw new GitError(E.ObjectTypeAssertionInRefFail, { ref: 'HEAD', type })
     }
-    let commit = SignedGitCommit.from(object)
-    commit = await commit.sign(openpgp, privateKeys)
+    let commit
+    if (openpgp) {
+      // Old API
+      commit = SignedGitCommit.from(object)
+      commit = await commit.sign(openpgp, privateKeys)
+    } else {
+      // Newer plugin API
+      let pgp = cores.get(core).get('pgp')
+      commit = GitCommit.from(object)
+      commit = await GitCommit.sign(commit, pgp, privateKeys)
+    }
     const newOid = await writeObject({
       fs,
       gitdir,

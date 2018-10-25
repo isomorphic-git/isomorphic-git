@@ -47,6 +47,7 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.1.2",
+    "@isomorphic-git/openpgp-plugin": "0.0.1",
     "async-lock": "^1.1.0",
     "clean-git-ref": "1.0.3",
     "crc": "^3.5.0",

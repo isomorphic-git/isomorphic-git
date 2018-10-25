@@ -3,6 +3,16 @@ import { formatAuthor } from '../utils/formatAuthor.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
 
+function normalize (str) {
+  // remove all <CR>
+  str = str.replace(/\r/g, '')
+  // no extra newlines up front
+  str = str.replace(/^\n+/, '')
+  // and a single newline at the end
+  str = str.replace(/\n+$/, '') + '\n'
+  return str
+}
+
 function indent (str) {
   return (
     str
@@ -159,5 +169,24 @@ export class GitCommit {
         '-----END PGP SIGNATURE-----'.length
     )
     return outdent(signature)
+  }
+
+  static async sign (commit, pgp, secretKey) {
+    const payload = commit.withoutSignature()
+    const message = GitCommit.justMessage(commit._commit)
+    let { signature } = await pgp.sign({ payload, secretKey })
+    // renormalize the line endings to the one true line-ending
+    signature = normalize(signature)
+    const headers = GitCommit.justHeaders(commit._commit)
+    let signedCommit =
+      headers + '\n' + 'gpgsig' + indent(signature) + '\n' + message
+    // return a new commit object
+    return GitCommit.from(signedCommit)
+  }
+
+  static async verify (commit, pgp, publicKey) {
+    const payload = commit.withoutSignature()
+    const signature = commit.isolateSignature()
+    return pgp.verify({ payload, publicKey, signature })
   }
 }

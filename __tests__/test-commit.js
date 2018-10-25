@@ -67,7 +67,70 @@ describe('commit', () => {
     expect(error.toJSON()).toMatchSnapshot()
   })
 
-  it('GPG signing', async () => {
+  it('pgp plugin signing', async () => {
+    // Setup
+    const { pgp } = require('@isomorphic-git/openpgp-plugin')
+    let { fs, gitdir } = await makeFixture('test-commit')
+    plugins.set('fs', fs)
+    plugins.set('pgp', pgp)
+    // Test
+    const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
+    await commit({
+      gitdir,
+      message: 'Initial commit',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1504842425,
+        timezoneOffset: 0
+      },
+      signingKey: privateKeys[0]
+    })
+    // await sign({
+    //   gitdir,
+    //   privateKeys: privateKeys[0]
+    // })
+    const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
+    let keys = await verify({
+      gitdir,
+      ref: 'HEAD',
+      publicKeys: publicKeys[0]
+    })
+    expect(keys[0]).toBe('a01edd29ac0f3952')
+  })
+
+  it('pgp plugin signing - backwards compatiblity', async () => {
+    // Setup
+    const { pgp } = require('@isomorphic-git/openpgp-plugin')
+    let { fs, gitdir } = await makeFixture('test-commit')
+    plugins.set('fs', fs)
+    plugins.set('pgp', pgp)
+    // Test
+    const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
+    await commit({
+      gitdir,
+      message: 'Initial commit',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1504842425,
+        timezoneOffset: 0
+      }
+    })
+    await sign({
+      gitdir,
+      privateKeys: privateKeys[0]
+    })
+    const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
+    let keys = await verify({
+      gitdir,
+      ref: 'HEAD',
+      publicKeys: publicKeys[0]
+    })
+    expect(keys[0]).toBe('a01edd29ac0f3952')
+  })
+
+  it('GPG signing (deprecated API)', async () => {
     // Setup
     const openpgp = require('openpgp/dist/openpgp.min.js')
 
