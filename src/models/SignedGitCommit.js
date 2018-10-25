@@ -1,6 +1,7 @@
-import { GitCommit } from './GitCommit'
-import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { indent } from '../utils/indent.js'
+import { normalizeNewlines } from '../utils/normalizeNewlines.js'
+
+import { GitCommit } from './GitCommit'
 
 export class SignedGitCommit extends GitCommit {
   static from (commit) {

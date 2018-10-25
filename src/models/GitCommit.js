@@ -1,7 +1,7 @@
 import { E, GitError } from '../models/GitError.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
-import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { indent } from '../utils/indent.js'
+import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { outdent } from '../utils/outdent.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
 
