@@ -20,14 +20,13 @@ export class GitRemoteHTTP {
   static async capabilities () {
     return ['discover', 'connect']
   }
-  static async discover ({ core, corsProxy, service, url, noGitSuffix, auth }) {
+  static async discover ({ core, corsProxy, service, url, noGitSuffix, auth, headers = {} }) {
     const _origUrl = url
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
-    let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
     headers['user-agent'] = pkg.agent
     let _auth = calculateBasicAuthUsernamePasswordPair(auth)
@@ -83,13 +82,12 @@ export class GitRemoteHTTP {
       throw err
     }
   }
-  static async connect ({ corsProxy, service, url, noGitSuffix, auth, stream }) {
+  static async connect ({ corsProxy, service, url, noGitSuffix, auth, stream, headers = {} }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
-    let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
     headers['user-agent'] = pkg.agent
