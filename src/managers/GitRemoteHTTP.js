@@ -97,7 +97,7 @@ export class GitRemoteHTTP {
     noGitSuffix,
     auth,
     stream,
-    headers = {}
+    headers
   }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
