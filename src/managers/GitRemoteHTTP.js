@@ -20,7 +20,7 @@ export class GitRemoteHTTP {
   static async capabilities () {
     return ['discover', 'connect']
   }
-  static async discover ({ core, corsProxy, service, url, noGitSuffix, auth, headers = {} }) {
+  static async discover ({ core, corsProxy, service, url, noGitSuffix, auth, headers }) {
     const _origUrl = url
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'

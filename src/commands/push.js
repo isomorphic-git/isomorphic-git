@@ -43,7 +43,7 @@ export async function push ({
   password = authPassword,
   token,
   oauth2format,
-  headers,
+  headers = {},
 }) {
   try {
     const fs = new FileSystem(_fs)
