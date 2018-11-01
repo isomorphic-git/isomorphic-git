@@ -32,7 +32,7 @@ export async function pull ({
   token,
   oauth2format,
   singleBranch,
-  headers = {},
+  headers = {}
 }) {
   try {
     const fs = new FileSystem(_fs)
