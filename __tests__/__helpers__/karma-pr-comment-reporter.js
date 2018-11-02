@@ -48,7 +48,7 @@ function postComment (body) {
     process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
   console.log(`Detected repo: ${repo}, issue: #${issue}, is PR: ${isPR}`)
   if (isPR) {
-    comment(process.env.GITHUB_TOKEN, repo, issue, body)
+    comment(process.env.KARMA_PR_REPORTER_GITHUB_TOKEN, repo, issue, body)
       .then(response => console.log(`posted results to PR #${issue}`))
       .catch(err => console.log('error leaving Github comment:', err))
   } else {

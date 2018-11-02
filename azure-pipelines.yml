@@ -24,7 +24,7 @@ jobs:
       BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
       BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
       # TODO: Figure out how to have karma-pr-commenter-reporter work without this present.
-      GITHUB_TOKEN: $(Github.Token)
+      KARMA_PR_REPORTER_GITHUB_TOKEN: $(Github.Token)
       SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
       SAUCE_USERNAME: $(Sauce.Username)
       TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,sl_android_chrome'
