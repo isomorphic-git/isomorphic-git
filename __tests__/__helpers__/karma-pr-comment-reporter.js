@@ -54,11 +54,11 @@ function postComment (message) {
       // .catch(err => console.log('error leaving Github comment:', err))
     fetch.post({
       url: 'https://karma-pr-reporter.glitch.me',
-      body: JSON.stringify({ repo, issue, message })
+      body: JSON.stringify({ repo, issue, message }),
     }, (err, res) => {
       if (err) return console.log('error leaving Github comment:', err)
       console.log(res.body)
-    }
+    })
   } else {
     console.log(message)
   }
