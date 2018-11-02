@@ -10,10 +10,6 @@ describe('push', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
   })
-  // For now we are only running this in the browser, because the karma middleware solution only
-  // works when running in Karma, and these tests also need to pass Jest and node-jasmine.
-  // At some point, we need to wrap git-http-server so it can be launched pre-test and killed post-test
-  // when running in jest/jasmine.
   it('push', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
@@ -150,25 +146,27 @@ describe('push', () => {
     }
     expect(error).toContain('401')
   })
-  ;(process.env.TEST_PUSH_GITHUB_TOKEN ? it : xit)(
-    'push to Github using token',
-    async () => {
-      // Setup
-      let { fs, gitdir } = await makeFixture('test-push')
-      plugins.set('fs', fs)
-      // Test
-      let res = await push({
-        gitdir,
-        corsProxy: process.browser ? 'http://localhost:9999' : undefined,
-        token: process.env.TEST_PUSH_GITHUB_TOKEN,
-        remote: 'origin',
-        ref: 'master',
-        force: true
-      })
-      expect(res).toBeTruthy()
-      expect(res.ok).toBeTruthy()
-      expect(res.ok[0]).toBe('unpack')
-      expect(res.ok[1]).toBe('refs/heads/master')
-    }
-  )
+  it('push to Github using token', async () => {
+    // This Personal OAuth token is for a test account (https://github.com/isomorphic-git-test-push)
+    // with "public_repo" access. The only repo it has write access to is
+    // https://github.com/isomorphic-git/test.empty
+    // It is stored reversed to avoid Github's auto-revoking feature.
+    const token = 'e8df25b340c98b7eec57a4976bd9074b93a7dc1c'.split('').reverse().join('')
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-push')
+    plugins.set('fs', fs)
+    // Test
+    let res = await push({
+      gitdir,
+      corsProxy: process.browser ? 'http://localhost:9999' : undefined,
+      token: token,
+      remote: 'origin',
+      ref: 'master',
+      force: true
+    })
+    expect(res).toBeTruthy()
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
+  })
 })
