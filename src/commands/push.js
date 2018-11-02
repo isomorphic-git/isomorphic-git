@@ -42,7 +42,8 @@ export async function push ({
   username = authUsername,
   password = authPassword,
   token,
-  oauth2format
+  oauth2format,
+  headers = {}
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -73,7 +74,8 @@ export async function push ({
       service: 'git-receive-pack',
       url,
       noGitSuffix,
-      auth
+      auth,
+      headers
     })
     auth = httpRemote.auth // hack to get new credentials from CredentialManager API
     let fullRemoteRef
@@ -150,6 +152,7 @@ export async function push ({
       url,
       noGitSuffix,
       auth,
+      headers,
       stream: packstream
     })
     let { packfile, progress } = await GitSideBand.demux(res)
