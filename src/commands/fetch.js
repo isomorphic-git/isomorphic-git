@@ -141,7 +141,8 @@ async function fetchPackfile ({
   exclude = [],
   relative = false,
   tags = false,
-  singleBranch = false
+  singleBranch = false,
+  headers = {}
 }) {
   const fs = new FileSystem(_fs)
   // Sanity checks
@@ -171,7 +172,8 @@ async function fetchPackfile ({
     service: 'git-upload-pack',
     url,
     noGitSuffix,
-    auth
+    auth,
+    headers
   })
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   // Check that the remote supports the requested features
@@ -239,7 +241,8 @@ async function fetchPackfile ({
     url,
     noGitSuffix,
     auth,
-    stream: packstream
+    stream: packstream,
+    headers
   })
   // Normally I would await this, but for some reason I'm having trouble detecting
   // when this header portion is over.

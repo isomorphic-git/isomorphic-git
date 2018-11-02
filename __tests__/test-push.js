@@ -151,7 +151,10 @@ describe('push', () => {
     // with "public_repo" access. The only repo it has write access to is
     // https://github.com/isomorphic-git/test.empty
     // It is stored reversed to avoid Github's auto-revoking feature.
-    const token = 'e8df25b340c98b7eec57a4976bd9074b93a7dc1c'.split('').reverse().join('')
+    const token = 'e8df25b340c98b7eec57a4976bd9074b93a7dc1c'
+      .split('')
+      .reverse()
+      .join('')
     // Setup
     let { fs, gitdir } = await makeFixture('test-push')
     plugins.set('fs', fs)

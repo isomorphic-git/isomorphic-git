@@ -26,7 +26,8 @@ export async function getRemoteInfo ({
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,
       noGitSuffix,
-      auth
+      auth,
+      headers: {}
     })
     auth = remote.auth // hack to get new credentials from CredentialManager API
     const result = {}

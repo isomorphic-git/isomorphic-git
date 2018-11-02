@@ -24,7 +24,8 @@ describe('GitRemoteHTTP', () => {
     let remote = await GitRemoteHTTP.discover({
       core: 'default',
       service: 'git-upload-pack',
-      url: 'https://github.com/isomorphic-git/isomorphic-git'
+      url: 'https://github.com/isomorphic-git/isomorphic-git',
+      headers: {}
     })
     expect(remote).toBeTruthy()
     expect(remote.symrefs.size > 0)
@@ -42,7 +43,8 @@ describe('GitRemoteHTTP', () => {
     let remote = await GitRemoteHTTP.discover({
       core: 'default',
       service: 'git-upload-pack',
-      url: 'http://example.dev/test-GitRemoteHTTP'
+      url: 'http://example.dev/test-GitRemoteHTTP',
+      headers: {}
     })
     expect(remote).toBeTruthy()
     // Teardown
@@ -58,7 +60,8 @@ describe('GitRemoteHTTP', () => {
     let remote = await GitRemoteHTTP.discover({
       core: 'default',
       service: 'git-receive-pack',
-      url: 'http://example.dev/test-GitRemoteHTTP'
+      url: 'http://example.dev/test-GitRemoteHTTP',
+      headers: {}
     })
     expect(remote).toBeTruthy()
     // Teardown
@@ -74,7 +77,9 @@ describe('GitRemoteHTTP', () => {
       await GitRemoteHTTP.discover({
         core: 'default',
         service: 'git-receive-pack',
-        url: 'https://github.com/isomorphic-git/not-there'
+        url: 'https://github.com/isomorphic-git/not-there',
+        discover: {},
+        headers: {}
       })
     } catch (err) {
       error = err
