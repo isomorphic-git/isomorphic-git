@@ -1,4 +1,4 @@
-import crc32 from 'crc/lib/crc32.js'
+import crc32 from 'crc-32'
 import applyDelta from 'git-apply-delta'
 import * as marky from 'marky'
 import pako from 'pako'
@@ -214,7 +214,7 @@ export class GitPackIndex {
       let end =
         i + 1 === offsetArray.length ? pack.byteLength - 20 : offsetArray[i + 1]
       let o = offsetToObject[start]
-      let crc = crc32(pack.slice(start, end))
+      let crc = crc32.buf(pack.slice(start, end)) >>> 0
       o.end = end
       o.crc = crc
     }

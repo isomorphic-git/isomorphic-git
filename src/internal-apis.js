@@ -44,7 +44,6 @@ export * from './utils/resolveTree'
 export * from './utils/shasum'
 export * from './utils/sleep'
 export * from './utils/symbols'
-export * from './utils/t'
 
 export * from './wire/parseReceivePackResponse'
 export * from './wire/parseRefsAdResponse'
