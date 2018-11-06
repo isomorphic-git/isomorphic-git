@@ -12,6 +12,11 @@ export function oauth2 (company, token) {
         username: token,
         password: 'x-oauth-basic'
       }
+    case 'githubapp':
+      return {
+        username: 'x-access-token',
+        password: token
+      }
     case 'bitbucket':
       return {
         username: 'x-token-auth',
