@@ -54,7 +54,7 @@
     "git-apply-delta": "0.0.7",
     "globalyzer": "^0.1.0",
     "globrex": "^0.1.1",
-    "ignore": "^5.0.3",
+    "ignore": "^5.0.4",
     "marky": "^1.2.1",
     "minimisted": "^2.0.0",
     "nick": "^0.1.3",
@@ -65,7 +65,7 @@
     "simple-get": "^3.0.2",
     "split2": "^3.0.0",
     "stream-source": "^0.3.5",
-    "through2": "^2.0.3"
+    "through2": "^2.0.4"
   },
   "devDependencies": {
     "@babel/core": "7.1.2",
@@ -105,7 +105,7 @@
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
     "karma-webpack": "3.0.5",
-    "nock": "10.0.1",
+    "nock": "10.0.2",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "openpgp": "2.6.2",
@@ -115,12 +115,12 @@
     "puppeteer": "1.9.0",
     "replace-in-file": "3.4.2",
     "rollup": "0.66.6",
-    "semantic-release": "15.10.6",
+    "semantic-release": "15.10.7",
     "standard": "11.0.1",
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
     "typescript": "3.1.3",
-    "webpack": "4.22.0",
+    "webpack": "4.25.1",
     "webpack-bundle-analyzer": "3.0.3",
     "webpack-cli": "3.1.2"
   },

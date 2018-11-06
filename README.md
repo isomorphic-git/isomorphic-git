@@ -21,7 +21,7 @@ Master branch status:
 </td><td>
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Build Status](https://travis-ci.org/isomorphic-git/isomorphic-git.svg?branch=master)](https://travis-ci.org/isomorphic-git/isomorphic-git)
+[![Build Status](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git.isomorphic-git?branchName=master)](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git.isomorphic-git?branchName=master)
 [![codecov](https://codecov.io/gh/isomorphic-git/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/isomorphic-git/isomorphic-git)
 [![dependencies](https://david-dm.org/isomorphic-git/isomorphic-git/status.svg)](https://david-dm.org/isomorphic-git/isomorphic-git)
 [![Known Vulnerabilities](https://snyk.io/test/github/isomorphic-git/isomorphic-git/badge.svg)](https://snyk.io/test/github/isomorphic-git/isomorphic-git)
@@ -52,7 +52,7 @@ Most recent build:
 </td><td>
   
 [![Build Status](https://saucelabs.com/buildstatus/_wmhilton)](https://saucelabs.com/beta/builds/e188d69c3e1640139b5899a5ff76f092)
-[![Build Status](https://travis-ci.org/isomorphic-git/isomorphic-git.svg)](https://travis-ci.org/isomorphic-git/isomorphic-git)
+[![Build Status](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git.isomorphic-git)](https://dev.azure.com/isomorphic-git/isomorphic-git/_build/latest?definitionId=1)
 
 </td></tr></table>
 
