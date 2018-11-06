@@ -37,7 +37,8 @@ async function makeFixture (dir) {
 }
 
 async function makeBrowserFixture (dir) {
-  window.localStorage.debug = 'isomorphic-git'
+  // enable / disable console.log statements
+  // window.localStorage.debug = 'isomorphic-git'
 
   const { fs, writable } = await FixturePromise
   writable.empty()
