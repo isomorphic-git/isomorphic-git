@@ -1,5 +1,3 @@
-import debug from 'debug'
-import * as marky from 'marky'
 import path from 'path'
 import pify from 'pify'
 
@@ -52,9 +50,7 @@ export class FileSystem {
    */
   async read (filepath, options = {}) {
     try {
-      marky.mark(filepath)
       let buffer = await this._readFile(filepath, options)
-      debug('readFile')(`${filepath} ${marky.stop(filepath).duration}`)
       return buffer
     } catch (err) {
       return null

@@ -36,7 +36,11 @@ export class GitRemoteHTTP {
       url = corsProxify(corsProxy, url)
     }
     // headers['Accept'] = `application/x-${service}-advertisement`
-    headers['user-agent'] = pkg.agent
+    // Only send a user agent in Node and to CORS proxies by default,
+    // because Gogs and others might not whitelist 'user-agent' in allowed headers.
+    if (!process.browser || corsProxy) {
+      headers['user-agent'] = headers['user-agent'] || pkg.agent
+    }
     let _auth = calculateBasicAuthUsernamePasswordPair(auth)
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
@@ -106,7 +110,11 @@ export class GitRemoteHTTP {
     }
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
-    headers['user-agent'] = pkg.agent
+    // Only send a user agent in Node and to CORS proxies by default,
+    // because Gogs and others might not whitelist 'user-agent' in allowed headers.
+    if (!process.browser || corsProxy) {
+      headers['user-agent'] = headers['user-agent'] || pkg.agent
+    }
     auth = calculateBasicAuthUsernamePasswordPair(auth)
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
