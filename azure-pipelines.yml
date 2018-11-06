@@ -20,11 +20,11 @@ jobs:
   - script: npm test
     displayName: 'Run tests'
     env:
-      BROWSER_STACK_ACCESS_KEY: $(Browser.Stack.Access.Key)
-      BROWSER_STACK_USERNAME: $(Browser.Stack.Username)
-      BUNDLESIZE_GITHUB_TOKEN: $(Bundlesize.Github.Token)
-      SAUCE_ACCESS_KEY: $(Sauce.Access.Key)
-      SAUCE_USERNAME: $(Sauce.Username)
+      BROWSER_STACK_ACCESS_KEY: $(BROWSER_STACK_ACCESS_KEY)
+      BROWSER_STACK_USERNAME: $(BROWSER_STACK_USERNAME)
+      BUNDLESIZE_GITHUB_TOKEN: $(BUNDLESIZE_GITHUB_TOKEN)
+      SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
+      SAUCE_USERNAME: $(SAUCE_USERNAME)
       TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,sl_android_chrome'
 
   - task: PublishTestResults@2
@@ -64,7 +64,7 @@ jobs:
     displayName: 'Publish to npm'
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     env:
-      GH_TOKEN: $(Gh.Token)
+      GH_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(Npm.Token)
       TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
       TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
