@@ -36,7 +36,7 @@ jobs:
 
   - task: PublishCodeCoverageResults@1
     displayName: 'Save code coverage'
-    condition: succeededOrFailed()
+    condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
     inputs:
       codeCoverageTool: Cobertura
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
@@ -48,14 +48,14 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     displayName: 'Save npm-tarball.tgz'
-    condition: succeededOrFailed()
+    condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
     inputs:
       artifactName: 'npm-tarball.tgz'
       PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Save bundle.umd.min.js'
-    condition: succeededOrFailed()
+    condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
     inputs:
       artifactName: 'bundle.umd.min.js'
       PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
