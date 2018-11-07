@@ -1,4 +1,5 @@
-const comment = require('github-comment')
+// const comment = require('github-comment')
+const fetch = require('simple-get')
 
 let commit =
   process.env.TRAVIS_PULL_REQUEST_SHA ||
@@ -35,8 +36,8 @@ const CommentReporter = function (
   }
 }
 
-function postComment (body) {
-  // comment(token, repo, issueId, body)
+function postComment (message) {
+  // comment(token, repo, issueId, message)
   const isPR =
     (process.env.TRAVIS_PULL_REQUEST &&
       process.env.TRAVIS_PULL_REQUEST !== 'false') ||
@@ -48,11 +49,21 @@ function postComment (body) {
     process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
   console.log(`Detected repo: ${repo}, issue: #${issue}, is PR: ${isPR}`)
   if (isPR) {
-    comment(process.env.GITHUB_TOKEN, repo, issue, body)
-      .then(response => console.log(`posted results to PR #${issue}`))
-      .catch(err => console.log('error leaving Github comment:', err))
+    // comment(process.env.KARMA_PR_REPORTER_GITHUB_TOKEN, repo, issue, message)
+    // .then(response => console.log(`posted results to PR #${issue}`))
+    // .catch(err => console.log('error leaving Github comment:', err))
+    fetch.post(
+      {
+        url: 'https://karma-pr-reporter.glitch.me',
+        body: JSON.stringify({ repo, issue, message })
+      },
+      (err, res) => {
+        if (err) return console.log('error leaving Github comment:', err)
+        console.log(res.body)
+      }
+    )
   } else {
-    console.log(body)
+    console.log(message)
   }
 }
 

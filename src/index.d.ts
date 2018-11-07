@@ -324,6 +324,7 @@ export function fetch(args: {
   relative?: boolean;
   tags?: boolean;
   singleBranch?: boolean;
+  headers?: { [key: string]: string };
 }): Promise<FetchResponse>;
 
 export function findRoot(args: { core?: string;
@@ -445,6 +446,7 @@ export function pull(args: {
   password?: string;
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+  headers?: { [key: string]: string };
   emitter?: EventEmitter;
   emitterPrefix?: string;
 }): Promise<void>;
@@ -464,6 +466,7 @@ export function push(args: {
   password?: string;
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
+  headers?: { [key: string]: string };
   emitter?: EventEmitter;
   emitterPrefix?: string;
 }): Promise<PushResponse>;

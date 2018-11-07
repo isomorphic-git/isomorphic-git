@@ -31,7 +31,8 @@ export async function pull ({
   password = authPassword,
   token,
   oauth2format,
-  singleBranch
+  singleBranch,
+  headers = {}
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -58,7 +59,8 @@ export async function pull ({
       password,
       token,
       oauth2format,
-      singleBranch
+      singleBranch,
+      headers
     })
     // Merge the remote tracking branch into the local one.
     await merge({

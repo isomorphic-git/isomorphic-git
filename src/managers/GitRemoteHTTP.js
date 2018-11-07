@@ -20,16 +20,30 @@ export class GitRemoteHTTP {
   static async capabilities () {
     return ['discover', 'connect']
   }
-  static async discover ({ core, corsProxy, service, url, noGitSuffix, auth }) {
+  static async discover ({
+    core,
+    corsProxy,
+    service,
+    url,
+    noGitSuffix,
+    auth,
+    headers
+  }) {
     const _origUrl = url
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
-    let headers = {}
     // headers['Accept'] = `application/x-${service}-advertisement`
-    headers['user-agent'] = pkg.agent
+    // Only send a user agent in Node and to CORS proxies by default,
+    // because Gogs and others might not whitelist 'user-agent' in allowed headers.
+    // Solutions using 'process.browser' can't be used as they rely on bundler shims,
+    // ans solutions using 'process.versions.node' had to be discarded because the
+    // BrowserFS 'process' shim is too complete.
+    if (typeof window === 'undefined' || corsProxy) {
+      headers['user-agent'] = headers['user-agent'] || pkg.agent
+    }
     let _auth = calculateBasicAuthUsernamePasswordPair(auth)
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
@@ -83,16 +97,30 @@ export class GitRemoteHTTP {
       throw err
     }
   }
-  static async connect ({ corsProxy, service, url, noGitSuffix, auth, stream }) {
+  static async connect ({
+    corsProxy,
+    service,
+    url,
+    noGitSuffix,
+    auth,
+    stream,
+    headers
+  }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
-    let headers = {}
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
-    headers['user-agent'] = pkg.agent
+    // Only send a user agent in Node and to CORS proxies by default,
+    // because Gogs and others might not whitelist 'user-agent' in allowed headers.
+    // Solutions using 'process.browser' can't be used as they rely on bundler shims,
+    // ans solutions using 'process.versions.node' had to be discarded because the
+    // BrowserFS 'process' shim is too complete.
+    if (typeof window === 'undefined' || corsProxy) {
+      headers['user-agent'] = headers['user-agent'] || pkg.agent
+    }
     auth = calculateBasicAuthUsernamePasswordPair(auth)
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
