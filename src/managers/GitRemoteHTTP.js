@@ -41,7 +41,7 @@ export class GitRemoteHTTP {
     // Solutions using 'process.browser' can't be used as they rely on bundler shims,
     // ans solutions using 'process.versions.node' had to be discarded because the
     // BrowserFS 'process' shim is too complete.
-    if ((typeof window === 'undefined') || corsProxy) {
+    if (typeof window === 'undefined' || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
     let _auth = calculateBasicAuthUsernamePasswordPair(auth)
@@ -118,7 +118,7 @@ export class GitRemoteHTTP {
     // Solutions using 'process.browser' can't be used as they rely on bundler shims,
     // ans solutions using 'process.versions.node' had to be discarded because the
     // BrowserFS 'process' shim is too complete.
-    if ((typeof window === 'undefined') || corsProxy) {
+    if (typeof window === 'undefined' || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
     auth = calculateBasicAuthUsernamePasswordPair(auth)
