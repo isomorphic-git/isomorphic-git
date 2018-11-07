@@ -1,4 +1,3 @@
-import { isNode } from 'browser-or-node'
 import pify from 'pify'
 import simpleGet from 'simple-get'
 
@@ -39,7 +38,10 @@ export class GitRemoteHTTP {
     // headers['Accept'] = `application/x-${service}-advertisement`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
-    if (isNode || corsProxy) {
+    // Solutions using 'process.browser' can't be used as they rely on bundler shims,
+    // ans solutions using 'process.versions.node' had to be discarded because the
+    // BrowserFS 'process' shim is too complete.
+    if (typeof window === 'undefined' || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
     let _auth = calculateBasicAuthUsernamePasswordPair(auth)
@@ -113,7 +115,10 @@ export class GitRemoteHTTP {
     headers['accept'] = `application/x-${service}-result`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
-    if (isNode || corsProxy) {
+    // Solutions using 'process.browser' can't be used as they rely on bundler shims,
+    // ans solutions using 'process.versions.node' had to be discarded because the
+    // BrowserFS 'process' shim is too complete.
+    if (typeof window === 'undefined' || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
     auth = calculateBasicAuthUsernamePasswordPair(auth)
