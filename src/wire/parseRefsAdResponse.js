@@ -29,7 +29,7 @@ export async function parseRefsAdResponse (stream, { service }) {
   let [firstRef, capabilitiesLine] = lineTwo
     .toString('utf8')
     .trim()
-    .split('\0')
+    .split('\x00')
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
   let [ref, name] = firstRef.split(' ')
   refs.set(name, ref)

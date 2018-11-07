@@ -7,7 +7,7 @@ export async function writeReceivePackRequest ({
   triplets = []
 }) {
   let packstream = new PassThrough()
-  let capsFirstLine = `\0 ${capabilities.join(' ')}`
+  let capsFirstLine = `\x00 ${capabilities.join(' ')}`
   for (let trip of triplets) {
     packstream.write(
       GitPktLine.encode(
