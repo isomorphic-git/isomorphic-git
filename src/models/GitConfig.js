@@ -186,7 +186,10 @@ export class GitConfig {
     } else {
       if (configIndex !== -1) {
         const config = this.parsedConfig[configIndex]
-        const modifiedConfig = Object.assign({}, config, { value, modified: true })
+        const modifiedConfig = Object.assign({}, config, {
+          value,
+          modified: true
+        })
         if (append) {
           this.parsedConfig.splice(configIndex + 1, 0, modifiedConfig)
         } else {
