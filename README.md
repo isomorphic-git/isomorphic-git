@@ -22,7 +22,6 @@ Master branch status:
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Build Status](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git-RELEASE?branchName=master)](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git-RELEASE?branchName=master)
-[![codecov](https://codecov.io/gh/isomorphic-git/isomorphic-git/branch/master/graph/badge.svg)](https://codecov.io/gh/isomorphic-git/isomorphic-git)
 [![dependencies](https://david-dm.org/isomorphic-git/isomorphic-git/status.svg)](https://david-dm.org/isomorphic-git/isomorphic-git)
 [![Known Vulnerabilities](https://snyk.io/test/github/isomorphic-git/isomorphic-git/badge.svg)](https://snyk.io/test/github/isomorphic-git/isomorphic-git)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_shield)
@@ -51,12 +50,12 @@ Most recent build:
 
 </td><td>
   
-[![Build Status](https://saucelabs.com/buildstatus/_wmhilton)](https://saucelabs.com/beta/builds/e188d69c3e1640139b5899a5ff76f092)
 [![Build Status](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git.isomorphic-git)](https://dev.azure.com/isomorphic-git/isomorphic-git/_build/latest?definitionId=1)
+[![Build Status](https://saucelabs.com/buildstatus/_wmhilton)](https://saucelabs.com/beta/builds/e188d69c3e1640139b5899a5ff76f092)
+[![BrowserStack Status](https://www.browserstack.com/automate/badge.svg?badge_key=MnFJSk9SWDZHK3JhcWxlRE5KUXpoVm1ndUZNSklSSGZlaFdpUzBTbjVWdz0tLUprUmRNcVNwWTd0TkFzSWVveFNpM0E9PQ==--86fecb8d528f51b7540094886e6dc6dd21bf6b8f)](https://www.browserstack.com/automate/public-build/MnFJSk9SWDZHK3JhcWxlRE5KUXpoVm1ndUZNSklSSGZlaFdpUzBTbjVWdz0tLUprUmRNcVNwWTd0TkFzSWVveFNpM0E9PQ==--86fecb8d528f51b7540094886e6dc6dd21bf6b8f)
 
 </td></tr></table>
 
-[![BrowserStack Status](https://www.browserstack.com/automate/badge.svg?badge_key=MnFJSk9SWDZHK3JhcWxlRE5KUXpoVm1ndUZNSklSSGZlaFdpUzBTbjVWdz0tLUprUmRNcVNwWTd0TkFzSWVveFNpM0E9PQ==--86fecb8d528f51b7540094886e6dc6dd21bf6b8f)](https://www.browserstack.com/automate/public-build/MnFJSk9SWDZHK3JhcWxlRE5KUXpoVm1ndUZNSklSSGZlaFdpUzBTbjVWdz0tLUprUmRNcVNwWTd0TkFzSWVveFNpM0E9PQ==--86fecb8d528f51b7540094886e6dc6dd21bf6b8f)
 
 `isomorphic-git` is a pure JavaScript implementation of git that works in node and browser environments (including WebWorkers and ServiceWorkers). This means it can be used to read and write to git repositories, as well as fetch from and push to git remotes like Github.
 
@@ -170,10 +169,10 @@ unless there is a major version bump.
 - [commit](https://isomorphic-git.github.io/docs/commit.html)
 - [config](https://isomorphic-git.github.io/docs/config.html)
 - [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
-- [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
-- [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
 - [deleteBranch](https://isomorphic-git.github.io/docs/deleteBranch.html)
 - [deleteRemote](https://isomorphic-git.github.io/docs/deleteRemote.html)
+- [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
+- [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
@@ -197,9 +196,12 @@ unless there is a major version bump.
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
+- [walkBeta1](https://isomorphic-git.github.io/docs/walkBeta1.html)
 - [writeObject](https://isomorphic-git.github.io/docs/writeObject.html)
 
 ### plugins
+- [credentialManager](https://isomorphic-git.github.io/docs/plugin_credentialManager.html)
+- [emitter](https://isomorphic-git.github.io/docs/plugin_emitter.html)
 - [fs](https://isomorphic-git.github.io/docs/plugin_fs.html)
 
 ## Community
