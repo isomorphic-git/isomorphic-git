@@ -1,6 +1,6 @@
+import { isNode } from 'browser-or-node'
 import pify from 'pify'
 import simpleGet from 'simple-get'
-import { isNode } from 'browser-or-node'
 
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
