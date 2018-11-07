@@ -48,7 +48,6 @@
   "dependencies": {
     "@babel/runtime": "^7.1.2",
     "async-lock": "^1.1.0",
-    "browser-or-node": "^1.1.0",
     "clean-git-ref": "1.0.3",
     "crc-32": "^1.2.0",
     "diff-lines": "^1.1.0",
