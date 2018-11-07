@@ -169,10 +169,10 @@ unless there is a major version bump.
 - [commit](https://isomorphic-git.github.io/docs/commit.html)
 - [config](https://isomorphic-git.github.io/docs/config.html)
 - [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
-- [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
-- [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
 - [deleteBranch](https://isomorphic-git.github.io/docs/deleteBranch.html)
 - [deleteRemote](https://isomorphic-git.github.io/docs/deleteRemote.html)
+- [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
+- [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
@@ -196,9 +196,12 @@ unless there is a major version bump.
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
+- [walkBeta1](https://isomorphic-git.github.io/docs/walkBeta1.html)
 - [writeObject](https://isomorphic-git.github.io/docs/writeObject.html)
 
 ### plugins
+- [credentialManager](https://isomorphic-git.github.io/docs/plugin_credentialManager.html)
+- [emitter](https://isomorphic-git.github.io/docs/plugin_emitter.html)
 - [fs](https://isomorphic-git.github.io/docs/plugin_fs.html)
 
 ## Community
