@@ -1,5 +1,6 @@
 import pify from 'pify'
 import simpleGet from 'simple-get'
+import { isNode } from 'browser-or-node'
 
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
@@ -38,7 +39,7 @@ export class GitRemoteHTTP {
     // headers['Accept'] = `application/x-${service}-advertisement`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
-    if (!process.browser || corsProxy) {
+    if (isNode || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
     let _auth = calculateBasicAuthUsernamePasswordPair(auth)
@@ -112,7 +113,7 @@ export class GitRemoteHTTP {
     headers['accept'] = `application/x-${service}-result`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
-    if (!process.browser || corsProxy) {
+    if (isNode || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
     auth = calculateBasicAuthUsernamePasswordPair(auth)
