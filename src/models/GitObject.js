@@ -3,7 +3,7 @@ import { E, GitError } from '../models/GitError.js'
 export class GitObject {
   static wrap ({ type, object }) {
     return Buffer.concat([
-      Buffer.from(`${type} ${object.byteLength.toString()}\0`),
+      Buffer.from(`${type} ${object.byteLength.toString()}\x00`),
       Buffer.from(object)
     ])
   }
