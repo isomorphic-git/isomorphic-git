@@ -14,7 +14,7 @@ let lock = null
 export class GitIndexManager {
   static async acquire ({ fs: _fs, filepath }, closure) {
     const fs = new FileSystem(_fs)
-    if (lock === null) lock = new AsyncLock()
+    if (lock === null) lock = new AsyncLock({ maxPending: Infinity })
     await lock.acquire(filepath, async function () {
       let index = map.get(filepath)
       if (index === undefined) {
