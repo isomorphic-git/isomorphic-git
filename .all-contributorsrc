@@ -230,6 +230,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "pytlesk4",
+      "name": "Thomas Pytleski",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/2294309?v=4",
+      "profile": "http://stoplight.io/",
+      "contributions": [
+        "bug"
+      ]
     }
   ]
 }
