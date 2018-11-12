@@ -113,7 +113,7 @@
     "pretty-format": "23.6.0",
     "puppeteer": "1.9.0",
     "replace-in-file": "3.4.2",
-    "rollup": "0.66.6",
+    "rollup": "0.67.1",
     "semantic-release": "15.10.7",
     "standard": "11.0.1",
     "timeout-cli": "0.3.2",
