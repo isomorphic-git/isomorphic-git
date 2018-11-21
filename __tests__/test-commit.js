@@ -96,7 +96,7 @@ describe('commit', () => {
 
   it('pgp plugin signing - backwards compatiblity', async () => {
     // Setup
-    const { pgp } = require('@isomorphic-git/openpgp-plugin')
+    const { pgp } = require('@isomorphic-git/pgp-plugin')
     let { fs, gitdir } = await makeFixture('test-commit')
     plugins.set('fs', fs)
     plugins.set('pgp', pgp)
