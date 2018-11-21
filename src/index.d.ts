@@ -113,7 +113,7 @@ export interface WalkerTree {
   size?: number;
   populateContent: () => Promise<void>;
   content?: Buffer;
-  populatHash: () => Promise<void>;
+  populateHash: () => Promise<void>;
   oid?: string;
 }
 
@@ -546,10 +546,10 @@ export function version(): string;
 export function walkBeta1<T, Q>(args: {
   core?: string;
   trees: Walker[];
-  filter: (entry: WalkerEntry) => Promise<boolean>;
-  map: (entry: WalkerEntry) => Promise<T | undefined>;
-  reduce: (parent: T | undefined, children: Q[]) => Promise<Q>;
-  iterate: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
+  filter?: (entry: WalkerEntry) => Promise<boolean>;
+  map?: (entry: WalkerEntry) => Promise<T | undefined>;
+  reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
+  iterate?: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
 
 export function writeObject(args: {
