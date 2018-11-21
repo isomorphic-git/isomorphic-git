@@ -69,12 +69,12 @@ describe('commit', () => {
 
   it('pgp plugin signing', async () => {
     // Setup
-    const { pgp } = require('@isomorphic-git/openpgp-plugin')
+    const { pgp } = require('@isomorphic-git/pgp-plugin')
     let { fs, gitdir } = await makeFixture('test-commit')
     plugins.set('fs', fs)
     plugins.set('pgp', pgp)
     // Test
-    const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
+    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await commit({
       gitdir,
       message: 'Initial commit',
@@ -84,19 +84,14 @@ describe('commit', () => {
         timestamp: 1504842425,
         timezoneOffset: 0
       },
-      signingKey: privateKeys[0]
+      signingKey: privateKey
     })
-    // await sign({
-    //   gitdir,
-    //   privateKeys: privateKeys[0]
-    // })
-    const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
     let keys = await verify({
       gitdir,
       ref: 'HEAD',
-      publicKeys: publicKeys[0]
+      publicKeys: publicKey
     })
-    expect(keys[0]).toBe('a01edd29ac0f3952')
+    expect(keys[0]).toBe('f2f0ced8a52613c4')
   })
 
   it('pgp plugin signing - backwards compatiblity', async () => {
@@ -106,7 +101,7 @@ describe('commit', () => {
     plugins.set('fs', fs)
     plugins.set('pgp', pgp)
     // Test
-    const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
+    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await commit({
       gitdir,
       message: 'Initial commit',
@@ -119,15 +114,14 @@ describe('commit', () => {
     })
     await sign({
       gitdir,
-      privateKeys: privateKeys[0]
+      privateKeys: privateKey
     })
-    const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
     let keys = await verify({
       gitdir,
       ref: 'HEAD',
-      publicKeys: publicKeys[0]
+      publicKeys: publicKey
     })
-    expect(keys[0]).toBe('a01edd29ac0f3952')
+    expect(keys[0]).toBe('f2f0ced8a52613c4')
   })
 
   it('GPG signing (deprecated API)', async () => {
@@ -137,7 +131,7 @@ describe('commit', () => {
     let { fs, gitdir } = await makeFixture('test-commit')
     plugins.set('fs', fs)
     // Test
-    const privateKeys = require('./__fixtures__/openpgp-private-keys.json')
+    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await commit({
       gitdir,
       message: 'Initial commit',
@@ -151,16 +145,15 @@ describe('commit', () => {
     await sign({
       gitdir,
       openpgp,
-      privateKeys: privateKeys[0]
+      privateKeys: privateKey
     })
-    const publicKeys = await require('./__fixtures__/openpgp-public-keys.json')
     let keys = await verify({
       gitdir,
       openpgp,
       ref: 'HEAD',
-      publicKeys: publicKeys[0]
+      publicKeys: publicKey
     })
-    expect(keys[0]).toBe('a01edd29ac0f3952')
+    expect(keys[0]).toBe('f2f0ced8a52613c4')
   })
 
   it('with timezone', async () => {
