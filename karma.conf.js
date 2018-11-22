@@ -150,6 +150,24 @@ module.exports = function (config) {
             // 'src/index.js'
           )
         }
+      },
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            include: /@isomorphic-git\/pgp-plugin/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                babelrc: false,
+                plugins: [
+                  '@babel/plugin-proposal-object-rest-spread',
+                  '@babel/plugin-transform-async-to-generator'
+                ]
+              }
+            }
+          }
+        ]
       }
     },
     plugins: [
