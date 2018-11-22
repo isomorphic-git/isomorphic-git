@@ -148,10 +148,6 @@ module.exports = function (config) {
             __dirname,
             'dist/bundle.umd.min.js'
             // 'src/index.js'
-          ),
-          '@isomorphic-git/pgp-plugin': path.resolve(
-            __dirname,
-            '__tests__/__helpers__/isomorphic-git-pgp-plugin.min.js'
           )
         }
       }
