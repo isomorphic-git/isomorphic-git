@@ -202,6 +202,7 @@ module.exports = function (config) {
   } else {
     options.browsers.push('ChromeHeadlessNoSandbox')
     options.browsers.push('FirefoxHeadless')
+    // options.browsers.push('Edge')
   }
 
   // Only re-run browsers that failed in the previous run.

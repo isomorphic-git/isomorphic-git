@@ -14,6 +14,8 @@ class PluginCore extends Map {
   set (key, value) {
     const verifySchema = (key, value) => {
       const pluginSchemas = {
+        credentialManager: ['fill', 'approved', 'rejected'],
+        emitter: ['emit'],
         fs: [
           'lstat',
           'mkdir',
@@ -24,8 +26,7 @@ class PluginCore extends Map {
           'unlink',
           'writeFile'
         ],
-        credentialManager: ['fill', 'approved', 'rejected'],
-        emitter: ['emit']
+        pgp: ['sign', 'verify']
       }
       if (!pluginSchemas.hasOwnProperty(key)) {
         throw new GitError(E.PluginUnrecognized, { plugin: key })
@@ -37,10 +38,6 @@ class PluginCore extends Map {
       }
     }
     verifySchema(key, value)
-    if (key === 'fs') {
-      // There can be only one.
-      super.set(key, value)
-    }
     if (key === 'credentialManager') {
       // There can be only one.
       super.set(key, value)
@@ -49,10 +46,18 @@ class PluginCore extends Map {
       // There can be only one.
       super.set(key, value)
     }
+    if (key === 'fs') {
+      // There can be only one.
+      super.set(key, value)
+    }
+    if (key === 'pgp') {
+      // There can be only one.
+      super.set(key, value)
+    }
   }
   get (key) {
     // Critical plugins throw an error instead of returning undefined.
-    const critical = new Set(['fs', 'credentialManager'])
+    const critical = new Set(['credentialManager', 'fs', 'pgp'])
     if (!super.has(key) && critical.has(key)) {
       throw new GitError(E.PluginUndefined, { plugin: key })
     }
