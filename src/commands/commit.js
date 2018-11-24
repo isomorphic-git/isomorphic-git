@@ -24,7 +24,8 @@ export async function commit ({
   fs: _fs = cores.get(core).get('fs'),
   message,
   author,
-  committer
+  committer,
+  signingKey
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -94,6 +95,10 @@ export async function commit ({
           },
           message
         })
+        if (signingKey) {
+          let pgp = cores.get(core).get('pgp')
+          comm = await GitCommit.sign(comm, pgp, signingKey)
+        }
         oid = await writeObject({
           fs,
           gitdir,

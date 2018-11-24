@@ -117,6 +117,16 @@ export interface WalkerTree {
   oid?: string;
 }
 
+export interface GitCredentialManagerPlugin {
+  fill: any;
+  approved: any;
+  rejected: any;
+}
+
+export interface GitEmitterPlugin {
+  emit: any;
+}
+
 export interface GitFsPlugin {
   readFile: any;
   writeFile: any;
@@ -128,19 +138,16 @@ export interface GitFsPlugin {
   lstat: any;
 }
 
-export interface GitCredentialManagerPlugin {
-  fill: any;
-  approved: any;
-  rejected: any;
+export interface GitPgpPlugin {
+  sign: any;
+  verify: any;
 }
 
-export interface GitEmitterPlugin {
-  emit: any;
-}
+export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp"
 
-export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin
+export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin
 
-export type GitPluginCore = Map<string, AnyGitPlugin>
+export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 
 export type StatusMatrix = Array<[string, number, number, number]>;
 
@@ -260,6 +267,7 @@ export function commit(args: {
     timestamp?: number;
     timezoneOffset?: number;
   };
+  signingKey?: string;
 }): Promise<string>;
 
 export function config(args: {
