@@ -5,7 +5,7 @@ const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack
 
 module.exports = [
   {
-    target: 'web',
+    target: 'webworker',
     entry: {
       bundle: './src/index.js',
       internal: './src/internal-apis.js'
