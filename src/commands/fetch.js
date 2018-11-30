@@ -112,10 +112,7 @@ export async function fetch ({
     // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
     if (packfileSha !== '') {
       res.packfile = `objects/pack/pack-${packfileSha}.pack`
-      await fs.write(
-        path.join(gitdir, res.packfile),
-        packfile
-      )
+      await fs.write(path.join(gitdir, res.packfile), packfile)
     }
     return res
   } catch (err) {
