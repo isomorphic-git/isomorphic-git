@@ -105,7 +105,7 @@ export class GitPackIndex {
       getExternalRefDelta
     })
   }
-  static async fromPack ({ pack, getExternalRefDelta }) {
+  static async fromPack ({ pack, getExternalRefDelta, emitter, emitterPrefix }) {
     const listpackTypes = {
       1: 'commit',
       2: 'tree',
@@ -158,6 +158,14 @@ export class GitPackIndex {
           ((totalObjectCount - num) * 100) / totalObjectCount
         )
         if (percent !== lastPercent) {
+          if (emitter) {
+            emitter.emit(`${emitterPrefix}progress`, {
+              phase: 'Receiving objects',
+              loaded: totalObjectCount - num,
+              total: totalObjectCount,
+              lengthComputable: true
+            })
+          }
           log(
             `${percent}%\t${Math.floor(
               marky.stop('percent').duration
@@ -249,6 +257,14 @@ export class GitPackIndex {
             marky.stop('percent').duration
           )}\t${callsToReadSlice}\t${callsToGetExternal}`
         )
+        if (emitter) {
+          emitter.emit(`${emitterPrefix}progress`, {
+            phase: 'Resolving deltas',
+            loaded: count,
+            total: totalObjectCount,
+            lengthComputable: true
+          })
+        }
         marky.mark('percent')
         callsToReadSlice = 0
         callsToGetExternal = 0

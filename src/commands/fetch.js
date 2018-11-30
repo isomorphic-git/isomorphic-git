@@ -84,29 +84,18 @@ export async function fetch ({
       if (emitter) {
         emitter.emit(`${emitterPrefix}message`, line.trim())
       }
-      let matches = line.match(/\((\d+?)\/(\d+?)\)/)
+      let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
       if (matches && emitter) {
         emitter.emit(`${emitterPrefix}progress`, {
-          loaded: parseInt(matches[1], 10),
-          total: parseInt(matches[2], 10),
+          phase: matches[1].trim(),
+          loaded: parseInt(matches[2], 10),
+          total: parseInt(matches[3], 10),
           lengthComputable: true
         })
       }
     })
     let packfile = await pify(concat)(response.packfile)
     let packfileSha = packfile.slice(-20).toString('hex')
-    // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
-    // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
-    // TODO: Longer term, we should actually:
-    // a) NOT concatenate the entire packfile into memory (line 78),
-    // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
-    // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
-    if (packfileSha !== '') {
-      await fs.write(
-        path.join(gitdir, `objects/pack/pack-${packfileSha}.pack`),
-        packfile
-      )
-    }
     // TODO: Return more metadata?
     let res = {
       defaultBranch: response.HEAD,
@@ -114,6 +103,19 @@ export async function fetch ({
     }
     if (response.headers) {
       res.headers = response.headers
+    }
+    // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
+    // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
+    // TODO: Longer term, we should actually:
+    // a) NOT concatenate the entire packfile into memory (line 78),
+    // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
+    // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
+    if (packfileSha !== '') {
+      res.packfile = `objects/pack/pack-${packfileSha}.pack`
+      await fs.write(
+        path.join(gitdir, res.packfile),
+        packfile
+      )
     }
     return res
   } catch (err) {
