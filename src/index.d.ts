@@ -332,6 +332,7 @@ export function findRoot(args: { core?: string;
 
 export function getRemoteInfo(args: {
   url: string;
+  corsProxy?: string;
   username?: string;
   password?: string;
   token?: string;
