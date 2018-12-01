@@ -2,6 +2,8 @@ import ignore from 'ignore'
 import path from 'path'
 
 import { FileSystem } from '../models/FileSystem.js'
+import { dirname } from '../utils/dirname.js'
+import { basename } from '../utils/basename.js'
 
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of cacheing.
@@ -17,7 +19,7 @@ export class GitIgnoreManager {
   }) {
     const fs = new FileSystem(_fs)
     // ALWAYS ignore ".git" folders.
-    if (path.basename(filepath) === '.git') return true
+    if (basename(filepath) === '.git') return true
     // Find all the .gitignore files that could affect this file
     let pairs = [
       {
@@ -46,7 +48,7 @@ export class GitIgnoreManager {
       // If the parent directory is excluded, we are done.
       // "It is not possible to re-include a file if a parent directory of that file is excluded. Git doesn’t list excluded directories for performance reasons, so any patterns on contained files have no effect, no matter where they are defined."
       // source: https://git-scm.com/docs/gitignore
-      let parentdir = path.dirname(p.filepath)
+      let parentdir = dirname(p.filepath)
       if (parentdir !== '.' && ign.ignores(parentdir)) return true
       // If the file is currently ignored, test for UNignoring.
       if (ignoredStatus) {

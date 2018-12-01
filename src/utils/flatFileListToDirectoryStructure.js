@@ -1,4 +1,5 @@
-import path from 'path'
+import { dirname } from '../utils/dirname.js'
+import { basename } from '../utils/basename.js'
 
 /*::
 type Node = {
@@ -18,7 +19,7 @@ export function flatFileListToDirectoryStructure (files) {
       let dir = {
         type: 'tree',
         fullpath: name,
-        basename: path.basename(name),
+        basename: basename(name),
         metadata: {},
         children: []
       }
@@ -26,7 +27,7 @@ export function flatFileListToDirectoryStructure (files) {
       // This recursively generates any missing parent folders.
       // We do it after we've added the inode to the set so that
       // we don't recurse infinitely trying to create the root '.' dirname.
-      dir.parent = mkdir(path.dirname(name))
+      dir.parent = mkdir(dirname(name))
       if (dir.parent && dir.parent !== dir) dir.parent.children.push(dir)
     }
     return inodes.get(name)
@@ -37,10 +38,10 @@ export function flatFileListToDirectoryStructure (files) {
       let file = {
         type: 'blob',
         fullpath: name,
-        basename: path.basename(name),
+        basename: basename(name),
         metadata: metadata,
         // This recursively generates any missing parent folders.
-        parent: mkdir(path.dirname(name)),
+        parent: mkdir(dirname(name)),
         children: []
       }
       if (file.parent) file.parent.children.push(file)
