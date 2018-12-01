@@ -2,7 +2,7 @@ import crc32 from 'crc-32'
 import applyDelta from 'git-apply-delta'
 import * as marky from 'marky'
 import pako from 'pako'
-import { PassThrough } from 'stream'
+import { PassThrough } from 'readable-stream'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'

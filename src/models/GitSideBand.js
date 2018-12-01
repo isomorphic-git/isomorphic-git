@@ -20,7 +20,7 @@ If no 'side-band' capability was specified, the server will stream the
 entire packfile without multiplexing.
 */
 // import splitBuffer from 'split-buffer'
-import { PassThrough } from 'stream'
+import { PassThrough } from 'readable-stream'
 
 import { GitPktLine } from './GitPktLine'
 
