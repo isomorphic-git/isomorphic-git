@@ -21,6 +21,8 @@ export async function checkout ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
+  emitter = cores.get(core).get('emitter'),
+  emitterPrefix = '',
   remote = 'origin',
   ref
 }) {
@@ -65,6 +67,7 @@ export async function checkout ({
     }
     let fullRef = await GitRefManager.expand({ fs, gitdir, ref })
 
+    let count = 0
     // Acquire a lock on the index
     await GitIndexManager.acquire(
       { fs, filepath: `${gitdir}/index` },
@@ -76,6 +79,13 @@ export async function checkout ({
         for (let entry of index) {
           try {
             await fs.rm(path.join(dir, entry.path))
+            if (emitter) {
+              emitter.emit(`${emitterPrefix}progress`, {
+                phase: 'Updating workdir',
+                loaded: ++count,
+                lengthComputable: false
+              })
+            }
           } catch (err) {}
         }
         index.clear()
@@ -136,6 +146,13 @@ export async function checkout ({
                     stats,
                     oid: head.oid
                   })
+                  if (emitter) {
+                    emitter.emit(`${emitterPrefix}progress`, {
+                      phase: 'Updating workdir',
+                      loaded: ++count,
+                      lengthComputable: false
+                    })
+                  }
                   break
                 }
                 default: {

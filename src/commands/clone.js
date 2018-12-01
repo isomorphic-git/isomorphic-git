@@ -3,10 +3,11 @@ import path from 'path'
 import { FileSystem } from '../models/FileSystem.js'
 import { cores } from '../utils/plugins.js'
 
-import { checkout } from './checkout'
-import { config } from './config'
-import { fetch } from './fetch'
-import { init } from './init'
+import { checkout } from './checkout.js'
+import { config } from './config.js'
+import { fetch } from './fetch.js'
+import { indexPack } from './indexPack.js'
+import { init } from './init.js'
 
 /**
  * Clone a repository
@@ -71,7 +72,7 @@ export async function clone ({
       })
     }
     // Fetch commits
-    let { defaultBranch } = await fetch({
+    let { defaultBranch, packfile } = await fetch({
       gitdir,
       fs,
       emitter,
@@ -92,12 +93,26 @@ export async function clone ({
     })
     ref = ref || defaultBranch
     ref = ref.replace('refs/heads/', '')
+    // Note: we're indexing the pack eagerly instead of lazily so
+    // we get the nice progress events
+    if (packfile) {
+      await indexPack({
+        dir: gitdir,
+        gitdir,
+        fs,
+        emitter,
+        emitterPrefix,
+        filepath: packfile
+      })
+    }
     // Checkout that branch
     if (!noCheckout) {
       await checkout({
         dir,
         gitdir,
         fs,
+        emitter,
+        emitterPrefix,
         ref,
         remote
       })
