@@ -1,9 +1,8 @@
-import { join } from '../utils/join.js'
-
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { hashObject } from '../utils/hashObject.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { readObject } from './readObject.js'

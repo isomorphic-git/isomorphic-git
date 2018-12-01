@@ -1,7 +1,6 @@
 // import diff3 from 'node-diff3'
-import { join } from '../utils/join.js'
-
 import { FileSystem } from '../models/FileSystem.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout'

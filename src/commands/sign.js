@@ -1,5 +1,3 @@
-import { join } from '../utils/join.js'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -7,6 +5,7 @@ import { E, GitError } from '../models/GitError.js'
 import { SignedGitCommit } from '../models/SignedGitCommit.js'
 import { readObject } from '../storage/readObject.js'
 import { writeObject } from '../storage/writeObject.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**

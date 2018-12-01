@@ -1,7 +1,7 @@
 import AsyncLock from 'async-lock'
-import { join } from '../utils/join.js'
 
 import { FileSystem } from '../models/FileSystem.js'
+import { join } from '../utils/join.js'
 
 let lock = null
 

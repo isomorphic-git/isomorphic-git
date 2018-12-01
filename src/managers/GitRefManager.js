@@ -1,10 +1,9 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import { join } from '../utils/join.js'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
+import { join } from '../utils/join.js'
 
 import { GitConfigManager } from './GitConfigManager'
 

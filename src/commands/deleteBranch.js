@@ -1,8 +1,8 @@
 import cleanGitRef from 'clean-git-ref'
-import { join } from '../utils/join.js'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { currentBranch } from './currentBranch'

@@ -1,9 +1,8 @@
-import { join } from '../utils/join.js'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { compareAge } from '../utils/compareAge.js'
+import { join } from '../utils/join.js'
 import { logCommit } from '../utils/logCommit.js'
 import { cores } from '../utils/plugins.js'
 

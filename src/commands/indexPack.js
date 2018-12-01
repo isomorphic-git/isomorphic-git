@@ -1,7 +1,6 @@
-import { join } from '../utils/join.js'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**

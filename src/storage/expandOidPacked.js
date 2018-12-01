@@ -1,8 +1,7 @@
-import { join } from '../utils/join.js'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { readPack } from '../storage/readPack.js'
+import { join } from '../utils/join.js'
 
 export async function expandOidPacked ({
   fs: _fs,

@@ -3,8 +3,8 @@ import cleanGitRef from 'clean-git-ref'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { cores } from '../utils/plugins.js'
 import { join } from '../utils/join.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Add a new remote

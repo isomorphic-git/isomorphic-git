@@ -1,8 +1,8 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
+import { join } from '../utils/join'
 import { log } from '../utils/log.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
-import { join } from '../utils/join'
 import { shasum } from '../utils/shasum.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
