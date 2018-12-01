@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -14,7 +14,7 @@ import { cores } from '../utils/plugins.js'
 export async function remove ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   filepath
 }) {

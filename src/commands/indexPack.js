@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
@@ -12,7 +12,7 @@ import { cores } from '../utils/plugins.js'
 export async function indexPack ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
@@ -20,7 +20,7 @@ export async function indexPack ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    filepath = path.join(dir, filepath)
+    filepath = join(dir, filepath)
     const pack = await fs.read(filepath)
     const idx = await GitPackIndex.fromPack({ pack, emitter, emitterPrefix })
     await fs.write(filepath.replace(/\.pack$/, '.idx'), idx.toBuffer())

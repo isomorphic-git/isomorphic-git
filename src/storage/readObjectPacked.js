@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
@@ -14,7 +14,7 @@ export async function readObjectPacked ({
   const fs = new FileSystem(_fs)
   // Check to see if it's in a packfile.
   // Iterate through all the .pack files
-  let list = await fs.readdir(path.join(gitdir, '/objects/pack'))
+  let list = await fs.readdir(join(gitdir, '/objects/pack'))
   list = list.filter(x => x.endsWith('.pack'))
   for (let filename of list) {
     const packFile = `${gitdir}/objects/pack/${filename}`

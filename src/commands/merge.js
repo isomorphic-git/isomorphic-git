@@ -1,5 +1,5 @@
 // import diff3 from 'node-diff3'
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -17,7 +17,7 @@ import { log } from './log'
 export async function merge ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ours,
   theirs,

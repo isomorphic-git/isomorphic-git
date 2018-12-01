@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -20,7 +20,7 @@ import { config } from './config'
 export async function commit ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   message,
   author,
@@ -112,7 +112,7 @@ export async function commit ({
           ref: 'HEAD',
           depth: 2
         })
-        await fs.write(path.join(gitdir, branch), oid + '\n')
+        await fs.write(join(gitdir, branch), oid + '\n')
       }
     )
     return oid

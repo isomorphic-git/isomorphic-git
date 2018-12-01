@@ -1,6 +1,6 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { readObject } from '../storage/readObject.js'
-import { pathjoin } from '../utils/pathjoin'
+import { join } from '../utils/join'
 import { resolveTree } from '../utils/resolveTree.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
@@ -53,10 +53,10 @@ class GitWalkerRepo {
     let tree = GitTree.from(object)
     // cache all entries
     for (const entry of tree) {
-      map.set(pathjoin(filepath, entry.path), entry)
+      map.set(join(filepath, entry.path), entry)
     }
     return tree.entries().map(entry => ({
-      fullpath: pathjoin(filepath, entry.path),
+      fullpath: join(filepath, entry.path),
       basename: entry.path,
       exists: true
     }))

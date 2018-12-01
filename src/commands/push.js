@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -26,7 +26,7 @@ import { pack } from './pack.js'
 export async function push ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',

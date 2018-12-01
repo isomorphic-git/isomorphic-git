@@ -1,10 +1,10 @@
 import cleanGitRef from 'clean-git-ref'
-import path from 'path'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { cores } from '../utils/plugins.js'
+import { join } from '../utils/join.js'
 
 /**
  * Create a branch
@@ -14,7 +14,7 @@ import { cores } from '../utils/plugins.js'
 export async function branch ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref
 }) {

@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
@@ -25,7 +25,7 @@ export async function findRoot ({
 }
 
 async function _findRoot (fs, filepath) {
-  if (await fs.exists(path.join(filepath, '.git'))) {
+  if (await fs.exists(join(filepath, '.git'))) {
     return filepath
   } else {
     let parent = dirname(filepath)

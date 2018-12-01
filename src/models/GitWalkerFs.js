@@ -2,7 +2,7 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
 import { log } from '../utils/log.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
-import { pathjoin } from '../utils/pathjoin'
+import { join } from '../utils/join'
 import { shasum } from '../utils/shasum.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
@@ -36,10 +36,10 @@ class GitWalkerFs {
     if (!entry.exists) return []
     let filepath = entry.fullpath
     let { fs, dir } = this
-    let names = await fs.readdir(pathjoin(dir, filepath))
+    let names = await fs.readdir(join(dir, filepath))
     if (names === null) return null
     return names.map(name => ({
-      fullpath: pathjoin(filepath, name),
+      fullpath: join(filepath, name),
       basename: name,
       exists: true
     }))

@@ -1,5 +1,5 @@
 import cleanGitRef from 'clean-git-ref'
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
@@ -15,7 +15,7 @@ import { currentBranch } from './currentBranch'
 export async function deleteBranch ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref
 }) {

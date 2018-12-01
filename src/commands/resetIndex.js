@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -16,7 +16,7 @@ import { readObject } from './readObject.js'
 export async function resetIndex ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   filepath,
   ref = 'HEAD'
@@ -52,7 +52,7 @@ export async function resetIndex ({
       size: 0
     }
     // If the file exists in the workdir...
-    const object = await fs.read(path.join(dir, filepath))
+    const object = await fs.read(join(dir, filepath))
     if (object) {
       // ... and has the same hash as the desired state...
       workdirOid = await hashObject({
@@ -62,7 +62,7 @@ export async function resetIndex ({
       })
       if (oid === workdirOid) {
         // ... use the workdir Stats object
-        stats = await fs.lstat(path.join(dir, filepath))
+        stats = await fs.lstat(join(dir, filepath))
       }
     }
     await GitIndexManager.acquire(

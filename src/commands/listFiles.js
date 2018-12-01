@@ -1,8 +1,6 @@
-import path from 'path'
-
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { pathjoin } from '../utils/pathjoin'
+import { join } from '../utils/join'
 import { cores } from '../utils/plugins.js'
 
 import { readObject } from './readObject'
@@ -16,7 +14,7 @@ import { resolveRef } from './resolveRef'
 export async function listFiles ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref
 }) {
@@ -52,10 +50,10 @@ async function accumulateFilesFromOid ({ gitdir, fs, oid, filenames, prefix }) {
         fs,
         oid: entry.oid,
         filenames,
-        prefix: pathjoin(prefix, entry.path)
+        prefix: join(prefix, entry.path)
       })
     } else {
-      filenames.push(pathjoin(prefix, entry.path))
+      filenames.push(join(prefix, entry.path))
     }
   }
 }

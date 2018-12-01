@@ -1,5 +1,5 @@
 import ignore from 'ignore'
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { dirname } from '../utils/dirname.js'
@@ -14,7 +14,7 @@ export class GitIgnoreManager {
   static async isIgnored ({
     fs: _fs,
     dir,
-    gitdir = path.join(dir, '.git'),
+    gitdir = join(dir, '.git'),
     filepath
   }) {
     const fs = new FileSystem(_fs)
@@ -23,7 +23,7 @@ export class GitIgnoreManager {
     // Find all the .gitignore files that could affect this file
     let pairs = [
       {
-        gitignore: path.join(dir, '.gitignore'),
+        gitignore: join(dir, '.gitignore'),
         filepath
       }
     ]
@@ -32,7 +32,7 @@ export class GitIgnoreManager {
       let folder = pieces.slice(0, i).join('/')
       let file = pieces.slice(i).join('/')
       pairs.push({
-        gitignore: path.join(dir, folder, '.gitignore'),
+        gitignore: join(dir, folder, '.gitignore'),
         filepath: file
       })
     }

@@ -1,5 +1,5 @@
 import globrex from 'globrex'
-import path from 'path'
+import { join } from '../utils/join.js'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -20,7 +20,7 @@ import { walkBeta1 } from './walkBeta1.js'
 export async function statusMatrix ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
   pattern = null
