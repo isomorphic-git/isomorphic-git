@@ -220,6 +220,8 @@ export function checkout(args: {
   fs?: any;
   dir: string;
   gitdir?: string;
+  emitter?: EventEmitter;
+  emitterPrefix?: string;
   remote?: string;
   ref?: string;
 }): Promise<void>;
@@ -344,6 +346,8 @@ export function indexPack(args: {
   fs?: any;
   dir: string;
   gitdir?: string;
+  emitter?: EventEmitter;
+  emitterPrefix?: string;
   filepath: string;
 }): Promise<void>;
 
