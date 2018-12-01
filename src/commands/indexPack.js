@@ -14,12 +14,15 @@ export async function indexPack ({
   dir,
   gitdir = path.join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
+  emitter = cores.get(core).get('emitter'),
+  emitterPrefix = '',
   filepath
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const pack = await fs.read(path.join(dir, filepath))
-    const idx = await GitPackIndex.fromPack({ pack })
+    filepath = path.join(dir, filepath)
+    const pack = await fs.read(filepath)
+    const idx = await GitPackIndex.fromPack({ pack, emitter, emitterPrefix })
     await fs.write(filepath.replace(/\.pack$/, '.idx'), idx.toBuffer())
   } catch (err) {
     err.caller = 'git.indexPack'
