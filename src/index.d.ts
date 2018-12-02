@@ -197,6 +197,7 @@ export function branch(args: {
   dir: string;
   gitdir?: string;
   ref: string;
+  checkout?: boolean;
 }): Promise<void>;
 
 export function deleteBranch(args: {
