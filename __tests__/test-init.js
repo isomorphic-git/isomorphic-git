@@ -13,4 +13,13 @@ describe('init', () => {
     expect(fs.existsSync(`${dir}/.git/refs/heads`)).toBe(true)
     expect(fs.existsSync(`${dir}/.git/HEAD`)).toBe(true)
   })
+  it('init --bare', async () => {
+    let { fs, dir } = await makeFixture('test-init')
+    plugins.set('fs', fs)
+    await init({ dir, bare: true })
+    expect(fs.existsSync(dir)).toBe(true)
+    expect(fs.existsSync(`${dir}/objects`)).toBe(true)
+    expect(fs.existsSync(`${dir}/refs/heads`)).toBe(true)
+    expect(fs.existsSync(`${dir}/HEAD`)).toBe(true)
+  })
 })
