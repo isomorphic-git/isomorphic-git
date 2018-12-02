@@ -1,11 +1,11 @@
-import pify from 'pify'
-import simpleGet from 'simple-get'
+import { fetch } from '../utils/fetch.js'
 
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { wrapStream } from '../utils/wrapStream.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
 // Try to accomodate known CORS proxy implementations:
@@ -48,12 +48,11 @@ export class GitRemoteHTTP {
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
-    let res = await pify(simpleGet)({
+    let res = await fetch(`${url}/info/refs?service=${service}`, {
       method: 'GET',
-      url: `${url}/info/refs?service=${service}`,
       headers
     })
-    if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
+    if (res.status === 401 && cores.get(core).has('credentialManager')) {
       // Acquire credentials and try again
       const credentialManager = cores.get(core).get('credentialManager')
       auth = await credentialManager.fill({ url: _origUrl })
@@ -61,27 +60,26 @@ export class GitRemoteHTTP {
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
       }
-      res = await pify(simpleGet)({
+      res = await fetch(`${url}/info/refs?service=${service}`, {
         method: 'GET',
-        url: `${url}/info/refs?service=${service}`,
         headers
       })
       // Tell credential manager if the credentials were no good
-      if (res.statusCode === 401) {
+      if (res.status === 401) {
         await credentialManager.rejected({ url: _origUrl, auth })
-      } else if (res.statusCode === 200) {
+      } else if (res.status === 200) {
         await credentialManager.approved({ url: _origUrl, auth })
       }
     }
-    if (res.statusCode !== 200) {
+    if (res.status !== 200) {
       throw new GitError(E.HTTPError, {
-        statusCode: res.statusCode,
-        statusMessage: res.statusMessage
+        statusCode: res.status,
+        statusMessage: res.statusText
       })
     }
     // I'm going to be nice and ignore the content-type requirement unless there is a problem.
     try {
-      let remoteHTTP = await parseRefsAdResponse(res, { service })
+      let remoteHTTP = await parseRefsAdResponse(Buffer.from(await res.arrayBuffer()), { service })
       remoteHTTP.auth = auth
       return remoteHTTP
     } catch (err) {
@@ -125,18 +123,17 @@ export class GitRemoteHTTP {
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
-    let res = await pify(simpleGet)({
+    let res = await fetch(`${url}/${service}`, {
       method: 'POST',
-      url: `${url}/${service}`,
-      body: stream,
+      body: await wrapStream(stream),
       headers
     })
-    if (res.statusCode !== 200) {
+    if (res.status !== 200) {
       throw new GitError(E.HTTPError, {
-        statusCode: res.statusCode,
-        statusMessage: res.statusMessage
+        statusCode: res.status,
+        statusMessage: res.statusText
       })
     }
-    return res
+    return Buffer.from(await res.arrayBuffer())
   }
 }

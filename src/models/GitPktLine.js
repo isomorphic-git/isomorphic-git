@@ -81,7 +81,9 @@ export class GitPktLine {
     }
   }
 
+  // Note: also accepts buffer input for flexibility
   static streamReader (stream) {
+    if (!stream.on) return GitPktLine.reader(stream)
     const bufferstream = streamSource(stream)
     return async function read () {
       try {
