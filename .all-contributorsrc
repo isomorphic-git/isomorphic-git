@@ -240,6 +240,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "vmarkovtsev",
+      "name": "Vadim Markovtsev",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/2793551?v=4",
+      "profile": "http://linkedin.com/in/vmarkovtsev",
+      "contributions": [
+        "bug"
+      ]
     }
   ]
 }
