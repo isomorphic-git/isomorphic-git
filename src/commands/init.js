@@ -9,8 +9,9 @@ import { cores } from '../utils/plugins.js'
  */
 export async function init ({
   core = 'default',
+  bare = false,
   dir,
-  gitdir = join(dir, '.git'),
+  gitdir = bare ? dir : join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs')
 }) {
   try {
@@ -32,8 +33,8 @@ export async function init ({
       '[core]\n' +
         '\trepositoryformatversion = 0\n' +
         '\tfilemode = false\n' +
-        '\tbare = false\n' +
-        '\tlogallrefupdates = true\n' +
+        `\tbare = ${bare}\n` +
+        (bare ? '' : '\tlogallrefupdates = true\n') +
         '\tsymlinks = false\n' +
         '\tignorecase = true\n'
     )
