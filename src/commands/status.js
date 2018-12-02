@@ -1,5 +1,3 @@
-import path from 'path'
-
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -10,6 +8,7 @@ import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
 import { compareStats } from '../utils/compareStats.js'
 import { hashObject } from '../utils/hashObject.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
@@ -20,7 +19,7 @@ import { cores } from '../utils/plugins.js'
 export async function status ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   filepath
 }) {
@@ -55,7 +54,7 @@ export async function status ({
         }
       }
     )
-    let stats = await fs.lstat(path.join(dir, filepath))
+    let stats = await fs.lstat(join(dir, filepath))
 
     let H = treeOid !== null // head
     let I = indexEntry !== null // index
@@ -65,7 +64,7 @@ export async function status ({
       if (I && !compareStats(indexEntry, stats)) {
         return indexEntry.oid
       } else {
-        let object = await fs.read(path.join(dir, filepath))
+        let object = await fs.read(join(dir, filepath))
         let workdirOid = await hashObject({
           gitdir,
           type: 'blob',

@@ -1,6 +1,5 @@
-import path from 'path'
-
 import { RunningMinimum } from '../models/RunningMinimum'
+import { basename } from '../utils/basename.js'
 
 // Take an array of length N of
 //   iterators of length Q_n
@@ -52,7 +51,7 @@ export function * unionOfIterators (sets) {
         // A little hacky, but eh
         result[i] = {
           fullpath: minimum,
-          basename: path.basename(minimum),
+          basename: basename(minimum),
           exists: false
         }
       }

@@ -1,6 +1,5 @@
-import path from 'path'
-
 import { FileSystem } from '../models/FileSystem.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout.js'
@@ -17,7 +16,7 @@ import { init } from './init.js'
 export async function clone ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',

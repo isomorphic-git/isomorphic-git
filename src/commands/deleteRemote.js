@@ -1,8 +1,7 @@
-import path from 'path'
-
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
@@ -13,7 +12,7 @@ import { cores } from '../utils/plugins.js'
 export async function deleteRemote ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   remote
 }) {

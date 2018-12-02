@@ -1,11 +1,10 @@
-import path from 'path'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { readObject as _readObject } from '../storage/readObject.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
@@ -17,7 +16,7 @@ import { resolveTree } from '../utils/resolveTree.js'
 export async function readObject ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   oid,
   format = 'parsed',

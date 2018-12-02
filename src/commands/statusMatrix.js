@@ -1,11 +1,11 @@
 import globrex from 'globrex'
-import path from 'path'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { WORKDIR } from '../models/GitWalkerFs.js'
 import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
+import { join } from '../utils/join.js'
 import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
 import { worthWalking } from '../utils/worthWalking.js'
@@ -20,7 +20,7 @@ import { walkBeta1 } from './walkBeta1.js'
 export async function statusMatrix ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
   pattern = null

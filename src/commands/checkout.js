@@ -1,11 +1,10 @@
-import path from 'path'
-
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { WORKDIR } from '../models/GitWalkerFs.js'
 import { TREE } from '../models/GitWalkerRepo.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { config } from './config'
@@ -19,7 +18,7 @@ import { walkBeta1 } from './walkBeta1.js'
 export async function checkout ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
@@ -78,7 +77,7 @@ export async function checkout ({
         // are not in the index or are in the index but have the wrong SHA.
         for (let entry of index) {
           try {
-            await fs.rm(path.join(dir, entry.path))
+            await fs.rm(join(dir, entry.path))
             if (emitter) {
               emitter.emit(`${emitterPrefix}progress`, {
                 phase: 'Updating workdir',

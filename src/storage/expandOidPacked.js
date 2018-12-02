@@ -1,8 +1,7 @@
-import path from 'path'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { readPack } from '../storage/readPack.js'
+import { join } from '../utils/join.js'
 
 export async function expandOidPacked ({
   fs: _fs,
@@ -13,7 +12,7 @@ export async function expandOidPacked ({
   const fs = new FileSystem(_fs)
   // Iterate through all the .pack files
   let results = []
-  let list = await fs.readdir(path.join(gitdir, '/objects/pack'))
+  let list = await fs.readdir(join(gitdir, '/objects/pack'))
   list = list.filter(x => x.endsWith('.pack'))
   for (let filename of list) {
     const packFile = `${gitdir}/objects/pack/${filename}`

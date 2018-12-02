@@ -1,9 +1,8 @@
-import path from 'path'
-
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { writeObject } from '../storage/writeObject.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
@@ -14,21 +13,21 @@ import { cores } from '../utils/plugins.js'
 export async function add ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   filepath
 }) {
   try {
     const fs = new FileSystem(_fs)
     const type = 'blob'
-    let stats = await fs.lstat(path.join(dir, filepath))
+    let stats = await fs.lstat(join(dir, filepath))
     if (!stats) throw new GitError(E.FileReadError, { filepath })
     if (stats.isDirectory()) {
       throw new GitError(E.NotImplementedFail)
     }
     const object = stats.isSymbolicLink()
-      ? await fs.readlink(path.join(dir, filepath))
-      : await fs.read(path.join(dir, filepath))
+      ? await fs.readlink(join(dir, filepath))
+      : await fs.read(join(dir, filepath))
     if (object === null) throw new GitError(E.FileReadError, { filepath })
     const oid = await writeObject({ fs, gitdir, type, object })
     await GitIndexManager.acquire(
