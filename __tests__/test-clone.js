@@ -47,7 +47,7 @@ describe('clone', () => {
     expect(fs.existsSync(`${gitdir}/refs/remotes/origin/test-branch`)).toBe(
       true
     )
-    expect(fs.existsSync(`${gitdir}/refs/heads/test-branch`)).toBe(false)
+    expect(fs.existsSync(`${gitdir}/refs/heads/test-branch`)).toBe(true)
     expect(fs.existsSync(`${dir}/package.json`)).toBe(false)
   })
   it('clone a tag', async () => {
