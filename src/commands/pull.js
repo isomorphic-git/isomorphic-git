@@ -1,7 +1,6 @@
 // import diff3 from 'node-diff3'
-import path from 'path'
-
 import { FileSystem } from '../models/FileSystem.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout'
@@ -18,7 +17,7 @@ import { merge } from './merge'
 export async function pull ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref,
   fastForwardOnly = false,

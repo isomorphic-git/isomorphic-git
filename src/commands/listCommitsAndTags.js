@@ -1,17 +1,16 @@
-import path from 'path'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 export async function listCommitsAndTags ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   start,
   finish

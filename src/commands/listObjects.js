@@ -1,16 +1,15 @@
-import path from 'path'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 export async function listObjects ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   oids
 }) {

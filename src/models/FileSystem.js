@@ -1,8 +1,8 @@
-import path from 'path'
 import pify from 'pify'
 
 import { E, GitError } from '../models/GitError.js'
 import { compareStrings } from '../utils/compareStrings.js'
+import { dirname } from '../utils/dirname.js'
 import { sleep } from '../utils/sleep.js'
 
 const delayedReleases = new Map()
@@ -65,7 +65,7 @@ export class FileSystem {
       return
     } catch (err) {
       // Hmm. Let's try mkdirp and try again.
-      await this.mkdir(path.dirname(filepath))
+      await this.mkdir(dirname(filepath))
       await this._writeFile(filepath, contents, options)
     }
   }
@@ -85,7 +85,7 @@ export class FileSystem {
       if (_selfCall) throw err
       // If we got a "no such file or directory error" backup and try again.
       if (err.code === 'ENOENT') {
-        let parent = path.dirname(filepath)
+        let parent = dirname(filepath)
         // Check to see if we've gone too far
         if (parent === '.' || parent === '/' || parent === filepath) throw err
         // Infinite recursion, what could go wrong?

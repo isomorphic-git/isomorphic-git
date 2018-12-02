@@ -1,7 +1,6 @@
-import path from 'path'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
@@ -31,7 +30,7 @@ function abbreviate (ref) {
 export async function currentBranch ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   fullname = false
 }) {

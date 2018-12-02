@@ -1,10 +1,9 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import path from 'path'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
+import { join } from '../utils/join.js'
 
 import { GitConfigManager } from './GitConfigManager'
 
@@ -50,7 +49,7 @@ export class GitRefManager {
     if (tags) {
       for (const serverRef of refs.keys()) {
         if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
-          const filename = path.join(gitdir, serverRef)
+          const filename = join(gitdir, serverRef)
           // Git's behavior is to only fetch tags that do not conflict with tags already present.
           if (!(await fs.exists(filename))) {
             // If there is a dereferenced an annotated tag value available, prefer that.
@@ -91,7 +90,7 @@ export class GitRefManager {
     // and .git/refs/remotes/origin/refs/merge-requests
     const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of actualRefsToWrite) {
-      await fs.write(path.join(gitdir, key), normalizeValue(value), 'utf8')
+      await fs.write(join(gitdir, key), normalizeValue(value), 'utf8')
     }
   }
   // TODO: make this less crude?
@@ -102,7 +101,7 @@ export class GitRefManager {
       throw new GitError(E.NotAnOidFail, { value })
     }
     const normalizeValue = value => value.trim() + '\n'
-    await fs.write(path.join(gitdir, ref), normalizeValue(value), 'utf8')
+    await fs.write(join(gitdir, ref), normalizeValue(value), 'utf8')
   }
   static async resolve ({ fs: _fs, gitdir, ref, depth }) {
     const fs = new FileSystem(_fs)

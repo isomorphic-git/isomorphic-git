@@ -1,4 +1,3 @@
-import path from 'path'
 import pify from 'pify'
 import concat from 'simple-concat'
 import split2 from 'split2'
@@ -9,6 +8,7 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
@@ -24,7 +24,7 @@ import { config } from './config'
 export async function fetch ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
@@ -112,7 +112,7 @@ export async function fetch ({
     // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
     if (packfileSha !== '') {
       res.packfile = `objects/pack/pack-${packfileSha}.pack`
-      await fs.write(path.join(gitdir, res.packfile), packfile)
+      await fs.write(join(gitdir, res.packfile), packfile)
     }
     return res
   } catch (err) {

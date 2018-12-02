@@ -1,11 +1,10 @@
-import path from 'path'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
@@ -26,7 +25,7 @@ import { pack } from './pack.js'
 export async function push ({
   core = 'default',
   dir,
-  gitdir = path.join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
