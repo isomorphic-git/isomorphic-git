@@ -75,7 +75,7 @@
     "@isomorphic-git/cors-proxy": "2.2.3",
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "3.3.0",
-    "@types/node": "10.12.7",
+    "@types/node": "10.12.11",
     "agadoo": "git+https://github.com/wmhilton-contrib/agadoo.git#external-imports",
     "all-contributors-cli": "5.4.1",
     "babel-core": "7.0.0-bridge.0",
