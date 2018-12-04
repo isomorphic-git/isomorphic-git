@@ -83,15 +83,15 @@ export async function fetch ({
     response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
       if (emitter) {
         emitter.emit(`${emitterPrefix}message`, line.trim())
-      }
-      let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
-      if (matches && emitter) {
-        emitter.emit(`${emitterPrefix}progress`, {
-          phase: matches[1].trim(),
-          loaded: parseInt(matches[2], 10),
-          total: parseInt(matches[3], 10),
-          lengthComputable: true
-        })
+        let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
+        if (matches) {
+          emitter.emit(`${emitterPrefix}progress`, {
+            phase: matches[1].trim(),
+            loaded: parseInt(matches[2], 10),
+            total: parseInt(matches[3], 10),
+            lengthComputable: true
+          })
+        }
       }
     })
     let packfile = await pify(concat)(response.packfile)
