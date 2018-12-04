@@ -105,17 +105,16 @@ export async function clone ({
       })
     }
     // Checkout that branch
-    if (!noCheckout) {
-      await checkout({
-        dir,
-        gitdir,
-        fs,
-        emitter,
-        emitterPrefix,
-        ref,
-        remote
-      })
-    }
+    await checkout({
+      dir,
+      gitdir,
+      fs,
+      emitter,
+      emitterPrefix,
+      ref,
+      remote,
+      noCheckout
+    })
   } catch (err) {
     err.caller = 'git.clone'
     throw err

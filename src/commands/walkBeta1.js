@@ -3,9 +3,9 @@ import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
- * Add a file to the git index (aka staging area)
+ * A powerful recursive tree-walking utility.
  *
- * @link https://isomorphic-git.github.io/docs/add.html
+ * @link https://isomorphic-git.org/docs/en/walkBeta1
  */
 export async function walkBeta1 ({
   core = 'default',

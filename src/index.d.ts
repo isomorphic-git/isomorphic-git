@@ -358,6 +358,7 @@ export function init(args: {
   fs?: any;
   dir: string;
   gitdir?: string;
+  bare?: boolean;
 }): Promise<void>;
 
 export function isDescendent(args: {
