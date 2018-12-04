@@ -16,7 +16,8 @@ export async function branch ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  ref
+  ref,
+  checkout = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -49,6 +50,10 @@ export async function branch ({
     }
     // Create a new branch that points at that same commit
     await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
+    if (checkout) {
+      // Update HEAD
+      await fs.write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
+    }
   } catch (err) {
     err.caller = 'git.branch'
     throw err
