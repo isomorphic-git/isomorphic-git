@@ -5,7 +5,7 @@ const snapshots = require('./__snapshots__/test-branch.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
-const { plugins, branch, init } = require('isomorphic-git')
+const { plugins, branch, init, currentBranch } = require('isomorphic-git')
 
 describe('branch', () => {
   beforeAll(() => {
@@ -20,6 +20,16 @@ describe('branch', () => {
     await branch({ dir, gitdir, ref: 'test-branch' })
     let files = await pify(fs.readdir)(path.resolve(gitdir, 'refs', 'heads'))
     expect(files.sort()).toMatchSnapshot()
+    expect(await currentBranch({ dir, gitdir })).toEqual('master')
+  })
+
+  it('branch --checkout', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-branch')
+    plugins.set('fs', fs)
+    // Test
+    await branch({ dir, gitdir, ref: 'test-branch', checkout: true })
+    expect(await currentBranch({ dir, gitdir })).toEqual('test-branch')
   })
 
   it('invalid branch name', async () => {
