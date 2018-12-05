@@ -72,6 +72,7 @@ export async function clone ({
     }
     // Fetch commits
     let { defaultBranch, packfile } = await fetch({
+      core,
       gitdir,
       fs,
       emitter,
