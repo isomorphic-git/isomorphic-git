@@ -208,12 +208,28 @@ export function deleteBranch(args: {
   ref: string;
 }): Promise<void>;
 
+export function deleteRef(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
+}): Promise<void>;
+
 export function deleteRemote(args: {
   core?: string;
   fs?: any;
   dir: string;
   gitdir?: string;
   remote: string;
+}): Promise<void>;
+
+export function deleteTag(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  name: string;
 }): Promise<void>;
 
 export function checkout(args: {
@@ -538,6 +554,36 @@ export function statusMatrix(args: {
   ref?: string;
   pattern: string;
 }): Promise<StatusMatrix>;
+
+export function tag(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  name: string;
+  annotated?: {
+    message: string;
+    tagger?: {
+      name?: string;
+      email?: string;
+      date?: Date;
+      timestamp?: number;
+      timezoneOffset?: number;
+    };
+    signingKey?: string;
+  };
+  oid?: string;
+}): Promise<void>;
+
+export function writeRef(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
+  value: string;
+  force?: boolean;
+}): Promise<void>;
 
 export function verify(args: {
   core?: string;

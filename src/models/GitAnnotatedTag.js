@@ -29,7 +29,7 @@ tag ${obj.tag}
 tagger ${formatAuthor(obj.tagger)}
 
 ${obj.message}
-${obj.signature}`
+${obj.signature ? obj.signature : ''}`
   }
 
   justHeaders () {
@@ -99,5 +99,22 @@ ${obj.signature}`
 
   toObject () {
     return Buffer.from(this._tag, 'utf8')
+  }
+
+  static async sign (tag, pgp, secretKey) {
+    const payload = tag.withoutSignature()
+    let { signature } = await pgp.sign({ payload, secretKey })
+    // renormalize the line endings to the one true line-ending
+    signature = normalizeNewlines(signature)
+    let signedTag =
+      payload + signature
+    // return a new tag object
+    return GitAnnotatedTag.from(signedTag)
+  }
+
+  static async verify (tag, pgp, publicKey) {
+    const payload = tag.withoutSignature()
+    const signature = tag.signature()
+    return pgp.verify({ payload, publicKey, signature })
   }
 }

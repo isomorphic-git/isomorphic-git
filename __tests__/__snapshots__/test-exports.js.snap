@@ -16,7 +16,9 @@ Array [
   "cores",
   "currentBranch",
   "deleteBranch",
+  "deleteRef",
   "deleteRemote",
+  "deleteTag",
   "expandOid",
   "expandRef",
   "fetch",
@@ -42,10 +44,12 @@ Array [
   "sign",
   "status",
   "statusMatrix",
+  "tag",
   "utils",
   "verify",
   "version",
   "walkBeta1",
   "writeObject",
+  "writeRef",
 ]
 `;

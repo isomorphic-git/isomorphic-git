@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`deleteRef deletes the latest tag ref to HEAD 1`] = `
+Array [
+  "prev",
+]
+`;

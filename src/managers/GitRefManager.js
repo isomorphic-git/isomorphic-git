@@ -103,6 +103,10 @@ export class GitRefManager {
     const normalizeValue = value => value.trim() + '\n'
     await fs.write(join(gitdir, ref), normalizeValue(value), 'utf8')
   }
+  static async deleteRef ({ fs: _fs, gitdir, ref }) {
+    const fs = new FileSystem(_fs)
+    await fs.rm(join(gitdir, ref))
+  }
   static async resolve ({ fs: _fs, gitdir, ref, depth }) {
     const fs = new FileSystem(_fs)
     if (depth !== undefined) {
