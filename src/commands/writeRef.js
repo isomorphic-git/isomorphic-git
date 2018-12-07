@@ -26,7 +26,7 @@ export async function writeRef ({
     if (!force) {
       try {
         await resolveRef({ fs, gitdir, ref })
-        throw new GitError(E.RefExistsError, { noun: 'tag', ref })
+        throw new GitError(E.RefExistsError, { noun: 'ref', ref })
       } catch (err) {
         if (err.name === E.RefExistsError) {
           throw err

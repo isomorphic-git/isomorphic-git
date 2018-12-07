@@ -1,3 +1,4 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`writeRef writes a tag ref to HEAD 1`] = `"cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69"`;
+exports[`writeRef sets current branch to another 1`] = `"cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69"`;
