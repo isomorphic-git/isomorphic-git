@@ -29,6 +29,17 @@ export async function tag ({
     const fs = new FileSystem(_fs)
     const ref = 'refs/tags/' + name
 
+    if (!force) {
+      try {
+        await resolveRef({ fs, gitdir, ref })
+        throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
+      } catch (err) {
+        if (err.name === E.RefExistsError) {
+          throw err
+        }
+      }
+    }
+
     let referredOid = oid || await resolveRef({ fs, gitdir, ref: await currentBranch({ gitdir, fullname: true }) })
 
     if (annotated) {
@@ -77,10 +88,10 @@ export async function tag ({
         let pgp = cores.get(core).get('pgp')
         tag = await GitAnnotatedTag.sign(tag, pgp, signingKey)
       }
-      referredOid = await writeObject({ fs, dir, type: 'tag', object: tag.toObject() })
+      referredOid = await writeObject({ fs, gitdir, type: 'tag', object: tag.toObject() })
     }
 
-    await writeRef({ fs, gitdir, ref, value: referredOid, force })
+    await writeRef({ fs, gitdir, ref, value: referredOid, force: true })
   } catch (err) {
     err.caller = 'git.tag'
     throw err

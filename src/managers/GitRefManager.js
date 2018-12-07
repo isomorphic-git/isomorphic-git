@@ -103,6 +103,15 @@ export class GitRefManager {
     const normalizeValue = value => value.trim() + '\n'
     await fs.write(join(gitdir, ref), normalizeValue(value), 'utf8')
   }
+  static async writeSymbolicRef ({ fs: _fs, gitdir, ref, value }) {
+    const fs = new FileSystem(_fs)
+    // TODO: Validate input
+    if (!value.startsWith('refs/')) {
+      throw new GitError(E.NotAnOidFail, { value })
+    }
+    const normalizeValue = value => value.trim() + '\n'
+    await fs.write(join(gitdir, ref), 'ref: ' + normalizeValue(value), 'utf8')
+  }
   static async deleteRef ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
     await fs.rm(join(gitdir, ref))

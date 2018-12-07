@@ -102,7 +102,7 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   static async sign (tag, pgp, secretKey) {
-    const payload = tag.withoutSignature()
+    const payload = tag.withoutSignature() + '\n'
     let { signature } = await pgp.sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
@@ -113,7 +113,7 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   static async verify (tag, pgp, publicKey) {
-    const payload = tag.withoutSignature()
+    const payload = tag.withoutSignature() + '\n'
     const signature = tag.signature()
     return pgp.verify({ payload, publicKey, signature })
   }
