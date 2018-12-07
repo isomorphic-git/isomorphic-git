@@ -22,7 +22,8 @@ export async function tag ({
   fs: _fs = cores.get(core).get('fs'),
   name,
   annotated = undefined,
-  oid = undefined
+  oid = undefined,
+  force = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -79,7 +80,7 @@ export async function tag ({
       referredOid = await writeObject({ fs, dir, type: 'tag', object: tag.toObject() })
     }
 
-    await writeRef({ fs, gitdir, ref, value: referredOid })
+    await writeRef({ fs, gitdir, ref, value: referredOid, force })
   } catch (err) {
     err.caller = 'git.tag'
     throw err

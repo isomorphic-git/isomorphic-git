@@ -573,15 +573,6 @@ export function tag(args: {
     signingKey?: string;
   };
   oid?: string;
-}): Promise<void>;
-
-export function writeRef(args: {
-  core?: string;
-  fs?: any;
-  dir: string;
-  gitdir?: string;
-  ref: string;
-  value: string;
   force?: boolean;
 }): Promise<void>;
 
@@ -616,3 +607,13 @@ export function writeObject(args: {
   oid?: string;
   encoding?: string;
 }): Promise<string>;
+
+export function writeRef(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  ref: string;
+  value: string;
+  force?: boolean;
+}): Promise<void>;
