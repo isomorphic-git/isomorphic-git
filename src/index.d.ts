@@ -616,4 +616,5 @@ export function writeRef(args: {
   ref: string;
   value: string;
   force?: boolean;
+  symbolic?: boolean;
 }): Promise<void>;

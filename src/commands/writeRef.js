@@ -17,7 +17,8 @@ export async function writeRef ({
   fs: _fs = cores.get(core).get('fs'),
   ref,
   value,
-  force = false
+  force = false,
+  symbolic = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -33,12 +34,21 @@ export async function writeRef ({
       }
     }
 
-    await GitRefManager.writeRef({
-      fs,
-      gitdir,
-      ref,
-      value
-    })
+    if (symbolic) {
+      await GitRefManager.writeSymbolicRef({
+        fs,
+        gitdir,
+        ref,
+        value
+      })
+    } else {
+      await GitRefManager.writeRef({
+        fs,
+        gitdir,
+        ref,
+        value
+      })
+    }
   } catch (err) {
     err.caller = 'git.writeRef'
     throw err

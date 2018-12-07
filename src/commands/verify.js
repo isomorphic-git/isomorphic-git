@@ -9,7 +9,7 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
- * Verify a signed commit
+ * Verify a signed commit or tag
  *
  * @link https://isomorphic-git.github.io/docs/verify.html
  */
