@@ -24,4 +24,14 @@ describe('currentBranch', () => {
     })
     expect(branch).toEqual('refs/heads/master')
   })
+  it.only('returns undefined if HEAD is detached', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-detachedHead')
+    plugins.set('fs', fs)
+    // Test
+    let branch = await currentBranch({
+      gitdir
+    })
+    expect(branch).toBeUndefined()
+  })
 })
