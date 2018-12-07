@@ -5,7 +5,7 @@ import { cores } from '../utils/plugins.js'
 import { GitError, E } from '../models/GitError.js'
 
 /**
- * Update refs.
+ * Write a ref.
  *
  * @link https://isomorphic-git.github.io/docs/writeRef.html
  */

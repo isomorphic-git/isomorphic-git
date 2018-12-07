@@ -4,7 +4,7 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
- * Update refs.
+ * Delete a ref.
  *
  * @link https://isomorphic-git.github.io/docs/deleteRef.html
  */
