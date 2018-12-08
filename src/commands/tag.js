@@ -1,4 +1,3 @@
-import { writeRef } from './writeRef'
 import { GitRefManager } from '../managers/GitRefManager'
 import { E, GitError } from '../models/GitError.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -52,7 +51,7 @@ export async function tag ({
       }
     }
 
-    await writeRef({ fs, gitdir, ref, value, force: true })
+    await GitRefManager.writeRef({ fs, gitdir, ref, value })
   } catch (err) {
     err.caller = 'git.tag'
     throw err

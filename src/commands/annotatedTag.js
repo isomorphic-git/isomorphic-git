@@ -1,6 +1,5 @@
 import { writeObject } from './writeObject'
 import { readObject } from './readObject'
-import { writeRef } from './writeRef'
 import { config } from './config'
 import { GitRefManager } from '../managers/GitRefManager'
 import { E, GitError } from '../models/GitError.js'
@@ -103,7 +102,7 @@ export async function annotatedTag ({
     }
     value = await writeObject({ fs, gitdir, type: 'tag', object: tag.toObject() })
 
-    await writeRef({ fs, gitdir, ref, value, force: true })
+    await GitRefManager.writeRef({ fs, gitdir, ref, value })
   } catch (err) {
     err.caller = 'git.annotatedTag'
     throw err
