@@ -28,9 +28,9 @@ export async function verify ({
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit' && type !== 'tag') {
       throw new GitError(E.ObjectTypeAssertionInRefFail, {
-        requiredType: 'commit/tag',
+        expected: 'commit/tag',
         ref,
-        actualType: type
+        type
       })
     }
     if (openpgp) {

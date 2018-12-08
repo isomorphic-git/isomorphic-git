@@ -27,9 +27,9 @@ export async function sign ({
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit') {
       throw new GitError(E.ObjectTypeAssertionInRefFail, {
-        requiredType: 'commit',
+        expected: 'commit',
         ref: 'HEAD',
-        actualType: type
+        type
       })
     }
     let commit

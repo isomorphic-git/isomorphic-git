@@ -16,7 +16,7 @@ const messages = {
   ObjectTypeUnknownFail: `Object { oid } has unknown type "{ type }".`,
   ObjectTypeAssertionFail: `Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`,
   ObjectTypeAssertionInTreeFail: `Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`,
-  ObjectTypeAssertionInRefFail: `{ ref } is not pointing to a "{ requiredType }" object but a "{ actualType }" object.`,
+  ObjectTypeAssertionInRefFail: `{ ref } is not pointing to a "{ expected }" object but a "{ type }" object.`,
   ObjectTypeAssertionInPathFail: `Found a blob { oid } in the path "{ path }" where a tree was expected.`,
   MissingAuthorError: `Author name and email must be specified as an argument or in the .git/config file.`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
