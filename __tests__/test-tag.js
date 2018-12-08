@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-tag.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { plugins, tag, verify, resolveRef, readObject } = require('isomorphic-git')
+const { plugins, tag, verify, resolveRef, readObject, writeObject } = require('isomorphic-git')
 
 describe('tag', () => {
   beforeAll(() => {
@@ -40,7 +40,7 @@ describe('tag', () => {
     const tagObject = (await readObject({ gitdir, oid: tagRef })).object
     expect(tagObject.object).toMatchSnapshot()
   })
-  it('fails on overwrite', async () => {
+  it('doesn\'t fail on overwrite with the same value', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-tag')
     plugins.set('fs', fs)
@@ -49,6 +49,25 @@ describe('tag', () => {
     let errorName
     try {
       await tag({ gitdir, name: 'latest' })
+    } catch (err) {
+      errorName = err.name
+    }
+    expect(errorName).toBe(undefined)
+  })
+  it('fails on overwrite with a different value', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-tag')
+    plugins.set('fs', fs)
+    // Test
+    await tag({ gitdir, name: 'latest' })
+    const anotherOid = await writeObject({
+      gitdir,
+      type: 'blob',
+      object: Buffer.from('hello', 'utf8')
+    })
+    let errorName
+    try {
+      await tag({ gitdir, name: 'latest', value: anotherOid })
     } catch (err) {
       errorName = err.name
     }

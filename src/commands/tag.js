@@ -28,22 +28,34 @@ export async function tag ({
     const fs = new FileSystem(_fs)
     const ref = 'refs/tags/' + name
 
-    if (!force) {
-      try {
-        await GitRefManager.resolve({ fs, gitdir, ref })
-        throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
-      } catch (err) {
-        if (err.name === E.RefExistsError) {
-          throw err
-        }
-      }
-    }
-
+    // Resolve passed value
     value = await GitRefManager.resolve({
       fs,
       gitdir,
       ref: value || 'HEAD'
     })
+
+    try {
+      // Attempt to get old value
+      const oldValue = await GitRefManager.resolve({ fs, gitdir, ref })
+      // If found and not forced overwriting
+      if (!force) {
+        if (oldValue !== value) {
+          // It exists and differ from passed value
+          throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
+        } else {
+          // Nothing to do, as the old value and the new one is the same
+          return
+        }
+      }
+    } catch (err) {
+      switch (err.name) {
+        case E.ResolveRefError:
+          // Not found, it's pretty OK
+          break
+        default: throw err
+      }
+    }
 
     if (annotated) {
       const message = annotated.message
