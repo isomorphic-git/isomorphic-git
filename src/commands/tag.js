@@ -75,7 +75,7 @@ export async function tag ({
       if (message === undefined) {
         throw new GitError(E.MissingRequiredParameterError, {
           function: 'tag',
-          parameter: 'message'
+          parameter: 'annotated.message'
         })
       }
       const referredObjectType = (await readObject({ fs, gitdir, oid: value })).type
