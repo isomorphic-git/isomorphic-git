@@ -23,7 +23,17 @@ export async function add ({
     let stats = await fs.lstat(join(dir, filepath))
     if (!stats) throw new GitError(E.FileReadError, { filepath })
     if (stats.isDirectory()) {
-      throw new GitError(E.NotImplementedFail)
+      const children = await fs.readdir(join(dir, filepath))
+      for (var c = 0; c < children.length; c++) {
+        await add({
+          core,
+          dir,
+          gitdir,
+          fs: _fs,
+          filepath: join(filepath, children[c])
+        })
+      }
+      return
     }
     const object = stats.isSymbolicLink()
       ? await fs.readlink(join(dir, filepath))

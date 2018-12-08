@@ -259,6 +259,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "pyramation",
+      "name": "Dan Lynch",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/545047?v=4",
+      "profile": "https://github.com/pyramation",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }
