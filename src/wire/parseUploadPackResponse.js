@@ -12,34 +12,36 @@ export async function parseUploadPackResponse (stream) {
   let done = false
   return new Promise((resolve, reject) => {
     // Parse the response
-    packetlines.pipe(
-      through2(async (data, enc, next) => {
-        let line = data.toString('utf8').trim()
-        if (line.startsWith('shallow')) {
-          let oid = line.slice(-41).trim()
-          if (oid.length !== 40) {
-            reject(new GitError(E.CorruptShallowOidFail, { oid }))
+    packetlines
+      .pipe(
+        through2(async (data, enc, next) => {
+          let line = data.toString('utf8').trim()
+          if (line.startsWith('shallow')) {
+            let oid = line.slice(-41).trim()
+            if (oid.length !== 40) {
+              reject(new GitError(E.CorruptShallowOidFail, { oid }))
+            }
+            shallows.push(oid)
+          } else if (line.startsWith('unshallow')) {
+            let oid = line.slice(-41).trim()
+            if (oid.length !== 40) {
+              reject(new GitError(E.CorruptShallowOidFail, { oid }))
+            }
+            unshallows.push(oid)
+          } else if (line.startsWith('ACK')) {
+            let [, oid, status] = line.split(' ')
+            acks.push({ oid, status })
+            if (!status) done = true
+          } else if (line.startsWith('NAK')) {
+            nak = true
+            done = true
           }
-          shallows.push(oid)
-        } else if (line.startsWith('unshallow')) {
-          let oid = line.slice(-41).trim()
-          if (oid.length !== 40) {
-            reject(new GitError(E.CorruptShallowOidFail, { oid }))
+          if (done) {
+            resolve({ shallows, unshallows, acks, nak, packfile, progress })
           }
-          unshallows.push(oid)
-        } else if (line.startsWith('ACK')) {
-          let [, oid, status] = line.split(' ')
-          acks.push({ oid, status })
-          if (!status) done = true
-        } else if (line.startsWith('NAK')) {
-          nak = true
-          done = true
-        }
-        if (done) {
-          resolve({ shallows, unshallows, acks, nak, packfile, progress })
-        }
-        next(null, data)
-      })
-    ).resume()
+          next(null, data)
+        })
+      )
+      .resume()
   })
 }
