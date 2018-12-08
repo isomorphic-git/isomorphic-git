@@ -79,15 +79,19 @@ describe('tag', () => {
     plugins.set('fs', fs)
     // Test
     await tag({ gitdir, name: 'latest' })
+    const anotherOid = await writeObject({
+      gitdir,
+      type: 'blob',
+      object: Buffer.from('hello', 'utf8')
+    })
     let errorName
     try {
-      await tag({ gitdir, name: 'latest', force: true })
+      await tag({ gitdir, name: 'latest', value: anotherOid, force: true })
     } catch (err) {
       errorName = err.name
     }
     expect(errorName).not.toBe('RefExistsError')
   })
-
   it('creates a signed tag to HEAD', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
