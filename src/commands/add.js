@@ -24,7 +24,11 @@ export async function add ({
     if (!stats) throw new GitError(E.FileReadError, { filepath })
     if (stats.isDirectory()) {
       const children = await fs.readdir(join(dir, filepath))
+      const gitdirRegExp = new RegExp(gitdir);
       for (var c = 0; c < children.length; c++) {
+        if (gitdirRegExp.test( join(dir, filepath, children[c]) )) {
+          continue
+        }
         await add({
           core,
           dir,

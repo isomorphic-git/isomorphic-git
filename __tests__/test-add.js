@@ -43,4 +43,14 @@ describe('add', () => {
     await add({ dir, filepath: 'c' })
     expect((await listFiles({ dir })).length === 3).toBe(true)
   })
+  it('git add .', async () => {
+    // Setup
+    let { fs, dir } = await makeFixture('test-add')
+    plugins.set('fs', fs)
+    // Test
+    await init({ dir })
+    expect((await listFiles({ dir })).length === 0).toBe(true)
+    await add({ dir, filepath: '.' })
+    expect((await listFiles({ dir })).length === 6).toBe(true)
+  })
 })
