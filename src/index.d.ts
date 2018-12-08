@@ -572,7 +572,7 @@ export function tag(args: {
     };
     signingKey?: string;
   };
-  oid?: string;
+  value?: string;
   force?: boolean;
 }): Promise<void>;
 

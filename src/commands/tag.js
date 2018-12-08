@@ -2,8 +2,7 @@ import { writeObject } from './writeObject'
 import { readObject } from './readObject'
 import { writeRef } from './writeRef'
 import { config } from './config'
-import { resolveRef } from './resolveRef'
-import { currentBranch } from './currentBranch'
+import { GitRefManager } from '../managers/GitRefManager'
 import { E, GitError } from '../models/GitError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
@@ -22,7 +21,7 @@ export async function tag ({
   fs: _fs = cores.get(core).get('fs'),
   name,
   annotated = undefined,
-  oid = undefined,
+  value = undefined,
   force = false
 }) {
   try {
@@ -31,7 +30,7 @@ export async function tag ({
 
     if (!force) {
       try {
-        await resolveRef({ fs, gitdir, ref })
+        await GitRefManager.resolve({ fs, gitdir, ref })
         throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
       } catch (err) {
         if (err.name === E.RefExistsError) {
@@ -40,7 +39,11 @@ export async function tag ({
       }
     }
 
-    let referredOid = oid || await resolveRef({ fs, gitdir, ref: await currentBranch({ gitdir, fullname: true }) })
+    value = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref: value || 'HEAD'
+    })
 
     if (annotated) {
       const message = annotated.message
@@ -63,10 +66,10 @@ export async function tag ({
           parameter: 'message'
         })
       }
-      const referredObjectType = (await readObject({ fs, gitdir, oid: referredOid })).type
+      const referredObjectType = (await readObject({ fs, gitdir, oid: value })).type
       let taggerDateTime = tagger.date || new Date()
       let tag = GitAnnotatedTag.from({
-        object: referredOid,
+        object: value,
         type: referredObjectType,
         tag: name,
         tagger: {
@@ -88,10 +91,10 @@ export async function tag ({
         let pgp = cores.get(core).get('pgp')
         tag = await GitAnnotatedTag.sign(tag, pgp, signingKey)
       }
-      referredOid = await writeObject({ fs, gitdir, type: 'tag', object: tag.toObject() })
+      value = await writeObject({ fs, gitdir, type: 'tag', object: tag.toObject() })
     }
 
-    await writeRef({ fs, gitdir, ref, value: referredOid, force: true })
+    await writeRef({ fs, gitdir, ref, value, force: true })
   } catch (err) {
     err.caller = 'git.tag'
     throw err
