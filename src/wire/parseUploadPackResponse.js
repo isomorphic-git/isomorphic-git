@@ -40,13 +40,6 @@ export async function parseUploadPackResponse (stream) {
         }
         next(null, data)
       })
-    )
-    // For some reason, clone --depth=1 returns >300 'shallow's but no ACK or NAK
-    // This is the failsafe in case there's no ack or nak
-    packetlines.on('end', () => {
-      if (!done) {
-        resolve({ shallows, unshallows, acks, nak, packfile, progress })
-      }
-    })
+    ).resume()
   })
 }
