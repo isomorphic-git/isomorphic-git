@@ -163,6 +163,7 @@ unless there is a major version bump.
 
 - [add](https://isomorphic-git.github.io/docs/add.html)
 - [addRemote](https://isomorphic-git.github.io/docs/addRemote.html)
+- [annotatedTag](https://isomorphic-git.github.io/docs/annotatedTag.html)
 - [branch](https://isomorphic-git.github.io/docs/branch.html)
 - [checkout](https://isomorphic-git.github.io/docs/checkout.html)
 - [clone](https://isomorphic-git.github.io/docs/clone.html)

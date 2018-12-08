@@ -561,8 +561,19 @@ export function tag(args: {
   dir: string;
   gitdir?: string;
   name: string;
-  annotated?: {
+  value?: string;
+  force?: boolean;
+}): Promise<void>;
+
+export function annotatedTag(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  name: string;
+  object: {
     message: string;
+    object?: string;
     tagger?: {
       name?: string;
       email?: string;
@@ -570,9 +581,28 @@ export function tag(args: {
       timestamp?: number;
       timezoneOffset?: number;
     };
-    signingKey?: string;
+    signature?: string;
   };
-  value?: string;
+  force?: boolean;
+}): Promise<void>;
+export function annotatedTag(args: {
+  core?: string;
+  fs?: any;
+  dir: string;
+  gitdir?: string;
+  name: string;
+  object: {
+    message: string;
+    object?: string;
+    tagger?: {
+      name?: string;
+      email?: string;
+      date?: Date;
+      timestamp?: number;
+      timezoneOffset?: number;
+    };
+  };
+  signingKey?: string;
   force?: boolean;
 }): Promise<void>;
 

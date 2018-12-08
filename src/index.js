@@ -3,6 +3,7 @@ import { oauth2 } from './utils/oauth2.js'
 
 export * from './commands/add.js'
 export * from './commands/addRemote.js'
+export * from './commands/annotatedTag.js'
 export * from './commands/branch.js'
 export * from './commands/checkout.js'
 export * from './commands/clone.js'

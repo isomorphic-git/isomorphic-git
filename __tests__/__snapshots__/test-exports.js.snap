@@ -8,6 +8,7 @@ Array [
   "WORKDIR",
   "add",
   "addRemote",
+  "annotatedTag",
   "branch",
   "checkout",
   "clone",
