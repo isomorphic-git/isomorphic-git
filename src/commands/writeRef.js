@@ -3,7 +3,6 @@ import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { GitError, E } from '../models/GitError.js'
-import { resolveRef } from './resolveRef'
 
 /**
  * Write a ref.
@@ -23,15 +22,9 @@ export async function writeRef ({
   try {
     const fs = new FileSystem(_fs)
 
-    if (!force) {
-      try {
-        await resolveRef({ fs, gitdir, ref })
-        throw new GitError(E.RefExistsError, { noun: 'ref', ref })
-      } catch (err) {
-        if (err.name === E.RefExistsError) {
-          throw err
-        }
-      }
+    const exist = await fs.exists(`${gitdir}/${ref}`)
+    if (exist && !force) {
+      throw new GitError(E.RefExistsError, { noun: 'ref', ref })
     }
 
     if (symbolic) {
@@ -42,6 +35,11 @@ export async function writeRef ({
         value
       })
     } else {
+      value = await GitRefManager.resolve({
+        fs,
+        gitdir,
+        ref: value
+      })
       await GitRefManager.writeRef({
         fs,
         gitdir,

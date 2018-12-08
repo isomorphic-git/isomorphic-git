@@ -29,10 +29,7 @@ describe('writeRef', () => {
     await writeRef({
       gitdir,
       ref: 'refs/heads/another',
-      value: await resolveRef({
-        gitdir,
-        ref: await currentBranch({ gitdir, fullname: true })
-      })
+      value: 'HEAD'
     })
     await writeRef({
       gitdir,
