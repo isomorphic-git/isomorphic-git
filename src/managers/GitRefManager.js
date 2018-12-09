@@ -149,6 +149,14 @@ export class GitRefManager {
     // Do we give up?
     throw new GitError(E.ResolveRefError, { ref })
   }
+  static async exists ({ fs, gitdir, ref }) {
+    try {
+      await GitRefManager.expand({ fs, gitdir, ref })
+      return true
+    } catch (err) {
+      return false
+    }
+  }
   static async expand ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
     // Is it a complete and valid SHA?
