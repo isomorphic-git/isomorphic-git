@@ -30,9 +30,16 @@ export async function tag ({
     })
 
     if (!force) {
-      const exist = await fs.exists(`${gitdir}/${ref}`)
-      if (exist) {
+      try {
+        await GitRefManager.resolve({ fs, gitdir, ref })
         throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
+      } catch (err) {
+        if (err.code === 'ResolveRefError') {
+          // The ref doesn't exist yet, we are OK
+        } else {
+          // Rethrow the RefExistsError
+          throw err
+        }
       }
     }
 
