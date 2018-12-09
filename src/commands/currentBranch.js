@@ -42,8 +42,9 @@ export async function currentBranch ({
       ref: 'HEAD',
       depth: 2
     })
-    if (fullname) return ref
-    return abbreviate(ref)
+    // Return `undefined` for detached HEAD
+    if (!ref.startsWith('refs/')) return
+    return fullname ? ref : abbreviate(ref)
   } catch (err) {
     err.caller = 'git.currentBranch'
     throw err
