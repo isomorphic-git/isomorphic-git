@@ -220,7 +220,7 @@ async function fetchPackfile ({
     try {
       ref = await GitRefManager.expand({ fs, gitdir, ref })
       // TODO: Actually, should we test whether we have the object using readObject?
-      if (!ref.startsWith('refs/tags')) {
+      if (!ref.startsWith('refs/tags/')) {
         let have = await GitRefManager.resolve({ fs, gitdir, ref })
         haves.push(have)
       }
