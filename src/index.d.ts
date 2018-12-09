@@ -288,7 +288,7 @@ export function currentBranch(args: {
   dir: string;
   gitdir?: string;
   fullname?: boolean;
-}): Promise<string>;
+}): Promise<string | undefined>;
 
 export function expandRef(args: {
   core?: string;
