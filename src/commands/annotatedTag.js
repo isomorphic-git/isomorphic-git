@@ -33,7 +33,7 @@ export async function annotatedTag ({
         parameter: 'object'
       })
     }
-    
+
     if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
       throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
     }

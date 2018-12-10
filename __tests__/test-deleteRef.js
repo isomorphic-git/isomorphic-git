@@ -1,14 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const snapshots = require('./__snapshots__/test-deleteRef.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { plugins, deleteRef, listTags } = require('isomorphic-git')
 
 describe('deleteRef', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
-  it('deletes the latest tag ref to HEAD', async () => {
+  it('deletes a loose tag', async () => {
     // Setup
     let { fs, gitdir } = await makeFixture('test-deleteRef')
     plugins.set('fs', fs)
@@ -20,6 +15,35 @@ describe('deleteRef', () => {
     let refs = await listTags({
       gitdir
     })
-    expect(refs).toMatchSnapshot()
+    expect(refs.includes('latest')).toEqual(false)
+  })
+  it('deletes a packed tag', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-deleteRef')
+    plugins.set('fs', fs)
+    // Test
+    await deleteRef({
+      gitdir,
+      ref: 'refs/tags/packed-tag'
+    })
+    let refs = await listTags({
+      gitdir
+    })
+    expect(refs.includes('packed-tag')).toEqual(false)
+  })
+  it('deletes a packed and loose tag', async () => {
+    // Setup
+    let { fs, gitdir } = await makeFixture('test-deleteRef')
+    plugins.set('fs', fs)
+    // Test
+    await deleteRef({
+      gitdir,
+      ref: 'refs/tags/packed-and-loose'
+    })
+    let refs = await listTags({
+      gitdir
+    })
+    expect(refs.includes('packed-and-loose')).toEqual(false)
+    expect(refs.includes('packed-tag')).toEqual(true)
   })
 })

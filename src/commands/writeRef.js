@@ -22,11 +22,8 @@ export async function writeRef ({
   try {
     const fs = new FileSystem(_fs)
 
-    if (!force) {
-      const exist = await fs.exists(`${gitdir}/${ref}`)
-      if (exist) {
-        throw new GitError(E.RefExistsError, { noun: 'ref', ref })
-      }
+    if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
+      throw new GitError(E.RefExistsError, { noun: 'ref', ref })
     }
 
     if (symbolic) {
