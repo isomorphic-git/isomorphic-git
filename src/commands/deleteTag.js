@@ -13,11 +13,11 @@ export async function deleteTag ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  name
+  ref
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const ref = 'refs/tags/' + name
+    const ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
     await deleteRef({ fs, gitdir, ref })
   } catch (err) {
     err.caller = 'git.deleteTag'

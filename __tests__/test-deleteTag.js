@@ -15,7 +15,7 @@ describe('deleteTag', () => {
     // Test
     await deleteTag({
       gitdir,
-      name: 'latest'
+      ref: 'latest'
     })
     let refs = await listTags({
       gitdir
