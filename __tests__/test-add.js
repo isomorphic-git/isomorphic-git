@@ -2,15 +2,27 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { plugins, init, add, listFiles } = require('isomorphic-git')
+const { join } = require('../src/utils/join');
+
+// NOTE: we cannot actually commit a real .gitignore file in fixtures or fixtures won't be included in this repo
+const writeGitIgnore = async (fs, dir) => {
+    await fs.writeFile(
+        join(dir, '.gitignore'),
+        ['*-pattern.js', 'i.txt', 'js_modules', '.DS_Store'].join('\n')
+    )
+}
+
 
 describe('add', () => {
   it('file', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-add')
     plugins.set('fs', fs)
+    await writeGitIgnore(fs, dir)
     // Test
     await init({ dir })
     await add({ dir, filepath: 'a.txt' })
+    await add({ dir, filepath: 'i.txt' })
     expect((await listFiles({ dir })).length === 1).toBe(true)
     await add({ dir, filepath: 'a.txt' })
     expect((await listFiles({ dir })).length === 1).toBe(true)
@@ -23,6 +35,7 @@ describe('add', () => {
     // Setup
     let { fs, dir } = await makeFixture('test-add')
     plugins.set('fs', fs)
+    await writeGitIgnore(fs, dir)
     // Test
     await init({ dir })
     let err = null
@@ -37,6 +50,7 @@ describe('add', () => {
     // Setup
     let { fs, dir } = await makeFixture('test-add')
     plugins.set('fs', fs)
+    await writeGitIgnore(fs, dir)
     // Test
     await init({ dir })
     expect((await listFiles({ dir })).length === 0).toBe(true)
@@ -47,10 +61,11 @@ describe('add', () => {
     // Setup
     let { fs, dir } = await makeFixture('test-add')
     plugins.set('fs', fs)
+    await writeGitIgnore(fs, dir)
     // Test
     await init({ dir })
     expect((await listFiles({ dir })).length === 0).toBe(true)
     await add({ dir, filepath: '.' })
-    expect((await listFiles({ dir })).length === 6).toBe(true)
+    expect((await listFiles({ dir })).length === 7).toBe(true)
   })
 })
