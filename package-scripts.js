@@ -34,7 +34,8 @@ module.exports = {
     lint: {
       default: series.nps('lint.js', 'lint.typescript'),
       js: `standard ${srcPaths}`,
-      typescript: 'tsc src/index.d.ts --lib es6'
+      typescript: 'tsc src/index.d.ts --lib es6',
+      typescriptTests: 'tsc -p tsconfig.json'
     },
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
