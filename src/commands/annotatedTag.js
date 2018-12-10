@@ -1,12 +1,14 @@
-import { writeObject } from './writeObject'
-import { readObject } from './readObject'
-import { config } from './config'
-import { GitRefManager } from '../managers/GitRefManager'
-import { E, GitError } from '../models/GitError.js'
+import { config } from './config.js'
+
+import { GitRefManager } from '../managers/GitRefManager.js'
+
 import { FileSystem } from '../models/FileSystem.js'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
+import { E, GitError } from '../models/GitError.js'
+import { readObject } from '../storage/readObject.js'
+import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 
 /**
  * Create an annotated tag.
@@ -18,42 +20,44 @@ export async function annotatedTag ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  name,
+  tag,
+  tagger,
+  message = '',
+  signature,
   object,
-  signingKey = undefined,
+  signingKey,
   force = false
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const ref = 'refs/tags/' + name
 
-    if (object === undefined) {
+    if (tag === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'annotatedTag',
-        parameter: 'object'
+        parameter: 'tag'
       })
     }
 
+    const ref = tag.startsWith('refs/tags/') ? tag : `refs/tags/${tag}`
+
     if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
-      throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
+      throw new GitError(E.RefExistsError, { noun: 'tag', ref })
     }
 
     // Resolve passed value
-    let value = await GitRefManager.resolve({
+    let oid = await GitRefManager.resolve({
       fs,
       gitdir,
-      ref: object.object || 'HEAD'
+      ref: object || 'HEAD'
     })
 
-    const message = object.message
-    const signature = object.signature
     if (signature && signingKey) {
       throw new GitError(E.InvalidParameterCombinationError, {
         function: 'annotatedTag',
-        parameters: ['object.signature', 'signingKey']
+        parameters: ['signature', 'signingKey']
       })
     }
-    let tagger = object.tagger
+
     // Fill in missing arguments with default values
     if (tagger === undefined) tagger = {}
     if (tagger.name === undefined) {
@@ -65,18 +69,13 @@ export async function annotatedTag ({
     if (tagger.name === undefined || tagger.email === undefined) {
       throw new GitError(E.MissingAuthorError)
     }
-    if (message === undefined) {
-      throw new GitError(E.MissingRequiredParameterError, {
-        function: 'tag',
-        parameter: 'annotated.message'
-      })
-    }
-    const referredObjectType = (await readObject({ fs, gitdir, oid: value })).type
+
+    const { type } = (await readObject({ fs, gitdir, oid }))
     let taggerDateTime = tagger.date || new Date()
-    let tag = GitAnnotatedTag.from({
-      object: value,
-      type: referredObjectType,
-      tag: name,
+    let tagObject = GitAnnotatedTag.from({
+      object: oid,
+      type,
+      tag,
       tagger: {
         name: tagger.name,
         email: tagger.email,
@@ -88,16 +87,16 @@ export async function annotatedTag ({
             tagger.timezoneOffset !== undefined &&
             tagger.timezoneOffset !== null
               ? tagger.timezoneOffset
-              : new Date().getTimezoneOffset()
+              : taggerDateTime.getTimezoneOffset()
       },
       message,
       signature
     })
     if (signingKey) {
       let pgp = cores.get(core).get('pgp')
-      tag = await GitAnnotatedTag.sign(tag, pgp, signingKey)
+      tagObject = await GitAnnotatedTag.sign(tagObject, pgp, signingKey)
     }
-    value = await writeObject({ fs, gitdir, type: 'tag', object: tag.toObject() })
+    let value = await writeObject({ fs, gitdir, type: 'tag', object: tagObject.toObject() })
 
     await GitRefManager.writeRef({ fs, gitdir, ref, value })
   } catch (err) {

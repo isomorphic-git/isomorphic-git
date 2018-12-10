@@ -10,13 +10,11 @@ describe('annotatedTag', () => {
     // Test
     await annotatedTag({
       gitdir,
-      name: 'latest',
-      object: {
-        message: 'some tag message',
-        tagger: {
-          name: 'Yu Shimura',
-          email: 'mail@yuhr.org'
-        }
+      tag: 'latest',
+      message: 'some tag message',
+      tagger: {
+        name: 'Yu Shimura',
+        email: 'mail@yuhr.org'
       }
     })
     const tagRef = await resolveRef({ gitdir, ref: 'refs/tags/latest' })
@@ -30,15 +28,13 @@ describe('annotatedTag', () => {
     // Test
     await annotatedTag({
       gitdir,
-      name: 'latest-blob',
-      object: {
-        message: 'some tag message',
-        tagger: {
-          name: 'Yu Shimura',
-          email: 'mail@yuhr.org'
-        },
-        object: 'd670460b4b4aece5915caf5c68d12f560a9fe3e4'
-      }
+      tag: 'latest-blob',
+      message: 'some tag message',
+      tagger: {
+        name: 'Yu Shimura',
+        email: 'mail@yuhr.org'
+      },
+      object: 'd670460b4b4aece5915caf5c68d12f560a9fe3e4'
     })
     const tagRef = await resolveRef({ gitdir, ref: 'refs/tags/latest-blob' })
     const {object: tagObject} = await readObject({ gitdir, oid: tagRef })
@@ -54,13 +50,11 @@ describe('annotatedTag', () => {
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await annotatedTag({
       gitdir,
-      name: 'latest',
-      object: {
-        message: 'some tag message',
-        tagger: {
-          name: 'Yu Shimura',
-          email: 'mail@yuhr.org'
-        }
+      tag: 'latest',
+      message: 'some tag message',
+      tagger: {
+        name: 'Yu Shimura',
+        email: 'mail@yuhr.org'
       },
       signingKey: privateKey
     })

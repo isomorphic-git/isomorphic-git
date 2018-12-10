@@ -8,10 +8,7 @@ describe('tag', () => {
     let { fs, gitdir } = await makeFixture('test-tag')
     plugins.set('fs', fs)
     // Test
-    await tag({
-      gitdir,
-      name: 'latest'
-    })
+    await tag({ gitdir, tag: 'latest' })
     const ref = await resolveRef({ gitdir, ref: 'refs/tags/latest' })
     expect(ref).toEqual('cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69')
   })
@@ -22,7 +19,7 @@ describe('tag', () => {
     // Test
     let error = null
     try {
-      await tag({ gitdir, name: 'existing-tag' })
+      await tag({ gitdir, tag: 'existing-tag' })
     } catch (err) {
       error = err
     }
@@ -36,7 +33,7 @@ describe('tag', () => {
     // Test
     let error = null
     try {
-      await tag({ gitdir, name: 'packed-tag' })
+      await tag({ gitdir, tag: 'packed-tag' })
     } catch (err) {
       error = err
     }
@@ -50,7 +47,7 @@ describe('tag', () => {
     // Test
     let error = null
     try {
-      await tag({ gitdir, name: 'existing-tag', force: true })
+      await tag({ gitdir, tag: 'existing-tag', force: true })
     } catch (err) {
       error = err
     }
@@ -63,7 +60,7 @@ describe('tag', () => {
     // Test
     let error = null
     try {
-      await tag({ gitdir, name: 'packed-tag', force: true })
+      await tag({ gitdir, tag: 'packed-tag', force: true })
     } catch (err) {
       error = err
     }

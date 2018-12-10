@@ -14,23 +14,23 @@ export async function tag ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  name,
-  value = undefined,
+  tag,
+  object,
   force = false
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const ref = 'refs/tags/' + name
+    const ref = 'refs/tags/' + tag
 
-    // Resolve passed value
-    value = await GitRefManager.resolve({
+    // Resolve passed object
+    let value = await GitRefManager.resolve({
       fs,
       gitdir,
-      ref: value || 'HEAD'
+      ref: object || 'HEAD'
     })
 
     if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
-      throw new GitError(E.RefExistsError, { noun: 'tag', ref: name })
+      throw new GitError(E.RefExistsError, { noun: 'tag', ref: tag })
     }
 
     await GitRefManager.writeRef({ fs, gitdir, ref, value })
