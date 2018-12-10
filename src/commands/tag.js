@@ -14,13 +14,21 @@ export async function tag ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  tag,
+  ref,
   object,
   force = false
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const ref = 'refs/tags/' + tag
+
+    if (ref === undefined) {
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'tag',
+        parameter: 'ref'
+      })
+    }
+
+    ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
     // Resolve passed object
     let value = await GitRefManager.resolve({
@@ -30,7 +38,7 @@ export async function tag ({
     })
 
     if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
-      throw new GitError(E.RefExistsError, { noun: 'tag', ref: tag })
+      throw new GitError(E.RefExistsError, { noun: 'tag', ref })
     }
 
     await GitRefManager.writeRef({ fs, gitdir, ref, value })

@@ -20,7 +20,7 @@ export async function annotatedTag ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  tag,
+  ref,
   tagger,
   message = '',
   signature,
@@ -31,14 +31,14 @@ export async function annotatedTag ({
   try {
     const fs = new FileSystem(_fs)
 
-    if (tag === undefined) {
+    if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'annotatedTag',
-        parameter: 'tag'
+        parameter: 'ref'
       })
     }
 
-    const ref = tag.startsWith('refs/tags/') ? tag : `refs/tags/${tag}`
+    ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
     if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
       throw new GitError(E.RefExistsError, { noun: 'tag', ref })
@@ -75,7 +75,7 @@ export async function annotatedTag ({
     let tagObject = GitAnnotatedTag.from({
       object: oid,
       type,
-      tag,
+      tag: ref.replace('refs/tags/', ''),
       tagger: {
         name: tagger.name,
         email: tagger.email,

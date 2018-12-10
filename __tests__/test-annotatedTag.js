@@ -10,7 +10,7 @@ describe('annotatedTag', () => {
     // Test
     await annotatedTag({
       gitdir,
-      tag: 'latest',
+      ref: 'latest',
       message: 'some tag message',
       tagger: {
         name: 'Yu Shimura',
@@ -28,7 +28,7 @@ describe('annotatedTag', () => {
     // Test
     await annotatedTag({
       gitdir,
-      tag: 'latest-blob',
+      ref: 'latest-blob',
       message: 'some tag message',
       tagger: {
         name: 'Yu Shimura',
@@ -50,7 +50,7 @@ describe('annotatedTag', () => {
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await annotatedTag({
       gitdir,
-      tag: 'latest',
+      ref: 'latest',
       message: 'some tag message',
       tagger: {
         name: 'Yu Shimura',
