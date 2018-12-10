@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-deleteTag.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { plugins, deleteTag, listTags } = require('isomorphic-git')
+const { E, plugins, deleteTag, listTags } = require('isomorphic-git')
 
 describe('deleteTag', () => {
   beforeAll(() => {
@@ -21,5 +21,20 @@ describe('deleteTag', () => {
       gitdir
     })
     expect(refs).toMatchSnapshot()
+  })
+
+  it('missing ref argument', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-deleteTag')
+    plugins.set('fs', fs)
+    let error = null
+    // Test
+    try {
+      await deleteTag({ dir, gitdir })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(E.MissingRequiredParameterError)
   })
 })

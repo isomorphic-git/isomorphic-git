@@ -1,5 +1,6 @@
 import { deleteRef } from './deleteRef'
 import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
@@ -17,7 +18,13 @@ export async function deleteTag ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
+    if (ref === undefined) {
+      throw new GitError(E.MissingRequiredParameterError, {
+        function: 'deleteTag',
+        parameter: 'ref'
+      })
+    }
+    ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
     await deleteRef({ fs, gitdir, ref })
   } catch (err) {
     err.caller = 'git.deleteTag'
