@@ -76,7 +76,7 @@
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "3.3.0",
     "@types/jest": "^23.3.10",
-    "@types/node": "10.12.7",
+    "@types/node": "10.12.12",
     "agadoo": "git+https://github.com/wmhilton-contrib/agadoo.git#external-imports",
     "all-contributors-cli": "5.4.1",
     "babel-core": "7.0.0-bridge.0",
