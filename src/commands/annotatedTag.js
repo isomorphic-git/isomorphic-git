@@ -80,12 +80,11 @@ export async function annotatedTag ({
         name: tagger.name,
         email: tagger.email,
         timestamp:
-            tagger.timestamp !== undefined && tagger.timestamp !== null
+            tagger.timestamp != null
               ? tagger.timestamp
               : Math.floor(taggerDateTime.valueOf() / 1000),
         timezoneOffset:
-            tagger.timezoneOffset !== undefined &&
-            tagger.timezoneOffset !== null
+            tagger.timezoneOffset != null
               ? tagger.timezoneOffset
               : taggerDateTime.getTimezoneOffset()
       },

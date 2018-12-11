@@ -70,12 +70,11 @@ export async function commit ({
             name: author.name,
             email: author.email,
             timestamp:
-              author.timestamp !== undefined && author.timestamp !== null
+              author.timestamp != null
                 ? author.timestamp
                 : Math.floor(authorDateTime.valueOf() / 1000),
             timezoneOffset:
-              author.timezoneOffset !== undefined &&
-              author.timezoneOffset !== null
+              author.timezoneOffset != null
                 ? author.timezoneOffset
                 : authorDateTime.getTimezoneOffset()
           },
@@ -83,12 +82,11 @@ export async function commit ({
             name: committer.name,
             email: committer.email,
             timestamp:
-              committer.timestamp !== undefined && committer.timestamp !== null
+              committer.timestamp != null
                 ? committer.timestamp
                 : Math.floor(committerDateTime.valueOf() / 1000),
             timezoneOffset:
-              committer.timezoneOffset !== undefined &&
-              committer.timezoneOffset !== null
+              committer.timezoneOffset != null
                 ? committer.timezoneOffset
                 : committerDateTime.getTimezoneOffset()
           },
