@@ -4,7 +4,7 @@ const snapshots = require('./__snapshots__/test-checkout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const pify = require('pify')
 
-const { plugins, checkout, listFiles } = require('isomorphic-git')
+const { plugins, checkout, listFiles, add, commit, branch } = require('isomorphic-git')
 
 describe('checkout', () => {
   beforeAll(() => {
@@ -51,5 +51,25 @@ describe('checkout', () => {
     expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
     expect(error.caller).toEqual('git.checkout')
+  })
+
+  it('checkout file permissions', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    plugins.set('fs', fs)
+    await branch({ dir, gitdir, ref: 'other', checkout: true })
+    await checkout({ dir, gitdir, ref: 'test-branch' })
+    await pify(fs.writeFile)(dir + '/regular-file.txt', 'regular file', { mode: 0o666 })
+    await pify(fs.writeFile)(dir + '/executable-file.sh', 'executable file', { mode: 0o777 })
+    const expectedRegularFileMode = (await pify(fs.stat)(dir + '/regular-file.txt')).mode
+    const expectedExecutableFileMode = (await pify(fs.stat)(dir + '/executable-file.sh')).mode
+    await add({ dir, gitdir, filepath: 'regular-file.txt' })
+    await add({ dir, gitdir, filepath: 'executable-file.sh' })
+    await commit({ dir, gitdir, author: { name: 'Git', email: 'git@example.org' }, message: 'add files' })
+    await checkout({ dir, gitdir, ref: 'other' })
+    await checkout({ dir, gitdir, ref: 'test-branch' })
+    const actualRegularFileMode = (await pify(fs.stat)(dir + '/regular-file.txt')).mode
+    const actualExecutableFileMode = (await pify(fs.stat)(dir + '/executable-file.sh')).mode
+    expect(actualRegularFileMode).toEqual(expectedRegularFileMode)
+    expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
 })
