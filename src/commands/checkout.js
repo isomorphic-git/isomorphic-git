@@ -124,7 +124,7 @@ export async function checkout ({
                       await fs.write(filepath, head.content)
                     } else if (head.mode === '100755') {
                       // executable file
-                      await fs.write(filepath, head.content, { mode: 0o755 })
+                      await fs.write(filepath, head.content, { mode: 0o777 })
                     } else if (head.mode === '120000') {
                       // symlink
                       await fs.writelink(filepath, head.content)
