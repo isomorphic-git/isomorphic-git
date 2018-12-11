@@ -26,7 +26,11 @@ export async function sign ({
     const oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit') {
-      throw new GitError(E.ObjectTypeAssertionInRefFail, { ref: 'HEAD', type })
+      throw new GitError(E.ObjectTypeAssertionInRefFail, {
+        expected: 'commit',
+        ref: 'HEAD',
+        type
+      })
     }
     let commit
     if (openpgp) {
