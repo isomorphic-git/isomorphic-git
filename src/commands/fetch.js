@@ -193,18 +193,12 @@ async function fetchPackfile ({
     ref,
     map: remoteHTTP.refs
   })
-  // Filter out the refs we want to ignore
-  for (let ref of remoteHTTP.refs.keys()) {
-    // Keep the one we're cloning obviously
-    if (ref === fullref) continue
-    // Keep head
-    if (ref === 'HEAD') continue
-    // Keep branches
-    if (ref.startsWith('refs/heads/')) continue
-    // Keep tags if we're keeping tags
-    if (tags && ref.startsWith('refs/tags/')) continue
-    // Remove pull requests and other junk
-    remoteHTTP.refs.delete(ref)
+  const remoteRefs = remoteHTTP.refs
+  // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
+  for (let remoteRef of remoteRefs.keys()) {
+    if (remoteRef === fullref || remoteRef === 'HEAD' || remoteRef.startsWith('refs/heads/') ||
+        (tags && remoteRef.startsWith('refs/tags/'))) continue
+    remoteRefs.delete(remoteRef)
   }
   // Assemble the application/x-git-upload-pack-request
   const capabilities = filterCapabilities(
@@ -220,13 +214,13 @@ async function fetchPackfile ({
   )
   if (relative) capabilities.push('deepen-relative')
   // Start requesting oids from the remote by their SHAs
-  let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
+  let wants = singleBranch ? [oid] : remoteRefs.values()
   let haves = []
   for (let ref of refs) {
     try {
       ref = await GitRefManager.expand({ fs, gitdir, ref })
       // TODO: Actually, should we test whether we have the object using readObject?
-      if (!ref.startsWith('refs/tags')) {
+      if (!ref.startsWith('refs/tags/')) {
         let have = await GitRefManager.resolve({ fs, gitdir, ref })
         haves.push(have)
       }
@@ -285,7 +279,7 @@ async function fetchPackfile ({
       key = value
     }
     // final value must not be a symref but a real ref
-    refs.set(key, remoteHTTP.refs.get(key))
+    refs.set(key, remoteRefs.get(key))
     await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
@@ -299,7 +293,7 @@ async function fetchPackfile ({
       fs,
       gitdir,
       remote,
-      refs: remoteHTTP.refs,
+      refs: remoteRefs,
       symrefs: remoteHTTP.symrefs,
       tags
     })
@@ -311,11 +305,11 @@ async function fetchPackfile ({
   if (response.HEAD === undefined) {
     let { oid } = GitRefManager.resolveAgainstMap({
       ref: 'HEAD',
-      map: remoteHTTP.refs
+      map: remoteRefs
     })
     // Use the name of the first branch that's not called HEAD that has
     // the same SHA as the branch called HEAD.
-    for (let [key, value] of remoteHTTP.refs.entries()) {
+    for (let [key, value] of remoteRefs.entries()) {
       if (key !== 'HEAD' && value === oid) {
         response.HEAD = key
         break
