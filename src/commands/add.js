@@ -1,5 +1,5 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitIgnoreManager } from '../managers/GitIgnoreManager.js';
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { writeObject } from '../storage/writeObject.js'

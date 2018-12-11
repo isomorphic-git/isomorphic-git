@@ -8,8 +8,7 @@ const { plugins, init, add, listFiles } = require('isomorphic-git')
 const writeGitIgnore = async (fs, dir) => pify(fs.writeFile)(
   path.join(dir, '.gitignore'),
   ['*-pattern.js', 'i.txt', 'js_modules', '.DS_Store'].join('\n')
-);
-
+)
 
 describe('add', () => {
   it('file', async () => {
