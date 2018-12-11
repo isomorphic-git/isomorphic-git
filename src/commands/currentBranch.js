@@ -4,19 +4,15 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
-const regexs = [
-  new RegExp('refs/remotes/(.*)/HEAD'),
-  new RegExp('refs/remotes/(.*)'),
-  new RegExp('refs/heads/(.*)'),
-  new RegExp('refs/tags/(.*)'),
-  new RegExp('refs/(.*)')
-]
+const abbreviateRx = new RegExp('^refs/(heads/|tags/|remotes/)?(.*)')
 
 function abbreviate (ref) {
-  for (const reg of regexs) {
-    let matches = reg.exec(ref)
-    if (matches) {
-      return matches[1]
+  const match = abbreviateRx.exec(ref)
+  if (match) {
+    if (match[1] === 'remotes/' && ref.endsWith('/HEAD')) {
+      return match[2].slice(0, -5)
+    } else {
+      return match[2]
     }
   }
   return ref
