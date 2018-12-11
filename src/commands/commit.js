@@ -77,7 +77,7 @@ export async function commit ({
               author.timezoneOffset !== undefined &&
               author.timezoneOffset !== null
                 ? author.timezoneOffset
-                : new Date().getTimezoneOffset()
+                : authorDateTime.getTimezoneOffset()
           },
           committer: {
             name: committer.name,
@@ -90,7 +90,7 @@ export async function commit ({
               committer.timezoneOffset !== undefined &&
               committer.timezoneOffset !== null
                 ? committer.timezoneOffset
-                : new Date().getTimezoneOffset()
+                : committerDateTime.getTimezoneOffset()
           },
           message
         })

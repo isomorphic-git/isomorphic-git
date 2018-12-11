@@ -1,6 +1,7 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
 import { join } from '../utils/join.js'
@@ -88,9 +89,8 @@ export class GitRefManager {
     // Examples of refs we need to avoid writing in loose format for efficieny's sake
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
-    const normalizeValue = value => value.trim() + '\n'
     for (let [key, value] of actualRefsToWrite) {
-      await fs.write(join(gitdir, key), normalizeValue(value), 'utf8')
+      await fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
     }
   }
   // TODO: make this less crude?
@@ -100,8 +100,24 @@ export class GitRefManager {
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new GitError(E.NotAnOidFail, { value })
     }
-    const normalizeValue = value => value.trim() + '\n'
-    await fs.write(join(gitdir, ref), normalizeValue(value), 'utf8')
+    await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
+  }
+  static async writeSymbolicRef ({ fs: _fs, gitdir, ref, value }) {
+    const fs = new FileSystem(_fs)
+    await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
+  }
+  static async deleteRef ({ fs: _fs, gitdir, ref }) {
+    const fs = new FileSystem(_fs)
+    // Delete regular ref
+    await fs.rm(join(gitdir, ref))
+    // Delete any packed ref
+    let text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    const packed = GitPackedRefs.from(text)
+    if (packed.refs.has(ref)) {
+      packed.delete(ref)
+      text = packed.toString()
+      await fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
+    }
   }
   static async resolve ({ fs: _fs, gitdir, ref, depth }) {
     const fs = new FileSystem(_fs)
@@ -135,6 +151,14 @@ export class GitRefManager {
     }
     // Do we give up?
     throw new GitError(E.ResolveRefError, { ref })
+  }
+  static async exists ({ fs, gitdir, ref }) {
+    try {
+      await GitRefManager.expand({ fs, gitdir, ref })
+      return true
+    } catch (err) {
+      return false
+    }
   }
   static async expand ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
@@ -195,31 +219,10 @@ export class GitRefManager {
     throw new GitError(E.ResolveRefError, { ref })
   }
   static async packedRefs ({ fs: _fs, gitdir }) {
-    const refs = new Map()
     const fs = new FileSystem(_fs)
     const text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
-    if (!text) return refs
-    const lines = text
-      .trim()
-      .split('\n')
-      .filter(line => !/^\s*#/.test(line))
-    let key = null
-    for (let line of lines) {
-      const i = line.indexOf(' ')
-      if (line.startsWith('^')) {
-        // This is a oid for the commit associated with the annotated tag immediately preceding this line.
-        // Trim off the '^'
-        const value = line.slice(1)
-        // The tagname^{} syntax is based on the output of `git show-ref --tags -d`
-        refs.set(key + '^{}', value)
-      } else {
-        // This is an oid followed by the ref name
-        const value = line.slice(0, i)
-        key = line.slice(i + 1)
-        refs.set(key, value)
-      }
-    }
-    return refs
+    const packed = GitPackedRefs.from(text)
+    return packed.refs
   }
   // List all the refs that match the `filepath` prefix
   static async listRefs ({ fs: _fs, gitdir, filepath }) {

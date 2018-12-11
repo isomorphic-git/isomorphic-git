@@ -198,6 +198,26 @@ export function addRemote(args: {
   url: string;
 }): Promise<void>;
 
+export function annotatedTag(args: {
+  core?: string;
+  fs?: any;
+  dir?: string;
+  gitdir?: string;
+  ref: string;
+  message: string;
+  object?: string;
+  tagger?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  signature?: string;
+  signingKey?: string;
+  force?: boolean;
+}): Promise<void>;
+
 export function branch(args: {
   core?: string;
   fs?: any;
@@ -205,22 +225,6 @@ export function branch(args: {
   gitdir?: string;
   ref: string;
   checkout?: boolean;
-}): Promise<void>;
-
-export function deleteBranch(args: {
-  core?: string;
-  fs?: any;
-  dir?: string;
-  gitdir?: string;
-  ref: string;
-}): Promise<void>;
-
-export function deleteRemote(args: {
-  core?: string;
-  fs?: any;
-  dir?: string;
-  gitdir?: string;
-  remote: string;
 }): Promise<void>;
 
 export function checkout(args: {
@@ -298,6 +302,38 @@ export function currentBranch(args: {
   gitdir?: string;
   fullname?: boolean;
 }): Promise<string | undefined>;
+
+export function deleteBranch(args: {
+  core?: string;
+  fs?: any;
+  dir?: string;
+  gitdir?: string;
+  ref: string;
+}): Promise<void>;
+
+export function deleteRef(args: {
+  core?: string;
+  fs?: any;
+  dir?: string;
+  gitdir?: string;
+  ref: string;
+}): Promise<void>;
+
+export function deleteRemote(args: {
+  core?: string;
+  fs?: any;
+  dir?: string;
+  gitdir?: string;
+  remote: string;
+}): Promise<void>;
+
+export function deleteTag(args: {
+  core?: string;
+  fs?: any;
+  dir?: string;
+  gitdir?: string;
+  ref: string;
+}): Promise<void>;
 
 export function expandRef(args: {
   core?: string;
@@ -548,6 +584,16 @@ export function statusMatrix(args: {
   pattern?: string;
 }): Promise<StatusMatrix>;
 
+export function tag(args: {
+  core?: string;
+  fs?: any;
+  dir?: string;
+  gitdir?: string;
+  ref: string;
+  object?: string;
+  force?: boolean;
+}): Promise<void>;
+
 export function verify(args: {
   core?: string;
   fs?: any;
@@ -579,3 +625,14 @@ export function writeObject(args: {
   oid?: string;
   encoding?: string;
 }): Promise<string>;
+
+export function writeRef(args: {
+  core?: string;
+  fs?: any;
+  dir?: string;
+  gitdir?: string;
+  ref: string;
+  value: string;
+  force?: boolean;
+  symbolic?: boolean;
+}): Promise<void>;
