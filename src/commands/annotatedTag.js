@@ -59,35 +59,27 @@ export async function annotatedTag ({
     }
 
     // Fill in missing arguments with default values
-    if (tagger === undefined) tagger = {}
-    if (tagger.name === undefined) {
-      tagger.name = await config({ fs, gitdir, path: 'user.name' })
-    }
-    if (tagger.email === undefined) {
-      tagger.email = await config({ fs, gitdir, path: 'user.email' })
-    }
+    tagger = { ...tagger }
+    tagger.name = tagger.name || await config({ fs, gitdir, path: 'user.name' })
+    tagger.email = tagger.email || await config({ fs, gitdir, path: 'user.email' })
     if (tagger.name === undefined || tagger.email === undefined) {
       throw new GitError(E.MissingAuthorError)
     }
 
-    const { type } = (await readObject({ fs, gitdir, oid }))
-    let taggerDateTime = tagger.date || new Date()
+    const taggerDateTime = tagger.date || new Date()
+    tagger.timestamp = tagger.timestamp != null
+      ? tagger.timestamp
+      : Math.floor(taggerDateTime.valueOf() / 1000)
+    tagger.timezoneOffset = tagger.timezoneOffset != null
+      ? tagger.timezoneOffset
+      : taggerDateTime.getTimezoneOffset()
+
+    const { type } = await readObject({ fs, gitdir, oid })
     let tagObject = GitAnnotatedTag.from({
       object: oid,
       type,
       tag: ref.replace('refs/tags/', ''),
-      tagger: {
-        name: tagger.name,
-        email: tagger.email,
-        timestamp:
-            tagger.timestamp != null
-              ? tagger.timestamp
-              : Math.floor(taggerDateTime.valueOf() / 1000),
-        timezoneOffset:
-            tagger.timezoneOffset != null
-              ? tagger.timezoneOffset
-              : taggerDateTime.getTimezoneOffset()
-      },
+      tagger,
       message,
       signature
     })

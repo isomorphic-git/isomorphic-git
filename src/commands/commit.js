@@ -28,26 +28,40 @@ export async function commit ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    // Fill in missing arguments with default values
-    if (author === undefined) author = {}
-    if (author.name === undefined) {
-      author.name = await config({ fs, gitdir, path: 'user.name' })
-    }
-    if (author.email === undefined) {
-      author.email = await config({ fs, gitdir, path: 'user.email' })
-    }
-    if (author.name === undefined || author.email === undefined) {
-      throw new GitError(E.MissingAuthorError)
-    }
+
     if (message === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'commit',
         parameter: 'message'
       })
     }
-    committer = committer || author
-    let authorDateTime = author.date || new Date()
-    let committerDateTime = committer.date || authorDateTime
+
+    // Fill in missing arguments with default values
+    author = { ...author }
+    author.name = author.name || await config({ fs, gitdir, path: 'user.name' })
+    author.email = author.email || await config({ fs, gitdir, path: 'user.email' })
+    if (author.name === undefined || author.email === undefined) {
+      throw new GitError(E.MissingAuthorError)
+    }
+
+    committer = { ...(committer || author) }
+
+    const authorDateTime = author.date || new Date()
+    author.timestamp = author.timestamp != null
+      ? author.timestamp
+      : Math.floor(authorDateTime.valueOf() / 1000)
+    author.timezoneOffset = author.timezoneOffset != null
+      ? author.timezoneOffset
+      : authorDateTime.getTimezoneOffset()
+
+    const committerDateTime = committer.date || authorDateTime
+    committer.timestamp = committer.timestamp != null
+      ? committer.timestamp
+      : Math.floor(committerDateTime.valueOf() / 1000)
+    committer.timezoneOffset = committer.timezoneOffset != null
+      ? committer.timezoneOffset
+      : committerDateTime.getTimezoneOffset()
+
     let oid
     await GitIndexManager.acquire(
       { fs, filepath: `${gitdir}/index` },
@@ -66,30 +80,8 @@ export async function commit ({
         let comm = GitCommit.from({
           tree: treeRef,
           parent: parents,
-          author: {
-            name: author.name,
-            email: author.email,
-            timestamp:
-              author.timestamp != null
-                ? author.timestamp
-                : Math.floor(authorDateTime.valueOf() / 1000),
-            timezoneOffset:
-              author.timezoneOffset != null
-                ? author.timezoneOffset
-                : authorDateTime.getTimezoneOffset()
-          },
-          committer: {
-            name: committer.name,
-            email: committer.email,
-            timestamp:
-              committer.timestamp != null
-                ? committer.timestamp
-                : Math.floor(committerDateTime.valueOf() / 1000),
-            timezoneOffset:
-              committer.timezoneOffset != null
-                ? committer.timezoneOffset
-                : committerDateTime.getTimezoneOffset()
-          },
+          author,
+          committer,
           message
         })
         if (signingKey) {
