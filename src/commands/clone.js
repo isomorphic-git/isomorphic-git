@@ -72,7 +72,7 @@ export async function clone ({
       })
     }
     // Fetch commits
-    let { defaultBranch, packfile } = await fetch({
+    const fetchResult = await fetch({
       core,
       gitdir,
       fs,
@@ -93,18 +93,19 @@ export async function clone ({
       headers,
       tags: !noTags
     })
-    ref = ref || defaultBranch
+    if (fetchResult == null) return
+    ref = ref || fetchResult.defaultBranch
     ref = ref.replace('refs/heads/', '')
     // Note: we're indexing the pack eagerly instead of lazily so
     // we get the nice progress events
-    if (packfile) {
+    if (fetchResult.packfile) {
       await indexPack({
         dir: gitdir,
         gitdir,
         fs,
         emitter,
         emitterPrefix,
-        filepath: packfile
+        filepath: fetchResult.packfile
       })
     }
     // Checkout that branch

@@ -118,8 +118,10 @@ export async function fetch ({
     }
     return res
   } catch (err) {
-    err.caller = 'git.fetch'
-    throw err
+    if (err.code !== E.RemoteRepositoryIsEmpty) {
+      err.caller = 'git.fetch'
+      throw err
+    }
   }
 }
 
@@ -177,6 +179,10 @@ async function fetchPackfile ({
     headers
   })
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
+  const remoteRefs = remoteHTTP.refs
+  if (remoteRefs.size === 0) {
+    throw new GitError(E.RemoteRepositoryIsEmpty)
+  }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
     throw new GitError(E.RemoteDoesNotSupportShallowFail)
@@ -193,9 +199,8 @@ async function fetchPackfile ({
   // Figure out the SHA for the requested ref
   let { oid, fullref } = GitRefManager.resolveAgainstMap({
     ref,
-    map: remoteHTTP.refs
+    map: remoteRefs
   })
-  const remoteRefs = remoteHTTP.refs
   // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
   for (let remoteRef of remoteRefs.keys()) {
     if (
