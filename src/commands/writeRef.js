@@ -2,9 +2,9 @@ import cleanGitRef from 'clean-git-ref'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-import { GitError, E } from '../models/GitError.js'
 
 /**
  * Write a ref.
@@ -33,7 +33,7 @@ export async function writeRef ({
       })
     }
 
-    if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
+    if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {
       throw new GitError(E.RefExistsError, { noun: 'ref', ref })
     }
 

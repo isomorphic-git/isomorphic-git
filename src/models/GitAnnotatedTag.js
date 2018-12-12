@@ -106,8 +106,7 @@ ${obj.signature ? obj.signature : ''}`
     let { signature } = await pgp.sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
-    let signedTag =
-      payload + signature
+    let signedTag = payload + signature
     // return a new tag object
     return GitAnnotatedTag.from(signedTag)
   }

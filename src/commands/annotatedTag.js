@@ -1,7 +1,4 @@
-import { config } from './config.js'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 import { E, GitError } from '../models/GitError.js'
@@ -9,6 +6,8 @@ import { readObject } from '../storage/readObject.js'
 import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
+
+import { config } from './config.js'
 
 /**
  * Create an annotated tag.
@@ -40,7 +39,7 @@ export async function annotatedTag ({
 
     ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
-    if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
+    if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {
       throw new GitError(E.RefExistsError, { noun: 'tag', ref })
     }
 
@@ -70,7 +69,7 @@ export async function annotatedTag ({
       throw new GitError(E.MissingAuthorError)
     }
 
-    const { type } = (await readObject({ fs, gitdir, oid }))
+    const { type } = await readObject({ fs, gitdir, oid })
     let taggerDateTime = tagger.date || new Date()
     let tagObject = GitAnnotatedTag.from({
       object: oid,
@@ -80,14 +79,13 @@ export async function annotatedTag ({
         name: tagger.name,
         email: tagger.email,
         timestamp:
-            tagger.timestamp !== undefined && tagger.timestamp !== null
-              ? tagger.timestamp
-              : Math.floor(taggerDateTime.valueOf() / 1000),
+          tagger.timestamp !== undefined && tagger.timestamp !== null
+            ? tagger.timestamp
+            : Math.floor(taggerDateTime.valueOf() / 1000),
         timezoneOffset:
-            tagger.timezoneOffset !== undefined &&
-            tagger.timezoneOffset !== null
-              ? tagger.timezoneOffset
-              : taggerDateTime.getTimezoneOffset()
+          tagger.timezoneOffset !== undefined && tagger.timezoneOffset !== null
+            ? tagger.timezoneOffset
+            : taggerDateTime.getTimezoneOffset()
       },
       message,
       signature
@@ -96,7 +94,12 @@ export async function annotatedTag ({
       let pgp = cores.get(core).get('pgp')
       tagObject = await GitAnnotatedTag.sign(tagObject, pgp, signingKey)
     }
-    let value = await writeObject({ fs, gitdir, type: 'tag', object: tagObject.toObject() })
+    let value = await writeObject({
+      fs,
+      gitdir,
+      type: 'tag',
+      object: tagObject.toObject()
+    })
 
     await GitRefManager.writeRef({ fs, gitdir, ref, value })
   } catch (err) {
