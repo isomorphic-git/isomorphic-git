@@ -1,7 +1,7 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { GitCommit } from '../models/GitCommit.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
+import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { SignedGitCommit } from '../models/SignedGitCommit.js'
 import { readObject } from '../storage/readObject.js'
@@ -50,7 +50,11 @@ export async function verify ({
         return valid
       } else if (type === 'tag') {
         let tag = GitAnnotatedTag.from(object)
-        let { valid, invalid } = await GitAnnotatedTag.verify(tag, pgp, publicKeys)
+        let { valid, invalid } = await GitAnnotatedTag.verify(
+          tag,
+          pgp,
+          publicKeys
+        )
         if (invalid.length > 0) return false
         return valid
       }
