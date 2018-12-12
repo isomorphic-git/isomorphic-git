@@ -8,8 +8,7 @@ import { writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-
-import { config } from './config'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 
 /**
  * Create a new commit
@@ -37,30 +36,15 @@ export async function commit ({
     }
 
     // Fill in missing arguments with default values
-    author = { ...author }
-    author.name = author.name || await config({ fs, gitdir, path: 'user.name' })
-    author.email = author.email || await config({ fs, gitdir, path: 'user.email' })
-    if (author.name === undefined || author.email === undefined) {
+    author = await normalizeAuthorObject(fs, gitdir, author || {})
+    if (author === undefined) {
       throw new GitError(E.MissingAuthorError)
     }
 
-    committer = { ...(committer || author) }
-
-    const authorDateTime = author.date || new Date()
-    author.timestamp = author.timestamp != null
-      ? author.timestamp
-      : Math.floor(authorDateTime.valueOf() / 1000)
-    author.timezoneOffset = author.timezoneOffset != null
-      ? author.timezoneOffset
-      : authorDateTime.getTimezoneOffset()
-
-    const committerDateTime = committer.date || authorDateTime
-    committer.timestamp = committer.timestamp != null
-      ? committer.timestamp
-      : Math.floor(committerDateTime.valueOf() / 1000)
-    committer.timezoneOffset = committer.timezoneOffset != null
-      ? committer.timezoneOffset
-      : committerDateTime.getTimezoneOffset()
+    committer = await normalizeAuthorObject(fs, gitdir, committer || author)
+    if (committer === undefined) {
+      throw new GitError(E.MissingCommitterError)
+    }
 
     let oid
     await GitIndexManager.acquire(
