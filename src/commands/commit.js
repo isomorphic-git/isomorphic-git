@@ -41,7 +41,10 @@ export async function commit ({
       throw new GitError(E.MissingAuthorError)
     }
 
-    committer = await normalizeAuthorObject(fs, gitdir, committer || author)
+    committer = Object.assign({}, committer || author)
+    // Match committer's date to author's one, if omitted
+    committer.date = committer.date || author.date
+    committer = await normalizeAuthorObject(fs, gitdir, committer)
     if (committer === undefined) {
       throw new GitError(E.MissingCommitterError)
     }
