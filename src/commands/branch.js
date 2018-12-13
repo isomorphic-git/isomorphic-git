@@ -17,7 +17,8 @@ export async function branch ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref,
-  checkout = false
+  checkout = false,
+  force = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -37,10 +38,10 @@ export async function branch ({
       })
     }
 
-    const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)
-    if (exist) {
+    if (!force && await fs.exists(`${gitdir}/refs/heads/${ref}`)) {
       throw new GitError(E.RefExistsError, { noun: 'branch', ref })
     }
+
     // Get tree oid
     let oid
     try {

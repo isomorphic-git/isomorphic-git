@@ -1,7 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`branch branch --checkout --force 1`] = `
+Array [
+  "existing-branch",
+  "master",
+]
+`;
+
+exports[`branch branch --force 1`] = `
+Array [
+  "existing-branch",
+  "master",
+]
+`;
+
 exports[`branch branch 1`] = `
 Array [
+  "existing-branch",
   "master",
   "test-branch",
 ]

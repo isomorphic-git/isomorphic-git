@@ -225,6 +225,7 @@ export function branch(args: {
   gitdir?: string;
   ref: string;
   checkout?: boolean;
+  force?: boolean;
 }): Promise<void>;
 
 export function checkout(args: {
