@@ -196,8 +196,12 @@ async function fetchPackfile ({
   const remoteRefs = remoteHTTP.refs
   // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
   for (let remoteRef of remoteRefs.keys()) {
-    if (remoteRef === fullref || remoteRef === 'HEAD' || remoteRef.startsWith('refs/heads/') ||
-        (tags && remoteRef.startsWith('refs/tags/'))) continue
+    if (
+      remoteRef === fullref ||
+      remoteRef === 'HEAD' ||
+      remoteRef.startsWith('refs/heads/') ||
+      (tags && remoteRef.startsWith('refs/tags/'))
+    ) { continue }
     remoteRefs.delete(remoteRef)
   }
   // Assemble the application/x-git-upload-pack-request

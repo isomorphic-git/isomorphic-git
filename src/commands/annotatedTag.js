@@ -1,5 +1,4 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 import { E, GitError } from '../models/GitError.js'
@@ -8,6 +7,8 @@ import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
+
+import { config } from './config.js'
 
 /**
  * Create an annotated tag.
@@ -39,7 +40,7 @@ export async function annotatedTag ({
 
     ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
-    if (!force && await GitRefManager.exists({ fs, gitdir, ref })) {
+    if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {
       throw new GitError(E.RefExistsError, { noun: 'tag', ref })
     }
 
@@ -76,7 +77,12 @@ export async function annotatedTag ({
       let pgp = cores.get(core).get('pgp')
       tagObject = await GitAnnotatedTag.sign(tagObject, pgp, signingKey)
     }
-    let value = await writeObject({ fs, gitdir, type: 'tag', object: tagObject.toObject() })
+    let value = await writeObject({
+      fs,
+      gitdir,
+      type: 'tag',
+      object: tagObject.toObject()
+    })
 
     await GitRefManager.writeRef({ fs, gitdir, ref, value })
   } catch (err) {
