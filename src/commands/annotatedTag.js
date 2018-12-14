@@ -20,7 +20,7 @@ export async function annotatedTag ({
   fs: _fs = cores.get(core).get('fs'),
   ref,
   tagger,
-  message = '',
+  message = ref,
   signature,
   object,
   signingKey,
