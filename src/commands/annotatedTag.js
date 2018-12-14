@@ -8,8 +8,6 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 
-import { config } from './config.js'
-
 /**
  * Create an annotated tag.
  *
