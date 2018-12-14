@@ -16,6 +16,7 @@ export async function getRemoteInfo ({
   password = authPassword,
   token,
   oauth2format,
+  headers = {},
   forPush = false
 }) {
   try {
@@ -27,7 +28,7 @@ export async function getRemoteInfo ({
       url,
       noGitSuffix,
       auth,
-      headers: {}
+      headers
     })
     auth = remote.auth // hack to get new credentials from CredentialManager API
     const result = {}
