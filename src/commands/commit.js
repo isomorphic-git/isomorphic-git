@@ -7,8 +7,8 @@ import { GitTree } from '../models/GitTree.js'
 import { writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Create a new commit

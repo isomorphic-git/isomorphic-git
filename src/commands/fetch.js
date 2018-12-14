@@ -203,7 +203,9 @@ async function fetchPackfile ({
       remoteRef === 'HEAD' ||
       remoteRef.startsWith('refs/heads/') ||
       (tags && remoteRef.startsWith('refs/tags/'))
-    ) { continue }
+    ) {
+      continue
+    }
     remoteRefs.delete(remoteRef)
   }
   // Assemble the application/x-git-upload-pack-request
