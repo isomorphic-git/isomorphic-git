@@ -40,12 +40,13 @@ export async function fetch ({
   password = authPassword,
   token,
   oauth2format,
-  depth,
-  since,
-  exclude,
-  relative,
-  tags,
-  singleBranch,
+  depth = null,
+  since = null,
+  exclude = [],
+  relative = false,
+  tags = false,
+  singleBranch = false,
+  headers = {},
   onprogress // deprecated
 }) {
   try {
@@ -74,7 +75,8 @@ export async function fetch ({
       exclude,
       relative,
       tags,
-      singleBranch
+      singleBranch,
+      headers
     })
     // Note: progress messages are designed to be written directly to the terminal,
     // so they are often sent with just a carriage return to overwrite the last line of output.
@@ -135,13 +137,13 @@ async function fetchPackfile ({
   password,
   token,
   oauth2format,
-  depth = null,
-  since = null,
-  exclude = [],
-  relative = false,
-  tags = false,
-  singleBranch = false,
-  headers = {}
+  depth,
+  since,
+  exclude,
+  relative,
+  tags,
+  singleBranch,
+  headers
 }) {
   const fs = new FileSystem(_fs)
   // Sanity checks
