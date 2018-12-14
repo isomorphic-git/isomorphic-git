@@ -10,12 +10,8 @@ export async function normalizeAuthorObject ({ fs, gitdir, author = {} }) {
   }
 
   date = date || new Date()
-  timestamp = timestamp !== undefined && timestamp !== null
-    ? timestamp
-    : Math.floor(date.valueOf() / 1000)
-  timezoneOffset = timezoneOffset !== undefined && timezoneOffset !== null
-    ? timezoneOffset
-    : date.getTimezoneOffset()
+  timestamp = timestamp != null ? timestamp : Math.floor(date.valueOf() / 1000)
+  timezoneOffset = timezoneOffset != null ? timezoneOffset : date.getTimezoneOffset()
 
   return { name, email, date, timestamp, timezoneOffset }
 }
