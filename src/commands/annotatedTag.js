@@ -5,8 +5,8 @@ import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
+import { cores } from '../utils/plugins.js'
 
 /**
  * Create an annotated tag.
