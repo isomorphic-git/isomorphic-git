@@ -260,6 +260,7 @@ export function clone(args: {
   singleBranch?: boolean;
   noCheckout?: boolean;
   noTags?: boolean;
+  headers?: { [key: string]: string };
 }): Promise<void>;
 
 export function commit(args: {
@@ -386,6 +387,7 @@ export function getRemoteInfo(args: {
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
   forPush?: boolean;
+  headers?: { [key: string]: string };
 }): Promise<RemoteDescription>;
 
 export function indexPack(args: {
