@@ -1,6 +1,6 @@
 import { config } from '../commands/config'
 
-export async function normalizeAuthorObject (fs, gitdir, author) {
+export async function normalizeAuthorObject ({ fs, gitdir, author = {} }) {
   let { name, email, date, timestamp, timezoneOffset } = author
   name = name || await config({ fs, gitdir, path: 'user.name' })
   email = email || await config({ fs, gitdir, path: 'user.email' })

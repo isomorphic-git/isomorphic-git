@@ -58,7 +58,7 @@ export async function annotatedTag ({
     }
 
     // Fill in missing arguments with default values
-    tagger = await normalizeAuthorObject(fs, gitdir, tagger || {})
+    tagger = await normalizeAuthorObject({ fs, gitdir, author: tagger })
     if (tagger === undefined) {
       throw new GitError(E.MissingTaggerError)
     }
