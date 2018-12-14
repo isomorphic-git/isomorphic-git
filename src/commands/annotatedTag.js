@@ -5,9 +5,8 @@ import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { cores } from '../utils/plugins.js'
-
-import { config } from './config.js'
 
 /**
  * Create an annotated tag.
@@ -21,7 +20,7 @@ export async function annotatedTag ({
   fs: _fs = cores.get(core).get('fs'),
   ref,
   tagger,
-  message = '',
+  message = ref,
   signature,
   object,
   signingKey,
@@ -58,35 +57,17 @@ export async function annotatedTag ({
     }
 
     // Fill in missing arguments with default values
-    if (tagger === undefined) tagger = {}
-    if (tagger.name === undefined) {
-      tagger.name = await config({ fs, gitdir, path: 'user.name' })
-    }
-    if (tagger.email === undefined) {
-      tagger.email = await config({ fs, gitdir, path: 'user.email' })
-    }
-    if (tagger.name === undefined || tagger.email === undefined) {
-      throw new GitError(E.MissingAuthorError)
+    tagger = await normalizeAuthorObject({ fs, gitdir, author: tagger })
+    if (tagger === undefined) {
+      throw new GitError(E.MissingTaggerError)
     }
 
     const { type } = await readObject({ fs, gitdir, oid })
-    let taggerDateTime = tagger.date || new Date()
     let tagObject = GitAnnotatedTag.from({
       object: oid,
       type,
       tag: ref.replace('refs/tags/', ''),
-      tagger: {
-        name: tagger.name,
-        email: tagger.email,
-        timestamp:
-          tagger.timestamp !== undefined && tagger.timestamp !== null
-            ? tagger.timestamp
-            : Math.floor(taggerDateTime.valueOf() / 1000),
-        timezoneOffset:
-          tagger.timezoneOffset !== undefined && tagger.timezoneOffset !== null
-            ? tagger.timezoneOffset
-            : taggerDateTime.getTimezoneOffset()
-      },
+      tagger,
       message,
       signature
     })
