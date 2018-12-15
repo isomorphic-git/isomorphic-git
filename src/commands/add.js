@@ -21,32 +21,38 @@ export async function add ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const ignored = await GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath })
-    if (ignored) return
-    let stats = await fs.lstat(join(dir, filepath))
-    if (!stats) throw new GitError(E.FileReadError, { filepath })
-    if (stats.isDirectory()) {
-      const children = await fs.readdir(join(dir, filepath))
-      const promises = children.map(child =>
-        add({ dir, gitdir, fs, filepath: join(filepath, child) })
-      )
-      await Promise.all(promises)
-    } else {
-      const object = stats.isSymbolicLink()
-        ? await fs.readlink(join(dir, filepath))
-        : await fs.read(join(dir, filepath))
-      if (object === null) throw new GitError(E.FileReadError, { filepath })
-      const oid = await writeObject({ fs, gitdir, type: 'blob', object })
-      await GitIndexManager.acquire(
-        { fs, filepath: `${gitdir}/index` },
-        async function (index) {
-          index.insert({ filepath, stats, oid })
-        }
-      )
-    }
+
+    await GitIndexManager.acquire(
+      { fs, filepath: `${gitdir}/index` },
+      async function (index) {
+        await addToIndex({ dir, gitdir, fs, filepath, index })
+      }
+    )
     // TODO: return all oids for all files added?
   } catch (err) {
     err.caller = 'git.add'
     throw err
+  }
+}
+
+async function addToIndex ({ dir, gitdir, fs, filepath, index }) {
+  // TODO: Should ignore UNLESS it's already in the index.
+  const ignored = await GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath })
+  if (ignored) return
+  let stats = await fs.lstat(join(dir, filepath))
+  if (!stats) throw new GitError(E.FileReadError, { filepath })
+  if (stats.isDirectory()) {
+    const children = await fs.readdir(join(dir, filepath))
+    const promises = children.map(child =>
+      addToIndex({ dir, gitdir, fs, filepath: join(filepath, child), index })
+    )
+    await Promise.all(promises)
+  } else {
+    const object = stats.isSymbolicLink()
+      ? await fs.readlink(join(dir, filepath))
+      : await fs.read(join(dir, filepath))
+    if (object === null) throw new GitError(E.FileReadError, { filepath })
+    const oid = await writeObject({ fs, gitdir, type: 'blob', object })
+    index.insert({ filepath, stats, oid })
   }
 }
