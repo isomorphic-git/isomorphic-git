@@ -78,6 +78,11 @@ export async function fetch ({
       singleBranch,
       headers
     })
+    if (response === null) {
+      return {
+        fetchHead: null
+      }
+    }
     // Note: progress messages are designed to be written directly to the terminal,
     // so they are often sent with just a carriage return to overwrite the last line of output.
     // But there are also messages delimited with newlines.
@@ -118,10 +123,8 @@ export async function fetch ({
     }
     return res
   } catch (err) {
-    if (err.code !== E.RemoteRepositoryIsEmpty) {
-      err.caller = 'git.fetch'
-      throw err
-    }
+    err.caller = 'git.fetch'
+    throw err
   }
 }
 
@@ -180,8 +183,9 @@ async function fetchPackfile ({
   })
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
+  // For the special case of an empty repository with no refs, return null.
   if (remoteRefs.size === 0) {
-    throw new GitError(E.RemoteRepositoryIsEmpty)
+    return null
   }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
