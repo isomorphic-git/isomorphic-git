@@ -7,6 +7,8 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { GitPackIndex } from '../models/GitPackIndex.js'
+import { readObject } from '../storage/readObject.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
@@ -119,7 +121,16 @@ export async function fetch ({
     // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
     if (packfileSha !== '') {
       res.packfile = `objects/pack/pack-${packfileSha}.pack`
-      await fs.write(join(gitdir, res.packfile), packfile)
+      const fullpath = join(gitdir, res.packfile)
+      await fs.write(fullpath, packfile)
+      const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
+      const idx = await GitPackIndex.fromPack({
+        pack: packfile,
+        getExternalRefDelta,
+        emitter,
+        emitterPrefix
+      })
+      await fs.write(fullpath.replace(/\.pack$/, '.idx'), idx.toBuffer())
     }
     return res
   } catch (err) {
