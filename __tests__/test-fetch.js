@@ -47,9 +47,6 @@ describe('fetch', () => {
     expect(fs.existsSync(`${gitdir}/shallow`)).toBe(true)
     // expect(output[0]).toEqual('Counting objects: 551, done.') // No longer reliable. New message seen was "Enumerating objects: 551, done."
     expect(output[output.length - 1].split(' ')[1]).toEqual('551')
-    expect(progress[progress.length - 1].loaded).toEqual(
-      progress[progress.length - 1].total
-    )
     let shallow = await pify(fs.readFile)(`${gitdir}/shallow`, {
       encoding: 'utf8'
     })
