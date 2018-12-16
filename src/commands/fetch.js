@@ -117,7 +117,12 @@ export async function fetch ({
       const fullpath = join(gitdir, res.packfile)
       await fs.write(fullpath, packfile)
       const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
-      const idx = await GitPackIndex.fromPack({ pack: packfile, getExternalRefDelta, emitter, emitterPrefix })
+      const idx = await GitPackIndex.fromPack({
+        pack: packfile,
+        getExternalRefDelta,
+        emitter,
+        emitterPrefix
+      })
       await fs.write(fullpath.replace(/\.pack$/, '.idx'), idx.toBuffer())
     }
     return res
@@ -207,7 +212,9 @@ async function fetchPackfile ({
       remoteRef === 'HEAD' ||
       remoteRef.startsWith('refs/heads/') ||
       (tags && remoteRef.startsWith('refs/tags/'))
-    ) { continue }
+    ) {
+      continue
+    }
     remoteRefs.delete(remoteRef)
   }
   // Assemble the application/x-git-upload-pack-request

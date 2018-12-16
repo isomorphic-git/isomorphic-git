@@ -17,7 +17,11 @@ export async function readObjectPacked ({
   list = list.filter(x => x.endsWith('.idx'))
   for (let filename of list) {
     const indexFile = `${gitdir}/objects/pack/${filename}`
-    let p = await readPackIndex({ fs, filename: indexFile, getExternalRefDelta })
+    let p = await readPackIndex({
+      fs,
+      filename: indexFile,
+      getExternalRefDelta
+    })
     if (p.error) throw new GitError(E.InternalFail, { message: p.error })
     // If the packfile DOES have the oid we're looking for...
     if (p.offsets.has(oid)) {

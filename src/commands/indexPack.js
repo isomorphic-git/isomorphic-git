@@ -23,7 +23,12 @@ export async function indexPack ({
     filepath = join(dir, filepath)
     const pack = await fs.read(filepath)
     const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
-    const idx = await GitPackIndex.fromPack({ pack, getExternalRefDelta, emitter, emitterPrefix })
+    const idx = await GitPackIndex.fromPack({
+      pack,
+      getExternalRefDelta,
+      emitter,
+      emitterPrefix
+    })
     await fs.write(filepath.replace(/\.pack$/, '.idx'), idx.toBuffer())
   } catch (err) {
     err.caller = 'git.indexPack'
