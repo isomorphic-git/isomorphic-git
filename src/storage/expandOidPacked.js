@@ -1,6 +1,6 @@
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { readPack } from '../storage/readPack.js'
+import { readPackIndex } from '../storage/readPackIndex.js'
 import { join } from '../utils/join.js'
 
 export async function expandOidPacked ({
@@ -13,10 +13,10 @@ export async function expandOidPacked ({
   // Iterate through all the .pack files
   let results = []
   let list = await fs.readdir(join(gitdir, '/objects/pack'))
-  list = list.filter(x => x.endsWith('.pack'))
+  list = list.filter(x => x.endsWith('.idx'))
   for (let filename of list) {
-    const packFile = `${gitdir}/objects/pack/${filename}`
-    let p = await readPack(fs, packFile, getExternalRefDelta)
+    const indexFile = `${gitdir}/objects/pack/${filename}`
+    let p = await readPackIndex({ fs, filename: indexFile, getExternalRefDelta })
     if (p.error) throw new GitError(E.InternalFail, { message: p.error })
     // Search through the list of oids in the packfile
     for (let oid of p.offsets.keys()) {

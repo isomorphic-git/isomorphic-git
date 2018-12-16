@@ -230,7 +230,7 @@ export class GitPackIndex {
 
     // We don't have the hashes yet. But we can generate them using the .readSlice function!
     const p = new GitPackIndex({
-      pack,
+      pack: Promise.resolve(pack),
       packfileSha,
       crcs,
       hashes,
