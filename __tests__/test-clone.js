@@ -112,4 +112,28 @@ describe('clone', () => {
     )
     expect(fs.existsSync(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
   })
+
+  it('clone empty repository from git-http-mock-server', async () => {
+    let { fs, dir, gitdir } = await makeFixture('test-clone-empty')
+    plugins.set('fs', fs)
+    await clone({
+      dir,
+      gitdir,
+      depth: 1,
+      url: 'http://localhost:8888/test-empty.git'
+    })
+    expect(fs.existsSync(`${dir}`)).toBe(true, `'dir' exists`)
+    expect(fs.existsSync(`${gitdir}/HEAD`)).toBe(
+      true,
+      `'gitdir/HEAD' exists`
+    )
+    expect(fs.readFileSync(`${gitdir}/HEAD`, 'utf-8').trim()).toEqual(
+      'ref: refs/heads/master',
+      `'gitdir/HEAD' points to refs/heads/master`
+    )
+    expect(fs.existsSync(`${gitdir}/refs/heads/master`)).toBe(
+      false,
+      `'gitdir/refs/heads/master' does not exist`
+    )
+  })
 })
