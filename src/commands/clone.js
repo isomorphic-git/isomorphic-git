@@ -71,7 +71,7 @@ export async function clone ({
       })
     }
     // Fetch commits
-    let { defaultBranch } = await fetch({
+    const { defaultBranch, fetchHead } = await fetch({
       core,
       gitdir,
       fs,
@@ -92,6 +92,7 @@ export async function clone ({
       headers,
       tags: !noTags
     })
+    if (fetchHead === null) return
     ref = ref || defaultBranch
     ref = ref.replace('refs/heads/', '')
     // Checkout that branch

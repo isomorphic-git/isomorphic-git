@@ -80,6 +80,11 @@ export async function fetch ({
       singleBranch,
       headers
     })
+    if (response === null) {
+      return {
+        fetchHead: null
+      }
+    }
     // Note: progress messages are designed to be written directly to the terminal,
     // so they are often sent with just a carriage return to overwrite the last line of output.
     // But there are also messages delimited with newlines.
@@ -188,6 +193,11 @@ async function fetchPackfile ({
     headers
   })
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
+  const remoteRefs = remoteHTTP.refs
+  // For the special case of an empty repository with no refs, return null.
+  if (remoteRefs.size === 0) {
+    return null
+  }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
     throw new GitError(E.RemoteDoesNotSupportShallowFail)
@@ -204,9 +214,8 @@ async function fetchPackfile ({
   // Figure out the SHA for the requested ref
   let { oid, fullref } = GitRefManager.resolveAgainstMap({
     ref,
-    map: remoteHTTP.refs
+    map: remoteRefs
   })
-  const remoteRefs = remoteHTTP.refs
   // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
   for (let remoteRef of remoteRefs.keys()) {
     if (

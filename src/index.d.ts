@@ -71,6 +71,7 @@ export interface PushResponse {
 
 export interface FetchResponse {
   defaultBranch: string;
+  fetchHead: string | null;
   headers?: object;
 }
 
