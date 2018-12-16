@@ -37,6 +37,7 @@ export async function clone ({
   singleBranch,
   noCheckout = false,
   noTags = false,
+  headers = {},
   onprogress
 }) {
   try {
@@ -88,6 +89,7 @@ export async function clone ({
       exclude,
       relative,
       singleBranch,
+      headers,
       tags: !noTags
     })
     ref = ref || defaultBranch
