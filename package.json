@@ -114,7 +114,7 @@
     "organize-js-imports": "1.2.1",
     "prettier-standard": "8.0.1",
     "pretty-format": "23.6.0",
-    "puppeteer": "1.10.0",
+    "puppeteer": "1.11.0",
     "replace-in-file": "3.4.2",
     "rollup": "0.67.4",
     "semantic-release": "15.12.0",
