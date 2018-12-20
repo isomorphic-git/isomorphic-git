@@ -13,7 +13,7 @@ export async function readObjectPacked ({
   const fs = new FileSystem(_fs)
   // Check to see if it's in a packfile.
   // Iterate through all the .idx files
-  let list = await fs.readdir(join(gitdir, '/objects/pack'))
+  let list = await fs.readdir(join(gitdir, 'objects/pack'))
   list = list.filter(x => x.endsWith('.idx'))
   for (let filename of list) {
     const indexFile = `${gitdir}/objects/pack/${filename}`
