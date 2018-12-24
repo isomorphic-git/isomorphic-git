@@ -159,10 +159,7 @@ describe('fetch', () => {
       url: 'http://localhost:8888/test-empty.git'
     })
     expect(fs.existsSync(`${dir}`)).toBe(true, `'dir' exists`)
-    expect(fs.existsSync(`${gitdir}/HEAD`)).toBe(
-      true,
-      `'gitdir/HEAD' exists`
-    )
+    expect(fs.existsSync(`${gitdir}/HEAD`)).toBe(true, `'gitdir/HEAD' exists`)
     expect(fs.readFileSync(`${gitdir}/HEAD`, 'utf-8').trim()).toEqual(
       'ref: refs/heads/master',
       `'gitdir/HEAD' points to refs/heads/master`
