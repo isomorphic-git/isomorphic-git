@@ -29,6 +29,12 @@ module.exports = function (config) {
         included: false
       },
       {
+        pattern: '__tests__/__fixtures__/**/.superblock.txt',
+        served: true,
+        watched: false,
+        included: false
+      },
+      {
         pattern: '__tests__/__fixtures__/**/.gitignore',
         served: true,
         watched: false,

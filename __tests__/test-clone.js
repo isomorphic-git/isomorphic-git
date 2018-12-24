@@ -2,6 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { plugins, clone } = require('isomorphic-git')
+const { FileSystem } = require('isomorphic-git/internal-apis')
 
 describe('clone', () => {
   // Unfortunately, cloning without singleBranch: true means the test time increases
@@ -11,6 +12,7 @@ describe('clone', () => {
   xit('clone with noTags', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     plugins.set('fs', fs)
+    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -20,18 +22,19 @@ describe('clone', () => {
       url: 'https://github.com/isomorphic-git/isomorphic-git',
       corsProxy: process.browser ? `http://localhost:9999` : undefined
     })
-    expect(fs.existsSync(`${dir}`)).toBe(true)
-    expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)
-    expect(fs.existsSync(`${gitdir}/refs/remotes/origin/test-branch`)).toBe(
+    expect(await fs.exists(`${dir}`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-branch`)).toBe(
       true
     )
-    expect(fs.existsSync(`${gitdir}/refs/heads/test-branch`)).toBe(true)
-    expect(fs.existsSync(`${dir}/package.json`)).toBe(true)
-    expect(fs.existsSync(`${gitdir}/refs/tags/v0.0.1`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/refs/heads/test-branch`)).toBe(true)
+    expect(await fs.exists(`${dir}/package.json`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/refs/tags/v0.0.1`)).toBe(false)
   })
   it('clone with noCheckout', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     plugins.set('fs', fs)
+    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -42,17 +45,18 @@ describe('clone', () => {
       url: 'https://github.com/isomorphic-git/isomorphic-git',
       corsProxy: process.browser ? `http://localhost:9999` : undefined
     })
-    expect(fs.existsSync(`${dir}`)).toBe(true)
-    expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)
-    expect(fs.existsSync(`${gitdir}/refs/remotes/origin/test-branch`)).toBe(
+    expect(await fs.exists(`${dir}`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-branch`)).toBe(
       true
     )
-    expect(fs.existsSync(`${gitdir}/refs/heads/test-branch`)).toBe(true)
-    expect(fs.existsSync(`${dir}/package.json`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/refs/heads/test-branch`)).toBe(true)
+    expect(await fs.exists(`${dir}/package.json`)).toBe(false)
   })
   it('clone a tag', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     plugins.set('fs', fs)
+    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -62,16 +66,17 @@ describe('clone', () => {
       url: 'https://github.com/isomorphic-git/isomorphic-git',
       corsProxy: process.browser ? `http://localhost:9999` : undefined
     })
-    expect(fs.existsSync(`${dir}`)).toBe(true)
-    expect(fs.existsSync(`${gitdir}/objects`)).toBe(true)
-    expect(fs.existsSync(`${gitdir}/refs/remotes/origin/test-tag`)).toBe(false)
-    expect(fs.existsSync(`${gitdir}/refs/heads/test-tag`)).toBe(false)
-    expect(fs.existsSync(`${gitdir}/refs/tags/test-tag`)).toBe(true)
-    expect(fs.existsSync(`${dir}/package.json`)).toBe(true)
+    expect(await fs.exists(`${dir}`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-tag`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/refs/heads/test-tag`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/refs/tags/test-tag`)).toBe(true)
+    expect(await fs.exists(`${dir}/package.json`)).toBe(true)
   })
   it('clone with an unregistered protocol', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     plugins.set('fs', fs)
+    fs = new FileSystem(fs)
     let url = `foobar://github.com/isomorphic-git/isomorphic-git`
     let error = null
     try {
@@ -94,6 +99,7 @@ describe('clone', () => {
   it('clone from git-http-mock-server', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-clone-karma')
     plugins.set('fs', fs)
+    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -101,37 +107,38 @@ describe('clone', () => {
       singleBranch: true,
       url: 'http://localhost:8888/test-status.git'
     })
-    expect(fs.existsSync(`${dir}`)).toBe(true, `'dir' exists`)
-    expect(fs.existsSync(`${gitdir}/objects`)).toBe(
+    expect(await fs.exists(`${dir}`)).toBe(true, `'dir' exists`)
+    expect(await fs.exists(`${gitdir}/objects`)).toBe(
       true,
       `'gitdir/objects' exists`
     )
-    expect(fs.existsSync(`${gitdir}/refs/heads/master`)).toBe(
+    expect(await fs.exists(`${gitdir}/refs/heads/master`)).toBe(
       true,
       `'gitdir/refs/heads/master' exists`
     )
-    expect(fs.existsSync(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
+    expect(await fs.exists(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
   })
 
   it('clone empty repository from git-http-mock-server', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-clone-empty')
     plugins.set('fs', fs)
+    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
       depth: 1,
       url: 'http://localhost:8888/test-empty.git'
     })
-    expect(fs.existsSync(`${dir}`)).toBe(true, `'dir' exists`)
-    expect(fs.existsSync(`${gitdir}/HEAD`)).toBe(
+    expect(await fs.exists(`${dir}`)).toBe(true, `'dir' exists`)
+    expect(await fs.exists(`${gitdir}/HEAD`)).toBe(
       true,
       `'gitdir/HEAD' exists`
     )
-    expect(fs.readFileSync(`${gitdir}/HEAD`, 'utf-8').trim()).toEqual(
+    expect((await fs.read(`${gitdir}/HEAD`)).toString('utf-8').trim()).toEqual(
       'ref: refs/heads/master',
       `'gitdir/HEAD' points to refs/heads/master`
     )
-    expect(fs.existsSync(`${gitdir}/refs/heads/master`)).toBe(
+    expect(await fs.exists(`${gitdir}/refs/heads/master`)).toBe(
       false,
       `'gitdir/refs/heads/master' does not exist`
     )

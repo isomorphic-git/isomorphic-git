@@ -4,34 +4,6 @@ const pify = require('pify')
 const setTestTimeout = require('./set-test-timeout')
 setTestTimeout(60000)
 
-const FixtureFS = async function () {
-  // This is all in a conditional so that Jest won't attempt to
-  // instrument BrowserFS with coverage collection which slows
-  // it down in Travis to >10min which causes Travis builds to fail.
-  if (process.browser) {
-    const BrowserFS = require('browserfs')
-    const HTTPRequestFS = pify(BrowserFS.FileSystem.HTTPRequest.Create)
-    const InMemoryFS = pify(BrowserFS.FileSystem.InMemory.Create)
-    const OverlayFS = pify(BrowserFS.FileSystem.OverlayFS.Create)
-    const index = require('../__fixtures__/index.json')
-    let readable = await HTTPRequestFS({
-      index,
-      baseUrl: 'http://localhost:9876/base/__tests__/__fixtures__/'
-    })
-    let writable = await InMemoryFS()
-    let ofs = await OverlayFS({ readable, writable })
-    BrowserFS.initialize(ofs)
-    const fs = BrowserFS.BFSRequire('fs')
-    return {
-      fs,
-      writable,
-      readable
-    }
-  }
-}
-
-const FixturePromise = FixtureFS()
-
 async function makeFixture (dir) {
   return process.browser ? makeBrowserFixture(dir) : makeNodeFixture(dir)
 }
@@ -40,20 +12,24 @@ async function makeBrowserFixture (dir) {
   // enable / disable console.log statements
   // window.localStorage.debug = 'isomorphic-git'
 
-  const { fs, writable } = await FixturePromise
-  writable.empty()
-  let gitdir = `${dir}.git`
+  const FS = require('@isomorphic-git/lightning-fs')
+  const fs = new FS(`testfs`, {
+    wipe: true,
+    url: 'http://localhost:9876/base/__tests__/__fixtures__'
+  })
+  dir = `/${dir}`
+  let gitdir = `/${dir}.git`
   try {
-    await pify(fs.stat)(dir)
+    await pify(fs.stat.bind(fs))(dir)
   } catch (err) {
     if (err.code !== 'ENOENT') throw err
-    await pify(fs.mkdir)(dir)
+    await pify(fs.mkdir.bind(fs))(dir)
   }
   try {
-    await pify(fs.stat)(gitdir)
+    await pify(fs.stat.bind(fs))(gitdir)
   } catch (err) {
     if (err.code !== 'ENOENT') throw err
-    await pify(fs.mkdir)(gitdir)
+    await pify(fs.mkdir.bind(fs))(gitdir)
   }
   return { fs, dir, gitdir }
 }
