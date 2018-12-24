@@ -157,10 +157,7 @@ describe('fetch', () => {
       url: 'http://localhost:8888/test-empty.git'
     })
     expect(await fs.exists(`${dir}`)).toBe(true, `'dir' exists`)
-    expect(await fs.exists(`${gitdir}/HEAD`)).toBe(
-      true,
-      `'gitdir/HEAD' exists`
-    )
+    expect(await fs.exists(`${gitdir}/HEAD`)).toBe(true, `'gitdir/HEAD' exists`)
     expect((await fs.read(`${gitdir}/HEAD`)).toString('utf-8').trim()).toEqual(
       'ref: refs/heads/master',
       `'gitdir/HEAD' points to refs/heads/master`

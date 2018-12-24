@@ -68,7 +68,9 @@ describe('clone', () => {
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
     expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
-    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-tag`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-tag`)).toBe(
+      false
+    )
     expect(await fs.exists(`${gitdir}/refs/heads/test-tag`)).toBe(false)
     expect(await fs.exists(`${gitdir}/refs/tags/test-tag`)).toBe(true)
     expect(await fs.exists(`${dir}/package.json`)).toBe(true)
@@ -130,10 +132,7 @@ describe('clone', () => {
       url: 'http://localhost:8888/test-empty.git'
     })
     expect(await fs.exists(`${dir}`)).toBe(true, `'dir' exists`)
-    expect(await fs.exists(`${gitdir}/HEAD`)).toBe(
-      true,
-      `'gitdir/HEAD' exists`
-    )
+    expect(await fs.exists(`${gitdir}/HEAD`)).toBe(true, `'gitdir/HEAD' exists`)
     expect((await fs.read(`${gitdir}/HEAD`)).toString('utf-8').trim()).toEqual(
       'ref: refs/heads/master',
       `'gitdir/HEAD' points to refs/heads/master`
