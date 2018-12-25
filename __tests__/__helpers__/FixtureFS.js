@@ -13,8 +13,8 @@ async function makeFixture (dir) {
 async function makeBrowserFixture (dir) {
   // enable / disable console.log statements
   // window.localStorage.debug = 'isomorphic-git'
-  const isSafari11 = /11\.[.\d ]+ Safari/.test(navigator && navigator.userAgent)
-  return (process.env.ENABLE_LIGHTNINGFS && !isSafari11) ? makeLightningFS(dir) : makeBrowserFS(dir)
+  const isSafari = /Safari/.test(navigator && navigator.userAgent)
+  return (process.env.ENABLE_LIGHTNINGFS && !isSafari) ? makeLightningFS(dir) : makeBrowserFS(dir)
 }
 
 module.exports.makeFixture = makeFixture
