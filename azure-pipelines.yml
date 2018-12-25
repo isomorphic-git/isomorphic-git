@@ -26,6 +26,7 @@ jobs:
       SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
       SAUCE_USERNAME: $(SAUCE_USERNAME)
       TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_ios_safari,sl_android_chrome'
+      ENABLE_LIGHTNINGFS: 'true'
 
   - task: PublishTestResults@2
     displayName: 'Save test results'
