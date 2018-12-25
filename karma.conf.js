@@ -79,6 +79,14 @@ module.exports = function (config) {
       },
       sl_ios_safari: {
         base: 'SauceLabs',
+        deviceName: 'iPhone X Simulator',
+        platformName: 'iOS',
+        platformVersion: '11.2',
+        browserName: 'Safari',
+        appiumVersion: '1.7.2'
+      },
+      sl_ios_safari12: {
+        base: 'SauceLabs',
         deviceName: 'iPhone 8 Simulator',
         platformName: 'iOS',
         platformVersion: '12.0',
