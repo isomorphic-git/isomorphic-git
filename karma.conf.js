@@ -79,11 +79,11 @@ module.exports = function (config) {
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone X Simulator',
+        deviceName: 'iPhone 8 Simulator',
         platformName: 'iOS',
-        platformVersion: '11.2',
+        platformVersion: '12.0',
         browserName: 'Safari',
-        appiumVersion: '1.7.2'
+        appiumVersion: '1.9.1'
       },
       sl_android_chrome: {
         base: 'SauceLabs',
