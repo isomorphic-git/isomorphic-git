@@ -140,7 +140,8 @@ module.exports = function (config) {
         new webpack.DefinePlugin({
           'process.env.TEST_PUSH_GITHUB_TOKEN': `'${
             process.env.TEST_PUSH_GITHUB_TOKEN
-          }'`
+          }'`,
+          'process.env.ENABLE_LIGHTNINGFS': `${!!process.env.ENABLE_LIGHTNINGFS}`
         })
       ],
       resolve: {

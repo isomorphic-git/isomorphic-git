@@ -1,8 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, clone } = require('isomorphic-git')
-const { FileSystem } = require('isomorphic-git/internal-apis')
+const { clone } = require('isomorphic-git')
 
 describe('clone', () => {
   // Unfortunately, cloning without singleBranch: true means the test time increases
@@ -11,8 +10,6 @@ describe('clone', () => {
   // the system and make this test take way too long.
   xit('clone with noTags', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -33,8 +30,6 @@ describe('clone', () => {
   })
   it('clone with noCheckout', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -55,8 +50,6 @@ describe('clone', () => {
   })
   it('clone a tag', async () => {
     let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -76,9 +69,7 @@ describe('clone', () => {
     expect(await fs.exists(`${dir}/package.json`)).toBe(true)
   })
   it('clone with an unregistered protocol', async () => {
-    let { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
+    let { dir, gitdir } = await makeFixture('isomorphic-git')
     let url = `foobar://github.com/isomorphic-git/isomorphic-git`
     let error = null
     try {
@@ -100,8 +91,6 @@ describe('clone', () => {
   })
   it('clone from git-http-mock-server', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-clone-karma')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,
@@ -123,8 +112,6 @@ describe('clone', () => {
 
   it('clone empty repository from git-http-mock-server', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-clone-empty')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     await clone({
       dir,
       gitdir,

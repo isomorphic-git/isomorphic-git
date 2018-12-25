@@ -2,10 +2,8 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-checkout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const pify = require('pify')
 
 const {
-  plugins,
   checkout,
   listFiles,
   add,
@@ -21,9 +19,8 @@ describe('checkout', () => {
   it('checkout', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    plugins.set('fs', fs)
     await checkout({ dir, gitdir, ref: 'test-branch' })
-    let files = await pify(fs.readdir)(dir)
+    let files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
@@ -32,13 +29,12 @@ describe('checkout', () => {
   it('checkout by SHA', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    plugins.set('fs', fs)
     await checkout({
       dir,
       gitdir,
       ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
-    let files = await pify(fs.readdir)(dir)
+    let files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
@@ -46,8 +42,7 @@ describe('checkout', () => {
 
   it('checkout unfetched branch', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    plugins.set('fs', fs)
+    let { dir, gitdir } = await makeFixture('test-checkout')
     let error = null
     try {
       await checkout({ dir, gitdir, ref: 'missing-branch' })
@@ -62,19 +57,18 @@ describe('checkout', () => {
 
   it('checkout file permissions', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    plugins.set('fs', fs)
     await branch({ dir, gitdir, ref: 'other', checkout: true })
     await checkout({ dir, gitdir, ref: 'test-branch' })
-    await pify(fs.writeFile)(dir + '/regular-file.txt', 'regular file', {
+    await fs.write(dir + '/regular-file.txt', 'regular file', {
       mode: 0o666
     })
-    await pify(fs.writeFile)(dir + '/executable-file.sh', 'executable file', {
+    await fs.write(dir + '/executable-file.sh', 'executable file', {
       mode: 0o777
     })
-    const expectedRegularFileMode = (await pify(fs.stat)(
+    const expectedRegularFileMode = (await fs.lstat(
       dir + '/regular-file.txt'
     )).mode
-    const expectedExecutableFileMode = (await pify(fs.stat)(
+    const expectedExecutableFileMode = (await fs.lstat(
       dir + '/executable-file.sh'
     )).mode
     await add({ dir, gitdir, filepath: 'regular-file.txt' })
@@ -87,10 +81,10 @@ describe('checkout', () => {
     })
     await checkout({ dir, gitdir, ref: 'other' })
     await checkout({ dir, gitdir, ref: 'test-branch' })
-    const actualRegularFileMode = (await pify(fs.stat)(
+    const actualRegularFileMode = (await fs.lstat(
       dir + '/regular-file.txt'
     )).mode
-    const actualExecutableFileMode = (await pify(fs.stat)(
+    const actualExecutableFileMode = (await fs.lstat(
       dir + '/executable-file.sh'
     )).mode
     expect(actualRegularFileMode).toEqual(expectedRegularFileMode)

@@ -1,12 +1,11 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { E, plugins, expandOid } = require('isomorphic-git')
+const { E, expandOid } = require('isomorphic-git')
 
 describe('expandOid', () => {
   it('expand short oid', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-expandOid')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-expandOid')
     let oid = '033417ae'
     // Test
     oid = await expandOid({ gitdir, oid })
@@ -15,8 +14,7 @@ describe('expandOid', () => {
 
   it('expand short oid (not found)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-expandOid')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-expandOid')
     let oid = '01234567'
     // Test
     let error = null
@@ -31,8 +29,7 @@ describe('expandOid', () => {
 
   it('expand short oid (ambiguous)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-expandOid')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-expandOid')
     let oid = '033417a'
     // Test
     let error = null
@@ -47,8 +44,7 @@ describe('expandOid', () => {
 
   it('expand short oid from packfile', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-expandOid')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-expandOid')
     let oid = '5f1f014'
     // Test
     oid = await expandOid({ gitdir, oid })

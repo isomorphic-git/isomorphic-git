@@ -2,14 +2,12 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const EventEmitter = require('events')
-const { FileSystem, sleep } = require('isomorphic-git/internal-apis')
+const { sleep } = require('isomorphic-git/internal-apis')
 const { E, plugins, fetch } = require('isomorphic-git')
 
 describe('fetch', () => {
   it('fetch (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     // Smoke Test
     await fetch({
       gitdir,
@@ -25,8 +23,6 @@ describe('fetch', () => {
 
   it('shallow fetch (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     let output = []
     let progress = []
     plugins.set(
@@ -65,8 +61,6 @@ describe('fetch', () => {
 
   it('shallow fetch since (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     // Test
     await fetch({
       gitdir,
@@ -82,8 +76,6 @@ describe('fetch', () => {
 
   it('shallow fetch exclude (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     // Test
     await fetch({
       gitdir,
@@ -99,8 +91,6 @@ describe('fetch', () => {
 
   it('shallow fetch relative (from Github)', async () => {
     let { fs, gitdir } = await makeFixture('test-fetch-cors')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     // Test
     await fetch({
       gitdir,
@@ -127,9 +117,7 @@ describe('fetch', () => {
   })
 
   it('errors if missing refspec', async () => {
-    let { fs, gitdir } = await makeFixture('test-issue-84')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
+    let { gitdir } = await makeFixture('test-issue-84')
     // Test
     let err = null
     try {
@@ -148,8 +136,6 @@ describe('fetch', () => {
   })
   it('fetch empty repository from git-http-mock-server', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-empty')
-    plugins.set('fs', fs)
-    fs = new FileSystem(fs)
     await fetch({
       dir,
       gitdir,

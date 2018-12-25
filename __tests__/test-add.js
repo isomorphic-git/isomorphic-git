@@ -1,13 +1,12 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, init, add, listFiles } = require('isomorphic-git')
+const { init, add, listFiles } = require('isomorphic-git')
 
 describe('add', () => {
   it('file', async () => {
     // Setup
-    let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
+    let { dir } = await makeFixture('test-add')
     // Test
     await init({ dir })
     await add({ dir, filepath: 'a.txt' })
@@ -21,8 +20,7 @@ describe('add', () => {
   })
   it('non-existant file', async () => {
     // Setup
-    let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
+    let { dir } = await makeFixture('test-add')
     // Test
     await init({ dir })
     let err = null

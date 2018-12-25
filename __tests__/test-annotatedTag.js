@@ -11,8 +11,7 @@ const {
 describe('annotatedTag', () => {
   it('creates an annotated tag to HEAD', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-annotatedTag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-annotatedTag')
     // Test
     await annotatedTag({
       gitdir,
@@ -29,8 +28,7 @@ describe('annotatedTag', () => {
   })
   it('creates an annotated tag pointing to a blob', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-annotatedTag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-annotatedTag')
     // Test
     await annotatedTag({
       gitdir,
@@ -49,8 +47,7 @@ describe('annotatedTag', () => {
   it('creates a signed tag to HEAD', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
-    let { fs, gitdir } = await makeFixture('test-annotatedTag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-annotatedTag')
     plugins.set('pgp', pgp)
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')

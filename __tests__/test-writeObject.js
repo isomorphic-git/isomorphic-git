@@ -1,14 +1,13 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, writeObject } = require('isomorphic-git')
+const { writeObject } = require('isomorphic-git')
 
 // NOTE: These are mostly the `readObject` tests but in reverse
 describe('writeObject', () => {
   it('parsed', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeObject')
     // Test
     let oid = await writeObject({
       gitdir,
@@ -53,8 +52,7 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('content', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeObject')
     // Test
     let oid = await writeObject({
       gitdir,
@@ -69,8 +67,7 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('wrapped', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeObject')
     // Test
     let oid = await writeObject({
       gitdir,
@@ -84,8 +81,7 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('deflated', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeObject')
     // Test
     let oid = await writeObject({
       gitdir,
@@ -100,8 +96,7 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('blob with encoding', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeObject')
     // Test
     let oid = await writeObject({
       gitdir,
@@ -141,8 +136,7 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
   })
   it('tree', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeObject')
     // Test
     let oid = await writeObject({
       gitdir,
@@ -265,8 +259,7 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
   })
   it('annotated tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeObject')
     // Test
     let oid = await writeObject({
       gitdir,

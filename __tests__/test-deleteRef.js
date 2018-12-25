@@ -1,12 +1,11 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { plugins, deleteRef, listTags } = require('isomorphic-git')
+const { deleteRef, listTags } = require('isomorphic-git')
 
 describe('deleteRef', () => {
   it('deletes a loose tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-deleteRef')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-deleteRef')
     // Test
     await deleteRef({
       gitdir,
@@ -19,8 +18,7 @@ describe('deleteRef', () => {
   })
   it('deletes a packed tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-deleteRef')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-deleteRef')
     // Test
     await deleteRef({
       gitdir,
@@ -33,8 +31,7 @@ describe('deleteRef', () => {
   })
   it('deletes a packed and loose tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-deleteRef')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-deleteRef')
     // Test
     await deleteRef({
       gitdir,
