@@ -270,6 +270,7 @@ async function fetchPackfile ({
   // so we can't stream the body.
   packstream = await pify(concat)(packstream)
   let raw = await GitRemoteHTTP.connect({
+    core,
     corsProxy,
     service: 'git-upload-pack',
     url,

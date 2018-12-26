@@ -1,7 +1,7 @@
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
-import { fetch } from '../utils/fetch.js'
+import { fetch as builtinFetch } from '../utils/fetch.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { wrapStream } from '../utils/wrapStream.js'
@@ -34,6 +34,8 @@ export class GitRemoteHTTP {
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
+    // Get the 'fetch' plugin
+    const fetch = cores.get(core).get('fetch') || builtinFetch
     // headers['Accept'] = `application/x-${service}-advertisement`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
@@ -98,6 +100,7 @@ export class GitRemoteHTTP {
     }
   }
   static async connect ({
+    core,
     corsProxy,
     service,
     url,
@@ -113,6 +116,8 @@ export class GitRemoteHTTP {
     }
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
+    // Get the 'fetch' plugin
+    const fetch = cores.get(core).get('fetch') || builtinFetch
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
     // Solutions using 'process.browser' can't be used as they rely on bundler shims,

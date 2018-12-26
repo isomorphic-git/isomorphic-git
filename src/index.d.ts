@@ -144,9 +144,11 @@ export interface GitPgpPlugin {
   verify: any;
 }
 
-export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp"
+export type GitFetchPlugin = Function;
 
-export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin
+export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "fetch"
+
+export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitFetchPlugin
 
 export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 

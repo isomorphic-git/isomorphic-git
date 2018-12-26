@@ -207,7 +207,9 @@ unless there is a major version bump.
 ### plugins
 - [credentialManager](https://isomorphic-git.github.io/docs/plugin_credentialManager.html)
 - [emitter](https://isomorphic-git.github.io/docs/plugin_emitter.html)
+- [fetch](https://isomorphic-git.github.io/docs/plugin_fetch.html)
 - [fs](https://isomorphic-git.github.io/docs/plugin_fs.html)
+- [pgp](https://isomorphic-git.github.io/docs/plugin_pgp.html)
 
 ## Community
 

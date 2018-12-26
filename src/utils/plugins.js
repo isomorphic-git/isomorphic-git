@@ -26,7 +26,8 @@ class PluginCore extends Map {
           'unlink',
           'writeFile'
         ],
-        pgp: ['sign', 'verify']
+        pgp: ['sign', 'verify'],
+        fetch: []
       }
       if (!pluginSchemas.hasOwnProperty(key)) {
         throw new GitError(E.PluginUnrecognized, { plugin: key })
@@ -38,22 +39,8 @@ class PluginCore extends Map {
       }
     }
     verifySchema(key, value)
-    if (key === 'credentialManager') {
-      // There can be only one.
-      super.set(key, value)
-    }
-    if (key === 'emitter') {
-      // There can be only one.
-      super.set(key, value)
-    }
-    if (key === 'fs') {
-      // There can be only one.
-      super.set(key, value)
-    }
-    if (key === 'pgp') {
-      // There can be only one.
-      super.set(key, value)
-    }
+    // There can be only one.
+    super.set(key, value)
   }
   get (key) {
     // Critical plugins throw an error instead of returning undefined.
