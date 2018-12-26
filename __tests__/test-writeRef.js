@@ -3,7 +3,6 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-writeRef.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const {
-  plugins,
   writeRef,
   resolveRef,
   currentBranch
@@ -15,8 +14,7 @@ describe('writeRef', () => {
   })
   it('writes a tag ref to HEAD', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeRef')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
       gitdir,
@@ -28,8 +26,7 @@ describe('writeRef', () => {
   })
   it('sets current branch to another', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeRef')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
       gitdir,

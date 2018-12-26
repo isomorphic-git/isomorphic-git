@@ -1,19 +1,17 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const pify = require('pify')
 const path = require('path')
 
-const { plugins, init, add, commit } = require('isomorphic-git')
+const { init, add, commit } = require('isomorphic-git')
 
 describe('basic test', () => {
   it('does not explode', async () => {
     let { fs, dir } = await makeFixture('test-basic')
-    plugins.set('fs', fs)
     console.log('Loaded fs')
     await init({ dir })
     console.log('init')
 
-    await pify(fs.writeFile)(path.join(dir, 'a.txt'), 'Hello')
+    await fs.write(path.join(dir, 'a.txt'), 'Hello')
     await add({ dir, filepath: 'a.txt' })
     console.log('add a.txt')
 

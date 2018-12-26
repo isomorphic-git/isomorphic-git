@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-readObject.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { plugins, readObject } = require('isomorphic-git')
+const { readObject } = require('isomorphic-git')
 
 describe('readObject', () => {
   beforeAll(() => {
@@ -11,8 +11,7 @@ describe('readObject', () => {
   })
   it('test missing', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -28,8 +27,7 @@ describe('readObject', () => {
   })
   it('parsed', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -41,8 +39,7 @@ describe('readObject', () => {
   })
   it('content', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -56,8 +53,7 @@ describe('readObject', () => {
   })
   it('wrapped', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -71,8 +67,7 @@ describe('readObject', () => {
   })
   it('deflated', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -86,8 +81,7 @@ describe('readObject', () => {
   })
   it('from packfile', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -103,8 +97,7 @@ describe('readObject', () => {
   })
   it('blob with encoding', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -121,8 +114,7 @@ describe('readObject', () => {
   })
   it('with simple filepath to blob', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -140,8 +132,7 @@ describe('readObject', () => {
   })
   it('with deep filepath to blob', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -156,8 +147,7 @@ describe('readObject', () => {
   })
   it('with simple filepath to tree', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -175,8 +165,7 @@ describe('readObject', () => {
   })
   it('with deep filepath to tree', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let ref = await readObject({
       gitdir,
@@ -191,8 +180,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (directory is a file)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -210,8 +198,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (no such directory)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -229,8 +216,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (leading slash)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -248,8 +234,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (trailing slash)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-readObject')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {

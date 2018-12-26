@@ -546,7 +546,8 @@ export function remove(args: {
 }): Promise<void>;
 
 export function resetIndex(args: {
-  fs: any,
+  core?: string;
+  fs?: any,
   dir: string,
   gitdir?: string,
   filepath: string,
