@@ -71,7 +71,8 @@ module.exports = function (config) {
       },
       sl_edge: {
         base: 'SauceLabs',
-        browserName: 'MicrosoftEdge'
+        browserName: 'MicrosoftEdge',
+        version: '17.17134'
       },
       sl_safari: {
         base: 'SauceLabs',
