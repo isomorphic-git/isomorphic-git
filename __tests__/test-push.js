@@ -12,8 +12,7 @@ describe('push', () => {
   })
   it('push', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     let output = []
     plugins.set(
       'emitter',
@@ -34,8 +33,7 @@ describe('push', () => {
   })
   it('push without ref', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let res = await push({
       gitdir,
@@ -48,8 +46,7 @@ describe('push', () => {
   })
   it('push with ref !== remoteRef', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let res = await push({
       gitdir,
@@ -64,8 +61,7 @@ describe('push', () => {
   })
   it('push with lightweight tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let res = await push({
       gitdir,
@@ -79,8 +75,7 @@ describe('push', () => {
   })
   it('push with annotated tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let res = await push({
       gitdir,
@@ -95,8 +90,7 @@ describe('push', () => {
 
   it('push with Basic Auth', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let res = await push({
       gitdir,
@@ -112,8 +106,7 @@ describe('push', () => {
   })
   it('throws an Error if no credentials supplied', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let error = null
     try {
@@ -129,8 +122,7 @@ describe('push', () => {
   })
   it('throws an Error if invalid credentials supplied', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let error = null
     try {
@@ -156,8 +148,7 @@ describe('push', () => {
       .reverse()
       .join('')
     // Setup
-    let { fs, gitdir } = await makeFixture('test-push')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-push')
     // Test
     let res = await push({
       gitdir,

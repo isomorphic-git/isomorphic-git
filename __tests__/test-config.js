@@ -1,13 +1,12 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, config } = require('isomorphic-git')
+const { config } = require('isomorphic-git')
 
 describe('config', () => {
   it('getting', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-config')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-config')
     // Test
     let sym = await config({ gitdir, path: 'core.symlinks' })
     let rfv = await config({ gitdir, path: 'core.repositoryformatversion' })
@@ -31,8 +30,7 @@ describe('config', () => {
 
   it('setting', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-config')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-config')
     // Test
     let bare
     // set to true
@@ -53,7 +51,7 @@ describe('config', () => {
       path: 'remote.origin.url',
       value: 'https://github.com/isomorphic-git/isomorphic-git'
     })
-    let url = await config({ fs, gitdir, path: 'remote.origin.url' })
+    let url = await config({ gitdir, path: 'remote.origin.url' })
     expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')
   })
 })

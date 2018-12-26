@@ -3,7 +3,6 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
-const pify = require('pify')
 const {
   GitPackIndex,
   GitObject,
@@ -16,7 +15,7 @@ describe('GitPackIndex', () => {
   })
   it('from .idx', async () => {
     let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    let idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
@@ -44,7 +43,7 @@ describe('GitPackIndex', () => {
   })
   it('from .pack', async () => {
     let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let pack = await pify(fs.readFile)(
+    let pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
@@ -72,13 +71,13 @@ describe('GitPackIndex', () => {
   })
   it('to .idx file from .pack', async () => {
     let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    let idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       )
     )
-    let pack = await pify(fs.readFile)(
+    let pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
@@ -91,13 +90,13 @@ describe('GitPackIndex', () => {
   })
   it('read undeltified object', async () => {
     let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    let idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       )
     )
-    let pack = await pify(fs.readFile)(
+    let pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
@@ -115,13 +114,13 @@ describe('GitPackIndex', () => {
   })
   it('read deltified object', async () => {
     let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    let idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       )
     )
-    let pack = await pify(fs.readFile)(
+    let pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'

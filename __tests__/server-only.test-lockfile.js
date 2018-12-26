@@ -1,12 +1,11 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { FileSystem, sleep } = require('isomorphic-git/internal-apis')
+const { sleep } = require('isomorphic-git/internal-apis')
 
 describe('lockfile', () => {
   it('make lockfile', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-lock')
-    fs = new FileSystem(fs)
     // Test
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
@@ -15,7 +14,6 @@ describe('lockfile', () => {
   it('cannot double-acquire lockfile', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-lock')
-    fs = new FileSystem(fs)
     // Test
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
@@ -30,7 +28,6 @@ describe('lockfile', () => {
   it('can release lockfile', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-lock')
-    fs = new FileSystem(fs)
     // Test
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
@@ -45,7 +42,6 @@ describe('lockfile', () => {
   it('cannot double-release lockfile', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-lock')
-    fs = new FileSystem(fs)
     // Test
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
@@ -61,7 +57,6 @@ describe('lockfile', () => {
   it('can retry until acquire lockfile', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-lock')
-    fs = new FileSystem(fs)
     // Test
     await fs.lock(dir)
     expect(await fs.exists(`${dir}.lock`)).toBe(true)
