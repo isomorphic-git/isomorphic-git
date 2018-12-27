@@ -81,7 +81,9 @@ export class GitRemoteHTTP {
     }
     // I'm going to be nice and ignore the content-type requirement unless there is a problem.
     try {
-      let remoteHTTP = await parseRefsAdResponse(Buffer.from(res.body), { service })
+      let remoteHTTP = await parseRefsAdResponse(Buffer.from(res.body), {
+        service
+      })
       remoteHTTP.auth = auth
       return remoteHTTP
     } catch (err) {
