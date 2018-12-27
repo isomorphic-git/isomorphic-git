@@ -145,6 +145,9 @@ export async function push ({
       oids: [...objects],
       outputStream: packstream
     })
+    // The browser isn't capable of streaming uploads, so for API consistancy
+    // in the 'http' plugin we're going to simple coerce the packstream to a buffer.
+    let packbuffer = await pify(concat)(packstream)
     let res = await GitRemoteHTTP.connect({
       core,
       corsProxy,
@@ -153,7 +156,7 @@ export async function push ({
       noGitSuffix,
       auth,
       headers,
-      stream: packstream
+      body: packbuffer
     })
     let { packfile, progress } = await GitSideBand.demux(res)
     if (emitter) {

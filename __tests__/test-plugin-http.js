@@ -2,18 +2,18 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { clone, plugins } = require('isomorphic-git')
-const { fetch } = require('isomorphic-git/internal-apis')
+const { http } = require('isomorphic-git/internal-apis')
 
-describe('plugin - fetch', () => {
+describe('plugin - http', () => {
   let callCount = 0
   beforeAll(() => {
-    plugins.set('fetch', (...args) => {
+    plugins.set('http', (...args) => {
       callCount++
-      return fetch(...args)
+      return http(...args)
     })
   })
-  it('clone should call provided fetch function', async () => {
-    let { dir, gitdir } = await makeFixture('test-plugin-fetch')
+  it('clone should call provided http function', async () => {
+    let { dir, gitdir } = await makeFixture('test-plugin-http')
     callCount = 0
     await clone({
       dir,
@@ -25,6 +25,6 @@ describe('plugin - fetch', () => {
     expect(callCount).toBe(2)
   })
   afterAll(() => {
-    plugins.delete('fetch')
+    plugins.delete('http')
   })
 })

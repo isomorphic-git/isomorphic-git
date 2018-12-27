@@ -144,11 +144,25 @@ export interface GitPgpPlugin {
   verify: any;
 }
 
-export type GitFetchPlugin = Function;
+type HttpRequest = {
+  url: string;
+  method?: string = 'GET';
+  headers?: {
+    [key: string]: string;
+  };
+  body?: Buffer;
+};
 
-export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "fetch"
+type HttpResponse = HttpRequest & {
+  statusCode: number;
+  statusMessage: string;
+}
 
-export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitFetchPlugin
+export type GitHttpPlugin = (request: HttpOptions) => HttpResponse;
+
+export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "http"
+
+export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitHttpPlugin
 
 export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 

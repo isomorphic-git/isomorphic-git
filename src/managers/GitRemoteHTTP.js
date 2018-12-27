@@ -1,10 +1,9 @@
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
-import { fetch as builtinFetch } from '../utils/fetch.js'
+import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
-import { wrapStream } from '../utils/wrapStream.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
 // Try to accomodate known CORS proxy implementations:
@@ -35,7 +34,7 @@ export class GitRemoteHTTP {
       url = corsProxify(corsProxy, url)
     }
     // Get the 'fetch' plugin
-    const fetch = cores.get(core).get('fetch') || builtinFetch
+    const http = cores.get(core).get('http') || builtinHttp
     // headers['Accept'] = `application/x-${service}-advertisement`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
@@ -49,11 +48,12 @@ export class GitRemoteHTTP {
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
-    let res = await fetch(`${url}/info/refs?service=${service}`, {
+    let res = await http({
+      url: `${url}/info/refs?service=${service}`,
       method: 'GET',
       headers
     })
-    if (res.status === 401 && cores.get(core).has('credentialManager')) {
+    if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
       // Acquire credentials and try again
       const credentialManager = cores.get(core).get('credentialManager')
       auth = await credentialManager.fill({ url: _origUrl })
@@ -61,29 +61,27 @@ export class GitRemoteHTTP {
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
       }
-      res = await fetch(`${url}/info/refs?service=${service}`, {
+      res = await http({
+        url: `${url}/info/refs?service=${service}`,
         method: 'GET',
         headers
       })
       // Tell credential manager if the credentials were no good
-      if (res.status === 401) {
+      if (res.statusCode === 401) {
         await credentialManager.rejected({ url: _origUrl, auth })
-      } else if (res.status === 200) {
+      } else if (res.statusCode === 200) {
         await credentialManager.approved({ url: _origUrl, auth })
       }
     }
-    if (res.status !== 200) {
+    if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
-        statusCode: res.status,
-        statusMessage: res.statusText
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage
       })
     }
     // I'm going to be nice and ignore the content-type requirement unless there is a problem.
     try {
-      let remoteHTTP = await parseRefsAdResponse(
-        Buffer.from(await res.arrayBuffer()),
-        { service }
-      )
+      let remoteHTTP = await parseRefsAdResponse(Buffer.from(res.body), { service })
       remoteHTTP.auth = auth
       return remoteHTTP
     } catch (err) {
@@ -106,7 +104,7 @@ export class GitRemoteHTTP {
     url,
     noGitSuffix,
     auth,
-    stream,
+    body,
     headers
   }) {
     // Auto-append the (necessary) .git if it's missing.
@@ -116,8 +114,8 @@ export class GitRemoteHTTP {
     }
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
-    // Get the 'fetch' plugin
-    const fetch = cores.get(core).get('fetch') || builtinFetch
+    // Get the 'http' plugin
+    const http = cores.get(core).get('http') || builtinHttp
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
     // Solutions using 'process.browser' can't be used as they rely on bundler shims,
@@ -130,17 +128,18 @@ export class GitRemoteHTTP {
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
-    let res = await fetch(`${url}/${service}`, {
+    let res = await http({
+      url: `${url}/${service}`,
       method: 'POST',
-      body: await wrapStream(stream),
+      body,
       headers
     })
-    if (res.status !== 200) {
+    if (statusCode !== 200) {
       throw new GitError(E.HTTPError, {
-        statusCode: res.status,
-        statusMessage: res.statusText
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage
       })
     }
-    return Buffer.from(await res.arrayBuffer())
+    return Buffer.from(res.body)
   }
 }

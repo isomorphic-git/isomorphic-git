@@ -268,7 +268,7 @@ async function fetchPackfile ({
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
-  packstream = await pify(concat)(packstream)
+  let packbuffer = await pify(concat)(packstream)
   let raw = await GitRemoteHTTP.connect({
     core,
     corsProxy,
@@ -276,7 +276,7 @@ async function fetchPackfile ({
     url,
     noGitSuffix,
     auth,
-    stream: packstream,
+    body: packbuffer,
     headers
   })
   // Normally I would await this, but for some reason I'm having trouble detecting
