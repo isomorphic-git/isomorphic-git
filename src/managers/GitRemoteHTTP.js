@@ -33,7 +33,7 @@ export class GitRemoteHTTP {
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
-    // Get the 'fetch' plugin
+    // Get the 'http' plugin
     const http = cores.get(core).get('http') || builtinHttp
     // headers['Accept'] = `application/x-${service}-advertisement`
     // Only send a user agent in Node and to CORS proxies by default,
@@ -49,8 +49,8 @@ export class GitRemoteHTTP {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
     let res = await http({
-      url: `${url}/info/refs?service=${service}`,
       method: 'GET',
+      url: `${url}/info/refs?service=${service}`,
       headers
     })
     if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
@@ -62,8 +62,8 @@ export class GitRemoteHTTP {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
       }
       res = await http({
-        url: `${url}/info/refs?service=${service}`,
         method: 'GET',
+        url: `${url}/info/refs?service=${service}`,
         headers
       })
       // Tell credential manager if the credentials were no good
@@ -129,12 +129,12 @@ export class GitRemoteHTTP {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
     let res = await http({
-      url: `${url}/${service}`,
       method: 'POST',
+      url: `${url}/${service}`,
       body,
       headers
     })
-    if (statusCode !== 200) {
+    if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
         statusCode: res.statusCode,
         statusMessage: res.statusMessage
