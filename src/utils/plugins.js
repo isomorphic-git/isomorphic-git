@@ -27,7 +27,7 @@ class PluginCore extends Map {
           'writeFile'
         ],
         pgp: ['sign', 'verify'],
-        fetch: []
+        http: []
       }
       if (!pluginSchemas.hasOwnProperty(key)) {
         throw new GitError(E.PluginUnrecognized, { plugin: key })

@@ -146,7 +146,7 @@ export interface GitPgpPlugin {
 
 type HttpRequest = {
   url: string;
-  method?: string = 'GET';
+  method?: string;
   headers?: {
     [key: string]: string;
   };
@@ -158,7 +158,7 @@ type HttpResponse = HttpRequest & {
   statusMessage: string;
 }
 
-export type GitHttpPlugin = (request: HttpOptions) => HttpResponse;
+export type GitHttpPlugin = (request: HttpRequest) => HttpResponse;
 
 export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "http"
 
