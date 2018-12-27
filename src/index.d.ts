@@ -150,7 +150,7 @@ type HttpRequest = {
   headers?: {
     [key: string]: string;
   };
-  body?: Buffer;
+  body?: Uint8Array;
 };
 
 type HttpResponse = HttpRequest & {
