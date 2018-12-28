@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
@@ -19,6 +20,7 @@ module.exports = [
     mode: 'production',
     devtool: 'source-map',
     plugins: [
+      new webpack.IgnorePlugin({resourceRegExp: /^got$/}),
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
         analyzerMode: 'static',
@@ -51,7 +53,8 @@ module.exports = [
               babelrc: false,
               plugins: [
                 '@babel/plugin-proposal-object-rest-spread',
-                '@babel/plugin-transform-async-to-generator'
+                '@babel/plugin-transform-async-to-generator',
+                '@babel/plugin-proposal-async-generator-functions'
               ]
             }
           }

@@ -1,5 +1,5 @@
 // const comment = require('github-comment')
-const fetch = require('node-fetch')
+const got = require('got')
 
 let commit =
   process.env.TRAVIS_PULL_REQUEST_SHA ||
@@ -52,7 +52,7 @@ function postComment (message) {
     // comment(process.env.KARMA_PR_REPORTER_GITHUB_TOKEN, repo, issue, message)
     // .then(response => console.log(`posted results to PR #${issue}`))
     // .catch(err => console.log('error leaving Github comment:', err))
-    fetch('https://karma-pr-reporter.glitch.me', {
+    got('https://karma-pr-reporter.glitch.me', {
       method: 'POST',
       body: JSON.stringify({ repo, issue, message })
     })

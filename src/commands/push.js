@@ -1,5 +1,6 @@
 import pify from 'pify'
 import concat from 'simple-concat'
+import asyncIteratorToStream from 'async-iterator-to-stream'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -161,7 +162,7 @@ export async function push ({
       headers,
       body: packbuffer
     })
-    let { packfile, progress } = await GitSideBand.demux(res)
+    let { packfile, progress } = await GitSideBand.demux(asyncIteratorToStream(res.body))
     if (emitter) {
       progress.on('data', chunk => {
         let msg = chunk.toString('utf8')

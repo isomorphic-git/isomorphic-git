@@ -1,6 +1,7 @@
 import pify from 'pify'
 import concat from 'simple-concat'
 import split2 from 'split2'
+import asyncIteratorToStream from 'async-iterator-to-stream'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -279,9 +280,7 @@ async function fetchPackfile ({
     body: packbuffer,
     headers
   })
-  // Normally I would await this, but for some reason I'm having trouble detecting
-  // when this header portion is over.
-  let response = await parseUploadPackResponse(raw)
+  let response = await parseUploadPackResponse(asyncIteratorToStream(raw.body))
   if (raw.headers) {
     response.headers = raw.headers
   }

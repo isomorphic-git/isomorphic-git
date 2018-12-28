@@ -8,5 +8,8 @@
         }
       }
     ]
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-async-generator-functions"
   ]
 }

@@ -1,3 +1,5 @@
+import { collect } from '../utils/collect.js'
+
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
@@ -81,7 +83,7 @@ export class GitRemoteHTTP {
     }
     // I'm going to be nice and ignore the content-type requirement unless there is a problem.
     try {
-      let remoteHTTP = await parseRefsAdResponse(Buffer.from(res.body), {
+      let remoteHTTP = await parseRefsAdResponse(await collect(res.body), {
         service
       })
       remoteHTTP.auth = auth
@@ -142,6 +144,6 @@ export class GitRemoteHTTP {
         statusMessage: res.statusMessage
       })
     }
-    return Buffer.from(res.body)
+    return res
   }
 }
