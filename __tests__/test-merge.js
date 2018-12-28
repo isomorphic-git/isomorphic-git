@@ -1,16 +1,14 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, merge, resolveRef } = require('isomorphic-git')
+const { merge, resolveRef } = require('isomorphic-git')
 
 describe('merge', () => {
   it('merge master into master', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-merge')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-merge')
     // Test
     let desiredOid = await resolveRef({
-      fs,
       gitdir,
       ref: 'master'
     })
@@ -31,8 +29,7 @@ describe('merge', () => {
   })
   it('merge medium into master', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-merge')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-merge')
     // Test
     let desiredOid = await resolveRef({
       gitdir,
@@ -55,8 +52,7 @@ describe('merge', () => {
   })
   it('merge oldest into master', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-merge')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-merge')
     // Test
     let desiredOid = await resolveRef({
       gitdir,
@@ -79,8 +75,7 @@ describe('merge', () => {
   })
   it('merge newest into master', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-merge')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-merge')
     // Test
     let desiredOid = await resolveRef({
       gitdir,

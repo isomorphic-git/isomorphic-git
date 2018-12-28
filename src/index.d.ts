@@ -496,7 +496,8 @@ export function remove(args: GitDir & {
 }): Promise<void>;
 
 export function resetIndex(args: Partial<WorkDir> & GitDir & {
-  fs: any,
+  core?: string;
+  fs?: any,
   filepath: string,
   ref?: string
 }): Promise<void>

@@ -1,12 +1,11 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { plugins, tag, resolveRef } = require('isomorphic-git')
+const { tag, resolveRef } = require('isomorphic-git')
 
 describe('tag', () => {
   it('creates a lightweight tag to HEAD', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-tag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-tag')
     // Test
     await tag({ gitdir, ref: 'latest' })
     const ref = await resolveRef({ gitdir, ref: 'refs/tags/latest' })
@@ -14,8 +13,7 @@ describe('tag', () => {
   })
   it('fails if tag already exists', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-tag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {
@@ -28,8 +26,7 @@ describe('tag', () => {
   })
   it('fails if tag already exists (packed)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-tag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {
@@ -42,8 +39,7 @@ describe('tag', () => {
   })
   it('force overwrite', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-tag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {
@@ -55,8 +51,7 @@ describe('tag', () => {
   })
   it('force overwrite (packed)', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-tag')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {

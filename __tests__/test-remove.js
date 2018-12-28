@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-remove.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { plugins, remove, listFiles } = require('isomorphic-git')
+const { remove, listFiles } = require('isomorphic-git')
 
 describe('remove', () => {
   beforeAll(() => {
@@ -11,8 +11,7 @@ describe('remove', () => {
   })
   it('file', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-remove')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-remove')
     // Test
     let before = await listFiles({ gitdir })
     expect(before).toMatchSnapshot()
@@ -23,8 +22,7 @@ describe('remove', () => {
   })
   it('dir', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-remove')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-remove')
     // Test
     let before = await listFiles({ gitdir })
     expect(before).toMatchSnapshot()

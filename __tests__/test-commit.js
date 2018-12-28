@@ -11,8 +11,7 @@ describe('commit', () => {
 
   it('commit', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-commit')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-commit')
     // Test
     let sha = await commit({
       gitdir,
@@ -29,8 +28,7 @@ describe('commit', () => {
 
   it('throw error if missing author', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-commit')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-commit')
     // Test
     let error = null
     try {
@@ -70,8 +68,7 @@ describe('commit', () => {
   it('pgp plugin signing', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
-    let { fs, gitdir } = await makeFixture('test-commit')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-commit')
     plugins.set('pgp', pgp)
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
@@ -97,8 +94,7 @@ describe('commit', () => {
   it('pgp plugin signing - backwards compatiblity', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
-    let { fs, gitdir } = await makeFixture('test-commit')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-commit')
     plugins.set('pgp', pgp)
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
@@ -127,9 +123,7 @@ describe('commit', () => {
   it('GPG signing (deprecated API)', async () => {
     // Setup
     const openpgp = require('openpgp/dist/openpgp.min.js')
-
-    let { fs, gitdir } = await makeFixture('test-commit')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-commit')
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await commit({
@@ -158,8 +152,7 @@ describe('commit', () => {
 
   it('with timezone', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-commit')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-commit')
     let commits
     // Test
     await commit({
