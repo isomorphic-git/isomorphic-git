@@ -2,12 +2,12 @@ import {fromBuffer, fromStream, fromNodeStream} from './AsyncIterator.js'
 
 export async function http ({ core, emitter, emitterPrefix, url, method = 'GET', headers = {}, body }) {
   return global.fetch
-    ? await httpBrowser({ core, emitter, emitterPrefix, url, method, headers, body })
-    : await httpNode({ core, emitter, emitterPrefix, url, method, headers, body })
+    ? httpBrowser({ core, emitter, emitterPrefix, url, method, headers, body })
+    : httpNode({ core, emitter, emitterPrefix, url, method, headers, body })
 }
 
 async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
-  let res = await fetch(url, { method, headers, body })
+  let res = await global.fetch(url, { method, headers, body })
   let iter = (res.body && res.body.getReader) ? fromStream(res.body) : fromBuffer(await res.arrayBuffer())
   return {
     url: res.url,

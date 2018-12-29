@@ -1,28 +1,28 @@
 // Convert a web ReadableStream (not Node stream!) to an Async Iterator
 // adapted from https://jakearchibald.com/2017/async-iterators-and-generators/
-export function fromStream(stream) {
+export function fromStream (stream) {
   // Use native async iteration if it's available.
   if (stream[Symbol.asyncIterator]) return stream
   const reader = stream.getReader()
   return {
-    next() { return reader.read() },
-    return() { reader.releaseLock(); return {} },
-    [Symbol.asyncIterator]() { return this }
+    next () { return reader.read() },
+    return () { reader.releaseLock(); return {} },
+    [Symbol.asyncIterator] () { return this }
   }
 }
 
 // This will be easier with async generator functions.
-export function fromBuffer(buffer) {
-  const queue = [Buffer.from(buffer)]
+export function fromBuffer (buffer) {
+  let queue = [Buffer.from(buffer)]
   return {
-    next() { return Promise.resolve({done: queue.length === 0, value: queue.pop()}) },
-    return() { queue = []; return {} },
-    [Symbol.asyncIterator]() { return this }
+    next () { return Promise.resolve({done: queue.length === 0, value: queue.pop()}) },
+    return () { queue = []; return {} },
+    [Symbol.asyncIterator] () { return this }
   }
 }
 
 // Convert a Node stream to an Async Iterator
-export function fromNodeStream(stream) {
+export function fromNodeStream (stream) {
   // Use native async iteration if it's available.
   if (stream[Symbol.asyncIterator]) return stream
   // Author's Note
@@ -56,7 +56,7 @@ export function fromNodeStream(stream) {
     }
   })
   return {
-    next() {
+    next () {
       return new Promise((resolve, reject) => {
         if (queue.length === 0 && ended) {
           return resolve({done: true})
@@ -67,10 +67,10 @@ export function fromNodeStream(stream) {
         }
       })
     },
-    return() {
+    return () {
       stream.removeAllListeners()
       if (stream.destroy) stream.destroy()
     },
-    [Symbol.asyncIterator]() { return this }
+    [Symbol.asyncIterator] () { return this }
   }
 }
