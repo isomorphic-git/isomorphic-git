@@ -154,6 +154,8 @@ export async function push ({
     let packbuffer = await pify(concat)(packstream)
     let res = await GitRemoteHTTP.connect({
       core,
+      emitter,
+      emitterPrefix,
       corsProxy,
       service: 'git-receive-pack',
       url,

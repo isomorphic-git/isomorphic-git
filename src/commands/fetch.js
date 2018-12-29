@@ -63,6 +63,8 @@ export async function fetch ({
       core,
       gitdir,
       fs,
+      emitter,
+      emitterPrefix,
       ref,
       refs,
       remote,
@@ -144,6 +146,8 @@ async function fetchPackfile ({
   core,
   gitdir,
   fs: _fs,
+  emitter,
+  emitterPrefix,
   ref,
   refs = [ref],
   remote,
@@ -272,6 +276,8 @@ async function fetchPackfile ({
   let packbuffer = await pify(concat)(packstream)
   let raw = await GitRemoteHTTP.connect({
     core,
+    emitter,
+    emitterPrefix,
     corsProxy,
     service: 'git-upload-pack',
     url,

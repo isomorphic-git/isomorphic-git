@@ -1,9 +1,9 @@
 import {fromBuffer, fromStream, fromNodeStream} from './AsyncIterator.js'
 
-export async function http ({ url, method = 'GET', headers = {}, body }) {
+export async function http ({ core, emitter, emitterPrefix, url, method = 'GET', headers = {}, body }) {
   return global.fetch
-    ? await httpBrowser({ url, method, headers, body })
-    : await httpNode({ url, method, headers, body })
+    ? await httpBrowser({ core, emitter, emitterPrefix, url, method, headers, body })
+    : await httpNode({ core, emitter, emitterPrefix, url, method, headers, body })
 }
 
 async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
@@ -19,7 +19,7 @@ async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
   }
 }
 
-async function httpNode ({ url, method = 'GET', headers = {}, body }) {
+async function httpNode ({ emitter, emitterPrefix, url, method = 'GET', headers = {}, body }) {
   return new Promise((resolve, reject) => {
     const got = require('got')
     let stream = got(url, { method, headers, body, stream: true, throwHttpErrors: false })
@@ -35,5 +35,23 @@ async function httpNode ({ url, method = 'GET', headers = {}, body }) {
       })
     })
     stream.on('error', reject)
+    if (emitter) {
+      stream.on('uploadProgress', progress => {
+        emitter.emit(`${emitterPrefix}progress`, {
+          phase: 'uploading',
+          loaded: progress.transferred,
+          total: progress.total || undefined,
+          lengthComputable: progress.total != null
+        })
+      })
+      stream.on('downloadProgress', progress => {
+        emitter.emit(`${emitterPrefix}progress`, {
+          phase: 'downloading',
+          loaded: progress.transferred,
+          total: progress.total || undefined,
+          lengthComputable: progress.total != null
+        })
+      })
+    }
   })
 }

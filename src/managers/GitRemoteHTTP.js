@@ -51,6 +51,7 @@ export class GitRemoteHTTP {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
     let res = await http({
+      core,
       method: 'GET',
       url: `${url}/info/refs?service=${service}`,
       headers
@@ -64,6 +65,7 @@ export class GitRemoteHTTP {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
       }
       res = await http({
+        core,
         method: 'GET',
         url: `${url}/info/refs?service=${service}`,
         headers
@@ -103,6 +105,8 @@ export class GitRemoteHTTP {
   }
   static async connect ({
     core,
+    emitter,
+    emitterPrefix,
     corsProxy,
     service,
     url,
@@ -133,6 +137,9 @@ export class GitRemoteHTTP {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
     let res = await http({
+      core,
+      emitter,
+      emitterPrefix,
       method: 'POST',
       url: `${url}/${service}`,
       body,
