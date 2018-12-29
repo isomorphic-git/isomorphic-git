@@ -4,7 +4,7 @@ import { getIterator } from './getIterator.js'
 export async function forAwait (iterable, cb) {
   let iter = getIterator(iterable)
   while (true) {
-    let {value, done} = await iter.next()
+    let { value, done } = await iter.next()
     if (value) cb(value)
     if (done) break
   }

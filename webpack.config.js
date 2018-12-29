@@ -20,7 +20,7 @@ module.exports = [
     mode: 'production',
     devtool: 'source-map',
     plugins: [
-      new webpack.IgnorePlugin({resourceRegExp: /^got$/}),
+      new webpack.IgnorePlugin({ resourceRegExp: /^got$/ }),
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
         analyzerMode: 'static',

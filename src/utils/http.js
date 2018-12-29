@@ -1,6 +1,14 @@
-import {fromBuffer, fromStream, fromNodeStream} from './AsyncIterator.js'
+import { fromBuffer, fromNodeStream, fromStream } from './AsyncIterator.js'
 
-export async function http ({ core, emitter, emitterPrefix, url, method = 'GET', headers = {}, body }) {
+export async function http ({
+  core,
+  emitter,
+  emitterPrefix,
+  url,
+  method = 'GET',
+  headers = {},
+  body
+}) {
   return global.fetch
     ? httpBrowser({ core, emitter, emitterPrefix, url, method, headers, body })
     : httpNode({ core, emitter, emitterPrefix, url, method, headers, body })
@@ -8,7 +16,10 @@ export async function http ({ core, emitter, emitterPrefix, url, method = 'GET',
 
 async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
   let res = await global.fetch(url, { method, headers, body })
-  let iter = (res.body && res.body.getReader) ? fromStream(res.body) : fromBuffer(await res.arrayBuffer())
+  let iter =
+    res.body && res.body.getReader
+      ? fromStream(res.body)
+      : fromBuffer(await res.arrayBuffer())
   return {
     url: res.url,
     method: res.method,
@@ -19,11 +30,24 @@ async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
   }
 }
 
-async function httpNode ({ emitter, emitterPrefix, url, method = 'GET', headers = {}, body }) {
+async function httpNode ({
+  emitter,
+  emitterPrefix,
+  url,
+  method = 'GET',
+  headers = {},
+  body
+}) {
   return new Promise((resolve, reject) => {
     const got = require('got')
-    let stream = got(url, { method, headers, body, stream: true, throwHttpErrors: false })
-    stream.on('response', (res) => {
+    let stream = got(url, {
+      method,
+      headers,
+      body,
+      stream: true,
+      throwHttpErrors: false
+    })
+    stream.on('response', res => {
       let iter = fromNodeStream(stream)
       resolve({
         url: res.url,

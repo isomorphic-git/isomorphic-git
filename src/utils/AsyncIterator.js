@@ -5,9 +5,16 @@ export function fromStream (stream) {
   if (stream[Symbol.asyncIterator]) return stream
   const reader = stream.getReader()
   return {
-    next () { return reader.read() },
-    return () { reader.releaseLock(); return {} },
-    [Symbol.asyncIterator] () { return this }
+    next () {
+      return reader.read()
+    },
+    return () {
+      reader.releaseLock()
+      return {}
+    },
+    [Symbol.asyncIterator] () {
+      return this
+    }
   }
 }
 
@@ -15,9 +22,16 @@ export function fromStream (stream) {
 export function fromBuffer (buffer) {
   let queue = [Buffer.from(buffer)]
   return {
-    next () { return Promise.resolve({done: queue.length === 0, value: queue.pop()}) },
-    return () { queue = []; return {} },
-    [Symbol.asyncIterator] () { return this }
+    next () {
+      return Promise.resolve({ done: queue.length === 0, value: queue.pop() })
+    },
+    return () {
+      queue = []
+      return {}
+    },
+    [Symbol.asyncIterator] () {
+      return this
+    }
   }
 }
 
@@ -38,7 +52,7 @@ export function fromNodeStream (stream) {
   stream.on('data', chunk => {
     queue.push(chunk)
     if (defer.resolve) {
-      defer.resolve({value: queue.shift(), done: false})
+      defer.resolve({ value: queue.shift(), done: false })
       defer = {}
     }
   })
@@ -51,7 +65,7 @@ export function fromNodeStream (stream) {
   stream.on('end', () => {
     ended = true
     if (defer.resolve) {
-      defer.resolve({done: true})
+      defer.resolve({ done: true })
       defer = {}
     }
   })
@@ -59,11 +73,11 @@ export function fromNodeStream (stream) {
     next () {
       return new Promise((resolve, reject) => {
         if (queue.length === 0 && ended) {
-          return resolve({done: true})
+          return resolve({ done: true })
         } else if (queue.length > 0) {
-          return resolve({value: queue.shift(), done: false})
+          return resolve({ value: queue.shift(), done: false })
         } else if (queue.length === 0 && !ended) {
-          defer = {resolve, reject}
+          defer = { resolve, reject }
         }
       })
     },
@@ -71,6 +85,8 @@ export function fromNodeStream (stream) {
       stream.removeAllListeners()
       if (stream.destroy) stream.destroy()
     },
-    [Symbol.asyncIterator] () { return this }
+    [Symbol.asyncIterator] () {
+      return this
+    }
   }
 }
