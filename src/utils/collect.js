@@ -9,5 +9,6 @@ export async function collect(iterable) {
     if (value) buffers.push(Buffer.from(value))
     if (done) break
   }
+  iter.return()
   return Buffer.concat(buffers)
 }
