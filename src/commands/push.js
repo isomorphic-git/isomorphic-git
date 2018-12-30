@@ -1,12 +1,10 @@
-import pify from 'pify'
-import concat from 'simple-concat'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
-import { asyncIteratorToStream } from '../utils/asyncIteratorToStream'
+import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
+import { fromStream } from '../utils/AsyncIterator.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
@@ -149,9 +147,6 @@ export async function push ({
       oids: [...objects],
       outputStream: packstream
     })
-    // The browser isn't capable of streaming uploads, so for API consistancy
-    // in the 'http' plugin we're going to simple coerce the packstream to a buffer.
-    let packbuffer = await pify(concat)(packstream)
     let res = await GitRemoteHTTP.connect({
       core,
       emitter,
@@ -162,7 +157,7 @@ export async function push ({
       noGitSuffix,
       auth,
       headers,
-      body: [packbuffer]
+      body: fromStream(packstream)
     })
     let { packfile, progress } = await GitSideBand.demux(
       asyncIteratorToStream(res.body)
