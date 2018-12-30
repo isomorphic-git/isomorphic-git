@@ -12,8 +12,8 @@ export function fromStream (stream) {
 }
 
 // This will be easier with async generator functions.
-export function fromBuffer (buffer) {
-  let queue = [Buffer.from(buffer)]
+export function fromValue (value) {
+  let queue = [value]
   return {
     next () { return Promise.resolve({done: queue.length === 0, value: queue.pop()}) },
     return () { queue = []; return {} },

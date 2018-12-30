@@ -1,3 +1,5 @@
+import { fromValue } from './AsyncIterator.js'
+
 export function getIterator (iterable) {
   if (iterable[Symbol.asyncIterator]) {
     return iterable[Symbol.asyncIterator]()
@@ -8,6 +10,5 @@ export function getIterator (iterable) {
   if (iterable.next) {
     return iterable
   }
-  console.log('UNABLE TO ITERATE OVER', iterable)
-  throw Error('unable to iterate')
+  return fromValue(iterable)
 }

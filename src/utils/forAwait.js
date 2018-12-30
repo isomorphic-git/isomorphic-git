@@ -8,5 +8,5 @@ export async function forAwait (iterable, cb) {
     if (value) cb(value)
     if (done) break
   }
-  iter.return()
+  if (iter.return) iter.return()
 }

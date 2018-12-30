@@ -150,7 +150,7 @@ type HttpRequest = {
   headers?: {
     [key: string]: string;
   };
-  body?: Uint8Array;
+  body?: AsyncIterableIterator<Uint8Array>;
 };
 
 type HttpResponse = HttpRequest & {

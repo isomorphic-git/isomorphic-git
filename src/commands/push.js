@@ -162,7 +162,7 @@ export async function push ({
       noGitSuffix,
       auth,
       headers,
-      body: packbuffer
+      body: [packbuffer]
     })
     let { packfile, progress } = await GitSideBand.demux(asyncIteratorToStream(res.body))
     if (emitter) {

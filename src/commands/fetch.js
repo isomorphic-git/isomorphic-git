@@ -283,7 +283,7 @@ async function fetchPackfile ({
     url,
     noGitSuffix,
     auth,
-    body: packbuffer,
+    body: [packbuffer],
     headers
   })
   let response = await parseUploadPackResponse(asyncIteratorToStream(raw.body))

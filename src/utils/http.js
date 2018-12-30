@@ -1,4 +1,6 @@
-import {fromBuffer, fromStream, fromNodeStream} from './AsyncIterator.js'
+import { fromStream, fromNodeStream } from './AsyncIterator.js'
+import { collect } from './collect.js'
+import { asyncIteratorToStream } from './asyncIteratorToStream.js'
 
 export async function http ({ core, emitter, emitterPrefix, url, method = 'GET', headers = {}, body }) {
   return global.fetch
@@ -7,8 +9,13 @@ export async function http ({ core, emitter, emitterPrefix, url, method = 'GET',
 }
 
 async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
+  // streaming uploads aren't possible yet in the browser
+  if (body) {
+    body = await collect(body)
+  }
   let res = await global.fetch(url, { method, headers, body })
-  let iter = (res.body && res.body.getReader) ? fromStream(res.body) : fromBuffer(await res.arrayBuffer())
+  // If streaming is supported return an async iterator. Otherwise, return a regular iterator.
+  let iter = (res.body && res.body.getReader) ? fromStream(res.body) : [new Uint8Array(await res.arrayBuffer())]
   return {
     url: res.url,
     method: res.method,
@@ -20,6 +27,9 @@ async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
 }
 
 async function httpNode ({ emitter, emitterPrefix, url, method = 'GET', headers = {}, body }) {
+  if (body) {
+    body = asyncIteratorToStream(body)
+  }
   return new Promise((resolve, reject) => {
     const got = require('got')
     let stream = got(url, { method, headers, body, stream: true, throwHttpErrors: false })
