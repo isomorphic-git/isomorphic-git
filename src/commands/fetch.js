@@ -1,7 +1,7 @@
+import asyncIteratorToStream from 'async-iterator-to-stream'
 import pify from 'pify'
 import concat from 'simple-concat'
 import split2 from 'split2'
-import asyncIteratorToStream from 'async-iterator-to-stream'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
