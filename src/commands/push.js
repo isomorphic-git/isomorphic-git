@@ -1,4 +1,3 @@
-import asyncIteratorToStream from 'async-iterator-to-stream'
 import pify from 'pify'
 import concat from 'simple-concat'
 
@@ -7,6 +6,7 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
+import { asyncIteratorToStream } from '../utils/asyncIteratorToStream'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
