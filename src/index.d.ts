@@ -150,9 +150,25 @@ export interface GitPgpPlugin {
   verify: any;
 }
 
-export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp"
+export type HttpRequest = {
+  url: string;
+  method?: string;
+  headers?: {
+    [key: string]: string;
+  };
+  body?: AsyncIterableIterator<Uint8Array>;
+};
 
-export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin
+export type HttpResponse = HttpRequest & {
+  statusCode: number;
+  statusMessage: string;
+}
+
+export type GitHttpPlugin = (request: HttpRequest) => HttpResponse;
+
+export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "http"
+
+export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitHttpPlugin
 
 export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 

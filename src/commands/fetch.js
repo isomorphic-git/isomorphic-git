@@ -9,6 +9,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
 import { readObject } from '../storage/readObject.js'
+import { asyncIteratorToStream } from '../utils/asyncIteratorToStream'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
@@ -62,6 +63,8 @@ export async function fetch ({
       core,
       gitdir,
       fs,
+      emitter,
+      emitterPrefix,
       ref,
       refs,
       remote,
@@ -143,6 +146,8 @@ async function fetchPackfile ({
   core,
   gitdir,
   fs: _fs,
+  emitter,
+  emitterPrefix,
   ref,
   refs = [ref],
   remote,
@@ -268,19 +273,20 @@ async function fetchPackfile ({
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
-  packstream = await pify(concat)(packstream)
+  let packbuffer = await pify(concat)(packstream)
   let raw = await GitRemoteHTTP.connect({
+    core,
+    emitter,
+    emitterPrefix,
     corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,
     auth,
-    stream: packstream,
+    body: [packbuffer],
     headers
   })
-  // Normally I would await this, but for some reason I'm having trouble detecting
-  // when this header portion is over.
-  let response = await parseUploadPackResponse(raw)
+  let response = await parseUploadPackResponse(asyncIteratorToStream(raw.body))
   if (raw.headers) {
     response.headers = raw.headers
   }
