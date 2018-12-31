@@ -144,7 +144,7 @@ export interface GitPgpPlugin {
   verify: any;
 }
 
-type HttpRequest = {
+export type HttpRequest = {
   url: string;
   method?: string;
   headers?: {
@@ -153,7 +153,7 @@ type HttpRequest = {
   body?: AsyncIterableIterator<Uint8Array>;
 };
 
-type HttpResponse = HttpRequest & {
+export type HttpResponse = HttpRequest & {
   statusCode: number;
   statusMessage: string;
 }
