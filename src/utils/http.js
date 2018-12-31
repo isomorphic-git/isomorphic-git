@@ -42,7 +42,10 @@ async function httpNode ({
   headers = {},
   body
 }) {
-  if (body) {
+  // If we can, we should send it as a single buffer so it sets a Content-Length header.
+  if (body && Array.isArray(body)) {
+    body = await collect(body)
+  } else if (body) {
     body = asyncIteratorToStream(body)
   }
   return new Promise((resolve, reject) => {
