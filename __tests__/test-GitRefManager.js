@@ -21,7 +21,8 @@ describe('GitRefManager', () => {
       filepath: 'refs/remotes/origin'
     })
     expect(refs).toMatchSnapshot()
-    refs = await GitRefManager.listRefs({ fs,
+    refs = await GitRefManager.listRefs({
+      fs,
       gitdir,
       filepath: 'refs/tags'
     })
@@ -31,7 +32,8 @@ describe('GitRefManager', () => {
     let { fs, gitdir } = await makeFixture('test-GitRefManager')
     let refs = await GitRefManager.listBranches({ fs, gitdir })
     expect(refs).toMatchSnapshot()
-    refs = await GitRefManager.listBranches({ fs,
+    refs = await GitRefManager.listBranches({
+      fs,
       gitdir,
       remote: 'origin'
     })
