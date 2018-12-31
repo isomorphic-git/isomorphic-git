@@ -1,8 +1,6 @@
 const { plugins } = require('isomorphic-git')
 const { FileSystem } = require('isomorphic-git/internal-apis')
 
-console.log('⚡⚡⚡ ENABLE_LIGHTNINGFS ⚡⚡⚡')
-
 async function makeLightningFS (dir) {
   const FS = require('@isomorphic-git/lightning-fs')
   const _fs = new FS(`testfs`, {

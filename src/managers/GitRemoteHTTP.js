@@ -1,9 +1,8 @@
-import pify from 'pify'
-import simpleGet from 'simple-get'
-
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
+import { collect } from '../utils/collect.js'
+import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
@@ -35,6 +34,8 @@ export class GitRemoteHTTP {
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
+    // Get the 'http' plugin
+    const http = cores.get(core).get('http') || builtinHttp
     // headers['Accept'] = `application/x-${service}-advertisement`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
@@ -48,7 +49,8 @@ export class GitRemoteHTTP {
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
-    let res = await pify(simpleGet)({
+    let res = await http({
+      core,
       method: 'GET',
       url: `${url}/info/refs?service=${service}`,
       headers
@@ -61,7 +63,8 @@ export class GitRemoteHTTP {
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
       }
-      res = await pify(simpleGet)({
+      res = await http({
+        core,
         method: 'GET',
         url: `${url}/info/refs?service=${service}`,
         headers
@@ -81,7 +84,9 @@ export class GitRemoteHTTP {
     }
     // I'm going to be nice and ignore the content-type requirement unless there is a problem.
     try {
-      let remoteHTTP = await parseRefsAdResponse(res, { service })
+      let remoteHTTP = await parseRefsAdResponse(await collect(res.body), {
+        service
+      })
       remoteHTTP.auth = auth
       return remoteHTTP
     } catch (err) {
@@ -98,12 +103,15 @@ export class GitRemoteHTTP {
     }
   }
   static async connect ({
+    core,
+    emitter,
+    emitterPrefix,
     corsProxy,
     service,
     url,
     noGitSuffix,
     auth,
-    stream,
+    body,
     headers
   }) {
     // Auto-append the (necessary) .git if it's missing.
@@ -113,6 +121,8 @@ export class GitRemoteHTTP {
     }
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
+    // Get the 'http' plugin
+    const http = cores.get(core).get('http') || builtinHttp
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
     // Solutions using 'process.browser' can't be used as they rely on bundler shims,
@@ -125,10 +135,13 @@ export class GitRemoteHTTP {
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
-    let res = await pify(simpleGet)({
+    let res = await http({
+      core,
+      emitter,
+      emitterPrefix,
       method: 'POST',
       url: `${url}/${service}`,
-      body: stream,
+      body,
       headers
     })
     if (res.statusCode !== 200) {

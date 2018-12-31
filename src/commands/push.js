@@ -3,6 +3,8 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
+import { fromStream } from '../utils/AsyncIterator.js'
+import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
@@ -146,15 +148,20 @@ export async function push ({
       outputStream: packstream
     })
     let res = await GitRemoteHTTP.connect({
+      core,
+      emitter,
+      emitterPrefix,
       corsProxy,
       service: 'git-receive-pack',
       url,
       noGitSuffix,
       auth,
       headers,
-      stream: packstream
+      body: fromStream(packstream)
     })
-    let { packfile, progress } = await GitSideBand.demux(res)
+    let { packfile, progress } = await GitSideBand.demux(
+      asyncIteratorToStream(res.body)
+    )
     if (emitter) {
       progress.on('data', chunk => {
         let msg = chunk.toString('utf8')

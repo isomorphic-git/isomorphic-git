@@ -208,6 +208,8 @@ unless there is a major version bump.
 - [credentialManager](https://isomorphic-git.github.io/docs/plugin_credentialManager.html)
 - [emitter](https://isomorphic-git.github.io/docs/plugin_emitter.html)
 - [fs](https://isomorphic-git.github.io/docs/plugin_fs.html)
+- [http](https://isomorphic-git.github.io/docs/plugin_http.html)
+- [pgp](https://isomorphic-git.github.io/docs/plugin_pgp.html)
 
 ## Community
 
