@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
 const { GitPktLine } = require('isomorphic-git/internal-apis')
-const bufferToStream = require('buffer-to-stream')
 
 describe('GitPktLine', () => {
   it('read buffer - simple', async () => {
@@ -63,7 +62,7 @@ describe('GitPktLine', () => {
   })
 
   it('read stream - simple', async () => {
-    let stream = bufferToStream(Buffer.from('0010hello world\n'))
+    let stream = [Buffer.from('0010hello world\n')]
     let read = GitPktLine.streamReader(stream)
     expect(typeof read === 'function').toBe(true)
     expect((await read()).toString('utf8') === 'hello world\n').toBe(true)
@@ -83,7 +82,7 @@ describe('GitPktLine', () => {
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
 0000`
     )
-    let stream = bufferToStream(buffer)
+    let stream = [buffer]
     let read = GitPktLine.streamReader(stream)
     expect(
       (await read()).toString('utf8') === '# service=git-upload-pack\n'

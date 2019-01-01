@@ -5,7 +5,6 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
 import { readObject } from '../storage/readObject.js'
-import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { collect } from '../utils/collect.js'
 import { forAwait } from '../utils/forAwait.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
@@ -282,7 +281,7 @@ async function fetchPackfile ({
     body: [packbuffer],
     headers
   })
-  let response = await parseUploadPackResponse(asyncIteratorToStream(raw.body))
+  let response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
     response.headers = raw.headers
   }

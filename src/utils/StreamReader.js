@@ -65,6 +65,9 @@ export class StreamReader {
     if (done) {
       this._ended = true
     }
+    if (value) {
+      value = Buffer.from(value)
+    }
     return value
   }
   _trim () {

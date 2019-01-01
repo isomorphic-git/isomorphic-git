@@ -3,7 +3,6 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
-import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { collect } from '../utils/collect.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
@@ -159,9 +158,7 @@ export async function push ({
       headers,
       body: [...packstream1, ...packstream2]
     })
-    let { packfile, progress } = await GitSideBand.demux(
-      asyncIteratorToStream(res.body)
-    )
+    let { packfile, progress } = await GitSideBand.demux(res.body)
     if (emitter) {
       forAwait(progress, chunk => {
         let msg = chunk.toString('utf8')
