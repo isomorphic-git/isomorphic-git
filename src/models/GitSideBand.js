@@ -19,9 +19,6 @@ information.
 If no 'side-band' capability was specified, the server will stream the
 entire packfile without multiplexing.
 */
-// import splitBuffer from 'split-buffer'
-import { PassThrough } from 'readable-stream'
-
 import { GitPktLine } from './GitPktLine.js'
 import { FIFO } from '../utils/FIFO.js'
 
@@ -29,7 +26,7 @@ export class GitSideBand {
   static demux (input) {
     let read = GitPktLine.streamReader(input)
     // And now for the ridiculous side-band or side-band-64k protocol
-    let packetlines = new PassThrough()
+    let packetlines = new FIFO()
     let packfile = new FIFO()
     let progress = new FIFO()
     // TODO: Use a proper through stream?
