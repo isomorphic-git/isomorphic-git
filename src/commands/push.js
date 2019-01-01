@@ -3,7 +3,6 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
-import { fromStream } from '../utils/AsyncIterator.js'
 import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
@@ -137,15 +136,14 @@ export async function push ({
       [...httpRemote.capabilities],
       ['report-status', 'side-band-64k', `agent=${pkg.agent}`]
     )
-    let packstream = await writeReceivePackRequest({
+    let packstream1 = await writeReceivePackRequest({
       capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
-    pack({
+    let packstream2 = await pack({
       fs,
       gitdir,
-      oids: [...objects],
-      outputStream: packstream
+      oids: [...objects]
     })
     let res = await GitRemoteHTTP.connect({
       core,
@@ -157,7 +155,7 @@ export async function push ({
       noGitSuffix,
       auth,
       headers,
-      body: fromStream(packstream)
+      body: [...packstream1, ...packstream2]
     })
     let { packfile, progress } = await GitSideBand.demux(
       asyncIteratorToStream(res.body)

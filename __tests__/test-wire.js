@@ -1,5 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const {
+  collect,
   parseRefsAdResponse,
   parseUploadPackResponse,
   parseUploadPackRequest,
@@ -7,8 +8,6 @@ const {
   writeUploadPackRequest
 } = require('isomorphic-git/internal-apis')
 const bufferToStream = require('buffer-to-stream')
-const pify = require('pify')
-const concat = require('simple-concat')
 // const stream = require('stream')
 
 /*
@@ -114,7 +113,7 @@ describe('git wire protocol', () => {
         'refs/heads/master5': 'e5c144897b64a44bd1164a0db60738452c9eaf87'
       }
     })
-    let buffer = await pify(concat)(res)
+    let buffer = await collect(res)
     expect(buffer.toString('utf8')).toBe(
       `01149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
@@ -190,8 +189,8 @@ describe('git wire protocol', () => {
         'e5c144897b64a44bd1164a0db60738452c9eaf87'
       ]
     }
-    let result = await writeUploadPackRequest(req)
-    let buffer = await pify(concat)(result)
+    let result = writeUploadPackRequest(req)
+    let buffer = await collect(result)
     expect(buffer.toString('utf8'))
       .toEqual(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
 0032want 5faa96fe725306e060386975a70e4b6eacb576ed

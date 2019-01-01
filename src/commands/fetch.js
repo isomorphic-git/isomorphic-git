@@ -9,7 +9,8 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
 import { readObject } from '../storage/readObject.js'
-import { asyncIteratorToStream } from '../utils/asyncIteratorToStream'
+import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
+import { collect } from '../utils/collect.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
@@ -261,19 +262,18 @@ async function fetchPackfile ({
   }
   let oids = await GitShallowManager.read({ fs, gitdir })
   let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
-  let packstream = await writeUploadPackRequest({
+  let packstream = writeUploadPackRequest({
     capabilities,
     wants,
     haves,
     shallows,
     depth,
     since,
-    exclude,
-    relative
+    exclude
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
-  let packbuffer = await pify(concat)(packstream)
+  let packbuffer = await collect(packstream)
   let raw = await GitRemoteHTTP.connect({
     core,
     emitter,

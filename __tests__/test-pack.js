@@ -1,11 +1,8 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
-const pify = require('pify')
-const stream = require('stream')
-const concat = require('simple-concat')
 
-const { pack } = require('isomorphic-git/internal-apis')
+const { pack, collect } = require('isomorphic-git/internal-apis')
 
 describe('pack', () => {
   it('git.pack', async () => {
@@ -15,11 +12,9 @@ describe('pack', () => {
     let fixture = await fs.read(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
-    let fstream = new stream.PassThrough()
-    await pack({
+    let fstream = await pack({
       fs,
       gitdir,
-      outputStream: fstream,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',
         '0bfe8fa3764089465235461624f2ede1533e74ec',
@@ -35,7 +30,7 @@ describe('pack', () => {
         '5477471ab5a6a8f2c217023532475044117a8f2c'
       ]
     })
-    let result = await pify(concat)(fstream)
+    let result = await collect(fstream)
     expect(fixture.buffer).toEqual(result.buffer)
   })
 })
