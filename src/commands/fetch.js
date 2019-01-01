@@ -1,7 +1,3 @@
-import pify from 'pify'
-import concat from 'simple-concat'
-import split2 from 'split2'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -11,10 +7,12 @@ import { GitPackIndex } from '../models/GitPackIndex.js'
 import { readObject } from '../storage/readObject.js'
 import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { collect } from '../utils/collect.js'
+import { forAwait } from '../utils/forAwait.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { splitLines } from '../utils/splitLines.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 
@@ -89,13 +87,11 @@ export async function fetch ({
         fetchHead: null
       }
     }
-    // Note: progress messages are designed to be written directly to the terminal,
-    // so they are often sent with just a carriage return to overwrite the last line of output.
-    // But there are also messages delimited with newlines.
-    // I also include CRLF just in case.
-    response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
-      if (emitter) {
+    if (emitter) {
+      let lines = splitLines(response.progress)
+      forAwait(lines, line => {
         emitter.emit(`${emitterPrefix}message`, line.trim())
+        emitter.emit(`${emitterPrefix}rawmessage`, line)
         let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
           emitter.emit(`${emitterPrefix}progress`, {
@@ -105,9 +101,9 @@ export async function fetch ({
             lengthComputable: true
           })
         }
-      }
-    })
-    let packfile = await pify(concat)(response.packfile)
+      })
+    }
+    let packfile = await collect(response.packfile)
     let packfileSha = packfile.slice(-20).toString('hex')
     // TODO: Return more metadata?
     let res = {

@@ -4,7 +4,9 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
+import { collect } from '../utils/collect.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
@@ -161,12 +163,13 @@ export async function push ({
       asyncIteratorToStream(res.body)
     )
     if (emitter) {
-      progress.on('data', chunk => {
+      forAwait(progress, chunk => {
         let msg = chunk.toString('utf8')
         emitter.emit(`${emitterPrefix}message`, msg)
       })
     }
     // Parse the response!
+    packfile = await collect(packfile)
     let result = await parseReceivePackResponse(packfile)
     if (res.headers) {
       result.headers = res.headers
