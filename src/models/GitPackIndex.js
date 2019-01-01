@@ -2,7 +2,6 @@ import crc32 from 'crc-32'
 import applyDelta from 'git-apply-delta'
 import * as marky from 'marky'
 import pako from 'pako'
-import { PassThrough } from 'readable-stream'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
@@ -11,12 +10,6 @@ import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject'
-
-function buffer2stream (buffer) {
-  let stream = new PassThrough()
-  stream.end(buffer)
-  return stream
-}
 
 function decodeVarInt (reader) {
   let bytes = []
@@ -151,7 +144,7 @@ export class GitPackIndex {
     marky.mark('offsets')
     marky.mark('percent')
     await listpack(
-      buffer2stream(pack),
+      [pack],
       ({ data, type, reference, offset, num }) => {
         if (totalObjectCount === null) totalObjectCount = num
         let percent = Math.floor(

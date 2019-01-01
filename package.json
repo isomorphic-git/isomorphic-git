@@ -64,8 +64,7 @@
     "sha.js": "^2.4.9",
     "simple-concat": "^1.0.0",
     "simple-get": "^3.0.2",
-    "stream-source": "^0.3.5",
-    "through2": "^3.0.0"
+    "stream-source": "^0.3.5"
   },
   "devDependencies": {
     "@babel/core": "7.2.0",

@@ -1,7 +1,9 @@
+import { getIterator } from './getIterator.js'
+
 // inspired by 'gartal' but lighter-weight and more battle-tested.
 export class StreamReader {
   constructor (stream) {
-    this.stream = stream
+    this.stream = getIterator(stream)
     this.buffer = null
     this.cursor = 0
     this.undoCursor = 0
@@ -57,34 +59,13 @@ export class StreamReader {
   async undo () {
     this.cursor = this.undoCursor
   }
-  _next () {
-    return new Promise((resolve, reject) => {
-      this.started = true
-      this.stream.once('error', err => {
-        this.stream.removeAllListeners()
-        reject(err)
-      })
-      this.stream.once('end', () => {
-        this.stream.removeAllListeners()
-        this._ended = true
-        resolve()
-      })
-      this.stream.once('readable', () => {
-        this.stream.removeAllListeners()
-        let buffers = []
-        let data = this.stream.read()
-        while (data) {
-          buffers.push(data)
-          data = this.stream.read()
-        }
-        let nextbuffer = Buffer.concat(buffers)
-        if (nextbuffer.length === 0) {
-          this._ended = true
-          this.stream.destroy()
-        }
-        resolve(nextbuffer)
-      })
-    })
+  async _next () {
+    this.started = true
+    let {done, value} = await this.stream.next()
+    if (done) {
+      this._ended = true
+    }
+    return value
   }
   _trim () {
     // Throw away parts of the buffer we don't need anymore
