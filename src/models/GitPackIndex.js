@@ -2,7 +2,6 @@ import crc32 from 'crc-32'
 import applyDelta from 'git-apply-delta'
 import * as marky from 'marky'
 import pako from 'pako'
-import { PassThrough } from 'readable-stream'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
@@ -11,12 +10,6 @@ import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject'
-
-function buffer2stream (buffer) {
-  let stream = new PassThrough()
-  stream.end(buffer)
-  return stream
-}
 
 function decodeVarInt (reader) {
   let bytes = []
@@ -150,68 +143,65 @@ export class GitPackIndex {
     marky.mark('total')
     marky.mark('offsets')
     marky.mark('percent')
-    await listpack(
-      buffer2stream(pack),
-      ({ data, type, reference, offset, num }) => {
-        if (totalObjectCount === null) totalObjectCount = num
-        let percent = Math.floor(
-          ((totalObjectCount - num) * 100) / totalObjectCount
-        )
-        if (percent !== lastPercent) {
-          if (emitter) {
-            emitter.emit(`${emitterPrefix}progress`, {
-              phase: 'Receiving objects',
-              loaded: totalObjectCount - num,
-              total: totalObjectCount,
-              lengthComputable: true
-            })
-          }
-          log(
-            `${percent}%\t${Math.floor(
-              marky.stop('percent').duration
-            )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
-              histogram.blob
-            }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
-              histogram['ref-delta']
-            }`
-          )
-
-          histogram = {
-            commit: 0,
-            tree: 0,
-            blob: 0,
-            tag: 0,
-            'ofs-delta': 0,
-            'ref-delta': 0
-          }
-          bytesProcessed = 0
-          marky.mark('percent')
+    await listpack([pack], ({ data, type, reference, offset, num }) => {
+      if (totalObjectCount === null) totalObjectCount = num
+      let percent = Math.floor(
+        ((totalObjectCount - num) * 100) / totalObjectCount
+      )
+      if (percent !== lastPercent) {
+        if (emitter) {
+          emitter.emit(`${emitterPrefix}progress`, {
+            phase: 'Receiving objects',
+            loaded: totalObjectCount - num,
+            total: totalObjectCount,
+            lengthComputable: true
+          })
         }
-        lastPercent = percent
-        // Change type from a number to a meaningful string
-        type = listpackTypes[type]
+        log(
+          `${percent}%\t${Math.floor(
+            marky.stop('percent').duration
+          )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
+            histogram.blob
+          }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
+            histogram['ref-delta']
+          }`
+        )
 
-        histogram[type]++
-        bytesProcessed += data.byteLength
+        histogram = {
+          commit: 0,
+          tree: 0,
+          blob: 0,
+          tag: 0,
+          'ofs-delta': 0,
+          'ref-delta': 0
+        }
+        bytesProcessed = 0
+        marky.mark('percent')
+      }
+      lastPercent = percent
+      // Change type from a number to a meaningful string
+      type = listpackTypes[type]
 
-        if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
-          offsetToObject[offset] = {
-            type,
-            offset
-          }
-        } else if (type === 'ofs-delta') {
-          offsetToObject[offset] = {
-            type,
-            offset
-          }
-        } else if (type === 'ref-delta') {
-          offsetToObject[offset] = {
-            type,
-            offset
-          }
+      histogram[type]++
+      bytesProcessed += data.byteLength
+
+      if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
+        offsetToObject[offset] = {
+          type,
+          offset
+        }
+      } else if (type === 'ofs-delta') {
+        offsetToObject[offset] = {
+          type,
+          offset
+        }
+      } else if (type === 'ref-delta') {
+        offsetToObject[offset] = {
+          type,
+          offset
         }
       }
-    )
+    })
     times['offsets'] = Math.floor(marky.stop('offsets').duration)
 
     log('Computing CRCs')

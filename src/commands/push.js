@@ -3,12 +3,12 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
-import { fromStream } from '../utils/AsyncIterator.js'
-import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { splitLines } from '../utils/splitLines.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 
@@ -137,15 +137,14 @@ export async function push ({
       [...httpRemote.capabilities],
       ['report-status', 'side-band-64k', `agent=${pkg.agent}`]
     )
-    let packstream = await writeReceivePackRequest({
+    let packstream1 = await writeReceivePackRequest({
       capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
-    pack({
+    let packstream2 = await pack({
       fs,
       gitdir,
-      oids: [...objects],
-      outputStream: packstream
+      oids: [...objects]
     })
     let res = await GitRemoteHTTP.connect({
       core,
@@ -157,15 +156,13 @@ export async function push ({
       noGitSuffix,
       auth,
       headers,
-      body: fromStream(packstream)
+      body: [...packstream1, ...packstream2]
     })
-    let { packfile, progress } = await GitSideBand.demux(
-      asyncIteratorToStream(res.body)
-    )
+    let { packfile, progress } = await GitSideBand.demux(res.body)
     if (emitter) {
-      progress.on('data', chunk => {
-        let msg = chunk.toString('utf8')
-        emitter.emit(`${emitterPrefix}message`, msg)
+      let lines = splitLines(progress)
+      forAwait(lines, line => {
+        emitter.emit(`${emitterPrefix}message`, line)
       })
     }
     // Parse the response!

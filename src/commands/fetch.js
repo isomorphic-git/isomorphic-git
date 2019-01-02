@@ -1,7 +1,3 @@
-import pify from 'pify'
-import concat from 'simple-concat'
-import split2 from 'split2'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -9,11 +5,13 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
 import { readObject } from '../storage/readObject.js'
-import { asyncIteratorToStream } from '../utils/asyncIteratorToStream'
+import { collect } from '../utils/collect.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { splitLines } from '../utils/splitLines.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 
@@ -88,13 +86,14 @@ export async function fetch ({
         fetchHead: null
       }
     }
-    // Note: progress messages are designed to be written directly to the terminal,
-    // so they are often sent with just a carriage return to overwrite the last line of output.
-    // But there are also messages delimited with newlines.
-    // I also include CRLF just in case.
-    response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
-      if (emitter) {
+    if (emitter) {
+      let lines = splitLines(response.progress)
+      forAwait(lines, line => {
+        // As a historical accident, 'message' events were trimmed removing valuable information,
+        // such as \r by itself which was a single to update the existing line instead of appending a new one.
+        // TODO NEXT BREAKING RELEASE: make 'message' behave like 'rawmessage' and remove 'rawmessage'.
         emitter.emit(`${emitterPrefix}message`, line.trim())
+        emitter.emit(`${emitterPrefix}rawmessage`, line)
         let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
           emitter.emit(`${emitterPrefix}progress`, {
@@ -104,9 +103,9 @@ export async function fetch ({
             lengthComputable: true
           })
         }
-      }
-    })
-    let packfile = await pify(concat)(response.packfile)
+      })
+    }
+    let packfile = await collect(response.packfile)
     let packfileSha = packfile.slice(-20).toString('hex')
     // TODO: Return more metadata?
     let res = {
@@ -261,19 +260,18 @@ async function fetchPackfile ({
   }
   let oids = await GitShallowManager.read({ fs, gitdir })
   let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
-  let packstream = await writeUploadPackRequest({
+  let packstream = writeUploadPackRequest({
     capabilities,
     wants,
     haves,
     shallows,
     depth,
     since,
-    exclude,
-    relative
+    exclude
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
-  let packbuffer = await pify(concat)(packstream)
+  let packbuffer = await collect(packstream)
   let raw = await GitRemoteHTTP.connect({
     core,
     emitter,
@@ -286,7 +284,7 @@ async function fetchPackfile ({
     body: [packbuffer],
     headers
   })
-  let response = await parseUploadPackResponse(asyncIteratorToStream(raw.body))
+  let response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
     response.headers = raw.headers
   }

@@ -1,42 +1,39 @@
-import { PassThrough } from 'readable-stream'
-
 import { GitPktLine } from '../models/GitPktLine.js'
 
-export async function writeUploadPackRequest ({
+export function writeUploadPackRequest ({
   capabilities = [],
   wants = [],
   haves = [],
   shallows = [],
   depth = null,
   since = null,
-  exclude = [],
-  relative = false
+  exclude = []
 }) {
-  let packstream = new PassThrough()
+  let packstream = []
   wants = [...new Set(wants)] // remove duplicates
   let firstLineCapabilities = ` ${capabilities.join(' ')}`
   for (const oid of wants) {
-    packstream.write(GitPktLine.encode(`want ${oid}${firstLineCapabilities}\n`))
+    packstream.push(GitPktLine.encode(`want ${oid}${firstLineCapabilities}\n`))
     firstLineCapabilities = ''
   }
   for (const oid of shallows) {
-    packstream.write(GitPktLine.encode(`shallow ${oid}\n`))
+    packstream.push(GitPktLine.encode(`shallow ${oid}\n`))
   }
   if (depth !== null) {
-    packstream.write(GitPktLine.encode(`deepen ${depth}\n`))
+    packstream.push(GitPktLine.encode(`deepen ${depth}\n`))
   }
   if (since !== null) {
-    packstream.write(
+    packstream.push(
       GitPktLine.encode(`deepen-since ${Math.floor(since.valueOf() / 1000)}\n`)
     )
   }
   for (const oid of exclude) {
-    packstream.write(GitPktLine.encode(`deepen-not ${oid}\n`))
+    packstream.push(GitPktLine.encode(`deepen-not ${oid}\n`))
   }
-  packstream.write(GitPktLine.flush())
+  packstream.push(GitPktLine.flush())
   for (const oid of haves) {
-    packstream.write(GitPktLine.encode(`have ${oid}\n`))
+    packstream.push(GitPktLine.encode(`have ${oid}\n`))
   }
-  packstream.end(GitPktLine.encode(`done\n`))
+  packstream.push(GitPktLine.encode(`done\n`))
   return packstream
 }
