@@ -75,7 +75,7 @@
     "@types/jest": "^23.3.10",
     "@types/node": "10.12.12",
     "agadoo": "git+https://github.com/wmhilton-contrib/agadoo.git#external-imports",
-    "all-contributors-cli": "5.4.1",
+    "all-contributors-cli": "5.6.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.4",
     "browserfs": "2.0.0",
