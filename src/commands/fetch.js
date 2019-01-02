@@ -94,7 +94,6 @@ export async function fetch ({
         // TODO NEXT BREAKING RELEASE: make 'message' behave like 'rawmessage' and remove 'rawmessage'.
         emitter.emit(`${emitterPrefix}message`, line.trim())
         emitter.emit(`${emitterPrefix}rawmessage`, line)
-        console.log(['line', line])
         let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
           emitter.emit(`${emitterPrefix}progress`, {
