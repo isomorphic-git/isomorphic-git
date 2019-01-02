@@ -61,7 +61,7 @@ export class StreamReader {
   }
   async _next () {
     this.started = true
-    let {done, value} = await this.stream.next()
+    let { done, value } = await this.stream.next()
     if (done) {
       this._ended = true
     }

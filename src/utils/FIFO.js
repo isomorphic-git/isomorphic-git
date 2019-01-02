@@ -3,7 +3,7 @@ export class FIFO {
     this._queue = []
   }
   write (chunk) {
-    if (this._ended) throw Error('You cannot write to a FIFO that has already been ended!')
+    if (this._ended) { throw Error('You cannot write to a FIFO that has already been ended!') }
     if (this._waiting) {
       let resolve = this._waiting
       this._waiting = null
@@ -32,9 +32,11 @@ export class FIFO {
       return { done: true }
     }
     if (this._waiting) {
-      throw Error('You cannot call read until the previous call to read has returned!')
+      throw Error(
+        'You cannot call read until the previous call to read has returned!'
+      )
     }
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this._waiting = resolve
     })
   }

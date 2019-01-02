@@ -50,8 +50,8 @@ Examples (as C-style strings):
 ----
 */
 import { BufferCursor } from '../utils/BufferCursor.js'
-import { padHex } from '../utils/padHex.js'
 import { StreamReader } from '../utils/StreamReader.js'
+import { padHex } from '../utils/padHex.js'
 
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line
