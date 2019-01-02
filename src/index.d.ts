@@ -164,7 +164,13 @@ export type HttpResponse = HttpRequest & {
   statusMessage: string;
 }
 
-export type GitHttpPlugin = (request: HttpRequest) => HttpResponse;
+export type GitHttpPlugin = (
+  request: HttpRequest & {
+    core?: string,
+    emitter?: GitEmitterPlugin,
+    emitterPrefix?: string
+  }
+) => HttpResponse;
 
 export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "http"
 
