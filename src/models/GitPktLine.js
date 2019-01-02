@@ -49,9 +49,7 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
-import streamSource from 'stream-source/index.node.js'
-
-import { BufferCursor } from '../utils/BufferCursor.js'
+import { StreamReader } from '../utils/StreamReader.js'
 import { padHex } from '../utils/padHex.js'
 
 // I'm really using this more as a namespace.
@@ -71,28 +69,16 @@ export class GitPktLine {
     return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
   }
 
-  static reader (buffer) {
-    let buffercursor = new BufferCursor(buffer)
-    return async function read () {
-      if (buffercursor.eof()) return true
-      let length = parseInt(buffercursor.slice(4).toString('utf8'), 16)
-      if (length === 0) return null
-      return buffercursor.slice(length - 4)
-    }
-  }
-
-  // Note: also accepts buffer input for flexibility
   static streamReader (stream) {
-    if (!stream.on) return GitPktLine.reader(stream)
-    const bufferstream = streamSource(stream)
+    const reader = new StreamReader(stream)
     return async function read () {
       try {
-        let length = await bufferstream.slice(4)
-        if (length === null) return true
+        let length = await reader.read(4)
+        if (length == null) return true
         length = parseInt(length.toString('utf8'), 16)
         if (length === 0) return null
-        let buffer = await bufferstream.slice(length - 4)
-        if (buffer === null) return true
+        let buffer = await reader.read(length - 4)
+        if (buffer == null) return true
         return buffer
       } catch (err) {
         console.log('error', err)

@@ -21,6 +21,7 @@ module.exports = [
     devtool: 'source-map',
     plugins: [
       new webpack.IgnorePlugin({ resourceRegExp: /^simple-get$/ }),
+      new webpack.IgnorePlugin({ resourceRegExp: /^readable-stream$/ }),
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
         analyzerMode: 'static',

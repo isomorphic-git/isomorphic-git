@@ -62,11 +62,7 @@
     "pify": "^4.0.1",
     "readable-stream": "2 || 3",
     "sha.js": "^2.4.9",
-    "simple-concat": "^1.0.0",
-    "simple-get": "^3.0.2",
-    "split2": "^3.0.0",
-    "stream-source": "^0.3.5",
-    "through2": "^3.0.0"
+    "simple-get": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "7.2.0",
@@ -79,11 +75,10 @@
     "@types/jest": "^23.3.10",
     "@types/node": "10.12.12",
     "agadoo": "git+https://github.com/wmhilton-contrib/agadoo.git#external-imports",
-    "all-contributors-cli": "5.4.1",
+    "all-contributors-cli": "5.6.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.4",
     "browserfs": "2.0.0",
-    "buffer-to-stream": "1.0.0",
     "bundlesize": "0.17.0",
     "cross-env": "5.2.0",
     "duplicate-package-checker-webpack-plugin": "3.0.0",
