@@ -49,7 +49,6 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
-import { BufferCursor } from '../utils/BufferCursor.js'
 import { StreamReader } from '../utils/StreamReader.js'
 import { padHex } from '../utils/padHex.js'
 
@@ -68,16 +67,6 @@ export class GitPktLine {
     let length = line.length + 4
     let hexlength = padHex(4, length)
     return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
-  }
-
-  static reader (buffer) {
-    let buffercursor = new BufferCursor(buffer)
-    return async function read () {
-      if (buffercursor.eof()) return true
-      let length = parseInt(buffercursor.slice(4).toString('utf8'), 16)
-      if (length === 0) return null
-      return buffercursor.slice(length - 4)
-    }
   }
 
   static streamReader (stream) {

@@ -3,12 +3,12 @@ import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
-import { collect } from '../utils/collect.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { splitLines } from '../utils/splitLines.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 
@@ -160,13 +160,12 @@ export async function push ({
     })
     let { packfile, progress } = await GitSideBand.demux(res.body)
     if (emitter) {
-      forAwait(progress, chunk => {
-        let msg = chunk.toString('utf8')
-        emitter.emit(`${emitterPrefix}message`, msg)
+      let lines = splitLines(progress)
+      forAwait(lines, line => {
+        emitter.emit(`${emitterPrefix}message`, line)
       })
     }
     // Parse the response!
-    packfile = await collect(packfile)
     let result = await parseReceivePackResponse(packfile)
     if (res.headers) {
       result.headers = res.headers

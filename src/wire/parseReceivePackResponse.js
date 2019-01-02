@@ -4,7 +4,7 @@ import { GitPktLine } from '../models/GitPktLine.js'
 export async function parseReceivePackResponse (packfile) {
   let result = {}
   let response = ''
-  let read = GitPktLine.reader(packfile)
+  let read = GitPktLine.streamReader(packfile)
   let line = await read()
   while (line !== true) {
     if (line !== null) response += line.toString('utf8') + '\n'
