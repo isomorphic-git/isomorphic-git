@@ -3,7 +3,9 @@ export class FIFO {
     this._queue = []
   }
   write (chunk) {
-    if (this._ended) { throw Error('You cannot write to a FIFO that has already been ended!') }
+    if (this._ended) {
+      throw Error('You cannot write to a FIFO that has already been ended!')
+    }
     if (this._waiting) {
       let resolve = this._waiting
       this._waiting = null
