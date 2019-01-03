@@ -107,8 +107,6 @@
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "openpgp": "2.6.2",
-    "organize-js-imports": "1.2.1",
-    "prettier-standard": "8.0.1",
     "pretty-format": "23.6.0",
     "puppeteer": "1.11.0",
     "replace-in-file": "3.4.2",
@@ -120,7 +118,7 @@
     "typescript": "3.2.2",
     "webpack": "4.28.3",
     "webpack-bundle-analyzer": "3.0.3",
-    "webpack-cli": "3.1.2"
+    "webpack-cli": "3.2.0"
   },
   "bundlesize": [
     {
