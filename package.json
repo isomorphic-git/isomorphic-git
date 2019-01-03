@@ -114,7 +114,7 @@
     "replace-in-file": "3.4.2",
     "rollup": "1.0.0",
     "semantic-release": "15.13.2",
-    "standard": "11.0.1",
+    "standard": "12.0.1",
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
     "typescript": "3.2.2",
