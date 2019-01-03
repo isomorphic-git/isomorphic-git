@@ -26,11 +26,6 @@ const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 
 module.exports = {
   scripts: {
-    format: {
-      default: series.nps('format.imports', 'format.prettier'),
-      imports: `node ./node_modules/organize-js-imports -maxNamesLength 0 -paths ${srcPaths}`,
-      prettier: retry3(`prettier-standard ${srcPaths}`)
-    },
     lint: {
       default: series.nps('lint.js', 'lint.typescript'),
       js: `standard ${srcPaths}`,
