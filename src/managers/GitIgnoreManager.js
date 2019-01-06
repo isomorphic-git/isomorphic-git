@@ -20,6 +20,8 @@ export class GitIgnoreManager {
     const fs = new FileSystem(_fs)
     // ALWAYS ignore ".git" folders.
     if (basename(filepath) === '.git') return true
+    // '.' is not a valid gitignore entry, so '.' is never ignored
+    if (filepath === '.') return false
     // Find all the .gitignore files that could affect this file
     let pairs = [
       {
