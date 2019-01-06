@@ -1,14 +1,12 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
-const pify = require('pify')
-const { plugins, status, add, remove } = require('isomorphic-git')
+const { status, add, remove } = require('isomorphic-git')
 
 describe('status', () => {
   it('status', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-status')
-    plugins.set('fs', fs)
     // Test
     const a = await status({ dir, gitdir, filepath: 'a.txt' })
     const b = await status({ dir, gitdir, filepath: 'b.txt' })
@@ -35,10 +33,10 @@ describe('status', () => {
     expect(d2).toEqual('added')
 
     // And finally the weirdo cases
-    let acontent = await pify(fs.readFile)(path.join(dir, 'a.txt'))
-    await pify(fs.writeFile)(path.join(dir, 'a.txt'), 'Hi')
+    let acontent = await fs.read(path.join(dir, 'a.txt'))
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
     await add({ dir, gitdir, filepath: 'a.txt' })
-    await pify(fs.writeFile)(path.join(dir, 'a.txt'), acontent)
+    await fs.write(path.join(dir, 'a.txt'), acontent)
     let a3 = await status({ dir, gitdir, filepath: 'a.txt' })
     expect(a3).toEqual('*unmodified')
 
@@ -46,9 +44,9 @@ describe('status', () => {
     let a4 = await status({ dir, gitdir, filepath: 'a.txt' })
     expect(a4).toEqual('*undeleted')
 
-    await pify(fs.writeFile)(path.join(dir, 'e.txt'), 'Hi')
+    await fs.write(path.join(dir, 'e.txt'), 'Hi')
     await add({ dir, gitdir, filepath: 'e.txt' })
-    await pify(fs.unlink)(path.join(dir, 'e.txt'))
+    await fs.rm(path.join(dir, 'e.txt'))
     let e3 = await status({ dir, gitdir, filepath: 'e.txt' })
     expect(e3).toEqual('*absent')
 

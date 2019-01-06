@@ -5,7 +5,6 @@ import { cores } from '../utils/plugins.js'
 import { checkout } from './checkout.js'
 import { config } from './config.js'
 import { fetch } from './fetch.js'
-import { indexPack } from './indexPack.js'
 import { init } from './init.js'
 
 /**
@@ -38,6 +37,7 @@ export async function clone ({
   singleBranch,
   noCheckout = false,
   noTags = false,
+  headers = {},
   onprogress
 }) {
   try {
@@ -71,7 +71,7 @@ export async function clone ({
       })
     }
     // Fetch commits
-    let { defaultBranch, packfile } = await fetch({
+    const { defaultBranch, fetchHead } = await fetch({
       core,
       gitdir,
       fs,
@@ -89,22 +89,12 @@ export async function clone ({
       exclude,
       relative,
       singleBranch,
+      headers,
       tags: !noTags
     })
+    if (fetchHead === null) return
     ref = ref || defaultBranch
     ref = ref.replace('refs/heads/', '')
-    // Note: we're indexing the pack eagerly instead of lazily so
-    // we get the nice progress events
-    if (packfile) {
-      await indexPack({
-        dir: gitdir,
-        gitdir,
-        fs,
-        emitter,
-        emitterPrefix,
-        filepath: packfile
-      })
-    }
     // Checkout that branch
     await checkout({
       dir,

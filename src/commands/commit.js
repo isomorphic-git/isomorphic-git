@@ -7,9 +7,8 @@ import { GitTree } from '../models/GitTree.js'
 import { writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { join } from '../utils/join.js'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { cores } from '../utils/plugins.js'
-
-import { config } from './config'
 
 /**
  * Create a new commit
@@ -28,26 +27,28 @@ export async function commit ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    // Fill in missing arguments with default values
-    if (author === undefined) author = {}
-    if (author.name === undefined) {
-      author.name = await config({ fs, gitdir, path: 'user.name' })
-    }
-    if (author.email === undefined) {
-      author.email = await config({ fs, gitdir, path: 'user.email' })
-    }
-    if (author.name === undefined || author.email === undefined) {
-      throw new GitError(E.MissingAuthorError)
-    }
+
     if (message === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'commit',
         parameter: 'message'
       })
     }
-    committer = committer || author
-    let authorDateTime = author.date || new Date()
-    let committerDateTime = committer.date || authorDateTime
+
+    // Fill in missing arguments with default values
+    author = await normalizeAuthorObject({ fs, gitdir, author })
+    if (author === undefined) {
+      throw new GitError(E.MissingAuthorError)
+    }
+
+    committer = Object.assign({}, committer || author)
+    // Match committer's date to author's one, if omitted
+    committer.date = committer.date || author.date
+    committer = await normalizeAuthorObject({ fs, gitdir, author: committer })
+    if (committer === undefined) {
+      throw new GitError(E.MissingCommitterError)
+    }
+
     let oid
     await GitIndexManager.acquire(
       { fs, filepath: `${gitdir}/index` },
@@ -66,32 +67,8 @@ export async function commit ({
         let comm = GitCommit.from({
           tree: treeRef,
           parent: parents,
-          author: {
-            name: author.name,
-            email: author.email,
-            timestamp:
-              author.timestamp !== undefined && author.timestamp !== null
-                ? author.timestamp
-                : Math.floor(authorDateTime.valueOf() / 1000),
-            timezoneOffset:
-              author.timezoneOffset !== undefined &&
-              author.timezoneOffset !== null
-                ? author.timezoneOffset
-                : new Date().getTimezoneOffset()
-          },
-          committer: {
-            name: committer.name,
-            email: committer.email,
-            timestamp:
-              committer.timestamp !== undefined && committer.timestamp !== null
-                ? committer.timestamp
-                : Math.floor(committerDateTime.valueOf() / 1000),
-            timezoneOffset:
-              committer.timezoneOffset !== undefined &&
-              committer.timezoneOffset !== null
-                ? committer.timezoneOffset
-                : new Date().getTimezoneOffset()
-          },
+          author,
+          committer,
           message
         })
         if (signingKey) {

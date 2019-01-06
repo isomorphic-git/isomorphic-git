@@ -1,10 +1,8 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
-const pify = require('pify')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const {
-  plugins,
   init,
   add,
   remove,
@@ -17,8 +15,7 @@ const {
 describe('unicode filepath support', () => {
   it('write/read index 日本語', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-unicode-paths')
-    plugins.set('fs', fs)
+    let { dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ dir, gitdir })
     // Test
     await add({ dir, gitdir, filepath: '日本語' })
@@ -29,11 +26,10 @@ describe('unicode filepath support', () => {
   it('write/read index docs/日本語', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-unicode-paths')
-    plugins.set('fs', fs)
     await init({ dir, gitdir })
     // Test
-    await pify(fs.mkdir)(path.join(dir, 'docs'))
-    await pify(fs.writeFile)(path.join(dir, 'docs/日本語'), '')
+    await fs.mkdir(path.join(dir, 'docs'))
+    await fs.write(path.join(dir, 'docs/日本語'), '')
     await add({ dir, gitdir, filepath: 'docs/日本語' })
     expect((await listFiles({ dir, gitdir }))[0]).toBe('docs/日本語')
     await remove({ dir, gitdir, filepath: 'docs/日本語' })
@@ -41,8 +37,7 @@ describe('unicode filepath support', () => {
   })
   it('write/read commit 日本語', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-unicode-paths')
-    plugins.set('fs', fs)
+    let { dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ dir, gitdir })
     await add({ dir, gitdir, filepath: '日本語' })
     // Test
@@ -65,8 +60,7 @@ describe('unicode filepath support', () => {
   })
   it('write/read tree 日本語', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-unicode-paths')
-    plugins.set('fs', fs)
+    let { dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ dir, gitdir })
     await add({ dir, gitdir, filepath: '日本語' })
     let sha = await commit({
@@ -88,8 +82,7 @@ describe('unicode filepath support', () => {
   })
   it('checkout 日本語', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-unicode-paths')
-    plugins.set('fs', fs)
+    let { dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ dir, gitdir })
     await add({ dir, gitdir, filepath: '日本語' })
     await commit({
@@ -112,9 +105,8 @@ describe('unicode filepath support', () => {
   it('checkout docs/日本語', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-unicode-paths')
-    plugins.set('fs', fs)
-    await pify(fs.mkdir)(path.join(dir, 'docs'))
-    await pify(fs.writeFile)(path.join(dir, 'docs/日本語'), '')
+    await fs.mkdir(path.join(dir, 'docs'))
+    await fs.write(path.join(dir, 'docs/日本語'), '')
     await init({ dir, gitdir })
     await add({ dir, gitdir, filepath: 'docs/日本語' })
     await commit({

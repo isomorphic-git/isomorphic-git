@@ -10,10 +10,7 @@ describe('GitRefManager', () => {
   })
   it('packedRefs', async () => {
     let { fs, gitdir } = await makeFixture('test-GitRefManager')
-    let refs = await GitRefManager.packedRefs({
-      fs,
-      gitdir
-    })
+    let refs = await GitRefManager.packedRefs({ fs, gitdir })
     expect([...refs]).toMatchSnapshot()
   })
   it('listRefs', async () => {
@@ -33,10 +30,7 @@ describe('GitRefManager', () => {
   })
   it('listBranches', async () => {
     let { fs, gitdir } = await makeFixture('test-GitRefManager')
-    let refs = await GitRefManager.listBranches({
-      fs,
-      gitdir
-    })
+    let refs = await GitRefManager.listBranches({ fs, gitdir })
     expect(refs).toMatchSnapshot()
     refs = await GitRefManager.listBranches({
       fs,
@@ -47,10 +41,7 @@ describe('GitRefManager', () => {
   })
   it('listTags', async () => {
     let { fs, gitdir } = await makeFixture('test-GitRefManager')
-    let refs = await GitRefManager.listTags({
-      fs,
-      gitdir
-    })
+    let refs = await GitRefManager.listTags({ fs, gitdir })
     expect(refs).toMatchSnapshot()
   })
 })

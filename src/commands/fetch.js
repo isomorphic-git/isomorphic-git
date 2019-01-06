@@ -1,16 +1,17 @@
-import pify from 'pify'
-import concat from 'simple-concat'
-import split2 from 'split2'
-
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { GitPackIndex } from '../models/GitPackIndex.js'
+import { readObject } from '../storage/readObject.js'
+import { collect } from '../utils/collect.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { splitLines } from '../utils/splitLines.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 
@@ -40,12 +41,13 @@ export async function fetch ({
   password = authPassword,
   token,
   oauth2format,
-  depth,
-  since,
-  exclude,
-  relative,
-  tags,
-  singleBranch,
+  depth = null,
+  since = null,
+  exclude = [],
+  relative = false,
+  tags = false,
+  singleBranch = false,
+  headers = {},
   onprogress // deprecated
 }) {
   try {
@@ -59,6 +61,8 @@ export async function fetch ({
       core,
       gitdir,
       fs,
+      emitter,
+      emitterPrefix,
       ref,
       refs,
       remote,
@@ -74,15 +78,22 @@ export async function fetch ({
       exclude,
       relative,
       tags,
-      singleBranch
+      singleBranch,
+      headers
     })
-    // Note: progress messages are designed to be written directly to the terminal,
-    // so they are often sent with just a carriage return to overwrite the last line of output.
-    // But there are also messages delimited with newlines.
-    // I also include CRLF just in case.
-    response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
-      if (emitter) {
+    if (response === null) {
+      return {
+        fetchHead: null
+      }
+    }
+    if (emitter) {
+      let lines = splitLines(response.progress)
+      forAwait(lines, line => {
+        // As a historical accident, 'message' events were trimmed removing valuable information,
+        // such as \r by itself which was a single to update the existing line instead of appending a new one.
+        // TODO NEXT BREAKING RELEASE: make 'message' behave like 'rawmessage' and remove 'rawmessage'.
         emitter.emit(`${emitterPrefix}message`, line.trim())
+        emitter.emit(`${emitterPrefix}rawmessage`, line)
         let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
           emitter.emit(`${emitterPrefix}progress`, {
@@ -92,9 +103,9 @@ export async function fetch ({
             lengthComputable: true
           })
         }
-      }
-    })
-    let packfile = await pify(concat)(response.packfile)
+      })
+    }
+    let packfile = await collect(response.packfile)
     let packfileSha = packfile.slice(-20).toString('hex')
     // TODO: Return more metadata?
     let res = {
@@ -112,7 +123,16 @@ export async function fetch ({
     // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
     if (packfileSha !== '') {
       res.packfile = `objects/pack/pack-${packfileSha}.pack`
-      await fs.write(join(gitdir, res.packfile), packfile)
+      const fullpath = join(gitdir, res.packfile)
+      await fs.write(fullpath, packfile)
+      const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
+      const idx = await GitPackIndex.fromPack({
+        pack: packfile,
+        getExternalRefDelta,
+        emitter,
+        emitterPrefix
+      })
+      await fs.write(fullpath.replace(/\.pack$/, '.idx'), idx.toBuffer())
     }
     return res
   } catch (err) {
@@ -125,6 +145,8 @@ async function fetchPackfile ({
   core,
   gitdir,
   fs: _fs,
+  emitter,
+  emitterPrefix,
   ref,
   refs = [ref],
   remote,
@@ -135,13 +157,13 @@ async function fetchPackfile ({
   password,
   token,
   oauth2format,
-  depth = null,
-  since = null,
-  exclude = [],
-  relative = false,
-  tags = false,
-  singleBranch = false,
-  headers = {}
+  depth,
+  since,
+  exclude,
+  relative,
+  tags,
+  singleBranch,
+  headers
 }) {
   const fs = new FileSystem(_fs)
   // Sanity checks
@@ -175,6 +197,11 @@ async function fetchPackfile ({
     headers
   })
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
+  const remoteRefs = remoteHTTP.refs
+  // For the special case of an empty repository with no refs, return null.
+  if (remoteRefs.size === 0) {
+    return null
+  }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
     throw new GitError(E.RemoteDoesNotSupportShallowFail)
@@ -191,20 +218,19 @@ async function fetchPackfile ({
   // Figure out the SHA for the requested ref
   let { oid, fullref } = GitRefManager.resolveAgainstMap({
     ref,
-    map: remoteHTTP.refs
+    map: remoteRefs
   })
-  // Filter out the refs we want to ignore
-  for (let ref of remoteHTTP.refs.keys()) {
-    // Keep the one we're cloning obviously
-    if (ref === fullref) continue
-    // Keep head
-    if (ref === 'HEAD') continue
-    // Keep branches
-    if (ref.startsWith('refs/heads/')) continue
-    // Keep tags if we're keeping tags
-    if (tags && ref.startsWith('refs/tags/')) continue
-    // Remove pull requests and other junk
-    remoteHTTP.refs.delete(ref)
+  // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
+  for (let remoteRef of remoteRefs.keys()) {
+    if (
+      remoteRef === fullref ||
+      remoteRef === 'HEAD' ||
+      remoteRef.startsWith('refs/heads/') ||
+      (tags && remoteRef.startsWith('refs/tags/'))
+    ) {
+      continue
+    }
+    remoteRefs.delete(remoteRef)
   }
   // Assemble the application/x-git-upload-pack-request
   const capabilities = filterCapabilities(
@@ -220,13 +246,13 @@ async function fetchPackfile ({
   )
   if (relative) capabilities.push('deepen-relative')
   // Start requesting oids from the remote by their SHAs
-  let wants = singleBranch ? [oid] : remoteHTTP.refs.values()
+  let wants = singleBranch ? [oid] : remoteRefs.values()
   let haves = []
   for (let ref of refs) {
     try {
       ref = await GitRefManager.expand({ fs, gitdir, ref })
       // TODO: Actually, should we test whether we have the object using readObject?
-      if (!ref.startsWith('refs/tags')) {
+      if (!ref.startsWith('refs/tags/')) {
         let have = await GitRefManager.resolve({ fs, gitdir, ref })
         haves.push(have)
       }
@@ -234,31 +260,31 @@ async function fetchPackfile ({
   }
   let oids = await GitShallowManager.read({ fs, gitdir })
   let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
-  let packstream = await writeUploadPackRequest({
+  let packstream = writeUploadPackRequest({
     capabilities,
     wants,
     haves,
     shallows,
     depth,
     since,
-    exclude,
-    relative
+    exclude
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
-  packstream = await pify(concat)(packstream)
+  let packbuffer = await collect(packstream)
   let raw = await GitRemoteHTTP.connect({
+    core,
+    emitter,
+    emitterPrefix,
     corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,
     auth,
-    stream: packstream,
+    body: [packbuffer],
     headers
   })
-  // Normally I would await this, but for some reason I'm having trouble detecting
-  // when this header portion is over.
-  let response = await parseUploadPackResponse(raw)
+  let response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
     response.headers = raw.headers
   }
@@ -285,7 +311,7 @@ async function fetchPackfile ({
       key = value
     }
     // final value must not be a symref but a real ref
-    refs.set(key, remoteHTTP.refs.get(key))
+    refs.set(key, remoteRefs.get(key))
     await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
@@ -299,7 +325,7 @@ async function fetchPackfile ({
       fs,
       gitdir,
       remote,
-      refs: remoteHTTP.refs,
+      refs: remoteRefs,
       symrefs: remoteHTTP.symrefs,
       tags
     })
@@ -311,11 +337,11 @@ async function fetchPackfile ({
   if (response.HEAD === undefined) {
     let { oid } = GitRefManager.resolveAgainstMap({
       ref: 'HEAD',
-      map: remoteHTTP.refs
+      map: remoteRefs
     })
     // Use the name of the first branch that's not called HEAD that has
     // the same SHA as the branch called HEAD.
-    for (let [key, value] of remoteHTTP.refs.entries()) {
+    for (let [key, value] of remoteRefs.entries()) {
       if (key !== 'HEAD' && value === oid) {
         response.HEAD = key
         break

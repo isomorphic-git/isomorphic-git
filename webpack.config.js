@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
@@ -19,6 +20,8 @@ module.exports = [
     mode: 'production',
     devtool: 'source-map',
     plugins: [
+      new webpack.IgnorePlugin({ resourceRegExp: /^simple-get$/ }),
+      new webpack.IgnorePlugin({ resourceRegExp: /^readable-stream$/ }),
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
         analyzerMode: 'static',

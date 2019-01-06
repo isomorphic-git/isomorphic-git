@@ -2,28 +2,25 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const snapshots = require('./__snapshots__/test-log.js.snap')
-const { plugins, log } = require('isomorphic-git')
+const { log } = require('isomorphic-git')
 
 describe('log', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
   })
   it('HEAD', async () => {
-    let { fs, gitdir } = await makeFixture('test-log')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-log')
     let commits = await log({ gitdir, ref: 'HEAD' })
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
   })
   it('HEAD depth', async () => {
-    let { fs, gitdir } = await makeFixture('test-log')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-log')
     let commits = await log({ gitdir, ref: 'HEAD', depth: 1 })
     expect(commits.length).toBe(1)
   })
   it('HEAD since', async () => {
-    let { fs, gitdir } = await makeFixture('test-log')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-log')
     let commits = await log({
       gitdir,
       ref: 'HEAD',
@@ -32,16 +29,14 @@ describe('log', () => {
     expect(commits.length).toBe(2)
   })
   it('test-branch', async () => {
-    let { fs, gitdir } = await makeFixture('test-log')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-log')
     let commits = await log({ gitdir, ref: 'origin/test-branch' })
     expect(commits).toMatchSnapshot()
   })
   it('with signing payloads', async () => {
     // Setup
     const openpgp = require('openpgp/dist/openpgp.min.js')
-    let { fs, gitdir } = await makeFixture('test-log')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-log')
     // Test
     let commits = await log({ gitdir, ref: 'HEAD', signing: true })
     expect(commits.length).toBe(5)
@@ -54,8 +49,7 @@ describe('log', () => {
     }
   })
   it('with complex merging history', async () => {
-    let { fs, gitdir } = await makeFixture('test-log-complex')
-    plugins.set('fs', fs)
+    let { gitdir } = await makeFixture('test-log-complex')
     let commits = await log({ gitdir, ref: 'master' })
     expect(commits).toMatchSnapshot()
   })

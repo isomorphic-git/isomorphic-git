@@ -51,7 +51,7 @@ export async function resetIndex ({
       size: 0
     }
     // If the file exists in the workdir...
-    const object = await fs.read(join(dir, filepath))
+    const object = dir && (await fs.read(join(dir, filepath)))
     if (object) {
       // ... and has the same hash as the desired state...
       workdirOid = await hashObject({

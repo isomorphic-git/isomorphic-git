@@ -11,7 +11,7 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
   const fs = new FileSystem(_fs)
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
-  const getExternalRefDelta = oid => readObject({ fs: _fs, gitdir, oid })
+  const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
 
   // Look for it in the loose object directory.
   let result = await readObjectLoose({ fs, gitdir, oid })

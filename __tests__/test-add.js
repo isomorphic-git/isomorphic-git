@@ -1,20 +1,18 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const path = require('path')
-const pify = require('pify')
-const { plugins, init, add, listFiles } = require('isomorphic-git')
+
+const { init, add, listFiles } = require('isomorphic-git')
 
 // NOTE: we cannot actually commit a real .gitignore file in fixtures or fixtures won't be included in this repo
-const writeGitIgnore = async (fs, dir) => pify(fs.writeFile)(
-  path.join(dir, '.gitignore'),
+const writeGitIgnore = async (fs, dir) => fs.write(
+  dir + '/.gitignore',
   ['*-pattern.js', 'i.txt', 'js_modules', '.DS_Store'].join('\n')
 )
 
 describe('add', () => {
   it('file', async () => {
     // Setup
-    let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
+    let { dir } = await makeFixture('test-add')
     // Test
     await init({ dir })
     await add({ dir, filepath: 'a.txt' })
@@ -29,7 +27,6 @@ describe('add', () => {
   it('ignored file', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
     await writeGitIgnore(fs, dir)
     // Test
     await init({ dir })
@@ -38,8 +35,7 @@ describe('add', () => {
   })
   it('non-existant file', async () => {
     // Setup
-    let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
+    let { dir } = await makeFixture('test-add')
     // Test
     await init({ dir })
     let err = null
@@ -52,8 +48,7 @@ describe('add', () => {
   })
   it('folder', async () => {
     // Setup
-    let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
+    let { dir } = await makeFixture('test-add')
     // Test
     await init({ dir })
     expect((await listFiles({ dir })).length).toEqual(0)
@@ -63,7 +58,6 @@ describe('add', () => {
   it('folder with .gitignore', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
     await writeGitIgnore(fs, dir)
     // Test
     await init({ dir })
@@ -74,7 +68,6 @@ describe('add', () => {
   it('git add .', async () => {
     // Setup
     let { fs, dir } = await makeFixture('test-add')
-    plugins.set('fs', fs)
     await writeGitIgnore(fs, dir)
     // Test
     await init({ dir })

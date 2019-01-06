@@ -29,6 +29,12 @@ module.exports = function (config) {
         included: false
       },
       {
+        pattern: '__tests__/__fixtures__/**/.superblock.txt',
+        served: true,
+        watched: false,
+        included: false
+      },
+      {
         pattern: '__tests__/__fixtures__/**/.gitignore',
         served: true,
         watched: false,
@@ -65,11 +71,14 @@ module.exports = function (config) {
       },
       sl_edge: {
         base: 'SauceLabs',
-        browserName: 'MicrosoftEdge'
+        browserName: 'MicrosoftEdge',
+        version: '17.17134'
       },
       sl_safari: {
         base: 'SauceLabs',
-        browserName: 'safari'
+        browserName: 'safari',
+        platform: 'macOS 10.13',
+        version: '11.1'
       },
       sl_ios_safari: {
         base: 'SauceLabs',
@@ -78,6 +87,14 @@ module.exports = function (config) {
         platformVersion: '11.2',
         browserName: 'Safari',
         appiumVersion: '1.7.2'
+      },
+      sl_ios_safari12: {
+        base: 'SauceLabs',
+        deviceName: 'iPhone 8 Simulator',
+        platformName: 'iOS',
+        platformVersion: '12.0',
+        browserName: 'Safari',
+        appiumVersion: '1.9.1'
       },
       sl_android_chrome: {
         base: 'SauceLabs',
@@ -134,7 +151,9 @@ module.exports = function (config) {
         new webpack.DefinePlugin({
           'process.env.TEST_PUSH_GITHUB_TOKEN': `'${
             process.env.TEST_PUSH_GITHUB_TOKEN
-          }'`
+          }'`,
+          'process.env.ENABLE_LIGHTNINGFS': `${!!process.env
+            .ENABLE_LIGHTNINGFS}`
         })
       ],
       resolve: {

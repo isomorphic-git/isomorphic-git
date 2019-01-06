@@ -2,6 +2,7 @@
 // forked from https://github.com/jvilk/BrowserFS/blob/master/scripts/make_http_index.ts
 var fs = require('fs')
 var path = require('path')
+var superblocktxt = require('@isomorphic-git/lightning-fs/src/superblocktxt.js')
 var symLinks = {}
 
 function rdSync (dpath, tree, name) {
@@ -40,5 +41,11 @@ var fsListing = JSON.stringify(
 fs.writeFileSync(
   path.join(__dirname, '..', '__fixtures__', 'index.json'),
   fsListing,
+  { encoding: 'utf8' }
+)
+
+fs.writeFileSync(
+  path.join(__dirname, '..', '__fixtures__', '.superblock.txt'),
+  superblocktxt(path.join(__dirname, '..', '__fixtures__')),
   { encoding: 'utf8' }
 )

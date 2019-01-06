@@ -4,6 +4,10 @@ Oh wow! Thanks for opening up the contributing file! :grin: :tada:
 
 You are very welcome here and any contribution is appreciated. :+1:
 
+# Tips
+
+The code is written in "plain" JavaScript and as a rule of thumb shouldn't require transpilation. (The glaring exception being browser's lack of support for bare imports.) However, until recently Webpack and Jest threw a parse error when they encountered object spread properties (like `{... args}`). So for now I ask that you use `Object.assign`. Too many people ran into issues with object spread. See https://gitter.im/isomorphic-git/Lobby?at=5bd8a0ed435c2a518e2cc779 for background. We'll upgrade all the Object.assign uses to object spread properties when we do a breaking release.
+
 ## New feature checklists :sparkles:️
 I'm honestly documenting these steps just so I don't forget them myself.
 
