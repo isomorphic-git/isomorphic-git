@@ -1,5 +1,5 @@
-import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
+import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { writeObject } from '../storage/writeObject.js'
@@ -37,7 +37,12 @@ export async function add ({
 
 async function addToIndex ({ dir, gitdir, fs, filepath, index }) {
   // TODO: Should ignore UNLESS it's already in the index.
-  const ignored = await GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath })
+  const ignored = await GitIgnoreManager.isIgnored({
+    fs,
+    dir,
+    gitdir,
+    filepath
+  })
   if (ignored) return
   let stats = await fs.lstat(join(dir, filepath))
   if (!stats) throw new GitError(E.FileReadError, { filepath })

@@ -32,7 +32,10 @@ async function httpBrowser ({ url, method = 'GET', headers = {}, body }) {
     // setting an Authorization header will override what is in the URL.
     if (!headers['Authorization']) {
       let { username, password } = urlObj
-      headers['Authorization'] = calculateBasicAuthHeader({ username, password })
+      headers['Authorization'] = calculateBasicAuthHeader({
+        username,
+        password
+      })
     }
     urlObj.username = ''
     urlObj.password = ''

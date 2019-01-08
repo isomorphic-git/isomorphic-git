@@ -4,10 +4,11 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { init, add, listFiles } = require('isomorphic-git')
 
 // NOTE: we cannot actually commit a real .gitignore file in fixtures or fixtures won't be included in this repo
-const writeGitIgnore = async (fs, dir) => fs.write(
-  dir + '/.gitignore',
-  ['*-pattern.js', 'i.txt', 'js_modules', '.DS_Store'].join('\n')
-)
+const writeGitIgnore = async (fs, dir) =>
+  fs.write(
+    dir + '/.gitignore',
+    ['*-pattern.js', 'i.txt', 'js_modules', '.DS_Store'].join('\n')
+  )
 
 describe('add', () => {
   it('file', async () => {
