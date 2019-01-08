@@ -16,3 +16,6 @@
 [remote "auth"]
   url = http://localhost:8888/test-push-server-auth.git
   fetch = +refs/heads/*:refs/remotes/pseudo/*
+[remote "url"]
+  url = http://testuser:testpassword@localhost:8888/test-push-server-auth.git
+  fetch = +refs/heads/*:refs/remotes/pseudo/*
