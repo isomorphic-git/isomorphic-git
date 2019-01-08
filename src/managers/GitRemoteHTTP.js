@@ -5,6 +5,7 @@ import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
+import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 
 // Try to accomodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string
@@ -30,6 +31,15 @@ export class GitRemoteHTTP {
     const _origUrl = url
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
+    let urlAuth = extractAuthFromUrl(url)
+    if (urlAuth) {
+      url = urlAuth.url
+      // To try to be backwards compatible with simple-get's behavior, which uses Node's http.request
+      // setting an Authorization header will override what is in the URL.
+      // Ergo manually specified auth parameters will override those in the URL.
+      auth.username = auth.username || urlAuth.username
+      auth.password = auth.password || urlAuth.password
+    }
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
@@ -115,6 +125,15 @@ export class GitRemoteHTTP {
   }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
+    let urlAuth = extractAuthFromUrl(url)
+    if (urlAuth) {
+      url = urlAuth.url
+      // To try to be backwards compatible with simple-get's behavior, which uses Node's http.request
+      // setting an Authorization header will override what is in the URL.
+      // Ergo manually specified auth parameters will override those in the URL.
+      auth.username = auth.username || urlAuth.username
+      auth.password = auth.password || urlAuth.password
+    }
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }

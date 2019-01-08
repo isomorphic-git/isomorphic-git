@@ -104,6 +104,20 @@ describe('push', () => {
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/master')
   })
+  it('push with Basic Auth credentials in the URL', async () => {
+    // Setup
+    let { gitdir } = await makeFixture('test-push')
+    // Test
+    let res = await push({
+      gitdir,
+      remote: 'url',
+      ref: 'master'
+    })
+    expect(res).toBeTruthy()
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
+  })
   it('throws an Error if no credentials supplied', async () => {
     // Setup
     let { gitdir } = await makeFixture('test-push')
