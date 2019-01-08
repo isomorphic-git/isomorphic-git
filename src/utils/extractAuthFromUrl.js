@@ -8,6 +8,6 @@ export function extractAuthFromUrl (url) {
   if (userpass == null) return null
   userpass = userpass[1]
   let [username, password] = userpass.split(':')
-  url = url.replace(userpass, '')
+  url = url.replace(`${userpass}@`, '')
   return { url, username, password }
 }
