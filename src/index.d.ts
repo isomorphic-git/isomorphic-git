@@ -185,8 +185,8 @@ export type WalkerEntry = WalkerTree[];
 export const plugins: GitPluginCore
 
 export const cores: {
-  get: (string) => GitPluginCore;
-  create: (string) => GitPluginCore;
+  get: (arg: string) => GitPluginCore;
+  create: (arg: string) => GitPluginCore;
 }
 
 export const E: {
