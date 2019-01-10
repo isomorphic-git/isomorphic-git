@@ -1,11 +1,11 @@
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
+import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
-import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 
 // Try to accomodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string
