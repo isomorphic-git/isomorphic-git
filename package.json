@@ -6,7 +6,8 @@
   "main": "dist/for-node/isomorphic-git/index.js",
   "browser": {
     "isomorphic-git": "./dist/bundle.umd.min.js",
-    "isomorphic-git/internal-apis": "./dist/internal.umd.min.js"
+    "isomorphic-git/internal-apis": "./dist/internal.umd.min.js",
+    "./src/utils/http.js": "./src/utils/http-browser.js"
   },
   "module": "dist/for-future/isomorphic-git/index.js",
   "unpkg": "dist/bundle.umd.min.js",
