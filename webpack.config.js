@@ -1,5 +1,4 @@
 const path = require('path')
-const webpack = require('webpack')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
@@ -20,8 +19,6 @@ module.exports = [
     mode: 'production',
     devtool: 'source-map',
     plugins: [
-      new webpack.IgnorePlugin({ resourceRegExp: /^simple-get$/ }),
-      new webpack.IgnorePlugin({ resourceRegExp: /^readable-stream$/ }),
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
         analyzerMode: 'static',
@@ -35,10 +32,6 @@ module.exports = [
     ],
     resolve: {
       alias: {
-        // Overwride the default 'stream' -> 'stream-browserify' mapping
-        stream: require.resolve('readable-stream'),
-        // Override dependencies on readable-stream@2 with v3.
-        'readable-stream': require.resolve('readable-stream'),
         // 'bops' depends on 0.0.2 but 1.x (used by node-libs-browser) is compatible
         'base64-js': require.resolve('base64-js')
       }
