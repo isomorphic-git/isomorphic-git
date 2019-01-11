@@ -56,7 +56,7 @@ module.exports = {
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       treeshake: 'agadoo',
-      size: process.env.ci
+      size: process.env.CI
         ? optional(
           `cross-env TRAVIS=true ` +
             `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
