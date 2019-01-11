@@ -1,3 +1,4 @@
+import resolve from 'rollup-plugin-node-resolve';
 import pkg from './package.json'
 
 const external = [
@@ -22,6 +23,9 @@ const moduleConfig = input => ({
       name: 'git',
       file: `dist/for-future/isomorphic-git/${input}`
     }
+  ],
+  plugins: [
+    resolve({ browser: true })
   ]
 })
 
