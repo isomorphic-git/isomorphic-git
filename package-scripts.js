@@ -56,15 +56,17 @@ module.exports = {
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       treeshake: 'agadoo',
-      size: optional(
-        `cross-env TRAVIS=true ` +
-          `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
-          `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
-            process.env.BUILD_REPOSITORY_NAME} ` +
-          // TODO: Figure out what the Azure equivalent of TRAVIS_PULL_REQUEST_SHA is.
-          `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} ` +
-          `bundlesize`
-      )
+      size: process.env.ci
+        ? optional(
+          `cross-env TRAVIS=true ` +
+            `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
+            `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
+              process.env.BUILD_REPOSITORY_NAME} ` +
+            // TODO: Figure out what the Azure equivalent of TRAVIS_PULL_REQUEST_SHA is.
+            `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} ` +
+            `bundlesize`
+        )
+        : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)
     },
     // ATTENTION:
     // LIST OF SAFE PORTS FOR SAUCE LABS (Edge and Safari) https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy+FAQS#SauceConnectProxyFAQS-CanIAccessApplicationsonlocalhost?
