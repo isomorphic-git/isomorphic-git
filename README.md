@@ -104,6 +104,8 @@ You don't need to know about all these features, but familiarizing yourself with
 
 View the full [Getting Started guide](https://isomorphic-git.github.io/docs/quickstart.html) on the docs website.
 
+Then check out the [Useful Snippets](https://isomorphic-git.org/docs/en/snippets) page, which includes even more sample code written by the community!
+
 ### CORS support
 
 Unfortunately, due to the same-origin policy by default `isomorphic-git` can only clone from the same origin as the webpage it is running on. This is terribly inconvenient, as it means for all practical purposes cloning and pushing repos must be done through a proxy.
@@ -112,10 +114,15 @@ For this purpose [@isomorphic-git/cors-proxy](https://github.com/isomorphic-git/
 For testing or small projects, you can also use [https://cors.isomorphic-git.org](https://cors.isomorphic-git.org) - a free proxy sponsored by [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git).
 
 I'm hoping to get CORS headers added to all the major Git hosting platforms eventually, and will list my progress here:
-- Gogs: [Supported in v0.11.43](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)
-- Gitlab: [PR Add CORS headers to git clone and git push #219](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219)
-- Bitbucket: PR TODO
-- Github: PR TODO
+
+| Service | Supports CORS requests |
+| --- | --- |
+| Gogs (self-hosted) | [✔](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html) |
+| Gitea (self-hosted) | [✔](https://github.com/go-gitea/gitea/pull/5719) |
+| Azure DevOps | [✔](https://github.com/isomorphic-git/isomorphic-git/issues/678#issuecomment-452402740) (Usage Note: requires `noGitSuffix: true` and authentication)
+| Gitlab | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/41755) is still open!
+| Bitbucket | ❌ |
+| Github | ❌ |
 
 It is literally just two lines of code to add the CORS headers!! Easy stuff. Surely it will happen.
 
@@ -130,17 +137,15 @@ npm install --save isomorphic-git
 In the package.json you'll see there are actually 4 different versions:
 
 ```json
-  "main": "dist/for-node/",
-  "browser": "dist/for-browserify/",
-  "module": "dist/for-future/",
+  "main": "dist/for-node/isomorphic-git/index.js",
+  "module": "dist/for-future/isomorphic-git/index.js",
   "unpkg": "dist/bundle.umd.min.js",
 ```
 
 This deserves a brief explanation.
 
 - the "main" version is for node.
-- the "browser" version is for browserify.
-- the "module" version is for native ES6 module loaders when they arrive.
+- the "module" version is for webpack or other browser bundlers.
 - the "unpkg" version is the UMD build.
 
 ### `isogit` CLI
