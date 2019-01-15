@@ -270,6 +270,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "jeffreywescott",
+      "name": "Jeffrey Wescott",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/130597?v=4",
+      "profile": "https://www.jeffreywescott.com/",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ]
 }
