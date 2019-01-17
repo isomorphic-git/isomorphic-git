@@ -96,7 +96,7 @@ export interface MergeReport {
   fastForward?: boolean;
 }
 
-export interface RemoteDescription {
+export interface RemoteDefinition {
   remote: string; // name of the remote
   url: string; // url of the remote
 }
@@ -430,7 +430,7 @@ export function listFiles(args: GitDir & {
 export function listRemotes(args: GitDir & {
   core?: string;
   fs?: any;
-}): Promise<Array<RemoteDescription>>;
+}): Promise<Array<RemoteDefinition>>;
 
 export function listTags(args: GitDir & {
   core?: string;
