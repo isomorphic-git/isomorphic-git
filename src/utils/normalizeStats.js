@@ -2,7 +2,12 @@ import { normalizeMode } from './normalizeMode'
 
 const MAX_UINT32 = 2 ** 32
 
-function SecondsNanoseconds (givenSeconds, givenNanoseconds, milliseconds, date) {
+function SecondsNanoseconds (
+  givenSeconds,
+  givenNanoseconds,
+  milliseconds,
+  date
+) {
   if (givenSeconds !== undefined && givenNanoseconds !== undefined) {
     return [givenSeconds, givenNanoseconds]
   }
@@ -15,8 +20,18 @@ function SecondsNanoseconds (givenSeconds, givenNanoseconds, milliseconds, date)
 }
 
 export function normalizeStats (e) {
-  const [ctimeSeconds, ctimeNanoseconds] = SecondsNanoseconds(e.ctimeSeconds, e.ctimeNanoseconds, e.ctimeMs, e.ctime)
-  const [mtimeSeconds, mtimeNanoseconds] = SecondsNanoseconds(e.mtimeSeconds, e.mtimeNanoseconds, e.mtimeMs, e.mtime)
+  const [ctimeSeconds, ctimeNanoseconds] = SecondsNanoseconds(
+    e.ctimeSeconds,
+    e.ctimeNanoseconds,
+    e.ctimeMs,
+    e.ctime
+  )
+  const [mtimeSeconds, mtimeNanoseconds] = SecondsNanoseconds(
+    e.mtimeSeconds,
+    e.mtimeNanoseconds,
+    e.mtimeMs,
+    e.mtime
+  )
 
   return {
     ctimeSeconds: ctimeSeconds % MAX_UINT32,
