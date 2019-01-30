@@ -73,7 +73,9 @@ export async function pull ({
       dir,
       gitdir,
       fs,
-      ref
+      ref,
+      emitter,
+      emitterPrefix
     })
   } catch (err) {
     err.caller = 'git.pull'
