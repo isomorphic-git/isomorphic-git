@@ -4,10 +4,12 @@ import { join } from '../utils/join'
 import { resolveTree } from '../utils/resolveTree.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
+import { FileSystem } from './FileSystem.js'
 import { GitTree } from './GitTree.js'
 
 class GitWalkerRepo {
-  constructor ({ fs, gitdir, ref }) {
+  constructor ({ fs: _fs, gitdir, ref }) {
+    const fs = new FileSystem(_fs)
     this.fs = fs
     this.gitdir = gitdir
     this.mapPromise = (async () => {
