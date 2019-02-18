@@ -6,10 +6,12 @@ import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
+import { FileSystem } from './FileSystem.js'
 import { GitObject } from './GitObject.js'
 
 class GitWalkerFs {
-  constructor ({ fs, dir, gitdir }) {
+  constructor ({ fs: _fs, dir, gitdir }) {
+    const fs = new FileSystem(_fs)
     this.fs = fs
     this.dir = dir
     this.gitdir = gitdir

@@ -4,8 +4,11 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
 import { normalizeStats } from '../utils/normalizeStats'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
+import { FileSystem } from './FileSystem.js'
+
 class GitWalkerIndex {
-  constructor ({ fs, gitdir }) {
+  constructor ({ fs: _fs, gitdir }) {
+    const fs = new FileSystem(_fs)
     this.treePromise = (async () => {
       let result
       await GitIndexManager.acquire(
