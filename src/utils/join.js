@@ -1,8 +1,7 @@
 // For some reason path.posix.join is undefined in webpack
 // Also, this is just much smaller
-export function join (...parts) {
-  parts = parts.filter(part => part !== '' && part !== '.')
-  if (parts.length === 0) return '.'
+import { normalizePath } from './normalizePath.js'
 
-  return parts.join('/')
+export function join (...parts) {
+  return normalizePath(parts.map(normalizePath).join('/'))
 }
