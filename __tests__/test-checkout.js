@@ -18,6 +18,24 @@ describe('checkout', () => {
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
+    let sha = await fs.read(gitdir + '/HEAD', 'utf8')
+    expect(sha).toBe('ref: refs/heads/test-branch\n')
+  })
+
+  it('checkout by tag', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'v1.0.0'
+    })
+    let files = await fs.readdir(dir)
+    expect(files.sort()).toMatchSnapshot()
+    let index = await listFiles({ dir, gitdir })
+    expect(index).toMatchSnapshot()
+    let sha = await fs.read(gitdir + '/HEAD', 'utf8')
+    expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
   })
 
   it('checkout by SHA', async () => {
@@ -32,6 +50,8 @@ describe('checkout', () => {
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
+    let sha = await fs.read(gitdir + '/HEAD', 'utf8')
+    expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
   })
 
   it('checkout unfetched branch', async () => {

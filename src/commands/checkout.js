@@ -177,8 +177,9 @@ export async function checkout ({
         }
       )
     }
-    // Update HEAD TODO: Handle non-branch cases
-    await fs.write(`${gitdir}/HEAD`, `ref: ${fullRef}\n`)
+    // Update HEAD
+    const content = fullRef.startsWith('refs/heads') ? `ref: ${fullRef}` : oid
+    await fs.write(`${gitdir}/HEAD`, `${content}\n`)
   } catch (err) {
     err.caller = 'git.checkout'
     throw err
