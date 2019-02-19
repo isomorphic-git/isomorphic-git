@@ -3,7 +3,9 @@ let shouldLog = null
 export function log (...args) {
   if (shouldLog === null) {
     shouldLog =
-      (process && process.env && process.env.DEBUG &&
+      (process &&
+        process.env &&
+        process.env.DEBUG &&
         (process.env.DEBUG === '*' ||
           process.env.DEBUG === 'isomorphic-git')) ||
       (typeof window !== 'undefined' &&
