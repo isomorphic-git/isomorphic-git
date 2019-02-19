@@ -14,9 +14,12 @@ describe('walkBeta1', () => {
         TREE({ fs, gitdir, ref: 'HEAD' }),
         STAGE({ fs, gitdir })
       ],
-      map: (entries) => entries.map(
-        ({ basename, exists, fullpath }) => ({ basename, exists, fullpath })
-      )
+      map: entries =>
+        entries.map(({ basename, exists, fullpath }) => ({
+          basename,
+          exists,
+          fullpath
+        }))
     })
     expect(matrix).toEqual([
       [
