@@ -4,6 +4,5 @@ export function emptyPackfile (pack) {
   const version = '00000002'
   const obCount = '00000000'
   const header = pheader + version + obCount
-  console.log('slice', pack.slice(0, 12).toString('hex'))
   return pack.slice(0, 12).toString('hex') === header
 }
