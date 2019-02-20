@@ -4,8 +4,10 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
+import { hasObject } from '../storage/hasObject.js'
 import { readObject } from '../storage/readObject.js'
 import { collect } from '../utils/collect.js'
+import { emptyPackfile } from '../utils/emptyPackfile.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
@@ -121,7 +123,7 @@ export async function fetch ({
     // a) NOT concatenate the entire packfile into memory (line 78),
     // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
     // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
-    if (packfileSha !== '') {
+    if (packfileSha !== '' && !emptyPackfile(packfile)) {
       res.packfile = `objects/pack/pack-${packfileSha}.pack`
       const fullpath = join(gitdir, res.packfile)
       await fs.write(fullpath, packfile)
@@ -245,19 +247,28 @@ async function fetchPackfile ({
     ]
   )
   if (relative) capabilities.push('deepen-relative')
-  // Start requesting oids from the remote by their SHAs
+  // Start figuring out which oids from the remote we want to request
   let wants = singleBranch ? [oid] : remoteRefs.values()
-  let haves = []
-  for (let ref of refs) {
+  // Come up with a reasonable list of oids to tell the remote we already have
+  // (preferably oids that are close ancestors of the branch heads we're fetching)
+  let haveRefs = singleBranch
+    ? refs
+    : await GitRefManager.listRefs({
+      fs,
+      gitdir,
+      filepath: `refs`
+    })
+  let haves = new Set()
+  for (let ref of haveRefs) {
     try {
       ref = await GitRefManager.expand({ fs, gitdir, ref })
-      // TODO: Actually, should we test whether we have the object using readObject?
-      if (!ref.startsWith('refs/tags/')) {
-        let have = await GitRefManager.resolve({ fs, gitdir, ref })
-        haves.push(have)
+      const oid = await GitRefManager.resolve({ fs, gitdir, ref })
+      if (await hasObject({ fs, gitdir, oid })) {
+        haves.add(oid)
       }
     } catch (err) {}
   }
+  haves = haves.values()
   let oids = await GitShallowManager.read({ fs, gitdir })
   let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
   let packstream = writeUploadPackRequest({
