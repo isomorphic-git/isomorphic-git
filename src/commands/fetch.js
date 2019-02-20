@@ -4,7 +4,7 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
-import { hasObject} from '../storage/hasObject.js'
+import { hasObject } from '../storage/hasObject.js'
 import { readObject } from '../storage/readObject.js'
 import { collect } from '../utils/collect.js'
 import { emptyPackfile } from '../utils/emptyPackfile.js'
@@ -251,11 +251,13 @@ async function fetchPackfile ({
   let wants = singleBranch ? [oid] : remoteRefs.values()
   // Come up with a reasonable list of oids to tell the remote we already have
   // (preferably oids that are close ancestors of the branch heads we're fetching)
-  let haveRefs = singleBranch ? refs : await GitRefManager.listRefs({
-    fs,
-    gitdir,
-    filepath: `refs`
-  })
+  let haveRefs = singleBranch
+    ? refs
+    : await GitRefManager.listRefs({
+      fs,
+      gitdir,
+      filepath: `refs`
+    })
   let haves = new Set()
   for (let ref of haveRefs) {
     try {

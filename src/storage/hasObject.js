@@ -1,7 +1,7 @@
 import { FileSystem } from '../models/FileSystem.js'
-import { readObject } from '../storage/readObject.js'
 import { hasObjectLoose } from '../storage/hasObjectLoose.js'
 import { hasObjectPacked } from '../storage/hasObjectPacked.js'
+import { readObject } from '../storage/readObject.js'
 
 export async function hasObject ({ fs: _fs, gitdir, oid, format = 'content' }) {
   const fs = new FileSystem(_fs)
