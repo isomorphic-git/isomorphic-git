@@ -307,6 +307,17 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "stefan-guggisberg",
+      "name": "Stefan Guggisberg",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1543625?v=4",
+      "profile": "https://github.com/stefan-guggisberg",
+      "contributions": [
+        "bug",
+        "code",
+        "test"
+      ]
     }
   ]
 }
