@@ -28,6 +28,16 @@ describe('resolveRef', () => {
     })
     expect(ref).toMatchSnapshot()
   })
+  it('config', async () => {
+    // Setup
+    let { gitdir } = await makeFixture('test-resolveRef')
+    // Test
+    let ref = await resolveRef({
+      gitdir,
+      ref: 'config'
+    })
+    expect(ref).toMatchSnapshot()
+  })
   it('test-tag', async () => {
     // Setup
     let { gitdir } = await makeFixture('test-resolveRef')
