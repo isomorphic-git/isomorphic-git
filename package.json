@@ -70,7 +70,7 @@
     "@babel/preset-env": "7.2.3",
     "@babel/runtime": "7.2.0",
     "@isomorphic-git/cors-proxy": "2.3.0",
-    "@isomorphic-git/lightning-fs": "2.0.0",
+    "@isomorphic-git/lightning-fs": "^3.2.0",
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "3.3.2",
     "@types/jest": "23.3.11",
