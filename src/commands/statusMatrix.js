@@ -63,11 +63,11 @@ export async function statusMatrix ({
         if (patternGlobrex && !patternGlobrex.regex.test(head.fullpath)) return
         // For now, just bail on directories
         await head.populateStat()
-        if (head.type === 'tree') return
+        if (head.type === 'tree' || head.type === 'special') return
         await workdir.populateStat()
-        if (workdir.type === 'tree') return
+        if (workdir.type === 'tree' || workdir.type === 'special') return
         await stage.populateStat()
-        if (stage.type === 'tree') return
+        if (stage.type === 'tree' || stage.type === 'special') return
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
         await head.populateHash()
         await stage.populateHash()

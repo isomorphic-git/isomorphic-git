@@ -318,6 +318,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "katakonst",
+      "name": "Catalin Pirvu",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6519792?v=4",
+      "profile": "https://github.com/katakonst",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }

@@ -108,7 +108,7 @@ export interface WalkerTree {
   basename: string;
   exists: boolean;
   populateStat: () => Promise<void>;
-  type?: 'tree' | 'blob';
+  type?: 'tree' | 'blob' | 'special';
   ctimeSeconds?: number;
   mtimeSeconds?: number;
   mtimeNanoseconds?: number;

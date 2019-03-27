@@ -51,6 +51,9 @@ class GitWalkerFs {
     let { fs, dir } = this
     let stats = await fs.lstat(`${dir}/${entry.fullpath}`)
     let type = stats.isDirectory() ? 'tree' : 'blob'
+    if (type === 'blob' && !stats.isFile() && !stats.isSymbolicLink()) {
+      type = 'special'
+    }
     if (!stats) {
       throw new Error(
         `ENOENT: no such file or directory, lstat '${entry.fullpath}'`
