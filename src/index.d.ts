@@ -221,6 +221,7 @@ export function add(args: {
 export function addRemote(args: GitDir & {
   core?: string;
   fs?: any;
+  force?: boolean;
   remote: string;
   url: string;
 }): Promise<void>;
