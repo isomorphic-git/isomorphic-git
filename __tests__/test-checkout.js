@@ -102,4 +102,26 @@ describe('checkout', () => {
     expect(actualRegularFileMode).toEqual(expectedRegularFileMode)
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
+
+  it('checkout using pattern', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await branch({ dir, gitdir, ref: 'other', checkout: true })
+    await checkout({ dir, gitdir, ref: 'test-branch' })
+    await fs.write(dir + '/regular-file.txt', 'regular file')
+    await fs.write(dir + '/executable-file.sh', 'executable file')
+    await add({ dir, gitdir, filepath: 'regular-file.txt' })
+    await add({ dir, gitdir, filepath: 'executable-file.sh' })
+    await commit({
+      dir,
+      gitdir,
+      author: { name: 'Git', email: 'git@example.org' },
+      message: 'add files'
+    })
+    await checkout({ dir, gitdir, ref: 'other' })
+    await checkout({ dir, gitdir, ref: 'test-branch', pattern: '*.txt' })
+    let files = await fs.readdir(dir)
+    expect(files).toContain('regular-file.txt')
+    expect(files).not.toContain('executable-file.sh')
+  })
 })

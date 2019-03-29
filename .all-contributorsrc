@@ -327,6 +327,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "nelsonni",
+      "name": "Nicholas Nelson",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6432572?v=4",
+      "profile": "http://web.engr.oregonstate.edu/~nelsonni/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ]
 }
