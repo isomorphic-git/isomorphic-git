@@ -1,3 +1,5 @@
+import globrex from 'globrex'
+
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -5,7 +7,9 @@ import { E, GitError } from '../models/GitError.js'
 import { WORKDIR } from '../models/GitWalkerFs.js'
 import { TREE } from '../models/GitWalkerRepo.js'
 import { join } from '../utils/join.js'
+import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
+import { worthWalking } from '../utils/worthWalking.js'
 
 import { config } from './config'
 import { walkBeta1 } from './walkBeta1.js'
@@ -24,6 +28,7 @@ export async function checkout ({
   emitterPrefix = '',
   remote = 'origin',
   ref,
+  pattern = null,
   noCheckout = false
 }) {
   try {
@@ -34,6 +39,9 @@ export async function checkout ({
         parameter: 'ref'
       })
     }
+    let patternGlobrex =
+      pattern && globrex(pattern, { globstar: true, extended: true })
+    let patternBase = pattern && patternRoot(pattern)
     // Get tree oid
     let oid
     try {
@@ -96,9 +104,16 @@ export async function checkout ({
               dir,
               gitdir,
               trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir })],
+              filter: async function ([head, workdir]) {
+                // match against 'pattern' parameter
+                if (pattern == null) return true
+                return worthWalking(head.fullpath, patternBase)
+              },
               map: async function ([head, workdir]) {
                 if (head.fullpath === '.') return
                 if (!head.exists) return
+                // Late filter against file names
+                if (patternGlobrex && !patternGlobrex.regex.test(head.fullpath)) return
                 await head.populateStat()
                 const filepath = `${dir}/${head.fullpath}`
                 switch (head.type) {
