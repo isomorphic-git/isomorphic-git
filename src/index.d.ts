@@ -258,6 +258,7 @@ export function checkout(args: WorkDir & GitDir & {
   emitterPrefix?: string;
   remote?: string;
   ref?: string;
+  pattern?: string;
 }): Promise<void>;
 
 export function clone(args: WorkDir & GitDir & {
