@@ -32,7 +32,9 @@ describe('packObjects', () => {
     })
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     expect(fixture.buffer).toEqual(packfile.buffer)
-    expect(await fs.exists(path.join(gitdir, `objects/pack/${filename}`))).toBe(false)
+    expect(await fs.exists(path.join(gitdir, `objects/pack/${filename}`))).toBe(
+      false
+    )
   })
   it('saves packfile to disk', async () => {
     // Setup

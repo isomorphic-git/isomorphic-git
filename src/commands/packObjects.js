@@ -1,9 +1,9 @@
-import { pack } from './pack'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { collect } from '../utils/collect.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
+
+import { pack } from './pack'
 
 export async function packObjects ({
   core = 'default',
