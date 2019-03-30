@@ -35,6 +35,7 @@ Array [
   "listTags",
   "log",
   "merge",
+  "packObjects",
   "plugins",
   "pull",
   "push",
