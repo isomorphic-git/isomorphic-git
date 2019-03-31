@@ -108,9 +108,9 @@ export class GitTree {
       this._entries.map(entry => {
         let mode = Buffer.from(entry.mode.replace(/^0/, ''))
         let space = Buffer.from(' ')
-        let path = Buffer.from(entry.path, { encoding: 'utf8' })
+        let path = Buffer.from(entry.path, 'utf8')
         let nullchar = Buffer.from([0])
-        let oid = Buffer.from(entry.oid.match(/../g).map(n => parseInt(n, 16)))
+        let oid = Buffer.from(entry.oid, 'hex')
         return Buffer.concat([mode, space, path, nullchar, oid])
       })
     )
