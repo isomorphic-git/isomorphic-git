@@ -18,13 +18,15 @@ import { walkBeta1 } from './walkBeta1.js'
 /**
  * Checkout a branch
  *
+ * If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [_.gitdir] - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} _.dir - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
- * @param {string} _.emitterPrefix - Scope emitted events by prepending `emitterPrefix` to the event name.
+ * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
+ * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  * @param {string} _.ref - Which branch to checkout
  * @param {string} [_.pattern = null] - Filter the results to only those filepath matches a glob pattern
  * @param {string} [_.remote = 'origin'] - Which remote repository to use
@@ -32,8 +34,6 @@ import { walkBeta1 } from './walkBeta1.js'
  * 
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  * 
- * If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
- *
  * @example
  * // checkout the master branch
  * await git.checkout({ dir: '$input((/))', ref: '$input((master))' })

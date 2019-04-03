@@ -13,7 +13,7 @@ import { cores } from '../utils/plugins.js'
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [_.gitdir] - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} _.ref - What to name the branch
  * @param {boolean} [_.checkout = false] - Update `HEAD` to point at the newly created branch

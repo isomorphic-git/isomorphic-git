@@ -32,33 +32,55 @@ import { config } from './config'
 /**
  * Fetch commits from a remote repository
  * 
+ * The object returned has the following schema:
+ * 
+ * ```ts
+ * export interface FetchResponse {
+ *   defaultBranch: string; // The branch that is cloned if no branch is specified (typically "master")
+ *   fetchHead: string | null; // The SHA-1 object id of the fetched head commit
+ *   headers?: object; // The HTTP response headers returned by the git server.
+ * }
+ * ```
+ * Future versions of isomorphic-git might return additional metadata.
+ * 
+ * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
+ * 
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [_.gitdir] - The [git directory](dir-vs-gitdir.md) path
- * @param {FileSystem} _.fs - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
- * @param {string} _.emitterPrefix - Scope emitted events by prepending `emitterPrefix` to the event name.
- * @param {string} [_.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch. 
- * @param {string} [_.remote] - What to name the remote that is created.
+ * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  * @param {string} [_.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
- * @param {boolean} [_.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {string} [_.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
+ * @param {string} [_.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch. 
+ * @param {boolean} [_.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {boolean} [_.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
+ * @param {boolean} [_.tags = false] - Also fetch tags
+ * @param {string} [_.remote] - What to name the remote that is created.
+ * @param {number} [_.depth] - Integer. Determines how much of the git repository's history to retrieve
+ * @param {Date} [_.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+ * @param {string[]} [_.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+ * @param {boolean} [_.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
  * @param {string} [_.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [_.password] - See the [Authentication](./authentication.html) documentation
  * @param {string} [_.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [_.oauth2format] - See the [Authentication](./authentication.html) documentation
- * @param {number} [_.depth = null] - Integer. Determines how much of the git repository's history to retrieve
- * @param {Date} [_.since = null] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
- * @param {string[]} [_.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
- * @param {boolean} [_.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
- * @param {boolean} [_.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
- * @param {boolean} [_.tags = false] - Also fetch tags
  * @param {object} [_.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
+ * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
+ * 
  * @returns {Promise<FetchResponse>} - Resolves successfully when fetch completes
  * 
  * @example
- * await git.init({ dir: '$input((/))' })
+ * await git.fetch({
+ *   dir: '$input((/))',
+ *   corsProxy: 'https://cors.isomorphic-git.org',
+ *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
+ *   ref: '$input((master))',
+ *   depth: $input((1)),
+ *   singleBranch: $input((true)),
+ *   tags: $input((false))
+ * })
  * console.log('done')
  * 
  */

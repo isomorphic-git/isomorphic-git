@@ -12,11 +12,11 @@ import { cores } from '../utils/plugins.js'
  *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [_.gitdir] - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} _.dir - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [_.gitdir=join(dir, '.git')] - The [git directory](dir-vs-gitdir.md) path
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} _.filepath - The path to the file to add to the index
- * @returns {Promise<void>} - Resolves successfully once the git index has been updated
+ * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
  * @example
  * await new Promise((resolve, reject) => fs.writeFile(
