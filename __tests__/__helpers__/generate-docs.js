@@ -41,9 +41,9 @@ function gendoc (filepath) {
       // Build params table
       const rows = [['param', 'type [= default]', 'description']]
       for (const param of obj.params) {
-        if (param.name === '_') continue
+        if (param.name === '_' || param.name === 'args') continue
 
-        let name = param.name.replace('_.', '')
+        let name = param.name.replace('_.', '').replace('args.', '')
         if (!param.optional) name = `**${name}**`
 
         let type = cleanType(param.type.names[0])

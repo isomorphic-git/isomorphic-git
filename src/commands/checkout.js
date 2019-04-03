@@ -22,9 +22,9 @@ import { walkBeta1 } from './walkBeta1.js'
  *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} _.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
- * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  * @param {string} _.ref - Which branch to checkout

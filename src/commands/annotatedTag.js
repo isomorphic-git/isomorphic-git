@@ -14,9 +14,9 @@ import { cores } from '../utils/plugins.js'
  *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
- * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} _.ref - What to name the tag
  * @param {string} [_.message = ''] - The tag message to use.
  * @param {string} [_.object = 'HEAD'] - The SHA-1 object id the tag points to. (Will resolve to a SHA-1 object id if value is a ref.) By default, the commit object which is referred by the current `HEAD` is used.
