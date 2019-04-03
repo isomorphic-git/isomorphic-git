@@ -136,7 +136,12 @@ export async function checkout ({
                 if (head.fullpath === '.') return
                 if (!head.exists) return
                 // Late filter against file names
-                if (patternGlobrex && !patternGlobrex.regex.test(head.fullpath)) { return }
+                if (
+                  patternGlobrex &&
+                  !patternGlobrex.regex.test(head.fullpath)
+                ) {
+                  return
+                }
                 await head.populateStat()
                 const filepath = `${dir}/${head.fullpath}`
                 switch (head.type) {
