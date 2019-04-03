@@ -1,3 +1,4 @@
+//@ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
@@ -9,35 +10,77 @@ import { init } from './init.js'
 
 /**
  * Clone a repository
+ * 
+ * @param {object} _
+ * @param {string} [_.core='default'] - The plugin core identifier to use for plugin injection
+ * @param {string} _.dir - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [_.gitdir=join(dir, '.git')] - The [git directory](dir-vs-gitdir.md) path 
+ * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
+ * @param {string} _.emitterPrefix - Scope emitted events by prepending `emitterPrefix` to the event name.
+ * @param {string} _.url - The URL of the remote repository
+ * @param {boolean} [_.noGitSuffix=false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**.)
+ * @param {string} [_.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo.
+ * @param {string} [_.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
+ * @param {string} [_.remote='origin'] - What to name the remote that is created.
+ * @param {string} [_.username] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [_.password] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [_.token] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [_.oauth2format] - See the [Authentication](./authentication.html) documentation
+ * @param {number} [_.depth] - Integer. Determines how much of the git repository's history to retrieve
+ * @param {Date} [_.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+ * @param {string[]} [_.exclude=[]] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+ * @param {boolean} [_.relative=false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+ * @param {boolean} [_.singleBranch=false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {boolean} [_.noCheckout=false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
+ * @param {boolean} [_.noTags=false] - By default clone will fetch all tags. `noTags` disables that behavior.
+ * @param {object} [_.headers={}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @returns {Promise<void>} Resolves successfully when clone completes
+ * 
+ * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
  *
- * @link https://isomorphic-git.github.io/docs/clone.html
+ * Example code:
+ * 
+ * @example
+ * await git.clone({
+ *   dir: '$input((/))',
+ *   corsProxy: 'https://cors.isomorphic-git.org',
+ *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
+ *   $textarea((singleBranch: true,
+ *   depth: 1))
+ * })
+ * console.log('done')
+ * 
  */
 export async function clone ({
   core = 'default',
-  dir,
-  gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
-  emitterPrefix = '',
-  url,
-  noGitSuffix = false,
-  corsProxy,
-  ref,
-  remote,
+  dir,                                        
+  gitdir = join(dir, '.git'),                 
+  fs: _fs = cores.get(core).get('fs'),        
+  emitter = cores.get(core).get('emitter'),   
+  emitterPrefix = '',                         
+  url,                                        
+  noGitSuffix = false,                        
+  corsProxy = undefined,                      
+  ref = undefined,                            
+  remote = 'origin',    
+  //@ts-ignore                      
   authUsername,
+  //@ts-ignore
   authPassword,
-  username = authUsername,
-  password = authPassword,
-  token,
-  oauth2format,
-  depth,
-  since,
-  exclude,
-  relative,
-  singleBranch,
-  noCheckout = false,
-  noTags = false,
-  headers = {},
+  username = undefined,                       
+  password = undefined,                       
+  token = undefined,                          
+  oauth2format = undefined,                   
+  depth = undefined,                          
+  since = undefined,                          
+  exclude = [],                               
+  relative = false,                           
+  singleBranch = false,                       
+  noCheckout = false,                         
+  noTags = false,                             
+  headers = {},                               
+  //@ts-ignore
   onprogress
 }) {
   try {
@@ -47,7 +90,8 @@ export async function clone ({
       )
     }
     const fs = new FileSystem(_fs)
-    remote = remote || 'origin'
+    username = username === undefined ? authUsername : username;
+    password = password === undefined ? authPassword : password;
     await init({ gitdir, fs })
     // Add remote
     await config({

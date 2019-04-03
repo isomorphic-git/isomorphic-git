@@ -35,7 +35,7 @@ export class GitRefManager {
     refs,
     symrefs,
     tags,
-    refspecs
+    refspecs = undefined
   }) {
     const fs = new FileSystem(_fs)
     // Validate input
@@ -128,7 +128,7 @@ export class GitRefManager {
       await fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
     }
   }
-  static async resolve ({ fs: _fs, gitdir, ref, depth }) {
+  static async resolve ({ fs: _fs, gitdir, ref, depth = undefined }) {
     const fs = new FileSystem(_fs)
     if (depth !== undefined) {
       depth--
@@ -197,7 +197,7 @@ export class GitRefManager {
     // Do we give up?
     throw new GitError(E.ExpandRefError, { ref })
   }
-  static resolveAgainstMap ({ ref, fullref = ref, depth, map }) {
+  static resolveAgainstMap ({ ref, fullref = ref, depth = undefined, map }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {
