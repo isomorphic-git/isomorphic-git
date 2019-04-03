@@ -29,9 +29,9 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [_.signature] - The signature attatched to the tag object. (Mutually exclusive with the `signingKey` option.)
  * @param {string} [_.signingKey] - Sign the tag object using this private PGP key. (Mutually exclusive with the `signature` option.)
  * @param {boolean} [_.force = false] - Instead of throwing an error if a tag named `ref` already exists, overwrite the existing tag. Note that this option does not modify the original tag object itself.
- * 
+ *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
- * 
+ *
  * @example
  * await git.annotatedTag({
  *   dir: '$input((/))',

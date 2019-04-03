@@ -10,14 +10,14 @@ import { init } from './init.js'
 
 /**
  * Clone a repository
- * 
+ *
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
- * 
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} _.dir - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path 
+ * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  * @param {string} _.url - The URL of the remote repository
  * @param {string} [_.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo.
  * @param {string} [_.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
@@ -37,9 +37,9 @@ import { init } from './init.js'
  * @param {object} [_.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
- * 
+ *
  * @returns {Promise<void>} Resolves successfully when clone completes
- * 
+ *
  * @example
  * await git.clone({
  *   dir: '$input((/))',

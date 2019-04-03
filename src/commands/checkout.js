@@ -33,7 +33,7 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {boolean} [_.noCheckout = false] - If true, will update HEAD but won't update the working directory
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
- * 
+ *
  * @example
  * // checkout the master branch
  * await git.checkout({ dir: '$input((/))', ref: '$input((master))' })

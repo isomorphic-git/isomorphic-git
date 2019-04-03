@@ -31,9 +31,9 @@ import { config } from './config'
 
 /**
  * Fetch commits from a remote repository
- * 
+ *
  * The object returned has the following schema:
- * 
+ *
  * ```ts
  * export interface FetchResponse {
  *   defaultBranch: string; // The branch that is cloned if no branch is specified (typically "master")
@@ -42,9 +42,9 @@ import { config } from './config'
  * }
  * ```
  * Future versions of isomorphic-git might return additional metadata.
- * 
+ *
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
- * 
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
@@ -52,7 +52,7 @@ import { config } from './config'
  * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  * @param {string} [_.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [_.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
- * @param {string} [_.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch. 
+ * @param {string} [_.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch.
  * @param {boolean} [_.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [_.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {boolean} [_.tags = false] - Also fetch tags
@@ -68,7 +68,7 @@ import { config } from './config'
  * @param {object} [_.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
- * 
+ *
  * @returns {Promise<FetchResponse>} - Resolves successfully when fetch completes
  *
  * @example
