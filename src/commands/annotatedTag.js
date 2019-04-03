@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
@@ -11,7 +11,7 @@ import { cores } from '../utils/plugins.js'
 
 /**
  * Create an annotated tag.
- * 
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
@@ -29,9 +29,9 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [_.signature] - The signature attatched to the tag object. (Mutually exclusive with the `signingKey` option.)
  * @param {string} [_.signingKey] - Sign the tag object using this private PGP key. (Mutually exclusive with the `signature` option.)
  * @param {boolean} [_.force = false] - Instead of throwing an error if a tag named `ref` already exists, overwrite the existing tag. Note that this option does not modify the original tag object itself.
- * 
+ *
  * @returns {Promise<void>} - Resolves successfully when filesystem operations are complete
- * 
+ *
  * @example
  * await git.annotatedTag({
  *   dir: '$input((/))',
@@ -43,7 +43,7 @@ import { cores } from '../utils/plugins.js'
  *   }
  * })
  * console.log('done')
- * 
+ *
  */
 export async function annotatedTag ({
   core = 'default',

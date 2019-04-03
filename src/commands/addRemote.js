@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import cleanGitRef from 'clean-git-ref'
 
 import { GitConfigManager } from '../managers/GitConfigManager.js'
@@ -18,13 +18,13 @@ import { cores } from '../utils/plugins.js'
  * @param {string} _.remote - The name of the remote
  * @param {string} _.url - The URL of the remote
  * @param {boolean} [_.force = false] - Instead of throwing an error if a remote named `remote` already exists, overwrite the existing remote.
- * 
+ *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
- * 
+ *
  * @example
  * await git.addRemote({ dir: '$input((/))', remote: '$input((upstream))', url: '$input((https://github.com/isomorphic-git/isomorphic-git))' })
  * console.log('done')
- * 
+ *
  */
 export async function addRemote ({
   core = 'default',

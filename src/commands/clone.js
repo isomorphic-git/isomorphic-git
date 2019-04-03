@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
@@ -10,11 +10,11 @@ import { init } from './init.js'
 
 /**
  * Clone a repository
- * 
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} _.dir - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [_.gitdir = join(dir, '.git')] - The [git directory](dir-vs-gitdir.md) path 
+ * @param {string} [_.gitdir = join(dir, '.git')] - The [git directory](dir-vs-gitdir.md) path
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} _.emitterPrefix - Scope emitted events by prepending `emitterPrefix` to the event name.
@@ -36,11 +36,11 @@ import { init } from './init.js'
  * @param {boolean} [_.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
  * @param {object} [_.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @returns {Promise<void>} Resolves successfully when clone completes
- * 
+ *
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
  *
  * Example code:
- * 
+ *
  * @example
  * await git.clone({
  *   dir: '$input((/))',
@@ -50,37 +50,37 @@ import { init } from './init.js'
  *   depth: 1))
  * })
  * console.log('done')
- * 
+ *
  */
 export async function clone ({
   core = 'default',
-  dir,                                        
-  gitdir = join(dir, '.git'),                 
-  fs: _fs = cores.get(core).get('fs'),        
-  emitter = cores.get(core).get('emitter'),   
-  emitterPrefix = '',                         
-  url,                                        
-  noGitSuffix = false,                        
-  corsProxy = undefined,                      
-  ref = undefined,                            
-  remote = 'origin',    
-  //@ts-ignore                      
+  dir,
+  gitdir = join(dir, '.git'),
+  fs: _fs = cores.get(core).get('fs'),
+  emitter = cores.get(core).get('emitter'),
+  emitterPrefix = '',
+  url,
+  noGitSuffix = false,
+  corsProxy = undefined,
+  ref = undefined,
+  remote = 'origin',
+  // @ts-ignore
   authUsername,
-  //@ts-ignore
+  // @ts-ignore
   authPassword,
-  username = undefined,                       
-  password = undefined,                       
-  token = undefined,                          
-  oauth2format = undefined,                   
-  depth = undefined,                          
-  since = undefined,                          
-  exclude = [],                               
-  relative = false,                           
-  singleBranch = false,                       
-  noCheckout = false,                         
-  noTags = false,                             
-  headers = {},                               
-  //@ts-ignore
+  username = undefined,
+  password = undefined,
+  token = undefined,
+  oauth2format = undefined,
+  depth = undefined,
+  since = undefined,
+  exclude = [],
+  relative = false,
+  singleBranch = false,
+  noCheckout = false,
+  noTags = false,
+  headers = {},
+  // @ts-ignore
   onprogress
 }) {
   try {
@@ -90,8 +90,8 @@ export async function clone ({
       )
     }
     const fs = new FileSystem(_fs)
-    username = username === undefined ? authUsername : username;
-    password = password === undefined ? authPassword : password;
+    username = username === undefined ? authUsername : username
+    password = password === undefined ? authPassword : password
     await init({ gitdir, fs })
     // Add remote
     await config({

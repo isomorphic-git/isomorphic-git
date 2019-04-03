@@ -19,13 +19,7 @@ const refpaths = ref => [
 ]
 
 // @see https://git-scm.com/docs/gitrepository-layout
-const GIT_FILES = [
-  'config',
-  'description',
-  'index',
-  'shallow',
-  'commondir'
-]
+const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
 
 export class GitRefManager {
   static async updateRemoteRefs ({
@@ -149,8 +143,7 @@ export class GitRefManager {
     // We need to alternate between the file system and the packed-refs
     let packedMap = await GitRefManager.packedRefs({ fs, gitdir })
     // Look in all the proper paths, in this order
-    const allpaths = refpaths(ref)
-      .filter((p) => !GIT_FILES.includes(p)) // exclude git system files (#709)
+    const allpaths = refpaths(ref).filter(p => !GIT_FILES.includes(p)) // exclude git system files (#709)
 
     for (let ref of allpaths) {
       sha =

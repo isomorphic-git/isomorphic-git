@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -21,7 +21,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 import { config } from './config'
 
 /**
- * 
+ *
  * @typedef {object} FetchResponse
  * @member {string} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
  * @member {string | null} fetchHead - The SHA-1 object id of the fetched head commit
@@ -31,7 +31,7 @@ import { config } from './config'
 
 /**
  * Fetch commits from a remote repository
- * 
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
@@ -39,7 +39,7 @@ import { config } from './config'
  * @param {FileSystem} _.fs - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} _.emitterPrefix - Scope emitted events by prepending `emitterPrefix` to the event name.
- * @param {string} [_.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch. 
+ * @param {string} [_.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch.
  * @param {string} [_.remote] - What to name the remote that is created.
  * @param {string} [_.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {boolean} [_.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
@@ -56,11 +56,11 @@ import { config } from './config'
  * @param {boolean} [_.tags = false] - Also fetch tags
  * @param {object} [_.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @returns {Promise<FetchResponse>} - Resolves successfully when fetch completes
- * 
+ *
  * @example
  * await git.init({ dir: '$input((/))' })
  * console.log('done')
- * 
+ *
  */
 export async function fetch ({
   core = 'default',
@@ -76,9 +76,9 @@ export async function fetch ({
   url,
   noGitSuffix = false,
   corsProxy,
-  //@ts-ignore
+  // @ts-ignore
   authUsername,
-  //@ts-ignore
+  // @ts-ignore
   authPassword,
   username = authUsername,
   password = authPassword,

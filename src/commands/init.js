@@ -1,11 +1,11 @@
-//@ts-check
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
  * Initialize a new repository
- * 
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
@@ -13,11 +13,11 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {boolean} [_.bare = false] - Initialize a bare repository
  * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
- * 
+ *
  * @example
  * await git.init({ dir: '$input((/))' })
  * console.log('done')
- * 
+ *
  */
 export async function init ({
   core = 'default',
