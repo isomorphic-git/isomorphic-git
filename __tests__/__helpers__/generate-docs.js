@@ -1,7 +1,6 @@
 const jsdoc = require('jsdoc-api')
 const fs = require('fs')
 const path = require('path')
-const util = require('util')
 const table = require('markdown-table')
 
 function cleanType (type) {
