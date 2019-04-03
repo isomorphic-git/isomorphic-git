@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
@@ -11,7 +11,7 @@ import { cores } from '../utils/plugins.js'
 
 /**
  * Create an annotated tag.
- * 
+ *
  * @param {object} _
  * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
@@ -43,7 +43,7 @@ import { cores } from '../utils/plugins.js'
  *   }
  * })
  * console.log('done')
- * 
+ *
  */
 export async function annotatedTag ({
   core = 'default',

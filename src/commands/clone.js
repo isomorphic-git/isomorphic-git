@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
@@ -49,37 +49,37 @@ import { init } from './init.js'
  *   depth: 1))
  * })
  * console.log('done')
- * 
+ *
  */
 export async function clone ({
   core = 'default',
-  dir,                                        
-  gitdir = join(dir, '.git'),                 
-  fs: _fs = cores.get(core).get('fs'),        
-  emitter = cores.get(core).get('emitter'),   
-  emitterPrefix = '',                         
-  url,                                        
-  noGitSuffix = false,                        
-  corsProxy = undefined,                      
-  ref = undefined,                            
-  remote = 'origin',    
-  //@ts-ignore                      
+  dir,
+  gitdir = join(dir, '.git'),
+  fs: _fs = cores.get(core).get('fs'),
+  emitter = cores.get(core).get('emitter'),
+  emitterPrefix = '',
+  url,
+  noGitSuffix = false,
+  corsProxy = undefined,
+  ref = undefined,
+  remote = 'origin',
+  // @ts-ignore
   authUsername,
-  //@ts-ignore
+  // @ts-ignore
   authPassword,
-  username = undefined,                       
-  password = undefined,                       
-  token = undefined,                          
-  oauth2format = undefined,                   
-  depth = undefined,                          
-  since = undefined,                          
-  exclude = [],                               
-  relative = false,                           
-  singleBranch = false,                       
-  noCheckout = false,                         
-  noTags = false,                             
-  headers = {},                               
-  //@ts-ignore
+  username = undefined,
+  password = undefined,
+  token = undefined,
+  oauth2format = undefined,
+  depth = undefined,
+  since = undefined,
+  exclude = [],
+  relative = false,
+  singleBranch = false,
+  noCheckout = false,
+  noTags = false,
+  headers = {},
+  // @ts-ignore
   onprogress
 }) {
   try {
@@ -89,8 +89,8 @@ export async function clone ({
       )
     }
     const fs = new FileSystem(_fs)
-    username = username === undefined ? authUsername : username;
-    password = password === undefined ? authPassword : password;
+    username = username === undefined ? authUsername : username
+    password = password === undefined ? authPassword : password
     await init({ gitdir, fs })
     // Add remote
     await config({

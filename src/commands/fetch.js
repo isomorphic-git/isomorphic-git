@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -21,7 +21,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 import { config } from './config'
 
 /**
- * 
+ *
  * @typedef {object} FetchResponse
  * @member {string} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
  * @member {string | null} fetchHead - The SHA-1 object id of the fetched head commit
@@ -70,7 +70,7 @@ import { config } from './config'
  * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  * 
  * @returns {Promise<FetchResponse>} - Resolves successfully when fetch completes
- * 
+ *
  * @example
  * await git.fetch({
  *   dir: '$input((/))',
@@ -82,7 +82,7 @@ import { config } from './config'
  *   tags: $input((false))
  * })
  * console.log('done')
- * 
+ *
  */
 export async function fetch ({
   core = 'default',
@@ -98,9 +98,9 @@ export async function fetch ({
   url,
   noGitSuffix = false,
   corsProxy,
-  //@ts-ignore
+  // @ts-ignore
   authUsername,
-  //@ts-ignore
+  // @ts-ignore
   authPassword,
   username = authUsername,
   password = authPassword,

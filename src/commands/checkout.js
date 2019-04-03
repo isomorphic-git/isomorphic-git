@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import globrex from 'globrex'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
@@ -31,19 +31,19 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {string} [_.pattern = null] - Filter the results to only those filepath matches a glob pattern
  * @param {string} [_.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [_.noCheckout = false] - If true, will update HEAD but won't update the working directory
- * 
+ *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  * 
  * @example
  * // checkout the master branch
  * await git.checkout({ dir: '$input((/))', ref: '$input((master))' })
  * console.log('done')
- * 
+ *
  * @example
  * // checkout only JSON and Markdown files from master branch
  * await git.checkout({ dir: '$input((/))', ref: '$input((master))', pattern: '$input((**\/*.{json,md}))' })
  * console.log('done')
- * 
+ *
  */
 export async function checkout ({
   core = 'default',
@@ -136,7 +136,12 @@ export async function checkout ({
                 if (head.fullpath === '.') return
                 if (!head.exists) return
                 // Late filter against file names
-                if (patternGlobrex && !patternGlobrex.regex.test(head.fullpath)) return
+                if (
+                  patternGlobrex &&
+                  !patternGlobrex.regex.test(head.fullpath)
+                ) {
+                  return
+                }
                 await head.populateStat()
                 const filepath = `${dir}/${head.fullpath}`
                 switch (head.type) {

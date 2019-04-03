@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import cleanGitRef from 'clean-git-ref'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -17,13 +17,13 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} _.ref - What to name the branch
  * @param {boolean} [_.checkout = false] - Update `HEAD` to point at the newly created branch
- * 
+ *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
- * 
+ *
  * @example
  * await git.branch({ dir: '$input((/))', ref: '$input((develop))' })
  * console.log('done')
- * 
+ *
  */
 export async function branch ({
   core = 'default',
