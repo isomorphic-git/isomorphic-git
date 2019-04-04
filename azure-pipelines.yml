@@ -14,8 +14,15 @@ jobs:
       versionSpec: '8.x'
     displayName: 'Install Node.js'
 
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
+    inputs:
+      keyfile: 'package-lock.json'
+      targetfolder: 'node_modules'
+      vstsFeed: '$(ArtifactFeed)'
+
   - script: npm ci
     displayName: 'Install dependencies'
+    condition: ne(variables['CacheRestored'], 'true'
 
   - script: npm test
     displayName: 'Run tests'
