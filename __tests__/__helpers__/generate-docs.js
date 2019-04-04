@@ -7,6 +7,54 @@ function cleanType (type) {
   return type.replace(/\.</g, '<')
 }
 
+const typedefs = new Map()
+
+function gentypedef (ast) {
+  let text = ''
+  text += `\n${ast.description}\n\n`
+  text += '```ts\n'
+  text += `type ${ast.name} {\n`
+  let currentprop = null
+  let indent = 2;
+  for (const prop of ast.properties) {
+    const type = cleanType(prop.type.names[0])
+    let ind = ' '.repeat(indent);
+    // This is pretty sloppy
+    if (currentprop !== null) {
+      if (prop.name.startsWith(currentprop)) {
+        let name = prop.name.replace(currentprop, '')
+        text += `${ind}${name}: ${cleanType(type)}; // ${prop.description}\n`
+        continue
+      } else {
+        indent -= 2
+        ind = ' '.repeat(indent);
+        currentprop = null
+        text += `${ind}}\n`
+      }
+    }
+    if (type === 'Object') {
+      currentprop = prop.name + '.'
+      if (prop.description) {
+        text += `${ind}// ${prop.description}\n`
+      }
+      text += `${ind}${prop.name}: {\n`
+      indent += 2
+      ind = ' '.repeat(indent);
+    } else {
+      text += `  ${prop.name}: ${cleanType(prop.type.names[0])}; // ${prop.description}\n`
+    }
+  }
+  while (indent > 2) {
+    indent -= 2
+    let ind = ' '.repeat(indent);
+    currentprop = null
+    text += `${ind}}\n`
+  }
+  text += `}\n`
+  text += '```\n'
+  typedefs.set(ast.name, text);
+}
+
 function gendoc (filepath) {
   // Load file
   let file = fs.readFileSync(filepath, 'utf8')
@@ -19,6 +67,11 @@ function gendoc (filepath) {
   let text = ''
   for (const obj of ast) {
     if (!obj.undocumented) {
+      console.log(obj.kind)
+      if (obj.kind === 'typedef') {
+        gentypedef(obj)
+        continue
+      }
       if (obj.kind === 'package') continue
       if (!obj.params) continue
       text += `---\n`
@@ -64,6 +117,11 @@ function gendoc (filepath) {
 
       text += table(rows)
       text += `\n`
+      if (obj.see) {
+        for (let type of obj.see) {
+          text += typedefs.get(type)
+        }
+      }
       if (description !== '') text += `\n${description}\n`
       text += `\nExample Code:\n`
       for (const example of obj.examples) {

@@ -22,25 +22,16 @@ import { config } from './config'
 
 /**
  *
- * @typedef {object} FetchResponse
- * @member {string} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
- * @member {string | null} fetchHead - The SHA-1 object id of the fetched head commit
- * @member {object} [headers] - The HTTP response headers returned by the git server
+ * @typedef {object} FetchResponse - The object returned has the following schema:
+ * @property {string} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
+ * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
+ * @property {object} [headers] - The HTTP response headers returned by the git server
  *
  */
 
 /**
  * Fetch commits from a remote repository
  *
- * The object returned has the following schema:
- *
- * ```ts
- * export interface FetchResponse {
- *   defaultBranch: string; // The branch that is cloned if no branch is specified (typically "master")
- *   fetchHead: string | null; // The SHA-1 object id of the fetched head commit
- *   headers?: object; // The HTTP response headers returned by the git server.
- * }
- * ```
  * Future versions of isomorphic-git might return additional metadata.
  *
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
@@ -70,7 +61,8 @@ import { config } from './config'
  * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<FetchResponse>} - Resolves successfully when fetch completes
- *
+ * @see FetchResponse
+ * 
  * @example
  * await git.fetch({
  *   dir: '$input((/))',
