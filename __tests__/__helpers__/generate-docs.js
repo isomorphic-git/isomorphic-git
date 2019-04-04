@@ -4,7 +4,11 @@ const path = require('path')
 const table = require('markdown-table')
 
 function cleanType (type) {
-  return type.replace(/\.</g, '<').replace(/</g, '\\<').replace(/>/g, '\\>')
+  return type.replace(/\.</g, '<')
+}
+
+function escapeType (type) {
+  return cleanType(type).replace(/</g, '\\<').replace(/>/g, '\\>')
 }
 
 const typedefs = new Map()
@@ -23,13 +27,13 @@ function gentypedef (ast) {
     if (currentprop !== null) {
       if (prop.name.startsWith(currentprop)) {
         let name = prop.name.replace(currentprop, '')
-        text += `${ind}${name}: ${cleanType(type)};${prop.description && `// ${prop.description}` || ''}\n`
+        text += `${ind}${name}: ${cleanType(type)};${prop.description && ` // ${prop.description}` || ''}\n`
         continue
       } else {
         indent -= 2
         ind = ' '.repeat(indent);
         currentprop = null
-        text += `${ind}}\n`
+        text += `${ind}};\n`
       }
     }
     if (type === 'Object') {
@@ -41,14 +45,14 @@ function gentypedef (ast) {
       indent += 2
       ind = ' '.repeat(indent);
     } else {
-      text += `  ${prop.name}${prop.optional && '?' || ''}: ${prop.type.names.map(cleanType).join(' | ')};${prop.description && `// ${prop.description}` || ''}\n`
+      text += `  ${prop.name}${prop.optional && '?' || ''}: ${prop.type.names.map(cleanType).join(' | ')};${prop.description && ` // ${prop.description}` || ''}\n`
     }
   }
   while (indent > 2) {
     indent -= 2
     let ind = ' '.repeat(indent);
     currentprop = null
-    text += `${ind}}\n`
+    text += `${ind}};\n`
   }
   text += `}\n`
   text += '```\n'
@@ -98,7 +102,7 @@ function gendoc (filepath) {
         let name = param.name.replace('_.', '').replace('args.', '')
         if (!param.optional) name = `**${name}**`
 
-        let type = param.type.names.map(cleanType).join(' | ')
+        let type = param.type.names.map(escapeType).join(' | ')
         if (param.defaultvalue !== undefined) { type = `${type} = ${param.defaultvalue}` }
 
         let description = param.description
@@ -110,7 +114,7 @@ function gendoc (filepath) {
       }
       rows.push([
         'return',
-        obj.returns[0].type.names.map(cleanType).join(' | '),
+        obj.returns[0].type.names.map(escapeType).join(' | '),
         obj.returns[0].description
       ])
 
