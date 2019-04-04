@@ -17,21 +17,21 @@ import { cores } from '../utils/plugins.js'
  * isomorphic-git which is an MIT/BSD style library, because that would violate the "dynamically linked" stipulation.
  * To use this feature you include openpgp with a separate script tag and pass it in as an argument.
  * </aside>
- * 
+ *
  * It creates a signed version of whatever commit HEAD currently points to, and then updates the current branch,
  * leaving the original commit dangling.
- * 
+ *
  * The `privateKeys` argument is a single string in ASCII armor format. However, it is plural "keys" because
  * you can technically have multiple private keys in a single ASCII armor string. The openpgp.sign() function accepts
  * multiple keys, so while I haven't tested it, it should support signing a single commit with multiple keys.
- * 
+ *
  * @deprecated
  * > **Deprecated**
  * > This command will be removed in the 1.0.0 version of `isomorphic-git` as it is no longer necessary.
  * >
  * > Previously, to sign commits you needed two steps, `commit` and then `sign`.
  * > Now commits can be signed when they are created with the [`commit`](./commit.md) command, provided you use a [`pgp`](./plugin_pgp.md) plugin.
- * 
+ *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
@@ -41,7 +41,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} args.privateKeys - A PGP private key in ASCII armor format
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are completed
- * 
+ *
  * @example
  * let sha = await git.sign({
  *   dir: '$input((/))',

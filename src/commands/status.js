@@ -16,7 +16,7 @@ import { cores } from '../utils/plugins.js'
  * Tell whether a file has been changed
  *
  * The possible resolve values are:
- * 
+ *
  * | status          | description                                                              |
  * | --------------- | ------------------------------------------------------------------------ |
  * | `"ignored"`     | file ignored by a .gitignore rule                                        |
@@ -30,7 +30,7 @@ import { cores } from '../utils/plugins.js'
  * | `"added"`       | previously untracked file, staged                                        |
  * | `"*unmodified"` | working dir and HEAD commit match, but index differs                     |
  * | `"*absent"`     | file not present in working dir or HEAD commit, but present in the index |
- * 
+ *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
