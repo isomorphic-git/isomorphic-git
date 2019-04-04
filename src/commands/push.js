@@ -75,8 +75,8 @@ import { pack } from './pack.js'
  *   token: $input((process.env.GITHUB_TOKEN)),
  * })
  * console.log(pushResponse)
-  *
-  */
+ *
+ */
 export async function push ({
   core = 'default',
   dir,

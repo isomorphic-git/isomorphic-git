@@ -8,7 +8,9 @@ function cleanType (type) {
 }
 
 function escapeType (type) {
-  return cleanType(type).replace(/</g, '\\<').replace(/>/g, '\\>')
+  return cleanType(type)
+    .replace(/</g, '\\<')
+    .replace(/>/g, '\\>')
 }
 
 const typedefs = new Map()
@@ -27,7 +29,9 @@ function gentypedef (ast) {
     if (currentprop !== null) {
       if (prop.name.startsWith(currentprop)) {
         let name = prop.name.replace(currentprop, '')
-        text += `${ind}${name}: ${cleanType(type)};${prop.description ? ` // ${prop.description}` : ''}\n`
+        text += `${ind}${name}: ${cleanType(type)};${
+          prop.description ? ` // ${prop.description}` : ''
+        }\n`
         continue
       } else {
         indent -= 2
@@ -45,7 +49,9 @@ function gentypedef (ast) {
       indent += 2
       ind = ' '.repeat(indent)
     } else {
-      text += `  ${prop.name}${prop.optional ? '?' : ''}: ${prop.type.names.map(cleanType).join(' | ')};${prop.description ? ` // ${prop.description}` : ''}\n`
+      text += `  ${prop.name}${prop.optional ? '?' : ''}: ${prop.type.names
+        .map(cleanType)
+        .join(' | ')};${prop.description ? ` // ${prop.description}` : ''}\n`
     }
   }
   while (indent > 2) {
@@ -107,7 +113,9 @@ function gendoc (filepath) {
           if (!param.optional) name = `**${name}**`
 
           let type = param.type.names.map(escapeType).join(' | ')
-          if (param.defaultvalue !== undefined) { type = `${type} = ${param.defaultvalue}` }
+          if (param.defaultvalue !== undefined) {
+            type = `${type} = ${param.defaultvalue}`
+          }
 
           let description = param.description
           if (description.startsWith('[deprecated]')) {
