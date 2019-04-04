@@ -76,11 +76,14 @@ function gendoc (filepath) {
         continue
       }
       if (obj.kind === 'package') continue
-      if (!obj.params) continue
+      if (!obj.params && !obj.returns) continue
       text += `---\n`
       text += `title: ${obj.name}\n`
       text += `sidebar_label: ${obj.name}\n`
       text += `---\n`
+      if (obj.deprecated) {
+        text += `\n${obj.deprecated}\n`
+      }
       // Split description into "first line" and "the rest"
       obj.description = obj.description.trim()
       // why JavaScript why
@@ -96,33 +99,37 @@ function gendoc (filepath) {
 
       // Build params table
       const rows = [['param', 'type [= default]', 'description']]
-      for (const param of obj.params) {
-        if (param.name === '_' || param.name === 'args') continue
+      if (obj.params) {
+        for (const param of obj.params) {
+          if (param.name === '_' || param.name === 'args') continue
 
-        let name = param.name.replace('_.', '').replace('args.', '')
-        if (!param.optional) name = `**${name}**`
+          let name = param.name.replace('_.', '').replace('args.', '')
+          if (!param.optional) name = `**${name}**`
 
-        let type = param.type.names.map(escapeType).join(' | ')
-        if (param.defaultvalue !== undefined) { type = `${type} = ${param.defaultvalue}` }
+          let type = param.type.names.map(escapeType).join(' | ')
+          if (param.defaultvalue !== undefined) { type = `${type} = ${param.defaultvalue}` }
 
-        let description = param.description
-        if (description.startsWith('[deprecated]')) {
-          description = description.replace('[deprecated] ', '')
-          name = name += ' [deprecated]'
+          let description = param.description
+          if (description.startsWith('[deprecated]')) {
+            description = description.replace('[deprecated] ', '')
+            name = name += ' [deprecated]'
+          }
+          // because of the `dir` / `gitdir` weirdness, some args are "required" but have default values
+          // and I have to distinguish them in a way that doesn't upset TypeScript
+          if (description.startsWith('[required]')) {
+            description = description.replace('[required] ', '')
+            name = `**${name}**`
+          }
+          rows.push([name, type, description])
         }
-        // because of the `dir` / `gitdir` weirdness, some args are "required" but have default values
-        // and I have to distinguish them in a way that doesn't upset TypeScript
-        if (description.startsWith('[required]')) {
-          description = description.replace('[required] ', '')
-          name = `**${name}**`
-        }
-        rows.push([name, type, description])
       }
-      rows.push([
-        'return',
-        obj.returns[0].type.names.map(escapeType).join(' | '),
-        obj.returns[0].description
-      ])
+      if (obj.returns) {
+        rows.push([
+          'return',
+          obj.returns[0].type.names.map(escapeType).join(' | '),
+          obj.returns[0].description
+        ])
+      }
 
       text += table(rows)
       text += `\n`
@@ -132,11 +139,13 @@ function gendoc (filepath) {
         }
       }
       if (description !== '') text += `\n${description}\n`
-      text += `\nExample Code:\n`
-      for (const example of obj.examples) {
-        text += '\n```js live\n'
-        text += example
-        text += '\n```\n'
+      if (obj.examples) {
+        text += `\nExample Code:\n`
+        for (const example of obj.examples) {
+          text += '\n```js live\n'
+          text += example
+          text += '\n```\n'
+        }
       }
     }
   }
