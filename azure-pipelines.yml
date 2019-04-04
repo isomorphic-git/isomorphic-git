@@ -22,7 +22,7 @@ jobs:
 
   - script: npm ci
     displayName: 'Install dependencies'
-    condition: ne(variables['CacheRestored'], 'true'
+    condition: ne(variables['CacheRestored'], 'true')
 
   - script: npm test
     displayName: 'Run tests'
