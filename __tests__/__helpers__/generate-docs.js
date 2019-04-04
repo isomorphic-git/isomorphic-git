@@ -4,7 +4,7 @@ const path = require('path')
 const table = require('markdown-table')
 
 function cleanType (type) {
-  return type.replace(/\.</g, '<')
+  return type.replace(/\.</g, '<').replace(/</g, '\\<').replace(/>/g, '\\>')
 }
 
 const typedefs = new Map()
@@ -13,7 +13,7 @@ function gentypedef (ast) {
   let text = ''
   text += `\n${ast.description}\n\n`
   text += '```ts\n'
-  text += `type ${ast.name} {\n`
+  text += `type ${ast.name} = {\n`
   let currentprop = null
   let indent = 2;
   for (const prop of ast.properties) {
@@ -23,7 +23,7 @@ function gentypedef (ast) {
     if (currentprop !== null) {
       if (prop.name.startsWith(currentprop)) {
         let name = prop.name.replace(currentprop, '')
-        text += `${ind}${name}: ${cleanType(type)}; // ${prop.description}\n`
+        text += `${ind}${name}: ${cleanType(type)};${prop.description && `// ${prop.description}` || ''}\n`
         continue
       } else {
         indent -= 2
@@ -41,7 +41,7 @@ function gentypedef (ast) {
       indent += 2
       ind = ' '.repeat(indent);
     } else {
-      text += `  ${prop.name}: ${cleanType(prop.type.names[0])}; // ${prop.description}\n`
+      text += `  ${prop.name}${prop.optional && '?' || ''}: ${prop.type.names.map(cleanType).join(' | ')};${prop.description && `// ${prop.description}` || ''}\n`
     }
   }
   while (indent > 2) {
@@ -67,7 +67,6 @@ function gendoc (filepath) {
   let text = ''
   for (const obj of ast) {
     if (!obj.undocumented) {
-      console.log(obj.kind)
       if (obj.kind === 'typedef') {
         gentypedef(obj)
         continue
@@ -99,7 +98,7 @@ function gendoc (filepath) {
         let name = param.name.replace('_.', '').replace('args.', '')
         if (!param.optional) name = `**${name}**`
 
-        let type = cleanType(param.type.names[0])
+        let type = param.type.names.map(cleanType).join(' | ')
         if (param.defaultvalue !== undefined) { type = `${type} = ${param.defaultvalue}` }
 
         let description = param.description
@@ -111,7 +110,7 @@ function gendoc (filepath) {
       }
       rows.push([
         'return',
-        cleanType(obj.returns[0].type.names[0]),
+        obj.returns[0].type.names.map(cleanType).join(' | '),
         obj.returns[0].description
       ])
 

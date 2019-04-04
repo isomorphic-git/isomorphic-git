@@ -13,30 +13,30 @@ import { init } from './init.js'
  *
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
  *
- * @param {object} _
- * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {string} _.dir - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
- * @param {string} _.url - The URL of the remote repository
- * @param {string} [_.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo.
- * @param {string} [_.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
- * @param {boolean} [_.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
- * @param {boolean} [_.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
- * @param {boolean} [_.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**.)
- * @param {boolean} [_.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
- * @param {string} [_.remote = 'origin'] - What to name the remote that is created.
- * @param {number} [_.depth] - Integer. Determines how much of the git repository's history to retrieve
- * @param {Date} [_.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
- * @param {string[]} [_.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
- * @param {boolean} [_.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
- * @param {string} [_.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [_.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [_.token] - See the [Authentication](./authentication.html) documentation
- * @param {string} [_.oauth2format] - See the [Authentication](./authentication.html) documentation
- * @param {object} [_.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {import('events').EventEmitter} [_.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
- * @param {string} [_.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.url - The URL of the remote repository
+ * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo.
+ * @param {string} [args.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
+ * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {boolean} [args.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
+ * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**.)
+ * @param {boolean} [args.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
+ * @param {string} [args.remote = 'origin'] - What to name the remote that is created.
+ * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
+ * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+ * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+ * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+ * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
+ * @param {object} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
+ * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *

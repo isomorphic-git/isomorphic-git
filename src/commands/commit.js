@@ -14,20 +14,20 @@ import { cores } from '../utils/plugins.js'
 /**
  * Create a new commit
  *
- * @param {Object} _
- * @param {string} [_.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [_.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {string} [_.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} _.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
- * @param {string} _.message - The commit message to use.
- * @param {Object} [_.author] - The details about the author.
- * @param {string} [_.author.name] - Default is `user.name` config.
- * @param {string} [_.author.email] - Default is `user.email` config.
- * @param {string} [_.author.date] - Set the author timestamp field. Default is the current date.
- * @param {string} [_.author.timestamp] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
- * @param {string} [_.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
- * @param {Object} [_.committer = author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
- * @param {string} [_.signingKey] - Sign the tag object using this private PGP key.
+ * @param {Object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.message - The commit message to use.
+ * @param {Object} [args.author] - The details about the author.
+ * @param {string} [args.author.name] - Default is `user.name` config.
+ * @param {string} [args.author.email] - Default is `user.email` config.
+ * @param {string} [args.author.date] - Set the author timestamp field. Default is the current date.
+ * @param {string} [args.author.timestamp] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+ * @param {string} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
+ * @param {Object} [args.committer = author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
+ * @param {string} [args.signingKey] - Sign the tag object using this private PGP key.
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  *

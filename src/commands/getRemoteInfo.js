@@ -20,28 +20,17 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
+ * @param {string} args.url - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
- * @param {string} [args.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch.
- * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities. 
  * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
- * @param {boolean} [args.tags = false] - Also fetch tags
- * @param {string} [args.remote] - What to name the remote that is created.
- * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
- * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
- * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
- * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
- * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
- * @returns {Promise<RemoteDescription>} - Resolves successfully with an object listing the branches, tags, and capabilities of the remote. 
+ * @returns {Promise<RemoteDescription>} Resolves successfully with an object listing the branches, tags, and capabilities of the remote. 
  * @see RemoteDescription
  * 
  * @example 
@@ -50,6 +39,7 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  *     "$input((https://cors.isomorphic-git.org/github.com/isomorphic-git/isomorphic-git.git))"
  * });
  * console.log(info);
+ * 
  */
 export async function getRemoteInfo ({
   core = 'default',
@@ -79,11 +69,12 @@ export async function getRemoteInfo ({
       headers
     })
     auth = remote.auth // hack to get new credentials from CredentialManager API
-    const result = {}
     // Note: remote.capabilities, remote.refs, and remote.symrefs are Set and Map objects,
     // but one of the objectives of the public API is to always return JSON-compatible objects
     // so we must JSONify them.
-    result.capabilities = [...remote.capabilities]
+    const result = {
+      capabilities: [...remote.capabilities]
+    }
     // Convert the flat list into an object tree, because I figure 99% of the time
     // that will be easier to use.
     for (const [ref, oid] of remote.refs) {
