@@ -41,7 +41,7 @@ import { cores } from '../utils/plugins.js'
  * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
  * @param {boolean} [args.signing = false] - Include the PGP signing payload
  *
- * @returns {Promise<Array<CommitDescription|{oid: string, error: any}>>} Resolves to an array of CommitDescription objects
+ * @returns {Promise<Array<CommitDescription>>} Resolves to an array of CommitDescription objects
  * @see CommitDescription
  *
  * @example
