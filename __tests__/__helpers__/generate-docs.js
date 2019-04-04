@@ -19,19 +19,19 @@ function gentypedef (ast) {
   text += '```ts\n'
   text += `type ${ast.name} = {\n`
   let currentprop = null
-  let indent = 2;
+  let indent = 2
   for (const prop of ast.properties) {
     const type = cleanType(prop.type.names[0])
-    let ind = ' '.repeat(indent);
+    let ind = ' '.repeat(indent)
     // This is pretty sloppy
     if (currentprop !== null) {
       if (prop.name.startsWith(currentprop)) {
         let name = prop.name.replace(currentprop, '')
-        text += `${ind}${name}: ${cleanType(type)};${prop.description && ` // ${prop.description}` || ''}\n`
+        text += `${ind}${name}: ${cleanType(type)};${prop.description ? ` // ${prop.description}` : ''}\n`
         continue
       } else {
         indent -= 2
-        ind = ' '.repeat(indent);
+        ind = ' '.repeat(indent)
         currentprop = null
         text += `${ind}};\n`
       }
@@ -43,20 +43,20 @@ function gentypedef (ast) {
       }
       text += `${ind}${prop.name}: {\n`
       indent += 2
-      ind = ' '.repeat(indent);
+      ind = ' '.repeat(indent)
     } else {
-      text += `  ${prop.name}${prop.optional && '?' || ''}: ${prop.type.names.map(cleanType).join(' | ')};${prop.description && ` // ${prop.description}` || ''}\n`
+      text += `  ${prop.name}${prop.optional ? '?' : ''}: ${prop.type.names.map(cleanType).join(' | ')};${prop.description ? ` // ${prop.description}` : ''}\n`
     }
   }
   while (indent > 2) {
     indent -= 2
-    let ind = ' '.repeat(indent);
+    let ind = ' '.repeat(indent)
     currentprop = null
     text += `${ind}};\n`
   }
   text += `}\n`
   text += '```\n'
-  typedefs.set(ast.name, text);
+  typedefs.set(ast.name, text)
 }
 
 function gendoc (filepath) {
@@ -109,6 +109,12 @@ function gendoc (filepath) {
         if (description.startsWith('[deprecated]')) {
           description = description.replace('[deprecated] ', '')
           name = name += ' [deprecated]'
+        }
+        // because of the `dir` / `gitdir` weirdness, some args are "required" but have default values
+        // and I have to distinguish them in a way that doesn't upset TypeScript
+        if (description.startsWith('[required]')) {
+          description = description.replace('[required] ', '')
+          name = `**${name}**`
         }
         rows.push([name, type, description])
       }

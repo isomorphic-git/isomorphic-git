@@ -62,7 +62,7 @@ import { config } from './config'
  *
  * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
  * @see FetchResponse
- * 
+ *
  * @example
  * await git.fetch({
  *   dir: '$input((/))',

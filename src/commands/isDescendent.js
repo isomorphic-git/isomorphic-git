@@ -18,7 +18,7 @@ import { cores } from '../utils/plugins.js'
  * @param {number} [depth = -1] - Maximum depth to search before giving up. -1 means no maximum depth.
  *
  * @returns {Promise<boolean>} Resolves to true if `oid` is a descendent of `ancestor`
- * 
+ *
  * @example
  * let oid = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
  * let ancestor = await git.resolveRef({ dir: '$input((/))', ref: '$input((v0.20.0))' })

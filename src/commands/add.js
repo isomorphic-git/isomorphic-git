@@ -16,6 +16,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to add to the index
+ *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
  * @example

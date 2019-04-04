@@ -30,7 +30,7 @@ import { cores } from '../utils/plugins.js'
  *   path: '$input((user.name))',
  *   value: '$input((Mr. Test))'
  * })
- * 
+ *
  * // Read config value
  * let value = await git.config({
  *   dir: '$input((/))',

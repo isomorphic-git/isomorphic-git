@@ -14,7 +14,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  *
  * @returns {Promise<Array<{remote: string, url: string}>>} Resolves successfully with an array of `{remote, url}` objects
- * 
+ *
  * @example
  * let remotes = await git.listRemotes({ dir: '$input((/))' })
  * console.log(remotes)

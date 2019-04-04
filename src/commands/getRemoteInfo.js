@@ -22,7 +22,7 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} args.url - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
- * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities. 
+ * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities.
  * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
@@ -30,16 +30,16 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
- * @returns {Promise<RemoteDescription>} Resolves successfully with an object listing the branches, tags, and capabilities of the remote. 
+ * @returns {Promise<RemoteDescription>} Resolves successfully with an object listing the branches, tags, and capabilities of the remote.
  * @see RemoteDescription
- * 
- * @example 
+ *
+ * @example
  * let info = await git.getRemoteInfo({
  *   url:
  *     "$input((https://cors.isomorphic-git.org/github.com/isomorphic-git/isomorphic-git.git))"
  * });
  * console.log(info);
- * 
+ *
  */
 export async function getRemoteInfo ({
   core = 'default',

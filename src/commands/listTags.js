@@ -14,7 +14,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  *
  * @returns {Promise<Array<string>>} Resolves successfully with an array of tag names
- * 
+ *
  * @example
  * let tags = await git.listTags({ dir: '$input((/))' })
  * console.log(tags)

@@ -8,7 +8,7 @@ import { deleteRef } from './deleteRef'
 
 /**
  * Delete a local tag ref
- * 
+ *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).

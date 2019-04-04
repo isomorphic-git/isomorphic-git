@@ -10,7 +10,7 @@ import { currentBranch } from './currentBranch.js'
 import { log } from './log'
 
 /**
- * 
+ *
  * @typedef {Object} MergeReport - Returns an object with a schema like this:
  * @property {string} oid - The SHA-1 object id that is now at the head of the branch
  * @property {boolean} [alreadyMerged] - True if the branch was already merged so no changes were made
@@ -27,7 +27,7 @@ import { log } from './log'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
- * @param {number} args.theirs - The branch to be merged
+ * @param {string} args.theirs - The branch to be merged
  * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
  *
  * @returns {Promise<MergeReport>} Resolves to a description of the merge operation

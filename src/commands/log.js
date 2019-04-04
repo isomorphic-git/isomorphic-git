@@ -8,7 +8,7 @@ import { logCommit } from '../utils/logCommit.js'
 import { cores } from '../utils/plugins.js'
 
 /**
- * 
+ *
  * @typedef {Object} CommitDescription - Returns an array of objects with a schema like this:
  * @property {string} oid - SHA-1 object id of this commit
  * @property {string} message - Commit message

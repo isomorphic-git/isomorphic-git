@@ -6,7 +6,7 @@ import { cores } from '../utils/plugins.js'
 
 /**
  * List branches
- * 
+ *
  * By default it lists local branches. If a 'remote' is specified, it lists the remote's branches. When listing remote branches, the HEAD branch is not filtered out, so it may be included in the list of results.
  *
  * Note that specifying a remote does not actually contact the server and update the list of branches.
@@ -21,7 +21,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.remote] - Instead of the branches in `refs/heads`, list the branches in `refs/remotes/${remote}`.
  *
  * @returns {Promise<Array<string>>} Resolves successfully with an array of branch names
- * 
+ *
  * @example
  * let branches = await git.listBranches({ dir: '$input((/))' })
  * console.log(branches)

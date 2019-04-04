@@ -12,7 +12,7 @@ import { currentBranch } from './currentBranch'
  * Delete a local branch
  *
  * > Note: This only deletes loose branches - it should be fixed in the future to delete packed branches as well.
- * 
+ *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).

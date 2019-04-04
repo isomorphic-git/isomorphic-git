@@ -9,7 +9,7 @@ import { cores } from '../utils/plugins.js'
  * Find the root git directory
  *
  * Starting at `filepath`, walks upward until it finds a directory that contains a subdirectory called '.git'.
- * 
+ *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).

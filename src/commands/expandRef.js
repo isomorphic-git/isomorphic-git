@@ -12,7 +12,7 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
- * @param {string} args.ref - The ref to expand (like "v1.0.0") 
+ * @param {string} args.ref - The ref to expand (like "v1.0.0")
  *
  * @returns {Promise<string>} Resolves successfully with a full ref name ("refs/tags/v1.0.0")
  *
