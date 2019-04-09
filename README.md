@@ -193,6 +193,7 @@ unless there is a major version bump.
 - [listTags](https://isomorphic-git.github.io/docs/listTags.html)
 - [log](https://isomorphic-git.github.io/docs/log.html)
 - [merge](https://isomorphic-git.github.io/docs/merge.html)
+- [packObjects](https://isomorphic-git.github.io/docs/packObjects.html)
 - [pull](https://isomorphic-git.github.io/docs/pull.html)
 - [push](https://isomorphic-git.github.io/docs/push.html)
 - [readObject](https://isomorphic-git.github.io/docs/readObject.html)
