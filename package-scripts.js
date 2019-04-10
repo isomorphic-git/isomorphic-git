@@ -29,6 +29,7 @@ module.exports = {
     lint: {
       default: series.nps('lint.js', 'lint.typescript'),
       js: `standard ${srcPaths}`,
+      fix: `standard --fix ${srcPaths}`,
       typescript: 'tsc src/index.d.ts --lib es6',
       typescriptTests: 'tsc -p tsconfig.json'
     },

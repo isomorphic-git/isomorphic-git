@@ -3,11 +3,34 @@ import { arrayRange } from '../utils/arrayRange.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
-
 /**
- * 
+ *
  * @typedef Walker
  * @property {Symbol} Symbol('GitWalkerSymbol')
+ */
+
+/**
+ *
+ * @typedef WalkerEntry
+ * @property {string} fullpath
+ * @property {string} basename
+ * @property {boolean} exists
+ * @property {Function} populateStat
+ * @property {'tree'|'blob'} [type]
+ * @property {number} [ctimeSeconds]
+ * @property {number} [ctimeNanoseconds]
+ * @property {number} [mtimeSeconds]
+ * @property {number} [mtimeNanoseconds]
+ * @property {number} [dev]
+ * @property {number} [ino]
+ * @property {number} [mode]
+ * @property {number} [uid]
+ * @property {number} [gid]
+ * @property {number} [size]
+ * @property {Function} populateContent
+ * @property {Buffer} [content]
+ * @property {Function} populateHash
+ * @property {string} [oid]
  */
 
 /**
@@ -15,8 +38,10 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * @param {object} args
  * @param {Walker[]} args.trees - The trees you want to traverse
- * @param {string} args.publicKeys - A PGP public key in ASCII armor format.
- * @param {OpenPGP} [args.openpgp] - [deprecated] An instance of the [OpenPGP library](https://unpkg.com/openpgp@2.6.2). Deprecated in favor of using a [PGP plugin](./plugin_pgp.md).
+ * @param {(entry: WalkerEntry) => Promise<boolean>} args.filter - Filter which `WalkerEntry`s to process
+ * @param {<T>(entry: WalkerEntry) => Promise<T>} args.map - Transform `WalkerEntry`s into a result form
+ * @param {<T, U>(parent: T, child: T[]) => Promise<U[]>} args.reduce - Control how mapped entries are combined with their parent result
+ * @param {<U>(walk: (root: WalkerEntry[]) => Promise<U>, children: IterableIterator<WalkerEntry[]>) => Promise<U[]>} args.iterate - Fine-tune how entries within a tree are iterated over
  * 
  * @returns {Promise<false | string[]>} The value `false` or the valid key ids (in hex format) used to sign the commit.
  *
@@ -26,6 +51,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
 export async function walkBeta1 ({
   trees,
   filter = async () => true,
+  // @ts-ignore
   map = async entry => entry,
   // The default reducer is a flatmap that filters out undefineds.
   reduce = async (parent, children) => {
@@ -67,9 +93,9 @@ export async function walkBeta1 ({
       let { children, entry } = await unionWalkerFromReaddir(root)
       if (await filter(entry)) {
         let parent = await map(entry)
-        children = await iterate(walk, children)
-        children = children.filter(x => x !== undefined)
-        return reduce(parent, children)
+        let walkedChildren = await iterate(walk, children)
+        walkedChildren = walkedChildren.filter(x => x !== undefined)
+        return reduce(parent, walkedChildren)
       }
     }
     return walk(root)

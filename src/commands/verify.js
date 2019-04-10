@@ -16,10 +16,10 @@ import { cores } from '../utils/plugins.js'
  * It is up to you to figure out what the commit's or tag's public key _should_ be.
  * I would use the "author" or "committer" name and email, and look up
  * that person's public key from a trusted source such as the GitHub API.
- * 
+ *
  * The function returns `false` if any of the signatures on a signed git commit are invalid.
  * Otherwise, it returns an array of the key ids that were used to sign it.
- * 
+ *
  * The `publicKeys` argument is a single string in ASCII armor format. However, it is plural "keys" because
  * you can technically have multiple public keys in a single ASCII armor string. While I haven't tested it, it
  * should support verifying a single commit signed with multiple keys. Hence why the returned result is an array of key ids.
@@ -32,7 +32,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} args.ref - A reference to the commit or tag to verify
  * @param {string} args.publicKeys - A PGP public key in ASCII armor format.
  * @param {OpenPGP} [args.openpgp] - [deprecated] An instance of the [OpenPGP library](https://unpkg.com/openpgp@2.6.2). Deprecated in favor of using a [PGP plugin](./plugin_pgp.md).
- * 
+ *
  * @returns {Promise<false | string[]>} The value `false` or the valid key ids (in hex format) used to sign the commit.
  *
  * @example

@@ -17,7 +17,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.object = 'HEAD'] - What oid the tag refers to. (Will resolve to oid if value is a ref.) By default, the commit object which is referred by the current `HEAD` is used.
  * @param {boolean} [args.force = false] - Instead of throwing an error if a tag named `ref` already exists, overwrite the existing tag.
  *
- * @returns {Promise<void>} Resolves successfully when filesystem operations are complete 
+ * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
  * await git.tag({ dir: '$input((/))', ref: '$input((test-tag))' })

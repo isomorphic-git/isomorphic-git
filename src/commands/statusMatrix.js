@@ -3,7 +3,7 @@ import globrex from 'globrex'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { WORKDIR } from '../models/GitWalkerFs.js'
+import { WORKDIR } from './WORKDIR.js'
 import { STAGE } from '../models/GitWalkerIndex.js'
 import { TREE } from '../models/GitWalkerRepo.js'
 import { join } from '../utils/join.js'

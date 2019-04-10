@@ -6,7 +6,7 @@ import { GitWalkerFs } from '../models/GitWalkerFs.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
 /**
- * 
+ *
  * @typedef Walker
  * @property {Symbol} Symbol('GitWalkerSymbol')
  */
@@ -30,7 +30,7 @@ import { GitWalkerSymbol } from '../utils/symbols.js'
  * ]
  *
  */
-export function WORKDIR ({ 
+export function WORKDIR ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
@@ -46,4 +46,3 @@ export function WORKDIR ({
   Object.freeze(o)
   return o
 }
-

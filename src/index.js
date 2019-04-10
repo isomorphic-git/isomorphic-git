@@ -44,8 +44,8 @@ export * from './commands/version.js'
 export * from './commands/walkBeta1.js'
 export * from './commands/writeObject.js'
 export * from './commands/writeRef.js'
+export * from './commands/WORKDIR.js'
 
-export * from './models/GitWalkerFs'
 export * from './models/GitWalkerIndex'
 export * from './models/GitWalkerRepo'
 
