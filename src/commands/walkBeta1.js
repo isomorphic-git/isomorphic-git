@@ -1,14 +1,29 @@
+// @ts-check
 import { arrayRange } from '../utils/arrayRange.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
+
+/**
+ * 
+ * @typedef Walker
+ * @property {Symbol} Symbol('GitWalkerSymbol')
+ */
+
 /**
  * A powerful recursive tree-walking utility.
  *
- * @link https://isomorphic-git.org/docs/en/walkBeta1
+ * @param {object} args
+ * @param {Walker[]} args.trees - The trees you want to traverse
+ * @param {string} args.publicKeys - A PGP public key in ASCII armor format.
+ * @param {OpenPGP} [args.openpgp] - [deprecated] An instance of the [OpenPGP library](https://unpkg.com/openpgp@2.6.2). Deprecated in favor of using a [PGP plugin](./plugin_pgp.md).
+ * 
+ * @returns {Promise<false | string[]>} The value `false` or the valid key ids (in hex format) used to sign the commit.
+ *
+ * @example
+  *
  */
 export async function walkBeta1 ({
-  core = 'default',
   trees,
   filter = async () => true,
   map = async entry => entry,
