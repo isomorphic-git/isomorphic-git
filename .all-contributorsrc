@@ -337,6 +337,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "addaleax",
+      "name": "Anna Henningsen",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/899444?v=4",
+      "profile": "https://twitter.com/addaleax",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }

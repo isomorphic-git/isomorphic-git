@@ -69,6 +69,11 @@ export interface TreeEntry {
   type?: string;
 }
 
+export interface PackObjectsResponse {
+  filename: string;
+  packfile?: Buffer;
+}
+
 export interface PushResponse {
   ok?: string[];
   errors?: string[];
@@ -470,6 +475,13 @@ export function merge(args: GitDir & {
   theirs: string;
   fastForwardOnly?: boolean;
 }): Promise<MergeReport>;
+
+export function packObjects(args: GitDir & {
+  core?: string;
+  fs?: any;
+  oids: string[];
+  write?: boolean;
+}): Promise<PackObjectsResponse>;
 
 export function pull(args: WorkDir & GitDir & {
   core?: string;
