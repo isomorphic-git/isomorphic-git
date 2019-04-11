@@ -1,3 +1,4 @@
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { collect } from '../utils/collect.js'
 import { join } from '../utils/join.js'

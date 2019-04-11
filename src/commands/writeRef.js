@@ -1,3 +1,4 @@
+// @ts-check
 import cleanGitRef from 'clean-git-ref'
 
 import { GitRefManager } from '../managers/GitRefManager.js'

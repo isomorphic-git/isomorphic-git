@@ -84,7 +84,7 @@ function gendoc (filepath) {
         continue
       }
       if (obj.kind === 'package') continue
-      if (!obj.params && !obj.returns) continue
+      if (!obj.params || !obj.returns) continue
       text += `---\n`
       text += `title: ${obj.name}\n`
       text += `sidebar_label: ${obj.name}\n`

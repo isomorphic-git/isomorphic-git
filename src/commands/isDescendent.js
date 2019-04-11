@@ -1,3 +1,4 @@
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
@@ -15,7 +16,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The descendent commit
  * @param {string} args.ancestor - The (proposed) ancestor commit
- * @param {number} [depth = -1] - Maximum depth to search before giving up. -1 means no maximum depth.
+ * @param {number} [args.depth = -1] - Maximum depth to search before giving up. -1 means no maximum depth.
  *
  * @returns {Promise<boolean>} Resolves to true if `oid` is a descendent of `ancestor`
  *
