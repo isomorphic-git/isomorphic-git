@@ -11,6 +11,41 @@ import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  *
+ * @typedef {Object} CommitDescription
+ * @property {string} oid - SHA-1 object id of this commit
+ * @property {string} message - commit message
+ * @property {string} tree - SHA-1 object id of corresponding file tree
+ * @property {string[]} parent - an array of zero or more SHA-1 object ids
+ * @property {Object} author
+ * @property {string} author.name - the author's name
+ * @property {string} author.email - the author's email
+ * @property {number} author.timestamp - UTC Unix timestamp in seconds
+ * @property {number} author.timezoneOffset - timezone difference from UTC in minutes
+ * @property {Object} committer
+ * @property {string} committer.name - the committer's name
+ * @property {string} committer.email - the committer's email
+ * @property {number} committer.timestamp - UTC Unix timestamp in seconds
+ * @property {number} committer.timezoneOffset - timezone difference from UTC in minutes
+ * @property {string} [gpgsig] - PGP signature (if present)
+ */
+
+/**
+ *
+ * @typedef {Object} TreeEntry
+ * @property {string} mode
+ * @property {string} path
+ * @property {string} oid
+ * @property {string} [type]
+ */
+
+/**
+ *
+ * @typedef {Object} TreeDescription
+ * @property {TreeEntry[]} entries
+ */
+
+/**
+ *
  * @typedef {Object} GitObjectDescription - The object returned has the following schema:
  * @property {string} oid
  * @property {'blob' | 'tree' | 'commit' | 'tag'} [type]
@@ -44,7 +79,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get
  * @param {'deflated' | 'wrapped' | 'content' | 'parsed'} [args.format = 'parsed'] - What format to return the object in. The choices are described in more detail below.
  * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the object at that filepath. To return the root directory of a tree set filepath to `''`

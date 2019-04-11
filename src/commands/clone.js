@@ -17,7 +17,7 @@ import { init } from './init.js'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.url - The URL of the remote repository
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo.
  * @param {string} [args.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.

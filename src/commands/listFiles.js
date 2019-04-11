@@ -17,7 +17,7 @@ import { readObject } from './readObject'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Return a list of all the files in the commit at `ref` instead of the files currently in the git index (aka staging area)
  *
  * @returns {Promise<Array<string>>} Resolves successfully with an array of filepaths
@@ -63,6 +63,7 @@ export async function listFiles ({
 async function accumulateFilesFromOid ({ gitdir, fs, oid, filenames, prefix }) {
   const { object } = await readObject({ gitdir, fs, oid, filepath: '' })
   // Note: this isn't parallelized because I'm too lazy to figure that out right now
+  // @ts-ignore
   for (const entry of object.entries) {
     if (entry.type === 'tree') {
       await accumulateFilesFromOid({

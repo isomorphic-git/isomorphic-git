@@ -35,7 +35,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} args.gitdir=join(dir, '.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to query
  *
  * @returns {Promise<string>} Resolves successfully with the file's git status
@@ -123,10 +123,12 @@ export async function status ({
     if (!H && W && !I) return '*added' // --A
     if (!H && W && I) {
       let workdirOid = await getWorkdirOid()
+      // @ts-ignore
       return workdirOid === indexEntry.oid ? 'added' : '*added' // -AA : -AB
     }
     if (H && !W && !I) return 'deleted' // A--
     if (H && !W && I) {
+      // @ts-ignore
       return treeOid === indexEntry.oid ? '*deleted' : '*deleted' // AA- : AB-
     }
     if (H && W && !I) {
@@ -136,8 +138,10 @@ export async function status ({
     if (H && W && I) {
       let workdirOid = await getWorkdirOid()
       if (workdirOid === treeOid) {
+        // @ts-ignore
         return workdirOid === indexEntry.oid ? 'unmodified' : '*unmodified' // AAA : ABA
       } else {
+        // @ts-ignore
         return workdirOid === indexEntry.oid ? 'modified' : '*modified' // ABB : AAB
       }
     }

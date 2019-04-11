@@ -13,7 +13,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The descendent commit
  * @param {string} args.ancestor - The (proposed) ancestor commit
  * @param {number} [args.depth = -1] - Maximum depth to search before giving up. -1 means no maximum depth.

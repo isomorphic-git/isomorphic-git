@@ -48,7 +48,7 @@ import { pack } from './pack.js'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} args.gitdir=join(dir,'.git') - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Which branch to push. By default this is the currently checked out branch.
  * @param {string} [args.remoteRef] - The name of the receiving branch on the remote. By default this is the same as `ref`. (See note below)
  * @param {string} [args.remote] - If URL is not specified, determines which remote to use.
@@ -160,14 +160,17 @@ export async function push ({
       '0000000000000000000000000000000000000000'
     let finish = [...httpRemote.refs.values()]
     // hack to speed up common force push scenarios
+    // @ts-ignore
     let mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
     for (let oid of mergebase) finish.push(oid)
+    // @ts-ignore
     let commits = await listCommitsAndTags({
       fs,
       gitdir,
       start: [oid],
       finish
     })
+    // @ts-ignore
     let objects = await listObjects({ fs, gitdir, oids: commits })
     if (!force) {
       // Is it a tag that already exists?

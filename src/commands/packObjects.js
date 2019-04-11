@@ -7,10 +7,10 @@ import { cores } from '../utils/plugins.js'
 import { pack } from './pack'
 
 /**
- * 
+ *
  * @typedef {Object} PackObjectsResponse The packObjects command returns an object with two properties:
  * @property {string} filename - The suggested filename for the packfile if you want to save it to disk somewhere. It includes the packfile SHA.
- * @property {Buffer} [packfile] - The packfile contents. Not present if `write` parameter was true, in which case the packfile was written straight to disk. 
+ * @property {Buffer} [packfile] - The packfile contents. Not present if `write` parameter was true, in which case the packfile was written straight to disk.
  */
 
 /**
