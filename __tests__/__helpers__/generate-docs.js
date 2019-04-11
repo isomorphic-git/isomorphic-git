@@ -140,6 +140,15 @@ function gendoc (filepath) {
           obj.returns[0].description
         ])
       }
+      if (obj.exceptions) {
+        for (let err of obj.exceptions) {
+          rows.push([
+            'throws',
+            'Error',
+            err.type.names.map(x => `[${x}](./errors.md#${x.toLowerCase()})`).join(' | ')
+          ])
+        }
+      }
 
       text += table(rows)
       text += `\n`

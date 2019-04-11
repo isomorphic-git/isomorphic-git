@@ -11,7 +11,7 @@
 
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] add parameter to the function in `src/commands/X.js`
-- [ ] add parameter to [docs](https://github.com/isomorphic-git/isomorphic-git.github.io/tree/source/docs)/X.md
+- [ ] document the parameter in the JSDoc comment above the function
 - [ ] add parameter to the TypeScript library definition for X in `src/index.d.ts`
 - [ ] add a test case in `__tests__/test-X.js` if possible
 - [ ] squash merge the PR with commit message "feat: Added 'bar' parameter to X command"
@@ -25,7 +25,7 @@
 - [ ] update `__tests__/__snapshots__/test-exports.js.snap`
 - [ ] add command to README list of commands
 - [ ] create a test in `src/__tests__`
-- [ ] create a new doc page [docs](https://github.com/isomorphic-git/isomorphic-git.github.io/tree/source/docs)/X.md
+- [ ] document the command with a JSDoc comment
   - [ ] add page to the [Alphabetical Index](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/docs/alphabetic.md)
   - [ ] add page to the [sidebar](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/website/sidebars.json)
 - [ ] squash merge the PR with commit message "feat: Added 'X' command"

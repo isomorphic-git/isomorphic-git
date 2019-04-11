@@ -15,7 +15,7 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.filepath - The file directory to start searching in.
  *
- * @returns {Promise<string>} Resolves successfully with a full ref name ("refs/tags/v1.0.0")
+ * @returns {Promise<string>} Resolves successfully with a root git directory path
  * @throws {GitRootNotFoundError}
  *
  * @example
