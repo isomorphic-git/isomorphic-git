@@ -6,7 +6,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { WORKDIR } from './WORKDIR'
-import { TREE } from '../models/GitWalkerRepo.js'
+import { TREE } from './TREE.js'
 import { join } from '../utils/join.js'
 import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
@@ -162,6 +162,7 @@ export async function checkout ({
                   case 'blob': {
                     await head.populateContent()
                     await head.populateHash()
+                    console.log(head.mode, typeof head.mode)
                     if (head.mode === '100644') {
                       // regular file
                       await fs.write(filepath, head.content)

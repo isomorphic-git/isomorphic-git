@@ -2,7 +2,7 @@
 import { cores } from '../utils/plugins.js'
 import { join } from '../utils/join.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { GitWalkerFs } from '../models/GitWalkerFs.js'
+import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
 /**
@@ -12,20 +12,20 @@ import { GitWalkerSymbol } from '../utils/symbols.js'
  */
 
 /**
- * Get a working directory Walker
+ * Get a git index Walker
  *
  * See [walkBeta1](./walkBeta1.md)
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {string} [args.dir] - [required] The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir, '.git')] - The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  *
- * @returns {Walker} Returns a working directory Walker
+ * @returns {Walker} Returns a git index Walker
  *
  */
-export function WORKDIR ({
+export function STAGE ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
@@ -35,7 +35,7 @@ export function WORKDIR ({
   let o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {
-      return new GitWalkerFs({ fs, dir, gitdir })
+      return new GitWalkerIndex({ fs, gitdir })
     }
   })
   Object.freeze(o)

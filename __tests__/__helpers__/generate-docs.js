@@ -17,7 +17,9 @@ const typedefs = new Map()
 
 function gentypedef (ast) {
   let text = ''
-  text += `\n${ast.description}\n\n`
+  if (ast.description) {
+    text += `\n${ast.description}\n\n`
+  }
   text += '```ts\n'
   text += `type ${ast.name} = {\n`
   let currentprop = null

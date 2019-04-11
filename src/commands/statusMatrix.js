@@ -4,8 +4,8 @@ import globrex from 'globrex'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { WORKDIR } from './WORKDIR.js'
-import { STAGE } from '../models/GitWalkerIndex.js'
-import { TREE } from '../models/GitWalkerRepo.js'
+import { STAGE } from './STAGE.js'
+import { TREE } from './TREE.js'
 import { join } from '../utils/join.js'
 import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
@@ -141,7 +141,7 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {string} [args.ref = 'HEAD'] - Optionally specify a different commit to compare against the workdir and stage instead of the HEAD
  * @param {string} [args.pattern] - Filter the results to only those whose filepath matches a glob pattern
  *
- * @returns {Promise<StatusMatrix>} Resolves with a status matrix, described below.
+ * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
  */
 export async function statusMatrix ({
   core = 'default',
@@ -157,9 +157,6 @@ export async function statusMatrix ({
       pattern && globrex(pattern, { globstar: true, extended: true })
     let patternBase = pattern && patternRoot(pattern)
     let results = await walkBeta1({
-      fs,
-      dir,
-      gitdir,
       trees: [
         TREE({ fs, gitdir, ref }),
         WORKDIR({ fs, dir, gitdir }),
@@ -200,7 +197,7 @@ export async function statusMatrix ({
         if (!head.exists && workdir.exists && !stage.exists) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
-          workdir.oid = 42
+          workdir.oid = '42'
         } else if (workdir.exists) {
           await workdir.populateHash()
         }
