@@ -1,3 +1,4 @@
+// @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -20,9 +21,60 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 import { config } from './config'
 
 /**
+ *
+ * @typedef {object} FetchResponse - The object returned has the following schema:
+ * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
+ * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
+ * @property {object} [headers] - The HTTP response headers returned by the git server
+ *
+ */
+
+/**
  * Fetch commits from a remote repository
  *
- * @link https://isomorphic-git.github.io/docs/fetch.html
+ * Future versions of isomorphic-git might return additional metadata.
+ *
+ * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
+ *
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
+ * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
+ * @param {string} [args.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch.
+ * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
+ * @param {boolean} [args.tags = false] - Also fetch tags
+ * @param {string} [args.remote] - What to name the remote that is created.
+ * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
+ * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+ * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+ * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+ * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
+ * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
+ * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
+ *
+ * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
+ * @see FetchResponse
+ *
+ * @example
+ * await git.fetch({
+ *   dir: '$input((/))',
+ *   corsProxy: 'https://cors.isomorphic-git.org',
+ *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
+ *   ref: '$input((master))',
+ *   depth: $input((1)),
+ *   singleBranch: $input((true)),
+ *   tags: $input((false))
+ * })
+ * console.log('done')
+ *
  */
 export async function fetch ({
   core = 'default',
@@ -32,12 +84,15 @@ export async function fetch ({
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   ref = 'HEAD',
+  // @ts-ignore
   refs,
   remote,
   url,
   noGitSuffix = false,
   corsProxy,
+  // @ts-ignore
   authUsername,
+  // @ts-ignore
   authPassword,
   username = authUsername,
   password = authPassword,
@@ -50,6 +105,7 @@ export async function fetch ({
   tags = false,
   singleBranch = false,
   headers = {},
+  // @ts-ignore
   onprogress // deprecated
 }) {
   try {
@@ -85,6 +141,7 @@ export async function fetch ({
     })
     if (response === null) {
       return {
+        defaultBranch: null,
         fetchHead: null
       }
     }
@@ -258,17 +315,17 @@ async function fetchPackfile ({
       gitdir,
       filepath: `refs`
     })
-  let haves = new Set()
+  let haves = []
   for (let ref of haveRefs) {
     try {
       ref = await GitRefManager.expand({ fs, gitdir, ref })
       const oid = await GitRefManager.resolve({ fs, gitdir, ref })
       if (await hasObject({ fs, gitdir, oid })) {
-        haves.add(oid)
+        haves.push(oid)
       }
     } catch (err) {}
   }
-  haves = haves.values()
+  haves = [...new Set(haves)]
   let oids = await GitShallowManager.read({ fs, gitdir })
   let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
   let packstream = writeUploadPackRequest({

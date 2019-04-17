@@ -1,3 +1,4 @@
+// @ts-check
 // import diff3 from 'node-diff3'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -9,9 +10,33 @@ import { currentBranch } from './currentBranch.js'
 import { log } from './log'
 
 /**
- * Merge one or more branches (Currently, only fast-forward merges are implemented.)
  *
- * @link https://isomorphic-git.github.io/docs/merge.html
+ * @typedef {Object} MergeReport - Returns an object with a schema like this:
+ * @property {string} oid - The SHA-1 object id that is now at the head of the branch
+ * @property {boolean} [alreadyMerged] - True if the branch was already merged so no changes were made
+ * @property {boolean} [fastForward] - True if it was a fast-forward merge
+ *
+ */
+
+/**
+ * Merge one or more branches *(Currently, only fast-forward merges are implemented.)*
+ *
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
+ * @param {string} args.theirs - The branch to be merged
+ * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
+ *
+ * @returns {Promise<MergeReport>} Resolves to a description of the merge operation
+ * @see MergeReport
+ *
+ * @example
+ * let m = await git.merge({ dir: '$input((/))', ours: '$input((master))', theirs: '$input((remotes/origin/master))' })
+ * console.log(m)
+ *
  */
 export async function merge ({
   core = 'default',
@@ -93,7 +118,7 @@ async function findMergeBase ({ gitdir, fs, refs }) {
   // Is the oldest commit an ancestor of the others?
   let sorted = commits.sort(compareAge)
   let candidate = sorted[0]
-  let since = candidate.timestamp - 1
+  let since = new Date(candidate.author.timestamp - 1)
   for (const ref of refs) {
     let list = await log({ gitdir, fs, ref, since })
     if (!list.find(commit => commit.oid === candidate.oid)) {

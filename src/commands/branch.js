@@ -1,3 +1,4 @@
+// @ts-check
 import cleanGitRef from 'clean-git-ref'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -9,7 +10,20 @@ import { cores } from '../utils/plugins.js'
 /**
  * Create a branch
  *
- * @link https://isomorphic-git.github.io/docs/branch.html
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.ref - What to name the branch
+ * @param {boolean} [args.checkout = false] - Update `HEAD` to point at the newly created branch
+ *
+ * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
+ *
+ * @example
+ * await git.branch({ dir: '$input((/))', ref: '$input((develop))' })
+ * console.log('done')
+ *
  */
 export async function branch ({
   core = 'default',

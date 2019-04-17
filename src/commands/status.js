@@ -1,3 +1,4 @@
+// @ts-check
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -14,7 +15,35 @@ import { cores } from '../utils/plugins.js'
 /**
  * Tell whether a file has been changed
  *
- * @link https://isomorphic-git.github.io/docs/status.html
+ * The possible resolve values are:
+ *
+ * | status          | description                                                              |
+ * | --------------- | ------------------------------------------------------------------------ |
+ * | `"ignored"`     | file ignored by a .gitignore rule                                        |
+ * | `"unmodified"`  | file unchanged from HEAD commit                                          |
+ * | `"*modified"`   | file has modifications, not yet staged                                   |
+ * | `"*deleted"`    | file has been removed, but the removal is not yet staged                 |
+ * | `"*added"`      | file is untracked, not yet staged                                        |
+ * | `"absent"`      | file not present in HEAD commit, staging area, or working dir            |
+ * | `"modified"`    | file has modifications, staged                                           |
+ * | `"deleted"`     | file has been removed, staged                                            |
+ * | `"added"`       | previously untracked file, staged                                        |
+ * | `"*unmodified"` | working dir and HEAD commit match, but index differs                     |
+ * | `"*absent"`     | file not present in working dir or HEAD commit, but present in the index |
+ *
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.filepath - The path to the file to query
+ *
+ * @returns {Promise<string>} Resolves successfully with the file's git status
+ *
+ * @example
+ * let status = await git.status({ dir: '$input((/))', filepath: '$input((README.md))' })
+ * console.log(status)
+ *
  */
 export async function status ({
   core = 'default',
@@ -94,10 +123,12 @@ export async function status ({
     if (!H && W && !I) return '*added' // --A
     if (!H && W && I) {
       let workdirOid = await getWorkdirOid()
+      // @ts-ignore
       return workdirOid === indexEntry.oid ? 'added' : '*added' // -AA : -AB
     }
     if (H && !W && !I) return 'deleted' // A--
     if (H && !W && I) {
+      // @ts-ignore
       return treeOid === indexEntry.oid ? '*deleted' : '*deleted' // AA- : AB-
     }
     if (H && W && !I) {
@@ -107,8 +138,10 @@ export async function status ({
     if (H && W && I) {
       let workdirOid = await getWorkdirOid()
       if (workdirOid === treeOid) {
+        // @ts-ignore
         return workdirOid === indexEntry.oid ? 'unmodified' : '*unmodified' // AAA : ABA
       } else {
+        // @ts-ignore
         return workdirOid === indexEntry.oid ? 'modified' : '*modified' // ABB : AAB
       }
     }

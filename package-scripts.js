@@ -29,6 +29,7 @@ module.exports = {
     lint: {
       default: series.nps('lint.js', 'lint.typescript'),
       js: `standard ${srcPaths}`,
+      fix: `standard --fix ${srcPaths}`,
       typescript: 'tsc src/index.d.ts --lib es6',
       typescriptTests: 'tsc -p tsconfig.json'
     },
@@ -56,6 +57,7 @@ module.exports = {
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       treeshake: 'agadoo',
+      docs: 'node ./__tests__/__helpers__/generate-docs.js',
       size: process.env.CI
         ? optional(
           `cross-env TRAVIS=true ` +

@@ -4,12 +4,11 @@ import { join } from '../utils/join'
 import { log } from '../utils/log.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
-import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { FileSystem } from './FileSystem.js'
 import { GitObject } from './GitObject.js'
 
-class GitWalkerFs {
+export class GitWalkerFs {
   constructor ({ fs: _fs, dir, gitdir }) {
     const fs = new FileSystem(_fs)
     this.fs = fs
@@ -98,15 +97,4 @@ class GitWalkerFs {
     )
     Object.assign(entry, { oid })
   }
-}
-
-export function WORKDIR ({ fs, dir, gitdir }) {
-  let o = Object.create(null)
-  Object.defineProperty(o, GitWalkerSymbol, {
-    value: function () {
-      return new GitWalkerFs({ fs, dir, gitdir })
-    }
-  })
-  Object.freeze(o)
-  return o
 }

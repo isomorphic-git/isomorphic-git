@@ -11,7 +11,7 @@ export async function writeObject ({
   type,
   object,
   format = 'content',
-  oid
+  oid = undefined
 }) {
   const fs = new FileSystem(_fs)
   if (format !== 'deflated') {

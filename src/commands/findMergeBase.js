@@ -1,3 +1,4 @@
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { readObject } from '../storage/readObject.js'

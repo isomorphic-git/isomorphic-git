@@ -1,3 +1,4 @@
+// @ts-check
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
@@ -5,9 +6,21 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
- * Delete an existing remote
+ * Removes the local config entry for a given remote
  *
- * @link https://isomorphic-git.github.io/docs/deleteRemote.html
+ * @param {Object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.remote - The name of the remote to delete
+ *
+ * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
+ *
+ * @example
+ * await git.deleteRemote({ dir: '$input((/))', remote: '$input((upstream))' })
+ * console.log('done')
+ *
  */
 export async function deleteRemote ({
   core = 'default',

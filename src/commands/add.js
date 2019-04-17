@@ -1,3 +1,4 @@
+// @ts-check
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -9,9 +10,25 @@ import { cores } from '../utils/plugins.js'
 /**
  * Add a file to the git index (aka staging area)
  *
- * @link https://isomorphic-git.github.io/docs/add.html
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.filepath - The path to the file to add to the index
+ *
+ * @returns {Promise<void>} Resolves successfully once the git index has been updated
+ *
+ * @example
+ * await new Promise((resolve, reject) => fs.writeFile(
+ *   '$input((/README.md))',
+ *   `$textarea((# TEST))`,
+ *   (err) => err ? reject(err) : resolve()
+ * ))
+ * await git.add({ dir: '$input((/))', filepath: '$input((README.md))' })
+ * console.log('done')
+ *
  */
-
 export async function add ({
   core = 'default',
   dir,
