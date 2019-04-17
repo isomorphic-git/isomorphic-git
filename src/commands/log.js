@@ -1,3 +1,4 @@
+// @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -7,9 +8,46 @@ import { logCommit } from '../utils/logCommit.js'
 import { cores } from '../utils/plugins.js'
 
 /**
+ *
+ * @typedef {Object} CommitDescription - Returns an array of objects with a schema like this:
+ * @property {string} oid - SHA-1 object id of this commit
+ * @property {string} message - Commit message
+ * @property {string} tree - SHA-1 object id of corresponding file tree
+ * @property {string[]} parent - an array of zero or more SHA-1 object ids
+ * @property {Object} author
+ * @property {string} author.name - The author's name
+ * @property {string} author.email - The author's email
+ * @property {number} author.timestamp - UTC Unix timestamp in seconds
+ * @property {number} author.timezoneOffset - Timezone difference from UTC in minutes
+ * @property {Object} committer
+ * @property {string} committer.name - The committer's name
+ * @property {string} committer.email - The committer's email
+ * @property {number} committer.timestamp - UTC Unix timestamp in seconds
+ * @property {number} committer.timezoneOffset - Timezone difference from UTC in minutes
+ * @property {string} [gpgsig] - PGP signature (if present)
+ * @property {string} [payload] - PGP signing payload (if requested)
+ */
+
+/**
  * Get commit descriptions from the git history
  *
- * @link https://isomorphic-git.github.io/docs/log.html
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.ref = 'HEAD'] - The commit to begin walking backwards through the history from
+ * @param {number} [args.depth] - Limit the number of commits returned. No limit by default.
+ * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
+ * @param {boolean} [args.signing = false] - Include the PGP signing payload
+ *
+ * @returns {Promise<Array<CommitDescription>>} Resolves to an array of CommitDescription objects
+ * @see CommitDescription
+ *
+ * @example
+ * let commits = await git.log({ dir: '$input((/))', depth: $input((5)), ref: '$input((master))' })
+ * console.log(commits)
+ *
  */
 export async function log ({
   core = 'default',
@@ -17,8 +55,8 @@ export async function log ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
-  depth,
-  since, // Date
+  depth = undefined,
+  since = undefined, // Date
   signing = false
 }) {
   try {
@@ -72,6 +110,7 @@ export async function log ({
       // Process tips in order by age
       tips.sort(compareAge)
     }
+    // @ts-ignore
     return commits
   } catch (err) {
     err.caller = 'git.log'

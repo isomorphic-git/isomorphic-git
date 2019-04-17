@@ -45,10 +45,9 @@ export * from './commands/version.js'
 export * from './commands/walkBeta1.js'
 export * from './commands/writeObject.js'
 export * from './commands/writeRef.js'
-
-export * from './models/GitWalkerFs'
-export * from './models/GitWalkerIndex'
-export * from './models/GitWalkerRepo'
+export * from './commands/WORKDIR.js'
+export * from './commands/STAGE.js'
+export * from './commands/TREE.js'
 
 export const utils = { auth, oauth2 }
 export { E } from './models/GitError'

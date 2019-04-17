@@ -2,12 +2,11 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join'
 import { resolveTree } from '../utils/resolveTree.js'
-import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { FileSystem } from './FileSystem.js'
 import { GitTree } from './GitTree.js'
 
-class GitWalkerRepo {
+export class GitWalkerRepo {
   constructor ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
     this.fs = fs
@@ -99,15 +98,4 @@ class GitWalkerRepo {
     let oid = obj.oid
     Object.assign(entry, { oid })
   }
-}
-
-export function TREE ({ fs, gitdir, ref }) {
-  let o = Object.create(null)
-  Object.defineProperty(o, GitWalkerSymbol, {
-    value: function () {
-      return new GitWalkerRepo({ fs, gitdir, ref })
-    }
-  })
-  Object.freeze(o)
-  return o
 }

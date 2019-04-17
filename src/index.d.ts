@@ -215,11 +215,9 @@ export function STAGE(args: {
   gitdir: string;
 }): Walker;
 
-export function add(args: {
+export function add(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   filepath: string;
 }): Promise<void>;
 

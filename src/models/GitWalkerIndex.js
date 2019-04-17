@@ -2,11 +2,10 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { normalizeStats } from '../utils/normalizeStats'
-import { GitWalkerSymbol } from '../utils/symbols.js'
 
 import { FileSystem } from './FileSystem.js'
 
-class GitWalkerIndex {
+export class GitWalkerIndex {
   constructor ({ fs: _fs, gitdir }) {
     const fs = new FileSystem(_fs)
     this.treePromise = (async () => {
@@ -83,15 +82,4 @@ class GitWalkerIndex {
       oid: inode.metadata.oid
     })
   }
-}
-
-export function STAGE ({ fs, gitdir }) {
-  let o = Object.create(null)
-  Object.defineProperty(o, GitWalkerSymbol, {
-    value: function () {
-      return new GitWalkerIndex({ fs, gitdir })
-    }
-  })
-  Object.freeze(o)
-  return o
 }

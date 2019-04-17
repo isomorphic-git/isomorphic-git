@@ -1,3 +1,4 @@
+// @ts-check
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
@@ -6,7 +7,37 @@ import { cores } from '../utils/plugins.js'
 /**
  * Read and/or write to the git config files.
  *
- * @link https://isomorphic-git.github.io/docs/config.html
+ * *Caveats:*
+ * - Currently only the local `$GIT_DIR/config` file can be read or written. However support for the global `~/.gitconfig` and system `$(prefix)/etc/gitconfig` will be added in the future.
+ * - The current parser does not support the more exotic features of the git-config file format such as `[include]` and `[includeIf]`.
+ *
+ * @param {Object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.path - The key of the git config entry
+ * @param {string} [args.value] - (Optional) A value to store at that path
+ * @param {boolean} [args.all = false] - If the config file contains multiple values, return them all as an array.
+ * @param {boolean} [args.append = false] - If true, will append rather than replace when setting (use with multi-valued config options).
+ *
+ * @returns {Promise<any>} Resolves with the config value
+ *
+ * @example
+ * // Write config value
+ * await git.config({
+ *   dir: '$input((/))',
+ *   path: '$input((user.name))',
+ *   value: '$input((Mr. Test))'
+ * })
+ *
+ * // Read config value
+ * let value = await git.config({
+ *   dir: '$input((/))',
+ *   path: '$input((user.name))'
+ * })
+ * console.log(value)
+ *
  */
 export async function config (args) {
   // These arguments are not in the function signature but destructured separately

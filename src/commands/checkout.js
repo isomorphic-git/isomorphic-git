@@ -1,11 +1,12 @@
+// @ts-check
 import globrex from 'globrex'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { WORKDIR } from '../models/GitWalkerFs.js'
-import { TREE } from '../models/GitWalkerRepo.js'
+import { WORKDIR } from './WORKDIR'
+import { TREE } from './TREE.js'
 import { join } from '../utils/join.js'
 import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
@@ -17,7 +18,32 @@ import { walkBeta1 } from './walkBeta1.js'
 /**
  * Checkout a branch
  *
- * @link https://isomorphic-git.github.io/docs/checkout.html
+ * If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
+ *
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
+ * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
+ * @param {string} args.ref - Which branch to checkout
+ * @param {string} [args.pattern = null] - Filter the results to only those filepath matches a glob pattern
+ * @param {string} [args.remote = 'origin'] - Which remote repository to use
+ * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
+ *
+ * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
+ *
+ * @example
+ * // checkout the master branch
+ * await git.checkout({ dir: '$input((/))', ref: '$input((master))' })
+ * console.log('done')
+ *
+ * @example
+ * // checkout only JSON and Markdown files from master branch
+ * await git.checkout({ dir: '$input((/))', ref: '$input((master))', pattern: '$input((**\/*.{json,md}))' })
+ * console.log('done')
+ *
  */
 export async function checkout ({
   core = 'default',
@@ -100,9 +126,6 @@ export async function checkout ({
           index.clear()
           try {
             await walkBeta1({
-              fs,
-              dir,
-              gitdir,
               trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir })],
               filter: async function ([head, workdir]) {
                 // match against 'pattern' parameter
@@ -113,7 +136,12 @@ export async function checkout ({
                 if (head.fullpath === '.') return
                 if (!head.exists) return
                 // Late filter against file names
-                if (patternGlobrex && !patternGlobrex.regex.test(head.fullpath)) { return }
+                if (
+                  patternGlobrex &&
+                  !patternGlobrex.regex.test(head.fullpath)
+                ) {
+                  return
+                }
                 await head.populateStat()
                 const filepath = `${dir}/${head.fullpath}`
                 switch (head.type) {
@@ -134,6 +162,7 @@ export async function checkout ({
                   case 'blob': {
                     await head.populateContent()
                     await head.populateHash()
+                    console.log(head.mode, typeof head.mode)
                     if (head.mode === '100644') {
                       // regular file
                       await fs.write(filepath, head.content)
