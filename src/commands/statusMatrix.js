@@ -3,14 +3,14 @@ import globrex from 'globrex'
 
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { WORKDIR } from './WORKDIR.js'
-import { STAGE } from './STAGE.js'
-import { TREE } from './TREE.js'
 import { join } from '../utils/join.js'
 import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
+import { STAGE } from './STAGE.js'
+import { TREE } from './TREE.js'
+import { WORKDIR } from './WORKDIR.js'
 import { walkBeta1 } from './walkBeta1.js'
 
 /**

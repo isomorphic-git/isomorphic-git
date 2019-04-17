@@ -145,7 +145,9 @@ function gendoc (filepath) {
           rows.push([
             'throws',
             'Error',
-            err.type.names.map(x => `[${x}](./errors.md#${x.toLowerCase()})`).join(' | ')
+            err.type.names
+              .map(x => `[${x}](./errors.md#${x.toLowerCase()})`)
+              .join(' | ')
           ])
         }
       }
