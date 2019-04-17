@@ -210,7 +210,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @returns {Promise<any>} The finished tree-walking result
  *
  * @see WalkerEntry
-  *
+ *
  */
 export async function walkBeta1 ({
   trees,

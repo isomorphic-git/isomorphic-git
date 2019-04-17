@@ -1,8 +1,8 @@
 // @ts-check
-import { cores } from '../utils/plugins.js'
-import { join } from '../utils/join.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
+import { join } from '../utils/join.js'
+import { cores } from '../utils/plugins.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 
 /**
