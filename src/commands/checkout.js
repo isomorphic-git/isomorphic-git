@@ -162,7 +162,6 @@ export async function checkout ({
                   case 'blob': {
                     await head.populateContent()
                     await head.populateHash()
-                    console.log(head.mode, typeof head.mode)
                     if (head.mode === '100644') {
                       // regular file
                       await fs.write(filepath, head.content)
