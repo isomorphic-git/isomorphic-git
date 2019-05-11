@@ -139,6 +139,10 @@ export interface GitEmitterPlugin {
   emit: any;
 }
 
+export interface GitFsPromisesPlugin {
+  promises: GitFsPlugin;
+}
+
 export interface GitFsPlugin {
   readFile: any;
   writeFile: any;
@@ -179,7 +183,7 @@ export type GitHttpPlugin = (
 
 export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "http"
 
-export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitHttpPlugin
+export type AnyGitPlugin = GitFsPlugin | GitFsPromisesPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitHttpPlugin
 
 export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 
