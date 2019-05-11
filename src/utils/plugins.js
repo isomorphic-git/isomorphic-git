@@ -13,6 +13,10 @@ import { E, GitError } from '../models/GitError'
 class PluginCore extends Map {
   set (key, value) {
     const verifySchema = (key, value) => {
+      // ugh. this sucks
+      if (key === 'fs' && value.promises) {
+        value = value.promises
+      }
       const pluginSchemas = {
         credentialManager: ['fill', 'approved', 'rejected'],
         emitter: ['emit'],

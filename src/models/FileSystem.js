@@ -17,16 +17,29 @@ export class FileSystem {
       throw new GitError(E.PluginUndefined, { plugin: 'fs' })
     }
     if (typeof fs._readFile !== 'undefined') return fs
-    this._readFile = pify(fs.readFile.bind(fs))
-    this._writeFile = pify(fs.writeFile.bind(fs))
-    this._mkdir = pify(fs.mkdir.bind(fs))
-    this._rmdir = pify(fs.rmdir.bind(fs))
-    this._unlink = pify(fs.unlink.bind(fs))
-    this._stat = pify(fs.stat.bind(fs))
-    this._lstat = pify(fs.lstat.bind(fs))
-    this._readdir = pify(fs.readdir.bind(fs))
-    this._readlink = pify(fs.readlink.bind(fs))
-    this._symlink = pify(fs.symlink.bind(fs))
+    if (fs.promises) {
+      this._readFile = fs.promises.readFile.bind(fs.promises)
+      this._writeFile = fs.promises.writeFile.bind(fs.promises)
+      this._mkdir = fs.promises.mkdir.bind(fs.promises)
+      this._rmdir = fs.promises.rmdir.bind(fs.promises)
+      this._unlink = fs.promises.unlink.bind(fs.promises)
+      this._stat = fs.promises.stat.bind(fs.promises)
+      this._lstat = fs.promises.lstat.bind(fs.promises)
+      this._readdir = fs.promises.readdir.bind(fs.promises)
+      this._readlink = fs.promises.readlink.bind(fs.promises)
+      this._symlink = fs.promises.symlink.bind(fs.promises)
+    } else {
+      this._readFile = pify(fs.readFile.bind(fs))
+      this._writeFile = pify(fs.writeFile.bind(fs))
+      this._mkdir = pify(fs.mkdir.bind(fs))
+      this._rmdir = pify(fs.rmdir.bind(fs))
+      this._unlink = pify(fs.unlink.bind(fs))
+      this._stat = pify(fs.stat.bind(fs))
+      this._lstat = pify(fs.lstat.bind(fs))
+      this._readdir = pify(fs.readdir.bind(fs))
+      this._readlink = pify(fs.readlink.bind(fs))
+      this._symlink = pify(fs.symlink.bind(fs))
+    }
   }
   /**
    * Return true if a file exists, false if it doesn't exist.

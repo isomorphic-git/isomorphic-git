@@ -7,7 +7,7 @@ async function makeLightningFS (dir) {
     wipe: true,
     url: 'http://localhost:9876/base/__tests__/__fixtures__'
   })
-  plugins.set('fs', _fs)
+  plugins.set('fs', { promises: _fs.promises })
   const fs = new FileSystem(_fs)
   dir = `/${dir}`
   let gitdir = `/${dir}.git`
