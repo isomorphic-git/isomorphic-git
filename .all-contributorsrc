@@ -346,6 +346,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "FabianHenneke",
+      "name": "Fabian Henneke",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/4312191?v=4",
+      "profile": "https://hen.ne.ke",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ]
 }
