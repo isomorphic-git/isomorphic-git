@@ -19,12 +19,17 @@ export async function http ({
     res.body && res.body.getReader
       ? fromStream(res.body)
       : [new Uint8Array(await res.arrayBuffer())]
+  // convert Header object to ordinary JSON
+  headers = {}
+  for (let [key, value] of res.headers.entries()) {
+    headers[key] = value
+  }
   return {
     url: res.url,
     method: res.method,
     statusCode: res.status,
     statusMessage: res.statusText,
     body: iter,
-    headers: res.headers
+    headers: headers
   }
 }
