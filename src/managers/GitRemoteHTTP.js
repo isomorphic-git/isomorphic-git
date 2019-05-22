@@ -54,7 +54,12 @@ export class GitRemoteHTTP {
     if (typeof window === 'undefined' || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
-    let _auth = calculateBasicAuthUsernamePasswordPair(auth)
+    // If the username came from the URL, we want to allow the password to be missing.
+    // This is because Github allows using the token as the username with an empty password
+    // so that is a style of git clone URL we might encounter and we don't want to throw a "Missing password or token" error.
+    // Also, we don't want to prematurely throw an error before the credentialManager plugin has
+    // had an opportunity to provide the password.
+    let _auth = calculateBasicAuthUsernamePasswordPair(auth, !!urlAuth)
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
@@ -149,7 +154,12 @@ export class GitRemoteHTTP {
     if (typeof window === 'undefined' || corsProxy) {
       headers['user-agent'] = headers['user-agent'] || pkg.agent
     }
-    auth = calculateBasicAuthUsernamePasswordPair(auth)
+    // If the username came from the URL, we want to allow the password to be missing.
+    // This is because Github allows using the token as the username with an empty password
+    // so that is a style of git clone URL we might encounter and we don't want to throw a "Missing password or token" error.
+    // Also, we don't want to prematurely throw an error before the credentialManager plugin has
+    // had an opportunity to provide the password.
+    auth = calculateBasicAuthUsernamePasswordPair(auth, !!urlAuth)
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
