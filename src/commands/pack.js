@@ -1,5 +1,7 @@
 import pako from 'pako'
 import Hash from 'sha.js/sha1'
+import hexToArrayBuffer from 'hex-to-array-buffer'
+import { encode } from 'isomorphic-textencoder'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { readObject } from '../storage/readObject.js'
@@ -28,7 +30,11 @@ export async function pack ({
   let hash = new Hash()
   let outputStream = []
   function write (chunk, enc) {
-    let buff = Buffer.from(chunk, enc)
+    const buff = (chunk instanceof Uint8Array)
+      ? chunk
+      : (enc === 'hex')
+        ? hexToArrayBuffer(chunk)
+        : encode(chunk)
     outputStream.push(buff)
     hash.update(buff)
   }
@@ -57,7 +63,7 @@ export async function pack ({
       length = length >>> 7
     }
     // Lastly, we can compress and write the object.
-    write(Buffer.from(pako.deflate(object)))
+    write(pako.deflate(object))
   }
   write('PACK')
   write('00000002', 'hex')
