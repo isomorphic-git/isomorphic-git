@@ -1,5 +1,6 @@
 // @ts-check
 import arrayBufferToHex from 'array-buffer-to-hex'
+
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'

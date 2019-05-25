@@ -1,5 +1,6 @@
 // @ts-check
 import arrayBufferToHex from 'array-buffer-to-hex'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { collect } from '../utils/collect.js'
 import { join } from '../utils/join.js'
