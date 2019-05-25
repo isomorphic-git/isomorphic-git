@@ -64,10 +64,6 @@ export class FileSystem {
   async read (filepath, options = {}) {
     try {
       let buffer = await this._readFile(filepath, options)
-      // Convert plain ArrayBuffers to Buffers
-      if (typeof buffer !== 'string') {
-        buffer = Buffer.from(buffer)
-      }
       return buffer
     } catch (err) {
       return null
@@ -189,7 +185,7 @@ export class FileSystem {
    * Write the contents of buffer to a symlink.
    */
   async writelink (filename, buffer) {
-    return this._symlink(buffer.toString('utf8'), filename)
+    return this._symlink(buffer, filename)
   }
 
   async lock (filename, triesLeft = 3) {

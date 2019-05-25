@@ -1,5 +1,10 @@
 // Modeled after https://github.com/tjfontaine/node-buffercursor
 // but with the goal of being much lighter weight.
+
+import { encode, decode } from 'isomorphic-textencoder'
+import hexToArrayBuffer from 'hex-to-array-buffer'
+import arrayBufferToHex from 'array-buffer-to-hex'
+
 export class BufferCursor {
   constructor (buffer) {
     this.buffer = buffer
@@ -20,7 +25,10 @@ export class BufferCursor {
     return r
   }
   toString (enc, length) {
-    const r = this.buffer.toString(enc, this._start, this._start + length)
+    const slice = buffer.slice(this._start, this._start + length)
+    const r = (enc === 'hex')
+      ? arrayBufferToHex(slice)
+      : decode(slice)
     this._start += length
     return r
   }

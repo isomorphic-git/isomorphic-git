@@ -47,14 +47,18 @@
     "src/index.d.ts"
   ],
   "dependencies": {
+    "array-buffer-to-hex": "^1.0.0",
     "async-lock": "^1.1.0",
     "clean-git-ref": "1.0.3",
+    "concat-buffers": "^1.0.0",
     "crc-32": "^1.2.0",
     "diff-lines": "^1.1.0",
     "git-apply-delta": "0.0.7",
     "globalyzer": "^0.1.0",
     "globrex": "^0.1.2",
+    "hex-to-array-buffer": "^1.1.0",
     "ignore": "^5.0.4",
+    "isomorphic-textencoder": "^1.0.1",
     "marky": "^1.2.1",
     "minimisted": "^2.0.0",
     "pako": "^1.0.7",

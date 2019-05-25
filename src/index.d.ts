@@ -16,7 +16,7 @@ export interface GitObjectDescription {
   oid: string;
   type?: 'blob' | 'tree' | 'commit' | 'tag';
   format: 'deflated' | 'wrapped' | 'content' | 'parsed';
-  object: Buffer | CommitDescription | TreeDescription | TagDescription;
+  object: Uint8Array | CommitDescription | TreeDescription | TagDescription;
   source?: string;
 }
 
@@ -71,7 +71,7 @@ export interface TreeEntry {
 
 export interface PackObjectsResponse {
   filename: string;
-  packfile?: Buffer;
+  packfile?: Uint8Array;
 }
 
 export interface PushResponse {
@@ -124,7 +124,7 @@ export interface WalkerTree {
   gid?: number;
   size?: number;
   populateContent: () => Promise<void>;
-  content?: Buffer;
+  content?: Uint8Array;
   populateHash: () => Promise<void>;
   oid?: string;
 }
@@ -596,7 +596,7 @@ export function writeObject(args: GitDir & {
   core?: string;
   fs?: any;
   type?: 'blob' | 'tree' | 'commit' | 'tag';
-  object: string | Buffer | CommitDescription | TreeDescription | TagDescription;
+  object: string | Uint8Array | CommitDescription | TreeDescription | TagDescription;
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
   oid?: string;
   encoding?: string;

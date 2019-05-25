@@ -1,3 +1,7 @@
+import arrayBufferToHex from 'array-buffer-to-hex'
+import { encode } from 'isomorphic-textencoder'
+import concat from 'concat-buffers'
+
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
@@ -33,7 +37,7 @@ function renderCacheEntryFlags (entry) {
 function parseBuffer (buffer) {
   // Verify shasum
   let shaComputed = shasum(buffer.slice(0, -20))
-  let shaClaimed = buffer.slice(-20).toString('hex')
+  let shaClaimed = arrayBufferToHex(buffer.slice(-20))
   if (shaClaimed !== shaComputed) {
     throw new GitError(E.InternalFail, {
       message: `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
@@ -112,7 +116,7 @@ export class GitIndex {
    */
   constructor (index) {
     this._dirty = false
-    if (Buffer.isBuffer(index)) {
+    if (index instanceof Uint8Array) {
       this._entries = parseBuffer(index)
     } else if (index === null) {
       this._entries = new Map()
@@ -138,7 +142,7 @@ export class GitIndex {
   }
   insert ({ filepath, stats, oid }) {
     stats = normalizeStats(stats)
-    let bfilepath = Buffer.from(filepath)
+    let bfilepath = encode(filepath)
     let entry = {
       ctimeSeconds: stats.ctimeSeconds,
       ctimeNanoseconds: stats.ctimeNanoseconds,
@@ -192,7 +196,7 @@ export class GitIndex {
     writer.write('DIRC', 4, 'utf8')
     writer.writeUInt32BE(2)
     writer.writeUInt32BE(this.entries.length)
-    let body = Buffer.concat(
+    let body = concat(
       this.entries.map(entry => {
         const bpath = Buffer.from(entry.path)
         // the fixed length + the filename + at least one null char => align by 8
@@ -216,8 +220,8 @@ export class GitIndex {
         return written
       })
     )
-    let main = Buffer.concat([header, body])
+    let main = concat([header, body])
     let sum = shasum(main)
-    return Buffer.concat([main, Buffer.from(sum, 'hex')])
+    return concat([main, Buffer.from(sum, 'hex')])
   }
 }

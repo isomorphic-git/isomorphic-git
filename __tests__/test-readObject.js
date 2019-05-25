@@ -2,6 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-readObject.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
+const arrayBufferToHex = require('array-buffer-to-hex')
 
 const { readObject } = require('isomorphic-git')
 
@@ -49,7 +50,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('commit')
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(arrayBufferToHex(ref.object)).toMatchSnapshot()
   })
   it('wrapped', async () => {
     // Setup
@@ -63,7 +64,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('wrapped')
     expect(ref.type).toEqual(undefined)
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(arrayBufferToHex(ref.object)).toMatchSnapshot()
   })
   it('deflated', async () => {
     // Setup
@@ -77,7 +78,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('deflated')
     expect(ref.type).toEqual(undefined)
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(arrayBufferToHex(ref.object)).toMatchSnapshot()
   })
   it('from packfile', async () => {
     // Setup
@@ -93,7 +94,7 @@ describe('readObject', () => {
     expect(ref.source).toBe(
       'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(arrayBufferToHex(ref.object)).toMatchSnapshot()
   })
   it('blob with encoding', async () => {
     // Setup
@@ -128,7 +129,7 @@ describe('readObject', () => {
       'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     expect(ref.oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(arrayBufferToHex(ref.object)).toMatchSnapshot()
   })
   it('with deep filepath to blob', async () => {
     // Setup
@@ -143,7 +144,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('blob')
     expect(ref.oid).toEqual('5264f23285d8be3ce45f95c102001ffa1d5391d3')
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(arrayBufferToHex(ref.object)).toMatchSnapshot()
   })
   it('with simple filepath to tree', async () => {
     // Setup
