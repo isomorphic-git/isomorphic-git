@@ -1,4 +1,5 @@
 // @ts-check
+import arrayBufferToHex from 'array-buffer-to-hex'
 import { FileSystem } from '../models/FileSystem.js'
 import { collect } from '../utils/collect.js'
 import { join } from '../utils/join.js'
@@ -48,7 +49,7 @@ export async function packObjects ({
     const fs = new FileSystem(_fs)
     const buffers = await pack({ core, gitdir, fs, oids })
     let packfile = await collect(buffers)
-    let packfileSha = packfile.slice(-20).toString('hex')
+    let packfileSha = arrayBufferToHex(packfile.slice(-20))
     let filename = `pack-${packfileSha}.pack`
     if (write) {
       await fs.write(join(gitdir, `objects/pack/${filename}`), packfile)

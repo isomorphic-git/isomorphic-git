@@ -1,4 +1,5 @@
 // @ts-check
+import { decode } from 'isomorphic-textencoder'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -115,7 +116,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  *     } else if (entry.type === 'blob') {
  *       if ($input((entry.path.endsWith('.js')))) {
  *         let { object: blob } = await git.readObject({ dir: '$input((/))', oid: entry.oid })
- *         if ($input((blob.toString('utf8').includes('commit')))) {
+ *         if ($input((decode(blob).includes('commit')))) {
  *           console.log(`${prefix}/${entry.path}`)
  *         }
  *       }
@@ -185,8 +186,8 @@ export async function readObject ({
         case 'blob':
           // Here we consider returning a raw Buffer as the 'content' format
           // and returning a string as the 'parsed' format
-          if (encoding) {
-            result.object = result.object.toString(encoding)
+          if (encoding === 'utf8') {
+            result.object = decode(result.object)
           } else {
             result.format = 'content'
           }

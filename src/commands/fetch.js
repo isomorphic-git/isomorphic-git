@@ -1,4 +1,5 @@
 // @ts-check
+import arrayBufferToHex from 'array-buffer-to-hex'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -165,7 +166,7 @@ export async function fetch ({
       })
     }
     let packfile = await collect(response.packfile)
-    let packfileSha = packfile.slice(-20).toString('hex')
+    let packfileSha = arrayBufferToHex(packfile.slice(-20))
     // TODO: Return more metadata?
     let res = {
       defaultBranch: response.HEAD,
