@@ -114,7 +114,7 @@
     "replace-in-file": "3.4.2",
     "rollup": "1.12.3",
     "rollup-plugin-node-resolve": "5.0.0",
-    "semantic-release": "15.13.2",
+    "semantic-release": "15.13.12",
     "standard": "12.0.1",
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
