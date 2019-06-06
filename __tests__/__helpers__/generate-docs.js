@@ -168,6 +168,18 @@ function gendoc (filepath) {
           text += '\n```\n'
         }
       }
+      if (obj.name) {
+        // This rewrites the "Edit" button on the docs page to point to the JSDoc page instead of the raw Markdown page.
+        text += `
+<script>
+(function rewriteEditLink() {
+  const el = document.querySelector('a.edit-page-link.button');
+  if (el) {
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/${obj.name}.js';
+  }
+})();
+</script>`
+      }
     }
   }
   return text
