@@ -11,6 +11,7 @@ function escapeType (type) {
   return cleanType(type)
     .replace(/</g, '\\<')
     .replace(/>/g, '\\>')
+    .replace(/\|/g, ' &#124; ')
 }
 
 const typedefs = new Map()
