@@ -1,4 +1,5 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { E } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join'
 import { resolveTree } from '../utils/resolveTree.js'
@@ -13,7 +14,15 @@ export class GitWalkerRepo {
     this.gitdir = gitdir
     this.mapPromise = (async () => {
       let map = new Map()
-      let oid = await GitRefManager.resolve({ fs, gitdir, ref })
+      let oid
+      try {
+        oid = await GitRefManager.resolve({ fs, gitdir, ref })
+      } catch (e) {
+        // Handle fresh branches with no commits
+        if (e.code === E.ResolveRefError) {
+          oid = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+        }
+      }
       let tree = await resolveTree({ fs, gitdir, oid })
       map.set('.', tree)
       return map
