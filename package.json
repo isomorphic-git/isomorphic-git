@@ -50,7 +50,7 @@
     "async-lock": "^1.1.0",
     "clean-git-ref": "1.0.3",
     "crc-32": "^1.2.0",
-    "diff-lines": "^1.1.0",
+    "diff-lines": "^1.1.1",
     "git-apply-delta": "0.0.7",
     "globalyzer": "^0.1.0",
     "globrex": "^0.1.2",
