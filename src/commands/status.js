@@ -197,7 +197,15 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
 
 async function getHeadTree ({ fs, gitdir }) {
   // Get the tree from the HEAD commit.
-  let oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+  let oid
+  try {
+    oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+  } catch (e) {
+    // Handle fresh branches with no commits
+    if (e.code === E.ResolveRefError) {
+      return []
+    }
+  }
   let { type, object } = await readObject({ fs, gitdir, oid })
   if (type !== 'commit') {
     throw new GitError(E.ResolveCommitError, { oid })

@@ -46,4 +46,17 @@ describe('statusMatrix', () => {
     matrix = await statusMatrix({ dir, gitdir, pattern: 'e.txt' })
     expect(matrix).toEqual([['e.txt', 0, 0, 3]])
   })
+
+  it('statusMatrix in an fresh git repo with no commits', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
+    await fs.write(path.join(dir, 'b.txt'), 'Hi')
+    await add({ dir, gitdir, filepath: 'b.txt' })
+    // Test
+    let a = await statusMatrix({ dir, gitdir, pattern: 'a.txt' })
+    expect(a).toEqual([['a.txt', 0, 2, 0]])
+    const b = await statusMatrix({ dir, gitdir, pattern: 'b.txt' })
+    expect(b).toEqual([['b.txt', 0, 2, 2]])
+  })
 })

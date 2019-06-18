@@ -63,4 +63,17 @@ describe('status', () => {
     expect(h).toEqual('ignored')
     expect(i).toEqual('*added')
   })
+
+  it('status in an fresh git repo with no commits', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
+    await fs.write(path.join(dir, 'b.txt'), 'Hi')
+    await add({ dir, gitdir, filepath: 'b.txt' })
+    // Test
+    const a = await status({ dir, gitdir, filepath: 'a.txt' })
+    expect(a).toEqual('*added')
+    const b = await status({ dir, gitdir, filepath: 'b.txt' })
+    expect(b).toEqual('added')
+  })
 })
