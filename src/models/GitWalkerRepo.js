@@ -1,8 +1,8 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { E } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join'
 import { resolveTree } from '../utils/resolveTree.js'
-import { E } from '../models/GitError.js'
 
 import { FileSystem } from './FileSystem.js'
 import { GitTree } from './GitTree.js'
