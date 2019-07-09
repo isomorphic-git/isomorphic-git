@@ -40,7 +40,11 @@ export interface CommitDescription {
   gpgsig?: string; // PGP signature (if present)
 }
 
-export interface CommitDescriptionWithPayload extends CommitDescription {
+export interface CommitDescriptionWithOid extends CommitDescription {
+  oid: string; // SHA1 object id of this commit
+}
+
+export interface CommitDescriptionWithPayload extends CommitDescriptionWithOid {
   payload: string;
 }
 
@@ -452,7 +456,7 @@ export function log(args: GitDir & {
   ref?: string;
   depth?: number;
   since?: Date;
-}): Promise<Array<CommitDescription>>;
+}): Promise<Array<CommitDescriptionWithOid>>;
 export function log(args: GitDir & {
   core?: string;
   fs?: any;
@@ -460,7 +464,7 @@ export function log(args: GitDir & {
   depth?: number;
   since?: Date;
   signing: false;
-}): Promise<Array<CommitDescription>>;
+}): Promise<Array<CommitDescriptionWithOid>>;
 export function log(args: GitDir & {
   core?: string;
   fs?: any;
