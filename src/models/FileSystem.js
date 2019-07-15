@@ -17,7 +17,7 @@ export class FileSystem {
       throw new GitError(E.PluginUndefined, { plugin: 'fs' })
     }
     if (typeof fs._readFile !== 'undefined') return fs
-    if (fs.promises) {
+    if (Object.getOwnPropertyDescriptor(fs, 'promises') && Object.getOwnPropertyDescriptor(fs, 'promises').enumerable) {
       this._readFile = fs.promises.readFile.bind(fs.promises)
       this._writeFile = fs.promises.writeFile.bind(fs.promises)
       this._mkdir = fs.promises.mkdir.bind(fs.promises)
