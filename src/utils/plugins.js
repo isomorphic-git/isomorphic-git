@@ -14,7 +14,11 @@ class PluginCore extends Map {
   set (key, value) {
     const verifySchema = (key, value) => {
       // ugh. this sucks
-      if (key === 'fs' && Object.getOwnPropertyDescriptor(value, 'promises') && Object.getOwnPropertyDescriptor(value, 'promises').enumerable) {
+      if (
+        key === 'fs' &&
+        Object.getOwnPropertyDescriptor(value, 'promises') &&
+        Object.getOwnPropertyDescriptor(value, 'promises').enumerable
+      ) {
         value = value.promises
       }
       const pluginSchemas = {

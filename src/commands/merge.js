@@ -47,7 +47,7 @@ export async function merge ({
   ours,
   theirs,
   fastForwardOnly = false,
-  dryRun = false,
+  dryRun = false
 }) {
   try {
     const fs = new FileSystem(_fs)
