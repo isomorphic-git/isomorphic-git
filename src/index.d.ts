@@ -480,6 +480,7 @@ export function merge(args: GitDir & {
   ours?: string;
   theirs: string;
   fastForwardOnly?: boolean;
+  dryRun?: boolean;
 }): Promise<MergeReport>;
 
 export function packObjects(args: GitDir & {
