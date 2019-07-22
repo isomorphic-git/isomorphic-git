@@ -29,6 +29,7 @@ import { log } from './log'
  * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
  * @param {string} args.theirs - The branch to be merged
  * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
+ * @param {boolean} [args.dryRun = false] - If true, simulates a merge so you can test whether it would succeed.
  *
  * @returns {Promise<MergeReport>} Resolves to a description of the merge operation
  * @see MergeReport
@@ -45,7 +46,8 @@ export async function merge ({
   fs: _fs = cores.get(core).get('fs'),
   ours,
   theirs,
-  fastForwardOnly
+  fastForwardOnly = false,
+  dryRun = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -82,7 +84,9 @@ export async function merge ({
       }
     }
     if (baseOid === ourOid) {
-      await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
+      if (!dryRun) {
+        await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
+      }
       return {
         oid: theirOid,
         fastForward: true
