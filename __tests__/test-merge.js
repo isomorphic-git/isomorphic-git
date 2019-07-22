@@ -96,4 +96,33 @@ describe('merge', () => {
     })
     expect(oid).toEqual(desiredOid)
   })
+
+  it('merge newest into master --dryRun', async () => {
+    // Setup
+    let { gitdir } = await makeFixture('test-merge')
+    // Test
+    let originalOid = await resolveRef({
+      gitdir,
+      ref: 'master'
+    })
+    let desiredOid = await resolveRef({
+      gitdir,
+      ref: 'newest'
+    })
+    let m = await merge({
+      gitdir,
+      ours: 'master',
+      theirs: 'newest',
+      fastForwardOnly: true,
+      dryRun: true
+    })
+    expect(m.oid).toEqual(desiredOid)
+    expect(m.alreadyMerged).toBeFalsy()
+    expect(m.fastForward).toBeTruthy()
+    let oid = await resolveRef({
+      gitdir,
+      ref: 'master'
+    })
+    expect(oid).toEqual(originalOid)
+  })
 })
