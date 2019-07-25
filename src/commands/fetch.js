@@ -26,6 +26,7 @@ import { config } from './config'
  * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
  * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
  * @property {object} [headers] - The HTTP response headers returned by the git server
+ * @property {string[]} [pruned] - A list of branches that were pruned, if you provided the `prune` parameter
  *
  */
 
@@ -57,6 +58,7 @@ import { config } from './config'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
@@ -105,6 +107,7 @@ export async function fetch ({
   tags = false,
   singleBranch = false,
   headers = {},
+  prune = false,
   // @ts-ignore
   onprogress // deprecated
 }) {
@@ -137,7 +140,8 @@ export async function fetch ({
       relative,
       tags,
       singleBranch,
-      headers
+      headers,
+      prune
     })
     if (response === null) {
       return {
@@ -173,6 +177,9 @@ export async function fetch ({
     }
     if (response.headers) {
       res.headers = response.headers
+    }
+    if (prune) {
+      res.pruned = response.pruned
     }
     // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
     // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
@@ -222,7 +229,8 @@ async function fetchPackfile ({
   relative,
   tags,
   singleBranch,
-  headers
+  headers,
+  prune
 }) {
   const fs = new FileSystem(_fs)
   // Sanity checks
@@ -380,23 +388,31 @@ async function fetchPackfile ({
     }
     // final value must not be a symref but a real ref
     refs.set(key, remoteRefs.get(key))
-    await GitRefManager.updateRemoteRefs({
+    let { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
       remote,
       refs,
       symrefs,
-      tags
+      tags,
+      prune
     })
+    if (prune) {
+      response.pruned = pruned
+    }
   } else {
-    await GitRefManager.updateRemoteRefs({
+    let { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
       remote,
       refs: remoteRefs,
       symrefs: remoteHTTP.symrefs,
-      tags
+      tags,
+      prune
     })
+    if (prune) {
+      response.pruned = pruned
+    }
   }
   // We need this value later for the `clone` command.
   response.HEAD = remoteHTTP.symrefs.get('HEAD')

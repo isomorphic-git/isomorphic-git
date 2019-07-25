@@ -43,4 +43,14 @@ export class GitRefSpec {
     }
     return null
   }
+  reverseTranslate (localBranch) {
+    if (this.matchPrefix) {
+      if (localBranch.startsWith(this.localPath)) {
+        return this.remotePath + localBranch.replace(this.localPath, '')
+      }
+    } else {
+      if (localBranch === this.localPath) return this.remotePath
+    }
+    return null
+  }
 }
