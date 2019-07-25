@@ -38,6 +38,8 @@ export class GitRefSpecSet {
     return result
   }
   localNamespaces () {
-    return this.rules.filter(rule => rule.matchPrefix).map(rule => rule.localPath.replace(/\/$/, ''))
+    return this.rules
+      .filter(rule => rule.matchPrefix)
+      .map(rule => rule.localPath.replace(/\/$/, ''))
   }
 }

@@ -82,7 +82,9 @@ export class GitRefManager {
     let pruned = []
     if (prune) {
       for (const filepath of refspec.localNamespaces()) {
-        const refs = (await this.listRefs({ fs, gitdir, filepath })).map(file => `${filepath}/${file}`)
+        const refs = (await this.listRefs({ fs, gitdir, filepath })).map(
+          file => `${filepath}/${file}`
+        )
         for (const ref of refs) {
           if (!actualRefsToWrite.has(ref)) {
             this.deleteRef({ fs, gitdir, ref })
