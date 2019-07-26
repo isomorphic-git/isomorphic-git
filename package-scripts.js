@@ -49,10 +49,12 @@ module.exports = {
       default: series.nps(
         'build.rollup',
         'build.webpack',
+        'build.errors',
         'build.indexjson',
         'build.treeshake',
         'build.size'
       ),
+      errors: 'node ./__tests__/__helpers__/generate-errors.js',
       webpack: 'webpack',
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
@@ -92,16 +94,18 @@ module.exports = {
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
         ? series.nps(
-          'lint',
+          'lint.js',
           'build',
+          'lint.typescript',
           'test.setup',
           'test.one',
           'test.karma',
           'test.teardown'
         )
         : series.nps(
-          'lint',
+          'lint.js',
           'build',
+          'lint.typescript',
           'test.setup',
           'test.one',
           'test.karma',
