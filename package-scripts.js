@@ -27,7 +27,7 @@ const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 module.exports = {
   scripts: {
     lint: {
-      default: series.nps('lint.js', 'build.errors', 'lint.typescript'),
+      default: series.nps('lint.js', 'lint.typescript'),
       js: `standard ${srcPaths}`,
       fix: `standard --fix ${srcPaths}`,
       typescript: 'tsc src/index.d.ts --lib es6',
@@ -94,16 +94,18 @@ module.exports = {
       // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
         ? series.nps(
-          'lint',
+          'lint.js',
           'build',
+          'lint.typescript',
           'test.setup',
           'test.one',
           'test.karma',
           'test.teardown'
         )
         : series.nps(
-          'lint',
+          'lint.js',
           'build',
+          'lint.typescript',
           'test.setup',
           'test.one',
           'test.karma',
