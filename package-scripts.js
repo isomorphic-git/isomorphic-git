@@ -47,12 +47,14 @@ module.exports = {
     },
     build: {
       default: series.nps(
+        'build.errors',
         'build.rollup',
         'build.webpack',
         'build.indexjson',
         'build.treeshake',
         'build.size'
       ),
+      errors: 'node ./__tests__/__helpers__/generate-errors.js',
       webpack: 'webpack',
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
