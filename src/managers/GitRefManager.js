@@ -29,7 +29,8 @@ export class GitRefManager {
     refs,
     symrefs,
     tags,
-    refspecs = undefined
+    refspecs = undefined,
+    prune = false
   }) {
     const fs = new FileSystem(_fs)
     // Validate input
@@ -77,6 +78,21 @@ export class GitRefManager {
         actualRefsToWrite.set(translatedRef, `ref: ${symtarget}`)
       }
     }
+    // If `prune` argument is true, clear out the existing local refspec roots
+    let pruned = []
+    if (prune) {
+      for (const filepath of refspec.localNamespaces()) {
+        const refs = (await this.listRefs({ fs, gitdir, filepath })).map(
+          file => `${filepath}/${file}`
+        )
+        for (const ref of refs) {
+          if (!actualRefsToWrite.has(ref)) {
+            this.deleteRef({ fs, gitdir, ref })
+            pruned.push(ref)
+          }
+        }
+      }
+    }
     // Update files
     // TODO: For large repos with a history of thousands of pull requests
     // (i.e. gitlab-ce) it would be vastly more efficient to write them
@@ -95,6 +111,7 @@ export class GitRefManager {
     for (let [key, value] of actualRefsToWrite) {
       await fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
     }
+    return { pruned }
   }
   // TODO: make this less crude?
   static async writeRef ({ fs: _fs, gitdir, ref, value }) {
