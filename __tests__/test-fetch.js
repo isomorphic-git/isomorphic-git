@@ -156,7 +156,9 @@ describe('fetch', () => {
 
   it('fetch --prune from git-http-mock-server', async () => {
     let { fs, dir, gitdir } = await makeFixture('test-fetch-client')
-    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
+      true
+    )
     let { pruned } = await fetch({
       dir,
       gitdir,
@@ -164,6 +166,8 @@ describe('fetch', () => {
       prune: true
     })
     expect(pruned).toEqual(['refs/remotes/origin/test-prune'])
-    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
+      false
+    )
   })
 })
