@@ -44,6 +44,7 @@
   "files": [
     "dist",
     "cli.js",
+    "src/errors.d.ts",
     "src/index.d.ts"
   ],
   "dependencies": {

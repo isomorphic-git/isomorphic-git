@@ -203,9 +203,7 @@ export const cores: {
   create: (arg: string) => GitPluginCore;
 }
 
-export const E: {
-  [key: string]: string;
-};
+export { E } from './errors';
 
 export function WORKDIR(args: {
   fs: any;
