@@ -47,9 +47,9 @@ module.exports = {
     },
     build: {
       default: series.nps(
-        'build.errors',
         'build.rollup',
         'build.webpack',
+        'build.errors',
         'build.indexjson',
         'build.treeshake',
         'build.size'
