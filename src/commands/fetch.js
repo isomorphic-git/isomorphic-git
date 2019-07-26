@@ -170,7 +170,6 @@ export async function fetch ({
     }
     let packfile = await collect(response.packfile)
     let packfileSha = packfile.slice(-20).toString('hex')
-    // TODO: Return more metadata?
     let res = {
       defaultBranch: response.HEAD,
       fetchHead: response.FETCH_HEAD

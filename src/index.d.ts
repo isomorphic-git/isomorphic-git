@@ -88,6 +88,7 @@ export interface FetchResponse {
   defaultBranch: string;
   fetchHead: string | null;
   headers?: object;
+  pruned?: string[];
 }
 
 export interface RemoteDescription {
@@ -385,6 +386,7 @@ export function fetch(args: GitDir & {
   relative?: boolean;
   tags?: boolean;
   singleBranch?: boolean;
+  prune?: boolean;
   headers?: { [key: string]: string };
 }): Promise<FetchResponse>;
 
