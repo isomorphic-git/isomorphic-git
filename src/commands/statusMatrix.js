@@ -139,8 +139,8 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref = 'HEAD'] - Optionally specify a different commit to compare against the workdir and stage instead of the HEAD
- * @param {string} [args.filepath = null] - Limit the query to the given file or directory
- * @param {string} [args.pattern = null] - Filter the results to only those whose filepath matches a glob pattern. (Pattern is relative to `filepath` if `filepath` is provided.)
+ * @param {string[]} [args.filepaths = ['.']] - Limit the query to the given files and directories
+ * @param {string} [args.pattern = null] - Filter the results to only those whose filepath matches a glob pattern. (Pattern is relative to `filepaths` if `filepaths` is provided.)
  *
  * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
  */
@@ -150,17 +150,21 @@ export async function statusMatrix ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
-  filepath = null,
+  filepaths = ['.'],
   pattern = null
 }) {
   try {
     const fs = new FileSystem(_fs)
-    if (filepath && pattern) {
-      pattern = `${filepath}/${pattern}`
+    let patternPart = ''
+    let patternGlobrex
+    if (pattern) {
+      patternPart = patternRoot(pattern);
+      if (patternPart) {
+        pattern = pattern.replace(patternPart + '/', '');
+      }
+      patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }
-    let patternGlobrex =
-      pattern && globrex(pattern, { globstar: true, extended: true })
-    let base = pattern ? patternRoot(pattern) : filepath
+    let bases = filepaths.map(filepath => join(filepath, patternPart))
     let results = await walkBeta1({
       trees: [
         TREE({ fs, gitdir, ref }),
@@ -180,12 +184,22 @@ export async function statusMatrix ({
             return false
           }
         }
-        // match against base path
-        return worthWalking(head.fullpath, base)
+        // match against base paths
+        return bases.some(base => worthWalking(head.fullpath, base))
       },
       map: async function ([head, workdir, stage]) {
         // Late filter against file names
-        if (patternGlobrex && !patternGlobrex.regex.test(head.fullpath)) return
+        if (patternGlobrex) {
+          let match = false
+          for (const base of bases) {
+            const partToMatch = head.fullpath.replace(base + '/', '')
+            if (patternGlobrex.regex.test(partToMatch)) {
+              match = true
+              break
+            }
+          }
+          if (!match) return
+        }
         // For now, just bail on directories
         await head.populateStat()
         if (head.type === 'tree' || head.type === 'special') return

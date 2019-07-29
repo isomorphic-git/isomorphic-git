@@ -28,8 +28,8 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  * @param {string} args.ref - Which branch to checkout
- * @param {string} [args.filepath = null] - Limit the checkout to the given file or directory
- * @param {string} [args.pattern = null] - Only checkout the files that match a glob pattern. (Pattern is relative to `filepath` if `filepath` is provided.)
+ * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
+ * @param {string} [args.pattern = null] - Only checkout the files that match a glob pattern. (Pattern is relative to `filepaths` if `filepaths` is provided.)
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
  *
@@ -55,7 +55,7 @@ export async function checkout ({
   emitterPrefix = '',
   remote = 'origin',
   ref,
-  filepath = null,
+  filepaths = ['.'],
   pattern = null,
   noCheckout = false
 }) {
@@ -67,12 +67,16 @@ export async function checkout ({
         parameter: 'ref'
       })
     }
-    if (filepath && pattern) {
-      pattern = `${filepath}/${pattern}`
+    let patternPart = ''
+    let patternGlobrex
+    if (pattern) {
+      patternPart = patternRoot(pattern);
+      if (patternPart) {
+        pattern = pattern.replace(patternPart + '/', '');
+      }
+      patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }
-    let patternGlobrex =
-      pattern && globrex(pattern, { globstar: true, extended: true })
-    let base = pattern ? patternRoot(pattern) : filepath
+    let bases = filepaths.map(filepath => join(filepath, patternPart))
     // Get tree oid
     let oid
     try {
@@ -133,17 +137,23 @@ export async function checkout ({
             await walkBeta1({
               trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir })],
               filter: async function ([head, workdir]) {
-                return worthWalking(head.fullpath, base)
+                // match against base paths
+                return bases.some(base => worthWalking(head.fullpath, base))
               },
               map: async function ([head, workdir]) {
                 if (head.fullpath === '.') return
                 if (!head.exists) return
                 // Late filter against file names
-                if (
-                  patternGlobrex &&
-                  !patternGlobrex.regex.test(head.fullpath)
-                ) {
-                  return
+                if (patternGlobrex) {
+                  let match = false
+                  for (const base of bases) {
+                    const partToMatch = head.fullpath.replace(base + '/', '')
+                    if (patternGlobrex.regex.test(partToMatch)) {
+                      match = true
+                      break
+                    }
+                  }
+                  if (!match) return
                 }
                 await head.populateStat()
                 const filepath = `${dir}/${head.fullpath}`

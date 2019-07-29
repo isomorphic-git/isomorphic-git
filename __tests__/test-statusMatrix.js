@@ -60,7 +60,7 @@ describe('statusMatrix', () => {
     expect(b).toEqual([['b.txt', 0, 2, 2]])
   })
 
-  it('statusMatrix (pattern vs filepath)', async () => {
+  it('statusMatrix (pattern vs filepaths)', async () => {
     // Setup
     let { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
     // Test
@@ -79,14 +79,24 @@ describe('statusMatrix', () => {
     matrix = await statusMatrix({ dir, gitdir, pattern: 'i' })
     expect(matrix).toEqual([])
 
-    matrix = await statusMatrix({ dir, gitdir, filepath: 'i' })
+    matrix = await statusMatrix({ dir, gitdir, filepaths: ['i'] })
     expect(matrix).toEqual([
+      ['i/.gitignore', 0, 2, 0],
+      ['i/i.txt', 0, 2, 0]
+    ])
+
+    matrix = await statusMatrix({ dir, gitdir, filepaths: [] })
+    expect(matrix).toBeUndefined();
+
+    matrix = await statusMatrix({ dir, gitdir, filepaths: ['i', 'h'] })
+    expect(matrix).toEqual([
+      ['h/h.txt', 0, 2, 0],
       ['i/.gitignore', 0, 2, 0],
       ['i/i.txt', 0, 2, 0]
     ])
   })
 
-  it('statusMatrix (pattern vs pattern + filepath)', async () => {
+  it('statusMatrix (pattern vs pattern + filepaths)', async () => {
     // Setup
     let { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
     // Test
@@ -98,9 +108,26 @@ describe('statusMatrix', () => {
       ['d.txt', 0, 2, 0]
     ])
 
-    matrix = await statusMatrix({ dir, gitdir, pattern: '*.txt', filepath: 'i' })
+    matrix = await statusMatrix({ dir, gitdir, pattern: '*.txt', filepaths: ['i'] })
     expect(matrix).toEqual([
       ['i/i.txt', 0, 2, 0]
     ])
+
+    matrix = await statusMatrix({ dir, gitdir, pattern: '*.txt', filepaths: ['.', 'i'] })
+    expect(matrix).toEqual([
+      ['a.txt', 1, 1, 1],
+      ['b.txt', 1, 2, 1],
+      ['c.txt', 1, 0, 1],
+      ['d.txt', 0, 2, 0],
+      ['i/i.txt', 0, 2, 0]
+    ])
+  
+    matrix = await statusMatrix({ dir, gitdir, pattern: 'i/*.txt', filepaths: ['.', 'i'] })
+    expect(matrix).toEqual([
+      ['i/i.txt', 0, 2, 0]
+    ])
+
+    matrix = await statusMatrix({ dir, gitdir, pattern: 'i/*.txt', filepaths: ['i'] })
+    expect(matrix).toEqual([])
   })
 })
