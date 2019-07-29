@@ -59,4 +59,48 @@ describe('statusMatrix', () => {
     const b = await statusMatrix({ dir, gitdir, pattern: 'b.txt' })
     expect(b).toEqual([['b.txt', 0, 2, 2]])
   })
+
+  it('statusMatrix (pattern vs filepath)', async () => {
+    // Setup
+    let { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+    // Test
+    let matrix = await statusMatrix({ dir, gitdir })
+    expect(matrix).toEqual([
+      ['a.txt', 1, 1, 1],
+      ['b.txt', 1, 2, 1],
+      ['c.txt', 1, 0, 1],
+      ['d.txt', 0, 2, 0],
+      ['g/g.txt', 0, 2, 0],
+      ['h/h.txt', 0, 2, 0],
+      ['i/.gitignore', 0, 2, 0],
+      ['i/i.txt', 0, 2, 0]
+    ])
+
+    matrix = await statusMatrix({ dir, gitdir, pattern: 'i' })
+    expect(matrix).toEqual([])
+
+    matrix = await statusMatrix({ dir, gitdir, filepath: 'i' })
+    expect(matrix).toEqual([
+      ['i/.gitignore', 0, 2, 0],
+      ['i/i.txt', 0, 2, 0]
+    ])
+  })
+
+  it('statusMatrix (pattern vs pattern + filepath)', async () => {
+    // Setup
+    let { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+    // Test
+    let matrix = await statusMatrix({ dir, gitdir, pattern: '*.txt' })
+    expect(matrix).toEqual([
+      ['a.txt', 1, 1, 1],
+      ['b.txt', 1, 2, 1],
+      ['c.txt', 1, 0, 1],
+      ['d.txt', 0, 2, 0]
+    ])
+
+    matrix = await statusMatrix({ dir, gitdir, pattern: '*.txt', filepath: 'i' })
+    expect(matrix).toEqual([
+      ['i/i.txt', 0, 2, 0]
+    ])
+  })
 })

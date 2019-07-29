@@ -150,6 +150,46 @@ Array [
 ]
 `;
 
+exports[`checkout checkout directory using filepath 1`] = `
+Array [
+  "src",
+]
+`;
+
+exports[`checkout checkout directory using filepath 2`] = `
+Array [
+  "src/models/GitBlob.js",
+  "src/models/GitCommit.js",
+  "src/models/GitConfig.js",
+  "src/models/GitTree.js",
+]
+`;
+
+exports[`checkout checkout file using filepath 1`] = `
+Array [
+  "src",
+]
+`;
+
+exports[`checkout checkout file using filepath 2`] = `
+Array [
+  "src/models/GitBlob.js",
+]
+`;
+
+exports[`checkout checkout file using filepath and pattern 1`] = `
+Array [
+  "src",
+]
+`;
+
+exports[`checkout checkout file using filepath and pattern 2`] = `
+Array [
+  "src/utils/read.js",
+  "src/utils/resolveRef.js",
+]
+`;
+
 exports[`checkout checkout unfetched branch 1`] = `
 Object {
   "caller": "git.checkout",

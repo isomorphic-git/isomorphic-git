@@ -139,7 +139,8 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref = 'HEAD'] - Optionally specify a different commit to compare against the workdir and stage instead of the HEAD
- * @param {string} [args.pattern] - Filter the results to only those whose filepath matches a glob pattern
+ * @param {string} [args.filepath = null] - Limit the query to the given file or directory
+ * @param {string} [args.pattern = null] - Filter the results to only those whose filepath matches a glob pattern. (Pattern is relative to `filepath` if `filepath` is provided.)
  *
  * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
  */
@@ -149,13 +150,17 @@ export async function statusMatrix ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
+  filepath = null,
   pattern = null
 }) {
   try {
     const fs = new FileSystem(_fs)
+    if (filepath && pattern) {
+      pattern = `${filepath}/${pattern}`
+    }
     let patternGlobrex =
       pattern && globrex(pattern, { globstar: true, extended: true })
-    let patternBase = pattern && patternRoot(pattern)
+    let base = pattern ? patternRoot(pattern) : filepath
     let results = await walkBeta1({
       trees: [
         TREE({ fs, gitdir, ref }),
@@ -163,8 +168,6 @@ export async function statusMatrix ({
         STAGE({ fs, gitdir })
       ],
       filter: async function ([head, workdir, stage]) {
-        // We need an awkward exception for the root directory
-        if (head.fullpath === '.') return true
         // Ignore ignored files, but only if they are not already tracked.
         if (!head.exists && !stage.exists && workdir.exists) {
           if (
@@ -177,9 +180,8 @@ export async function statusMatrix ({
             return false
           }
         }
-        // match against 'pattern' parameter
-        if (pattern === null) return true
-        return worthWalking(head.fullpath, patternBase)
+        // match against base path
+        return worthWalking(head.fullpath, base)
       },
       map: async function ([head, workdir, stage]) {
         // Late filter against file names
