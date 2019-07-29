@@ -268,6 +268,7 @@ export function checkout(args: WorkDir & GitDir & {
   emitterPrefix?: string;
   remote?: string;
   ref?: string;
+  filepaths?: string[];
   pattern?: string;
 }): Promise<void>;
 
@@ -568,6 +569,7 @@ export function statusMatrix(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
   ref?: string;
+  filepaths?: string[];
   pattern?: string;
 }): Promise<StatusMatrix>;
 
