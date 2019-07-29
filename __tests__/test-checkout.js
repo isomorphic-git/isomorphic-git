@@ -124,4 +124,66 @@ describe('checkout', () => {
     expect(files).toContain('regular-file.txt')
     expect(files).not.toContain('executable-file.sh')
   })
+
+  it('checkout directories using filepaths', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/models', 'test']
+    })
+    let files = await fs.readdir(dir)
+    expect(files.sort()).toMatchSnapshot()
+    let index = await listFiles({ dir, gitdir })
+    expect(index).toMatchSnapshot()
+  })
+
+  it('checkout files using filepaths', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/models/GitBlob.js', 'src/utils/write.js']
+    })
+    let files = await fs.readdir(dir)
+    expect(files.sort()).toMatchSnapshot()
+    let index = await listFiles({ dir, gitdir })
+    expect(index).toMatchSnapshot()
+  })
+
+  it('checkout files using filepaths and pattern', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/utils', 'test'],
+      pattern: 'r*'
+    })
+    let files = await fs.readdir(dir)
+    expect(files.sort()).toMatchSnapshot()
+    let index = await listFiles({ dir, gitdir })
+    expect(index).toMatchSnapshot()
+  })
+
+  it('checkout files using filepaths and deep pattern', async () => {
+    // Setup
+    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/utils', 'test'],
+      pattern: 'snapshots/r*'
+    })
+    let files = await fs.readdir(dir)
+    expect(files.sort()).toMatchSnapshot()
+    let index = await listFiles({ dir, gitdir })
+    expect(index).toMatchSnapshot()
+  })
 })
