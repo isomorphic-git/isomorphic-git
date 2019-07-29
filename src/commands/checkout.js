@@ -70,9 +70,9 @@ export async function checkout ({
     let patternPart = ''
     let patternGlobrex
     if (pattern) {
-      patternPart = patternRoot(pattern);
+      patternPart = patternRoot(pattern)
       if (patternPart) {
-        pattern = pattern.replace(patternPart + '/', '');
+        pattern = pattern.replace(patternPart + '/', '')
       }
       patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }

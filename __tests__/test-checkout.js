@@ -128,7 +128,12 @@ describe('checkout', () => {
   it('checkout directories using filepaths', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({ dir, gitdir, ref: 'test-branch', filepaths: [ 'src/models', 'test' ] })
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/models', 'test']
+    })
     let files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
@@ -138,7 +143,12 @@ describe('checkout', () => {
   it('checkout files using filepaths', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({ dir, gitdir, ref: 'test-branch', filepaths: [ 'src/models/GitBlob.js', 'src/utils/write.js' ] })
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/models/GitBlob.js', 'src/utils/write.js']
+    })
     let files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
@@ -148,7 +158,13 @@ describe('checkout', () => {
   it('checkout files using filepaths and pattern', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({ dir, gitdir, ref: 'test-branch', filepaths: [ 'src/utils', 'test' ], pattern: 'r*' })
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/utils', 'test'],
+      pattern: 'r*'
+    })
     let files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
@@ -158,7 +174,13 @@ describe('checkout', () => {
   it('checkout files using filepaths and deep pattern', async () => {
     // Setup
     let { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({ dir, gitdir, ref: 'test-branch', filepaths: [ 'src/utils', 'test' ], pattern: 'snapshots/r*' })
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/utils', 'test'],
+      pattern: 'snapshots/r*'
+    })
     let files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
     let index = await listFiles({ dir, gitdir })
