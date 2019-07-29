@@ -80,10 +80,7 @@ describe('statusMatrix', () => {
     expect(matrix).toEqual([])
 
     matrix = await statusMatrix({ dir, gitdir, filepath: 'i' })
-    expect(matrix).toEqual([
-      ['i/.gitignore', 0, 2, 0],
-      ['i/i.txt', 0, 2, 0]
-    ])
+    expect(matrix).toEqual([['i/.gitignore', 0, 2, 0], ['i/i.txt', 0, 2, 0]])
   })
 
   it('statusMatrix (pattern vs pattern + filepath)', async () => {
@@ -98,9 +95,12 @@ describe('statusMatrix', () => {
       ['d.txt', 0, 2, 0]
     ])
 
-    matrix = await statusMatrix({ dir, gitdir, pattern: '*.txt', filepath: 'i' })
-    expect(matrix).toEqual([
-      ['i/i.txt', 0, 2, 0]
-    ])
+    matrix = await statusMatrix({
+      dir,
+      gitdir,
+      pattern: '*.txt',
+      filepath: 'i'
+    })
+    expect(matrix).toEqual([['i/i.txt', 0, 2, 0]])
   })
 })
