@@ -10,9 +10,9 @@ async function makeLightningFS (dir) {
     url: 'http://localhost:9876/base/__tests__/__fixtures__'
   })
   const core = `core-lightningfs-${i++}`
-  cores.create(core).set('fs', Object.assign({}, _fs))
-  plugins.set('fs', Object.assign({}, _fs)) // deprecated
-  const fs = new FileSystem(Object.assign({}, _fs))
+  cores.create(core).set('fs', _fs)
+  plugins.set('fs', _fs) // deprecated
+  const fs = new FileSystem(_fs)
   dir = `/${dir}`
   let gitdir = `/${dir}.git`
   await fs.mkdir(dir)

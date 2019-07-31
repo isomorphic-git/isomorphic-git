@@ -6,12 +6,12 @@ const { FileSystem } = require('isomorphic-git/internal-apis')
 let i = 0
 
 async function makeNodeFixture (fixture) {
-  const _fs = require('fs')
+  const _fs = Object.assign({}, require('fs'))
   const core = `core-node-${i++}`
-  cores.create(core).set('fs', Object.assign({}, _fs))
-  plugins.set('fs', Object.assign({}, _fs)) // deprecated
+  cores.create(core).set('fs', _fs)
+  plugins.set('fs', _fs) // deprecated
   
-  const fs = new FileSystem(Object.assign({}, _fs))
+  const fs = new FileSystem(_fs)
 
   const {
     getFixturePath,
