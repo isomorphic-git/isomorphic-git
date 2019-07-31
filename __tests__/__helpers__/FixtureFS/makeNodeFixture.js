@@ -8,10 +8,10 @@ let i = 0
 async function makeNodeFixture (fixture) {
   const _fs = require('fs')
   const core = `core-node-${i++}`
-  cores.create(core).set('fs', _fs)
-  plugins.set('fs', _fs) // deprecated
-
-  const fs = new FileSystem({ ..._fs })
+  cores.create(core).set('fs', Object.assign({}, _fs))
+  plugins.set('fs', Object.assign({}, _fs)) // deprecated
+  
+  const fs = new FileSystem(Object.assign({}, _fs))
 
   const {
     getFixturePath,

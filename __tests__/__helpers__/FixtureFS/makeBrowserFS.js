@@ -32,10 +32,10 @@ async function makeBrowserFS (dir) {
     browserFSwritable.empty()
 
     const core = `core-browserfs-${i++}`
-    cores.create(core).set('fs', { ..._fs })
+    cores.create(core).set('fs', Object.assign({}, _fs))
     plugins.set('fs', _fs) // deprecated
 
-    const fs = new FileSystem({ ..._fs })
+    const fs = new FileSystem(Object.assign({}, _fs))
 
     dir = `/${dir}`
     let gitdir = `/${dir}.git`
