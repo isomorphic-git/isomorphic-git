@@ -3,8 +3,8 @@ import AsyncLock from 'async-lock'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { GitIndex } from '../models/GitIndex.js'
-import { compareStats } from '../utils/compareStats.js'
 import { DeepMap } from '../utils/DeepMap.js'
+import { compareStats } from '../utils/compareStats.js'
 
 // import Lock from '../utils.js'
 

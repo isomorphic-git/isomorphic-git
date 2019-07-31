@@ -79,7 +79,12 @@ describe('unicode filepath support', () => {
     let { object: comm } = await readObject({ core, dir, gitdir, oid: sha })
     // Test
     // Check GitTree object
-    let { object: tree } = await readObject({ core, dir, gitdir, oid: comm.tree })
+    let { object: tree } = await readObject({
+      core,
+      dir,
+      gitdir,
+      oid: comm.tree
+    })
     expect(tree.entries[0].path).toBe('日本語')
   })
   it('checkout 日本語', async () => {
