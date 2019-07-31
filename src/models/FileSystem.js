@@ -6,6 +6,7 @@ import { dirname } from '../utils/dirname.js'
 import { sleep } from '../utils/sleep.js'
 
 const delayedReleases = new Map()
+const fsmap = new WeakMap()
 /**
  * This is just a collection of helper functions really. At least that's how it started.
  */
@@ -16,7 +17,17 @@ export class FileSystem {
     if (fs === undefined) {
       throw new GitError(E.PluginUndefined, { plugin: 'fs' })
     }
-    if (typeof fs._readFile !== 'undefined') return fs
+    // This is sad... but preserving reference equality is now necessary
+    // to deal with cache invalidation in GitIndexManager.
+    if (fsmap.has(fs)) {
+      return fsmap.get(fs)
+    }
+    if (fsmap.has(fs._original_unwrapped_fs)) {
+      return fsmap.get(fs._original_unwrapped_fs)
+    }
+
+    if (typeof fs._original_unwrapped_fs !== 'undefined') return fs
+
     if (
       Object.getOwnPropertyDescriptor(fs, 'promises') &&
       Object.getOwnPropertyDescriptor(fs, 'promises').enumerable
@@ -43,6 +54,8 @@ export class FileSystem {
       this._readlink = pify(fs.readlink.bind(fs))
       this._symlink = pify(fs.symlink.bind(fs))
     }
+    this._original_unwrapped_fs = fs
+    fsmap.set(fs, this)
   }
   /**
    * Return true if a file exists, false if it doesn't exist.
