@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+const path = require('path').posix || require('path')
 const { join } = require('isomorphic-git/internal-apis')
 
 describe('utils/join', () => {
