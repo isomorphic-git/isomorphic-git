@@ -495,6 +495,7 @@ export function pull(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
   ref?: string;
+  corsProxy?: string;
   singleBranch?: boolean;
   fastForwardOnly?: boolean;
   username?: string;
