@@ -21,6 +21,7 @@ import { merge } from './merge'
  * @param {string} args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Which branch to fetch. By default this is the currently checked out branch.
+ * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.fastForwardOnly = false] - Only perform simple fast-forward merges. (Don't create merge commits.)
  * @param {boolean} [args.noGitSuffix = false] - If true, do not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
@@ -51,6 +52,7 @@ export async function pull ({
   ref,
   fastForwardOnly = false,
   noGitSuffix = false,
+  corsProxy,
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   // @ts-ignore
@@ -83,6 +85,7 @@ export async function pull ({
       emitter,
       emitterPrefix,
       noGitSuffix,
+      corsProxy,
       ref,
       remote,
       username,
