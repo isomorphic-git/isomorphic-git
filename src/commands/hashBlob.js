@@ -31,10 +31,7 @@ import { hashObject } from '../storage/hashObject.js'
  * console.log('format', format)
  *
  */
-export async function hashBlob ({
-  core = 'default',
-  object
-}) {
+export async function hashBlob ({ core = 'default', object }) {
   try {
     // Convert object to buffer
     if (typeof object === 'string') {

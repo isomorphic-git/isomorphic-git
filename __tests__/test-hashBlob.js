@@ -33,7 +33,10 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
 
 const buffer = Buffer.from(string, 'utf8')
 
-const wrapped = Buffer.concat([ Buffer.from(`blob ${buffer.byteLength}\x00`), buffer ])
+const wrapped = Buffer.concat([
+  Buffer.from(`blob ${buffer.byteLength}\x00`),
+  buffer
+])
 
 describe('hashBlob', () => {
   it('object as Buffer', async () => {
