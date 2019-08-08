@@ -20,7 +20,7 @@ import { hashObject } from '../storage/hashObject.js'
  *
  * @returns {Promise<{HashBlobResult}>} Resolves successfully with the SHA-1 object id and the wrapped object Buffer.
  * @see HashBlobResult
- * 
+ *
  * @example
  * let { oid, type, object, format } = await git.hashBlob({
  *   object: '$input((Hello world!))',
