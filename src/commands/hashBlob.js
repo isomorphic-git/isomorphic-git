@@ -19,8 +19,9 @@ import { hashObject } from '../storage/hashObject.js'
  * @param {Buffer|string} args.object - The object to write. If `object` is a String then it will be converted to a Buffer using UTF-8 encoding.
  *
  * @returns {Promise<{HashBlobResult}>} Resolves successfully with the SHA-1 object id and the wrapped object Buffer.
- *
- * @example *
+ * @see HashBlobResult
+ * 
+ * @example
  * let { oid, type, object, format } = await git.hashBlob({
  *   object: '$input((Hello world!))',
  * })
