@@ -9,8 +9,8 @@ function cleanType (type) {
 
 function escapeType (type) {
   return cleanType(type)
-    .replace(/</g, '\\<')
-    .replace(/>/g, '\\>')
+    .replace(/(?<!\\)</g, '\\<')
+    .replace(/(?<!\\)>/g, '\\>')
     .replace(/\|/g, ' &#124; ')
 }
 
@@ -131,7 +131,7 @@ function gendoc (filepath) {
             description = description.replace('[required] ', '')
             name = `**${name}**`
           }
-          rows.push([name, type, description])
+          rows.push([name, escapeType(type), escapeType(description)])
         }
       }
       if (obj.returns) {

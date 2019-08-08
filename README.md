@@ -184,6 +184,7 @@ unless there is a major version bump.
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
+- [hashBlob](https://isomorphic-git.github.io/docs/hashBlob.html)
 - [indexPack](https://isomorphic-git.github.io/docs/indexPack.html)
 - [init](https://isomorphic-git.github.io/docs/init.html)
 - [isDescendent](https://isomorphic-git.github.io/docs/isDescendent.html)
