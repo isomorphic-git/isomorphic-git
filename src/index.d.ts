@@ -610,6 +610,18 @@ export function writeObject(args: GitDir & {
   encoding?: string;
 }): Promise<string>;
 
+type HashBlobResult = {
+  oid: string;
+  type: 'blob';
+  object: Buffer;
+  format: 'wrapped';
+}
+
+export function hashBlob(args: {
+  core?: string;
+  object: string | Buffer | CommitDescription | TreeDescription | TagDescription;
+}): Promise<HashBlobResult>;
+
 export function writeRef(args: GitDir & {
   core?: string;
   fs?: any;
