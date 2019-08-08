@@ -26,6 +26,7 @@ Array [
   "findMergeBase",
   "findRoot",
   "getRemoteInfo",
+  "hashBlob",
   "indexPack",
   "init",
   "isDescendent",
