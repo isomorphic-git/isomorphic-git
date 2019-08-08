@@ -37,8 +37,8 @@ export function fromValue (value) {
 
 // Convert a Node stream to an Async Iterator
 export function fromNodeStream (stream) {
-  // Use native async iteration if it's available.
-  if (stream[Symbol.asyncIterator]) return stream
+  // Use native async iteration if it's available without a warning.
+  if (stream[Symbol.asyncIterator] && !Object.getOwnPropertyDescriptor(global, 'Buffer').enumerable) return stream
   // Author's Note
   // I tried many MANY ways to do this.
   // I tried two npm modules (stream-to-async-iterator and streams-to-async-iterator) with no luck.
