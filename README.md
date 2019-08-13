@@ -99,7 +99,7 @@ BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
 </script>
 ```
 
-If you're using a bundler and ES module syntax, use either a namespace import or named imports to benefit from tree-shaking:
+If you're using ES module syntax, use either a namespace import or named imports to benefit from tree-shaking:
 
 ```js
 import * as git from 'isomorphic-git'
