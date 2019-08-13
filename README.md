@@ -99,6 +99,14 @@ BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
 </script>
 ```
 
+If you're using ES module syntax, use either a namespace import or named imports to benefit from tree-shaking:
+
+```js
+import * as git from 'isomorphic-git'
+// or
+import {plugins, clone, commit, push} from 'isomorphic-git
+```
+
 Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystem on top of a read-only filesystem.
 You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck using the IndexedDB backend I suggested above.
 
