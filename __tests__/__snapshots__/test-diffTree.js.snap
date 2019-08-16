@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`diffTree diff a-file against a-folder 1`] = `
+Array [
+  Object {
+    "after": undefined,
+    "before": "61780798228d17af2d34fce4cfbdf35556832472",
+    "filepath": "a/b",
+    "op": "rm",
+  },
+  Object {
+    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "before": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
+    "filepath": "a",
+    "op": "rmdir-write",
+  },
+]
+`;
+
+exports[`diffTree diff a-folder against a-file 1`] = `
+Array [
+  Object {
+    "after": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
+    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "filepath": "a",
+    "op": "rm-mkdir",
+  },
+  Object {
+    "after": "61780798228d17af2d34fce4cfbdf35556832472",
+    "before": undefined,
+    "filepath": "a/b",
+    "op": "write",
+  },
+]
+`;
+
+exports[`diffTree diff commit against empty commit 1`] = `
+Array [
+  Object {
+    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "before": undefined,
+    "filepath": "a",
+    "op": "write",
+  },
+  Object {
+    "after": "61780798228d17af2d34fce4cfbdf35556832472",
+    "before": undefined,
+    "filepath": "b",
+    "op": "write",
+  },
+  Object {
+    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "before": undefined,
+    "filepath": "c",
+    "op": "mkdir",
+  },
+  Object {
+    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "before": undefined,
+    "filepath": "c/d",
+    "op": "write",
+  },
+  Object {
+    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "before": undefined,
+    "filepath": "c/e",
+    "op": "write",
+  },
+]
+`;
+
+exports[`diffTree diff commit against itself 1`] = `Array []`;
+
+exports[`diffTree diff empty commit against commit 1`] = `
+Array [
+  Object {
+    "after": undefined,
+    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "filepath": "a",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "61780798228d17af2d34fce4cfbdf35556832472",
+    "filepath": "b",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "c/d",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "filepath": "c/e",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "filepath": "c",
+    "op": "rmdir",
+  },
+]
+`;
+
+exports[`diffTree diff two empty commits 1`] = `Array []`;

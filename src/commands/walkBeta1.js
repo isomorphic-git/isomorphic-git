@@ -2,6 +2,7 @@
 import { arrayRange } from '../utils/arrayRange.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
+import { flat } from '../utils/flat.js'
 
 /**
  *
@@ -219,9 +220,7 @@ export async function walkBeta1 ({
   map = async entry => entry,
   // The default reducer is a flatmap that filters out undefineds.
   reduce = async (parent, children) => {
-    // TODO: can we just do [parent, ...children]?
-    // TODO: replace with `[parent, children].flat()` once that gets standardized
-    const flatten = children.reduce((acc, x) => acc.concat(x), [])
+    let flatten = flat(children)
     if (parent !== undefined) flatten.unshift(parent)
     return flatten
   },

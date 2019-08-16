@@ -2,12 +2,13 @@
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
+import { flat } from '../utils/flat.js'
 
 import { TREE } from './TREE.js'
 import { walkBeta1 } from './walkBeta1.js'
 
 /**
- * 
+ *
  * @typedef {('rm'|'write'|'overwrite'|'mkdir'|'rmdir'|'noop'|'rmdir-write'|'rm-mkdir')} TreePatchOp
  */
 
@@ -49,7 +50,7 @@ export async function diffTree ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   before,
-  after,
+  after
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -68,8 +69,28 @@ export async function diffTree ({
           filepath: before.fullpath,
           op,
           before: before.oid,
-          after: after.oid,
+          after: after.oid
         }
+      },
+      reduce: async (parent, children) => {
+        // If there are no children we can just return it.
+        if (parent && children.length === 0) {
+          return [parent]
+        }
+        // The `parent` must be an op involving a tree somehow,
+        // either with the tree in the before commit or the after commit.
+        // (Or both, but in that case it's a noop and already filtered).
+        // That leaves four possible TreePatchOps, with two cases.
+        //
+        // If we're creating a directory, we need to order that _before_ children.
+        if (parent && (parent.op === 'rm-mkdir' || parent.op === 'mkdir')) {
+          children.unshift(parent)
+        }
+        // If we're deleting a directory, we need to order that _after_ children.
+        if (parent && (parent.op == 'rmdir-write' || parent.op === 'rmdir')) {
+          children.push(parent)
+        }
+        return flat(children)
       }
     })
     return results
@@ -80,10 +101,10 @@ export async function diffTree ({
 }
 
 /**
- * 
- * @param {import('./walkBeta1.js').WalkerEntry} before 
- * @param {import('./walkBeta1.js').WalkerEntry} after 
- * 
+ *
+ * @param {import('./walkBeta1.js').WalkerEntry} before
+ * @param {import('./walkBeta1.js').WalkerEntry} after
+ *
  * @returns {TreePatchOp}
  */
 function computeOp (before, after) {
