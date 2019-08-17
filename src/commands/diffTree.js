@@ -9,16 +9,16 @@ import { walkBeta1 } from './walkBeta1.js'
 
 /**
  *
- * @typedef {('rm'|'write'|'overwrite'|'mkdir'|'rmdir'|'noop'|'rmdir-write'|'rm-mkdir')} TreePatchOp
+ * @typedef {('chmod+x'|'chmod-x'|'mkdir'|'noop'|'rm'|'rmdir'|'write')} FileSystemFn
  */
 
 /**
  *
  * @typedef {Object} TreePatch - The object returned has the following schema:
  * @property {string} filepath - The file path
- * @property {TreePatchOp} op - The filesystem operation to perform
+ * @property {FileSystemFn[]} ops - The filesystem operation to perform
  * @property {string|null} before - The SHA-1 object id from the before tree
- * @property {string|null} after - The SHA-1 object id from the after tree
+ * @property {string|null} after - The SHA-1 object id from the after 
  *
  */
 
@@ -36,7 +36,7 @@ import { walkBeta1 } from './walkBeta1.js'
  *
  * @returns {Promise<TreePatch[]>} The name of the current branch or undefined if the HEAD is detached.
  * @see TreePatch
- * @see TreePatchOp
+ * @see FileSystemFn
  *
  * @example
  * // Get the current branch name
@@ -63,32 +63,26 @@ export async function diffTree ({
         if (before.fullpath === '.') return
         await Promise.all([before.populateStat(), after.populateStat()])
         await Promise.all([before.populateHash(), after.populateHash()])
-        const op = computeOp(before, after)
-        if (op === 'noop') return
+        const ops = computeOps(before, after)
+        if (ops.length === 0) return
         return {
           filepath: before.fullpath,
-          op,
+          ops,
           before: before.oid,
           after: after.oid
         }
       },
+      /**
+       * @param {TreePatch} [parent]
+       * @param {TreePatch[]} children
+       */
       reduce: async (parent, children) => {
-        // If there are no children we can just return it.
-        if (parent && children.length === 0) {
-          return [parent]
-        }
-        // The `parent` must be an op involving a tree somehow,
-        // either with the tree in the before commit or the after commit.
-        // (Or both, but in that case it's a noop and already filtered).
-        // That leaves four possible TreePatchOps, with two cases.
-        //
-        // If we're creating a directory, we need to order that _before_ children.
-        if (parent && (parent.op === 'rm-mkdir' || parent.op === 'mkdir')) {
-          children.unshift(parent)
-        }
         // If we're deleting a directory, we need to order that _after_ children.
-        if (parent && (parent.op == 'rmdir-write' || parent.op === 'rmdir')) {
+        if (parent && parent.ops.includes('rmdir')) {
           children.push(parent)
+        // Everything else, do the parent operations first.
+        } else if (parent) {
+          children.unshift(parent)
         }
         return flat(children)
       }
@@ -105,19 +99,38 @@ export async function diffTree ({
  * @param {import('./walkBeta1.js').WalkerEntry} before
  * @param {import('./walkBeta1.js').WalkerEntry} after
  *
- * @returns {TreePatchOp}
+ * @returns {FileSystemFn[]}
  */
-function computeOp (before, after) {
-  if (before.oid === after.oid) return 'noop'
+function computeOps (before, after) {
+  const ops = computeMajorOp(before, after)
+  if (before.mode !== after.mode) {
+    if (after.mode === '100644') {
+      ops.push('chmod-x')
+    } else if (after.mode === '100755') {
+      ops.push('chmod+x')
+    }
+  }
+  return ops
+}
+
+/**
+ *
+ * @param {import('./walkBeta1.js').WalkerEntry} before
+ * @param {import('./walkBeta1.js').WalkerEntry} after
+ *
+ * @returns {FileSystemFn[]}
+ */
+function computeMajorOp (before, after) {
+  if (before.oid === after.oid) return []
   // Note: here we ignore our handy `.exists` and just coerce `.type` to undefined lol
   switch (`${before.type}-${after.type}`) {
-    case 'blob-blob': return 'overwrite'
-    case 'tree-tree': return 'noop'
-    case 'blob-tree': return 'rm-mkdir'
-    case 'tree-blob': return 'rmdir-write'
-    case 'undefined-blob': return 'write'
-    case 'undefined-tree': return 'mkdir'
-    case 'blob-undefined': return 'rm'
-    case 'tree-undefined': return 'rmdir'
+    case 'blob-blob': return ['write']
+    case 'tree-tree': return []
+    case 'blob-tree': return ['rm', 'mkdir']
+    case 'tree-blob': return ['rmdir', 'write']
+    case 'undefined-blob': return ['write']
+    case 'undefined-tree': return ['mkdir']
+    case 'blob-undefined': return ['rm']
+    case 'tree-undefined': return ['rmdir']
   }
 }

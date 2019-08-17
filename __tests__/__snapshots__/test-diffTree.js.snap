@@ -51,6 +51,27 @@ Array [
 ]
 `;
 
+exports[`diffTree diff change-modes against mainline 1`] = `
+Array [
+  Object {
+    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "filepath": "a",
+    "ops": Array [
+      "chmod+x",
+    ],
+  },
+  Object {
+    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "c/d",
+    "ops": Array [
+      "chmod+x",
+    ],
+  },
+]
+`;
+
 exports[`diffTree diff commit against empty commit 1`] = `
 Array [
   Object {
@@ -160,6 +181,27 @@ Array [
     "before": "faceb189bb665fe7a631602d904e57a4014187b7",
     "filepath": "c",
     "op": "rmdir",
+  },
+]
+`;
+
+exports[`diffTree diff mainline against change-modes 1`] = `
+Array [
+  Object {
+    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+    "filepath": "a",
+    "ops": Array [
+      "chmod-x",
+    ],
+  },
+  Object {
+    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "c/d",
+    "ops": Array [
+      "chmod-x",
+    ],
   },
 ]
 `;
