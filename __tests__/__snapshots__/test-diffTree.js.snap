@@ -106,4 +106,139 @@ Array [
 ]
 `;
 
+exports[`diffTree diff folder-replaces-file against mainline 1`] = `
+Array [
+  Object {
+    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "before": "61780798228d17af2d34fce4cfbdf35556832472",
+    "filepath": "b",
+    "op": "rm-mkdir",
+  },
+  Object {
+    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "before": undefined,
+    "filepath": "b/d",
+    "op": "write",
+  },
+  Object {
+    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "before": undefined,
+    "filepath": "b/e",
+    "op": "write",
+  },
+  Object {
+    "after": undefined,
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "c/d",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "filepath": "c/e",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "filepath": "c",
+    "op": "rmdir",
+  },
+]
+`;
+
+exports[`diffTree diff mainline against nest-folder 1`] = `
+Array [
+  Object {
+    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "before": undefined,
+    "filepath": "c",
+    "op": "mkdir",
+  },
+  Object {
+    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "before": undefined,
+    "filepath": "c/d",
+    "op": "write",
+  },
+  Object {
+    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "before": undefined,
+    "filepath": "c/e",
+    "op": "write",
+  },
+  Object {
+    "after": undefined,
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "d/c/d",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "filepath": "d/c/e",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "filepath": "d/c",
+    "op": "rmdir",
+  },
+  Object {
+    "after": undefined,
+    "before": "878e0205d8bdb7d02844893647f02f49df655aff",
+    "filepath": "d",
+    "op": "rmdir",
+  },
+]
+`;
+
+exports[`diffTree diff nest-folder against mainline 1`] = `
+Array [
+  Object {
+    "after": undefined,
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "c/d",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "filepath": "c/e",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "filepath": "c",
+    "op": "rmdir",
+  },
+  Object {
+    "after": "878e0205d8bdb7d02844893647f02f49df655aff",
+    "before": undefined,
+    "filepath": "d",
+    "op": "mkdir",
+  },
+  Object {
+    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "before": undefined,
+    "filepath": "d/c",
+    "op": "mkdir",
+  },
+  Object {
+    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "before": undefined,
+    "filepath": "d/c/d",
+    "op": "write",
+  },
+  Object {
+    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "before": undefined,
+    "filepath": "d/c/e",
+    "op": "write",
+  },
+]
+`;
+
 exports[`diffTree diff two empty commits 1`] = `Array []`;
