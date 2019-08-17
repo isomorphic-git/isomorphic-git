@@ -1,452 +1,532 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`diffTree diff a-file against a-folder 1`] = `
-Array [
-  Object {
-    "after": undefined,
-    "before": "61780798228d17af2d34fce4cfbdf35556832472",
-    "filepath": "a/b",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "before": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
-    "filepath": "a",
-    "ops": Array [
-      "rmdir",
-      "write",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "basename": "a",
+      "before": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
+      "ops": Array [
+        "rmdir",
+        "write",
+      ],
+      "subOps": Array [
+        Object {
+          "after": undefined,
+          "basename": "b",
+          "before": "61780798228d17af2d34fce4cfbdf35556832472",
+          "ops": Array [
+            "rm",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff a-folder against a-file 1`] = `
-Array [
-  Object {
-    "after": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
-    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "filepath": "a",
-    "ops": Array [
-      "rm",
-      "mkdir",
-    ],
-  },
-  Object {
-    "after": "61780798228d17af2d34fce4cfbdf35556832472",
-    "before": undefined,
-    "filepath": "a/b",
-    "ops": Array [
-      "write",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
+      "basename": "a",
+      "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "ops": Array [
+        "rm",
+        "mkdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": "61780798228d17af2d34fce4cfbdf35556832472",
+          "basename": "b",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff add-files against mainline 1`] = `
-Array [
-  Object {
-    "after": "01058d844a98d293a3b03a8615a34700e4ed2be3",
-    "before": undefined,
-    "filepath": "c/g",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "6a69f92020f5df77af6e8813ff1232493383b708",
-    "before": undefined,
-    "filepath": "f",
-    "ops": Array [
-      "write",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "c19d15d2a33fcfd7633460bf08e25eb70a0b75a9",
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "ops": Array [],
+      "subOps": Array [
+        Object {
+          "after": "01058d844a98d293a3b03a8615a34700e4ed2be3",
+          "basename": "g",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+    Object {
+      "after": "6a69f92020f5df77af6e8813ff1232493383b708",
+      "basename": "f",
+      "before": undefined,
+      "ops": Array [
+        "write",
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff change-modes against mainline 1`] = `
-Array [
-  Object {
-    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "filepath": "a",
-    "ops": Array [
-      "chmod+x",
-    ],
-  },
-  Object {
-    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "c/d",
-    "ops": Array [
-      "chmod+x",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "basename": "a",
+      "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "ops": Array [
+        "chmod+x",
+      ],
+    },
+    Object {
+      "after": "825f3723278804ff2c0073973739c1478db72603",
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "ops": Array [],
+      "subOps": Array [
+        Object {
+          "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "ops": Array [
+            "chmod+x",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff commit against empty commit 1`] = `
-Array [
-  Object {
-    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "before": undefined,
-    "filepath": "a",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "61780798228d17af2d34fce4cfbdf35556832472",
-    "before": undefined,
-    "filepath": "b",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "before": undefined,
-    "filepath": "c",
-    "ops": Array [
-      "mkdir",
-    ],
-  },
-  Object {
-    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "before": undefined,
-    "filepath": "c/d",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "before": undefined,
-    "filepath": "c/e",
-    "ops": Array [
-      "write",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "basename": "a",
+      "before": undefined,
+      "ops": Array [
+        "write",
+      ],
+    },
+    Object {
+      "after": "61780798228d17af2d34fce4cfbdf35556832472",
+      "basename": "b",
+      "before": undefined,
+      "ops": Array [
+        "write",
+      ],
+    },
+    Object {
+      "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "basename": "c",
+      "before": undefined,
+      "ops": Array [
+        "mkdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "basename": "d",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+        Object {
+          "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "basename": "e",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
-exports[`diffTree diff commit against itself 1`] = `Array []`;
-
 exports[`diffTree diff empty commit against commit 1`] = `
-Array [
-  Object {
-    "after": undefined,
-    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "filepath": "a",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "61780798228d17af2d34fce4cfbdf35556832472",
-    "filepath": "b",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "c/d",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "filepath": "c/e",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "filepath": "c",
-    "ops": Array [
-      "rmdir",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": undefined,
+      "basename": "a",
+      "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "ops": Array [
+        "rm",
+      ],
+    },
+    Object {
+      "after": undefined,
+      "basename": "b",
+      "before": "61780798228d17af2d34fce4cfbdf35556832472",
+      "ops": Array [
+        "rm",
+      ],
+    },
+    Object {
+      "after": undefined,
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "ops": Array [
+        "rmdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": undefined,
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "ops": Array [
+            "rm",
+          ],
+        },
+        Object {
+          "after": undefined,
+          "basename": "e",
+          "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "ops": Array [
+            "rm",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff folder-replaces-file against mainline 1`] = `
-Array [
-  Object {
-    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "before": "61780798228d17af2d34fce4cfbdf35556832472",
-    "filepath": "b",
-    "ops": Array [
-      "rm",
-      "mkdir",
-    ],
-  },
-  Object {
-    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "before": undefined,
-    "filepath": "b/d",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "before": undefined,
-    "filepath": "b/e",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "c/d",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "filepath": "c/e",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "filepath": "c",
-    "ops": Array [
-      "rmdir",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "basename": "b",
+      "before": "61780798228d17af2d34fce4cfbdf35556832472",
+      "ops": Array [
+        "rm",
+        "mkdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "basename": "d",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+        Object {
+          "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "basename": "e",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+    Object {
+      "after": undefined,
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "ops": Array [
+        "rmdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": undefined,
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "ops": Array [
+            "rm",
+          ],
+        },
+        Object {
+          "after": undefined,
+          "basename": "e",
+          "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "ops": Array [
+            "rm",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff mainline against change-modes 1`] = `
-Array [
-  Object {
-    "after": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "before": "78981922613b2afb6025042ff6bd878ac1994e85",
-    "filepath": "a",
-    "ops": Array [
-      "chmod-x",
-    ],
-  },
-  Object {
-    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "c/d",
-    "ops": Array [
-      "chmod-x",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "basename": "a",
+      "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "ops": Array [
+        "chmod-x",
+      ],
+    },
+    Object {
+      "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "basename": "c",
+      "before": "825f3723278804ff2c0073973739c1478db72603",
+      "ops": Array [],
+      "subOps": Array [
+        Object {
+          "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "ops": Array [
+            "chmod-x",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff mainline against nest-folder 1`] = `
-Array [
-  Object {
-    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "before": undefined,
-    "filepath": "c",
-    "ops": Array [
-      "mkdir",
-    ],
-  },
-  Object {
-    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "before": undefined,
-    "filepath": "c/d",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "before": undefined,
-    "filepath": "c/e",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "d/c/d",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "filepath": "d/c/e",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "filepath": "d/c",
-    "ops": Array [
-      "rmdir",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "878e0205d8bdb7d02844893647f02f49df655aff",
-    "filepath": "d",
-    "ops": Array [
-      "rmdir",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "basename": "c",
+      "before": undefined,
+      "ops": Array [
+        "mkdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "basename": "d",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+        Object {
+          "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "basename": "e",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+    Object {
+      "after": undefined,
+      "basename": "d",
+      "before": "878e0205d8bdb7d02844893647f02f49df655aff",
+      "ops": Array [
+        "rmdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": undefined,
+          "basename": "c",
+          "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+          "ops": Array [
+            "rmdir",
+          ],
+          "subOps": Array [
+            Object {
+              "after": undefined,
+              "basename": "d",
+              "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+              "ops": Array [
+                "rm",
+              ],
+            },
+            Object {
+              "after": undefined,
+              "basename": "e",
+              "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+              "ops": Array [
+                "rm",
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff nest-folder against mainline 1`] = `
-Array [
-  Object {
-    "after": undefined,
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "c/d",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "filepath": "c/e",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "filepath": "c",
-    "ops": Array [
-      "rmdir",
-    ],
-  },
-  Object {
-    "after": "878e0205d8bdb7d02844893647f02f49df655aff",
-    "before": undefined,
-    "filepath": "d",
-    "ops": Array [
-      "mkdir",
-    ],
-  },
-  Object {
-    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "before": undefined,
-    "filepath": "d/c",
-    "ops": Array [
-      "mkdir",
-    ],
-  },
-  Object {
-    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "before": undefined,
-    "filepath": "d/c/d",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "before": undefined,
-    "filepath": "d/c/e",
-    "ops": Array [
-      "write",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": undefined,
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "ops": Array [
+        "rmdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": undefined,
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "ops": Array [
+            "rm",
+          ],
+        },
+        Object {
+          "after": undefined,
+          "basename": "e",
+          "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "ops": Array [
+            "rm",
+          ],
+        },
+      ],
+    },
+    Object {
+      "after": "878e0205d8bdb7d02844893647f02f49df655aff",
+      "basename": "d",
+      "before": undefined,
+      "ops": Array [
+        "mkdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+          "basename": "c",
+          "before": undefined,
+          "ops": Array [
+            "mkdir",
+          ],
+          "subOps": Array [
+            Object {
+              "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+              "basename": "d",
+              "before": undefined,
+              "ops": Array [
+                "write",
+              ],
+            },
+            Object {
+              "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+              "basename": "e",
+              "before": undefined,
+              "ops": Array [
+                "write",
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff remove-files against mainline 1`] = `
-Array [
-  Object {
-    "after": undefined,
-    "before": "61780798228d17af2d34fce4cfbdf35556832472",
-    "filepath": "b",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "c/d",
-    "ops": Array [
-      "rm",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": undefined,
+      "basename": "b",
+      "before": "61780798228d17af2d34fce4cfbdf35556832472",
+      "ops": Array [
+        "rm",
+      ],
+    },
+    Object {
+      "after": "84bb40e9d011ee678d381b1f29976f947c7c7985",
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "ops": Array [],
+      "subOps": Array [
+        Object {
+          "after": undefined,
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "ops": Array [
+            "rm",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
 
 exports[`diffTree diff rename-folder against mainline 1`] = `
-Array [
-  Object {
-    "after": undefined,
-    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "filepath": "c/d",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "filepath": "c/e",
-    "ops": Array [
-      "rm",
-    ],
-  },
-  Object {
-    "after": undefined,
-    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "filepath": "c",
-    "ops": Array [
-      "rmdir",
-    ],
-  },
-  Object {
-    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
-    "before": undefined,
-    "filepath": "f",
-    "ops": Array [
-      "mkdir",
-    ],
-  },
-  Object {
-    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
-    "before": undefined,
-    "filepath": "f/d",
-    "ops": Array [
-      "write",
-    ],
-  },
-  Object {
-    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
-    "before": undefined,
-    "filepath": "f/e",
-    "ops": Array [
-      "write",
-    ],
-  },
-]
+Object {
+  "subOps": Array [
+    Object {
+      "after": undefined,
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "ops": Array [
+        "rmdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": undefined,
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "ops": Array [
+            "rm",
+          ],
+        },
+        Object {
+          "after": undefined,
+          "basename": "e",
+          "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "ops": Array [
+            "rm",
+          ],
+        },
+      ],
+    },
+    Object {
+      "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "basename": "f",
+      "before": undefined,
+      "ops": Array [
+        "mkdir",
+      ],
+      "subOps": Array [
+        Object {
+          "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "basename": "d",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+        Object {
+          "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "basename": "e",
+          "before": undefined,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+  ],
+}
 `;
-
-exports[`diffTree diff two empty commits 1`] = `Array []`;

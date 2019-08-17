@@ -47,7 +47,9 @@ export async function mergeTreePatches ({
     if (collisions.length > 0) {
       throw new GitError(E.MergeConflict, { collisions })
     }
-
+    // we need to reorder patches so we can efficiently create GitTree objects in a single pass.
+    // also we need to inject 'finalize-tree' commands.
+    // Also, if we split patches into a hierarchy by folder, we can parallize apply them. :/
     return flat(patchsets)
   } catch (err) {
     err.caller = 'git.mergeTreePatches'
