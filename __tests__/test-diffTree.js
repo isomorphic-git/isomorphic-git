@@ -15,7 +15,7 @@ describe('diffTree', () => {
     let { gitdir } = await makeFixture('test-diff')
     // Test
     let diff = await diffTree({ gitdir, before: 'master', after: 'master' })
-    expect(diff).toEqual({})
+    expect(diff).toMatchSnapshot()
   })
 
   it('diff commit against itself', async () => {
@@ -23,7 +23,7 @@ describe('diffTree', () => {
     let { gitdir } = await makeFixture('test-diff')
     // Test
     let diff = await diffTree({ gitdir, before: 'mainline', after: 'mainline' })
-    expect(diff).toEqual({})
+    expect(diff).toMatchSnapshot()
   })
 
   it('diff commit against empty commit', async () => {

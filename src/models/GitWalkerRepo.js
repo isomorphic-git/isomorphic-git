@@ -24,6 +24,7 @@ export class GitWalkerRepo {
         }
       }
       const tree = await resolveTree({ fs, gitdir, oid })
+      tree.type = 'tree'
       map.set('.', tree)
       return map
     })()

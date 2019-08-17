@@ -20,6 +20,7 @@ import { walkBeta1 } from './walkBeta1.js'
  * @property {string|null} before - The SHA-1 object id from the before tree
  * @property {string|null} after - The SHA-1 object id from the after 
  * @property {TreePatch[]} [subOps] - Child patches of this patch
+ * @property {TreePatch[]} [conflicts] - Child patches of this patch
  *
  */
 
@@ -61,7 +62,6 @@ export async function diffTree ({
     let results = await walkBeta1({
       trees: [beforeTree, afterTree],
       map: async function ([before, after]) {
-        if (before.fullpath === '.') return {}
         await Promise.all([before.populateStat(), after.populateStat()])
         await Promise.all([before.populateHash(), after.populateHash()])
         const ops = computeOps(before, after)
@@ -141,4 +141,5 @@ function computeMajorOp (before, after) {
     case 'blob-undefined': return ['rm']
     case 'tree-undefined': return ['rmdir']
   }
+  console.log(before, after)
 }

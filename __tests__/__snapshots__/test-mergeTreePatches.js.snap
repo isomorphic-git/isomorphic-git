@@ -1,0 +1,110 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mergeTreePatches merge add-files and remove-files 1`] = `
+Object {
+  "basename": ".",
+  "index": 0,
+  "ops": Array [],
+  "subOps": Array [
+    Object {
+      "basename": "a",
+      "before": "78981922613b2afb6025042ff6bd878ac1994e85",
+      "index": 1,
+      "ops": Array [
+        "rm",
+      ],
+    },
+    Object {
+      "basename": "b",
+      "before": "61780798228d17af2d34fce4cfbdf35556832472",
+      "index": 1,
+      "ops": Array [
+        "rm",
+      ],
+    },
+    Object {
+      "basename": "c",
+      "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+      "index": 1,
+      "ops": Array [
+        "rmdir",
+      ],
+      "subOps": Array [
+        Object {
+          "basename": "d",
+          "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+          "index": 1,
+          "ops": Array [
+            "rm",
+          ],
+        },
+        Object {
+          "basename": "e",
+          "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+          "index": 1,
+          "ops": Array [
+            "rm",
+          ],
+        },
+        Object {
+          "after": "01058d844a98d293a3b03a8615a34700e4ed2be3",
+          "basename": "g",
+          "index": 0,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+    Object {
+      "after": "6a69f92020f5df77af6e8813ff1232493383b708",
+      "basename": "f",
+      "index": 0,
+      "ops": Array [
+        "write",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`mergeTreePatches merge two conflicting TreePatches 1`] = `
+Object {
+  "basename": ".",
+  "index": 0,
+  "ops": Array [],
+  "subOps": Array [
+    Object {
+      "conflicts": Array [
+        Object {
+          "after": "78981922613b2afb6025042ff6bd878ac1994e85",
+          "basename": "a",
+          "index": 0,
+          "ops": Array [
+            "write",
+          ],
+        },
+        Object {
+          "after": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
+          "basename": "a",
+          "index": 1,
+          "ops": Array [
+            "mkdir",
+          ],
+        },
+      ],
+      "ops": Array [],
+      "subOps": Array [
+        Object {
+          "after": "61780798228d17af2d34fce4cfbdf35556832472",
+          "basename": "b",
+          "index": 1,
+          "ops": Array [
+            "write",
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
