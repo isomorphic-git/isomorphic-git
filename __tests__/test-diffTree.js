@@ -42,6 +42,22 @@ describe('diffTree', () => {
     expect(diff).toMatchSnapshot()
   })
 
+  it('diff add-files against mainline', async () => {
+    // Setup
+    let { gitdir } = await makeFixture('test-diff')
+    // Test
+    let diff = await diffTree({ gitdir, before: 'mainline', after: 'add-files' })
+    expect(diff).toMatchSnapshot()
+  })
+  
+  it('diff remove-files against mainline', async () => {
+    // Setup
+    let { gitdir } = await makeFixture('test-diff')
+    // Test
+    let diff = await diffTree({ gitdir, before: 'mainline', after: 'remove-files' })
+    expect(diff).toMatchSnapshot()
+  })
+
   it('diff a-file against a-folder', async () => {
     // Setup
     let { gitdir } = await makeFixture('test-diff')
@@ -81,4 +97,13 @@ describe('diffTree', () => {
     let diff = await diffTree({ gitdir, before: 'mainline', after: 'folder-replaces-file' })
     expect(diff).toMatchSnapshot()
   })
+
+  it('diff rename-folder against mainline', async () => {
+    // Setup
+    let { gitdir } = await makeFixture('test-diff')
+    // Test
+    let diff = await diffTree({ gitdir, before: 'mainline', after: 'rename-folder' })
+    expect(diff).toMatchSnapshot()
+  })
+
 })

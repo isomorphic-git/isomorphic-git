@@ -34,6 +34,23 @@ Array [
 ]
 `;
 
+exports[`diffTree diff add-files against mainline 1`] = `
+Array [
+  Object {
+    "after": "01058d844a98d293a3b03a8615a34700e4ed2be3",
+    "before": undefined,
+    "filepath": "c/g",
+    "op": "write",
+  },
+  Object {
+    "after": "6a69f92020f5df77af6e8813ff1232493383b708",
+    "before": undefined,
+    "filepath": "f",
+    "op": "write",
+  },
+]
+`;
+
 exports[`diffTree diff commit against empty commit 1`] = `
 Array [
   Object {
@@ -236,6 +253,64 @@ Array [
     "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "before": undefined,
     "filepath": "d/c/e",
+    "op": "write",
+  },
+]
+`;
+
+exports[`diffTree diff remove-files against mainline 1`] = `
+Array [
+  Object {
+    "after": undefined,
+    "before": "61780798228d17af2d34fce4cfbdf35556832472",
+    "filepath": "b",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "c/d",
+    "op": "rm",
+  },
+]
+`;
+
+exports[`diffTree diff rename-folder against mainline 1`] = `
+Array [
+  Object {
+    "after": undefined,
+    "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "filepath": "c/d",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "filepath": "c/e",
+    "op": "rm",
+  },
+  Object {
+    "after": undefined,
+    "before": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "filepath": "c",
+    "op": "rmdir",
+  },
+  Object {
+    "after": "faceb189bb665fe7a631602d904e57a4014187b7",
+    "before": undefined,
+    "filepath": "f",
+    "op": "mkdir",
+  },
+  Object {
+    "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
+    "before": undefined,
+    "filepath": "f/d",
+    "op": "write",
+  },
+  Object {
+    "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
+    "before": undefined,
+    "filepath": "f/e",
     "op": "write",
   },
 ]
