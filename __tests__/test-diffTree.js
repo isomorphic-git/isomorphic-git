@@ -106,7 +106,7 @@ describe('diffTree', () => {
     expect(diff).toMatchSnapshot()
   })
 
-  fit('diff change-modes against mainline', async () => {
+  it('diff change-modes against mainline', async () => {
     // Setup
     let { gitdir } = await makeFixture('test-diff')
     // Test
@@ -114,7 +114,7 @@ describe('diffTree', () => {
     expect(diff).toMatchSnapshot()
   })
 
-  fit('diff mainline against change-modes', async () => {
+  it('diff mainline against change-modes', async () => {
     // Setup
     let { gitdir } = await makeFixture('test-diff')
     // Test

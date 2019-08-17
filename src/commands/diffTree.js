@@ -103,12 +103,13 @@ export async function diffTree ({
  */
 function computeOps (before, after) {
   const ops = computeMajorOp(before, after)
-  if (before.mode !== after.mode) {
-    if (after.mode === '100644') {
-      ops.push('chmod-x')
-    } else if (after.mode === '100755') {
-      ops.push('chmod+x')
-    }
+  // If mode changed, add a mode change op.
+  // Note: the conditions are slightly asymetrical because we need to apply chmod+x to newly created files,
+  // but not chmod-x because files are chmod-x by default.
+  if (before.mode === '100755' && after.mode === '100644') {
+    ops.push('chmod-x')
+  } else if (before.mode !== '100755' && after.mode === '100755') {
+    ops.push('chmod+x')
   }
   return ops
 }

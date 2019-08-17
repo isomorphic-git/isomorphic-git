@@ -6,13 +6,18 @@ Array [
     "after": undefined,
     "before": "61780798228d17af2d34fce4cfbdf35556832472",
     "filepath": "a/b",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": "78981922613b2afb6025042ff6bd878ac1994e85",
     "before": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
     "filepath": "a",
-    "op": "rmdir-write",
+    "ops": Array [
+      "rmdir",
+      "write",
+    ],
   },
 ]
 `;
@@ -23,13 +28,18 @@ Array [
     "after": "6be660545b31f61a82a87d2b1915f0b88bb9f16f",
     "before": "78981922613b2afb6025042ff6bd878ac1994e85",
     "filepath": "a",
-    "op": "rm-mkdir",
+    "ops": Array [
+      "rm",
+      "mkdir",
+    ],
   },
   Object {
     "after": "61780798228d17af2d34fce4cfbdf35556832472",
     "before": undefined,
     "filepath": "a/b",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
 ]
 `;
@@ -40,13 +50,17 @@ Array [
     "after": "01058d844a98d293a3b03a8615a34700e4ed2be3",
     "before": undefined,
     "filepath": "c/g",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "6a69f92020f5df77af6e8813ff1232493383b708",
     "before": undefined,
     "filepath": "f",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
 ]
 `;
@@ -78,31 +92,41 @@ Array [
     "after": "78981922613b2afb6025042ff6bd878ac1994e85",
     "before": undefined,
     "filepath": "a",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "61780798228d17af2d34fce4cfbdf35556832472",
     "before": undefined,
     "filepath": "b",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "faceb189bb665fe7a631602d904e57a4014187b7",
     "before": undefined,
     "filepath": "c",
-    "op": "mkdir",
+    "ops": Array [
+      "mkdir",
+    ],
   },
   Object {
     "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "before": undefined,
     "filepath": "c/d",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "before": undefined,
     "filepath": "c/e",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
 ]
 `;
@@ -115,31 +139,41 @@ Array [
     "after": undefined,
     "before": "78981922613b2afb6025042ff6bd878ac1994e85",
     "filepath": "a",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "61780798228d17af2d34fce4cfbdf35556832472",
     "filepath": "b",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "filepath": "c/d",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "filepath": "c/e",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "faceb189bb665fe7a631602d904e57a4014187b7",
     "filepath": "c",
-    "op": "rmdir",
+    "ops": Array [
+      "rmdir",
+    ],
   },
 ]
 `;
@@ -150,37 +184,50 @@ Array [
     "after": "faceb189bb665fe7a631602d904e57a4014187b7",
     "before": "61780798228d17af2d34fce4cfbdf35556832472",
     "filepath": "b",
-    "op": "rm-mkdir",
+    "ops": Array [
+      "rm",
+      "mkdir",
+    ],
   },
   Object {
     "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "before": undefined,
     "filepath": "b/d",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "before": undefined,
     "filepath": "b/e",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": undefined,
     "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "filepath": "c/d",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "filepath": "c/e",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "faceb189bb665fe7a631602d904e57a4014187b7",
     "filepath": "c",
-    "op": "rmdir",
+    "ops": Array [
+      "rmdir",
+    ],
   },
 ]
 `;
@@ -212,43 +259,57 @@ Array [
     "after": "faceb189bb665fe7a631602d904e57a4014187b7",
     "before": undefined,
     "filepath": "c",
-    "op": "mkdir",
+    "ops": Array [
+      "mkdir",
+    ],
   },
   Object {
     "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "before": undefined,
     "filepath": "c/d",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "before": undefined,
     "filepath": "c/e",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": undefined,
     "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "filepath": "d/c/d",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "filepath": "d/c/e",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "faceb189bb665fe7a631602d904e57a4014187b7",
     "filepath": "d/c",
-    "op": "rmdir",
+    "ops": Array [
+      "rmdir",
+    ],
   },
   Object {
     "after": undefined,
     "before": "878e0205d8bdb7d02844893647f02f49df655aff",
     "filepath": "d",
-    "op": "rmdir",
+    "ops": Array [
+      "rmdir",
+    ],
   },
 ]
 `;
@@ -259,43 +320,57 @@ Array [
     "after": undefined,
     "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "filepath": "c/d",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "filepath": "c/e",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "faceb189bb665fe7a631602d904e57a4014187b7",
     "filepath": "c",
-    "op": "rmdir",
+    "ops": Array [
+      "rmdir",
+    ],
   },
   Object {
     "after": "878e0205d8bdb7d02844893647f02f49df655aff",
     "before": undefined,
     "filepath": "d",
-    "op": "mkdir",
+    "ops": Array [
+      "mkdir",
+    ],
   },
   Object {
     "after": "faceb189bb665fe7a631602d904e57a4014187b7",
     "before": undefined,
     "filepath": "d/c",
-    "op": "mkdir",
+    "ops": Array [
+      "mkdir",
+    ],
   },
   Object {
     "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "before": undefined,
     "filepath": "d/c/d",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "before": undefined,
     "filepath": "d/c/e",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
 ]
 `;
@@ -306,13 +381,17 @@ Array [
     "after": undefined,
     "before": "61780798228d17af2d34fce4cfbdf35556832472",
     "filepath": "b",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "filepath": "c/d",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
 ]
 `;
@@ -323,37 +402,49 @@ Array [
     "after": undefined,
     "before": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "filepath": "c/d",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "filepath": "c/e",
-    "op": "rm",
+    "ops": Array [
+      "rm",
+    ],
   },
   Object {
     "after": undefined,
     "before": "faceb189bb665fe7a631602d904e57a4014187b7",
     "filepath": "c",
-    "op": "rmdir",
+    "ops": Array [
+      "rmdir",
+    ],
   },
   Object {
     "after": "faceb189bb665fe7a631602d904e57a4014187b7",
     "before": undefined,
     "filepath": "f",
-    "op": "mkdir",
+    "ops": Array [
+      "mkdir",
+    ],
   },
   Object {
     "after": "4bcfe98e640c8284511312660fb8709b0afa888e",
     "before": undefined,
     "filepath": "f/d",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
   Object {
     "after": "d905d9da82c97264ab6f4920e20242e088850ce9",
     "before": undefined,
     "filepath": "f/e",
-    "op": "write",
+    "ops": Array [
+      "write",
+    ],
   },
 ]
 `;
