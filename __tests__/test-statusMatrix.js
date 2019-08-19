@@ -6,7 +6,7 @@ const { statusMatrix, add, remove } = require('isomorphic-git')
 describe('statusMatrix', () => {
   it('statusMatrix', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-statusMatrix')
+    const { fs, dir, gitdir } = await makeFixture('test-statusMatrix')
     // Test
     let matrix = await statusMatrix({ dir, gitdir })
     expect(matrix).toEqual([
@@ -29,7 +29,7 @@ describe('statusMatrix', () => {
     ])
 
     // And finally the weirdo cases
-    let acontent = await fs.read(path.join(dir, 'a.txt'))
+    const acontent = await fs.read(path.join(dir, 'a.txt'))
     await fs.write(path.join(dir, 'a.txt'), 'Hi')
     await add({ dir, gitdir, filepath: 'a.txt' })
     await fs.write(path.join(dir, 'a.txt'), acontent)
@@ -49,12 +49,12 @@ describe('statusMatrix', () => {
 
   it('statusMatrix in an fresh git repo with no commits', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-empty')
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
     await fs.write(path.join(dir, 'a.txt'), 'Hi')
     await fs.write(path.join(dir, 'b.txt'), 'Hi')
     await add({ dir, gitdir, filepath: 'b.txt' })
     // Test
-    let a = await statusMatrix({ dir, gitdir, pattern: 'a.txt' })
+    const a = await statusMatrix({ dir, gitdir, pattern: 'a.txt' })
     expect(a).toEqual([['a.txt', 0, 2, 0]])
     const b = await statusMatrix({ dir, gitdir, pattern: 'b.txt' })
     expect(b).toEqual([['b.txt', 0, 2, 2]])
@@ -62,7 +62,7 @@ describe('statusMatrix', () => {
 
   it('statusMatrix (pattern vs filepaths)', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+    const { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
     // Test
     let matrix = await statusMatrix({ dir, gitdir })
     expect(matrix).toEqual([
@@ -95,7 +95,7 @@ describe('statusMatrix', () => {
 
   it('statusMatrix (pattern vs pattern + filepaths)', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+    const { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
     // Test
     let matrix = await statusMatrix({ dir, gitdir, pattern: '*.txt' })
     expect(matrix).toEqual([

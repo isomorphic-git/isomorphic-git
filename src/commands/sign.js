@@ -80,7 +80,7 @@ export async function sign ({
       commit = await commit.sign(openpgp, privateKeys)
     } else {
       // Newer plugin API
-      let pgp = cores.get(core).get('pgp')
+      const pgp = cores.get(core).get('pgp')
       commit = GitCommit.from(object)
       commit = await GitCommit.sign(commit, pgp, privateKeys)
     }

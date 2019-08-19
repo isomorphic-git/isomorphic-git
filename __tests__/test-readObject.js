@@ -11,7 +11,7 @@ describe('readObject', () => {
   })
   it('test missing', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -27,9 +27,9 @@ describe('readObject', () => {
   })
   it('parsed', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
@@ -39,9 +39,9 @@ describe('readObject', () => {
   })
   it('content', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'content'
@@ -53,9 +53,9 @@ describe('readObject', () => {
   })
   it('wrapped', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'wrapped'
@@ -67,9 +67,9 @@ describe('readObject', () => {
   })
   it('deflated', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'deflated'
@@ -81,9 +81,9 @@ describe('readObject', () => {
   })
   it('from packfile', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: '0b8faa11b353db846b40eb064dfb299816542a46',
       format: 'deflated'
@@ -97,9 +97,9 @@ describe('readObject', () => {
   })
   it('blob with encoding', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: '4551a1856279dde6ae9d65862a1dff59a5f199d8',
       format: 'parsed',
@@ -114,9 +114,9 @@ describe('readObject', () => {
   })
   it('with simple filepath to blob', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -132,9 +132,9 @@ describe('readObject', () => {
   })
   it('with deep filepath to blob', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -147,9 +147,9 @@ describe('readObject', () => {
   })
   it('with simple filepath to tree', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -165,9 +165,9 @@ describe('readObject', () => {
   })
   it('with deep filepath to tree', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
-    let ref = await readObject({
+    const ref = await readObject({
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -180,7 +180,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (directory is a file)', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -198,7 +198,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (no such directory)', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -216,7 +216,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (leading slash)', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
@@ -234,7 +234,7 @@ describe('readObject', () => {
   })
   it('with erroneous filepath (trailing slash)', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-readObject')
+    const { gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {

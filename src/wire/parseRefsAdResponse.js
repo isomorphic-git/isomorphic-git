@@ -8,7 +8,7 @@ export async function parseRefsAdResponse (stream, { service }) {
 
   // There is probably a better way to do this, but for now
   // let's just throw the result parser inline here.
-  let read = GitPktLine.streamReader(stream)
+  const read = GitPktLine.streamReader(stream)
   let lineOne = await read()
   // skip past any flushes
   while (lineOne === null) lineOne = await read()
@@ -26,18 +26,18 @@ export async function parseRefsAdResponse (stream, { service }) {
   // In the edge case of a brand new repo, zero refs (and zero capabilities)
   // are returned.
   if (lineTwo === true) return { capabilities, refs, symrefs }
-  let [firstRef, capabilitiesLine] = lineTwo
+  const [firstRef, capabilitiesLine] = lineTwo
     .toString('utf8')
     .trim()
     .split('\x00')
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
-  let [ref, name] = firstRef.split(' ')
+  const [ref, name] = firstRef.split(' ')
   refs.set(name, ref)
   while (true) {
-    let line = await read()
+    const line = await read()
     if (line === true) break
     if (line !== null) {
-      let [ref, name] = line
+      const [ref, name] = line
         .toString('utf8')
         .trim()
         .split(' ')
@@ -45,9 +45,9 @@ export async function parseRefsAdResponse (stream, { service }) {
     }
   }
   // Symrefs are thrown into the "capabilities" unfortunately.
-  for (let cap of capabilities) {
+  for (const cap of capabilities) {
     if (cap.startsWith('symref=')) {
-      let m = cap.match(/symref=([^:]+):(.*)/)
+      const m = cap.match(/symref=([^:]+):(.*)/)
       if (m.length === 3) {
         symrefs.set(m[1], m[2])
       }

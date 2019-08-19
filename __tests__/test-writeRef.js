@@ -10,7 +10,7 @@ describe('writeRef', () => {
   })
   it('writes a tag ref to HEAD', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeRef')
+    const { gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
       gitdir,
@@ -22,7 +22,7 @@ describe('writeRef', () => {
   })
   it('sets current branch to another', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeRef')
+    const { gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
       gitdir,

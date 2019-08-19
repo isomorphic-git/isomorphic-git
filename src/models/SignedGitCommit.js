@@ -7,11 +7,12 @@ export class SignedGitCommit extends GitCommit {
   static from (commit) {
     return new SignedGitCommit(commit)
   }
+
   async sign (openpgp, privateKeys) {
-    let commit = this.withoutSignature()
-    let headers = GitCommit.justHeaders(this._commit)
-    let message = GitCommit.justMessage(this._commit)
-    let privKeyObj = openpgp.key.readArmored(privateKeys).keys
+    const commit = this.withoutSignature()
+    const headers = GitCommit.justHeaders(this._commit)
+    const message = GitCommit.justMessage(this._commit)
+    const privKeyObj = openpgp.key.readArmored(privateKeys).keys
     let { signature } = await openpgp.sign({
       data: openpgp.util.str2Uint8Array(commit),
       privateKeys: privKeyObj,
@@ -20,14 +21,14 @@ export class SignedGitCommit extends GitCommit {
     })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
-    let signedCommit =
+    const signedCommit =
       headers + '\n' + 'gpgsig' + indent(signature) + '\n' + message
     // return a new commit object
     return GitCommit.from(signedCommit)
   }
 
   async listSigningKeys (openpgp) {
-    let msg = openpgp.message.readSignedContent(
+    const msg = openpgp.message.readSignedContent(
       this.withoutSignature(),
       this.isolateSignature()
     )
@@ -35,13 +36,15 @@ export class SignedGitCommit extends GitCommit {
   }
 
   async verify (openpgp, publicKeys) {
-    let pubKeyObj = openpgp.key.readArmored(publicKeys).keys
-    let msg = openpgp.message.readSignedContent(
+    const pubKeyObj = openpgp.key.readArmored(publicKeys).keys
+    const msg = openpgp.message.readSignedContent(
       this.withoutSignature(),
       this.isolateSignature()
     )
-    let results = msg.verify(pubKeyObj)
-    let validity = results.reduce((a, b) => a.valid && b.valid, { valid: true })
+    const results = msg.verify(pubKeyObj)
+    const validity = results.reduce((a, b) => a.valid && b.valid, {
+      valid: true
+    })
     return validity
   }
 }

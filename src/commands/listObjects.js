@@ -14,24 +14,24 @@ export async function listObjects ({
   oids
 }) {
   const fs = new FileSystem(_fs)
-  let visited = new Set()
+  const visited = new Set()
   // We don't do the purest simplest recursion, because we can
   // avoid reading Blob objects entirely since the Tree objects
   // tell us which oids are Blobs and which are Trees.
   async function walk (oid) {
     visited.add(oid)
-    let { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, gitdir, oid })
     if (type === 'tag') {
-      let tag = GitAnnotatedTag.from(object)
-      let obj = tag.headers().object
+      const tag = GitAnnotatedTag.from(object)
+      const obj = tag.headers().object
       await walk(obj)
     } else if (type === 'commit') {
-      let commit = GitCommit.from(object)
-      let tree = commit.headers().tree
+      const commit = GitCommit.from(object)
+      const tree = commit.headers().tree
       await walk(tree)
     } else if (type === 'tree') {
-      let tree = GitTree.from(object)
-      for (let entry of tree) {
+      const tree = GitTree.from(object)
+      for (const entry of tree) {
         // only add blobs and trees to the set,
         // skipping over submodules whose type is 'commit'
         if (entry.type === 'blob' || entry.type === 'tree') {
@@ -45,7 +45,7 @@ export async function listObjects ({
     }
   }
   // Let's go walking!
-  for (let oid of oids) {
+  for (const oid of oids) {
     await walk(oid)
   }
   return visited

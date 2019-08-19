@@ -28,7 +28,7 @@ export async function http ({
       },
       (err, res) => {
         if (err) return reject(err)
-        let iter = fromNodeStream(res)
+        const iter = fromNodeStream(res)
         resolve({
           url: res.url,
           method: res.method,

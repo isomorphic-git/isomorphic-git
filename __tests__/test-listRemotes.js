@@ -5,7 +5,7 @@ const { listRemotes } = require('isomorphic-git')
 describe('listRemotes', () => {
   it('listRemotes', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-listRemotes')
+    const { dir, gitdir } = await makeFixture('test-listRemotes')
     // Test
     const a = await listRemotes({ dir, gitdir })
     expect(a).toEqual([

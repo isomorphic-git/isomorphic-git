@@ -13,7 +13,7 @@ describe('plugin - http', () => {
     })
   })
   it('clone should call provided http function', async () => {
-    let { dir, gitdir } = await makeFixture('test-plugin-http')
+    const { dir, gitdir } = await makeFixture('test-plugin-http')
     callCount = 0
     await clone({
       dir,

@@ -31,12 +31,12 @@ export async function findMergeBase ({
     // TODO: I think it would be much safer if we actually tracked the identities of the walkers
     // rather than the sum.
     const counts = {}
-    let passes = oids.length
+    const passes = oids.length
     let heads = oids
     while (heads.length) {
       // Count how many times we've passed each commit
-      let result = []
-      for (let oid of heads) {
+      const result = []
+      for (const oid of heads) {
         if (counts[oid]) {
           counts[oid] += 1
         } else {
@@ -50,13 +50,13 @@ export async function findMergeBase ({
         return result
       }
       // We haven't found a common ancestor yet
-      let newheads = []
-      for (let oid of heads) {
+      const newheads = []
+      for (const oid of heads) {
         try {
-          let { object } = await readObject({ fs, gitdir, oid })
-          let commit = GitCommit.from(object)
-          let { parent } = commit.parseHeaders()
-          for (let oid of parent) {
+          const { object } = await readObject({ fs, gitdir, oid })
+          const commit = GitCommit.from(object)
+          const { parent } = commit.parseHeaders()
+          for (const oid of parent) {
             newheads.push(oid)
           }
         } catch (err) {

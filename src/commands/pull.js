@@ -73,12 +73,12 @@ export async function pull ({
       ref = await currentBranch({ fs, gitdir })
     }
     // Fetch from the correct remote.
-    let remote = await config({
+    const remote = await config({
       gitdir,
       fs,
       path: `branch.${ref}.remote`
     })
-    let { fetchHead } = await fetch({
+    const { fetchHead } = await fetch({
       dir,
       gitdir,
       fs,

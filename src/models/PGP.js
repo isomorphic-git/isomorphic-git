@@ -8,8 +8,8 @@ var keyring = new openpgp.Keyring()
 
 // Print a key
 function printKey () {
-  let keyid = printKeyid(this.primaryKey.getKeyId())
-  let userid = printUser(this.getPrimaryUser().user)
+  const keyid = printKeyid(this.primaryKey.getKeyId())
+  const userid = printUser(this.getPrimaryUser().user)
   return keyid + ' ' + userid
 }
 // openpgp.key.toString = printKey
@@ -24,8 +24,8 @@ function printUser (user) {
 }
 
 function getFullSignature (signature) {
-  let key = keyring.getKeysForId(printKeyid(signature.keyid))[0]
-  let user = key.getPrimaryUser().user
+  const key = keyring.getKeysForId(printKeyid(signature.keyid))[0]
+  const user = key.getPrimaryUser().user
   signature.user = user
   signature.email = printUser(user).match(/<(.*)>/)[1]
   return signature
@@ -33,7 +33,7 @@ function getFullSignature (signature) {
 
 // Find the public key(s) for `email` on the local browser keyring.
 function locallookup (email) {
-  let keys = keyring.publicKeys.getForAddress(email)
+  const keys = keyring.publicKeys.getForAddress(email)
   if (keys.length === 0) {
     return null
   }
@@ -53,8 +53,8 @@ export class PGP {
       keys = openpgp.key.readArmored(keys).keys
       // Find keys with an exact match for the email address given
       let results = []
-      for (let k of keys) {
-        for (let u of k.users) {
+      for (const k of keys) {
+        for (const u of k.users) {
           if (u.userId.userid.includes(`<${email}>`)) {
             results.push(k.primaryKey.keyid.toHex())
             keyring.publicKeys.push(k)
@@ -89,8 +89,8 @@ export class PGP {
 
   // Returns a human-readable list of all the public keys in the browser's keyring.
   static async list () {
-    let print = []
-    for (let key of keyring.publicKeys.keys) {
+    const print = []
+    for (const key of keyring.publicKeys.keys) {
       print.push(printKey.apply(key))
     }
     return print
@@ -100,7 +100,7 @@ export class PGP {
   static async encrypt (email, msg) {
     // Load Alice's keypair from localstorage
     // let privateKey = keyring.privateKeys.keys[0]
-    let publicKey = locallookup(email)
+    const publicKey = locallookup(email)
     const encrypted = await openpgp.encrypt({
       publicKeys: publicKey, // NOTE: it's plural...
       data: msg
@@ -111,7 +111,7 @@ export class PGP {
   // Decrypt `msg` using the private key for `email`
   // msg should be the full encrypted message including the -----BEGIN PGP MESSAGE----- and -----END PGP MESSAGE----- lines.
   static async decrypt (email, msg) {
-    let privateKey = PGP.lookupPrivateKey(email)
+    const privateKey = PGP.lookupPrivateKey(email)
     const decrypted = openpgp.decrypt({
       privateKey: privateKey,
       message: openpgp.message.readArmored(msg)
@@ -122,7 +122,7 @@ export class PGP {
   // Sign `msg` using the private key for `email'
   static async sign (email, msg) {
     // Load keypair from localstorage
-    let privateKey = PGP.lookupPrivateKey(email)
+    const privateKey = PGP.lookupPrivateKey(email)
     if (privateKey) {
       const signed = await openpgp.sign({
         privateKeys: privateKey,
@@ -138,7 +138,7 @@ export class PGP {
 
   // Verify a signed `msg` using the public key for `email`
   static async verify (email, msg) {
-    let publicKeys = locallookup(email)
+    const publicKeys = locallookup(email)
     const verified = await openpgp.verify({
       publicKeys: publicKeys,
       message: openpgp.cleartext.readArmored(msg)
@@ -155,15 +155,15 @@ export class PGP {
   // Sign `plaintext` using the private key for `email'
   static async createBinaryDetachedSignature (email, plaintext) {
     // Load keypair from localstorage
-    let privateKey = PGP.lookupPrivateKey(email)
+    const privateKey = PGP.lookupPrivateKey(email)
     if (privateKey) {
       // Is the only difference between cleartext signatures and detached binary the text normalization?
       // If so, I could probably add that functionality to openpgpjs - I'd just need a little guidance
       // on how to encode the PacketType and add the functionality to export to armor.js
-      let bytes = openpgp.util.str2Uint8Array(plaintext)
-      let message = openpgp.message.fromBinary(bytes)
-      let signedMessage = message.sign([privateKey])
-      let signature = signedMessage.packets.filterByTag(
+      const bytes = openpgp.util.str2Uint8Array(plaintext)
+      const message = openpgp.message.fromBinary(bytes)
+      const signedMessage = message.sign([privateKey])
+      const signature = signedMessage.packets.filterByTag(
         openpgp.enums.packet.signature
       )
       let armoredMessage = openpgp.armor.encode(
@@ -191,7 +191,7 @@ export class PGP {
   static async verifyDetachedSignature (email, message, signature) {
     locallookup(email)
     console.log('email, message, signature =', email, message, signature)
-    let msg = openpgp.message.readSignedContent(message, signature)
+    const msg = openpgp.message.readSignedContent(message, signature)
     console.log('msg =', msg)
     var result = msg.verify(keyring.publicKeys.keys)
     console.log('result[0] =', result[0])
@@ -201,7 +201,7 @@ export class PGP {
 
   // Returns true if the keyring has a private key for `email`.
   static hasPrivateKey (email) {
-    let keys = keyring.privateKeys.getForAddress(email)
+    const keys = keyring.privateKeys.getForAddress(email)
     return keys.length > 0
   }
 
@@ -216,12 +216,12 @@ export class PGP {
 
   // Upload the public signing key to the MIT key server
   static async publish (email) {
-    let key = PGP.exportPublicKey(email)
+    const key = PGP.exportPublicKey(email)
     return Promise.all([hkp.upload(key), hkp2.upload(key)])
   }
 
   static lookupPrivateKey (email) {
-    let keys = keyring.privateKeys.getForAddress(email)
+    const keys = keyring.privateKeys.getForAddress(email)
     if (keys.length === 0) {
       return null
     }

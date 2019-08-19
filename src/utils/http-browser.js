@@ -14,14 +14,14 @@ export async function http ({
   if (body) {
     body = await collect(body)
   }
-  let res = await global.fetch(url, { method, headers, body })
-  let iter =
+  const res = await global.fetch(url, { method, headers, body })
+  const iter =
     res.body && res.body.getReader
       ? fromStream(res.body)
       : [new Uint8Array(await res.arrayBuffer())]
   // convert Header object to ordinary JSON
   headers = {}
-  for (let [key, value] of res.headers.entries()) {
+  for (const [key, value] of res.headers.entries()) {
     headers[key] = value
   }
   return {

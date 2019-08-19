@@ -11,9 +11,9 @@ describe('commit', () => {
 
   it('commit', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-commit')
+    const { gitdir } = await makeFixture('test-commit')
     // Test
-    let sha = await commit({
+    const sha = await commit({
       gitdir,
       author: {
         name: 'Mr. Test',
@@ -28,7 +28,7 @@ describe('commit', () => {
 
   it('throw error if missing author', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-commit')
+    const { gitdir } = await makeFixture('test-commit')
     // Test
     let error = null
     try {
@@ -68,7 +68,7 @@ describe('commit', () => {
   it('pgp plugin signing', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
-    let { gitdir } = await makeFixture('test-commit')
+    const { gitdir } = await makeFixture('test-commit')
     plugins.set('pgp', pgp)
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
@@ -83,7 +83,7 @@ describe('commit', () => {
       },
       signingKey: privateKey
     })
-    let keys = await verify({
+    const keys = await verify({
       gitdir,
       ref: 'HEAD',
       publicKeys: publicKey
@@ -94,7 +94,7 @@ describe('commit', () => {
   it('pgp plugin signing - backwards compatiblity', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
-    let { gitdir } = await makeFixture('test-commit')
+    const { gitdir } = await makeFixture('test-commit')
     plugins.set('pgp', pgp)
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
@@ -112,7 +112,7 @@ describe('commit', () => {
       gitdir,
       privateKeys: privateKey
     })
-    let keys = await verify({
+    const keys = await verify({
       gitdir,
       ref: 'HEAD',
       publicKeys: publicKey
@@ -123,7 +123,7 @@ describe('commit', () => {
   it('GPG signing (deprecated API)', async () => {
     // Setup
     const openpgp = require('openpgp/dist/openpgp.min.js')
-    let { gitdir } = await makeFixture('test-commit')
+    const { gitdir } = await makeFixture('test-commit')
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await commit({
@@ -141,7 +141,7 @@ describe('commit', () => {
       openpgp,
       privateKeys: privateKey
     })
-    let keys = await verify({
+    const keys = await verify({
       gitdir,
       openpgp,
       ref: 'HEAD',
@@ -152,7 +152,7 @@ describe('commit', () => {
 
   it('with timezone', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-commit')
+    const { gitdir } = await makeFixture('test-commit')
     let commits
     // Test
     await commit({

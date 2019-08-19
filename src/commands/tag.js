@@ -46,7 +46,7 @@ export async function tag ({
     ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
     // Resolve passed object
-    let value = await GitRefManager.resolve({
+    const value = await GitRefManager.resolve({
       fs,
       gitdir,
       ref: object || 'HEAD'

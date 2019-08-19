@@ -64,8 +64,8 @@ export class GitPktLine {
     if (typeof line === 'string') {
       line = Buffer.from(line)
     }
-    let length = line.length + 4
-    let hexlength = padHex(4, length)
+    const length = line.length + 4
+    const hexlength = padHex(4, length)
     return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
   }
 
@@ -77,7 +77,7 @@ export class GitPktLine {
         if (length == null) return true
         length = parseInt(length.toString('utf8'), 16)
         if (length === 0) return null
-        let buffer = await reader.read(length - 4)
+        const buffer = await reader.read(length - 4)
         if (buffer == null) return true
         return buffer
       } catch (err) {

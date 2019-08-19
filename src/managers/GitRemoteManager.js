@@ -3,7 +3,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
 function parseRemoteUrl ({ url }) {
-  let matches = url.match(/(\w+)(:\/\/|::)(.*)/)
+  const matches = url.match(/(\w+)(:\/\/|::)(.*)/)
   if (matches === null) return
   /*
    * When git encounters a URL of the form <transport>://<address>, where <transport> is
@@ -39,7 +39,7 @@ export class GitRemoteManager {
     remoteHelpers.set('http', GitRemoteHTTP)
     remoteHelpers.set('https', GitRemoteHTTP)
 
-    let parts = parseRemoteUrl({ url })
+    const parts = parseRemoteUrl({ url })
     if (!parts) {
       throw new GitError(E.RemoteUrlParseError, { url })
     }

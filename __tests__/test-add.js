@@ -13,7 +13,7 @@ const writeGitIgnore = async (fs, dir) =>
 describe('add', () => {
   it('file', async () => {
     // Setup
-    let { core, dir } = await makeFixture('test-add')
+    const { core, dir } = await makeFixture('test-add')
     // Test
     await init({ core, dir })
     await add({ core, dir, filepath: 'a.txt' })
@@ -27,7 +27,7 @@ describe('add', () => {
   })
   it('ignored file', async () => {
     // Setup
-    let { fs, core, dir } = await makeFixture('test-add')
+    const { fs, core, dir } = await makeFixture('test-add')
     await writeGitIgnore(fs, dir)
     // Test
     await init({ core, dir })
@@ -36,7 +36,7 @@ describe('add', () => {
   })
   it('non-existant file', async () => {
     // Setup
-    let { core, dir } = await makeFixture('test-add')
+    const { core, dir } = await makeFixture('test-add')
     // Test
     await init({ core, dir })
     let err = null
@@ -49,7 +49,7 @@ describe('add', () => {
   })
   it('folder', async () => {
     // Setup
-    let { core, dir } = await makeFixture('test-add')
+    const { core, dir } = await makeFixture('test-add')
     // Test
     await init({ core, dir })
     expect((await listFiles({ core, dir })).length).toEqual(0)
@@ -58,7 +58,7 @@ describe('add', () => {
   })
   it('folder with .gitignore', async () => {
     // Setup
-    let { fs, core, dir } = await makeFixture('test-add')
+    const { fs, core, dir } = await makeFixture('test-add')
     await writeGitIgnore(fs, dir)
     // Test
     await init({ core, dir })
@@ -68,7 +68,7 @@ describe('add', () => {
   })
   it('git add .', async () => {
     // Setup
-    let { fs, core, dir } = await makeFixture('test-add')
+    const { fs, core, dir } = await makeFixture('test-add')
     await writeGitIgnore(fs, dir)
     // Test
     await init({ core, dir })

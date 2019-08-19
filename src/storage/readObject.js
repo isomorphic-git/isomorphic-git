@@ -48,13 +48,13 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
       if (format === 'wrapped' && result.format === 'wrapped') {
         return result
       }
-      let sha = shasum(result.object)
+      const sha = shasum(result.object)
       if (sha !== oid) {
         throw new GitError(E.InternalFail, {
           message: `SHA check failed! Expected ${oid}, computed ${sha}`
         })
       }
-      let { object, type } = GitObject.unwrap(result.object)
+      const { object, type } = GitObject.unwrap(result.object)
       result.type = type
       result.object = object
       result.format = 'content'

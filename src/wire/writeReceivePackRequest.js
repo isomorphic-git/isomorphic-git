@@ -4,9 +4,9 @@ export async function writeReceivePackRequest ({
   capabilities = [],
   triplets = []
 }) {
-  let packstream = []
+  const packstream = []
   let capsFirstLine = `\x00 ${capabilities.join(' ')}`
-  for (let trip of triplets) {
+  for (const trip of triplets) {
     packstream.push(
       GitPktLine.encode(
         `${trip.oldoid} ${trip.oid} ${trip.fullRef}${capsFirstLine}\n`

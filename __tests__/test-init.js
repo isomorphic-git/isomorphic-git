@@ -5,7 +5,7 @@ const { init } = require('isomorphic-git')
 
 describe('init', () => {
   it('init', async () => {
-    let { fs, dir } = await makeFixture('test-init')
+    const { fs, dir } = await makeFixture('test-init')
     await init({ dir })
     expect(await fs.exists(dir)).toBe(true)
     expect(await fs.exists(`${dir}/.git/objects`)).toBe(true)
@@ -13,7 +13,7 @@ describe('init', () => {
     expect(await fs.exists(`${dir}/.git/HEAD`)).toBe(true)
   })
   it('init --bare', async () => {
-    let { fs, dir } = await makeFixture('test-init')
+    const { fs, dir } = await makeFixture('test-init')
     await init({ dir, bare: true })
     expect(await fs.exists(dir)).toBe(true)
     expect(await fs.exists(`${dir}/objects`)).toBe(true)

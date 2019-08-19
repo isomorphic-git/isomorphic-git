@@ -48,7 +48,7 @@ export class GitIndexManager {
       if (await isIndexStale(fs, filepath)) {
         await updateCachedIndexFile(fs, filepath)
       }
-      let index = map.get([fs, filepath])
+      const index = map.get([fs, filepath])
       await closure(index)
       if (index._dirty) {
         // Acquire a file lock while we're writing the index file

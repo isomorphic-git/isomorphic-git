@@ -46,7 +46,7 @@ export async function currentBranch ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let ref = await GitRefManager.resolve({
+    const ref = await GitRefManager.resolve({
       fs,
       gitdir,
       ref: 'HEAD',

@@ -8,7 +8,7 @@ const git = require('.')
 
 minimisted(async function ({ _: [command, ...args], ...opts }) {
   try {
-    let result = await git[command](Object.assign({ fs, dir: '.' }, opts))
+    const result = await git[command](Object.assign({ fs, dir: '.' }, opts))
     if (result === undefined) return
     // detect streams
     if (typeof result.on === 'function') {

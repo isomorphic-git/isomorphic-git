@@ -8,7 +8,7 @@ describe('getRemoteInfo', () => {
     registerSnapshots(snapshots)
   })
   it('getRemoteInfo', async () => {
-    let info = await getRemoteInfo({
+    const info = await getRemoteInfo({
       url: 'http://localhost:8888/test-dumb-http-server.git'
     })
     expect(info).not.toBeNull()

@@ -56,14 +56,14 @@ export async function isDescendent ({
     // We do not use recursion here, because that would lead to depth-first traversal,
     // and we want to maintain a breadth-first traversal to avoid hitting shallow clone depth cutoffs.
     const queue = [oid]
-    let visited = new Set()
+    const visited = new Set()
     let searchdepth = 0
     while (queue.length) {
       if (searchdepth++ === depth) {
         throw new GitError(E.MaxSearchDepthExceeded, { depth })
       }
-      let oid = queue.shift()
-      let { type, object } = await readObject({
+      const oid = queue.shift()
+      const { type, object } = await readObject({
         fs,
         gitdir,
         oid

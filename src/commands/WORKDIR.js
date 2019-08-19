@@ -32,7 +32,7 @@ export function WORKDIR ({
   fs: _fs = cores.get(core).get('fs')
 }) {
   const fs = new FileSystem(_fs)
-  let o = Object.create(null)
+  const o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {
       return new GitWalkerFs({ fs, dir, gitdir })

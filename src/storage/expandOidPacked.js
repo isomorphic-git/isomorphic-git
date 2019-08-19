@@ -11,19 +11,19 @@ export async function expandOidPacked ({
 }) {
   const fs = new FileSystem(_fs)
   // Iterate through all the .pack files
-  let results = []
+  const results = []
   let list = await fs.readdir(join(gitdir, '/objects/pack'))
   list = list.filter(x => x.endsWith('.idx'))
-  for (let filename of list) {
+  for (const filename of list) {
     const indexFile = `${gitdir}/objects/pack/${filename}`
-    let p = await readPackIndex({
+    const p = await readPackIndex({
       fs,
       filename: indexFile,
       getExternalRefDelta
     })
     if (p.error) throw new GitError(E.InternalFail, { message: p.error })
     // Search through the list of oids in the packfile
-    for (let oid of p.offsets.keys()) {
+    for (const oid of p.offsets.keys()) {
       if (oid.startsWith(short)) results.push(oid)
     }
   }

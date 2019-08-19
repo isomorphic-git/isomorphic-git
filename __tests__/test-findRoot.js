@@ -10,22 +10,22 @@ const { findRoot } = require('isomorphic-git')
 describe('findRoot', () => {
   it('filepath has its own .git folder', async () => {
     // Setup
-    let { fs, dir } = await makeFixture('test-findRoot')
+    const { fs, dir } = await makeFixture('test-findRoot')
     await fs.mkdir(path.join(dir, 'foobar', '.git'))
     await fs.mkdir(path.join(dir, 'foobar/bar', '.git'))
     // Test
-    let root = await findRoot({
+    const root = await findRoot({
       filepath: path.join(dir, 'foobar')
     })
     expect(path.basename(root)).toBe('foobar')
   })
   it('filepath has ancestor with a .git folder', async () => {
     // Setup
-    let { fs, dir } = await makeFixture('test-findRoot')
+    const { fs, dir } = await makeFixture('test-findRoot')
     await fs.mkdir(path.join(dir, 'foobar', '.git'))
     await fs.mkdir(path.join(dir, 'foobar/bar', '.git'))
     // Test
-    let root = await findRoot({
+    const root = await findRoot({
       filepath: path.join(dir, 'foobar/bar/baz/buzz')
     })
     expect(path.basename(root)).toBe('bar')

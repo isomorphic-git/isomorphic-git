@@ -16,7 +16,7 @@ export function flatFileListToDirectoryStructure (files) {
   const inodes = new Map()
   const mkdir = function (name) {
     if (!inodes.has(name)) {
-      let dir = {
+      const dir = {
         type: 'tree',
         fullpath: name,
         basename: basename(name),
@@ -35,7 +35,7 @@ export function flatFileListToDirectoryStructure (files) {
 
   const mkfile = function (name, metadata) {
     if (!inodes.has(name)) {
-      let file = {
+      const file = {
         type: 'blob',
         fullpath: name,
         basename: basename(name),
@@ -51,7 +51,7 @@ export function flatFileListToDirectoryStructure (files) {
   }
 
   mkdir('.')
-  for (let file of files) {
+  for (const file of files) {
     mkfile(file.path, file)
   }
   return inodes

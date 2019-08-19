@@ -16,29 +16,29 @@ export async function listCommitsAndTags ({
   finish
 }) {
   const fs = new FileSystem(_fs)
-  let startingSet = new Set()
-  let finishingSet = new Set()
-  for (let ref of start) {
+  const startingSet = new Set()
+  const finishingSet = new Set()
+  for (const ref of start) {
     startingSet.add(await GitRefManager.resolve({ fs, gitdir, ref }))
   }
-  for (let ref of finish) {
+  for (const ref of finish) {
     // We may not have these refs locally so we must try/catch
     try {
-      let oid = await GitRefManager.resolve({ fs, gitdir, ref })
+      const oid = await GitRefManager.resolve({ fs, gitdir, ref })
       finishingSet.add(oid)
     } catch (err) {}
   }
-  let visited = new Set()
+  const visited = new Set()
   // Because git commits are named by their hash, there is no
   // way to construct a cycle. Therefore we won't worry about
   // setting a default recursion limit.
   async function walk (oid) {
     visited.add(oid)
-    let { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, gitdir, oid })
     // Recursively resolve annotated tags
     if (type === 'tag') {
-      let tag = GitAnnotatedTag.from(object)
-      let commit = tag.headers().object
+      const tag = GitAnnotatedTag.from(object)
+      const commit = tag.headers().object
       return walk(commit)
     }
     if (type !== 'commit') {
@@ -48,8 +48,8 @@ export async function listCommitsAndTags ({
         expected: 'commit'
       })
     }
-    let commit = GitCommit.from(object)
-    let parents = commit.headers().parent
+    const commit = GitCommit.from(object)
+    const parents = commit.headers().parent
     for (oid of parents) {
       if (!finishingSet.has(oid) && !visited.has(oid)) {
         await walk(oid)
@@ -57,7 +57,7 @@ export async function listCommitsAndTags ({
     }
   }
   // Let's go walking!
-  for (let oid of startingSet) {
+  for (const oid of startingSet) {
     await walk(oid)
   }
   return visited

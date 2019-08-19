@@ -10,9 +10,9 @@ describe('listObjects', () => {
   })
   it('listObjects', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-listObjects')
+    const { fs, gitdir } = await makeFixture('test-listObjects')
     // Test
-    let objects = await listObjects({
+    const objects = await listObjects({
       fs,
       gitdir,
       oids: [
