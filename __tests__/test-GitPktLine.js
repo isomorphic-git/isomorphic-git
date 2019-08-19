@@ -3,15 +3,15 @@ const { GitPktLine } = require('isomorphic-git/internal-apis')
 
 describe('GitPktLine', () => {
   it('read stream - simple', async () => {
-    let stream = [Buffer.from('0010hello world\n')]
-    let read = GitPktLine.streamReader(stream)
+    const stream = [Buffer.from('0010hello world\n')]
+    const read = GitPktLine.streamReader(stream)
     expect(typeof read === 'function').toBe(true)
     expect((await read()).toString('utf8') === 'hello world\n').toBe(true)
     expect(await read()).toBe(true)
   })
 
   it('read stream - realistic', async () => {
-    let buffer = Buffer.from(
+    const buffer = Buffer.from(
       `001e# service=git-upload-pack
 000001059ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/github-g91c094cac
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
@@ -23,8 +23,8 @@ describe('GitPktLine', () => {
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
 0000`
     )
-    let stream = [buffer]
-    let read = GitPktLine.streamReader(stream)
+    const stream = [buffer]
+    const read = GitPktLine.streamReader(stream)
     expect(
       (await read()).toString('utf8') === '# service=git-upload-pack\n'
     ).toBe(true)
@@ -66,7 +66,7 @@ describe('GitPktLine', () => {
   })
 
   it('encode string', async () => {
-    let foo = GitPktLine.encode('hello world\n')
+    const foo = GitPktLine.encode('hello world\n')
     expect(foo).toBeTruthy()
     expect(Buffer.compare(foo, Buffer.from('0010hello world\n')) === 0).toBe(
       true
@@ -74,13 +74,13 @@ describe('GitPktLine', () => {
   })
 
   it('encode empty string', async () => {
-    let foo = GitPktLine.encode('')
+    const foo = GitPktLine.encode('')
     expect(foo).toBeTruthy()
     expect(Buffer.compare(foo, Buffer.from('0004')) === 0).toBe(true)
   })
 
   it('encode flush', async () => {
-    let foo = GitPktLine.flush()
+    const foo = GitPktLine.flush()
     expect(foo).toBeTruthy()
     expect(Buffer.compare(foo, Buffer.from('0000')) === 0).toBe(true)
   })

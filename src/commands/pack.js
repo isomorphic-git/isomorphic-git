@@ -25,24 +25,23 @@ export async function pack ({
   oids
 }) {
   const fs = new FileSystem(_fs)
-  let hash = new Hash()
-  let outputStream = []
+  const hash = new Hash()
+  const outputStream = []
   function write (chunk, enc) {
-    let buff = Buffer.from(chunk, enc)
+    const buff = Buffer.from(chunk, enc)
     outputStream.push(buff)
     hash.update(buff)
   }
   function writeObject ({ stype, object }) {
-    let lastFour, multibyte, length
     // Object type is encoded in bits 654
-    let type = types[stype]
+    const type = types[stype]
     // The length encoding gets complicated.
-    length = object.length
+    let length = object.length
     // Whether the next byte is part of the variable-length encoded number
     // is encoded in bit 7
-    multibyte = length > 0b1111 ? 0b10000000 : 0b0
+    let multibyte = length > 0b1111 ? 0b10000000 : 0b0
     // Last four bits of length is encoded in bits 3210
-    lastFour = length & 0b1111
+    const lastFour = length & 0b1111
     // Discard those bits
     length = length >>> 4
     // The first byte is then (1-bit multibyte?), (3-bit type), (4-bit least sig 4-bits of length)
@@ -63,12 +62,12 @@ export async function pack ({
   write('00000002', 'hex')
   // Write a 4 byte (32-bit) int
   write(padHex(8, oids.length), 'hex')
-  for (let oid of oids) {
-    let { type, object } = await readObject({ fs, gitdir, oid })
+  for (const oid of oids) {
+    const { type, object } = await readObject({ fs, gitdir, oid })
     writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum
-  let digest = hash.digest()
+  const digest = hash.digest()
   outputStream.push(digest)
   return outputStream
 }

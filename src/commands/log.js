@@ -61,17 +61,17 @@ export async function log ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let sinceTimestamp =
+    const sinceTimestamp =
       since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
     // TODO: In the future, we may want to have an API where we return a
     // async iterator that emits commits.
-    let commits = []
-    let shallowCommits = await GitShallowManager.read({ fs, gitdir })
-    let oid = await GitRefManager.resolve({ fs, gitdir, ref })
-    let tips /*: Array */ = [await logCommit({ fs, gitdir, oid, signing })]
+    const commits = []
+    const shallowCommits = await GitShallowManager.read({ fs, gitdir })
+    const oid = await GitRefManager.resolve({ fs, gitdir, ref })
+    const tips /*: Array */ = [await logCommit({ fs, gitdir, oid, signing })]
 
     while (true) {
-      let commit = tips.pop()
+      const commit = tips.pop()
 
       // Stop the loop if we encounter an error
       if (commit.error) {
@@ -97,7 +97,7 @@ export async function log ({
         // Add the parents of this commit to the queue
         // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
         for (const oid of commit.parent) {
-          let commit = await logCommit({ fs, gitdir, oid, signing })
+          const commit = await logCommit({ fs, gitdir, oid, signing })
           if (!tips.map(commit => commit.oid).includes(commit.oid)) {
             tips.push(commit)
           }

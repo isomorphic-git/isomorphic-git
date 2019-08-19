@@ -8,7 +8,7 @@ describe('GitConfig', () => {
       keyaaa = valfoo
       [bar]
       keyaaa = valbar`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valfoo')
     })
 
@@ -17,7 +17,7 @@ describe('GitConfig', () => {
       keyaaa = valfoo
       [bar]
       keyaaa = valbar`)
-      let a = await config.get('bar.keyaaa')
+      const a = await config.get('bar.keyaaa')
       expect(a).toEqual('valbar')
     })
 
@@ -26,21 +26,21 @@ describe('GitConfig', () => {
       keyaaa = valaaa
       keybbb
       keyccc = valccc`)
-      let a = await config.get('foo.keybbb')
+      const a = await config.get('foo.keybbb')
       expect(a).toEqual('true')
     })
 
     it('section case insensitive', async () => {
       const config = GitConfig.from(`[Foo]
       keyaaa = valaaa`)
-      let a = await config.get('FOO.keyaaa')
+      const a = await config.get('FOO.keyaaa')
       expect(a).toEqual('valaaa')
     })
 
     it('variable name insensitive', async () => {
       const config = GitConfig.from(`[foo]
       KeyAaa = valaaa`)
-      let a = await config.get('foo.KEYaaa')
+      const a = await config.get('foo.KEYaaa')
       expect(a).toEqual('valaaa')
     })
 
@@ -49,7 +49,7 @@ describe('GitConfig', () => {
       keyaaa = valaaa
       keybbb = valbbb
       keybbb = valBBB`)
-      let a = await config.get('foo.keybbb')
+      const a = await config.get('foo.keybbb')
       expect(a).toEqual('valBBB')
     })
 
@@ -58,7 +58,7 @@ describe('GitConfig', () => {
       keyaaa = valaaa
       keybbb = valbbb
       keybbb = valBBB`)
-      let a = await config.getall('foo.keybbb')
+      const a = await config.getall('foo.keybbb')
       expect(a).toEqual(['valbbb', 'valBBB'])
     })
 
@@ -67,7 +67,7 @@ describe('GitConfig', () => {
       url = https://foo.com/project.git
       [remote "bar"]
       url = https://bar.com/project.git`)
-      let a = await config.get('remote.bar.url')
+      const a = await config.get('remote.bar.url')
       expect(a).toEqual('https://bar.com/project.git')
     })
   })
@@ -78,9 +78,9 @@ describe('GitConfig', () => {
       #keyaaa = valaaa
       ;keybbb = valbbb
       keyccc = valccc`)
-      let a = await config.get('foo.#keyaaa')
+      const a = await config.get('foo.#keyaaa')
       expect(a).toBeUndefined()
-      let b = await config.get('foo.;keybbb')
+      const b = await config.get('foo.;keybbb')
       expect(b).toBeUndefined()
     })
 
@@ -89,9 +89,9 @@ describe('GitConfig', () => {
       keyaaa = valaaa #comment #aaa
       keybbb = valbbb ;comment ;bbb
       keyccc = valccc`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valaaa')
-      let b = await config.get('foo.keybbb')
+      const b = await config.get('foo.keybbb')
       expect(b).toEqual('valbbb')
     })
 
@@ -113,9 +113,9 @@ describe('GitConfig', () => {
       keyaaa = valaaa " #commentaaa"
       keybbb = valbbb " ;commentbbb"
       keyccc = valccc`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valaaa  #commentaaa')
-      let b = await config.get('foo.keybbb')
+      const b = await config.get('foo.keybbb')
       expect(b).toEqual('valbbb  ;commentbbb')
     })
   })
@@ -124,14 +124,14 @@ describe('GitConfig', () => {
     it('simple', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = "valaaa"`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valaaa')
     })
 
     it('escaped', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = \\"valaaa`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('"valaaa')
     })
 
@@ -139,44 +139,44 @@ describe('GitConfig', () => {
       const config = GitConfig.from(`[foo]
       keyaaa = "val" aaa
       keybbb = val "a" a"a"`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('val aaa')
-      let b = await config.get('foo.keybbb')
+      const b = await config.get('foo.keybbb')
       expect(b).toEqual('val a aa')
     })
 
     it('odd number of quotes', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = "val" a "aa`)
-      let a = await config.get('foo.keybbb')
+      const a = await config.get('foo.keybbb')
       expect(a).toBeUndefined()
     })
 
     it('# in quoted values', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = "#valaaa"`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('#valaaa')
     })
 
     it('; in quoted values', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = "val;a;a;a"`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('val;a;a;a')
     })
 
     it('# after quoted values', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = "valaaa" # comment`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valaaa')
     })
 
     it('; after quoted values', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = "valaaa" ; comment`)
-      let a = await config.get('foo.keyaaa')
+      const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valaaa')
     })
   })
@@ -191,13 +191,13 @@ describe('GitConfig', () => {
       symlinks = false
       ignorecase = true
       bigFileThreshold = 2`)
-      let a = await config.get('core.repositoryformatversion')
-      let b = await config.get('core.filemode')
-      let c = await config.get('core.bare')
-      let d = await config.get('core.logallrefupdates')
-      let e = await config.get('core.symlinks')
-      let f = await config.get('core.ignorecase')
-      let g = await config.get('core.bigFileThreshold')
+      const a = await config.get('core.repositoryformatversion')
+      const b = await config.get('core.filemode')
+      const c = await config.get('core.bare')
+      const d = await config.get('core.logallrefupdates')
+      const e = await config.get('core.symlinks')
+      const f = await config.get('core.ignorecase')
+      const g = await config.get('core.bigFileThreshold')
       expect(a).toEqual('0')
       expect(b).toEqual(true)
       expect(c).toEqual(false)
@@ -213,10 +213,10 @@ describe('GitConfig', () => {
       bare = on
       logallrefupdates = no
       symlinks = true`)
-      let a = await config.get('core.filemode')
-      let b = await config.get('core.bare')
-      let c = await config.get('core.logallrefupdates')
-      let d = await config.get('core.symlinks')
+      const a = await config.get('core.filemode')
+      const b = await config.get('core.bare')
+      const c = await config.get('core.logallrefupdates')
+      const d = await config.get('core.symlinks')
       expect(a).toEqual(false)
       expect(b).toEqual(true)
       expect(c).toEqual(false)
@@ -230,9 +230,9 @@ describe('GitConfig', () => {
       bigFileThreshold = 2m`)
       const configC = GitConfig.from(`[core]
       bigFileThreshold = 2g`)
-      let a = await configA.get('core.bigFileThreshold')
-      let b = await configB.get('core.bigFileThreshold')
-      let c = await configC.get('core.bigFileThreshold')
+      const a = await configA.get('core.bigFileThreshold')
+      const b = await configB.get('core.bigFileThreshold')
+      const c = await configC.get('core.bigFileThreshold')
       expect(a).toEqual(2048)
       expect(b).toEqual(2097152)
       expect(c).toEqual(2147483648)
@@ -427,7 +427,7 @@ describe('GitConfig', () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valaaa
       keybbb = valbbb`)
-      let a = await config.get('foo.unknown')
+      const a = await config.get('foo.unknown')
       expect(a).toBeUndefined()
     })
 
@@ -435,7 +435,7 @@ describe('GitConfig', () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valaaa
       keybbb = valbbb`)
-      let a = await config.get('bar.keyaaa')
+      const a = await config.get('bar.keyaaa')
       expect(a).toBeUndefined()
     })
 
@@ -444,7 +444,7 @@ describe('GitConfig', () => {
       url = https://foo.com/project.git
       [remote "bar"]
       url = https://bar.com/project.git`)
-      let a = await config.get('remote.unknown.url')
+      const a = await config.get('remote.unknown.url')
       expect(a).toBeUndefined()
     })
 
@@ -455,11 +455,11 @@ describe('GitConfig', () => {
       keyaaa = valaaa
       [ba?z]
       keyaaa = valaaa`)
-      let a = await config.get('fo o.keyaaa')
+      const a = await config.get('fo o.keyaaa')
       expect(a).toBeUndefined()
-      let b = await config.get('ba~r.keyaaa')
+      const b = await config.get('ba~r.keyaaa')
       expect(b).toBeUndefined()
-      let c = await config.get('ba?z.keyaaa')
+      const c = await config.get('ba?z.keyaaa')
       expect(c).toBeUndefined()
     })
 
@@ -477,13 +477,13 @@ describe('GitConfig', () => {
       key?bbb = valbbb
       key%ccc = valccc
       key.ddd = valddd`)
-      let a = await config.get('foo.key aaa')
+      const a = await config.get('foo.key aaa')
       expect(a).toBeUndefined()
-      let b = await config.get('foo.key?bbb')
+      const b = await config.get('foo.key?bbb')
       expect(b).toBeUndefined()
-      let c = await config.get('foo.key%ccc')
+      const c = await config.get('foo.key%ccc')
       expect(c).toBeUndefined()
-      let d = await config.get('foo.key.ddd')
+      const d = await config.get('foo.key.ddd')
       expect(d).toBeUndefined()
     })
 

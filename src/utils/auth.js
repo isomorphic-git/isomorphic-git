@@ -6,7 +6,7 @@
 export function auth (username, password) {
   // Allow specifying it as one argument (mostly for CLI inputability)
   if (password === undefined) {
-    let i = username.indexOf(':')
+    const i = username.indexOf(':')
     if (i > -1) {
       password = username.slice(i + 1)
       username = username.slice(0, i)

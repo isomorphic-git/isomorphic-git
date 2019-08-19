@@ -13,17 +13,17 @@ describe('branch', () => {
 
   it('branch', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-branch')
+    const { fs, dir, gitdir } = await makeFixture('test-branch')
     // Test
     await branch({ dir, gitdir, ref: 'test-branch' })
-    let files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
+    const files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
     expect(files.sort()).toMatchSnapshot()
     expect(await currentBranch({ dir, gitdir })).toEqual('master')
   })
 
   it('branch --checkout', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-branch')
+    const { dir, gitdir } = await makeFixture('test-branch')
     // Test
     await branch({ dir, gitdir, ref: 'test-branch', checkout: true })
     expect(await currentBranch({ dir, gitdir })).toEqual('test-branch')
@@ -31,7 +31,7 @@ describe('branch', () => {
 
   it('invalid branch name', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-branch')
+    const { dir, gitdir } = await makeFixture('test-branch')
     let error = null
     // Test
     try {
@@ -45,7 +45,7 @@ describe('branch', () => {
 
   it('missing ref argument', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-branch')
+    const { dir, gitdir } = await makeFixture('test-branch')
     let error = null
     // Test
     try {
@@ -59,7 +59,7 @@ describe('branch', () => {
 
   it('empty repo', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-branch-empty-repo')
+    const { dir, gitdir } = await makeFixture('test-branch-empty-repo')
     await init({ dir, gitdir })
     let error = null
     // Test

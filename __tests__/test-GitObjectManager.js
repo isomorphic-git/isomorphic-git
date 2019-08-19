@@ -11,7 +11,7 @@ describe('GitObjectManager', () => {
 
   it('test missing', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-GitObjectManager')
+    const { fs, gitdir } = await makeFixture('test-GitObjectManager')
     // Test
     let error = null
     try {

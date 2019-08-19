@@ -21,9 +21,9 @@ export class GitCommit {
   }
 
   static fromPayloadSignature ({ payload, signature }) {
-    let headers = GitCommit.justHeaders(payload)
-    let message = GitCommit.justMessage(payload)
-    let commit = normalizeNewlines(
+    const headers = GitCommit.justHeaders(payload)
+    const message = GitCommit.justMessage(payload)
+    const commit = normalizeNewlines(
       headers + '\ngpgsig' + indent(signature) + '\n' + message
     )
     return new GitCommit(commit)
@@ -60,9 +60,9 @@ export class GitCommit {
   }
 
   parseHeaders () {
-    let headers = GitCommit.justHeaders(this._commit).split('\n')
-    let hs = []
-    for (let h of headers) {
+    const headers = GitCommit.justHeaders(this._commit).split('\n')
+    const hs = []
+    for (const h of headers) {
       if (h[0] === ' ') {
         // combine with previous header (without space indent)
         hs[hs.length - 1] += '\n' + h.slice(1)
@@ -70,12 +70,12 @@ export class GitCommit {
         hs.push(h)
       }
     }
-    let obj = {
+    const obj = {
       parent: []
     }
-    for (let h of hs) {
-      let key = h.slice(0, h.indexOf(' '))
-      let value = h.slice(h.indexOf(' ') + 1)
+    for (const h of hs) {
+      const key = h.slice(0, h.indexOf(' '))
+      const value = h.slice(h.indexOf(' ') + 1)
       if (Array.isArray(obj[key])) {
         obj[key].push(value)
       } else {
@@ -104,13 +104,13 @@ export class GitCommit {
           message: `commit 'parent' property should be an array`
         })
       }
-      for (let p of obj.parent) {
+      for (const p of obj.parent) {
         headers += `parent ${p}\n`
       }
     }
-    let author = obj.author
+    const author = obj.author
     headers += `author ${formatAuthor(author)}\n`
-    let committer = obj.committer || obj.author
+    const committer = obj.committer || obj.author
     headers += `committer ${formatAuthor(committer)}\n`
     if (obj.gpgsig) {
       headers += 'gpgsig' + indent(obj.gpgsig)
@@ -127,10 +127,10 @@ export class GitCommit {
   }
 
   withoutSignature () {
-    let commit = normalizeNewlines(this._commit)
+    const commit = normalizeNewlines(this._commit)
     if (commit.indexOf('\ngpgsig') === -1) return commit
-    let headers = commit.slice(0, commit.indexOf('\ngpgsig'))
-    let message = commit.slice(
+    const headers = commit.slice(0, commit.indexOf('\ngpgsig'))
+    const message = commit.slice(
       commit.indexOf('-----END PGP SIGNATURE-----\n') +
         '-----END PGP SIGNATURE-----\n'.length
     )
@@ -138,7 +138,7 @@ export class GitCommit {
   }
 
   isolateSignature () {
-    let signature = this._commit.slice(
+    const signature = this._commit.slice(
       this._commit.indexOf('-----BEGIN PGP SIGNATURE-----'),
       this._commit.indexOf('-----END PGP SIGNATURE-----') +
         '-----END PGP SIGNATURE-----'.length
@@ -153,7 +153,7 @@ export class GitCommit {
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
     const headers = GitCommit.justHeaders(commit._commit)
-    let signedCommit =
+    const signedCommit =
       headers + '\n' + 'gpgsig' + indent(signature) + '\n' + message
     // return a new commit object
     return GitCommit.from(signedCommit)

@@ -25,16 +25,16 @@ function mode2type (mode) {
 }
 
 function parseBuffer (buffer) {
-  let _entries = []
+  const _entries = []
   let cursor = 0
   while (cursor < buffer.length) {
-    let space = buffer.indexOf(32, cursor)
+    const space = buffer.indexOf(32, cursor)
     if (space === -1) {
       throw new GitError(E.InternalFail, {
         message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
       })
     }
-    let nullchar = buffer.indexOf(0, cursor)
+    const nullchar = buffer.indexOf(0, cursor)
     if (nullchar === -1) {
       throw new GitError(E.InternalFail, {
         message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
@@ -42,9 +42,9 @@ function parseBuffer (buffer) {
     }
     let mode = buffer.slice(cursor, space).toString('utf8')
     if (mode === '40000') mode = '040000' // makes it line up neater in printed output
-    let type = mode2type(mode)
-    let path = buffer.slice(space + 1, nullchar).toString('utf8')
-    let oid = buffer.slice(nullchar + 1, nullchar + 21).toString('hex')
+    const type = mode2type(mode)
+    const path = buffer.slice(space + 1, nullchar).toString('utf8')
+    const oid = buffer.slice(nullchar + 1, nullchar + 21).toString('hex')
     cursor = nullchar + 21
     _entries.push({ mode, path, oid, type })
   }
@@ -95,31 +95,36 @@ export class GitTree {
       })
     }
   }
+
   static from (tree) {
     return new GitTree(tree)
   }
+
   render () {
     return this._entries
       .map(entry => `${entry.mode} ${entry.type} ${entry.oid}    ${entry.path}`)
       .join('\n')
   }
+
   toObject () {
     return Buffer.concat(
       this._entries.map(entry => {
-        let mode = Buffer.from(entry.mode.replace(/^0/, ''))
-        let space = Buffer.from(' ')
-        let path = Buffer.from(entry.path, 'utf8')
-        let nullchar = Buffer.from([0])
-        let oid = Buffer.from(entry.oid, 'hex')
+        const mode = Buffer.from(entry.mode.replace(/^0/, ''))
+        const space = Buffer.from(' ')
+        const path = Buffer.from(entry.path, 'utf8')
+        const nullchar = Buffer.from([0])
+        const oid = Buffer.from(entry.oid, 'hex')
         return Buffer.concat([mode, space, path, nullchar, oid])
       })
     )
   }
+
   entries () {
     return this._entries
   }
+
   * [Symbol.iterator] () {
-    for (let entry of this._entries) {
+    for (const entry of this._entries) {
       yield entry
     }
   }

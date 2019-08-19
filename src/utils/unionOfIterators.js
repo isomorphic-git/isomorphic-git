@@ -25,9 +25,9 @@ export function * unionOfIterators (sets) {
    */
 
   // Init
-  let min = new RunningMinimum()
+  const min = new RunningMinimum()
   let minimum
-  let heads = []
+  const heads = []
   const numsets = sets.length
   for (let i = 0; i < numsets; i++) {
     // Abuse the fact that iterators continue to return 'undefined' for value
@@ -40,7 +40,7 @@ export function * unionOfIterators (sets) {
   if (min.value === null) return
   // Iterate
   while (true) {
-    let result = []
+    const result = []
     minimum = min.value
     min.reset()
     for (let i = 0; i < numsets; i++) {

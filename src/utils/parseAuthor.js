@@ -1,5 +1,5 @@
 export function parseAuthor (author) {
-  let [, name, email, timestamp, offset] = author.match(
+  const [, name, email, timestamp, offset] = author.match(
     /^(.*) <(.*)> (.*) (.*)$/
   )
   return {

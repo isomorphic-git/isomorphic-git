@@ -43,7 +43,7 @@ async function _findRoot (fs, filepath) {
   if (await fs.exists(join(filepath, '.git'))) {
     return filepath
   } else {
-    let parent = dirname(filepath)
+    const parent = dirname(filepath)
     if (parent === filepath) {
       throw new GitError(E.GitRootNotFoundError, { filepath })
     }

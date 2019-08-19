@@ -78,10 +78,10 @@ export async function getRemoteInfo ({
     // Convert the flat list into an object tree, because I figure 99% of the time
     // that will be easier to use.
     for (const [ref, oid] of remote.refs) {
-      let parts = ref.split('/')
-      let last = parts.pop()
+      const parts = ref.split('/')
+      const last = parts.pop()
       let o = result
-      for (let part of parts) {
+      for (const part of parts) {
         o[part] = o[part] || {}
         o = o[part]
       }
@@ -89,10 +89,10 @@ export async function getRemoteInfo ({
     }
     // Merge symrefs on top of refs to more closely match actual git repo layouts
     for (const [symref, ref] of remote.symrefs) {
-      let parts = symref.split('/')
-      let last = parts.pop()
+      const parts = symref.split('/')
+      const last = parts.pop()
       let o = result
-      for (let part of parts) {
+      for (const part of parts) {
         o[part] = o[part] || {}
         o = o[part]
       }

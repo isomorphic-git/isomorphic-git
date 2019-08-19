@@ -70,22 +70,22 @@ export async function verify ({
     }
     if (openpgp) {
       // Old API
-      let commit = SignedGitCommit.from(object)
-      let keys = await commit.listSigningKeys(openpgp)
-      let validity = await commit.verify(openpgp, publicKeys)
+      const commit = SignedGitCommit.from(object)
+      const keys = await commit.listSigningKeys(openpgp)
+      const validity = await commit.verify(openpgp, publicKeys)
       if (!validity) return false
       return keys
     } else {
       // Newer plugin API
-      let pgp = cores.get(core).get('pgp')
+      const pgp = cores.get(core).get('pgp')
       if (type === 'commit') {
-        let commit = GitCommit.from(object)
-        let { valid, invalid } = await GitCommit.verify(commit, pgp, publicKeys)
+        const commit = GitCommit.from(object)
+        const { valid, invalid } = await GitCommit.verify(commit, pgp, publicKeys)
         if (invalid.length > 0) return false
         return valid
       } else if (type === 'tag') {
-        let tag = GitAnnotatedTag.from(object)
-        let { valid, invalid } = await GitAnnotatedTag.verify(
+        const tag = GitAnnotatedTag.from(object)
+        const { valid, invalid } = await GitAnnotatedTag.verify(
           tag,
           pgp,
           publicKeys

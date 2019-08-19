@@ -4,7 +4,7 @@ const { version } = require('isomorphic-git')
 
 describe('version', () => {
   it('version', () => {
-    let v = version()
+    const v = version()
     expect(v).toEqual(pkg.version)
   })
 })

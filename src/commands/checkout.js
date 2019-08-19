@@ -76,7 +76,7 @@ export async function checkout ({
       }
       patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }
-    let bases = filepaths.map(filepath => join(filepath, patternPart))
+    const bases = filepaths.map(filepath => join(filepath, patternPart))
     // Get tree oid
     let oid
     try {
@@ -86,7 +86,7 @@ export async function checkout ({
     } catch (err) {
       // If `ref` doesn't exist, create a new remote tracking branch
       // Figure out the commit to checkout
-      let remoteRef = `${remote}/${ref}`
+      const remoteRef = `${remote}/${ref}`
       oid = await GitRefManager.resolve({
         fs,
         gitdir,
@@ -108,7 +108,7 @@ export async function checkout ({
       // Create a new branch that points at that same commit
       await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
     }
-    let fullRef = await GitRefManager.expand({ fs, gitdir, ref })
+    const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
 
     if (!noCheckout) {
       let count = 0
@@ -120,7 +120,7 @@ export async function checkout ({
           // Instead of deleting and rewriting everything, only delete files
           // that are not present in the new branch, and only write files that
           // are not in the index or are in the index but have the wrong SHA.
-          for (let entry of index) {
+          for (const entry of index) {
             try {
               await fs.rm(join(dir, entry.path))
               if (emitter) {
@@ -191,7 +191,7 @@ export async function checkout ({
                         }" detected in blob ${head.oid}`
                       })
                     }
-                    let stats = await fs.lstat(filepath)
+                    const stats = await fs.lstat(filepath)
                     // We can't trust the executable bit returned by lstat on Windows,
                     // so we need to preserve this value from the TREE.
                     // TODO: Figure out how git handles this internally.

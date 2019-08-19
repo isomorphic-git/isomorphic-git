@@ -8,9 +8,9 @@ export function formatAuthor ({ name, email, timestamp, timezoneOffset }) {
 // but can also default to +0 was extraordinary.
 
 function formatTimezoneOffset (minutes) {
-  let sign = simpleSign(negateExceptForZero(minutes))
+  const sign = simpleSign(negateExceptForZero(minutes))
   minutes = Math.abs(minutes)
-  let hours = Math.floor(minutes / 60)
+  const hours = Math.floor(minutes / 60)
   minutes -= hours * 60
   let strHours = String(hours)
   let strMinutes = String(minutes)

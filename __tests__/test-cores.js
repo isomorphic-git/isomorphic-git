@@ -9,7 +9,7 @@ describe('cores', () => {
   })
   it('cores.get', async () => {
     // Setup
-    let { _fs } = await makeFixture('test-cores')
+    const { _fs } = await makeFixture('test-cores')
     cores.get('default').set('fs', _fs)
     let error = null
     try {
@@ -22,7 +22,7 @@ describe('cores', () => {
   })
   it('core.create', async () => {
     // Setup
-    let { _fs } = await makeFixture('test-cores')
+    const { _fs } = await makeFixture('test-cores')
     cores.get('default').set('fs', _fs)
     let error = null
     try {
@@ -35,7 +35,7 @@ describe('cores', () => {
   })
   it('cores have separate plugins', async () => {
     // Setup
-    let { _fs } = await makeFixture('test-cores')
+    const { _fs } = await makeFixture('test-cores')
     plugins.set('fs', _fs)
     cores.create('third').set('foo', _fs)
     expect(cores.get('default').has('fs')).toBeTruthy()
@@ -45,7 +45,7 @@ describe('cores', () => {
   })
   it('plugin schema violation', async () => {
     // Setup
-    let fs = {
+    const fs = {
       readFile () {}
     }
     let error = null
@@ -59,7 +59,7 @@ describe('cores', () => {
   })
   it('unrecognized plugin', async () => {
     // Setup
-    let { _fs } = await makeFixture('test-cores')
+    const { _fs } = await makeFixture('test-cores')
     let error = null
     try {
       plugins.set('fz', _fs)

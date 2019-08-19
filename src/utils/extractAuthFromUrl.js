@@ -7,7 +7,7 @@ export function extractAuthFromUrl (url) {
   let userpass = url.match(/^https?:\/\/([^/]+)@/)
   if (userpass == null) return null
   userpass = userpass[1]
-  let [username, password] = userpass.split(':')
+  const [username, password] = userpass.split(':')
   url = url.replace(`${userpass}@`, '')
   return { url, username, password }
 }

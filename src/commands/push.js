@@ -121,9 +121,9 @@ export async function push ({
     } else {
       fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     }
-    let oid = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
+    const oid = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
     let auth = { username, password, token, oauth2format }
-    let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
+    const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     const httpRemote = await GitRemoteHTTP.discover({
       core,
       corsProxy,
@@ -155,23 +155,23 @@ export async function push ({
         }
       }
     }
-    let oldoid =
+    const oldoid =
       httpRemote.refs.get(fullRemoteRef) ||
       '0000000000000000000000000000000000000000'
-    let finish = [...httpRemote.refs.values()]
+    const finish = [...httpRemote.refs.values()]
     // hack to speed up common force push scenarios
     // @ts-ignore
-    let mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
-    for (let oid of mergebase) finish.push(oid)
+    const mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
+    for (const oid of mergebase) finish.push(oid)
     // @ts-ignore
-    let commits = await listCommitsAndTags({
+    const commits = await listCommitsAndTags({
       fs,
       gitdir,
       start: [oid],
       finish
     })
     // @ts-ignore
-    let objects = await listObjects({ fs, gitdir, oids: commits })
+    const objects = await listObjects({ fs, gitdir, oids: commits })
     if (!force) {
       // Is it a tag that already exists?
       if (
@@ -195,16 +195,16 @@ export async function push ({
       [...httpRemote.capabilities],
       ['report-status', 'side-band-64k', `agent=${pkg.agent}`]
     )
-    let packstream1 = await writeReceivePackRequest({
+    const packstream1 = await writeReceivePackRequest({
       capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
-    let packstream2 = await pack({
+    const packstream2 = await pack({
       fs,
       gitdir,
       oids: [...objects]
     })
-    let res = await GitRemoteHTTP.connect({
+    const res = await GitRemoteHTTP.connect({
       core,
       emitter,
       emitterPrefix,
@@ -216,15 +216,15 @@ export async function push ({
       headers,
       body: [...packstream1, ...packstream2]
     })
-    let { packfile, progress } = await GitSideBand.demux(res.body)
+    const { packfile, progress } = await GitSideBand.demux(res.body)
     if (emitter) {
-      let lines = splitLines(progress)
+      const lines = splitLines(progress)
       forAwait(lines, line => {
         emitter.emit(`${emitterPrefix}message`, line)
       })
     }
     // Parse the response!
-    let result = await parseReceivePackResponse(packfile)
+    const result = await parseReceivePackResponse(packfile)
     if (res.headers) {
       result.headers = res.headers
     }

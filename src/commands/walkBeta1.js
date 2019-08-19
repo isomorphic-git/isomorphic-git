@@ -221,7 +221,7 @@ export async function walkBeta1 ({
   reduce = async (parent, children) => {
     // TODO: can we just do [parent, ...children]?
     // TODO: replace with `[parent, children].flat()` once that gets standardized
-    let flatten = children.reduce((acc, x) => acc.concat(x), [])
+    const flatten = children.reduce((acc, x) => acc.concat(x), [])
     if (parent !== undefined) flatten.unshift(parent)
     return flatten
   },
@@ -229,9 +229,9 @@ export async function walkBeta1 ({
   iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
   try {
-    let walkers = trees.map(proxy => proxy[GitWalkerSymbol]())
+    const walkers = trees.map(proxy => proxy[GitWalkerSymbol]())
 
-    let root = new Array(walkers.length).fill({
+    const root = new Array(walkers.length).fill({
       fullpath: '.',
       basename: '.',
       exists: true
@@ -245,7 +245,7 @@ export async function walkBeta1 ({
         entry[i] = new walkers[i].ConstructEntry(entry[i])
       })
       // Now process child directories
-      let iterators = subdirs
+      const iterators = subdirs
         .map(array => (array === null ? [] : array))
         .map(array => array[Symbol.iterator]())
       return {
@@ -255,9 +255,9 @@ export async function walkBeta1 ({
     }
 
     const walk = async root => {
-      let { children, entry } = await unionWalkerFromReaddir(root)
+      const { children, entry } = await unionWalkerFromReaddir(root)
       if (await filter(entry)) {
-        let parent = await map(entry)
+        const parent = await map(entry)
         let walkedChildren = await iterate(walk, children)
         walkedChildren = walkedChildren.filter(x => x !== undefined)
         return reduce(parent, walkedChildren)

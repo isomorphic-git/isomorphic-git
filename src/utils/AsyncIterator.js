@@ -52,7 +52,7 @@ export function fromNodeStream (stream) {
   // So if you are horrified that this solution just builds up a queue with no backpressure,
   // and turns Promises inside out, too bad. This is the first code that worked reliably.
   let ended = false
-  let queue = []
+  const queue = []
   let defer = {}
   stream.on('data', chunk => {
     queue.push(chunk)

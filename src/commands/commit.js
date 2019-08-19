@@ -86,7 +86,7 @@ export async function commit ({
         const treeRef = await constructTree({ fs, gitdir, inode })
         let parents
         try {
-          let parent = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+          const parent = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
           parents = [parent]
         } catch (err) {
           // Probably an initial commit
@@ -100,7 +100,7 @@ export async function commit ({
           message
         })
         if (signingKey) {
-          let pgp = cores.get(core).get('pgp')
+          const pgp = cores.get(core).get('pgp')
           comm = await GitCommit.sign(comm, pgp, signingKey)
         }
         oid = await writeObject({
@@ -128,21 +128,21 @@ export async function commit ({
 
 async function constructTree ({ fs, gitdir, inode }) {
   // use depth first traversal
-  let children = inode.children
-  for (let inode of children) {
+  const children = inode.children
+  for (const inode of children) {
     if (inode.type === 'tree') {
       inode.metadata.mode = '040000'
       inode.metadata.oid = await constructTree({ fs, gitdir, inode })
     }
   }
-  let entries = children.map(inode => ({
+  const entries = children.map(inode => ({
     mode: inode.metadata.mode,
     path: inode.basename,
     oid: inode.metadata.oid,
     type: inode.type
   }))
   const tree = GitTree.from(entries)
-  let oid = await writeObject({
+  const oid = await writeObject({
     fs,
     gitdir,
     type: 'tree',

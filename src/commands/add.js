@@ -61,7 +61,7 @@ async function addToIndex ({ dir, gitdir, fs, filepath, index }) {
     filepath
   })
   if (ignored) return
-  let stats = await fs.lstat(join(dir, filepath))
+  const stats = await fs.lstat(join(dir, filepath))
   if (!stats) throw new GitError(E.FileReadError, { filepath })
   if (stats.isDirectory()) {
     const children = await fs.readdir(join(dir, filepath))

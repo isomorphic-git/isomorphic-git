@@ -164,8 +164,8 @@ export async function statusMatrix ({
       }
       patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }
-    let bases = filepaths.map(filepath => join(filepath, patternPart))
-    let results = await walkBeta1({
+    const bases = filepaths.map(filepath => join(filepath, patternPart))
+    const results = await walkBeta1({
       trees: [
         TREE({ fs, gitdir, ref }),
         WORKDIR({ fs, dir, gitdir }),
@@ -217,10 +217,10 @@ export async function statusMatrix ({
         } else if (workdir.exists) {
           await workdir.populateHash()
         }
-        let entry = [undefined, head.oid, workdir.oid, stage.oid]
-        let result = entry.map(value => entry.indexOf(value))
+        const entry = [undefined, head.oid, workdir.oid, stage.oid]
+        const result = entry.map(value => entry.indexOf(value))
         result.shift() // remove leading undefined entry
-        let fullpath = head.fullpath || workdir.fullpath || stage.fullpath
+        const fullpath = head.fullpath || workdir.fullpath || stage.fullpath
         return [fullpath, ...result]
       }
     })

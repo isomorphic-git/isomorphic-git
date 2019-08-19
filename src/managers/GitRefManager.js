@@ -34,7 +34,7 @@ export class GitRefManager {
   }) {
     const fs = new FileSystem(_fs)
     // Validate input
-    for (let value of refs.values()) {
+    for (const value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
         throw new GitError(E.NotAnOidFail, { value })
       }
@@ -49,7 +49,7 @@ export class GitRefManager {
       refspecs.unshift(`+HEAD:refs/remotes/${remote}/HEAD`)
     }
     const refspec = GitRefSpecSet.from(refspecs)
-    let actualRefsToWrite = new Map()
+    const actualRefsToWrite = new Map()
     // Add all tags if the fetch tags argument is true.
     if (tags) {
       for (const serverRef of refs.keys()) {
@@ -65,21 +65,21 @@ export class GitRefManager {
       }
     }
     // Combine refs and symrefs giving symrefs priority
-    let refTranslations = refspec.translate([...refs.keys()])
-    for (let [serverRef, translatedRef] of refTranslations) {
-      let value = refs.get(serverRef)
+    const refTranslations = refspec.translate([...refs.keys()])
+    for (const [serverRef, translatedRef] of refTranslations) {
+      const value = refs.get(serverRef)
       actualRefsToWrite.set(translatedRef, value)
     }
-    let symrefTranslations = refspec.translate([...symrefs.keys()])
-    for (let [serverRef, translatedRef] of symrefTranslations) {
-      let value = symrefs.get(serverRef)
-      let symtarget = refspec.translateOne(value)
+    const symrefTranslations = refspec.translate([...symrefs.keys()])
+    for (const [serverRef, translatedRef] of symrefTranslations) {
+      const value = symrefs.get(serverRef)
+      const symtarget = refspec.translateOne(value)
       if (symtarget) {
         actualRefsToWrite.set(translatedRef, `ref: ${symtarget}`)
       }
     }
     // If `prune` argument is true, clear out the existing local refspec roots
-    let pruned = []
+    const pruned = []
     if (prune) {
       for (const filepath of refspec.localNamespaces()) {
         const refs = (await this.listRefs({ fs, gitdir, filepath })).map(
@@ -108,11 +108,12 @@ export class GitRefManager {
     // Examples of refs we need to avoid writing in loose format for efficieny's sake
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
-    for (let [key, value] of actualRefsToWrite) {
+    for (const [key, value] of actualRefsToWrite) {
       await fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
     }
     return { pruned }
   }
+
   // TODO: make this less crude?
   static async writeRef ({ fs: _fs, gitdir, ref, value }) {
     const fs = new FileSystem(_fs)
@@ -122,10 +123,12 @@ export class GitRefManager {
     }
     await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
   }
+
   static async writeSymbolicRef ({ fs: _fs, gitdir, ref, value }) {
     const fs = new FileSystem(_fs)
     await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
   }
+
   static async deleteRef ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
     // Delete regular ref
@@ -139,6 +142,7 @@ export class GitRefManager {
       await fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
     }
   }
+
   static async resolve ({ fs: _fs, gitdir, ref, depth = undefined }) {
     const fs = new FileSystem(_fs)
     if (depth !== undefined) {
@@ -158,11 +162,11 @@ export class GitRefManager {
       return ref
     }
     // We need to alternate between the file system and the packed-refs
-    let packedMap = await GitRefManager.packedRefs({ fs, gitdir })
+    const packedMap = await GitRefManager.packedRefs({ fs, gitdir })
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref).filter(p => !GIT_FILES.includes(p)) // exclude git system files (#709)
 
-    for (let ref of allpaths) {
+    for (const ref of allpaths) {
       sha =
         (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
         packedMap.get(ref)
@@ -173,6 +177,7 @@ export class GitRefManager {
     // Do we give up?
     throw new GitError(E.ResolveRefError, { ref })
   }
+
   static async exists ({ fs, gitdir, ref }) {
     try {
       await GitRefManager.expand({ fs, gitdir, ref })
@@ -181,6 +186,7 @@ export class GitRefManager {
       return false
     }
   }
+
   static async expand ({ fs: _fs, gitdir, ref }) {
     const fs = new FileSystem(_fs)
     // Is it a complete and valid SHA?
@@ -188,25 +194,27 @@ export class GitRefManager {
       return ref
     }
     // We need to alternate between the file system and the packed-refs
-    let packedMap = await GitRefManager.packedRefs({ fs, gitdir })
+    const packedMap = await GitRefManager.packedRefs({ fs, gitdir })
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
-    for (let ref of allpaths) {
+    for (const ref of allpaths) {
       if (await fs.exists(`${gitdir}/${ref}`)) return ref
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
     throw new GitError(E.ExpandRefError, { ref })
   }
+
   static async expandAgainstMap ({ ref, map }) {
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
-    for (let ref of allpaths) {
+    for (const ref of allpaths) {
       if (await map.has(ref)) return ref
     }
     // Do we give up?
     throw new GitError(E.ExpandRefError, { ref })
   }
+
   static resolveAgainstMap ({ ref, fullref = ref, depth = undefined, map }) {
     if (depth !== undefined) {
       depth--
@@ -225,8 +233,8 @@ export class GitRefManager {
     }
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
-    for (let ref of allpaths) {
-      let sha = map.get(ref)
+    for (const ref of allpaths) {
+      const sha = map.get(ref)
       if (sha) {
         return GitRefManager.resolveAgainstMap({
           ref: sha.trim(),
@@ -239,16 +247,18 @@ export class GitRefManager {
     // Do we give up?
     throw new GitError(E.ResolveRefError, { ref })
   }
+
   static async packedRefs ({ fs: _fs, gitdir }) {
     const fs = new FileSystem(_fs)
     const text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     const packed = GitPackedRefs.from(text)
     return packed.refs
   }
+
   // List all the refs that match the `filepath` prefix
   static async listRefs ({ fs: _fs, gitdir, filepath }) {
     const fs = new FileSystem(_fs)
-    let packedMap = GitRefManager.packedRefs({ fs, gitdir })
+    const packedMap = GitRefManager.packedRefs({ fs, gitdir })
     let files = null
     try {
       files = await fs.readdirDeep(`${gitdir}/${filepath}`)
@@ -272,6 +282,7 @@ export class GitRefManager {
     files.sort(compareRefNames)
     return files
   }
+
   static async listBranches ({ fs: _fs, gitdir, remote }) {
     const fs = new FileSystem(_fs)
     if (remote) {
@@ -284,9 +295,10 @@ export class GitRefManager {
       return GitRefManager.listRefs({ fs, gitdir, filepath: `refs/heads` })
     }
   }
+
   static async listTags ({ fs: _fs, gitdir }) {
     const fs = new FileSystem(_fs)
-    let tags = await GitRefManager.listRefs({
+    const tags = await GitRefManager.listRefs({
       fs,
       gitdir,
       filepath: `refs/tags`

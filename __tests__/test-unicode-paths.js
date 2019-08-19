@@ -15,7 +15,7 @@ const {
 describe('unicode filepath support', () => {
   it('write/read index 日本語', async () => {
     // Setup
-    let { core, dir, gitdir } = await makeFixture('test-unicode-paths')
+    const { core, dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ core, dir, gitdir })
     // Test
     await add({ core, dir, gitdir, filepath: '日本語' })
@@ -25,7 +25,7 @@ describe('unicode filepath support', () => {
   })
   it('write/read index docs/日本語', async () => {
     // Setup
-    let { fs, core, dir, gitdir } = await makeFixture('test-unicode-paths')
+    const { fs, core, dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ core, dir, gitdir })
     // Test
     await fs.mkdir(path.join(dir, 'docs'))
@@ -37,11 +37,11 @@ describe('unicode filepath support', () => {
   })
   it('write/read commit 日本語', async () => {
     // Setup
-    let { core, dir, gitdir } = await makeFixture('test-unicode-paths')
+    const { core, dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ core, dir, gitdir })
     await add({ core, dir, gitdir, filepath: '日本語' })
     // Test
-    let sha = await commit({
+    const sha = await commit({
       core,
       dir,
       gitdir,
@@ -54,17 +54,17 @@ describe('unicode filepath support', () => {
       message: '日本語'
     })
     // Check GitCommit object
-    let { object: comm } = await readObject({ core, dir, gitdir, oid: sha })
+    const { object: comm } = await readObject({ core, dir, gitdir, oid: sha })
     expect(comm.author.name).toBe('日本語')
     expect(comm.author.email).toBe('日本語@example.com')
     expect(comm.message).toBe('日本語\n')
   })
   it('write/read tree 日本語', async () => {
     // Setup
-    let { core, dir, gitdir } = await makeFixture('test-unicode-paths')
+    const { core, dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ core, dir, gitdir })
     await add({ core, dir, gitdir, filepath: '日本語' })
-    let sha = await commit({
+    const sha = await commit({
       core,
       dir,
       gitdir,
@@ -76,10 +76,10 @@ describe('unicode filepath support', () => {
       },
       message: '日本語'
     })
-    let { object: comm } = await readObject({ core, dir, gitdir, oid: sha })
+    const { object: comm } = await readObject({ core, dir, gitdir, oid: sha })
     // Test
     // Check GitTree object
-    let { object: tree } = await readObject({
+    const { object: tree } = await readObject({
       core,
       dir,
       gitdir,
@@ -89,7 +89,7 @@ describe('unicode filepath support', () => {
   })
   it('checkout 日本語', async () => {
     // Setup
-    let { core, dir, gitdir } = await makeFixture('test-unicode-paths')
+    const { core, dir, gitdir } = await makeFixture('test-unicode-paths')
     await init({ core, dir, gitdir })
     await add({ core, dir, gitdir, filepath: '日本語' })
     await commit({
@@ -112,7 +112,7 @@ describe('unicode filepath support', () => {
   })
   it('checkout docs/日本語', async () => {
     // Setup
-    let { fs, core, dir, gitdir } = await makeFixture('test-unicode-paths')
+    const { fs, core, dir, gitdir } = await makeFixture('test-unicode-paths')
     await fs.mkdir(path.join(dir, 'docs'))
     await fs.write(path.join(dir, 'docs/日本語'), '')
     await init({ core, dir, gitdir })

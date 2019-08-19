@@ -116,7 +116,7 @@
     "rollup": "1.19.4",
     "rollup-plugin-node-resolve": "5.2.0",
     "semantic-release": "15.13.21",
-    "standard": "12.0.1",
+    "standard": "13.1.0",
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
     "typescript": "3.5.3",

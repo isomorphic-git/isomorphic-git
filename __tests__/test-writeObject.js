@@ -7,9 +7,9 @@ const { writeObject } = require('isomorphic-git')
 describe('writeObject', () => {
   it('parsed', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeObject')
+    const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    let oid = await writeObject({
+    const oid = await writeObject({
       gitdir,
       format: 'parsed',
       type: 'commit',
@@ -52,9 +52,9 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('content', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeObject')
+    const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    let oid = await writeObject({
+    const oid = await writeObject({
       gitdir,
       type: 'commit',
       object: Buffer.from(
@@ -67,9 +67,9 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('wrapped', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeObject')
+    const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    let oid = await writeObject({
+    const oid = await writeObject({
       gitdir,
       object: Buffer.from(
         '636f6d6d69742031313133007472656520653062386633353734303630656532346530336534616633383936663635646432303861363063630a706172656e7420623466383230366439653335393431366230663334323338636265623430306637646138383961380a617574686f722057696c6c2048696c746f6e203c776d68696c746f6e40676d61696c2e636f6d3e2031353032343834323030202d303430300a636f6d6d69747465722057696c6c2048696c746f6e203c776d68696c746f6e40676d61696c2e636f6d3e2031353032343834323030202d303430300a677067736967202d2d2d2d2d424547494e20504750205349474e41545552452d2d2d2d2d0a2056657273696f6e3a20476e7550472076310a200a2069514963424141424167414742514a5a6a68626f41416f4a454a594a754b575369366135563555502f3034305366656d4a3133505242587374326542353967730a2033685078323944524b42684674766b2b75532b383532332f6855667279326f655757643659526b636e6b7878415574426e667a566b49394167524963314e544d0a20683558744c4d51756243414b77384a577656766f5845547a7756414f446d646d764334575351434c752b6f706f65362f573752766b7254443070626b774834450a204d586f686135397349575a2f4661635a5836427959716846796b664a4c386743467652537a6a69714249627350375871324d68346a6b414b596c357a785633750a2071436b3236686e684c2b2b6b7766586c75325964477442392b6c6a33706b314e655771523337397a527a68345031304678584a3138715378637a626b41464f590a20366f356837612f4d716c314b71574239454642757043706a79646d704174506f366c3155733461336c6942354c4a76436839786752324874536852346239374f0a206e49705850346e6779347a3955797258587878706951516e2f6b566e2f754b6774764770386e4f46696f6f3631504369396a7332516d5178637375424f654f2b0a2044644671356b32504d4e5a4c77697a74345038454766564a6f50624c68645950346f57694d437559562f32664e68306f7a6c2f713137364847737a6c66726b650a203333325a306d614a3341357849526a30623776524e48563841416c394468656f334c73706a656f765032697963434846503033675370434b644c5242524334540a2058313042424644386e6f434d584a78623571656e72662b654b526438643467374a7463797a7156676b42513638474947383434565752426f6c4f7a78344279350a20634161772f5359495a4733526f7241633131695a37737661306a464953656a6d457a496562754368537a64574f324f4f575256764d6468795a77444c556741620a205169786832626d5067723368396e787132446d6e0a203d342b444e0a202d2d2d2d2d454e4420504750205349474e41545552452d2d2d2d2d0a0a496d70726f7665207265736f6c766552656620746f2068616e646c65206d6f7265206b696e6473206f6620726566732e204164642074657374730a',
@@ -81,9 +81,9 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('deflated', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeObject')
+    const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    let oid = await writeObject({
+    const oid = await writeObject({
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       object: Buffer.from(
@@ -96,9 +96,9 @@ Qixh2bmPgr3h9nxq2Dmn
   })
   it('blob with encoding', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeObject')
+    const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    let oid = await writeObject({
+    const oid = await writeObject({
       gitdir,
       type: 'blob',
       object: `#!/usr/bin/env node
@@ -136,9 +136,9 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
   })
   it('tree', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeObject')
+    const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    let oid = await writeObject({
+    const oid = await writeObject({
       gitdir,
       type: 'tree',
       format: 'parsed',
@@ -259,9 +259,9 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
   })
   it('annotated tag', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-writeObject')
+    const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    let oid = await writeObject({
+    const oid = await writeObject({
       gitdir,
       format: 'parsed',
       type: 'tag',

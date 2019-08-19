@@ -47,9 +47,9 @@ export async function packObjects ({
   try {
     const fs = new FileSystem(_fs)
     const buffers = await pack({ core, gitdir, fs, oids })
-    let packfile = await collect(buffers)
-    let packfileSha = packfile.slice(-20).toString('hex')
-    let filename = `pack-${packfileSha}.pack`
+    const packfile = await collect(buffers)
+    const packfileSha = packfile.slice(-20).toString('hex')
+    const filename = `pack-${packfileSha}.pack`
     if (write) {
       await fs.write(join(gitdir, `objects/pack/${filename}`), packfile)
       return { filename }
