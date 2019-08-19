@@ -75,7 +75,7 @@ export async function annotatedTag ({
     }
 
     // Resolve passed value
-    let oid = await GitRefManager.resolve({
+    const oid = await GitRefManager.resolve({
       fs,
       gitdir,
       ref: object || 'HEAD'
@@ -104,10 +104,10 @@ export async function annotatedTag ({
       signature
     })
     if (signingKey) {
-      let pgp = cores.get(core).get('pgp')
+      const pgp = cores.get(core).get('pgp')
       tagObject = await GitAnnotatedTag.sign(tagObject, pgp, signingKey)
     }
-    let value = await writeObject({
+    const value = await writeObject({
       fs,
       gitdir,
       type: 'tag',

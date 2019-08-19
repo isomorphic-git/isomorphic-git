@@ -6,8 +6,8 @@ import { forAwait } from './forAwait.js'
 // But there are also messages delimited with newlines.
 // I also include CRLF just in case.
 function findSplit (str) {
-  let r = str.indexOf('\r')
-  let n = str.indexOf('\n')
+  const r = str.indexOf('\r')
+  const n = str.indexOf('\n')
   if (r === -1 && n === -1) return -1
   if (r === -1) return n + 1 // \n
   if (n === -1) return r + 1 // \r
@@ -16,14 +16,14 @@ function findSplit (str) {
 }
 
 export function splitLines (input) {
-  let output = new FIFO()
+  const output = new FIFO()
   let tmp = ''
   ;(async () => {
     await forAwait(input, chunk => {
       chunk = chunk.toString('utf8')
       tmp += chunk
       while (true) {
-        let i = findSplit(tmp)
+        const i = findSplit(tmp)
         if (i === -1) break
         output.write(tmp.slice(0, i))
         tmp = tmp.slice(i)

@@ -7,12 +7,13 @@ export class GitObject {
       Buffer.from(object)
     ])
   }
+
   static unwrap (buffer) {
-    let s = buffer.indexOf(32) // first space
-    let i = buffer.indexOf(0) // first null value
-    let type = buffer.slice(0, s).toString('utf8') // get type of object
-    let length = buffer.slice(s + 1, i).toString('utf8') // get type of object
-    let actualLength = buffer.length - (i + 1)
+    const s = buffer.indexOf(32) // first space
+    const i = buffer.indexOf(0) // first null value
+    const type = buffer.slice(0, s).toString('utf8') // get type of object
+    const length = buffer.slice(s + 1, i).toString('utf8') // get type of object
+    const actualLength = buffer.length - (i + 1)
     // verify length
     if (parseInt(length) !== actualLength) {
       throw new GitError(E.InternalFail, {

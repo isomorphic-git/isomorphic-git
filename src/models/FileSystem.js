@@ -57,6 +57,7 @@ export class FileSystem {
     this._original_unwrapped_fs = fs
     fsmap.set(fs, this)
   }
+
   /**
    * Return true if a file exists, false if it doesn't exist.
    * Rethrows errors that aren't related to file existance.
@@ -74,6 +75,7 @@ export class FileSystem {
       }
     }
   }
+
   /**
    * Return the contents of a file if it exists, otherwise returns null.
    */
@@ -89,6 +91,7 @@ export class FileSystem {
       return null
     }
   }
+
   /**
    * Write a file (creating missing directories if need be) without throwing errors.
    */
@@ -102,6 +105,7 @@ export class FileSystem {
       await this._writeFile(filepath, contents, options)
     }
   }
+
   /**
    * Make a directory (or series of nested directories) without throwing an error if it already exists.
    */
@@ -118,7 +122,7 @@ export class FileSystem {
       if (_selfCall) throw err
       // If we got a "no such file or directory error" backup and try again.
       if (err.code === 'ENOENT') {
-        let parent = dirname(filepath)
+        const parent = dirname(filepath)
         // Check to see if we've gone too far
         if (parent === '.' || parent === '/' || parent === filepath) throw err
         // Infinite recursion, what could go wrong?
@@ -127,6 +131,7 @@ export class FileSystem {
       }
     }
   }
+
   /**
    * Delete a file without throwing an error if it is already deleted.
    */
@@ -137,12 +142,13 @@ export class FileSystem {
       if (err.code !== 'ENOENT') throw err
     }
   }
+
   /**
    * Read a directory without throwing an error is the directory doesn't exist
    */
   async readdir (filepath) {
     try {
-      let names = await this._readdir(filepath)
+      const names = await this._readdir(filepath)
       // Ordering is not guaranteed, and system specific (Windows vs Unix)
       // so we must sort them ourselves.
       names.sort(compareStrings)
@@ -152,6 +158,7 @@ export class FileSystem {
       return []
     }
   }
+
   /**
    * Return a flast list of all the files nested inside a directory
    *
@@ -170,13 +177,14 @@ export class FileSystem {
     )
     return files.reduce((a, f) => a.concat(f), [])
   }
+
   /**
    * Return the Stats of a file/symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
    */
   async lstat (filename) {
     try {
-      let stats = await this._lstat(filename)
+      const stats = await this._lstat(filename)
       return stats
     } catch (err) {
       if (err.code === 'ENOENT') {
@@ -185,6 +193,7 @@ export class FileSystem {
       throw err
     }
   }
+
   /**
    * Reads the contents of a symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
@@ -201,6 +210,7 @@ export class FileSystem {
       throw err
     }
   }
+
   /**
    * Write the contents of buffer to a symlink.
    */

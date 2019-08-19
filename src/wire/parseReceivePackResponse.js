@@ -2,16 +2,16 @@ import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
 export async function parseReceivePackResponse (packfile) {
-  let result = {}
+  const result = {}
   let response = ''
-  let read = GitPktLine.streamReader(packfile)
+  const read = GitPktLine.streamReader(packfile)
   let line = await read()
   while (line !== true) {
     if (line !== null) response += line.toString('utf8') + '\n'
     line = await read()
   }
 
-  let lines = response.toString('utf8').split('\n')
+  const lines = response.toString('utf8').split('\n')
   // We're expecting "unpack {unpack-result}"
   line = lines.shift()
   if (!line.startsWith('unpack ')) {
@@ -22,9 +22,9 @@ export async function parseReceivePackResponse (packfile) {
   } else {
     result.errors = [line.trim()]
   }
-  for (let line of lines) {
-    let status = line.slice(0, 2)
-    let refAndMessage = line.slice(3)
+  for (const line of lines) {
+    const status = line.slice(0, 2)
+    const refAndMessage = line.slice(3)
     if (status === 'ok') {
       result.ok = result.ok || []
       result.ok.push(refAndMessage)

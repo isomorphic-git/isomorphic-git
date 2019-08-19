@@ -10,23 +10,23 @@ describe('resetIndex', () => {
   })
   it('modified', async () => {
     // Setup
-    let { gitdir, dir } = await makeFixture('test-resetIndex')
+    const { gitdir, dir } = await makeFixture('test-resetIndex')
     // Test
-    let before = await listFiles({ gitdir })
+    const before = await listFiles({ gitdir })
     expect(before).toMatchSnapshot()
     await resetIndex({ dir, gitdir, filepath: 'a.txt' })
-    let after = await listFiles({ gitdir })
+    const after = await listFiles({ gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length).toBe(true)
   })
   it('new', async () => {
     // Setup
-    let { gitdir, dir } = await makeFixture('test-resetIndex')
+    const { gitdir, dir } = await makeFixture('test-resetIndex')
     // Test
-    let before = await listFiles({ gitdir })
+    const before = await listFiles({ gitdir })
     expect(before).toMatchSnapshot()
     await resetIndex({ dir, gitdir, filepath: 'd.txt' })
-    let after = await listFiles({ gitdir })
+    const after = await listFiles({ gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length + 1).toBe(true)
   })

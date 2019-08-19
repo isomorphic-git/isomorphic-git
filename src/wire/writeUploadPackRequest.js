@@ -9,7 +9,7 @@ export function writeUploadPackRequest ({
   since = null,
   exclude = []
 }) {
-  let packstream = []
+  const packstream = []
   wants = [...new Set(wants)] // remove duplicates
   let firstLineCapabilities = ` ${capabilities.join(' ')}`
   for (const oid of wants) {

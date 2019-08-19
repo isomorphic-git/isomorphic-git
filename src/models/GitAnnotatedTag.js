@@ -37,7 +37,7 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   message () {
-    let tag = this.withoutSignature()
+    const tag = this.withoutSignature()
     return tag.slice(tag.indexOf('\n\n') + 2)
   }
 
@@ -53,9 +53,9 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   headers () {
-    let headers = this.justHeaders().split('\n')
-    let hs = []
-    for (let h of headers) {
+    const headers = this.justHeaders().split('\n')
+    const hs = []
+    for (const h of headers) {
       if (h[0] === ' ') {
         // combine with previous header (without space indent)
         hs[hs.length - 1] += '\n' + h.slice(1)
@@ -63,10 +63,10 @@ ${obj.signature ? obj.signature : ''}`
         hs.push(h)
       }
     }
-    let obj = {}
-    for (let h of hs) {
-      let key = h.slice(0, h.indexOf(' '))
-      let value = h.slice(h.indexOf(' ') + 1)
+    const obj = {}
+    for (const h of hs) {
+      const key = h.slice(0, h.indexOf(' '))
+      const value = h.slice(h.indexOf(' ') + 1)
       if (Array.isArray(obj[key])) {
         obj[key].push(value)
       } else {
@@ -83,13 +83,13 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   withoutSignature () {
-    let tag = normalizeNewlines(this._tag)
+    const tag = normalizeNewlines(this._tag)
     if (tag.indexOf('\n-----BEGIN PGP SIGNATURE-----') === -1) return tag
     return tag.slice(0, tag.lastIndexOf('\n-----BEGIN PGP SIGNATURE-----'))
   }
 
   signature () {
-    let signature = this._tag.slice(
+    const signature = this._tag.slice(
       this._tag.indexOf('-----BEGIN PGP SIGNATURE-----'),
       this._tag.indexOf('-----END PGP SIGNATURE-----') +
         '-----END PGP SIGNATURE-----'.length
@@ -106,7 +106,7 @@ ${obj.signature ? obj.signature : ''}`
     let { signature } = await pgp.sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
-    let signedTag = payload + signature
+    const signedTag = payload + signature
     // return a new tag object
     return GitAnnotatedTag.from(signedTag)
   }

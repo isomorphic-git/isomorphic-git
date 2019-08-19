@@ -10,8 +10,8 @@ describe('deleteRemote', () => {
   })
   it('deleteRemote', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-deleteRemote')
-    let remote = 'foo'
+    const { dir, gitdir } = await makeFixture('test-deleteRemote')
+    const remote = 'foo'
     // Test
     await deleteRemote({ dir, gitdir, remote })
     const a = await listRemotes({ dir, gitdir })
@@ -19,7 +19,7 @@ describe('deleteRemote', () => {
   })
   it('missing argument', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-addRemote')
+    const { dir, gitdir } = await makeFixture('test-addRemote')
     // Test
     let error = null
     try {

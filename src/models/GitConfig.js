@@ -145,9 +145,11 @@ export class GitConfig {
       return { line, isSection, section, subsection, name, value, path }
     })
   }
+
   static from (text) {
     return new GitConfig(text)
   }
+
   async get (path, getall = false) {
     const allValues = this.parsedConfig
       .filter(config => config.path === path.toLowerCase())
@@ -157,23 +159,28 @@ export class GitConfig {
       })
     return getall ? allValues : allValues.pop()
   }
+
   async getall (path) {
     return this.get(path, true)
   }
+
   async getSubsections (section) {
     return this.parsedConfig
       .filter(config => config.section === section && config.isSection)
       .map(config => config.subsection)
   }
+
   async deleteSection (section, subsection) {
     this.parsedConfig = this.parsedConfig.filter(
       config =>
         !(config.section === section && config.subsection === subsection)
     )
   }
+
   async append (path, value) {
     return this.set(path, value, true)
   }
+
   async set (path, value, append = false) {
     const configIndex = findLastIndex(
       this.parsedConfig,
@@ -232,6 +239,7 @@ export class GitConfig {
       }
     }
   }
+
   toString () {
     return this.parsedConfig
       .map(({ line, section, subsection, name, value, modified = false }) => {

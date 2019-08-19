@@ -43,7 +43,7 @@ export async function config (args) {
   // These arguments are not in the function signature but destructured separately
   // as a result of a bit of a design flaw that requires the un-destructured argument object
   // in order to call args.hasOwnProperty('value') later on.
-  let {
+  const {
     core = 'default',
     dir,
     gitdir = join(dir, '.git'),
@@ -60,7 +60,10 @@ export async function config (args) {
     // 1) there is no 'value' argument (do a "get")
     // 2) there is a 'value' argument with a value of undefined (do a "set")
     // Because setting a key to undefined is how we delete entries from the ini.
-    if (value === undefined && !args.hasOwnProperty('value')) {
+    if (
+      value === undefined &&
+      !Object.prototype.hasOwnProperty.call(args, 'value')
+    ) {
       if (all) {
         return config.getall(path)
       } else {

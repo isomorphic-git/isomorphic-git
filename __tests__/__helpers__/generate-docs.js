@@ -31,7 +31,7 @@ function gentypedef (ast) {
     // This is pretty sloppy
     if (currentprop !== null) {
       if (prop.name.startsWith(currentprop)) {
-        let name = prop.name.replace(currentprop, '')
+        const name = prop.name.replace(currentprop, '')
         text += `${ind}${name}: ${cleanType(type)};${
           prop.description ? ` // ${prop.description}` : ''
         }\n`
@@ -59,7 +59,7 @@ function gentypedef (ast) {
   }
   while (indent > 2) {
     indent -= 2
-    let ind = ' '.repeat(indent)
+    const ind = ' '.repeat(indent)
     currentprop = null
     text += `${ind}};\n`
   }
@@ -96,7 +96,7 @@ function gendoc (filepath) {
       // Split description into "first line" and "the rest"
       obj.description = obj.description.trim()
       // why JavaScript why
-      let _index = obj.description.indexOf('\n')
+      const _index = obj.description.indexOf('\n')
       const headline =
         _index === -1
           ? obj.description
@@ -142,7 +142,7 @@ function gendoc (filepath) {
         ])
       }
       if (obj.exceptions) {
-        for (let err of obj.exceptions) {
+        for (const err of obj.exceptions) {
           rows.push([
             'throws',
             'Error',
@@ -156,7 +156,7 @@ function gendoc (filepath) {
       text += table(rows)
       text += `\n`
       if (obj.see) {
-        for (let type of obj.see) {
+        for (const type of obj.see) {
           text += typedefs.get(type)
         }
       }
@@ -188,12 +188,12 @@ function gendoc (filepath) {
   return text
 }
 
-let commandDir = path.join(__dirname, '..', '..', 'src', 'commands')
-let files = fs.readdirSync(commandDir)
-for (let filename of files) {
-  let doctext = gendoc(path.join(commandDir, filename))
+const commandDir = path.join(__dirname, '..', '..', 'src', 'commands')
+const files = fs.readdirSync(commandDir)
+for (const filename of files) {
+  const doctext = gendoc(path.join(commandDir, filename))
   if (doctext !== '') {
-    let docfilename = path.join(
+    const docfilename = path.join(
       __dirname,
       '..',
       '..',

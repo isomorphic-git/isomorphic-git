@@ -170,6 +170,7 @@ export class GitError extends Error {
     this.message = renderTemplate(messages[code], data || {})
     if (Error.captureStackTrace) Error.captureStackTrace(this, this.constructor)
   }
+
   toJSON () {
     return {
       code: this.code,
@@ -178,6 +179,7 @@ export class GitError extends Error {
       message: this.message
     }
   }
+
   toString () {
     return this.stack.toString()
   }

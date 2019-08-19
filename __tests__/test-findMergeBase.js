@@ -8,7 +8,7 @@ const { findMergeBase } = require('isomorphic-git')
 describe('findMergeBase', () => {
   it('silly edge cases', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-findMergeBase')
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -28,10 +28,9 @@ describe('findMergeBase', () => {
   })
   it('no common ancestor scenarios', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-findMergeBase')
-    let base
+    const { gitdir } = await makeFixture('test-findMergeBase')
     // Test
-    base = await findMergeBase({
+    const base = await findMergeBase({
       gitdir,
       oids: [
         '9ec6646dd454e8f530c478c26f8b06e57f880bd6', // A
@@ -42,7 +41,7 @@ describe('findMergeBase', () => {
   })
   it('fast-forward scenarios', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-findMergeBase')
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -84,7 +83,7 @@ describe('findMergeBase', () => {
   })
   it('diverging scenarios', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-findMergeBase')
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -146,7 +145,7 @@ describe('findMergeBase', () => {
   })
   it('merge commit scenarios', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-findMergeBase')
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -197,10 +196,9 @@ describe('findMergeBase', () => {
   })
   it('recursive merge base scenarios', async () => {
     // Setup
-    let { gitdir } = await makeFixture('test-findMergeBase')
-    let base
+    const { gitdir } = await makeFixture('test-findMergeBase')
     // Test
-    base = await findMergeBase({
+    const base = await findMergeBase({
       gitdir,
       oids: [
         '85303393b9fd415d48913dfec47d42db184dc4d8', // Z1

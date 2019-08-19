@@ -59,12 +59,12 @@ dBWrLc3kdnemrlhSRzR2
 
 describe('GitAnnotatedTag', () => {
   it('parse', async () => {
-    let tag = GitAnnotatedTag.from(tagString)
+    const tag = GitAnnotatedTag.from(tagString)
     expect(tag.parse()).toEqual(tagObject)
   })
 
   it('render', async () => {
-    let tag = GitAnnotatedTag.from(tagObject)
+    const tag = GitAnnotatedTag.from(tagObject)
     expect(tag.render()).toEqual(tagString)
   })
 })

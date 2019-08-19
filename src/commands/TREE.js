@@ -34,7 +34,7 @@ export function TREE ({
   ref = 'HEAD'
 }) {
   const fs = new FileSystem(_fs)
-  let o = Object.create(null)
+  const o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {
       return new GitWalkerRepo({ fs, gitdir, ref })

@@ -12,51 +12,51 @@ describe('checkout', () => {
 
   it('checkout', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({ dir, gitdir, ref: 'test-branch' })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
-    let sha = await fs.read(gitdir + '/HEAD', 'utf8')
+    const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('ref: refs/heads/test-branch\n')
   })
 
   it('checkout by tag', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
       dir,
       gitdir,
       ref: 'v1.0.0'
     })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
-    let sha = await fs.read(gitdir + '/HEAD', 'utf8')
+    const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
   })
 
   it('checkout by SHA', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
       dir,
       gitdir,
       ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
-    let sha = await fs.read(gitdir + '/HEAD', 'utf8')
+    const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
   })
 
   it('checkout unfetched branch', async () => {
     // Setup
-    let { dir, gitdir } = await makeFixture('test-checkout')
+    const { dir, gitdir } = await makeFixture('test-checkout')
     let error = null
     try {
       await checkout({ dir, gitdir, ref: 'missing-branch' })
@@ -70,7 +70,7 @@ describe('checkout', () => {
   })
 
   it('checkout file permissions', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await branch({ dir, gitdir, ref: 'other', checkout: true })
     await checkout({ dir, gitdir, ref: 'test-branch' })
     await fs.write(dir + '/regular-file.txt', 'regular file', {
@@ -105,7 +105,7 @@ describe('checkout', () => {
 
   it('checkout using pattern', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await branch({ dir, gitdir, ref: 'other', checkout: true })
     await checkout({ dir, gitdir, ref: 'test-branch' })
     await fs.write(dir + '/regular-file.txt', 'regular file')
@@ -120,44 +120,44 @@ describe('checkout', () => {
     })
     await checkout({ dir, gitdir, ref: 'other' })
     await checkout({ dir, gitdir, ref: 'test-branch', pattern: '*.txt' })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files).toContain('regular-file.txt')
     expect(files).not.toContain('executable-file.sh')
   })
 
   it('checkout directories using filepaths', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
       dir,
       gitdir,
       ref: 'test-branch',
       filepaths: ['src/models', 'test']
     })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 
   it('checkout files using filepaths', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
       dir,
       gitdir,
       ref: 'test-branch',
       filepaths: ['src/models/GitBlob.js', 'src/utils/write.js']
     })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 
   it('checkout files using filepaths and pattern', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
       dir,
       gitdir,
@@ -165,15 +165,15 @@ describe('checkout', () => {
       filepaths: ['src/utils', 'test'],
       pattern: 'r*'
     })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 
   it('checkout files using filepaths and deep pattern', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
       dir,
       gitdir,
@@ -181,9 +181,9 @@ describe('checkout', () => {
       filepaths: ['src/utils', 'test'],
       pattern: 'snapshots/r*'
     })
-    let files = await fs.readdir(dir)
+    const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    let index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 })

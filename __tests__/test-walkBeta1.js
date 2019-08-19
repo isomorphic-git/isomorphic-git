@@ -6,9 +6,9 @@ const { walkBeta1, WORKDIR, TREE, STAGE } = require('isomorphic-git')
 describe('walkBeta1', () => {
   it('can walk using WORKDIR, TREE, and STAGE', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-walkBeta1')
+    const { fs, dir, gitdir } = await makeFixture('test-walkBeta1')
     // Test
-    let matrix = await walkBeta1({
+    const matrix = await walkBeta1({
       trees: [
         WORKDIR({ fs, dir, gitdir }),
         TREE({ fs, gitdir, ref: 'HEAD' }),

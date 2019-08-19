@@ -4,7 +4,7 @@ import { readObject } from '../storage/readObject.js'
 
 export async function logCommit ({ fs, gitdir, oid, signing }) {
   try {
-    let { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit') {
       throw new GitError(E.ObjectTypeAssertionFail, {
         oid,

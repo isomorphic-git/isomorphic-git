@@ -64,18 +64,22 @@ export async function merge ({
       gitdir,
       ref: theirs
     })
-    let ourOid = await GitRefManager.resolve({
+    const ourOid = await GitRefManager.resolve({
       fs,
       gitdir,
       ref: ours
     })
-    let theirOid = await GitRefManager.resolve({
+    const theirOid = await GitRefManager.resolve({
       fs,
       gitdir,
       ref: theirs
     })
     // find most recent common ancestor of ref a and ref b
-    let baseOid = await findMergeBase({ gitdir, fs, refs: [ourOid, theirOid] })
+    const baseOid = await findMergeBase({
+      gitdir,
+      fs,
+      refs: [ourOid, theirOid]
+    })
     // handle fast-forward case
     if (baseOid === theirOid) {
       return {
@@ -110,9 +114,9 @@ function compareAge (a, b) {
 
 async function findMergeBase ({ gitdir, fs, refs }) {
   // Where is async flatMap when you need it?
-  let commits = []
+  const commits = []
   for (const ref of refs) {
-    let list = await log({ gitdir, fs, ref, depth: 1 })
+    const list = await log({ gitdir, fs, ref, depth: 1 })
     commits.push(list[0])
   }
   // Are they actually the same commit?
@@ -120,11 +124,11 @@ async function findMergeBase ({ gitdir, fs, refs }) {
     return commits[0].oid
   }
   // Is the oldest commit an ancestor of the others?
-  let sorted = commits.sort(compareAge)
+  const sorted = commits.sort(compareAge)
   let candidate = sorted[0]
-  let since = new Date(candidate.author.timestamp - 1)
+  const since = new Date(candidate.author.timestamp - 1)
   for (const ref of refs) {
-    let list = await log({ gitdir, fs, ref, since })
+    const list = await log({ gitdir, fs, ref, since })
     if (!list.find(commit => commit.oid === candidate.oid)) {
       candidate = null
       break

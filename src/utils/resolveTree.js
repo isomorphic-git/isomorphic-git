@@ -9,7 +9,7 @@ export async function resolveTree ({ fs, gitdir, oid }) {
   if (oid === '4b825dc642cb6eb9a060e54bf8d69288fbee4904') {
     return { tree: GitTree.from([]), oid }
   }
-  let { type, object } = await readObject({ fs, gitdir, oid })
+  const { type, object } = await readObject({ fs, gitdir, oid })
   // Resolve annotated tag objects to whatever
   if (type === 'tag') {
     oid = GitAnnotatedTag.from(object).parse().object

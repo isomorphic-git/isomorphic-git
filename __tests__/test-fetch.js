@@ -7,7 +7,7 @@ const { E, plugins, fetch } = require('isomorphic-git')
 
 describe('fetch', () => {
   it('fetch (from Github)', async () => {
-    let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Smoke Test
     await fetch({
       gitdir,
@@ -22,9 +22,9 @@ describe('fetch', () => {
   })
 
   it('shallow fetch (from Github)', async () => {
-    let { fs, gitdir } = await makeFixture('test-fetch-cors')
-    let output = []
-    let progress = []
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    const output = []
+    const progress = []
     plugins.set(
       'emitter',
       new EventEmitter()
@@ -60,7 +60,7 @@ describe('fetch', () => {
   })
 
   it('shallow fetch since (from Github)', async () => {
-    let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Test
     await fetch({
       gitdir,
@@ -70,12 +70,12 @@ describe('fetch', () => {
       ref: 'test-branch-shallow-clone'
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
-    let shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
+    const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
     expect(shallow).toEqual('36d201c8fea9d87128e7fccd32c21643f355540d\n')
   })
 
   it('shallow fetch exclude (from Github)', async () => {
-    let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Test
     await fetch({
       gitdir,
@@ -85,12 +85,12 @@ describe('fetch', () => {
       ref: 'test-branch-shallow-clone'
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
-    let shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
+    const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
     expect(shallow).toEqual('0094dadf9804971c851e99b13845d10c8849db12\n')
   })
 
   it('shallow fetch relative (from Github)', async () => {
-    let { fs, gitdir } = await makeFixture('test-fetch-cors')
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
     // Test
     await fetch({
       gitdir,
@@ -117,7 +117,7 @@ describe('fetch', () => {
   })
 
   it('errors if missing refspec', async () => {
-    let { gitdir } = await makeFixture('test-issue-84')
+    const { gitdir } = await makeFixture('test-issue-84')
     // Test
     let err = null
     try {
@@ -135,7 +135,7 @@ describe('fetch', () => {
     expect(err.code).toEqual(E.NoRefspecConfiguredError)
   })
   it('fetch empty repository from git-http-mock-server', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-empty')
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
     await fetch({
       dir,
       gitdir,
@@ -155,11 +155,11 @@ describe('fetch', () => {
   })
 
   it('fetch --prune from git-http-mock-server', async () => {
-    let { fs, dir, gitdir } = await makeFixture('test-fetch-client')
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
     expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
       true
     )
-    let { pruned } = await fetch({
+    const { pruned } = await fetch({
       dir,
       gitdir,
       depth: 1,

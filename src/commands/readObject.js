@@ -148,12 +148,12 @@ export async function readObject ({
         throw new GitError(E.DirectorySeparatorsError)
       }
       const _oid = oid
-      let result = await resolveTree({ fs, gitdir, oid })
-      let tree = result.tree
+      const result = await resolveTree({ fs, gitdir, oid })
+      const tree = result.tree
       if (filepath === '') {
         oid = result.oid
       } else {
-        let pathArray = filepath.split('/')
+        const pathArray = filepath.split('/')
         oid = await resolveFile({
           fs,
           gitdir,
@@ -166,7 +166,7 @@ export async function readObject ({
     }
     // GitObjectManager does not know how to parse content, so we tweak that parameter before passing it.
     const _format = format === 'parsed' ? 'content' : format
-    let result = await _readObject({
+    const result = await _readObject({
       fs,
       gitdir,
       oid,
@@ -207,13 +207,13 @@ export async function readObject ({
 }
 
 async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
-  let name = pathArray.shift()
-  for (let entry of tree) {
+  const name = pathArray.shift()
+  for (const entry of tree) {
     if (entry.path === name) {
       if (pathArray.length === 0) {
         return entry.oid
       } else {
-        let { type, object } = await _readObject({
+        const { type, object } = await _readObject({
           fs,
           gitdir,
           oid: entry.oid

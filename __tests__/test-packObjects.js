@@ -7,12 +7,12 @@ const { packObjects } = require('isomorphic-git')
 describe('packObjects', () => {
   it('makes a packfile', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-packObjects')
+    const { fs, dir, gitdir } = await makeFixture('test-packObjects')
     // Test
-    let fixture = await fs.read(
+    const fixture = await fs.read(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
-    let { filename, packfile } = await packObjects({
+    const { filename, packfile } = await packObjects({
       fs,
       gitdir,
       oids: [
@@ -38,12 +38,12 @@ describe('packObjects', () => {
   })
   it('saves packfile to disk', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-packObjects')
+    const { fs, dir, gitdir } = await makeFixture('test-packObjects')
     // Test
-    let fixture = await fs.read(
+    const fixture = await fs.read(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
-    let { filename } = await packObjects({
+    const { filename } = await packObjects({
       fs,
       gitdir,
       oids: [
@@ -63,9 +63,9 @@ describe('packObjects', () => {
       write: true
     })
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
-    let filepath = path.join(gitdir, `objects/pack/${filename}`)
+    const filepath = path.join(gitdir, `objects/pack/${filename}`)
     expect(await fs.exists(filepath)).toBe(true)
-    let packfile = await fs.read(filepath)
+    const packfile = await fs.read(filepath)
     expect(fixture.buffer).toEqual(packfile.buffer)
   })
 })

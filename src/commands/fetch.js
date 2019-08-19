@@ -118,7 +118,7 @@ export async function fetch ({
       )
     }
     const fs = new FileSystem(_fs)
-    let response = await fetchPackfile({
+    const response = await fetchPackfile({
       core,
       gitdir,
       fs,
@@ -150,14 +150,14 @@ export async function fetch ({
       }
     }
     if (emitter) {
-      let lines = splitLines(response.progress)
+      const lines = splitLines(response.progress)
       forAwait(lines, line => {
         // As a historical accident, 'message' events were trimmed removing valuable information,
         // such as \r by itself which was a single to update the existing line instead of appending a new one.
         // TODO NEXT BREAKING RELEASE: make 'message' behave like 'rawmessage' and remove 'rawmessage'.
         emitter.emit(`${emitterPrefix}message`, line.trim())
         emitter.emit(`${emitterPrefix}rawmessage`, line)
-        let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
+        const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
           emitter.emit(`${emitterPrefix}progress`, {
             phase: matches[1].trim(),
@@ -168,9 +168,9 @@ export async function fetch ({
         }
       })
     }
-    let packfile = await collect(response.packfile)
-    let packfileSha = packfile.slice(-20).toString('hex')
-    let res = {
+    const packfile = await collect(response.packfile)
+    const packfileSha = packfile.slice(-20).toString('hex')
+    const res = {
       defaultBranch: response.HEAD,
       fetchHead: response.FETCH_HEAD
     }
@@ -252,8 +252,8 @@ async function fetchPackfile ({
     corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }
-  let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
-  let remoteHTTP = await GitRemoteHTTP.discover({
+  const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
+  const remoteHTTP = await GitRemoteHTTP.discover({
     core,
     corsProxy,
     service: 'git-upload-pack',
@@ -282,12 +282,12 @@ async function fetchPackfile ({
     throw new GitError(E.RemoteDoesNotSupportDeepenRelativeFail)
   }
   // Figure out the SHA for the requested ref
-  let { oid, fullref } = GitRefManager.resolveAgainstMap({
+  const { oid, fullref } = GitRefManager.resolveAgainstMap({
     ref,
     map: remoteRefs
   })
   // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
-  for (let remoteRef of remoteRefs.keys()) {
+  for (const remoteRef of remoteRefs.keys()) {
     if (
       remoteRef === fullref ||
       remoteRef === 'HEAD' ||
@@ -312,10 +312,10 @@ async function fetchPackfile ({
   )
   if (relative) capabilities.push('deepen-relative')
   // Start figuring out which oids from the remote we want to request
-  let wants = singleBranch ? [oid] : remoteRefs.values()
+  const wants = singleBranch ? [oid] : remoteRefs.values()
   // Come up with a reasonable list of oids to tell the remote we already have
   // (preferably oids that are close ancestors of the branch heads we're fetching)
-  let haveRefs = singleBranch
+  const haveRefs = singleBranch
     ? refs
     : await GitRefManager.listRefs({
       fs,
@@ -333,9 +333,9 @@ async function fetchPackfile ({
     } catch (err) {}
   }
   haves = [...new Set(haves)]
-  let oids = await GitShallowManager.read({ fs, gitdir })
-  let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
-  let packstream = writeUploadPackRequest({
+  const oids = await GitShallowManager.read({ fs, gitdir })
+  const shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
+  const packstream = writeUploadPackRequest({
     capabilities,
     wants,
     haves,
@@ -346,8 +346,8 @@ async function fetchPackfile ({
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
-  let packbuffer = await collect(packstream)
-  let raw = await GitRemoteHTTP.connect({
+  const packbuffer = await collect(packstream)
+  const raw = await GitRemoteHTTP.connect({
     core,
     emitter,
     emitterPrefix,
@@ -359,7 +359,7 @@ async function fetchPackfile ({
     body: [packbuffer],
     headers
   })
-  let response = await parseUploadPackResponse(raw.body)
+  const response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
     response.headers = raw.headers
   }
@@ -380,14 +380,14 @@ async function fetchPackfile ({
     let bail = 10
     let key = fullref
     while (bail--) {
-      let value = remoteHTTP.symrefs.get(key)
+      const value = remoteHTTP.symrefs.get(key)
       if (value === undefined) break
       symrefs.set(key, value)
       key = value
     }
     // final value must not be a symref but a real ref
     refs.set(key, remoteRefs.get(key))
-    let { pruned } = await GitRefManager.updateRemoteRefs({
+    const { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
       remote,
@@ -400,7 +400,7 @@ async function fetchPackfile ({
       response.pruned = pruned
     }
   } else {
-    let { pruned } = await GitRefManager.updateRemoteRefs({
+    const { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
       remote,
@@ -418,13 +418,13 @@ async function fetchPackfile ({
   // AWS CodeCommit doesn't list HEAD as a symref, but we can reverse engineer it
   // Find the SHA of the branch called HEAD
   if (response.HEAD === undefined) {
-    let { oid } = GitRefManager.resolveAgainstMap({
+    const { oid } = GitRefManager.resolveAgainstMap({
       ref: 'HEAD',
       map: remoteRefs
     })
     // Use the name of the first branch that's not called HEAD that has
     // the same SHA as the branch called HEAD.
-    for (let [key, value] of remoteRefs.entries()) {
+    for (const [key, value] of remoteRefs.entries()) {
       if (key !== 'HEAD' && value === oid) {
         response.HEAD = key
         break
