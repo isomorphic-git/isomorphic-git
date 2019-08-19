@@ -4,7 +4,7 @@ module.exports = {
     '^isomorphic-git$': '<rootDir>/src',
     '^isomorphic-git/(.+)$': '<rootDir>/src/$1'
   },
-  collectCoverageFrom: ['src/**'],
+  collectCoverageFrom: ['src/*.js', 'src/**/*.js'],
   testEnvironment: 'node',
   reporters: [
     'default',

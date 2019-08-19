@@ -41,8 +41,7 @@ module.exports = {
     },
     contributors: {
       add: 'all-contributors add',
-      generate:
-        'all-contributors generate && node ./__tests__/__helpers__/fix-all-contributors.js',
+      generate: 'all-contributors generate',
       check: 'all-contributors check'
     },
     build: {
