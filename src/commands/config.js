@@ -60,7 +60,10 @@ export async function config (args) {
     // 1) there is no 'value' argument (do a "get")
     // 2) there is a 'value' argument with a value of undefined (do a "set")
     // Because setting a key to undefined is how we delete entries from the ini.
-    if (value === undefined && !Object.prototype.hasOwnProperty.call(args, 'value')) {
+    if (
+      value === undefined &&
+      !Object.prototype.hasOwnProperty.call(args, 'value')
+    ) {
       if (all) {
         return config.getall(path)
       } else {

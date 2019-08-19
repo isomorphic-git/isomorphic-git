@@ -138,7 +138,9 @@ describe('git wire protocol', () => {
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
 0000`)
     ]
-    const result = await parseRefsAdResponse(res, { service: 'git-upload-pack' })
+    const result = await parseRefsAdResponse(res, {
+      service: 'git-upload-pack'
+    })
     expect([...result.capabilities]).toEqual([
       'multi_ack',
       'thin-pack',

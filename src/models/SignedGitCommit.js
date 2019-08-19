@@ -42,7 +42,9 @@ export class SignedGitCommit extends GitCommit {
       this.isolateSignature()
     )
     const results = msg.verify(pubKeyObj)
-    const validity = results.reduce((a, b) => a.valid && b.valid, { valid: true })
+    const validity = results.reduce((a, b) => a.valid && b.valid, {
+      valid: true
+    })
     return validity
   }
 }

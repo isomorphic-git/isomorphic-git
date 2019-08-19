@@ -75,7 +75,11 @@ export async function merge ({
       ref: theirs
     })
     // find most recent common ancestor of ref a and ref b
-    const baseOid = await findMergeBase({ gitdir, fs, refs: [ourOid, theirOid] })
+    const baseOid = await findMergeBase({
+      gitdir,
+      fs,
+      refs: [ourOid, theirOid]
+    })
     // handle fast-forward case
     if (baseOid === theirOid) {
       return {

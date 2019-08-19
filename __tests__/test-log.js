@@ -43,7 +43,10 @@ describe('log', () => {
     expect(commits).toMatchSnapshot()
     // Verify
     for (const commit of commits) {
-      const msg = openpgp.message.readSignedContent(commit.payload, commit.gpgsig)
+      const msg = openpgp.message.readSignedContent(
+        commit.payload,
+        commit.gpgsig
+      )
       const keys = msg.getSigningKeyIds().map(keyid => keyid.toHex())
       expect(keys).toEqual(['9609b8a5928ba6b9'])
     }

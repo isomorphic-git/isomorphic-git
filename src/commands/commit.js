@@ -86,7 +86,11 @@ export async function commit ({
         const treeRef = await constructTree({ fs, gitdir, inode })
         let parents
         try {
-          const parent = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+          const parent = await GitRefManager.resolve({
+            fs,
+            gitdir,
+            ref: 'HEAD'
+          })
           parents = [parent]
         } catch (err) {
           // Probably an initial commit
