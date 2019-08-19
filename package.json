@@ -113,16 +113,16 @@
     "pretty-format": "23.6.0",
     "puppeteer": "1.11.0",
     "replace-in-file": "3.4.4",
-    "rollup": "1.12.3",
-    "rollup-plugin-node-resolve": "5.0.0",
+    "rollup": "1.19.4",
+    "rollup-plugin-node-resolve": "5.2.0",
     "semantic-release": "15.13.21",
     "standard": "12.0.1",
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
     "typescript": "3.5.3",
-    "webpack": "4.32.2",
-    "webpack-bundle-analyzer": "3.3.2",
-    "webpack-cli": "3.3.2"
+    "webpack": "4.39.2",
+    "webpack-bundle-analyzer": "3.4.1",
+    "webpack-cli": "3.3.7"
   },
   "bundlesize": [
     {
