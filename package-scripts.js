@@ -66,10 +66,9 @@ module.exports = {
               `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
               `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
                 process.env.BUILD_REPOSITORY_NAME} ` +
-              // TODO: Figure out what the Azure equivalent of TRAVIS_PULL_REQUEST_SHA is.
-              `TRAVIS_PULL_REQUEST_SHA=${
+              (process.env.TRAVIS_PULL_REQUEST_SHA ? `TRAVIS_PULL_REQUEST_SHA=${
                 process.env.TRAVIS_PULL_REQUEST_SHA
-              } ` +
+              } ` : '') +
               `bundlesize`
         )
         : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)
