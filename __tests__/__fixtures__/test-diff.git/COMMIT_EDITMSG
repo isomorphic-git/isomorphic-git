@@ -1,1 +1,9 @@
-mv c d/c
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch mainline
+# Changes not staged for commit:
+#	deleted:    a
+#	deleted:    b
+#

@@ -38,8 +38,8 @@ describe('mergeTreePatches', () => {
     // Test
     const diff1 = await diffTree({ gitdir, before: 'mainline', after: 'add-files' })
     const diff2 = await diffTree({ gitdir, before: 'mainline', after: 'change-modes' })
-    const patchset = await mergeTreePatches({ treePatches: [diff1, diff2] })
-    expect(patchset).toMatchSnapshot()
+    const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
+    expect(patch).toMatchSnapshot()
   })
 
   it('merge add-files and remove-files', async () => {
