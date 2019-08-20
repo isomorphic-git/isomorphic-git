@@ -1,8 +1,8 @@
 // @ts-check
 import { arrayRange } from '../utils/arrayRange.js'
+import { flat } from '../utils/flat.js'
 import { GitWalkerSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
-import { flat } from '../utils/flat.js'
 
 /**
  *

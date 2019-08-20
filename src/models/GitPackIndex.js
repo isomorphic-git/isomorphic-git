@@ -438,9 +438,7 @@ export class GitPackIndex {
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
       throw new GitError(E.InternalFail, {
-        message: `Packfile told us object would have length ${length} but it had length ${
-          object.byteLength
-        }`
+        message: `Packfile told us object would have length ${length} but it had length ${object.byteLength}`
       })
     }
     if (base) {

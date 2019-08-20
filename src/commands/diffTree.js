@@ -79,7 +79,10 @@ export async function diffTree ({
         if (children.length === 0) {
           return parent
         } else {
-          const subOps = children.filter(child => child.ops.length > 0 || (child.subOps && child.subOps.length > 0)) // remove undefineds
+          const subOps = children.filter(
+            child =>
+              child.ops.length > 0 || (child.subOps && child.subOps.length > 0)
+          ) // remove undefineds
           if (subOps.length > 0) parent.subOps = subOps
           return parent
         }
@@ -131,14 +134,22 @@ function computeMajorOp (before, after) {
   if (before.oid === after.oid) return []
   // Note: here we ignore our handy `.exists` and just coerce `.type` to undefined lol
   switch (`${before.type}-${after.type}`) {
-    case 'blob-blob': return ['write']
-    case 'tree-tree': return []
-    case 'blob-tree': return ['rm', 'mkdir']
-    case 'tree-blob': return ['rmdir', 'write']
-    case 'undefined-blob': return ['write']
-    case 'undefined-tree': return ['mkdir']
-    case 'blob-undefined': return ['rm']
-    case 'tree-undefined': return ['rmdir']
+    case 'blob-blob':
+      return ['write']
+    case 'tree-tree':
+      return []
+    case 'blob-tree':
+      return ['rm', 'mkdir']
+    case 'tree-blob':
+      return ['rmdir', 'write']
+    case 'undefined-blob':
+      return ['write']
+    case 'undefined-tree':
+      return ['mkdir']
+    case 'blob-undefined':
+      return ['rm']
+    case 'tree-undefined':
+      return ['rmdir']
   }
   console.log(before, after)
 }

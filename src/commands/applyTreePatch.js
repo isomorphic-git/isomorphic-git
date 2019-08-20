@@ -1,13 +1,13 @@
 // @ts-check
 import { FileSystem } from '../models/FileSystem.js'
+import { GitTree } from '../models/GitTree.js'
+import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { TREE } from './TREE.js'
 import { TREEPATCH } from './TREEPATCH.js'
 import { walkBeta1 } from './walkBeta1.js'
-import { GitTree } from '../models/GitTree.js'
-import { writeObject } from '../storage/writeObject.js'
 
 /**
  *
@@ -57,7 +57,12 @@ export async function applyTreePatch ({
 
       map: async ([repo, patch]) => {
         // label entries
-        await Promise.all([repo.populateStat(), patch.populateStat(), repo.populateHash(), repo.populateHash()])
+        await Promise.all([
+          repo.populateStat(),
+          patch.populateStat(),
+          repo.populateHash(),
+          repo.populateHash()
+        ])
         // handle deletions
         if (patch.exists && patch.ops) {
           if (patch.ops.includes('rm') && !patch.ops.includes('mkdir')) {

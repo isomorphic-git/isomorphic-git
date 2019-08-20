@@ -5,7 +5,8 @@ export class GitWalkerPatch {
     this.map = new Map()
 
     const cachePatch = (patch, root) => {
-      const fullpath = root && root !== '.' ? `${root}/${patch.basename}` : patch.basename
+      const fullpath =
+        root && root !== '.' ? `${root}/${patch.basename}` : patch.basename
       this.map.set(fullpath, patch)
       if (patch.subOps) {
         for (const subOp of patch.subOps) {

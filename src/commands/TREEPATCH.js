@@ -22,10 +22,7 @@ import { GitWalkerSymbol } from '../utils/symbols.js'
  * @returns {Walker} Returns a git commit Walker
  *
  */
-export function TREEPATCH ({
-  core = 'default',
-  patch
-}) {
+export function TREEPATCH ({ core = 'default', patch }) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {

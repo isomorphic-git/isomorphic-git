@@ -24,15 +24,15 @@ import { walkBeta1 } from './walkBeta1.js'
  * console.log(branch)
  *
  */
-export async function mergeTreePatches ({
-  treePatches
-}) {
+export async function mergeTreePatches ({ treePatches }) {
   try {
     const results = await walkBeta1({
       trees: treePatches.map(patch => TREEPATCH({ patch })),
-      map: async (entries) => {
+      map: async entries => {
         // label entries
-        entries.forEach((entry, index) => { entry.index = index })
+        entries.forEach((entry, index) => {
+          entry.index = index
+        })
         // Only one change can happen per filepath
         const ops = entries.filter(entry => entry.ops && entry.ops.length > 0)
         if (ops.length === 0) {
@@ -55,7 +55,11 @@ export async function mergeTreePatches ({
           return parent
         } else {
           try {
-            const subOps = children.filter(child => child.ops.length > 0 || (child.subOps && child.subOps.length > 0)) // remove undefineds
+            const subOps = children.filter(
+              child =>
+                child.ops.length > 0 ||
+                (child.subOps && child.subOps.length > 0)
+            ) // remove undefineds
             if (subOps.length > 0) parent.subOps = subOps
             return parent
           } catch (e) {

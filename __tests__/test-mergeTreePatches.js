@@ -27,7 +27,11 @@ describe('mergeTreePatches', () => {
     const { gitdir } = await makeFixture('test-diff')
     // Test
     const diff1 = await diffTree({ gitdir, before: 'master', after: 'a-file' })
-    const diff2 = await diffTree({ gitdir, before: 'master', after: 'a-folder' })
+    const diff2 = await diffTree({
+      gitdir,
+      before: 'master',
+      after: 'a-folder'
+    })
     const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
     expect(patch).toMatchSnapshot()
   })
@@ -36,8 +40,16 @@ describe('mergeTreePatches', () => {
     // Setup
     const { gitdir } = await makeFixture('test-diff')
     // Test
-    const diff1 = await diffTree({ gitdir, before: 'mainline', after: 'add-files' })
-    const diff2 = await diffTree({ gitdir, before: 'mainline', after: 'change-modes' })
+    const diff1 = await diffTree({
+      gitdir,
+      before: 'mainline',
+      after: 'add-files'
+    })
+    const diff2 = await diffTree({
+      gitdir,
+      before: 'mainline',
+      after: 'change-modes'
+    })
     const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
     expect(patch).toMatchSnapshot()
   })
@@ -46,8 +58,16 @@ describe('mergeTreePatches', () => {
     // Setup
     const { gitdir } = await makeFixture('test-diff')
     // Test
-    const diff1 = await diffTree({ gitdir, before: 'mainline', after: 'add-files' })
-    const diff2 = await diffTree({ gitdir, before: 'mainline', after: 'remofe-files' })
+    const diff1 = await diffTree({
+      gitdir,
+      before: 'mainline',
+      after: 'add-files'
+    })
+    const diff2 = await diffTree({
+      gitdir,
+      before: 'mainline',
+      after: 'remofe-files'
+    })
     const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
     expect(patch).toMatchSnapshot()
   })
