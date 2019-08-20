@@ -2,7 +2,6 @@
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-import { flat } from '../utils/flat.js'
 
 import { TREE } from './TREE.js'
 import { walkBeta1 } from './walkBeta1.js'
@@ -18,7 +17,7 @@ import { walkBeta1 } from './walkBeta1.js'
  * @property {string} basename - The file name
  * @property {FileSystemFn[]} ops - The filesystem operation to perform
  * @property {string|null} before - The SHA-1 object id from the before tree
- * @property {string|null} after - The SHA-1 object id from the after 
+ * @property {string|null} after - The SHA-1 object id from the after
  * @property {TreePatch[]} [subOps] - Child patches of this patch
  * @property {TreePatch[]} [conflicts] - Child patches of this patch
  *
@@ -59,7 +58,7 @@ export async function diffTree ({
     const beforeTree = TREE({ core, dir, gitdir, fs, ref: before })
     const afterTree = TREE({ core, dir, gitdir, fs, ref: after })
 
-    let results = await walkBeta1({
+    const results = await walkBeta1({
       trees: [beforeTree, afterTree],
       map: async function ([before, after]) {
         await Promise.all([before.populateStat(), after.populateStat()])
@@ -80,7 +79,7 @@ export async function diffTree ({
         if (children.length === 0) {
           return parent
         } else {
-          const subOps = children.filter(child => child.ops.length > 0 || child.subOps && child.subOps.length > 0) // remove undefineds
+          const subOps = children.filter(child => child.ops.length > 0 || (child.subOps && child.subOps.length > 0)) // remove undefineds
           if (subOps.length > 0) parent.subOps = subOps
           return parent
         }

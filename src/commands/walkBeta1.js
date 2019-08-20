@@ -220,7 +220,7 @@ export async function walkBeta1 ({
   map = async entry => entry,
   // The default reducer is a flatmap that filters out undefineds.
   reduce = async (parent, children) => {
-    let flatten = flat(children)
+    const flatten = flat(children)
     if (parent !== undefined) flatten.unshift(parent)
     return flatten
   },

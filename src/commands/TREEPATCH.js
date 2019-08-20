@@ -26,7 +26,7 @@ export function TREEPATCH ({
   core = 'default',
   patch
 }) {
-  let o = Object.create(null)
+  const o = Object.create(null)
   Object.defineProperty(o, GitWalkerSymbol, {
     value: function () {
       return new GitWalkerPatch({ patch })

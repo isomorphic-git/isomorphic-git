@@ -1,6 +1,4 @@
 // @ts-check
-import { GitError, E } from '../models/GitError.js'
-import { flat } from '../utils/flat.js'
 import { TREEPATCH } from './TREEPATCH.js'
 import { walkBeta1 } from './walkBeta1.js'
 
@@ -27,15 +25,14 @@ import { walkBeta1 } from './walkBeta1.js'
  *
  */
 export async function mergeTreePatches ({
-  treePatches,
+  treePatches
 }) {
   try {
-    const collisions = []
     const results = await walkBeta1({
       trees: treePatches.map(patch => TREEPATCH({ patch })),
       map: async (entries) => {
         // label entries
-        entries.forEach((entry, index) => entry.index = index)
+        entries.forEach((entry, index) => { entry.index = index })
         // Only one change can happen per filepath
         const ops = entries.filter(entry => entry.ops && entry.ops.length > 0)
         if (ops.length === 0) {
@@ -58,9 +55,9 @@ export async function mergeTreePatches ({
           return parent
         } else {
           try {
-          const subOps = children.filter(child => child.ops.length > 0 || child.subOps && child.subOps.length > 0) // remove undefineds
-          if (subOps.length > 0) parent.subOps = subOps
-          return parent
+            const subOps = children.filter(child => child.ops.length > 0 || (child.subOps && child.subOps.length > 0)) // remove undefineds
+            if (subOps.length > 0) parent.subOps = subOps
+            return parent
           } catch (e) {
             console.log(children)
           }

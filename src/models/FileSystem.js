@@ -155,6 +155,7 @@ export class FileSystem {
       return false
     }
   }
+
   /**
    * Read a directory without throwing an error is the directory doesn't exist
    */
