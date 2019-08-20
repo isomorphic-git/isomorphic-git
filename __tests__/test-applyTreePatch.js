@@ -73,4 +73,33 @@ describe('applyTreePatch', () => {
     }))[0]
     expect(oid).toBe(commit.tree)
   })
+
+  it("merge 'delete-first-half' and 'delete-second-half'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-diff')
+    // Test
+    const diff1 = await diffTree({
+      gitdir,
+      before: 'mainline',
+      after: 'delete-first-half'
+    })
+    const diff2 = await diffTree({
+      gitdir,
+      before: 'mainline',
+      after: 'delete-second-half'
+    })
+    const treePatch = await mergeTreePatches({ treePatches: [diff1, diff2] })
+    const oid = await applyTreePatch({
+      fs,
+      gitdir,
+      base: 'mainline',
+      treePatch
+    })
+    const commit = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'delete-first-half-merge-delete-second-half'
+    }))[0]
+    expect(oid).toBe(commit.tree)
+  })
 })

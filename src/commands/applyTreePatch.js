@@ -112,7 +112,11 @@ export async function applyTreePatch ({
        */
       reduce: async (parent, children) => {
         const entries = children.filter(Boolean) // remove undefineds
-        if (children.length > 0) {
+
+        // automatically delete directories if they have been emptied
+        if (parent && parent.type === 'tree' && entries.length === 0) return
+
+        if (entries.length > 0) {
           const tree = new GitTree(entries)
           const object = tree.toObject()
           const oid = await writeObject({ fs, gitdir, type: 'tree', object })
