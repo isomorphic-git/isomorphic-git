@@ -96,7 +96,7 @@
     "karma-chrome-launcher": "2.2.0",
     "karma-edge-launcher": "0.4.2",
     "karma-fail-fast-reporter": "1.0.5",
-    "karma-firefox-launcher": "1.1.0",
+    "karma-firefox-launcher": "1.2.0",
     "karma-ie-launcher": "1.0.0",
     "karma-jasmine": "2.0.1",
     "karma-junit-reporter": "1.2.0",
