@@ -12,7 +12,7 @@ describe('mergeTreePatches', () => {
     registerSnapshots(snapshots)
   })
 
-  fit('merge two empty TreePatches', async () => {
+  it('merge two empty TreePatches', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-diff')
     // Test
@@ -22,7 +22,7 @@ describe('mergeTreePatches', () => {
     expect(patch).toEqual({ basename: '.', index: 0, ops: [] })
   })
 
-  fit('merge two conflicting TreePatches', async () => {
+  it('merge two conflicting TreePatches', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-diff')
     // Test
@@ -42,7 +42,7 @@ describe('mergeTreePatches', () => {
     expect(patchset).toMatchSnapshot()
   })
 
-  fit('merge add-files and remove-files', async () => {
+  it('merge add-files and remove-files', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-diff')
     // Test
