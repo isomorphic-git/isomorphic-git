@@ -27,6 +27,7 @@ describe('merge', () => {
     })
     expect(oid).toEqual(desiredOid)
   })
+
   it('merge medium into master', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-merge')
@@ -50,6 +51,7 @@ describe('merge', () => {
     })
     expect(oid).toEqual(desiredOid)
   })
+
   it('merge oldest into master', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-merge')
@@ -73,6 +75,7 @@ describe('merge', () => {
     })
     expect(oid).toEqual(desiredOid)
   })
+
   it('merge newest into master', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-merge')

@@ -3,6 +3,7 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
@@ -121,9 +122,16 @@ export async function merge ({
       // try a fancier merge
       const treeOid = await basicMerge({ fs, gitdir, ours: ourOid, theirs: theirOid, base: baseOid })
       if (!dryRun) {
-        const message = `Merge branch '${theirs}' into ${ours}`
-        const oid = await commit({ fs, gitdir, message, author, committer, signingKey })
-        await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: oid })
+        const oid = await commit({
+          fs,
+          gitdir,
+          message: `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(ours)}`,
+          ref: ours,
+          parent: [ourOid, theirOid],
+          author,
+          committer,
+          signingKey
+        })
         return {
           oid,
           tree: treeOid,
