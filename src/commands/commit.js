@@ -101,11 +101,13 @@ export async function commit ({
         const treeRef = await constructTree({ fs, gitdir, inode })
         if (!parent) {
           try {
-            parent = [await GitRefManager.resolve({
-              fs,
-              gitdir,
-              ref
-            })]
+            parent = [
+              await GitRefManager.resolve({
+                fs,
+                gitdir,
+                ref
+              })
+            ]
           } catch (err) {
             // Probably an initial commit
             parent = []
