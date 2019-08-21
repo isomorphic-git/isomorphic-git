@@ -110,7 +110,10 @@ describe('commit', () => {
     })
     expect(sha).toBe('43fbc94f2c1db655a833e08c72d005954ff32f32')
     // does NOT update master branch pointer
-    const { parent: parents, tree: _tree } = (await log({ gitdir, depth: 1 }))[0]
+    const { parent: parents, tree: _tree } = (await log({
+      gitdir,
+      depth: 1
+    }))[0]
     expect(parents).not.toEqual([originalOid])
     expect(parents).toEqual(parent)
     expect(_tree).toEqual(tree)

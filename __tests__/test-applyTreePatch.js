@@ -144,7 +144,7 @@ describe('applyTreePatch', () => {
         email: 'mrtest@example.com',
         timestamp: 1262356920,
         timezoneOffset: -0
-      },
+      }
     })
     const mergeCommit = (await log({ gitdir, ref: 'delete-first-half', depth: 1 }))[0]
     expect(report.tree).toBe(commit.tree)
