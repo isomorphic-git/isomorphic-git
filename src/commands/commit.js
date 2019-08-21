@@ -20,6 +20,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
+ * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.
  * @param {string} args.message - The commit message to use.
  * @param {Object} [args.author] - The details about the author.
  * @param {string} [args.author.name] - Default is `user.name` config.
@@ -51,6 +52,7 @@ export async function commit ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   ref,
+  parent,
   message,
   author,
   committer,
@@ -97,21 +99,23 @@ export async function commit ({
         const inodes = flatFileListToDirectoryStructure(index.entries)
         const inode = inodes.get('.')
         const treeRef = await constructTree({ fs, gitdir, inode })
-        let parents
-        try {
-          const parent = await GitRefManager.resolve({
-            fs,
-            gitdir,
-            ref
-          })
-          parents = [parent]
-        } catch (err) {
-          // Probably an initial commit
-          parents = []
+        if (!parent) {
+          try {
+            parent = [
+              await GitRefManager.resolve({
+                fs,
+                gitdir,
+                ref
+              })
+            ]
+          } catch (err) {
+            // Probably an initial commit
+            parent = []
+          }
         }
         let comm = GitCommit.from({
           tree: treeRef,
-          parent: parents,
+          parent,
           author,
           committer,
           message
