@@ -120,13 +120,14 @@ export async function merge ({
         throw new GitError(E.FastForwardFail)
       }
       // try a fancier merge
-      const treeOid = await basicMerge({ fs, gitdir, ours: ourOid, theirs: theirOid, base: baseOid })
+      const tree = await basicMerge({ fs, gitdir, ours: ourOid, theirs: theirOid, base: baseOid })
       if (!dryRun) {
         const oid = await commit({
           fs,
           gitdir,
           message: `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(ours)}`,
           ref: ours,
+          tree,
           parent: [ourOid, theirOid],
           author,
           committer,
@@ -134,12 +135,12 @@ export async function merge ({
         })
         return {
           oid,
-          tree: treeOid,
+          tree,
           mergeCommit: true
         }
       }
       return {
-        tree: treeOid,
+        tree,
         mergeCommit: true
       }
     }
