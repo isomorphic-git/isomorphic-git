@@ -19,8 +19,6 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
- * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.
  * @param {string} args.message - The commit message to use.
  * @param {Object} [args.author] - The details about the author.
  * @param {string} [args.author.name] - Default is `user.name` config.
@@ -31,6 +29,9 @@ import { cores } from '../utils/plugins.js'
  * @param {Object} [args.committer = author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key.
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
+ * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
+ * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.
+ * @param {string} [args.tree] - The SHA-1 object id of the tree to use. If not specified, a new tree object is created from the current git index.
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  *
@@ -51,13 +52,14 @@ export async function commit ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  ref,
-  parent,
   message,
   author,
   committer,
   signingKey,
-  noUpdateBranch = false
+  noUpdateBranch = false,
+  ref,
+  parent,
+  tree
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -98,7 +100,9 @@ export async function commit ({
       async function (index) {
         const inodes = flatFileListToDirectoryStructure(index.entries)
         const inode = inodes.get('.')
-        const treeRef = await constructTree({ fs, gitdir, inode })
+        if (!tree) {
+          tree = await constructTree({ fs, gitdir, inode })
+        }
         if (!parent) {
           try {
             parent = [
@@ -114,7 +118,7 @@ export async function commit ({
           }
         }
         let comm = GitCommit.from({
-          tree: treeRef,
+          tree,
           parent,
           author,
           committer,
