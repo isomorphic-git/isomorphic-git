@@ -12,6 +12,7 @@ describe('commit', () => {
   it('commit', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-commit')
+    const { oid: originalOid } = (await log({ gitdir, depth: 1 }))[0]
     // Test
     const sha = await commit({
       gitdir,
@@ -24,6 +25,63 @@ describe('commit', () => {
       message: 'Initial commit'
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
+    // updates branch pointer
+    const { oid: currentOid } = (await log({ gitdir, depth: 1 }))[0]
+    expect(currentOid).not.toEqual(originalOid)
+    expect(currentOid).toEqual(sha)
+  })
+
+  it('without updating branch', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-commit')
+    const { oid: originalOid } = (await log({ gitdir, depth: 1 }))[0]
+    // Test
+    const sha = await commit({
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      },
+      message: 'Initial commit',
+      noUpdateBranch: true
+    })
+    expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
+    // does NOT update branch pointer
+    const { oid: currentOid } = (await log({ gitdir, depth: 1 }))[0]
+    expect(currentOid).toEqual(originalOid)
+    expect(currentOid).not.toEqual(sha)
+  })
+
+  it('custom ref', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-commit')
+    const { oid: originalOid } = (await log({ gitdir, depth: 1 }))[0]
+    // Test
+    const sha = await commit({
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      },
+      message: 'Initial commit',
+      ref: 'refs/heads/master-copy'
+    })
+    expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
+    // does NOT update master branch pointer
+    const { oid: currentOid } = (await log({ gitdir, depth: 1 }))[0]
+    expect(currentOid).toEqual(originalOid)
+    expect(currentOid).not.toEqual(sha)
+    // but DOES update master-copy
+    const { oid: copyOid } = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'master-copy'
+    }))[0]
+    expect(sha).toEqual(copyOid)
   })
 
   it('throw error if missing author', async () => {
