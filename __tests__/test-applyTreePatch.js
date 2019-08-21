@@ -122,6 +122,6 @@ describe('applyTreePatch', () => {
       theirs: 'delete-second-half',
       dryRun: true
     })
-    expect(report.treeOid).toBe(commit.tree)
+    expect(report.tree).toBe(commit.tree)
   })
 })

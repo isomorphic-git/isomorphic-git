@@ -7,7 +7,7 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { currentBranch } from './currentBranch.js'
-import { log } from './log'
+import { commit } from './commit'
 import { diffTree } from './diffTree.js'
 import { mergeTreePatches } from './mergeTreePatches.js'
 import { applyTreePatch } from './applyTreePatch.js'
@@ -16,9 +16,11 @@ import { findMergeBase } from './findMergeBase.js'
 /**
  *
  * @typedef {Object} MergeReport - Returns an object with a schema like this:
- * @property {string} oid - The SHA-1 object id that is now at the head of the branch
+ * @property {string} [oid] - The SHA-1 object id that is now at the head of the branch. Absent only if `dryRun` was specified and `mergeCommit` is true.
  * @property {boolean} [alreadyMerged] - True if the branch was already merged so no changes were made
  * @property {boolean} [fastForward] - True if it was a fast-forward merge
+ * @property {boolean} [mergeCommit] - True if merge resulted in a merge commit
+ * @property {string} [tree] - The SHA-1 object id of the tree resulting from a merge commit
  *
  */
 
@@ -34,6 +36,9 @@ import { findMergeBase } from './findMergeBase.js'
  * @param {string} args.theirs - The branch to be merged
  * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
  * @param {boolean} [args.dryRun = false] - If true, simulates a merge so you can test whether it would succeed.
+ * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
+ * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
+ * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
  *
  * @returns {Promise<MergeReport>} Resolves to a description of the merge operation
  * @see MergeReport
@@ -51,7 +56,10 @@ export async function merge ({
   ours,
   theirs,
   fastForwardOnly = false,
-  dryRun = false
+  dryRun = false,
+  author,
+  committer,
+  signingKey
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -113,10 +121,17 @@ export async function merge ({
       // try a fancier merge
       const treeOid = await basicMerge({ fs, gitdir, ours: ourOid, theirs: theirOid, base: baseOid })
       if (!dryRun) {
-        await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: treeOid })
+        const message = `Merge branch '${theirs}' into ${ours}`
+        const oid = await commit({ fs, gitdir, message, author, committer, signingKey })
+        await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: oid })
+        return {
+          oid,
+          tree: treeOid,
+          mergeCommit: true
+        }
       }
       return {
-        treeOid,
+        tree: treeOid,
         mergeCommit: true
       }
     }
@@ -126,49 +141,15 @@ export async function merge ({
   }
 }
 
-function compareAge (a, b) {
-  return a.committer.timestamp - b.committer.timestamp
-}
-
-// async function findMergeBase ({ gitdir, fs, refs }) {
-//   // Where is async flatMap when you need it?
-//   const commits = []
-//   for (const ref of refs) {
-//     const list = await log({ gitdir, fs, ref, depth: 1 })
-//     commits.push(list[0])
-//   }
-//   // Are they actually the same commit?
-//   if (commits.every(commit => commit.oid === commits[0].oid)) {
-//     return commits[0].oid
-//   }
-//   // Is the oldest commit an ancestor of the others?
-//   const sorted = commits.sort(compareAge)
-//   let candidate = sorted[0]
-//   const since = new Date(candidate.author.timestamp - 1)
-//   for (const ref of refs) {
-//     const list = await log({ gitdir, fs, ref, since })
-//     if (!list.find(commit => commit.oid === candidate.oid)) {
-//       candidate = null
-//       break
-//     }
-//   }
-//   if (candidate) return candidate.oid
-//   // Is...
-//   throw new GitError(E.MergeNotSupportedFail)
-// }
-
-async function basicMerge ({ fs, gitdir, ours, theirs, base}) {
+async function basicMerge ({ fs, gitdir, ours, theirs, base }) {
   const diff1 = await diffTree({ gitdir, before: base, after: ours })
   const diff2 = await diffTree({ gitdir, before: base, after: theirs })
   const { treePatch, hasConflicts } = await mergeTreePatches({ treePatches: [diff1, diff2] })
   if (hasConflicts) throw new GitError(E.MergeNotSupportedFail)
-  const oid = await applyTreePatch({
+  return applyTreePatch({
     fs,
     gitdir,
     base,
     treePatch
   })
-  // todo create commit
-  console.log(oid)
-  return oid
 }
