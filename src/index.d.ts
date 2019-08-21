@@ -299,6 +299,7 @@ export function commit(args: GitDir & {
   core?: string;
   fs?: any;
   ref?: string;
+  parent?: string[];
   message: string;
   author: {
     name?: string;
