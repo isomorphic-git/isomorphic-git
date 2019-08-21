@@ -26,7 +26,8 @@ describe('commit', () => {
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // updates branch pointer
-    const { oid: currentOid } = (await log({ gitdir, depth: 1 }))[0]
+    const { oid: currentOid, parent } = (await log({ gitdir, depth: 1 }))[0]
+    expect(parent).toEqual([originalOid])
     expect(currentOid).not.toEqual(originalOid)
     expect(currentOid).toEqual(sha)
   })
@@ -82,6 +83,34 @@ describe('commit', () => {
       ref: 'master-copy'
     }))[0]
     expect(sha).toEqual(copyOid)
+  })
+
+  it('custom parents', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-commit')
+    const { oid: originalOid } = (await log({ gitdir, depth: 1 }))[0]
+    // Test
+    const parent = [
+      '1111111111111111111111111111111111111111',
+      '2222222222222222222222222222222222222222',
+      '3333333333333333333333333333333333333333'
+    ]
+    const sha = await commit({
+      gitdir,
+      parent,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      },
+      message: 'Initial commit'
+    })
+    expect(sha).toBe('e11b6803f58bc2218f2e92a1bae0eeee0101a06c')
+    // does NOT update master branch pointer
+    const { parent: parents } = (await log({ gitdir, depth: 1 }))[0]
+    expect(parents).not.toEqual([originalOid])
+    expect(parents).toEqual(parent)
   })
 
   it('throw error if missing author', async () => {
