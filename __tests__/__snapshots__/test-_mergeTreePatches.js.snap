@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`mergeTreePatches merge add-files and change-modes 1`] = `
+exports[`_mergeTreePatches merge add-files and change-modes 1`] = `
 Object {
   "basename": ".",
   "index": 0,
@@ -53,7 +53,7 @@ Object {
 }
 `;
 
-exports[`mergeTreePatches merge add-files and remove-files 1`] = `
+exports[`_mergeTreePatches merge add-files and remove-files 1`] = `
 Object {
   "basename": ".",
   "index": 0,
@@ -121,7 +121,7 @@ Object {
 }
 `;
 
-exports[`mergeTreePatches merge two conflicting TreePatches 1`] = `
+exports[`_mergeTreePatches merge two conflicting TreePatches 1`] = `
 Object {
   "basename": ".",
   "index": 0,

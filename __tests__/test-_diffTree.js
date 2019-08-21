@@ -1,28 +1,30 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const snapshots = require('./__snapshots__/test-diffTree.js.snap')
+// @ts-ignore
+const snapshots = require('./__snapshots__/test-_diffTree.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { diffTree } = require('isomorphic-git')
+const { _diffTree } = require('isomorphic-git/internal-apis')
 
-describe('diffTree', () => {
+describe('_diffTree', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
   })
 
   it('diff two empty commits', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({ gitdir, before: 'master', after: 'master' })
+    const diff = await _diffTree({ fs, gitdir, before: 'master', after: 'master' })
     expect(diff).toMatchSnapshot()
   })
 
   it('diff commit against itself', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'mainline',
       after: 'mainline'
@@ -32,25 +34,26 @@ describe('diffTree', () => {
 
   it('diff commit against empty commit', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({ gitdir, before: 'master', after: 'mainline' })
+    const diff = await _diffTree({ fs, gitdir, before: 'master', after: 'mainline' })
     expect(diff).toMatchSnapshot()
   })
 
   it('diff empty commit against commit', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({ gitdir, before: 'mainline', after: 'master' })
+    const diff = await _diffTree({ fs, gitdir, before: 'mainline', after: 'master' })
     expect(diff).toMatchSnapshot()
   })
 
   it('diff add-files against mainline', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'mainline',
       after: 'add-files'
@@ -60,9 +63,10 @@ describe('diffTree', () => {
 
   it('diff remove-files against mainline', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'mainline',
       after: 'remove-files'
@@ -72,25 +76,26 @@ describe('diffTree', () => {
 
   it('diff a-file against a-folder', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({ gitdir, before: 'a-folder', after: 'a-file' })
+    const diff = await _diffTree({ fs, gitdir, before: 'a-folder', after: 'a-file' })
     expect(diff).toMatchSnapshot()
   })
 
   it('diff a-folder against a-file', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({ gitdir, before: 'a-file', after: 'a-folder' })
+    const diff = await _diffTree({ fs, gitdir, before: 'a-file', after: 'a-folder' })
     expect(diff).toMatchSnapshot()
   })
 
   it('diff nest-folder against mainline', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'mainline',
       after: 'nest-folder'
@@ -100,9 +105,10 @@ describe('diffTree', () => {
 
   it('diff mainline against nest-folder', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'nest-folder',
       after: 'mainline'
@@ -112,9 +118,10 @@ describe('diffTree', () => {
 
   it('diff folder-replaces-file against mainline', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'mainline',
       after: 'folder-replaces-file'
@@ -124,9 +131,10 @@ describe('diffTree', () => {
 
   it('diff rename-folder against mainline', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'mainline',
       after: 'rename-folder'
@@ -136,9 +144,10 @@ describe('diffTree', () => {
 
   it('diff change-modes against mainline', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'mainline',
       after: 'change-modes'
@@ -148,9 +157,10 @@ describe('diffTree', () => {
 
   it('diff mainline against change-modes', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-diff')
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await diffTree({
+    const diff = await _diffTree({
+      fs,
       gitdir,
       before: 'change-modes',
       after: 'mainline'

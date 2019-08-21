@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`diffTree diff a-file against a-folder 1`] = `
+exports[`_diffTree diff a-file against a-folder 1`] = `
 Object {
   "after": "aaff74984cccd156a469afa7d9ab10e4777beb24",
   "basename": ".",
@@ -30,7 +30,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff a-folder against a-file 1`] = `
+exports[`_diffTree diff a-folder against a-file 1`] = `
 Object {
   "after": "e15e58f6a6e2edc7ab8063ae7e8565028d2bdefd",
   "basename": ".",
@@ -60,7 +60,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff add-files against mainline 1`] = `
+exports[`_diffTree diff add-files against mainline 1`] = `
 Object {
   "after": "ab318441c394f77457394ca9320484807c4ac4a8",
   "basename": ".",
@@ -95,7 +95,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff change-modes against mainline 1`] = `
+exports[`_diffTree diff change-modes against mainline 1`] = `
 Object {
   "after": "6cfc3efa546435864c3f01bac1b0ce713996b342",
   "basename": ".",
@@ -130,7 +130,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff commit against empty commit 1`] = `
+exports[`_diffTree diff commit against empty commit 1`] = `
 Object {
   "after": "5005b9a37d7f2174d7a0a87b94402b83bc70bdb9",
   "basename": ".",
@@ -183,7 +183,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff commit against itself 1`] = `
+exports[`_diffTree diff commit against itself 1`] = `
 Object {
   "after": "5005b9a37d7f2174d7a0a87b94402b83bc70bdb9",
   "basename": ".",
@@ -192,7 +192,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff empty commit against commit 1`] = `
+exports[`_diffTree diff empty commit against commit 1`] = `
 Object {
   "after": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
   "basename": ".",
@@ -245,7 +245,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff folder-replaces-file against mainline 1`] = `
+exports[`_diffTree diff folder-replaces-file against mainline 1`] = `
 Object {
   "after": "decf623207d38c60aa08b54ce9c8e52fb1491064",
   "basename": ".",
@@ -309,7 +309,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff mainline against change-modes 1`] = `
+exports[`_diffTree diff mainline against change-modes 1`] = `
 Object {
   "after": "5005b9a37d7f2174d7a0a87b94402b83bc70bdb9",
   "basename": ".",
@@ -344,7 +344,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff mainline against nest-folder 1`] = `
+exports[`_diffTree diff mainline against nest-folder 1`] = `
 Object {
   "after": "5005b9a37d7f2174d7a0a87b94402b83bc70bdb9",
   "basename": ".",
@@ -417,7 +417,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff nest-folder against mainline 1`] = `
+exports[`_diffTree diff nest-folder against mainline 1`] = `
 Object {
   "after": "c5ea66f32b2749db1646ec3800cd27a366af4a73",
   "basename": ".",
@@ -490,7 +490,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff remove-files against mainline 1`] = `
+exports[`_diffTree diff remove-files against mainline 1`] = `
 Object {
   "after": "e92b943e694655c9ba42dca3b2f69a46594e50be",
   "basename": ".",
@@ -525,7 +525,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff rename-folder against mainline 1`] = `
+exports[`_diffTree diff rename-folder against mainline 1`] = `
 Object {
   "after": "6a498d4ad57cc3b7e916479e58965d95f8033942",
   "basename": ".",
@@ -588,7 +588,7 @@ Object {
 }
 `;
 
-exports[`diffTree diff two empty commits 1`] = `
+exports[`_diffTree diff two empty commits 1`] = `
 Object {
   "after": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
   "basename": ".",

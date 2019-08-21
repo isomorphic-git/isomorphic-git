@@ -1,10 +1,10 @@
 // @ts-check
-import { TREEPATCH } from './TREEPATCH.js'
+import { _TREEPATCH } from './_TREEPATCH.js'
 import { walkBeta1 } from './walkBeta1.js'
 
 /**
  *
- * @typedef {import('./diffTree').TreePatch} TreePatch
+ * @typedef {import('./_diffTree').TreePatch} TreePatch
  */
 
 /**
@@ -17,17 +17,12 @@ import { walkBeta1 } from './walkBeta1.js'
  * @returns {Promise<{ treePatch: TreePatch, hasConflicts: boolean}>} The name of the current branch or undefined if the HEAD is detached.
  * @see TreePatch
  *
- * @example
- * // Get the current branch name
- * let branch = await git.mergeTreePatches({ dir: '$input((/))', treePatches: $input(([])) })
- * console.log(branch)
- *
  */
-export async function mergeTreePatches ({ treePatches }) {
+export async function _mergeTreePatches ({ treePatches }) {
   try {
     let hasConflicts = false
     const treePatch = await walkBeta1({
-      trees: treePatches.map(patch => TREEPATCH({ patch })),
+      trees: treePatches.map(patch => _TREEPATCH({ patch })),
       map: async entries => {
         // label entries
         entries.forEach((entry, index) => {
@@ -71,7 +66,7 @@ export async function mergeTreePatches ({ treePatches }) {
     })
     return { treePatch, hasConflicts }
   } catch (err) {
-    err.caller = 'git.mergeTreePatches'
+    err.caller = 'git._mergeTreePatches'
     throw err
   }
 }

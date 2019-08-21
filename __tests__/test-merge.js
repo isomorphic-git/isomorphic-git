@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { merge, resolveRef } = require('isomorphic-git')
+const { merge, resolveRef, log } = require('isomorphic-git')
 
 describe('merge', () => {
   it('merge master into master', async () => {
@@ -127,5 +127,52 @@ describe('merge', () => {
       ref: 'master'
     })
     expect(oid).toEqual(originalOid)
+  })
+
+  it("merge 'delete-first-half' and 'delete-second-half' (dryRun)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
+    const commit = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'delete-first-half-merge-delete-second-half'
+    }))[0]
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'delete-first-half',
+      theirs: 'delete-second-half',
+      dryRun: true
+    })
+    expect(report.tree).toBe(commit.tree)
+  })
+
+  it("merge 'delete-first-half' and 'delete-second-half'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-_diffTree')
+    const commit = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'delete-first-half-merge-delete-second-half'
+    }))[0]
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'delete-first-half',
+      theirs: 'delete-second-half',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      }
+    })
+    const mergeCommit = (await log({ gitdir, ref: 'delete-first-half', depth: 1 }))[0]
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
   })
 })

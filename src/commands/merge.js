@@ -7,11 +7,11 @@ import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
+import { _applyTreePatch } from './_applyTreePatch.js'
+import { _diffTree } from './_diffTree.js'
+import { _mergeTreePatches } from './_mergeTreePatches.js'
 import { currentBranch } from './currentBranch.js'
 import { commit } from './commit'
-import { diffTree } from './diffTree.js'
-import { mergeTreePatches } from './mergeTreePatches.js'
-import { applyTreePatch } from './applyTreePatch.js'
 import { findMergeBase } from './findMergeBase.js'
 
 /**
@@ -151,11 +151,11 @@ export async function merge ({
 }
 
 async function basicMerge ({ fs, gitdir, ours, theirs, base }) {
-  const diff1 = await diffTree({ gitdir, before: base, after: ours })
-  const diff2 = await diffTree({ gitdir, before: base, after: theirs })
-  const { treePatch, hasConflicts } = await mergeTreePatches({ treePatches: [diff1, diff2] })
+  const diff1 = await _diffTree({ gitdir, before: base, after: ours })
+  const diff2 = await _diffTree({ gitdir, before: base, after: theirs })
+  const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
   if (hasConflicts) throw new GitError(E.MergeNotSupportedFail)
-  return applyTreePatch({
+  return _applyTreePatch({
     fs,
     gitdir,
     base,

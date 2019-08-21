@@ -39,13 +39,8 @@ import { walkBeta1 } from './walkBeta1.js'
  * @see TreePatch
  * @see FileSystemFn
  *
- * @example
- * // Get the current branch name
- * let branch = await git.diffTree({ dir: '$input((/))', fullname: $input((false)) })
- * console.log(branch)
- *
  */
-export async function diffTree ({
+export async function _diffTree ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
@@ -98,7 +93,7 @@ export async function diffTree ({
     })
     return results
   } catch (err) {
-    err.caller = 'git.diffTree'
+    err.caller = 'git._diffTree'
     throw err
   }
 }

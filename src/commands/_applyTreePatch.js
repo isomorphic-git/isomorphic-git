@@ -5,13 +5,13 @@ import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
+import { _TREEPATCH } from './_TREEPATCH.js'
 import { TREE } from './TREE.js'
-import { TREEPATCH } from './TREEPATCH.js'
 import { walkBeta1 } from './walkBeta1.js'
 
 /**
  *
- * @typedef {import('./diffTree').TreePatch} TreePatch
+ * @typedef {import('./_diffTree').TreePatch} TreePatch
  */
 
 /**
@@ -33,13 +33,8 @@ import { walkBeta1 } from './walkBeta1.js'
  * @returns {Promise<string>} The SHA-1 object id of the new tree
  * @see TreePatch
  *
- * @example
- * // Get the current branch name
- * let branch = await git.applyTreePatch({ dir: '$input((/))', treePatches: $input(([])) })
- * console.log(branch)
- *
  */
-export async function applyTreePatch ({
+export async function _applyTreePatch ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
@@ -50,7 +45,7 @@ export async function applyTreePatch ({
   try {
     const fs = new FileSystem(_fs)
     const tree = TREE({ core, dir, gitdir, fs, ref: base })
-    const patch = TREEPATCH({ patch: treePatch })
+    const patch = _TREEPATCH({ patch: treePatch })
 
     const results = await walkBeta1({
       trees: [tree, patch],
@@ -127,7 +122,7 @@ export async function applyTreePatch ({
     })
     return results.oid
   } catch (err) {
-    err.caller = 'git.applyTreePatch'
+    err.caller = 'git._applyTreePatch'
     throw err
   }
 }
