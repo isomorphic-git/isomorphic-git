@@ -76,7 +76,11 @@ describe('commit', () => {
     expect(currentOid).toEqual(originalOid)
     expect(currentOid).not.toEqual(sha)
     // but DOES update master-copy
-    const { oid: copyOid } = (await log({ gitdir, depth: 1, ref: 'master-copy' }))[0]
+    const { oid: copyOid } = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'master-copy'
+    }))[0]
     expect(sha).toEqual(copyOid)
   })
 

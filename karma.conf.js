@@ -149,9 +149,7 @@ module.exports = function (config) {
       plugins: [
         new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/),
         new webpack.DefinePlugin({
-          'process.env.TEST_PUSH_GITHUB_TOKEN': `'${
-            process.env.TEST_PUSH_GITHUB_TOKEN
-          }'`
+          'process.env.TEST_PUSH_GITHUB_TOKEN': `'${process.env.TEST_PUSH_GITHUB_TOKEN}'`
         })
       ],
       resolve: {
