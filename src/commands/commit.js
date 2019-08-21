@@ -19,6 +19,7 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
  * @param {string} args.message - The commit message to use.
  * @param {Object} [args.author] - The details about the author.
  * @param {string} [args.author.name] - Default is `user.name` config.
@@ -28,6 +29,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {Object} [args.committer = author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key.
+ * @param {boolean} [args.updateBranch = true] - Whether to update the branch pointer after creating the commit. True by default.
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  *
@@ -48,13 +50,24 @@ export async function commit ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
+  ref,
   message,
   author,
   committer,
-  signingKey
+  signingKey,
+  updateBranch = true
 }) {
   try {
     const fs = new FileSystem(_fs)
+
+    if (!ref) {
+      ref = await GitRefManager.resolve({
+        fs,
+        gitdir,
+        ref: 'HEAD',
+        depth: 2
+      })
+    }
 
     if (message === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
@@ -89,7 +102,7 @@ export async function commit ({
           const parent = await GitRefManager.resolve({
             fs,
             gitdir,
-            ref: 'HEAD'
+            ref
           })
           parents = [parent]
         } catch (err) {
@@ -113,14 +126,15 @@ export async function commit ({
           type: 'commit',
           object: comm.toObject()
         })
-        // Update branch pointer
-        const branch = await GitRefManager.resolve({
-          fs,
-          gitdir,
-          ref: 'HEAD',
-          depth: 2
-        })
-        await fs.write(join(gitdir, branch), oid + '\n')
+        if (updateBranch) {
+          // Update branch pointer
+          await GitRefManager.writeRef({
+            fs,
+            gitdir,
+            ref,
+            value: oid
+          })
+        }
       }
     )
     return oid
