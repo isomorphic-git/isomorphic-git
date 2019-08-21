@@ -8,6 +8,10 @@ import { cores } from '../utils/plugins.js'
 
 import { currentBranch } from './currentBranch.js'
 import { log } from './log'
+import { diffTree } from './diffTree.js'
+import { mergeTreePatches } from './mergeTreePatches.js'
+import { applyTreePatch } from './applyTreePatch.js'
+import { findMergeBase } from './findMergeBase.js'
 
 /**
  *
@@ -75,11 +79,17 @@ export async function merge ({
       ref: theirs
     })
     // find most recent common ancestor of ref a and ref b
-    const baseOid = await findMergeBase({
+    const baseOids = await findMergeBase({
+      core,
+      dir,
       gitdir,
       fs,
-      refs: [ourOid, theirOid]
+      oids: [ourOid, theirOid]
     })
+    if (baseOids.length !== 1) {
+      throw new GitError(E.MergeNotSupportedFail)
+    }
+    const baseOid = baseOids[0]
     // handle fast-forward case
     if (baseOid === theirOid) {
       return {
@@ -100,7 +110,15 @@ export async function merge ({
       if (fastForwardOnly) {
         throw new GitError(E.FastForwardFail)
       }
-      throw new GitError(E.MergeNotSupportedFail)
+      // try a fancier merge
+      const treeOid = await basicMerge({ fs, gitdir, ours: ourOid, theirs: theirOid, base: baseOid })
+      if (!dryRun) {
+        await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: treeOid })
+      }
+      return {
+        treeOid,
+        mergeCommit: true
+      }
     }
   } catch (err) {
     err.caller = 'git.merge'
@@ -112,29 +130,45 @@ function compareAge (a, b) {
   return a.committer.timestamp - b.committer.timestamp
 }
 
-async function findMergeBase ({ gitdir, fs, refs }) {
-  // Where is async flatMap when you need it?
-  const commits = []
-  for (const ref of refs) {
-    const list = await log({ gitdir, fs, ref, depth: 1 })
-    commits.push(list[0])
-  }
-  // Are they actually the same commit?
-  if (commits.every(commit => commit.oid === commits[0].oid)) {
-    return commits[0].oid
-  }
-  // Is the oldest commit an ancestor of the others?
-  const sorted = commits.sort(compareAge)
-  let candidate = sorted[0]
-  const since = new Date(candidate.author.timestamp - 1)
-  for (const ref of refs) {
-    const list = await log({ gitdir, fs, ref, since })
-    if (!list.find(commit => commit.oid === candidate.oid)) {
-      candidate = null
-      break
-    }
-  }
-  if (candidate) return candidate.oid
-  // Is...
-  throw new GitError(E.MergeNotSupportedFail)
+// async function findMergeBase ({ gitdir, fs, refs }) {
+//   // Where is async flatMap when you need it?
+//   const commits = []
+//   for (const ref of refs) {
+//     const list = await log({ gitdir, fs, ref, depth: 1 })
+//     commits.push(list[0])
+//   }
+//   // Are they actually the same commit?
+//   if (commits.every(commit => commit.oid === commits[0].oid)) {
+//     return commits[0].oid
+//   }
+//   // Is the oldest commit an ancestor of the others?
+//   const sorted = commits.sort(compareAge)
+//   let candidate = sorted[0]
+//   const since = new Date(candidate.author.timestamp - 1)
+//   for (const ref of refs) {
+//     const list = await log({ gitdir, fs, ref, since })
+//     if (!list.find(commit => commit.oid === candidate.oid)) {
+//       candidate = null
+//       break
+//     }
+//   }
+//   if (candidate) return candidate.oid
+//   // Is...
+//   throw new GitError(E.MergeNotSupportedFail)
+// }
+
+async function basicMerge ({ fs, gitdir, ours, theirs, base}) {
+  const diff1 = await diffTree({ gitdir, before: base, after: ours })
+  const diff2 = await diffTree({ gitdir, before: base, after: theirs })
+  const { treePatch, hasConflicts } = await mergeTreePatches({ treePatches: [diff1, diff2] })
+  if (hasConflicts) throw new GitError(E.MergeNotSupportedFail)
+  const oid = await applyTreePatch({
+    fs,
+    gitdir,
+    base,
+    treePatch
+  })
+  // todo create commit
+  console.log(oid)
+  return oid
 }

@@ -13,9 +13,8 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {TreePatch[]} args.treePatches - The SHA-1 object id of the first commit
- * @param {string} args.after - The SHA-1 object id of the second commit
  *
- * @returns {Promise<TreePatch>} The name of the current branch or undefined if the HEAD is detached.
+ * @returns {Promise<{ treePatch: TreePatch, hasConflicts: boolean}>} The name of the current branch or undefined if the HEAD is detached.
  * @see TreePatch
  *
  * @example
@@ -26,7 +25,8 @@ import { walkBeta1 } from './walkBeta1.js'
  */
 export async function mergeTreePatches ({ treePatches }) {
   try {
-    const results = await walkBeta1({
+    let hasConflicts = false
+    const treePatch = await walkBeta1({
       trees: treePatches.map(patch => TREEPATCH({ patch })),
       map: async entries => {
         // label entries
@@ -40,6 +40,7 @@ export async function mergeTreePatches ({ treePatches }) {
         } else if (ops.length === 1) {
           return entryToPatch(ops[0])
         } else {
+          hasConflicts = true
           return {
             ops: [],
             conflicts: ops.map(entryToPatch)
@@ -68,7 +69,7 @@ export async function mergeTreePatches ({ treePatches }) {
         }
       }
     })
-    return results
+    return { treePatch, hasConflicts }
   } catch (err) {
     err.caller = 'git.mergeTreePatches'
     throw err

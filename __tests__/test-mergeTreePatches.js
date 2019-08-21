@@ -18,8 +18,9 @@ describe('mergeTreePatches', () => {
     // Test
     const diff1 = await diffTree({ gitdir, before: 'master', after: 'master' })
     const diff2 = await diffTree({ gitdir, before: 'master', after: 'master' })
-    const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
-    expect(patch).toEqual({ basename: '.', index: 0, ops: [] })
+    const { treePatch, hasConflicts } = await mergeTreePatches({ treePatches: [diff1, diff2] })
+    expect(hasConflicts).toBe(false)
+    expect(treePatch).toEqual({ basename: '.', index: 0, ops: [] })
   })
 
   it('merge two conflicting TreePatches', async () => {
@@ -32,8 +33,9 @@ describe('mergeTreePatches', () => {
       before: 'master',
       after: 'a-folder'
     })
-    const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
-    expect(patch).toMatchSnapshot()
+    const { treePatch, hasConflicts } = await mergeTreePatches({ treePatches: [diff1, diff2] })
+    expect(hasConflicts).toBe(true)
+    expect(treePatch).toMatchSnapshot()
   })
 
   it('merge add-files and change-modes', async () => {
@@ -50,8 +52,9 @@ describe('mergeTreePatches', () => {
       before: 'mainline',
       after: 'change-modes'
     })
-    const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
-    expect(patch).toMatchSnapshot()
+    const { treePatch, hasConflicts } = await mergeTreePatches({ treePatches: [diff1, diff2] })
+    expect(hasConflicts).toBe(false)
+    expect(treePatch).toMatchSnapshot()
   })
 
   it('merge add-files and remove-files', async () => {
@@ -68,7 +71,8 @@ describe('mergeTreePatches', () => {
       before: 'mainline',
       after: 'remofe-files'
     })
-    const patch = await mergeTreePatches({ treePatches: [diff1, diff2] })
-    expect(patch).toMatchSnapshot()
+    const { treePatch, hasConflicts } = await mergeTreePatches({ treePatches: [diff1, diff2] })
+    expect(hasConflicts).toBe(false)
+    expect(treePatch).toMatchSnapshot()
   })
 })
