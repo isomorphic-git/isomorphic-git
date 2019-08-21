@@ -85,7 +85,7 @@ describe('commit', () => {
     expect(sha).toEqual(copyOid)
   })
 
-  it('custom parents', async () => {
+  it('custom parents and tree', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-commit')
     const { oid: originalOid } = (await log({ gitdir, depth: 1 }))[0]
@@ -95,9 +95,11 @@ describe('commit', () => {
       '2222222222222222222222222222222222222222',
       '3333333333333333333333333333333333333333'
     ]
+    const tree = '4444444444444444444444444444444444444444'
     const sha = await commit({
       gitdir,
       parent,
+      tree,
       author: {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
@@ -106,11 +108,15 @@ describe('commit', () => {
       },
       message: 'Initial commit'
     })
-    expect(sha).toBe('e11b6803f58bc2218f2e92a1bae0eeee0101a06c')
+    expect(sha).toBe('43fbc94f2c1db655a833e08c72d005954ff32f32')
     // does NOT update master branch pointer
-    const { parent: parents } = (await log({ gitdir, depth: 1 }))[0]
+    const { parent: parents, tree: _tree } = (await log({
+      gitdir,
+      depth: 1
+    }))[0]
     expect(parents).not.toEqual([originalOid])
     expect(parents).toEqual(parent)
+    expect(_tree).toEqual(tree)
   })
 
   it('throw error if missing author', async () => {
