@@ -298,8 +298,6 @@ export function clone(args: WorkDir & GitDir & {
 export function commit(args: GitDir & {
   core?: string;
   fs?: any;
-  ref?: string;
-  parent?: string[];
   message: string;
   author: {
     name?: string;
@@ -317,6 +315,9 @@ export function commit(args: GitDir & {
   };
   signingKey?: string;
   noUpdateBranch?: boolean;
+  ref?: string;
+  parent?: string[];
+  tree?: string;
 }): Promise<string>;
 
 export function config(args: GitDir & {
