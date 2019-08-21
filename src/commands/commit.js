@@ -29,7 +29,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {Object} [args.committer = author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key.
- * @param {boolean} [args.updateBranch = true] - Whether to update the branch pointer after creating the commit. True by default.
+ * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  *
@@ -55,7 +55,7 @@ export async function commit ({
   author,
   committer,
   signingKey,
-  updateBranch = true
+  noUpdateBranch = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -126,7 +126,7 @@ export async function commit ({
           type: 'commit',
           object: comm.toObject()
         })
-        if (updateBranch) {
+        if (!noUpdateBranch) {
           // Update branch pointer
           await GitRefManager.writeRef({
             fs,

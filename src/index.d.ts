@@ -315,7 +315,7 @@ export function commit(args: GitDir & {
     timezoneOffset?: number;
   };
   signingKey?: string;
-  updateBranch?: boolean;
+  noUpdateBranch?: boolean;
 }): Promise<string>;
 
 export function config(args: GitDir & {
