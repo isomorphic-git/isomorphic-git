@@ -186,9 +186,7 @@ export async function checkout ({
                       await fs.writelink(filepath, head.content)
                     } else {
                       throw new GitError(E.InternalFail, {
-                        message: `Invalid mode "${
-                          head.mode
-                        }" detected in blob ${head.oid}`
+                        message: `Invalid mode "${head.mode}" detected in blob ${head.oid}`
                       })
                     }
                     const stats = await fs.lstat(filepath)

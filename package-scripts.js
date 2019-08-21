@@ -66,9 +66,7 @@ module.exports = {
               `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
                 process.env.BUILD_REPOSITORY_NAME} ` +
               (process.env.TRAVIS_PULL_REQUEST_SHA
-                ? `TRAVIS_PULL_REQUEST_SHA=${
-                  process.env.TRAVIS_PULL_REQUEST_SHA
-                } `
+                ? `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} `
                 : '') +
               `bundlesize`
         )
