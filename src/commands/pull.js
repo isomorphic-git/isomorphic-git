@@ -32,6 +32,9 @@ import { merge } from './merge'
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
+ * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
+ * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
+ * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -64,7 +67,10 @@ export async function pull ({
   token,
   oauth2format,
   singleBranch,
-  headers = {}
+  headers = {},
+  author,
+  committer,
+  signingKey
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -101,7 +107,10 @@ export async function pull ({
       fs,
       ours: ref,
       theirs: fetchHead,
-      fastForwardOnly
+      fastForwardOnly,
+      author,
+      committer,
+      signingKey
     })
     await checkout({
       dir,
