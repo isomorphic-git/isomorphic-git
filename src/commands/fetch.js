@@ -367,12 +367,17 @@ async function fetchPackfile ({
   // Apply all the 'shallow' and 'unshallow' commands
   for (const oid of response.shallows) {
     if (!oids.has(oid)) {
-      // server says it's shallow, but do we have the parents?
-      const { object } = await readObject({ fs, gitdir, oid })
-      const commit = new GitCommit(object)
-      const hasParents = await Promise.all(commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid })))
-      const haveAllParents = hasParents.length === 0 || hasParents.every(has => has)
-      if (!haveAllParents) {
+      // this is in a try/catch mostly because my old test fixtures are missing objects
+      try {
+        // server says it's shallow, but do we have the parents?
+        const { object } = await readObject({ fs, gitdir, oid })
+        const commit = new GitCommit(object)
+        const hasParents = await Promise.all(commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid })))
+        const haveAllParents = hasParents.length === 0 || hasParents.every(has => has)
+        if (!haveAllParents) {
+          oids.add(oid)
+        }
+      } catch (err) {
         oids.add(oid)
       }
     }
