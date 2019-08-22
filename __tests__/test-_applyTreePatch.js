@@ -31,7 +31,9 @@ describe('_applyTreePatch', () => {
       before: 'mainline',
       after: 'remove-files'
     })
-    const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+    const { treePatch, hasConflicts } = await _mergeTreePatches({
+      treePatches: [diff1, diff2]
+    })
     expect(hasConflicts).toBe(false)
     const oid = await _applyTreePatch({
       fs,
@@ -64,7 +66,9 @@ describe('_applyTreePatch', () => {
       before: 'mainline',
       after: 'add-files'
     })
-    const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+    const { treePatch, hasConflicts } = await _mergeTreePatches({
+      treePatches: [diff1, diff2]
+    })
     expect(hasConflicts).toBe(false)
     const oid = await _applyTreePatch({
       fs,
@@ -97,7 +101,9 @@ describe('_applyTreePatch', () => {
       before: 'mainline',
       after: 'delete-second-half'
     })
-    const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+    const { treePatch, hasConflicts } = await _mergeTreePatches({
+      treePatches: [diff1, diff2]
+    })
     expect(hasConflicts).toBe(false)
     const oid = await _applyTreePatch({
       fs,

@@ -5,8 +5,8 @@ import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
-import { _TREEPATCH } from './_TREEPATCH.js'
 import { TREE } from './TREE.js'
+import { _TREEPATCH } from './_TREEPATCH.js'
 import { walkBeta1 } from './walkBeta1.js'
 
 /**

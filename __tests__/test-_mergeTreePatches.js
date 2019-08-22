@@ -15,9 +15,21 @@ describe('_mergeTreePatches', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff1 = await _diffTree({ fs, gitdir, before: 'master', after: 'master' })
-    const diff2 = await _diffTree({ fs, gitdir, before: 'master', after: 'master' })
-    const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+    const diff1 = await _diffTree({
+      fs,
+      gitdir,
+      before: 'master',
+      after: 'master'
+    })
+    const diff2 = await _diffTree({
+      fs,
+      gitdir,
+      before: 'master',
+      after: 'master'
+    })
+    const { treePatch, hasConflicts } = await _mergeTreePatches({
+      treePatches: [diff1, diff2]
+    })
     expect(hasConflicts).toBe(false)
     expect(treePatch).toEqual({ basename: '.', index: 0, ops: [] })
   })
@@ -26,14 +38,21 @@ describe('_mergeTreePatches', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff1 = await _diffTree({ fs, gitdir, before: 'master', after: 'a-file' })
+    const diff1 = await _diffTree({
+      fs,
+      gitdir,
+      before: 'master',
+      after: 'a-file'
+    })
     const diff2 = await _diffTree({
       fs,
       gitdir,
       before: 'master',
       after: 'a-folder'
     })
-    const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+    const { treePatch, hasConflicts } = await _mergeTreePatches({
+      treePatches: [diff1, diff2]
+    })
     expect(hasConflicts).toBe(true)
     expect(treePatch).toMatchSnapshot()
   })
@@ -54,7 +73,9 @@ describe('_mergeTreePatches', () => {
       before: 'mainline',
       after: 'change-modes'
     })
-    const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+    const { treePatch, hasConflicts } = await _mergeTreePatches({
+      treePatches: [diff1, diff2]
+    })
     expect(hasConflicts).toBe(false)
     expect(treePatch).toMatchSnapshot()
   })
@@ -75,7 +96,9 @@ describe('_mergeTreePatches', () => {
       before: 'mainline',
       after: 'remofe-files'
     })
-    const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+    const { treePatch, hasConflicts } = await _mergeTreePatches({
+      treePatches: [diff1, diff2]
+    })
     expect(hasConflicts).toBe(false)
     expect(treePatch).toMatchSnapshot()
   })

@@ -15,7 +15,12 @@ describe('_diffTree', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await _diffTree({ fs, gitdir, before: 'master', after: 'master' })
+    const diff = await _diffTree({
+      fs,
+      gitdir,
+      before: 'master',
+      after: 'master'
+    })
     expect(diff).toMatchSnapshot()
   })
 
@@ -36,7 +41,12 @@ describe('_diffTree', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await _diffTree({ fs, gitdir, before: 'master', after: 'mainline' })
+    const diff = await _diffTree({
+      fs,
+      gitdir,
+      before: 'master',
+      after: 'mainline'
+    })
     expect(diff).toMatchSnapshot()
   })
 
@@ -44,7 +54,12 @@ describe('_diffTree', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await _diffTree({ fs, gitdir, before: 'mainline', after: 'master' })
+    const diff = await _diffTree({
+      fs,
+      gitdir,
+      before: 'mainline',
+      after: 'master'
+    })
     expect(diff).toMatchSnapshot()
   })
 
@@ -78,7 +93,12 @@ describe('_diffTree', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await _diffTree({ fs, gitdir, before: 'a-folder', after: 'a-file' })
+    const diff = await _diffTree({
+      fs,
+      gitdir,
+      before: 'a-folder',
+      after: 'a-file'
+    })
     expect(diff).toMatchSnapshot()
   })
 
@@ -86,7 +106,12 @@ describe('_diffTree', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-_diffTree')
     // Test
-    const diff = await _diffTree({ fs, gitdir, before: 'a-file', after: 'a-folder' })
+    const diff = await _diffTree({
+      fs,
+      gitdir,
+      before: 'a-file',
+      after: 'a-folder'
+    })
     expect(diff).toMatchSnapshot()
   })
 

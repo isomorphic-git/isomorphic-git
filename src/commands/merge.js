@@ -10,8 +10,8 @@ import { cores } from '../utils/plugins.js'
 import { _applyTreePatch } from './_applyTreePatch.js'
 import { _diffTree } from './_diffTree.js'
 import { _mergeTreePatches } from './_mergeTreePatches.js'
-import { currentBranch } from './currentBranch.js'
 import { commit } from './commit'
+import { currentBranch } from './currentBranch.js'
 import { findMergeBase } from './findMergeBase.js'
 
 /**
@@ -120,12 +120,20 @@ export async function merge ({
         throw new GitError(E.FastForwardFail)
       }
       // try a fancier merge
-      const tree = await basicMerge({ fs, gitdir, ours: ourOid, theirs: theirOid, base: baseOid })
+      const tree = await basicMerge({
+        fs,
+        gitdir,
+        ours: ourOid,
+        theirs: theirOid,
+        base: baseOid
+      })
       if (!dryRun) {
         const oid = await commit({
           fs,
           gitdir,
-          message: `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(ours)}`,
+          message: `Merge branch '${abbreviateRef(
+            theirs
+          )}' into ${abbreviateRef(ours)}`,
           ref: ours,
           tree,
           parent: [ourOid, theirOid],
@@ -153,7 +161,9 @@ export async function merge ({
 async function basicMerge ({ fs, gitdir, ours, theirs, base }) {
   const diff1 = await _diffTree({ gitdir, before: base, after: ours })
   const diff2 = await _diffTree({ gitdir, before: base, after: theirs })
-  const { treePatch, hasConflicts } = await _mergeTreePatches({ treePatches: [diff1, diff2] })
+  const { treePatch, hasConflicts } = await _mergeTreePatches({
+    treePatches: [diff1, diff2]
+  })
   if (hasConflicts) throw new GitError(E.MergeNotSupportedFail)
   return _applyTreePatch({
     fs,
