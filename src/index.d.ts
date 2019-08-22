@@ -101,9 +101,11 @@ export interface RemoteDescription {
 }
 
 export interface MergeReport {
-  oid: string;
+  oid?: string;
   alreadyMerged?: boolean;
   fastForward?: boolean;
+  mergeCommit?: boolean;
+  tree?: string;
 }
 
 export interface RemoteDefinition {
@@ -299,7 +301,7 @@ export function commit(args: GitDir & {
   core?: string;
   fs?: any;
   message: string;
-  author: {
+  author?: {
     name?: string;
     email?: string;
     date?: Date;
@@ -486,6 +488,21 @@ export function merge(args: GitDir & {
   theirs: string;
   fastForwardOnly?: boolean;
   dryRun?: boolean;
+  author?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  committer?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  signingKey?: string;
 }): Promise<MergeReport>;
 
 export function packObjects(args: GitDir & {
