@@ -81,14 +81,6 @@ export async function _diffTree ({
           if (subOps.length > 0) parent.subOps = subOps
           return parent
         }
-        // // If we're deleting a directory, we need to order that _after_ children.
-        // if (parent && parent.ops.includes('rmdir')) {
-        //   children.push(parent)
-        // // Everything else, do the parent operations first.
-        // } else if (parent) {
-        //   children.unshift(parent)
-        // }
-        // return flat(children)
       }
     })
     return results

@@ -144,19 +144,6 @@ export class FileSystem {
   }
 
   /**
-   * Try to delete a directory, but don't throw an error if we fail.
-   * Returns true if delete was successful, false if it was not.
-   */
-  async rmdir (filepath) {
-    try {
-      await this._rmdir(filepath)
-      return true
-    } catch (err) {
-      return false
-    }
-  }
-
-  /**
    * Read a directory without throwing an error is the directory doesn't exist
    */
   async readdir (filepath) {
