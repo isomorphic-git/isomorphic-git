@@ -1,3 +1,7 @@
+export * from './commands/_applyTreePatch'
+export * from './commands/_diffTree'
+export * from './commands/_mergeTreePatches'
+export * from './commands/_TREEPATCH'
 export * from './commands/listCommitsAndTags'
 export * from './commands/listObjects'
 export * from './commands/pack'
