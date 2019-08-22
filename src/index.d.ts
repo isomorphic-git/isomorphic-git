@@ -87,6 +87,7 @@ export interface PushResponse {
 export interface FetchResponse {
   defaultBranch: string;
   fetchHead: string | null;
+  fetchHeadDescription: string | null;
   headers?: object;
   pruned?: string[];
 }
@@ -488,6 +489,7 @@ export function merge(args: GitDir & {
   theirs: string;
   fastForwardOnly?: boolean;
   dryRun?: boolean;
+  message?: string;
   author?: {
     name?: string;
     email?: string;
