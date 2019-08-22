@@ -26,7 +26,7 @@ import { findMergeBase } from './findMergeBase.js'
  */
 
 /**
- * Merge one or more branches *(Currently, only fast-forward merges are implemented.)*
+ * Merge one or more branches *(Currently, only very simple cases are handled.)*
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection

@@ -526,6 +526,21 @@ export function pull(args: WorkDir & GitDir & {
   headers?: { [key: string]: string };
   emitter?: EventEmitter;
   emitterPrefix?: string;
+  author?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  committer?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  signingKey?: string;
 }): Promise<void>;
 
 export function push(args: GitDir & {
