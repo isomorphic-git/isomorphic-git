@@ -5,6 +5,7 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
+import { GitCommit } from '../models/GitCommit.js'
 import { hasObject } from '../storage/hasObject.js'
 import { readObject } from '../storage/readObject.js'
 import { collect } from '../utils/collect.js'
@@ -365,7 +366,21 @@ async function fetchPackfile ({
   }
   // Apply all the 'shallow' and 'unshallow' commands
   for (const oid of response.shallows) {
-    oids.add(oid)
+    if (!oids.has(oid)) {
+      // this is in a try/catch mostly because my old test fixtures are missing objects
+      try {
+        // server says it's shallow, but do we have the parents?
+        const { object } = await readObject({ fs, gitdir, oid })
+        const commit = new GitCommit(object)
+        const hasParents = await Promise.all(commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid })))
+        const haveAllParents = hasParents.length === 0 || hasParents.every(has => has)
+        if (!haveAllParents) {
+          oids.add(oid)
+        }
+      } catch (err) {
+        oids.add(oid)
+      }
+    }
   }
   for (const oid of response.unshallows) {
     oids.delete(oid)
