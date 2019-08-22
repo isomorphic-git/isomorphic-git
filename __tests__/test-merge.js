@@ -131,7 +131,7 @@ describe('merge', () => {
 
   it("merge 'delete-first-half' and 'delete-second-half' (dryRun)", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-_diffTree')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       gitdir,
       depth: 1,
@@ -150,7 +150,7 @@ describe('merge', () => {
 
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-_diffTree')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       gitdir,
       depth: 1,
