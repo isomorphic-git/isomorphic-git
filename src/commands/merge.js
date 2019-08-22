@@ -37,6 +37,7 @@ import { findMergeBase } from './findMergeBase.js'
  * @param {string} args.theirs - The branch to be merged
  * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
  * @param {boolean} [args.dryRun = false] - If true, simulates a merge so you can test whether it would succeed.
+ * @param {string} [args.message] - Overrides the default auto-generated merge commit message
  * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
  * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
@@ -58,6 +59,7 @@ export async function merge ({
   theirs,
   fastForwardOnly = false,
   dryRun = false,
+  message,
   author,
   committer,
   signingKey
@@ -127,13 +129,16 @@ export async function merge ({
         theirs: theirOid,
         base: baseOid
       })
+      if (!message) {
+        message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(
+          ours
+        )}`
+      }
       if (!dryRun) {
         const oid = await commit({
           fs,
           gitdir,
-          message: `Merge branch '${abbreviateRef(
-            theirs
-          )}' into ${abbreviateRef(ours)}`,
+          message,
           ref: ours,
           tree,
           parent: [ourOid, theirOid],
