@@ -3,9 +3,9 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
-import { GitCommit } from '../models/GitCommit.js'
 import { hasObject } from '../storage/hasObject.js'
 import { readObject } from '../storage/readObject.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
@@ -376,8 +376,11 @@ async function fetchPackfile ({
         // server says it's shallow, but do we have the parents?
         const { object } = await readObject({ fs, gitdir, oid })
         const commit = new GitCommit(object)
-        const hasParents = await Promise.all(commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid })))
-        const haveAllParents = hasParents.length === 0 || hasParents.every(has => has)
+        const hasParents = await Promise.all(
+          commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid }))
+        )
+        const haveAllParents =
+          hasParents.length === 0 || hasParents.every(has => has)
         if (!haveAllParents) {
           oids.add(oid)
         }

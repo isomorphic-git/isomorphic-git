@@ -130,7 +130,9 @@ export async function merge ({
         base: baseOid
       })
       if (!message) {
-        message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(ours)}`
+        message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(
+          ours
+        )}`
       }
       if (!dryRun) {
         const oid = await commit({
