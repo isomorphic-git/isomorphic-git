@@ -199,6 +199,11 @@ describe('merge', () => {
       depth: 1,
       ref: 'delete-first-half-merge-delete-second-half'
     }))[0]
+    const originalCommit = (await log({
+      gitdir,
+      ref: 'delete-first-half',
+      depth: 1
+    }))[0]
     // Test
     const report = await merge({
       fs,
@@ -208,6 +213,13 @@ describe('merge', () => {
       dryRun: true
     })
     expect(report.tree).toBe(commit.tree)
+    // make sure branch hasn't been moved
+    const notMergeCommit = (await log({
+      gitdir,
+      ref: 'delete-first-half',
+      depth: 1
+    }))[0]
+    expect(notMergeCommit.oid).toEqual(originalCommit.oid)
   })
 
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {
