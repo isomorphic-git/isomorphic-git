@@ -8,6 +8,7 @@ import { GitPackIndex } from '../models/GitPackIndex.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { hasObject } from '../storage/hasObject.js'
 import { readObject } from '../storage/readObject.js'
+import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { collect } from '../utils/collect.js'
 import { emptyPackfile } from '../utils/emptyPackfile.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
@@ -26,6 +27,7 @@ import { config } from './config'
  * @typedef {object} FetchResponse - The object returned has the following schema:
  * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
  * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
+ * @property {string | null} fetchHeadDescription - a textual description of the branch that was fetched
  * @property {object} [headers] - The HTTP response headers returned by the git server
  * @property {string[]} [pruned] - A list of branches that were pruned, if you provided the `prune` parameter
  *
@@ -147,7 +149,8 @@ export async function fetch ({
     if (response === null) {
       return {
         defaultBranch: null,
-        fetchHead: null
+        fetchHead: null,
+        fetchHeadDescription: null
       }
     }
     if (emitter) {
@@ -173,7 +176,8 @@ export async function fetch ({
     const packfileSha = packfile.slice(-20).toString('hex')
     const res = {
       defaultBranch: response.HEAD,
-      fetchHead: response.FETCH_HEAD
+      fetchHead: response.FETCH_HEAD.oid,
+      fetchHeadDescription: response.FETCH_HEAD.description
     }
     if (response.headers) {
       res.headers = response.headers
@@ -446,6 +450,10 @@ async function fetchPackfile ({
       }
     }
   }
-  response.FETCH_HEAD = oid
+  const noun = fullref.startsWith('refs/tags') ? 'tag' : 'branch'
+  response.FETCH_HEAD = {
+    oid,
+    description: `${noun} '${abbreviateRef(fullref)}' of ${url}`
+  }
   return response
 }

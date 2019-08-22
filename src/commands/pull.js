@@ -84,7 +84,7 @@ export async function pull ({
       fs,
       path: `branch.${ref}.remote`
     })
-    const { fetchHead } = await fetch({
+    const { fetchHead, fetchHeadDescription } = await fetch({
       dir,
       gitdir,
       fs,
@@ -108,6 +108,7 @@ export async function pull ({
       ours: ref,
       theirs: fetchHead,
       fastForwardOnly,
+      message: `Merge ${fetchHeadDescription}`,
       author,
       committer,
       signingKey
