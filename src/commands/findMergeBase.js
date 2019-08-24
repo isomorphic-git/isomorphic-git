@@ -30,7 +30,7 @@ export async function findMergeBase ({
     // until we find a commit that N distinct walkers has visited.
     const visits = {}
     const passes = oids.length
-    let heads = oids.map((oid, index) => ({index, oid}))
+    let heads = oids.map((oid, index) => ({ index, oid }))
     while (heads.length) {
       // Count how many times we've passed each commit
       const result = new Set()

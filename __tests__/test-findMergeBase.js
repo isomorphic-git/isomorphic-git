@@ -222,8 +222,6 @@ describe('findMergeBase', () => {
         '83ad8e1ec6f21f8d0d74587b6a8021fec1a165e1' // isse819
       ]
     })
-    expect(base).toEqual([
-      '2316ae441d2c72d8d15673beb81390272671c526'
-    ])
+    expect(base).toEqual(['2316ae441d2c72d8d15673beb81390272671c526'])
   })
 })
