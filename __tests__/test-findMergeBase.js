@@ -210,4 +210,20 @@ describe('findMergeBase', () => {
       '17b2c7d8ba9756c6c28e4d8cfdbed11793952270'
     ])
   })
+
+  it('fork & rejoin in one branch base scenarios', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-findMergeBase')
+    // Test
+    const base = await findMergeBase({
+      gitdir,
+      oids: [
+        '815474b6e581921cbe05825631decac922803d28', // issue819-upstream
+        '83ad8e1ec6f21f8d0d74587b6a8021fec1a165e1' // isse819
+      ]
+    })
+    expect(base).toEqual([
+      '2316ae441d2c72d8d15673beb81390272671c526'
+    ])
+  })
 })
