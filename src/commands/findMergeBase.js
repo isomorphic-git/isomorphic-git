@@ -26,38 +26,33 @@ export async function findMergeBase ({
     const fs = new FileSystem(_fs)
     // If we start N independent walkers, one at each of the given `oids`, and walk backwards
     // through ancestors, eventually we'll discover a commit where each one of these N walkers
-    // has passed through. So we just need to keep tallies until we find one where we've walked
-    // through N times.
-    // TODO: I think it would be much safer if we actually tracked the identities of the walkers
-    // rather than the sum.
-    const counts = {}
+    // has passed through. So we just need to keep track of which walkers have visited each commit
+    // until we find a commit that N distinct walkers has visited.
+    const visits = {}
     const passes = oids.length
-    let heads = oids
+    let heads = oids.map((oid, index) => ({ index, oid }))
     while (heads.length) {
       // Count how many times we've passed each commit
-      const result = []
-      for (const oid of heads) {
-        if (counts[oid]) {
-          counts[oid] += 1
-        } else {
-          counts[oid] = 1
-        }
-        if (counts[oid] === passes) {
-          result.push(oid)
+      const result = new Set()
+      for (const { oid, index } of heads) {
+        if (!visits[oid]) visits[oid] = new Set()
+        visits[oid].add(index)
+        if (visits[oid].size === passes) {
+          result.add(oid)
         }
       }
-      if (result.length > 0) {
-        return result
+      if (result.size > 0) {
+        return [...result]
       }
       // We haven't found a common ancestor yet
       const newheads = []
-      for (const oid of heads) {
+      for (const { oid, index } of heads) {
         try {
           const { object } = await readObject({ fs, gitdir, oid })
           const commit = GitCommit.from(object)
           const { parent } = commit.parseHeaders()
           for (const oid of parent) {
-            newheads.push(oid)
+            newheads.push({ oid, index })
           }
         } catch (err) {
           // do nothing
