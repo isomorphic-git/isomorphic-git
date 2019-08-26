@@ -51,22 +51,29 @@ export async function branch ({
       })
     }
 
-    const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)
+    const fullref = `refs/heads/${ref}`
+
+    const exist = await GitRefManager.exists({ fs, gitdir, ref: fullref })
     if (exist) {
       throw new GitError(E.RefExistsError, { noun: 'branch', ref })
     }
-    // Get tree oid
+
+    // Get current HEAD tree oid
     let oid
     try {
       oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
     } catch (e) {
-      throw new GitError(E.NoHeadCommitError, { noun: 'branch', ref })
+      // Probably an empty repo
     }
-    // Create a new branch that points at that same commit
-    await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
+
+    // Create a new ref that points at the current commit
+    if (oid) {
+      await GitRefManager.writeRef({ fs, gitdir, ref: fullref, value: oid })
+    }
+
     if (checkout) {
       // Update HEAD
-      await fs.write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
+      await GitRefManager.writeSymbolicRef({ fs, gitdir, ref: 'HEAD', value: fullref })
     }
   } catch (err) {
     err.caller = 'git.branch'
