@@ -73,7 +73,12 @@ export async function branch ({
 
     if (checkout) {
       // Update HEAD
-      await GitRefManager.writeSymbolicRef({ fs, gitdir, ref: 'HEAD', value: fullref })
+      await GitRefManager.writeSymbolicRef({
+        fs,
+        gitdir,
+        ref: 'HEAD',
+        value: fullref
+      })
     }
   } catch (err) {
     err.caller = 'git.branch'

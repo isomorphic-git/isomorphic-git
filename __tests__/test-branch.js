@@ -84,7 +84,9 @@ describe('branch', () => {
       error = err
     }
     expect(error).toBeNull()
-    expect(await fs.exists(path.resolve(gitdir, 'refs/heads/origin'))).toBeTruthy()
+    expect(
+      await fs.exists(path.resolve(gitdir, 'refs/heads/origin'))
+    ).toBeTruthy()
   })
 
   it('create branch named "HEAD"', async () => {
@@ -98,6 +100,8 @@ describe('branch', () => {
       error = err
     }
     expect(error).toBeNull()
-    expect(await fs.exists(path.resolve(gitdir, 'refs/heads/HEAD'))).toBeTruthy()
+    expect(
+      await fs.exists(path.resolve(gitdir, 'refs/heads/HEAD'))
+    ).toBeTruthy()
   })
 })
