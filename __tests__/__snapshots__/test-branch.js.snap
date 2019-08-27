@@ -7,18 +7,6 @@ Array [
 ]
 `;
 
-exports[`branch empty repo 1`] = `
-Object {
-  "caller": "git.branch",
-  "code": "NoHeadCommitError",
-  "data": Object {
-    "noun": "branch",
-    "ref": "test-branch",
-  },
-  "message": "Failed to create branch \\"test-branch\\" because the HEAD ref could not be resolved to a commit.",
-}
-`;
-
 exports[`branch invalid branch name 1`] = `
 Object {
   "caller": "git.branch",
