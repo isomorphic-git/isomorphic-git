@@ -1,6 +1,6 @@
 import diff3Merge from 'diff3'
 
-const LINEBREAKS = /^.*(\r?\n|$)/mg
+const LINEBREAKS = /^.*(\r?\n|$)/gm
 
 export function _mergeFile ({
   ours,
