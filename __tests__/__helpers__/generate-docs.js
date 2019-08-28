@@ -193,19 +193,16 @@ function gendoc (filepath) {
 
 const docDir = path.join(__dirname, '..', '..', 'docs')
 if (!fs.existsSync(docDir)) {
-  fs.mkdirSync(docDir);
+  fs.mkdirSync(docDir)
 }
 
 const commandDir = path.join(__dirname, '..', '..', 'src', 'commands')
 const files = fs.readdirSync(commandDir)
 for (const filename of files) {
-  if (filename.startsWith('_')) continue;
+  if (filename.startsWith('_')) continue
   const doctext = gendoc(path.join(commandDir, filename))
   if (doctext !== '') {
-    const docfilename = path.join(
-      docDir,
-      filename.replace(/js$/, 'md')
-    )
+    const docfilename = path.join(docDir, filename.replace(/js$/, 'md'))
     fs.writeFileSync(docfilename, doctext)
   }
 }
