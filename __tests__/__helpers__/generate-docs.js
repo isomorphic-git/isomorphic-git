@@ -74,8 +74,13 @@ function gendoc (filepath) {
 
   // Fix some TypeScript-isms that jsdoc doesn't like
   file = file.replace(/\{import\('events'\)\.EventEmitter\}/g, '{EventEmitter}')
-
-  const ast = jsdoc.explainSync({ source: file })
+  let ast
+  try {
+    ast = jsdoc.explainSync({ source: file })
+  } catch (e) {
+    console.log(`Unable to parse ${filepath}`, e.message)
+    return ''
+  }
 
   let text = ''
   for (const obj of ast) {
@@ -186,18 +191,18 @@ function gendoc (filepath) {
   return text
 }
 
+const docDir = path.join(__dirname, '..', '..', 'docs')
+if (!fs.existsSync(docDir)) {
+  fs.mkdirSync(docDir)
+}
+
 const commandDir = path.join(__dirname, '..', '..', 'src', 'commands')
 const files = fs.readdirSync(commandDir)
 for (const filename of files) {
+  if (filename.startsWith('_')) continue
   const doctext = gendoc(path.join(commandDir, filename))
   if (doctext !== '') {
-    const docfilename = path.join(
-      __dirname,
-      '..',
-      '..',
-      'docs',
-      filename.replace(/js$/, 'md')
-    )
+    const docfilename = path.join(docDir, filename.replace(/js$/, 'md'))
     fs.writeFileSync(docfilename, doctext)
   }
 }
