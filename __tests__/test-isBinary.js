@@ -10,10 +10,7 @@ const binaryFiles = [
   'favicon-16x16.gif',
   'favicon-16x16.png'
 ]
-const textFiles = [
-  'browserconfig.xml',
-  'manifest.json'
-]
+const textFiles = ['browserconfig.xml', 'manifest.json']
 
 describe('isBinary', () => {
   for (const file of binaryFiles) {
@@ -25,7 +22,7 @@ describe('isBinary', () => {
       expect(isBinary(buffer)).toEqual(true)
     })
   }
-  
+
   for (const file of textFiles) {
     it(`${path.extname(file)} is NOT binary`, async () => {
       // Setup
