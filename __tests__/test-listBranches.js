@@ -1,4 +1,5 @@
 /* eslint-env node, browser, jasmine */
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-listBranches.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')

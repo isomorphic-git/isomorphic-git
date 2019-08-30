@@ -1,4 +1,5 @@
 /* eslint-env node, browser, jasmine */
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-GitError.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
