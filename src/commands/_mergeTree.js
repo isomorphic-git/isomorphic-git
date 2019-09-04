@@ -165,7 +165,9 @@ function modified (entry, base) {
     entry.type === base.type &&
     entry.mode === base.mode &&
     entry.oid === base.oid
-  ) { return false }
+  ) {
+    return false
+  }
   return true
 }
 
