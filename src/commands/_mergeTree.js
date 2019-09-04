@@ -1,14 +1,14 @@
 // @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { GitTree } from '../models/GitTree.js'
+import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 import { TREE } from './TREE.js'
-import { walkBeta1 } from './walkBeta1.js'
 import { _mergeFile } from './_mergeFile.js'
-import { writeObject } from '../storage/writeObject.js'
-import { GitTree } from '../models/GitTree.js'
+import { walkBeta1 } from './walkBeta1.js'
 
 /**
  *
@@ -57,8 +57,12 @@ export async function _mergeTree ({
       trees: [ourTree, baseTree, theirTree],
       map: async function ([ours, base, theirs]) {
         await Promise.all([
-          ours.populateStat(), base.populateStat(), theirs.populateStat(),
-          ours.populateHash(), base.populateHash(), theirs.populateHash()
+          ours.populateStat(),
+          base.populateStat(),
+          theirs.populateStat(),
+          ours.populateHash(),
+          base.populateHash(),
+          theirs.populateHash()
         ])
         // What we did, what they did
         const ourChange = modified(ours, base)
@@ -73,24 +77,32 @@ export async function _mergeTree ({
             }
           }
           case 'false-true': {
-            return theirs.exists ? {
-              mode: theirs.mode,
-              path: theirs.basename,
-              oid: theirs.oid,
-              type: theirs.type
-            } : void 0
+            return theirs.exists
+              ? {
+                mode: theirs.mode,
+                path: theirs.basename,
+                oid: theirs.oid,
+                type: theirs.type
+              }
+              : void 0
           }
           case 'true-false': {
-            return ours.exists ? {
-              mode: ours.mode,
-              path: ours.basename,
-              oid: ours.oid,
-              type: ours.type
-            }: void 0
+            return ours.exists
+              ? {
+                mode: ours.mode,
+                path: ours.basename,
+                oid: ours.oid,
+                type: ours.type
+              }
+              : void 0
           }
           case 'true-true': {
             // Modifications
-            if (ours.type === 'blob' && base.type === 'blob' && theirs.type === 'blob') {
+            if (
+              ours.type === 'blob' &&
+              base.type === 'blob' &&
+              theirs.type === 'blob'
+            ) {
               return mergeBlobs({
                 fs,
                 gitdir,
@@ -120,7 +132,13 @@ export async function _mergeTree ({
         if (entries.length > 0) {
           const tree = new GitTree(entries)
           const object = tree.toObject()
-          const oid = await writeObject({ fs, gitdir, type: 'tree', object, dryRun })
+          const oid = await writeObject({
+            fs,
+            gitdir,
+            type: 'tree',
+            object,
+            dryRun
+          })
           parent.oid = oid
         }
         return parent
@@ -143,7 +161,11 @@ function modified (entry, base) {
   if (entry.exists && !base.exists) return true
   if (!entry.exists && base.exists) return true
   if (entry.type === 'tree' && base.type === 'tree') return false
-  if (entry.type === base.type && entry.mode === base.mode && entry.oid === base.oid) return false
+  if (
+    entry.type === base.type &&
+    entry.mode === base.mode &&
+    entry.oid === base.oid
+  ) { return false }
   return true
 }
 
@@ -163,7 +185,19 @@ function modified (entry, base) {
  * @param {boolean} [args.dryRun = false]
  *
  */
-async function mergeBlobs ({ fs, gitdir, ours, base, theirs, ourName, theirName, baseName, format, markerSize, dryRun }) {
+async function mergeBlobs ({
+  fs,
+  gitdir,
+  ours,
+  base,
+  theirs,
+  ourName,
+  theirName,
+  baseName,
+  format,
+  markerSize,
+  dryRun
+}) {
   const type = 'blob'
   // this might change if we figure out rename detection
   const path = base.basename
@@ -176,7 +210,11 @@ async function mergeBlobs ({ fs, gitdir, ours, base, theirs, ourName, theirName,
   if (ours.oid === base.oid) return { mode, path, oid: theirs.oid, type }
   if (theirs.oid === base.oid) return { mode, path, oid: ours.oid, type }
   // if both sides made changes do a merge
-  await Promise.all([ours.populateContent(), base.populateContent(), theirs.populateContent()])
+  await Promise.all([
+    ours.populateContent(),
+    base.populateContent(),
+    theirs.populateContent()
+  ])
   const { mergedText, cleanMerge } = _mergeFile({
     ourContent: ours.content.toString('utf8'),
     baseContent: base.content.toString('utf8'),
@@ -191,6 +229,12 @@ async function mergeBlobs ({ fs, gitdir, ours, base, theirs, ourName, theirName,
     // all other types of conflicts fail
     throw new GitError(E.MergeConflict, { filepath: ours.fullpath })
   }
-  const oid = await writeObject({ fs, gitdir, type: 'blob', object: Buffer.from(mergedText, 'utf8'), dryRun })
+  const oid = await writeObject({
+    fs,
+    gitdir,
+    type: 'blob',
+    object: Buffer.from(mergedText, 'utf8'),
+    dryRun
+  })
   return { mode, path, oid, type }
 }

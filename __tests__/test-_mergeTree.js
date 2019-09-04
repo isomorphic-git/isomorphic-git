@@ -21,7 +21,15 @@ describe('_mergeTree', () => {
     const ourOid = await resolveRef({ fs, gitdir, ref: ourName })
     const theirOid = await resolveRef({ fs, gitdir, ref: theirName })
     const baseOid = await resolveRef({ fs, gitdir, ref: baseRef })
-    const oid = await _mergeTree({ fs, gitdir, ourOid, theirOid, baseOid, ourName, theirName })
+    const oid = await _mergeTree({
+      fs,
+      gitdir,
+      ourOid,
+      theirOid,
+      baseOid,
+      ourName,
+      theirName
+    })
     expect(oid).toBe(commit.tree)
   })
 
@@ -41,7 +49,15 @@ describe('_mergeTree', () => {
     const ourOid = await resolveRef({ fs, gitdir, ref: ourName })
     const theirOid = await resolveRef({ fs, gitdir, ref: theirName })
     const baseOid = await resolveRef({ fs, gitdir, ref: baseRef })
-    const oid = await _mergeTree({ fs, gitdir, ourOid, theirOid, baseOid, ourName, theirName })
+    const oid = await _mergeTree({
+      fs,
+      gitdir,
+      ourOid,
+      theirOid,
+      baseOid,
+      ourName,
+      theirName
+    })
     expect(oid).toBe(commit.tree)
   })
 
@@ -61,7 +77,15 @@ describe('_mergeTree', () => {
     const ourOid = await resolveRef({ fs, gitdir, ref: ourName })
     const theirOid = await resolveRef({ fs, gitdir, ref: theirName })
     const baseOid = await resolveRef({ fs, gitdir, ref: baseRef })
-    const oid = await _mergeTree({ fs, gitdir, ourOid, theirOid, baseOid, ourName, theirName })
+    const oid = await _mergeTree({
+      fs,
+      gitdir,
+      ourOid,
+      theirOid,
+      baseOid,
+      ourName,
+      theirName
+    })
     expect(oid).toBe(commit.tree)
   })
 })
