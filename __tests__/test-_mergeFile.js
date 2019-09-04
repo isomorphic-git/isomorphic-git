@@ -9,9 +9,9 @@ describe('_mergeFile', () => {
     const { fs, dir } = await makeFixture('test-_mergeFile')
     // Test
     const { cleanMerge, mergedText } = _mergeFile({
-      ours: await fs.read(`${dir}/a.txt`, 'utf8'),
-      base: await fs.read(`${dir}/o.txt`, 'utf8'),
-      theirs: await fs.read(`${dir}/b.txt`, 'utf8')
+      ourContent: await fs.read(`${dir}/a.txt`, 'utf8'),
+      baseContent: await fs.read(`${dir}/o.txt`, 'utf8'),
+      theirContent: await fs.read(`${dir}/b.txt`, 'utf8')
     })
     expect(cleanMerge).toBe(true)
     expect(mergedText).toEqual(await fs.read(`${dir}/aob.txt`, 'utf8'))
@@ -22,9 +22,9 @@ describe('_mergeFile', () => {
     const { fs, dir } = await makeFixture('test-_mergeFile')
     // Test
     const { cleanMerge, mergedText } = _mergeFile({
-      ours: await fs.read(`${dir}/a.txt`, 'utf8'),
-      base: await fs.read(`${dir}/o.txt`, 'utf8'),
-      theirs: await fs.read(`${dir}/c.txt`, 'utf8')
+      ourContent: await fs.read(`${dir}/a.txt`, 'utf8'),
+      baseContent: await fs.read(`${dir}/o.txt`, 'utf8'),
+      theirContent: await fs.read(`${dir}/c.txt`, 'utf8')
     })
     expect(cleanMerge).toBe(false)
     expect(mergedText).toEqual(await fs.read(`${dir}/aoc.txt`, 'utf8'))
@@ -35,9 +35,9 @@ describe('_mergeFile', () => {
     const { fs, dir } = await makeFixture('test-_mergeFile')
     // Test
     const { cleanMerge, mergedText } = _mergeFile({
-      ours: await fs.read(`${dir}/a.txt`, 'utf8'),
-      base: await fs.read(`${dir}/o.txt`, 'utf8'),
-      theirs: await fs.read(`${dir}/c.txt`, 'utf8'),
+      ourContent: await fs.read(`${dir}/a.txt`, 'utf8'),
+      baseContent: await fs.read(`${dir}/o.txt`, 'utf8'),
+      theirContent: await fs.read(`${dir}/c.txt`, 'utf8'),
       format: 'diff3'
     })
     expect(cleanMerge).toBe(false)
@@ -49,9 +49,9 @@ describe('_mergeFile', () => {
     const { fs, dir } = await makeFixture('test-_mergeFile')
     // Test
     const { cleanMerge, mergedText } = _mergeFile({
-      ours: await fs.read(`${dir}/a.txt`, 'utf8'),
-      base: await fs.read(`${dir}/o.txt`, 'utf8'),
-      theirs: await fs.read(`${dir}/c.txt`, 'utf8'),
+      ourContent: await fs.read(`${dir}/a.txt`, 'utf8'),
+      baseContent: await fs.read(`${dir}/o.txt`, 'utf8'),
+      theirContent: await fs.read(`${dir}/c.txt`, 'utf8'),
       format: 'diff3',
       markerSize: 10
     })

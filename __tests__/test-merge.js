@@ -276,6 +276,63 @@ describe('merge', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MergeNotSupportedFail)
+    expect(error.code).toBe(E.MergeConflict)
+  })
+
+  it("merge two branches that modified the same file (no conflict)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    const commit = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'a-merge-b'
+    }))[0]
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'b',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      }
+    })
+    const mergeCommit = (await log({
+      gitdir,
+      ref: 'a',
+      depth: 1
+    }))[0]
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+
+  it("merge two branches that modified the same file (should conflict)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    // Test
+    let error = null
+    try {
+      await merge({
+        fs,
+        gitdir,
+        ours: 'a',
+        theirs: 'c',
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0
+        }
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(E.MergeConflict)
   })
 })

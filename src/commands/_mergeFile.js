@@ -3,18 +3,18 @@ import diff3Merge from 'diff3'
 const LINEBREAKS = /^.*(\r?\n|$)/gm
 
 export function _mergeFile ({
-  ours,
-  base,
-  theirs,
+  ourContent,
+  baseContent,
+  theirContent,
   ourName = 'ours',
   baseName = 'base',
   theirName = 'theirs',
   format = 'diff',
   markerSize = 7
 }) {
-  ours = ours.match(LINEBREAKS)
-  base = base.match(LINEBREAKS)
-  theirs = theirs.match(LINEBREAKS)
+  const ours = ourContent.match(LINEBREAKS)
+  const base = baseContent.match(LINEBREAKS)
+  const theirs = theirContent.match(LINEBREAKS)
 
   // Here we let the diff3 library do the heavy lifting.
   const result = diff3Merge(ours, base, theirs)

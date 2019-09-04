@@ -71,7 +71,8 @@ const messages = {
   PluginSchemaViolation: `Schema check failed for "{ plugin }" plugin; missing { method } method.`,
   PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
-  ShortOidNotFound: `Could not find an object matching "{ short }".`
+  ShortOidNotFound: `Could not find an object matching "{ short }".`,
+  MergeConflict: `Merge conflict in { filepath }.`
 }
 
 export const E = {
@@ -144,7 +145,8 @@ export const E = {
   PluginSchemaViolation: `PluginSchemaViolation`,
   PluginUnrecognized: `PluginUnrecognized`,
   AmbiguousShortOid: `AmbiguousShortOid`,
-  ShortOidNotFound: `ShortOidNotFound`
+  ShortOidNotFound: `ShortOidNotFound`,
+  MergeConflict: `MergeConflict`
 }
 
 function renderTemplate (template, values) {

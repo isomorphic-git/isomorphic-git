@@ -12,9 +12,9 @@ import { walkBeta1 } from './walkBeta1.js'
  *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {TreePatch[]} args.treePatches - The SHA-1 object id of the first commit
+ * @param {TreePatch[]} args.treePatches - An array of TreePatch objects to merge
  *
- * @returns {Promise<{ treePatch: TreePatch, hasConflicts: boolean}>} The name of the current branch or undefined if the HEAD is detached.
+ * @returns {Promise<{ treePatch: TreePatch, hasConflicts: boolean}>}
  * @see TreePatch
  *
  */
