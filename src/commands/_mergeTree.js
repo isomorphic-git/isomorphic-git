@@ -115,7 +115,7 @@ export async function _mergeTree ({
               })
             }
             // all other types of conflicts fail
-            throw new GitError(E.MergeConflict, { filepath: ours.fullpath })
+            throw new GitError(E.MergeNotSupportedFail)
           }
         }
       },
@@ -229,7 +229,7 @@ async function mergeBlobs ({
   })
   if (!cleanMerge) {
     // all other types of conflicts fail
-    throw new GitError(E.MergeConflict, { filepath: ours.fullpath })
+    throw new GitError(E.MergeNotSupportedFail)
   }
   const oid = await writeObject({
     fs,

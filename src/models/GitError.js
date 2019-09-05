@@ -29,7 +29,7 @@ const messages = {
   RemoteDoesNotSupportSmartHTTP: `Remote does not support the "smart" HTTP protocol, and isomorphic-git does not support the "dumb" HTTP protocol, so they are incompatible.`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
-  MergeNotSupportedFail: `Merges where both sides modified the same file are not supported yet.`,
+  MergeNotSupportedFail: `Merges with conflicts are not supported yet.`,
   DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
   ResolveTreeError: `Could not resolve { oid } to a tree.`,
   ResolveCommitError: `Could not resolve { oid } to a commit.`,
@@ -71,8 +71,7 @@ const messages = {
   PluginSchemaViolation: `Schema check failed for "{ plugin }" plugin; missing { method } method.`,
   PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
-  ShortOidNotFound: `Could not find an object matching "{ short }".`,
-  MergeConflict: `Merge conflict in { filepath }.`
+  ShortOidNotFound: `Could not find an object matching "{ short }".`
 }
 
 export const E = {
@@ -145,8 +144,7 @@ export const E = {
   PluginSchemaViolation: `PluginSchemaViolation`,
   PluginUnrecognized: `PluginUnrecognized`,
   AmbiguousShortOid: `AmbiguousShortOid`,
-  ShortOidNotFound: `ShortOidNotFound`,
-  MergeConflict: `MergeConflict`
+  ShortOidNotFound: `ShortOidNotFound`
 }
 
 function renderTemplate (template, values) {

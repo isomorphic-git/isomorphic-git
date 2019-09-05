@@ -276,7 +276,7 @@ describe('merge', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MergeConflict)
+    expect(error.code).toBe(E.MergeNotSupportedFail)
   })
 
   it("merge two branches that modified the same file (no conflict)'", async () => {
@@ -333,6 +333,6 @@ describe('merge', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MergeConflict)
+    expect(error.code).toBe(E.MergeNotSupportedFail)
   })
 })
