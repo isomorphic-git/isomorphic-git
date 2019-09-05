@@ -1,15 +1,14 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, findMergeBase } = require('isomorphic-git')
+const { findMergeBase } = require('isomorphic-git')
 
 // These have been checked with
 // GIT_DIR=__tests__/__fixtures__/test-findMergeBase.git git merge-base -a --octopus COMMITS
 describe('findMergeBase', () => {
   it('silly edge cases', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-findMergeBase')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -29,11 +28,9 @@ describe('findMergeBase', () => {
   })
   it('no common ancestor scenarios', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-findMergeBase')
-    plugins.set('fs', fs)
-    let base
+    const { gitdir } = await makeFixture('test-findMergeBase')
     // Test
-    base = await findMergeBase({
+    const base = await findMergeBase({
       gitdir,
       oids: [
         '9ec6646dd454e8f530c478c26f8b06e57f880bd6', // A
@@ -44,8 +41,7 @@ describe('findMergeBase', () => {
   })
   it('fast-forward scenarios', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-findMergeBase')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -87,8 +83,7 @@ describe('findMergeBase', () => {
   })
   it('diverging scenarios', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-findMergeBase')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -150,8 +145,7 @@ describe('findMergeBase', () => {
   })
   it('merge commit scenarios', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-findMergeBase')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
@@ -202,11 +196,9 @@ describe('findMergeBase', () => {
   })
   it('recursive merge base scenarios', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-findMergeBase')
-    plugins.set('fs', fs)
-    let base
+    const { gitdir } = await makeFixture('test-findMergeBase')
     // Test
-    base = await findMergeBase({
+    const base = await findMergeBase({
       gitdir,
       oids: [
         '85303393b9fd415d48913dfec47d42db184dc4d8', // Z1
@@ -217,5 +209,19 @@ describe('findMergeBase', () => {
       '17aa7af08369d0e2d174df64d78fe57f9f0a60ba',
       '17b2c7d8ba9756c6c28e4d8cfdbed11793952270'
     ])
+  })
+
+  it('fork & rejoin in one branch base scenarios', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-findMergeBase')
+    // Test
+    const base = await findMergeBase({
+      gitdir,
+      oids: [
+        '815474b6e581921cbe05825631decac922803d28', // issue819-upstream
+        '83ad8e1ec6f21f8d0d74587b6a8021fec1a165e1' // isse819
+      ]
+    })
+    expect(base).toEqual(['2316ae441d2c72d8d15673beb81390272671c526'])
   })
 })

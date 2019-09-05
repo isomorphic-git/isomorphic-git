@@ -66,3 +66,6 @@ private.key
 doc
 __tests__/__fixtures__/index.json
 junit.xml
+__tests__/__fixtures__/.superblock.txt
+src/errors.d.ts
+docs

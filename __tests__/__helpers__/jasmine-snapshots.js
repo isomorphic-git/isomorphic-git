@@ -7,7 +7,7 @@ module.exports = snapshots => {
   /**
    * A fake reporter that lets us keep track of the current test name.
    */
-  let snapshotCounts = {}
+  const snapshotCounts = {}
   let currentSpecName = null
   const SnapshotReporter = {
     suiteStarted (meta) {
@@ -31,9 +31,7 @@ module.exports = snapshots => {
         compare (actual) {
           snapshotCounts[currentSpecName] =
             1 + (snapshotCounts[currentSpecName] || 0)
-          let currentSnapshotName = `${currentSpecName} ${
-            snapshotCounts[currentSpecName]
-          }`
+          const currentSnapshotName = `${currentSpecName} ${snapshotCounts[currentSpecName]}`
           // console.log(`snapshot ${currentSnapshotName}`)
           try {
             assertSnapshot(actual, snapshots, currentSnapshotName)

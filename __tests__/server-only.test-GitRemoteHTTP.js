@@ -11,17 +11,17 @@ describe('GitRemoteHTTP', () => {
 
   it('capabilities', async () => {
     // Test
-    let caps = await GitRemoteHTTP.capabilities()
+    const caps = await GitRemoteHTTP.capabilities()
     expect(caps).toEqual(expect.arrayContaining(['discover', 'connect']))
   })
 
   it('preparePull (Github response)', async () => {
     // Setup
-    let { nockDone } = await nock.back(
+    const { nockDone } = await nock.back(
       'GitRemoteHTTP - preparePull (Github response).json'
     )
     // Test
-    let remote = await GitRemoteHTTP.discover({
+    const remote = await GitRemoteHTTP.discover({
       core: 'default',
       service: 'git-upload-pack',
       url: 'https://github.com/isomorphic-git/isomorphic-git',
@@ -36,11 +36,11 @@ describe('GitRemoteHTTP', () => {
 
   it('preparePull (mock response)', async () => {
     // Setup
-    let { nockDone } = await nock.back(
+    const { nockDone } = await nock.back(
       'GitRemoteHTTP - preparePull (mock response).json'
     )
     // Test
-    let remote = await GitRemoteHTTP.discover({
+    const remote = await GitRemoteHTTP.discover({
       core: 'default',
       service: 'git-upload-pack',
       url: 'http://example.dev/test-GitRemoteHTTP',
@@ -53,11 +53,11 @@ describe('GitRemoteHTTP', () => {
 
   it('preparePush (mock response)', async () => {
     // Setup
-    let { nockDone } = await nock.back(
+    const { nockDone } = await nock.back(
       'GitRemoteHTTP - preparePush (mock response).json'
     )
     // Test
-    let remote = await GitRemoteHTTP.discover({
+    const remote = await GitRemoteHTTP.discover({
       core: 'default',
       service: 'git-receive-pack',
       url: 'http://example.dev/test-GitRemoteHTTP',

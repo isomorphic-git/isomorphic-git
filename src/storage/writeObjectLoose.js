@@ -16,8 +16,8 @@ export async function writeObjectLoose ({
         'GitObjectStoreLoose expects objects to write to be in deflated format'
     })
   }
-  let source = `objects/${oid.slice(0, 2)}/${oid.slice(2)}`
-  let filepath = `${gitdir}/${source}`
+  const source = `objects/${oid.slice(0, 2)}/${oid.slice(2)}`
+  const filepath = `${gitdir}/${source}`
   // Don't overwrite existing git objects - this helps avoid EPERM errors.
   // Although I don't know how we'd fix corrupted objects then. Perhaps delete them
   // on read?

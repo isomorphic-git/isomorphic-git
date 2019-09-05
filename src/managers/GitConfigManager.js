@@ -6,9 +6,10 @@ export class GitConfigManager {
     const fs = new FileSystem(_fs)
     // We can improve efficiency later if needed.
     // TODO: read from full list of git config files
-    let text = await fs.read(`${gitdir}/config`, { encoding: 'utf8' })
+    const text = await fs.read(`${gitdir}/config`, { encoding: 'utf8' })
     return GitConfig.from(text)
   }
+
   static async save ({ fs: _fs, gitdir, config }) {
     const fs = new FileSystem(_fs)
     // We can improve efficiency later if needed.

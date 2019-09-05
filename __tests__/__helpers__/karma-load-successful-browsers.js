@@ -19,9 +19,9 @@ module.exports = {
     }
   },
   filter (browsers) {
-    let [, successfulBrowsers] = module.exports.load()
+    const [, successfulBrowsers] = module.exports.load()
     console.log('skipping browsers:', successfulBrowsers)
-    let newbrowsers = browsers.filter(b => !successfulBrowsers.includes(b))
+    const newbrowsers = browsers.filter(b => !successfulBrowsers.includes(b))
 
     if (newbrowsers.length === 0) {
       console.log(

@@ -19,21 +19,20 @@ information.
 If no 'side-band' capability was specified, the server will stream the
 entire packfile without multiplexing.
 */
-// import splitBuffer from 'split-buffer'
-import { PassThrough } from 'readable-stream'
+import { FIFO } from '../utils/FIFO.js'
 
-import { GitPktLine } from './GitPktLine'
+import { GitPktLine } from './GitPktLine.js'
 
 export class GitSideBand {
   static demux (input) {
-    let read = GitPktLine.streamReader(input)
+    const read = GitPktLine.streamReader(input)
     // And now for the ridiculous side-band or side-band-64k protocol
-    let packetlines = new PassThrough()
-    let packfile = new PassThrough()
-    let progress = new PassThrough()
+    const packetlines = new FIFO()
+    const packfile = new FIFO()
+    const progress = new FIFO()
     // TODO: Use a proper through stream?
     const nextBit = async function () {
-      let line = await read()
+      const line = await read()
       // Skip over flush packets
       if (line === null) return nextBit()
       // A made up convention to signal there's no more to read.
@@ -52,7 +51,7 @@ export class GitSideBand {
           progress.write(line.slice(1))
           break
         case 3: // fatal error message just before stream aborts
-          let error = line.slice(1)
+          const error = line.slice(1)
           progress.write(error)
           packfile.destroy(new Error(error.toString('utf8')))
           return

@@ -2,12 +2,10 @@ import { E, GitError } from '../models/GitError.js'
 
 import { oauth2 } from './oauth2'
 
-export function calculateBasicAuthUsernamePasswordPair ({
-  username,
-  password,
-  token,
-  oauth2format
-} = {}) {
+export function calculateBasicAuthUsernamePasswordPair (
+  { username, password, token, oauth2format } = {},
+  allowEmptyPassword = false
+) {
   // This checks for the presense and/or absense of each of the 4 parameters,
   // converts that to a 4-bit binary representation, and then handles
   // every possible combination (2^4 or 16 cases) with a lookup table.
@@ -18,7 +16,9 @@ export function calculateBasicAuthUsernamePasswordPair ({
   // prettier-ignore
   switch (key) {
     case '0000': return null
-    case '1000': throw new GitError(E.MissingPasswordTokenError)
+    case '1000':
+      if (allowEmptyPassword) return { username, password: '' }
+      else throw new GitError(E.MissingPasswordTokenError)
     case '0100': throw new GitError(E.MissingUsernameError)
     case '1100': return { username, password }
     case '0010': return { username: token, password: '' } // Github's alternative format

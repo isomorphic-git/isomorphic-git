@@ -1,3 +1,4 @@
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
@@ -5,7 +6,18 @@ import { cores } from '../utils/plugins.js'
 /**
  * Initialize a new repository
  *
- * @link https://isomorphic-git.github.io/docs/init.html
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {boolean} [args.bare = false] - Initialize a bare repository
+ * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
+ *
+ * @example
+ * await git.init({ dir: '$input((/))' })
+ * console.log('done')
+ *
  */
 export async function init ({
   core = 'default',
@@ -25,7 +37,7 @@ export async function init ({
       'refs/tags'
     ]
     folders = folders.map(dir => gitdir + '/' + dir)
-    for (let folder of folders) {
+    for (const folder of folders) {
       await fs.mkdir(folder)
     }
     await fs.write(

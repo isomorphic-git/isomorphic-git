@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
-const pify = require('pify')
 const {
   GitPackIndex,
   GitObject,
@@ -15,14 +15,14 @@ describe('GitPackIndex', () => {
     registerSnapshots(snapshots)
   })
   it('from .idx', async () => {
-    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    const { fs, gitdir } = await makeFixture('test-GitPackIndex')
+    const idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       )
     )
-    let p = await GitPackIndex.fromIdx({ idx })
+    const p = await GitPackIndex.fromIdx({ idx })
     expect(shasum(JSON.stringify(p.hashes))).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
@@ -43,14 +43,14 @@ describe('GitPackIndex', () => {
     )
   })
   it('from .pack', async () => {
-    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let pack = await pify(fs.readFile)(
+    const { fs, gitdir } = await makeFixture('test-GitPackIndex')
+    const pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
       )
     )
-    let p = await GitPackIndex.fromPack({ pack })
+    const p = await GitPackIndex.fromPack({ pack })
     expect(shasum(JSON.stringify(p.hashes))).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
@@ -71,70 +71,70 @@ describe('GitPackIndex', () => {
     )
   })
   it('to .idx file from .pack', async () => {
-    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    const { fs, gitdir } = await makeFixture('test-GitPackIndex')
+    const idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       )
     )
-    let pack = await pify(fs.readFile)(
+    const pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
       )
     )
-    let p = await GitPackIndex.fromPack({ pack })
-    let idxbuffer = p.toBuffer()
+    const p = await GitPackIndex.fromPack({ pack })
+    const idxbuffer = p.toBuffer()
     expect(idxbuffer.byteLength).toBe(idx.byteLength)
     expect(idxbuffer.equals(idx)).toBe(true)
   })
   it('read undeltified object', async () => {
-    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    const { fs, gitdir } = await makeFixture('test-GitPackIndex')
+    const idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       )
     )
-    let pack = await pify(fs.readFile)(
+    const pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
       )
     )
-    let p = await GitPackIndex.fromIdx({ idx })
+    const p = await GitPackIndex.fromIdx({ idx })
     await p.load({ pack })
-    let { type, object } = await p.read({
+    const { type, object } = await p.read({
       oid: '637c4e69d85e0dcc18898ec251377453d0891585'
     })
     expect(type).toBe('commit')
     expect(object.toString('utf8')).toMatchSnapshot()
-    let oid = shasum(GitObject.wrap({ type, object }))
+    const oid = shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('637c4e69d85e0dcc18898ec251377453d0891585')
   })
   it('read deltified object', async () => {
-    let { fs, gitdir } = await makeFixture('test-GitPackIndex')
-    let idx = await pify(fs.readFile)(
+    const { fs, gitdir } = await makeFixture('test-GitPackIndex')
+    const idx = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.idx'
       )
     )
-    let pack = await pify(fs.readFile)(
+    const pack = await fs.read(
       path.join(
         gitdir,
         'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
       )
     )
-    let p = await GitPackIndex.fromIdx({ idx })
+    const p = await GitPackIndex.fromIdx({ idx })
     await p.load({ pack })
-    let { type, object } = await p.read({
+    const { type, object } = await p.read({
       oid: '7fb539a8e8488c3fd2793e7dda8a44693e25cce1' // 9 levels deep of deltification.
     })
     expect(type).toBe('blob')
     expect(object.toString('utf8')).toMatchSnapshot()
-    let oid = shasum(GitObject.wrap({ type, object }))
+    const oid = shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('7fb539a8e8488c3fd2793e7dda8a44693e25cce1')
   })
 })

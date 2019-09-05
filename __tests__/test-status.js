@@ -1,14 +1,12 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
-const pify = require('pify')
-const { plugins, status, add, remove } = require('isomorphic-git')
+const { status, add, remove } = require('isomorphic-git')
 
 describe('status', () => {
   it('status', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-status')
-    plugins.set('fs', fs)
+    const { fs, dir, gitdir } = await makeFixture('test-status')
     // Test
     const a = await status({ dir, gitdir, filepath: 'a.txt' })
     const b = await status({ dir, gitdir, filepath: 'b.txt' })
@@ -35,34 +33,47 @@ describe('status', () => {
     expect(d2).toEqual('added')
 
     // And finally the weirdo cases
-    let acontent = await pify(fs.readFile)(path.join(dir, 'a.txt'))
-    await pify(fs.writeFile)(path.join(dir, 'a.txt'), 'Hi')
+    const acontent = await fs.read(path.join(dir, 'a.txt'))
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
     await add({ dir, gitdir, filepath: 'a.txt' })
-    await pify(fs.writeFile)(path.join(dir, 'a.txt'), acontent)
-    let a3 = await status({ dir, gitdir, filepath: 'a.txt' })
+    await fs.write(path.join(dir, 'a.txt'), acontent)
+    const a3 = await status({ dir, gitdir, filepath: 'a.txt' })
     expect(a3).toEqual('*unmodified')
 
     await remove({ dir, gitdir, filepath: 'a.txt' })
-    let a4 = await status({ dir, gitdir, filepath: 'a.txt' })
+    const a4 = await status({ dir, gitdir, filepath: 'a.txt' })
     expect(a4).toEqual('*undeleted')
 
-    await pify(fs.writeFile)(path.join(dir, 'e.txt'), 'Hi')
+    await fs.write(path.join(dir, 'e.txt'), 'Hi')
     await add({ dir, gitdir, filepath: 'e.txt' })
-    await pify(fs.unlink)(path.join(dir, 'e.txt'))
-    let e3 = await status({ dir, gitdir, filepath: 'e.txt' })
+    await fs.rm(path.join(dir, 'e.txt'))
+    const e3 = await status({ dir, gitdir, filepath: 'e.txt' })
     expect(e3).toEqual('*absent')
 
     // Yay .gitignore!
     // NOTE: make_http_index does not include hidden files, so
     // I had to insert test-status/.gitignore and test-status/i/.gitignore
     // manually into the JSON.
-    let f = await status({ dir, gitdir, filepath: 'f.txt' })
-    let g = await status({ dir, gitdir, filepath: 'g/g.txt' })
-    let h = await status({ dir, gitdir, filepath: 'h/h.txt' })
-    let i = await status({ dir, gitdir, filepath: 'i/i.txt' })
+    const f = await status({ dir, gitdir, filepath: 'f.txt' })
+    const g = await status({ dir, gitdir, filepath: 'g/g.txt' })
+    const h = await status({ dir, gitdir, filepath: 'h/h.txt' })
+    const i = await status({ dir, gitdir, filepath: 'i/i.txt' })
     expect(f).toEqual('ignored')
     expect(g).toEqual('ignored')
     expect(h).toEqual('ignored')
     expect(i).toEqual('*added')
+  })
+
+  it('status in an fresh git repo with no commits', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
+    await fs.write(path.join(dir, 'b.txt'), 'Hi')
+    await add({ dir, gitdir, filepath: 'b.txt' })
+    // Test
+    const a = await status({ dir, gitdir, filepath: 'a.txt' })
+    expect(a).toEqual('*added')
+    const b = await status({ dir, gitdir, filepath: 'b.txt' })
+    expect(b).toEqual('added')
   })
 })

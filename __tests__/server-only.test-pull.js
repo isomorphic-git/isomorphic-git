@@ -4,7 +4,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const nock = require('nock')
 const path = require('path')
 
-const { plugins, pull, resolveRef } = require('isomorphic-git')
+const { pull, resolveRef } = require('isomorphic-git')
 
 describe('pull', () => {
   beforeAll(() => {
@@ -12,18 +12,17 @@ describe('pull', () => {
   })
   it('basic pull', async () => {
     // Setup
-    let { nockDone } = await nock.back('pull - basic pull.json')
-    let { fs, dir, gitdir } = await makeFixture('test-pull-client')
-    plugins.set('fs', fs)
+    const { nockDone } = await nock.back('pull - basic pull.json')
+    const { dir, gitdir } = await makeFixture('test-pull-client')
     // Test
-    let desiredOid = '97c024f73eaab2781bf3691597bc7c833cb0e22f'
+    const desiredOid = '97c024f73eaab2781bf3691597bc7c833cb0e22f'
     await pull({
       dir,
       gitdir,
       ref: 'master',
       fastForwardOnly: true
     })
-    let oid = await resolveRef({
+    const oid = await resolveRef({
       gitdir,
       ref: 'master'
     })

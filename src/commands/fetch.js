@@ -1,27 +1,85 @@
-import pify from 'pify'
-import concat from 'simple-concat'
-import split2 from 'split2'
-
+// @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
+import { hasObject } from '../storage/hasObject.js'
 import { readObject } from '../storage/readObject.js'
+import { abbreviateRef } from '../utils/abbreviateRef.js'
+import { collect } from '../utils/collect.js'
+import { emptyPackfile } from '../utils/emptyPackfile.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
+import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
+import { splitLines } from '../utils/splitLines.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 
 import { config } from './config'
 
 /**
+ *
+ * @typedef {object} FetchResponse - The object returned has the following schema:
+ * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
+ * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
+ * @property {string | null} fetchHeadDescription - a textual description of the branch that was fetched
+ * @property {object} [headers] - The HTTP response headers returned by the git server
+ * @property {string[]} [pruned] - A list of branches that were pruned, if you provided the `prune` parameter
+ *
+ */
+
+/**
  * Fetch commits from a remote repository
  *
- * @link https://isomorphic-git.github.io/docs/fetch.html
+ * Future versions of isomorphic-git might return additional metadata.
+ *
+ * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
+ *
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
+ * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
+ * @param {string} [args.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch.
+ * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
+ * @param {boolean} [args.tags = false] - Also fetch tags
+ * @param {string} [args.remote] - What to name the remote that is created.
+ * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
+ * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
+ * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
+ * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
+ * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
+ * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
+ * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
+ * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
+ * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
+ *
+ * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
+ * @see FetchResponse
+ *
+ * @example
+ * await git.fetch({
+ *   dir: '$input((/))',
+ *   corsProxy: 'https://cors.isomorphic-git.org',
+ *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
+ *   ref: '$input((master))',
+ *   depth: $input((1)),
+ *   singleBranch: $input((true)),
+ *   tags: $input((false))
+ * })
+ * console.log('done')
+ *
  */
 export async function fetch ({
   core = 'default',
@@ -31,12 +89,15 @@ export async function fetch ({
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   ref = 'HEAD',
+  // @ts-ignore
   refs,
   remote,
   url,
   noGitSuffix = false,
   corsProxy,
+  // @ts-ignore
   authUsername,
+  // @ts-ignore
   authPassword,
   username = authUsername,
   password = authPassword,
@@ -49,6 +110,8 @@ export async function fetch ({
   tags = false,
   singleBranch = false,
   headers = {},
+  prune = false,
+  // @ts-ignore
   onprogress // deprecated
 }) {
   try {
@@ -58,10 +121,12 @@ export async function fetch ({
       )
     }
     const fs = new FileSystem(_fs)
-    let response = await fetchPackfile({
+    const response = await fetchPackfile({
       core,
       gitdir,
       fs,
+      emitter,
+      emitterPrefix,
       ref,
       refs,
       remote,
@@ -78,21 +143,25 @@ export async function fetch ({
       relative,
       tags,
       singleBranch,
-      headers
+      headers,
+      prune
     })
     if (response === null) {
       return {
-        fetchHead: null
+        defaultBranch: null,
+        fetchHead: null,
+        fetchHeadDescription: null
       }
     }
-    // Note: progress messages are designed to be written directly to the terminal,
-    // so they are often sent with just a carriage return to overwrite the last line of output.
-    // But there are also messages delimited with newlines.
-    // I also include CRLF just in case.
-    response.progress.pipe(split2(/(\r\n)|\r|\n/)).on('data', line => {
-      if (emitter) {
+    if (emitter) {
+      const lines = splitLines(response.progress)
+      forAwait(lines, line => {
+        // As a historical accident, 'message' events were trimmed removing valuable information,
+        // such as \r by itself which was a single to update the existing line instead of appending a new one.
+        // TODO NEXT BREAKING RELEASE: make 'message' behave like 'rawmessage' and remove 'rawmessage'.
         emitter.emit(`${emitterPrefix}message`, line.trim())
-        let matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
+        emitter.emit(`${emitterPrefix}rawmessage`, line)
+        const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
           emitter.emit(`${emitterPrefix}progress`, {
             phase: matches[1].trim(),
@@ -101,17 +170,20 @@ export async function fetch ({
             lengthComputable: true
           })
         }
-      }
-    })
-    let packfile = await pify(concat)(response.packfile)
-    let packfileSha = packfile.slice(-20).toString('hex')
-    // TODO: Return more metadata?
-    let res = {
+      })
+    }
+    const packfile = await collect(response.packfile)
+    const packfileSha = packfile.slice(-20).toString('hex')
+    const res = {
       defaultBranch: response.HEAD,
-      fetchHead: response.FETCH_HEAD
+      fetchHead: response.FETCH_HEAD.oid,
+      fetchHeadDescription: response.FETCH_HEAD.description
     }
     if (response.headers) {
       res.headers = response.headers
+    }
+    if (prune) {
+      res.pruned = response.pruned
     }
     // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
     // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
@@ -119,7 +191,7 @@ export async function fetch ({
     // a) NOT concatenate the entire packfile into memory (line 78),
     // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
     // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
-    if (packfileSha !== '') {
+    if (packfileSha !== '' && !emptyPackfile(packfile)) {
       res.packfile = `objects/pack/pack-${packfileSha}.pack`
       const fullpath = join(gitdir, res.packfile)
       await fs.write(fullpath, packfile)
@@ -143,6 +215,8 @@ async function fetchPackfile ({
   core,
   gitdir,
   fs: _fs,
+  emitter,
+  emitterPrefix,
   ref,
   refs = [ref],
   remote,
@@ -159,7 +233,8 @@ async function fetchPackfile ({
   relative,
   tags,
   singleBranch,
-  headers
+  headers,
+  prune
 }) {
   const fs = new FileSystem(_fs)
   // Sanity checks
@@ -182,8 +257,8 @@ async function fetchPackfile ({
     corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }
-  let GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
-  let remoteHTTP = await GitRemoteHTTP.discover({
+  const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
+  const remoteHTTP = await GitRemoteHTTP.discover({
     core,
     corsProxy,
     service: 'git-upload-pack',
@@ -212,12 +287,12 @@ async function fetchPackfile ({
     throw new GitError(E.RemoteDoesNotSupportDeepenRelativeFail)
   }
   // Figure out the SHA for the requested ref
-  let { oid, fullref } = GitRefManager.resolveAgainstMap({
+  const { oid, fullref } = GitRefManager.resolveAgainstMap({
     ref,
     map: remoteRefs
   })
   // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
-  for (let remoteRef of remoteRefs.keys()) {
+  for (const remoteRef of remoteRefs.keys()) {
     if (
       remoteRef === fullref ||
       remoteRef === 'HEAD' ||
@@ -241,52 +316,78 @@ async function fetchPackfile ({
     ]
   )
   if (relative) capabilities.push('deepen-relative')
-  // Start requesting oids from the remote by their SHAs
-  let wants = singleBranch ? [oid] : remoteRefs.values()
+  // Start figuring out which oids from the remote we want to request
+  const wants = singleBranch ? [oid] : remoteRefs.values()
+  // Come up with a reasonable list of oids to tell the remote we already have
+  // (preferably oids that are close ancestors of the branch heads we're fetching)
+  const haveRefs = singleBranch
+    ? refs
+    : await GitRefManager.listRefs({
+      fs,
+      gitdir,
+      filepath: `refs`
+    })
   let haves = []
-  for (let ref of refs) {
+  for (let ref of haveRefs) {
     try {
       ref = await GitRefManager.expand({ fs, gitdir, ref })
-      // TODO: Actually, should we test whether we have the object using readObject?
-      if (!ref.startsWith('refs/tags/')) {
-        let have = await GitRefManager.resolve({ fs, gitdir, ref })
-        haves.push(have)
+      const oid = await GitRefManager.resolve({ fs, gitdir, ref })
+      if (await hasObject({ fs, gitdir, oid })) {
+        haves.push(oid)
       }
     } catch (err) {}
   }
-  let oids = await GitShallowManager.read({ fs, gitdir })
-  let shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
-  let packstream = await writeUploadPackRequest({
+  haves = [...new Set(haves)]
+  const oids = await GitShallowManager.read({ fs, gitdir })
+  const shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
+  const packstream = writeUploadPackRequest({
     capabilities,
     wants,
     haves,
     shallows,
     depth,
     since,
-    exclude,
-    relative
+    exclude
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
-  packstream = await pify(concat)(packstream)
-  let raw = await GitRemoteHTTP.connect({
+  const packbuffer = await collect(packstream)
+  const raw = await GitRemoteHTTP.connect({
+    core,
+    emitter,
+    emitterPrefix,
     corsProxy,
     service: 'git-upload-pack',
     url,
     noGitSuffix,
     auth,
-    stream: packstream,
+    body: [packbuffer],
     headers
   })
-  // Normally I would await this, but for some reason I'm having trouble detecting
-  // when this header portion is over.
-  let response = await parseUploadPackResponse(raw)
+  const response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
     response.headers = raw.headers
   }
   // Apply all the 'shallow' and 'unshallow' commands
   for (const oid of response.shallows) {
-    oids.add(oid)
+    if (!oids.has(oid)) {
+      // this is in a try/catch mostly because my old test fixtures are missing objects
+      try {
+        // server says it's shallow, but do we have the parents?
+        const { object } = await readObject({ fs, gitdir, oid })
+        const commit = new GitCommit(object)
+        const hasParents = await Promise.all(
+          commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid }))
+        )
+        const haveAllParents =
+          hasParents.length === 0 || hasParents.every(has => has)
+        if (!haveAllParents) {
+          oids.add(oid)
+        }
+      } catch (err) {
+        oids.add(oid)
+      }
+    }
   }
   for (const oid of response.unshallows) {
     oids.delete(oid)
@@ -301,49 +402,61 @@ async function fetchPackfile ({
     let bail = 10
     let key = fullref
     while (bail--) {
-      let value = remoteHTTP.symrefs.get(key)
+      const value = remoteHTTP.symrefs.get(key)
       if (value === undefined) break
       symrefs.set(key, value)
       key = value
     }
     // final value must not be a symref but a real ref
     refs.set(key, remoteRefs.get(key))
-    await GitRefManager.updateRemoteRefs({
+    const { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
       remote,
       refs,
       symrefs,
-      tags
+      tags,
+      prune
     })
+    if (prune) {
+      response.pruned = pruned
+    }
   } else {
-    await GitRefManager.updateRemoteRefs({
+    const { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
       remote,
       refs: remoteRefs,
       symrefs: remoteHTTP.symrefs,
-      tags
+      tags,
+      prune
     })
+    if (prune) {
+      response.pruned = pruned
+    }
   }
   // We need this value later for the `clone` command.
   response.HEAD = remoteHTTP.symrefs.get('HEAD')
   // AWS CodeCommit doesn't list HEAD as a symref, but we can reverse engineer it
   // Find the SHA of the branch called HEAD
   if (response.HEAD === undefined) {
-    let { oid } = GitRefManager.resolveAgainstMap({
+    const { oid } = GitRefManager.resolveAgainstMap({
       ref: 'HEAD',
       map: remoteRefs
     })
     // Use the name of the first branch that's not called HEAD that has
     // the same SHA as the branch called HEAD.
-    for (let [key, value] of remoteRefs.entries()) {
+    for (const [key, value] of remoteRefs.entries()) {
       if (key !== 'HEAD' && value === oid) {
         response.HEAD = key
         break
       }
     }
   }
-  response.FETCH_HEAD = oid
+  const noun = fullref.startsWith('refs/tags') ? 'tag' : 'branch'
+  response.FETCH_HEAD = {
+    oid,
+    description: `${noun} '${abbreviateRef(fullref)}' of ${url}`
+  }
   return response
 }

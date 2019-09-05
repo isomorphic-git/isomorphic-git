@@ -11,9 +11,9 @@ export async function writeObject ({
   type,
   object,
   format = 'content',
-  oid
+  oid = undefined,
+  dryRun = false
 }) {
-  const fs = new FileSystem(_fs)
   if (format !== 'deflated') {
     if (format !== 'wrapped') {
       object = GitObject.wrap({ type, object })
@@ -21,6 +21,9 @@ export async function writeObject ({
     oid = shasum(object)
     object = Buffer.from(pako.deflate(object))
   }
-  await writeObjectLoose({ fs, gitdir, object, format: 'deflated', oid })
+  if (!dryRun) {
+    const fs = new FileSystem(_fs)
+    await writeObjectLoose({ fs, gitdir, object, format: 'deflated', oid })
+  }
   return oid
 }

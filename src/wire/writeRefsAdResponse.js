@@ -1,10 +1,8 @@
-import { PassThrough } from 'readable-stream'
-
 import { GitPktLine } from '../models/GitPktLine.js'
 import { pkg } from '../utils/pkg'
 
 export async function writeRefsAdResponse ({ capabilities, refs, symrefs }) {
-  let stream = new PassThrough()
+  const stream = []
   // Compose capabilities string
   let syms = ''
   for (const [key, value] of Object.entries(symrefs)) {
@@ -16,10 +14,9 @@ export async function writeRefsAdResponse ({ capabilities, refs, symrefs }) {
   // Note: In the edge case of a brand new repo, zero refs (and zero capabilities)
   // are returned.
   for (const [key, value] of Object.entries(refs)) {
-    stream.write(GitPktLine.encode(`${value} ${key}${caps}\n`))
+    stream.push(GitPktLine.encode(`${value} ${key}${caps}\n`))
     caps = ''
   }
-  stream.write(GitPktLine.flush())
-  stream.end()
+  stream.push(GitPktLine.flush())
   return stream
 }

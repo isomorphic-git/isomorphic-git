@@ -1,12 +1,11 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { plugins, listRemotes } = require('isomorphic-git')
+const { listRemotes } = require('isomorphic-git')
 
 describe('listRemotes', () => {
   it('listRemotes', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-listRemotes')
-    plugins.set('fs', fs)
+    const { dir, gitdir } = await makeFixture('test-listRemotes')
     // Test
     const a = await listRemotes({ dir, gitdir })
     expect(a).toEqual([

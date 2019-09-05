@@ -9,6 +9,7 @@ export class GitRefSpec {
       matchPrefix
     })
   }
+
   static from (refspec) {
     const [
       forceMatch,
@@ -33,6 +34,7 @@ export class GitRefSpec {
     })
     // TODO: We need to run resolveRef on both paths to expand them to their full name.
   }
+
   translate (remoteBranch) {
     if (this.matchPrefix) {
       if (remoteBranch.startsWith(this.remotePath)) {
@@ -40,6 +42,17 @@ export class GitRefSpec {
       }
     } else {
       if (remoteBranch === this.remotePath) return this.localPath
+    }
+    return null
+  }
+
+  reverseTranslate (localBranch) {
+    if (this.matchPrefix) {
+      if (localBranch.startsWith(this.localPath)) {
+        return this.remotePath + localBranch.replace(this.localPath, '')
+      }
+    } else {
+      if (localBranch === this.localPath) return this.remotePath
     }
     return null
   }

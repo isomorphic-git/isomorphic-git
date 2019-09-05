@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-deleteTag.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { E, plugins, deleteTag, listTags } = require('isomorphic-git')
+const { E, deleteTag, listTags } = require('isomorphic-git')
 
 describe('deleteTag', () => {
   beforeAll(() => {
@@ -10,14 +11,13 @@ describe('deleteTag', () => {
   })
   it('deletes the latest tag to HEAD', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-deleteTag')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-deleteTag')
     // Test
     await deleteTag({
       gitdir,
       ref: 'latest'
     })
-    let refs = await listTags({
+    const refs = await listTags({
       gitdir
     })
     expect(refs).toMatchSnapshot()
@@ -25,8 +25,7 @@ describe('deleteTag', () => {
 
   it('missing ref argument', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-deleteTag')
-    plugins.set('fs', fs)
+    const { dir, gitdir } = await makeFixture('test-deleteTag')
     let error = null
     // Test
     try {

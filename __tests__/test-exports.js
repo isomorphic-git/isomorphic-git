@@ -1,4 +1,5 @@
 /* eslint-env node, browser, jasmine */
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-exports.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
@@ -9,7 +10,7 @@ describe('exports', () => {
     registerSnapshots(snapshots)
   })
   it('exposes only the intended API functions', async () => {
-    let names = Object.keys(git)
+    const names = Object.keys(git)
     expect(names.sort()).toMatchSnapshot()
   })
 })

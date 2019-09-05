@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-addRemote.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { plugins, addRemote, listRemotes } = require('isomorphic-git')
+const { addRemote, listRemotes } = require('isomorphic-git')
 
 describe('addRemote', () => {
   beforeAll(() => {
@@ -10,8 +11,7 @@ describe('addRemote', () => {
   })
   it('addRemote', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-addRemote')
-    plugins.set('fs', fs)
+    const { dir, gitdir } = await makeFixture('test-addRemote')
     const remote = 'baz'
     const url = 'git@github.com:baz/baz.git'
     // Test
@@ -25,8 +25,7 @@ describe('addRemote', () => {
   })
   it('missing argument', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-addRemote')
-    plugins.set('fs', fs)
+    const { dir, gitdir } = await makeFixture('test-addRemote')
     const remote = 'baz'
     const url = undefined
     // Test
@@ -41,8 +40,7 @@ describe('addRemote', () => {
   })
   it('invalid remote name', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-addRemote')
-    plugins.set('fs', fs)
+    const { dir, gitdir } = await makeFixture('test-addRemote')
     const remote = '@{HEAD~1}'
     const url = 'git@github.com:baz/baz.git'
     // Test

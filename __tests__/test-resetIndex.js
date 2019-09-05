@@ -1,5 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-resetIndex.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { resetIndex, listFiles } = require('isomorphic-git')
@@ -10,23 +11,23 @@ describe('resetIndex', () => {
   })
   it('modified', async () => {
     // Setup
-    let { fs, gitdir, dir } = await makeFixture('test-resetIndex')
+    const { gitdir, dir } = await makeFixture('test-resetIndex')
     // Test
-    let before = await listFiles({ fs, gitdir })
+    const before = await listFiles({ gitdir })
     expect(before).toMatchSnapshot()
-    await resetIndex({ fs, dir, gitdir, filepath: 'a.txt' })
-    let after = await listFiles({ fs, gitdir })
+    await resetIndex({ dir, gitdir, filepath: 'a.txt' })
+    const after = await listFiles({ gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length).toBe(true)
   })
   it('new', async () => {
     // Setup
-    let { fs, gitdir, dir } = await makeFixture('test-resetIndex')
+    const { gitdir, dir } = await makeFixture('test-resetIndex')
     // Test
-    let before = await listFiles({ fs, gitdir })
+    const before = await listFiles({ gitdir })
     expect(before).toMatchSnapshot()
-    await resetIndex({ fs, dir, gitdir, filepath: 'd.txt' })
-    let after = await listFiles({ fs, gitdir })
+    await resetIndex({ dir, gitdir, filepath: 'd.txt' })
+    const after = await listFiles({ gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length + 1).toBe(true)
   })

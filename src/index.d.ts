@@ -6,6 +6,12 @@ import { EventEmitter } from 'events';
 
 export as namespace git;
 
+// Basic building blocks
+type WorkDir = { dir: string }
+type ExplicitGitDir = { gitdir: string }
+type ImplicitGitDir = { dir: string }
+type GitDir = ExplicitGitDir | ImplicitGitDir
+
 export interface GitObjectDescription {
   oid: string;
   type?: 'blob' | 'tree' | 'commit' | 'tag';
@@ -34,7 +40,11 @@ export interface CommitDescription {
   gpgsig?: string; // PGP signature (if present)
 }
 
-export interface CommitDescriptionWithPayload extends CommitDescription {
+export interface CommitDescriptionWithOid extends CommitDescription {
+  oid: string; // SHA1 object id of this commit
+}
+
+export interface CommitDescriptionWithPayload extends CommitDescriptionWithOid {
   payload: string;
 }
 
@@ -63,6 +73,11 @@ export interface TreeEntry {
   type?: string;
 }
 
+export interface PackObjectsResponse {
+  filename: string;
+  packfile?: Buffer;
+}
+
 export interface PushResponse {
   ok?: string[];
   errors?: string[];
@@ -72,7 +87,9 @@ export interface PushResponse {
 export interface FetchResponse {
   defaultBranch: string;
   fetchHead: string | null;
+  fetchHeadDescription: string | null;
   headers?: object;
+  pruned?: string[];
 }
 
 export interface RemoteDescription {
@@ -85,12 +102,14 @@ export interface RemoteDescription {
 }
 
 export interface MergeReport {
-  oid: string;
+  oid?: string;
   alreadyMerged?: boolean;
   fastForward?: boolean;
+  mergeCommit?: boolean;
+  tree?: string;
 }
 
-export interface RemoteDescription {
+export interface RemoteDefinition {
   remote: string; // name of the remote
   url: string; // url of the remote
 }
@@ -102,7 +121,7 @@ export interface WalkerTree {
   basename: string;
   exists: boolean;
   populateStat: () => Promise<void>;
-  type?: 'tree' | 'blob';
+  type?: 'tree' | 'blob' | 'special';
   ctimeSeconds?: number;
   mtimeSeconds?: number;
   mtimeNanoseconds?: number;
@@ -128,6 +147,10 @@ export interface GitEmitterPlugin {
   emit: any;
 }
 
+export interface GitFsPromisesPlugin {
+  promises: GitFsPlugin;
+}
+
 export interface GitFsPlugin {
   readFile: any;
   writeFile: any;
@@ -144,9 +167,31 @@ export interface GitPgpPlugin {
   verify: any;
 }
 
-export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp"
+export type HttpRequest = {
+  url: string;
+  method?: string;
+  headers?: {
+    [key: string]: string;
+  };
+  body?: AsyncIterableIterator<Uint8Array>;
+};
 
-export type AnyGitPlugin = GitFsPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin
+export type HttpResponse = HttpRequest & {
+  statusCode: number;
+  statusMessage: string;
+}
+
+export type GitHttpPlugin = (
+  request: HttpRequest & {
+    core?: string,
+    emitter?: GitEmitterPlugin,
+    emitterPrefix?: string
+  }
+) => HttpResponse;
+
+export type GitPluginName = "credentialManager" | "emitter" | "fs" | "pgp" | "http"
+
+export type AnyGitPlugin = GitFsPlugin | GitFsPromisesPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitHttpPlugin
 
 export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 
@@ -157,13 +202,11 @@ export type WalkerEntry = WalkerTree[];
 export const plugins: GitPluginCore
 
 export const cores: {
-  get: (string) => GitPluginCore;
-  create: (string) => GitPluginCore;
+  get: (arg: string) => GitPluginCore;
+  create: (arg: string) => GitPluginCore;
 }
 
-export const E: {
-  [key: string]: string;
-};
+export { E } from './errors';
 
 export function WORKDIR(args: {
   fs: any;
@@ -182,28 +225,23 @@ export function STAGE(args: {
   gitdir: string;
 }): Walker;
 
-export function add(args: {
+export function add(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   filepath: string;
 }): Promise<void>;
 
-export function addRemote(args: {
+export function addRemote(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
+  force?: boolean;
   remote: string;
   url: string;
 }): Promise<void>;
 
-export function annotatedTag(args: {
+export function annotatedTag(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
   message: string;
   object?: string;
@@ -219,31 +257,27 @@ export function annotatedTag(args: {
   force?: boolean;
 }): Promise<void>;
 
-export function branch(args: {
+export function branch(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
   checkout?: boolean;
 }): Promise<void>;
 
-export function checkout(args: {
+export function checkout(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   emitter?: EventEmitter;
   emitterPrefix?: string;
   remote?: string;
   ref?: string;
+  filepaths?: string[];
+  pattern?: string;
 }): Promise<void>;
 
-export function clone(args: {
+export function clone(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   emitter?: EventEmitter;
   emitterPrefix?: string;
   url: string;
@@ -264,13 +298,11 @@ export function clone(args: {
   headers?: { [key: string]: string };
 }): Promise<void>;
 
-export function commit(args: {
+export function commit(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   message: string;
-  author: {
+  author?: {
     name?: string;
     email?: string;
     date?: Date;
@@ -285,79 +317,65 @@ export function commit(args: {
     timezoneOffset?: number;
   };
   signingKey?: string;
+  noUpdateBranch?: boolean;
+  ref?: string;
+  parent?: string[];
+  tree?: string;
 }): Promise<string>;
 
-export function config(args: {
+export function config(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   path: string;
   all?: boolean;
   value?: string | boolean | number | undefined;
 }): Promise<any>;
 
-export function currentBranch(args: {
+export function currentBranch(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   fullname?: boolean;
 }): Promise<string | undefined>;
 
-export function deleteBranch(args: {
+export function deleteBranch(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
 }): Promise<void>;
 
-export function deleteRef(args: {
+export function deleteRef(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
 }): Promise<void>;
 
-export function deleteRemote(args: {
+export function deleteRemote(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   remote: string;
 }): Promise<void>;
 
-export function deleteTag(args: {
+export function deleteTag(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
 }): Promise<void>;
 
-export function expandRef(args: {
+export function expandRef(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
 }): Promise<string>;
 
-export function expandOid(args: {
+export function expandOid(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   oid: string;
 }): Promise<string>;
 
-export function fetch(args: {
+export function fetch(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   emitter?: EventEmitter;
   emitterPrefix?: string;
   url?: string;
@@ -374,13 +392,18 @@ export function fetch(args: {
   relative?: boolean;
   tags?: boolean;
   singleBranch?: boolean;
+  prune?: boolean;
   headers?: { [key: string]: string };
 }): Promise<FetchResponse>;
 
-export function findRoot(args: { core?: string;
-  fs?: any; filepath: string }): Promise<string>;
+export function findRoot(args: {
+  core?: string;
+  fs?: any;
+  filepath: string
+}): Promise<string>;
 
 export function getRemoteInfo(args: {
+  core?: string;
   url: string;
   corsProxy?: string;
   username?: string;
@@ -391,110 +414,111 @@ export function getRemoteInfo(args: {
   headers?: { [key: string]: string };
 }): Promise<RemoteDescription>;
 
-export function indexPack(args: {
+export function indexPack(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   emitter?: EventEmitter;
   emitterPrefix?: string;
   filepath: string;
 }): Promise<void>;
 
-export function init(args: {
+export function init(args: GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   bare?: boolean;
 }): Promise<void>;
 
-export function isDescendent(args: {
+export function isDescendent(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   oid: string;
   ancestor: string;
   depth?: string;
 }): Promise<boolean>;
 
-export function listBranches(args: {
+export function listBranches(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   remote?: string;
 }): Promise<Array<string>>;
 
-export function listFiles(args: {
+export function listFiles(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref?: string;
 }): Promise<Array<string>>;
 
-export function listRemotes(args: {
+export function listRemotes(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
-}): Promise<Array<RemoteDescription>>;
+}): Promise<Array<RemoteDefinition>>;
 
-export function listTags(args: {
+export function listTags(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
 }): Promise<Array<string>>;
 
-export function log(args: {
+export function log(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref?: string;
   depth?: number;
   since?: Date;
-}): Promise<Array<CommitDescription>>;
-export function log(args: {
+}): Promise<Array<CommitDescriptionWithOid>>;
+export function log(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref?: string;
   depth?: number;
   since?: Date;
   signing: false;
-}): Promise<Array<CommitDescription>>;
-export function log(args: {
+}): Promise<Array<CommitDescriptionWithOid>>;
+export function log(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref?: string;
   depth?: number;
   since?: Date;
   signing: true;
 }): Promise<Array<CommitDescriptionWithPayload>>;
 
-export function merge(args: {
+export function merge(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ours?: string;
   theirs: string;
   fastForwardOnly?: boolean;
+  dryRun?: boolean;
+  message?: string;
+  author?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  committer?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  signingKey?: string;
 }): Promise<MergeReport>;
 
-export function pull(args: {
+export function packObjects(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
+  oids: string[];
+  write?: boolean;
+}): Promise<PackObjectsResponse>;
+
+export function pull(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
   ref?: string;
+  corsProxy?: string;
   singleBranch?: boolean;
   fastForwardOnly?: boolean;
   username?: string;
@@ -504,13 +528,26 @@ export function pull(args: {
   headers?: { [key: string]: string };
   emitter?: EventEmitter;
   emitterPrefix?: string;
+  author?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  committer?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  signingKey?: string;
 }): Promise<void>;
 
-export function push(args: {
+export function push(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref?: string;
   remoteRef?: string;
   remote?: string;
@@ -526,82 +563,66 @@ export function push(args: {
   emitterPrefix?: string;
 }): Promise<PushResponse>;
 
-export function readObject(args: {
+export function readObject(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   oid: string;
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
   filepath?: string;
   encoding?: string;
 }): Promise<GitObjectDescription>;
 
-export function remove(args: {
+export function remove(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   filepath: string;
 }): Promise<void>;
 
-export function resetIndex(args: {
-  fs: any,
-  dir: string,
-  gitdir?: string,
+export function resetIndex(args: Partial<WorkDir> & GitDir & {
+  core?: string;
+  fs?: any,
   filepath: string,
   ref?: string
 }): Promise<void>
 
-export function resolveRef(args: {
+export function resolveRef(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
   depth?: number;
 }): Promise<string>;
 
-export function sign(args: {
+export function sign(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   privateKeys: string;
 }): Promise<string>;
 
-export function status(args: {
+export function status(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   filepath: string;
 }): Promise<string>;
 
-export function statusMatrix(args: {
+export function statusMatrix(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  dir: string;
-  gitdir?: string;
   ref?: string;
+  filepaths?: string[];
   pattern?: string;
 }): Promise<StatusMatrix>;
 
-export function tag(args: {
+export function tag(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
   object?: string;
   force?: boolean;
 }): Promise<void>;
 
-export function verify(args: {
+export function verify(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
   publicKeys: string;
 }): Promise<false | Array<string>>;
@@ -617,11 +638,9 @@ export function walkBeta1<T, Q>(args: {
   iterate?: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
 
-export function writeObject(args: {
+export function writeObject(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   type?: 'blob' | 'tree' | 'commit' | 'tag';
   object: string | Buffer | CommitDescription | TreeDescription | TagDescription;
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
@@ -629,11 +648,21 @@ export function writeObject(args: {
   encoding?: string;
 }): Promise<string>;
 
-export function writeRef(args: {
+type HashBlobResult = {
+  oid: string;
+  type: 'blob';
+  object: Buffer;
+  format: 'wrapped';
+}
+
+export function hashBlob(args: {
+  core?: string;
+  object: string | Buffer | CommitDescription | TreeDescription | TagDescription;
+}): Promise<HashBlobResult>;
+
+export function writeRef(args: GitDir & {
   core?: string;
   fs?: any;
-  dir?: string;
-  gitdir?: string;
   ref: string;
   value: string;
   force?: boolean;

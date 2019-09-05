@@ -1,14 +1,12 @@
 /* eslint-env node, browser, jasmine */
 const {
+  collect,
   parseRefsAdResponse,
   parseUploadPackResponse,
   parseUploadPackRequest,
   writeRefsAdResponse,
   writeUploadPackRequest
 } = require('isomorphic-git/internal-apis')
-const bufferToStream = require('buffer-to-stream')
-const pify = require('pify')
-const concat = require('simple-concat')
 // const stream = require('stream')
 
 /*
@@ -85,7 +83,7 @@ Git Push:
  */
 describe('git wire protocol', () => {
   it('writeRefsAd', async () => {
-    let res = await writeRefsAdResponse({
+    const res = await writeRefsAdResponse({
       service: 'git-upload-pack',
       capabilities: [
         'multi_ack',
@@ -114,7 +112,7 @@ describe('git wire protocol', () => {
         'refs/heads/master5': 'e5c144897b64a44bd1164a0db60738452c9eaf87'
       }
     })
-    let buffer = await pify(concat)(res)
+    const buffer = await collect(res)
     expect(buffer.toString('utf8')).toBe(
       `01149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
@@ -128,7 +126,7 @@ describe('git wire protocol', () => {
     )
   })
   it('parseRefsAdResponse', async () => {
-    let res = bufferToStream(
+    const res = [
       Buffer.from(`001e# service=git-upload-pack
 000001149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
@@ -139,8 +137,10 @@ describe('git wire protocol', () => {
 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
 0000`)
-    )
-    let result = await parseRefsAdResponse(res, { service: 'git-upload-pack' })
+    ]
+    const result = await parseRefsAdResponse(res, {
+      service: 'git-upload-pack'
+    })
     expect([...result.capabilities]).toEqual([
       'multi_ack',
       'thin-pack',
@@ -171,7 +171,7 @@ describe('git wire protocol', () => {
     ])
   })
   it('writeUploadPackRequest', async () => {
-    let req = {
+    const req = {
       capabilities: [
         'multi_ack_detailed',
         'no-done',
@@ -190,8 +190,8 @@ describe('git wire protocol', () => {
         'e5c144897b64a44bd1164a0db60738452c9eaf87'
       ]
     }
-    let result = await writeUploadPackRequest(req)
-    let buffer = await pify(concat)(result)
+    const result = writeUploadPackRequest(req)
+    const buffer = await collect(result)
     expect(buffer.toString('utf8'))
       .toEqual(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
 0032want 5faa96fe725306e060386975a70e4b6eacb576ed
@@ -204,7 +204,7 @@ describe('git wire protocol', () => {
 `)
   })
   it('parseUploadPackRequest', async () => {
-    let req = bufferToStream(
+    const req = [
       Buffer.from(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
 0032want 5faa96fe725306e060386975a70e4b6eacb576ed
 0032want 9ea43b479f5fedc679e3eb37803275d727bf51b7
@@ -214,8 +214,8 @@ describe('git wire protocol', () => {
 0032want e5c144897b64a44bd1164a0db60738452c9eaf87
 00000009done
 `)
-    )
-    let result = await parseUploadPackRequest(req)
+    ]
+    const result = await parseUploadPackRequest(req)
     expect([...result.capabilities]).toEqual([
       'multi_ack_detailed',
       'no-done',
@@ -279,17 +279,17 @@ describe('git wire protocol', () => {
   // 0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d\n`)
   //   })
   it('parseUploadPackResponse - simple clone', async () => {
-    let res = bufferToStream(Buffer.from(`0008NAK\n`))
-    let result = await parseUploadPackResponse(res)
+    const res = [Buffer.from(`0008NAK\n`)]
+    const result = await parseUploadPackResponse(res)
     expect(result.nak).toBe(true)
   })
   it('parseUploadPackResponse - incremental update (fetch)', async () => {
-    let res = bufferToStream(
+    const res = [
       Buffer.from(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue
 0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d
 `)
-    )
-    let result = await parseUploadPackResponse(res)
+    ]
+    const result = await parseUploadPackResponse(res)
     expect(result.nak).toBe(false)
     expect(result.acks).toEqual([
       { oid: '7e47fe2bd8d01d481f44d7af0531bd93d3b21c01', status: 'continue' },

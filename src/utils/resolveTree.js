@@ -5,7 +5,11 @@ import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
 
 export async function resolveTree ({ fs, gitdir, oid }) {
-  let { type, object } = await readObject({ fs, gitdir, oid })
+  // Empty tree - bypass `readObject`
+  if (oid === '4b825dc642cb6eb9a060e54bf8d69288fbee4904') {
+    return { tree: GitTree.from([]), oid }
+  }
+  const { type, object } = await readObject({ fs, gitdir, oid })
   // Resolve annotated tag objects to whatever
   if (type === 'tag') {
     oid = GitAnnotatedTag.from(object).parse().object

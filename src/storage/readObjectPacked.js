@@ -15,9 +15,9 @@ export async function readObjectPacked ({
   // Iterate through all the .idx files
   let list = await fs.readdir(join(gitdir, 'objects/pack'))
   list = list.filter(x => x.endsWith('.idx'))
-  for (let filename of list) {
+  for (const filename of list) {
     const indexFile = `${gitdir}/objects/pack/${filename}`
-    let p = await readPackIndex({
+    const p = await readPackIndex({
       fs,
       filename: indexFile,
       getExternalRefDelta
@@ -30,7 +30,7 @@ export async function readObjectPacked ({
         const packFile = indexFile.replace(/idx$/, 'pack')
         p.pack = fs.read(packFile)
       }
-      let result = await p.read({ oid, getExternalRefDelta })
+      const result = await p.read({ oid, getExternalRefDelta })
       result.format = 'content'
       result.source = `objects/pack/${filename.replace(/idx$/, 'pack')}`
       return result

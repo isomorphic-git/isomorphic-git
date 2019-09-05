@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-deleteRemote.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { plugins, deleteRemote, listRemotes } = require('isomorphic-git')
+const { deleteRemote, listRemotes } = require('isomorphic-git')
 
 describe('deleteRemote', () => {
   beforeAll(() => {
@@ -10,9 +11,8 @@ describe('deleteRemote', () => {
   })
   it('deleteRemote', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-deleteRemote')
-    plugins.set('fs', fs)
-    let remote = 'foo'
+    const { dir, gitdir } = await makeFixture('test-deleteRemote')
+    const remote = 'foo'
     // Test
     await deleteRemote({ dir, gitdir, remote })
     const a = await listRemotes({ dir, gitdir })
@@ -20,8 +20,7 @@ describe('deleteRemote', () => {
   })
   it('missing argument', async () => {
     // Setup
-    let { fs, dir, gitdir } = await makeFixture('test-addRemote')
-    plugins.set('fs', fs)
+    const { dir, gitdir } = await makeFixture('test-addRemote')
     // Test
     let error = null
     try {

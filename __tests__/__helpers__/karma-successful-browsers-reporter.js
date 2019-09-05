@@ -16,7 +16,7 @@ const BrowsersReporter = function (
     this.browserCount = browsers.length
     this.buildOk = true
     // Append to the existing list of successful browsers
-    let tmp = loadSuccessfulBrowsers.load()
+    const tmp = loadSuccessfulBrowsers.load()
     this.successfulBrowsersFullNames = tmp[0]
     this.successfulBrowsers = tmp[1]
   }

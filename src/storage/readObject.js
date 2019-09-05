@@ -13,8 +13,17 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
   // process can acquire external ref-deltas.
   const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
 
+  let result
+  // Empty tree - hard-coded so we can use it as a shorthand.
+  // Note: I think the canonical git implementation must do this too because
+  // `git cat-file -t 4b825dc642cb6eb9a060e54bf8d69288fbee4904` prints "tree" even in empty repos.
+  if (oid === '4b825dc642cb6eb9a060e54bf8d69288fbee4904') {
+    result = { format: 'wrapped', object: Buffer.from(`tree 0\x00`) }
+  }
   // Look for it in the loose object directory.
-  let result = await readObjectLoose({ fs, gitdir, oid })
+  if (!result) {
+    result = await readObjectLoose({ fs, gitdir, oid })
+  }
   // Check to see if it's in a packfile.
   if (!result) {
     result = await readObjectPacked({ fs, gitdir, oid, getExternalRefDelta })
@@ -23,28 +32,32 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
   if (!result) {
     throw new GitError(E.ReadObjectFail, { oid })
   }
+
   if (format === 'deflated') {
     return result
   }
+
   // BEHOLD! THE ONLY TIME I'VE EVER WANTED TO USE A CASE STATEMENT WITH FOLLOWTHROUGH!
   // eslint-ignore
   /* eslint-disable no-fallthrough */
   switch (result.format) {
     case 'deflated':
-      let buffer = Buffer.from(pako.inflate(result.object))
-      result = { format: 'wrapped', object: buffer, source: result.source }
+      result.object = Buffer.from(pako.inflate(result.object))
+      result.format = 'wrapped'
     case 'wrapped':
       if (format === 'wrapped' && result.format === 'wrapped') {
         return result
       }
-      let sha = shasum(result.object)
+      const sha = shasum(result.object)
       if (sha !== oid) {
         throw new GitError(E.InternalFail, {
           message: `SHA check failed! Expected ${oid}, computed ${sha}`
         })
       }
-      let { object, type } = GitObject.unwrap(buffer)
-      result = { type, format: 'content', object, source: result.source }
+      const { object, type } = GitObject.unwrap(result.object)
+      result.type = type
+      result.object = object
+      result.format = 'content'
     case 'content':
       if (format === 'content') return result
       break

@@ -1,21 +1,21 @@
 import { GitPktLine } from '../models/GitPktLine.js'
 
 export async function parseUploadPackRequest (stream) {
-  let read = GitPktLine.streamReader(stream)
+  const read = GitPktLine.streamReader(stream)
   let done = false
   let capabilities = null
-  let wants = []
-  let haves = []
-  let shallows = []
+  const wants = []
+  const haves = []
+  const shallows = []
   let depth
   let since
-  let exclude = []
+  const exclude = []
   let relative = false
   while (!done) {
-    let line = await read()
+    const line = await read()
     if (line === true) break
     if (line === null) continue
-    let [key, value, ...rest] = line
+    const [key, value, ...rest] = line
       .toString('utf8')
       .trim()
       .split(' ')

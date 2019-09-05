@@ -1,13 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-writeRef.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const {
-  plugins,
-  writeRef,
-  resolveRef,
-  currentBranch
-} = require('isomorphic-git')
+const { writeRef, resolveRef, currentBranch } = require('isomorphic-git')
 
 describe('writeRef', () => {
   beforeAll(() => {
@@ -15,8 +11,7 @@ describe('writeRef', () => {
   })
   it('writes a tag ref to HEAD', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeRef')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
       gitdir,
@@ -28,8 +23,7 @@ describe('writeRef', () => {
   })
   it('sets current branch to another', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-writeRef')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
       gitdir,

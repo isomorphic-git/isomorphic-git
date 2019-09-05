@@ -30,13 +30,16 @@ export class GitPackedRefs {
     }
     return this
   }
+
   static from (text) {
     return new GitPackedRefs(text)
   }
+
   delete (ref) {
     this.parsedConfig = this.parsedConfig.filter(entry => entry.ref !== ref)
     this.refs.delete(ref)
   }
+
   toString () {
     return this.parsedConfig.map(({ line }) => line).join('\n') + '\n'
   }

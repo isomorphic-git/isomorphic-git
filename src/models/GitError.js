@@ -1,13 +1,11 @@
 // modeled after Therror https://github.com/therror/therror/
 // but with the goal of being much lighter weight.
 
-import nick from 'nick'
-
 const messages = {
   FileReadError: `Could not read file "{ filepath }".`,
   MissingRequiredParameterError: `The function "{ function }" requires a "{ parameter }" parameter but none was provided.`,
   InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
-  InvalidParameterCombinationError: `The function "{ function }" doesn't take these parameters simultaneously: { parameters.join(", ") }`,
+  InvalidParameterCombinationError: `The function "{ function }" doesn't take these parameters simultaneously: { parameters }`,
   RefExistsError: `Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`,
   RefNotExistsError: `Failed to { verb } { noun } "{ ref }" because { noun } "{ ref }" does not exists.`,
   BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,
@@ -31,7 +29,7 @@ const messages = {
   RemoteDoesNotSupportSmartHTTP: `Remote does not support the "smart" HTTP protocol, and isomorphic-git does not support the "dumb" HTTP protocol, so they are incompatible.`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
-  MergeNotSupportedFail: `Non-fast-forward merges are not supported yet.`,
+  MergeNotSupportedFail: `Merges with conflicts are not supported yet.`,
   DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
   ResolveTreeError: `Could not resolve { oid } to a tree.`,
   ResolveCommitError: `Could not resolve { oid } to a commit.`,
@@ -149,15 +147,30 @@ export const E = {
   ShortOidNotFound: `ShortOidNotFound`
 }
 
+function renderTemplate (template, values) {
+  let result = template
+  for (const key of Object.keys(values)) {
+    let subs
+    if (Array.isArray(values[key])) {
+      subs = values[key].join(', ')
+    } else {
+      subs = String(values[key])
+    }
+    result = result.replace(new RegExp(`{ ${key} }`, 'g'), subs)
+  }
+  return result
+}
+
 export class GitError extends Error {
   constructor (code, data) {
     super()
     this.name = code
     this.code = code
     this.data = data
-    this.message = nick(messages[code])(data || {})
+    this.message = renderTemplate(messages[code], data || {})
     if (Error.captureStackTrace) Error.captureStackTrace(this, this.constructor)
   }
+
   toJSON () {
     return {
       code: this.code,
@@ -166,6 +179,7 @@ export class GitError extends Error {
       message: this.message
     }
   }
+
   toString () {
     return this.stack.toString()
   }

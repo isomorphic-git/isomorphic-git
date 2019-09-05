@@ -1,46 +1,43 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { plugins, deleteRef, listTags } = require('isomorphic-git')
+const { deleteRef, listTags } = require('isomorphic-git')
 
 describe('deleteRef', () => {
   it('deletes a loose tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-deleteRef')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-deleteRef')
     // Test
     await deleteRef({
       gitdir,
       ref: 'refs/tags/latest'
     })
-    let refs = await listTags({
+    const refs = await listTags({
       gitdir
     })
     expect(refs.includes('latest')).toEqual(false)
   })
   it('deletes a packed tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-deleteRef')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-deleteRef')
     // Test
     await deleteRef({
       gitdir,
       ref: 'refs/tags/packed-tag'
     })
-    let refs = await listTags({
+    const refs = await listTags({
       gitdir
     })
     expect(refs.includes('packed-tag')).toEqual(false)
   })
   it('deletes a packed and loose tag', async () => {
     // Setup
-    let { fs, gitdir } = await makeFixture('test-deleteRef')
-    plugins.set('fs', fs)
+    const { gitdir } = await makeFixture('test-deleteRef')
     // Test
     await deleteRef({
       gitdir,
       ref: 'refs/tags/packed-and-loose'
     })
-    let refs = await listTags({
+    const refs = await listTags({
       gitdir
     })
     expect(refs.includes('packed-and-loose')).toEqual(false)

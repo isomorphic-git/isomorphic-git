@@ -1,3 +1,4 @@
+// @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
@@ -8,7 +9,23 @@ import { cores } from '../utils/plugins.js'
 /**
  * Check whether a git commit is descended from another
  *
- * @link https://isomorphic-git.github.io/docs/isDescendent.html
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.oid - The descendent commit
+ * @param {string} args.ancestor - The (proposed) ancestor commit
+ * @param {number} [args.depth = -1] - Maximum depth to search before giving up. -1 means no maximum depth.
+ *
+ * @returns {Promise<boolean>} Resolves to true if `oid` is a descendent of `ancestor`
+ *
+ * @example
+ * let oid = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
+ * let ancestor = await git.resolveRef({ dir: '$input((/))', ref: '$input((v0.20.0))' })
+ * console.log(oid, ancestor)
+ * await git.isDescendent({ dir: '$input((/))', oid, ancestor, depth: $input((-1)) })
+ *
  */
 export async function isDescendent ({
   core = 'default',
@@ -39,14 +56,14 @@ export async function isDescendent ({
     // We do not use recursion here, because that would lead to depth-first traversal,
     // and we want to maintain a breadth-first traversal to avoid hitting shallow clone depth cutoffs.
     const queue = [oid]
-    let visited = new Set()
+    const visited = new Set()
     let searchdepth = 0
     while (queue.length) {
       if (searchdepth++ === depth) {
         throw new GitError(E.MaxSearchDepthExceeded, { depth })
       }
-      let oid = queue.shift()
-      let { type, object } = await readObject({
+      const oid = queue.shift()
+      const { type, object } = await readObject({
         fs,
         gitdir,
         oid

@@ -5,6 +5,7 @@ export class RunningMinimum {
     // You know better than to set it directly right?
     this.value = null
   }
+
   consider (value) {
     if (value === null || value === undefined) return
     if (this.value === null) {
@@ -13,6 +14,7 @@ export class RunningMinimum {
       this.value = value
     }
   }
+
   reset () {
     this.value = null
   }

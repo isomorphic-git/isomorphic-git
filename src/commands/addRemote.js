@@ -1,3 +1,4 @@
+// @ts-check
 import cleanGitRef from 'clean-git-ref'
 
 import { GitConfigManager } from '../managers/GitConfigManager.js'
@@ -7,9 +8,23 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
- * Add a new remote
+ * Add or update a remote
  *
- * @link https://isomorphic-git.github.io/docs/addRemote.html
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.remote - The name of the remote
+ * @param {string} args.url - The URL of the remote
+ * @param {boolean} [args.force = false] - Instead of throwing an error if a remote named `remote` already exists, overwrite the existing remote.
+ *
+ * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
+ *
+ * @example
+ * await git.addRemote({ dir: '$input((/))', remote: '$input((upstream))', url: '$input((https://github.com/isomorphic-git/isomorphic-git))' })
+ * console.log('done')
+ *
  */
 export async function addRemote ({
   core = 'default',

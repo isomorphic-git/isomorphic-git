@@ -1,3 +1,4 @@
+// @ts-check
 import cleanGitRef from 'clean-git-ref'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -9,7 +10,20 @@ import { cores } from '../utils/plugins.js'
 /**
  * Create a branch
  *
- * @link https://isomorphic-git.github.io/docs/branch.html
+ * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string} args.ref - What to name the branch
+ * @param {boolean} [args.checkout = false] - Update `HEAD` to point at the newly created branch
+ *
+ * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
+ *
+ * @example
+ * await git.branch({ dir: '$input((/))', ref: '$input((develop))' })
+ * console.log('done')
+ *
  */
 export async function branch ({
   core = 'default',
@@ -37,22 +51,34 @@ export async function branch ({
       })
     }
 
-    const exist = await fs.exists(`${gitdir}/refs/heads/${ref}`)
+    const fullref = `refs/heads/${ref}`
+
+    const exist = await GitRefManager.exists({ fs, gitdir, ref: fullref })
     if (exist) {
       throw new GitError(E.RefExistsError, { noun: 'branch', ref })
     }
-    // Get tree oid
+
+    // Get current HEAD tree oid
     let oid
     try {
       oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
     } catch (e) {
-      throw new GitError(E.NoHeadCommitError, { noun: 'branch', ref })
+      // Probably an empty repo
     }
-    // Create a new branch that points at that same commit
-    await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
+
+    // Create a new ref that points at the current commit
+    if (oid) {
+      await GitRefManager.writeRef({ fs, gitdir, ref: fullref, value: oid })
+    }
+
     if (checkout) {
       // Update HEAD
-      await fs.write(`${gitdir}/HEAD`, `ref: refs/heads/${ref}`)
+      await GitRefManager.writeSymbolicRef({
+        fs,
+        gitdir,
+        ref: 'HEAD',
+        value: fullref
+      })
     }
   } catch (err) {
     err.caller = 'git.branch'

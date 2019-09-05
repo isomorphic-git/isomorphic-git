@@ -1,4 +1,5 @@
 /* eslint-env node, browser, jasmine */
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-flatFileListToDirectoryStructure.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const {
@@ -11,26 +12,26 @@ describe('flatFileListToDirectoryStructure', () => {
   })
 
   it('simple', async () => {
-    let inode = flatFileListToDirectoryStructure([
+    const inode = flatFileListToDirectoryStructure([
       { path: 'hello/there.txt' }
     ]).get('.')
     expect(inode.fullpath).toBe('.')
     expect(inode.type).toBe('tree')
     expect(inode.children.length).toBe(1)
-    let hello = inode.children[0]
+    const hello = inode.children[0]
     expect(hello.type).toBe('tree')
     expect(hello.fullpath).toBe('hello')
     expect(hello.basename).toBe('hello')
     expect(hello.parent).toBe(inode)
     expect(hello.children.length).toBe(1)
-    let there = hello.children[0]
+    const there = hello.children[0]
     expect(there.type).toBe('blob')
     expect(there.fullpath).toBe('hello/there.txt')
     expect(there.basename).toBe('there.txt')
   })
 
   it('advanced', async () => {
-    let filelist = [
+    const filelist = [
       '.babelrc',
       '.editorconfig',
       '.flowconfig',
@@ -64,8 +65,8 @@ describe('flatFileListToDirectoryStructure', () => {
       'test/test-init.js',
       'test/test-resolveRef.js'
     ]
-    let files = filelist.map(f => ({ path: f, someMeta: f.length }))
-    let inodes = flatFileListToDirectoryStructure(files)
+    const files = filelist.map(f => ({ path: f, someMeta: f.length }))
+    const inodes = flatFileListToDirectoryStructure(files)
     expect(inodes.get('.')).toMatchSnapshot()
   })
 })
