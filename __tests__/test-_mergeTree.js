@@ -7,7 +7,7 @@ const { _mergeTree } = require('isomorphic-git/internal-apis')
 describe('_mergeTree', () => {
   it("merge 'add-files' and 'remove-files'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-_diffTree')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       fs,
       gitdir,
@@ -35,7 +35,7 @@ describe('_mergeTree', () => {
 
   it("merge 'remove-files' and 'add-files'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-_diffTree')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       fs,
       gitdir,
@@ -63,7 +63,7 @@ describe('_mergeTree', () => {
 
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-_diffTree')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       fs,
       gitdir,

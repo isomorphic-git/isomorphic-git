@@ -311,6 +311,38 @@ describe('merge', () => {
     expect(mergeCommit.parent).toEqual(commit.parent)
   })
 
+  it("merge two branches where one modified file and the other modified file mode'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    const commit = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'a-merge-d'
+    }))[0]
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'd',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      }
+    })
+    const mergeCommit = (await log({
+      gitdir,
+      ref: 'a',
+      depth: 1
+    }))[0]
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+
   it("merge two branches that modified the same file (should conflict)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
