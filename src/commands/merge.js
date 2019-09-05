@@ -5,11 +5,9 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { join } from '../utils/join.js'
+import { mergeTree } from '../utils/mergeTree.js'
 import { cores } from '../utils/plugins.js'
 
-import { _applyTreePatch } from './_applyTreePatch.js'
-import { _diffTree } from './_diffTree.js'
-import { _mergeTreePatches } from './_mergeTreePatches.js'
 import { commit } from './commit'
 import { currentBranch } from './currentBranch.js'
 import { findMergeBase } from './findMergeBase.js'
@@ -122,12 +120,17 @@ export async function merge ({
         throw new GitError(E.FastForwardFail)
       }
       // try a fancier merge
-      const tree = await basicMerge({
+      const tree = await mergeTree({
+        core,
         fs,
         gitdir,
-        ours: ourOid,
-        theirs: theirOid,
-        base: baseOid
+        ourOid,
+        theirOid,
+        baseOid,
+        ourName: ours,
+        baseName: 'base',
+        theirName: theirs,
+        dryRun
       })
       if (!message) {
         message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(
@@ -161,19 +164,4 @@ export async function merge ({
     err.caller = 'git.merge'
     throw err
   }
-}
-
-async function basicMerge ({ fs, gitdir, ours, theirs, base }) {
-  const diff1 = await _diffTree({ gitdir, before: base, after: ours })
-  const diff2 = await _diffTree({ gitdir, before: base, after: theirs })
-  const { treePatch, hasConflicts } = await _mergeTreePatches({
-    treePatches: [diff1, diff2]
-  })
-  if (hasConflicts) throw new GitError(E.MergeNotSupportedFail)
-  return _applyTreePatch({
-    fs,
-    gitdir,
-    base,
-    treePatch
-  })
 }
