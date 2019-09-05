@@ -12,7 +12,7 @@ export async function expandOidPacked ({
   const fs = new FileSystem(_fs)
   // Iterate through all the .pack files
   const results = []
-  let list = await fs.readdir(join(gitdir, '/objects/pack'))
+  let list = await fs.readdir(join(gitdir, 'objects/pack'))
   list = list.filter(x => x.endsWith('.idx'))
   for (const filename of list) {
     const indexFile = `${gitdir}/objects/pack/${filename}`
