@@ -5,9 +5,9 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { join } from '../utils/join.js'
+import { mergeTree } from '../utils/mergeTree.js'
 import { cores } from '../utils/plugins.js'
 
-import { _mergeTree } from './_mergeTree.js'
 import { commit } from './commit'
 import { currentBranch } from './currentBranch.js'
 import { findMergeBase } from './findMergeBase.js'
@@ -120,7 +120,7 @@ export async function merge ({
         throw new GitError(E.FastForwardFail)
       }
       // try a fancier merge
-      const tree = await _mergeTree({
+      const tree = await mergeTree({
         core,
         fs,
         gitdir,

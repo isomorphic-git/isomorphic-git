@@ -1,18 +1,18 @@
 // @ts-check
+import { TREE } from '../commands/TREE.js'
+import { walkBeta1 } from '../commands/walkBeta1.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { writeObject } from '../storage/writeObject.js'
-import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
-import { TREE } from './TREE.js'
-import { _mergeFile } from './_mergeFile.js'
-import { walkBeta1 } from './walkBeta1.js'
+import { join } from './join.js'
+import { mergeFile } from './mergeFile.js'
+import { cores } from './plugins.js'
 
 /**
  *
- * @typedef {import('./readObject').TreeEntry} TreeEntry
+ * @typedef {import('../commands/readObject').TreeEntry} TreeEntry
  */
 
 /**
@@ -34,7 +34,7 @@ import { walkBeta1 } from './walkBeta1.js'
  * @returns {Promise<string>} - The SHA-1 object id of the merged tree
  *
  */
-export async function _mergeTree ({
+export async function mergeTree ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
@@ -47,114 +47,109 @@ export async function _mergeTree ({
   theirName = 'theirs',
   dryRun = false
 }) {
-  try {
-    const fs = new FileSystem(_fs)
-    const ourTree = TREE({ core, dir, gitdir, fs, ref: ourOid })
-    const baseTree = TREE({ core, dir, gitdir, fs, ref: baseOid })
-    const theirTree = TREE({ core, dir, gitdir, fs, ref: theirOid })
+  const fs = new FileSystem(_fs)
+  const ourTree = TREE({ core, dir, gitdir, fs, ref: ourOid })
+  const baseTree = TREE({ core, dir, gitdir, fs, ref: baseOid })
+  const theirTree = TREE({ core, dir, gitdir, fs, ref: theirOid })
 
-    const results = await walkBeta1({
-      trees: [ourTree, baseTree, theirTree],
-      map: async function ([ours, base, theirs]) {
-        await Promise.all([
-          ours.populateStat(),
-          base.populateStat(),
-          theirs.populateStat(),
-          ours.populateHash(),
-          base.populateHash(),
-          theirs.populateHash()
-        ])
-        // What we did, what they did
-        const ourChange = modified(ours, base)
-        const theirChange = modified(theirs, base)
-        switch (`${ourChange}-${theirChange}`) {
-          case 'false-false': {
-            return {
-              mode: base.mode,
-              path: base.basename,
-              oid: base.oid,
-              type: base.type
-            }
-          }
-          case 'false-true': {
-            return theirs.exists
-              ? {
-                mode: theirs.mode,
-                path: theirs.basename,
-                oid: theirs.oid,
-                type: theirs.type
-              }
-              : void 0
-          }
-          case 'true-false': {
-            return ours.exists
-              ? {
-                mode: ours.mode,
-                path: ours.basename,
-                oid: ours.oid,
-                type: ours.type
-              }
-              : void 0
-          }
-          case 'true-true': {
-            // Modifications
-            if (
-              ours.type === 'blob' &&
-              base.type === 'blob' &&
-              theirs.type === 'blob'
-            ) {
-              return mergeBlobs({
-                fs,
-                gitdir,
-                ours,
-                base,
-                theirs,
-                ourName,
-                baseName,
-                theirName
-              })
-            }
-            // all other types of conflicts fail
-            throw new GitError(E.MergeNotSupportedFail)
+  const results = await walkBeta1({
+    trees: [ourTree, baseTree, theirTree],
+    map: async function ([ours, base, theirs]) {
+      await Promise.all([
+        ours.populateStat(),
+        base.populateStat(),
+        theirs.populateStat(),
+        ours.populateHash(),
+        base.populateHash(),
+        theirs.populateHash()
+      ])
+      // What we did, what they did
+      const ourChange = modified(ours, base)
+      const theirChange = modified(theirs, base)
+      switch (`${ourChange}-${theirChange}`) {
+        case 'false-false': {
+          return {
+            mode: base.mode,
+            path: base.basename,
+            oid: base.oid,
+            type: base.type
           }
         }
-      },
-      /**
-       * @param {TreeEntry} [parent]
-       * @param {Array<TreeEntry>} children
-       */
-      reduce: async (parent, children) => {
-        const entries = children.filter(Boolean) // remove undefineds
-
-        // automatically delete directories if they have been emptied
-        if (parent && parent.type === 'tree' && entries.length === 0) return
-
-        if (entries.length > 0) {
-          const tree = new GitTree(entries)
-          const object = tree.toObject()
-          const oid = await writeObject({
-            fs,
-            gitdir,
-            type: 'tree',
-            object,
-            dryRun
-          })
-          parent.oid = oid
+        case 'false-true': {
+          return theirs.exists
+            ? {
+              mode: theirs.mode,
+              path: theirs.basename,
+              oid: theirs.oid,
+              type: theirs.type
+            }
+            : void 0
         }
-        return parent
+        case 'true-false': {
+          return ours.exists
+            ? {
+              mode: ours.mode,
+              path: ours.basename,
+              oid: ours.oid,
+              type: ours.type
+            }
+            : void 0
+        }
+        case 'true-true': {
+          // Modifications
+          if (
+            ours.type === 'blob' &&
+            base.type === 'blob' &&
+            theirs.type === 'blob'
+          ) {
+            return mergeBlobs({
+              fs,
+              gitdir,
+              ours,
+              base,
+              theirs,
+              ourName,
+              baseName,
+              theirName
+            })
+          }
+          // all other types of conflicts fail
+          throw new GitError(E.MergeNotSupportedFail)
+        }
       }
-    })
-    return results.oid
-  } catch (err) {
-    err.caller = 'git._mergeTree'
-    throw err
-  }
+    },
+    /**
+     * @param {TreeEntry} [parent]
+     * @param {Array<TreeEntry>} children
+     */
+    reduce: async (parent, children) => {
+      const entries = children.filter(Boolean) // remove undefineds
+
+      // automatically delete directories if they have been emptied
+      if (parent && parent.type === 'tree' && entries.length === 0) return
+
+      if (entries.length > 0) {
+        const tree = new GitTree(entries)
+        const object = tree.toObject()
+        const oid = await writeObject({
+          fs,
+          gitdir,
+          type: 'tree',
+          object,
+          dryRun
+        })
+        parent.oid = oid
+      }
+      return parent
+    }
+  })
+  return results.oid
 }
 
 /**
  *
- * @param {import('./walkBeta1.js').WalkerEntry} entry
- * @param {import('./walkBeta1.js').WalkerEntry} base
+ * @param {import('../commands/walkBeta1.js').WalkerEntry} entry
+ * @param {import('../commands/walkBeta1.js').WalkerEntry} base
  *
  */
 function modified (entry, base) {
@@ -176,9 +171,9 @@ function modified (entry, base) {
  * @param {Object} args
  * @param {FileSystem} args.fs
  * @param {string} args.gitdir
- * @param {import('./walkBeta1.js').WalkerEntry} args.ours
- * @param {import('./walkBeta1.js').WalkerEntry} args.base
- * @param {import('./walkBeta1.js').WalkerEntry} args.theirs
+ * @param {import('../commands/walkBeta1.js').WalkerEntry} args.ours
+ * @param {import('../commands/walkBeta1.js').WalkerEntry} args.base
+ * @param {import('../commands/walkBeta1.js').WalkerEntry} args.theirs
  * @param {string} [args.ourName]
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]
@@ -217,7 +212,7 @@ async function mergeBlobs ({
     base.populateContent(),
     theirs.populateContent()
   ])
-  const { mergedText, cleanMerge } = _mergeFile({
+  const { mergedText, cleanMerge } = mergeFile({
     ourContent: ours.content.toString('utf8'),
     baseContent: base.content.toString('utf8'),
     theirContent: theirs.content.toString('utf8'),

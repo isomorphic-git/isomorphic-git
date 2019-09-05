@@ -2,7 +2,7 @@ import diff3Merge from 'diff3'
 
 const LINEBREAKS = /^.*(\r?\n|$)/gm
 
-export function _mergeFile ({
+export function mergeFile ({
   ourContent,
   baseContent,
   theirContent,
