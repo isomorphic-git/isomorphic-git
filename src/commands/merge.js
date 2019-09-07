@@ -24,7 +24,16 @@ import { findMergeBase } from './findMergeBase.js'
  */
 
 /**
- * Merge one or more branches *(Currently, only very simple cases are handled.)*
+ * Merge two branches
+ *
+ * ## Limitations
+ *
+ * Currently it does not support incomplete merges. That is, if there are merge conflicts it cannot solve
+ * with the built in diff3 algorithm it will not modify the working dir, and will throw a [`MergeNotSupportedFail`](./errors.md#mergenotsupportedfail) error.
+ *
+ * Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
+ *
+ * Currently it does not support selecting alternative merge strategies.
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
@@ -35,6 +44,7 @@ import { findMergeBase } from './findMergeBase.js'
  * @param {string} args.theirs - The branch to be merged
  * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
  * @param {boolean} [args.dryRun = false] - If true, simulates a merge so you can test whether it would succeed.
+ * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
  * @param {string} [args.message] - Overrides the default auto-generated merge commit message
  * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
  * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
@@ -57,6 +67,7 @@ export async function merge ({
   theirs,
   fastForwardOnly = false,
   dryRun = false,
+  noUpdateBranch = false,
   message,
   author,
   committer,
@@ -107,7 +118,7 @@ export async function merge ({
       }
     }
     if (baseOid === ourOid) {
-      if (!dryRun) {
+      if (!dryRun && !noUpdateBranch) {
         await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
       }
       return {
@@ -137,25 +148,21 @@ export async function merge ({
           ours
         )}`
       }
-      if (!dryRun) {
-        const oid = await commit({
-          fs,
-          gitdir,
-          message,
-          ref: ours,
-          tree,
-          parent: [ourOid, theirOid],
-          author,
-          committer,
-          signingKey
-        })
-        return {
-          oid,
-          tree,
-          mergeCommit: true
-        }
-      }
+      const oid = await commit({
+        fs,
+        gitdir,
+        message,
+        ref: ours,
+        tree,
+        parent: [ourOid, theirOid],
+        author,
+        committer,
+        signingKey,
+        dryRun,
+        noUpdateBranch
+      })
       return {
+        oid,
         tree,
         mergeCommit: true
       }

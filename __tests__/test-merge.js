@@ -100,7 +100,36 @@ describe('merge', () => {
     expect(oid).toEqual(desiredOid)
   })
 
-  it('merge newest into master --dryRun', async () => {
+  it('merge newest into master --dryRun (no author needed since fastForward)', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-merge')
+    // Test
+    const originalOid = await resolveRef({
+      gitdir,
+      ref: 'master'
+    })
+    const desiredOid = await resolveRef({
+      gitdir,
+      ref: 'newest'
+    })
+    const m = await merge({
+      gitdir,
+      ours: 'master',
+      theirs: 'newest',
+      fastForwardOnly: true,
+      dryRun: true
+    })
+    expect(m.oid).toEqual(desiredOid)
+    expect(m.alreadyMerged).toBeFalsy()
+    expect(m.fastForward).toBeTruthy()
+    const oid = await resolveRef({
+      gitdir,
+      ref: 'master'
+    })
+    expect(oid).toEqual(originalOid)
+  })
+
+  it('merge newest into master --noUpdateBranch', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-merge')
     // Test
@@ -191,6 +220,26 @@ describe('merge', () => {
     expect(mergeCommit.parent).toEqual(commit.parent)
   })
 
+  it("merge 'delete-first-half' and 'delete-second-half' (dryRun, missing author)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    // Test
+    let error = null
+    try {
+      await merge({
+        fs,
+        gitdir,
+        ours: 'delete-first-half',
+        theirs: 'delete-second-half',
+        dryRun: true
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBe(null)
+    expect(error.code).toBe(E.MissingAuthorError)
+  })
+
   it("merge 'delete-first-half' and 'delete-second-half' (dryRun)", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
@@ -210,6 +259,12 @@ describe('merge', () => {
       gitdir,
       ours: 'delete-first-half',
       theirs: 'delete-second-half',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      },
       dryRun: true
     })
     expect(report.tree).toBe(commit.tree)
@@ -220,6 +275,55 @@ describe('merge', () => {
       depth: 1
     }))[0]
     expect(notMergeCommit.oid).toEqual(originalCommit.oid)
+    // make sure no commit object was created
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
+      )
+    ).toBe(false)
+  })
+
+  it("merge 'delete-first-half' and 'delete-second-half' (noUpdateBranch)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    const commit = (await log({
+      gitdir,
+      depth: 1,
+      ref: 'delete-first-half-merge-delete-second-half'
+    }))[0]
+    const originalCommit = (await log({
+      gitdir,
+      ref: 'delete-first-half',
+      depth: 1
+    }))[0]
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'delete-first-half',
+      theirs: 'delete-second-half',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      },
+      noUpdateBranch: true
+    })
+    expect(report.tree).toBe(commit.tree)
+    // make sure branch hasn't been moved
+    const notMergeCommit = (await log({
+      gitdir,
+      ref: 'delete-first-half',
+      depth: 1
+    }))[0]
+    expect(notMergeCommit.oid).toEqual(originalCommit.oid)
+    // but make sure the commit object exists
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
+      )
+    ).toBe(true)
   })
 
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {
