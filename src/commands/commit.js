@@ -28,6 +28,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {Object} [args.committer = author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key.
+ * @param {boolean} [args.dryRun = false] - If true, simulates making a commit so you can test whether it would succeed. Implies `noUpdateBranch`.
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
  * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
  * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.
@@ -56,6 +57,7 @@ export async function commit ({
   author,
   committer,
   signingKey,
+  dryRun = false,
   noUpdateBranch = false,
   ref,
   parent,
@@ -101,7 +103,7 @@ export async function commit ({
         const inodes = flatFileListToDirectoryStructure(index.entries)
         const inode = inodes.get('.')
         if (!tree) {
-          tree = await constructTree({ fs, gitdir, inode })
+          tree = await constructTree({ fs, gitdir, inode, dryRun })
         }
         if (!parent) {
           try {
@@ -132,9 +134,10 @@ export async function commit ({
           fs,
           gitdir,
           type: 'commit',
-          object: comm.toObject()
+          object: comm.toObject(),
+          dryRun
         })
-        if (!noUpdateBranch) {
+        if (!noUpdateBranch && !dryRun) {
           // Update branch pointer
           await GitRefManager.writeRef({
             fs,
@@ -152,13 +155,13 @@ export async function commit ({
   }
 }
 
-async function constructTree ({ fs, gitdir, inode }) {
+async function constructTree ({ fs, gitdir, inode, dryRun }) {
   // use depth first traversal
   const children = inode.children
   for (const inode of children) {
     if (inode.type === 'tree') {
       inode.metadata.mode = '040000'
-      inode.metadata.oid = await constructTree({ fs, gitdir, inode })
+      inode.metadata.oid = await constructTree({ fs, gitdir, inode, dryRun })
     }
   }
   const entries = children.map(inode => ({
@@ -172,7 +175,8 @@ async function constructTree ({ fs, gitdir, inode }) {
     fs,
     gitdir,
     type: 'tree',
-    object: tree.toObject()
+    object: tree.toObject(),
+    dryRun
   })
   return oid
 }

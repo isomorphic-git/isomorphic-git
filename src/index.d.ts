@@ -318,6 +318,7 @@ export function commit(args: GitDir & {
   };
   signingKey?: string;
   noUpdateBranch?: boolean;
+  dryRun?: boolean;
   ref?: string;
   parent?: string[];
   tree?: string;
@@ -490,6 +491,7 @@ export function merge(args: GitDir & {
   theirs: string;
   fastForwardOnly?: boolean;
   dryRun?: boolean;
+  noUpdateBranch?: boolean;
   message?: string;
   author?: {
     name?: string;
