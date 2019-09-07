@@ -30,7 +30,8 @@ export class GitRefManager {
     symrefs,
     tags,
     refspecs = undefined,
-    prune = false
+    prune = false,
+    pruneTags = false
   }) {
     const fs = new FileSystem(_fs)
     // Validate input
@@ -50,13 +51,18 @@ export class GitRefManager {
     }
     const refspec = GitRefSpecSet.from(refspecs)
     const actualRefsToWrite = new Map()
+    // Delete all current tags if the pruneTags argument is true.
+    if (pruneTags) {
+      for (const tag of await GitRefManager.listRefs({ fs, gitdir, filepath: 'refs/tags' })) {
+        GitRefManager.deleteRef({ fs, gitdir, ref: `refs/tags/${tag}` })
+      }
+    }
     // Add all tags if the fetch tags argument is true.
     if (tags) {
       for (const serverRef of refs.keys()) {
         if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
-          const filename = join(gitdir, serverRef)
           // Git's behavior is to only fetch tags that do not conflict with tags already present.
-          if (!(await fs.exists(filename))) {
+          if (!(await GitRefManager.exists({ fs, gitdir, ref: serverRef }))) {
             // If there is a dereferenced an annotated tag value available, prefer that.
             const oid = refs.get(serverRef + '^{}') || refs.get(serverRef)
             actualRefsToWrite.set(serverRef, oid)

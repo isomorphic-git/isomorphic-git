@@ -393,6 +393,7 @@ export function fetch(args: GitDir & {
   tags?: boolean;
   singleBranch?: boolean;
   prune?: boolean;
+  pruneTags?: boolean;
   headers?: { [key: string]: string };
 }): Promise<FetchResponse>;
 
