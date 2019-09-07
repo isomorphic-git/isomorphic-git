@@ -35,7 +35,7 @@ describe('commit', () => {
 
   it('without updating branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-commit')
+    const { fs, gitdir } = await makeFixture('test-commit')
     const { oid: originalOid } = (await log({ gitdir, depth: 1 }))[0]
     // Test
     const sha = await commit({
@@ -54,6 +54,41 @@ describe('commit', () => {
     const { oid: currentOid } = (await log({ gitdir, depth: 1 }))[0]
     expect(currentOid).toEqual(originalOid)
     expect(currentOid).not.toEqual(sha)
+    // but DID create commit object
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/7a/51c0b1181d738198ff21c4679d3aa32eb52fe0`
+      )
+    ).toBe(true)
+  })
+
+  it('dry run', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-commit')
+    const { oid: originalOid } = (await log({ gitdir, depth: 1 }))[0]
+    // Test
+    const sha = await commit({
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0
+      },
+      message: 'Initial commit',
+      dryRun: true
+    })
+    expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
+    // does NOT update branch pointer
+    const { oid: currentOid } = (await log({ gitdir, depth: 1 }))[0]
+    expect(currentOid).toEqual(originalOid)
+    expect(currentOid).not.toEqual(sha)
+    // and did NOT create commit object
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/7a/51c0b1181d738198ff21c4679d3aa32eb52fe0`
+      )
+    ).toBe(false)
   })
 
   it('custom ref', async () => {
