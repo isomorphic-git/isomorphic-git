@@ -276,7 +276,11 @@ describe('merge', () => {
     }))[0]
     expect(notMergeCommit.oid).toEqual(originalCommit.oid)
     // make sure no commit object was created
-    expect(await fs.exists(`${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`)).toBe(false)
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
+      )
+    ).toBe(false)
   })
 
   it("merge 'delete-first-half' and 'delete-second-half' (noUpdateBranch)", async () => {
@@ -315,7 +319,11 @@ describe('merge', () => {
     }))[0]
     expect(notMergeCommit.oid).toEqual(originalCommit.oid)
     // but make sure the commit object exists
-    expect(await fs.exists(`${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`)).toBe(true)
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
+      )
+    ).toBe(true)
   })
 
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {

@@ -55,7 +55,11 @@ describe('commit', () => {
     expect(currentOid).toEqual(originalOid)
     expect(currentOid).not.toEqual(sha)
     // but DID create commit object
-    expect(await fs.exists(`${gitdir}/objects/7a/51c0b1181d738198ff21c4679d3aa32eb52fe0`)).toBe(true)
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/7a/51c0b1181d738198ff21c4679d3aa32eb52fe0`
+      )
+    ).toBe(true)
   })
 
   it('dry run', async () => {
@@ -80,7 +84,11 @@ describe('commit', () => {
     expect(currentOid).toEqual(originalOid)
     expect(currentOid).not.toEqual(sha)
     // and did NOT create commit object
-    expect(await fs.exists(`${gitdir}/objects/7a/51c0b1181d738198ff21c4679d3aa32eb52fe0`)).toBe(false)
+    expect(
+      await fs.exists(
+        `${gitdir}/objects/7a/51c0b1181d738198ff21c4679d3aa32eb52fe0`
+      )
+    ).toBe(false)
   })
 
   it('custom ref', async () => {
