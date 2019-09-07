@@ -53,11 +53,12 @@ export class GitRefManager {
     const actualRefsToWrite = new Map()
     // Delete all current tags if the pruneTags argument is true.
     if (pruneTags) {
-      for (const tag of await GitRefManager.listRefs({
+      const tags = await GitRefManager.listRefs({
         fs,
         gitdir,
         filepath: 'refs/tags'
-      })) {
+      })
+      for (const tag of tags) {
         await GitRefManager.deleteRef({ fs, gitdir, ref: `refs/tags/${tag}` })
       }
     }
