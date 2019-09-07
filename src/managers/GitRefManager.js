@@ -58,7 +58,7 @@ export class GitRefManager {
         gitdir,
         filepath: 'refs/tags'
       })) {
-        GitRefManager.deleteRef({ fs, gitdir, ref: `refs/tags/${tag}` })
+        await GitRefManager.deleteRef({ fs, gitdir, ref: `refs/tags/${tag}` })
       }
     }
     // Add all tags if the fetch tags argument is true.
