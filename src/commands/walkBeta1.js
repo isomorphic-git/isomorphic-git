@@ -205,7 +205,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @param {Walker[]} args.trees - The trees you want to traverse
  * @param {function(WalkerEntry[]): Promise<boolean>} [args.filter] - Filter which `WalkerEntry`s to process
  * @param {function(WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
- * @param {function(any, any[]): Promise<any[]>} [args.reduce] - Control how mapped entries are combined with their parent result
+ * @param {function(any, any[]): Promise<any>} [args.reduce] - Control how mapped entries are combined with their parent result
  * @param {function(function(WalkerEntry[]): Promise<any[]>, IterableIterator<WalkerEntry[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
  *
  * @returns {Promise<any>} The finished tree-walking result

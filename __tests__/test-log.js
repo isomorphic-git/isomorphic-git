@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
+// @ts-ignore
 const snapshots = require('./__snapshots__/test-log.js.snap')
 const { log } = require('isomorphic-git')
 
