@@ -58,7 +58,11 @@ export class GitRefManager {
         gitdir,
         filepath: 'refs/tags'
       })
-      await GitRefManager.deleteRefs({ fs, gitdir, refs: tags.map(tag => `refs/tags/${tag}`) })
+      await GitRefManager.deleteRefs({
+        fs,
+        gitdir,
+        refs: tags.map(tag => `refs/tags/${tag}`)
+      })
     }
     // Add all tags if the fetch tags argument is true.
     if (tags) {
@@ -91,9 +95,11 @@ export class GitRefManager {
     const pruned = []
     if (prune) {
       for (const filepath of refspec.localNamespaces()) {
-        const refs = (await GitRefManager.listRefs({ fs, gitdir, filepath })).map(
-          file => `${filepath}/${file}`
-        )
+        const refs = (await GitRefManager.listRefs({
+          fs,
+          gitdir,
+          filepath
+        })).map(file => `${filepath}/${file}`)
         for (const ref of refs) {
           if (!actualRefsToWrite.has(ref)) {
             pruned.push(ref)

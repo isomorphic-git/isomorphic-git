@@ -172,7 +172,9 @@ describe('fetch', () => {
   // parameter is causing Mobile Safari 11 tests to crash / disconnect.
   // So... I'm just gonna consider it a fluke.
   // TODO: Remove this check when we drop support for Safari 11.
-  ;(typeof navigator !== 'undefined' && navigator.userAgent.match(/iPhone/) ? xit : it)('fetch --prune-tags from git-http-mock-server', async () => {
+  ;(typeof navigator !== 'undefined' && navigator.userAgent.match(/iPhone/)
+    ? xit
+    : it)('fetch --prune-tags from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
     expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(true)
     const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
