@@ -45,10 +45,7 @@ export class GitIndexManager {
       // to make sure other processes aren't writing to it
       // simultaneously, which could result in a corrupted index.
       // const fileLock = await Lock(filepath)
-      // TEMPORARY HACK / WORKAROUND
       if (await isIndexStale(fs, filepath)) {
-        await updateCachedIndexFile(fs, filepath)
-      } else {
         await updateCachedIndexFile(fs, filepath)
       }
       const index = map.get([fs, filepath])
