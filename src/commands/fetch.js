@@ -62,6 +62,7 @@ import { config } from './config'
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
+ * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
@@ -111,6 +112,7 @@ export async function fetch ({
   singleBranch = false,
   headers = {},
   prune = false,
+  pruneTags = false,
   // @ts-ignore
   onprogress // deprecated
 }) {
@@ -144,7 +146,8 @@ export async function fetch ({
       tags,
       singleBranch,
       headers,
-      prune
+      prune,
+      pruneTags
     })
     if (response === null) {
       return {
@@ -234,7 +237,8 @@ async function fetchPackfile ({
   tags,
   singleBranch,
   headers,
-  prune
+  prune,
+  pruneTags
 }) {
   const fs = new FileSystem(_fs)
   // Sanity checks
@@ -429,7 +433,8 @@ async function fetchPackfile ({
       refs: remoteRefs,
       symrefs: remoteHTTP.symrefs,
       tags,
-      prune
+      prune,
+      pruneTags
     })
     if (prune) {
       response.pruned = pruned
