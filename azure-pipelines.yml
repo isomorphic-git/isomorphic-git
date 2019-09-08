@@ -69,7 +69,7 @@ jobs:
 
   - script: npm run semantic-release
     displayName: 'Publish to npm'
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/beta')))
     env:
       GH_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(Npm.Token)
