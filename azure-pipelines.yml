@@ -32,7 +32,7 @@ jobs:
       BUNDLESIZE_GITHUB_TOKEN: $(BUNDLESIZE_GITHUB_TOKEN)
       SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
       SAUCE_USERNAME: $(SAUCE_USERNAME)
-      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_ios_safari12,sl_safari,sl_android_chrome'
+      TEST_BROWSERS: 'sl_chrome,sl_firefox,sl_safari,sl_android_chrome,sl_ios_safari'
 
   - task: PublishTestResults@2
     displayName: 'Save test results'

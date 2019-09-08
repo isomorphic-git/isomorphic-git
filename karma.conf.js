@@ -60,49 +60,37 @@ module.exports = function (config) {
     captureTimeout: 4 * 60 * 1000, // default 60000
     // SauceLabs browsers
     customLaunchers: {
-      XXXsl_chrome: {
+      sl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
-        extendedDebugging: true
+        version: '76.0'
       },
       sl_firefox: {
         base: 'SauceLabs',
-        browserName: 'firefox'
-      },
-      sl_edge: {
-        base: 'SauceLabs',
-        browserName: 'MicrosoftEdge',
-        version: '17.17134'
+        browserName: 'firefox',
+        version: '69.0'
       },
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
-        platform: 'macOS 10.13',
-        version: '11.1'
-      },
-      sl_ios_safari: {
-        base: 'SauceLabs',
-        deviceName: 'iPhone X Simulator',
-        platformName: 'iOS',
-        platformVersion: '11.2',
-        browserName: 'Safari',
-        appiumVersion: '1.9.1'
-      },
-      sl_ios_safari12: {
-        base: 'SauceLabs',
-        deviceName: 'iPhone 8 Simulator',
-        platformName: 'iOS',
-        platformVersion: '12.0',
-        browserName: 'Safari',
-        appiumVersion: '1.9.1'
+        platform: 'macOS 10.14',
+        version: '12.0'
       },
       sl_android_chrome: {
         base: 'SauceLabs',
         deviceName: 'Android GoogleAPI Emulator',
         platformName: 'Android',
-        platformVersion: '7.1',
+        platformVersion: '9.0',
         browserName: 'Chrome',
-        appiumVersion: '1.9.1'
+        appiumVersion: '1.13.0'
+      },
+      sl_ios_safari: {
+        base: 'SauceLabs',
+        deviceName: 'iPhone X Simulator',
+        platformName: 'iOS',
+        platformVersion: '12.2',
+        browserName: 'Safari',
+        appiumVersion: '1.13.0'
       },
       FirefoxHeadless: {
         base: 'Firefox',

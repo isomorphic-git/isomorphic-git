@@ -42,7 +42,7 @@ Browser Support:
 
 </td><td>
 
-[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&microsoftedge=17&safari=11&android=7.1&iphone=11.2)](https://saucelabs.com/u/_wmhilton)
+[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/browsers?googlechrome=+76&firefox=68&safari=12&android=9.0&iphone=12.2)](https://saucelabs.com/u/_wmhilton)
 
 </td></tr><tr><td>
 
