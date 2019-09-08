@@ -66,8 +66,9 @@ export class GitRefManager {
     if (tags) {
       for (const serverRef of refs.keys()) {
         if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
+          const filename = join(gitdir, serverRef)
           // Git's behavior is to only fetch tags that do not conflict with tags already present.
-          if (!(await GitRefManager.exists({ fs, gitdir, ref: serverRef }))) {
+          if (!(await fs.exists(filename))) {
             // If there is a dereferenced an annotated tag value available, prefer that.
             const oid = refs.get(serverRef + '^{}') || refs.get(serverRef)
             actualRefsToWrite.set(serverRef, oid)
