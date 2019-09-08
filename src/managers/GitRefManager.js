@@ -58,17 +58,14 @@ export class GitRefManager {
         gitdir,
         filepath: 'refs/tags'
       })
-      for (const tag of tags) {
-        await GitRefManager.deleteRef({ fs, gitdir, ref: `refs/tags/${tag}` })
-      }
+      await GitRefManager.deleteRefs({ fs, gitdir, refs: tags.map(tag => `refs/tags/${tag}`) })
     }
     // Add all tags if the fetch tags argument is true.
     if (tags) {
       for (const serverRef of refs.keys()) {
         if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
-          const filename = join(gitdir, serverRef)
           // Git's behavior is to only fetch tags that do not conflict with tags already present.
-          if (!(await fs.exists(filename))) {
+          if (!(await GitRefManager.exists({ fs, gitdir, ref: serverRef }))) {
             // If there is a dereferenced an annotated tag value available, prefer that.
             const oid = refs.get(serverRef + '^{}') || refs.get(serverRef)
             actualRefsToWrite.set(serverRef, oid)
@@ -99,10 +96,12 @@ export class GitRefManager {
         )
         for (const ref of refs) {
           if (!actualRefsToWrite.has(ref)) {
-            await GitRefManager.deleteRef({ fs, gitdir, ref })
             pruned.push(ref)
           }
         }
+      }
+      if (pruned.length > 0) {
+        await GitRefManager.deleteRefs({ fs, gitdir, refs: pruned })
       }
     }
     // Update files
@@ -141,15 +140,24 @@ export class GitRefManager {
     await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
   }
 
-  static async deleteRef ({ fs: _fs, gitdir, ref }) {
+  static async deleteRef ({ fs, gitdir, ref }) {
+    return GitRefManager.deleteRefs({ fs, gitdir, refs: [ref] })
+  }
+
+  static async deleteRefs ({ fs: _fs, gitdir, refs }) {
     const fs = new FileSystem(_fs)
     // Delete regular ref
-    await fs.rm(join(gitdir, ref))
+    await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref
     let text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     const packed = GitPackedRefs.from(text)
-    if (packed.refs.has(ref)) {
-      packed.delete(ref)
+    const beforeSize = packed.refs.size
+    for (const ref of refs) {
+      if (packed.refs.has(ref)) {
+        packed.delete(ref)
+      }
+    }
+    if (packed.refs.size < beforeSize) {
       text = packed.toString()
       await fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
     }
