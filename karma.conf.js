@@ -94,10 +94,6 @@ module.exports = function (config) {
         browserName: 'Safari',
         appiumVersion: '1.13.0'
       },
-      FirefoxHeadless: {
-        base: 'Firefox',
-        flags: ['-headless']
-      },
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox']

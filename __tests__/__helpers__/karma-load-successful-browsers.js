@@ -20,7 +20,7 @@ module.exports = {
   },
   filter (browsers) {
     const [, successfulBrowsers] = module.exports.load()
-    console.log('skipping browsers:', successfulBrowsers)
+    console.log('skipping browsers:', successfulBrowsers.filter(Boolean))
     const newbrowsers = browsers.filter(b => !successfulBrowsers.includes(b))
 
     if (newbrowsers.length === 0) {
