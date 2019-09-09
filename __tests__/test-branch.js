@@ -60,7 +60,9 @@ describe('branch', () => {
 
   it('empty repo', async () => {
     // Setup
-    const { core, fs, dir, gitdir } = await makeFixture('test-branch-empty-repo')
+    const { core, fs, dir, gitdir } = await makeFixture(
+      'test-branch-empty-repo'
+    )
     await init({ core, dir, gitdir })
     let error = null
     // Test

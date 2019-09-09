@@ -9,7 +9,11 @@ describe('config', () => {
     const { core, gitdir } = await makeFixture('test-config')
     // Test
     const sym = await config({ core, gitdir, path: 'core.symlinks' })
-    const rfv = await config({ core, gitdir, path: 'core.repositoryformatversion' })
+    const rfv = await config({
+      core,
+      gitdir,
+      path: 'core.repositoryformatversion'
+    })
     const url = await config({ core, gitdir, path: 'remote.origin.url' })
     const fetch = await config({ core, gitdir, path: 'remote.upstream.fetch' })
     const fetches = await config({

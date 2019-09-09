@@ -26,12 +26,14 @@ describe('fetch', () => {
     const { core, fs, gitdir } = await makeFixture('test-fetch-cors')
     const output = []
     const progress = []
-    cores.get(core).set(
-      'emitter',
-      new EventEmitter()
-        .on('fetch.message', output.push.bind(output))
-        .on('fetch.progress', progress.push.bind(progress))
-    )
+    cores
+      .get(core)
+      .set(
+        'emitter',
+        new EventEmitter()
+          .on('fetch.message', output.push.bind(output))
+          .on('fetch.progress', progress.push.bind(progress))
+      )
     // Test
     await fetch({
       core,

@@ -24,7 +24,11 @@ describe('annotatedTag', () => {
       }
     })
     const tagRef = await resolveRef({ core, gitdir, ref: 'refs/tags/latest' })
-    const { object: tagObject } = await readObject({ core, gitdir, oid: tagRef })
+    const { object: tagObject } = await readObject({
+      core,
+      gitdir,
+      oid: tagRef
+    })
     expect(tagObject.object).toEqual('cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69')
   })
   it('creates an annotated tag pointing to a blob', async () => {
@@ -42,8 +46,16 @@ describe('annotatedTag', () => {
       },
       object: 'd670460b4b4aece5915caf5c68d12f560a9fe3e4'
     })
-    const tagRef = await resolveRef({ core, gitdir, ref: 'refs/tags/latest-blob' })
-    const { object: tagObject } = await readObject({ core, gitdir, oid: tagRef })
+    const tagRef = await resolveRef({
+      core,
+      gitdir,
+      ref: 'refs/tags/latest-blob'
+    })
+    const { object: tagObject } = await readObject({
+      core,
+      gitdir,
+      oid: tagRef
+    })
     expect(tagObject.object).toEqual('d670460b4b4aece5915caf5c68d12f560a9fe3e4')
   })
   it('creates a signed tag to HEAD', async () => {

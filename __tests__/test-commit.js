@@ -28,7 +28,11 @@ describe('commit', () => {
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // updates branch pointer
-    const { oid: currentOid, parent } = (await log({ core, gitdir, depth: 1 }))[0]
+    const { oid: currentOid, parent } = (await log({
+      core,
+      gitdir,
+      depth: 1
+    }))[0]
     expect(parent).toEqual([originalOid])
     expect(currentOid).not.toEqual(originalOid)
     expect(currentOid).toEqual(sha)

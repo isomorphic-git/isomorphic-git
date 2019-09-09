@@ -15,10 +15,12 @@ describe('push', () => {
     // Setup
     const { core, gitdir } = await makeFixture('test-push')
     const output = []
-    cores.get(core).set(
-      'emitter',
-      new EventEmitter().on('push.message', output.push.bind(output))
-    )
+    cores
+      .get(core)
+      .set(
+        'emitter',
+        new EventEmitter().on('push.message', output.push.bind(output))
+      )
     // Test
     const res = await push({
       core,

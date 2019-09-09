@@ -62,7 +62,9 @@ describe('statusMatrix', () => {
 
   it('statusMatrix (pattern vs filepaths)', async () => {
     // Setup
-    const { core, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+    const { core, dir, gitdir } = await makeFixture(
+      'test-statusMatrix-filepath'
+    )
     // Test
     let matrix = await statusMatrix({ core, dir, gitdir })
     expect(matrix).toEqual([
@@ -95,7 +97,9 @@ describe('statusMatrix', () => {
 
   it('statusMatrix (pattern vs pattern + filepaths)', async () => {
     // Setup
-    const { core, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+    const { core, dir, gitdir } = await makeFixture(
+      'test-statusMatrix-filepath'
+    )
     // Test
     let matrix = await statusMatrix({ core, dir, gitdir, pattern: '*.txt' })
     expect(matrix).toEqual([

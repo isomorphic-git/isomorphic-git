@@ -200,7 +200,12 @@ describe('merge', () => {
         timezoneOffset: -0
       }
     })
-    const mergeCommit = (await log({ core, gitdir, ref: 'add-files', depth: 1 }))[0]
+    const mergeCommit = (await log({
+      core,
+      gitdir,
+      ref: 'add-files',
+      depth: 1
+    }))[0]
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
