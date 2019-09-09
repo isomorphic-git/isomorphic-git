@@ -11,11 +11,9 @@ describe('listTags', () => {
   })
   it('listTags', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listTags')
+    const { core, gitdir } = await makeFixture('test-listTags')
     // Test
-    const refs = await listTags({
-      gitdir
-    })
+    const refs = await listTags({ core, gitdir })
     expect(refs).toMatchSnapshot()
   })
 })

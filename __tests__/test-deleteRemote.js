@@ -11,20 +11,20 @@ describe('deleteRemote', () => {
   })
   it('deleteRemote', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-deleteRemote')
+    const { core, dir, gitdir } = await makeFixture('test-deleteRemote')
     const remote = 'foo'
     // Test
-    await deleteRemote({ dir, gitdir, remote })
-    const a = await listRemotes({ dir, gitdir })
+    await deleteRemote({ core, dir, gitdir, remote })
+    const a = await listRemotes({ core, dir, gitdir })
     expect(a).toEqual([{ remote: 'bar', url: 'git@github.com:bar/bar.git' }])
   })
   it('missing argument', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-addRemote')
+    const { core, dir, gitdir } = await makeFixture('test-addRemote')
     // Test
     let error = null
     try {
-      await deleteRemote({ dir, gitdir })
+      await deleteRemote({ core, dir, gitdir })
     } catch (err) {
       error = err
     }

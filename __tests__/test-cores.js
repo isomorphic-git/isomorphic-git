@@ -10,7 +10,7 @@ describe('cores', () => {
   it('cores.get', async () => {
     // Setup
     const { _fs } = await makeFixture('test-cores')
-    cores.get('default').set('fs', _fs)
+    // Test
     let error = null
     try {
       cores.get('first').set('fs', _fs)
@@ -23,7 +23,7 @@ describe('cores', () => {
   it('core.create', async () => {
     // Setup
     const { _fs } = await makeFixture('test-cores')
-    cores.get('default').set('fs', _fs)
+    // Test
     let error = null
     try {
       cores.create('second').set('fs', _fs)
@@ -36,9 +36,8 @@ describe('cores', () => {
   it('cores have separate plugins', async () => {
     // Setup
     const { _fs } = await makeFixture('test-cores')
-    plugins.set('fs', _fs)
+    // Test
     cores.create('third').set('foo', _fs)
-    expect(cores.get('default').has('fs')).toBeTruthy()
     expect(cores.get('default').has('foo')).toBeFalsy()
     expect(cores.get('third').has('fs')).toBeFalsy()
     expect(cores.get('third').get('foo')).toBeTruthy()
@@ -48,6 +47,7 @@ describe('cores', () => {
     const fs = {
       readFile () {}
     }
+    // Test
     let error = null
     try {
       plugins.set('fs', fs)
@@ -60,6 +60,7 @@ describe('cores', () => {
   it('unrecognized plugin', async () => {
     // Setup
     const { _fs } = await makeFixture('test-cores')
+    // Test
     let error = null
     try {
       plugins.set('fz', _fs)

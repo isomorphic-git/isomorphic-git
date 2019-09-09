@@ -33,7 +33,6 @@ async function makeBrowserFS (dir) {
 
     const core = `core-browserfs-${i++}`
     cores.create(core).set('fs', _fs)
-    plugins.set('fs', _fs) // deprecated
 
     const fs = new FileSystem(_fs)
 

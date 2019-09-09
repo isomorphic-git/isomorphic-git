@@ -7,13 +7,13 @@ const { packObjects } = require('isomorphic-git')
 describe('packObjects', () => {
   it('makes a packfile', async () => {
     // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-packObjects')
+    const { core, fs, dir, gitdir } = await makeFixture('test-packObjects')
     // Test
     const fixture = await fs.read(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
     const { filename, packfile } = await packObjects({
-      fs,
+      core,
       gitdir,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',
@@ -38,13 +38,13 @@ describe('packObjects', () => {
   })
   it('saves packfile to disk', async () => {
     // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-packObjects')
+    const { core, fs, dir, gitdir } = await makeFixture('test-packObjects')
     // Test
     const fixture = await fs.read(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
     const { filename } = await packObjects({
-      fs,
+      core,
       gitdir,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',

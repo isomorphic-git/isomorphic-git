@@ -5,30 +5,23 @@ const { currentBranch } = require('isomorphic-git')
 describe('currentBranch', () => {
   it('resolve HEAD to master', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-resolveRef')
+    const { core, gitdir } = await makeFixture('test-resolveRef')
     // Test
-    const branch = await currentBranch({
-      gitdir
-    })
+    const branch = await currentBranch({ core, gitdir })
     expect(branch).toEqual('master')
   })
   it('resolve HEAD to refs/heads/master', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-resolveRef')
+    const { core, gitdir } = await makeFixture('test-resolveRef')
     // Test
-    const branch = await currentBranch({
-      gitdir,
-      fullname: true
-    })
+    const branch = await currentBranch({ core, gitdir, fullname: true })
     expect(branch).toEqual('refs/heads/master')
   })
   it('returns undefined if HEAD is detached', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-detachedHead')
+    const { core, gitdir } = await makeFixture('test-detachedHead')
     // Test
-    const branch = await currentBranch({
-      gitdir
-    })
+    const branch = await currentBranch({ core, gitdir })
     expect(branch).toBeUndefined()
   })
 })

@@ -11,16 +11,17 @@ describe('listBranches', () => {
   })
   it('listBranches', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listBranches')
+    const { core, gitdir } = await makeFixture('test-listBranches')
     // Test
-    const commits = await listBranches({ gitdir })
+    const commits = await listBranches({ core, gitdir })
     expect(commits).toMatchSnapshot()
   })
   it('remote', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listBranches')
+    const { core, gitdir } = await makeFixture('test-listBranches')
     // Test
     const commits = await listBranches({
+      core,
       gitdir,
       remote: 'origin'
     })

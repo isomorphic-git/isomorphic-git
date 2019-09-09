@@ -11,23 +11,23 @@ describe('resetIndex', () => {
   })
   it('modified', async () => {
     // Setup
-    const { gitdir, dir } = await makeFixture('test-resetIndex')
+    const { core, gitdir, dir } = await makeFixture('test-resetIndex')
     // Test
-    const before = await listFiles({ gitdir })
+    const before = await listFiles({ core, gitdir })
     expect(before).toMatchSnapshot()
-    await resetIndex({ dir, gitdir, filepath: 'a.txt' })
-    const after = await listFiles({ gitdir })
+    await resetIndex({ core, dir, gitdir, filepath: 'a.txt' })
+    const after = await listFiles({ core, gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length).toBe(true)
   })
   it('new', async () => {
     // Setup
-    const { gitdir, dir } = await makeFixture('test-resetIndex')
+    const { core, gitdir, dir } = await makeFixture('test-resetIndex')
     // Test
-    const before = await listFiles({ gitdir })
+    const before = await listFiles({ core, gitdir })
     expect(before).toMatchSnapshot()
-    await resetIndex({ dir, gitdir, filepath: 'd.txt' })
-    const after = await listFiles({ gitdir })
+    await resetIndex({ core, dir, gitdir, filepath: 'd.txt' })
+    const after = await listFiles({ core, gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length + 1).toBe(true)
   })

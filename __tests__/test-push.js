@@ -5,7 +5,7 @@ const snapshots = require('./__snapshots__/test-push.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const EventEmitter = require('events')
 
-const { plugins, push } = require('isomorphic-git')
+const { cores, push } = require('isomorphic-git')
 
 describe('push', () => {
   beforeAll(() => {
@@ -13,14 +13,15 @@ describe('push', () => {
   })
   it('push', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     const output = []
-    plugins.set(
+    cores.get(core).set(
       'emitter',
       new EventEmitter().on('push.message', output.push.bind(output))
     )
     // Test
     const res = await push({
+      core,
       gitdir,
       emitterPrefix: 'push.',
       remote: 'karma',
@@ -34,9 +35,10 @@ describe('push', () => {
   })
   it('push without ref', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      core,
       gitdir,
       remote: 'karma'
     })
@@ -47,9 +49,10 @@ describe('push', () => {
   })
   it('push with ref !== remoteRef', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      core,
       gitdir,
       remote: 'karma',
       ref: 'master',
@@ -62,9 +65,10 @@ describe('push', () => {
   })
   it('push with lightweight tag', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      core,
       gitdir,
       remote: 'karma',
       ref: 'lightweight-tag'
@@ -76,9 +80,10 @@ describe('push', () => {
   })
   it('push with annotated tag', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      core,
       gitdir,
       remote: 'karma',
       ref: 'annotated-tag'
@@ -91,9 +96,10 @@ describe('push', () => {
 
   it('push with Basic Auth', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      core,
       gitdir,
       username: 'testuser',
       password: 'testpassword',
@@ -107,9 +113,10 @@ describe('push', () => {
   })
   it('push with Basic Auth credentials in the URL', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      core,
       gitdir,
       remote: 'url',
       ref: 'master'
@@ -121,11 +128,12 @@ describe('push', () => {
   })
   it('throws an Error if no credentials supplied', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     let error = null
     try {
       await push({
+        core,
         gitdir,
         remote: 'auth',
         ref: 'master'
@@ -137,11 +145,12 @@ describe('push', () => {
   })
   it('throws an Error if invalid credentials supplied', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     let error = null
     try {
       await push({
+        core,
         gitdir,
         username: 'test',
         password: 'test',
@@ -163,9 +172,10 @@ describe('push', () => {
       .reverse()
       .join('')
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { core, gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      core,
       gitdir,
       corsProxy: process.browser ? 'http://localhost:9999' : undefined,
       token: token,

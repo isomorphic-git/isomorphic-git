@@ -12,23 +12,23 @@ describe('remove', () => {
   })
   it('file', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-remove')
+    const { core, gitdir } = await makeFixture('test-remove')
     // Test
-    const before = await listFiles({ gitdir })
+    const before = await listFiles({ core, gitdir })
     expect(before).toMatchSnapshot()
-    await remove({ gitdir, filepath: 'LICENSE.md' })
-    const after = await listFiles({ gitdir })
+    await remove({ core, gitdir, filepath: 'LICENSE.md' })
+    const after = await listFiles({ core, gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length + 1).toBe(true)
   })
   it('dir', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-remove')
+    const { core, gitdir } = await makeFixture('test-remove')
     // Test
-    const before = await listFiles({ gitdir })
+    const before = await listFiles({ core, gitdir })
     expect(before).toMatchSnapshot()
-    await remove({ gitdir, filepath: 'src/models' })
-    const after = await listFiles({ gitdir })
+    await remove({ core, gitdir, filepath: 'src/models' })
+    const after = await listFiles({ core, gitdir })
     expect(after).toMatchSnapshot()
     expect(before.length === after.length + 5).toBe(true)
   })

@@ -90,7 +90,7 @@ module.exports = function (config) {
         base: 'SauceLabs',
         deviceName: 'iPhone XS Max Simulator',
         platformName: 'iOS',
-        platformVersion: '12.0',
+        platformVersion: '12.2',
         browserName: 'Safari',
         appiumVersion: '1.13.0'
       },

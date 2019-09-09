@@ -6,16 +6,17 @@ const { init, add, commit } = require('isomorphic-git')
 
 describe('basic test', () => {
   it('does not explode', async () => {
-    const { fs, dir } = await makeFixture('test-basic')
+    const { core, fs, dir } = await makeFixture('test-basic')
     console.log('Loaded fs')
-    await init({ dir })
+    await init({ core, dir })
     console.log('init')
 
     await fs.write(path.join(dir, 'a.txt'), 'Hello')
-    await add({ dir, filepath: 'a.txt' })
+    await add({ core, dir, filepath: 'a.txt' })
     console.log('add a.txt')
 
     const oid = await commit({
+      core,
       dir,
       author: {
         name: 'Mr. Test',

@@ -1,21 +1,21 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { clone, plugins } = require('isomorphic-git')
+const { clone, cores } = require('isomorphic-git')
 const { http } = require('isomorphic-git/internal-apis')
 
 describe('plugin - http', () => {
-  let callCount = 0
-  beforeAll(() => {
-    plugins.set('http', (...args) => {
+  it('clone should call provided http function', async () => {
+    // Setup
+    const { core, dir, gitdir } = await makeFixture('test-plugin-http')
+    let callCount = 0
+    // Test
+    cores.get(core).set('http', (...args) => {
       callCount++
       return http(...args)
     })
-  })
-  it('clone should call provided http function', async () => {
-    const { dir, gitdir } = await makeFixture('test-plugin-http')
-    callCount = 0
     await clone({
+      core,
       dir,
       gitdir,
       depth: 1,
@@ -23,8 +23,5 @@ describe('plugin - http', () => {
       url: 'http://localhost:8888/test-status.git'
     })
     expect(callCount).toBe(2)
-  })
-  afterAll(() => {
-    plugins.delete('http')
   })
 })

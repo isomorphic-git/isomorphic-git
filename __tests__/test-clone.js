@@ -9,8 +9,9 @@ describe('clone', () => {
   // of pull requests. So automated tools to update dependencies via PRs can overwhelm
   // the system and make this test take way too long.
   xit('clone with noTags', async () => {
-    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    const { core, fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
+      core,
       dir,
       gitdir,
       depth: 1,
@@ -29,8 +30,9 @@ describe('clone', () => {
     expect(await fs.exists(`${gitdir}/refs/tags/v0.0.1`)).toBe(false)
   })
   it('clone with noCheckout', async () => {
-    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    const { core, fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
+      core,
       dir,
       gitdir,
       depth: 1,
@@ -49,8 +51,9 @@ describe('clone', () => {
     expect(await fs.exists(`${dir}/package.json`)).toBe(false)
   })
   it('clone a tag', async () => {
-    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    const { core, fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
+      core,
       dir,
       gitdir,
       depth: 1,
@@ -69,11 +72,12 @@ describe('clone', () => {
     expect(await fs.exists(`${dir}/package.json`)).toBe(true)
   })
   it('clone with an unregistered protocol', async () => {
-    const { dir, gitdir } = await makeFixture('isomorphic-git')
+    const { core, dir, gitdir } = await makeFixture('isomorphic-git')
     const url = `foobar://github.com/isomorphic-git/isomorphic-git`
     let error = null
     try {
       await clone({
+        core,
         dir,
         gitdir,
         depth: 1,
@@ -90,8 +94,9 @@ describe('clone', () => {
     expect(error.caller).toEqual('git.clone')
   })
   it('clone from git-http-mock-server', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
+    const { core, fs, dir, gitdir } = await makeFixture('test-clone-karma')
     await clone({
+      core,
       dir,
       gitdir,
       depth: 1,
@@ -111,8 +116,9 @@ describe('clone', () => {
   })
 
   it('clone empty repository from git-http-mock-server', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-clone-empty')
+    const { core, fs, dir, gitdir } = await makeFixture('test-clone-empty')
     await clone({
+      core,
       dir,
       gitdir,
       depth: 1,

@@ -12,11 +12,12 @@ describe('readObject', () => {
   })
   it('test missing', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
       await readObject({
+        core,
         gitdir,
         oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
       })
@@ -26,11 +27,13 @@ describe('readObject', () => {
     expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
+
   it('parsed', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
@@ -38,11 +41,13 @@ describe('readObject', () => {
     expect(ref.format).toEqual('parsed')
     expect(ref.type).toEqual('commit')
   })
+
   it('content', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'content'
@@ -52,11 +57,13 @@ describe('readObject', () => {
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
+
   it('wrapped', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'wrapped'
@@ -66,11 +73,13 @@ describe('readObject', () => {
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
+
   it('deflated', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
       format: 'deflated'
@@ -80,11 +89,13 @@ describe('readObject', () => {
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
+
   it('from packfile', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: '0b8faa11b353db846b40eb064dfb299816542a46',
       format: 'deflated'
@@ -96,11 +107,13 @@ describe('readObject', () => {
     )
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
+
   it('blob with encoding', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: '4551a1856279dde6ae9d65862a1dff59a5f199d8',
       format: 'parsed',
@@ -113,11 +126,13 @@ describe('readObject', () => {
     )
     expect(ref.object).toMatchSnapshot()
   })
+
   it('with simple filepath to blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -131,11 +146,13 @@ describe('readObject', () => {
     expect(ref.oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
+
   it('with deep filepath to blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -146,11 +163,13 @@ describe('readObject', () => {
     expect(ref.oid).toEqual('5264f23285d8be3ce45f95c102001ffa1d5391d3')
     expect(ref.object.toString('hex')).toMatchSnapshot()
   })
+
   it('with simple filepath to tree', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -164,11 +183,13 @@ describe('readObject', () => {
     expect(ref.oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
     expect(ref.object).toMatchSnapshot()
   })
+
   it('with deep filepath to tree', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     const ref = await readObject({
+      core,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       format: 'parsed',
@@ -179,13 +200,15 @@ describe('readObject', () => {
     expect(ref.oid).toEqual('7704a6e8a802efcdbe6cf3dfa114c105f1d5c67a')
     expect(ref.object).toMatchSnapshot()
   })
+
   it('with erroneous filepath (directory is a file)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
       await readObject({
+        core,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         format: 'parsed',
@@ -197,13 +220,15 @@ describe('readObject', () => {
     expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
+
   it('with erroneous filepath (no such directory)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
       await readObject({
+        core,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         format: 'parsed',
@@ -215,13 +240,15 @@ describe('readObject', () => {
     expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
+
   it('with erroneous filepath (leading slash)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
       await readObject({
+        core,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         format: 'parsed',
@@ -233,13 +260,15 @@ describe('readObject', () => {
     expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
+
   it('with erroneous filepath (trailing slash)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readObject')
+    const { core, gitdir } = await makeFixture('test-readObject')
     // Test
     let error = null
     try {
       await readObject({
+        core,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         format: 'parsed',
