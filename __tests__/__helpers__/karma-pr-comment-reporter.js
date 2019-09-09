@@ -14,13 +14,33 @@ const CommentReporter = function (
   helper,
   formatError
 ) {
+  baseReporterDecorator(this)
+
   this.rows = [
     `## Test Results${commit}:`,
-    `| Browser | Passed | Skipped | Failed | Time | Disconnected | Error |`,
-    `|---------|--------|---------|--------|------|--------------|-------|`
+    `| Browser | Passed | Skipped | Failed | Time | Disconnected |`,
+    `|---------|--------|---------|--------|------|--------------|`
   ]
+  this.errorsByBrowser = {}
+  this.longestTests = []
   this.startTime = Date.now()
-  this.onRunStart = function (browsers) {}
+
+  this.onBrowserStart = function (browser) {
+    this.errorsByBrowser[browser.name] = []
+  }
+  this.specSuccess = function (browser, result) {
+    const maxShow = 10
+    if (this.longestTests.length === 0 || result.time > this.longestTests[this.longestTests.length - 1].result.time) {
+      if (this.longestTests.length > maxShow) {
+        this.longestTests.pop()
+      }
+      this.longestTests.push({ browser, result })
+      this.longestTests.sort((a, b) => b.result.time - a.result.time)
+    }
+  }
+  this.specFailure = function (browser, result) {
+    this.errorsByBrowser[browser.name].push(testNameFormatter(result))
+  }
   this.onBrowserComplete = function (browser) {
     var results = browser.lastResult
     this.rows.push(
@@ -28,11 +48,46 @@ const CommentReporter = function (
         results.failed
       } | ${helper.formatTimeInterval(Date.now() - this.startTime)} | ${
         results.disconnected
-      } | ${results.error.message} |`
+      } |`
     )
   }
   this.onRunComplete = function () {
-    postComment(this.rows.join('\n'))
+    postComment(this.rows.join('\n') + longestToMarkup(this.longestTests) + errorsToMarkup(this.errorsByBrowser))
+  }
+
+  function shortBrowserName (browser) {
+    return browser.name.match(/[^\d+]+/)[0].trim()
+  }
+
+  // concatenate test suite(s) and test description by default
+  function testNameFormatter (result) {
+    return `${result.suite.join(' ')} ${result.description}`
+  }
+
+  function errorsToMarkup (errorsByBrowser) {
+    const maxShow = 5
+    let text = '\n\n'
+    for (const browser in errorsByBrowser) {
+      const numErrors = errorsByBrowser[browser].length
+      if (numErrors === 0) continue
+      text += `${browser}:\n`
+      for (let i = 0; i < Math.min(maxShow, numErrors); i++) {
+        text += `- ${errorsByBrowser[browser][i]}\n`
+      }
+      if (numErrors > maxShow) {
+        text += `- and ${numErrors - maxShow} more\n`
+      }
+      text += `\n`
+    }
+    return text
+  }
+
+  function longestToMarkup (longestTests) {
+    let text = '\n\n'
+    for (const thing of longestTests) {
+      text += `- ${helper.formatTimeInterval(thing.result.time)} ${shortBrowserName(thing.browser)} ${testNameFormatter(thing.result)}\n`
+    }
+    return text
   }
 }
 
