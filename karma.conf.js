@@ -63,11 +63,13 @@ module.exports = function (config) {
       sl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
+        platform: 'Windows 10',
         version: '76.0'
       },
       sl_firefox: {
         base: 'SauceLabs',
         browserName: 'firefox',
+        platform: 'Windows 10',
         version: '69.0'
       },
       sl_safari: {
@@ -86,9 +88,9 @@ module.exports = function (config) {
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone X Simulator',
+        deviceName: 'iPhone XS Max Simulator',
         platformName: 'iOS',
-        platformVersion: '12.2',
+        platformVersion: '12.0',
         browserName: 'Safari',
         appiumVersion: '1.13.0'
       },
