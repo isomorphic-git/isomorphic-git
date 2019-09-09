@@ -75,20 +75,20 @@ module.exports = function (config) {
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
-        platform: 'macOS 10.14',
-        version: '12.0'
+        platform: 'macOS 10.13',
+        version: '12.1'
       },
       sl_android_chrome: {
         base: 'SauceLabs',
         deviceName: 'Android GoogleAPI Emulator',
         platformName: 'Android',
-        platformVersion: '9.0',
+        platformVersion: '8.1',
         browserName: 'Chrome',
         appiumVersion: '1.13.0'
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone XS Max Simulator',
+        deviceName: 'iPhone Simulator',
         platformName: 'iOS',
         platformVersion: '12.2',
         browserName: 'Safari',
