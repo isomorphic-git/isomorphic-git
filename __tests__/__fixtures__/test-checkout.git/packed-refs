@@ -1,0 +1,3 @@
+# pack-refs with: peeled fully-peeled sorted 
+e10ebb90d03eaacca84de1af0a59b444232da99e refs/heads/test-branch
+e10ebb90d03eaacca84de1af0a59b444232da99e refs/tags/v1.0.0
