@@ -52,6 +52,8 @@ const CommentReporter = function (
     ])
   }
   this.onRunComplete = function () {
+    // Sort browsers alphabetically
+    this.rows.sort((a, b) => ((a[0] === b[0]) ? 0 : (a[0] > b[0]) ? 1 : -1))
     postComment(`## Test Results${commit}:\n` + table(this.rows) + errorsToMarkup(this.errorsByBrowser) + longestToMarkup(this.longestTests))
   }
 
