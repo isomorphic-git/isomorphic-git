@@ -17,9 +17,7 @@ const CommentReporter = function (
 ) {
   baseReporterDecorator(this)
 
-  this.rows = [
-    ['Browser', 'Pass', 'Skip', 'Fail', 'Time', 'Disconnect?']
-  ]
+  this.rows = [['Browser', 'Pass', 'Skip', 'Fail', 'Time', 'Disconnect?']]
   this.errorsByBrowser = {}
   this.longestTests = []
   this.startTime = Date.now()
@@ -29,7 +27,10 @@ const CommentReporter = function (
   }
   this.specSuccess = function (browser, result) {
     const maxShow = 10
-    if (this.longestTests.length === 0 || result.time > this.longestTests[this.longestTests.length - 1].result.time) {
+    if (
+      this.longestTests.length === 0 ||
+      result.time > this.longestTests[this.longestTests.length - 1].result.time
+    ) {
       if (this.longestTests.length > maxShow) {
         this.longestTests.pop()
       }
@@ -53,8 +54,13 @@ const CommentReporter = function (
   }
   this.onRunComplete = function () {
     // Sort browsers alphabetically
-    this.rows.sort((a, b) => ((a[0] === b[0]) ? 0 : (a[0] > b[0]) ? 1 : -1))
-    postComment(`## Test Results${commit}:\n` + table(this.rows) + errorsToMarkup(this.errorsByBrowser) + longestToMarkup(this.longestTests))
+    this.rows.sort((a, b) => (a[0] === b[0] ? 0 : a[0] > b[0] ? 1 : -1))
+    postComment(
+      `## Test Results${commit}:\n` +
+        table(this.rows) +
+        errorsToMarkup(this.errorsByBrowser) +
+        longestToMarkup(this.longestTests)
+    )
   }
 
   function shortBrowserName (browser) {
@@ -94,7 +100,11 @@ const CommentReporter = function (
   function longestToMarkup (longestTests) {
     let text = '\n### Longest running tests\n'
     for (const thing of longestTests) {
-      text += `- ${helper.formatTimeInterval(thing.result.time)} - ${testNameFormatter(thing.result)} - _${shortBrowserName(thing.browser)}_\n`
+      text += `- ${helper.formatTimeInterval(
+        thing.result.time
+      )} - ${testNameFormatter(thing.result)} - _${shortBrowserName(
+        thing.browser
+      )}_\n`
     }
     return text
   }
