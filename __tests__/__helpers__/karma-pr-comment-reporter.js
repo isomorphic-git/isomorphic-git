@@ -121,6 +121,7 @@ function postComment (message) {
     process.env.TRAVIS_PULL_REQUEST ||
     process.env.SYSTEM_PULLREQUEST_PULLREQUESTNUMBER ||
     process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
+  console.log(message)
   console.log(`Detected repo: ${repo}, issue: #${issue}, is PR: ${isPR}\n`)
   if (isPR) {
     // comment(process.env.KARMA_PR_REPORTER_GITHUB_TOKEN, repo, issue, message)
@@ -137,7 +138,7 @@ function postComment (message) {
       }
     )
   } else {
-    console.log(message)
+    console.log('not leaving a Github comment')
   }
 }
 
