@@ -46,6 +46,7 @@ module.exports = {
     },
     build: {
       default: series.nps(
+        'build.lightningfs',
         'build.rollup',
         'build.webpack',
         'build.errors',
@@ -55,6 +56,7 @@ module.exports = {
       ),
       errors: 'node ./__tests__/__helpers__/generate-errors.js',
       webpack: 'webpack',
+      lightningfs: 'cd node_modules/@isomorphic-git/lightning-fs && npm run build',
       rollup: 'rollup -c',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       treeshake: 'agadoo',
