@@ -1,4 +1,5 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -16,6 +17,7 @@ export async function listCommitsAndTags ({
   finish
 }) {
   const fs = new FileSystem(_fs)
+  const shallows = await GitShallowManager.read({ fs, gitdir })
   const startingSet = new Set()
   const finishingSet = new Set()
   for (const ref of start) {
@@ -48,11 +50,13 @@ export async function listCommitsAndTags ({
         expected: 'commit'
       })
     }
-    const commit = GitCommit.from(object)
-    const parents = commit.headers().parent
-    for (oid of parents) {
-      if (!finishingSet.has(oid) && !visited.has(oid)) {
-        await walk(oid)
+    if (!shallows.has(oid)) {
+      const commit = GitCommit.from(object)
+      const parents = commit.headers().parent
+      for (oid of parents) {
+        if (!finishingSet.has(oid) && !visited.has(oid)) {
+          await walk(oid)
+        }
       }
     }
   }
