@@ -37,11 +37,9 @@ export async function isDescendent ({
   ancestor,
   depth = -1
 }) {
-  console.log('isDescendent', oid, ancestor)
   try {
     const fs = new FileSystem(_fs)
     const shallows = await GitShallowManager.read({ fs, gitdir })
-    console.log('shallows', shallows)
     if (!oid) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'isDescendent',
@@ -67,7 +65,6 @@ export async function isDescendent ({
         throw new GitError(E.MaxSearchDepthExceeded, { depth })
       }
       const oid = queue.shift()
-      console.log('oid', oid)
       const { type, object } = await readObject({
         fs,
         gitdir,
