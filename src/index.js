@@ -1,6 +1,7 @@
 import { auth } from './utils/auth.js'
 import { oauth2 } from './utils/oauth2.js'
 
+export * from './commands/abort.js'
 export * from './commands/add.js'
 export * from './commands/addRemote.js'
 export * from './commands/annotatedTag.js'

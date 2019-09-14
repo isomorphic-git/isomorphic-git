@@ -6,6 +6,7 @@ Array [
   "STAGE",
   "TREE",
   "WORKDIR",
+  "abort",
   "add",
   "addRemote",
   "annotatedTag",

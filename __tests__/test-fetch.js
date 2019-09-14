@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const EventEmitter = require('events')
 const { sleep } = require('isomorphic-git/internal-apis')
-const { E, plugins, fetch } = require('isomorphic-git')
+const { E, plugins, fetch, abort } = require('isomorphic-git')
 
 describe('fetch', () => {
   it('fetch (from Github)', async () => {
@@ -194,5 +194,54 @@ describe('fetch', () => {
     // assert that tags was force-updated
     const newValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
     expect(oldValue).not.toEqual(newValue)
+  })
+
+  it('abort fetch (25ms delay) (from Github)', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-fetch-cors')
+    const processId = String(Math.random())
+    // Test
+    let error = null
+    try {
+      await Promise.all([
+        fetch({
+          gitdir,
+          singleBranch: true,
+          remote: 'origin',
+          ref: 'test-branch-shallow-clone',
+          processId
+        }),
+        sleep(25).then(() => {
+          console.log('processId', { processId })
+          return abort({ processId })
+        })
+      ])
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBe(null)
+    expect(error.name).toBe('AbortError')
+  })
+
+  it('preimptive abort (from Github)', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-fetch-cors')
+    const processId = String(Math.random())
+    // Test
+    let error = null
+    try {
+      await abort({ processId })
+      await fetch({
+        gitdir,
+        singleBranch: true,
+        remote: 'origin',
+        ref: 'test-branch-shallow-clone',
+        processId
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBe(null)
+    expect(error.name).toBe('AbortError')
   })
 })

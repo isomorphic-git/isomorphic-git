@@ -1,3 +1,4 @@
+import { ProcessManager } from '../managers/ProcessManager.js'
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
@@ -27,7 +28,8 @@ export class GitRemoteHTTP {
     url,
     noGitSuffix,
     auth,
-    headers
+    headers,
+    processId
   }) {
     const _origUrl = url
     // Auto-append the (necessary) .git if it's missing.
@@ -64,6 +66,7 @@ export class GitRemoteHTTP {
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
+    ProcessManager.registerAbortCallback(processId, http.abort)
     let res = await http({
       core,
       method: 'GET',
@@ -122,6 +125,7 @@ export class GitRemoteHTTP {
     core,
     emitter,
     emitterPrefix,
+    processId,
     corsProxy,
     service,
     url,
@@ -165,6 +169,7 @@ export class GitRemoteHTTP {
     if (auth) {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
+    ProcessManager.registerAbortCallback(processId, http.abort)
     const res = await http({
       core,
       emitter,

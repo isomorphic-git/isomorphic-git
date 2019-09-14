@@ -65,6 +65,7 @@ import { config } from './config'
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
+ * @param {string} [args.processId = ''] - Providing a `processId` allows you to abort the fetching process
  *
  * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
  * @see FetchResponse
@@ -89,6 +90,7 @@ export async function fetch ({
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
+  processId,
   ref = 'HEAD',
   // @ts-ignore
   refs,
@@ -129,6 +131,7 @@ export async function fetch ({
       fs,
       emitter,
       emitterPrefix,
+      processId,
       ref,
       refs,
       remote,
@@ -220,6 +223,7 @@ async function fetchPackfile ({
   fs: _fs,
   emitter,
   emitterPrefix,
+  processId,
   ref,
   refs = [ref],
   remote,
@@ -269,7 +273,8 @@ async function fetchPackfile ({
     url,
     noGitSuffix,
     auth,
-    headers
+    headers,
+    processId
   })
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
@@ -366,7 +371,8 @@ async function fetchPackfile ({
     noGitSuffix,
     auth,
     body: [packbuffer],
-    headers
+    headers,
+    processId
   })
   const response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
