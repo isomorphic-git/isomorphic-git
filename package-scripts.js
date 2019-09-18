@@ -120,7 +120,8 @@ module.exports = {
         : `jest --ci --coverage`,
       karma: process.env.CI
         ? retry3('karma start --single-run')
-        : 'karma start --single-run'
+        : 'cross-env karma start --single-run',
+      karmore: 'cross-env TEST_NO_BROWSERS=1 karma start --no-single-run'
     },
     prepublish: {
       default: series.nps('prepublish.version', 'build'),
