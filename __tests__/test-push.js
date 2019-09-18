@@ -7,6 +7,10 @@ const EventEmitter = require('events')
 
 const { plugins, push } = require('isomorphic-git')
 
+// this is so it works with either Node local tests or Browser WAN tests
+const localhost =
+  typeof window === 'undefined' ? 'localhost' : window.location.hostname
+
 describe('push', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
@@ -167,7 +171,7 @@ describe('push', () => {
     // Test
     const res = await push({
       gitdir,
-      corsProxy: process.browser ? 'http://localhost:9999' : undefined,
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
       token: token,
       remote: 'origin',
       ref: 'master',

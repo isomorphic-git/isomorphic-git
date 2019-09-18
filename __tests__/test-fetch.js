@@ -5,6 +5,10 @@ const EventEmitter = require('events')
 const { sleep } = require('isomorphic-git/internal-apis')
 const { E, plugins, fetch } = require('isomorphic-git')
 
+// this is so it works with either Node local tests or Browser WAN tests
+const localhost =
+  typeof window === 'undefined' ? 'localhost' : window.location.hostname
+
 describe('fetch', () => {
   it('fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
@@ -141,7 +145,7 @@ describe('fetch', () => {
       dir,
       gitdir,
       depth: 1,
-      url: 'http://localhost:8888/test-empty.git'
+      url: `http://${localhost}:8888/test-empty.git`
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
     expect(await fs.exists(`${gitdir}/HEAD`)).toBe(true)
