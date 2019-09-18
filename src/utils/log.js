@@ -2,9 +2,9 @@ let shouldLog = null
 
 export function log (...args) {
   if (shouldLog === null) {
-    // touching localStorage causes an SECURITY_ERR in Chrome for plain HTTP sites with non localhost origin I think.
-    // at least that is what I'm seeing doing Karma testing on my Android phone via local WAN
-    // using Object.getPropertyDescriptor(window, 'localStorage').enumerable didn't avoid the error either
+    // Reading localStorage can throw a SECURITY_ERR in Chrome Mobile if "Block third-party cookies and site data" is enabled
+    // and maybe in other scenarios too. I started seeing this error doing Karma testing on my Android phone via local WLAN.
+    // Using the Object.getPropertyDescriptor(window, 'localStorage').enumerable trick didn't avoid the error so using try/catch.
     try {
       shouldLog =
         (process &&
