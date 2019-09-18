@@ -5,7 +5,7 @@ import { ProcessManager } from '../managers/ProcessManager.js'
  * Abort an ongoing operation
  *
  * Currently only the `clone`, `fetch`, and `checkout` commands are abortable.
- * 
+ *
  * @param {object} args
  * @param {string} args.processId = '' - identifies which operation to abort
  *
@@ -27,8 +27,6 @@ import { ProcessManager } from '../managers/ProcessManager.js'
  * console.log('done')
  *
  */
-export async function abort ({
-  processId
-}) {
+export async function abort ({ processId }) {
   ProcessManager.abort(processId)
 }

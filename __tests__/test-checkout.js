@@ -4,7 +4,14 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-checkout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { checkout, listFiles, add, commit, branch, abort } = require('isomorphic-git')
+const {
+  checkout,
+  listFiles,
+  add,
+  commit,
+  branch,
+  abort
+} = require('isomorphic-git')
 
 describe('checkout', () => {
   beforeAll(() => {

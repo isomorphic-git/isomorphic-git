@@ -65,7 +65,9 @@ export async function checkout ({
   try {
     const fs = new FileSystem(_fs)
     let abortRequested = false
-    ProcessManager.registerAbortCallback(processId, () => { abortRequested = true })
+    ProcessManager.registerAbortCallback(processId, () => {
+      abortRequested = true
+    })
     if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'checkout',

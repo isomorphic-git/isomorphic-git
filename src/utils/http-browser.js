@@ -46,8 +46,6 @@ export async function http ({
   }
 }
 
-http.abort = async function abort ({
-  processId
-}) {
+http.abort = async function abort ({ processId }) {
   ProcessManager.abort(processId)
 }
