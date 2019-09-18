@@ -214,17 +214,19 @@ module.exports = function (config) {
 
   if (process.env.TEST_BROWSERS) {
     options.browsers = process.env.TEST_BROWSERS.split(',')
-  } else {
+  } else if (!process.env.TEST_NO_BROWSERS) {
     options.browsers.push('ChromeHeadlessNoSandbox')
     options.browsers.push('FirefoxHeadless')
     // options.browsers.push('Edge')
   }
 
-  // Only re-run browsers that failed in the previous run.
-  options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
-    options.browsers
-  )
-  console.log('running with browsers:', options.browsers)
+  if (!process.env.TEST_NO_BROWSERS) {
+    // Only re-run browsers that failed in the previous run.
+    options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
+      options.browsers
+    )
+    console.log('running with browsers:', options.browsers)
+  }
 
   if (!process.env.CI) {
     // Continuous Integration mode

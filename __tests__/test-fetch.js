@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const EventEmitter = require('events')
 const { sleep } = require('isomorphic-git/internal-apis')
-const { E, plugins, fetch } = require('isomorphic-git')
+const { E, plugins, config, fetch } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -12,6 +12,11 @@ const localhost =
 describe('fetch', () => {
   it('fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await config({
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`
+    })
     // Smoke Test
     await fetch({
       gitdir,
@@ -27,6 +32,11 @@ describe('fetch', () => {
 
   it('shallow fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await config({
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`
+    })
     const output = []
     const progress = []
     plugins.set(
@@ -65,6 +75,11 @@ describe('fetch', () => {
 
   it('shallow fetch since (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await config({
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`
+    })
     // Test
     await fetch({
       gitdir,
@@ -80,6 +95,11 @@ describe('fetch', () => {
 
   it('shallow fetch exclude (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await config({
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`
+    })
     // Test
     await fetch({
       gitdir,
@@ -95,6 +115,11 @@ describe('fetch', () => {
 
   it('shallow fetch relative (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await config({
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`
+    })
     // Test
     await fetch({
       gitdir,
@@ -122,6 +147,11 @@ describe('fetch', () => {
 
   it('errors if missing refspec', async () => {
     const { gitdir } = await makeFixture('test-issue-84')
+    await config({
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`
+    })
     // Test
     let err = null
     try {
@@ -157,6 +187,11 @@ describe('fetch', () => {
 
   it('fetch --prune from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
+    await config({
+      gitdir,
+      path: 'remote.origin.url',
+      value: `http://${localhost}:8888/test-fetch-server.git`
+    })
     expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
       true
     )
@@ -180,6 +215,11 @@ describe('fetch', () => {
     ? xit
     : it)('fetch --prune-tags from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
+    await config({
+      gitdir,
+      path: 'remote.origin.url',
+      value: `http://${localhost}:8888/test-fetch-server.git`
+    })
     expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(true)
     const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
     try {
