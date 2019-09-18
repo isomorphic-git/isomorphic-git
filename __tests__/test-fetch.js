@@ -211,10 +211,7 @@ describe('fetch', () => {
           ref: 'test-branch-shallow-clone',
           processId
         }),
-        sleep(25).then(() => {
-          console.log('processId', { processId })
-          return abort({ processId })
-        })
+        sleep(25).then(() => abort({ processId }))
       ])
     } catch (e) {
       error = e

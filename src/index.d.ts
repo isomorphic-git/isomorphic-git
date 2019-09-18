@@ -225,6 +225,10 @@ export function STAGE(args: {
   gitdir: string;
 }): Walker;
 
+export function abort(args: {
+  processId: string;
+}): Promise<void>;
+
 export function add(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
@@ -269,6 +273,7 @@ export function checkout(args: WorkDir & GitDir & {
   fs?: any;
   emitter?: EventEmitter;
   emitterPrefix?: string;
+  processId?: string;
   remote?: string;
   ref?: string;
   filepaths?: string[];
@@ -280,6 +285,7 @@ export function clone(args: WorkDir & GitDir & {
   fs?: any;
   emitter?: EventEmitter;
   emitterPrefix?: string;
+  processId?: string;
   url: string;
   corsProxy?: string;
   ref?: string;
@@ -379,6 +385,7 @@ export function fetch(args: GitDir & {
   fs?: any;
   emitter?: EventEmitter;
   emitterPrefix?: string;
+  processId?: string;
   url?: string;
   corsProxy?: string;
   ref?: string;

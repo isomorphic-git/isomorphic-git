@@ -1,7 +1,8 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { clone } = require('isomorphic-git')
+const { sleep } = require('isomorphic-git/internal-apis')
+const { clone, abort } = require('isomorphic-git')
 
 describe('clone', () => {
   // Unfortunately, cloning without singleBranch: true means the test time increases
@@ -128,5 +129,32 @@ describe('clone', () => {
       false,
       `'gitdir/refs/heads/master' does not exist`
     )
+  })
+
+  it('abort clone (50ms delay) (from Github)', async () => {
+    // Setup
+    const { dir, gitdir } = await makeFixture('isomorphic-git')
+    const processId = String(Math.random())
+    // Test
+    let error = null
+    try {
+      await Promise.all([
+        clone({
+          dir,
+          gitdir,
+          depth: 1,
+          ref: 'test-branch',
+          singleBranch: true,
+          noCheckout: true,
+          url: 'https://github.com/isomorphic-git/isomorphic-git',
+          corsProxy: process.browser ? `http://localhost:9999` : undefined,
+          processId
+        }),
+        sleep(50).then(() => abort({ processId }))
+      ])
+    } catch (e) {
+      error = e
+    }
+    expect(error.name).toBe('AbortError')
   })
 })
