@@ -21,9 +21,16 @@ export async function http ({
     if (body) {
       body = await collect(body)
     }
-    const { signal, abort } = new AbortController()
-    ProcessManager.registerAbortCallback(processId, abort)
-    const res = await fetch(url, { method, headers, body, signal })
+    const options = { method, headers, body }
+    if (processId !== void 0) {
+      // TODO: Remove this progressive enhancement check when we drop support for Safari < 11.3
+      if (typeof AbortController === 'object') {
+        const { signal, abort } = new AbortController()
+        ProcessManager.registerAbortCallback(processId, abort)
+        options.signal = signal
+      }
+    }
+    const res = await fetch(url, options)
     const iter =
       res.body && res.body.getReader
         ? fromStream(res.body)
