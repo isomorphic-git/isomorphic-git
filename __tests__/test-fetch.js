@@ -6,7 +6,8 @@ const { sleep } = require('isomorphic-git/internal-apis')
 const { E, plugins, fetch } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
-const localhost = typeof window === 'undefined' ? 'localhost' : window.location.hostname
+const localhost =
+  typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 describe('fetch', () => {
   it('fetch (from Github)', async () => {

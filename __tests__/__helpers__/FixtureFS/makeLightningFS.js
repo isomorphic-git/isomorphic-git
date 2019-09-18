@@ -4,7 +4,8 @@ const { FileSystem } = require('isomorphic-git/internal-apis')
 let i = 0
 
 // this is so it works with either Node local tests or Browser WAN tests
-const localhost = typeof window === 'undefined' ? 'localhost' : window.location.hostname
+const localhost =
+  typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 async function makeLightningFS (dir) {
   const FS = require('@isomorphic-git/lightning-fs')

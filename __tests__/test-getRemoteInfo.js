@@ -5,7 +5,8 @@ const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { E, getRemoteInfo } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
-const localhost = typeof window === 'undefined' ? 'localhost' : window.location.hostname
+const localhost =
+  typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 describe('getRemoteInfo', () => {
   beforeAll(() => {
@@ -26,8 +27,7 @@ describe('getRemoteInfo', () => {
       let error = null
       try {
         await getRemoteInfo({
-          url:
-            `http://${localhost}:9876/base/__tests__/__fixtures__/test-dumb-http-server.git`
+          url: `http://${localhost}:9876/base/__tests__/__fixtures__/test-dumb-http-server.git`
         })
       } catch (err) {
         error = err

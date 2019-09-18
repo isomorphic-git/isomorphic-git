@@ -8,7 +8,8 @@ const EventEmitter = require('events')
 const { plugins, push } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
-const localhost = typeof window === 'undefined' ? 'localhost' : window.location.hostname
+const localhost =
+  typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 describe('push', () => {
   beforeAll(() => {

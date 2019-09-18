@@ -13,7 +13,7 @@ export function log (...args) {
           (process.env.DEBUG === '*' ||
             process.env.DEBUG === 'isomorphic-git')) ||
         (typeof window !== 'undefined' &&
-        typeof window.localStorage !== 'undefined' &&
+          typeof window.localStorage !== 'undefined' &&
           (window.localStorage.debug === '*' ||
             window.localStorage.debug === 'isomorphic-git'))
     } catch (_) {
