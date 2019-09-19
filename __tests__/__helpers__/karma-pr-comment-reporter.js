@@ -1,5 +1,6 @@
 // const comment = require('github-comment')
 const fetch = require('simple-get')
+const table = require('markdown-table')
 
 let commit =
   process.env.TRAVIS_PULL_REQUEST_SHA ||
@@ -14,25 +15,98 @@ const CommentReporter = function (
   helper,
   formatError
 ) {
-  this.rows = [
-    `## Test Results${commit}:`,
-    `| Browser | Passed | Skipped | Failed | Time | Disconnected | Error |`,
-    `|---------|--------|---------|--------|------|--------------|-------|`
-  ]
+  baseReporterDecorator(this)
+
+  this.rows = [['Browser', 'Pass', 'Skip', 'Fail', 'Time', 'Disconnect?']]
+  this.errorsByBrowser = {}
+  this.longestTests = []
   this.startTime = Date.now()
-  this.onRunStart = function (browsers) {}
+
+  this.onBrowserStart = function (browser) {
+    this.errorsByBrowser[browser.name] = []
+  }
+  this.specSuccess = function (browser, result) {
+    const maxShow = 10
+    if (
+      this.longestTests.length === 0 ||
+      result.time > this.longestTests[this.longestTests.length - 1].result.time
+    ) {
+      if (this.longestTests.length > maxShow) {
+        this.longestTests.pop()
+      }
+      this.longestTests.push({ browser, result })
+      this.longestTests.sort((a, b) => b.result.time - a.result.time)
+    }
+  }
+  this.specFailure = function (browser, result) {
+    this.errorsByBrowser[browser.name].push(testNameFormatter(result))
+  }
   this.onBrowserComplete = function (browser) {
-    var results = browser.lastResult
-    this.rows.push(
-      `| ${browser.name} | ${results.success} | ${results.skipped} | ${
-        results.failed
-      } | ${helper.formatTimeInterval(Date.now() - this.startTime)} | ${
-        results.disconnected
-      } | ${results.error.message} |`
-    )
+    const results = browser.lastResult
+    this.rows.push([
+      browser.name,
+      results.success,
+      results.skipped,
+      results.failed,
+      formatTime(Date.now() - this.startTime),
+      results.disconnected
+    ])
   }
   this.onRunComplete = function () {
-    postComment(this.rows.join('\n'))
+    // Sort browsers alphabetically
+    this.rows.sort((a, b) => (a[0] === b[0] ? 0 : a[0] > b[0] ? 1 : -1))
+    postComment(
+      `## Test Results${commit}:\n` +
+        table(this.rows) +
+        errorsToMarkup(this.errorsByBrowser) +
+        longestToMarkup(this.longestTests)
+    )
+  }
+
+  function shortBrowserName (browser) {
+    return browser.name.match(/[^\d+]+/)[0].trim()
+  }
+
+  function formatTime (ns) {
+    const m = Math.floor(ns / 1000 / 60)
+    const s = Math.floor(ns / 1000 - m * 60)
+    return `${m}m:${s}s`
+  }
+
+  // concatenate test suite(s) and test description by default
+  function testNameFormatter (result) {
+    return `${result.suite.join(' ')} ${result.description}`
+  }
+
+  function errorsToMarkup (errorsByBrowser) {
+    let actuallyNothingToShow = true
+    const maxShow = 5
+    let text = '\n\n### Erroring Tests\n\n'
+    for (const browser in errorsByBrowser) {
+      const numErrors = errorsByBrowser[browser].length
+      if (numErrors === 0) continue
+      actuallyNothingToShow = false
+      text += `- ${browser}:\n`
+      for (let i = 0; i < Math.min(maxShow, numErrors); i++) {
+        text += `  - ${errorsByBrowser[browser][i]}\n`
+      }
+      if (numErrors > maxShow) {
+        text += `- and ${numErrors - maxShow} more\n`
+      }
+    }
+    return actuallyNothingToShow ? '\n' : text
+  }
+
+  function longestToMarkup (longestTests) {
+    let text = '\n### Longest running tests\n'
+    for (const thing of longestTests) {
+      text += `- ${helper.formatTimeInterval(
+        thing.result.time
+      )} - ${testNameFormatter(thing.result)} - _${shortBrowserName(
+        thing.browser
+      )}_\n`
+    }
+    return text
   }
 }
 
@@ -47,7 +121,8 @@ function postComment (message) {
     process.env.TRAVIS_PULL_REQUEST ||
     process.env.SYSTEM_PULLREQUEST_PULLREQUESTNUMBER ||
     process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
-  console.log(`Detected repo: ${repo}, issue: #${issue}, is PR: ${isPR}`)
+  console.log(message)
+  console.log(`Detected repo: ${repo}, issue: #${issue}, is PR: ${isPR}\n`)
   if (isPR) {
     // comment(process.env.KARMA_PR_REPORTER_GITHUB_TOKEN, repo, issue, message)
     // .then(response => console.log(`posted results to PR #${issue}`))
@@ -63,7 +138,7 @@ function postComment (message) {
       }
     )
   } else {
-    console.log(message)
+    console.log('not leaving a Github comment')
   }
 }
 

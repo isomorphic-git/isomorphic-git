@@ -1,4 +1,5 @@
 // @ts-check
+import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
@@ -38,6 +39,7 @@ export async function isDescendent ({
 }) {
   try {
     const fs = new FileSystem(_fs)
+    const shallows = await GitShallowManager.read({ fs, gitdir })
     if (!oid) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'isDescendent',
@@ -76,11 +78,13 @@ export async function isDescendent ({
       for (const parent of commit.parent) {
         if (parent === ancestor) return true
       }
-      // If not, add them to heads
-      for (const parent of commit.parent) {
-        if (!visited.has(parent)) {
-          queue.push(parent)
-          visited.add(parent)
+      // If not, add them to heads (unless we know this is a shallow commit)
+      if (!shallows.has(oid)) {
+        for (const parent of commit.parent) {
+          if (!visited.has(parent)) {
+            queue.push(parent)
+            visited.add(parent)
+          }
         }
       }
       // Eventually, we'll travel entire tree to the roots where all the parents are empty arrays,
