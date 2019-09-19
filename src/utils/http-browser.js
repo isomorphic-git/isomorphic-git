@@ -16,40 +16,36 @@ export async function http ({
   headers = {},
   body
 }) {
-  try {
-    // streaming uploads aren't possible yet in the browser
-    if (body) {
-      body = await collect(body)
+  // streaming uploads aren't possible yet in the browser
+  if (body) {
+    body = await collect(body)
+  }
+  const options = { method, headers, body }
+  if (processId !== void 0) {
+    // TODO: Remove this progressive enhancement check when we drop support for Safari < 11.3
+    if (typeof AbortController === 'function') {
+      const controller = new AbortController()
+      ProcessManager.registerAbortCallback(processId, () => controller.abort())
+      options.signal = controller.signal
     }
-    const options = { method, headers, body }
-    if (processId !== void 0) {
-      // TODO: Remove this progressive enhancement check when we drop support for Safari < 11.3
-      if (typeof AbortController === 'object') {
-        const { signal, abort } = new AbortController()
-        ProcessManager.registerAbortCallback(processId, abort)
-        options.signal = signal
-      }
-    }
-    const res = await fetch(url, options)
-    const iter =
-      res.body && res.body.getReader
-        ? fromStream(res.body)
-        : [new Uint8Array(await res.arrayBuffer())]
-    // convert Header object to ordinary JSON
-    headers = {}
-    for (const [key, value] of res.headers.entries()) {
-      headers[key] = value
-    }
-    return {
-      url: res.url,
-      method: res.method,
-      statusCode: res.status,
-      statusMessage: res.statusText,
-      body: iter,
-      headers: headers
-    }
-  } finally {
-    ProcessManager.unregister(processId)
+  }
+  const res = await fetch(url, options)
+  const iter =
+    res.body && res.body.getReader
+      ? fromStream(res.body)
+      : [new Uint8Array(await res.arrayBuffer())]
+  // convert Header object to ordinary JSON
+  headers = {}
+  for (const [key, value] of res.headers.entries()) {
+    headers[key] = value
+  }
+  return {
+    url: res.url,
+    method: res.method,
+    statusCode: res.status,
+    statusMessage: res.statusText,
+    body: iter,
+    headers: headers
   }
 }
 

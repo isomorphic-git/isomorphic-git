@@ -71,7 +71,8 @@ export class GitRemoteHTTP {
       core,
       method: 'GET',
       url: `${url}/info/refs?service=${service}`,
-      headers
+      headers,
+      processId
     })
     if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
       // Acquire credentials and try again
@@ -85,7 +86,8 @@ export class GitRemoteHTTP {
         core,
         method: 'GET',
         url: `${url}/info/refs?service=${service}`,
-        headers
+        headers,
+        processId
       })
       // Tell credential manager if the credentials were no good
       if (res.statusCode === 401) {
@@ -174,6 +176,7 @@ export class GitRemoteHTTP {
       core,
       emitter,
       emitterPrefix,
+      processId,
       method: 'POST',
       url: `${url}/${service}`,
       body,

@@ -9,7 +9,7 @@ export class ProcessMap {
    */
   abort (processId) {
     const callbacks = this._map.get(processId)
-    this._map.set(processId, true)
+    this._map.set(processId, false)
     if (callbacks) for (const handler of callbacks) handler({ processId })
   }
 
@@ -20,7 +20,7 @@ export class ProcessMap {
    */
   registerAbortCallback (processId, callback) {
     const callbacks = this._map.has(processId) ? this._map.get(processId) : []
-    if (callbacks === true) {
+    if (callbacks === false) {
       const e = new Error()
       e.name = 'AbortError'
       throw e
