@@ -21,7 +21,7 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
     // list of files / patterns to load in the browser
     files: [
-      '__tests__/test-*.js',
+      '__tests__/index.webpack.js',
       {
         pattern: '__tests__/__fixtures__/**/*',
         served: true,
@@ -46,7 +46,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '__tests__/test-*.js': ['webpack']
+      '__tests__/index.webpack.js': ['webpack']
     },
     // web server port
     port: 9876,
