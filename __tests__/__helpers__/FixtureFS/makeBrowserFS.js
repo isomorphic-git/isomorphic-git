@@ -20,7 +20,7 @@ async function makeBrowserFS (dir) {
       const index = require('../../__fixtures__/index.json')
       let readable = await HTTPRequestFS({
         index,
-        baseUrl: 'http://localhost:9876/base/__tests__/__fixtures__/'
+        baseUrl: '/base/__tests__/__fixtures__/'
       })
       let writable = await InMemoryFS()
       let ofs = await OverlayFS({ readable, writable })
