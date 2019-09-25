@@ -18,7 +18,7 @@ async function makeLightningFS (dir) {
   plugins.set('fs', _fs) // deprecated
   const fs = new FileSystem(_fs)
   dir = `/${dir}`
-  let gitdir = `/${dir}.git`
+  const gitdir = `/${dir}.git`
   await fs.mkdir(dir)
   await fs.mkdir(gitdir)
   return { _fs, fs, dir, gitdir, core }
