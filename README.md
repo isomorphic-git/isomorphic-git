@@ -128,7 +128,7 @@ I'm hoping to get CORS headers added to all the major Git hosting platforms even
 | Gogs (self-hosted) | [✔](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html) |
 | Gitea (self-hosted) | [✔](https://github.com/go-gitea/gitea/pull/5719) |
 | Azure DevOps | [✔](https://github.com/isomorphic-git/isomorphic-git/issues/678#issuecomment-452402740) (Usage Note: requires `noGitSuffix: true` and authentication)
-| Gitlab | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/41755) is still open!
+| Gitlab | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open!
 | Bitbucket | ❌ |
 | Github | ❌ |
 
