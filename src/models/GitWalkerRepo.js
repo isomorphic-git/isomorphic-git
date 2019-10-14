@@ -66,7 +66,11 @@ export class GitWalkerRepo {
     }
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== obj.type) {
-      throw new GitError(E.ObjectTypeAssertionFail, { oid, expected: obj.type, type })
+      throw new GitError(E.ObjectTypeAssertionFail, {
+        oid,
+        expected: obj.type,
+        type
+      })
     }
     const tree = GitTree.from(object)
     // cache all entries
