@@ -9,6 +9,7 @@ import { config } from './config'
 import { currentBranch } from './currentBranch'
 import { fetch } from './fetch'
 import { merge } from './merge'
+import { fastCheckout } from './fastCheckout.js'
 
 /**
  * Fetch and merge commits from a remote repository *(Currently, only fast-forward merges are implemented.)*
@@ -35,6 +36,7 @@ import { merge } from './merge'
  * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
  * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
+ * @param {boolean} [args.fast = false] - use fastCheckout instead of regular checkout
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -70,7 +72,8 @@ export async function pull ({
   headers = {},
   author,
   committer,
-  signingKey
+  signingKey,
+  fast = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -113,14 +116,25 @@ export async function pull ({
       committer,
       signingKey
     })
-    await checkout({
-      dir,
-      gitdir,
-      fs,
-      ref,
-      emitter,
-      emitterPrefix
-    })
+    if (fast) {
+      await fastCheckout({
+        dir,
+        gitdir,
+        fs,
+        ref,
+        emitter,
+        emitterPrefix
+      })
+    } else {
+      await checkout({
+        dir,
+        gitdir,
+        fs,
+        ref,
+        emitter,
+        emitterPrefix
+      })
+    }
   } catch (err) {
     err.caller = 'git.pull'
     throw err

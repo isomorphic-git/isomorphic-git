@@ -395,6 +395,17 @@ export function expandOid(args: GitDir & {
   oid: string;
 }): Promise<string>;
 
+export function fastCheckout(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
+  emitter?: EventEmitter;
+  emitterPrefix?: string;
+  remote?: string;
+  ref?: string;
+  filepaths?: string[];
+  pattern?: string;
+}): Promise<void>;
+
 export function fetch(args: GitDir & {
   core?: string;
   fs?: any;

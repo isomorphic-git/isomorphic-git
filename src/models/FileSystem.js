@@ -153,6 +153,17 @@ export class FileSystem {
   }
 
   /**
+   * Delete a directory without throwing an error if it is already deleted.
+   */
+  async rmdir (filepath) {
+    try {
+      await this._rmdir(filepath)
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err
+    }
+  }
+
+  /**
    * Read a directory without throwing an error is the directory doesn't exist
    */
   async readdir (filepath) {
