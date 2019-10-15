@@ -123,7 +123,7 @@ describe('checkout', () => {
     await fastCheckout({ dir, gitdir, ref: 'regular-file' })
     const { mode: actualRegularFileMode } = await fs.lstat(dir + '/hello.sh')
     expect(actualRegularFileMode).toEqual(expectedRegularFileMode)
-    await fastCheckout({ dir, gitdir, ref: 'empty' })
+
     await fastCheckout({ dir, gitdir, ref: 'executable-file' })
     const { mode: actualExecutableFileMode } = await fs.lstat(dir + '/hello.sh')
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)

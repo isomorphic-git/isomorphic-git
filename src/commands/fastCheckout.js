@@ -205,14 +205,14 @@ export async function fastCheckout ({
                 case 'blob-blob': {
                   // Has file mode changed?
                   if (commit.mode !== normalizeMode(stage.mode).toString(8)) {
-                    console.log('worked', commit.fullpath, commit.mode, normalizeMode(stage.mode).toString(8))
-                    return ['update', commit.fullpath, commit.oid, commit.mode]
+                    await commit.populateHash()
+                    return ['update', commit.fullpath, commit.oid, commit.mode, true]
                   }
                   // TODO: HANDLE SYMLINKS
                   // Has the file content changed?
                   await Promise.all([commit.populateHash(), stage.populateHash()])
                   if (commit.oid !== stage.oid) {
-                    return ['update', commit.fullpath, commit.oid]
+                    return ['update', commit.fullpath, commit.oid, commit.mode, false]
                   } else {
                     return
                   }
@@ -336,20 +336,21 @@ export async function fastCheckout ({
         async function (index) {
           await Promise.all(
             ops.filter(([method]) => method === 'create' || method === 'update').map(
-              async function ([method, fullpath, oid, mode]) {
+              async function ([_, fullpath, oid, mode, chmod]) {
                 const filepath = `${dir}/${fullpath}`
                 try {
                   const { object } = await readObject({ fs, gitdir, oid })
-                  await fs.write(filepath, object)
+                  if (chmod) {
+                    // Note: the mode option of fs.write only works when creating files,
+                    // not updating them. Since the `fs` plugin doesn't expose `chmod` this
+                    // is our only option.
+                    await fs.rm(filepath)
+                  }
                   if (mode === '100644') {
                     // regular file
                     await fs.write(filepath, object)
                   } else if (mode === '100755') {
                     // executable file
-                    // Note: the mode option of fs.write only works when creating files,
-                    // not updating them. Since the `fs` plugin doesn't expose `chmod` this
-                    // is our only option.
-                    await fs.rm(filepath)
                     await fs.write(filepath, object, { mode: 0o777 })
                   } else if (mode === '120000') {
                     // symlink
