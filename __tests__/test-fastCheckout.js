@@ -104,6 +104,31 @@ describe('checkout', () => {
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
 
+  it('checkout changing file permissions', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+
+    await fs.write(dir + '/regular-file.txt', 'regular file', {
+      mode: 0o666
+    })
+    await fs.write(dir + '/executable-file.sh', 'executable file', {
+      mode: 0o777
+    })
+    const { mode: expectedRegularFileMode } = (await fs.lstat(dir + '/regular-file.txt'))
+    const { mode: expectedExecutableFileMode } = (await fs.lstat(
+      dir + '/executable-file.sh'
+    ))
+
+    // Test
+    await fastCheckout({ dir, gitdir, ref: 'regular-file' })
+    const { mode: actualRegularFileMode } = await fs.lstat(dir + '/hello.sh')
+    expect(actualRegularFileMode).toEqual(expectedRegularFileMode)
+    await fastCheckout({ dir, gitdir, ref: 'empty' })
+    await fastCheckout({ dir, gitdir, ref: 'executable-file' })
+    const { mode: actualExecutableFileMode } = await fs.lstat(dir + '/hello.sh')
+    expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
+  })
+
   it('checkout using pattern', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')

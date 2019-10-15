@@ -17,6 +17,7 @@ import { STAGE } from './STAGE.js'
 import { flat } from '../utils/flat.js'
 import { readObject } from '../storage/readObject.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { normalizeMode } from '../utils/normalizeMode.js'
 
 /**
  * Checkout a branch
@@ -131,6 +132,7 @@ export async function fastCheckout ({
             return bases.some(base => worthWalking(commit.fullpath, base))
           },
           map: async function ([commit, workdir, stage]) {
+            if (commit.fullpath === '.') return
             // Late filter against file names
             if (patternGlobrex) {
               let match = false
@@ -151,7 +153,6 @@ export async function fastCheckout ({
                 lengthComputable: false
               })
             }
-            if (commit.fullpath === '.') return
             // Just ignore files if they are not tracked && not part of the new commit.
             if (!stage.exists && !commit.exists) return
             // Deleted entries
@@ -181,7 +182,13 @@ export async function fastCheckout ({
                   return ['create', commit.fullpath, commit.oid, commit.mode]
                 }
                 case 'commit': {
-                  return ['submodule', commit.fullpath, commit.oid]
+                  // gitlinks
+                  console.log(
+                    new GitError(E.NotImplementedFail, {
+                      thing: 'submodule support'
+                    })
+                  )
+                  return
                 }
                 default: {
                   return ['error', `new entry Unhandled type ${commit.type}`]
@@ -196,14 +203,13 @@ export async function fastCheckout ({
                   return
                 }
                 case 'blob-blob': {
-                  // Mode change
-                  // if (commit.mode !== stage.mode) {
-                    console.log('commit', commit.mode)
-                    console.log('stage', stage.mode)
-                  // }
-                  // Has the file changed?
-                  // TODO: ACCOUNT FOR FILE MODE CHANGES
+                  // Has file mode changed?
+                  if (commit.mode !== normalizeMode(stage.mode).toString(8)) {
+                    console.log('worked', commit.fullpath, commit.mode, normalizeMode(stage.mode).toString(8))
+                    return ['update', commit.fullpath, commit.oid, commit.mode]
+                  }
                   // TODO: HANDLE SYMLINKS
+                  // Has the file content changed?
                   await Promise.all([commit.populateHash(), stage.populateHash()])
                   if (commit.oid !== stage.oid) {
                     return ['update', commit.fullpath, commit.oid]
