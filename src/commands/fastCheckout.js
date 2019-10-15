@@ -62,7 +62,7 @@ export async function fastCheckout ({
   filepaths = ['.'],
   pattern = null,
   noCheckout = false,
-  dryRun = false,
+  dryRun = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -116,11 +116,10 @@ export async function fastCheckout ({
 
     // Return early if HEAD is already at ref oid
     const HEAD = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
-    if (HEAD === oid) return
 
     // Update working dir
     let count = 0
-    if (!noCheckout) {
+    if (!noCheckout && HEAD !== oid) {
       let ops
       // First pass - just analyze files (not directories) and figure out what needs to be done
       // and (TODO) if it can be done without losing uncommitted changes.
@@ -179,7 +178,7 @@ export async function fastCheckout ({
                 }
                 case 'blob': {
                   await commit.populateHash()
-                  return ['create', commit.fullpath, commit.oid]
+                  return ['create', commit.fullpath, commit.oid, commit.mode]
                 }
                 case 'commit': {
                   return ['submodule', commit.fullpath, commit.oid]
@@ -197,6 +196,11 @@ export async function fastCheckout ({
                   return
                 }
                 case 'blob-blob': {
+                  // Mode change
+                  // if (commit.mode !== stage.mode) {
+                    console.log('commit', commit.mode)
+                    console.log('stage', stage.mode)
+                  // }
                   // Has the file changed?
                   // TODO: ACCOUNT FOR FILE MODE CHANGES
                   // TODO: HANDLE SYMLINKS
@@ -246,18 +250,17 @@ export async function fastCheckout ({
         return ops
       }
 
-
       // Second pass - execute planned changes
       // The cheapest semi-parallel solution without computing a full dependency graph will be
       // to just do ops in 4 dumb phases: delete files, delete dirs, create dirs, write files
 
       count = 0
-      let total = ops.length
+      const total = ops.length
       await GitIndexManager.acquire(
         { fs, filepath: `${gitdir}/index` },
         /**
-         * 
-         * @param {import('../models/GitIndex.js').GitIndex} index 
+         *
+         * @param {import('../models/GitIndex.js').GitIndex} index
          */
         async function (index) {
           await Promise.all(
@@ -321,20 +324,43 @@ export async function fastCheckout ({
       await GitIndexManager.acquire(
         { fs, filepath: `${gitdir}/index` },
         /**
-         * 
-         * @param {import('../models/GitIndex.js').GitIndex} index 
+         *
+         * @param {import('../models/GitIndex.js').GitIndex} index
          */
         async function (index) {
           await Promise.all(
             ops.filter(([method]) => method === 'create' || method === 'update').map(
-              async function ([_, fullpath, oid]) {
+              async function ([method, fullpath, oid, mode]) {
                 const filepath = `${dir}/${fullpath}`
                 try {
                   const { object } = await readObject({ fs, gitdir, oid })
                   await fs.write(filepath, object)
-                  
+                  if (mode === '100644') {
+                    // regular file
+                    await fs.write(filepath, object)
+                  } else if (mode === '100755') {
+                    // executable file
+                    // Note: the mode option of fs.write only works when creating files,
+                    // not updating them. Since the `fs` plugin doesn't expose `chmod` this
+                    // is our only option.
+                    await fs.rm(filepath)
+                    await fs.write(filepath, object, { mode: 0o777 })
+                  } else if (mode === '120000') {
+                    // symlink
+                    await fs.writelink(filepath, object)
+                  } else {
+                    throw new GitError(E.InternalFail, {
+                      message: `Invalid mode "${mode}" detected in blob ${oid}`
+                    })
+                  }
+
                   const stats = await fs.lstat(filepath)
-                  // TODO: Insert mode hack from regular `checkout`.
+                  // We can't trust the executable bit returned by lstat on Windows,
+                  // so we need to preserve this value from the TREE.
+                  // TODO: Figure out how git handles this internally.
+                  if (mode === '100755') {
+                    stats.mode = 0o755
+                  }
                   index.insert({
                     filepath: fullpath,
                     stats,
@@ -356,13 +382,13 @@ export async function fastCheckout ({
         }
       )
     }
-  
+
     // Update HEAD
     const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     const content = fullRef.startsWith('refs/heads') ? `ref: ${fullRef}` : oid
     await fs.write(`${gitdir}/HEAD`, `${content}\n`)
   } catch (err) {
-    err.caller = 'git.fastCheckout'
+    err.caller = 'git.checkout'
     throw err
   }
 }
