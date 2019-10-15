@@ -4,7 +4,14 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-checkout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { checkout, listFiles, add, commit, branch } = require('isomorphic-git')
+const {
+  checkout,
+  listFiles,
+  add,
+  commit,
+  branch,
+  abort
+} = require('isomorphic-git')
 
 describe('checkout', () => {
   beforeAll(() => {
@@ -186,5 +193,25 @@ describe('checkout', () => {
     expect(files.sort()).toMatchSnapshot()
     const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
+  })
+
+  it('checkout can be aborted (preimptive)', async () => {
+    // Setup
+    const { dir, gitdir } = await makeFixture('test-checkout')
+    const processId = String(Math.random())
+    // Test
+    let error = null
+    try {
+      abort({ processId })
+      await checkout({
+        dir,
+        gitdir,
+        ref: 'test-branch',
+        processId
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error.name).toBe('AbortError')
   })
 })

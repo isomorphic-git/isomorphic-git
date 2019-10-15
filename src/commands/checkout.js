@@ -3,6 +3,7 @@ import globrex from 'globrex'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { ProcessManager } from '../managers/ProcessManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
@@ -27,6 +28,7 @@ import { walkBeta1 } from './walkBeta1.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
+ * @param {string} [args.processId = ''] - identifier that can be used to [abort](abort.md) the command
  * @param {string} args.ref - Which branch to checkout
  * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
  * @param {string} [args.pattern = null] - Only checkout the files that match a glob pattern. (Pattern is relative to `filepaths` if `filepaths` is provided.)
@@ -53,6 +55,7 @@ export async function checkout ({
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
+  processId,
   remote = 'origin',
   ref,
   filepaths = ['.'],
@@ -61,6 +64,10 @@ export async function checkout ({
 }) {
   try {
     const fs = new FileSystem(_fs)
+    let abortRequested = false
+    ProcessManager.registerAbortCallback(processId, () => {
+      abortRequested = true
+    })
     if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'checkout',
@@ -141,6 +148,7 @@ export async function checkout ({
                 return bases.some(base => worthWalking(head.fullpath, base))
               },
               map: async function ([head, workdir]) {
+                if (abortRequested) throw new GitError(E.AbortError)
                 if (head.fullpath === '.') return
                 if (!head.exists) return
                 // Late filter against file names

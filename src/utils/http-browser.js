@@ -1,10 +1,16 @@
+/* eslint-env browser */
+import { ProcessMap } from '../models/ProcessMap.js'
+
 import { fromStream } from './AsyncIterator.js'
 import { collect } from './collect.js'
+
+const ProcessManager = new ProcessMap()
 
 export async function http ({
   core,
   emitter,
   emitterPrefix,
+  processId,
   url,
   method = 'GET',
   headers = {},
@@ -14,7 +20,16 @@ export async function http ({
   if (body) {
     body = await collect(body)
   }
-  const res = await global.fetch(url, { method, headers, body })
+  const options = { method, headers, body }
+  if (processId !== void 0) {
+    // TODO: Remove this progressive enhancement check when we drop support for Safari < 11.3
+    if (typeof AbortController === 'function') {
+      const controller = new AbortController()
+      ProcessManager.registerAbortCallback(processId, () => controller.abort())
+      options.signal = controller.signal
+    }
+  }
+  const res = await fetch(url, options)
   const iter =
     res.body && res.body.getReader
       ? fromStream(res.body)
@@ -32,4 +47,8 @@ export async function http ({
     body: iter,
     headers: headers
   }
+}
+
+http.abort = async function abort ({ processId }) {
+  ProcessManager.abort(processId)
 }

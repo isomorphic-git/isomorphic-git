@@ -37,6 +37,7 @@ import { init } from './init.js'
  * @param {object} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
+ * @param {string} [args.processId = ''] - identifier that can be used to [abort](abort.md) the command
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -58,6 +59,7 @@ export async function clone ({
   fs: _fs = cores.get(core).get('fs'),
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
+  processId,
   url,
   noGitSuffix = false,
   corsProxy = undefined,
@@ -120,6 +122,7 @@ export async function clone ({
       fs,
       emitter,
       emitterPrefix,
+      processId,
       noGitSuffix,
       ref,
       remote,
@@ -145,6 +148,7 @@ export async function clone ({
       fs,
       emitter,
       emitterPrefix,
+      processId,
       ref,
       remote,
       noCheckout

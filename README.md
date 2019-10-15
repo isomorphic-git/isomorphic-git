@@ -174,6 +174,7 @@ unless there is a major version bump.
 
 ### commands
 
+- [abort](https://isomorphic-git.github.io/docs/abort.html)
 - [add](https://isomorphic-git.github.io/docs/add.html)
 - [addRemote](https://isomorphic-git.github.io/docs/addRemote.html)
 - [annotatedTag](https://isomorphic-git.github.io/docs/annotatedTag.html)

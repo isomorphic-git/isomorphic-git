@@ -1,9 +1,10 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { isSafariMobile11 } = require('./__helpers__/browser-detection.js')
 
 const EventEmitter = require('events')
 const { sleep } = require('isomorphic-git/internal-apis')
-const { E, plugins, config, fetch } = require('isomorphic-git')
+const { E, plugins, abort, config, fetch } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -211,32 +212,80 @@ describe('fetch', () => {
   // parameter is causing Mobile Safari 11 tests to crash / disconnect.
   // So... I'm just gonna consider it a fluke.
   // TODO: Remove this check when we drop support for Safari 11.
-  ;(typeof navigator !== 'undefined' && navigator.userAgent.match(/iPhone/)
-    ? xit
-    : it)('fetch --prune-tags from git-http-mock-server', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
-    await config({
-      gitdir,
-      path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-fetch-server.git`
-    })
-    expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(true)
-    const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
-    try {
-      await fetch({
-        dir,
+  ;(isSafariMobile11 ? xit : it)(
+    'fetch --prune-tags from git-http-mock-server',
+    async () => {
+      const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
+      await config({
         gitdir,
-        depth: 1,
-        tags: true,
-        pruneTags: true
+        path: 'remote.origin.url',
+        value: `http://${localhost}:8888/test-fetch-server.git`
       })
-    } catch (err) {
-      // shrug
+      expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(true)
+      const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
+      try {
+        await fetch({
+          dir,
+          gitdir,
+          depth: 1,
+          tags: true,
+          pruneTags: true
+        })
+      } catch (err) {
+        // shrug
+      }
+      // assert that tag was deleted
+      expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(false)
+      // assert that tags was force-updated
+      const newValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
+      expect(oldValue).not.toEqual(newValue)
     }
-    // assert that tag was deleted
-    expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(false)
-    // assert that tags was force-updated
-    const newValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
-    expect(oldValue).not.toEqual(newValue)
+  )
+  ;(isSafariMobile11 ? xit : it)(
+    'abort fetch (25ms delay) (from Github)',
+    async () => {
+      // Setup
+      const { gitdir } = await makeFixture('test-fetch-cors')
+      const processId = String(Math.random())
+      // Test
+      let error = null
+      try {
+        await Promise.all([
+          fetch({
+            gitdir,
+            singleBranch: true,
+            remote: 'origin',
+            ref: 'test-branch-shallow-clone',
+            processId
+          }),
+          sleep(25).then(() => abort({ processId }))
+        ])
+      } catch (e) {
+        error = e
+      }
+      expect(error).not.toBe(null)
+      expect(error.name).toBe('AbortError')
+    }
+  )
+  ;(isSafariMobile11 ? xit : it)('preimptive abort (from Github)', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-fetch-cors')
+    const processId = String(Math.random())
+    // Test
+    let error = null
+    try {
+      await abort({ processId })
+      await fetch({
+        gitdir,
+        singleBranch: true,
+        remote: 'origin',
+        ref: 'test-branch-shallow-clone',
+        processId
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBe(null)
+    expect(error.name).toBe('AbortError')
   })
 })

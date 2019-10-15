@@ -1,11 +1,16 @@
+import { ProcessMap } from '../models/ProcessMap.js'
+
 import { fromNodeStream } from './AsyncIterator.js'
 import { asyncIteratorToStream } from './asyncIteratorToStream.js'
 import { collect } from './collect.js'
+
+const ProcessManager = new ProcessMap()
 
 export async function http ({
   core,
   emitter,
   emitterPrefix,
+  processId,
   url,
   method = 'GET',
   headers = {},
@@ -19,7 +24,7 @@ export async function http ({
   }
   return new Promise((resolve, reject) => {
     const get = require('simple-get')
-    get(
+    const req = get(
       {
         url,
         method,
@@ -27,6 +32,7 @@ export async function http ({
         body
       },
       (err, res) => {
+        ProcessManager.unregister(processId)
         if (err) return reject(err)
         const iter = fromNodeStream(res)
         resolve({
@@ -39,5 +45,12 @@ export async function http ({
         })
       }
     )
+    ProcessManager.registerAbortCallback(processId, () => {
+      req.abort()
+    })
   })
+}
+
+http.abort = async function abort ({ processId }) {
+  ProcessManager.abort(processId)
 }
