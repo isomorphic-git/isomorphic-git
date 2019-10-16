@@ -85,6 +85,7 @@ export class GitWalkerFs {
       { fs, filepath: `${gitdir}/index` },
       async function (index) {
         const stage = index.entriesMap.get(entry.fullpath)
+        if (!entry.type) await entry.populateStat()
         if (!stage || compareStats(entry, stage)) {
           log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
           if (!entry.content) await entry.populateContent()
