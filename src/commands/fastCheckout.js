@@ -153,78 +153,161 @@ export async function fastCheckout ({
                 lengthComputable: false
               })
             }
-            // Just ignore files if they are not tracked && not part of the new commit.
-            if (!stage.exists && !commit.exists) return
-            // Deleted entries
-            if (stage.exists && !commit.exists) {
-              await stage.populateStat()
-              switch (stage.type) {
-                case 'tree': {
-                  return ['rmdir', stage.fullpath]
-                }
-                case 'blob': {
-                  return ['delete', stage.fullpath]
-                }
-                default: {
-                  return [`delete entry Unhandled type ${stage.type}`]
-                }
-              }
-            }
-            // New entries
-            if (!stage.exists && commit.exists) {
-              await commit.populateStat()
-              switch (commit.type) {
-                case 'tree': {
-                  return ['mkir', commit.fullpath]
-                }
-                case 'blob': {
-                  await commit.populateHash()
-                  return ['create', commit.fullpath, commit.oid, commit.mode]
-                }
-                case 'commit': {
-                  // gitlinks
-                  console.log(
-                    new GitError(E.NotImplementedFail, {
-                      thing: 'submodule support'
-                    })
-                  )
-                  return
-                }
-                default: {
-                  return ['error', `new entry Unhandled type ${commit.type}`]
-                }
-              }
-            }
-            // Modified entries
-            if (stage.exists && commit.exists) {
-              await Promise.all([commit.populateStat(), stage.populateStat()])
-              switch (`${stage.type}-${commit.type}`) {
-                case 'tree-tree': {
-                  return
-                }
-                case 'blob-blob': {
-                  // Has file mode changed?
-                  if (commit.mode !== normalizeMode(stage.mode).toString(8)) {
-                    await commit.populateHash()
-                    return ['update', commit.fullpath, commit.oid, commit.mode, true]
+            // This is a kind of silly pattern but it worked so well for me in calculateBasicAuthUsernamePasswordPair.js
+            // and it makes intuitively demonstrating exhaustiveness so *easy*.
+            // This checks for the presense and/or absense of each of the 3 entries,
+            // converts that to a 3-bit binary representation, and then handles
+            // every possible combination (2^3 or 8 cases) with a lookup table.
+            const key = [!!stage.exists, !!commit.exists, !!workdir.exists]
+              .map(Number)
+              .join('')
+            switch (key) {
+              // Impossible case.
+              case '000': return
+              // Ignore workdir files that are not tracked and not part of the new commit.
+              case '001': return
+              // New entries
+              case '010': {
+                await commit.populateStat()
+                switch (commit.type) {
+                  case 'tree': {
+                    return ['mkdir', commit.fullpath]
                   }
-                  // TODO: HANDLE SYMLINKS
-                  // Has the file content changed?
-                  await Promise.all([commit.populateHash(), stage.populateHash()])
-                  if (commit.oid !== stage.oid) {
-                    return ['update', commit.fullpath, commit.oid, commit.mode, false]
-                  } else {
+                  case 'blob': {
+                    await commit.populateHash()
+                    return ['create', commit.fullpath, commit.oid, commit.mode]
+                  }
+                  case 'commit': {
+                    // gitlinks
+                    console.log(
+                      new GitError(E.NotImplementedFail, {
+                        thing: 'submodule support'
+                      })
+                    )
                     return
                   }
+                  default: {
+                    return ['error', `new entry Unhandled type ${commit.type}`]
+                  }
                 }
-                case 'tree-blob': {
-                  return ['update-dir-to-blob', commit.fullpath, commit.oid]
+              }
+              // New entries but there is already something in the workdir there.
+              case '011': {
+                await Promise.all([commit.populateStat(), workdir.populateStat()])
+                switch (`${commit.type}-${workdir.type}`) {
+                  case 'tree-tree': {
+                    return // noop
+                  }
+                  case 'tree-blob':
+                  case 'blob-tree': {
+                    return ['conflict', commit.fullpath]
+                  }
+                  case 'blob-blob': {
+                    await Promise.all([commit.populateHash(), workdir.populateHash()])
+                    // Is the incoming file different?
+                    if (commit.oid !== workdir.oid) {
+                      return ['conflict', commit.fullpath]
+                    } else {
+                      // Is the incoming file a different mode?
+                      if (commit.mode !== normalizeMode(workdir.mode).toString(8)) {
+                        return ['conflict', commit.fullpath]
+                      } else {
+                        return ['create-index', commit.fullpath, commit.oid, commit.mode]
+                      }
+                    }
+                  }
+                  case 'commit-tree': {
+                    // TODO: submodule
+                    // We'll ignore submodule directories for now.
+                    // Users prefer we not throw an error for lack of submodule support.
+                    // gitlinks
+                    console.log(
+                      new GitError(E.NotImplementedFail, {
+                        thing: 'submodule support'
+                      })
+                    )
+                  }
+                  case 'commit-blob': {
+                    // TODO: submodule
+                    // But... we'll complain if there is a *file* where we would
+                    // put a submodule if we had submodule support.
+                    return ['conflict', commit.fullpath]
+                  }
+                  default: {
+                    return ['error', `new entry Unhandled type ${commit.type}`]
+                  }
                 }
-                case 'blob-tree': {
-                  return ['update-blob-to-tree', commit.fullpath]
+              }
+              // Something in stage but not in the commit OR the workdir.
+              // Note: I verified this behavior against canonical git.
+              case '100': {
+                return ['delete-index', stage.fullpath]
+              }
+              // Deleted entries
+              // TODO: How to handle if stage type and workdir type mismatch?
+              case '101': {
+                await stage.populateStat()
+                switch (stage.type) {
+                  case 'tree': {
+                    return ['rmdir', stage.fullpath]
+                  }
+                  case 'blob': {
+                    // Git checks that the workdir.oid === stage.oid before deleting file
+                    await Promise.all([stage.populateHash(), workdir.populateHash()])
+                    if (stage.oid !== workdir.oid) {
+                      return ['conflict', stage.fullpath]
+                    } else {
+                      return ['delete', stage.fullpath]
+                    }
+                  }
+                  default: {
+                    return [`delete entry Unhandled type ${stage.type}`]
+                  }
                 }
-                default: {
-                  return ['error', `update entry Unhandled type ${stage.type}-${commit.type}`]
+              }
+              // Modified entries but file was deleted in workdir for some reason. Kinda odd case.
+              case '110':
+              // Modified entries
+              case '111': {
+                await Promise.all([commit.populateStat(), stage.populateStat()])
+                switch (`${stage.type}-${commit.type}`) {
+                  case 'tree-tree': {
+                    return
+                  }
+                  case 'blob-blob': {
+                    // Check for local changes that would be lost
+                    if (workdir.exists) {
+                      await workdir.populateStat()
+                      await Promise.all([stage.populateHash(), commit.populateHash(), workdir.populateHash()])
+                      // Note: canonical git only compares with the stage. But we're smart enough
+                      // to compare to the stage AND the incoming commit.
+                      if (workdir.oid !== stage.oid && workdir.oid !== commit.oid) {
+                        return ['conflict', commit.fullpath]
+                      }
+                    }
+                    // Has file mode changed?
+                    if (commit.mode !== normalizeMode(stage.mode).toString(8)) {
+                      await commit.populateHash()
+                      return ['update', commit.fullpath, commit.oid, commit.mode, true]
+                    }
+                    // TODO: HANDLE SYMLINKS
+                    // Has the file content changed?
+                    await Promise.all([commit.populateHash(), stage.populateHash()])
+                    if (commit.oid !== stage.oid) {
+                      return ['update', commit.fullpath, commit.oid, commit.mode, false]
+                    } else {
+                      return
+                    }
+                  }
+                  case 'tree-blob': {
+                    return ['update-dir-to-blob', commit.fullpath, commit.oid]
+                  }
+                  case 'blob-tree': {
+                    return ['update-blob-to-tree', commit.fullpath]
+                  }
+                  default: {
+                    return ['error', `update entry Unhandled type ${stage.type}-${commit.type}`]
+                  }
                 }
               }
             }
@@ -251,6 +334,19 @@ export async function fastCheckout ({
           throw err
         }
       }
+
+      // Report conflicts
+      const conflicts = ops.filter(([method]) => method === 'conflict').map(([method, fullpath]) => fullpath)
+      if (conflicts.length > 0) {
+        throw new GitError(E.CheckoutConflictError, { filepaths: conflicts })
+      }
+
+      // Collect errors
+      const errors = ops.filter(([method]) => method === 'error').map(([method, fullpath]) => fullpath)
+      if (errors.length > 0) {
+        throw new GitError(E.InternalFail, { message: errors })
+      }
+
       // XXX: for testing, we'll just return here for now.
       if (dryRun) {
         return ops
@@ -270,10 +366,12 @@ export async function fastCheckout ({
          */
         async function (index) {
           await Promise.all(
-            ops.filter(([method]) => method === 'delete').map(
-              async function ([_, fullpath]) {
+            ops.filter(([method]) => method === 'delete' || method === 'delete-index').map(
+              async function ([method, fullpath]) {
                 const filepath = `${dir}/${fullpath}`
-                await fs.rm(filepath)
+                if (method === 'delete') {
+                  await fs.rm(filepath)
+                }
                 index.delete({ filepath: fullpath })
                 if (emitter) {
                   emitter.emit(`${emitterPrefix}progress`, {
@@ -335,30 +433,32 @@ export async function fastCheckout ({
          */
         async function (index) {
           await Promise.all(
-            ops.filter(([method]) => method === 'create' || method === 'update').map(
-              async function ([_, fullpath, oid, mode, chmod]) {
+            ops.filter(([method]) => method === 'create' || method === 'create-index' || method === 'update').map(
+              async function ([method, fullpath, oid, mode, chmod]) {
                 const filepath = `${dir}/${fullpath}`
                 try {
-                  const { object } = await readObject({ fs, gitdir, oid })
-                  if (chmod) {
-                    // Note: the mode option of fs.write only works when creating files,
-                    // not updating them. Since the `fs` plugin doesn't expose `chmod` this
-                    // is our only option.
-                    await fs.rm(filepath)
-                  }
-                  if (mode === '100644') {
-                    // regular file
-                    await fs.write(filepath, object)
-                  } else if (mode === '100755') {
-                    // executable file
-                    await fs.write(filepath, object, { mode: 0o777 })
-                  } else if (mode === '120000') {
-                    // symlink
-                    await fs.writelink(filepath, object)
-                  } else {
-                    throw new GitError(E.InternalFail, {
-                      message: `Invalid mode "${mode}" detected in blob ${oid}`
-                    })
+                  if (method !== 'create-index') {
+                    const { object } = await readObject({ fs, gitdir, oid })
+                    if (chmod) {
+                      // Note: the mode option of fs.write only works when creating files,
+                      // not updating them. Since the `fs` plugin doesn't expose `chmod` this
+                      // is our only option.
+                      await fs.rm(filepath)
+                    }
+                    if (mode === '100644') {
+                      // regular file
+                      await fs.write(filepath, object)
+                    } else if (mode === '100755') {
+                      // executable file
+                      await fs.write(filepath, object, { mode: 0o777 })
+                    } else if (mode === '120000') {
+                      // symlink
+                      await fs.writelink(filepath, object)
+                    } else {
+                      throw new GitError(E.InternalFail, {
+                        message: `Invalid mode "${mode}" detected in blob ${oid}`
+                      })
+                    }
                   }
 
                   const stats = await fs.lstat(filepath)
