@@ -46,12 +46,9 @@ export async function listFiles ({
       await accumulateFilesFromOid({ gitdir, fs, oid, filenames, prefix: '' })
       return filenames
     } else {
-      return GitIndexManager.acquire(
-        { fs, gitdir },
-        async function (index) {
-          return index.entries.map(x => x.path)
-        }
-      )
+      return GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+        return index.entries.map(x => x.path)
+      })
     }
   } catch (err) {
     err.caller = 'git.listFiles'
