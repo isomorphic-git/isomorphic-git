@@ -92,7 +92,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * ```
  *
  * Additional properties are computed on demand, asynchronously, and cached. This lets you build lean, mean, efficient walking machines.
- * 
+ *
  * ```js
  * await entry.type() // 'tree', 'blob'
  * ```
@@ -104,12 +104,12 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * ```js
  * await entry.oid() // SHA1 string
  * ```
- * 
+ *
  * ```js
  * await entry.content() // Buffer?
  * // STAGE cannot provide content
  * ```
- * 
+ *
  * ```js
  * await entry.stat()
  * entry.ctimeSeconds // number;
