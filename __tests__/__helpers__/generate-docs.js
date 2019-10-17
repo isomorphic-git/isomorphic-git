@@ -15,7 +15,9 @@ function escapeType (type) {
 }
 
 function recoverFunctionSignature (name, text) {
-  const matches = text.match(new RegExp(`{function\\(([^\\)]*)\\):([^}]*)} \\[?${name}`))
+  const matches = text.match(
+    new RegExp(`{function\\(([^\\)]*)\\):([^}]*)} \\[?${name}`)
+  )
   if (matches !== null) {
     matches[1] = matches[1].trim()
     matches[2] = matches[2].trim()
@@ -106,7 +108,7 @@ function gendoc (filepath) {
         continue
       }
       if (obj.kind === 'package') continue
-      if (!obj.params && !obj.returns || !obj.description) continue
+      if ((!obj.params && !obj.returns) || !obj.description) continue
       text += `---\n`
       text += `title: ${obj.name}\n`
       text += `sidebar_label: ${obj.name}\n`

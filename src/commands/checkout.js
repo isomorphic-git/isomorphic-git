@@ -173,13 +173,15 @@ export async function checkout ({
                   break
                 }
                 case 'blob': {
-                  if (await head.mode() === 0o100644) {
+                  if ((await head.mode()) === 0o100644) {
                     // regular file
                     await fs.write(filepath, await head.content())
-                  } else if (await head.mode() === 0o100755) {
+                  } else if ((await head.mode()) === 0o100755) {
                     // executable file
-                    await fs.write(filepath, await head.content(), { mode: 0o777 })
-                  } else if (await head.mode() === 0o120000) {
+                    await fs.write(filepath, await head.content(), {
+                      mode: 0o777
+                    })
+                  } else if ((await head.mode()) === 0o120000) {
                     // symlink
                     await fs.writelink(filepath, await head.content())
                   } else {
@@ -191,7 +193,7 @@ export async function checkout ({
                   // We can't trust the executable bit returned by lstat on Windows,
                   // so we need to preserve this value from the TREE.
                   // TODO: Figure out how git handles this internally.
-                  if (await head.mode() === 0o100755) {
+                  if ((await head.mode()) === 0o100755) {
                     stats.mode = 0o100755
                   }
                   index.insert({
