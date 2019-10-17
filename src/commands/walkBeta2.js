@@ -271,8 +271,10 @@ export async function walkBeta2 ({
 
     const walk = async root => {
       const { children, entry } = await unionWalkerFromReaddir(root)
-      if (await filter(entry)) {
-        const parent = await map(entry)
+      const fullpath = entry[0].fullpath
+      const actualEntries = [fullpath, ...entry.map(entry => entry.exists ? entry : null)]
+      if (await filter(actualEntries)) {
+        const parent = await map(actualEntries)
         let walkedChildren = await iterate(walk, children)
         walkedChildren = walkedChildren.filter(x => x !== undefined)
         return reduce(parent, walkedChildren)
