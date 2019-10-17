@@ -15,19 +15,25 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
 /**
  * Get a git commit Walker
  *
- * See [walkBeta1](./walkBeta1.md)
+ * See [walkBeta2](./walkBeta2.md)
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.ref='HEAD'] - [required] The commit to walk
+ * @param {string} [args.ref='HEAD'] - The commit to walk
  *
  * @returns {Walker} Returns a git commit Walker
  *
  */
-export function TREE ({ core = 'default', dir, gitdir, fs: _fs, ref = 'HEAD' }) {
+export function TREE ({
+  ref = 'HEAD',
+  // @ts-ignore
+  core = 'default',
+  // @ts-ignore
+  dir,
+  // @ts-ignore
+  gitdir,
+  // @ts-ignore
+  fs: _fs
+}) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkBeta1Symbol, {
     value: function () {

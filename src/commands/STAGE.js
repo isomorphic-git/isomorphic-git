@@ -15,18 +15,20 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
 /**
  * Get a git index Walker
  *
- * See [walkBeta1](./walkBeta1.md)
- *
- * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * See [walkBeta2](./walkBeta2.md)
  *
  * @returns {Walker} Returns a git index Walker
  *
  */
-export function STAGE ({ core = 'default', dir, gitdir, fs: _fs } = {}) {
+export function STAGE ({
+  core = 'default',
+  // @ts-ignore
+  dir,
+  // @ts-ignore
+  gitdir,
+  // @ts-ignore
+  fs: _fs
+} = {}) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkBeta1Symbol, {
     value: function () {
