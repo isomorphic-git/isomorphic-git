@@ -40,7 +40,7 @@ export async function add ({
     const fs = new FileSystem(_fs)
 
     await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
+      { fs, gitdir },
       async function (index) {
         await addToIndex({ dir, gitdir, fs, filepath, index })
       }

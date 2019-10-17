@@ -114,7 +114,7 @@ export async function checkout ({
       let count = 0
       // Acquire a lock on the index
       await GitIndexManager.acquire(
-        { fs, filepath: `${gitdir}/index` },
+        { fs, gitdir },
         async function (index) {
           // TODO: Big optimization possible here.
           // Instead of deleting and rewriting everything, only delete files

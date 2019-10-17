@@ -37,9 +37,11 @@ async function isIndexStale (fs, filepath) {
 }
 
 export class GitIndexManager {
-  static async acquire ({ fs: _fs, filepath }, closure) {
+  static async acquire ({ fs: _fs, gitdir }, closure) {
     const fs = new FileSystem(_fs)
+    const filepath = `${gitdir}/index`
     if (lock === null) lock = new AsyncLock({ maxPending: Infinity })
+    let result
     await lock.acquire(filepath, async function () {
       // Acquire a file lock while we're reading the index
       // to make sure other processes aren't writing to it
@@ -49,7 +51,7 @@ export class GitIndexManager {
         await updateCachedIndexFile(fs, filepath)
       }
       const index = map.get([fs, filepath])
-      await closure(index)
+      result = await closure(index)
       if (index._dirty) {
         // Acquire a file lock while we're writing the index file
         // let fileLock = await Lock(filepath)
@@ -60,5 +62,6 @@ export class GitIndexManager {
         index._dirty = false
       }
     })
+    return result
   }
 }

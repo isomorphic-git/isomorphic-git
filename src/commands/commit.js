@@ -96,9 +96,8 @@ export async function commit ({
       throw new GitError(E.MissingCommitterError)
     }
 
-    let oid
-    await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
+    return GitIndexManager.acquire(
+      { fs, gitdir },
       async function (index) {
         const inodes = flatFileListToDirectoryStructure(index.entries)
         const inode = inodes.get('.')
@@ -130,7 +129,7 @@ export async function commit ({
           const pgp = cores.get(core).get('pgp')
           comm = await GitCommit.sign(comm, pgp, signingKey)
         }
-        oid = await writeObject({
+        const oid = await writeObject({
           fs,
           gitdir,
           type: 'commit',
@@ -146,9 +145,9 @@ export async function commit ({
             value: oid
           })
         }
+        return oid
       }
     )
-    return oid
   } catch (err) {
     err.caller = 'git.commit'
     throw err

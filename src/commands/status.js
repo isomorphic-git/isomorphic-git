@@ -70,17 +70,13 @@ export async function status ({
       tree: headTree,
       path: filepath
     })
-    let indexEntry = null
-    // Acquire a lock on the index
-    await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
+    const indexEntry = await GitIndexManager.acquire(
+      { fs, gitdir },
       async function (index) {
         for (const entry of index) {
-          if (entry.path === filepath) {
-            indexEntry = entry
-            break
-          }
+          if (entry.path === filepath) return entry
         }
+        return null
       }
     )
     const stats = await fs.lstat(join(dir, filepath))
@@ -107,7 +103,7 @@ export async function status ({
           if (stats.size !== -1) {
             // We don't await this so we can return faster for one-off cases.
             GitIndexManager.acquire(
-              { fs, filepath: `${gitdir}/index` },
+              { fs, gitdir },
               async function (index) {
                 index.insert({ filepath, stats, oid: workdirOid })
               }

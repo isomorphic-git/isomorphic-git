@@ -8,16 +8,12 @@ import { FileSystem } from './FileSystem.js'
 export class GitWalkerIndex {
   constructor ({ fs: _fs, gitdir }) {
     const fs = new FileSystem(_fs)
-    this.treePromise = (async () => {
-      let result
-      await GitIndexManager.acquire(
-        { fs, filepath: `${gitdir}/index` },
-        async function (index) {
-          result = flatFileListToDirectoryStructure(index.entries)
-        }
-      )
-      return result
-    })()
+    this.treePromise = GitIndexManager.acquire(
+      { fs, gitdir },
+      async function (index) {
+        return flatFileListToDirectoryStructure(index.entries)
+      }
+    )
     const walker = this
     this.ConstructEntry = class IndexEntry {
       constructor (entry) {

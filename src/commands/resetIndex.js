@@ -81,7 +81,7 @@ export async function resetIndex ({
       }
     }
     await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
+      { fs, gitdir },
       async function (index) {
         index.delete({ filepath })
         if (oid) {
