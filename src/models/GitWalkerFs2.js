@@ -112,7 +112,7 @@ export class GitWalkerFs2 {
         const content = await fs.read(`${dir}/${entry.fullpath}`)
         // workaround for a BrowserFS edge case
         entry._actualSize = content.length
-        if (entry._stat && entry._stat.size === -1) entry._stat.size = entry._actualSize
+        if (entry._stat && entry._stat.size === -1) { entry._stat.size = entry._actualSize }
         entry._content = content
       }
     }
@@ -125,32 +125,31 @@ export class GitWalkerFs2 {
       const { fs, gitdir } = this
       let oid
       // See if we can use the SHA1 hash in the index.
-      await GitIndexManager.acquire(
-        { fs, gitdir },
-        async function (index) {
-          const stage = index.entriesMap.get(entry.fullpath)
-          const stats = await entry.stat()
-          if (!stage || compareStats(stats, stage)) {
-            log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
-            const content = await entry.content()
-            if (content === void 0) {
-              oid = void 0
-            } else {
-              oid = shasum(GitObject.wrap({ type: 'blob', object: await entry.content() }))
-              if (stage && oid === stage.oid) {
-                index.insert({
-                  filepath: entry.fullpath,
-                  stats,
-                  oid: oid
-                })
-              }
-            }
+      await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+        const stage = index.entriesMap.get(entry.fullpath)
+        const stats = await entry.stat()
+        if (!stage || compareStats(stats, stage)) {
+          log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
+          const content = await entry.content()
+          if (content === void 0) {
+            oid = void 0
           } else {
-            // Use the index SHA1 rather than compute it
-            oid = stage.oid
+            oid = shasum(
+              GitObject.wrap({ type: 'blob', object: await entry.content() })
+            )
+            if (stage && oid === stage.oid) {
+              index.insert({
+                filepath: entry.fullpath,
+                stats,
+                oid: oid
+              })
+            }
           }
+        } else {
+          // Use the index SHA1 rather than compute it
+          oid = stage.oid
         }
-      )
+      })
       entry._oid = oid
     }
     return entry._oid

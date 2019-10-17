@@ -27,13 +27,7 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
  * @returns {Walker} Returns a git commit Walker
  *
  */
-export function TREE ({
-  core = 'default',
-  dir,
-  gitdir,
-  fs: _fs,
-  ref = 'HEAD'
-}) {
+export function TREE ({ core = 'default', dir, gitdir, fs: _fs, ref = 'HEAD' }) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkBeta1Symbol, {
     value: function () {

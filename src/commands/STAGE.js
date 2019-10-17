@@ -26,12 +26,7 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
  * @returns {Walker} Returns a git index Walker
  *
  */
-export function STAGE ({
-  core = 'default',
-  dir,
-  gitdir,
-  fs: _fs
-} = {}) {
+export function STAGE ({ core = 'default', dir, gitdir, fs: _fs } = {}) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkBeta1Symbol, {
     value: function () {

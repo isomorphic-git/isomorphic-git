@@ -26,12 +26,7 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
  * @returns {Walker} Returns a working directory Walker
  *
  */
-export function WORKDIR ({
-  core = 'default',
-  dir,
-  gitdir,
-  fs: _fs
-} = {}) {
+export function WORKDIR ({ core = 'default', dir, gitdir, fs: _fs } = {}) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkBeta1Symbol, {
     value: function () {

@@ -96,58 +96,55 @@ export async function commit ({
       throw new GitError(E.MissingCommitterError)
     }
 
-    return GitIndexManager.acquire(
-      { fs, gitdir },
-      async function (index) {
-        const inodes = flatFileListToDirectoryStructure(index.entries)
-        const inode = inodes.get('.')
-        if (!tree) {
-          tree = await constructTree({ fs, gitdir, inode, dryRun })
+    return GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+      const inodes = flatFileListToDirectoryStructure(index.entries)
+      const inode = inodes.get('.')
+      if (!tree) {
+        tree = await constructTree({ fs, gitdir, inode, dryRun })
+      }
+      if (!parent) {
+        try {
+          parent = [
+            await GitRefManager.resolve({
+              fs,
+              gitdir,
+              ref
+            })
+          ]
+        } catch (err) {
+          // Probably an initial commit
+          parent = []
         }
-        if (!parent) {
-          try {
-            parent = [
-              await GitRefManager.resolve({
-                fs,
-                gitdir,
-                ref
-              })
-            ]
-          } catch (err) {
-            // Probably an initial commit
-            parent = []
-          }
-        }
-        let comm = GitCommit.from({
-          tree,
-          parent,
-          author,
-          committer,
-          message
-        })
-        if (signingKey) {
-          const pgp = cores.get(core).get('pgp')
-          comm = await GitCommit.sign(comm, pgp, signingKey)
-        }
-        const oid = await writeObject({
+      }
+      let comm = GitCommit.from({
+        tree,
+        parent,
+        author,
+        committer,
+        message
+      })
+      if (signingKey) {
+        const pgp = cores.get(core).get('pgp')
+        comm = await GitCommit.sign(comm, pgp, signingKey)
+      }
+      const oid = await writeObject({
+        fs,
+        gitdir,
+        type: 'commit',
+        object: comm.toObject(),
+        dryRun
+      })
+      if (!noUpdateBranch && !dryRun) {
+        // Update branch pointer
+        await GitRefManager.writeRef({
           fs,
           gitdir,
-          type: 'commit',
-          object: comm.toObject(),
-          dryRun
+          ref,
+          value: oid
         })
-        if (!noUpdateBranch && !dryRun) {
-          // Update branch pointer
-          await GitRefManager.writeRef({
-            fs,
-            gitdir,
-            ref,
-            value: oid
-          })
-        }
-        return oid
       }
-    )
+      return oid
+    })
   } catch (err) {
     err.caller = 'git.commit'
     throw err
