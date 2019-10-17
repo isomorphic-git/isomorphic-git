@@ -113,123 +113,120 @@ export async function checkout ({
     if (!noCheckout) {
       let count = 0
       // Acquire a lock on the index
-      await GitIndexManager.acquire(
-        { fs, filepath: `${gitdir}/index` },
-        async function (index) {
-          // TODO: Big optimization possible here.
-          // Instead of deleting and rewriting everything, only delete files
-          // that are not present in the new branch, and only write files that
-          // are not in the index or are in the index but have the wrong SHA.
-          for (const entry of index) {
-            try {
-              await fs.rm(join(dir, entry.path))
-              if (emitter) {
-                emitter.emit(`${emitterPrefix}progress`, {
-                  phase: 'Updating workdir',
-                  loaded: ++count,
-                  lengthComputable: false
-                })
-              }
-            } catch (err) {}
-          }
-          index.clear()
+      await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+        // TODO: Big optimization possible here.
+        // Instead of deleting and rewriting everything, only delete files
+        // that are not present in the new branch, and only write files that
+        // are not in the index or are in the index but have the wrong SHA.
+        for (const entry of index) {
           try {
-            await walkBeta1({
-              trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir })],
-              filter: async function ([head, workdir]) {
-                // match against base paths
-                return bases.some(base => worthWalking(head.fullpath, base))
-              },
-              map: async function ([head, workdir]) {
-                if (head.fullpath === '.') return
-                if (!head.exists) return
-                // Late filter against file names
-                if (patternGlobrex) {
-                  let match = false
-                  for (const base of bases) {
-                    const partToMatch = head.fullpath.replace(base + '/', '')
-                    if (patternGlobrex.regex.test(partToMatch)) {
-                      match = true
-                      break
-                    }
+            await fs.rm(join(dir, entry.path))
+            if (emitter) {
+              emitter.emit(`${emitterPrefix}progress`, {
+                phase: 'Updating workdir',
+                loaded: ++count,
+                lengthComputable: false
+              })
+            }
+          } catch (err) {}
+        }
+        index.clear()
+        try {
+          await walkBeta1({
+            trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir })],
+            filter: async function ([head, workdir]) {
+              // match against base paths
+              return bases.some(base => worthWalking(head.fullpath, base))
+            },
+            map: async function ([head, workdir]) {
+              if (head.fullpath === '.') return
+              if (!head.exists) return
+              // Late filter against file names
+              if (patternGlobrex) {
+                let match = false
+                for (const base of bases) {
+                  const partToMatch = head.fullpath.replace(base + '/', '')
+                  if (patternGlobrex.regex.test(partToMatch)) {
+                    match = true
+                    break
                   }
-                  if (!match) return
                 }
-                await head.populateStat()
-                const filepath = `${dir}/${head.fullpath}`
-                switch (head.type) {
-                  case 'tree': {
-                    // ignore directories for now
-                    if (!workdir.exists) await fs.mkdir(filepath)
-                    break
-                  }
-                  case 'commit': {
-                    // gitlinks
-                    console.log(
-                      new GitError(E.NotImplementedFail, {
-                        thing: 'submodule support'
-                      })
-                    )
-                    break
-                  }
-                  case 'blob': {
-                    await head.populateContent()
-                    await head.populateHash()
-                    if (head.mode === '100644') {
-                      // regular file
-                      await fs.write(filepath, head.content)
-                    } else if (head.mode === '100755') {
-                      // executable file
-                      await fs.write(filepath, head.content, { mode: 0o777 })
-                    } else if (head.mode === '120000') {
-                      // symlink
-                      await fs.writelink(filepath, head.content)
-                    } else {
-                      throw new GitError(E.InternalFail, {
-                        message: `Invalid mode "${head.mode}" detected in blob ${head.oid}`
-                      })
-                    }
-                    const stats = await fs.lstat(filepath)
-                    // We can't trust the executable bit returned by lstat on Windows,
-                    // so we need to preserve this value from the TREE.
-                    // TODO: Figure out how git handles this internally.
-                    if (head.mode === '100755') {
-                      stats.mode = 0o755
-                    }
-                    index.insert({
-                      filepath: head.fullpath,
-                      stats,
-                      oid: head.oid
+                if (!match) return
+              }
+              await head.populateStat()
+              const filepath = `${dir}/${head.fullpath}`
+              switch (head.type) {
+                case 'tree': {
+                  // ignore directories for now
+                  if (!workdir.exists) await fs.mkdir(filepath)
+                  break
+                }
+                case 'commit': {
+                  // gitlinks
+                  console.log(
+                    new GitError(E.NotImplementedFail, {
+                      thing: 'submodule support'
                     })
-                    if (emitter) {
-                      emitter.emit(`${emitterPrefix}progress`, {
-                        phase: 'Updating workdir',
-                        loaded: ++count,
-                        lengthComputable: false
-                      })
-                    }
-                    break
-                  }
-                  default: {
-                    throw new GitError(E.ObjectTypeAssertionInTreeFail, {
-                      type: head.type,
-                      oid: head.oid,
-                      entrypath: head.fullpath
+                  )
+                  break
+                }
+                case 'blob': {
+                  await head.populateContent()
+                  await head.populateHash()
+                  if (head.mode === '100644') {
+                    // regular file
+                    await fs.write(filepath, head.content)
+                  } else if (head.mode === '100755') {
+                    // executable file
+                    await fs.write(filepath, head.content, { mode: 0o777 })
+                  } else if (head.mode === '120000') {
+                    // symlink
+                    await fs.writelink(filepath, head.content)
+                  } else {
+                    throw new GitError(E.InternalFail, {
+                      message: `Invalid mode "${head.mode}" detected in blob ${head.oid}`
                     })
                   }
+                  const stats = await fs.lstat(filepath)
+                  // We can't trust the executable bit returned by lstat on Windows,
+                  // so we need to preserve this value from the TREE.
+                  // TODO: Figure out how git handles this internally.
+                  if (head.mode === '100755') {
+                    stats.mode = 0o755
+                  }
+                  index.insert({
+                    filepath: head.fullpath,
+                    stats,
+                    oid: head.oid
+                  })
+                  if (emitter) {
+                    emitter.emit(`${emitterPrefix}progress`, {
+                      phase: 'Updating workdir',
+                      loaded: ++count,
+                      lengthComputable: false
+                    })
+                  }
+                  break
+                }
+                default: {
+                  throw new GitError(E.ObjectTypeAssertionInTreeFail, {
+                    type: head.type,
+                    oid: head.oid,
+                    entrypath: head.fullpath
+                  })
                 }
               }
-            })
-          } catch (err) {
-            // Throw a more helpful error message for this common mistake.
-            if (err.code === E.ReadObjectFail && err.data.oid === oid) {
-              throw new GitError(E.CommitNotFetchedError, { ref, oid })
-            } else {
-              throw err
             }
+          })
+        } catch (err) {
+          // Throw a more helpful error message for this common mistake.
+          if (err.code === E.ReadObjectFail && err.data.oid === oid) {
+            throw new GitError(E.CommitNotFetchedError, { ref, oid })
+          } else {
+            throw err
           }
         }
-      )
+      })
     }
     // Update HEAD
     const content = fullRef.startsWith('refs/heads') ? `ref: ${fullRef}` : oid

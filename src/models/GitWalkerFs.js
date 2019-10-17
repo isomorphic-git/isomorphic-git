@@ -79,30 +79,31 @@ export class GitWalkerFs {
   async populateHash (entry) {
     if (!entry.exists) return
     const { fs, gitdir } = this
-    let oid
     // See if we can use the SHA1 hash in the index.
-    await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
-      async function (index) {
-        const stage = index.entriesMap.get(entry.fullpath)
-        if (!entry.type) await entry.populateStat()
-        if (!stage || compareStats(entry, stage)) {
-          log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
-          if (!entry.content) await entry.populateContent()
-          oid = shasum(GitObject.wrap({ type: 'blob', object: entry.content }))
-          if (stage && oid === stage.oid) {
-            index.insert({
-              filepath: entry.fullpath,
-              stats: entry,
-              oid: oid
-            })
-          }
-        } else {
-          // Use the index SHA1 rather than compute it
-          oid = stage.oid
+    const oid = await GitIndexManager.acquire({ fs, gitdir }, async function (
+      index
+    ) {
+      const stage = index.entriesMap.get(entry.fullpath)
+      if (!entry.type) await entry.populateStat()
+      if (!stage || compareStats(entry, stage)) {
+        log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
+        if (!entry.content) await entry.populateContent()
+        const oid = shasum(
+          GitObject.wrap({ type: 'blob', object: entry.content })
+        )
+        if (stage && oid === stage.oid) {
+          index.insert({
+            filepath: entry.fullpath,
+            stats: entry,
+            oid: oid
+          })
         }
+        return oid
+      } else {
+        // Use the index SHA1 rather than compute it
+        return stage.oid
       }
-    )
+    })
     Object.assign(entry, { oid })
   }
 }
