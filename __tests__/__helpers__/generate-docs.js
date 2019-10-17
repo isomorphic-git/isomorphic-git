@@ -14,6 +14,15 @@ function escapeType (type) {
     .replace(/\|/g, ' &#124; ')
 }
 
+function recoverFunctionSignature (name, text) {
+  const matches = text.match(new RegExp(`{function\\(([^\\)]*)\\):([^}]*)} \\[?${name}`))
+  if (matches !== null) {
+    matches[1] = matches[1].trim()
+    matches[2] = matches[2].trim()
+    return `(${matches[1]}) => ${matches[2]}`
+  }
+}
+
 const typedefs = new Map()
 
 function gentypedef (ast) {
@@ -27,6 +36,13 @@ function gentypedef (ast) {
   let indent = 2
   for (const prop of ast.properties) {
     const type = cleanType(prop.type.names[0])
+    // Note: the parser doesn't yet understand the full function syntax, so we hack it in
+    if (type === 'function') {
+      const betterName = recoverFunctionSignature(prop.name, ast.comment)
+      if (betterName) {
+        prop.type.names[0] = betterName
+      }
+    }
     let ind = ' '.repeat(indent)
     // This is pretty sloppy
     if (currentprop !== null) {
@@ -121,6 +137,12 @@ function gendoc (filepath) {
           if (!param.optional) name = `**${name}**`
 
           let type = param.type.names.map(escapeType).join(' | ')
+          if (param.type.names[0] === 'function') {
+            const betterName = recoverFunctionSignature(param.name, obj.comment)
+            if (betterName) {
+              type = betterName
+            }
+          }
           if (param.defaultvalue !== undefined) {
             type = `${type} = ${param.defaultvalue}`
           }

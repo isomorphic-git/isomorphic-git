@@ -34,11 +34,11 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @property {string} fullpath
  * @property {string} basename
  * @property {boolean} exists
- * @property {() => Promise<'tree'|'blob'|'special'|'commit'>} type
- * @property {() => Promise<number>} mode
- * @property {() => Promise<string>} oid
- * @property {() => Promise<Buffer>} content
- * @property {() => Promise<Stat>} stat
+ * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
+ * @property {function(): Promise<number>} mode
+ * @property {function(): Promise<string>} oid
+ * @property {function(): Promise<Buffer>} content
+ * @property {function(): Promise<Stat>} stat
  */
 
 /**
@@ -95,7 +95,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * By only computing these values if needed, you build can build lean, mean, efficient walking machines.
  *
  * ```js
- * await entry.type() // 'tree' | 'blob'
+ * await entry.type() // 'tree' | 'blob' | 'special' (irregular files) | 'commit' (submodules)
  * ```
  *
  * ```js
