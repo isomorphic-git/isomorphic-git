@@ -94,9 +94,9 @@ export async function mergeTree ({
         case 'true-true': {
           // Modifications
           if (
-            await ours.type() === 'blob' &&
-            await base.type() === 'blob' &&
-            await theirs.type() === 'blob'
+            (await ours.type()) === 'blob' &&
+            (await base.type()) === 'blob' &&
+            (await theirs.type()) === 'blob'
           ) {
             return mergeBlobs({
               fs,
@@ -151,11 +151,11 @@ export async function mergeTree ({
 async function modified (entry, base) {
   if (entry.exists && !base.exists) return true
   if (!entry.exists && base.exists) return true
-  if (await entry.type() === 'tree' && await base.type() === 'tree') return false
+  if ((await entry.type()) === 'tree' && (await base.type()) === 'tree') { return false }
   if (
-    await entry.type() === await base.type() &&
-    await entry.mode() === await base.mode() &&
-    await entry.oid() === await base.oid()
+    (await entry.type()) === (await base.type()) &&
+    (await entry.mode()) === (await base.mode()) &&
+    (await entry.oid()) === (await base.oid())
   ) {
     return false
   }
@@ -196,12 +196,15 @@ async function mergeBlobs ({
   const path = base.basename
   // Compute the new mode.
   // Since there are ONLY two valid blob modes ('100755' and '100644') it boils down to this
-  const mode = await base.mode() === await ours.mode() ? await theirs.mode() : await ours.mode()
+  const mode =
+    (await base.mode()) === (await ours.mode())
+      ? await theirs.mode()
+      : await ours.mode()
   // The trivial case: nothing to merge except maybe mode
-  if (await ours.oid() === await theirs.oid()) return { mode, path, oid: await ours.oid(), type }
+  if ((await ours.oid()) === (await theirs.oid())) { return { mode, path, oid: await ours.oid(), type } }
   // if only one side made oid changes, return that side's oid
-  if (await ours.oid() === await base.oid()) return { mode, path, oid: await theirs.oid(), type }
-  if (await theirs.oid() === await base.oid()) return { mode, path, oid: await ours.oid(), type }
+  if ((await ours.oid()) === (await base.oid())) { return { mode, path, oid: await theirs.oid(), type } }
+  if ((await theirs.oid()) === (await base.oid())) { return { mode, path, oid: await ours.oid(), type } }
   // if both sides made changes do a merge
   const { mergedText, cleanMerge } = mergeFile({
     ourContent: (await ours.content()).toString('utf8'),

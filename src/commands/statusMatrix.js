@@ -169,11 +169,7 @@ export async function statusMatrix ({
       fs,
       dir,
       gitdir,
-      trees: [
-        TREE({ ref }),
-        WORKDIR(),
-        STAGE()
-      ],
+      trees: [TREE({ ref }), WORKDIR(), STAGE()],
       filter: async function ([head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
         if (!head.exists && !stage.exists && workdir.exists) {
@@ -204,9 +200,15 @@ export async function statusMatrix ({
           if (!match) return
         }
         // For now, just bail on directories
-        if (await head.type() === 'tree' || await head.type() === 'special') return
-        if (await workdir.type() === 'tree' || await workdir.type() === 'special') return
-        if (await stage.type() === 'tree' || await stage.type() === 'special') return
+        if ((await head.type()) === 'tree' || (await head.type()) === 'special') { return }
+        if (
+          (await workdir.type()) === 'tree' ||
+          (await workdir.type()) === 'special'
+        ) { return }
+        if (
+          (await stage.type()) === 'tree' ||
+          (await stage.type()) === 'special'
+        ) { return }
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
         const headOid = await head.oid()
         const stageOid = await stage.oid()
