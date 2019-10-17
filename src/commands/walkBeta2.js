@@ -247,7 +247,9 @@ export async function walkBeta2 ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    const walkers = trees.map(proxy => proxy[GitWalkBeta2Symbol]({ fs, dir, gitdir }))
+    const walkers = trees.map(proxy =>
+      proxy[GitWalkBeta2Symbol]({ fs, dir, gitdir })
+    )
 
     const root = new Array(walkers.length).fill({
       fullpath: '.',

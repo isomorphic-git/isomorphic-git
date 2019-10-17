@@ -12,11 +12,7 @@ describe('walkBeta2', () => {
       fs,
       dir,
       gitdir,
-      trees: [
-        WORKDIR(),
-        TREE({ ref: 'HEAD' }),
-        STAGE()
-      ],
+      trees: [WORKDIR(), TREE({ ref: 'HEAD' }), STAGE()],
       map: entries =>
         entries.map(({ basename, exists, fullpath }) => ({
           basename,
@@ -65,50 +61,152 @@ describe('walkBeta2', () => {
       fs,
       dir,
       gitdir,
-      trees: [
-        WORKDIR(),
-        TREE({ ref: 'HEAD' }),
-        STAGE()
-      ],
-      map: entries => Promise.all(
-        entries.map(async (entry) => {
-          const fullpath = entry.fullpath
-          const exists = entry.exists
-          const type = await entry.type()
-          const mode = await entry.mode()
-          const oid = await entry.oid()
-          let content = await entry.content()
-          if (content) content = content.toString('utf8')
-          await entry.stat() // Not saving the results of stat bc it's pretty variable, but running it to check it doesn't fail
-          return { fullpath, exists, type, mode, content, oid }
-        }
-        ))
+      trees: [WORKDIR(), TREE({ ref: 'HEAD' }), STAGE()],
+      map: entries =>
+        Promise.all(
+          entries.map(async entry => {
+            const fullpath = entry.fullpath
+            const exists = entry.exists
+            const type = await entry.type()
+            const mode = await entry.mode()
+            const oid = await entry.oid()
+            let content = await entry.content()
+            if (content) content = content.toString('utf8')
+            await entry.stat() // Not saving the results of stat bc it's pretty variable, but running it to check it doesn't fail
+            return { fullpath, exists, type, mode, content, oid }
+          })
+        )
     })
     expect(matrix).toEqual([
       [
-        { fullpath: '.', exists: true, type: 'tree', mode: 0o40000, content: undefined, oid: undefined },
-        { fullpath: '.', exists: true, type: 'tree', mode: 0o40000, content: undefined, oid: 'a7ab08ac7277588e8ccb9b22047d6ebb751dee0f' },
-        { fullpath: '.', exists: true, type: 'tree', mode: undefined, content: undefined, oid: undefined }
+        {
+          fullpath: '.',
+          exists: true,
+          type: 'tree',
+          mode: 0o40000,
+          content: undefined,
+          oid: undefined
+        },
+        {
+          fullpath: '.',
+          exists: true,
+          type: 'tree',
+          mode: 0o40000,
+          content: undefined,
+          oid: 'a7ab08ac7277588e8ccb9b22047d6ebb751dee0f'
+        },
+        {
+          fullpath: '.',
+          exists: true,
+          type: 'tree',
+          mode: undefined,
+          content: undefined,
+          oid: undefined
+        }
       ],
       [
-        { fullpath: 'a.txt', exists: true, type: 'blob', mode: FILEMODE, content: 'Hello\n', oid: 'e965047ad7c57865823c7d992b1d046ea66edf78' },
-        { fullpath: 'a.txt', exists: true, type: 'blob', mode: 0o100644, content: 'Hello\n', oid: 'e965047ad7c57865823c7d992b1d046ea66edf78' },
-        { fullpath: 'a.txt', exists: true, type: 'blob', mode: 0o100644, content: undefined, oid: 'e965047ad7c57865823c7d992b1d046ea66edf78' }
+        {
+          fullpath: 'a.txt',
+          exists: true,
+          type: 'blob',
+          mode: FILEMODE,
+          content: 'Hello\n',
+          oid: 'e965047ad7c57865823c7d992b1d046ea66edf78'
+        },
+        {
+          fullpath: 'a.txt',
+          exists: true,
+          type: 'blob',
+          mode: 0o100644,
+          content: 'Hello\n',
+          oid: 'e965047ad7c57865823c7d992b1d046ea66edf78'
+        },
+        {
+          fullpath: 'a.txt',
+          exists: true,
+          type: 'blob',
+          mode: 0o100644,
+          content: undefined,
+          oid: 'e965047ad7c57865823c7d992b1d046ea66edf78'
+        }
       ],
       [
-        { fullpath: 'b.txt', exists: true, type: 'blob', mode: FILEMODE, content: 'world!!!', oid: '77787b8f756d76b1d470f0dbb919d5d35dc55ef8' },
-        { fullpath: 'b.txt', exists: true, type: 'blob', mode: 0o100644, content: 'world!', oid: 'c944ebc28f05731ef588ac6298485ba5e8bf3704' },
-        { fullpath: 'b.txt', exists: true, type: 'blob', mode: 0o100644, content: undefined, oid: 'c944ebc28f05731ef588ac6298485ba5e8bf3704' }
+        {
+          fullpath: 'b.txt',
+          exists: true,
+          type: 'blob',
+          mode: FILEMODE,
+          content: 'world!!!',
+          oid: '77787b8f756d76b1d470f0dbb919d5d35dc55ef8'
+        },
+        {
+          fullpath: 'b.txt',
+          exists: true,
+          type: 'blob',
+          mode: 0o100644,
+          content: 'world!',
+          oid: 'c944ebc28f05731ef588ac6298485ba5e8bf3704'
+        },
+        {
+          fullpath: 'b.txt',
+          exists: true,
+          type: 'blob',
+          mode: 0o100644,
+          content: undefined,
+          oid: 'c944ebc28f05731ef588ac6298485ba5e8bf3704'
+        }
       ],
       [
-        { fullpath: 'c.txt', exists: false, type: undefined, mode: undefined, content: undefined, oid: undefined },
-        { fullpath: 'c.txt', exists: true, type: 'blob', mode: 0o100644, content: '!!!', oid: '08faabdc782b92e1e8d371fdd13b30c0a3f54676' },
-        { fullpath: 'c.txt', exists: true, type: 'blob', mode: 0o100644, content: undefined, oid: '08faabdc782b92e1e8d371fdd13b30c0a3f54676' }
+        {
+          fullpath: 'c.txt',
+          exists: false,
+          type: undefined,
+          mode: undefined,
+          content: undefined,
+          oid: undefined
+        },
+        {
+          fullpath: 'c.txt',
+          exists: true,
+          type: 'blob',
+          mode: 0o100644,
+          content: '!!!',
+          oid: '08faabdc782b92e1e8d371fdd13b30c0a3f54676'
+        },
+        {
+          fullpath: 'c.txt',
+          exists: true,
+          type: 'blob',
+          mode: 0o100644,
+          content: undefined,
+          oid: '08faabdc782b92e1e8d371fdd13b30c0a3f54676'
+        }
       ],
       [
-        { fullpath: 'd.txt', exists: true, type: 'blob', mode: FILEMODE, content: 'Hello again', oid: '895a23b41a53a99670b5fd4092e4199e3a328e02' },
-        { fullpath: 'd.txt', exists: false, type: undefined, mode: undefined, content: undefined, oid: undefined },
-        { fullpath: 'd.txt', exists: false, type: undefined, mode: undefined, content: undefined, oid: undefined }
+        {
+          fullpath: 'd.txt',
+          exists: true,
+          type: 'blob',
+          mode: FILEMODE,
+          content: 'Hello again',
+          oid: '895a23b41a53a99670b5fd4092e4199e3a328e02'
+        },
+        {
+          fullpath: 'd.txt',
+          exists: false,
+          type: undefined,
+          mode: undefined,
+          content: undefined,
+          oid: undefined
+        },
+        {
+          fullpath: 'd.txt',
+          exists: false,
+          type: undefined,
+          mode: undefined,
+          content: undefined,
+          oid: undefined
+        }
       ]
     ])
   })
