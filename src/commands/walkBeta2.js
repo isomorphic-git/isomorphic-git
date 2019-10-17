@@ -1,13 +1,31 @@
 // @ts-check
+import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'
-import { GitWalkBeta1Symbol } from '../utils/symbols.js'
+import { join } from '../utils/join.js'
+import { cores } from '../utils/plugins.js'
+import { GitWalkBeta2Symbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
  *
  * @typedef {Object} Walker
- * @property {Symbol} Symbol('GitWalkBeta1Symbol')
+ * @property {Symbol} Symbol('GitWalkBeta2Symbol')
+ */
+
+/**
+ *
+ * @typedef {Object} Stat Output of fs.stat, normalized for git
+ * @property {number} ctimeSeconds
+ * @property {number} ctimeNanoseconds
+ * @property {number} mtimeSeconds
+ * @property {number} mtimeNanoseconds
+ * @property {number} dev
+ * @property {number} ino
+ * @property {number} mode
+ * @property {number} uid
+ * @property {number} gid
+ * @property {number} size
  */
 
 /**
@@ -16,28 +34,17 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @property {string} fullpath
  * @property {string} basename
  * @property {boolean} exists
- * @property {Function} populateStat
- * @property {'tree'|'blob'|'special'|'commit'} [type]
- * @property {number} [ctimeSeconds]
- * @property {number} [ctimeNanoseconds]
- * @property {number} [mtimeSeconds]
- * @property {number} [mtimeNanoseconds]
- * @property {number} [dev]
- * @property {number} [ino]
- * @property {number|string} [mode] WORKDIR and STAGE return numbers, TREE returns a string... I'll fix this in walkBeta2
- * @property {number} [uid]
- * @property {number} [gid]
- * @property {number} [size]
- * @property {Function} populateContent
- * @property {Buffer} [content]
- * @property {Function} populateHash
- * @property {string} [oid]
+ * @property {() => Promise<'tree'|'blob'|'special'|'commit'>} type
+ * @property {() => Promise<number>} mode
+ * @property {() => Promise<string>} oid
+ * @property {() => Promise<Buffer>} content
+ * @property {() => Promise<Stat>} stat
  */
 
 /**
  * A powerful recursive tree-walking utility.
  *
- * The `walk` API (tentatively named `walkBeta1`) simplifies gathering detailed information about a tree or comparing all the filepaths in two or more trees.
+ * The `walk` API (tentatively named `walkBeta2`) simplifies gathering detailed information about a tree or comparing all the filepaths in two or more trees.
  * Trees can be file directories, git commits, or git indexes (aka staging areas).
  * So you can compare two file directories, or 10 commits, or the stage of one repo with the working directory of another repo... etc.
  * As long as a file or directory is present in at least one of the trees, it will be traversed.
@@ -52,8 +59,8 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * ```
  *
  * These functions return objects that implement the `Walker` interface.
- * The only thing they are good for is passing into `walkBeta1`'s `trees` argument.
- * Here are the three `Walker`s passed into `walkBeta1` by the `statusMatrix` command for example:
+ * The only thing they are good for is passing into `walkBeta2`'s `trees` argument.
+ * Here are the three `Walker`s passed into `walkBeta2` by the `statusMatrix` command for example:
  *
  * ```js
  * let gitdir = '.git'
@@ -84,12 +91,27 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * }
  * ```
  *
- * Additional properties can be computed only when needed. This lets you build lean, mean, efficient walking machines.
+ * Additional properties are computed on demand, asynchronously, and cached. This lets you build lean, mean, efficient walking machines.
+ * 
  * ```js
- * await entry.populateStat()
- * // populates
- * entry.type // 'tree', 'blob'
- * // and where applicable, these properties:
+ * await entry.type() // 'tree', 'blob'
+ * ```
+ *
+ * ```js
+ * await entry.mode() // 0o40000, 0o100644, 0o100755, 0o12000
+ * ```
+ *
+ * ```js
+ * await entry.oid() // SHA1 string
+ * ```
+ * 
+ * ```js
+ * await entry.content() // Buffer?
+ * // STAGE cannot provide content
+ * ```
+ * 
+ * ```js
+ * await entry.stat()
  * entry.ctimeSeconds // number;
  * entry.ctimeNanoseconds // number;
  * entry.mtimeSeconds // number;
@@ -102,18 +124,6 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * entry.size // number;
  * ```
  *
- * ```js
- * await entry.populateContent()
- * // populates
- * entry.content // Buffer
- * // except for STAGE which does not currently provide content
- * ```
- *
- * ```js
- * await entry.populateHash()
- * // populates
- * entry.oid // SHA1 string
- * ```
  *
  * ## filter(WalkerEntry[]) => boolean
  *
@@ -202,6 +212,10 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * > Note: For a complete example, look at the implementation of `statusMatrix`.
  *
  * @param {object} args
+ * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Walker[]} args.trees - The trees you want to traverse
  * @param {function(WalkerEntry[]): Promise<boolean>} [args.filter] - Filter which `WalkerEntry`s to process
  * @param {function(WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
@@ -213,7 +227,11 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @see WalkerEntry
  *
  */
-export async function walkBeta1 ({
+export async function walkBeta2 ({
+  core = 'default',
+  dir,
+  gitdir = join(dir, '.git'),
+  fs: _fs = cores.get(core).get('fs'),
   trees,
   filter = async () => true,
   // @ts-ignore
@@ -228,7 +246,8 @@ export async function walkBeta1 ({
   iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
   try {
-    const walkers = trees.map(proxy => proxy[GitWalkBeta1Symbol]())
+    const fs = new FileSystem(_fs)
+    const walkers = trees.map(proxy => proxy[GitWalkBeta2Symbol]({ fs, dir, gitdir }))
 
     const root = new Array(walkers.length).fill({
       fullpath: '.',

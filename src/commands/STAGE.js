@@ -1,9 +1,10 @@
 // @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
+import { GitWalkerIndex2 } from '../models/GitWalkerIndex2.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-import { GitWalkerSymbol } from '../utils/symbols.js'
+import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
 
 /**
  *
@@ -28,14 +29,21 @@ import { GitWalkerSymbol } from '../utils/symbols.js'
 export function STAGE ({
   core = 'default',
   dir,
-  gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs')
-}) {
-  const fs = new FileSystem(_fs)
+  gitdir,
+  fs: _fs
+} = {}) {
   const o = Object.create(null)
-  Object.defineProperty(o, GitWalkerSymbol, {
+  Object.defineProperty(o, GitWalkBeta1Symbol, {
     value: function () {
+      gitdir = gitdir || join(dir, '.git')
+      _fs = cores.get(core).get('fs')
+      const fs = new FileSystem(_fs)
       return new GitWalkerIndex({ fs, gitdir })
+    }
+  })
+  Object.defineProperty(o, GitWalkBeta2Symbol, {
+    value: function ({ fs, gitdir }) {
+      return new GitWalkerIndex2({ fs, gitdir })
     }
   })
   Object.freeze(o)
