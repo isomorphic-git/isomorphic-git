@@ -15,18 +15,21 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
 /**
  * Get a working directory Walker
  *
- * See [walkBeta1](./walkBeta1.md)
- *
- * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir, '.git')] - The [git directory](dir-vs-gitdir.md) path
+ * See [walkBeta2](./walkBeta2.md)
  *
  * @returns {Walker} Returns a working directory Walker
  *
  */
-export function WORKDIR ({ core = 'default', dir, gitdir, fs: _fs } = {}) {
+export function WORKDIR ({
+  // @ts-ignore
+  core = 'default',
+  // @ts-ignore
+  dir,
+  // @ts-ignore
+  gitdir,
+  // @ts-ignore
+  fs: _fs
+} = {}) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkBeta1Symbol, {
     value: function () {

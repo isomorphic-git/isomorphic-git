@@ -13,7 +13,7 @@ import { worthWalking } from '../utils/worthWalking.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR'
 import { config } from './config'
-import { walkBeta1 } from './walkBeta1.js'
+import { walkBeta2 } from './walkBeta2.js'
 
 /**
  * Checkout a branch
@@ -132,8 +132,11 @@ export async function checkout ({
         }
         index.clear()
         try {
-          await walkBeta1({
-            trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir })],
+          await walkBeta2({
+            fs,
+            dir,
+            gitdir,
+            trees: [TREE({ ref }), WORKDIR()],
             filter: async function ([head, workdir]) {
               // match against base paths
               return bases.some(base => worthWalking(head.fullpath, base))
@@ -153,9 +156,8 @@ export async function checkout ({
                 }
                 if (!match) return
               }
-              await head.populateStat()
               const filepath = `${dir}/${head.fullpath}`
-              switch (head.type) {
+              switch (await head.type()) {
                 case 'tree': {
                   // ignore directories for now
                   if (!workdir.exists) await fs.mkdir(filepath)
@@ -171,33 +173,31 @@ export async function checkout ({
                   break
                 }
                 case 'blob': {
-                  await head.populateContent()
-                  await head.populateHash()
-                  if (head.mode === '100644') {
+                  if (await head.mode() === 0o100644) {
                     // regular file
-                    await fs.write(filepath, head.content)
-                  } else if (head.mode === '100755') {
+                    await fs.write(filepath, await head.content())
+                  } else if (await head.mode() === 0o100755) {
                     // executable file
-                    await fs.write(filepath, head.content, { mode: 0o777 })
-                  } else if (head.mode === '120000') {
+                    await fs.write(filepath, await head.content(), { mode: 0o777 })
+                  } else if (await head.mode() === 0o120000) {
                     // symlink
-                    await fs.writelink(filepath, head.content)
+                    await fs.writelink(filepath, await head.content())
                   } else {
                     throw new GitError(E.InternalFail, {
-                      message: `Invalid mode "${head.mode}" detected in blob ${head.oid}`
+                      message: `Invalid mode "${await head.mode()}" detected in blob ${await head.oid()}`
                     })
                   }
                   const stats = await fs.lstat(filepath)
                   // We can't trust the executable bit returned by lstat on Windows,
                   // so we need to preserve this value from the TREE.
                   // TODO: Figure out how git handles this internally.
-                  if (head.mode === '100755') {
-                    stats.mode = 0o755
+                  if (await head.mode() === 0o100755) {
+                    stats.mode = 0o100755
                   }
                   index.insert({
                     filepath: head.fullpath,
                     stats,
-                    oid: head.oid
+                    oid: await head.oid()
                   })
                   if (emitter) {
                     emitter.emit(`${emitterPrefix}progress`, {
@@ -210,8 +210,8 @@ export async function checkout ({
                 }
                 default: {
                   throw new GitError(E.ObjectTypeAssertionInTreeFail, {
-                    type: head.type,
-                    oid: head.oid,
+                    type: await head.type(),
+                    oid: await head.oid(),
                     entrypath: head.fullpath
                   })
                 }

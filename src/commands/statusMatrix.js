@@ -11,7 +11,7 @@ import { worthWalking } from '../utils/worthWalking.js'
 import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR.js'
-import { walkBeta1 } from './walkBeta1.js'
+import { walkBeta2 } from './walkBeta2.js'
 
 /**
  * Efficiently get the status of multiple files at once.
@@ -165,11 +165,14 @@ export async function statusMatrix ({
       patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }
     const bases = filepaths.map(filepath => join(filepath, patternPart))
-    const results = await walkBeta1({
+    const results = await walkBeta2({
+      fs,
+      dir,
+      gitdir,
       trees: [
-        TREE({ fs, gitdir, ref }),
-        WORKDIR({ fs, dir, gitdir }),
-        STAGE({ fs, gitdir })
+        TREE({ ref }),
+        WORKDIR(),
+        STAGE()
       ],
       filter: async function ([head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
@@ -201,23 +204,21 @@ export async function statusMatrix ({
           if (!match) return
         }
         // For now, just bail on directories
-        await head.populateStat()
-        if (head.type === 'tree' || head.type === 'special') return
-        await workdir.populateStat()
-        if (workdir.type === 'tree' || workdir.type === 'special') return
-        await stage.populateStat()
-        if (stage.type === 'tree' || stage.type === 'special') return
+        if (await head.type() === 'tree' || await head.type() === 'special') return
+        if (await workdir.type() === 'tree' || await workdir.type() === 'special') return
+        if (await stage.type() === 'tree' || await stage.type() === 'special') return
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
-        await head.populateHash()
-        await stage.populateHash()
+        const headOid = await head.oid()
+        const stageOid = await stage.oid()
+        let workdirOid
         if (!head.exists && workdir.exists && !stage.exists) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
-          workdir.oid = '42'
+          workdirOid = '42'
         } else if (workdir.exists) {
-          await workdir.populateHash()
+          workdirOid = await workdir.oid()
         }
-        const entry = [undefined, head.oid, workdir.oid, stage.oid]
+        const entry = [undefined, headOid, workdirOid, stageOid]
         const result = entry.map(value => entry.indexOf(value))
         result.shift() // remove leading undefined entry
         const fullpath = head.fullpath || workdir.fullpath || stage.fullpath

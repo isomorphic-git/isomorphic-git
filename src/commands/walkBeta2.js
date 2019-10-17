@@ -45,8 +45,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * A powerful recursive tree-walking utility.
  *
  * The `walk` API (tentatively named `walkBeta2`) simplifies gathering detailed information about a tree or comparing all the filepaths in two or more trees.
- * Trees can be file directories, git commits, or git indexes (aka staging areas).
- * So you can compare two file directories, or 10 commits, or the stage of one repo with the working directory of another repo... etc.
+ * Trees can be git commits, the working directory, or the or git index (staging area).
  * As long as a file or directory is present in at least one of the trees, it will be traversed.
  * Entries are traversed in alphabetical order.
  *
@@ -58,7 +57,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * import { TREE, WORKDIR, STAGE } from 'isomorphic-git'
  * ```
  *
- * These functions return objects that implement the `Walker` interface.
+ * These functions return opaque handles called `Walker`s.
  * The only thing they are good for is passing into `walkBeta2`'s `trees` argument.
  * Here are the three `Walker`s passed into `walkBeta2` by the `statusMatrix` command for example:
  *
@@ -68,15 +67,15 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * let ref = 'HEAD'
  *
  * let trees = [
- *   TREE({fs, gitdir, ref}),
- *   WORKDIR({fs, dir, gitdir}),
- *   STAGE({fs, gitdir})
+ *   TREE({ ref }),
+ *   WORKDIR(),
+ *   STAGE()
  * ]
  * ```
  *
  * See the doc pages for [TREE](./TREE.md), [WORKDIR](./WORKDIR.md), and [STAGE](./STAGE.md).
  *
- * `filter`, `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerTree`s into the desired result.
+ * `filter`, `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerEntry`s into the desired result.
  *
  * ## WalkerEntry
  * The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
@@ -91,23 +90,24 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * }
  * ```
  *
- * Additional properties are computed on demand, asynchronously, and cached. This lets you build lean, mean, efficient walking machines.
+ * Additional information is computed on demand, asynchronously, using methods.
+ * The methods are memoized per `WalkerEntry` so calling them multiple times in a `map` function does not adversely impact performance.
+ * By only computing these values if needed, you build can build lean, mean, efficient walking machines.
  *
  * ```js
- * await entry.type() // 'tree', 'blob'
+ * await entry.type() // 'tree' | 'blob'
  * ```
  *
  * ```js
- * await entry.mode() // 0o40000, 0o100644, 0o100755, 0o12000
+ * await entry.mode() // 0o40000 | 0o100644 | 0o100755 | 0o12000
  * ```
  *
  * ```js
- * await entry.oid() // SHA1 string
+ * await entry.oid() // The SHA-1 object id
  * ```
  *
  * ```js
- * await entry.content() // Buffer?
- * // STAGE cannot provide content
+ * await entry.content() // Buffer | void.  STAGE cannot provide content.
  * ```
  *
  * ```js
@@ -161,8 +161,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * Example 1: Find all the files containing the word 'foo'.
  * ```js
  * async function map([head, workdir]) {
- *   await workdir.populateContent()
- *   let content = workdir.content.toString('utf8')
+ *   let content = (await workdir.content()).toString('utf8')
  *   if (content.contains('foo')) {
  *     return {
  *       fullpath: workdir.fullpath,
@@ -170,20 +169,16 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *     }
  *   }
  * }
- *
  * ```
  *
  * Example 2: Return the difference between the working directory and the HEAD commit
  * ```js
  * const diff = require('diff-lines')
  * async function map([head, workdir]) {
- *   await head.populateContent()
- *   await head.populateHash()
- *   await workdir.populateContent()
  *   return {
  *     filename: head.fullpath,
- *     oid: head.oid,
- *     diff: diff(head.content.toString('utf8'), workdir.content.toString('utf8'))
+ *     oid: await head.oid(),
+ *     diff: diff((await head.content()).toString('utf8'), (await workdir.content()).toString('utf8'))
  *   }
  * }
  * ```
