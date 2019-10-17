@@ -32,7 +32,7 @@ export class GitWalkerFs2 {
       async mode () {
         return walker.mode(this)
       }
-  
+
       async stat () {
         return walker.stat(this)
       }
