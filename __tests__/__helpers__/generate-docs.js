@@ -106,7 +106,7 @@ function gendoc (filepath) {
         continue
       }
       if (obj.kind === 'package') continue
-      if (!obj.params || !obj.returns) continue
+      if (!obj.params && !obj.returns || !obj.description) continue
       text += `---\n`
       text += `title: ${obj.name}\n`
       text += `sidebar_label: ${obj.name}\n`
@@ -115,7 +115,11 @@ function gendoc (filepath) {
         text += `\n${obj.deprecated}\n`
       }
       // Split description into "first line" and "the rest"
-      obj.description = obj.description.trim()
+      try {
+        obj.description = obj.description.trim()
+      } catch (e) {
+        console.log(obj)
+      }
       // why JavaScript why
       const _index = obj.description.indexOf('\n')
       const headline =
