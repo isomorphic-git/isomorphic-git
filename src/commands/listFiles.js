@@ -40,20 +40,16 @@ export async function listFiles ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let filenames
     if (ref) {
       const oid = await GitRefManager.resolve({ gitdir, fs, ref })
-      filenames = []
+      const filenames = []
       await accumulateFilesFromOid({ gitdir, fs, oid, filenames, prefix: '' })
+      return filenames
     } else {
-      await GitIndexManager.acquire(
-        { fs, filepath: `${gitdir}/index` },
-        async function (index) {
-          filenames = index.entries.map(x => x.path)
-        }
-      )
+      return GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+        return index.entries.map(x => x.path)
+      })
     }
-    return filenames
   } catch (err) {
     err.caller = 'git.listFiles'
     throw err
