@@ -13,14 +13,14 @@ describe('walkBeta2', () => {
       dir,
       gitdir,
       trees: [WORKDIR(), TREE({ ref: 'HEAD' }), STAGE()],
-      map: ([fullpath, workdir, tree, stage]) => [fullpath, !!workdir, !!tree, !!stage]
+      map: (filepath, [workdir, tree, stage]) => [filepath, !!workdir, !!tree, !!stage]
     })
     expect(matrix).toEqual([
-      [ '.', true, true, true ],
-      [ 'a.txt', true, true, true ],
-      [ 'b.txt', true, true, true ],
-      [ 'c.txt', false, true, true ],
-      [ 'd.txt', true, false, false ]
+      ['.', true, true, true],
+      ['a.txt', true, true, true],
+      ['b.txt', true, true, true],
+      ['c.txt', false, true, true],
+      ['d.txt', true, false, false]
     ])
   })
 
@@ -37,8 +37,8 @@ describe('walkBeta2', () => {
       dir,
       gitdir,
       trees: [WORKDIR(), TREE({ ref: 'HEAD' }), STAGE()],
-      map: async ([fullpath, workdir, tree, stage]) => [
-        fullpath,
+      map: async (filepath, [workdir, tree, stage]) => [
+        filepath,
         workdir && {
           type: await workdir.type(),
           mode: await workdir.mode(),

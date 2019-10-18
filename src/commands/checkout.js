@@ -137,18 +137,18 @@ export async function checkout ({
             dir,
             gitdir,
             trees: [TREE({ ref }), WORKDIR()],
-            filter: async function ([head, workdir]) {
+            filter: async function (filepath, [head, workdir]) {
               // match against base paths
-              return bases.some(base => worthWalking(head.fullpath, base))
+              return bases.some(base => worthWalking(filepath, base))
             },
-            map: async function ([head, workdir]) {
-              if (head.fullpath === '.') return
-              if (!head.exists) return
+            map: async function (fullpath, [head, workdir]) {
+              if (fullpath === '.') return
+              if (!head) return
               // Late filter against file names
               if (patternGlobrex) {
                 let match = false
                 for (const base of bases) {
-                  const partToMatch = head.fullpath.replace(base + '/', '')
+                  const partToMatch = fullpath.replace(base + '/', '')
                   if (patternGlobrex.regex.test(partToMatch)) {
                     match = true
                     break
@@ -156,11 +156,11 @@ export async function checkout ({
                 }
                 if (!match) return
               }
-              const filepath = `${dir}/${head.fullpath}`
+              const filepath = `${dir}/${fullpath}`
               switch (await head.type()) {
                 case 'tree': {
                   // ignore directories for now
-                  if (!workdir.exists) await fs.mkdir(filepath)
+                  if (!workdir) await fs.mkdir(filepath)
                   break
                 }
                 case 'commit': {
@@ -197,7 +197,7 @@ export async function checkout ({
                     stats.mode = 0o100755
                   }
                   index.insert({
-                    filepath: head.fullpath,
+                    filepath: fullpath,
                     stats,
                     oid: await head.oid()
                   })
@@ -214,7 +214,7 @@ export async function checkout ({
                   throw new GitError(E.ObjectTypeAssertionInTreeFail, {
                     type: await head.type(),
                     oid: await head.oid(),
-                    entrypath: head.fullpath
+                    entrypath: fullpath
                   })
                 }
               }
