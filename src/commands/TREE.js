@@ -13,7 +13,7 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
  */
 
 /**
- * Get a git commit Walker
+ * Get a git commit `Walker`
  *
  * See [walkBeta2](./walkBeta2.md)
  *
