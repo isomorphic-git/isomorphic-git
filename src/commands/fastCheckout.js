@@ -12,12 +12,11 @@ import { worthWalking } from '../utils/worthWalking.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR.js'
 import { config } from './config.js'
-import { walkBeta1 } from './walkBeta1.js'
+import { walkBeta2 } from './walkBeta2.js'
 import { STAGE } from './STAGE.js'
 import { flat } from '../utils/flat.js'
 import { readObject } from '../storage/readObject.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { normalizeMode } from '../utils/normalizeMode.js'
 
 /**
  * Checkout a branch
@@ -125,19 +124,22 @@ export async function fastCheckout ({
       // First pass - just analyze files (not directories) and figure out what needs to be done
       // and (TODO) if it can be done without losing uncommitted changes.
       try {
-        ops = await walkBeta1({
-          trees: [TREE({ fs, gitdir, ref }), WORKDIR({ fs, dir, gitdir }), STAGE({ fs, gitdir })],
-          filter: async function ([commit, workdir, stage]) {
+        ops = await walkBeta2({
+          fs,
+          dir,
+          gitdir,
+          trees: [TREE({ ref }), WORKDIR(), STAGE()],
+          map: async function (fullpath, [commit, workdir, stage]) {
+            if (fullpath === '.') return
             // match against base paths
-            return bases.some(base => worthWalking(commit.fullpath, base))
-          },
-          map: async function ([commit, workdir, stage]) {
-            if (commit.fullpath === '.') return
+            if (!bases.some(base => worthWalking(fullpath, base))) {
+              return null
+            }
             // Late filter against file names
             if (patternGlobrex) {
               let match = false
               for (const base of bases) {
-                const partToMatch = commit.fullpath.replace(base + '/', '')
+                const partToMatch = fullpath.replace(base + '/', '')
                 if (patternGlobrex.regex.test(partToMatch)) {
                   match = true
                   break
@@ -158,7 +160,7 @@ export async function fastCheckout ({
             // This checks for the presense and/or absense of each of the 3 entries,
             // converts that to a 3-bit binary representation, and then handles
             // every possible combination (2^3 or 8 cases) with a lookup table.
-            const key = [!!stage.exists, !!commit.exists, !!workdir.exists]
+            const key = [!!stage, !!commit, !!workdir]
               .map(Number)
               .join('')
             switch (key) {
@@ -168,14 +170,12 @@ export async function fastCheckout ({
               case '001': return
               // New entries
               case '010': {
-                await commit.populateStat()
-                switch (commit.type) {
+                switch (await commit.type()) {
                   case 'tree': {
-                    return ['mkdir', commit.fullpath]
+                    return ['mkdir', fullpath]
                   }
                   case 'blob': {
-                    await commit.populateHash()
-                    return ['create', commit.fullpath, commit.oid, commit.mode]
+                    return ['create', fullpath, await commit.oid(), await commit.mode()]
                   }
                   case 'commit': {
                     // gitlinks
@@ -187,32 +187,30 @@ export async function fastCheckout ({
                     return
                   }
                   default: {
-                    return ['error', `new entry Unhandled type ${commit.type}`]
+                    return ['error', `new entry Unhandled type ${await commit.type()}`]
                   }
                 }
               }
               // New entries but there is already something in the workdir there.
               case '011': {
-                await Promise.all([commit.populateStat(), workdir.populateStat()])
-                switch (`${commit.type}-${workdir.type}`) {
+                switch (`${await commit.type()}-${await workdir.type()}`) {
                   case 'tree-tree': {
                     return // noop
                   }
                   case 'tree-blob':
                   case 'blob-tree': {
-                    return ['conflict', commit.fullpath]
+                    return ['conflict', fullpath]
                   }
                   case 'blob-blob': {
-                    await Promise.all([commit.populateHash(), workdir.populateHash()])
                     // Is the incoming file different?
-                    if (commit.oid !== workdir.oid) {
-                      return ['conflict', commit.fullpath]
+                    if (await commit.oid() !== await workdir.oid()) {
+                      return ['conflict', fullpath]
                     } else {
                       // Is the incoming file a different mode?
-                      if (commit.mode !== normalizeMode(workdir.mode).toString(8)) {
-                        return ['conflict', commit.fullpath]
+                      if (await commit.mode() !== await workdir.mode()) {
+                        return ['conflict', fullpath]
                       } else {
-                        return ['create-index', commit.fullpath, commit.oid, commit.mode]
+                        return ['create-index', fullpath, await commit.oid(), await commit.mode()]
                       }
                     }
                   }
@@ -226,12 +224,13 @@ export async function fastCheckout ({
                         thing: 'submodule support'
                       })
                     )
+                    return
                   }
                   case 'commit-blob': {
                     // TODO: submodule
                     // But... we'll complain if there is a *file* where we would
                     // put a submodule if we had submodule support.
-                    return ['conflict', commit.fullpath]
+                    return ['conflict', fullpath]
                   }
                   default: {
                     return ['error', `new entry Unhandled type ${commit.type}`]
@@ -241,72 +240,67 @@ export async function fastCheckout ({
               // Something in stage but not in the commit OR the workdir.
               // Note: I verified this behavior against canonical git.
               case '100': {
-                return ['delete-index', stage.fullpath]
+                return ['delete-index', fullpath]
               }
               // Deleted entries
               // TODO: How to handle if stage type and workdir type mismatch?
               case '101': {
-                await stage.populateStat()
-                switch (stage.type) {
+                switch (await stage.type()) {
                   case 'tree': {
-                    return ['rmdir', stage.fullpath]
+                    return ['rmdir', fullpath]
                   }
                   case 'blob': {
                     // Git checks that the workdir.oid === stage.oid before deleting file
-                    await Promise.all([stage.populateHash(), workdir.populateHash()])
-                    if (stage.oid !== workdir.oid) {
-                      return ['conflict', stage.fullpath]
+                    if (await stage.oid() !== await workdir.oid()) {
+                      return ['conflict', fullpath]
                     } else {
-                      return ['delete', stage.fullpath]
+                      return ['delete', fullpath]
                     }
                   }
                   default: {
-                    return [`delete entry Unhandled type ${stage.type}`]
+                    return [`delete entry Unhandled type ${await stage.type()}`]
                   }
                 }
               }
+              /* eslint-disable no-fallthrough */
               // Modified entries but file was deleted in workdir for some reason. Kinda odd case.
               case '110':
               // Modified entries
               case '111': {
-                await Promise.all([commit.populateStat(), stage.populateStat()])
-                switch (`${stage.type}-${commit.type}`) {
+                /* eslint-enable no-fallthrough */
+                switch (`${await stage.type()}-${await commit.type()}`) {
                   case 'tree-tree': {
                     return
                   }
                   case 'blob-blob': {
                     // Check for local changes that would be lost
-                    if (workdir.exists) {
-                      await workdir.populateStat()
-                      await Promise.all([stage.populateHash(), commit.populateHash(), workdir.populateHash()])
+                    if (workdir) {
                       // Note: canonical git only compares with the stage. But we're smart enough
                       // to compare to the stage AND the incoming commit.
-                      if (workdir.oid !== stage.oid && workdir.oid !== commit.oid) {
-                        return ['conflict', commit.fullpath]
+                      if (await workdir.oid() !== await stage.oid() && await workdir.oid() !== await commit.oid()) {
+                        return ['conflict', fullpath]
                       }
                     }
                     // Has file mode changed?
-                    if (commit.mode !== normalizeMode(stage.mode).toString(8)) {
-                      await commit.populateHash()
-                      return ['update', commit.fullpath, commit.oid, commit.mode, true]
+                    if (await commit.mode() !== await stage.mode()) {
+                      return ['update', fullpath, await commit.oid(), await commit.mode(), true]
                     }
                     // TODO: HANDLE SYMLINKS
                     // Has the file content changed?
-                    await Promise.all([commit.populateHash(), stage.populateHash()])
-                    if (commit.oid !== stage.oid) {
-                      return ['update', commit.fullpath, commit.oid, commit.mode, false]
+                    if (await commit.oid() !== await stage.oid()) {
+                      return ['update', fullpath, await commit.oid(), await commit.mode(), false]
                     } else {
                       return
                     }
                   }
                   case 'tree-blob': {
-                    return ['update-dir-to-blob', commit.fullpath, commit.oid]
+                    return ['update-dir-to-blob', fullpath, await commit.oid()]
                   }
                   case 'blob-tree': {
-                    return ['update-blob-to-tree', commit.fullpath]
+                    return ['update-blob-to-tree', fullpath]
                   }
                   default: {
-                    return ['error', `update entry Unhandled type ${stage.type}-${commit.type}`]
+                    return ['error', `update entry Unhandled type ${await stage.type()}-${await commit.type()}`]
                   }
                 }
               }
@@ -359,7 +353,7 @@ export async function fastCheckout ({
       count = 0
       const total = ops.length
       await GitIndexManager.acquire(
-        { fs, filepath: `${gitdir}/index` },
+        { fs, gitdir },
         /**
          *
          * @param {import('../models/GitIndex.js').GitIndex} index
@@ -426,7 +420,7 @@ export async function fastCheckout ({
       )
 
       await GitIndexManager.acquire(
-        { fs, filepath: `${gitdir}/index` },
+        { fs, gitdir },
         /**
          *
          * @param {import('../models/GitIndex.js').GitIndex} index
@@ -445,18 +439,18 @@ export async function fastCheckout ({
                       // is our only option.
                       await fs.rm(filepath)
                     }
-                    if (mode === '100644') {
+                    if (mode === 0o100644) {
                       // regular file
                       await fs.write(filepath, object)
-                    } else if (mode === '100755') {
+                    } else if (mode === 0o100755) {
                       // executable file
                       await fs.write(filepath, object, { mode: 0o777 })
-                    } else if (mode === '120000') {
+                    } else if (mode === 0o120000) {
                       // symlink
                       await fs.writelink(filepath, object)
                     } else {
                       throw new GitError(E.InternalFail, {
-                        message: `Invalid mode "${mode}" detected in blob ${oid}`
+                        message: `Invalid mode 0o${mode.toString(8)} detected in blob ${oid}`
                       })
                     }
                   }
@@ -465,7 +459,7 @@ export async function fastCheckout ({
                   // We can't trust the executable bit returned by lstat on Windows,
                   // so we need to preserve this value from the TREE.
                   // TODO: Figure out how git handles this internally.
-                  if (mode === '100755') {
+                  if (mode === 0o100755) {
                     stats.mode = 0o755
                   }
                   index.insert({
