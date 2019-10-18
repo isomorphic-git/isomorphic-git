@@ -31,9 +31,6 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
 /**
  *
  * @typedef {Object} WalkerEntry The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
- * @property {string} fullpath
- * @property {string} basename
- * @property {boolean} exists
  * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
  * @property {function(): Promise<number>} mode
  * @property {function(): Promise<string>} oid
@@ -212,8 +209,8 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Walker[]} args.trees - The trees you want to traverse
- * @param {function(WalkerEntry[]): Promise<boolean>} [args.filter] - Filter which `WalkerEntry`s to process
- * @param {function(WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
+ * @param {function(string, ?WalkerEntry[]): Promise<boolean>} [args.filter] - Filter which `WalkerEntry`s to process
+ * @param {function(string, ?WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
  * @param {function(any, any[]): Promise<any>} [args.reduce] - Control how mapped entries are combined with their parent result
  * @param {function(function(WalkerEntry[]): Promise<any[]>, IterableIterator<WalkerEntry[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
  *
@@ -230,7 +227,7 @@ export async function walkBeta2 ({
   trees,
   filter = async () => true,
   // @ts-ignore
-  map = async entry => entry,
+  map = async (_, entry) => entry,
   // The default reducer is a flatmap that filters out undefineds.
   reduce = async (parent, children) => {
     const flatten = flat(children)
@@ -272,9 +269,10 @@ export async function walkBeta2 ({
     const walk = async root => {
       const { children, entry } = await unionWalkerFromReaddir(root)
       const fullpath = entry[0].fullpath
-      const actualEntries = [fullpath, ...entry.map(entry => entry.exists ? entry : null)]
-      if (await filter(actualEntries)) {
-        const parent = await map(actualEntries)
+      /** @type {?WalkerEntry[]} */
+      const actualEntries = entry.map(entry => entry.exists ? entry : null)
+      if (await filter(fullpath, actualEntries)) {
+        const parent = await map(fullpath, actualEntries)
         let walkedChildren = await iterate(walk, children)
         walkedChildren = walkedChildren.filter(x => x !== undefined)
         return reduce(parent, walkedChildren)

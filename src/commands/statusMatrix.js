@@ -170,28 +170,28 @@ export async function statusMatrix ({
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],
-      filter: async function ([head, workdir, stage]) {
+      filter: async function (filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
-        if (!head.exists && !stage.exists && workdir.exists) {
+        if (!head && !stage && workdir) {
           if (
             await GitIgnoreManager.isIgnored({
               fs,
               dir,
-              filepath: workdir.fullpath
+              filepath
             })
           ) {
             return false
           }
         }
         // match against base paths
-        return bases.some(base => worthWalking(head.fullpath, base))
+        return bases.some(base => worthWalking(filepath, base))
       },
-      map: async function ([head, workdir, stage]) {
+      map: async function (filepath, [head, workdir, stage]) {
         // Late filter against file names
         if (patternGlobrex) {
           let match = false
           for (const base of bases) {
-            const partToMatch = head.fullpath.replace(base + '/', '')
+            const partToMatch = filepath.replace(base + '/', '')
             if (patternGlobrex.regex.test(partToMatch)) {
               match = true
               break
@@ -200,31 +200,27 @@ export async function statusMatrix ({
           if (!match) return
         }
         // For now, just bail on directories
-        if ((await head.type()) === 'tree' || (await head.type()) === 'special') { return }
-        if (
-          (await workdir.type()) === 'tree' ||
-          (await workdir.type()) === 'special'
-        ) { return }
-        if (
-          (await stage.type()) === 'tree' ||
-          (await stage.type()) === 'special'
-        ) { return }
+        const headType = head && await head.type()
+        if (headType === 'tree' || headType === 'special') return
+        const workdirType = workdir && await workdir.type()
+        if (workdirType === 'tree' || workdirType === 'special') return
+        const stageType = stage && await stage.type()
+        if (stageType === 'tree' || stageType === 'special') return
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
-        const headOid = await head.oid()
-        const stageOid = await stage.oid()
+        const headOid = head ? await head.oid() : undefined
+        const stageOid = stage ? await stage.oid() : undefined
         let workdirOid
-        if (!head.exists && workdir.exists && !stage.exists) {
+        if (!head && workdir && !stage) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
           workdirOid = '42'
-        } else if (workdir.exists) {
+        } else if (workdir) {
           workdirOid = await workdir.oid()
         }
         const entry = [undefined, headOid, workdirOid, stageOid]
         const result = entry.map(value => entry.indexOf(value))
         result.shift() // remove leading undefined entry
-        const fullpath = head.fullpath || workdir.fullpath || stage.fullpath
-        return [fullpath, ...result]
+        return [filepath, ...result]
       }
     })
     return results

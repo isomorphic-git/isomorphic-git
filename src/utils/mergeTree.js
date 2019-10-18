@@ -6,6 +6,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { writeObject } from '../storage/writeObject.js'
 
+import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
 import { cores } from './plugins.js'
@@ -58,7 +59,8 @@ export async function mergeTree ({
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],
-    map: async function ([ours, base, theirs]) {
+    map: async function (filepath, [ours, base, theirs]) {
+      const path = basename(filepath)
       // What we did, what they did
       const ourChange = await modified(ours, base)
       const theirChange = await modified(theirs, base)
@@ -66,26 +68,26 @@ export async function mergeTree ({
         case 'false-false': {
           return {
             mode: await base.mode(),
-            path: base.basename,
+            path,
             oid: await base.oid(),
             type: await base.type()
           }
         }
         case 'false-true': {
-          return theirs.exists
+          return theirs
             ? {
               mode: await theirs.mode(),
-              path: theirs.basename,
+              path,
               oid: await theirs.oid(),
               type: await theirs.type()
             }
             : void 0
         }
         case 'true-false': {
-          return ours.exists
+          return ours
             ? {
               mode: await ours.mode(),
-              path: ours.basename,
+              path,
               oid: await ours.oid(),
               type: await ours.type()
             }
@@ -94,6 +96,7 @@ export async function mergeTree ({
         case 'true-true': {
           // Modifications
           if (
+            ours && base && theirs &&
             (await ours.type()) === 'blob' &&
             (await base.type()) === 'blob' &&
             (await theirs.type()) === 'blob'
@@ -101,6 +104,7 @@ export async function mergeTree ({
             return mergeBlobs({
               fs,
               gitdir,
+              path,
               ours,
               base,
               theirs,
@@ -149,8 +153,9 @@ export async function mergeTree ({
  *
  */
 async function modified (entry, base) {
-  if (entry.exists && !base.exists) return true
-  if (!entry.exists && base.exists) return true
+  if (!entry && !base) return false
+  if (entry && !base) return true
+  if (!entry && base) return true
   if ((await entry.type()) === 'tree' && (await base.type()) === 'tree') { return false }
   if (
     (await entry.type()) === (await base.type()) &&
@@ -167,6 +172,7 @@ async function modified (entry, base) {
  * @param {Object} args
  * @param {FileSystem} args.fs
  * @param {string} args.gitdir
+ * @param {string} args.path
  * @param {import('../commands/walkBeta2.js').WalkerEntry} args.ours
  * @param {import('../commands/walkBeta2.js').WalkerEntry} args.base
  * @param {import('../commands/walkBeta2.js').WalkerEntry} args.theirs
@@ -181,6 +187,7 @@ async function modified (entry, base) {
 async function mergeBlobs ({
   fs,
   gitdir,
+  path,
   ours,
   base,
   theirs,
@@ -192,8 +199,6 @@ async function mergeBlobs ({
   dryRun
 }) {
   const type = 'blob'
-  // this might change if we figure out rename detection
-  const path = base.basename
   // Compute the new mode.
   // Since there are ONLY two valid blob modes ('100755' and '100644') it boils down to this
   const mode =
