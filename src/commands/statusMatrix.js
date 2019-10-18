@@ -170,7 +170,7 @@ export async function statusMatrix ({
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],
-      filter: async function (filepath, [head, workdir, stage]) {
+      map: async function (filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
         if (!head && !stage && workdir) {
           if (
@@ -180,13 +180,13 @@ export async function statusMatrix ({
               filepath
             })
           ) {
-            return false
+            return null
           }
         }
         // match against base paths
-        return bases.some(base => worthWalking(filepath, base))
-      },
-      map: async function (filepath, [head, workdir, stage]) {
+        if (!bases.some(base => worthWalking(filepath, base))) {
+          return null
+        }
         // Late filter against file names
         if (patternGlobrex) {
           let match = false

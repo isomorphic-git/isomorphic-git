@@ -46,8 +46,8 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * As long as a file or directory is present in at least one of the trees, it will be traversed.
  * Entries are traversed in alphabetical order.
  *
- * The arguments to `walk` are the `trees` you want to traverse, and 4 optional transform functions:
- *  `filter`, `map`, `reduce`, and `iterate`.
+ * The arguments to `walk` are the `trees` you want to traverse, and 3 optional transform functions:
+ *  `map`, `reduce`, and `iterate`.
  *
  * The trees are represented by three magic functions that can be imported:
  * ```js
@@ -72,22 +72,13 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * See the doc pages for [TREE](./TREE.md), [WORKDIR](./WORKDIR.md), and [STAGE](./STAGE.md).
  *
- * `filter`, `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerEntry`s into the desired result.
+ * `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerEntry`s into the desired result.
  *
  * ## WalkerEntry
  * The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
- * `filter` and `map` each receive an array of `WalkerEntry[]` as their main argument, one `WalkerEntry` for each `Walker` in the `trees` argument.
+ * `map` receives an array of `WalkerEntry[]` as its main argument, one `WalkerEntry` for each `Walker` in the `trees` argument.
  *
- * By default, `WalkerEntry`s only have three properties:
- * ```js
- * {
- *   fullpath: string;
- *   basename: string;
- *   exists: boolean;
- * }
- * ```
- *
- * Additional information is computed on demand, asynchronously, using methods.
+ * `WalkerEntry`s have the following methods.
  * The methods are memoized per `WalkerEntry` so calling them multiple times in a `map` function does not adversely impact performance.
  * By only computing these values if needed, you build can build lean, mean, efficient walking machines.
  *
@@ -108,43 +99,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * ```
  *
  * ```js
- * await entry.stat()
- * entry.ctimeSeconds // number;
- * entry.ctimeNanoseconds // number;
- * entry.mtimeSeconds // number;
- * entry.mtimeNanoseconds // number;
- * entry.dev // number;
- * entry.ino // number;
- * entry.mode // number;
- * entry.uid // number;
- * entry.gid // number;
- * entry.size // number;
- * ```
- *
- *
- * ## filter(WalkerEntry[]) => boolean
- *
- * Default: `async () => true`.
- *
- * This is a good place to put limiting logic such as skipping entries with certain filenames.
- * If you return false for directories, then none of the children of that directory will be walked.
- *
- * Example:
- * ```js
- * let path = require('path')
- * let cwd = 'src/app'
- * // Only examine files in the directory `cwd`
- * async function filter ([head, workdir, stage]) {
- *   // It doesn't matter which tree (head, workdir, or stage) you use here.
- *   return (
- *     // return true for the root directory
- *     head.fullpath === '.' ||
- *     // return true for 'src' and 'src/app'
- *     cwd.startsWith(head.fullpath) ||
- *     // return true for 'src/app/*'
- *     path.dirname(head.fullpath) === cwd
- *   )
- * }
+ * await entry.stat() // Normalized filesystem `stat` data. All properties are numbers.
  * ```
  *
  * ## map(WalkerEntry[]) => any
@@ -154,14 +109,15 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * This is a good place for query logic, such as examining the contents of a file.
  * Ultimately, compare all the entries and return any values you are interested in.
  * If you do not return a value (or return undefined) that entry will be filtered from the results.
+ * If you return `null` for a directory, then none of the children of that directory will be walked.
  *
  * Example 1: Find all the files containing the word 'foo'.
  * ```js
- * async function map([head, workdir]) {
+ * async function map(filepath, [head, workdir]) {
  *   let content = (await workdir.content()).toString('utf8')
  *   if (content.contains('foo')) {
  *     return {
- *       fullpath: workdir.fullpath,
+ *       filepath,
  *       content
  *     }
  *   }
@@ -171,11 +127,32 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * Example 2: Return the difference between the working directory and the HEAD commit
  * ```js
  * const diff = require('diff-lines')
- * async function map([head, workdir]) {
+ * async function map(filepath, [head, workdir]) {
  *   return {
- *     filename: head.fullpath,
+ *     filepath,
  *     oid: await head.oid(),
  *     diff: diff((await head.content()).toString('utf8'), (await workdir.content()).toString('utf8'))
+ *   }
+ * }
+ * ```
+ *
+ * Example 3:
+ * ```js
+ * let path = require('path')
+ * // Only examine files in the directory `cwd`
+ * let cwd = 'src/app'
+ * async function map (filepath, [head, workdir, stage]) {
+ *   if (
+ *     // don't skip the root directory
+ *     head.fullpath !== '.' &&
+ *     // return true for 'src' and 'src/app'
+ *     !cwd.startsWith(filepath) &&
+ *     // return true for 'src/app/*'
+ *     path.dirname(filepath) !== cwd
+ *   ) {
+ *     return null
+ *   } else {
+ *     return filepath
  *   }
  * }
  * ```
@@ -209,7 +186,6 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Walker[]} args.trees - The trees you want to traverse
- * @param {function(string, ?WalkerEntry[]): Promise<boolean>} [args.filter] - Filter which `WalkerEntry`s to process
  * @param {function(string, ?WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
  * @param {function(any, any[]): Promise<any>} [args.reduce] - Control how mapped entries are combined with their parent result
  * @param {function(function(WalkerEntry[]): Promise<any[]>, IterableIterator<WalkerEntry[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
@@ -225,7 +201,6 @@ export async function walkBeta2 ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   trees,
-  filter = async () => true,
   // @ts-ignore
   map = async (_, entry) => entry,
   // The default reducer is a flatmap that filters out undefineds.
@@ -271,8 +246,8 @@ export async function walkBeta2 ({
       const fullpath = entry[0].fullpath
       /** @type {?WalkerEntry[]} */
       const actualEntries = entry.map(entry => entry.exists ? entry : null)
-      if (await filter(fullpath, actualEntries)) {
-        const parent = await map(fullpath, actualEntries)
+      const parent = await map(fullpath, actualEntries)
+      if (parent !== null) {
         let walkedChildren = await iterate(walk, children)
         walkedChildren = walkedChildren.filter(x => x !== undefined)
         return reduce(parent, walkedChildren)
