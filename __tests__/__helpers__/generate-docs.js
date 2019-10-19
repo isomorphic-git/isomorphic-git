@@ -14,6 +14,17 @@ function escapeType (type) {
     .replace(/\|/g, ' &#124; ')
 }
 
+function recoverFunctionSignature (name, text) {
+  const matches = text.match(
+    new RegExp(`{function\\(([^\\)]*)\\):([^}]*)} \\[?${name}`)
+  )
+  if (matches !== null) {
+    matches[1] = matches[1].trim()
+    matches[2] = matches[2].trim()
+    return `(${matches[1]}) => ${matches[2]}`
+  }
+}
+
 const typedefs = new Map()
 
 function gentypedef (ast) {
@@ -27,6 +38,13 @@ function gentypedef (ast) {
   let indent = 2
   for (const prop of ast.properties) {
     const type = cleanType(prop.type.names[0])
+    // Note: the parser doesn't yet understand the full function syntax, so we hack it in
+    if (type === 'function') {
+      const betterName = recoverFunctionSignature(prop.name, ast.comment)
+      if (betterName) {
+        prop.type.names[0] = betterName
+      }
+    }
     let ind = ' '.repeat(indent)
     // This is pretty sloppy
     if (currentprop !== null) {
@@ -90,7 +108,7 @@ function gendoc (filepath) {
         continue
       }
       if (obj.kind === 'package') continue
-      if (!obj.params || !obj.returns) continue
+      if ((!obj.params && !obj.returns) || !obj.description) continue
       text += `---\n`
       text += `title: ${obj.name}\n`
       text += `sidebar_label: ${obj.name}\n`
@@ -99,14 +117,18 @@ function gendoc (filepath) {
         text += `\n${obj.deprecated}\n`
       }
       // Split description into "first line" and "the rest"
-      obj.description = obj.description.trim()
+      try {
+        obj.description = obj.description.trim()
+      } catch (e) {
+        console.log(obj)
+      }
       // why JavaScript why
       const _index = obj.description.indexOf('\n')
       const headline =
         _index === -1
           ? obj.description
           : obj.description.slice(0, _index + 1).trim()
-      const description =
+      let description =
         _index === -1 ? '' : obj.description.slice(_index + 1).trim()
 
       text += `\n${headline}\n\n`
@@ -121,6 +143,12 @@ function gendoc (filepath) {
           if (!param.optional) name = `**${name}**`
 
           let type = param.type.names.map(escapeType).join(' | ')
+          if (param.type.names[0] === 'function') {
+            const betterName = recoverFunctionSignature(param.name, obj.comment)
+            if (betterName) {
+              type = betterName
+            }
+          }
           if (param.defaultvalue !== undefined) {
             type = `${type} = ${param.defaultvalue}`
           }
@@ -164,6 +192,9 @@ function gendoc (filepath) {
         for (const type of obj.see) {
           text += typedefs.get(type)
         }
+      }
+      for (const [name, typedef] of typedefs) {
+        description = description.replace(`{@link ${name} typedef}`, typedef)
       }
       if (description !== '') text += `\n${description}\n`
       if (obj.examples) {

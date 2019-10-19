@@ -215,7 +215,7 @@ unless there is a major version bump.
 - [tag](https://isomorphic-git.github.io/docs/tag.html)
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
-- [walkBeta1](https://isomorphic-git.github.io/docs/walkBeta1.html)
+- [walkBeta2](https://isomorphic-git.github.io/docs/walkBeta2.html)
 - [writeObject](https://isomorphic-git.github.io/docs/writeObject.html)
 - [writeRef](https://isomorphic-git.github.io/docs/writeRef.html)
 
