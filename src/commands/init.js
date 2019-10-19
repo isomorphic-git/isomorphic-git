@@ -24,7 +24,8 @@ export async function init ({
   bare = false,
   dir,
   gitdir = bare ? dir : join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs')
+  fs: _fs = cores.get(core).get('fs'),
+  noOverwrite = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -40,16 +41,18 @@ export async function init ({
     for (const folder of folders) {
       await fs.mkdir(folder)
     }
-    await fs.write(
-      gitdir + '/config',
-      '[core]\n' +
+    if (!noOverwrite || !await fs.exists(gitdir + '/config')) {
+      await fs.write(
+        gitdir + '/config',
+        '[core]\n' +
         '\trepositoryformatversion = 0\n' +
         '\tfilemode = false\n' +
         `\tbare = ${bare}\n` +
         (bare ? '' : '\tlogallrefupdates = true\n') +
         '\tsymlinks = false\n' +
         '\tignorecase = true\n'
-    )
+      )
+    }
     await fs.write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
   } catch (err) {
     err.caller = 'git.init'

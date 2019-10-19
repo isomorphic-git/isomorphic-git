@@ -428,6 +428,7 @@ export function init(args: GitDir & {
   core?: string;
   fs?: any;
   bare?: boolean;
+  noOverwrite?: boolean;
 }): Promise<void>;
 
 export function isDescendent(args: GitDir & {
