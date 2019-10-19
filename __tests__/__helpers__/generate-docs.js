@@ -128,7 +128,7 @@ function gendoc (filepath) {
         _index === -1
           ? obj.description
           : obj.description.slice(0, _index + 1).trim()
-      const description =
+      let description =
         _index === -1 ? '' : obj.description.slice(_index + 1).trim()
 
       text += `\n${headline}\n\n`
@@ -192,6 +192,9 @@ function gendoc (filepath) {
         for (const type of obj.see) {
           text += typedefs.get(type)
         }
+      }
+      for (const [name, typedef] of typedefs) {
+        description = description.replace(`{@link ${name} typedef}`, typedef)
       }
       if (description !== '') text += `\n${description}\n`
       if (obj.examples) {

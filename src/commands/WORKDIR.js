@@ -13,7 +13,7 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
  */
 
 /**
- * Get a working directory Walker
+ * Get a working directory `Walker`
  *
  * See [walkBeta2](./walkBeta2.md)
  *

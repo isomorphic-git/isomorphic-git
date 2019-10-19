@@ -138,11 +138,11 @@ export async function checkout ({
             gitdir,
             trees: [TREE({ ref }), WORKDIR()],
             map: async function (fullpath, [head, workdir]) {
-              if (fullpath === '.') return
               // match against base paths
               if (!bases.some(base => worthWalking(fullpath, base))) {
                 return null
               }
+              if (fullpath === '.') return
               if (!head) return
               // Late filter against file names
               if (patternGlobrex) {

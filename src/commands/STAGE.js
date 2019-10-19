@@ -17,7 +17,7 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
  *
  * See [walkBeta2](./walkBeta2.md)
  *
- * @returns {Walker} Returns a git index Walker
+ * @returns {Walker} Returns a git index `Walker`
  *
  */
 export function STAGE ({

@@ -32,8 +32,8 @@ export class GitWalkerRepo2 {
     })()
     const walker = this
     this.ConstructEntry = class TreeEntry {
-      constructor (entry) {
-        Object.assign(this, entry)
+      constructor (fullpath) {
+        this._fullpath = fullpath
         this._type = false
         this._mode = false
         this._stat = false
@@ -64,8 +64,7 @@ export class GitWalkerRepo2 {
   }
 
   async readdir (entry) {
-    if (!entry.exists) return []
-    const filepath = entry.fullpath
+    const filepath = entry._fullpath
     const { fs, gitdir } = this
     const map = await this.mapPromise
     const obj = map.get(filepath)
@@ -89,48 +88,36 @@ export class GitWalkerRepo2 {
     for (const entry of tree) {
       map.set(join(filepath, entry.path), entry)
     }
-    return tree.entries().map(entry => ({
-      fullpath: join(filepath, entry.path),
-      basename: entry.path,
-      exists: true
-    }))
+    return tree.entries().map(entry => join(filepath, entry.path))
   }
 
   async type (entry) {
-    if (!entry.exists) return
     if (entry._type === false) {
-      await entry.stat()
+      const map = await this.mapPromise
+      const { type } = map.get(entry._fullpath)
+      entry._type = type
     }
     return entry._type
   }
 
   async mode (entry) {
-    if (!entry.exists) return
-    if (entry._type === false) {
-      await entry.stat()
+    if (entry._mode === false) {
+      const map = await this.mapPromise
+      const { mode } = map.get(entry._fullpath)
+      entry._mode = normalizeMode(parseInt(mode, 8))
     }
     return entry._mode
   }
 
-  async stat (entry) {
-    if (!entry.exists) return
-    if (entry._stat === false) {
-      // All we can add here is mode and type.
-      const map = await this.mapPromise
-      const { mode, type } = map.get(entry.fullpath)
-      entry._type = type
-      entry._mode = normalizeMode(parseInt(mode, 8))
-      entry._stat = { mode: entry._mode }
-    }
-    return entry._stat
+  async stat (_entry) {
+
   }
 
   async content (entry) {
-    if (!entry.exists) return
     if (entry._content === false) {
       const map = await this.mapPromise
       const { fs, gitdir } = this
-      const obj = map.get(entry.fullpath)
+      const obj = map.get(entry._fullpath)
       const oid = obj.oid
       const { type, object } = await readObject({ fs, gitdir, oid })
       if (type !== 'blob') {
@@ -143,10 +130,9 @@ export class GitWalkerRepo2 {
   }
 
   async oid (entry) {
-    if (!entry.exists) return
     if (entry._oid === false) {
       const map = await this.mapPromise
-      const obj = map.get(entry.fullpath)
+      const obj = map.get(entry._fullpath)
       entry._oid = obj.oid
     }
     return entry._oid

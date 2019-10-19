@@ -5,7 +5,7 @@ import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { GitWalkBeta2Symbol } from '../utils/symbols.js'
-import { unionOfIterators } from '../utils/unionOfIterators.js'
+import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
 
 /**
  *
@@ -15,7 +15,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
  *
- * @typedef {Object} Stat Output of fs.stat, normalized for git
+ * @typedef {Object} Stat Normalized subset of filesystem `stat` data:
  * @property {number} ctimeSeconds
  * @property {number} ctimeNanoseconds
  * @property {number} mtimeSeconds
@@ -49,67 +49,121 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * The arguments to `walk` are the `trees` you want to traverse, and 3 optional transform functions:
  *  `map`, `reduce`, and `iterate`.
  *
- * The trees are represented by three magic functions that can be imported:
+ * ## `TREE`, `WORKDIR`, and `STAGE`
+ *
+ * Tree walkers are represented by three separate functions that can be imported:
+ *
  * ```js
  * import { TREE, WORKDIR, STAGE } from 'isomorphic-git'
  * ```
  *
  * These functions return opaque handles called `Walker`s.
- * The only thing they are good for is passing into `walkBeta2`'s `trees` argument.
+ * The only thing that `Walker` objects are good for is passing into `walkBeta2`.
  * Here are the three `Walker`s passed into `walkBeta2` by the `statusMatrix` command for example:
  *
  * ```js
- * let gitdir = '.git'
- * let dir = '.'
  * let ref = 'HEAD'
  *
- * let trees = [
- *   TREE({ ref }),
- *   WORKDIR(),
- *   STAGE()
- * ]
+ * let trees = [TREE({ ref }), WORKDIR(), STAGE()]
  * ```
  *
- * See the doc pages for [TREE](./TREE.md), [WORKDIR](./WORKDIR.md), and [STAGE](./STAGE.md).
+ * For the arguments, see the doc pages for [TREE](./TREE.md), [WORKDIR](./WORKDIR.md), and [STAGE](./STAGE.md).
  *
  * `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerEntry`s into the desired result.
  *
  * ## WalkerEntry
- * The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
- * `map` receives an array of `WalkerEntry[]` as its main argument, one `WalkerEntry` for each `Walker` in the `trees` argument.
  *
- * `WalkerEntry`s have the following methods.
+ * {@link WalkerEntry typedef}
+ *
+ * `map` receives an array of `WalkerEntry[]` as its main argument, one `WalkerEntry` for each `Walker` in the `trees` argument.
  * The methods are memoized per `WalkerEntry` so calling them multiple times in a `map` function does not adversely impact performance.
  * By only computing these values if needed, you build can build lean, mean, efficient walking machines.
  *
- * ```js
- * await entry.type() // 'tree' | 'blob' | 'special' (irregular files) | 'commit' (submodules)
- * ```
+ * ### WalkerEntry#type()
+ *
+ * Returns the kind as a string. This is normally either `tree` or `blob`.
+ *
+ * `TREE`, `STAGE`, and `WORKDIR` walkers all return a string.
+ *
+ * Possible values:
+ *
+ * - `'tree'` directory
+ * - `'blob'` file
+ * - `'special'` used by `WORKDIR` to represent irregular files like sockets and FIFOs
+ * - `'commit'` used by `TREE` to represent submodules
  *
  * ```js
- * await entry.mode() // 0o40000 | 0o100644 | 0o100755 | 0o12000
+ * await entry.type()
  * ```
+ *
+ * ### WalkerEntry#mode()
+ *
+ * Returns the file mode as a number. Use this to distinguish between regular files, symlinks, and executable files.
+ *
+ * `TREE`, `STAGE`, and `WORKDIR` walkers all return a number for all `type`s of entries.
+ *
+ * It has been normalized to one of the 4 values that are allowed in git commits:
+ *
+ * - `0o40000` directory
+ * - `0o100644` file
+ * - `0o100755` file (executable)
+ * - `0o120000` symlink
+ *
+ * Tip: to make modes more readable, you can print them to octal using `.toString(8)`.
  *
  * ```js
- * await entry.oid() // The SHA-1 object id
+ * await entry.mode()
  * ```
+ *
+ * ### WalkerEntry#oid()
+ *
+ * Returns the SHA-1 object id for blobs and trees.
+ *
+ * `TREE` walkers return a string for `blob` and `tree` entries.
+ *
+ * `STAGE` and `WORKDIR` walkers return a string for `blob` entries and `undefined` for `tree` entries.
  *
  * ```js
- * await entry.content() // Buffer | void.  STAGE cannot provide content.
+ * await entry.oid()
  * ```
+ *
+ * ### WalkerEntry#content()
+ *
+ * Returns the file contents as a Buffer.
+ *
+ * `TREE` and `WORKDIR` walkers return a Buffer for `blob` entries and `undefined` for `tree` entries.
+ *
+ * `STAGE` walkers always return `undefined` since the file contents are never stored in the stage.
  *
  * ```js
- * await entry.stat() // Normalized filesystem `stat` data. All properties are numbers.
+ * await entry.content()
  * ```
  *
- * ## map(WalkerEntry[]) => any
+ * ### WalkerEntry#stat()
  *
- * Default: `async entry => entry`
+ * Returns a normalized subset of filesystem Stat data.
+ *
+ * `WORKDIR` walkers return a `Stat` for `blob` and `tree` entries.
+ *
+ * `STAGE` walkers return a `Stat` for `blob` entries and `undefined` for `tree` entries.
+ *
+ * `TREE` walkers return `undefined` for all entry types.
+ *
+ * ```js
+ * await entry.stat()
+ * ```
+ *
+ * {@link Stat typedef}
+ *
+ * ## map(string, Array<WalkerEntry|null>) => Promise<any>
+ *
+ * This is the function that is called once per entry BEFORE visiting the children of that node.
+ *
+ * If you return `null` for a `tree` entry, then none of the children of that `tree` entry will be walked.
  *
  * This is a good place for query logic, such as examining the contents of a file.
  * Ultimately, compare all the entries and return any values you are interested in.
  * If you do not return a value (or return undefined) that entry will be filtered from the results.
- * If you return `null` for a directory, then none of the children of that directory will be walked.
  *
  * Example 1: Find all the files containing the word 'foo'.
  * ```js
@@ -159,6 +213,8 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * ## reduce(parent, children)
  *
+ * This is the function that is called once per entry AFTER visiting the children of that node.
+ *
  * Default: `async (parent, children) => parent === undefined ? children.flat() : [parent, children].flat()`
  *
  * The default implementation of this function returns all directories and children in a giant flat array.
@@ -178,8 +234,6 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * The default implementation recurses all children concurrently using Promise.all.
  * However you could use a custom function to traverse children serially or use a global queue to throttle recursion.
  *
- * > Note: For a complete example, look at the implementation of `statusMatrix`.
- *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
@@ -192,7 +246,6 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * @returns {Promise<any>} The finished tree-walking result
  *
- * @see WalkerEntry
  *
  */
 export async function walkBeta2 ({
@@ -218,35 +271,29 @@ export async function walkBeta2 ({
       proxy[GitWalkBeta2Symbol]({ fs, dir, gitdir })
     )
 
-    const root = new Array(walkers.length).fill({
-      fullpath: '.',
-      basename: '.',
-      exists: true
-    })
+    const root = new Array(walkers.length).fill('.')
     const range = arrayRange(0, walkers.length)
-    const unionWalkerFromReaddir = async entry => {
-      const subdirs = await Promise.all(
-        range.map(i => walkers[i].readdir(entry[i]))
-      )
+    const unionWalkerFromReaddir = async entries => {
       range.map(i => {
-        entry[i] = new walkers[i].ConstructEntry(entry[i])
+        entries[i] = entries[i] && new walkers[i].ConstructEntry(entries[i])
       })
+      const subdirs = await Promise.all(
+        range.map(i => entries[i] ? walkers[i].readdir(entries[i]) : [])
+      )
       // Now process child directories
       const iterators = subdirs
         .map(array => (array === null ? [] : array))
         .map(array => array[Symbol.iterator]())
       return {
-        entry,
-        children: unionOfIterators(iterators)
+        entries,
+        children: unionOfIterators2(iterators)
       }
     }
 
     const walk = async root => {
-      const { children, entry } = await unionWalkerFromReaddir(root)
-      const fullpath = entry[0].fullpath
-      /** @type {?WalkerEntry[]} */
-      const actualEntries = entry.map(entry => entry.exists ? entry : null)
-      const parent = await map(fullpath, actualEntries)
+      const { entries, children } = await unionWalkerFromReaddir(root)
+      const fullpath = entries.find(entry => entry && entry._fullpath)._fullpath
+      const parent = await map(fullpath, entries)
       if (parent !== null) {
         let walkedChildren = await iterate(walk, children)
         walkedChildren = walkedChildren.filter(x => x !== undefined)
