@@ -109,9 +109,7 @@ export class GitWalkerRepo2 {
     return entry._mode
   }
 
-  async stat (_entry) {
-
-  }
+  async stat (_entry) {}
 
   async content (entry) {
     if (entry._content === false) {

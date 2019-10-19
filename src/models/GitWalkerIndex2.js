@@ -55,7 +55,8 @@ export class GitWalkerIndex2 {
       throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
     }
     return inode.children
-      .map(inode => inode.fullpath
+      .map(
+        inode => inode.fullpath
         // TODO: Figure out why flatFileListToDirectoryStructure is not returning children
         // sorted correctly for "__tests__/__fixtures__/test-push.git"
       )
