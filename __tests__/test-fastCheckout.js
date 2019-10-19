@@ -4,7 +4,13 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-fastCheckout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { fastCheckout, listFiles, add, commit, branch } = require('isomorphic-git')
+const {
+  fastCheckout,
+  listFiles,
+  add,
+  commit,
+  branch
+} = require('isomorphic-git')
 
 describe('checkout', () => {
   beforeAll(() => {
@@ -114,10 +120,12 @@ describe('checkout', () => {
     await fs.write(dir + '/executable-file.sh', 'executable file', {
       mode: 0o777
     })
-    const { mode: expectedRegularFileMode } = (await fs.lstat(dir + '/regular-file.txt'))
-    const { mode: expectedExecutableFileMode } = (await fs.lstat(
+    const { mode: expectedRegularFileMode } = await fs.lstat(
+      dir + '/regular-file.txt'
+    )
+    const { mode: expectedExecutableFileMode } = await fs.lstat(
       dir + '/executable-file.sh'
-    ))
+    )
 
     // Test
     await fastCheckout({ dir, gitdir, ref: 'regular-file' })

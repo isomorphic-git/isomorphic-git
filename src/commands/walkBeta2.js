@@ -278,7 +278,7 @@ export async function walkBeta2 ({
         entries[i] = entries[i] && new walkers[i].ConstructEntry(entries[i])
       })
       const subdirs = await Promise.all(
-        range.map(i => entries[i] ? walkers[i].readdir(entries[i]) : [])
+        range.map(i => (entries[i] ? walkers[i].readdir(entries[i]) : []))
       )
       // Now process child directories
       const iterators = subdirs

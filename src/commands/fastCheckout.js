@@ -1,22 +1,22 @@
 // @ts-check
 import globrex from 'globrex'
 
+import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
+import { readObject } from '../storage/readObject.js'
+import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
 import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
+import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR.js'
 import { config } from './config.js'
 import { walkBeta2 } from './walkBeta2.js'
-import { STAGE } from './STAGE.js'
-import { flat } from '../utils/flat.js'
-import { readObject } from '../storage/readObject.js'
-import { GitIndexManager } from '../managers/GitIndexManager.js'
 
 /**
  * Checkout a branch
@@ -160,14 +160,14 @@ export async function fastCheckout ({
             // This checks for the presense and/or absense of each of the 3 entries,
             // converts that to a 3-bit binary representation, and then handles
             // every possible combination (2^3 or 8 cases) with a lookup table.
-            const key = [!!stage, !!commit, !!workdir]
-              .map(Number)
-              .join('')
+            const key = [!!stage, !!commit, !!workdir].map(Number).join('')
             switch (key) {
               // Impossible case.
-              case '000': return
+              case '000':
+                return
               // Ignore workdir files that are not tracked and not part of the new commit.
-              case '001': return
+              case '001':
+                return
               // New entries
               case '010': {
                 switch (await commit.type()) {
@@ -175,7 +175,12 @@ export async function fastCheckout ({
                     return ['mkdir', fullpath]
                   }
                   case 'blob': {
-                    return ['create', fullpath, await commit.oid(), await commit.mode()]
+                    return [
+                      'create',
+                      fullpath,
+                      await commit.oid(),
+                      await commit.mode()
+                    ]
                   }
                   case 'commit': {
                     // gitlinks
@@ -187,7 +192,10 @@ export async function fastCheckout ({
                     return
                   }
                   default: {
-                    return ['error', `new entry Unhandled type ${await commit.type()}`]
+                    return [
+                      'error',
+                      `new entry Unhandled type ${await commit.type()}`
+                    ]
                   }
                 }
               }
@@ -203,14 +211,19 @@ export async function fastCheckout ({
                   }
                   case 'blob-blob': {
                     // Is the incoming file different?
-                    if (await commit.oid() !== await workdir.oid()) {
+                    if ((await commit.oid()) !== (await workdir.oid())) {
                       return ['conflict', fullpath]
                     } else {
                       // Is the incoming file a different mode?
-                      if (await commit.mode() !== await workdir.mode()) {
+                      if ((await commit.mode()) !== (await workdir.mode())) {
                         return ['conflict', fullpath]
                       } else {
-                        return ['create-index', fullpath, await commit.oid(), await commit.mode()]
+                        return [
+                          'create-index',
+                          fullpath,
+                          await commit.oid(),
+                          await commit.mode()
+                        ]
                       }
                     }
                   }
@@ -251,7 +264,7 @@ export async function fastCheckout ({
                   }
                   case 'blob': {
                     // Git checks that the workdir.oid === stage.oid before deleting file
-                    if (await stage.oid() !== await workdir.oid()) {
+                    if ((await stage.oid()) !== (await workdir.oid())) {
                       return ['conflict', fullpath]
                     } else {
                       return ['delete', fullpath]
@@ -277,18 +290,33 @@ export async function fastCheckout ({
                     if (workdir) {
                       // Note: canonical git only compares with the stage. But we're smart enough
                       // to compare to the stage AND the incoming commit.
-                      if (await workdir.oid() !== await stage.oid() && await workdir.oid() !== await commit.oid()) {
+                      if (
+                        (await workdir.oid()) !== (await stage.oid()) &&
+                        (await workdir.oid()) !== (await commit.oid())
+                      ) {
                         return ['conflict', fullpath]
                       }
                     }
                     // Has file mode changed?
-                    if (await commit.mode() !== await stage.mode()) {
-                      return ['update', fullpath, await commit.oid(), await commit.mode(), true]
+                    if ((await commit.mode()) !== (await stage.mode())) {
+                      return [
+                        'update',
+                        fullpath,
+                        await commit.oid(),
+                        await commit.mode(),
+                        true
+                      ]
                     }
                     // TODO: HANDLE SYMLINKS
                     // Has the file content changed?
-                    if (await commit.oid() !== await stage.oid()) {
-                      return ['update', fullpath, await commit.oid(), await commit.mode(), false]
+                    if ((await commit.oid()) !== (await stage.oid())) {
+                      return [
+                        'update',
+                        fullpath,
+                        await commit.oid(),
+                        await commit.mode(),
+                        false
+                      ]
                     } else {
                       return
                     }
@@ -300,7 +328,10 @@ export async function fastCheckout ({
                     return ['update-blob-to-tree', fullpath]
                   }
                   default: {
-                    return ['error', `update entry Unhandled type ${await stage.type()}-${await commit.type()}`]
+                    return [
+                      'error',
+                      `update entry Unhandled type ${await stage.type()}-${await commit.type()}`
+                    ]
                   }
                 }
               }
@@ -330,13 +361,17 @@ export async function fastCheckout ({
       }
 
       // Report conflicts
-      const conflicts = ops.filter(([method]) => method === 'conflict').map(([method, fullpath]) => fullpath)
+      const conflicts = ops
+        .filter(([method]) => method === 'conflict')
+        .map(([method, fullpath]) => fullpath)
       if (conflicts.length > 0) {
         throw new GitError(E.CheckoutConflictError, { filepaths: conflicts })
       }
 
       // Collect errors
-      const errors = ops.filter(([method]) => method === 'error').map(([method, fullpath]) => fullpath)
+      const errors = ops
+        .filter(([method]) => method === 'error')
+        .map(([method, fullpath]) => fullpath)
       if (errors.length > 0) {
         throw new GitError(E.InternalFail, { message: errors })
       }
@@ -360,8 +395,11 @@ export async function fastCheckout ({
          */
         async function (index) {
           await Promise.all(
-            ops.filter(([method]) => method === 'delete' || method === 'delete-index').map(
-              async function ([method, fullpath]) {
+            ops
+              .filter(
+                ([method]) => method === 'delete' || method === 'delete-index'
+              )
+              .map(async function ([method, fullpath]) {
                 const filepath = `${dir}/${fullpath}`
                 if (method === 'delete') {
                   await fs.rm(filepath)
@@ -374,8 +412,7 @@ export async function fastCheckout ({
                     total
                   })
                 }
-              }
-            )
+              })
           )
         }
       )
@@ -395,7 +432,9 @@ export async function fastCheckout ({
             }
           } catch (e) {
             if (e.code === 'ENOTEMPTY') {
-              console.log(`Did not delete ${fullpath} because directory is not empty`)
+              console.log(
+                `Did not delete ${fullpath} because directory is not empty`
+              )
             } else {
               throw e
             }
@@ -404,8 +443,9 @@ export async function fastCheckout ({
       }
 
       await Promise.all(
-        ops.filter(([method]) => method === 'mkdir').map(
-          async function ([_, fullpath]) {
+        ops
+          .filter(([method]) => method === 'mkdir')
+          .map(async function ([_, fullpath]) {
             const filepath = `${dir}/${fullpath}`
             await fs.mkdir(filepath)
             if (emitter) {
@@ -415,8 +455,7 @@ export async function fastCheckout ({
                 total
               })
             }
-          }
-        )
+          })
       )
 
       await GitIndexManager.acquire(
@@ -427,8 +466,14 @@ export async function fastCheckout ({
          */
         async function (index) {
           await Promise.all(
-            ops.filter(([method]) => method === 'create' || method === 'create-index' || method === 'update').map(
-              async function ([method, fullpath, oid, mode, chmod]) {
+            ops
+              .filter(
+                ([method]) =>
+                  method === 'create' ||
+                  method === 'create-index' ||
+                  method === 'update'
+              )
+              .map(async function ([method, fullpath, oid, mode, chmod]) {
                 const filepath = `${dir}/${fullpath}`
                 try {
                   if (method !== 'create-index') {
@@ -450,7 +495,9 @@ export async function fastCheckout ({
                       await fs.writelink(filepath, object)
                     } else {
                       throw new GitError(E.InternalFail, {
-                        message: `Invalid mode 0o${mode.toString(8)} detected in blob ${oid}`
+                        message: `Invalid mode 0o${mode.toString(
+                          8
+                        )} detected in blob ${oid}`
                       })
                     }
                   }
@@ -477,8 +524,7 @@ export async function fastCheckout ({
                 } catch (e) {
                   console.log(e)
                 }
-              }
-            )
+              })
           )
         }
       )

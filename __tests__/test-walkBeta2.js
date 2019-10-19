@@ -13,7 +13,12 @@ describe('walkBeta2', () => {
       dir,
       gitdir,
       trees: [WORKDIR(), TREE({ ref: 'HEAD' }), STAGE()],
-      map: (filepath, [workdir, tree, stage]) => [filepath, !!workdir, !!tree, !!stage]
+      map: (filepath, [workdir, tree, stage]) => [
+        filepath,
+        !!workdir,
+        !!tree,
+        !!stage
+      ]
     })
     expect(matrix).toEqual([
       ['.', true, true, true],
@@ -48,21 +53,25 @@ describe('walkBeta2', () => {
           type: await workdir.type(),
           mode: await workdir.mode(),
           oid: await workdir.oid(),
-          content: await workdir.content() && (await workdir.content()).toString('utf8'),
+          content:
+            (await workdir.content()) &&
+            (await workdir.content()).toString('utf8'),
           hasStat: !!(await workdir.stat())
         },
         tree && {
           type: await tree.type(),
           mode: await tree.mode(),
           oid: await tree.oid(),
-          content: await tree.content() && (await tree.content()).toString('utf8'),
+          content:
+            (await tree.content()) && (await tree.content()).toString('utf8'),
           hasStat: !!(await tree.stat())
         },
         stage && {
           type: await stage.type(),
           mode: await stage.mode(),
           oid: await stage.oid(),
-          content: await stage.content() && (await stage.content()).toString('utf8'),
+          content:
+            (await stage.content()) && (await stage.content()).toString('utf8'),
           hasStat: !!(await stage.stat())
         }
       ]

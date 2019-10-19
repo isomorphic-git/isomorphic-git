@@ -7,9 +7,9 @@ import { cores } from '../utils/plugins.js'
 import { checkout } from './checkout'
 import { config } from './config'
 import { currentBranch } from './currentBranch'
+import { fastCheckout } from './fastCheckout.js'
 import { fetch } from './fetch'
 import { merge } from './merge'
-import { fastCheckout } from './fastCheckout.js'
 
 /**
  * Fetch and merge commits from a remote repository *(Currently, only fast-forward merges are implemented.)*
