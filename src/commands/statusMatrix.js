@@ -200,11 +200,11 @@ export async function statusMatrix ({
           if (!match) return
         }
         // For now, just bail on directories
-        const headType = head && await head.type()
+        const headType = head && (await head.type())
         if (headType === 'tree' || headType === 'special') return
-        const workdirType = workdir && await workdir.type()
+        const workdirType = workdir && (await workdir.type())
         if (workdirType === 'tree' || workdirType === 'special') return
-        const stageType = stage && await stage.type()
+        const stageType = stage && (await stage.type())
         if (stageType === 'tree' || stageType === 'special') return
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
         const headOid = head ? await head.oid() : undefined
