@@ -11,7 +11,7 @@ import { worthWalking } from '../utils/worthWalking.js'
 import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR.js'
-import { walkBeta1 } from './walkBeta1.js'
+import { walkBeta2 } from './walkBeta2.js'
 
 /**
  * Efficiently get the status of multiple files at once.
@@ -165,34 +165,33 @@ export async function statusMatrix ({
       patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }
     const bases = filepaths.map(filepath => join(filepath, patternPart))
-    const results = await walkBeta1({
-      trees: [
-        TREE({ fs, gitdir, ref }),
-        WORKDIR({ fs, dir, gitdir }),
-        STAGE({ fs, gitdir })
-      ],
-      filter: async function ([head, workdir, stage]) {
+    const results = await walkBeta2({
+      fs,
+      dir,
+      gitdir,
+      trees: [TREE({ ref }), WORKDIR(), STAGE()],
+      map: async function (filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
-        if (!head.exists && !stage.exists && workdir.exists) {
+        if (!head && !stage && workdir) {
           if (
             await GitIgnoreManager.isIgnored({
               fs,
               dir,
-              filepath: workdir.fullpath
+              filepath
             })
           ) {
-            return false
+            return null
           }
         }
         // match against base paths
-        return bases.some(base => worthWalking(head.fullpath, base))
-      },
-      map: async function ([head, workdir, stage]) {
+        if (!bases.some(base => worthWalking(filepath, base))) {
+          return null
+        }
         // Late filter against file names
         if (patternGlobrex) {
           let match = false
           for (const base of bases) {
-            const partToMatch = head.fullpath.replace(base + '/', '')
+            const partToMatch = filepath.replace(base + '/', '')
             if (patternGlobrex.regex.test(partToMatch)) {
               match = true
               break
@@ -201,27 +200,27 @@ export async function statusMatrix ({
           if (!match) return
         }
         // For now, just bail on directories
-        await head.populateStat()
-        if (head.type === 'tree' || head.type === 'special') return
-        await workdir.populateStat()
-        if (workdir.type === 'tree' || workdir.type === 'special') return
-        await stage.populateStat()
-        if (stage.type === 'tree' || stage.type === 'special') return
+        const headType = head && await head.type()
+        if (headType === 'tree' || headType === 'special') return
+        const workdirType = workdir && await workdir.type()
+        if (workdirType === 'tree' || workdirType === 'special') return
+        const stageType = stage && await stage.type()
+        if (stageType === 'tree' || stageType === 'special') return
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.
-        await head.populateHash()
-        await stage.populateHash()
-        if (!head.exists && workdir.exists && !stage.exists) {
+        const headOid = head ? await head.oid() : undefined
+        const stageOid = stage ? await stage.oid() : undefined
+        let workdirOid
+        if (!head && workdir && !stage) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
-          workdir.oid = '42'
-        } else if (workdir.exists) {
-          await workdir.populateHash()
+          workdirOid = '42'
+        } else if (workdir) {
+          workdirOid = await workdir.oid()
         }
-        const entry = [undefined, head.oid, workdir.oid, stage.oid]
+        const entry = [undefined, headOid, workdirOid, stageOid]
         const result = entry.map(value => entry.indexOf(value))
         result.shift() // remove leading undefined entry
-        const fullpath = head.fullpath || workdir.fullpath || stage.fullpath
-        return [fullpath, ...result]
+        return [filepath, ...result]
       }
     })
     return results

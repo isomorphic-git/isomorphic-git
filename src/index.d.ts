@@ -137,6 +137,27 @@ export interface WalkerTree {
   oid?: string;
 }
 
+export interface WalkerEntry2 {
+  fullpath: string;
+  basename: string;
+  exists: boolean;
+  type: () => Promise<'tree' | 'blob' | 'special'>;
+  mode: () => Promise<number>;
+  oid: () => Promise<string>;
+  content: () => Promise<Buffer|void>;
+  stat: () => Promise<{
+    ctimeSeconds: number;
+    mtimeSeconds: number;
+    mtimeNanoseconds: number;
+    dev: number;
+    ino: number;
+    mode: number;
+    uid: number;
+    gid: number;
+    size: number;
+  }>;
+}
+
 export interface GitCredentialManagerPlugin {
   fill: any;
   approved: any;
@@ -639,6 +660,16 @@ export function walkBeta1<T, Q>(args: {
   map?: (entry: WalkerEntry) => Promise<T | undefined>;
   reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
   iterate?: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
+}): Promise<Q|undefined>;
+
+export function walkBeta2<T, Q>(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
+  trees: Walker[];
+  filter?: (entries: WalkerEntry2[]) => Promise<boolean>;
+  map?: (entries: WalkerEntry2[]) => Promise<T | undefined>;
+  reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
+  iterate?: (walk: (parent: WalkerEntry2[]) => Promise<Q>, children: Iterable<WalkerEntry2[]>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
 
 export function writeObject(args: GitDir & {
