@@ -16,12 +16,11 @@ function escapeType (type) {
 
 function recoverFunctionSignature (name, text) {
   const matches = text.match(
-    new RegExp(`{function\\(([^\\)]*)\\):([^}]*)} \\[?${name}`)
+    new RegExp(`{function\\(([^\\n]*)} \\[?${name}`)
   )
   if (matches !== null) {
     matches[1] = matches[1].trim()
-    matches[2] = matches[2].trim()
-    return `(${matches[1]}) => ${matches[2]}`
+    return `function(${matches[1]}`
   }
 }
 
