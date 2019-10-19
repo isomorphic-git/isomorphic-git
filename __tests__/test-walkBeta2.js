@@ -49,21 +49,21 @@ describe('walkBeta2', () => {
           mode: await workdir.mode(),
           oid: await workdir.oid(),
           content: await workdir.content() && (await workdir.content()).toString('utf8'),
-          hasStat: !!await workdir.stat()
+          hasStat: !!(await workdir.stat())
         },
         tree && {
           type: await tree.type(),
           mode: await tree.mode(),
           oid: await tree.oid(),
           content: await tree.content() && (await tree.content()).toString('utf8'),
-          hasStat: !!await tree.stat()
+          hasStat: !!(await tree.stat())
         },
         stage && {
           type: await stage.type(),
           mode: await stage.mode(),
           oid: await stage.oid(),
           content: await stage.content() && (await stage.content()).toString('utf8'),
-          hasStat: !!await stage.stat()
+          hasStat: !!(await stage.stat())
         }
       ]
     })

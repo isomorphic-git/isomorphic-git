@@ -15,8 +15,8 @@ export class GitWalkerIndex2 {
     })
     const walker = this
     this.ConstructEntry = class StageEntry {
-      constructor (entry) {
-        Object.assign(this, entry)
+      constructor (fullpath) {
+        this._fullpath = fullpath
         this._type = false
         this._mode = false
         this._stat = false
@@ -46,8 +46,7 @@ export class GitWalkerIndex2 {
   }
 
   async readdir (entry) {
-    if (!entry.exists) return []
-    const filepath = entry.fullpath
+    const filepath = entry._fullpath
     const tree = await this.treePromise
     const inode = tree.get(filepath)
     if (!inode) return null
@@ -56,18 +55,14 @@ export class GitWalkerIndex2 {
       throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
     }
     return inode.children
-      .map(inode => ({
-        fullpath: inode.fullpath,
-        basename: inode.basename,
-        exists: true
+      .map(inode => inode.fullpath
         // TODO: Figure out why flatFileListToDirectoryStructure is not returning children
         // sorted correctly for "__tests__/__fixtures__/test-push.git"
-      }))
+      )
       .sort((a, b) => compareStrings(a.fullpath, b.fullpath))
   }
 
   async type (entry) {
-    if (!entry.exists) return
     if (entry._type === false) {
       await entry.stat()
     }
@@ -75,7 +70,6 @@ export class GitWalkerIndex2 {
   }
 
   async mode (entry) {
-    if (!entry.exists) return
     if (entry._mode === false) {
       await entry.stat()
     }
@@ -83,13 +77,12 @@ export class GitWalkerIndex2 {
   }
 
   async stat (entry) {
-    if (!entry.exists) return
     if (entry._stat === false) {
       const tree = await this.treePromise
-      const inode = tree.get(entry.fullpath)
+      const inode = tree.get(entry._fullpath)
       if (!inode) {
         throw new Error(
-          `ENOENT: no such file or directory, lstat '${entry.fullpath}'`
+          `ENOENT: no such file or directory, lstat '${entry._fullpath}'`
         )
       }
       const stats = inode.type === 'tree' ? {} : normalizeStats(inode.metadata)
@@ -104,15 +97,14 @@ export class GitWalkerIndex2 {
     return entry._stat
   }
 
-  async content (entry) {
+  async content (_entry) {
     // Cannot get content for an index entry
   }
 
   async oid (entry) {
-    if (!entry.exists) return
     if (entry._oid === false) {
       const tree = await this.treePromise
-      const inode = tree.get(entry.fullpath)
+      const inode = tree.get(entry._fullpath)
       entry._oid = inode.metadata.oid
     }
     return entry._oid

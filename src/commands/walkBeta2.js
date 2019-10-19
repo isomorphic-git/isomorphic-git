@@ -5,7 +5,7 @@ import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { GitWalkBeta2Symbol } from '../utils/symbols.js'
-import { unionOfIterators } from '../utils/unionOfIterators.js'
+import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
 
 /**
  *
@@ -271,35 +271,29 @@ export async function walkBeta2 ({
       proxy[GitWalkBeta2Symbol]({ fs, dir, gitdir })
     )
 
-    const root = new Array(walkers.length).fill({
-      fullpath: '.',
-      basename: '.',
-      exists: true
-    })
+    const root = new Array(walkers.length).fill('.')
     const range = arrayRange(0, walkers.length)
-    const unionWalkerFromReaddir = async entry => {
-      const subdirs = await Promise.all(
-        range.map(i => walkers[i].readdir(entry[i]))
-      )
+    const unionWalkerFromReaddir = async entries => {
       range.map(i => {
-        entry[i] = new walkers[i].ConstructEntry(entry[i])
+        entries[i] = entries[i] && new walkers[i].ConstructEntry(entries[i])
       })
+      const subdirs = await Promise.all(
+        range.map(i => entries[i] ? walkers[i].readdir(entries[i]) : [])
+      )
       // Now process child directories
       const iterators = subdirs
         .map(array => (array === null ? [] : array))
         .map(array => array[Symbol.iterator]())
       return {
-        entry,
-        children: unionOfIterators(iterators)
+        entries,
+        children: unionOfIterators2(iterators)
       }
     }
 
     const walk = async root => {
-      const { children, entry } = await unionWalkerFromReaddir(root)
-      const fullpath = entry[0].fullpath
-      /** @type {?WalkerEntry[]} */
-      const actualEntries = entry.map(entry => entry.exists ? entry : null)
-      const parent = await map(fullpath, actualEntries)
+      const { entries, children } = await unionWalkerFromReaddir(root)
+      const fullpath = entries.find(entry => entry && entry._fullpath)._fullpath
+      const parent = await map(fullpath, entries)
       if (parent !== null) {
         let walkedChildren = await iterate(walk, children)
         walkedChildren = walkedChildren.filter(x => x !== undefined)
