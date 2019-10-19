@@ -107,7 +107,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * - `0o40000` directory
  * - `0o100644` file
  * - `0o100755` file (executable)
- * - `0o12000` symlink
+ * - `0o120000` symlink
  *
  * Tip: to make modes more readable, you can print them to octal using `.toString(8)`.
  *
@@ -131,7 +131,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * Returns the file contents as a Buffer.
  *
- * `TREE` and `WORKDIR` walkers return a Buffer for `blob` entries.
+ * `TREE` and `WORKDIR` walkers return a Buffer for `blob` entries and `undefined` for `tree` entries.
  *
  * `STAGE` walkers always return `undefined` since the file contents are never stored in the stage.
  *

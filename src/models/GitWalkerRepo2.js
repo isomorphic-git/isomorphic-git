@@ -99,30 +99,25 @@ export class GitWalkerRepo2 {
   async type (entry) {
     if (!entry.exists) return
     if (entry._type === false) {
-      await entry.stat()
+      const map = await this.mapPromise
+      const { type } = map.get(entry.fullpath)
+      entry._type = type
     }
     return entry._type
   }
 
   async mode (entry) {
     if (!entry.exists) return
-    if (entry._type === false) {
-      await entry.stat()
+    if (entry._mode === false) {
+      const map = await this.mapPromise
+      const { mode } = map.get(entry.fullpath)
+      entry._mode = normalizeMode(parseInt(mode, 8))
     }
     return entry._mode
   }
 
-  async stat (entry) {
-    if (!entry.exists) return
-    if (entry._stat === false) {
-      // All we can add here is mode and type.
-      const map = await this.mapPromise
-      const { mode, type } = map.get(entry.fullpath)
-      entry._type = type
-      entry._mode = normalizeMode(parseInt(mode, 8))
-      entry._stat = { mode: entry._mode }
-    }
-    return entry._stat
+  async stat (_entry) {
+    return
   }
 
   async content (entry) {

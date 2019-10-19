@@ -94,8 +94,12 @@ export class GitWalkerIndex2 {
       }
       const stats = inode.type === 'tree' ? {} : normalizeStats(inode.metadata)
       entry._type = inode.type
-      entry._stat = stats
       entry._mode = stats.mode
+      if (inode.type === 'tree') {
+        entry._stat = void 0
+      } else {
+        entry._stat = stats
+      }
     }
     return entry._stat
   }
