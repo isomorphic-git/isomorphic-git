@@ -5,6 +5,7 @@ const snapshots = require('./__snapshots__/test-fastCheckout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
 const {
+  E,
   fastCheckout,
   listFiles,
   add,
@@ -137,28 +138,6 @@ describe('checkout', () => {
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
 
-  it('checkout using pattern', async () => {
-    // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await branch({ dir, gitdir, ref: 'other', checkout: true })
-    await fastCheckout({ dir, gitdir, ref: 'test-branch' })
-    await fs.write(dir + '/regular-file.txt', 'regular file')
-    await fs.write(dir + '/executable-file.sh', 'executable file')
-    await add({ dir, gitdir, filepath: 'regular-file.txt' })
-    await add({ dir, gitdir, filepath: 'executable-file.sh' })
-    await commit({
-      dir,
-      gitdir,
-      author: { name: 'Git', email: 'git@example.org' },
-      message: 'add files'
-    })
-    await fastCheckout({ dir, gitdir, ref: 'other' })
-    await fastCheckout({ dir, gitdir, ref: 'test-branch', pattern: '*.txt' })
-    const files = await fs.readdir(dir)
-    expect(files).toContain('regular-file.txt')
-    expect(files).not.toContain('executable-file.sh')
-  })
-
   it('checkout directories using filepaths', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
@@ -189,35 +168,89 @@ describe('checkout', () => {
     expect(index).toMatchSnapshot()
   })
 
-  it('checkout files using filepaths and pattern', async () => {
+  it('checkout detects conflicts', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await fastCheckout({
-      dir,
-      gitdir,
-      ref: 'test-branch',
-      filepaths: ['src/utils', 'test'],
-      pattern: 'r*'
-    })
-    const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
-    expect(index).toMatchSnapshot()
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      await fastCheckout({
+        dir,
+        gitdir,
+        ref: 'test-branch'
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(E.CheckoutConflictError)
+    expect(error.data.filepaths).toEqual(['README.md'])
   })
 
-  it('checkout files using filepaths and deep pattern', async () => {
+  it('checkout files ignoring conflicts dry run', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      await fastCheckout({
+        dir,
+        gitdir,
+        ref: 'test-branch',
+        force: true,
+        dryRun: true
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeNull()
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).toBe('Hello world')
+  })
+
+  it('checkout files ignoring conflicts', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      await fastCheckout({
+        dir,
+        gitdir,
+        ref: 'test-branch',
+        force: true
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeNull()
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('Hello world')
+  })
+
+  it('restore files to HEAD state by not providing a ref', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await fastCheckout({
       dir,
       gitdir,
-      ref: 'test-branch',
-      filepaths: ['src/utils', 'test'],
-      pattern: 'snapshots/r*'
+      ref: 'test-branch'
     })
-    const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
-    expect(index).toMatchSnapshot()
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      let ops = await fastCheckout({
+        dir,
+        gitdir,
+        force: true
+      })
+      console.log(ops)
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeNull()
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('Hello world')
   })
 })

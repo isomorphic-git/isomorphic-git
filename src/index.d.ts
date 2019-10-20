@@ -291,7 +291,7 @@ export function checkout(args: WorkDir & GitDir & {
   emitter?: EventEmitter;
   emitterPrefix?: string;
   remote?: string;
-  ref?: string;
+  ref: string;
   filepaths?: string[];
   pattern?: string;
 }): Promise<void>;
@@ -403,7 +403,8 @@ export function fastCheckout(args: WorkDir & GitDir & {
   remote?: string;
   ref?: string;
   filepaths?: string[];
-  pattern?: string;
+  dryRun?: boolean;
+  debug?: boolean;
   force?: boolean;
 }): Promise<void>;
 

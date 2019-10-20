@@ -1,6 +1,4 @@
 // @ts-check
-import globrex from 'globrex'
-
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -8,7 +6,6 @@ import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
-import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
@@ -30,26 +27,30 @@ import { walkBeta2 } from './walkBeta2.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
- * @param {string} args.ref - Which branch to checkout
+ * @param {string} [args.ref] - Which branch to checkout
  * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
- * @param {string} [args.pattern = null] - Only checkout the files that match a glob pattern. (Pattern is relative to `filepaths` if `filepaths` is provided.)
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
+ * @param {boolean} [args.noUpdateHead = false] - If true, will update the working directory but won't update HEAD
  * @param {boolean} [args.dryRun = false] - If true, simulates a checkout so you can test whether it would succeed.
  * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * // checkout the master branch
+ * // switch to the master branch
  * await git.fastCheckout({ dir: '$input((/))', ref: '$input((master))' })
  * console.log('done')
  *
  * @example
- * // checkout only JSON and Markdown files from master branch
- * await git.fastCheckout({ dir: '$input((/))', ref: '$input((master))', pattern: '$input((**\/*.{json,md}))' })
+ * // restore the 'docs' and 'src/docs' folders to the way they were, overwriting any changes
+ * await git.fastCheckout({ dir: '$input((/))', force: true, filepaths: ['docs', 'src/docs'] })
  * console.log('done')
  *
+ * @example
+ * // restore the 'docs' and 'src/docs' folders to the way they are in the 'develop' branch, overwriting any changes
+ * await git.fastCheckout({ dir: '$input((/))', ref: 'develop', noUpdateHead: true, force: true, filepaths: ['docs', 'src/docs'] })
+ * console.log('done')
  */
 export async function fastCheckout ({
   core = 'default',
@@ -59,31 +60,17 @@ export async function fastCheckout ({
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   remote = 'origin',
-  ref,
+  ref = 'HEAD',
   filepaths = ['.'],
-  pattern = null,
   noCheckout = false,
+  noUpdateHead = false,
   dryRun = false,
+  // @ts-ignore
+  debug = false,
   force = false
 }) {
   try {
     const fs = new FileSystem(_fs)
-    if (ref === undefined) {
-      throw new GitError(E.MissingRequiredParameterError, {
-        function: 'checkout',
-        parameter: 'ref'
-      })
-    }
-    let patternPart = ''
-    let patternGlobrex
-    if (pattern) {
-      patternPart = patternRoot(pattern)
-      if (patternPart) {
-        pattern = pattern.replace(patternPart + '/', '')
-      }
-      patternGlobrex = globrex(pattern, { globstar: true, extended: true })
-    }
-    const bases = filepaths.map(filepath => join(filepath, patternPart))
     // Get tree oid
     let oid
     try {
@@ -91,6 +78,7 @@ export async function fastCheckout ({
       // TODO: Figure out what to do if both 'ref' and 'remote' are specified, ref already exists,
       // and is configured to track a different remote.
     } catch (err) {
+      if (ref === 'HEAD') throw err
       // If `ref` doesn't exist, create a new remote tracking branch
       // Figure out the commit to checkout
       const remoteRef = `${remote}/${ref}`
@@ -131,20 +119,8 @@ export async function fastCheckout ({
           map: async function (fullpath, [commit, workdir, stage]) {
             if (fullpath === '.') return
             // match against base paths
-            if (!bases.some(base => worthWalking(fullpath, base))) {
+            if (!filepaths.some(base => worthWalking(fullpath, base))) {
               return null
-            }
-            // Late filter against file names
-            if (patternGlobrex) {
-              let match = false
-              for (const base of bases) {
-                const partToMatch = fullpath.replace(base + '/', '')
-                if (patternGlobrex.regex.test(partToMatch)) {
-                  match = true
-                  break
-                }
-              }
-              if (!match) return
             }
             // Emit progress event
             if (emitter) {
@@ -409,9 +385,13 @@ export async function fastCheckout ({
         throw new GitError(E.InternalFail, { message: errors })
       }
 
-      // XXX: for testing, we'll just return here for now.
       if (dryRun) {
-        return ops
+        // Since the format of 'ops' is in flux, I really would rather folk besides myself not start relying on it
+        if (debug) {
+          return ops
+        } else {
+          return
+        }
       }
 
       // Second pass - execute planned changes
@@ -564,9 +544,15 @@ export async function fastCheckout ({
     }
 
     // Update HEAD
-    const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
-    const content = fullRef.startsWith('refs/heads') ? `ref: ${fullRef}` : oid
-    await fs.write(`${gitdir}/HEAD`, `${content}\n`)
+    if (ref === 'HEAD' || !noUpdateHead) {
+      const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
+      if (fullRef.startsWith('refs/heads')) {
+        await GitRefManager.writeSymbolicRef({ fs, gitdir, ref: 'HEAD', value: fullRef })
+      } else {
+        // detached head
+        await GitRefManager.writeRef({ fs, gitdir, ref: 'HEAD', value: oid })
+      }
+    }
   } catch (err) {
     err.caller = 'git.checkout'
     throw err
