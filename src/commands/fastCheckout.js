@@ -36,6 +36,7 @@ import { walkBeta2 } from './walkBeta2.js'
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
  * @param {boolean} [args.dryRun = false] - If true, simulates a checkout so you can test whether it would succeed.
+ * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -62,7 +63,8 @@ export async function fastCheckout ({
   filepaths = ['.'],
   pattern = null,
   noCheckout = false,
-  dryRun = false
+  dryRun = false,
+  force = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -114,12 +116,9 @@ export async function fastCheckout ({
       await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
     }
 
-    // Return early if HEAD is already at ref oid
-    const HEAD = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
-
     // Update working dir
     let count = 0
-    if (!noCheckout && HEAD !== oid) {
+    if (!noCheckout) {
       let ops
       // First pass - just analyze files (not directories) and figure out what needs to be done
       // and (TODO) if it can be done without losing uncommitted changes.
@@ -212,11 +211,31 @@ export async function fastCheckout ({
                   case 'blob-blob': {
                     // Is the incoming file different?
                     if ((await commit.oid()) !== (await workdir.oid())) {
-                      return ['conflict', fullpath]
+                      if (force) {
+                        return [
+                          'update',
+                          fullpath,
+                          await commit.oid(),
+                          await commit.mode(),
+                          (await commit.mode()) !== (await workdir.mode())
+                        ]
+                      } else {
+                        return ['conflict', fullpath]
+                      }
                     } else {
                       // Is the incoming file a different mode?
                       if ((await commit.mode()) !== (await workdir.mode())) {
-                        return ['conflict', fullpath]
+                        if (force) {
+                          return [
+                            'update',
+                            fullpath,
+                            await commit.oid(),
+                            await commit.mode(),
+                            true
+                          ]
+                        } else {
+                          return ['conflict', fullpath]
+                        }
                       } else {
                         return [
                           'create-index',
@@ -265,7 +284,11 @@ export async function fastCheckout ({
                   case 'blob': {
                     // Git checks that the workdir.oid === stage.oid before deleting file
                     if ((await stage.oid()) !== (await workdir.oid())) {
-                      return ['conflict', fullpath]
+                      if (force) {
+                        return ['delete', fullpath]
+                      } else {
+                        return ['conflict', fullpath]
+                      }
                     } else {
                       return ['delete', fullpath]
                     }
@@ -294,7 +317,17 @@ export async function fastCheckout ({
                         (await workdir.oid()) !== (await stage.oid()) &&
                         (await workdir.oid()) !== (await commit.oid())
                       ) {
-                        return ['conflict', fullpath]
+                        if (force) {
+                          return [
+                            'update',
+                            fullpath,
+                            await commit.oid(),
+                            await commit.mode(),
+                            (await commit.mode()) !== (await workdir.mode())
+                          ]
+                        } else {
+                          return ['conflict', fullpath]
+                        }
                       }
                     }
                     // Has file mode changed?

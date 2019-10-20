@@ -404,6 +404,7 @@ export function fastCheckout(args: WorkDir & GitDir & {
   ref?: string;
   filepaths?: string[];
   pattern?: string;
+  force?: boolean;
 }): Promise<void>;
 
 export function fetch(args: GitDir & {
