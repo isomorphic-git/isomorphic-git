@@ -332,6 +332,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://twitter.com/addaleax"><img src="https://avatars2.githubusercontent.com/u/899444?v=4&s=60" width="60px;" alt="Anna Henningsen"/><br /><sub><b>Anna Henningsen</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=addaleax" title="Code">💻</a></td>
     <td align="center"><a href="https://hen.ne.ke"><img src="https://avatars0.githubusercontent.com/u/4312191?v=4&s=60" width="60px;" alt="Fabian Henneke"/><br /><sub><b>Fabian Henneke</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3AFabianHenneke" title="Bug reports">🐛</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=FabianHenneke" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/djencks"><img src="https://avatars2.githubusercontent.com/u/569822?v=4" width="60px;" alt="djencks"/><br /><sub><b>djencks</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=djencks" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=djencks" title="Tests">⚠️</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-enable -->
