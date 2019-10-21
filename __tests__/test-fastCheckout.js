@@ -241,7 +241,7 @@ describe('checkout', () => {
     // Test
     let error = null
     try {
-      let ops = await fastCheckout({
+      const ops = await fastCheckout({
         dir,
         gitdir,
         force: true
