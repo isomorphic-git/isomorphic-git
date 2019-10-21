@@ -62,12 +62,11 @@ module.exports = {
       size: process.env.CI
         ? optional(
           `cross-env TRAVIS=true ` +
-              `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
-              `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
-                process.env.BUILD_REPOSITORY_NAME} ` +
-              (process.env.TRAVIS_PULL_REQUEST_SHA
-                ? `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} `
-                : '') +
+              `BUNDLESIZE_GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
+              `CI_REPO_OWNER=isomorphic-git ` +
+              `CI_REPO_NAME=isomorphic-git ` +
+              `CI_COMMIT_MESSAGE=${process.env.CI_COMMIT_MESSAGE} ` +
+              `CI_COMMIT_SHA=${process.env.CI_PR_COMMIT_SHA || process.env.CI_COMMIT_SHA} ` +
               `bundlesize`
         )
         : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)

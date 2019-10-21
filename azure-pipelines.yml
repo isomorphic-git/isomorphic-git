@@ -32,6 +32,10 @@ jobs:
       BUNDLESIZE_GITHUB_TOKEN: $(BUNDLESIZE_GITHUB_TOKEN)
       SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
       SAUCE_USERNAME: $(SAUCE_USERNAME)
+      TRAVIS_PULL_REQUEST_SHA: $(system.pullRequest.sourceCommitId)
+      CI_COMMIT_MESSAGE: $(Build.SourceVersionMessage)
+      CI_PR_COMMIT_SHA: $(system.pullRequest.sourceCommitId)
+      CI_COMMIT_SHA: $(Build.SourceVersion)
       TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_ios_safari,sl_safari,sl_android_chrome'
 
   - task: PublishTestResults@2
