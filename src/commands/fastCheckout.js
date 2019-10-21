@@ -27,7 +27,7 @@ import { walkBeta2 } from './walkBeta2.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
- * @param {string} [args.ref] - Which branch to checkout
+ * @param {string} [args.ref = 'HEAD'] - Source to checkout files from
  * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
