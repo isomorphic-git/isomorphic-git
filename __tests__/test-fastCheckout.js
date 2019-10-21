@@ -13,7 +13,7 @@ const {
   branch
 } = require('isomorphic-git')
 
-describe('checkout', () => {
+describe('fastCheckout', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
   })

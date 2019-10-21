@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`checkout checkout 1`] = `
+exports[`fastCheckout checkout 1`] = `
 Array [
   ".babelrc",
   ".editorconfig",
@@ -15,7 +15,7 @@ Array [
 ]
 `;
 
-exports[`checkout checkout 2`] = `
+exports[`fastCheckout checkout 2`] = `
 Array [
   ".babelrc",
   ".editorconfig",
@@ -50,7 +50,7 @@ Array [
 ]
 `;
 
-exports[`checkout checkout by SHA 1`] = `
+exports[`fastCheckout checkout by SHA 1`] = `
 Array [
   ".babelrc",
   ".editorconfig",
@@ -65,7 +65,7 @@ Array [
 ]
 `;
 
-exports[`checkout checkout by SHA 2`] = `
+exports[`fastCheckout checkout by SHA 2`] = `
 Array [
   ".babelrc",
   ".editorconfig",
@@ -100,7 +100,7 @@ Array [
 ]
 `;
 
-exports[`checkout checkout by tag 1`] = `
+exports[`fastCheckout checkout by tag 1`] = `
 Array [
   ".babelrc",
   ".editorconfig",
@@ -115,7 +115,7 @@ Array [
 ]
 `;
 
-exports[`checkout checkout by tag 2`] = `
+exports[`fastCheckout checkout by tag 2`] = `
 Array [
   ".babelrc",
   ".editorconfig",
@@ -150,14 +150,14 @@ Array [
 ]
 `;
 
-exports[`checkout checkout directories using filepaths 1`] = `
+exports[`fastCheckout checkout directories using filepaths 1`] = `
 Array [
   "src",
   "test",
 ]
 `;
 
-exports[`checkout checkout directories using filepaths 2`] = `
+exports[`fastCheckout checkout directories using filepaths 2`] = `
 Array [
   "src/models/GitBlob.js",
   "src/models/GitCommit.js",
@@ -170,20 +170,20 @@ Array [
 ]
 `;
 
-exports[`checkout checkout files using filepaths 1`] = `
+exports[`fastCheckout checkout files using filepaths 1`] = `
 Array [
   "src",
 ]
 `;
 
-exports[`checkout checkout files using filepaths 2`] = `
+exports[`fastCheckout checkout files using filepaths 2`] = `
 Array [
   "src/models/GitBlob.js",
   "src/utils/write.js",
 ]
 `;
 
-exports[`checkout checkout unfetched branch 1`] = `
+exports[`fastCheckout checkout unfetched branch 1`] = `
 Object {
   "caller": "git.checkout",
   "code": "CommitNotFetchedError",
