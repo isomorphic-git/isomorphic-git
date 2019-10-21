@@ -113,7 +113,16 @@ export async function fastCheckout ({
       let ops
       // First pass - just analyze files (not directories) and figure out what needs to be done
       try {
-        ops = await analyze({ fs, dir, gitdir, ref, force, filepaths, emitter, emitterPrefix })
+        ops = await analyze({
+          fs,
+          dir,
+          gitdir,
+          ref,
+          force,
+          filepaths,
+          emitter,
+          emitterPrefix
+        })
       } catch (err) {
         // Throw a more helpful error message for this common mistake.
         if (err.code === E.ReadObjectFail && err.data.oid === oid) {
@@ -154,31 +163,28 @@ export async function fastCheckout ({
 
       let count = 0
       const total = ops.length
-      await GitIndexManager.acquire(
-        { fs, gitdir },
-        async function (index) {
-          await Promise.all(
-            ops
-              .filter(
-                ([method]) => method === 'delete' || method === 'delete-index'
-              )
-              .map(async function ([method, fullpath]) {
-                const filepath = `${dir}/${fullpath}`
-                if (method === 'delete') {
-                  await fs.rm(filepath)
-                }
-                index.delete({ filepath: fullpath })
-                if (emitter) {
-                  emitter.emit(`${emitterPrefix}progress`, {
-                    phase: 'Updating workdir',
-                    loaded: ++count,
-                    total
-                  })
-                }
-              })
-          )
-        }
-      )
+      await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+        await Promise.all(
+          ops
+            .filter(
+              ([method]) => method === 'delete' || method === 'delete-index'
+            )
+            .map(async function ([method, fullpath]) {
+              const filepath = `${dir}/${fullpath}`
+              if (method === 'delete') {
+                await fs.rm(filepath)
+              }
+              index.delete({ filepath: fullpath })
+              if (emitter) {
+                emitter.emit(`${emitterPrefix}progress`, {
+                  phase: 'Updating workdir',
+                  loaded: ++count,
+                  total
+                })
+              }
+            })
+        )
+      })
 
       // Note: this is cannot be done naively in parallel
       for (const [method, fullpath] of ops) {
@@ -221,79 +227,81 @@ export async function fastCheckout ({
           })
       )
 
-      await GitIndexManager.acquire(
-        { fs, gitdir },
-        async function (index) {
-          await Promise.all(
-            ops
-              .filter(
-                ([method]) =>
-                  method === 'create' ||
-                  method === 'create-index' ||
-                  method === 'update'
-              )
-              .map(async function ([method, fullpath, oid, mode, chmod]) {
-                const filepath = `${dir}/${fullpath}`
-                try {
-                  if (method !== 'create-index') {
-                    const { object } = await readObject({ fs, gitdir, oid })
-                    if (chmod) {
-                      // Note: the mode option of fs.write only works when creating files,
-                      // not updating them. Since the `fs` plugin doesn't expose `chmod` this
-                      // is our only option.
-                      await fs.rm(filepath)
-                    }
-                    if (mode === 0o100644) {
-                      // regular file
-                      await fs.write(filepath, object)
-                    } else if (mode === 0o100755) {
-                      // executable file
-                      await fs.write(filepath, object, { mode: 0o777 })
-                    } else if (mode === 0o120000) {
-                      // symlink
-                      await fs.writelink(filepath, object)
-                    } else {
-                      throw new GitError(E.InternalFail, {
-                        message: `Invalid mode 0o${mode.toString(
-                          8
-                        )} detected in blob ${oid}`
-                      })
-                    }
+      await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+        await Promise.all(
+          ops
+            .filter(
+              ([method]) =>
+                method === 'create' ||
+                method === 'create-index' ||
+                method === 'update'
+            )
+            .map(async function ([method, fullpath, oid, mode, chmod]) {
+              const filepath = `${dir}/${fullpath}`
+              try {
+                if (method !== 'create-index') {
+                  const { object } = await readObject({ fs, gitdir, oid })
+                  if (chmod) {
+                    // Note: the mode option of fs.write only works when creating files,
+                    // not updating them. Since the `fs` plugin doesn't expose `chmod` this
+                    // is our only option.
+                    await fs.rm(filepath)
                   }
-
-                  const stats = await fs.lstat(filepath)
-                  // We can't trust the executable bit returned by lstat on Windows,
-                  // so we need to preserve this value from the TREE.
-                  // TODO: Figure out how git handles this internally.
-                  if (mode === 0o100755) {
-                    stats.mode = 0o755
-                  }
-                  index.insert({
-                    filepath: fullpath,
-                    stats,
-                    oid
-                  })
-                  if (emitter) {
-                    emitter.emit(`${emitterPrefix}progress`, {
-                      phase: 'Updating workdir',
-                      loaded: ++count,
-                      total
+                  if (mode === 0o100644) {
+                    // regular file
+                    await fs.write(filepath, object)
+                  } else if (mode === 0o100755) {
+                    // executable file
+                    await fs.write(filepath, object, { mode: 0o777 })
+                  } else if (mode === 0o120000) {
+                    // symlink
+                    await fs.writelink(filepath, object)
+                  } else {
+                    throw new GitError(E.InternalFail, {
+                      message: `Invalid mode 0o${mode.toString(
+                        8
+                      )} detected in blob ${oid}`
                     })
                   }
-                } catch (e) {
-                  console.log(e)
                 }
-              })
-          )
-        }
-      )
+
+                const stats = await fs.lstat(filepath)
+                // We can't trust the executable bit returned by lstat on Windows,
+                // so we need to preserve this value from the TREE.
+                // TODO: Figure out how git handles this internally.
+                if (mode === 0o100755) {
+                  stats.mode = 0o755
+                }
+                index.insert({
+                  filepath: fullpath,
+                  stats,
+                  oid
+                })
+                if (emitter) {
+                  emitter.emit(`${emitterPrefix}progress`, {
+                    phase: 'Updating workdir',
+                    loaded: ++count,
+                    total
+                  })
+                }
+              } catch (e) {
+                console.log(e)
+              }
+            })
+        )
+      })
     }
 
     // Update HEAD
     if (ref === 'HEAD' || !noUpdateHead) {
       const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
       if (fullRef.startsWith('refs/heads')) {
-        await GitRefManager.writeSymbolicRef({ fs, gitdir, ref: 'HEAD', value: fullRef })
+        await GitRefManager.writeSymbolicRef({
+          fs,
+          gitdir,
+          ref: 'HEAD',
+          value: fullRef
+        })
       } else {
         // detached head
         await GitRefManager.writeRef({ fs, gitdir, ref: 'HEAD', value: oid })
@@ -305,7 +313,16 @@ export async function fastCheckout ({
   }
 }
 
-async function analyze ({ fs, dir, gitdir, ref, force, filepaths, emitter, emitterPrefix }) {
+async function analyze ({
+  fs,
+  dir,
+  gitdir,
+  ref,
+  force,
+  filepaths,
+  emitter,
+  emitterPrefix
+}) {
   let count = 0
   return walkBeta2({
     fs,
