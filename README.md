@@ -189,6 +189,7 @@ unless there is a major version bump.
 - [deleteTag](https://isomorphic-git.github.io/docs/deleteTag.html)
 - [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
 - [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
+- [fastCheckout](https://isomorphic-git.github.io/docs/fastCheckout.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)

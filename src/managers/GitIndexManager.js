@@ -37,6 +37,11 @@ async function isIndexStale (fs, filepath) {
 }
 
 export class GitIndexManager {
+  /**
+   *
+   * @param {object} opts
+   * @param {function(GitIndex): any} closure
+   */
   static async acquire ({ fs: _fs, gitdir }, closure) {
     const fs = new FileSystem(_fs)
     const filepath = `${gitdir}/index`

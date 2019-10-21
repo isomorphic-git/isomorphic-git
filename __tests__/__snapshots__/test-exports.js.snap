@@ -22,6 +22,7 @@ Array [
   "deleteTag",
   "expandOid",
   "expandRef",
+  "fastCheckout",
   "fetch",
   "findMergeBase",
   "findRoot",
