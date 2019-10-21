@@ -65,7 +65,7 @@ module.exports = {
               `BUNDLESIZE_GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
               `CI_REPO_OWNER=isomorphic-git ` +
               `CI_REPO_NAME=isomorphic-git ` +
-              `CI_COMMIT_MESSAGE=${process.env.CI_COMMIT_MESSAGE} ` +
+              `CI_COMMIT_MESSAGE='${process.env.CI_COMMIT_MESSAGE.replace(/'/g, "\\'")}' ` +
               `CI_COMMIT_SHA=${process.env.CI_PR_COMMIT_SHA ||
                 process.env.CI_COMMIT_SHA} ` +
               `bundlesize`
