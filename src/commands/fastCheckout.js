@@ -310,9 +310,9 @@ export async function fastCheckout ({
   }
 }
 
-async function analyze({ fs, dir, gitdir, ref, force, filepaths, emitter, emitterPrefix }) {
+async function analyze ({ fs, dir, gitdir, ref, force, filepaths, emitter, emitterPrefix }) {
   let count = 0
-  return await walkBeta2({
+  return walkBeta2({
     fs,
     dir,
     gitdir,
