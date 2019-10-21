@@ -87,6 +87,7 @@
     "envify": "4.1.0",
     "git-http-mock-server": "1.2.0",
     "github-comment": "1.0.1",
+    "inquirer": "^7.0.0",
     "jasmine": "3.4.0",
     "jasmine-core": "3.4.0",
     "jest": "24.9.0",
