@@ -112,7 +112,6 @@ export async function fastCheckout ({
     if (!noCheckout) {
       let ops
       // First pass - just analyze files (not directories) and figure out what needs to be done
-      // and (TODO) if it can be done without losing uncommitted changes.
       try {
         ops = await analyze({ fs, dir, gitdir, ref, force, filepaths, emitter, emitterPrefix })
       } catch (err) {
