@@ -19,9 +19,9 @@ import { walkBeta2 } from './walkBeta2.js'
  * Checkout a branch
  *
  * If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
- * 
+ *
  * This is basically a next-gen rewrite of [checkout](./checkout.md) that has proper support for conflict detection, removing empty directories, etc.
- * 
+ *
  * I will probably replace checkout entirely in the 1.0 release with the `switch` and `restore` commands found in new versions of git.
  *
  * @param {object} args
@@ -157,10 +157,6 @@ export async function fastCheckout ({
       const total = ops.length
       await GitIndexManager.acquire(
         { fs, gitdir },
-        /**
-         *
-         * @param {import('../models/GitIndex.js').GitIndex} index
-         */
         async function (index) {
           await Promise.all(
             ops
@@ -228,10 +224,6 @@ export async function fastCheckout ({
 
       await GitIndexManager.acquire(
         { fs, gitdir },
-        /**
-         *
-         * @param {import('../models/GitIndex.js').GitIndex} index
-         */
         async function (index) {
           await Promise.all(
             ops
