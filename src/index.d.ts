@@ -291,7 +291,7 @@ export function checkout(args: WorkDir & GitDir & {
   emitter?: EventEmitter;
   emitterPrefix?: string;
   remote?: string;
-  ref?: string;
+  ref: string;
   filepaths?: string[];
   pattern?: string;
 }): Promise<void>;
@@ -394,6 +394,19 @@ export function expandOid(args: GitDir & {
   fs?: any;
   oid: string;
 }): Promise<string>;
+
+export function fastCheckout(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
+  emitter?: EventEmitter;
+  emitterPrefix?: string;
+  remote?: string;
+  ref?: string;
+  filepaths?: string[];
+  dryRun?: boolean;
+  debug?: boolean;
+  force?: boolean;
+}): Promise<void>;
 
 export function fetch(args: GitDir & {
   core?: string;
