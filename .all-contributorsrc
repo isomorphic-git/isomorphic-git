@@ -356,6 +356,17 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "djencks",
+      "name": "djencks",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/569822?v=4",
+      "profile": "https://github.com/djencks",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
-  ]
+  ],
+  "commitConvention": "angular"
 }
