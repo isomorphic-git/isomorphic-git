@@ -142,6 +142,10 @@ export async function fastCheckout ({
                 return
               // Ignore workdir files that are not tracked and not part of the new commit.
               case '001':
+                // OK, make an exception for explicitly named files.
+                if (force && filepaths.includes(fullpath)) {
+                  return ['delete', fullpath]
+                }
                 return
               // New entries
               case '010': {
@@ -275,7 +279,7 @@ export async function fastCheckout ({
                 }
               }
               /* eslint-disable no-fallthrough */
-              // Modified entries but file was deleted in workdir for some reason. Kinda odd case.
+              // File missing from workdir
               case '110':
               // Modified entries
               case '111': {
@@ -305,6 +309,14 @@ export async function fastCheckout ({
                           return ['conflict', fullpath]
                         }
                       }
+                    } else if (force) {
+                      return [
+                        'update',
+                        fullpath,
+                        await commit.oid(),
+                        await commit.mode(),
+                        (await commit.mode()) !== (await stage.mode())
+                      ]
                     }
                     // Has file mode changed?
                     if ((await commit.mode()) !== (await stage.mode())) {
