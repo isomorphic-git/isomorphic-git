@@ -12,6 +12,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {boolean} [args.bare = false] - Initialize a bare repository
+ * @param {boolean} [args.noOverwrite = false] - Detect if this is already a git repo and do not re-write `.git/config`
  * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
  *
  * @example
@@ -29,6 +30,7 @@ export async function init ({
 }) {
   try {
     const fs = new FileSystem(_fs)
+    if (noOverwrite && await fs.exists(gitdir + '/config')) return
     let folders = [
       'hooks',
       'info',
@@ -41,18 +43,16 @@ export async function init ({
     for (const folder of folders) {
       await fs.mkdir(folder)
     }
-    if (!noOverwrite || !await fs.exists(gitdir + '/config')) {
-      await fs.write(
-        gitdir + '/config',
-        '[core]\n' +
-        '\trepositoryformatversion = 0\n' +
-        '\tfilemode = false\n' +
-        `\tbare = ${bare}\n` +
-        (bare ? '' : '\tlogallrefupdates = true\n') +
-        '\tsymlinks = false\n' +
-        '\tignorecase = true\n'
-      )
-    }
+    await fs.write(
+      gitdir + '/config',
+      '[core]\n' +
+      '\trepositoryformatversion = 0\n' +
+      '\tfilemode = false\n' +
+      `\tbare = ${bare}\n` +
+      (bare ? '' : '\tlogallrefupdates = true\n') +
+      '\tsymlinks = false\n' +
+      '\tignorecase = true\n'
+    )
     await fs.write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
   } catch (err) {
     err.caller = 'git.init'
