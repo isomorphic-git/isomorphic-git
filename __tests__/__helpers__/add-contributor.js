@@ -1,21 +1,17 @@
-var { execSync } = require('child_process');
-var inquirer = require('inquirer');
+var { execSync } = require('child_process')
+var inquirer = require('inquirer')
 inquirer
   .prompt([
     {
       type: 'input',
       name: 'username',
-      message: 'GitHub username:',
+      message: 'GitHub username:'
     },
     {
       type: 'checkbox',
       name: 'contributions',
       message: 'Contribution type(s):',
-      default: [
-        'code',
-        'test',
-        'doc'
-      ],
+      default: ['code', 'test', 'doc'],
       choices: [
         {
           value: 'code',
@@ -70,7 +66,7 @@ inquirer
           name: 'Ideas & Planning'
         },
         {
-          value: "infra",
+          value: 'infra',
           name: 'Infrastructure'
         },
         {
@@ -125,9 +121,18 @@ inquirer
     }
   ])
   .then(answers => {
-    console.log('\n(This may take a moment to download the add-contributors-cli.)\n')
-    var cmd = `npx all-contributors-cli add ${answers.username} ${answers.contributions.join(',')}`
+    console.log(
+      '\n(This may take a moment to download the add-contributors-cli.)\n'
+    )
+    var cmd = `npx all-contributors-cli add ${
+      answers.username
+    } ${answers.contributions.join(',')}`
     console.log(cmd)
-    execSync(`npx all-contributors-cli add ${answers.username} ${answers.contributions.join(',')}`, { encoding: 'utf8' })
+    execSync(
+      `npx all-contributors-cli add ${
+        answers.username
+      } ${answers.contributions.join(',')}`,
+      { encoding: 'utf8' }
+    )
     console.log('\nOK, all done, added a commit and everything.')
-  });
+  })
