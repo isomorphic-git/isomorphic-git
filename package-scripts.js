@@ -66,7 +66,8 @@ module.exports = {
               `CI_REPO_OWNER=isomorphic-git ` +
               `CI_REPO_NAME=isomorphic-git ` +
               `CI_COMMIT_MESSAGE=${process.env.CI_COMMIT_MESSAGE} ` +
-              `CI_COMMIT_SHA=${process.env.CI_PR_COMMIT_SHA || process.env.CI_COMMIT_SHA} ` +
+              `CI_COMMIT_SHA=${process.env.CI_PR_COMMIT_SHA ||
+                process.env.CI_COMMIT_SHA} ` +
               `bundlesize`
         )
         : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)
