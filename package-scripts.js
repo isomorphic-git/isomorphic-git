@@ -61,7 +61,7 @@ module.exports = {
       docs: 'node ./__tests__/__helpers__/generate-docs.js',
       size: process.env.CI
         ? optional(
-          `cross-env TRAVIS=true ` +
+          `cross-env-shell TRAVIS=true ` +
               `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
               `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
                 process.env.BUILD_REPOSITORY_NAME} ` +
