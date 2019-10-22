@@ -406,6 +406,8 @@ export function fastCheckout(args: WorkDir & GitDir & {
   dryRun?: boolean;
   debug?: boolean;
   force?: boolean;
+  noCheckout?: boolean;
+  noUpdateHead?: boolean;
 }): Promise<void>;
 
 export function fetch(args: GitDir & {

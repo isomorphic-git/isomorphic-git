@@ -35,7 +35,7 @@ import { walkBeta2 } from './walkBeta2.js'
  * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
- * @param {boolean} [args.noUpdateHead = false] - If true, will update the working directory but won't update HEAD
+ * @param {boolean} [args.noUpdateHead] - If true, will update the working directory but won't update HEAD. Defaults to `false` when `ref` is provided, and `true` if `ref` is not provided.
  * @param {boolean} [args.dryRun = false] - If true, simulates a checkout so you can test whether it would succeed.
  * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
  *
@@ -64,16 +64,17 @@ export async function fastCheckout ({
   emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   remote = 'origin',
-  ref = 'HEAD',
+  ref: _ref,
   filepaths = ['.'],
   noCheckout = false,
-  noUpdateHead = false,
+  noUpdateHead = _ref === void 0,
   dryRun = false,
   // @ts-ignore
   debug = false,
   force = false
 }) {
   try {
+    const ref = _ref || 'HEAD'
     const fs = new FileSystem(_fs)
     // Get tree oid
     let oid
@@ -293,7 +294,7 @@ export async function fastCheckout ({
     }
 
     // Update HEAD
-    if (ref === 'HEAD' || !noUpdateHead) {
+    if (!noUpdateHead) {
       const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
       if (fullRef.startsWith('refs/heads')) {
         await GitRefManager.writeSymbolicRef({
