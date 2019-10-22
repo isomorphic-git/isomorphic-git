@@ -30,7 +30,7 @@ export async function init ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    if (noOverwrite && await fs.exists(gitdir + '/config')) return
+    if (noOverwrite && (await fs.exists(gitdir + '/config'))) return
     let folders = [
       'hooks',
       'info',
@@ -46,12 +46,12 @@ export async function init ({
     await fs.write(
       gitdir + '/config',
       '[core]\n' +
-      '\trepositoryformatversion = 0\n' +
-      '\tfilemode = false\n' +
-      `\tbare = ${bare}\n` +
-      (bare ? '' : '\tlogallrefupdates = true\n') +
-      '\tsymlinks = false\n' +
-      '\tignorecase = true\n'
+        '\trepositoryformatversion = 0\n' +
+        '\tfilemode = false\n' +
+        `\tbare = ${bare}\n` +
+        (bare ? '' : '\tlogallrefupdates = true\n') +
+        '\tsymlinks = false\n' +
+        '\tignorecase = true\n'
     )
     await fs.write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
   } catch (err) {
