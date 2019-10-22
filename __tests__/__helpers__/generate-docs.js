@@ -235,14 +235,20 @@ for (const filename of files) {
   }
 }
 
-
 // Generate errors.md
 const { E } = require('../..')
 const errorFile = path.join(__dirname, '..', '..', 'src', 'errors.d.ts')
 const thisFile = path.relative(path.dirname(errorFile), __filename)
 
 const docFile = path.join(__dirname, '..', '..', 'docs', 'errors.md')
-const sourceFile = path.join(__dirname, '..', '..', 'src', 'models', 'GitError.js')
+const sourceFile = path.join(
+  __dirname,
+  '..',
+  '..',
+  'src',
+  'models',
+  'GitError.js'
+)
 const sourceCode = fs.readFileSync(sourceFile, 'utf8')
 
 let contents = `---
