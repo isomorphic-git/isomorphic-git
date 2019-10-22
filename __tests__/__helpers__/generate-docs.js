@@ -265,11 +265,11 @@ explanation, and gives possible resolutions to common scenarios where these erro
 
 `
 
-let keys = Object.keys(E)
+const keys = Object.keys(E)
 keys.sort()
 
 for (const key of keys) {
-  let matches = sourceCode.match(new RegExp(`${key}: \`(.*)\`,?\\n`))
+  const matches = sourceCode.match(new RegExp(`${key}: \`(.*)\`,?\\n`))
   if (matches) {
     contents += `### ${key}\n`
     contents += matches[1] + '\n\n'
