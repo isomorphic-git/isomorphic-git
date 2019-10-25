@@ -23,7 +23,9 @@ describe('GitPackIndex', () => {
       )
     )
     const p = await GitPackIndex.fromIdx({ idx })
-    expect(await shasum(Buffer.from(JSON.stringify(p.hashes)))).toMatchSnapshot()
+    expect(
+      await shasum(Buffer.from(JSON.stringify(p.hashes)))
+    ).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets.get('0b8faa11b353db846b40eb064dfb299816542a46')).toEqual(
@@ -51,7 +53,9 @@ describe('GitPackIndex', () => {
       )
     )
     const p = await GitPackIndex.fromPack({ pack })
-    expect(await shasum(Buffer.from(JSON.stringify(p.hashes)))).toMatchSnapshot()
+    expect(
+      await shasum(Buffer.from(JSON.stringify(p.hashes)))
+    ).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets.get('0b8faa11b353db846b40eb064dfb299816542a46')).toEqual(
