@@ -88,7 +88,7 @@ export class GitWalkerFs {
       if (!stage || compareStats(entry, stage)) {
         log(`INDEX CACHE MISS: calculating SHA for ${entry.fullpath}`)
         if (!entry.content) await entry.populateContent()
-        const oid = shasum(
+        const oid = await shasum(
           GitObject.wrap({ type: 'blob', object: entry.content })
         )
         if (stage && oid === stage.oid) {
