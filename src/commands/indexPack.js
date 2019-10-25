@@ -46,7 +46,7 @@ export async function indexPack ({
       emitter,
       emitterPrefix
     })
-    await fs.write(filepath.replace(/\.pack$/, '.idx'), idx.toBuffer())
+    await fs.write(filepath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
   } catch (err) {
     err.caller = 'git.indexPack'
     throw err

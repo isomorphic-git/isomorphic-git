@@ -23,7 +23,9 @@ describe('GitPackIndex', () => {
       )
     )
     const p = await GitPackIndex.fromIdx({ idx })
-    expect(shasum(JSON.stringify(p.hashes))).toMatchSnapshot()
+    expect(
+      await shasum(Buffer.from(JSON.stringify(p.hashes)))
+    ).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets.get('0b8faa11b353db846b40eb064dfb299816542a46')).toEqual(
@@ -51,7 +53,9 @@ describe('GitPackIndex', () => {
       )
     )
     const p = await GitPackIndex.fromPack({ pack })
-    expect(shasum(JSON.stringify(p.hashes))).toMatchSnapshot()
+    expect(
+      await shasum(Buffer.from(JSON.stringify(p.hashes)))
+    ).toMatchSnapshot()
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets.get('0b8faa11b353db846b40eb064dfb299816542a46')).toEqual(
@@ -85,7 +89,7 @@ describe('GitPackIndex', () => {
       )
     )
     const p = await GitPackIndex.fromPack({ pack })
-    const idxbuffer = p.toBuffer()
+    const idxbuffer = await p.toBuffer()
     expect(idxbuffer.byteLength).toBe(idx.byteLength)
     expect(idxbuffer.equals(idx)).toBe(true)
   })
@@ -110,7 +114,7 @@ describe('GitPackIndex', () => {
     })
     expect(type).toBe('commit')
     expect(object.toString('utf8')).toMatchSnapshot()
-    const oid = shasum(GitObject.wrap({ type, object }))
+    const oid = await shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('637c4e69d85e0dcc18898ec251377453d0891585')
   })
   it('read deltified object', async () => {
@@ -134,7 +138,7 @@ describe('GitPackIndex', () => {
     })
     expect(type).toBe('blob')
     expect(object.toString('utf8')).toMatchSnapshot()
-    const oid = shasum(GitObject.wrap({ type, object }))
+    const oid = await shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('7fb539a8e8488c3fd2793e7dda8a44693e25cce1')
   })
 })
