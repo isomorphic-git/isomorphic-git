@@ -17,7 +17,7 @@ let lock = null
 async function updateCachedIndexFile (fs, filepath) {
   const stat = await fs.lstat(filepath)
   const rawIndexFile = await fs.read(filepath)
-  const index = GitIndex.from(rawIndexFile)
+  const index = await GitIndex.from(rawIndexFile)
   // cache the GitIndex object so we don't need to re-read it
   // every time.
   map.set([fs, filepath], index)
@@ -60,7 +60,7 @@ export class GitIndexManager {
       if (index._dirty) {
         // Acquire a file lock while we're writing the index file
         // let fileLock = await Lock(filepath)
-        const buffer = index.toObject()
+        const buffer = await index.toObject()
         await fs.write(filepath, buffer)
         // Update cached stat value
         stats.set([fs, filepath], await fs.lstat(filepath))

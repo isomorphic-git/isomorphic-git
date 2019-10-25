@@ -126,7 +126,7 @@ export class GitWalkerFs2 {
           if (content === void 0) {
             oid = void 0
           } else {
-            oid = shasum(
+            oid = await shasum(
               GitObject.wrap({ type: 'blob', object: await entry.content() })
             )
             if (stage && oid === stage.oid) {

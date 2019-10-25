@@ -277,7 +277,7 @@ export class GitPackIndex {
         timeByDepth[p.readDepth] += time
         objectsByDepth[p.readDepth] += 1
         marky.mark('hash')
-        const oid = shasum(GitObject.wrap({ type, object }))
+        const oid = await shasum(GitObject.wrap({ type, object }))
         times.hash += marky.stop('hash').duration
         o.oid = oid
         hashes.push(oid)
@@ -312,7 +312,7 @@ export class GitPackIndex {
     return p
   }
 
-  toBuffer () {
+  async toBuffer () {
     const buffers = []
     const write = (str, encoding) => {
       buffers.push(Buffer.from(str, encoding))
@@ -351,7 +351,7 @@ export class GitPackIndex {
     write(this.packfileSha, 'hex')
     // Write out shasum
     const totalBuffer = Buffer.concat(buffers)
-    const sha = shasum(totalBuffer)
+    const sha = await shasum(totalBuffer)
     const shaBuffer = Buffer.alloc(20)
     shaBuffer.write(sha, 'hex')
     return Buffer.concat([totalBuffer, shaBuffer])

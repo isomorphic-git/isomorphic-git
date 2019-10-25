@@ -241,12 +241,11 @@ describe('fastCheckout', () => {
     // Test
     let error = null
     try {
-      const ops = await fastCheckout({
+      await fastCheckout({
         dir,
         gitdir,
         force: true
       })
-      console.log(ops)
     } catch (e) {
       error = e
     }

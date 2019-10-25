@@ -11,7 +11,7 @@ export async function hashObject ({
     if (format !== 'wrapped') {
       object = GitObject.wrap({ type, object })
     }
-    oid = shasum(object)
+    oid = await shasum(object)
   }
   return { oid, object }
 }
