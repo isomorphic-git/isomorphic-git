@@ -38,8 +38,13 @@ export class GitRemoteHTTP {
       // To try to be backwards compatible with simple-get's behavior, which uses Node's http.request
       // setting an Authorization header will override what is in the URL.
       // Ergo manually specified auth parameters will override those in the URL.
-      auth.username = auth.username || urlAuth.username
-      auth.password = auth.password || urlAuth.password
+      // However, since the oauth2 option is incompatible with usernames and passwords, rather than throw an
+      // E.MixUsernamePasswordOauth2formatTokenError error, we'll avoid that situation by ignoring the username
+      // and/or password in the url.
+      if (!auth.oauth2format) {
+        auth.username = auth.username || urlAuth.username
+        auth.password = auth.password || urlAuth.password
+      }
     }
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
