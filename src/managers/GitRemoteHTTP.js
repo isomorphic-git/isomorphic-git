@@ -30,6 +30,8 @@ export class GitRemoteHTTP {
     headers
   }) {
     const _origUrl = url
+    // Try to convert SSH URLs to HTTPS ones
+    url = url.replace(/^git@([^:]+):/, 'https://$1/')
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     const urlAuth = extractAuthFromUrl(url)
@@ -130,6 +132,8 @@ export class GitRemoteHTTP {
     body,
     headers
   }) {
+    // Try to convert SSH URLs to HTTPS ones
+    url = url.replace(/^git@([^:]+):/, 'https://$1/')
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     const urlAuth = extractAuthFromUrl(url)
