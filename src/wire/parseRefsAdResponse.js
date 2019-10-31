@@ -26,7 +26,10 @@ export async function parseRefsAdResponse (stream, { service }) {
   // In the edge case of a brand new repo, zero refs (and zero capabilities)
   // are returned.
   if (lineTwo === true) return { capabilities, refs, symrefs }
-  const [firstRef, capabilitiesLine] = splitAndCheck(lineTwo.toString('utf8'), '\x00')
+  const [firstRef, capabilitiesLine] = splitAndCheck(
+    lineTwo.toString('utf8'),
+    '\x00'
+  )
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
   const [ref, name] = splitAndCheck(firstRef, ' ')
   refs.set(name, ref)
@@ -51,9 +54,7 @@ export async function parseRefsAdResponse (stream, { service }) {
 }
 
 function splitAndCheck (line, sep) {
-  const split = line
-    .trim()
-    .split(sep)
+  const split = line.trim().split(sep)
   if (split.length !== 2) {
     throw new GitError(E.AssertServerResponseFail, {
       expected: `Two words separated by '${sep}'`,
