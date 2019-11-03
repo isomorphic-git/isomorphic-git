@@ -218,7 +218,7 @@ describe('git wire protocol', () => {
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
-        expected: "Two words separated by '\0'",
+        expected: '\0',
         actual:
           '9ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development\n'
       })
@@ -246,7 +246,7 @@ describe('git wire protocol', () => {
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
-        expected: "Two words separated by ' '",
+        expected: ' ',
         actual: '9ea43b479f5fedc679e3eb37803275d727bf51b7  HEAD'
       })
     }
@@ -272,7 +272,7 @@ describe('git wire protocol', () => {
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
-        expected: "Two words separated by ' '",
+        expected: ' ',
         actual: 'fb74ea1a9b6a9601df18c38d3de751c51f064bf7refs/heads/js2\n0'
       })
     }
