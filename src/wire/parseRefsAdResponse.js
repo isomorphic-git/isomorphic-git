@@ -28,16 +28,17 @@ export async function parseRefsAdResponse (stream, { service }) {
   if (lineTwo === true) return { capabilities, refs, symrefs }
   const [firstRef, capabilitiesLine] = splitAndAssert(
     lineTwo.toString('utf8'),
-    '\x00'
+    '\x00',
+    '\\x00'
   )
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
-  const [ref, name] = splitAndAssert(firstRef, ' ')
+  const [ref, name] = splitAndAssert(firstRef, ' ', ' ')
   refs.set(name, ref)
   while (true) {
     const line = await read()
     if (line === true) break
     if (line !== null) {
-      const [ref, name] = splitAndAssert(line.toString('utf8'), ' ')
+      const [ref, name] = splitAndAssert(line.toString('utf8'), ' ', ' ')
       refs.set(name, ref)
     }
   }
@@ -53,11 +54,11 @@ export async function parseRefsAdResponse (stream, { service }) {
   return { capabilities, refs, symrefs }
 }
 
-function splitAndAssert (line, sep) {
+function splitAndAssert (line, sep, expected) {
   const split = line.trim().split(sep)
   if (split.length !== 2) {
     throw new GitError(E.AssertServerResponseFail, {
-      expected: sep,
+      expected,
       actual: line.toString('utf8')
     })
   }
