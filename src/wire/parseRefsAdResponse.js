@@ -58,7 +58,7 @@ function splitAndAssert (line, sep, expected) {
   const split = line.trim().split(sep)
   if (split.length !== 2) {
     throw new GitError(E.AssertServerResponseFail, {
-      expected,
+      expected: `Two strings separated by '${expected}'`,
       actual: line.toString('utf8')
     })
   }
