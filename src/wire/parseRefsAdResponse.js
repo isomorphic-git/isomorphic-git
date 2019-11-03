@@ -30,26 +30,28 @@ export async function parseRefsAdResponse (stream, { service }) {
     .toString('utf8')
     .trim()
     .split('\x00')
-  capabilitiesLine.split(' ').map(x => capabilities.add(x))
-  const [ref, name] = firstRef.split(' ')
-  refs.set(name, ref)
-  while (true) {
-    const line = await read()
-    if (line === true) break
-    if (line !== null) {
-      const [ref, name] = line
-        .toString('utf8')
-        .trim()
-        .split(' ')
-      refs.set(name, ref)
+  if (capabilitiesLine) {
+    capabilitiesLine.split(' ').map(x => capabilities.add(x))
+    const [ref, name] = firstRef.split(' ')
+    refs.set(name, ref)
+    while (true) {
+      const line = await read()
+      if (line === true) break
+      if (line !== null) {
+        const [ref, name] = line
+          .toString('utf8')
+          .trim()
+          .split(' ')
+        refs.set(name, ref)
+      }
     }
-  }
-  // Symrefs are thrown into the "capabilities" unfortunately.
-  for (const cap of capabilities) {
-    if (cap.startsWith('symref=')) {
-      const m = cap.match(/symref=([^:]+):(.*)/)
-      if (m.length === 3) {
-        symrefs.set(m[1], m[2])
+    // Symrefs are thrown into the "capabilities" unfortunately.
+    for (const cap of capabilities) {
+      if (cap.startsWith('symref=')) {
+        const m = cap.match(/symref=([^:]+):(.*)/)
+        if (m.length === 3) {
+          symrefs.set(m[1], m[2])
+        }
       }
     }
   }
