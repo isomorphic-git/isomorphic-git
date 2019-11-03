@@ -200,15 +200,10 @@ describe('git wire protocol', () => {
   it('parseRefsAdResponse bad null separated', async () => {
     const res = [
       Buffer.from(`001e# service=git-upload-pack
-000001149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
-003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
-003c5faa96fe725306e060386975a70e4b6eacb576ed refs/heads/js3
-003f9ea43b479f5fedc679e3eb37803275d727bf51b7 refs/heads/master
-0040c1751a5447a7b025e5bca507af483dde7b0b956f refs/heads/master2
-0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
-004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
-0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
-0000`)
+0072ERR Repository not found
+The requested repository does not exist, or you do not have permission to
+access it.
+`)
     ]
     try {
       await parseRefsAdResponse(res, {
@@ -218,9 +213,12 @@ describe('git wire protocol', () => {
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
-        expected: '\\x00',
+        expected: `Two strings separated by '\\x00'`,
         actual:
-          '9ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development\n'
+          `ERR Repository not found
+The requested repository does not exist, or you do not have permission to
+access it.
+`
       })
     }
   })
@@ -246,7 +244,7 @@ describe('git wire protocol', () => {
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
-        expected: ' ',
+        expected: `Two strings separated by ' '`,
         actual: '9ea43b479f5fedc679e3eb37803275d727bf51b7  HEAD'
       })
     }
@@ -272,7 +270,7 @@ describe('git wire protocol', () => {
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
-        expected: ' ',
+        expected: `Two strings separated by ' '`,
         actual: 'fb74ea1a9b6a9601df18c38d3de751c51f064bf7refs/heads/js2\n0'
       })
     }
