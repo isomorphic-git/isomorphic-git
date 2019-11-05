@@ -30,11 +30,11 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
 
 /**
  *
- * @typedef {Object} WalkerEntry The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
+ * @typedef {Object} WalkerEntry2 The `WalkerEntry2` is an interface that abstracts computing many common tree / blob stats.
  * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
  * @property {function(): Promise<number>} mode
  * @property {function(): Promise<string>} oid
- * @property {function(): Promise<Buffer>} content
+ * @property {function(): Promise<Buffer | void>} content
  * @property {function(): Promise<Stat>} stat
  */
 
@@ -69,17 +69,17 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  *
  * For the arguments, see the doc pages for [TREE](./TREE.md), [WORKDIR](./WORKDIR.md), and [STAGE](./STAGE.md).
  *
- * `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerEntry`s into the desired result.
+ * `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerEntry2`s into the desired result.
  *
- * ## WalkerEntry
+ * ## WalkerEntry2
  *
- * {@link WalkerEntry typedef}
+ * {@link WalkerEntry2 typedef}
  *
- * `map` receives an array of `WalkerEntry[]` as its main argument, one `WalkerEntry` for each `Walker` in the `trees` argument.
- * The methods are memoized per `WalkerEntry` so calling them multiple times in a `map` function does not adversely impact performance.
+ * `map` receives an array of `WalkerEntry2[]` as its main argument, one `WalkerEntry2` for each `Walker` in the `trees` argument.
+ * The methods are memoized per `WalkerEntry2` so calling them multiple times in a `map` function does not adversely impact performance.
  * By only computing these values if needed, you build can build lean, mean, efficient walking machines.
  *
- * ### WalkerEntry#type()
+ * ### WalkerEntry2#type()
  *
  * Returns the kind as a string. This is normally either `tree` or `blob`.
  *
@@ -96,7 +96,7 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  * await entry.type()
  * ```
  *
- * ### WalkerEntry#mode()
+ * ### WalkerEntry2#mode()
  *
  * Returns the file mode as a number. Use this to distinguish between regular files, symlinks, and executable files.
  *
@@ -115,7 +115,7 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  * await entry.mode()
  * ```
  *
- * ### WalkerEntry#oid()
+ * ### WalkerEntry2#oid()
  *
  * Returns the SHA-1 object id for blobs and trees.
  *
@@ -127,7 +127,7 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  * await entry.oid()
  * ```
  *
- * ### WalkerEntry#content()
+ * ### WalkerEntry2#content()
  *
  * Returns the file contents as a Buffer.
  *
@@ -139,7 +139,7 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  * await entry.content()
  * ```
  *
- * ### WalkerEntry#stat()
+ * ### WalkerEntry2#stat()
  *
  * Returns a normalized subset of filesystem Stat data.
  *
@@ -155,7 +155,7 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  *
  * {@link Stat typedef}
  *
- * ## map(string, Array<WalkerEntry|null>) => Promise<any>
+ * ## map(string, Array<WalkerEntry2|null>) => Promise<any>
  *
  * This is the function that is called once per entry BEFORE visiting the children of that node.
  *
@@ -240,9 +240,9 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Walker[]} args.trees - The trees you want to traverse
- * @param {function(string, ?WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
+ * @param {function(string, ?WalkerEntry2[]): Promise<any>} [args.map] - Transform `WalkerEntry2`s into a result form
  * @param {function(any, any[]): Promise<any>} [args.reduce] - Control how mapped entries are combined with their parent result
- * @param {function(function(WalkerEntry[]): Promise<any[]>, IterableIterator<WalkerEntry[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
+ * @param {function(function(WalkerEntry2[]): Promise<any[]>, IterableIterator<WalkerEntry2[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
  *
  * @returns {Promise<any>} The finished tree-walking result
  *

@@ -2,7 +2,7 @@
   "name": "isomorphic-git",
   "version": "0.0.0-development",
   "description": "A pure JavaScript implementation of git for node and browsers!",
-  "typings": "./src/index.d.ts",
+  "typings": "./dist/for-future/isomorphic-git/index/index.d.ts",
   "main": "dist/for-node/isomorphic-git/index.js",
   "browser": {
     "isomorphic-git": "./dist/bundle.umd.min.js",
@@ -121,7 +121,7 @@
     "standard": "13.1.0",
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
-    "typescript": "3.5.3",
+    "typescript": "^3.7.2",
     "webpack": "4.39.2",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.7"

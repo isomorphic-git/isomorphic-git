@@ -49,6 +49,7 @@ module.exports = {
         'build.rollup',
         'build.webpack',
         'build.errors',
+        'build.ts',
         'build.indexjson',
         'build.treeshake',
         'build.size'
@@ -59,6 +60,7 @@ module.exports = {
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.js',
+      ts: 'tsc dist/for-future/isomorphic-git/index.js  --lib es6 --allowJs --emitDeclarationOnly --declaration',
       size: process.env.CI
         ? optional(
           `cross-env TRAVIS=true ` +

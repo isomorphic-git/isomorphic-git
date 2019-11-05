@@ -12,11 +12,11 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
  *
- * @typedef {Object} WalkerEntry The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
+ * @typedef {Object} WalkerTree The `WalkerTree` is an interface that abstracts computing many common tree / blob stats.
  * @property {string} fullpath
  * @property {string} basename
  * @property {boolean} exists
- * @property {Function} populateStat
+ * @property {function(): Promise<void>} populateStat
  * @property {'tree'|'blob'|'special'|'commit'} [type]
  * @property {number} [ctimeSeconds]
  * @property {number} [ctimeNanoseconds]
@@ -28,9 +28,9 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @property {number} [uid]
  * @property {number} [gid]
  * @property {number} [size]
- * @property {Function} populateContent
+ * @property {function(): Promise<void>} populateContent
  * @property {Buffer} [content]
- * @property {Function} populateHash
+ * @property {function(): Promise<void>} populateHash
  * @property {string} [oid]
  */
 
@@ -71,11 +71,11 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * `filter`, `map`, `reduce`, and `iterate` allow you control the recursive walk by pruning and transforming `WalkerTree`s into the desired result.
  *
- * ## WalkerEntry
- * The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
- * `filter` and `map` each receive an array of `WalkerEntry[]` as their main argument, one `WalkerEntry` for each `Walker` in the `trees` argument.
+ * ## WalkerTree
+ * The `WalkerTree` is an interface that abstracts computing many common tree / blob stats.
+ * `filter` and `map` each receive an array of `WalkerTree[]` as their main argument, one `WalkerTree` for each `Walker` in the `trees` argument.
  *
- * By default, `WalkerEntry`s only have three properties:
+ * By default, `WalkerTree`s only have three properties:
  * ```js
  * {
  *   fullpath: string;
@@ -115,7 +115,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * entry.oid // SHA1 string
  * ```
  *
- * ## filter(WalkerEntry[]) => boolean
+ * ## filter(WalkerTree[]) => boolean
  *
  * Default: `async () => true`.
  *
@@ -140,7 +140,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * }
  * ```
  *
- * ## map(WalkerEntry[]) => any
+ * ## map(WalkerTree[]) => any
  *
  * Default: `async entry => entry`
  *
@@ -203,14 +203,14 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  * @param {object} args
  * @param {Walker[]} args.trees - The trees you want to traverse
- * @param {function(WalkerEntry[]): Promise<boolean>} [args.filter] - Filter which `WalkerEntry`s to process
- * @param {function(WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
+ * @param {function(WalkerTree[]): Promise<boolean>} [args.filter] - Filter which `WalkerTree`s to process
+ * @param {function(WalkerTree[]): Promise<any>} [args.map] - Transform `WalkerTree`s into a result form
  * @param {function(any, any[]): Promise<any>} [args.reduce] - Control how mapped entries are combined with their parent result
- * @param {function(function(WalkerEntry[]): Promise<any[]>, IterableIterator<WalkerEntry[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
+ * @param {function(function(WalkerTree[]): Promise<any[]>, IterableIterator<WalkerTree[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
  *
  * @returns {Promise<any>} The finished tree-walking result
  *
- * @see WalkerEntry
+ * @see WalkerTree
  *
  */
 export async function walkBeta1 ({

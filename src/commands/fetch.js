@@ -28,7 +28,7 @@ import { config } from './config'
  * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
  * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
  * @property {string | null} fetchHeadDescription - a textual description of the branch that was fetched
- * @property {object} [headers] - The HTTP response headers returned by the git server
+ * @property {Object<string, string>} [headers] - The HTTP response headers returned by the git server
  * @property {string[]} [pruned] - A list of branches that were pruned, if you provided the `prune` parameter
  *
  */

@@ -1,5 +1,87 @@
 import { E, GitError } from '../models/GitError'
 
+/**
+ * @typedef {object} GitCredentialManagerPlugin
+ * @property {Function} fill
+ * @property {Function} approved
+ * @property {Function} rejected
+ */
+
+/**
+ * @typedef {object} GitEmitterPlugin
+ * @property {Function} emit
+ */
+
+/**
+ * @typedef {object} GitFsPlugin
+ * @property {Function} readFile
+ * @property {Function} writeFile
+ * @property {Function} unlink
+ * @property {Function} readdir
+ * @property {Function} mkdir
+ * @property {Function} rmdir
+ * @property {Function} stat
+ * @property {Function} lstat
+ */
+
+/**
+ * @typedef {object} GitFsPromisesPlugin
+ * @property {GitFsPlugin} promises
+ */
+
+/**
+ * @typedef {object} GitPgpPlugin
+ * @property {Function} sign
+ * @property {Function} verify
+ */
+
+/**
+ * @typedef {object} HttpRequest
+ * @property {string} url
+ * @property {string} [method]
+ * @property {Object<string, string>} [headers]
+ * @property { AsyncIterableIterator<Uint8Array>} [body]
+ */
+
+/**
+ * @typedef {object} HttpResponse
+ * @property {string} url
+ * @property {string} [method]
+ * @property {Object<string, string>} [headers]
+ * @property { AsyncIterableIterator<Uint8Array>} [body]
+ * @property {number} statusCode
+ * @property {string} statusMessage
+ */
+
+/**
+ * @typedef {object} GitHttpPluginArguments
+ * @property {string} url
+ * @property {string} [method]
+ * @property {Object<string, string>} [headers]
+ * @property { AsyncIterableIterator<Uint8Array>} [body]
+ * @property {string} [core]
+ * @property {GitEmitterPlugin} [emitter]
+ * @property {string} [emitterPrefix]
+ */
+
+/**
+ * @callback GitHttpPlugin
+ * @param {GitHttpPluginArguments} args
+ * @returns {HttpResponse}
+ */
+
+/**
+ * @typedef {"credentialManager" | "emitter" | "fs" | "pgp" | "http"} GitPluginName
+ */
+
+/**
+ * @typedef {GitFsPlugin | GitFsPromisesPlugin | GitCredentialManagerPlugin | GitEmitterPlugin | GitPgpPlugin | GitHttpPlugin} AnyGitPlugin
+ */
+
+/**
+ * @typedef {Map<GitPluginName, AnyGitPlugin>} GitPluginCore
+ */
+
 // A collection of plugins is called a core.
 // 99.99% of the time you will only need a single core,
 // Because if you load isomorphic-git in an entirely new execution context

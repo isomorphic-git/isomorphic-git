@@ -5,6 +5,15 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
 /**
+ *
+ * @typedef {object} RemoteDefinition - The object returned has the following schema:
+ * @property {string} remote - name of the remote
+ * @property {string} url - url of the remote
+ *
+ */
+
+
+/**
  * List remotes
  *
  * @param {object} args
@@ -13,7 +22,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  *
- * @returns {Promise<Array<{remote: string, url: string}>>} Resolves successfully with an array of `{remote, url}` objects
+ * @returns {Promise<Array<RemoteDefinition>>} Resolves successfully with an array of `{remote, url}` objects
  *
  * @example
  * let remotes = await git.listRemotes({ dir: '$input((/))' })

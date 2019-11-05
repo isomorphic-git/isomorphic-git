@@ -31,6 +31,21 @@ import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  *
+ * @typedef {Object} TagDescription
+ * @property {string} object - SHA-1 object id of the tag target
+ * @property {'blob' | 'tree' | 'commit' | 'tag'} type - The type of the tagged object
+ * @property {string} tag - The tag name
+ * @property {Object} tagger
+ * @property {string} tagger.name - the tagger's name
+ * @property {string} tagger.email - the tagger's email
+ * @property {number} tagger.timestamp - UTC Unix timestamp in seconds
+ * @property {number} tagger.timezoneOffset - timezone difference from UTC in minutes
+ * @property {string} message - The tag message
+ * @property {string} [signature] - PGP signature (if present)
+ */
+
+/**
+ *
  * @typedef {Object} TreeEntry
  * @property {string} mode
  * @property {string} path
@@ -50,7 +65,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @property {string} oid
  * @property {'blob' | 'tree' | 'commit' | 'tag'} [type]
  * @property {'deflated' | 'wrapped' | 'content' | 'parsed'} format
- * @property {Buffer | String | CommitDescription | TreeDescription} object
+ * @property {Buffer | String | CommitDescription | TreeDescription | TagDescription} object
  * @property {string} [source]
  *
  */
