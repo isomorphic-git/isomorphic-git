@@ -2,6 +2,7 @@ import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 
 import { E, GitError } from './GitError.js'
 
@@ -21,7 +22,7 @@ function renderCacheEntryFlags (entry) {
   flags.extended = false
   // 12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
   // is stored in this field.
-  flags.nameLength = Math.min(Buffer.from(entry.path).length, 0xfff)
+  flags.nameLength = Math.min(TinyBuffer.from(entry.path).length, 0xfff)
   return (
     (flags.assumeValid ? 0b1000000000000000 : 0) +
     (flags.extended ? 0b0100000000000000 : 0) +
@@ -41,14 +42,10 @@ export class GitIndex {
   }
 
   static async from (buffer) {
-    if (Buffer.isBuffer(buffer)) {
-      return GitIndex.fromBuffer(buffer)
-    } else if (buffer === null) {
+    if (buffer === null) {
       return new GitIndex(null)
     } else {
-      throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitIndex.from'
-      })
+      return GitIndex.fromBuffer(buffer)
     }
   }
 
@@ -141,7 +138,7 @@ export class GitIndex {
 
   insert ({ filepath, stats, oid }) {
     stats = normalizeStats(stats)
-    const bfilepath = Buffer.from(filepath)
+    const bfilepath = TinyBuffer.from(filepath)
     const entry = {
       ctimeSeconds: stats.ctimeSeconds,
       ctimeNanoseconds: stats.ctimeNanoseconds,
@@ -194,17 +191,17 @@ export class GitIndex {
   }
 
   async toObject () {
-    const header = Buffer.alloc(12)
+    const header = TinyBuffer.alloc(12)
     const writer = new BufferCursor(header)
     writer.write('DIRC', 4, 'utf8')
     writer.writeUInt32BE(2)
     writer.writeUInt32BE(this.entries.length)
-    const body = Buffer.concat(
+    const body = TinyBuffer.concat(
       this.entries.map(entry => {
-        const bpath = Buffer.from(entry.path)
+        const bpath = TinyBuffer.from(entry.path)
         // the fixed length + the filename + at least one null char => align by 8
         const length = Math.ceil((62 + bpath.length + 1) / 8) * 8
-        const written = Buffer.alloc(length)
+        const written = TinyBuffer.alloc(length)
         const writer = new BufferCursor(written)
         const stat = normalizeStats(entry)
         writer.writeUInt32BE(stat.ctimeSeconds)
@@ -223,8 +220,8 @@ export class GitIndex {
         return written
       })
     )
-    const main = Buffer.concat([header, body])
+    const main = TinyBuffer.concat([header, body])
     const sum = await shasum(main)
-    return Buffer.concat([main, Buffer.from(sum, 'hex')])
+    return TinyBuffer.concat([main, TinyBuffer.from(sum, 'hex')])
   }
 }
