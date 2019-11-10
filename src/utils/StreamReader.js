@@ -1,3 +1,4 @@
+import { TinyBuffer } from './TinyBuffer.js'
 import { getIterator } from './getIterator.js'
 
 // inspired by 'gartal' but lighter-weight and more battle-tested.
@@ -106,7 +107,7 @@ export class StreamReader {
       if (this._ended) break
       buffers.push(nextbuffer)
     }
-    this.buffer = Buffer.concat(buffers)
+    this.buffer = TinyBuffer.concat(buffers)
   }
 
   async _loadnext () {
