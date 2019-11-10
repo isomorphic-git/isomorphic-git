@@ -1,4 +1,5 @@
 import { E, GitError } from '../models/GitError.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { comparePath } from '../utils/comparePath.js'
 
 /*::
@@ -82,14 +83,10 @@ export class GitTree {
   _entries: Array<TreeEntry>
   */
   constructor (entries) {
-    if (Buffer.isBuffer(entries)) {
-      this._entries = parseBuffer(entries)
-    } else if (Array.isArray(entries)) {
+    if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {
-      throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitTree constructor'
-      })
+      this._entries = parseBuffer(entries)
     }
     // There appears to be an edge case (in this repo no less) where
     // the tree is NOT sorted as expected if some directories end with ".git"
@@ -107,14 +104,14 @@ export class GitTree {
   }
 
   toObject () {
-    return Buffer.concat(
+    return TinyBuffer.concat(
       this._entries.map(entry => {
-        const mode = Buffer.from(entry.mode.replace(/^0/, ''))
-        const space = Buffer.from(' ')
-        const path = Buffer.from(entry.path, 'utf8')
-        const nullchar = Buffer.from([0])
-        const oid = Buffer.from(entry.oid, 'hex')
-        return Buffer.concat([mode, space, path, nullchar, oid])
+        const mode = TinyBuffer.from(entry.mode.replace(/^0/, ''))
+        const space = TinyBuffer.from(' ')
+        const path = TinyBuffer.from(entry.path, 'utf8')
+        const nullchar = TinyBuffer.from([0])
+        const oid = TinyBuffer.from(entry.oid, 'hex')
+        return TinyBuffer.concat([mode, space, path, nullchar, oid])
       })
     )
   }

@@ -14,7 +14,7 @@ export class TinyBuffer extends Uint8Array {
   static from (src, encoding) {
     if (typeof src === 'string') {
       return new TinyBuffer(fromString(src, encoding))
-    } else if (src.buffer) {
+    } else if (src.buffer || Array.isArray(src)) {
       return new TinyBuffer(src)
     }
     console.log('from src', src)
