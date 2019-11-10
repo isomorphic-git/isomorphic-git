@@ -2,7 +2,6 @@ import { encode as fromUTF8, decode as toUTF8 } from 'isomorphic-textencoder'
 import toHex from 'array-buffer-to-hex'
 import fromHex from 'hex-to-array-buffer'
 import { fromByteArray as toBase64, toByteArray as fromBase64 } from 'base64-js'
-import equal from 'arraybuffer-equal'
 
 // A minimal (and portable!) alternative to the large 'buffer' polyfill provided by Webpack.
 export class TinyBuffer extends Uint8Array {
@@ -108,7 +107,14 @@ export class TinyBuffer extends Uint8Array {
   }
 
   equals (another) {
-    return equal(this.buffer, another.buffer)
+    if (this === another) return true
+    if (this.length !== another.length) return false
+    for (let i = 0; i < this.length; i++) {
+      if (this[i] !== another[i]) {
+        return false
+      }
+    }
+    return true
   }
 }
 
