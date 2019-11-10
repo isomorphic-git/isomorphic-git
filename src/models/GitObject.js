@@ -1,10 +1,11 @@
 import { E, GitError } from '../models/GitError.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 
 export class GitObject {
   static wrap ({ type, object }) {
-    return Buffer.concat([
-      Buffer.from(`${type} ${object.byteLength.toString()}\x00`),
-      Buffer.from(object)
+    return TinyBuffer.concat([
+      TinyBuffer.from(`${type} ${object.byteLength.toString()}\x00`),
+      TinyBuffer.from(object)
     ])
   }
 
@@ -22,7 +23,7 @@ export class GitObject {
     }
     return {
       type,
-      object: Buffer.from(buffer.slice(i + 1))
+      object: TinyBuffer.from(buffer.slice(i + 1))
     }
   }
 }
