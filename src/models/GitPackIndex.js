@@ -316,7 +316,7 @@ export class GitPackIndex {
   async toBuffer () {
     const buffers = []
     const write = (str, encoding) => {
-      buffers.push(Buffer.from(str, encoding))
+      buffers.push(TinyBuffer.from(str, encoding))
     }
     // Write out IDX v2 magic number
     write('ff744f63', 'hex')

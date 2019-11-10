@@ -4,8 +4,8 @@
 import pako from 'pako'
 
 import { E, GitError } from '../models/GitError.js'
-
-import { StreamReader } from './StreamReader.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { StreamReader } from '../utils/StreamReader.js'
 
 export async function listpack (stream, onData) {
   const reader = new StreamReader(stream)
@@ -98,7 +98,7 @@ async function parseHeader (reader) {
       shift += 7
       bytes.push(byte)
     } while (byte & 0b10000000)
-    reference = Buffer.from(bytes)
+    reference = TinyBuffer.from(bytes)
   }
   if (type === 7) {
     const buf = await reader.read(20)
