@@ -33,7 +33,7 @@ describe('walkBeta2', () => {
     ])
   })
 
-  xit('can populate type, mode, oid, and content', async () => {
+  it('can populate type, mode, oid, and content', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-walkBeta2')
     // BrowserFS has a design quirk where HTTPRequestFS has a default mode of 555 for everything,

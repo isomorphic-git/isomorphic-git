@@ -5,6 +5,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { writeObject } from '../storage/writeObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 
 import { basename } from './basename.js'
 import { join } from './join.js'
@@ -239,7 +240,7 @@ async function mergeBlobs ({
     fs,
     gitdir,
     type: 'blob',
-    object: Buffer.from(mergedText, 'utf8'),
+    object: TinyBuffer.from(mergedText, 'utf8'),
     dryRun
   })
   return { mode, path, oid, type }

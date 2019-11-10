@@ -1,3 +1,5 @@
+import { TinyBuffer } from '../utils/TinyBuffer.js'
+
 export function calculateBasicAuthHeader ({ username, password }) {
-  return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+  return `Basic ${TinyBuffer.from(`${username}:${password}`).toString('base64')}`
 }
