@@ -39,6 +39,10 @@ export class TinyBuffer extends Uint8Array {
     return new TinyBuffer(buffer)
   }
 
+  static isBuffer (thing) {
+    return !!thing.buffer
+  }
+
   toString (encoding, start, end) {
     const slice = this.slice(start, end)
     switch (encoding) {

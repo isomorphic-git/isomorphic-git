@@ -75,7 +75,7 @@ export class StreamReader {
       this._ended = true
     }
     if (value) {
-      value = Buffer.from(value)
+      value = TinyBuffer.from(value)
     }
     return value
   }

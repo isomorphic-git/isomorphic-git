@@ -37,7 +37,7 @@ export async function listpack (stream, onData) {
     while (!inflator.result) {
       const chunk = await reader.chunk()
       if (reader.ended) break
-      inflator.push(chunk, false)
+      inflator.push(new Uint8Array(chunk), false)
       if (inflator.err) {
         throw new GitError(E.InternalFail, {
           message: `Pako error: ${inflator.msg}`
