@@ -443,7 +443,7 @@ export class GitPackIndex {
       })
     }
     if (base) {
-      object = Buffer.from(applyDelta(object, base))
+      object = TinyBuffer.from(applyDelta(object, base))
     }
     // Cache the result based on depth.
     if (this.readDepth > 3) {
