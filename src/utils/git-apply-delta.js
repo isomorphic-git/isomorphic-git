@@ -90,7 +90,7 @@ class Decoder {
 
   write (byte) {
     const MSB = 0x80
-    const REST = 0x7F
+    const REST = 0x7f
 
     this.accum.push(byte & REST)
     if (byte & MSB) return
@@ -125,7 +125,7 @@ function binaryCopy (source, target, targetStart, sourceStart, sourceEnd) {
 
   if (source.buffer !== target.buffer) {
     // fast copy
-    const len = (sourceEnd - sourceStart) + targetStart
+    const len = sourceEnd - sourceStart + targetStart
 
     for (let i = targetStart, j = sourceStart; i < len; ++i, ++j) {
       target[i] = source[j]

@@ -1,8 +1,8 @@
 import { BufferCursor } from '../utils/BufferCursor.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
-import { TinyBuffer } from '../utils/TinyBuffer.js'
 
 import { E, GitError } from './GitError.js'
 

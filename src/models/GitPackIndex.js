@@ -337,13 +337,17 @@ export class GitPackIndex {
       write(hash, 'hex')
     }
     // Write out crcs
-    const crcsBuffer = new BufferCursor(TinyBuffer.alloc(this.hashes.length * 4))
+    const crcsBuffer = new BufferCursor(
+      TinyBuffer.alloc(this.hashes.length * 4)
+    )
     for (const hash of this.hashes) {
       crcsBuffer.writeUInt32BE(this.crcs[hash])
     }
     buffers.push(crcsBuffer.buffer)
     // Write out offsets
-    const offsetsBuffer = new BufferCursor(TinyBuffer.alloc(this.hashes.length * 4))
+    const offsetsBuffer = new BufferCursor(
+      TinyBuffer.alloc(this.hashes.length * 4)
+    )
     for (const hash of this.hashes) {
       offsetsBuffer.writeUInt32BE(this.offsets.get(hash))
     }

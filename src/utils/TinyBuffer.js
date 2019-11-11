@@ -1,7 +1,7 @@
-import { encode as fromUTF8, decode as toUTF8 } from 'isomorphic-textencoder'
 import toHex from 'array-buffer-to-hex'
-import fromHex from 'hex-to-array-buffer'
 import { fromByteArray as toBase64, toByteArray as fromBase64 } from 'base64-js'
+import fromHex from 'hex-to-array-buffer'
+import { decode as toUTF8, encode as fromUTF8 } from 'isomorphic-textencoder'
 
 // A minimal (and portable!) alternative to the large 'buffer' polyfill provided by Webpack.
 export class TinyBuffer extends Uint8Array {
@@ -75,7 +75,10 @@ export class TinyBuffer extends Uint8Array {
     // Node's Buffer won't throw if the source is bigger than the dest, so we mustn't either
     sourceEnd = Math.min(sourceEnd, this.length)
     sourceEnd = Math.min(sourceEnd, sourceStart + target.length - targetStart)
-    const src = (sourceStart === 0 && sourceEnd === this.length) ? this : this.slice(sourceStart, sourceEnd)
+    const src =
+      sourceStart === 0 && sourceEnd === this.length
+        ? this
+        : this.slice(sourceStart, sourceEnd)
     target.set(src, targetStart)
   }
 

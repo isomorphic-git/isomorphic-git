@@ -68,9 +68,7 @@ describe('GitPktLine', () => {
   it('encode string', async () => {
     const foo = GitPktLine.encode('hello world\n')
     expect(foo).toBeTruthy()
-    expect(foo.equals(Buffer.from('0010hello world\n'))).toEqual(
-      true
-    )
+    expect(foo.equals(Buffer.from('0010hello world\n'))).toEqual(true)
   })
 
   it('encode empty string', async () => {

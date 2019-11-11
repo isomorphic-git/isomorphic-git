@@ -4,8 +4,8 @@
 import pako from 'pako'
 
 import { E, GitError } from '../models/GitError.js'
-import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { StreamReader } from '../utils/StreamReader.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 
 export async function listpack (stream, onData) {
   const reader = new StreamReader(stream)
