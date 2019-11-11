@@ -73,6 +73,7 @@ export class TinyBuffer extends Uint8Array {
    */
   copy (target, targetStart = 0, sourceStart = 0, sourceEnd = this.length) {
     // Node's Buffer won't throw if the source is bigger than the dest, so we mustn't either
+    sourceEnd = Math.min(sourceEnd, this.length)
     sourceEnd = Math.min(sourceEnd, sourceStart + target.length - targetStart)
     const src = (sourceStart === 0 && sourceEnd === this.length) ? this : this.slice(sourceStart, sourceEnd)
     target.set(src, targetStart)

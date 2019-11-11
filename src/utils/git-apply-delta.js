@@ -3,96 +3,163 @@
 
 // Modified by William Hilton - I needed to remove 'bops' dependency since it mistakenly
 // assumes Buffers in Node and Uint8Array in browser when really it's always Uint8Arrays.
-
 import { TinyBuffer } from '../utils/TinyBuffer.js'
 
-var binary = require('bops')
-  , Decoder = require('varint/decode.js')
-  , vi = new Decoder
+export function applyDelta (delta, target) {
+  const vi = new Decoder()
+  const OFFSET_BUFFER = new TinyBuffer(4)
+  const LENGTH_BUFFER = new TinyBuffer(4)
 
-// we use writeUint[8|32][LE|BE] instead of indexing
-// into buffers so that we get buffer-browserify compat.
-var OFFSET_BUFFER = new TinyBuffer(4)
-  , LENGTH_BUFFER = new TinyBuffer(4)
+  const baseSizeInfo = { size: null, buffer: null }
+  const resizedSizeInfo = { size: null, buffer: null }
+  let outIdx
+  let command
+  let idx
 
-export function applyDelta(delta, target) {
-  var base_size_info = {size: null, buffer: null}
-    , resized_size_info = {size: null, buffer: null}
-    , output_buffer
-    , out_idx
-    , command
-    , len
-    , idx
+  deltaHeader(delta, baseSizeInfo)
+  deltaHeader(baseSizeInfo.buffer, resizedSizeInfo)
 
-  delta_header(delta, base_size_info)
-  delta_header(base_size_info.buffer, resized_size_info)
+  delta = resizedSizeInfo.buffer
 
-  delta = resized_size_info.buffer
+  idx = 0
+  outIdx = 0
+  const outputBuffer = new TinyBuffer(resizedSizeInfo.size)
 
-  idx =
-  out_idx = 0
-  output_buffer = new TinyBuffer(resized_size_info.size)
+  const len = delta.length
 
-  len = delta.length
-
-  while(idx < len) {
+  while (idx < len) {
     command = delta[idx++]
     command & 0x80 ? copy() : insert()
   }
 
-  return output_buffer
+  return outputBuffer
 
-  function copy() {
+  function copy () {
     OFFSET_BUFFER.writeUInt32LE(0, 0)
     LENGTH_BUFFER.writeUInt32LE(0, 0)
 
-    var check = 1
-      , length
-      , offset
+    let check = 1
 
-    for(var x = 0; x < 4; ++x) {
-      if(command & check) {
+    for (let x = 0; x < 4; ++x) {
+      if (command & check) {
         OFFSET_BUFFER[3 - x] = delta[idx++]
       }
       check <<= 1
     }
 
-    for(var x = 0; x < 3; ++x) {
-      if(command & check) {
+    for (let x = 0; x < 3; ++x) {
+      if (command & check) {
         LENGTH_BUFFER[3 - x] = delta[idx++]
       }
       check <<= 1
     }
     LENGTH_BUFFER[0] = 0
 
-    length = LENGTH_BUFFER.readUInt32BE(0) || 0x10000
-    offset = OFFSET_BUFFER.readUInt32BE(0)
+    const length = LENGTH_BUFFER.readUInt32BE(0) || 0x10000
+    const offset = OFFSET_BUFFER.readUInt32BE(0)
 
-    binary.copy(target, output_buffer, out_idx, offset, offset + length)
-    out_idx += length
+    binaryCopy(target, outputBuffer, outIdx, offset, offset + length)
+    outIdx += length
   }
 
-  function insert() {
-    binary.copy(delta, output_buffer, out_idx, idx, command + idx)
+  function insert () {
+    binaryCopy(delta, outputBuffer, outIdx, idx, command + idx)
     idx += command
-    out_idx += command
+    outIdx += command
+  }
+
+  function deltaHeader (buf, output) {
+    let idx = 0
+    let size = 0
+
+    do {
+      size = vi.write(buf[idx++])
+    } while (size === void 0)
+
+    output.size = size
+    output.buffer = buf.subarray(idx)
   }
 }
 
-function delta_header(buf, output) {
-  var done = false
-    , idx = 0
-    , size = 0
-
-  vi.ondata = function(s) {
-    size = s
-    done = true
+// Chris Dickinson <chris@neversaw.us>
+// MIT License in package.json but no LICENSE file, again.
+class Decoder {
+  constructor () {
+    this.accum = []
   }
 
-  do {
-    vi.write(buf[idx++])
-  } while(!done)
+  write (byte) {
+    const MSB = 0x80
+    const REST = 0x7F
+    var msb = byte & MSB
+    var accum = this.accum
+    var len
+    var out
 
-  output.size = size
-  output.buffer = buf.subarray(idx)
+    accum[accum.length] = byte & REST
+    if (msb) {
+      return
+    }
+
+    len = accum.length
+    out = 0
+
+    for (var i = 0; i < len; ++i) {
+      out |= accum[i] << (7 * i)
+    }
+
+    accum.length = 0
+    return out
+  }
+}
+
+// Chris Dickinson <chris@neversaw.us>
+// MIT License in package.json but no LICENSE file, again. Yes, three modules.
+function binaryCopy (source, target, targetStart, sourceStart, sourceEnd) {
+  targetStart = arguments.length < 3 ? 0 : targetStart
+  sourceStart = arguments.length < 4 ? 0 : sourceStart
+  sourceEnd = arguments.length < 5 ? source.length : sourceEnd
+
+  if (sourceEnd === sourceStart) {
+    return
+  }
+
+  if (target.length === 0 || source.length === 0) {
+    return
+  }
+
+  if (sourceEnd > source.length) {
+    sourceEnd = source.length
+  }
+
+  if (target.length - targetStart < sourceEnd - sourceStart) {
+    sourceEnd = target.length - targetStart + sourceStart
+  }
+
+  if (source.buffer !== target.buffer) {
+    return fastCopy(source, target, targetStart, sourceStart, sourceEnd)
+  }
+  return slowCopy(source, target, targetStart, sourceStart, sourceEnd)
+}
+
+function fastCopy (source, target, targetStart, sourceStart, sourceEnd) {
+  var len = (sourceEnd - sourceStart) + targetStart
+
+  for (var i = targetStart, j = sourceStart;
+    i < len;
+    ++i,
+    ++j) {
+    target[i] = source[j]
+  }
+}
+
+function slowCopy (from, to, j, i, jend) {
+  // the buffers could overlap.
+  var iend = jend + i
+  var tmp = new Uint8Array([].slice.call(from, i, iend))
+  var x = 0
+
+  for (; i < iend; ++i, ++x) {
+    to[j++] = tmp[x]
+  }
 }
