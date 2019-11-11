@@ -1,11 +1,11 @@
 import crc32 from 'crc-32'
-import applyDelta from 'git-apply-delta'
 import * as marky from 'marky'
 import pako from 'pako'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { applyDelta } from '../utils/git-apply-delta.js'
 import { listpack } from '../utils/git-list-pack.js'
 import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'

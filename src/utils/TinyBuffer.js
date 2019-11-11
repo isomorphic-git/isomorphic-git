@@ -65,7 +65,15 @@ export class TinyBuffer extends Uint8Array {
     return this.byteLength
   }
 
+  /**
+   * @param {TinyBuffer} target
+   * @param {number} targetStart
+   * @param {number} sourceStart
+   * @param {number} sourceEnd
+   */
   copy (target, targetStart = 0, sourceStart = 0, sourceEnd = this.length) {
+    // Node's Buffer won't throw if the source is bigger than the dest, so we mustn't either
+    sourceEnd = Math.min(sourceEnd, sourceStart + target.length - targetStart)
     const src = (sourceStart === 0 && sourceEnd === this.length) ? this : this.slice(sourceStart, sourceEnd)
     target.set(src, targetStart)
   }
@@ -108,6 +116,10 @@ export class TinyBuffer extends Uint8Array {
 
   writeUInt32BE (value, offset) {
     this.view.setUint32(offset, value, false)
+  }
+
+  writeUInt32LE (value, offset) {
+    this.view.setUint32(offset, value, true)
   }
 
   equals (another) {
