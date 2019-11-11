@@ -91,24 +91,16 @@ class Decoder {
   write (byte) {
     const MSB = 0x80
     const REST = 0x7F
-    var msb = byte & MSB
-    var accum = this.accum
-    var len
-    var out
 
-    accum[accum.length] = byte & REST
-    if (msb) {
-      return
+    this.accum.push(byte & REST)
+    if (byte & MSB) return
+
+    let out = 0
+    for (var i = 0; i < this.accum.length; ++i) {
+      out |= this.accum[i] << (7 * i)
     }
 
-    len = accum.length
-    out = 0
-
-    for (var i = 0; i < len; ++i) {
-      out |= accum[i] << (7 * i)
-    }
-
-    accum.length = 0
+    this.accum = []
     return out
   }
 }
@@ -120,13 +112,8 @@ function binaryCopy (source, target, targetStart, sourceStart, sourceEnd) {
   sourceStart = arguments.length < 4 ? 0 : sourceStart
   sourceEnd = arguments.length < 5 ? source.length : sourceEnd
 
-  if (sourceEnd === sourceStart) {
-    return
-  }
-
-  if (target.length === 0 || source.length === 0) {
-    return
-  }
+  if (sourceEnd === sourceStart) return
+  if (target.length === 0 || source.length === 0) return
 
   if (sourceEnd > source.length) {
     sourceEnd = source.length
@@ -137,29 +124,21 @@ function binaryCopy (source, target, targetStart, sourceStart, sourceEnd) {
   }
 
   if (source.buffer !== target.buffer) {
-    return fastCopy(source, target, targetStart, sourceStart, sourceEnd)
+    // fast copy
+    const len = (sourceEnd - sourceStart) + targetStart
+
+    for (let i = targetStart, j = sourceStart; i < len; ++i, ++j) {
+      target[i] = source[j]
+    }
+    return
   }
-  return slowCopy(source, target, targetStart, sourceStart, sourceEnd)
-}
-
-function fastCopy (source, target, targetStart, sourceStart, sourceEnd) {
-  var len = (sourceEnd - sourceStart) + targetStart
-
-  for (var i = targetStart, j = sourceStart;
-    i < len;
-    ++i,
-    ++j) {
-    target[i] = source[j]
-  }
-}
-
-function slowCopy (from, to, j, i, jend) {
+  // slow copy
   // the buffers could overlap.
-  var iend = jend + i
-  var tmp = new Uint8Array([].slice.call(from, i, iend))
+  var iend = sourceEnd + sourceStart
+  var tmp = new Uint8Array([].slice.call(source, sourceStart, iend))
   var x = 0
 
-  for (; i < iend; ++i, ++x) {
-    to[j++] = tmp[x]
+  for (; sourceStart < iend; ++sourceStart, ++x) {
+    target[targetStart++] = tmp[x]
   }
 }
