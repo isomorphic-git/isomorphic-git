@@ -1,12 +1,12 @@
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
+import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
-import { collect } from '../utils/collect.js'
 
 // Try to accomodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string
@@ -104,7 +104,9 @@ export class GitRemoteHTTP {
       })
     }
     // Git "smart" HTTP servers should respond with the correct Content-Type header.
-    if (res.headers['content-type'] === `application/x-${service}-advertisement`) {
+    if (
+      res.headers['content-type'] === `application/x-${service}-advertisement`
+    ) {
       const remoteHTTP = await parseRefsAdResponse(res.body, { service })
       remoteHTTP.auth = auth
       return remoteHTTP
@@ -114,14 +116,18 @@ export class GitRemoteHTTP {
       // In this case, we save the response as plain text so we can generate a better error message if needed.
       let data = await collect(res.body)
       let response = data.toString('utf8')
-      let preview = response.length < 256 ? response : response.slice(0, 256) + '...'
+      let preview =
+        response.length < 256 ? response : response.slice(0, 256) + '...'
       // For backwards compatibility, try to parse it anyway.
       try {
         const remoteHTTP = await parseRefsAdResponse([data], { service })
         remoteHTTP.auth = auth
         return remoteHTTP
       } catch (e) {
-        throw new GitError(E.RemoteDoesNotSupportSmartHTTP, { preview, response })
+        throw new GitError(E.RemoteDoesNotSupportSmartHTTP, {
+          preview,
+          response
+        })
       }
     }
   }
