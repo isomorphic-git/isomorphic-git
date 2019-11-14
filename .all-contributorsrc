@@ -363,6 +363,7 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/569822?v=4",
       "profile": "https://github.com/djencks",
       "contributions": [
+        "bug",
         "code",
         "test"
       ]
