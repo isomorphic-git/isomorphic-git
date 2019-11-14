@@ -214,8 +214,7 @@ access it.
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
         expected: `Two strings separated by '\\x00'`,
-        actual:
-          `ERR Repository not found
+        actual: `ERR Repository not found
 The requested repository does not exist, or you do not have permission to
 access it.
 `
