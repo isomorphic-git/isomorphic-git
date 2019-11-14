@@ -6,6 +6,7 @@ import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
+import { collect } from '../utils/collect.js'
 
 // Try to accomodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string
@@ -102,24 +103,26 @@ export class GitRemoteHTTP {
         statusMessage: res.statusMessage
       })
     }
-    // I'm going to be nice and ignore the content-type requirement unless there is a problem.
-    try {
-      const remoteHTTP = await parseRefsAdResponse(res.body, {
-        service
-      })
+    // Git "smart" HTTP servers should respond with the correct Content-Type header.
+    if (res.headers['content-type'] === `application/x-${service}-advertisement`) {
+      const remoteHTTP = await parseRefsAdResponse(res.body, { service })
       remoteHTTP.auth = auth
       return remoteHTTP
-    } catch (err) {
-      // Detect "dumb" HTTP protocol responses and throw more specific error message
-      if (
-        err.code === E.AssertServerResponseFail &&
-        err.data.expected === `# service=${service}\\n` &&
-        res.headers['content-type'] !== `application/x-${service}-advertisement`
-      ) {
-        // Ooooooh that's why it failed.
-        throw new GitError(E.RemoteDoesNotSupportSmartHTTP, {})
+    } else {
+      // If they don't send the correct content-type header, that's a good indicator it is either a "dumb" HTTP
+      // server, or the user specified an incorrect remote URL and the response is actually an HTML page.
+      // In this case, we save the response as plain text so we can generate a better error message if needed.
+      let data = await collect(res.body)
+      let response = data.toString('utf8')
+      let preview = response.length < 256 ? response : response.slice(0, 256) + '...'
+      // For backwards compatibility, try to parse it anyway.
+      try {
+        const remoteHTTP = await parseRefsAdResponse([data], { service })
+        remoteHTTP.auth = auth
+        return remoteHTTP
+      } catch (e) {
+        throw new GitError(E.RemoteDoesNotSupportSmartHTTP, { preview, response })
       }
-      throw err
     }
   }
 
