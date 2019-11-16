@@ -137,6 +137,27 @@ export interface WalkerTree {
   oid?: string;
 }
 
+export interface WalkerEntry2 {
+  fullpath: string;
+  basename: string;
+  exists: boolean;
+  type: () => Promise<'tree' | 'blob' | 'special'>;
+  mode: () => Promise<number>;
+  oid: () => Promise<string>;
+  content: () => Promise<Buffer|void>;
+  stat: () => Promise<{
+    ctimeSeconds: number;
+    mtimeSeconds: number;
+    mtimeNanoseconds: number;
+    dev: number;
+    ino: number;
+    mode: number;
+    uid: number;
+    gid: number;
+    size: number;
+  }>;
+}
+
 export interface GitCredentialManagerPlugin {
   fill: any;
   approved: any;
@@ -270,7 +291,7 @@ export function checkout(args: WorkDir & GitDir & {
   emitter?: EventEmitter;
   emitterPrefix?: string;
   remote?: string;
-  ref?: string;
+  ref: string;
   filepaths?: string[];
   pattern?: string;
 }): Promise<void>;
@@ -374,6 +395,21 @@ export function expandOid(args: GitDir & {
   oid: string;
 }): Promise<string>;
 
+export function fastCheckout(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
+  emitter?: EventEmitter;
+  emitterPrefix?: string;
+  remote?: string;
+  ref?: string;
+  filepaths?: string[];
+  dryRun?: boolean;
+  debug?: boolean;
+  force?: boolean;
+  noCheckout?: boolean;
+  noUpdateHead?: boolean;
+}): Promise<void>;
+
 export function fetch(args: GitDir & {
   core?: string;
   fs?: any;
@@ -428,6 +464,7 @@ export function init(args: GitDir & {
   core?: string;
   fs?: any;
   bare?: boolean;
+  noOverwrite?: boolean;
 }): Promise<void>;
 
 export function isDescendent(args: GitDir & {
@@ -435,7 +472,7 @@ export function isDescendent(args: GitDir & {
   fs?: any;
   oid: string;
   ancestor: string;
-  depth?: string;
+  depth?: number;
 }): Promise<boolean>;
 
 export function listBranches(args: GitDir & {
@@ -639,6 +676,16 @@ export function walkBeta1<T, Q>(args: {
   map?: (entry: WalkerEntry) => Promise<T | undefined>;
   reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
   iterate?: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
+}): Promise<Q|undefined>;
+
+export function walkBeta2<T, Q>(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
+  trees: Walker[];
+  filter?: (entries: WalkerEntry2[]) => Promise<boolean>;
+  map?: (entries: WalkerEntry2[]) => Promise<T | undefined>;
+  reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
+  iterate?: (walk: (parent: WalkerEntry2[]) => Promise<Q>, children: Iterable<WalkerEntry2[]>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
 
 export function writeObject(args: GitDir & {

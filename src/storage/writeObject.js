@@ -18,7 +18,7 @@ export async function writeObject ({
     if (format !== 'wrapped') {
       object = GitObject.wrap({ type, object })
     }
-    oid = shasum(object)
+    oid = await shasum(object)
     object = Buffer.from(pako.deflate(object))
   }
   if (!dryRun) {

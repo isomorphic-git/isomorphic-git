@@ -80,15 +80,12 @@ export async function resetIndex ({
         stats = await fs.lstat(join(dir, filepath))
       }
     }
-    await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
-      async function (index) {
-        index.delete({ filepath })
-        if (oid) {
-          index.insert({ filepath, stats, oid })
-        }
+    await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+      index.delete({ filepath })
+      if (oid) {
+        index.insert({ filepath, stats, oid })
       }
-    )
+    })
   } catch (err) {
     err.caller = 'git.reset'
     throw err

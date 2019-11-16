@@ -39,12 +39,9 @@ export async function add ({
   try {
     const fs = new FileSystem(_fs)
 
-    await GitIndexManager.acquire(
-      { fs, filepath: `${gitdir}/index` },
-      async function (index) {
-        await addToIndex({ dir, gitdir, fs, filepath, index })
-      }
-    )
+    await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+      await addToIndex({ dir, gitdir, fs, filepath, index })
+    })
     // TODO: return all oids for all files added?
   } catch (err) {
     err.caller = 'git.add'

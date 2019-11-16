@@ -1,0 +1,196 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fastCheckout checkout 1`] = `
+Array [
+  ".babelrc",
+  ".editorconfig",
+  ".flowconfig",
+  ".gitignore",
+  "LICENSE.md",
+  "README.md",
+  "package.json",
+  "shrinkwrap.yaml",
+  "src",
+  "test",
+]
+`;
+
+exports[`fastCheckout checkout 2`] = `
+Array [
+  ".babelrc",
+  ".editorconfig",
+  ".flowconfig",
+  ".gitignore",
+  "LICENSE.md",
+  "README.md",
+  "package.json",
+  "shrinkwrap.yaml",
+  "src/commands/checkout.js",
+  "src/commands/config.js",
+  "src/commands/fetch.js",
+  "src/commands/init.js",
+  "src/index.js",
+  "src/models/GitBlob.js",
+  "src/models/GitCommit.js",
+  "src/models/GitConfig.js",
+  "src/models/GitTree.js",
+  "src/utils/combinePayloadAndSignature.js",
+  "src/utils/commitSha.js",
+  "src/utils/exists.js",
+  "src/utils/mkdirs.js",
+  "src/utils/read.js",
+  "src/utils/resolveRef.js",
+  "src/utils/unwrapObject.js",
+  "src/utils/wrapCommit.js",
+  "src/utils/write.js",
+  "test/resolveRef.js",
+  "test/smoke.js",
+  "test/snapshots/resolveRef.js.md",
+  "test/snapshots/resolveRef.js.snap",
+]
+`;
+
+exports[`fastCheckout checkout by SHA 1`] = `
+Array [
+  ".babelrc",
+  ".editorconfig",
+  ".flowconfig",
+  ".gitignore",
+  "LICENSE.md",
+  "README.md",
+  "package.json",
+  "shrinkwrap.yaml",
+  "src",
+  "test",
+]
+`;
+
+exports[`fastCheckout checkout by SHA 2`] = `
+Array [
+  ".babelrc",
+  ".editorconfig",
+  ".flowconfig",
+  ".gitignore",
+  "LICENSE.md",
+  "README.md",
+  "package.json",
+  "shrinkwrap.yaml",
+  "src/commands/checkout.js",
+  "src/commands/config.js",
+  "src/commands/fetch.js",
+  "src/commands/init.js",
+  "src/index.js",
+  "src/models/GitBlob.js",
+  "src/models/GitCommit.js",
+  "src/models/GitConfig.js",
+  "src/models/GitTree.js",
+  "src/utils/combinePayloadAndSignature.js",
+  "src/utils/commitSha.js",
+  "src/utils/exists.js",
+  "src/utils/mkdirs.js",
+  "src/utils/read.js",
+  "src/utils/resolveRef.js",
+  "src/utils/unwrapObject.js",
+  "src/utils/wrapCommit.js",
+  "src/utils/write.js",
+  "test/resolveRef.js",
+  "test/smoke.js",
+  "test/snapshots/resolveRef.js.md",
+  "test/snapshots/resolveRef.js.snap",
+]
+`;
+
+exports[`fastCheckout checkout by tag 1`] = `
+Array [
+  ".babelrc",
+  ".editorconfig",
+  ".flowconfig",
+  ".gitignore",
+  "LICENSE.md",
+  "README.md",
+  "package.json",
+  "shrinkwrap.yaml",
+  "src",
+  "test",
+]
+`;
+
+exports[`fastCheckout checkout by tag 2`] = `
+Array [
+  ".babelrc",
+  ".editorconfig",
+  ".flowconfig",
+  ".gitignore",
+  "LICENSE.md",
+  "README.md",
+  "package.json",
+  "shrinkwrap.yaml",
+  "src/commands/checkout.js",
+  "src/commands/config.js",
+  "src/commands/fetch.js",
+  "src/commands/init.js",
+  "src/index.js",
+  "src/models/GitBlob.js",
+  "src/models/GitCommit.js",
+  "src/models/GitConfig.js",
+  "src/models/GitTree.js",
+  "src/utils/combinePayloadAndSignature.js",
+  "src/utils/commitSha.js",
+  "src/utils/exists.js",
+  "src/utils/mkdirs.js",
+  "src/utils/read.js",
+  "src/utils/resolveRef.js",
+  "src/utils/unwrapObject.js",
+  "src/utils/wrapCommit.js",
+  "src/utils/write.js",
+  "test/resolveRef.js",
+  "test/smoke.js",
+  "test/snapshots/resolveRef.js.md",
+  "test/snapshots/resolveRef.js.snap",
+]
+`;
+
+exports[`fastCheckout checkout directories using filepaths 1`] = `
+Array [
+  "src",
+  "test",
+]
+`;
+
+exports[`fastCheckout checkout directories using filepaths 2`] = `
+Array [
+  "src/models/GitBlob.js",
+  "src/models/GitCommit.js",
+  "src/models/GitConfig.js",
+  "src/models/GitTree.js",
+  "test/resolveRef.js",
+  "test/smoke.js",
+  "test/snapshots/resolveRef.js.md",
+  "test/snapshots/resolveRef.js.snap",
+]
+`;
+
+exports[`fastCheckout checkout files using filepaths 1`] = `
+Array [
+  "src",
+]
+`;
+
+exports[`fastCheckout checkout files using filepaths 2`] = `
+Array [
+  "src/models/GitBlob.js",
+  "src/utils/write.js",
+]
+`;
+
+exports[`fastCheckout checkout unfetched branch 1`] = `
+Object {
+  "caller": "git.checkout",
+  "code": "CommitNotFetchedError",
+  "data": Object {
+    "oid": "033417ae18b174f078f2f44232cb7a374f4c60ce",
+    "ref": "missing-branch",
+  },
+  "message": "Failed to checkout \\"missing-branch\\" because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally.",
+}
+`;

@@ -19,13 +19,13 @@ async function makeNodeFixture (fixture) {
     copyFixtureIntoTempDir
   } = require('jest-fixtures')
 
-  let testsDir = path.resolve(__dirname, '..')
+  const testsDir = path.resolve(__dirname, '..')
 
-  let dir = (await getFixturePath(testsDir, fixture))
+  const dir = (await getFixturePath(testsDir, fixture))
     ? await copyFixtureIntoTempDir(testsDir, fixture)
     : await createTempDir()
 
-  let gitdir = (await getFixturePath(testsDir, `${fixture}.git`))
+  const gitdir = (await getFixturePath(testsDir, `${fixture}.git`))
     ? await copyFixtureIntoTempDir(testsDir, `${fixture}.git`)
     : await createTempDir()
 
