@@ -48,7 +48,7 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
       if (format === 'wrapped' && result.format === 'wrapped') {
         return result
       }
-      const sha = shasum(result.object)
+      const sha = await shasum(result.object)
       if (sha !== oid) {
         throw new GitError(E.InternalFail, {
           message: `SHA check failed! Expected ${oid}, computed ${sha}`

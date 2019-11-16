@@ -2,6 +2,7 @@
   "include": ["__tests__"],
   "exclude": ["node_modules"],
   "compilerOptions": {
+    "strictNullChecks": true,
     "noEmit": true,
     "allowJs": true,
     "checkJs": true,

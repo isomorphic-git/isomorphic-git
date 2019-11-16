@@ -1,5 +1,5 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E } from '../models/GitError.js'
+import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join'
 import { resolveTree } from '../utils/resolveTree.js'
@@ -60,14 +60,17 @@ export class GitWalkerRepo {
     if (!obj) throw new Error(`No obj for ${filepath}`)
     const oid = obj.oid
     if (!oid) throw new Error(`No oid for obj ${JSON.stringify(obj)}`)
-    if (obj.type === 'commit') {
-      // TODO: support submodules
+    if (obj.type !== 'tree') {
+      // TODO: support submodules (type === 'commit')
       return null
     }
     const { type, object } = await readObject({ fs, gitdir, oid })
-    if (type === 'blob') return null
-    if (type !== 'tree') {
-      throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
+    if (type !== obj.type) {
+      throw new GitError(E.ObjectTypeAssertionFail, {
+        oid,
+        expected: obj.type,
+        type
+      })
     }
     const tree = GitTree.from(object)
     // cache all entries

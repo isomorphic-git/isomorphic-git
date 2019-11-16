@@ -78,6 +78,11 @@ export class FileSystem {
 
   /**
    * Return the contents of a file if it exists, otherwise returns null.
+   *
+   * @param {string} filepath
+   * @param {object} [options]
+   *
+   * @returns {Buffer|null}
    */
   async read (filepath, options = {}) {
     try {
@@ -94,6 +99,10 @@ export class FileSystem {
 
   /**
    * Write a file (creating missing directories if need be) without throwing errors.
+   *
+   * @param {string} filepath
+   * @param {Buffer|Uint8Array|string} contents
+   * @param {object|string} [options]
    */
   async write (filepath, contents, options = {}) {
     try {
@@ -138,6 +147,17 @@ export class FileSystem {
   async rm (filepath) {
     try {
       await this._unlink(filepath)
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err
+    }
+  }
+
+  /**
+   * Delete a directory without throwing an error if it is already deleted.
+   */
+  async rmdir (filepath) {
+    try {
+      await this._rmdir(filepath)
     } catch (err) {
       if (err.code !== 'ENOENT') throw err
     }

@@ -12,6 +12,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {boolean} [args.bare = false] - Initialize a bare repository
+ * @param {boolean} [args.noOverwrite = false] - Detect if this is already a git repo and do not re-write `.git/config`
  * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
  *
  * @example
@@ -24,10 +25,12 @@ export async function init ({
   bare = false,
   dir,
   gitdir = bare ? dir : join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs')
+  fs: _fs = cores.get(core).get('fs'),
+  noOverwrite = false
 }) {
   try {
     const fs = new FileSystem(_fs)
+    if (noOverwrite && (await fs.exists(gitdir + '/config'))) return
     let folders = [
       'hooks',
       'info',

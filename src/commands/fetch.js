@@ -205,7 +205,7 @@ export async function fetch ({
         emitter,
         emitterPrefix
       })
-      await fs.write(fullpath.replace(/\.pack$/, '.idx'), idx.toBuffer())
+      await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
     }
     return res
   } catch (err) {
@@ -314,7 +314,11 @@ async function fetchPackfile ({
       'multi_ack_detailed',
       'no-done',
       'side-band-64k',
-      'thin-pack',
+      // Note: I removed 'thin-pack' option since our code doesn't "fatten" packfiles,
+      // which is necessary for compatibility with git. It was the cause of mysterious
+      // 'fatal: pack has [x] unresolved deltas' errors that plagued us for some time.
+      // isomorphic-git is perfectly happy with thin packfiles in .git/objects/pack but
+      // canonical git it turns out is NOT.
       'ofs-delta',
       `agent=${pkg.agent}`
     ]

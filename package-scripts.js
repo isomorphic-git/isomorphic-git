@@ -40,7 +40,7 @@ module.exports = {
       karma: runInNewWindow('karma start')
     },
     contributors: {
-      add: 'all-contributors add',
+      add: 'node ./__tests__/__helpers__/add-contributor.js',
       generate: 'all-contributors generate',
       check: 'all-contributors check'
     },

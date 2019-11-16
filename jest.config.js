@@ -1,5 +1,5 @@
 module.exports = {
-  testRegex: '/__tests__/[^\\/]+\\.js',
+  testRegex: '/__tests__/(server-only\\.)?test-[^\\/]+\\.js',
   moduleNameMapper: {
     '^isomorphic-git$': '<rootDir>/src',
     '^isomorphic-git/(.+)$': '<rootDir>/src/$1'
