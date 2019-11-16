@@ -67,6 +67,20 @@ By providing functionality as separate functions instead of an object oriented A
 
 The project includes type definitions so you can enjoy static type-checking and intelligent code completion in editors like VS Code and [CodeSandbox](https://codesandbox.io).
 
+## 1.0 Release Plans
+
+The 1.0 release is planned to coincide with the stable release of the new Chromium-based [Micorosoft Edge](https://blogs.windows.com/msedgedev/2019/11/04/edge-chromium-release-candidate-get-ready/#QU89TOA8e8dE8Hev.97) in January 2020, so that we can drop support for the old Edge browser.
+
+At the time of writing, the following breaking changes are planned:
+
+1. The supported browser versions will be bumped.
+2. The `checkout` command will be removed, and the safer and faster `fastCheckout` command renamed to `checkout`.
+3. The `walkBeta1` command will be removed, and the `walkBeta2` command renamed to `walk`.
+4. The deprecated commands `sign`, `utils.auth`, and `utils.oauth2` will be removed.
+5. Support for the deprecated `fs` function argument will be removed.
+6. Support for the deprecated `emitter` function argument will be removed.
+7. Support for the `signing` function argument of `log` will be removed, and `log` will simply always return a payload. The `payload` property will be renamed to `gpgmsg` so its purpose is more obvious. (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
+
 ## Getting Started
 
 The "isomorphic" in `isomorphic-git` means it works equally well on the server or the browser.
