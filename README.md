@@ -67,6 +67,20 @@ By providing functionality as separate functions instead of an object oriented A
 
 The project includes type definitions so you can enjoy static type-checking and intelligent code completion in editors like VS Code and [CodeSandbox](https://codesandbox.io).
 
+## 1.0 Release Plans
+
+The 1.0 release is planned to coincide with the stable release of the new Chromium-based [Micorosoft Edge](https://blogs.windows.com/msedgedev/2019/11/04/edge-chromium-release-candidate-get-ready/#QU89TOA8e8dE8Hev.97) in January 2020, so that we can drop support for the old Edge browser.
+
+At the time of writing, the following breaking changes are planned:
+
+1. The supported browser versions will be bumped.
+2. The `checkout` command will be removed, and the safer and faster `fastCheckout` command renamed to `checkout`.
+3. The `walkBeta1` command will be removed, and the `walkBeta2` command renamed to `walk`.
+4. The deprecated commands `sign`, `utils.auth`, and `utils.oauth2` will be removed.
+5. Support for the deprecated `fs` function argument will be removed.
+6. Support for the deprecated `emitter` function argument will be removed.
+7. Support for the `signing` function argument of `log` will be removed, and `log` will simply always return a payload. The `payload` property will be renamed to `gpgmsg` so its purpose is more obvious. (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
+
 ## Getting Started
 
 The "isomorphic" in `isomorphic-git` means it works equally well on the server or the browser.
@@ -128,7 +142,7 @@ I'm hoping to get CORS headers added to all the major Git hosting platforms even
 | Gogs (self-hosted) | [✔](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html) |
 | Gitea (self-hosted) | [✔](https://github.com/go-gitea/gitea/pull/5719) |
 | Azure DevOps | [✔](https://github.com/isomorphic-git/isomorphic-git/issues/678#issuecomment-452402740) (Usage Note: requires `noGitSuffix: true` and authentication)
-| Gitlab | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/41755) is still open!
+| Gitlab | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open!
 | Bitbucket | ❌ |
 | Github | ❌ |
 
@@ -189,6 +203,7 @@ unless there is a major version bump.
 - [deleteTag](https://isomorphic-git.github.io/docs/deleteTag.html)
 - [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
 - [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
+- [fastCheckout](https://isomorphic-git.github.io/docs/fastCheckout.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
@@ -215,7 +230,7 @@ unless there is a major version bump.
 - [tag](https://isomorphic-git.github.io/docs/tag.html)
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
-- [walkBeta1](https://isomorphic-git.github.io/docs/walkBeta1.html)
+- [walkBeta2](https://isomorphic-git.github.io/docs/walkBeta2.html)
 - [writeObject](https://isomorphic-git.github.io/docs/writeObject.html)
 - [writeRef](https://isomorphic-git.github.io/docs/writeRef.html)
 
@@ -331,6 +346,10 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="http://web.engr.oregonstate.edu/~nelsonni/"><img src="https://avatars1.githubusercontent.com/u/6432572?v=4&s=60" width="60px;" alt="Nicholas Nelson"/><br /><sub><b>Nicholas Nelson</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=nelsonni" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=nelsonni" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://twitter.com/addaleax"><img src="https://avatars2.githubusercontent.com/u/899444?v=4&s=60" width="60px;" alt="Anna Henningsen"/><br /><sub><b>Anna Henningsen</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=addaleax" title="Code">💻</a></td>
     <td align="center"><a href="https://hen.ne.ke"><img src="https://avatars0.githubusercontent.com/u/4312191?v=4&s=60" width="60px;" alt="Fabian Henneke"/><br /><sub><b>Fabian Henneke</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3AFabianHenneke" title="Bug reports">🐛</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=FabianHenneke" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/djencks"><img src="https://avatars2.githubusercontent.com/u/569822?v=4" width="60px;" alt="djencks"/><br /><sub><b>djencks</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Adjencks" title="Bug reports">🐛</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=djencks" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=djencks" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://justamouse.com"><img src="https://avatars0.githubusercontent.com/u/1086421?v=4" width="60px;" alt="Clemens Wolff"/><br /><sub><b>Clemens Wolff</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=c-w" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=c-w" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=c-w" title="Tests">⚠️</a></td>
   </tr>
 </table>
 

@@ -19,11 +19,12 @@ const CommentReporter = function (
 
   this.rows = [['Browser', 'Pass', 'Skip', 'Fail', 'Time', 'Disconnect?']]
   this.errorsByBrowser = {}
+  this.startTimesByBrowser = {}
   this.longestTests = []
-  this.startTime = Date.now()
 
   this.onBrowserStart = function (browser) {
     this.errorsByBrowser[browser.name] = []
+    this.startTimesByBrowser[browser.name] = Date.now()
   }
   this.specSuccess = function (browser, result) {
     const maxShow = 10
@@ -48,7 +49,7 @@ const CommentReporter = function (
       results.success,
       results.skipped,
       results.failed,
-      formatTime(Date.now() - this.startTime),
+      formatTime(Date.now() - this.startTimesByBrowser[browser.name]),
       results.disconnected
     ])
   }

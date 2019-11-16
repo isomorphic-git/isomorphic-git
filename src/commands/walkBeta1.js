@@ -1,13 +1,13 @@
 // @ts-check
 import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'
-import { GitWalkerSymbol } from '../utils/symbols.js'
+import { GitWalkBeta1Symbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
  *
  * @typedef {Object} Walker
- * @property {Symbol} Symbol('GitWalkerSymbol')
+ * @property {Symbol} Symbol('GitWalkBeta1Symbol')
  */
 
 /**
@@ -228,7 +228,7 @@ export async function walkBeta1 ({
   iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
   try {
-    const walkers = trees.map(proxy => proxy[GitWalkerSymbol]())
+    const walkers = trees.map(proxy => proxy[GitWalkBeta1Symbol]())
 
     const root = new Array(walkers.length).fill({
       fullpath: '.',

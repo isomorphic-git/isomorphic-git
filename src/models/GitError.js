@@ -26,7 +26,7 @@ const messages = {
   RemoteDoesNotSupportDeepenSinceFail: `Remote does not support shallow fetches by date.`,
   RemoteDoesNotSupportDeepenNotFail: `Remote does not support shallow fetches excluding commits reachable by refs.`,
   RemoteDoesNotSupportDeepenRelativeFail: `Remote does not support shallow fetches relative to the current shallow depth.`,
-  RemoteDoesNotSupportSmartHTTP: `Remote does not support the "smart" HTTP protocol, and isomorphic-git does not support the "dumb" HTTP protocol, so they are incompatible.`,
+  RemoteDoesNotSupportSmartHTTP: `Remote did not reply using the "smart" HTTP protocol. Expected "001e# service=git-upload-pack" but received: { preview }`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
   MergeNotSupportedFail: `Merges with conflicts are not supported yet.`,
@@ -71,7 +71,8 @@ const messages = {
   PluginSchemaViolation: `Schema check failed for "{ plugin }" plugin; missing { method } method.`,
   PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
-  ShortOidNotFound: `Could not find an object matching "{ short }".`
+  ShortOidNotFound: `Could not find an object matching "{ short }".`,
+  CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`
 }
 
 export const E = {
@@ -144,7 +145,8 @@ export const E = {
   PluginSchemaViolation: `PluginSchemaViolation`,
   PluginUnrecognized: `PluginUnrecognized`,
   AmbiguousShortOid: `AmbiguousShortOid`,
-  ShortOidNotFound: `ShortOidNotFound`
+  ShortOidNotFound: `ShortOidNotFound`,
+  CheckoutConflictError: `CheckoutConflictError`
 }
 
 function renderTemplate (template, values) {

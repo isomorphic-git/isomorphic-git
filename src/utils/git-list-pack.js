@@ -2,7 +2,6 @@
 // It's used slightly differently - instead of returning a through stream it wraps a stream.
 // (I tried to make it API identical, but that ended up being 2x slower than this version.)
 import pako from 'pako'
-import Hash from 'sha.js/sha1'
 
 import { E, GitError } from '../models/GitError.js'
 
@@ -10,9 +9,7 @@ import { StreamReader } from './StreamReader.js'
 
 export async function listpack (stream, onData) {
   const reader = new StreamReader(stream)
-  const hash = new Hash()
   let PACK = await reader.read(4)
-  hash.update(PACK)
   PACK = PACK.toString('utf8')
   if (PACK !== 'PACK') {
     throw new GitError(E.InternalFail, {
@@ -21,7 +18,6 @@ export async function listpack (stream, onData) {
   }
 
   let version = await reader.read(4)
-  hash.update(version)
   version = version.readUInt32BE(0)
   if (version !== 2) {
     throw new GitError(E.InternalFail, {
@@ -30,14 +26,13 @@ export async function listpack (stream, onData) {
   }
 
   let numObjects = await reader.read(4)
-  hash.update(numObjects)
   numObjects = numObjects.readUInt32BE(0)
   // If (for some godforsaken reason) this is an empty packfile, abort now.
   if (numObjects < 1) return
 
   while (!reader.eof() && numObjects--) {
     const offset = reader.tell()
-    const { type, length, ofs, reference } = await parseHeader(reader, hash)
+    const { type, length, ofs, reference } = await parseHeader(reader)
     const inflator = new pako.Inflate()
     while (!inflator.result) {
       const chunk = await reader.chunk()
@@ -57,8 +52,7 @@ export async function listpack (stream, onData) {
 
         // Backtrack parser to where deflated data ends
         await reader.undo()
-        const buf = await reader.read(chunk.length - inflator.strm.avail_in)
-        hash.update(buf)
+        await reader.read(chunk.length - inflator.strm.avail_in)
         const end = reader.tell()
         onData({
           data: inflator.result,
@@ -69,17 +63,14 @@ export async function listpack (stream, onData) {
           reference,
           ofs
         })
-      } else {
-        hash.update(chunk)
       }
     }
   }
 }
 
-async function parseHeader (reader, hash) {
+async function parseHeader (reader) {
   // Object type is encoded in bits 654
   let byte = await reader.byte()
-  hash.update(Buffer.from([byte]))
   const type = (byte >> 4) & 0b111
   // The length encoding get complicated.
   // Last four bits of length is encoded in bits 3210
@@ -90,7 +81,6 @@ async function parseHeader (reader, hash) {
     let shift = 4
     do {
       byte = await reader.byte()
-      hash.update(Buffer.from([byte]))
       length |= (byte & 0b01111111) << shift
       shift += 7
     } while (byte & 0b10000000)
@@ -104,7 +94,6 @@ async function parseHeader (reader, hash) {
     const bytes = []
     do {
       byte = await reader.byte()
-      hash.update(Buffer.from([byte]))
       ofs |= (byte & 0b01111111) << shift
       shift += 7
       bytes.push(byte)
@@ -113,7 +102,6 @@ async function parseHeader (reader, hash) {
   }
   if (type === 7) {
     const buf = await reader.read(20)
-    hash.update(buf)
     reference = buf
   }
   return { type, length, ofs, reference }
