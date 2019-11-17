@@ -210,7 +210,7 @@ export async function push ({
       emitterPrefix,
       corsProxy,
       service: 'git-receive-pack',
-      url,
+      url: httpRemote.url,
       noGitSuffix,
       auth,
       headers,

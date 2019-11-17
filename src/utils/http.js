@@ -30,7 +30,7 @@ export async function http ({
         if (err) return reject(err)
         const iter = fromNodeStream(res)
         resolve({
-          url: res.url,
+          url: res.redirected ? res.url : url,
           method: res.method,
           statusCode: res.statusCode,
           statusMessage: res.statusMessage,

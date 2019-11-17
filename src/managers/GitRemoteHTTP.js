@@ -70,10 +70,11 @@ export class GitRemoteHTTP {
     if (_auth) {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
+    const requestUrl = `${url}/info/refs?service=${service}`
     let res = await http({
       core,
       method: 'GET',
-      url: `${url}/info/refs?service=${service}`,
+      url: requestUrl,
       headers
     })
     if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
@@ -87,7 +88,7 @@ export class GitRemoteHTTP {
       res = await http({
         core,
         method: 'GET',
-        url: `${url}/info/refs?service=${service}`,
+        url: requestUrl,
         headers
       })
       // Tell credential manager if the credentials were no good
@@ -104,11 +105,20 @@ export class GitRemoteHTTP {
       })
     }
     // Git "smart" HTTP servers should respond with the correct Content-Type header.
-    if (
-      res.headers['content-type'] === `application/x-${service}-advertisement`
-    ) {
+    if (res.headers['content-type'] === `application/x-${service}-advertisement`) {
       const remoteHTTP = await parseRefsAdResponse(res.body, { service })
       remoteHTTP.auth = auth
+      // Figure out if the URL needs to be changed for the subsequent `connect` request
+      let redirectedUrl = _origUrl
+      // Take CORS-proxy information as gospel
+      if (res.headers['x-redirected-url']) {
+        redirectedUrl = res.headers['x-redirected-url'].replace(/\/info\/refs\?.*$/, '')
+        delete res.headers['x-redirected-url']
+      // Otherwise, detect if redirects were handled client-side
+      } else if (res.url !== requestUrl) {
+        redirectedUrl = res.url.replace(/\/info\/refs\?.*$/, '')
+      }
+      remoteHTTP.url = redirectedUrl
       return remoteHTTP
     } else {
       // If they don't send the correct content-type header, that's a good indicator it is either a "dumb" HTTP

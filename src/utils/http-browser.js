@@ -25,7 +25,7 @@ export async function http ({
     headers[key] = value
   }
   return {
-    url: res.url,
+    url: res.redirected ? res.url : url,
     method: res.method,
     statusCode: res.status,
     statusMessage: res.statusText,

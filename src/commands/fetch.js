@@ -149,12 +149,8 @@ export async function fetch ({
       prune,
       pruneTags
     })
-    if (response === null) {
-      return {
-        defaultBranch: null,
-        fetchHead: null,
-        fetchHeadDescription: null
-      }
+    if (response.fetchHead === null) {
+      return response
     }
     if (emitter) {
       const lines = splitLines(response.progress)
@@ -178,9 +174,10 @@ export async function fetch ({
     const packfile = await collect(response.packfile)
     const packfileSha = packfile.slice(-20).toString('hex')
     const res = {
-      defaultBranch: response.HEAD,
-      fetchHead: response.FETCH_HEAD.oid,
-      fetchHeadDescription: response.FETCH_HEAD.description
+      defaultBranch: response.defaultBranch,
+      fetchHead: response.fetchHead,
+      fetchHeadDescription: response.fetchHeadDescription,
+      redirectedUrl: response.redirectedUrl
     }
     if (response.headers) {
       res.headers = response.headers
@@ -271,11 +268,17 @@ async function fetchPackfile ({
     auth,
     headers
   })
+  const redirectedUrl = url === remoteHTTP.url ? null : remoteHTTP.url
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
-  // For the special case of an empty repository with no refs, return null.
+  // For the special case of an empty repository with no refs, return with fetchHead === null.
   if (remoteRefs.size === 0) {
-    return null
+    return {
+      defaultBranch: null,
+      fetchHead: null,
+      fetchHeadDescription: null,
+      redirectedUrl
+    }
   }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
@@ -366,7 +369,7 @@ async function fetchPackfile ({
     emitterPrefix,
     corsProxy,
     service: 'git-upload-pack',
-    url,
+    url: remoteHTTP.url,
     noGitSuffix,
     auth,
     body: [packbuffer],
@@ -445,10 +448,10 @@ async function fetchPackfile ({
     }
   }
   // We need this value later for the `clone` command.
-  response.HEAD = remoteHTTP.symrefs.get('HEAD')
+  let defaultBranch = remoteHTTP.symrefs.get('HEAD')
   // AWS CodeCommit doesn't list HEAD as a symref, but we can reverse engineer it
   // Find the SHA of the branch called HEAD
-  if (response.HEAD === undefined) {
+  if (defaultBranch === undefined) {
     const { oid } = GitRefManager.resolveAgainstMap({
       ref: 'HEAD',
       map: remoteRefs
@@ -457,15 +460,15 @@ async function fetchPackfile ({
     // the same SHA as the branch called HEAD.
     for (const [key, value] of remoteRefs.entries()) {
       if (key !== 'HEAD' && value === oid) {
-        response.HEAD = key
+        defaultBranch = key
         break
       }
     }
   }
   const noun = fullref.startsWith('refs/tags') ? 'tag' : 'branch'
-  response.FETCH_HEAD = {
-    oid,
-    description: `${noun} '${abbreviateRef(fullref)}' of ${url}`
-  }
+  response.defaultBranch = defaultBranch
+  response.fetchHead = oid
+  response.fetchHeadDescription = `${noun} '${abbreviateRef(fullref)}' of ${url}`
+  response.redirectedUrl = redirectedUrl
   return response
 }
