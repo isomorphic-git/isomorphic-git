@@ -69,7 +69,7 @@
     "@babel/plugin-transform-async-to-generator": "7.5.0",
     "@babel/preset-env": "7.5.5",
     "@babel/runtime": "7.5.5",
-    "@isomorphic-git/cors-proxy": "2.5.0",
+    "@isomorphic-git/cors-proxy": "2.6.0",
     "@isomorphic-git/lightning-fs": "^3.3.0",
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "3.3.6",
