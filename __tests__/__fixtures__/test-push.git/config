@@ -22,3 +22,6 @@
 [remote "gitlab"]
 	url = https://gitlab.com/isomorphic-git/test.empty
 	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "awscc"]
+	url = https://git-codecommit.us-west-2.amazonaws.com/v1/repos/test.empty
+	fetch = +refs/heads/*:refs/remotes/origin/*

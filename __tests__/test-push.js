@@ -264,4 +264,31 @@ describe('push', () => {
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/master')
   })
+  it('push to AWS CodeCommit using token', async () => {
+    // These HTTPS Git credentials for AWS CodeCommit are for IAM user arn:aws:iam::260687965765:user/tester
+    // which only has git access to the test repo:
+    // https://git-codecommit.us-west-2.amazonaws.com/v1/repos/test.empty
+    // It is stored reversed because the GitHub one is stored reversed and I like being consistant.
+    const token = '=cYfZKeyeW3ig0yZrkzkd9ElDKYctLgV2WNOZ1Ctntnt'
+      .split('')
+      .reverse()
+      .join('')
+    // Setup
+    const { gitdir } = await makeFixture('test-push')
+    // Test
+    const res = await push({
+      noGitSuffix: true,
+      gitdir,
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+      username: 'tester-at-260687965765',
+      password: token,
+      remote: 'awscc',
+      ref: 'master',
+      force: true
+    })
+    expect(res).toBeTruthy()
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
+  })
 })
