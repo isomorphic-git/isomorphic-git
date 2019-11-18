@@ -416,6 +416,7 @@ export function fetch(args: GitDir & {
   emitter?: EventEmitter;
   emitterPrefix?: string;
   url?: string;
+  noGitSuffix?: boolean;
   corsProxy?: string;
   ref?: string;
   remote?: string;
@@ -592,6 +593,7 @@ export function push(args: GitDir & {
   remoteRef?: string;
   remote?: string;
   url?: string;
+  noGitSuffix?: boolean;
   corsProxy?: string;
   force?: boolean;
   username?: string;

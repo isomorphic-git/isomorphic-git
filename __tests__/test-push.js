@@ -30,6 +30,7 @@ describe('push', () => {
     )
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       emitterPrefix: 'push.',
       remote: 'karma',
@@ -51,6 +52,7 @@ describe('push', () => {
     })
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       remote: 'karma'
     })
@@ -69,6 +71,7 @@ describe('push', () => {
     })
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       remote: 'karma',
       ref: 'master',
@@ -89,6 +92,7 @@ describe('push', () => {
     })
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       remote: 'karma',
       ref: 'lightweight-tag'
@@ -108,6 +112,7 @@ describe('push', () => {
     })
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       remote: 'karma',
       ref: 'annotated-tag'
@@ -128,6 +133,7 @@ describe('push', () => {
     })
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       username: 'testuser',
       password: 'testpassword',
@@ -149,6 +155,7 @@ describe('push', () => {
     })
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       remote: 'url',
       ref: 'master'
@@ -170,6 +177,7 @@ describe('push', () => {
     let error = null
     try {
       await push({
+        noGitSuffix: true,
         gitdir,
         remote: 'auth',
         ref: 'master'
@@ -191,6 +199,7 @@ describe('push', () => {
     let error = null
     try {
       await push({
+        noGitSuffix: true,
         gitdir,
         username: 'test',
         password: 'test',
@@ -202,7 +211,7 @@ describe('push', () => {
     }
     expect(error).toContain('401')
   })
-  it('push to Github using token', async () => {
+  it('push to GitHub using token', async () => {
     // This Personal OAuth token is for a test account (https://github.com/isomorphic-git-test-push)
     // with "public_repo" access. The only repo it has write access to is
     // https://github.com/isomorphic-git/test.empty
@@ -215,10 +224,38 @@ describe('push', () => {
     const { gitdir } = await makeFixture('test-push')
     // Test
     const res = await push({
+      noGitSuffix: true,
       gitdir,
       corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
       token: token,
       remote: 'origin',
+      ref: 'master',
+      force: true
+    })
+    expect(res).toBeTruthy()
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/master')
+  })
+  it('push to GitLab using token', async () => {
+    // This Personal Access Token is for a test account (https://gitlab.com/isomorphic-git-test-push)
+    // with "read_repository" and "write_repository" access. However the only repo it has write access to is
+    // https://gitlab.com/isomorphic-git/test.empty
+    // It is stored reversed because the GitHub one is stored reversed and I like being consistant.
+    const token = 'vjNzgKP7acS6e6vb2Q6g'
+      .split('')
+      .reverse()
+      .join('')
+    // Setup
+    const { gitdir } = await makeFixture('test-push')
+    // Test
+    const res = await push({
+      noGitSuffix: true,
+      gitdir,
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+      username: 'isomorphic-git-test-push',
+      password: token,
+      remote: 'gitlab',
       ref: 'master',
       force: true
     })

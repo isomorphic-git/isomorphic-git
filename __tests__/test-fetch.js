@@ -19,6 +19,7 @@ describe('fetch', () => {
     })
     // Smoke Test
     await fetch({
+      noGitSuffix: true,
       gitdir,
       singleBranch: true,
       remote: 'origin',
@@ -47,6 +48,7 @@ describe('fetch', () => {
     )
     // Test
     await fetch({
+      noGitSuffix: true,
       gitdir,
       emitterPrefix: 'fetch.',
       depth: 1,
@@ -62,6 +64,7 @@ describe('fetch', () => {
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
     await fetch({
+      noGitSuffix: true,
       gitdir,
       depth: 2,
       singleBranch: true,
@@ -82,6 +85,7 @@ describe('fetch', () => {
     })
     // Test
     await fetch({
+      noGitSuffix: true,
       gitdir,
       since: new Date(1506571200000),
       singleBranch: true,
@@ -102,6 +106,7 @@ describe('fetch', () => {
     })
     // Test
     await fetch({
+      noGitSuffix: true,
       gitdir,
       exclude: ['v0.0.5'],
       singleBranch: true,
@@ -122,6 +127,7 @@ describe('fetch', () => {
     })
     // Test
     await fetch({
+      noGitSuffix: true,
       gitdir,
       depth: 1,
       singleBranch: true,
@@ -133,6 +139,7 @@ describe('fetch', () => {
     expect(shallow).toEqual('92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n')
     // Now test deepen
     await fetch({
+      noGitSuffix: true,
       gitdir,
       relative: true,
       depth: 1,
@@ -156,6 +163,7 @@ describe('fetch', () => {
     let err = null
     try {
       await fetch({
+        noGitSuffix: true,
         gitdir,
         since: new Date(1506571200000),
         singleBranch: true,
@@ -172,6 +180,7 @@ describe('fetch', () => {
   it('fetch empty repository from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-empty')
     await fetch({
+      noGitSuffix: true,
       dir,
       gitdir,
       depth: 1,
@@ -196,6 +205,7 @@ describe('fetch', () => {
       true
     )
     const { pruned } = await fetch({
+      noGitSuffix: true,
       dir,
       gitdir,
       depth: 1,
@@ -224,6 +234,7 @@ describe('fetch', () => {
     const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
     try {
       await fetch({
+        noGitSuffix: true,
         dir,
         gitdir,
         depth: 1,

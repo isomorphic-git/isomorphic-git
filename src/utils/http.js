@@ -29,8 +29,13 @@ export async function http ({
       (err, res) => {
         if (err) return reject(err)
         const iter = fromNodeStream(res)
+        try {
+          const origURL = new URL(url)
+          const origPath = origURL.pathname + origURL.search
+          url = url.replace(origPath, res.req.path)
+        } catch (_) {}
         resolve({
-          url: res.redirected ? res.url : url,
+          url: url,
           method: res.method,
           statusCode: res.statusCode,
           statusMessage: res.statusMessage,
