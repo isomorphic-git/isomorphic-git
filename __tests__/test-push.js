@@ -202,29 +202,4 @@ describe('push', () => {
     }
     expect(error).toContain('401')
   })
-  it('push to Github using token', async () => {
-    // This Personal OAuth token is for a test account (https://github.com/isomorphic-git-test-push)
-    // with "public_repo" access. The only repo it has write access to is
-    // https://github.com/isomorphic-git/test.empty
-    // It is stored reversed to avoid Github's auto-revoking feature.
-    const token = 'e8df25b340c98b7eec57a4976bd9074b93a7dc1c'
-      .split('')
-      .reverse()
-      .join('')
-    // Setup
-    const { gitdir } = await makeFixture('test-push')
-    // Test
-    const res = await push({
-      gitdir,
-      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
-      token: token,
-      remote: 'origin',
-      ref: 'master',
-      force: true
-    })
-    expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
-  })
 })
