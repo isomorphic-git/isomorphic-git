@@ -5,6 +5,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitObject } from '../models/GitObject.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { readObjectPacked } from '../storage/readObjectPacked.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { shasum } from '../utils/shasum.js'
 
 export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) {
@@ -18,7 +19,7 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
   // Note: I think the canonical git implementation must do this too because
   // `git cat-file -t 4b825dc642cb6eb9a060e54bf8d69288fbee4904` prints "tree" even in empty repos.
   if (oid === '4b825dc642cb6eb9a060e54bf8d69288fbee4904') {
-    result = { format: 'wrapped', object: Buffer.from(`tree 0\x00`) }
+    result = { format: 'wrapped', object: TinyBuffer.from(`tree 0\x00`) }
   }
   // Look for it in the loose object directory.
   if (!result) {
@@ -42,7 +43,7 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
   /* eslint-disable no-fallthrough */
   switch (result.format) {
     case 'deflated':
-      result.object = Buffer.from(pako.inflate(result.object))
+      result.object = TinyBuffer.from(pako.inflate(result.object))
       result.format = 'wrapped'
     case 'wrapped':
       if (format === 'wrapped' && result.format === 'wrapped') {

@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
@@ -7,14 +7,10 @@ export class GitAnnotatedTag {
   constructor (tag) {
     if (typeof tag === 'string') {
       this._tag = tag
-    } else if (Buffer.isBuffer(tag)) {
-      this._tag = tag.toString('utf8')
-    } else if (typeof tag === 'object') {
+    } else if (typeof tag.object === 'string') {
       this._tag = GitAnnotatedTag.render(tag)
     } else {
-      throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitAnnotatedTag constructor'
-      })
+      this._tag = tag.toString('utf8')
     }
   }
 
@@ -98,7 +94,7 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   toObject () {
-    return Buffer.from(this._tag, 'utf8')
+    return TinyBuffer.from(this._tag, 'utf8')
   }
 
   static async sign (tag, pgp, secretKey) {

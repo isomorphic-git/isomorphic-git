@@ -3,6 +3,7 @@ import Hash from 'sha.js/sha1'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { readObject } from '../storage/readObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
 import { cores } from '../utils/plugins.js'
@@ -28,7 +29,7 @@ export async function pack ({
   const hash = new Hash()
   const outputStream = []
   function write (chunk, enc) {
-    const buff = Buffer.from(chunk, enc)
+    const buff = TinyBuffer.from(chunk, enc)
     outputStream.push(buff)
     hash.update(buff)
   }
@@ -56,7 +57,7 @@ export async function pack ({
       length = length >>> 7
     }
     // Lastly, we can compress and write the object.
-    write(Buffer.from(pako.deflate(object)))
+    write(TinyBuffer.from(pako.deflate(object)))
   }
   write('PACK')
   write('00000002', 'hex')

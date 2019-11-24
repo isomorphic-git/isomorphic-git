@@ -3,6 +3,7 @@ import pako from 'pako'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitObject } from '../models/GitObject.js'
 import { writeObjectLoose } from '../storage/writeObjectLoose.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { shasum } from '../utils/shasum.js'
 
 export async function writeObject ({
@@ -19,7 +20,7 @@ export async function writeObject ({
       object = GitObject.wrap({ type, object })
     }
     oid = await shasum(object)
-    object = Buffer.from(pako.deflate(object))
+    object = TinyBuffer.from(pako.deflate(object))
   }
   if (!dryRun) {
     const fs = new FileSystem(_fs)

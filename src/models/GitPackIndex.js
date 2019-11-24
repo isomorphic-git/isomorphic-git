@@ -1,10 +1,11 @@
 import crc32 from 'crc-32'
-import applyDelta from 'git-apply-delta'
 import * as marky from 'marky'
 import pako from 'pako'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { applyDelta } from '../utils/git-apply-delta.js'
 import { listpack } from '../utils/git-list-pack.js'
 import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'
@@ -315,14 +316,14 @@ export class GitPackIndex {
   async toBuffer () {
     const buffers = []
     const write = (str, encoding) => {
-      buffers.push(Buffer.from(str, encoding))
+      buffers.push(TinyBuffer.from(str, encoding))
     }
     // Write out IDX v2 magic number
     write('ff744f63', 'hex')
     // Write out version number 2
     write('00000002', 'hex')
     // Write fanout table
-    const fanoutBuffer = new BufferCursor(Buffer.alloc(256 * 4))
+    const fanoutBuffer = new BufferCursor(TinyBuffer.alloc(256 * 4))
     for (let i = 0; i < 256; i++) {
       let count = 0
       for (const hash of this.hashes) {
@@ -336,13 +337,17 @@ export class GitPackIndex {
       write(hash, 'hex')
     }
     // Write out crcs
-    const crcsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
+    const crcsBuffer = new BufferCursor(
+      TinyBuffer.alloc(this.hashes.length * 4)
+    )
     for (const hash of this.hashes) {
       crcsBuffer.writeUInt32BE(this.crcs[hash])
     }
     buffers.push(crcsBuffer.buffer)
     // Write out offsets
-    const offsetsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
+    const offsetsBuffer = new BufferCursor(
+      TinyBuffer.alloc(this.hashes.length * 4)
+    )
     for (const hash of this.hashes) {
       offsetsBuffer.writeUInt32BE(this.offsets.get(hash))
     }
@@ -350,11 +355,11 @@ export class GitPackIndex {
     // Write out packfile checksum
     write(this.packfileSha, 'hex')
     // Write out shasum
-    const totalBuffer = Buffer.concat(buffers)
+    const totalBuffer = TinyBuffer.concat(buffers)
     const sha = await shasum(totalBuffer)
-    const shaBuffer = Buffer.alloc(20)
+    const shaBuffer = TinyBuffer.alloc(20)
     shaBuffer.write(sha, 'hex')
-    return Buffer.concat([totalBuffer, shaBuffer])
+    return TinyBuffer.concat([totalBuffer, shaBuffer])
   }
 
   async load ({ pack }) {
@@ -442,7 +447,7 @@ export class GitPackIndex {
       })
     }
     if (base) {
-      object = Buffer.from(applyDelta(object, base))
+      object = TinyBuffer.from(applyDelta(object, base))
     }
     // Cache the result based on depth.
     if (this.readDepth > 3) {

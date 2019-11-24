@@ -5,6 +5,7 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { writeObject as _writeObject } from '../storage/writeObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 
@@ -86,7 +87,7 @@ export async function writeObject ({
           object = GitTree.from(object.entries).toObject()
           break
         case 'blob':
-          object = Buffer.from(object, encoding)
+          object = TinyBuffer.from(object, encoding)
           break
         case 'tag':
           object = GitAnnotatedTag.from(object).toObject()

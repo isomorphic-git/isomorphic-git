@@ -1,5 +1,6 @@
 // @ts-check
 import { hashObject } from '../storage/hashObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 
 /**
  *
@@ -36,7 +37,7 @@ export async function hashBlob ({ core = 'default', object }) {
   try {
     // Convert object to buffer
     if (typeof object === 'string') {
-      object = Buffer.from(object, 'utf8')
+      object = TinyBuffer.from(object, 'utf8')
     }
 
     const type = 'blob'
