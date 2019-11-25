@@ -257,6 +257,51 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
     })
     expect(oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
   })
+  it('tree entries sorted correctly', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-writeObject')
+    // Test
+    const oid = await writeObject({
+      gitdir,
+      type: 'tree',
+      format: 'parsed',
+      object: {
+        entries: [
+          {
+            mode: '040000',
+            path: 'config',
+            oid: 'd564d0bc3dd917926892c55e3706cc116d5b165e',
+            type: 'tree'
+          },
+          {
+            mode: '100644',
+            path: 'config ',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          },
+          {
+            mode: '100644',
+            path: 'config.',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          },
+          {
+            mode: '100644',
+            path: 'config0',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          },
+          {
+            mode: '100644',
+            path: 'config~',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          }
+        ]
+      }
+    })
+    expect(oid).toEqual('c8a72f5bd8633663210490897b798ddc3ff9ca64')
+  })
   it('annotated tag', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-writeObject')
