@@ -261,47 +261,45 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
     // Setup
     const { gitdir } = await makeFixture('test-writeObject')
     // Test
-    const oid = await writeObject(
-      {
-        gitdir,
-        type: 'tree',
-        format: 'parsed',
-        object: {
-          entries: [
-            {
-              mode: '040000',
-              path: 'config',
-              oid: 'd564d0bc3dd917926892c55e3706cc116d5b165e',
-              type: 'tree'
-            },
-            {
-              mode: '100644',
-              path: 'config ',
-              oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
-              type: 'blob'
-            },
-            {
-              mode: '100644',
-              path: 'config.',
-              oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
-              type: 'blob'
-            },
-            {
-              mode: '100644',
-              path: 'config0',
-              oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
-              type: 'blob'
-            },
-            {
-              mode: '100644',
-              path: 'config~',
-              oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
-              type: 'blob'
-            }
-          ]
-        }
+    const oid = await writeObject({
+      gitdir,
+      type: 'tree',
+      format: 'parsed',
+      object: {
+        entries: [
+          {
+            mode: '040000',
+            path: 'config',
+            oid: 'd564d0bc3dd917926892c55e3706cc116d5b165e',
+            type: 'tree'
+          },
+          {
+            mode: '100644',
+            path: 'config ',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          },
+          {
+            mode: '100644',
+            path: 'config.',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          },
+          {
+            mode: '100644',
+            path: 'config0',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          },
+          {
+            mode: '100644',
+            path: 'config~',
+            oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+            type: 'blob'
+          }
+        ]
       }
-    )
+    })
     expect(oid).toEqual('c8a72f5bd8633663210490897b798ddc3ff9ca64')
   })
   it('annotated tag', async () => {
