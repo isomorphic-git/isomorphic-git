@@ -17,16 +17,17 @@ export async function serveReceivePack ({
   const fs = new FileSystem(_fs)
   try {
     const response = []
-    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, GitPktLine.encode('unpack ok\n')))
-    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, GitPktLine.encode('ok refs/heads/master\n')))
-    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, Buffer.concat([GitPktLine.flush(), GitPktLine.flush()])))
+    response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode('unpack ok\n')))
+    response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode('ok refs/heads/master\n')))
+    response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.flush()))
+    response.push(GitPktLine.flush())
 
     return {
       headers: {
-        'content-type': `application/x-${service}-result`,
-        'pragma': 'no-cache',
-        'cache-control': 'no-cache, max-age=0, must-revalidate',
-        'vary': 'Accept-Encoding',
+        'Content-Type': `application/x-${service}-result`,
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+        'Vary': 'Accept-Encoding',
       },
       response
     }
