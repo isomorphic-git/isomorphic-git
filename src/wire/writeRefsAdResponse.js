@@ -4,6 +4,7 @@ import { pkg } from '../utils/pkg'
 export async function writeRefsAdResponse ({ service, capabilities, refs, symrefs }) {
   const stream = []
   stream.push(GitPktLine.encode(`# service=${service}\n`))
+  stream.push(GitPktLine.flush())
   // Compose capabilities string
   let syms = ''
   for (const [key, value] of Object.entries(symrefs)) {

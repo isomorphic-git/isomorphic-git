@@ -22,7 +22,10 @@ export async function serveReceivePack ({
     
     return {
       headers: {
-        'content-type': `application/x-${service}-result`
+        'content-type': `application/x-${service}-result`,
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache, max-age=0, must-revalidate',
+        'vary': 'Accept-Encoding',
       },
       response
     }
