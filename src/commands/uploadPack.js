@@ -44,6 +44,7 @@ export async function uploadPack ({
         depth: 2
       })
       return writeRefsAdResponse({
+        service: 'git-upload-pack',
         capabilities,
         refs,
         symrefs

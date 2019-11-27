@@ -138,3 +138,6 @@ export class GitSideBand {
   //   return output
   // }
 }
+GitSideBand.PackfileChannel = 1
+GitSideBand.MessageChannel = 2
+GitSideBand.ErrorChannel = 3

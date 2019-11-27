@@ -2,6 +2,8 @@ export * from './commands/listCommitsAndTags'
 export * from './commands/listObjects'
 export * from './commands/pack'
 export * from './commands/uploadPack'
+export * from './commands/serveInfoRefs'
+export * from './commands/serveReceivePack'
 
 export * from './managers/GitConfigManager'
 export * from './managers/GitIgnoreManager'

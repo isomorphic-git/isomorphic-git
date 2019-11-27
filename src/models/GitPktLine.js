@@ -69,6 +69,15 @@ export class GitPktLine {
     return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
   }
 
+  static encodeSideBand (channel, line) {
+    if (typeof line === 'string') {
+      line = Buffer.from(line)
+    }
+    const length = line.length + 4
+    const hexlength = padHex(4, length)
+    return Buffer.concat([Buffer.from(hexlength, 'utf8'), Buffer.from([channel]), line])
+  }
+
   static streamReader (stream) {
     const reader = new StreamReader(stream)
     return async function read () {
