@@ -73,7 +73,7 @@ export class GitPktLine {
     if (typeof line === 'string') {
       line = Buffer.from(line)
     }
-    const length = line.length + 4
+    const length = line.length + 4 + 1
     const hexlength = padHex(4, length)
     return Buffer.concat([Buffer.from(hexlength, 'utf8'), Buffer.from([channel]), line])
   }

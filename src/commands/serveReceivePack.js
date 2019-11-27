@@ -17,9 +17,10 @@ export async function serveReceivePack ({
   const fs = new FileSystem(_fs)
   try {
     const response = []
-    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, 'Hello, World!\n'))
-    response.push(GitPktLine.encodeSideBand(GitSideBand.ErrorChannel, 'Unsupported\n'))
-    
+    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, GitPktLine.encode('unpack ok\n')))
+    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, GitPktLine.encode('ok refs/heads/master\n')))
+    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, Buffer.concat([GitPktLine.flush(), GitPktLine.flush()])))
+
     return {
       headers: {
         'content-type': `application/x-${service}-result`,
