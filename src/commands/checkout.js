@@ -173,7 +173,7 @@ export async function checkout ({
                       })
                     )
                   }
-                  
+
                   break
                 }
                 case 'blob': {
