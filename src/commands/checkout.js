@@ -57,7 +57,8 @@ export async function checkout ({
   ref,
   filepaths = ['.'],
   pattern = null,
-  noCheckout = false
+  noCheckout = false,
+  noSubmodules = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -165,11 +166,14 @@ export async function checkout ({
                 }
                 case 'commit': {
                   // gitlinks
-                  console.log(
-                    new GitError(E.NotImplementedFail, {
-                      thing: 'submodule support'
-                    })
-                  )
+                  if (!noSubmodules) {
+                    console.log(
+                      new GitError(E.NotImplementedFail, {
+                        thing: 'submodule support'
+                      })
+                    )
+                  }
+                  
                   break
                 }
                 case 'blob': {
