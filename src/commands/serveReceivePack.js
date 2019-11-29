@@ -19,6 +19,8 @@ export async function serveReceivePack (msg) {
         return GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode(`ng ${msg.ref} ${msg.message}\n`))
       case 'print':
         return GitPktLine.encodeSideBand(GitSideBand.MessageChannel, msg.message)
+      case 'error':
+        return GitPktLine.encodeSideBand(GitSideBand.ErrorChannel, msg.message)
       case 'fin':
         return Buffer.concat(
           [

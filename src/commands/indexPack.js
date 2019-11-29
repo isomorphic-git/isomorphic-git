@@ -19,7 +19,7 @@ import { cores } from '../utils/plugins.js'
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
- * @returns {Promise<void>} Resolves when filesystem operations are complete
+ * @returns {Promise<string[]>} Resolves with a list of the SHA-1 object ids contained in the packfile
  *
  * @example
  * await git.indexPack({ dir: '$input((/))', filepath: '$input((pack-9cbd243a1caa4cb4bef976062434a958d82721a9.pack))' })
@@ -47,6 +47,7 @@ export async function indexPack ({
       emitterPrefix
     })
     await fs.write(filepath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
+    return [...idx.hashes]
   } catch (err) {
     err.caller = 'git.indexPack'
     throw err

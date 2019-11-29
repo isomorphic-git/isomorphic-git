@@ -44,6 +44,9 @@ function otherVarIntDecode (reader, startWith) {
   return result
 }
 
+/**
+ * @property {string[]} hashes - the oids contained in the pack
+ */
 export class GitPackIndex {
   constructor (stuff) {
     Object.assign(this, stuff)
