@@ -12,14 +12,21 @@ export async function serveReceivePack ({
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
   service,
-  banner
+  banner,
+  unpack = 'ok',
+  ok = [],
+  errors = [],
 }) {
   const fs = new FileSystem(_fs)
   try {
     const response = []
-    response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, 'Resolving deltas:   0% (0/4)\n'))
-    response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode('unpack ok\n')))
-    response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode('ok refs/heads/master\n')))
+    response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode(`unpack ${unpack}\n`)))
+    for (let ref of ok) {
+      response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode(`ok ${ref}\n`)))
+    }
+    for (let refAndMessage of errors) {
+      response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.encode(`ng ${refAndMessage}\n`)))
+    }
     response.push(GitPktLine.encodeSideBand(GitSideBand.MessageChannel, banner))
     response.push(GitPktLine.encodeSideBand(GitSideBand.PackfileChannel, GitPktLine.flush()))
     response.push(GitPktLine.flush())

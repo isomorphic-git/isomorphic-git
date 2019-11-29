@@ -53,6 +53,7 @@ export * from './utils/shasum'
 export * from './utils/sleep'
 export * from './utils/symbols'
 
+export * from './wire/parseReceivePackRequest'
 export * from './wire/parseReceivePackResponse'
 export * from './wire/parseRefsAdResponse'
 export * from './wire/parseUploadPackResponse'
