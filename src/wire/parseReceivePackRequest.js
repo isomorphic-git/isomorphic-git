@@ -21,6 +21,7 @@ import { GitPktLine } from '../models/GitPktLine.js'
 export async function parseReceivePackRequest (stream) {
   const read = GitPktLine.streamReader(stream)
   let line = await read()
+  if (line == null) throw new Error('Client is done')
   let capabilities
   ;[line, capabilities] = line.toString('utf8').split('\0')
   capabilities = capabilities.split(' ')
