@@ -32,6 +32,7 @@ export async function parseReceivePackRequest (stream) {
   }
   return {
     capabilities,
-    updates
+    updates,
+    packfile: await read({ rawIterator: true })
   }
 }

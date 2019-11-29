@@ -80,7 +80,18 @@ export class GitPktLine {
 
   static streamReader (stream) {
     const reader = new StreamReader(stream)
-    return async function read () {
+    let dead = false
+    return async function read (options) {
+      if (options && options.rawIterator) {
+        dead = true
+        let iterator = async function * () {
+          while (!reader.eof()) {
+            yield reader.chunk()
+          }
+        }
+        return iterator()
+      }
+      if (dead) throw new Error('Two sources trying to consume the same stream, tut tut.')
       try {
         let length = await reader.read(4)
         if (length == null) return true
