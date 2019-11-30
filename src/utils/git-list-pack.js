@@ -54,7 +54,7 @@ export async function listpack (stream, onData) {
         await reader.undo()
         await reader.read(chunk.length - inflator.strm.avail_in)
         const end = reader.tell()
-        onData({
+        await onData({
           data: inflator.result,
           type,
           num: numObjects,

@@ -11,6 +11,14 @@ import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject'
 
+function tick () {
+  if (process && process.nextTick) {
+    return new Promise(cb => process.nextTick(cb))
+  } else {
+    return new Promise(cb => setTimeout(cb, 0))
+  }
+}
+
 function decodeVarInt (reader) {
   const bytes = []
   let byte = 0
@@ -148,7 +156,7 @@ export class GitPackIndex {
     marky.mark('total')
     marky.mark('offsets')
     marky.mark('percent')
-    await listpack([pack], ({ data, type, reference, offset, num }) => {
+    await listpack([pack], async ({ data, type, reference, offset, num }) => {
       if (totalObjectCount === null) totalObjectCount = num
       const percent = Math.floor(
         ((totalObjectCount - num) * 100) / totalObjectCount
@@ -161,6 +169,7 @@ export class GitPackIndex {
             total: totalObjectCount,
             lengthComputable: true
           })
+          await tick()
         }
         log(
           `${percent}%\t${Math.floor(
@@ -259,6 +268,7 @@ export class GitPackIndex {
             total: totalObjectCount,
             lengthComputable: true
           })
+          await tick()
         }
         marky.mark('percent')
         callsToReadSlice = 0
