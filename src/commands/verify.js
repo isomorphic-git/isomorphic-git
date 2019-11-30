@@ -80,7 +80,7 @@ export async function verify ({
       const pgp = cores.get(core).get('pgp')
       if (type === 'commit') {
         const commit = GitCommit.from(object)
-        if (commit.isolateSignature() === '') return false
+        if (commit.isolateSignature() === '') throw new GitError(E.NoSignatureError, { type, oid })
         const { valid, invalid } = await GitCommit.verify(
           commit,
           pgp,
@@ -90,7 +90,7 @@ export async function verify ({
         return valid
       } else if (type === 'tag') {
         const tag = GitAnnotatedTag.from(object)
-        if (tag.signature() === '') return false
+        if (tag.signature() === '') throw new GitError(E.NoSignatureError, { type, oid })
         const { valid, invalid } = await GitAnnotatedTag.verify(
           tag,
           pgp,

@@ -72,7 +72,8 @@ const messages = {
   PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
-  CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`
+  CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`,
+  NoSignatureError: `The { type } { oid } could not be verified because it was not signed.`
 }
 
 export const E = {
@@ -146,7 +147,8 @@ export const E = {
   PluginUnrecognized: `PluginUnrecognized`,
   AmbiguousShortOid: `AmbiguousShortOid`,
   ShortOidNotFound: `ShortOidNotFound`,
-  CheckoutConflictError: `CheckoutConflictError`
+  CheckoutConflictError: `CheckoutConflictError`,
+  NoSignatureError: `NoSignatureError`
 }
 
 function renderTemplate (template, values) {
