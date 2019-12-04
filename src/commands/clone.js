@@ -37,6 +37,7 @@ import { init } from './init.js'
  * @param {object} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
+ * @param {boolean} [args.autoTranslateSSH] - Attempt to automatically translate SSH remotes into HTTP equivalents
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -79,6 +80,7 @@ export async function clone ({
   noCheckout = false,
   noTags = false,
   headers = {},
+  autoTranslateSSH = false,
   // @ts-ignore
   onprogress
 }) {
@@ -133,7 +135,8 @@ export async function clone ({
       relative,
       singleBranch,
       headers,
-      tags: !noTags
+      tags: !noTags,
+      autoTranslateSSH
     })
     if (fetchHead === null) return
     ref = ref || defaultBranch

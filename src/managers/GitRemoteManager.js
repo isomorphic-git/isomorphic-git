@@ -3,6 +3,13 @@ import { E, GitError } from '../models/GitError.js'
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
 function parseRemoteUrl ({ url }) {
+  // the stupid "shorter scp-like syntax"
+  if (url.startsWith('git@')) {
+    return {
+      transport: 'ssh',
+      address: url
+    }
+  }
   const matches = url.match(/(\w+)(:\/\/|::)(.*)/)
   if (matches === null) return
   /*
