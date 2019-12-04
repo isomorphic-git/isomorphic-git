@@ -264,7 +264,10 @@ async function fetchPackfile ({
   }
 
   // Try to convert SSH URLs to HTTPS ones
-  if (autoTranslateSSH || await config({ fs, gitdir, path: `isomorphic-git.autoTranslateSSH` })) {
+  if (
+    autoTranslateSSH ||
+    (await config({ fs, gitdir, path: `isomorphic-git.autoTranslateSSH` }))
+  ) {
     url = translateSSHtoHTTP(url)
   }
 
