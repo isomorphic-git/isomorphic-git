@@ -294,6 +294,7 @@ export function checkout(args: WorkDir & GitDir & {
   ref: string;
   filepaths?: string[];
   pattern?: string;
+  noSubmodules?: boolean;
 }): Promise<void>;
 
 export function clone(args: WorkDir & GitDir & {
@@ -315,6 +316,7 @@ export function clone(args: WorkDir & GitDir & {
   relative?: boolean;
   singleBranch?: boolean;
   noCheckout?: boolean;
+  noSubmodules?: boolean;
   noTags?: boolean;
   headers?: { [key: string]: string };
   autoTranslateSSH?: boolean;

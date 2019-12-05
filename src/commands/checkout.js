@@ -32,6 +32,7 @@ import { walkBeta2 } from './walkBeta2.js'
  * @param {string} [args.pattern = null] - Only checkout the files that match a glob pattern. (Pattern is relative to `filepaths` if `filepaths` is provided.)
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
+ * @param {boolean} [args.noSubmodules = false] - If true, will not print out an error about missing submodules support. TODO: Skip checkout out submodules when supported instead.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -57,7 +58,8 @@ export async function checkout ({
   ref,
   filepaths = ['.'],
   pattern = null,
-  noCheckout = false
+  noCheckout = false,
+  noSubmodules = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -165,11 +167,14 @@ export async function checkout ({
                 }
                 case 'commit': {
                   // gitlinks
-                  console.log(
-                    new GitError(E.NotImplementedFail, {
-                      thing: 'submodule support'
-                    })
-                  )
+                  if (!noSubmodules) {
+                    console.log(
+                      new GitError(E.NotImplementedFail, {
+                        thing: 'submodule support'
+                      })
+                    )
+                  }
+
                   break
                 }
                 case 'blob': {
