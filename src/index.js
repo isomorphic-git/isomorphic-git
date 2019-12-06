@@ -39,6 +39,8 @@ export * from './commands/remove.js'
 export * from './commands/resetIndex.js'
 export * from './commands/resolveRef.js'
 export * from './commands/sign.js'
+export * from './commands/serveInfoRefs'
+export * from './commands/serveReceivePack'
 export * from './commands/status.js'
 export * from './commands/statusMatrix.js'
 export * from './commands/tag.js'
@@ -51,6 +53,8 @@ export * from './commands/writeRef.js'
 export * from './commands/WORKDIR.js'
 export * from './commands/STAGE.js'
 export * from './commands/TREE.js'
+
+export * from './wire/parseReceivePackRequest'
 
 export const utils = { auth, oauth2 }
 export { E } from './models/GitError'
