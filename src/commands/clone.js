@@ -23,6 +23,7 @@ import { init } from './init.js'
  * @param {string} [args.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
+ * @param {boolean} [args.noSubmodules = false] - If true, clone will not log an error about missing submodule support. TODO: Make this not check out submodules when ther's submodule support
  * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**.)
  * @param {boolean} [args.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
  * @param {string} [args.remote = 'origin'] - What to name the remote that is created.
@@ -37,6 +38,7 @@ import { init } from './init.js'
  * @param {object} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
+ * @param {boolean} [args.autoTranslateSSH] - Attempt to automatically translate SSH remotes into HTTP equivalents
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -77,8 +79,10 @@ export async function clone ({
   relative = false,
   singleBranch = false,
   noCheckout = false,
+  noSubmodules = false,
   noTags = false,
   headers = {},
+  autoTranslateSSH = false,
   // @ts-ignore
   onprogress
 }) {
@@ -133,7 +137,8 @@ export async function clone ({
       relative,
       singleBranch,
       headers,
-      tags: !noTags
+      tags: !noTags,
+      autoTranslateSSH
     })
     if (fetchHead === null) return
     ref = ref || defaultBranch
@@ -147,7 +152,8 @@ export async function clone ({
       emitterPrefix,
       ref,
       remote,
-      noCheckout
+      noCheckout,
+      noSubmodules
     })
   } catch (err) {
     err.caller = 'git.clone'

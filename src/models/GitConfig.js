@@ -26,27 +26,30 @@ const schema = {
     symlinks: bool,
     ignorecase: bool,
     bigFileThreshold: num
+  },
+  'isomorphic-git': {
+    autoTranslateSSH: bool
   }
 }
 
-// https://git-scm.com/docs/git-config
+// https://git-scm.com/docs/git-config#_syntax
 
 // section starts with [ and ends with ]
-// section is alphanumeric (ASCII) with _ and .
+// section is alphanumeric (ASCII) with - and .
 // section is case insensitive
 // subsection is optionnal
 // subsection is specified after section and one or more spaces
 // subsection is specified between double quotes
-const SECTION_LINE_REGEX = /^\[([A-Za-z0-9_.]+)(?: "(.*)")?\]$/
-const SECTION_REGEX = /^[A-Za-z0-9_.]+$/
+const SECTION_LINE_REGEX = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/
+const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 
 // variable lines contain a name, and equal sign and then a value
 // variable lines can also only contain a name (the implicit value is a boolean true)
-// variable name is alphanumeric (ASCII) with _
+// variable name is alphanumeric (ASCII) with -
 // variable name starts with an alphabetic character
 // variable name is case insensitive
-const VARIABLE_LINE_REGEX = /^([A-Za-z]\w*)(?: *= *(.*))?$/
-const VARIABLE_NAME_REGEX = /^[A-Za-z]\w*$/
+const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/
+const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z-]*$/
 
 const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
 
