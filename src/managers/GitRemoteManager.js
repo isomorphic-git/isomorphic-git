@@ -1,4 +1,5 @@
 import { E, GitError } from '../models/GitError.js'
+import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
@@ -55,7 +56,8 @@ export class GitRemoteManager {
     }
     throw new GitError(E.UnknownTransportError, {
       url,
-      transport: parts.transport
+      transport: parts.transport,
+      suggestion: parts.transport === 'ssh' ? translateSSHtoHTTP(url) : void 0
     })
   }
 }
