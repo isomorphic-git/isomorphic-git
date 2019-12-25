@@ -1,0 +1,223 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+;[{target: 'commit',
+    targetOid: '6ebf3aa59a5e3cadace0372111e00ec642f0cd00',
+    commit1Oid: '8d9acefe1a27d901b6b8c98f8d4ed0318443ed19',
+    tree1Oid: 'dbdcef98400a2a3ce241d37f6823f87bc3508643',
+    tree1Source: 'objects/db/dcef98400a2a3ce241d37f6823f87bc3508643',
+    commit2Oid: '2bd7631fd89a8cdd6d1aa42a0533884bf713fa69',
+    tree2Oid: '7b7d2ff3685282622db62502f5f5eba5ec13deb7',
+    tree2Source: 'objects/7b/7d2ff3685282622db62502f5f5eba5ec13deb7',
+    commit3Oid: '148b4b9ff054886187608ad65ae0a1df71212d6f'},
+  {target: 'tree',
+    targetOid: 'ef1f8cce373cccea690b8b494f101d8ca24df0e2',
+    commit1Oid: '274f9313a05dd2a4175d103f02b8f601e679e3e4',
+    tree1Oid: 'cbd4154cd0d0e3cb82f65a076e0c73d0584b1460',
+    tree1Source: 'objects/cb/d4154cd0d0e3cb82f65a076e0c73d0584b1460',
+    commit2Oid: '4f3a6ef0abae72248aac379ba9581928573fcfd1',
+    tree2Oid: 'a67bbb27d4a7f88c3925c9e06cc55dbc47cf6200',
+    tree2Source: 'objects/a6/7bbb27d4a7f88c3925c9e06cc55dbc47cf6200',
+    commit3Oid: 'ae8c5f0306af4a1ea73ef69eeaf80f42d4046407'},
+  {target: 'file',
+    targetOid: '4dd1ef7569b18d92d93c0a35bb6b93049137b355',
+    commit1Oid: '1df254168587758ab1ca35c697cf87f85bc74086',
+    tree1Oid: '867e0f13c637aad1f3b6f846896c2a62b96c0140',
+    tree1Source: 'objects/86/7e0f13c637aad1f3b6f846896c2a62b96c0140',
+    commit2Oid: 'e96786041ddca7c8d005e76a120ae7cbaf2f3f47',
+    tree2Oid: 'a1a0f97966a8d16bfe005ad20ab923b99a9c85d1',
+    tree2Source: 'objects/a1/a0f97966a8d16bfe005ad20ab923b99a9c85d1',
+    commit3Oid: 'bdf254183f3122d51e982b9e4227ae24b72e3764'}
+ ].forEach((p) => {
+
+;[undefined, 'refs/notes/commits', 'refs/notes/custom'].forEach((ref) => {
+
+exports[`notes test on ${p.target} at ${ref} 1`] =  `
+Object {
+  "author": Object {
+    "email": "mrtest2@example.com",
+    "name": "Mr. Test2",
+    "timestamp": 1262356920,
+    "timezoneOffset": -0,
+  },
+  "committer": Object {
+    "email": "mrtest2@example.com",
+    "name": "Mr. Test2",
+    "timestamp": 1262356920,
+    "timezoneOffset": -0,
+  },
+  "message": "Note added by 'isomorphic-git addNote'
+",
+  "oid": "${p.commit1Oid}",
+  "parent": Array [],
+  "tree": "${p.tree1Oid}",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 2`] = `
+Object {
+  "format": "parsed",
+  "object": Object {
+    "entries": Array [
+      Object {
+        "mode": "100644",
+        "oid": "12ea6aceff573446a8fa07b5fde322b5bc204e11",
+        "path": "${p.targetOid}",
+        "type": "blob",
+      },
+    ],
+  },
+  "oid": "${p.tree1Oid}",
+  "source": "${p.tree1Source}",
+  "type": "tree",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 3`] = `
+Object {
+  "format": "content",
+  "object": Object {
+    "data": Array [
+      110,
+      111,
+      116,
+      101,
+      32,
+      49,
+    ],
+    "type": "Buffer",
+  },
+  "oid": "12ea6aceff573446a8fa07b5fde322b5bc204e11",
+  "source": "objects/12/ea6aceff573446a8fa07b5fde322b5bc204e11",
+  "type": "blob",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 4`] = `
+Object {
+  "oid": "12ea6aceff573446a8fa07b5fde322b5bc204e11",
+  "path": "${p.targetOid}",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 5`] = `
+Object {
+  "data": Array [
+    110,
+    111,
+    116,
+    101,
+    32,
+    49,
+  ],
+  "type": "Buffer",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 6`] = `
+Object {
+  "author": Object {
+    "email": "mrtest2@example.com",
+    "name": "Mr. Test2",
+    "timestamp": 1262356920,
+    "timezoneOffset": -0,
+  },
+  "committer": Object {
+    "email": "mrtest2@example.com",
+    "name": "Mr. Test2",
+    "timestamp": 1262356920,
+    "timezoneOffset": -0,
+  },
+  "message": "Note added by 'isomorphic-git addNote'
+",
+  "oid": "${p.commit2Oid}",
+  "parent": Array [
+    "${p.commit1Oid}",
+  ],
+  "tree": "${p.tree2Oid}",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 7`] = `
+Object {
+  "format": "parsed",
+  "object": Object {
+    "entries": Array [
+      Object {
+        "mode": "100644",
+        "oid": "6d9b3a7e621c93a905b45a84bb1959ec5a113bb0",
+        "path": "${p.targetOid}",
+        "type": "blob",
+      },
+    ],
+  },
+  "oid": "${p.tree2Oid}",
+  "source": "${p.tree2Source}",
+  "type": "tree",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 8`] = `
+Object {
+  "format": "content",
+  "object": Object {
+    "data": Array [
+      110,
+      111,
+      116,
+      101,
+      32,
+      50,
+    ],
+    "type": "Buffer",
+  },
+  "oid": "6d9b3a7e621c93a905b45a84bb1959ec5a113bb0",
+  "source": "objects/6d/9b3a7e621c93a905b45a84bb1959ec5a113bb0",
+  "type": "blob",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 9`] = `
+Object {
+  "oid": "6d9b3a7e621c93a905b45a84bb1959ec5a113bb0",
+  "path": "${p.targetOid}",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 10`] = `
+Object {
+  "data": Array [
+    110,
+    111,
+    116,
+    101,
+    32,
+    50,
+  ],
+  "type": "Buffer",
+}
+`;
+
+exports[`notes test on ${p.target} at ${ref} 11`] = `
+Object {
+  "author": Object {
+    "email": "mrtest2@example.com",
+    "name": "Mr. Test2",
+    "timestamp": 1262356920,
+    "timezoneOffset": -0,
+  },
+  "committer": Object {
+    "email": "mrtest2@example.com",
+    "name": "Mr. Test2",
+    "timestamp": 1262356920,
+    "timezoneOffset": -0,
+  },
+  "message": "Note removed by 'isomorphic-git removeNote'
+",
+  "oid": "${p.commit3Oid}",
+  "parent": Array [
+    "${p.commit2Oid}",
+  ],
+  "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+}
+`;
+})
+})

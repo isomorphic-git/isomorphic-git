@@ -146,7 +146,8 @@ export const E = {
   PluginUnrecognized: `PluginUnrecognized`,
   AmbiguousShortOid: `AmbiguousShortOid`,
   ShortOidNotFound: `ShortOidNotFound`,
-  CheckoutConflictError: `CheckoutConflictError`
+  CheckoutConflictError: `CheckoutConflictError`,
+  NoNoteOnObjectError: `NoNoteOnObjectError`
 }
 
 function renderTemplate (template, values) {

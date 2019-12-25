@@ -252,6 +252,29 @@ export function add(args: WorkDir & GitDir & {
   filepath: string;
 }): Promise<void>;
 
+export function addNote(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
+  ref?: string;
+  oid: string;
+  note: any;
+  author?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  committer?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  signingKey?: string;
+}): Promise<void>;
+
 export function addRemote(args: GitDir & {
   core?: string;
   fs?: any;
@@ -491,6 +514,13 @@ export function listFiles(args: GitDir & {
   ref?: string;
 }): Promise<Array<string>>;
 
+export function listNotes(args: GitDir & {
+  core?: string;
+  fs?: any;
+  ref?: string;
+  oid?: string;
+}): Promise<Array<string>>;
+
 export function listRemotes(args: GitDir & {
   core?: string;
   fs?: any;
@@ -624,6 +654,28 @@ export function remove(args: GitDir & {
   filepath: string;
 }): Promise<void>;
 
+export function removeNote(args: WorkDir & GitDir & {
+  core?: string;
+  fs?: any;
+  ref?: string;
+  oid: string;
+  author?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  committer?: {
+    name?: string;
+    email?: string;
+    date?: Date;
+    timestamp?: number;
+    timezoneOffset?: number;
+  };
+  signingKey?: string;
+}): Promise<void>;
+
 export function resetIndex(args: Partial<WorkDir> & GitDir & {
   core?: string;
   fs?: any,
@@ -636,6 +688,13 @@ export function resolveRef(args: GitDir & {
   fs?: any;
   ref: string;
   depth?: number;
+}): Promise<string>;
+
+export function showNote(args: GitDir & {
+  core?: string;
+  fs?: any;
+  ref?: string;
+  oid: string;
 }): Promise<string>;
 
 export function sign(args: GitDir & {
