@@ -1,14 +1,14 @@
 // @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
+import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { cores } from '../utils/plugins.js'
 
 import { readObject } from './readObject'
 import { writeObject } from './writeObject.js'
-import { GitCommit } from '../models/GitCommit.js'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
-import { GitError, E } from '../models/GitError.js'
 
 /**
  * Remove an object note
@@ -64,9 +64,19 @@ export async function removeNote ({
     throw new GitError(E.MissingCommitterError)
   }
 
-  const previousCommit = await readObject({ gitdir, fs, oid: refOid, format: 'parsed' })
+  const previousCommit = await readObject({
+    gitdir,
+    fs,
+    oid: refOid,
+    format: 'parsed'
+  })
   const treeOid = previousCommit.object.tree
-  const treeObject = (await readObject({ gitdir, fs, oid: treeOid, format: 'parsed' })).object
+  const treeObject = (await readObject({
+    gitdir,
+    fs,
+    oid: treeOid,
+    format: 'parsed'
+  })).object
 
   const entries = treeObject.entries
   var removedNoteOid

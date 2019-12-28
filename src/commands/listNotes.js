@@ -16,7 +16,7 @@ import { readObject } from './readObject'
  * @param {string} [args.oid] - The SHA-1 object id of the object to list the note for. If omitted, entries for all notes are returned.
  *
  * @returns {Promise<[Object]>} Resolves successfully with an array of entries containing path and oid matching the request.
-*/
+ */
 
 export async function listNotes ({
   core = 'default',
@@ -28,11 +28,29 @@ export async function listNotes ({
 }) {
   try {
     const refOid = await GitRefManager.resolve({ gitdir, fs, ref })
-    const commit = await readObject({ gitdir, fs, oid: refOid, format: 'parsed' })
-    const tree = await readObject({ gitdir, fs, oid: commit.object.tree, format: 'parsed' })
-    return tree.object.entries.filter((entry) => (entry.mode === '100644' &&
-     entry.type === 'blob' &&
-     entry.path.length === 40 && /[0-9a-f]{40}/.test(entry.path) && (!oid || entry.path === oid)))
-      .map((entry) => { return { path: entry.path, oid: entry.oid } })
-  } catch (Error) { }
+    const commit = await readObject({
+      gitdir,
+      fs,
+      oid: refOid,
+      format: 'parsed'
+    })
+    const tree = await readObject({
+      gitdir,
+      fs,
+      oid: commit.object.tree,
+      format: 'parsed'
+    })
+    return tree.object.entries
+      .filter(
+        entry =>
+          entry.mode === '100644' &&
+          entry.type === 'blob' &&
+          entry.path.length === 40 &&
+          /[0-9a-f]{40}/.test(entry.path) &&
+          (!oid || entry.path === oid)
+      )
+      .map(entry => {
+        return { path: entry.path, oid: entry.oid }
+      })
+  } catch (Error) {}
 }

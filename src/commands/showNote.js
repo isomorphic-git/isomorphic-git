@@ -28,7 +28,13 @@ export async function showNote ({
 }) {
   try {
     const refOid = await GitRefManager.resolve({ gitdir, fs, ref })
-    const { object } = await readObject({ gitdir, fs, oid: refOid, filepath: oid, format: 'parsed' })
+    const { object } = await readObject({
+      gitdir,
+      fs,
+      oid: refOid,
+      filepath: oid,
+      format: 'parsed'
+    })
     return object
-  } catch (Error) { }
+  } catch (Error) {}
 }

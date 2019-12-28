@@ -1,14 +1,14 @@
 // @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { GitCommit } from '../models/GitCommit.js'
+import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { cores } from '../utils/plugins.js'
 
 import { readObject } from './readObject'
 import { writeObject } from './writeObject.js'
-import { GitCommit } from '../models/GitCommit.js'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
-import { GitError, E } from '../models/GitError.js'
 
 /**
  * Add an object note
@@ -49,8 +49,7 @@ export async function addNote ({
   let refOid
   try {
     refOid = await GitRefManager.resolve({ gitdir, fs, ref })
-  } catch (Error) {
-  }
+  } catch (Error) {}
 
   author = await normalizeAuthorObject({ fs, gitdir, author })
   if (author === undefined) {
@@ -65,9 +64,13 @@ export async function addNote ({
     throw new GitError(E.MissingCommitterError)
   }
 
-  const previousCommit = refOid ? await readObject({ gitdir, fs, oid: refOid, format: 'parsed' }) : undefined
+  const previousCommit = refOid
+    ? await readObject({ gitdir, fs, oid: refOid, format: 'parsed' })
+    : undefined
   const treeOid = refOid ? previousCommit.object.tree : undefined
-  const treeObject = refOid ? (await readObject({ gitdir, fs, oid: treeOid, format: 'parsed' })).object : { entries: [] }
+  const treeObject = refOid
+    ? (await readObject({ gitdir, fs, oid: treeOid, format: 'parsed' })).object
+    : { entries: [] }
 
   const entries = treeObject.entries
   var toMerge
