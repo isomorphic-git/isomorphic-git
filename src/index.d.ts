@@ -588,6 +588,7 @@ export function pull(args: WorkDir & GitDir & {
     timezoneOffset?: number;
   };
   signingKey?: string;
+  noSubmodules?: boolean;
 }): Promise<void>;
 
 export function push(args: GitDir & {
