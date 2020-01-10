@@ -38,6 +38,7 @@ import { merge } from './merge'
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
  * @param {boolean} [args.autoTranslateSSH] - Attempt to automatically translate SSH remotes into HTTP equivalents
  * @param {boolean} [args.fast = false] - use fastCheckout instead of regular checkout
+ * @param {boolean} [args.noSubmodules = false] - If true, will not print out an error about missing submodules support. TODO: Skip checkout out submodules when supported instead.
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -75,7 +76,8 @@ export async function pull ({
   committer,
   signingKey,
   autoTranslateSSH = false,
-  fast = false
+  fast = false,
+  noSubmodules = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -135,7 +137,8 @@ export async function pull ({
         fs,
         ref,
         emitter,
-        emitterPrefix
+        emitterPrefix,
+        noSubmodules
       })
     }
   } catch (err) {
