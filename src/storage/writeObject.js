@@ -1,8 +1,7 @@
-import pako from 'pako'
-
 import { FileSystem } from '../models/FileSystem.js'
 import { GitObject } from '../models/GitObject.js'
 import { writeObjectLoose } from '../storage/writeObjectLoose.js'
+import { deflate } from '../utils/deflate.js'
 import { shasum } from '../utils/shasum.js'
 
 export async function writeObject ({
@@ -19,7 +18,7 @@ export async function writeObject ({
       object = GitObject.wrap({ type, object })
     }
     oid = await shasum(object)
-    object = Buffer.from(pako.deflate(object))
+    object = Buffer.from(await deflate(object))
   }
   if (!dryRun) {
     const fs = new FileSystem(_fs)

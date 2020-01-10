@@ -111,6 +111,10 @@ module.exports = function (config) {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox']
+      },
+      ChromeCanaryHeadlessNoSandbox: {
+        base: 'ChromeCanaryHeadless',
+        flags: ['--no-sandbox']
       }
     },
     sauceLabs: {
@@ -218,6 +222,7 @@ module.exports = function (config) {
     options.browsers.push('ChromeHeadlessNoSandbox')
     options.browsers.push('FirefoxHeadless')
     // options.browsers.push('Edge')
+    // options.browsers.push('ChromeCanaryHeadlessNoSandbox')
   }
 
   if (!process.env.TEST_NO_BROWSERS) {
