@@ -8,7 +8,9 @@ export async function inflate (buffer) {
   if (supportsDecompressionStream === null) {
     supportsDecompressionStream = testDecompressionStream()
   }
-  return supportsDecompressionStream ? browserInflate(buffer) : pako.inflate(buffer)
+  return supportsDecompressionStream
+    ? browserInflate(buffer)
+    : pako.inflate(buffer)
 }
 
 async function browserInflate (buffer) {

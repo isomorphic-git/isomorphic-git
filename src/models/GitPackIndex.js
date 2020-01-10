@@ -4,8 +4,8 @@ import * as marky from 'marky'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
-import { inflate } from '../utils/inflate.js'
 import { listpack } from '../utils/git-list-pack.js'
+import { inflate } from '../utils/inflate.js'
 import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'
 

@@ -8,7 +8,9 @@ export async function deflate (buffer) {
   if (supportsCompressionStream === null) {
     supportsCompressionStream = testCompressionStream()
   }
-  return supportsCompressionStream ? browserDeflate(buffer) : pako.deflate(buffer)
+  return supportsCompressionStream
+    ? browserDeflate(buffer)
+    : pako.deflate(buffer)
 }
 
 async function browserDeflate (buffer) {
