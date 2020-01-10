@@ -1,8 +1,8 @@
-import pako from 'pako'
 import Hash from 'sha.js/sha1'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { readObject } from '../storage/readObject.js'
+import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
 import { cores } from '../utils/plugins.js'
@@ -32,7 +32,7 @@ export async function pack ({
     outputStream.push(buff)
     hash.update(buff)
   }
-  function writeObject ({ stype, object }) {
+  async function writeObject ({ stype, object }) {
     // Object type is encoded in bits 654
     const type = types[stype]
     // The length encoding gets complicated.
@@ -56,7 +56,7 @@ export async function pack ({
       length = length >>> 7
     }
     // Lastly, we can compress and write the object.
-    write(Buffer.from(pako.deflate(object)))
+    write(Buffer.from(await deflate(object)))
   }
   write('PACK')
   write('00000002', 'hex')
@@ -64,7 +64,7 @@ export async function pack ({
   write(padHex(8, oids.length), 'hex')
   for (const oid of oids) {
     const { type, object } = await readObject({ fs, gitdir, oid })
-    writeObject({ write, object, stype: type })
+    await writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum
   const digest = hash.digest()
