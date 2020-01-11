@@ -37,10 +37,13 @@ describe('cores', () => {
     // Setup
     const { _fs } = await makeFixture('test-cores')
     plugins.set('fs', _fs)
+    // @ts-ignore
     cores.create('third').set('foo', _fs)
     expect(cores.get('default').has('fs')).toBeTruthy()
+    // @ts-ignore
     expect(cores.get('default').has('foo')).toBeFalsy()
     expect(cores.get('third').has('fs')).toBeFalsy()
+    // @ts-ignore
     expect(cores.get('third').get('foo')).toBeTruthy()
   })
   it('plugin schema violation', async () => {
@@ -50,6 +53,7 @@ describe('cores', () => {
     }
     let error = null
     try {
+      // @ts-ignore
       plugins.set('fs', fs)
     } catch (err) {
       error = err
@@ -62,6 +66,7 @@ describe('cores', () => {
     const { _fs } = await makeFixture('test-cores')
     let error = null
     try {
+      // @ts-ignore
       plugins.set('fz', _fs)
     } catch (err) {
       error = err

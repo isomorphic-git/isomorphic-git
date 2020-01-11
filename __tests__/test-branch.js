@@ -50,6 +50,7 @@ describe('branch', () => {
     let error = null
     // Test
     try {
+      // @ts-ignore
       await branch({ dir, gitdir })
     } catch (err) {
       error = err

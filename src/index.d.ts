@@ -317,6 +317,7 @@ export function clone(args: WorkDir & GitDir & {
   singleBranch?: boolean;
   noCheckout?: boolean;
   noSubmodules?: boolean;
+  noGitSuffix?: boolean;
   noTags?: boolean;
   headers?: { [key: string]: string };
   autoTranslateSSH?: boolean;
@@ -432,6 +433,7 @@ export function fetch(args: GitDir & {
   relative?: boolean;
   tags?: boolean;
   singleBranch?: boolean;
+  noGitSuffix?: boolean;
   prune?: boolean;
   pruneTags?: boolean;
   headers?: { [key: string]: string };
@@ -453,6 +455,7 @@ export function getRemoteInfo(args: {
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
   forPush?: boolean;
+  noGitSuffix?: boolean;
   headers?: { [key: string]: string };
 }): Promise<RemoteDescription>;
 
@@ -565,6 +568,7 @@ export function pull(args: WorkDir & GitDir & {
   corsProxy?: string;
   singleBranch?: boolean;
   fastForwardOnly?: boolean;
+  noGitSuffix?: boolean;
   username?: string;
   password?: string;
   token?: string;
@@ -600,6 +604,7 @@ export function push(args: GitDir & {
   url?: string;
   corsProxy?: string;
   force?: boolean;
+  noGitSuffix?: boolean;
   username?: string;
   password?: string;
   token?: string;
