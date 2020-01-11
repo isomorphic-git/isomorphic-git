@@ -58,6 +58,13 @@ import { resolveTree } from '../utils/resolveTree.js'
 /**
  * Read a git object directly by its SHA-1 object id
  *
+ * @deprecated
+ * > **Deprecated**
+ * > This command will be removed in the 1.0.0 version of `isomorphic-git` as it is overly complicated.
+ * >
+ * > If you know the type of object you are reading, use [`readBlob`](./readBlob.md), [`readCommit`](./readCommit.md), [`readTag`](./readTag.md), or [`readTree`](./readTree.md).
+ * > If you do not know the type of object you are reading, use [`readRawObject`](./readRawObject.md).
+ *
  * Regarding `GitObjectDescription`:
  *
  * - `oid` will be the same as the `oid` argument unless the `filepath` argument is provided, in which case it will be the oid of the tree or blob being returned.

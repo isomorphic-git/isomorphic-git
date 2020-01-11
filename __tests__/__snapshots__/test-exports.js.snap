@@ -41,6 +41,7 @@ Array [
   "plugins",
   "pull",
   "push",
+  "readBlob",
   "readObject",
   "remove",
   "resetIndex",

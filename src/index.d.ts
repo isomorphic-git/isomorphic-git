@@ -20,6 +20,12 @@ export interface GitObjectDescription {
   source?: string;
 }
 
+export interface BlobObject {
+  oid: string;
+  type: 'blob';
+  object: Buffer;
+}
+
 export interface CommitDescription {
   oid?: string; // SHA1 object id of this commit
   message: string; // Commit message
@@ -614,6 +620,13 @@ export function push(args: GitDir & {
   emitterPrefix?: string;
   autoTranslateSSH?: boolean;
 }): Promise<PushResponse>;
+
+export function readBlob(args: GitDir & {
+  core?: string;
+  fs?: any;
+  oid: string;
+  filepath?: string;
+}): Promise<BlobObject>;
 
 export function readObject(args: GitDir & {
   core?: string;
