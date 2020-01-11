@@ -55,6 +55,7 @@ describe('deleteBranch', () => {
     let error = null
     // Test
     try {
+      // @ts-ignore
       await deleteBranch({ dir, gitdir })
     } catch (err) {
       error = err
