@@ -106,6 +106,9 @@ export async function merge ({
       fs,
       oids: [ourOid, theirOid]
     })
+    if (baseOids.length === 0) {
+      throw new GitError(E.UnrelatedHistoriesFail)
+    }
     if (baseOids.length !== 1) {
       throw new GitError(E.MergeNotSupportedFail)
     }
