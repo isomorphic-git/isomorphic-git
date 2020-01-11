@@ -29,6 +29,7 @@ describe('deleteTag', () => {
     let error = null
     // Test
     try {
+      // @ts-ignore
       await deleteTag({ dir, gitdir })
     } catch (err) {
       error = err
