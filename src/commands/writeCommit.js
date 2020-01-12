@@ -32,7 +32,7 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {CommitObject} args.commit - The object to write.
+ * @param {CommitObject} args.commit - The object to write
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly written object.
  * @see CommitObject

@@ -50,6 +50,13 @@ export interface CommitObject {
   gpgsig?: string; // PGP signature (if signed)
 }
 
+export interface ReadTreeResult {
+  oid: string;
+  tree: TreeObject;
+}
+
+export type TreeObject = TreeEntry[];
+
 export interface CommitDescription {
   oid?: string; // SHA1 object id of this commit
   message: string; // Commit message
@@ -100,7 +107,7 @@ export interface TreeEntry {
   mode: string;
   path: string;
   oid: string;
-  type?: string;
+  type: string;
 }
 
 export interface PackObjectsResponse {
@@ -667,6 +674,13 @@ export function readObject(args: GitDir & {
   encoding?: string;
 }): Promise<GitObjectDescription>;
 
+export function readTree(args: GitDir & {
+  core?: string;
+  fs?: any;
+  oid: string;
+  filepath?: string;
+}): Promise<ReadTreeResult>;
+
 export function remove(args: GitDir & {
   core?: string;
   fs?: any;
@@ -763,6 +777,12 @@ export function writeObject(args: GitDir & {
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
   oid?: string;
   encoding?: string;
+}): Promise<string>;
+
+export function writeTree(args: GitDir & {
+  core?: string;
+  fs?: any;
+  tree: TreeObject;
 }): Promise<string>;
 
 type HashBlobResult = {

@@ -73,7 +73,7 @@ function nudgeIntoShape (entry) {
   }
   entry.mode = limitModeToAllowed(entry.mode) // index
   if (!entry.type) {
-    entry.type = 'blob' // index
+    entry.type = mode2type(entry.mode) // index
   }
   return entry
 }

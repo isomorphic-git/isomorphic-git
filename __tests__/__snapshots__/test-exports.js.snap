@@ -44,6 +44,7 @@ Array [
   "readBlob",
   "readCommit",
   "readObject",
+  "readTree",
   "remove",
   "resetIndex",
   "resolveRef",
@@ -60,5 +61,6 @@ Array [
   "writeCommit",
   "writeObject",
   "writeRef",
+  "writeTree",
 ]
 `;

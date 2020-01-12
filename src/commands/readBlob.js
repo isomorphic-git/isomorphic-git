@@ -22,7 +22,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get
- * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the object at that filepath.
+ * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the blob object at that filepath.
  *
  * @returns {Promise<ReadBlobResult>} Resolves successfully with a blob object description
  * @see ReadBlobResult
