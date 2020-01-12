@@ -12,7 +12,7 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {Uint8Array} args.object - The blob object to write
+ * @param {Uint8Array} args.blob - The blob object to write
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly written object
  *
@@ -20,7 +20,7 @@ import { cores } from '../utils/plugins.js'
  * // Manually create a blob.
  * let oid = await git.writeBlob({
  *   dir: '$input((/))',
- *   object: $input((new Uint8Array([])))
+ *   blob: $input((new Uint8Array([])))
  * })
  *
  * console.log('oid', oid) // should be 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391'
@@ -31,7 +31,7 @@ export async function writeBlob ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  object
+  blob
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -39,7 +39,7 @@ export async function writeBlob ({
       fs,
       gitdir,
       type: 'blob',
-      object,
+      object: blob,
       format: 'content'
     })
     return oid

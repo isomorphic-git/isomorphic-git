@@ -20,10 +20,34 @@ export interface GitObjectDescription {
   source?: string;
 }
 
-export interface BlobObject {
+export interface ReadBlobResult {
   oid: string;
-  type: 'blob';
-  object: Buffer;
+  blob: Buffer;
+}
+
+export interface ReadCommitResult {
+  oid: string;
+  commit: CommitObject;
+  payload: string; // PGP payload
+}
+
+export interface CommitObject {
+  message: string; // Commit message
+  tree: string; // SHA1 object id of corresponding file tree
+  parent: string[]; // an array of zero or more SHA1 object ids
+  author: {
+    name: string; // The author's name
+    email: string; // The author's email
+    timestamp: number; // UTC Unix timestamp in seconds
+    timezoneOffset: number; // Timezone difference from UTC in minutes
+  };
+  committer: {
+    name: string; // The committer's name
+    email: string; // The committer's email
+    timestamp: number; // UTC Unix timestamp in seconds
+    timezoneOffset: number; // Timezone difference from UTC in minutes
+  };
+  gpgsig?: string; // PGP signature (if signed)
 }
 
 export interface CommitDescription {
@@ -626,7 +650,13 @@ export function readBlob(args: GitDir & {
   fs?: any;
   oid: string;
   filepath?: string;
-}): Promise<BlobObject>;
+}): Promise<ReadBlobResult>;
+
+export function readCommit(args: GitDir & {
+  core?: string;
+  fs?: any;
+  oid: string;
+}): Promise<ReadCommitResult>;
 
 export function readObject(args: GitDir & {
   core?: string;
@@ -716,7 +746,13 @@ export function walkBeta2<T, Q>(args: WorkDir & GitDir & {
 export function writeBlob(args: GitDir & {
   core?: string;
   fs?: any;
-  object: Uint8Array;
+  blob: Uint8Array;
+}): Promise<string>;
+
+export function writeCommit(args: GitDir & {
+  core?: string;
+  fs?: any;
+  commit: CommitObject;
 }): Promise<string>;
 
 export function writeObject(args: GitDir & {

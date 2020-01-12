@@ -26,42 +26,39 @@ describe('readBlob', () => {
     expect(error).not.toBeNull()
     expect(error.toJSON()).toMatchSnapshot()
   })
-  it('blob with encoding', async () => {
+  it('blob', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-readBlob')
     // Test
-    const ref = await readBlob({
+    const { blob } = await readBlob({
       gitdir,
       oid: '4551a1856279dde6ae9d65862a1dff59a5f199d8'
     })
-    expect(ref.type).toEqual('blob')
-    expect(ref.object.toString('utf8')).toMatchSnapshot()
+    expect(blob.toString('utf8')).toMatchSnapshot()
   })
   it('with simple filepath to blob', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-readBlob')
     // Test
-    const ref = await readBlob({
+    const { oid, blob } = await readBlob({
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       filepath: 'cli.js'
     })
-    expect(ref.type).toEqual('blob')
-    expect(ref.oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
+    expect(blob.toString('hex')).toMatchSnapshot()
   })
   it('with deep filepath to blob', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-readBlob')
     // Test
-    const ref = await readBlob({
+    const { oid, blob } = await readBlob({
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       filepath: 'src/commands/clone.js'
     })
-    expect(ref.type).toEqual('blob')
-    expect(ref.oid).toEqual('5264f23285d8be3ce45f95c102001ffa1d5391d3')
-    expect(ref.object.toString('hex')).toMatchSnapshot()
+    expect(oid).toEqual('5264f23285d8be3ce45f95c102001ffa1d5391d3')
+    expect(blob.toString('hex')).toMatchSnapshot()
   })
   it('with simple filepath to tree', async () => {
     // Setup

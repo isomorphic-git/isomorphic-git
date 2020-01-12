@@ -1,17 +1,15 @@
 // @ts-check
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
+import { resolveBlob } from '../utils/resolveBlob.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
 /**
  *
- * @typedef {Object} BlobObject - The object returned has the following schema:
+ * @typedef {Object} ReadBlobResult - The object returned has the following schema:
  * @property {string} oid
- * @property {'blob'} type
- * @property {Buffer} object
+ * @property {Buffer} blob
  *
  */
 
@@ -26,8 +24,8 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {string} args.oid - The SHA-1 object id to get
  * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the object at that filepath.
  *
- * @returns {Promise<BlobObject>} Resolves successfully with a blob object description
- * @see BlobObject
+ * @returns {Promise<ReadBlobResult>} Resolves successfully with a blob object description
+ * @see ReadBlobResult
  *
  * @example
  * // Get the contents of 'README.md' in the master branch.
@@ -54,24 +52,12 @@ export async function readBlob ({
     if (filepath !== undefined) {
       oid = await resolveFilepath({ fs, gitdir, oid, filepath })
     }
-    const { object, type } = await readObject({
+    const blob = await resolveBlob({
       fs,
       gitdir,
-      oid,
-      format: 'content'
+      oid
     })
-    if (type !== 'blob') {
-      throw new GitError(E.ObjectTypeAssertionFail, {
-        oid,
-        type,
-        expected: 'blob'
-      })
-    }
-    return {
-      oid,
-      type,
-      object
-    }
+    return blob
   } catch (err) {
     err.caller = 'git.readBlob'
     throw err

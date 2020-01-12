@@ -10,7 +10,7 @@ describe('writeBlob', () => {
     // Test
     const oid = await writeBlob({
       gitdir,
-      object: new Uint8Array([])
+      blob: new Uint8Array([])
     })
     expect(oid).toEqual('e69de29bb2d1d6434b8b29ae775ad8c2e48c5391')
   })
@@ -20,7 +20,7 @@ describe('writeBlob', () => {
     // Test
     const oid = await writeBlob({
       gitdir,
-      object: Buffer.from(`#!/usr/bin/env node
+      blob: Buffer.from(`#!/usr/bin/env node
 const minimisted = require('minimisted')
 const git = require('.')
 

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`readBlob blob with encoding 1`] = `
+exports[`readBlob blob 1`] = `
 "#!/usr/bin/env node
 const minimisted = require('minimisted')
 const git = require('.')

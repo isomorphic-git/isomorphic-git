@@ -42,6 +42,7 @@ Array [
   "pull",
   "push",
   "readBlob",
+  "readCommit",
   "readObject",
   "remove",
   "resetIndex",
@@ -56,6 +57,7 @@ Array [
   "walkBeta1",
   "walkBeta2",
   "writeBlob",
+  "writeCommit",
   "writeObject",
   "writeRef",
 ]
