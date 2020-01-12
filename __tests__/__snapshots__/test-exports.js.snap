@@ -55,6 +55,7 @@ Array [
   "version",
   "walkBeta1",
   "walkBeta2",
+  "writeBlob",
   "writeObject",
   "writeRef",
 ]

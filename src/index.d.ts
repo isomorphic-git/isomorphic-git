@@ -713,6 +713,12 @@ export function walkBeta2<T, Q>(args: WorkDir & GitDir & {
   iterate?: (walk: (parent: WalkerEntry2[]) => Promise<Q>, children: Iterable<WalkerEntry2[]>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
 
+export function writeBlob(args: GitDir & {
+  core?: string;
+  fs?: any;
+  object: Uint8Array;
+}): Promise<string>;
+
 export function writeObject(args: GitDir & {
   core?: string;
   fs?: any;
