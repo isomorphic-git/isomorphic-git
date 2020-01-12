@@ -58,12 +58,6 @@ import { resolveTree } from '../utils/resolveTree.js'
 /**
  * Read a git object directly by its SHA-1 object id
  *
- * @deprecated
- * > **Deprecated**
- * > This command is overly complicated.
- * >
- * > If you know the type of object you are reading, use [`readBlob`](./readBlob.md), [`readCommit`](./readCommit.md), [`readTag`](./readTag.md), or [`readTree`](./readTree.md).
- *
  * Regarding `GitObjectDescription`:
  *
  * - `oid` will be the same as the `oid` argument unless the `filepath` argument is provided, in which case it will be the oid of the tree or blob being returned.
@@ -80,6 +74,12 @@ import { resolveTree } from '../utils/resolveTree.js'
  * | 'wrapped'  | Return the inflated object buffer wrapped in the git object header if possible. This is the raw data used when calculating the SHA-1 object id of a git object.                                           |
  * | 'content'  | Return the object buffer without the git header.                                                                                                                                                          |
  * | 'parsed'   | Returns a parsed representation of the object.                                                                                                                                                            |
+ *
+ * @deprecated
+ * > **Deprecated**
+ * > This command is overly complicated.
+ * >
+ * > If you know the type of object you are reading, use [`readBlob`](./readBlob.md), [`readCommit`](./readCommit.md), [`readTag`](./readTag.md), or [`readTree`](./readTree.md).
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
