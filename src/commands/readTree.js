@@ -2,8 +2,8 @@
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-import { resolveTree } from '../utils/resolveTree.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
+import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  *

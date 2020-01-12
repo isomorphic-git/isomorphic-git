@@ -20,7 +20,8 @@ describe('writeBlob', () => {
     // Test
     const oid = await writeBlob({
       gitdir,
-      blob: Buffer.from(`#!/usr/bin/env node
+      blob: Buffer.from(
+        `#!/usr/bin/env node
 const minimisted = require('minimisted')
 const git = require('.')
 
@@ -47,7 +48,9 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
   if (result === undefined) return
   console.log(JSON.stringify(result, null, 2))
 })
-`, 'utf8')
+`,
+        'utf8'
+      )
     })
     expect(oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
   })
