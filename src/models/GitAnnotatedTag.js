@@ -89,6 +89,7 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   signature () {
+    if (this._tag.indexOf('\n-----BEGIN PGP SIGNATURE-----') === -1) return
     const signature = this._tag.slice(
       this._tag.indexOf('-----BEGIN PGP SIGNATURE-----'),
       this._tag.indexOf('-----END PGP SIGNATURE-----') +
@@ -97,12 +98,16 @@ ${obj.signature ? obj.signature : ''}`
     return normalizeNewlines(signature)
   }
 
+  payload () {
+    return this.withoutSignature() + '\n'
+  }
+
   toObject () {
     return Buffer.from(this._tag, 'utf8')
   }
 
   static async sign (tag, pgp, secretKey) {
-    const payload = tag.withoutSignature() + '\n'
+    const payload = tag.payload()
     let { signature } = await pgp.sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
@@ -112,7 +117,7 @@ ${obj.signature ? obj.signature : ''}`
   }
 
   static async verify (tag, pgp, publicKey) {
-    const payload = tag.withoutSignature() + '\n'
+    const payload = tag.payload()
     const signature = tag.signature()
     return pgp.verify({ payload, publicKey, signature })
   }

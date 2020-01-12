@@ -57,6 +57,26 @@ export interface ReadTreeResult {
 
 export type TreeObject = TreeEntry[];
 
+export interface ReadTagResult {
+  oid: string;
+  commit: TagObject;
+  payload: string; // PGP payload
+}
+
+export interface TagObject {
+  object: string;
+  type: 'blob' | 'tree' | 'commit' | 'tag';
+  tag: string;
+  tagger: {
+    name: string; // The tagger's name
+    email: string; // The tagger's email
+    timestamp: number; // UTC Unix timestamp in seconds
+    timezoneOffset: number; // Timezone difference from UTC in minutes
+  };
+  message: string;
+  signature?: string;
+}
+
 export interface CommitDescription {
   oid?: string; // SHA1 object id of this commit
   message: string; // Commit message
@@ -674,6 +694,12 @@ export function readObject(args: GitDir & {
   encoding?: string;
 }): Promise<GitObjectDescription>;
 
+export function readTag(args: GitDir & {
+  core?: string;
+  fs?: any;
+  oid: string;
+}): Promise<ReadTagResult>;
+
 export function readTree(args: GitDir & {
   core?: string;
   fs?: any;
@@ -777,6 +803,12 @@ export function writeObject(args: GitDir & {
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
   oid?: string;
   encoding?: string;
+}): Promise<string>;
+
+export function writeTag(args: GitDir & {
+  core?: string;
+  fs?: any;
+  tag: TagObject;
 }): Promise<string>;
 
 export function writeTree(args: GitDir & {

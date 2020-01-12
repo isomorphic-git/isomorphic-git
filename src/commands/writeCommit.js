@@ -34,7 +34,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {CommitObject} args.commit - The object to write
  *
- * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly written object.
+ * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly written object
  * @see CommitObject
  *
  */
