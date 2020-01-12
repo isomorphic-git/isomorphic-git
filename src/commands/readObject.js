@@ -75,6 +75,12 @@ import { resolveTree } from '../utils/resolveTree.js'
  * | 'content'  | Return the object buffer without the git header.                                                                                                                                                          |
  * | 'parsed'   | Returns a parsed representation of the object.                                                                                                                                                            |
  *
+ * @deprecated
+ * > **Deprecated**
+ * > This command is overly complicated.
+ * >
+ * > If you know the type of object you are reading, use [`readBlob`](./readBlob.md), [`readCommit`](./readCommit.md), [`readTag`](./readTag.md), or [`readTree`](./readTree.md).
+ *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
