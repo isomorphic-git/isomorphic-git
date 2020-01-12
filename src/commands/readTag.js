@@ -8,7 +8,7 @@ import { cores } from '../utils/plugins.js'
 
 /**
  *
- * @typedef {Object} ReadTagResult
+ * @typedef {Object} ReadTagResult - The object returned has the following schema:
  * @property {string} oid - SHA-1 object id of this tag
  * @property {TagObject} tag - the parsed tag object
  * @property {string} payload - PGP signing payload
@@ -30,7 +30,7 @@ import { cores } from '../utils/plugins.js'
  */
 
 /**
- * Read a git annotated tag object directly by its SHA-1 object id
+ * Read an annotated tag object directly
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection

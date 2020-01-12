@@ -6,7 +6,7 @@ import { resolveCommit } from '../utils/resolveCommit.js'
 
 /**
  *
- * @typedef {Object} ReadCommitResult
+ * @typedef {Object} ReadCommitResult - The object returned has the following schema:
  * @property {string} oid - SHA-1 object id of this commit
  * @property {CommitObject} commit - the parsed commit object
  * @property {string} payload - PGP signing payload
@@ -32,7 +32,7 @@ import { resolveCommit } from '../utils/resolveCommit.js'
  */
 
 /**
- * Read a git commit directly by its SHA-1 object id
+ * Read a commit object directly
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection

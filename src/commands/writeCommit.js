@@ -25,7 +25,7 @@ import { cores } from '../utils/plugins.js'
  */
 
 /**
- * Write a git commit object directly
+ * Write a commit object directly
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection

@@ -14,7 +14,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  */
 
 /**
- * Read a git blob directly by its SHA-1 object id
+ * Read a blob object directly
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection

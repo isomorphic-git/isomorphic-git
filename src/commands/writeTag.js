@@ -21,7 +21,7 @@ import { cores } from '../utils/plugins.js'
  */
 
 /**
- * Write a tag object directly
+ * Write an annotated tag object directly
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection

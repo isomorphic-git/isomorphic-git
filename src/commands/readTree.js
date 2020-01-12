@@ -7,7 +7,7 @@ import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  *
- * @typedef {Object} ReadTreeResult
+ * @typedef {Object} ReadTreeResult - The object returned has the following schema:
  * @property {string} oid - SHA-1 object id of this tree
  * @property {TreeObject} tree - the parsed tree object
  */
@@ -27,7 +27,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  */
 
 /**
- * Read a git tree directly by its SHA-1 object id
+ * Read a tree object directly
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
