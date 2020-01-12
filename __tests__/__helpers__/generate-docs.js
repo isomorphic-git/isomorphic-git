@@ -70,9 +70,11 @@ function gentypedef (ast) {
         indent += 2
         ind = ' '.repeat(indent)
       } else {
-        text += `  ${prop.name}${prop.optional ? '?' : ''}: ${prop.type.names
-          .map(cleanType)
-          .join(' | ')};${prop.description ? ` // ${prop.description}` : ''}\n`
+        text += `  ${prop.name}${
+          prop.optional ? '?' : ''
+        }: ${prop.type.names.map(cleanType).join(' | ')};${
+          prop.description ? ` // ${prop.description}` : ''
+        }\n`
       }
     }
     while (indent > 2) {
