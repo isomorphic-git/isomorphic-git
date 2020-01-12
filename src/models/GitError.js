@@ -72,7 +72,8 @@ const messages = {
   PluginUnrecognized: `Unrecognized plugin type "{ plugin }"`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
-  CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`
+  CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`,
+  NoteAlreadyExistsError: `A note object { note } already exists on object { oid }. Use 'force: true' parameter to overwrite existing notes.`
 }
 
 export const E = {
@@ -147,6 +148,7 @@ export const E = {
   AmbiguousShortOid: `AmbiguousShortOid`,
   ShortOidNotFound: `ShortOidNotFound`,
   CheckoutConflictError: `CheckoutConflictError`,
+  NoteAlreadyExistsError: `NoteAlreadyExistsError`,
   NoNoteOnObjectError: `NoNoteOnObjectError`
 }
 
