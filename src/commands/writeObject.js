@@ -13,10 +13,9 @@ import { cores } from '../utils/plugins.js'
  *
  * @deprecated
  * > **Deprecated**
- * > This command will be removed in the 1.0.0 version of `isomorphic-git` as it is overly complicated.
+ * > This command is overly complicated.
  * >
  * > If you know the type of object you are writing, use [`writeBlob`](./writeBlob.md), [`writeCommit`](./writeCommit.md), [`writeTag`](./writeTag.md), or [`writeTree`](./writeTree.md).
- * > If you do not know the type of object you are writing, use [`writeRawObject`](./writeRawObject.md).
  *
  * `format` can have the following values:
  *

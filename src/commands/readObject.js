@@ -60,10 +60,9 @@ import { resolveTree } from '../utils/resolveTree.js'
  *
  * @deprecated
  * > **Deprecated**
- * > This command will be removed in the 1.0.0 version of `isomorphic-git` as it is overly complicated.
+ * > This command is overly complicated.
  * >
  * > If you know the type of object you are reading, use [`readBlob`](./readBlob.md), [`readCommit`](./readCommit.md), [`readTag`](./readTag.md), or [`readTree`](./readTree.md).
- * > If you do not know the type of object you are reading, use [`readRawObject`](./readRawObject.md).
  *
  * Regarding `GitObjectDescription`:
  *

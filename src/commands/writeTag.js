@@ -31,7 +31,8 @@ import { cores } from '../utils/plugins.js'
  * @param {TagObject} args.tag - The object to write
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly written object
- *
+ * @see TagObject
+ * 
  * @example
  * // Manually create an annotated tag.
  * let sha = await git.resolveRef({ dir: '$input((/))', ref: '$input((HEAD))' })
