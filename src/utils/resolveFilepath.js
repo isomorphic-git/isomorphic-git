@@ -31,7 +31,14 @@ export async function resolveFilepath ({ fs, gitdir, oid, filepath }) {
   return oid
 }
 
-async function _resolveFilepath ({ fs, gitdir, tree, pathArray, oid, filepath }) {
+async function _resolveFilepath ({
+  fs,
+  gitdir,
+  tree,
+  pathArray,
+  oid,
+  filepath
+}) {
   const name = pathArray.shift()
   for (const entry of tree) {
     if (entry.path === name) {
