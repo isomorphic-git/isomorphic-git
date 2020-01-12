@@ -36,6 +36,16 @@ describe('readBlob', () => {
     })
     expect(blob.toString('utf8')).toMatchSnapshot()
   })
+  it('peels tags', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-readBlob')
+    // Test
+    const { oid } = await readBlob({
+      gitdir,
+      oid: 'cdf8e34555b62edbbe978f20d7b4796cff781f9d'
+    })
+    expect(oid).toBe('4551a1856279dde6ae9d65862a1dff59a5f199d8')
+  })
   it('with simple filepath to blob', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-readBlob')

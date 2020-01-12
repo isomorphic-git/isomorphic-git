@@ -46,4 +46,14 @@ describe('readCommit', () => {
     })
     expect(result).toMatchSnapshot()
   })
+  it('peels tags', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-readCommit')
+    // Test
+    const result = await readCommit({
+      gitdir,
+      oid: '587d3f8290b513e2ee85ecd317e6efecd545aee6'
+    })
+    expect(result.oid).toBe('033417ae18b174f078f2f44232cb7a374f4c60ce')
+  })
 })

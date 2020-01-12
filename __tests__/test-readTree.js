@@ -10,6 +10,28 @@ describe('readTree', () => {
   beforeAll(() => {
     registerSnapshots(snapshots)
   })
+  it('read a tree directly', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-readTree')
+    // Test
+    const { oid, tree } = await readTree({
+      gitdir,
+      oid: '6257985e3378ec42a03a57a7dc8eb952d69a5ff3'
+    })
+    expect(oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
+    expect(tree).toMatchSnapshot()
+  })
+  it('peels tags', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-readTree')
+    // Test
+    const { oid, tree } = await readTree({
+      gitdir,
+      oid: '86167ce7861387275b2fbd188e031e00aff446f9'
+    })
+    expect(oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
+    expect(tree).toMatchSnapshot()
+  })
   it('with simple filepath to tree', async () => {
     // Setup
     const { gitdir } = await makeFixture('test-readTree')

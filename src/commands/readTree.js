@@ -34,7 +34,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} args.oid - The SHA-1 object id to get
+ * @param {string} args.oid - The SHA-1 object id to get. Annotated tags and commits are peeled.
  * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the tree object at that filepath.
  *
  * @returns {Promise<ReadTreeResult>} Resolves successfully with a git tree object
