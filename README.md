@@ -189,6 +189,7 @@ unless there is a major version bump.
 ### commands
 
 - [add](https://isomorphic-git.github.io/docs/add.html)
+- [addNote](https://isomorphic-git.github.io/docs/addNote.html)
 - [addRemote](https://isomorphic-git.github.io/docs/addRemote.html)
 - [annotatedTag](https://isomorphic-git.github.io/docs/annotatedTag.html)
 - [branch](https://isomorphic-git.github.io/docs/branch.html)
@@ -213,6 +214,7 @@ unless there is a major version bump.
 - [isDescendent](https://isomorphic-git.github.io/docs/isDescendent.html)
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
+- [listNotes](https://isomorphic-git.github.io/docs/listNotes.html)
 - [listRemotes](https://isomorphic-git.github.io/docs/listRemotes.html)
 - [listTags](https://isomorphic-git.github.io/docs/listTags.html)
 - [log](https://isomorphic-git.github.io/docs/log.html)
@@ -226,8 +228,10 @@ unless there is a major version bump.
 - [readTag](https://isomorphic-git.github.io/docs/readTag.html)
 - [readTree](https://isomorphic-git.github.io/docs/readTree.html)
 - [remove](https://isomorphic-git.github.io/docs/remove.html)
+- [removeNote](https://isomorphic-git.github.io/docs/removeNote.html)
 - [resetIndex](https://isomorphic-git.github.io/docs/resetIndex.html)
 - [resolveRef](https://isomorphic-git.github.io/docs/resolveRef.html)
+- [showNote](https://isomorphic-git.github.io/docs/showNote.html)
 - [sign](https://isomorphic-git.github.io/docs/sign.html)
 - [status](https://isomorphic-git.github.io/docs/status.html)
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
