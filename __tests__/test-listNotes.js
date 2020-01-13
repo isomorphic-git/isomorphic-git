@@ -1,9 +1,8 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { listNotes, readBlob, resolveRef, readTree } = require('isomorphic-git')
+const { listNotes } = require('isomorphic-git')
 
-// NOTE: These are mostly the `readObject` tests but in reverse
 describe('listNotes', () => {
   it('from default branch', async () => {
     // Setup
@@ -33,8 +32,8 @@ describe('listNotes', () => {
     const { gitdir } = await makeFixture('test-listNotes')
     // Test
     const notes = await listNotes({
-      ref: 'refs/notes/alt',
       gitdir,
+      ref: 'refs/notes/alt',
     })
     expect(notes.length).toBe(1)
     expect(notes).toEqual([

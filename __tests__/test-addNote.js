@@ -3,7 +3,6 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { addNote, readBlob, resolveRef, readTree } = require('isomorphic-git')
 
-// NOTE: These are mostly the `readObject` tests but in reverse
 describe('addNote', () => {
   it('to a commit', async () => {
     // Setup
