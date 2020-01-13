@@ -309,7 +309,7 @@ export function add(args: WorkDir & GitDir & {
   filepath: string;
 }): Promise<void>;
 
-export function addNote(args: WorkDir & GitDir & {
+export function addNote(args: GitDir & {
   core?: string;
   fs?: any;
   ref?: string;
@@ -330,7 +330,7 @@ export function addNote(args: WorkDir & GitDir & {
     timezoneOffset?: number;
   };
   signingKey?: string;
-}): Promise<void>;
+}): Promise<string>;
 
 export function addRemote(args: GitDir & {
   core?: string;
@@ -743,7 +743,7 @@ export function remove(args: GitDir & {
   filepath: string;
 }): Promise<void>;
 
-export function removeNote(args: WorkDir & GitDir & {
+export function removeNote(args: GitDir & {
   core?: string;
   fs?: any;
   ref?: string;
@@ -784,7 +784,7 @@ export function showNote(args: GitDir & {
   fs?: any;
   ref?: string;
   oid: string;
-}): Promise<string>;
+}): Promise<Buffer>;
 
 export function sign(args: GitDir & {
   core?: string;
