@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { addNote, readBlob, resolveRef, readTree } = require('isomorphic-git')
+const { E, addNote, readBlob, resolveRef, readTree } = require('isomorphic-git')
 
 describe('addNote', () => {
   it('to a commit', async () => {
@@ -154,5 +154,73 @@ describe('addNote', () => {
       filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
     })
     expect(blob.toString('utf8')).toEqual('This is a note about a blob.')
+  })
+  it('throws if note already exists', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-addNote')
+    await addNote({
+      gitdir,
+      author: {
+        name: 'William Hilton',
+        email: 'wmhilton@gmail.com',
+        timestamp: 1578937310,
+        timezoneOffset: 300
+      },
+      oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
+      note: 'This is a note about a commit.'
+    })
+    // Test
+    let error = null
+    try {
+      await addNote({
+        gitdir,
+        author: {
+          name: 'William Hilton',
+          email: 'wmhilton@gmail.com',
+          timestamp: 1578937310,
+          timezoneOffset: 300
+        },
+        oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
+        note: 'This is a note about a commit.'
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(E.NoteAlreadyExistsError)
+  })
+  it('replaces existing note with --force', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-addNote')
+    await addNote({
+      gitdir,
+      author: {
+        name: 'William Hilton',
+        email: 'wmhilton@gmail.com',
+        timestamp: 1578937310,
+        timezoneOffset: 300
+      },
+      oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
+      note: 'This is a note about a commit.'
+    })
+    // Test
+    const oid = await addNote({
+      gitdir,
+      author: {
+        name: 'William Hilton',
+        email: 'wmhilton@gmail.com',
+        timestamp: 1578937310,
+        timezoneOffset: 300
+      },
+      oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
+      note: 'This is the newer note about a commit.',
+      force: true
+    })
+    const { blob } = await readBlob({
+      gitdir,
+      oid,
+      filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164'
+    })
+    expect(blob.toString('utf8')).toEqual('This is the newer note about a commit.')
   })
 })

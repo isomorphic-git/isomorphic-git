@@ -29,19 +29,25 @@ export async function listNotes ({
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let refOid
+
+    // Get the current note commit
+    let parent
     try {
-      refOid = await GitRefManager.resolve({ gitdir, fs, ref })
+      parent = await GitRefManager.resolve({ gitdir, fs, ref })
     } catch (err) {
-      if (err.code === E.RefNotExistsError) {
+      if (err.code === E.ResolveRefError) {
         return []
       }
     }
+
+    // Create the current note tree
     const result = await readTree({
       gitdir,
       fs,
-      oid: refOid
+      oid: parent
     })
+
+    // Format the tree entries
     const notes = result.tree.map(entry => ({ target: entry.path, note: entry.oid }))
     return notes
   } catch (err) {

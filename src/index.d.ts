@@ -330,6 +330,7 @@ export function addNote(args: GitDir & {
     timezoneOffset?: number;
   };
   signingKey?: string;
+  force?: boolean;
 }): Promise<string>;
 
 export function addRemote(args: GitDir & {

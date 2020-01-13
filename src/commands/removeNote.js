@@ -1,6 +1,7 @@
 // @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { E } from '../models/GitError.js'
 import { join } from '../utils/join'
 import { cores } from '../utils/plugins.js'
 
@@ -44,14 +45,21 @@ export async function removeNote ({
   try {
     const fs = new FileSystem(_fs)
 
-    // get the current note commit
-    const parent = await GitRefManager.resolve({ gitdir, fs, ref })
+    // Get the current note commit
+    let parent
+    try {
+      parent = await GitRefManager.resolve({ gitdir, fs, ref })
+    } catch (err) {
+      if (err.code !== E.ResolveRefError) {
+        throw err
+      }
+    }
 
-    // get the note tree
-    const result = await readTree({ core, dir, gitdir, fs, oid: parent })
+    // I'm using the "empty tree" magic number here for brevity
+    const result = await readTree({ core, dir, gitdir, fs, oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904' })
     let tree = result.tree
 
-    // remove the note blob entry from the tree
+    // Remove the note blob entry from the tree
     tree = tree.filter(entry => entry.path !== oid)
 
     // Create the new note tree

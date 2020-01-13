@@ -50,6 +50,7 @@ export async function addNote ({
   try {
     const fs = new FileSystem(_fs)
 
+    // Get the current note commit
     let parent
     try {
       parent = await GitRefManager.resolve({ gitdir, fs, ref })

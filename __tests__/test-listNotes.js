@@ -43,4 +43,15 @@ describe('listNotes', () => {
       }
     ])
   })
+  it('from non-existant branch', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-listNotes')
+    // Test
+    const notes = await listNotes({
+      gitdir,
+      ref: 'refs/notes/alt2'
+    })
+    expect(notes.length).toBe(0)
+    expect(notes).toEqual([])
+  })
 })
