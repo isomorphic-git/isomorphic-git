@@ -43,6 +43,8 @@ describe('readNote', () => {
       ref: 'refs/notes/alt',
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164'
     })
-    expect(note.toString('utf8')).toEqual('This is alternate note about a commit.\n')
+    expect(note.toString('utf8')).toEqual(
+      'This is alternate note about a commit.\n'
+    )
   })
 })

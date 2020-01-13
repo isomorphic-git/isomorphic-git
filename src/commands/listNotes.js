@@ -1,11 +1,11 @@
 // @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { E } from '../models/GitError.js'
 import { join } from '../utils/join'
 import { cores } from '../utils/plugins.js'
 
 import { readTree } from './readTree'
-import { E } from '../models/GitError.js'
 
 /**
  * List all the object notes
@@ -48,7 +48,10 @@ export async function listNotes ({
     })
 
     // Format the tree entries
-    const notes = result.tree.map(entry => ({ target: entry.path, note: entry.oid }))
+    const notes = result.tree.map(entry => ({
+      target: entry.path,
+      note: entry.oid
+    }))
     return notes
   } catch (err) {
     err.caller = 'git.listNotes'

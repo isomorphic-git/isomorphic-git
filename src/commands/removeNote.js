@@ -6,8 +6,8 @@ import { join } from '../utils/join'
 import { cores } from '../utils/plugins.js'
 
 import { commit } from './commit.js'
-import { writeTree } from './writeTree.js'
 import { readTree } from './readTree.js'
+import { writeTree } from './writeTree.js'
 
 /**
  * Remove an object note
@@ -56,7 +56,13 @@ export async function removeNote ({
     }
 
     // I'm using the "empty tree" magic number here for brevity
-    const result = await readTree({ core, dir, gitdir, fs, oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904' })
+    const result = await readTree({
+      core,
+      dir,
+      gitdir,
+      fs,
+      oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+    })
     let tree = result.tree
 
     // Remove the note blob entry from the tree

@@ -221,6 +221,8 @@ describe('addNote', () => {
       oid,
       filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164'
     })
-    expect(blob.toString('utf8')).toEqual('This is the newer note about a commit.')
+    expect(blob.toString('utf8')).toEqual(
+      'This is the newer note about a commit.'
+    )
   })
 })
