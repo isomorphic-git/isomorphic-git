@@ -579,7 +579,7 @@ export function listNotes(args: GitDir & {
   fs?: any;
   ref?: string;
   oid?: string;
-}): Promise<Array<string>>;
+}): Promise<Array<{ oid: string, path: string }>>;
 
 export function listRemotes(args: GitDir & {
   core?: string;

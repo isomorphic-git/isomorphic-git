@@ -130,4 +130,30 @@ describe('addNote', () => {
       expect(tree.length).toBe(3)
     }
   })
+  it('can add a note to a different branch', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-addNote')
+    // Test
+    const oid = await addNote({
+      gitdir,
+      ref: 'refs/notes/alt',
+      author: {
+        name: 'William Hilton',
+        email: 'wmhilton@gmail.com',
+        timestamp: 1578937310,
+        timezoneOffset: 300
+      },
+      oid: '68aba62e560c0ebc3396e8ae9335232cd93a3f60',
+      note: 'This is a note about a blob.'
+    })
+    const commit = await resolveRef({ gitdir, ref: 'refs/notes/alt' })
+    expect(commit).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
+    expect(oid).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
+    let { blob } = await readBlob({
+      gitdir,
+      oid: '6428616e2600d3cd4b66059d5c561a85ce4b33ff',
+      filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
+    })
+    expect(blob.toString('utf8')).toEqual('This is a note about a blob.')
+  })
 })
