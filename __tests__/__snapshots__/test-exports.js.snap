@@ -43,7 +43,11 @@ Array [
   "plugins",
   "pull",
   "push",
+  "readBlob",
+  "readCommit",
   "readObject",
+  "readTag",
+  "readTree",
   "remove",
   "removeNote",
   "resetIndex",
@@ -58,7 +62,11 @@ Array [
   "version",
   "walkBeta1",
   "walkBeta2",
+  "writeBlob",
+  "writeCommit",
   "writeObject",
   "writeRef",
+  "writeTag",
+  "writeTree",
 ]
 `;

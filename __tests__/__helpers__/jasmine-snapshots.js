@@ -59,7 +59,7 @@ module.exports = snapshots => {
       }
     }
   }
-
   jasmine.getEnv().addReporter(SnapshotReporter)
+  // @ts-ignore
   jasmine.addMatchers(customMatchers(snapshots))
 }

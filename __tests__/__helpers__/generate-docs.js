@@ -27,58 +27,64 @@ const typedefs = new Map()
 function gentypedef (ast) {
   let text = ''
   if (ast.description) {
-    text += `\n${ast.description}\n\n`
+    text += `\n${ast.description}\n`
   }
-  text += '```ts\n'
-  text += `type ${ast.name} = {\n`
-  let currentprop = null
-  let indent = 2
-  for (const prop of ast.properties) {
-    const type = cleanType(prop.type.names[0])
-    // Note: the parser doesn't yet understand the full function syntax, so we hack it in
-    if (type === 'function') {
-      const betterName = recoverFunctionSignature(prop.name, ast.comment)
-      if (betterName) {
-        prop.type.names[0] = betterName
+  text += '\n```ts\n'
+  if (!ast.properties) {
+    text += `type ${ast.name} = ${cleanType(ast.type.names[0])};\n`
+  } else {
+    text += `type ${ast.name} = {\n`
+    let currentprop = null
+    let indent = 2
+    for (const prop of ast.properties) {
+      const type = cleanType(prop.type.names[0])
+      // Note: the parser doesn't yet understand the full function syntax, so we hack it in
+      if (type === 'function') {
+        const betterName = recoverFunctionSignature(prop.name, ast.comment)
+        if (betterName) {
+          prop.type.names[0] = betterName
+        }
       }
-    }
-    let ind = ' '.repeat(indent)
-    // This is pretty sloppy
-    if (currentprop !== null) {
-      if (prop.name.startsWith(currentprop)) {
-        const name = prop.name.replace(currentprop, '')
-        text += `${ind}${name}: ${cleanType(type)};${
+      let ind = ' '.repeat(indent)
+      // This is pretty sloppy
+      if (currentprop !== null) {
+        if (prop.name.startsWith(currentprop)) {
+          const name = prop.name.replace(currentprop, '')
+          text += `${ind}${name}: ${cleanType(type)};${
+            prop.description ? ` // ${prop.description}` : ''
+          }\n`
+          continue
+        } else {
+          indent -= 2
+          ind = ' '.repeat(indent)
+          currentprop = null
+          text += `${ind}};\n`
+        }
+      }
+      if (type === 'Object') {
+        currentprop = prop.name + '.'
+        if (prop.description) {
+          text += `${ind}// ${prop.description}\n`
+        }
+        text += `${ind}${prop.name}: {\n`
+        indent += 2
+        ind = ' '.repeat(indent)
+      } else {
+        text += `  ${prop.name}${
+          prop.optional ? '?' : ''
+        }: ${prop.type.names.map(cleanType).join(' | ')};${
           prop.description ? ` // ${prop.description}` : ''
         }\n`
-        continue
-      } else {
-        indent -= 2
-        ind = ' '.repeat(indent)
-        currentprop = null
-        text += `${ind}};\n`
       }
     }
-    if (type === 'Object') {
-      currentprop = prop.name + '.'
-      if (prop.description) {
-        text += `${ind}// ${prop.description}\n`
-      }
-      text += `${ind}${prop.name}: {\n`
-      indent += 2
-      ind = ' '.repeat(indent)
-    } else {
-      text += `  ${prop.name}${prop.optional ? '?' : ''}: ${prop.type.names
-        .map(cleanType)
-        .join(' | ')};${prop.description ? ` // ${prop.description}` : ''}\n`
+    while (indent > 2) {
+      indent -= 2
+      const ind = ' '.repeat(indent)
+      currentprop = null
+      text += `${ind}};\n`
     }
+    text += `}\n`
   }
-  while (indent > 2) {
-    indent -= 2
-    const ind = ' '.repeat(indent)
-    currentprop = null
-    text += `${ind}};\n`
-  }
-  text += `}\n`
   text += '```\n'
   typedefs.set(ast.name, text)
 }

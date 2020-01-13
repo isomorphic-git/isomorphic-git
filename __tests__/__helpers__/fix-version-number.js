@@ -7,5 +7,6 @@ var options = {
   to: pkg.version
 }
 ;(async function () {
+  // @ts-ignore
   await replace(options)
 })()

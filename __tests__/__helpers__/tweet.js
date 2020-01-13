@@ -12,7 +12,7 @@ var tweet = TweetTweet({
 })
 
 let commitMessage = process.env.BUILD_SOURCEVERSIONMESSAGE
-commitMessage = commitMessage ? '\n\n' + commitMessage : ''
+commitMessage = commitMessage ? '\n\n' + commitMessage.split('\n')[0] : ''
 
 tweet(message + commitMessage, function (err, response) {
   if (err) return console.log(err)

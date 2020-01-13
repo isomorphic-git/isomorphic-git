@@ -222,7 +222,11 @@ unless there is a major version bump.
 - [packObjects](https://isomorphic-git.github.io/docs/packObjects.html)
 - [pull](https://isomorphic-git.github.io/docs/pull.html)
 - [push](https://isomorphic-git.github.io/docs/push.html)
+- [readBlob](https://isomorphic-git.github.io/docs/readBlob.html)
+- [readCommit](https://isomorphic-git.github.io/docs/readCommit.html)
 - [readObject](https://isomorphic-git.github.io/docs/readObject.html)
+- [readTag](https://isomorphic-git.github.io/docs/readTag.html)
+- [readTree](https://isomorphic-git.github.io/docs/readTree.html)
 - [remove](https://isomorphic-git.github.io/docs/remove.html)
 - [removeNote](https://isomorphic-git.github.io/docs/removeNote.html)
 - [resetIndex](https://isomorphic-git.github.io/docs/resetIndex.html)
@@ -235,7 +239,11 @@ unless there is a major version bump.
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
 - [walkBeta2](https://isomorphic-git.github.io/docs/walkBeta2.html)
+- [writeBlob](https://isomorphic-git.github.io/docs/writeBlob.html)
+- [writeCommit](https://isomorphic-git.github.io/docs/writeCommit.html)
 - [writeObject](https://isomorphic-git.github.io/docs/writeObject.html)
+- [writeTag](https://isomorphic-git.github.io/docs/writeTag.html)
+- [writeTree](https://isomorphic-git.github.io/docs/writeTree.html)
 - [writeRef](https://isomorphic-git.github.io/docs/writeRef.html)
 
 ### plugins

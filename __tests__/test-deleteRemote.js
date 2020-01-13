@@ -24,6 +24,7 @@ describe('deleteRemote', () => {
     // Test
     let error = null
     try {
+      // @ts-ignore
       await deleteRemote({ dir, gitdir })
     } catch (err) {
       error = err

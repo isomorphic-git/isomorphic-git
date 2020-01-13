@@ -1,11 +1,11 @@
 import crc32 from 'crc-32'
 import applyDelta from 'git-apply-delta'
 import * as marky from 'marky'
-import pako from 'pako'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { listpack } from '../utils/git-list-pack.js'
+import { inflate } from '../utils/inflate.js'
 import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'
 
@@ -434,7 +434,7 @@ export class GitPackIndex {
     }
     // Handle undeltified objects
     const buffer = raw.slice(reader.tell())
-    object = Buffer.from(pako.inflate(buffer))
+    object = Buffer.from(await inflate(buffer))
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
       throw new GitError(E.InternalFail, {
