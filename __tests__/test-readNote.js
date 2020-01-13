@@ -1,14 +1,14 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { showNote } = require('isomorphic-git')
+const { readNote } = require('isomorphic-git')
 
-describe('showNote', () => {
+describe('readNote', () => {
   it('to a commit', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-showNote')
+    const { gitdir } = await makeFixture('test-readNote')
     // Test
-    const note = await showNote({
+    const note = await readNote({
       gitdir,
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164'
     })
@@ -16,9 +16,9 @@ describe('showNote', () => {
   })
   it('to a tree', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-showNote')
+    const { gitdir } = await makeFixture('test-readNote')
     // Test
-    const note = await showNote({
+    const note = await readNote({
       gitdir,
       oid: '199948939a0b95c6f27668689102496574b2c332'
     })
@@ -26,9 +26,9 @@ describe('showNote', () => {
   })
   it('to a blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-showNote')
+    const { gitdir } = await makeFixture('test-readNote')
     // Test
-    const note = await showNote({
+    const note = await readNote({
       gitdir,
       oid: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
     })
@@ -36,9 +36,9 @@ describe('showNote', () => {
   })
   it('from an alternate branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-showNote')
+    const { gitdir } = await makeFixture('test-readNote')
     // Test
-    const note = await showNote({
+    const note = await readNote({
       gitdir,
       ref: 'refs/notes/alt',
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164'

@@ -715,6 +715,13 @@ export function readCommit(args: GitDir & {
   oid: string;
 }): Promise<ReadCommitResult>;
 
+export function readNote(args: GitDir & {
+  core?: string;
+  fs?: any;
+  ref?: string;
+  oid: string;
+}): Promise<Buffer>;
+
 export function readObject(args: GitDir & {
   core?: string;
   fs?: any;
@@ -778,13 +785,6 @@ export function resolveRef(args: GitDir & {
   ref: string;
   depth?: number;
 }): Promise<string>;
-
-export function showNote(args: GitDir & {
-  core?: string;
-  fs?: any;
-  ref?: string;
-  oid: string;
-}): Promise<Buffer>;
 
 export function sign(args: GitDir & {
   core?: string;

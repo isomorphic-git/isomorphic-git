@@ -1,17 +1,16 @@
 // @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { cores } from '../utils/plugins.js'
 
-import { readObject } from './readObject'
-import { writeObject } from './writeObject.js'
+import { commit } from './commit.js'
+import { writeTree } from './writeTree.js'
+import { readTree } from './readTree.js'
 
 /**
  * Remove an object note
+ *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
@@ -42,87 +41,46 @@ export async function removeNote ({
   committer,
   signingKey
 }) {
-  const fs = new FileSystem(_fs)
-
-  let refOid
   try {
-    refOid = await GitRefManager.resolve({ gitdir, fs, ref })
-  } catch (Error) {
-    throw new GitError(E.InvalidRefNameError)
+    const fs = new FileSystem(_fs)
+
+    // get the current note commit
+    const parent = await GitRefManager.resolve({ gitdir, fs, ref })
+
+    // get the note tree
+    const result = await readTree({ core, dir, gitdir, fs, oid: parent })
+    let tree = result.tree
+
+    // remove the note blob entry from the tree
+    tree = tree.filter(entry => entry.path !== oid)
+
+    // Create the new note tree
+    const treeOid = await writeTree({
+      core,
+      dir,
+      gitdir,
+      fs,
+      tree
+    })
+
+    // Create the new note commit
+    const commitOid = await commit({
+      core,
+      dir,
+      gitdir,
+      fs,
+      ref,
+      tree: treeOid,
+      parent: parent && [parent],
+      message: `Note removed by 'isomorphic-git removeNote'\n`,
+      author,
+      committer,
+      signingKey
+    })
+
+    return commitOid
+  } catch (err) {
+    err.caller = 'git.removeNote'
+    throw err
   }
-
-  author = await normalizeAuthorObject({ fs, gitdir, author })
-  if (author === undefined) {
-    throw new GitError(E.MissingAuthorError)
-  }
-
-  committer = Object.assign({}, committer || author)
-  // Match committer's date to author's one, if omitted
-  committer.date = committer.date || author.date
-  committer = await normalizeAuthorObject({ fs, gitdir, author: committer })
-  if (committer === undefined) {
-    throw new GitError(E.MissingCommitterError)
-  }
-
-  const previousCommit = await readObject({
-    gitdir,
-    fs,
-    oid: refOid,
-    format: 'parsed'
-  })
-  const treeOid = previousCommit.object.tree
-  const treeObject = (await readObject({
-    gitdir,
-    fs,
-    oid: treeOid,
-    format: 'parsed'
-  })).object
-
-  const entries = treeObject.entries
-  var removedNoteOid
-  for (let i = 0; i < entries.length; i++) {
-    if (entries[i].path === oid) {
-      removedNoteOid = entries.splice(i, 1)
-      break
-    }
-  }
-  if (!removedNoteOid) {
-    throw new GitError(E.NoNoteOnObjectError)
-  }
-
-  const newTreeOid = await writeObject({
-    fs,
-    gitdir,
-    type: 'tree',
-    object: treeObject
-  })
-
-  const message = `Note removed by 'isomorphic-git removeNote'\n`
-
-  let commit = GitCommit.from({
-    tree: newTreeOid,
-    parent: [previousCommit.oid],
-    author,
-    committer,
-    message
-  })
-  if (signingKey) {
-    const pgp = cores.get(core).get('pgp')
-    commit = await GitCommit.sign(commit, pgp, signingKey)
-  }
-  const commitOid = await writeObject({
-    fs,
-    gitdir,
-    type: 'commit',
-    object: commit.toObject()
-  })
-  // Update branch pointer
-  await GitRefManager.writeRef({
-    fs,
-    gitdir,
-    ref,
-    value: commitOid
-  })
-
-  return commitOid
 }

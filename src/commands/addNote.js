@@ -52,7 +52,7 @@ export async function addNote ({
 
     let parent
     try {
-      parent = [await GitRefManager.resolve({ gitdir, fs, ref })]
+      parent = await GitRefManager.resolve({ gitdir, fs, ref })
     } catch (err) {
       if (err.code !== E.ResolveRefError) {
         throw err
@@ -60,7 +60,7 @@ export async function addNote ({
     }
 
     // I'm using the "empty tree" magic number here for brevity
-    const result = await readTree({ core, dir, gitdir, fs, oid: parent ? parent[0] : '4b825dc642cb6eb9a060e54bf8d69288fbee4904' })
+    const result = await readTree({ core, dir, gitdir, fs, oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904' })
     let tree = result.tree
 
     // Handle the case where a note already exists
@@ -89,7 +89,7 @@ export async function addNote ({
       blob: note
     })
 
-    // Create the note tree
+    // Create the new note tree
     tree.push({ mode: '100644', path: oid, oid: noteOid, type: 'blob' })
     const treeOid = await writeTree({
       core,
@@ -99,7 +99,7 @@ export async function addNote ({
       tree
     })
 
-    // Create the note commit
+    // Create the new note commit
     const commitOid = await commit({
       core,
       dir,
@@ -107,7 +107,7 @@ export async function addNote ({
       fs,
       ref,
       tree: treeOid,
-      parent,
+      parent: parent && [parent],
       message: `Note added by 'isomorphic-git addNote'\n`,
       author,
       committer,

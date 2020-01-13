@@ -1,12 +1,14 @@
 // @ts-check
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join'
 import { cores } from '../utils/plugins.js'
 
-import { readObject } from './readObject'
+import { readBlob } from './readBlob'
 
 /**
- * Show a specified note
+ * Read the contents of a note
+ *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
@@ -18,23 +20,28 @@ import { readObject } from './readObject'
  * @returns {Promise<Buffer>} Resolves successfully with note contents as a Buffer.
  */
 
-export async function showNote ({
+export async function readNote ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs = cores.get(core).get('fs'),
+  fs: _fs = cores.get(core).get('fs'),
   ref = 'refs/notes/commits',
   oid
 }) {
   try {
-    const refOid = await GitRefManager.resolve({ gitdir, fs, ref })
-    const { object } = await readObject({
+    const fs = new FileSystem(_fs)
+
+    const parent = await GitRefManager.resolve({ gitdir, fs, ref })
+    const { blob } = await readBlob({
       gitdir,
       fs,
-      oid: refOid,
-      filepath: oid,
-      format: 'parsed'
+      oid: parent,
+      filepath: oid
     })
-    return object
-  } catch (Error) {}
+
+    return blob
+  } catch (err) {
+    err.caller = 'git.readNote'
+    throw err
+  }
 }
