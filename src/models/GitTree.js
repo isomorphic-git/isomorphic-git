@@ -2,14 +2,14 @@ import { E, GitError } from '../models/GitError.js'
 import { comparePath } from '../utils/comparePath.js'
 import { compareTreeEntryPath } from '../utils/compareTreeEntryPath.js'
 
-/*::
-type TreeEntry = {
-  mode: string,
-  path: string,
-  oid: string,
-  type?: string
-}
-*/
+/**
+ *
+ * @typedef {Object} TreeEntry
+ * @property {string} mode - the 6 digit hexadecimal mode
+ * @property {string} path - the name of the file or directory
+ * @property {string} oid - the SHA-1 object id of the blob or tree
+ * @property {'commit'|'blob'|'tree'} type - the type of object
+ */
 
 function mode2type (mode) {
   // prettier-ignore
@@ -79,9 +79,6 @@ function nudgeIntoShape (entry) {
 }
 
 export class GitTree {
-  /*::
-  _entries: Array<TreeEntry>
-  */
   constructor (entries) {
     if (Buffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
@@ -123,6 +120,9 @@ export class GitTree {
     )
   }
 
+  /**
+   * @returns {TreeEntry[]}
+   */
   entries () {
     return this._entries
   }
