@@ -148,8 +148,7 @@ export const E = {
   AmbiguousShortOid: `AmbiguousShortOid`,
   ShortOidNotFound: `ShortOidNotFound`,
   CheckoutConflictError: `CheckoutConflictError`,
-  NoteAlreadyExistsError: `NoteAlreadyExistsError`,
-  NoNoteOnObjectError: `NoNoteOnObjectError`
+  NoteAlreadyExistsError: `NoteAlreadyExistsError`
 }
 
 function renderTemplate (template, values) {
