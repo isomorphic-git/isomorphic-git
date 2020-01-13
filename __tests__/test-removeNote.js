@@ -9,7 +9,7 @@ describe('removeNote', () => {
     const { gitdir } = await makeFixture('test-removeNote')
     // Test
     let notes = await listNotes({
-      gitdir,
+      gitdir
     })
     expect(notes.length).toBe(3)
     const oid = await removeNote({
@@ -23,7 +23,7 @@ describe('removeNote', () => {
       oid: '199948939a0b95c6f27668689102496574b2c332'
     })
     notes = await listNotes({
-      gitdir,
+      gitdir
     })
     expect(notes.length).toBe(2)
     expect(oid).toBe('96cc0598c9f2eaac733d0817981039596c0c410f')
@@ -34,7 +34,7 @@ describe('removeNote', () => {
     // Test
     let notes = await listNotes({
       gitdir,
-      ref: 'refs/notes/alt',
+      ref: 'refs/notes/alt'
     })
     expect(notes.length).toBe(1)
     const oid = await removeNote({
@@ -50,7 +50,7 @@ describe('removeNote', () => {
     })
     notes = await listNotes({
       gitdir,
-      ref: 'refs/notes/alt',
+      ref: 'refs/notes/alt'
     })
     expect(notes.length).toBe(0)
     expect(oid).toBe('cfab6e154843d83173626d8d39d1dbe0f603921b')

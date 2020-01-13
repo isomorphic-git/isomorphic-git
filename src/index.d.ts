@@ -763,7 +763,7 @@ export function removeNote(args: GitDir & {
     timezoneOffset?: number;
   };
   signingKey?: string;
-}): Promise<void>;
+}): Promise<string>;
 
 export function resetIndex(args: Partial<WorkDir> & GitDir & {
   core?: string;

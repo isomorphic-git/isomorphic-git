@@ -22,7 +22,7 @@ describe('addNote', () => {
     const commit = await resolveRef({ gitdir, ref: 'refs/notes/commits' })
     expect(commit).toEqual('3b4b7a6c2382ea60a0b4c7ff69920af9a2e6408d')
     expect(oid).toEqual('3b4b7a6c2382ea60a0b4c7ff69920af9a2e6408d')
-    let { blob } = await readBlob({
+    const { blob } = await readBlob({
       gitdir,
       oid: '3b4b7a6c2382ea60a0b4c7ff69920af9a2e6408d',
       filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164'
@@ -47,7 +47,7 @@ describe('addNote', () => {
     const commit = await resolveRef({ gitdir, ref: 'refs/notes/commits' })
     expect(commit).toEqual('4b52ff827d2b5fe1786bf52a1b78dd25517b6cdd')
     expect(oid).toEqual('4b52ff827d2b5fe1786bf52a1b78dd25517b6cdd')
-    let { blob } = await readBlob({
+    const { blob } = await readBlob({
       gitdir,
       oid: '4b52ff827d2b5fe1786bf52a1b78dd25517b6cdd',
       filepath: '199948939a0b95c6f27668689102496574b2c332'
@@ -72,7 +72,7 @@ describe('addNote', () => {
     const commit = await resolveRef({ gitdir, ref: 'refs/notes/commits' })
     expect(commit).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
     expect(oid).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
-    let { blob } = await readBlob({
+    const { blob } = await readBlob({
       gitdir,
       oid: '6428616e2600d3cd4b66059d5c561a85ce4b33ff',
       filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
@@ -148,7 +148,7 @@ describe('addNote', () => {
     const commit = await resolveRef({ gitdir, ref: 'refs/notes/alt' })
     expect(commit).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
     expect(oid).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
-    let { blob } = await readBlob({
+    const { blob } = await readBlob({
       gitdir,
       oid: '6428616e2600d3cd4b66059d5c561a85ce4b33ff',
       filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
