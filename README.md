@@ -287,6 +287,7 @@ Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions
 - [GIT Web Terminal](https://jcubic.github.io/git/)
 - [Next Editor](https://next-editor.app/)
 - [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git)
+- [Stoplight Studio](https://stoplight.io/studio/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git) - a modern editor for API design and technical writing
 
 ## Similar projects
 
