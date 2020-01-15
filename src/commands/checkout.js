@@ -121,6 +121,24 @@ export async function checkout ({
         // that are not present in the new branch, and only write files that
         // are not in the index or are in the index but have the wrong SHA.
         for (const entry of index) {
+          // match against base paths
+          if (!bases.some(base => worthWalking(entry.path, base))) {
+            continue
+          }
+
+          // filter against file names
+          if (patternGlobrex) {
+            let match = false
+            for (const base of bases) {
+              const partToMatch = entry.path.replace(base + '/', '')
+              if (patternGlobrex.regex.test(partToMatch)) {
+                match = true
+                break
+              }
+            }
+            if (!match) continue
+          }
+
           try {
             await fs.rm(join(dir, entry.path))
             if (emitter) {
