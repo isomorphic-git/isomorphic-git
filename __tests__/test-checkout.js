@@ -187,4 +187,22 @@ describe('checkout', () => {
     const index = await listFiles({ dir, gitdir })
     expect(index).toMatchSnapshot()
   })
+
+  it('checkout files should not delete other files', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch'
+    })
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/utils', 'test']
+    })
+    const files = await fs.readdir(dir)
+    expect(files).toContain('README.md')
+  })
 })

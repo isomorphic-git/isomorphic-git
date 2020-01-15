@@ -252,4 +252,22 @@ describe('fastCheckout', () => {
     expect(error).toBeNull()
     expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('Hello world')
   })
+
+  it('checkout files should not delete other files', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await fastCheckout({
+      dir,
+      gitdir,
+      ref: 'test-branch'
+    })
+    await fastCheckout({
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/utils', 'test']
+    })
+    const files = await fs.readdir(dir)
+    expect(files).toContain('README.md')
+  })
 })
