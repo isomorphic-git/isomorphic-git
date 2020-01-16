@@ -805,6 +805,7 @@ export function statusMatrix(args: WorkDir & GitDir & {
   ref?: string;
   filepaths?: string[];
   pattern?: string;
+  noSubmodules?: boolean;
 }): Promise<StatusMatrix>;
 
 export function tag(args: GitDir & {
