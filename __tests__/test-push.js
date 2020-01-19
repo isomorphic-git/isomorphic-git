@@ -144,7 +144,9 @@ describe('push', () => {
     expect(res.ok).toBeTruthy()
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/foobar')
-    expect(await listBranches({ gitdir, remote: 'karma' })).not.toContain('foobar')
+    expect(await listBranches({ gitdir, remote: 'karma' })).not.toContain(
+      'foobar'
+    )
   })
 
   it('push with Basic Auth', async () => {
