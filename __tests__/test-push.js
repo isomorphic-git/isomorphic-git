@@ -117,6 +117,32 @@ describe('push', () => {
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/tags/annotated-tag')
   })
+  it('push delete', async () => {
+    // Setup
+    const { gitdir } = await makeFixture('test-push')
+    await config({
+      gitdir,
+      path: 'remote.karma.url',
+      value: `http://${localhost}:8888/test-push-server.git`
+    })
+    await push({
+      gitdir,
+      remote: 'karma',
+      ref: 'master',
+      remoteRef: 'foobar'
+    })
+    // Test
+    const res = await push({
+      gitdir,
+      remote: 'karma',
+      remoteRef: 'foobar',
+      delete: true
+    })
+    expect(res).toBeTruthy()
+    expect(res.ok).toBeTruthy()
+    expect(res.ok[0]).toBe('unpack')
+    expect(res.ok[1]).toBe('refs/heads/foobar')
+  })
 
   it('push with Basic Auth', async () => {
     // Setup
