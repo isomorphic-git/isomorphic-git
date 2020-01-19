@@ -54,6 +54,7 @@ import { pack } from './pack.js'
  * @param {string} [args.remoteRef] - The name of the receiving branch on the remote. By default this is the same as `ref`. (See note below)
  * @param {string} [args.remote] - If URL is not specified, determines which remote to use.
  * @param {boolean} [args.force = false] - If true, behaves the same as `git push --force`
+ * @param {boolean} [args.delete = false] - If true, delete the remote ref
  * @param {boolean} [args.noGitSuffix = false] - If true, do not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {string} [args.url] - The URL of the remote git server. The default is the value set in the git config for that remote.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
@@ -91,6 +92,7 @@ export async function push ({
   remote = 'origin',
   url,
   force = false,
+  delete: _delete = false,
   noGitSuffix = false,
   corsProxy,
   // @ts-ignore
@@ -133,7 +135,7 @@ export async function push ({
     } else {
       fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     }
-    const oid = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
+    const oid = _delete ? '0000000000000000000000000000000000000000' : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
     let auth = { username, password, token, oauth2format }
     const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     const httpRemote = await GitRemoteHTTP.discover({
@@ -170,35 +172,39 @@ export async function push ({
     const oldoid =
       httpRemote.refs.get(fullRemoteRef) ||
       '0000000000000000000000000000000000000000'
-    const finish = [...httpRemote.refs.values()]
-    // hack to speed up common force push scenarios
-    // @ts-ignore
-    const mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
-    for (const oid of mergebase) finish.push(oid)
-    // @ts-ignore
-    const commits = await listCommitsAndTags({
-      fs,
-      gitdir,
-      start: [oid],
-      finish
-    })
-    // @ts-ignore
-    const objects = await listObjects({ fs, gitdir, oids: commits })
-    if (!force) {
-      // Is it a tag that already exists?
-      if (
-        fullRef.startsWith('refs/tags') &&
-        oldoid !== '0000000000000000000000000000000000000000'
-      ) {
-        throw new GitError(E.PushRejectedTagExists, {})
-      }
-      // Is it a non-fast-forward commit?
-      if (
-        oid !== '0000000000000000000000000000000000000000' &&
-        oldoid !== '0000000000000000000000000000000000000000' &&
-        !(await isDescendent({ fs, gitdir, oid, ancestor: oldoid }))
-      ) {
-        throw new GitError(E.PushRejectedNonFastForward, {})
+    let objects = []
+    if (!_delete) {
+      const finish = [...httpRemote.refs.values()]
+      // hack to speed up common force push scenarios
+      // @ts-ignore
+      const mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
+      for (const oid of mergebase) finish.push(oid)
+      // @ts-ignore
+      const commits = await listCommitsAndTags({
+        fs,
+        gitdir,
+        start: [oid],
+        finish
+      })
+      // @ts-ignore
+      objects = await listObjects({ fs, gitdir, oids: commits })
+
+      if (!force) {
+        // Is it a tag that already exists?
+        if (
+          fullRef.startsWith('refs/tags') &&
+          oldoid !== '0000000000000000000000000000000000000000'
+        ) {
+          throw new GitError(E.PushRejectedTagExists, {})
+        }
+        // Is it a non-fast-forward commit?
+        if (
+          oid !== '0000000000000000000000000000000000000000' &&
+          oldoid !== '0000000000000000000000000000000000000000' &&
+          !(await isDescendent({ fs, gitdir, oid, ancestor: oldoid }))
+        ) {
+          throw new GitError(E.PushRejectedNonFastForward, {})
+        }
       }
     }
     // We can only safely use capabilities that the server also understands.
@@ -211,7 +217,7 @@ export async function push ({
       capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
-    const packstream2 = await pack({
+    const packstream2 = _delete ? [] : await pack({
       fs,
       gitdir,
       oids: [...objects]

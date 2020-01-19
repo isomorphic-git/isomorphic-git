@@ -692,6 +692,7 @@ export function push(args: GitDir & {
   url?: string;
   corsProxy?: string;
   force?: boolean;
+  delete?: boolean;
   noGitSuffix?: boolean;
   username?: string;
   password?: string;
