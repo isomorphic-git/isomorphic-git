@@ -135,7 +135,9 @@ export async function push ({
     } else {
       fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     }
-    const oid = _delete ? '0000000000000000000000000000000000000000' : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
+    const oid = _delete
+      ? '0000000000000000000000000000000000000000'
+      : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
     let auth = { username, password, token, oauth2format }
     const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     const httpRemote = await GitRemoteHTTP.discover({
@@ -217,11 +219,13 @@ export async function push ({
       capabilities,
       triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
     })
-    const packstream2 = _delete ? [] : await pack({
-      fs,
-      gitdir,
-      oids: [...objects]
-    })
+    const packstream2 = _delete
+      ? []
+      : await pack({
+        fs,
+        gitdir,
+        oids: [...objects]
+      })
     const res = await GitRemoteHTTP.connect({
       core,
       emitter,

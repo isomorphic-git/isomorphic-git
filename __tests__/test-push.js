@@ -129,14 +129,14 @@ describe('push', () => {
       gitdir,
       remote: 'karma',
       ref: 'master',
-      remoteRef: 'foobar',
+      remoteRef: 'foobar'
     })
     // Test
     const res = await push({
       gitdir,
       remote: 'karma',
       remoteRef: 'foobar',
-      delete: true,
+      delete: true
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBeTruthy()
