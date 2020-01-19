@@ -250,6 +250,16 @@ export async function push ({
     if (res.headers) {
       result.headers = res.headers
     }
+
+    // Update the local copy of the remote ref
+    if (remote && result.ok && result.ok.includes(fullRemoteRef)) {
+      const ref = `refs/remotes/${remote}/${fullRemoteRef.replace('refs/heads', '')}`
+      if (_delete) {
+        await GitRefManager.deleteRef({ fs, gitdir, ref })
+      } else {
+        await GitRefManager.writeRef({ fs, gitdir, ref, value: oid })
+      }
+    }
     return result
   } catch (err) {
     err.caller = 'git.push'
