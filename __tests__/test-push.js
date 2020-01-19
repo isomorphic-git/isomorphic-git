@@ -140,7 +140,6 @@ describe('push', () => {
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBeTruthy()
-    console.log(res)
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/foobar')
   })
