@@ -38,6 +38,8 @@ import { walkBeta2 } from './walkBeta2.js'
  * @param {boolean} [args.noUpdateHead] - If true, will update the working directory but won't update HEAD. Defaults to `false` when `ref` is provided, and `true` if `ref` is not provided.
  * @param {boolean} [args.dryRun = false] - If true, simulates a checkout so you can test whether it would succeed.
  * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
+ * @param {boolean} [args.noSubmodules = false] - If true, will not print out errors about missing submodules support.
+ * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -71,7 +73,9 @@ export async function fastCheckout ({
   dryRun = false,
   // @ts-ignore
   debug = false,
-  force = false
+  force = false,
+  noSubmodules = false,
+  newSubmoduleBehavior = false
 }) {
   try {
     const ref = _ref || 'HEAD'
@@ -122,7 +126,9 @@ export async function fastCheckout ({
           force,
           filepaths,
           emitter,
-          emitterPrefix
+          emitterPrefix,
+          noSubmodules,
+          newSubmoduleBehavior
         })
       } catch (err) {
         // Throw a more helpful error message for this common mistake.
@@ -188,33 +194,38 @@ export async function fastCheckout ({
       })
 
       // Note: this is cannot be done naively in parallel
-      for (const [method, fullpath] of ops) {
-        if (method === 'rmdir') {
-          const filepath = `${dir}/${fullpath}`
-          try {
-            await fs.rmdir(filepath)
-            if (emitter) {
-              emitter.emit(`${emitterPrefix}progress`, {
-                phase: 'Updating workdir',
-                loaded: ++count,
-                total
-              })
-            }
-          } catch (e) {
-            if (e.code === 'ENOTEMPTY') {
-              console.log(
-                `Did not delete ${fullpath} because directory is not empty`
-              )
-            } else {
-              throw e
+      await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+        for (const [method, fullpath] of ops) {
+          if (method === 'rmdir' || method === 'rmdir-index') {
+            const filepath = `${dir}/${fullpath}`
+            try {
+              if (method === 'rmdir-index') {
+                index.delete({ filepath: fullpath })
+              }
+              await fs.rmdir(filepath)
+              if (emitter) {
+                emitter.emit(`${emitterPrefix}progress`, {
+                  phase: 'Updating workdir',
+                  loaded: ++count,
+                  total
+                })
+              }
+            } catch (e) {
+              if (e.code === 'ENOTEMPTY') {
+                console.log(
+                  `Did not delete ${fullpath} because directory is not empty`
+                )
+              } else {
+                throw e
+              }
             }
           }
         }
-      }
+      })
 
       await Promise.all(
         ops
-          .filter(([method]) => method === 'mkdir')
+          .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
           .map(async function ([_, fullpath]) {
             const filepath = `${dir}/${fullpath}`
             await fs.mkdir(filepath)
@@ -235,12 +246,13 @@ export async function fastCheckout ({
               ([method]) =>
                 method === 'create' ||
                 method === 'create-index' ||
-                method === 'update'
+                method === 'update' ||
+                method === 'mkdir-index'
             )
             .map(async function ([method, fullpath, oid, mode, chmod]) {
               const filepath = `${dir}/${fullpath}`
               try {
-                if (method !== 'create-index') {
+                if (method !== 'create-index' && method !== 'mkdir-index') {
                   const { object } = await readObject({ fs, gitdir, oid })
                   if (chmod) {
                     // Note: the mode option of fs.write only works when creating files,
@@ -272,6 +284,10 @@ export async function fastCheckout ({
                 // TODO: Figure out how git handles this internally.
                 if (mode === 0o100755) {
                   stats.mode = 0o755
+                }
+                // Submodules are present in the git index but use a unique mode different from trees
+                if (method === 'mkdir-index') {
+                  stats.mode = 0o160000
                 }
                 index.insert({
                   filepath: fullpath,
@@ -322,7 +338,9 @@ async function analyze ({
   force,
   filepaths,
   emitter,
-  emitterPrefix
+  emitterPrefix,
+  noSubmodules,
+  newSubmoduleBehavior
 }) {
   let count = 0
   return walkBeta2({
@@ -377,12 +395,18 @@ async function analyze ({
             }
             case 'commit': {
               // gitlinks
-              console.log(
-                new GitError(E.NotImplementedFail, {
-                  thing: 'submodule support'
-                })
-              )
-              return
+              if (!noSubmodules) {
+                console.log(
+                  new GitError(E.NotImplementedFail, {
+                    thing: 'submodule support'
+                  })
+                )
+              }
+              if (newSubmoduleBehavior) {
+                return ['mkdir-index', fullpath, await commit.oid(), await commit.mode()]
+              } else {
+                return
+              }
             }
             default: {
               return [
@@ -487,8 +511,11 @@ async function analyze ({
                 return ['delete', fullpath]
               }
             }
+            case 'commit': {
+              return ['rmdir-index', fullpath]
+            }
             default: {
-              return [`delete entry Unhandled type ${await stage.type()}`]
+              return ['error', `delete entry Unhandled type ${await stage.type()}`]
             }
           }
         }
