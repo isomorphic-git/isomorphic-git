@@ -430,6 +430,13 @@ export function commit(args: GitDir & {
   tree?: string;
 }): Promise<string>;
 
+export function findMergeBase(args: GitDir & {
+  core?: string,
+  fs?: any,
+  oids: string[]
+}): Promise<string[]>;
+
+
 export function config(args: GitDir & {
   core?: string;
   fs?: any;
