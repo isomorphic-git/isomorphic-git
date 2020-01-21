@@ -378,6 +378,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "alexspeller",
+      "name": "Alex Speller",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1217?v=4",
+      "profile": "http://alexspeller.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
