@@ -597,6 +597,21 @@ async function analyze ({
             case 'blob-tree': {
               return ['update-blob-to-tree', fullpath]
             }
+            case 'commit-commit': {
+              if (newSubmoduleBehavior) {
+                return [
+                  'mkdir-index',
+                  fullpath,
+                  await commit.oid(),
+                  await commit.mode()
+                ]
+              } else {
+                return [
+                  'error',
+                  `update entry Unhandled type ${await stage.type()}-${await commit.type()}`
+                ]
+              }
+            }
             default: {
               return [
                 'error',
