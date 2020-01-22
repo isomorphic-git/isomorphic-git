@@ -403,7 +403,12 @@ async function analyze ({
                 )
               }
               if (newSubmoduleBehavior) {
-                return ['mkdir-index', fullpath, await commit.oid(), await commit.mode()]
+                return [
+                  'mkdir-index',
+                  fullpath,
+                  await commit.oid(),
+                  await commit.mode()
+                ]
               } else {
                 return
               }
@@ -515,7 +520,10 @@ async function analyze ({
               return ['rmdir-index', fullpath]
             }
             default: {
-              return ['error', `delete entry Unhandled type ${await stage.type()}`]
+              return [
+                'error',
+                `delete entry Unhandled type ${await stage.type()}`
+              ]
             }
           }
         }

@@ -1,7 +1,8 @@
 import { E, GitError } from '../models/GitError.js'
+
 /**
- * 
- * @param {number} mode 
+ *
+ * @param {number} mode
  */
 export function mode2type (mode) {
   // prettier-ignore

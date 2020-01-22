@@ -1,7 +1,13 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { clone, checkout, listFiles, fastCheckout, commit } = require('isomorphic-git')
+const {
+  clone,
+  checkout,
+  listFiles,
+  fastCheckout,
+  commit
+} = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -55,11 +61,17 @@ describe('submodule "support"', () => {
       newSubmoduleBehavior: true
     })
     // Test
-    await checkout({ dir, gitdir, ref: 'master', noSubmodules: true, newSubmoduleBehavior: true })
+    await checkout({
+      dir,
+      gitdir,
+      ref: 'master',
+      noSubmodules: true,
+      newSubmoduleBehavior: true
+    })
     expect(await listFiles({ gitdir })).toContain('test.empty')
   })
 
-  it('submodules are unstaged when switching to a branch that doesn\'t have them (checkout)', async () => {
+  it("submodules are unstaged when switching to a branch that doesn't have them (checkout)", async () => {
     const { dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
       dir,
@@ -84,11 +96,17 @@ describe('submodule "support"', () => {
       newSubmoduleBehavior: true
     })
     // Test
-    await fastCheckout({ dir, gitdir, ref: 'master', noSubmodules: true, newSubmoduleBehavior: true })
+    await fastCheckout({
+      dir,
+      gitdir,
+      ref: 'master',
+      noSubmodules: true,
+      newSubmoduleBehavior: true
+    })
     expect(await listFiles({ gitdir })).toContain('test.empty')
   })
 
-  it('submodules are unstaged when switching to a branch that doesn\'t have them (fastCheckout)', async () => {
+  it("submodules are unstaged when switching to a branch that doesn't have them (fastCheckout)", async () => {
     const { dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
       dir,
