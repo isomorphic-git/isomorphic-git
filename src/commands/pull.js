@@ -39,6 +39,7 @@ import { merge } from './merge'
  * @param {boolean} [args.autoTranslateSSH] - Attempt to automatically translate SSH remotes into HTTP equivalents
  * @param {boolean} [args.fast = false] - use fastCheckout instead of regular checkout
  * @param {boolean} [args.noSubmodules = false] - If true, will not print out an error about missing submodules support. TODO: Skip checkout out submodules when supported instead.
+ * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -77,7 +78,8 @@ export async function pull ({
   signingKey,
   autoTranslateSSH = false,
   fast = false,
-  noSubmodules = false
+  noSubmodules = false,
+  newSubmoduleBehavior = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -128,7 +130,9 @@ export async function pull ({
         fs,
         ref,
         emitter,
-        emitterPrefix
+        emitterPrefix,
+        noSubmodules,
+        newSubmoduleBehavior
       })
     } else {
       await checkout({
@@ -138,7 +142,8 @@ export async function pull ({
         ref,
         emitter,
         emitterPrefix,
-        noSubmodules
+        noSubmodules,
+        newSubmoduleBehavior
       })
     }
   } catch (err) {
