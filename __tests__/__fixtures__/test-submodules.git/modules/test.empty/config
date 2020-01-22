@@ -1,0 +1,14 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+	worktree = ../../../test-submodules/test.empty
+[remote "origin"]
+	url = https://github.com/isomorphic-git/test.empty
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "test"]
+	remote = origin
+	merge = refs/heads/test

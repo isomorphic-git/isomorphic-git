@@ -376,6 +376,7 @@ export function checkout(args: WorkDir & GitDir & {
   filepaths?: string[];
   pattern?: string;
   noSubmodules?: boolean;
+  newSubmoduleBehavior?: boolean;
 }): Promise<void>;
 
 export function clone(args: WorkDir & GitDir & {
@@ -398,6 +399,7 @@ export function clone(args: WorkDir & GitDir & {
   singleBranch?: boolean;
   noCheckout?: boolean;
   noSubmodules?: boolean;
+  newSubmoduleBehavior?: boolean;
   noGitSuffix?: boolean;
   noTags?: boolean;
   headers?: { [key: string]: string };
@@ -493,6 +495,8 @@ export function fastCheckout(args: WorkDir & GitDir & {
   force?: boolean;
   noCheckout?: boolean;
   noUpdateHead?: boolean;
+  noSubmodules?: boolean;
+  newSubmoduleBehavior?: boolean;
 }): Promise<void>;
 
 export function fetch(args: GitDir & {

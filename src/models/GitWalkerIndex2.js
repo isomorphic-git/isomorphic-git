@@ -1,6 +1,7 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
+import { mode2type } from '../utils/mode2type'
 import { normalizeStats } from '../utils/normalizeStats'
 
 import { FileSystem } from './FileSystem.js'
@@ -83,7 +84,7 @@ export class GitWalkerIndex2 {
         )
       }
       const stats = inode.type === 'tree' ? {} : normalizeStats(inode.metadata)
-      entry._type = inode.type
+      entry._type = inode.type === 'tree' ? 'tree' : mode2type(stats.mode)
       entry._mode = stats.mode
       if (inode.type === 'tree') {
         entry._stat = void 0

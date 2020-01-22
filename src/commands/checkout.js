@@ -33,6 +33,7 @@ import { walkBeta2 } from './walkBeta2.js'
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
  * @param {boolean} [args.noCheckout = false] - If true, will update HEAD but won't update the working directory
  * @param {boolean} [args.noSubmodules = false] - If true, will not print out an error about missing submodules support. TODO: Skip checkout out submodules when supported instead.
+ * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -59,7 +60,8 @@ export async function checkout ({
   filepaths = ['.'],
   pattern = null,
   noCheckout = false,
-  noSubmodules = false
+  noSubmodules = false,
+  newSubmoduleBehavior = false
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -192,7 +194,16 @@ export async function checkout ({
                       })
                     )
                   }
-
+                  if (newSubmoduleBehavior) {
+                    if (!workdir) await fs.mkdir(filepath)
+                    const stats = await fs.lstat(filepath)
+                    stats.mode = 0o160000 // submodules have a unique mode different from trees
+                    index.insert({
+                      filepath: fullpath,
+                      stats,
+                      oid: await head.oid()
+                    })
+                  }
                   break
                 }
                 case 'blob': {
