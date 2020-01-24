@@ -136,11 +136,10 @@ module.exports = function (config) {
     singleRun: true,
     // test results reporter to use
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['browsers', 'verbose', 'longest', 'pr-comment', 'junit'],
+    reporters: ['browsers', 'verbose', 'pr-comment', 'junit'],
     junitReporter: {
       outputDir: './junit'
     },
-    longestSpecsToReport: 50,
     browserify: {
       transform: [
         // Replace process.env.CI
@@ -180,7 +179,6 @@ module.exports = function (config) {
       'karma-firefox-launcher',
       'karma-jasmine',
       'karma-junit-reporter',
-      'karma-longest-reporter',
       'karma-sauce-launcher',
       'karma-verbose-reporter',
       'karma-webpack',
