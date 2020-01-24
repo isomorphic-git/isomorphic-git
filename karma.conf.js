@@ -72,29 +72,21 @@ module.exports = function (config) {
       sl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge',
-        version: '17.17134'
+        version: '79.0'
       },
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
-        platform: 'macOS 10.13',
-        version: '11.1'
+        platform: 'macOS 10.15',
+        version: '13.0'
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone X Simulator',
+        deviceName: 'iPhone 11 Pro Max Simulator',
         platformName: 'iOS',
-        platformVersion: '11.2',
+        platformVersion: '13.0',
         browserName: 'Safari',
-        appiumVersion: '1.9.1'
-      },
-      sl_ios_safari12: {
-        base: 'SauceLabs',
-        deviceName: 'iPhone 8 Simulator',
-        platformName: 'iOS',
-        platformVersion: '12.0',
-        browserName: 'Safari',
-        appiumVersion: '1.9.1'
+        appiumVersion: '1.15.0'
       },
       sl_android_chrome: {
         base: 'SauceLabs',
