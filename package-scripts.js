@@ -2,6 +2,8 @@
 // It's like package.json scripts, but more flexible.
 const { concurrent, series, runInNewWindow } = require('nps-utils')
 
+const pkg = require('./package.json')
+
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.js')
 
@@ -72,6 +74,19 @@ module.exports = {
         )
         : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)
     },
+    website: {
+      default: series.nps(
+        'website.build',
+        'website.version',
+        'website.publish'
+      ),
+      build: '(cd website && npm install && npm run build)',
+      version:
+        pkg.version === '0.0.0-development'
+          ? 'echo "Not a new version"'
+          : `(cd website && npm run create-version ${pkg.version})`,
+      publish: '(cd website && node ./scripts/deploy-gh-pages.js)'
+    },
     // ATTENTION:
     // LIST OF SAFE PORTS FOR SAUCE LABS (Edge and Safari) https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy+FAQS#SauceConnectProxyFAQS-CanIAccessApplicationsonlocalhost?
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
@@ -95,6 +110,7 @@ module.exports = {
           'lint.js',
           'build',
           'lint.typescript',
+          'build.docs',
           'test.setup',
           'test.one',
           'test.karma',
