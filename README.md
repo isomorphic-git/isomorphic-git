@@ -1,85 +1,55 @@
+<p align="center">
+  <img src="website/static/img/isomorphic-git-logo.svg" alt="" height="150"/>
+</p>
+
 # isomorphic-git
-A pure JavaScript implementation of git for node and browsers!
 
-<table><tr><td>
+`isomorphic-git` is a pure JavaScript reimplementation of git that works in both Node.js and browser JavaScript environments. It can read and write to git repositories, fetch from and push to git remotes (such as GitHub), all without any native C++ module dependencies.
 
-Latest release:
-
-</td><td>
-
-[![current npm version](https://img.shields.io/npm/v/isomorphic-git.svg)](https://www.npmjs.com/package/isomorphic-git)
-![required node version](https://img.shields.io/node/v/isomorphic-git.svg)
-![written in ECMAScript 2017+](https://img.shields.io/badge/ECMAScript-2017%2B-brightgreen.svg)
-![license](https://img.shields.io/npm/l/isomorphic-git.svg)
-[![gzip size](http://img.badgesize.io/https://unpkg.com/isomorphic-git?compression=gzip)](https://unpkg.com/isomorphic-git)
-[![install size](https://packagephobia.now.sh/badge?p=isomorphic-git)](https://packagephobia.now.sh/result?p=isomorphic-git)
-
-</td></tr><tr><td>
-
-Master branch status:
-
-</td><td>
-
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Build Status](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git-RELEASE?branchName=master)](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git-RELEASE?branchName=master)
-[![dependencies](https://david-dm.org/isomorphic-git/isomorphic-git/status.svg)](https://david-dm.org/isomorphic-git/isomorphic-git)
-[![Known Vulnerabilities](https://snyk.io/test/github/isomorphic-git/isomorphic-git/badge.svg)](https://snyk.io/test/github/isomorphic-git/isomorphic-git)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_shield)
-
-</td></tr><tr><td>
-
-Social:
-
-</td><td>
-
-[![Gitter chat](https://badges.gitter.im/isomorphic-git.svg)](https://gitter.im/isomorphic-git/Lobby)
-[![Backers on Open Collective](https://opencollective.com/isomorphic-git/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/isomorphic-git/sponsors/badge.svg)](#sponsors)
-
-</td></tr><tr><td>
-
-Browser Support:
-
-</td><td>
-
-[![Sauce Labs Test Status (for master branch)](https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&microsoftedge=17&safari=11&android=7.1&iphone=11.2)](https://saucelabs.com/u/_wmhilton)
-
-</td></tr><tr><td>
-
-Most recent build:
-
-</td><td>
-  
-[![Build Status](https://dev.azure.com/isomorphic-git/isomorphic-git/_apis/build/status/isomorphic-git.isomorphic-git)](https://dev.azure.com/isomorphic-git/isomorphic-git/_build/latest?definitionId=1)
-[![Build Status](https://saucelabs.com/buildstatus/_wmhilton)](https://saucelabs.com/beta/builds/e188d69c3e1640139b5899a5ff76f092)
-[![BrowserStack Status](https://www.browserstack.com/automate/badge.svg?badge_key=MnFJSk9SWDZHK3JhcWxlRE5KUXpoVm1ndUZNSklSSGZlaFdpUzBTbjVWdz0tLUprUmRNcVNwWTd0TkFzSWVveFNpM0E9PQ==--86fecb8d528f51b7540094886e6dc6dd21bf6b8f)](https://www.browserstack.com/automate/public-build/MnFJSk9SWDZHK3JhcWxlRE5KUXpoVm1ndUZNSklSSGZlaFdpUzBTbjVWdz0tLUprUmRNcVNwWTd0TkFzSWVveFNpM0E9PQ==--86fecb8d528f51b7540094886e6dc6dd21bf6b8f)
-
-</td></tr></table>
-
-
-`isomorphic-git` is a pure JavaScript implementation of git that works in node and browser environments (including WebWorkers and ServiceWorkers). This means it can be used to read and write to git repositories, as well as fetch from and push to git remotes like Github.
+## Goals
 
 Isomorphic-git aims for 100% interoperability with the canonical git implementation. This means it does all its operations by modifying files in a ".git" directory just like the git you are used to. The included `isogit` CLI can operate on git repositories on your desktop or server.
 
-`isomorphic-git` aims to be a complete solution with no assembly required.
-I've tried carefully to design the API so it is easy to use all the features, without paying a penalty in bundle size.
-By providing functionality as separate functions instead of an object oriented API, code bundlers like Webpack will only include the functionality your application actually uses. (Or at least that's the goal.)
+This library aims to be a complete solution with no assembly required.
+The API has been designed with modern tools like Rollup and Webpack in mind.
+By providing functionality as individual functions, code bundlers can produce smaller bundles by including only the functions your application uses.
 
 The project includes type definitions so you can enjoy static type-checking and intelligent code completion in editors like VS Code and [CodeSandbox](https://codesandbox.io).
+
+## Supported Environments
+
+The following environments are tested in CI and will continue to be supported until the next breaking version:
+
+<table width="100%">
+<tr>
+<td align="center"><img src="website/static/img/browsers/node.webp" alt="" width="64" height="64"><br> Node 7.6</td>
+<td align="center"><img src="website/static/img/browsers/chrome.png" alt="" width="64" height="64"><br> Chrome 66</td>
+<td align="center"><img src="website/static/img/browsers/edge.png" alt="" width="64" height="64"><br> Edge 17</td>
+<td align="center"><img src="website/static/img/browsers/firefox.png" alt="" width="64" height="64"><br> Firefox 60</td>
+<td align="center"><img src="website/static/img/browsers/safari.png" alt="" width="64" height="64"><br> Safari 11</td>
+<td align="center"><img src="website/static/img/browsers/android.svg" alt="" width="64" height="64"><br> Android 7.1</td>
+<td align="center"><img src="website/static/img/browsers/ios.svg" alt="" width="64" height="64"><br> iOS 11.2</td>
+</tr>
+</table>
 
 ## 1.0 Release Plans
 
 The 1.0 release is planned to coincide with the stable release of the new Chromium-based [Micorosoft Edge](https://blogs.windows.com/msedgedev/2019/11/04/edge-chromium-release-candidate-get-ready/#QU89TOA8e8dE8Hev.97) in January 2020, so that we can drop support for the old Edge browser.
+*Update: The new Edge browser is out, so I'm working on getting 1.0 out now.*
 
 At the time of writing, the following breaking changes are planned:
 
 1. The supported browser versions will be bumped.
-2. The `checkout` command will be removed, and the safer and faster `fastCheckout` command renamed to `checkout`.
-3. The `walkBeta1` command will be removed, and the `walkBeta2` command renamed to `walk`.
-4. The deprecated commands `sign`, `utils.auth`, and `utils.oauth2` will be removed.
-5. Support for the deprecated `fs` function argument will be removed.
-6. Support for the deprecated `emitter` function argument will be removed.
-7. Support for the `signing` function argument of `log` will be removed, and `log` will simply always return a payload. The `payload` property will be renamed to `gpgmsg` so its purpose is more obvious. (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
+2. Commands that will be renamed:
+   1. The `checkout` command will be replaced with the implementation used in the safer and faster `fastCheckout` command and `fastCheckout` will be removed.
+   2. The `walkBeta2` command renamed to `walk`, and the `walkBeta1` command will be removed.
+3. Deprecated commands and function arguments will be removed:
+   1. The commands `sign`, `utils.auth`, and `utils.oauth2` will be removed.
+   2. The `fs` and `emitter` function arguments will be removed.
+   3. The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
+   4. The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. The `payload` property will be renamed to `gpgmsg` so its purpose is more obvious. (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
+4. Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
+5. The `pattern` and globbing options will be removed so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `matcher` function instead.
 
 ## Getting Started
 
