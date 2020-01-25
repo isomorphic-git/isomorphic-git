@@ -232,7 +232,7 @@ if (!fs.existsSync(docDir)) {
 
 const gitignorePath = path.join(__dirname, '..', '..', '.gitignore')
 let gitignoreContent = fs.readFileSync(gitignorePath, 'utf8')
-let idx = gitignoreContent.indexOf(
+const idx = gitignoreContent.indexOf(
   '# AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE'
 )
 gitignoreContent = gitignoreContent.slice(0, idx)
