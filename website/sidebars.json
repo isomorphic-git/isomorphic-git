@@ -1,0 +1,114 @@
+{
+  "docs": {
+    "All Commands": [
+      "alphabetic",
+      "errors"
+    ],
+    "Repository": [
+      "init",
+      "clone",
+      "commit",
+      "log",
+      "config",
+      "fetch",
+      "checkout",
+      "fastCheckout",
+      "push",
+      "pull",
+      "merge",
+      "verify"
+    ],
+    "Files": [
+      "add",
+      "remove",
+      "listFiles",
+      "status"
+    ],
+    "Branches": [
+      "currentBranch",
+      "branch",
+      "deleteBranch",
+      "listBranches"
+    ],
+    "Tags": [
+      "tag",
+      "annotatedTag",
+      "deleteTag",
+      "listTags"
+    ],
+    "Remotes": [
+      "getRemoteInfo",
+      "addRemote",
+      "deleteRemote",
+      "listRemotes"
+    ],
+    "Notes": [
+      "addNote",
+      "readNote",
+      "removeNote",
+      "listNotes"
+    ],
+    "Walking": [
+      "walkBeta2",
+      "WORKDIR",
+      "STAGE",
+      "TREE"
+    ],
+    "Plugins": [
+      "plugin_credentialManager",
+      "plugin_emitter",
+      "plugin_fs",
+      "plugin_http",
+      "plugin_pgp"
+    ],
+    "Raw Objects": [
+      "readBlob",
+      "readCommit",
+      "readTag",
+      "readTree",
+      "writeBlob",
+      "writeCommit",
+      "writeTag",
+      "writeTree"
+    ],
+    "Plumbing Commands": [
+      "findRoot",
+      "expandRef",
+      "expandOid",
+      "resetIndex",
+      "resolveRef",
+      "writeRef",
+      "deleteRef",
+      "hashBlob",
+      "statusMatrix",
+      "isDescendent",
+      "indexPack",
+      "packObjects"
+    ],
+    "Misc Commands": [
+      "version"
+    ],
+    "Deprecated Commands": [
+      "utils_auth",
+      "utils_oauth2",
+      "sign",
+      "readObject",
+      "writeObject"
+    ]
+  },
+  "guide": {
+    "Getting Started": [
+      "quickstart",
+      "browser",
+      "fs",
+      "authentication",
+      "cli",
+      "dir-vs-gitdir"
+    ],
+    "More": [
+      "faq",
+      "snippets",
+      "webworker"
+    ]
+  }
+}
