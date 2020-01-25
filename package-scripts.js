@@ -81,9 +81,10 @@ module.exports = {
         'website.publish'
       ),
       build: '(cd website && npm install && npm run build)',
-      version: pkg.version === '0.0.0-development'
-        ? 'echo "Not a new version"'
-        : `(cd website && npm run create-version ${pkg.version})`,
+      version:
+        pkg.version === '0.0.0-development'
+          ? 'echo "Not a new version"'
+          : `(cd website && npm run create-version ${pkg.version})`,
       publish: '(cd website && node ./scripts/deploy-gh-pages.js)'
     },
     // ATTENTION:
