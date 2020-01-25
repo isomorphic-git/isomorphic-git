@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="website/static/img/isomorphic-git-logo.svg" alt="" height="150"/>
+  <img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/isomorphic-git-logo.svg?sanitize=true" alt="" height="150"/>
 </p>
 
 # isomorphic-git
@@ -22,13 +22,13 @@ The following environments are tested in CI and will continue to be supported un
 
 <table width="100%">
 <tr>
-<td align="center"><img src="website/static/img/browsers/node.webp" alt="" width="64" height="64"><br> Node 7.6</td>
-<td align="center"><img src="website/static/img/browsers/chrome.png" alt="" width="64" height="64"><br> Chrome 66</td>
-<td align="center"><img src="website/static/img/browsers/edge.png" alt="" width="64" height="64"><br> Edge 17</td>
-<td align="center"><img src="website/static/img/browsers/firefox.png" alt="" width="64" height="64"><br> Firefox 60</td>
-<td align="center"><img src="website/static/img/browsers/safari.png" alt="" width="64" height="64"><br> Safari 11</td>
-<td align="center"><img src="website/static/img/browsers/android.svg" alt="" width="64" height="64"><br> Android 7.1</td>
-<td align="center"><img src="website/static/img/browsers/ios.svg" alt="" width="64" height="64"><br> iOS 11.2</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/node.webp" alt="" width="64" height="64"><br> Node 7.6</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/chrome.png" alt="" width="64" height="64"><br> Chrome 66</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/edge.png" alt="" width="64" height="64"><br> Edge 17</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/firefox.png" alt="" width="64" height="64"><br> Firefox 60</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/safari.png" alt="" width="64" height="64"><br> Safari 11</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/android.svg?sanitize=true" alt="" width="64" height="64"><br> Android 7.1</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/ios.svg?sanitize=true" alt="" width="64" height="64"><br> iOS 11.2</td>
 </tr>
 </table>
 
