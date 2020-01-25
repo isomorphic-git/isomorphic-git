@@ -1,7 +1,7 @@
 {
   "name": "isomorphic-git",
   "version": "0.0.0-development",
-  "description": "A pure JavaScript implementation of git for node and browsers!",
+  "description": "A pure JavaScript reimplementation of git for node and browsers",
   "typings": "./src/index.d.ts",
   "main": "dist/for-node/isomorphic-git/index.js",
   "browser": {
