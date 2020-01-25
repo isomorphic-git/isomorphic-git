@@ -121,7 +121,7 @@
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
     "typescript": "3.7.4",
-    "webpack": "4.39.2",
+    "webpack": "4.41.5",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.7"
   },
