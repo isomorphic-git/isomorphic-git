@@ -23,6 +23,7 @@
     "format": "nps format",
     "build": "nps build",
     "test": "nps test",
+    "publish-website": "nps website",
     "prepublishOnly": "nps prepublish",
     "semantic-release": "semantic-release",
     "add-contributor": "nps contributors.add"
