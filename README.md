@@ -11,8 +11,8 @@
 Isomorphic-git aims for 100% interoperability with the canonical git implementation. This means it does all its operations by modifying files in a ".git" directory just like the git you are used to. The included `isogit` CLI can operate on git repositories on your desktop or server.
 
 This library aims to be a complete solution with no assembly required.
-I've tried carefully to design the API so it is easy to use all the features, without paying a penalty in bundle size.
-By providing functionality as separate functions instead of an object oriented API, code bundlers like Webpack will only include the functionality your application actually uses. (Or at least that's the goal.)
+The API has been designed with modern tools like Rollup and Webpack in mind.
+By providing functionality as individual functions, code bundlers can produce smaller bundles by including only the functions your application uses.
 
 The project includes type definitions so you can enjoy static type-checking and intelligent code completion in editors like VS Code and [CodeSandbox](https://codesandbox.io).
 
