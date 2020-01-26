@@ -134,6 +134,14 @@ module.exports = function (config) {
         browserName: 'Chrome',
         appiumVersion: '1.15.0'
       },
+      bs_android_chrome: {
+        base: 'BrowserStack',
+        os: 'android',
+        os_version: '10.0',
+        browser: 'android',
+        device: 'Google Pixel 4',
+        real_mobile: true
+      },
       FirefoxHeadless: {
         base: 'Firefox',
         flags: ['-headless']
@@ -205,6 +213,7 @@ module.exports = function (config) {
       }
     },
     plugins: [
+      'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-edge-launcher',
       'karma-ie-launcher',

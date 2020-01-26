@@ -33,7 +33,7 @@ jobs:
       SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
       SAUCE_USERNAME: $(SAUCE_USERNAME)
       # TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_ios_safari,sl_safari,sl_android_chrome'
-      TEST_BROWSERS: 'sl_android_chrome10,sl_android_chrome9,sl_android_chrome81,sl_android_chrome80,sl_android_chrome'
+      TEST_BROWSERS: 'bs_android_chrome'
 
   - task: PublishTestResults@2
     displayName: 'Save test results'
