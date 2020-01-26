@@ -249,12 +249,12 @@ function gendoc (file, filepath) {
     if (entry.type !== 'blob') continue
     if (entry.path.startsWith('_')) continue
     // Load file
-    let { blob } = await git.readBlob({
+    const { blob } = await git.readBlob({
       dir,
       oid,
       filepath: `src/commands/${entry.path}`
     })
-    let filetext = blob.toString('utf8')
+    const filetext = blob.toString('utf8')
     const doctext = gendoc(filetext, entry.path)
     if (doctext !== '') {
       const docfilename = entry.path.replace(/js$/, 'md')
@@ -269,7 +269,7 @@ function gendoc (file, filepath) {
   const thisFile = path.relative(dir, __filename)
 
   const docFile = path.join(__dirname, '..', '..', 'docs', 'errors.md')
-  let { blob } = await git.readBlob({
+  const { blob } = await git.readBlob({
     dir,
     oid,
     filepath: 'src/models/GitError.js'
