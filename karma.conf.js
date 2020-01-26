@@ -88,8 +88,45 @@ module.exports = function (config) {
         browserName: 'Safari',
         appiumVersion: '1.15.0'
       },
+      sl_android_chrome10: {
+        base: 'SauceLabs',
+        deviceOrientation: 'portrait',
+        deviceName: 'Android GoogleAPI Emulator',
+        platformName: 'Android',
+        platformVersion: '10.0',
+        browserName: 'Chrome',
+        appiumVersion: '1.15.0'
+      },
+      sl_android_chrome9: {
+        base: 'SauceLabs',
+        deviceOrientation: 'portrait',
+        deviceName: 'Android GoogleAPI Emulator',
+        platformName: 'Android',
+        platformVersion: '9.0',
+        browserName: 'Chrome',
+        appiumVersion: '1.15.0'
+      },
+      sl_android_chrome81: {
+        base: 'SauceLabs',
+        deviceOrientation: 'portrait',
+        deviceName: 'Android GoogleAPI Emulator',
+        platformName: 'Android',
+        platformVersion: '8.1',
+        browserName: 'Chrome',
+        appiumVersion: '1.15.0'
+      },
+      sl_android_chrome80: {
+        base: 'SauceLabs',
+        deviceOrientation: 'portrait',
+        deviceName: 'Android GoogleAPI Emulator',
+        platformName: 'Android',
+        platformVersion: '8.0',
+        browserName: 'Chrome',
+        appiumVersion: '1.15.0'
+      },
       sl_android_chrome: {
         base: 'SauceLabs',
+        deviceOrientation: 'portrait',
         deviceName: 'Android GoogleAPI Emulator',
         platformName: 'Android',
         platformVersion: '7.1',
