@@ -24,6 +24,9 @@ jobs:
     displayName: 'Install dependencies'
     condition: ne(variables['CacheRestored'], 'true')
 
+  - script: sudo echo 'lh  127.0.0.1' >> /etc/hosts
+    displayName: 'Modify /etc/hosts for SauceLabs'
+
   - script: npm test
     displayName: 'Run tests'
     env:

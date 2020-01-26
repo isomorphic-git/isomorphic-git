@@ -50,6 +50,7 @@ module.exports = function (config) {
     },
     // web server port
     port: 9876,
+    hostname: process.env.CI ? 'lh' : void 0,
     // enable / disable colors in the output (reporters and logs)
     colors: true,
     // Increase timeouts since some actions take quite a while.
@@ -147,6 +148,7 @@ module.exports = function (config) {
       }
     },
     sauceLabs: {
+      tunnelDomains: ['lh'],
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
       testName: `${REPO} / ${ISSUE} / ${COMMIT}`,
       // Note: I added the Date.now() bit so that when I can click "Restart" on a Travis job,
