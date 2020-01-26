@@ -76,15 +76,17 @@ module.exports = {
     },
     website: {
       default: series.nps(
-        'website.build',
+        'website.install',
         'website.version',
+        'website.build',
         'website.publish'
       ),
-      build: '(cd website && npm install && npm run build)',
+      install: `(cd website && npm install)`,
       version:
         pkg.version === '0.0.0-development'
           ? 'echo "Not a new version"'
           : `(cd website && npm run create-version ${pkg.version})`,
+      build: '(cd website && npm run build)',
       publish: '(cd website && node ./scripts/deploy-gh-pages.js)'
     },
     // ATTENTION:
