@@ -72,6 +72,14 @@ module.exports = {
         )
         : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)
     },
+    website: {
+      default: series.nps(
+        'website.build',
+        'website.publish'
+      ),
+      build: '(cd website && npm install && npm run build)',
+      publish: '(cd website && node ./scripts/deploy-gh-pages.js)'
+    },
     // ATTENTION:
     // LIST OF SAFE PORTS FOR SAUCE LABS (Edge and Safari) https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy+FAQS#SauceConnectProxyFAQS-CanIAccessApplicationsonlocalhost?
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
@@ -95,6 +103,7 @@ module.exports = {
           'lint.js',
           'build',
           'lint.typescript',
+          'build.docs',
           'test.setup',
           'test.one',
           'test.karma',
