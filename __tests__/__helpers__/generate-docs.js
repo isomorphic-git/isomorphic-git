@@ -2,6 +2,12 @@ const jsdoc = require('jsdoc-api')
 const fs = require('fs')
 const path = require('path')
 const table = require('markdown-table')
+const git = require('../../dist/for-node/isomorphic-git/index.js')
+
+git.plugins.set('fs', fs)
+
+const dir = path.join(__dirname, '..', '..')
+const ref = process.argv[2] || 'HEAD'
 
 function cleanType (type) {
   return type.replace(/\.</g, '<')
@@ -89,10 +95,7 @@ function gentypedef (ast) {
   typedefs.set(ast.name, text)
 }
 
-function gendoc (filepath) {
-  // Load file
-  let file = fs.readFileSync(filepath, 'utf8')
-
+function gendoc (file, filepath) {
   // Fix some TypeScript-isms that jsdoc doesn't like
   file = file.replace(/\{import\('events'\)\.EventEmitter\}/g, '{EventEmitter}')
   let ast
@@ -225,6 +228,8 @@ function gendoc (filepath) {
   return text
 }
 
+;(async () => {
+
 const docDir = path.join(__dirname, '..', '..', 'docs')
 if (!fs.existsSync(docDir)) {
   fs.mkdirSync(docDir)
@@ -239,13 +244,17 @@ gitignoreContent = gitignoreContent.slice(0, idx)
 gitignoreContent += '# AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE\n'
 gitignoreContent += 'docs/errors.md\n'
 
-const commandDir = path.join(__dirname, '..', '..', 'src', 'commands')
-const files = fs.readdirSync(commandDir)
-for (const filename of files) {
-  if (filename.startsWith('_')) continue
-  const doctext = gendoc(path.join(commandDir, filename))
+const oid = await git.resolveRef({ dir, ref })
+const { tree } = await git.readTree({ dir, oid, filepath: 'src/commands' })
+for (const entry of tree) {
+  if (entry.type !== 'blob') continue
+  if (entry.path.startsWith('_')) continue
+  // Load file
+  let { blob } = await git.readBlob({ dir, oid, filepath: `src/commands/${entry.path}` })
+  let filetext = blob.toString('utf8')
+  const doctext = gendoc(filetext, entry.path)
   if (doctext !== '') {
-    const docfilename = filename.replace(/js$/, 'md')
+    const docfilename = entry.path.replace(/js$/, 'md')
     fs.writeFileSync(path.join(docDir, docfilename), doctext)
     gitignoreContent += `docs/${docfilename}\n`
   }
@@ -254,19 +263,11 @@ fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8')
 
 // Generate errors.md
 const { E } = require('../..')
-const errorFile = path.join(__dirname, '..', '..', 'src', 'errors.d.ts')
-const thisFile = path.relative(path.dirname(errorFile), __filename)
+const thisFile = path.relative(dir, __filename)
 
 const docFile = path.join(__dirname, '..', '..', 'docs', 'errors.md')
-const sourceFile = path.join(
-  __dirname,
-  '..',
-  '..',
-  'src',
-  'models',
-  'GitError.js'
-)
-const sourceCode = fs.readFileSync(sourceFile, 'utf8')
+let { blob } = await git.readBlob({ dir, oid, filepath: 'src/models/GitError.js' })
+const sourceCode = blob.toString('utf8')
 
 let contents = `---
 title: Error Codes
@@ -294,3 +295,5 @@ for (const key of keys) {
 }
 
 fs.writeFileSync(docFile, contents)
+
+})()
