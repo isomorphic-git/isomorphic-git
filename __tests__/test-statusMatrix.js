@@ -94,7 +94,11 @@ describe('statusMatrix', () => {
     // Setup
     const { dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
     // Test
-    let matrix = await statusMatrix({ dir, gitdir, filter: filepath => !filepath.includes('/') && filepath.endsWith('.txt') })
+    let matrix = await statusMatrix({
+      dir,
+      gitdir,
+      filter: filepath => !filepath.includes('/') && filepath.endsWith('.txt')
+    })
     expect(matrix).toEqual([
       ['a.txt', 1, 1, 1],
       ['b.txt', 1, 2, 1],
