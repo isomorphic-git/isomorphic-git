@@ -40,16 +40,17 @@ The 1.0 release is planned to coincide with the stable release of the new Chromi
 At the time of writing, the following breaking changes are planned:
 
 - [x] The supported browser versions will be bumped.
-- [ ] Commands that will be renamed:
-  - [ ] The `checkout` command will be replaced with the implementation used in the safer and faster `fastCheckout` command and `fastCheckout` will be removed.
+- [x] Commands that will be renamed:
+  - [x] The `checkout` command will be replaced with the implementation used in the safer and faster `fastCheckout` command and `fastCheckout` will be removed.
   - [x] The `walkBeta2` command renamed to `walk`, and the `walkBeta1` command will be removed.
 - [ ] Deprecated commands and function arguments will be removed:
   - [ ] The commands `sign`, `utils.auth`, and `utils.oauth2` will be removed.
   - [ ] The `fs` and `emitter` function arguments will be removed.
-  - [ ] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
+  - [x] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
   - [ ] The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. The `payload` property will be renamed to `gpgmsg` so its purpose is more obvious. (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
 - [ ] Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
 - [ ] The `pattern` and globbing options will be removed so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `matcher` function instead.
+- [ ] The `autoTranslateSSH` feature will be removed, since it's trivial to implement using just the `UnknownTransportError.data.suggestion`
 
 ## Getting Started
 
@@ -174,7 +175,6 @@ unless there is a major version bump.
 - [deleteTag](https://isomorphic-git.github.io/docs/deleteTag.html)
 - [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
 - [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
-- [fastCheckout](https://isomorphic-git.github.io/docs/fastCheckout.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)

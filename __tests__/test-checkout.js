@@ -4,7 +4,14 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const snapshots = require('./__snapshots__/test-checkout.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { checkout, listFiles, add, commit, branch } = require('isomorphic-git')
+const {
+  E,
+  checkout,
+  listFiles,
+  add,
+  commit,
+  branch
+} = require('isomorphic-git')
 
 describe('checkout', () => {
   beforeAll(() => {
@@ -104,26 +111,31 @@ describe('checkout', () => {
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
 
-  it('checkout using pattern', async () => {
+  it('checkout changing file permissions', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await branch({ dir, gitdir, ref: 'other', checkout: true })
-    await checkout({ dir, gitdir, ref: 'test-branch' })
-    await fs.write(dir + '/regular-file.txt', 'regular file')
-    await fs.write(dir + '/executable-file.sh', 'executable file')
-    await add({ dir, gitdir, filepath: 'regular-file.txt' })
-    await add({ dir, gitdir, filepath: 'executable-file.sh' })
-    await commit({
-      dir,
-      gitdir,
-      author: { name: 'Git', email: 'git@example.org' },
-      message: 'add files'
+
+    await fs.write(dir + '/regular-file.txt', 'regular file', {
+      mode: 0o666
     })
-    await checkout({ dir, gitdir, ref: 'other' })
-    await checkout({ dir, gitdir, ref: 'test-branch', pattern: '*.txt' })
-    const files = await fs.readdir(dir)
-    expect(files).toContain('regular-file.txt')
-    expect(files).not.toContain('executable-file.sh')
+    await fs.write(dir + '/executable-file.sh', 'executable file', {
+      mode: 0o777
+    })
+    const { mode: expectedRegularFileMode } = await fs.lstat(
+      dir + '/regular-file.txt'
+    )
+    const { mode: expectedExecutableFileMode } = await fs.lstat(
+      dir + '/executable-file.sh'
+    )
+
+    // Test
+    await checkout({ dir, gitdir, ref: 'regular-file' })
+    const { mode: actualRegularFileMode } = await fs.lstat(dir + '/hello.sh')
+    expect(actualRegularFileMode).toEqual(expectedRegularFileMode)
+
+    await checkout({ dir, gitdir, ref: 'executable-file' })
+    const { mode: actualExecutableFileMode } = await fs.lstat(dir + '/hello.sh')
+    expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
 
   it('checkout directories using filepaths', async () => {
@@ -156,36 +168,89 @@ describe('checkout', () => {
     expect(index).toMatchSnapshot()
   })
 
-  it('checkout files using filepaths and pattern', async () => {
+  it('checkout detects conflicts', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({
-      dir,
-      gitdir,
-      ref: 'test-branch',
-      filepaths: ['src/utils', 'test'],
-      pattern: 'r*'
-    })
-    const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
-    expect(index).toMatchSnapshot()
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      await checkout({
+        dir,
+        gitdir,
+        ref: 'test-branch'
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(E.CheckoutConflictError)
+    expect(error.data.filepaths).toEqual(['README.md'])
   })
 
-  it('checkout files using filepaths and deep pattern', async () => {
+  it('checkout files ignoring conflicts dry run', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      await checkout({
+        dir,
+        gitdir,
+        ref: 'test-branch',
+        force: true,
+        dryRun: true
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeNull()
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).toBe('Hello world')
+  })
+
+  it('checkout files ignoring conflicts', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      await checkout({
+        dir,
+        gitdir,
+        ref: 'test-branch',
+        force: true
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeNull()
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('Hello world')
+  })
+
+  it('restore files to HEAD state by not providing a ref', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
       dir,
       gitdir,
-      ref: 'test-branch',
-      filepaths: ['src/utils', 'test'],
-      pattern: 'snapshots/r*'
+      ref: 'test-branch'
     })
-    const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
-    expect(index).toMatchSnapshot()
+    await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
+    // Test
+    let error = null
+    try {
+      await checkout({
+        dir,
+        gitdir,
+        force: true
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeNull()
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('Hello world')
   })
 
   it('checkout files should not delete other files', async () => {

@@ -183,34 +183,6 @@ Array [
 ]
 `;
 
-exports[`checkout checkout files using filepaths and deep pattern 1`] = `
-Array [
-  "test",
-]
-`;
-
-exports[`checkout checkout files using filepaths and deep pattern 2`] = `
-Array [
-  "test/snapshots/resolveRef.js.md",
-  "test/snapshots/resolveRef.js.snap",
-]
-`;
-
-exports[`checkout checkout files using filepaths and pattern 1`] = `
-Array [
-  "src",
-  "test",
-]
-`;
-
-exports[`checkout checkout files using filepaths and pattern 2`] = `
-Array [
-  "src/utils/read.js",
-  "src/utils/resolveRef.js",
-  "test/resolveRef.js",
-]
-`;
-
 exports[`checkout checkout unfetched branch 1`] = `
 Object {
   "caller": "git.checkout",
