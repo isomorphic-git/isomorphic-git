@@ -27,7 +27,10 @@ describe('commit', () => {
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // updates branch pointer
-    const { oid: currentOid, parent } = (await log({ gitdir, depth: 1 }))[0]
+    const {
+      oid: currentOid,
+      commit: { parent }
+    } = (await log({ gitdir, depth: 1 }))[0]
     expect(parent).toEqual([originalOid])
     expect(currentOid).not.toEqual(originalOid)
     expect(currentOid).toEqual(sha)
@@ -149,7 +152,7 @@ describe('commit', () => {
     const { parent: parents, tree: _tree } = (await log({
       gitdir,
       depth: 1
-    }))[0]
+    }))[0].commit
     expect(parents).not.toEqual([originalOid])
     expect(parents).toEqual(parent)
     expect(_tree).toEqual(tree)
@@ -297,7 +300,7 @@ describe('commit', () => {
       message: '-0 offset'
     })
     commits = await log({ gitdir, depth: 1 })
-    expect(Object.is(commits[0].author.timezoneOffset, -0)).toBeTruthy()
+    expect(Object.is(commits[0].commit.author.timezoneOffset, -0)).toBeTruthy()
 
     await commit({
       gitdir,
@@ -310,7 +313,7 @@ describe('commit', () => {
       message: '+0 offset'
     })
     commits = await log({ gitdir, depth: 1 })
-    expect(Object.is(commits[0].author.timezoneOffset, 0)).toBeTruthy()
+    expect(Object.is(commits[0].commit.author.timezoneOffset, 0)).toBeTruthy()
 
     await commit({
       gitdir,
@@ -323,7 +326,7 @@ describe('commit', () => {
       message: '+240 offset'
     })
     commits = await log({ gitdir, depth: 1 })
-    expect(Object.is(commits[0].author.timezoneOffset, 240)).toBeTruthy()
+    expect(Object.is(commits[0].commit.author.timezoneOffset, 240)).toBeTruthy()
 
     await commit({
       gitdir,
@@ -336,6 +339,8 @@ describe('commit', () => {
       message: '-240 offset'
     })
     commits = await log({ gitdir, depth: 1 })
-    expect(Object.is(commits[0].author.timezoneOffset, -240)).toBeTruthy()
+    expect(
+      Object.is(commits[0].commit.author.timezoneOffset, -240)
+    ).toBeTruthy()
   })
 })
