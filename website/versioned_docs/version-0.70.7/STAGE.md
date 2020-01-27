@@ -11,7 +11,7 @@ Get a git index Walker
 | ------ | ---------------- | ---------------------------- |
 | return | Walker           | Returns a git index `Walker` |
 
-See [walkBeta2](walkBeta2)
+See [walkBeta2](./walkBeta2.md)
 
 <script>
 (function rewriteEditLink() {

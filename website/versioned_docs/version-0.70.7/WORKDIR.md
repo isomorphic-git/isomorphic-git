@@ -11,7 +11,7 @@ Get a working directory `Walker`
 | ------ | ---------------- | ---------------------------------- |
 | return | Walker           | Returns a working directory Walker |
 
-See [walkBeta2](walkBeta2)
+See [walkBeta2](./walkBeta2.md)
 
 <script>
 (function rewriteEditLink() {

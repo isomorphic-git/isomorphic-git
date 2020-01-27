@@ -12,7 +12,7 @@ Get a git commit `Walker`
 | ref    | string = 'HEAD'  | The commit to walk          |
 | return | Walker           | Returns a git commit Walker |
 
-See [walkBeta2](walkBeta2)
+See [walkBeta2](./walkBeta2.md)
 
 <script>
 (function rewriteEditLink() {
