@@ -98,7 +98,7 @@ describe('fetch', () => {
   })
 
   it('the SSH -> HTTPS UnknownTransportError suggestion feature', async () => {
-    const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    const { gitdir } = await makeFixture('test-fetch-cors')
     await config({
       gitdir,
       path: 'http.corsProxy',
