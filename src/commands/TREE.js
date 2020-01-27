@@ -19,9 +19,7 @@ import { GitWalkSymbol } from '../utils/symbols.js'
  * @returns {Walker} Returns a git commit Walker
  *
  */
-export function TREE ({
-  ref = 'HEAD'
-}) {
+export function TREE ({ ref = 'HEAD' }) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkSymbol, {
     value: function ({ fs, gitdir }) {
