@@ -26,9 +26,6 @@ const schema = {
     symlinks: bool,
     ignorecase: bool,
     bigFileThreshold: num
-  },
-  'isomorphic-git': {
-    autoTranslateSSH: bool
   }
 }
 

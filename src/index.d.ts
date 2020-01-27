@@ -399,7 +399,6 @@ export function clone(args: WorkDir & GitDir & {
   noGitSuffix?: boolean;
   noTags?: boolean;
   headers?: { [key: string]: string };
-  autoTranslateSSH?: boolean;
 }): Promise<void>;
 
 export function commit(args: GitDir & {
@@ -501,7 +500,6 @@ export function fetch(args: GitDir & {
   prune?: boolean;
   pruneTags?: boolean;
   headers?: { [key: string]: string };
-  autoTranslateSSH?: boolean;
 }): Promise<FetchResponse>;
 
 export function findRoot(args: {
@@ -631,7 +629,6 @@ export function pull(args: WorkDir & GitDir & {
   headers?: { [key: string]: string };
   emitter?: EventEmitter;
   emitterPrefix?: string;
-  autoTranslateSSH?: boolean;
   author?: {
     name?: string;
     email?: string;
@@ -668,7 +665,6 @@ export function push(args: GitDir & {
   headers?: { [key: string]: string };
   emitter?: EventEmitter;
   emitterPrefix?: string;
-  autoTranslateSSH?: boolean;
 }): Promise<PushResponse>;
 
 export function readBlob(args: GitDir & {
