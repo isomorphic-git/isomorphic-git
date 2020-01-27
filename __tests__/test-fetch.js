@@ -277,13 +277,7 @@ describe('fetch', () => {
     )
   })
 
-  // XXX: After a PROLONGED and tiring battle... I don't know why the eff the pruneTags
-  // parameter is causing Mobile Safari 11 tests to crash / disconnect.
-  // So... I'm just gonna consider it a fluke.
-  // TODO: Remove this check when we drop support for Safari 11.
-  ;(typeof navigator !== 'undefined' && navigator.userAgent.match(/iPhone/)
-    ? xit
-    : it)('fetch --prune-tags from git-http-mock-server', async () => {
+  it('fetch --prune-tags from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
     await config({
       gitdir,
