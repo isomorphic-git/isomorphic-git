@@ -18,7 +18,6 @@ const versions = require(`${CWD}/versions.json`);
 function Versions(props) {
   const {config: siteConfig} = props;
   const latestVersion = versions[0];
-  const repoUrl = `https://github.com/${siteConfig.organizationName}/${siteConfig.projectName}`;
   return (
     <div className="docMainWrapper wrapper">
       <Container className="mainContainer versionsContainer">
@@ -84,11 +83,6 @@ function Versions(props) {
                             props.language ? props.language + '/' : ''
                           }${version}/alphabetic`}>
                           Documentation
-                        </a>
-                      </td>
-                      <td>
-                        <a href={`${repoUrl}/releases/tag/v${version}`}>
-                          Release Notes
                         </a>
                       </td>
                     </tr>
