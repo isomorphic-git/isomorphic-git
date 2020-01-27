@@ -1,12 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const {
-  clone,
-  checkout,
-  listFiles,
-  commit
-} = require('isomorphic-git')
+const { clone, checkout, listFiles, commit } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =

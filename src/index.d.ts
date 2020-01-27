@@ -796,7 +796,7 @@ export function statusMatrix(args: WorkDir & GitDir & {
   fs?: any;
   ref?: string;
   filepaths?: string[];
-  pattern?: string;
+  filter?: (filepath: string) => boolean;
   noSubmodules?: boolean;
 }): Promise<StatusMatrix>;
 
