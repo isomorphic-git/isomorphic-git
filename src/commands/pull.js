@@ -7,7 +7,6 @@ import { cores } from '../utils/plugins.js'
 import { checkout } from './checkout'
 import { config } from './config'
 import { currentBranch } from './currentBranch'
-import { fastCheckout } from './fastCheckout.js'
 import { fetch } from './fetch'
 import { merge } from './merge'
 
@@ -37,7 +36,6 @@ import { merge } from './merge'
  * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
  * @param {boolean} [args.autoTranslateSSH] - Attempt to automatically translate SSH remotes into HTTP equivalents
- * @param {boolean} [args.fast = false] - use fastCheckout instead of regular checkout
  * @param {boolean} [args.noSubmodules = false] - If true, will not print out an error about missing submodules support. TODO: Skip checkout out submodules when supported instead.
  * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  *
@@ -77,7 +75,6 @@ export async function pull ({
   committer,
   signingKey,
   autoTranslateSSH = false,
-  fast = false,
   noSubmodules = false,
   newSubmoduleBehavior = false
 }) {
@@ -123,29 +120,16 @@ export async function pull ({
       committer,
       signingKey
     })
-    if (fast) {
-      await fastCheckout({
-        dir,
-        gitdir,
-        fs,
-        ref,
-        emitter,
-        emitterPrefix,
-        noSubmodules,
-        newSubmoduleBehavior
-      })
-    } else {
-      await checkout({
-        dir,
-        gitdir,
-        fs,
-        ref,
-        emitter,
-        emitterPrefix,
-        noSubmodules,
-        newSubmoduleBehavior
-      })
-    }
+    await checkout({
+      dir,
+      gitdir,
+      fs,
+      ref,
+      emitter,
+      emitterPrefix,
+      noSubmodules,
+      newSubmoduleBehavior
+    })
   } catch (err) {
     err.caller = 'git.pull'
     throw err
