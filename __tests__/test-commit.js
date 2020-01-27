@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 // @ts-ignore
 const snapshots = require('./__snapshots__/test-commit.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { plugins, commit, sign, verify, log } = require('isomorphic-git')
+const { plugins, commit, verify, log } = require('isomorphic-git')
 
 describe('commit', () => {
   beforeAll(() => {
@@ -217,67 +217,6 @@ describe('commit', () => {
     })
     const keys = await verify({
       gitdir,
-      ref: 'HEAD',
-      publicKeys: publicKey
-    })
-    expect(keys[0]).toBe('f2f0ced8a52613c4')
-  })
-
-  it('pgp plugin signing - backwards compatiblity', async () => {
-    // Setup
-    const { pgp } = require('@isomorphic-git/pgp-plugin')
-    const { gitdir } = await makeFixture('test-commit')
-    plugins.set('pgp', pgp)
-    // Test
-    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
-    await commit({
-      gitdir,
-      message: 'Initial commit',
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1504842425,
-        timezoneOffset: 0
-      }
-    })
-    await sign({
-      gitdir,
-      privateKeys: privateKey
-    })
-    const keys = await verify({
-      gitdir,
-      ref: 'HEAD',
-      publicKeys: publicKey
-    })
-    expect(keys[0]).toBe('f2f0ced8a52613c4')
-  })
-
-  it('GPG signing (deprecated API)', async () => {
-    // Setup
-    const openpgp = require('openpgp/dist/openpgp.min.js')
-    const { gitdir } = await makeFixture('test-commit')
-    // Test
-    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
-    await commit({
-      gitdir,
-      message: 'Initial commit',
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1504842425,
-        timezoneOffset: 0
-      }
-    })
-    await sign({
-      gitdir,
-      // @ts-ignore
-      openpgp,
-      privateKeys: privateKey
-    })
-    const keys = await verify({
-      gitdir,
-      // @ts-ignore
-      openpgp,
       ref: 'HEAD',
       publicKeys: publicKey
     })

@@ -52,7 +52,6 @@ Array [
   "removeNote",
   "resetIndex",
   "resolveRef",
-  "sign",
   "status",
   "statusMatrix",
   "tag",
