@@ -1,10 +1,7 @@
 // @ts-check
-import globrex from 'globrex'
-
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { patternRoot } from '../utils/patternRoot.js'
 import { cores } from '../utils/plugins.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
@@ -140,7 +137,7 @@ import { walk } from './walk.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref = 'HEAD'] - Optionally specify a different commit to compare against the workdir and stage instead of the HEAD
  * @param {string[]} [args.filepaths = ['.']] - Limit the query to the given files and directories
- * @param {string} [args.pattern = null] - Filter the results to only those whose filepath matches a glob pattern. (Pattern is relative to `filepaths` if `filepaths` is provided.)
+ * @param {function(string): boolean} [args.filter] - Filter the results to only those whose filepath matches a function.
  * @param {boolean} [args.noSubmodules = false] - If true, will skip over submodules completely
  *
  * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
@@ -152,21 +149,11 @@ export async function statusMatrix ({
   fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
   filepaths = ['.'],
-  pattern = null,
+  filter,
   noSubmodules = false
 }) {
   try {
     const fs = new FileSystem(_fs)
-    let patternPart = ''
-    let patternGlobrex
-    if (pattern) {
-      patternPart = patternRoot(pattern)
-      if (patternPart) {
-        pattern = pattern.replace(patternPart + '/', '')
-      }
-      patternGlobrex = globrex(pattern, { globstar: true, extended: true })
-    }
-    const bases = filepaths.map(filepath => join(filepath, patternPart))
     const results = await walk({
       fs,
       dir,
@@ -186,20 +173,12 @@ export async function statusMatrix ({
           }
         }
         // match against base paths
-        if (!bases.some(base => worthWalking(filepath, base))) {
+        if (!filepaths.some(base => worthWalking(filepath, base))) {
           return null
         }
         // Late filter against file names
-        if (patternGlobrex) {
-          let match = false
-          for (const base of bases) {
-            const partToMatch = filepath.replace(base + '/', '')
-            if (patternGlobrex.regex.test(partToMatch)) {
-              match = true
-              break
-            }
-          }
-          if (!match) return
+        if (filter) {
+          if (!filter(filepath)) return
         }
 
         // For now, just bail on directories
