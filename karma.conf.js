@@ -50,7 +50,6 @@ module.exports = function (config) {
     },
     // web server port
     port: 9876,
-    hostname: process.env.CI ? 'lh' : void 0,
     // enable / disable colors in the output (reporters and logs)
     colors: true,
     // Increase timeouts since some actions take quite a while.
