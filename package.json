@@ -54,8 +54,6 @@
     "crc-32": "^1.2.0",
     "diff3": "0.0.3",
     "git-apply-delta": "0.0.7",
-    "globalyzer": "^0.1.4",
-    "globrex": "^0.1.2",
     "ignore": "^5.1.4",
     "marky": "^1.2.1",
     "minimisted": "^2.0.0",
