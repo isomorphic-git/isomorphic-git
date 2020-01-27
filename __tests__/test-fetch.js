@@ -81,7 +81,7 @@ describe('fetch', () => {
       value: `http://${localhost}:9999`
     })
     // Test
-    let err = null
+    let err
     try {
       await fetch({
         gitdir,
@@ -97,7 +97,7 @@ describe('fetch', () => {
     expect(err.code).toEqual(E.UnknownTransportError)
   })
 
-  it('shallow fetch using autoTranslateSSH param (from Github)', async () => {
+  it('the SSH -> HTTPS UnknownTransportError suggestion feature', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
     await config({
       gitdir,
@@ -105,42 +105,21 @@ describe('fetch', () => {
       value: `http://${localhost}:9999`
     })
     // Test
-    await fetch({
-      gitdir,
-      depth: 1,
-      singleBranch: true,
-      remote: 'ssh',
-      ref: 'test-branch-shallow-clone',
-      autoTranslateSSH: true
-    })
-    expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
-    const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
-    expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
-  })
-
-  it('shallow fetch using autoTranslateSSH config (from Github)', async () => {
-    const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
-      gitdir,
-      path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
-    })
-    await config({
-      gitdir,
-      path: 'isomorphic-git.autoTranslateSSH',
-      value: true
-    })
-    // Test
-    await fetch({
-      gitdir,
-      depth: 1,
-      singleBranch: true,
-      remote: 'ssh',
-      ref: 'test-branch-shallow-clone'
-    })
-    expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
-    const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
-    expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
+    let err
+    try {
+      await fetch({
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        remote: 'ssh',
+        ref: 'test-branch-shallow-clone'
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err).toBeDefined()
+    expect(err.code).toBe(E.UnknownTransportError)
+    expect(err.data.suggestion).toBe('https://github.com/isomorphic-git/isomorphic-git.git')
   })
 
   it('shallow fetch since (from Github)', async () => {

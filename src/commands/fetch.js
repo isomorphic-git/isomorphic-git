@@ -17,7 +17,6 @@ import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { splitLines } from '../utils/splitLines.js'
-import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 
@@ -64,7 +63,6 @@ import { config } from './config'
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
- * @param {boolean} [args.autoTranslateSSH] - Attempt to automatically translate SSH remotes into HTTP equivalents
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
@@ -115,7 +113,6 @@ export async function fetch ({
   headers = {},
   prune = false,
   pruneTags = false,
-  autoTranslateSSH = false,
   // @ts-ignore
   onprogress // deprecated
 }) {
@@ -151,7 +148,6 @@ export async function fetch ({
       headers,
       prune,
       pruneTags,
-      autoTranslateSSH
     })
     if (response === null) {
       return {
@@ -242,8 +238,7 @@ async function fetchPackfile ({
   singleBranch,
   headers,
   prune,
-  pruneTags,
-  autoTranslateSSH
+  pruneTags
 }) {
   const fs = new FileSystem(_fs)
   // Sanity checks
@@ -261,14 +256,6 @@ async function fetchPackfile ({
       gitdir,
       path: `remote.${remote}.url`
     })
-  }
-
-  // Try to convert SSH URLs to HTTPS ones
-  if (
-    autoTranslateSSH ||
-    (await config({ fs, gitdir, path: `isomorphic-git.autoTranslateSSH` }))
-  ) {
-    url = translateSSHtoHTTP(url)
   }
 
   if (corsProxy === undefined) {
