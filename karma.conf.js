@@ -65,7 +65,7 @@ module.exports = function (config) {
         browserName: 'chrome',
         extendedDebugging: true
       },
-      sl_firefox: {
+      XXXsl_firefox: {
         base: 'SauceLabs',
         browserName: 'firefox'
       },
@@ -88,43 +88,7 @@ module.exports = function (config) {
         browserName: 'Safari',
         appiumVersion: '1.15.0'
       },
-      sl_android_chrome10: {
-        base: 'SauceLabs',
-        deviceOrientation: 'portrait',
-        deviceName: 'Android GoogleAPI Emulator',
-        platformName: 'Android',
-        platformVersion: '10.0',
-        browserName: 'Chrome',
-        appiumVersion: '1.15.0'
-      },
-      sl_android_chrome9: {
-        base: 'SauceLabs',
-        deviceOrientation: 'portrait',
-        deviceName: 'Android GoogleAPI Emulator',
-        platformName: 'Android',
-        platformVersion: '9.0',
-        browserName: 'Chrome',
-        appiumVersion: '1.15.0'
-      },
-      sl_android_chrome81: {
-        base: 'SauceLabs',
-        deviceOrientation: 'portrait',
-        deviceName: 'Android GoogleAPI Emulator',
-        platformName: 'Android',
-        platformVersion: '8.1',
-        browserName: 'Chrome',
-        appiumVersion: '1.15.0'
-      },
-      sl_android_chrome80: {
-        base: 'SauceLabs',
-        deviceOrientation: 'portrait',
-        deviceName: 'Android GoogleAPI Emulator',
-        platformName: 'Android',
-        platformVersion: '8.0',
-        browserName: 'Chrome',
-        appiumVersion: '1.15.0'
-      },
-      sl_android_chrome: {
+      XXXsl_android_chrome: {
         base: 'SauceLabs',
         deviceOrientation: 'portrait',
         deviceName: 'Android GoogleAPI Emulator',
@@ -155,10 +119,6 @@ module.exports = function (config) {
       }
     },
     sauceLabs: {
-      connectOptions: {
-        noSslBumpDomains: 'all',
-        tunnelDomains: ['lh']
-      },
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
       testName: `${REPO} / ${ISSUE} / ${COMMIT}`,
       // Note: I added the Date.now() bit so that when I can click "Restart" on a Travis job,
@@ -171,7 +131,7 @@ module.exports = function (config) {
       recordVideo: false,
       public: 'public restricted'
     },
-    concurrency: 5,
+    concurrency: 6,
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: true,

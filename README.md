@@ -27,7 +27,7 @@ The following environments are tested in CI and will continue to be supported un
 <td align="center"><img src="https://raw.githubusercontent.com/alrra/browser-logos/bc47e4601d2c1fd46a7912f9aed5cdda4afdb301/src/edge/edge.svg?sanitize=true" alt="" width="64" height="64"><br> Edge 79</td>
 <td align="center"><img src="https://raw.githubusercontent.com/alrra/browser-logos/bc47e4601d2c1fd46a7912f9aed5cdda4afdb301/src/firefox/firefox.svg?sanitize=true" alt="" width="64" height="64"><br> Firefox 72</td>
 <td align="center"><img src="https://raw.githubusercontent.com/alrra/browser-logos/bc47e4601d2c1fd46a7912f9aed5cdda4afdb301/src/safari/safari_64x64.png" alt="" width="64" height="64"><br> Safari 13</td>
-<td align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Android_logo_2019.svg" alt="" width="64" height="64"><br> Android 7.1</td>
+<td align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Android_logo_2019.svg" alt="" width="64" height="64"><br> Android 10</td>
 <td align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/IOS_13_logo.svg" alt="" width="64" height="64"><br> iOS 13</td>
 </tr>
 </table>
