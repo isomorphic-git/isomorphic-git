@@ -1,6 +1,7 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
+import { mode2type } from '../utils/mode2type'
 import { normalizeStats } from '../utils/normalizeStats'
 
 import { FileSystem } from './FileSystem.js'
@@ -14,31 +15,39 @@ export class GitWalkerIndex {
       return flatFileListToDirectoryStructure(index.entries)
     })
     const walker = this
-    this.ConstructEntry = class IndexEntry {
-      constructor (entry) {
-        Object.assign(this, entry)
+    this.ConstructEntry = class StageEntry {
+      constructor (fullpath) {
+        this._fullpath = fullpath
+        this._type = false
+        this._mode = false
+        this._stat = false
+        this._oid = false
       }
 
-      async populateStat () {
-        if (!this.exists) return
-        await walker.populateStat(this)
+      async type () {
+        return walker.type(this)
       }
 
-      async populateContent () {
-        if (!this.exists) return
-        await walker.populateContent(this)
+      async mode () {
+        return walker.mode(this)
       }
 
-      async populateHash () {
-        if (!this.exists) return
-        await walker.populateHash(this)
+      async stat () {
+        return walker.stat(this)
+      }
+
+      async content () {
+        return walker.content(this)
+      }
+
+      async oid () {
+        return walker.oid(this)
       }
     }
   }
 
   async readdir (entry) {
-    if (!entry.exists) return []
-    const filepath = entry.fullpath
+    const filepath = entry._fullpath
     const tree = await this.treePromise
     const inode = tree.get(filepath)
     if (!inode) return null
@@ -46,42 +55,56 @@ export class GitWalkerIndex {
     if (inode.type !== 'tree') {
       throw new Error(`ENOTDIR: not a directory, scandir '${filepath}'`)
     }
-    return inode.children
-      .map(inode => ({
-        fullpath: inode.fullpath,
-        basename: inode.basename,
-        exists: true
-        // TODO: Figure out why flatFileListToDirectoryStructure is not returning children
-        // sorted correctly for "__tests__/__fixtures__/test-push.git"
-      }))
-      .sort((a, b) => compareStrings(a.fullpath, b.fullpath))
+    const names = inode.children.map(inode => inode.fullpath)
+    names.sort(compareStrings)
+    return names
   }
 
-  async populateStat (entry) {
-    const tree = await this.treePromise
-    const inode = tree.get(entry.fullpath)
-    if (!inode) {
-      throw new Error(
-        `ENOENT: no such file or directory, lstat '${entry.fullpath}'`
-      )
+  async type (entry) {
+    if (entry._type === false) {
+      await entry.stat()
     }
-    const stats = inode.type === 'tree' ? {} : normalizeStats(inode.metadata)
-    Object.assign(entry, { type: inode.type }, stats)
+    return entry._type
   }
 
-  async populateContent (entry) {
+  async mode (entry) {
+    if (entry._mode === false) {
+      await entry.stat()
+    }
+    return entry._mode
+  }
+
+  async stat (entry) {
+    if (entry._stat === false) {
+      const tree = await this.treePromise
+      const inode = tree.get(entry._fullpath)
+      if (!inode) {
+        throw new Error(
+          `ENOENT: no such file or directory, lstat '${entry._fullpath}'`
+        )
+      }
+      const stats = inode.type === 'tree' ? {} : normalizeStats(inode.metadata)
+      entry._type = inode.type === 'tree' ? 'tree' : mode2type(stats.mode)
+      entry._mode = stats.mode
+      if (inode.type === 'tree') {
+        entry._stat = void 0
+      } else {
+        entry._stat = stats
+      }
+    }
+    return entry._stat
+  }
+
+  async content (_entry) {
     // Cannot get content for an index entry
   }
 
-  async populateHash (entry) {
-    const tree = await this.treePromise
-    const inode = tree.get(entry.fullpath)
-    if (!inode) return null
-    if (inode.type === 'tree') {
-      throw new Error(`EISDIR: illegal operation on a directory, read`)
+  async oid (entry) {
+    if (entry._oid === false) {
+      const tree = await this.treePromise
+      const inode = tree.get(entry._fullpath)
+      entry._oid = inode.metadata.oid
     }
-    Object.assign(entry, {
-      oid: inode.metadata.oid
-    })
+    return entry._oid
   }
 }

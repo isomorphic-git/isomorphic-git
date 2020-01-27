@@ -1,6 +1,6 @@
 // @ts-check
 import { TREE } from '../commands/TREE.js'
-import { walkBeta2 } from '../commands/walkBeta2.js'
+import { walk } from '../commands/walk.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
@@ -53,7 +53,7 @@ export async function mergeTree ({
   const baseTree = TREE({ ref: baseOid })
   const theirTree = TREE({ ref: theirOid })
 
-  const results = await walkBeta2({
+  const results = await walk({
     core,
     fs,
     dir,
@@ -150,8 +150,8 @@ export async function mergeTree ({
 
 /**
  *
- * @param {import('../commands/walkBeta2.js').WalkerEntry} entry
- * @param {import('../commands/walkBeta2.js').WalkerEntry} base
+ * @param {import('../commands/walk.js').WalkerEntry} entry
+ * @param {import('../commands/walk.js').WalkerEntry} base
  *
  */
 async function modified (entry, base) {
@@ -177,9 +177,9 @@ async function modified (entry, base) {
  * @param {FileSystem} args.fs
  * @param {string} args.gitdir
  * @param {string} args.path
- * @param {import('../commands/walkBeta2.js').WalkerEntry} args.ours
- * @param {import('../commands/walkBeta2.js').WalkerEntry} args.base
- * @param {import('../commands/walkBeta2.js').WalkerEntry} args.theirs
+ * @param {import('../commands/walk.js').WalkerEntry} args.ours
+ * @param {import('../commands/walk.js').WalkerEntry} args.base
+ * @param {import('../commands/walk.js').WalkerEntry} args.theirs
  * @param {string} [args.ourName]
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]

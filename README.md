@@ -39,17 +39,17 @@ The 1.0 release is planned to coincide with the stable release of the new Chromi
 
 At the time of writing, the following breaking changes are planned:
 
-1. The supported browser versions will be bumped.
-2. Commands that will be renamed:
-   1. The `checkout` command will be replaced with the implementation used in the safer and faster `fastCheckout` command and `fastCheckout` will be removed.
-   2. The `walkBeta2` command renamed to `walk`, and the `walkBeta1` command will be removed.
-3. Deprecated commands and function arguments will be removed:
-   1. The commands `sign`, `utils.auth`, and `utils.oauth2` will be removed.
-   2. The `fs` and `emitter` function arguments will be removed.
-   3. The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
-   4. The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. The `payload` property will be renamed to `gpgmsg` so its purpose is more obvious. (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
-4. Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
-5. The `pattern` and globbing options will be removed so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `matcher` function instead.
+- [x] The supported browser versions will be bumped.
+- [ ] Commands that will be renamed:
+  - [ ] The `checkout` command will be replaced with the implementation used in the safer and faster `fastCheckout` command and `fastCheckout` will be removed.
+  - [x] The `walkBeta2` command renamed to `walk`, and the `walkBeta1` command will be removed.
+- [ ] Deprecated commands and function arguments will be removed:
+  - [ ] The commands `sign`, `utils.auth`, and `utils.oauth2` will be removed.
+  - [ ] The `fs` and `emitter` function arguments will be removed.
+  - [ ] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
+  - [ ] The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. The `payload` property will be renamed to `gpgmsg` so its purpose is more obvious. (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
+- [ ] Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
+- [ ] The `pattern` and globbing options will be removed so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `matcher` function instead.
 
 ## Getting Started
 
@@ -208,7 +208,7 @@ unless there is a major version bump.
 - [tag](https://isomorphic-git.github.io/docs/tag.html)
 - [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
-- [walkBeta2](https://isomorphic-git.github.io/docs/walkBeta2.html)
+- [walk](https://isomorphic-git.github.io/docs/walk.html)
 - [writeBlob](https://isomorphic-git.github.io/docs/writeBlob.html)
 - [writeCommit](https://isomorphic-git.github.io/docs/writeCommit.html)
 - [writeObject](https://isomorphic-git.github.io/docs/writeObject.html)

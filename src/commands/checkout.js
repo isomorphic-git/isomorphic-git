@@ -13,7 +13,7 @@ import { worthWalking } from '../utils/worthWalking.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR'
 import { config } from './config'
-import { walkBeta2 } from './walkBeta2.js'
+import { walk } from './walk.js'
 
 /**
  * Checkout a branch
@@ -154,7 +154,7 @@ export async function checkout ({
         }
         index.clear()
         try {
-          await walkBeta2({
+          await walk({
             fs,
             dir,
             gitdir,
