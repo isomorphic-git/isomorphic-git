@@ -65,44 +65,45 @@ module.exports = function (config) {
         browserName: 'chrome',
         extendedDebugging: true
       },
-      sl_firefox: {
+      XXXsl_firefox: {
         base: 'SauceLabs',
         browserName: 'firefox'
       },
       sl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge',
-        version: '17.17134'
+        version: '79.0'
       },
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
-        platform: 'macOS 10.13',
-        version: '11.1'
+        platform: 'macOS 10.15',
+        version: '13.0'
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone X Simulator',
+        deviceName: 'iPhone 11 Pro Max Simulator',
         platformName: 'iOS',
-        platformVersion: '11.2',
+        platformVersion: '13.0',
         browserName: 'Safari',
-        appiumVersion: '1.9.1'
+        appiumVersion: '1.15.0'
       },
-      sl_ios_safari12: {
+      XXXsl_android_chrome: {
         base: 'SauceLabs',
-        deviceName: 'iPhone 8 Simulator',
-        platformName: 'iOS',
-        platformVersion: '12.0',
-        browserName: 'Safari',
-        appiumVersion: '1.9.1'
-      },
-      sl_android_chrome: {
-        base: 'SauceLabs',
+        deviceOrientation: 'portrait',
         deviceName: 'Android GoogleAPI Emulator',
         platformName: 'Android',
         platformVersion: '7.1',
         browserName: 'Chrome',
-        appiumVersion: '1.9.1'
+        appiumVersion: '1.15.0'
+      },
+      bs_android_chrome: {
+        base: 'BrowserStack',
+        os: 'android',
+        os_version: '10.0',
+        browser: 'android',
+        device: 'Google Pixel 4',
+        real_mobile: true
       },
       FirefoxHeadless: {
         base: 'Firefox',
@@ -130,7 +131,7 @@ module.exports = function (config) {
       recordVideo: false,
       public: 'public restricted'
     },
-    concurrency: 5,
+    concurrency: 6,
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: true,
@@ -171,6 +172,7 @@ module.exports = function (config) {
       }
     },
     plugins: [
+      'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-edge-launcher',
       'karma-ie-launcher',
