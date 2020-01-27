@@ -73,10 +73,7 @@ module.exports = {
         : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)
     },
     website: {
-      default: series.nps(
-        'website.build',
-        'website.publish'
-      ),
+      default: series.nps('website.build', 'website.publish'),
       build: '(cd website && npm install && npm run build)',
       publish: '(cd website && node ./scripts/deploy-gh-pages.js)'
     },

@@ -1,6 +1,5 @@
 module.exports = function translateBrowser (fullname) {
   if (fullname.startsWith('X ')) {
-
   } else if (fullname.startsWith('HeadlessChrome')) {
     return 'ChromeHeadlessNoSandbox'
   } else if (fullname.startsWith('Firefox')) {
@@ -11,7 +10,8 @@ module.exports = function translateBrowser (fullname) {
     return 'sl_android_chrome'
   } else if (fullname.startsWith('Safari')) {
     return 'sl_safari'
-  } else if (fullname.startsWith('Chrome')) { // Sauce/Karma reports Edge 79 as Chrome
+  } else if (fullname.startsWith('Chrome')) {
+    // Sauce/Karma reports Edge 79 as Chrome
     return 'sl_edge'
   } else {
     console.log('translateBrowser ERROR', fullname)
