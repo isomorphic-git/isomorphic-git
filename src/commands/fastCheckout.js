@@ -13,7 +13,7 @@ import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR.js'
 import { config } from './config.js'
-import { walkBeta2 } from './walkBeta2.js'
+import { walk } from './walk.js'
 
 /**
  * Checkout a branch
@@ -343,7 +343,7 @@ async function analyze ({
   newSubmoduleBehavior
 }) {
   let count = 0
-  return walkBeta2({
+  return walk({
     fs,
     dir,
     gitdir,

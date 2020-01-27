@@ -11,7 +11,7 @@ import { worthWalking } from '../utils/worthWalking.js'
 import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR.js'
-import { walkBeta2 } from './walkBeta2.js'
+import { walk } from './walk.js'
 
 /**
  * Efficiently get the status of multiple files at once.
@@ -167,7 +167,7 @@ export async function statusMatrix ({
       patternGlobrex = globrex(pattern, { globstar: true, extended: true })
     }
     const bases = filepaths.map(filepath => join(filepath, patternPart))
-    const results = await walkBeta2({
+    const results = await walk({
       fs,
       dir,
       gitdir,

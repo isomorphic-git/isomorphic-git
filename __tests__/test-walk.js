@@ -1,14 +1,14 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { walkBeta2, WORKDIR, TREE, STAGE } = require('isomorphic-git')
+const { walk, WORKDIR, TREE, STAGE } = require('isomorphic-git')
 
-describe('walkBeta2', () => {
+describe('walk', () => {
   it('can walk using WORKDIR, TREE, and STAGE', async () => {
     // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-walkBeta2')
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
     // Test
-    const matrix = await walkBeta2({
+    const matrix = await walk({
       fs,
       dir,
       gitdir,
@@ -35,14 +35,14 @@ describe('walkBeta2', () => {
 
   it('can populate type, mode, oid, and content', async () => {
     // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-walkBeta2')
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
     // BrowserFS has a design quirk where HTTPRequestFS has a default mode of 555 for everything,
     // meaning that files have the executable bit set by default!
     const isBrowserFS = !!fs._original_unwrapped_fs.getRootFS
     const FILEMODE = isBrowserFS ? 0o100755 : 0o100644
     const SYMLINKMODE = isBrowserFS ? 0o100755 : 0o120000
     // Test
-    const matrix = await walkBeta2({
+    const matrix = await walk({
       fs,
       dir,
       gitdir,

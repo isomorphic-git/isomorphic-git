@@ -1,10 +1,6 @@
 // @ts-check
-import { FileSystem } from '../models/FileSystem.js'
 import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
-import { GitWalkerRepo2 } from '../models/GitWalkerRepo2.js'
-import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
-import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
+import { GitWalkSymbol } from '../utils/symbols.js'
 
 /**
  *
@@ -15,7 +11,7 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
 /**
  * Get a git commit `Walker`
  *
- * See [walkBeta2](./walkBeta2.md)
+ * See [walk](./walk.md)
  *
  * @param {object} args
  * @param {string} [args.ref='HEAD'] - The commit to walk
@@ -24,28 +20,12 @@ import { GitWalkBeta1Symbol, GitWalkBeta2Symbol } from '../utils/symbols.js'
  *
  */
 export function TREE ({
-  ref = 'HEAD',
-  // @ts-ignore
-  core = 'default',
-  // @ts-ignore
-  dir,
-  // @ts-ignore
-  gitdir,
-  // @ts-ignore
-  fs: _fs
+  ref = 'HEAD'
 }) {
   const o = Object.create(null)
-  Object.defineProperty(o, GitWalkBeta1Symbol, {
-    value: function () {
-      gitdir = gitdir || join(dir, '.git')
-      _fs = cores.get(core).get('fs')
-      const fs = new FileSystem(_fs)
-      return new GitWalkerRepo({ fs, gitdir, ref })
-    }
-  })
-  Object.defineProperty(o, GitWalkBeta2Symbol, {
+  Object.defineProperty(o, GitWalkSymbol, {
     value: function ({ fs, gitdir }) {
-      return new GitWalkerRepo2({ fs, gitdir, ref })
+      return new GitWalkerRepo({ fs, gitdir, ref })
     }
   })
   Object.freeze(o)
