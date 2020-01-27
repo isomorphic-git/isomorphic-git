@@ -10,7 +10,6 @@ import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
 import { cores } from '../utils/plugins.js'
 import { splitLines } from '../utils/splitLines.js'
-import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 
@@ -63,7 +62,6 @@ import { pack } from './pack.js'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {boolean} [args.autoTranslateSSH] - Attempt to automatically translate SSH remotes into HTTP equivalents
  * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
@@ -103,22 +101,13 @@ export async function push ({
   password = authPassword,
   token,
   oauth2format,
-  headers = {},
-  autoTranslateSSH = false
+  headers = {}
 }) {
   try {
     const fs = new FileSystem(_fs)
     // TODO: Figure out how pushing tags works. (This only works for branches.)
     if (url === undefined) {
       url = await config({ fs, gitdir, path: `remote.${remote}.url` })
-    }
-
-    // Try to convert SSH URLs to HTTPS ones
-    if (
-      autoTranslateSSH ||
-      (await config({ fs, gitdir, path: `isomorphic-git.autoTranslateSSH` }))
-    ) {
-      url = translateSSHtoHTTP(url)
     }
 
     if (corsProxy === undefined) {
