@@ -119,7 +119,9 @@ describe('fetch', () => {
     }
     expect(err).toBeDefined()
     expect(err.code).toBe(E.UnknownTransportError)
-    expect(err.data.suggestion).toBe('https://github.com/isomorphic-git/isomorphic-git.git')
+    expect(err.data.suggestion).toBe(
+      'https://github.com/isomorphic-git/isomorphic-git.git'
+    )
   })
 
   it('shallow fetch since (from Github)', async () => {

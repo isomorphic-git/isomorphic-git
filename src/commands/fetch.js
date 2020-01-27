@@ -147,7 +147,7 @@ export async function fetch ({
       singleBranch,
       headers,
       prune,
-      pruneTags,
+      pruneTags
     })
     if (response === null) {
       return {
