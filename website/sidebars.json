@@ -49,7 +49,7 @@
       "listNotes"
     ],
     "Walking": [
-      "walkBeta2",
+      "walk",
       "WORKDIR",
       "STAGE",
       "TREE"

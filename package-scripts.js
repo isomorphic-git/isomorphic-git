@@ -74,6 +74,7 @@ module.exports = {
     },
     website: {
       default: series.nps('website.build', 'website.publish'),
+      dev: '(cd website && npm start)',
       build: '(cd website && npm install && npm run build)',
       publish: '(cd website && node ./scripts/deploy-gh-pages.js)'
     },

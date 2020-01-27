@@ -288,13 +288,9 @@
         "title": "version",
         "sidebar_label": "version"
       },
-      "walkBeta1": {
-        "title": "walkBeta1",
-        "sidebar_label": "walkBeta1"
-      },
-      "walkBeta2": {
-        "title": "walkBeta2",
-        "sidebar_label": "walkBeta2"
+      "walk": {
+        "title": "walk",
+        "sidebar_label": "walk"
       },
       "WORKDIR": {
         "title": "WORKDIR",
@@ -686,6 +682,26 @@
       "version-0.77.0/version-0.77.0-push": {
         "title": "push",
         "sidebar_label": "push"
+      },
+      "version-0.78.0/version-0.78.0-checkout": {
+        "title": "checkout",
+        "sidebar_label": "checkout"
+      },
+      "version-0.78.0/version-0.78.0-clone": {
+        "title": "clone",
+        "sidebar_label": "clone"
+      },
+      "version-0.78.0/version-0.78.0-errors": {
+        "title": "Error Codes",
+        "sidebar_label": "Error Code Index"
+      },
+      "version-0.78.0/version-0.78.0-fastCheckout": {
+        "title": "fastCheckout",
+        "sidebar_label": "fastCheckout"
+      },
+      "version-0.78.0/version-0.78.0-pull": {
+        "title": "pull",
+        "sidebar_label": "pull"
       }
     },
     "links": {

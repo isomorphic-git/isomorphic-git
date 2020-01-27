@@ -830,16 +830,7 @@ export function verify(args: GitDir & {
 
 export function version(): string;
 
-export function walkBeta1<T, Q>(args: {
-  core?: string;
-  trees: Walker[];
-  filter?: (entry: WalkerEntry) => Promise<boolean>;
-  map?: (entry: WalkerEntry) => Promise<T | undefined>;
-  reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
-  iterate?: (walk: (parent: WalkerEntry) => Promise<Q>, children: Iterable<WalkerEntry>) => Promise<Array<Q|undefined>>;
-}): Promise<Q|undefined>;
-
-export function walkBeta2<T, Q>(args: WorkDir & GitDir & {
+export function walk<T, Q>(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
   trees: Walker[];

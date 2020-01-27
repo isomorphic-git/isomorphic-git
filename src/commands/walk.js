@@ -4,13 +4,13 @@ import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-import { GitWalkBeta2Symbol } from '../utils/symbols.js'
+import { GitWalkSymbol } from '../utils/symbols.js'
 import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
 
 /**
  *
  * @typedef {Object} Walker
- * @property {Symbol} Symbol('GitWalkBeta2Symbol')
+ * @property {Symbol} Symbol('GitWalkSymbol')
  */
 
 /**
@@ -41,7 +41,7 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
 /**
  * A powerful recursive tree-walking utility.
  *
- * The `walk` API (tentatively named `walkBeta2`) simplifies gathering detailed information about a tree or comparing all the filepaths in two or more trees.
+ * The `walk` API simplifies gathering detailed information about a tree or comparing all the filepaths in two or more trees.
  * Trees can be git commits, the working directory, or the or git index (staging area).
  * As long as a file or directory is present in at least one of the trees, it will be traversed.
  * Entries are traversed in alphabetical order.
@@ -58,8 +58,8 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  * ```
  *
  * These functions return opaque handles called `Walker`s.
- * The only thing that `Walker` objects are good for is passing into `walkBeta2`.
- * Here are the three `Walker`s passed into `walkBeta2` by the `statusMatrix` command for example:
+ * The only thing that `Walker` objects are good for is passing into `walk`.
+ * Here are the three `Walker`s passed into `walk` by the `statusMatrix` command for example:
  *
  * ```js
  * let ref = 'HEAD'
@@ -248,7 +248,7 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  *
  *
  */
-export async function walkBeta2 ({
+export async function walk ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
@@ -268,7 +268,7 @@ export async function walkBeta2 ({
   try {
     const fs = new FileSystem(_fs)
     const walkers = trees.map(proxy =>
-      proxy[GitWalkBeta2Symbol]({ fs, dir, gitdir })
+      proxy[GitWalkSymbol]({ fs, dir, gitdir })
     )
 
     const root = new Array(walkers.length).fill('.')
