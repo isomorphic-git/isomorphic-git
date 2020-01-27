@@ -97,14 +97,6 @@ export interface CommitDescription {
   gpgsig?: string; // PGP signature (if present)
 }
 
-export interface CommitDescriptionWithOid extends CommitDescription {
-  oid: string; // SHA1 object id of this commit
-}
-
-export interface CommitDescriptionWithPayload extends CommitDescriptionWithOid {
-  payload: string;
-}
-
 export interface TreeDescription {
   entries: Array<TreeEntry>;
 }
@@ -589,23 +581,7 @@ export function log(args: GitDir & {
   ref?: string;
   depth?: number;
   since?: Date;
-}): Promise<Array<CommitDescriptionWithOid>>;
-export function log(args: GitDir & {
-  core?: string;
-  fs?: any;
-  ref?: string;
-  depth?: number;
-  since?: Date;
-  signing: false;
-}): Promise<Array<CommitDescriptionWithOid>>;
-export function log(args: GitDir & {
-  core?: string;
-  fs?: any;
-  ref?: string;
-  depth?: number;
-  since?: Date;
-  signing: true;
-}): Promise<Array<CommitDescriptionWithPayload>>;
+}): Promise<Array<ReadCommitResult>>;
 
 export function merge(args: GitDir & {
   core?: string;

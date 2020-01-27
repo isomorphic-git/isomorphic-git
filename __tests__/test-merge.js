@@ -166,7 +166,7 @@ describe('merge', () => {
       gitdir,
       depth: 1,
       ref: 'add-files-merge-remove-files'
-    }))[0]
+    }))[0].commit
     // Test
     const report = await merge({
       fs,
@@ -180,7 +180,7 @@ describe('merge', () => {
         timezoneOffset: -0
       }
     })
-    const mergeCommit = (await log({ gitdir, ref: 'add-files', depth: 1 }))[0]
+    const mergeCommit = (await log({ gitdir, ref: 'add-files', depth: 1 }))[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -195,7 +195,7 @@ describe('merge', () => {
       gitdir,
       depth: 1,
       ref: 'remove-files-merge-add-files'
-    }))[0]
+    }))[0].commit
     // TestTest
     const report = await merge({
       fs,
@@ -213,7 +213,7 @@ describe('merge', () => {
       gitdir,
       ref: 'remove-files',
       depth: 1
-    }))[0]
+    }))[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -267,7 +267,7 @@ describe('merge', () => {
       },
       dryRun: true
     })
-    expect(report.tree).toBe(commit.tree)
+    expect(report.tree).toBe(commit.commit.tree)
     // make sure branch hasn't been moved
     const notMergeCommit = (await log({
       gitdir,
@@ -278,6 +278,7 @@ describe('merge', () => {
     // make sure no commit object was created
     expect(
       await fs.exists(
+        // @ts-ignore
         `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
       )
     ).toBe(false)
@@ -310,7 +311,7 @@ describe('merge', () => {
       },
       noUpdateBranch: true
     })
-    expect(report.tree).toBe(commit.tree)
+    expect(report.tree).toBe(commit.commit.tree)
     // make sure branch hasn't been moved
     const notMergeCommit = (await log({
       gitdir,
@@ -321,6 +322,7 @@ describe('merge', () => {
     // but make sure the commit object exists
     expect(
       await fs.exists(
+        // @ts-ignore
         `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
       )
     ).toBe(true)
@@ -333,7 +335,7 @@ describe('merge', () => {
       gitdir,
       depth: 1,
       ref: 'delete-first-half-merge-delete-second-half'
-    }))[0]
+    }))[0].commit
     // Test
     const report = await merge({
       fs,
@@ -351,7 +353,7 @@ describe('merge', () => {
       gitdir,
       ref: 'delete-first-half',
       depth: 1
-    }))[0]
+    }))[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -390,7 +392,7 @@ describe('merge', () => {
       gitdir,
       depth: 1,
       ref: 'a-merge-b'
-    }))[0]
+    }))[0].commit
     // Test
     const report = await merge({
       fs,
@@ -408,7 +410,7 @@ describe('merge', () => {
       gitdir,
       ref: 'a',
       depth: 1
-    }))[0]
+    }))[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -422,7 +424,7 @@ describe('merge', () => {
       gitdir,
       depth: 1,
       ref: 'a-merge-d'
-    }))[0]
+    }))[0].commit
     // Test
     const report = await merge({
       fs,
@@ -440,7 +442,7 @@ describe('merge', () => {
       gitdir,
       ref: 'a',
       depth: 1
-    }))[0]
+    }))[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)

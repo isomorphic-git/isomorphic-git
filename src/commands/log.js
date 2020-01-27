@@ -1,16 +1,23 @@
 // @ts-check
+import { readCommit } from '../commands/readCommit.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { compareAge } from '../utils/compareAge.js'
 import { join } from '../utils/join.js'
-import { logCommit } from '../utils/logCommit.js'
 import { cores } from '../utils/plugins.js'
 
 /**
  *
- * @typedef {Object} CommitDescription - Returns an array of objects with a schema like this:
+ * @typedef {Object} ReadCommitResult
  * @property {string} oid - SHA-1 object id of this commit
+ * @property {CommitObject} commit - the parsed commit object
+ * @property {string} payload - PGP signing payload
+ */
+
+/**
+ *
+ * @typedef {Object} CommitObject
  * @property {string} message - Commit message
  * @property {string} tree - SHA-1 object id of corresponding file tree
  * @property {string[]} parent - an array of zero or more SHA-1 object ids
@@ -25,7 +32,6 @@ import { cores } from '../utils/plugins.js'
  * @property {number} committer.timestamp - UTC Unix timestamp in seconds
  * @property {number} committer.timezoneOffset - Timezone difference from UTC in minutes
  * @property {string} [gpgsig] - PGP signature (if present)
- * @property {string} [payload] - PGP signing payload (if requested)
  */
 
 /**
@@ -39,10 +45,10 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.ref = 'HEAD'] - The commit to begin walking backwards through the history from
  * @param {number} [args.depth] - Limit the number of commits returned. No limit by default.
  * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
- * @param {boolean} [args.signing = false] - Include the PGP signing payload
  *
- * @returns {Promise<Array<CommitDescription>>} Resolves to an array of CommitDescription objects
- * @see CommitDescription
+ * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
+ * @see ReadCommitResult
+ * @see CommitObject
  *
  * @example
  * let commits = await git.log({ dir: '$input((/))', depth: $input((5)), ref: '$input((master))' })
@@ -56,8 +62,7 @@ export async function log ({
   fs: _fs = cores.get(core).get('fs'),
   ref = 'HEAD',
   depth = undefined,
-  since = undefined, // Date
-  signing = false
+  since = undefined // Date
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -68,21 +73,15 @@ export async function log ({
     const commits = []
     const shallowCommits = await GitShallowManager.read({ fs, gitdir })
     const oid = await GitRefManager.resolve({ fs, gitdir, ref })
-    const tips /*: Array */ = [await logCommit({ fs, gitdir, oid, signing })]
+    const tips = [await readCommit({ core, fs, gitdir, oid })]
 
     while (true) {
       const commit = tips.pop()
 
-      // Stop the loop if we encounter an error
-      if (commit.error) {
-        commits.push(commit)
-        break
-      }
-
       // Stop the log if we've hit the age limit
       if (
         sinceTimestamp !== undefined &&
-        commit.committer.timestamp <= sinceTimestamp
+        commit.commit.committer.timestamp <= sinceTimestamp
       ) {
         break
       }
@@ -96,8 +95,8 @@ export async function log ({
       if (!shallowCommits.has(commit.oid)) {
         // Add the parents of this commit to the queue
         // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
-        for (const oid of commit.parent) {
-          const commit = await logCommit({ fs, gitdir, oid, signing })
+        for (const oid of commit.commit.parent) {
+          const commit = await readCommit({ core, fs, gitdir, oid })
           if (!tips.map(commit => commit.oid).includes(commit.oid)) {
             tips.push(commit)
           }
@@ -108,9 +107,8 @@ export async function log ({
       if (tips.length === 0) break
 
       // Process tips in order by age
-      tips.sort(compareAge)
+      tips.sort((a, b) => compareAge(a.commit, b.commit))
     }
-    // @ts-ignore
     return commits
   } catch (err) {
     err.caller = 'git.log'
