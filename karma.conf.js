@@ -141,12 +141,6 @@ module.exports = function (config) {
     junitReporter: {
       outputDir: './junit'
     },
-    browserify: {
-      transform: [
-        // Replace process.env.CI
-        'envify'
-      ]
-    },
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',

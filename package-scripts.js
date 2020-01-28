@@ -20,8 +20,6 @@ const optional = cmd =>
 const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
 const timeout5 = timeout(5)
 
-const or = (a, b) => `(${a}) || (${b})`
-
 const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 
 module.exports = {
@@ -92,10 +90,6 @@ module.exports = {
       stop: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server stop`
     },
     test: {
-      // We run jest in Travis so we get accurate code coverage that's mapped to the original source.
-      // But by default, we skip 'jest' because I decided to make it an optionalDependency after it was
-      // pointed out to me that it depends on native modules that don't have prebuilt binaries available,
-      // and no one should be required to install Python and a C++ compiler to contribute to this code.
       default: process.env.CI
         ? series.nps(
           'lint.js',
@@ -103,7 +97,7 @@ module.exports = {
           'lint.typescript',
           'build.docs',
           'test.setup',
-          'test.one',
+          'test.jest',
           'test.karma',
           'test.teardown'
         )
@@ -112,18 +106,14 @@ module.exports = {
           'build',
           'lint.typescript',
           'test.setup',
-          'test.one',
+          'test.jest',
           'test.karma',
           'test.teardown'
         ),
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
-      one: retry3(or('nps test.jest', 'nps test.jasmine')),
-      jasmine: process.env.CI
-        ? `cross-env NODE_PATH=./dist/for-node ${timeout5('jasmine')}`
-        : `cross-env NODE_PATH=./dist/for-node jasmine`,
       jest: process.env.CI
-        ? `${timeout5('jest --ci --coverage')}`
+        ? retry3(`${timeout5('jest --ci --coverage')}`)
         : `jest --ci --coverage`,
       karma: process.env.CI
         ? retry3('karma start --single-run')

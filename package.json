@@ -3,13 +3,13 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "typings": "./src/index.d.ts",
-  "main": "dist/for-node/isomorphic-git/index.js",
+  "main": "dist/index.cjs",
   "browser": {
     "isomorphic-git": "./dist/bundle.umd.min.js",
     "isomorphic-git/internal-apis": "./dist/internal.umd.min.js",
     "./src/utils/http.js": "./src/utils/http-browser.js"
   },
-  "module": "dist/for-future/isomorphic-git/index.js",
+  "module": "dist/index.js",
   "unpkg": "dist/bundle.umd.min.js",
   "bin": {
     "isogit": "./cli.js"
@@ -43,7 +43,12 @@
   },
   "homepage": "https://isomorphic-git.org/",
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.cjs",
+    "dist/browser-tests.json",
+    "dist/bundle.umd.min.js",
+    "dist/bundle.umd.min.js.map",
+    "dist/size_report.html",
     "cli.js",
     "src/errors.d.ts",
     "src/index.d.ts"
@@ -87,7 +92,6 @@
     "git-http-mock-server": "1.2.0",
     "github-comment": "1.0.1",
     "inquirer": "^7.0.0",
-    "jasmine": "3.5.0",
     "jasmine-core": "3.4.0",
     "jest": "24.9.0",
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
