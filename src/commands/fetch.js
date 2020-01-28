@@ -159,11 +159,7 @@ export async function fetch ({
     if (emitter) {
       const lines = splitLines(response.progress)
       forAwait(lines, line => {
-        // As a historical accident, 'message' events were trimmed removing valuable information,
-        // such as \r by itself which was a single to update the existing line instead of appending a new one.
-        // TODO NEXT BREAKING RELEASE: make 'message' behave like 'rawmessage' and remove 'rawmessage'.
-        emitter.emit(`${emitterPrefix}message`, line.trim())
-        emitter.emit(`${emitterPrefix}rawmessage`, line)
+        emitter.emit(`${emitterPrefix}message`, line)
         const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
           emitter.emit(`${emitterPrefix}progress`, {
