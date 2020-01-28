@@ -1,5 +1,5 @@
 import resolve from 'rollup-plugin-node-resolve'
-
+import path from 'path'
 import pkg from './package.json'
 
 const external = [
@@ -7,9 +7,7 @@ const external = [
   'path',
   'crypto',
   'stream',
-  'openpgp/dist/openpgp.min.js',
   'crc/lib/crc32.js',
-  'stream-source/index.node.js',
   'sha.js/sha1',
   ...Object.keys(pkg.dependencies)
 ]
@@ -22,7 +20,7 @@ const moduleConfig = input => ({
     {
       format: 'es',
       name: 'git',
-      file: `dist/for-future/isomorphic-git/${input}`
+      file: `dist/${input}`
     }
   ],
   plugins: [resolve({ browser: true })]
@@ -36,7 +34,7 @@ const nodeConfig = input => ({
     {
       format: 'cjs',
       name: 'git',
-      file: `dist/for-node/isomorphic-git/${input}`
+      file: `dist/${path.basename(input, '.js')}.cjs`
     }
   ]
 })
