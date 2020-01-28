@@ -751,12 +751,6 @@ export function resolveRef(args: GitDir & {
   depth?: number;
 }): Promise<string>;
 
-export function sign(args: GitDir & {
-  core?: string;
-  fs?: any;
-  privateKeys: string;
-}): Promise<string>;
-
 export function status(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;

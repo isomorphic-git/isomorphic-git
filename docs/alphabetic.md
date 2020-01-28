@@ -46,7 +46,6 @@ sidebar_label: Alphabetical Index
 - [removeNote](removeNote)
 - [resetIndex](resetIndex)
 - [resolveRef](resolveRef)
-- [sign](sign) [deprecated]
 - [STAGE](STAGE)
 - [status](status)
 - [statusMatrix](statusMatrix)
