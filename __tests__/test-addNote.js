@@ -27,7 +27,9 @@ describe('addNote', () => {
       oid: '3b4b7a6c2382ea60a0b4c7ff69920af9a2e6408d',
       filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164'
     })
-    expect(Buffer.from(blob).toString('utf8')).toEqual('This is a note about a commit.')
+    expect(Buffer.from(blob).toString('utf8')).toEqual(
+      'This is a note about a commit.'
+    )
   })
   it('to a tree', async () => {
     // Setup
@@ -52,7 +54,9 @@ describe('addNote', () => {
       oid: '4b52ff827d2b5fe1786bf52a1b78dd25517b6cdd',
       filepath: '199948939a0b95c6f27668689102496574b2c332'
     })
-    expect(Buffer.from(blob).toString('utf8')).toEqual('This is a note about a tree.')
+    expect(Buffer.from(blob).toString('utf8')).toEqual(
+      'This is a note about a tree.'
+    )
   })
   it('to a blob', async () => {
     // Setup
@@ -77,7 +81,9 @@ describe('addNote', () => {
       oid: '6428616e2600d3cd4b66059d5c561a85ce4b33ff',
       filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
     })
-    expect(Buffer.from(blob).toString('utf8')).toEqual('This is a note about a blob.')
+    expect(Buffer.from(blob).toString('utf8')).toEqual(
+      'This is a note about a blob.'
+    )
   })
   it('consecutive notes accumulate', async () => {
     // Setup
@@ -153,7 +159,9 @@ describe('addNote', () => {
       oid: '6428616e2600d3cd4b66059d5c561a85ce4b33ff',
       filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
     })
-    expect(Buffer.from(blob).toString('utf8')).toEqual('This is a note about a blob.')
+    expect(Buffer.from(blob).toString('utf8')).toEqual(
+      'This is a note about a blob.'
+    )
   })
   it('throws if note already exists', async () => {
     // Setup
