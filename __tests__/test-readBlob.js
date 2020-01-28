@@ -34,7 +34,7 @@ describe('readBlob', () => {
       gitdir,
       oid: '4551a1856279dde6ae9d65862a1dff59a5f199d8'
     })
-    expect(blob.toString('utf8')).toMatchSnapshot()
+    expect(Buffer.from(blob).toString('utf8')).toMatchSnapshot()
   })
   it('peels tags', async () => {
     // Setup
@@ -56,7 +56,7 @@ describe('readBlob', () => {
       filepath: 'cli.js'
     })
     expect(oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
-    expect(blob.toString('hex')).toMatchSnapshot()
+    expect(Buffer.from(blob).toString('hex')).toMatchSnapshot()
   })
   it('with deep filepath to blob', async () => {
     // Setup
@@ -68,7 +68,7 @@ describe('readBlob', () => {
       filepath: 'src/commands/clone.js'
     })
     expect(oid).toEqual('5264f23285d8be3ce45f95c102001ffa1d5391d3')
-    expect(blob.toString('hex')).toMatchSnapshot()
+    expect(Buffer.from(blob).toString('hex')).toMatchSnapshot()
   })
   it('with simple filepath to tree', async () => {
     // Setup

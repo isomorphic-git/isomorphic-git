@@ -50,7 +50,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @property {string} oid
  * @property {'blob' | 'tree' | 'commit' | 'tag'} [type]
  * @property {'deflated' | 'wrapped' | 'content' | 'parsed'} format
- * @property {Buffer | String | CommitDescription | TreeDescription} object
+ * @property {Uint8Array | String | CommitDescription | TreeDescription} object
  * @property {string} [source]
  *
  */
@@ -194,6 +194,7 @@ export async function readObject ({
           if (encoding) {
             result.object = result.object.toString(encoding)
           } else {
+            result.object = new Uint8Array(result.object)
             result.format = 'content'
           }
           break
