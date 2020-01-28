@@ -45,13 +45,14 @@ At the time of writing, the following breaking changes are planned:
   - [x] The `walkBeta2` command renamed to `walk`, and the `walkBeta1` command will be removed.
 - [ ] Deprecated commands and function arguments will be removed:
   - [x] The `sign` command will be removed.
-  - [ ] The commands `utils.auth` and `utils.oauth2` will be removed.
+  - [x] The commands `utils.auth` and `utils.oauth2` will be removed.
   - [ ] The `fs` and `emitter` function arguments will be removed.
   - [x] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
   - [x] The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. **Update: Actually, it now returns the same kind of objects as `readCommit` because that just makes a lot of sense.** (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
 - [ ] Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
 - [x] The `pattern` and globbing options will be removed from `statusMatrix` so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `filter` function instead.
 - [x] The `autoTranslateSSH` feature will be removed, since it's trivial to implement using just the `UnknownTransportError.data.suggestion`
+- [ ] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
 
 ## Getting Started
 

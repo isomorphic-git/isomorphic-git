@@ -29,7 +29,6 @@ export * from './models/SignedGitCommit'
 export * from './storage/readObject'
 export * from './storage/writeObject'
 
-export * from './utils/auth'
 export * from './utils/calculateBasicAuthHeader'
 export * from './utils/calculateBasicAuthUsernamePasswordPair'
 export * from './utils/collect'
