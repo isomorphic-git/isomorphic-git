@@ -16,5 +16,5 @@ export async function resolveBlob ({ fs, gitdir, oid }) {
       expected: 'blob'
     })
   }
-  return { oid, blob: object }
+  return { oid, blob: new Uint8Array(object) }
 }

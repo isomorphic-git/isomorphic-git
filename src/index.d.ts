@@ -22,7 +22,7 @@ export interface GitObjectDescription {
 
 export interface ReadBlobResult {
   oid: string;
-  blob: Buffer;
+  blob: Uint8Array;
 }
 
 export interface ReadCommitResult {
@@ -685,7 +685,7 @@ export function readNote(args: GitDir & {
   fs?: any;
   ref?: string;
   oid: string;
-}): Promise<Buffer>;
+}): Promise<Uint8Array>;
 
 export function readObject(args: GitDir & {
   core?: string;
