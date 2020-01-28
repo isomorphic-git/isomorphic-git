@@ -222,9 +222,9 @@ async function mergeBlobs ({
   }
   // if both sides made changes do a merge
   const { mergedText, cleanMerge } = mergeFile({
-    ourContent: (await ours.content()).toString('utf8'),
-    baseContent: (await base.content()).toString('utf8'),
-    theirContent: (await theirs.content()).toString('utf8'),
+    ourContent: Buffer.from(await ours.content()).toString('utf8'),
+    baseContent: Buffer.from(await base.content()).toString('utf8'),
+    theirContent: Buffer.from(await theirs.content()).toString('utf8'),
     ourName,
     theirName,
     baseName,

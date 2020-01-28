@@ -172,7 +172,7 @@ export interface WalkerEntry {
   type: () => Promise<'tree' | 'blob' | 'special'>;
   mode: () => Promise<number>;
   oid: () => Promise<string>;
-  content: () => Promise<Buffer|void>;
+  content: () => Promise<Uint8Array | void>;
   stat: () => Promise<{
     ctimeSeconds: number;
     mtimeSeconds: number;

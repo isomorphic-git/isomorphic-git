@@ -55,7 +55,7 @@ describe('walk', () => {
           oid: await workdir.oid(),
           content:
             (await workdir.content()) &&
-            (await workdir.content()).toString('utf8'),
+            Buffer.from(await workdir.content()).toString('utf8'),
           hasStat: !!(await workdir.stat())
         },
         tree && {
@@ -63,7 +63,7 @@ describe('walk', () => {
           mode: await tree.mode(),
           oid: await tree.oid(),
           content:
-            (await tree.content()) && (await tree.content()).toString('utf8'),
+            (await tree.content()) && Buffer.from(await tree.content()).toString('utf8'),
           hasStat: !!(await tree.stat())
         },
         stage && {
@@ -71,7 +71,7 @@ describe('walk', () => {
           mode: await stage.mode(),
           oid: await stage.oid(),
           content:
-            (await stage.content()) && (await stage.content()).toString('utf8'),
+            (await stage.content()) && Buffer.from(await stage.content()).toString('utf8'),
           hasStat: !!(await stage.stat())
         }
       ]
