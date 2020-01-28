@@ -240,10 +240,6 @@
         "title": "resolveRef",
         "sidebar_label": "resolveRef"
       },
-      "sign": {
-        "title": "sign",
-        "sidebar_label": "sign"
-      },
       "snippets": {
         "title": "Useful Code Snippets",
         "sidebar_label": "Useful Snippets"
