@@ -2,7 +2,7 @@ const jsdoc = require('jsdoc-api')
 const fs = require('fs')
 const path = require('path')
 const table = require('markdown-table')
-const git = require('../../dist/for-node/isomorphic-git/index.js')
+const git = require('../..')
 
 git.plugins.set('fs', fs)
 
