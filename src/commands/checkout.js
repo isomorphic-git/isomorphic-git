@@ -20,10 +20,6 @@ import { walk } from './walk.js'
  *
  * If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
  *
- * This is basically a next-gen rewrite of [checkout](./checkout.md) that has proper support for conflict detection, removing empty directories, etc.
- *
- * I will probably replace checkout entirely in the 1.0 release with the `switch` and `restore` commands found in new versions of git.
- *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).

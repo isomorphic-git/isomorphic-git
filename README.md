@@ -53,7 +53,7 @@ At the time of writing, the following breaking changes are planned:
 - [x] The `pattern` and globbing options will be removed from `statusMatrix` so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `filter` function instead.
 - [x] The `autoTranslateSSH` feature will be removed, since it's trivial to implement using just the `UnknownTransportError.data.suggestion`
 - [x] Make the 'message' event behave like 'rawmessage' and remove 'rawmessage'.
-- [ ] Update the README to recommend LightningFS rather than BrowserFS.
+- [x] Update the README to recommend LightningFS rather than BrowserFS.
 - [ ] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
 
 ## Getting Started
@@ -73,18 +73,15 @@ git.plugins.set('fs', fs)
 ```
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
-At the time of writing, the most complete option is [BrowserFS](https://github.com/jvilk/BrowserFS).
-Compared to Node, there is an extra setup step to configure BrowserFS, as seen below:
+The easiest to setup and most performant library is [LightningFS](https://github.com/isomorphic-git/lightning-fs) which is maintained by the same author and basically part of the `isomorphic-git` suite.
+If LightningFS doesn't meet your requirements, isomorphic-git should also work with [BrowserFS](https://github.com/jvilk/BrowserFS) and [Filer](https://github.com/filerjs/filer).
 
 ```html
-<script src="https://unpkg.com/browserfs"></script>
+<script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
 <script src="https://unpkg.com/isomorphic-git"></script>
 <script>
-BrowserFS.configure({ fs: "IndexedDB", options: {} }, function (err) {
-  if (err) return console.log(err);
-  window.fs = BrowserFS.BFSRequire("fs");
-  git.plugins.set('fs', window.fs);
-});
+const fs = new LightningFS('fs')
+git.plugins.set('fs', fs)
 </script>
 ```
 
@@ -95,9 +92,6 @@ import * as git from 'isomorphic-git'
 // or
 import {plugins, clone, commit, push} from 'isomorphic-git
 ```
-
-Besides IndexedDB, BrowserFS supports many different backends with different performance characteristics, as well as advanced configurations such as: multiple mounting points, and overlaying a writeable filesystem on top of a read-only filesystem.
-You don't need to know about all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck using the IndexedDB backend I suggested above.
 
 View the full [Getting Started guide](https://isomorphic-git.github.io/docs/quickstart.html) on the docs website.
 
