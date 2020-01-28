@@ -17,7 +17,7 @@ import { readBlob } from './readBlob'
  * @param {string} [args.ref] - The notes ref to look under
  * @param {string} [args.oid] - The SHA-1 object id of the object to get the note for.
  *
- * @returns {Promise<Buffer>} Resolves successfully with note contents as a Buffer.
+ * @returns {Promise<Uint8Array>} Resolves successfully with note contents as a Buffer.
  */
 
 export async function readNote ({

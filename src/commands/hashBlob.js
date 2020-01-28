@@ -6,7 +6,7 @@ import { hashObject } from '../storage/hashObject.js'
  * @typedef {object} HashBlobResult - The object returned has the following schema:
  * @property {string} oid - The SHA-1 object id
  * @property {'blob'} type - The type of the object
- * @property {Buffer} object - The wrapped git object (the thing that is hashed)
+ * @property {Uint8Array} object - The wrapped git object (the thing that is hashed)
  * @property {'wrapped'} format - The format of the object
  *
  */
@@ -16,9 +16,9 @@ import { hashObject } from '../storage/hashObject.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {Buffer|string} args.object - The object to write. If `object` is a String then it will be converted to a Buffer using UTF-8 encoding.
+ * @param {Uint8Array|string} args.object - The object to write. If `object` is a String then it will be converted to a Uint8Array using UTF-8 encoding.
  *
- * @returns {Promise<{HashBlobResult}>} Resolves successfully with the SHA-1 object id and the wrapped object Buffer.
+ * @returns {Promise<{HashBlobResult}>} Resolves successfully with the SHA-1 object id and the wrapped object Uint8Array.
  * @see HashBlobResult
  *
  * @example
@@ -37,6 +37,8 @@ export async function hashBlob ({ core = 'default', object }) {
     // Convert object to buffer
     if (typeof object === 'string') {
       object = Buffer.from(object, 'utf8')
+    } else {
+      object = Buffer.from(object)
     }
 
     const type = 'blob'
@@ -45,7 +47,7 @@ export async function hashBlob ({ core = 'default', object }) {
       format: 'content',
       object
     })
-    return { oid, type, object: _object, format: 'wrapped' }
+    return { oid, type, object: new Uint8Array(_object), format: 'wrapped' }
   } catch (err) {
     err.caller = 'git.hashBlob'
     throw err

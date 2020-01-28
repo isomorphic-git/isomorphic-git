@@ -9,7 +9,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  *
  * @typedef {Object} ReadBlobResult - The object returned has the following schema:
  * @property {string} oid
- * @property {Buffer} blob
+ * @property {Uint8Array} blob
  *
  */
 

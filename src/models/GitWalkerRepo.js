@@ -121,7 +121,7 @@ export class GitWalkerRepo {
       if (type !== 'blob') {
         entry._content = void 0
       } else {
-        entry._content = object
+        entry._content = new Uint8Array(object)
       }
     }
     return entry._content
