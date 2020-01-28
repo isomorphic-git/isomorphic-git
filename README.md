@@ -52,6 +52,8 @@ At the time of writing, the following breaking changes are planned:
 - [x] Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
 - [x] The `pattern` and globbing options will be removed from `statusMatrix` so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `filter` function instead.
 - [x] The `autoTranslateSSH` feature will be removed, since it's trivial to implement using just the `UnknownTransportError.data.suggestion`
+- [x] Make the 'message' event behave like 'rawmessage' and remove 'rawmessage'.
+- [ ] Update the README to recommend LightningFS rather than BrowserFS.
 - [ ] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
 
 ## Getting Started
