@@ -1,6 +1,3 @@
-import { auth } from './utils/auth.js'
-import { oauth2 } from './utils/oauth2.js'
-
 export * from './commands/add.js'
 export * from './commands/addNote.js'
 export * from './commands/addRemote.js'
@@ -61,7 +58,6 @@ export * from './commands/WORKDIR.js'
 export * from './commands/STAGE.js'
 export * from './commands/TREE.js'
 
-export const utils = { auth, oauth2 }
 export { E } from './models/GitError'
 
 export * from './utils/plugins.js'

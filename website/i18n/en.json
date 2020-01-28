@@ -264,14 +264,6 @@
         "title": "TREE",
         "sidebar_label": "TREE"
       },
-      "utils_auth": {
-        "title": "auth",
-        "sidebar_label": "utils.auth"
-      },
-      "utils_oauth2": {
-        "title": "oauth2",
-        "sidebar_label": "utils.oauth2"
-      },
       "verify": {
         "title": "verify",
         "sidebar_label": "verify"

@@ -51,8 +51,6 @@ sidebar_label: Alphabetical Index
 - [statusMatrix](statusMatrix)
 - [tag](tag)
 - [TREE](TREE)
-- [utils.auth](utils_auth) [deprecated]
-- [utils.oauth2](utils_oauth2) [deprecated]
 - [verify](verify)
 - [version](version)
 - [walk](walk)
