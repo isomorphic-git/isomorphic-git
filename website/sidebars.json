@@ -88,8 +88,6 @@
       "version"
     ],
     "Deprecated Commands": [
-      "utils_auth",
-      "utils_oauth2",
       "readObject",
       "writeObject"
     ]
