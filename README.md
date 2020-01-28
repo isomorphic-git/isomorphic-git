@@ -125,11 +125,11 @@ You can install it from npm.
 npm install --save isomorphic-git
 ```
 
-In the package.json you'll see there are actually 4 different versions:
+In the package.json you'll see there are actually 3 different versions:
 
 ```json
-  "main": "dist/for-node/isomorphic-git/index.js",
-  "module": "dist/for-future/isomorphic-git/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "unpkg": "dist/bundle.umd.min.js",
 ```
 
@@ -234,7 +234,7 @@ The main difference is the ridiculous amount of hacks involved in the tests.
 We use Facebook's [Jest](https://jestjs.io) for testing, which make doing TDD fast and fun,
 but we also used custom hacks so that the same
 tests will also run in the browser using [Jasmine](https://jasmine.github.io/) via [Karma](https://karma-runner.github.io).
-We even have our own [karma plugin](https://github.com/isomorphic-git/karma-git-http-server-middleware) for serving
+We even have our own [mock server](https://github.com/isomorphic-git/git-http-mock-server) for serving
 git repository test fixtures!
 
 You'll need [Node.js](https://nodejs.org) installed, but everything else is a devDependency.
