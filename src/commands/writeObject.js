@@ -34,12 +34,12 @@ import { cores } from '../utils/plugins.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {Buffer|string|Object} args.object - The object to write.
+ * @param {Uint8Array|string|Object} args.object - The object to write.
  * @param {'blob'|'tree'|'commit'|'tag'} args.type - The kind of object to write.
  * @param {'deflated' | 'wrapped' | 'content' | 'parsed'} [args.format = 'parsed'] - What format the object is in. The possible choices are listed below.
  * @param {string} args.oid - If `format` is `'deflated'` then this param is required. Otherwise it is calculated.
  * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the object at that filepath. To return the root directory of a tree set filepath to `''`
- * @param {string} [args.encoding] - If `type` is `'blob'` then `content` will be converted to a Buffer using `encoding`.
+ * @param {string} [args.encoding] - If `type` is `'blob'` then `content` will be converted to a Uint8Array using `encoding`.
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly written object.
  *

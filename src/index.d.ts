@@ -16,7 +16,7 @@ export interface GitObjectDescription {
   oid: string;
   type?: 'blob' | 'tree' | 'commit' | 'tag';
   format: 'deflated' | 'wrapped' | 'content' | 'parsed';
-  object: Buffer | CommitDescription | TreeDescription | TagDescription;
+  object: Uint8Array | CommitDescription | TreeDescription | TagDescription;
   source?: string;
 }
 
@@ -124,7 +124,7 @@ export interface TreeEntry {
 
 export interface PackObjectsResponse {
   filename: string;
-  packfile?: Buffer;
+  packfile?: Uint8Array;
 }
 
 export interface PushResponse {
@@ -165,28 +165,7 @@ export interface RemoteDefinition {
 
 export interface Walker {}
 
-export interface WalkerTree {
-  fullpath: string;
-  basename: string;
-  exists: boolean;
-  populateStat: () => Promise<void>;
-  type?: 'tree' | 'blob' | 'special';
-  ctimeSeconds?: number;
-  mtimeSeconds?: number;
-  mtimeNanoseconds?: number;
-  dev?: number;
-  ino?: number;
-  mode?: number;
-  uid?: number;
-  gid?: number;
-  size?: number;
-  populateContent: () => Promise<void>;
-  content?: Buffer;
-  populateHash: () => Promise<void>;
-  oid?: string;
-}
-
-export interface WalkerEntry2 {
+export interface WalkerEntry {
   fullpath: string;
   basename: string;
   exists: boolean;
@@ -266,8 +245,6 @@ export type AnyGitPlugin = GitFsPlugin | GitFsPromisesPlugin | GitCredentialMana
 export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 
 export type StatusMatrix = Array<[string, number, number, number]>;
-
-export type WalkerEntry = WalkerTree[];
 
 export const plugins: GitPluginCore
 
@@ -787,10 +764,10 @@ export function walk<T, Q>(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
   trees: Walker[];
-  filter?: (entries: WalkerEntry2[]) => Promise<boolean>;
-  map?: (entries: WalkerEntry2[]) => Promise<T | undefined>;
+  filter?: (entries: WalkerEntry[]) => Promise<boolean>;
+  map?: (entries: WalkerEntry[]) => Promise<T | undefined>;
   reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
-  iterate?: (walk: (parent: WalkerEntry2[]) => Promise<Q>, children: Iterable<WalkerEntry2[]>) => Promise<Array<Q|undefined>>;
+  iterate?: (walk: (parent: WalkerEntry[]) => Promise<Q>, children: Iterable<WalkerEntry[]>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
 
 export function writeBlob(args: GitDir & {
@@ -809,7 +786,7 @@ export function writeObject(args: GitDir & {
   core?: string;
   fs?: any;
   type?: 'blob' | 'tree' | 'commit' | 'tag';
-  object: string | Buffer | CommitDescription | TreeDescription | TagDescription;
+  object: string | Uint8Array | CommitDescription | TreeDescription | TagDescription;
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
   oid?: string;
   encoding?: string;
@@ -830,13 +807,13 @@ export function writeTree(args: GitDir & {
 type HashBlobResult = {
   oid: string;
   type: 'blob';
-  object: Buffer;
+  object: Uint8Array;
   format: 'wrapped';
 }
 
 export function hashBlob(args: {
   core?: string;
-  object: string | Buffer | CommitDescription | TreeDescription | TagDescription;
+  object: string | Uint8Array;
 }): Promise<HashBlobResult>;
 
 export function writeRef(args: GitDir & {

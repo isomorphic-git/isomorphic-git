@@ -32,6 +32,7 @@ describe('packObjects', () => {
     })
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     expect(fixture.buffer).toEqual(packfile.buffer)
+    expect(Buffer.compare(Buffer.from(fixture), Buffer.from(packfile)) === 0).toBe(true)
     expect(await fs.exists(path.join(gitdir, `objects/pack/${filename}`))).toBe(
       false
     )
@@ -67,5 +68,6 @@ describe('packObjects', () => {
     expect(await fs.exists(filepath)).toBe(true)
     const packfile = await fs.read(filepath)
     expect(fixture.buffer).toEqual(packfile.buffer)
+    expect(Buffer.compare(Buffer.from(fixture), Buffer.from(packfile)) === 0).toBe(true)
   })
 })
