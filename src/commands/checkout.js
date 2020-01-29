@@ -25,7 +25,6 @@ import { walk } from './walk.js'
  * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  * @param {string} [args.ref = 'HEAD'] - Source to checkout files from
  * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
@@ -59,7 +58,6 @@ export async function checkout ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   remote = 'origin',
   ref: _ref,
@@ -76,6 +74,7 @@ export async function checkout ({
   try {
     const ref = _ref || 'HEAD'
     const fs = new FileSystem(_fs)
+    const emitter = cores.get(core).get('emitter')
     // Get tree oid
     let oid
     try {

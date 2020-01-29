@@ -338,7 +338,6 @@ export function branch(args: GitDir & {
 export function checkout(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  emitter?: EventEmitter;
   emitterPrefix?: string;
   remote?: string;
   ref?: string;
@@ -355,7 +354,6 @@ export function checkout(args: WorkDir & GitDir & {
 export function clone(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  emitter?: EventEmitter;
   emitterPrefix?: string;
   url: string;
   corsProxy?: string;
@@ -457,7 +455,6 @@ export function expandOid(args: GitDir & {
 export function fetch(args: GitDir & {
   core?: string;
   fs?: any;
-  emitter?: EventEmitter;
   emitterPrefix?: string;
   url?: string;
   corsProxy?: string;
@@ -501,7 +498,6 @@ export function getRemoteInfo(args: {
 export function indexPack(args: WorkDir & GitDir & {
   core?: string;
   fs?: any;
-  emitter?: EventEmitter;
   emitterPrefix?: string;
   filepath: string;
 }): Promise<void>;
@@ -604,7 +600,6 @@ export function pull(args: WorkDir & GitDir & {
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
   headers?: { [key: string]: string };
-  emitter?: EventEmitter;
   emitterPrefix?: string;
   author?: {
     name?: string;
@@ -640,7 +635,6 @@ export function push(args: GitDir & {
   token?: string;
   oauth2format?: 'github' | 'bitbucket' | 'gitlab';
   headers?: { [key: string]: string };
-  emitter?: EventEmitter;
   emitterPrefix?: string;
 }): Promise<PushResponse>;
 

@@ -37,7 +37,6 @@ import { init } from './init.js'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
@@ -58,7 +57,6 @@ export async function clone ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   url,
   noGitSuffix = false,
@@ -122,7 +120,6 @@ export async function clone ({
       core,
       gitdir,
       fs,
-      emitter,
       emitterPrefix,
       noGitSuffix,
       ref,
@@ -147,7 +144,6 @@ export async function clone ({
       dir,
       gitdir,
       fs,
-      emitter,
       emitterPrefix,
       ref,
       remote,

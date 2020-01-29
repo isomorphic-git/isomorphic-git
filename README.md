@@ -46,7 +46,8 @@ At the time of writing, the following breaking changes are planned:
 - [ ] Deprecated commands and function arguments will be removed:
   - [x] The `sign` command will be removed.
   - [x] The commands `utils.auth` and `utils.oauth2` will be removed.
-  - [ ] The `fs` and `emitter` function arguments will be removed.
+  - [x] The `emitter` function argument will be removed.
+  - [ ] The `fs` function argument will be removed.
   - [x] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
   - [x] The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. **Update: Actually, it now returns the same kind of objects as `readCommit` because that just makes a lot of sense.** (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
 - [x] Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
@@ -54,7 +55,8 @@ At the time of writing, the following breaking changes are planned:
 - [x] The `autoTranslateSSH` feature will be removed, since it's trivial to implement using just the `UnknownTransportError.data.suggestion`
 - [x] Make the 'message' event behave like 'rawmessage' and remove 'rawmessage'.
 - [x] Update the README to recommend LightningFS rather than BrowserFS.
-- [ ] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
+- [x] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
+- [ ] I think I will change the `plugins` API. The current API (`plugins.set('fs', fs)`) uses a kinda-hacky run-time schema validation that just checks whether certain methods are defined. Static type checking would actually provide a better developer experience and better guarantees, but having `.set` be polymorphic is hard to accurately describe using JSDoc, so I might switch to an API like `plugins.fs(fs)`.
 
 ## Getting Started
 

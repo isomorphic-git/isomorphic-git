@@ -63,7 +63,6 @@ import { config } from './config'
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
@@ -87,7 +86,6 @@ export async function fetch ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   ref = 'HEAD',
   // @ts-ignore
@@ -117,6 +115,8 @@ export async function fetch ({
   onprogress // deprecated
 }) {
   try {
+    const emitter = cores.get(core).get('emitter')
+
     if (onprogress !== undefined) {
       console.warn(
         'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'

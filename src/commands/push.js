@@ -62,7 +62,6 @@ import { pack } from './pack.js'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<PushResponse>} Resolves successfully when push completes with a detailed description of the operation from the server.
@@ -83,7 +82,6 @@ export async function push ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   ref,
   remoteRef,
@@ -105,6 +103,8 @@ export async function push ({
 }) {
   try {
     const fs = new FileSystem(_fs)
+    const emitter = cores.get(core).get('emitter')
+
     // TODO: Figure out how pushing tags works. (This only works for branches.)
     if (url === undefined) {
       url = await config({ fs, gitdir, path: `remote.${remote}.url` })

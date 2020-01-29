@@ -30,7 +30,6 @@ import { merge } from './merge'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
  * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
@@ -58,7 +57,6 @@ export async function pull ({
   fastForwardOnly = false,
   noGitSuffix = false,
   corsProxy,
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   // @ts-ignore
   authUsername,
@@ -92,7 +90,6 @@ export async function pull ({
       dir,
       gitdir,
       fs,
-      emitter,
       emitterPrefix,
       noGitSuffix,
       corsProxy,
@@ -122,7 +119,6 @@ export async function pull ({
       gitdir,
       fs,
       ref,
-      emitter,
       emitterPrefix,
       noSubmodules,
       newSubmoduleBehavior

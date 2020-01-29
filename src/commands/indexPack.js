@@ -16,7 +16,6 @@ import { cores } from '../utils/plugins.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the .pack file to index
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<void>} Resolves when filesystem operations are complete
@@ -31,12 +30,13 @@ export async function indexPack ({
   dir,
   gitdir = join(dir, '.git'),
   fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   filepath
 }) {
   try {
     const fs = new FileSystem(_fs)
+    const emitter = cores.get(core).get('emitter')
+
     filepath = join(dir, filepath)
     const pack = await fs.read(filepath)
     const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
