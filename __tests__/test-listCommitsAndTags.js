@@ -12,11 +12,10 @@ describe('listCommitsAndTags', () => {
   })
   it('listCommitsAndTags', async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-listCommitsAndTags')
-    plugins.set('fs', fs)
+    const { _fs, gitdir } = await makeFixture('test-listCommitsAndTags')
+    plugins.set('fs', _fs)
     // Test
     const commits = await listCommitsAndTags({
-      fs,
       gitdir,
       start: ['c60bbbe99e96578105c57c4b3f2b6ebdf863edbc'],
       finish: ['c77052f99c33dbe3d2a120805fcebe9e2194b6f9']

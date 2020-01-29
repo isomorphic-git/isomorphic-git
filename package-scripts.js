@@ -67,7 +67,7 @@ module.exports = {
               `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
               `bundlewatch`
         )
-        : optional(`bundlewatch`)
+        : optional(`cross-env bundlewatch dist/bundle.umd.min.js`)
     },
     website: {
       default: series.nps('website.build', 'website.publish'),

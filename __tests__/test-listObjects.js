@@ -11,8 +11,8 @@ describe('listObjects', () => {
   })
   it('listObjects', async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-listObjects')
-    plugins.set('fs', fs)
+    const { _fs, gitdir } = await makeFixture('test-listObjects')
+    plugins.set('fs', _fs)
     // Test
     const objects = await listObjects({
       gitdir,
