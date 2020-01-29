@@ -109,18 +109,11 @@ export async function fetch ({
   headers = {},
   prune = false,
   pruneTags = false,
-  // @ts-ignore
-  onprogress // deprecated
 }) {
   try {
+    const fs = new FileSystem(cores.get(core).get('fs'))
     const emitter = cores.get(core).get('emitter')
 
-    if (onprogress !== undefined) {
-      console.warn(
-        'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
-      )
-    }
-    const fs = new FileSystem(cores.get(core).get('fs'))
     const response = await fetchPackfile({
       core,
       gitdir,

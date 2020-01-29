@@ -76,16 +76,9 @@ export async function clone ({
   noSubmodules = false,
   newSubmoduleBehavior = false,
   noTags = false,
-  headers = {},
-  // @ts-ignore
-  onprogress
+  headers = {}
 }) {
   try {
-    if (onprogress !== undefined) {
-      console.warn(
-        'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
-      )
-    }
     username = username === undefined ? authUsername : username
     password = password === undefined ? authPassword : password
     await init({ core, gitdir })
