@@ -37,7 +37,6 @@ import { findMergeBase } from './findMergeBase.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
@@ -62,7 +61,6 @@ export async function merge ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ours,
   theirs,
   fastForwardOnly = false,
@@ -74,9 +72,9 @@ export async function merge ({
   signingKey
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     if (ours === undefined) {
-      ours = await currentBranch({ fs, gitdir, fullname: true })
+      ours = await currentBranch({ core, gitdir, fullname: true })
     }
     ours = await GitRefManager.expand({
       fs,
@@ -103,7 +101,6 @@ export async function merge ({
       core,
       dir,
       gitdir,
-      fs,
       oids: [ourOid, theirOid]
     })
     if (baseOids.length !== 1) {
@@ -133,7 +130,6 @@ export async function merge ({
       // try a fancier merge
       const tree = await mergeTree({
         core,
-        fs,
         gitdir,
         ourOid,
         theirOid,
@@ -149,7 +145,7 @@ export async function merge ({
         )}`
       }
       const oid = await commit({
-        fs,
+        core,
         gitdir,
         message,
         ref: ours,

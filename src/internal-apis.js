@@ -24,7 +24,6 @@ export * from './models/GitRefSpec'
 export * from './models/GitRefSpecSet'
 export * from './models/GitSideBand'
 export * from './models/GitTree'
-export * from './models/SignedGitCommit'
 
 export * from './storage/readObject'
 export * from './storage/writeObject'

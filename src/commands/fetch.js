@@ -42,7 +42,6 @@ import { config } from './config'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
@@ -63,7 +62,6 @@ import { config } from './config'
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
@@ -86,8 +84,6 @@ export async function fetch ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   ref = 'HEAD',
   // @ts-ignore
@@ -112,21 +108,15 @@ export async function fetch ({
   singleBranch = false,
   headers = {},
   prune = false,
-  pruneTags = false,
-  // @ts-ignore
-  onprogress // deprecated
+  pruneTags = false
 }) {
   try {
-    if (onprogress !== undefined) {
-      console.warn(
-        'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
-      )
-    }
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
+    const emitter = cores.get(core).get('emitter')
+
     const response = await fetchPackfile({
       core,
       gitdir,
-      fs,
       emitter,
       emitterPrefix,
       ref,
@@ -213,7 +203,6 @@ export async function fetch ({
 async function fetchPackfile ({
   core,
   gitdir,
-  fs: _fs,
   emitter,
   emitterPrefix,
   ref,
@@ -236,7 +225,7 @@ async function fetchPackfile ({
   prune,
   pruneTags
 }) {
-  const fs = new FileSystem(_fs)
+  const fs = new FileSystem(cores.get(core).get('fs'))
   // Sanity checks
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
@@ -248,14 +237,14 @@ async function fetchPackfile ({
   remote = remote || 'origin'
   if (url === undefined) {
     url = await config({
-      fs,
+      core,
       gitdir,
       path: `remote.${remote}.url`
     })
   }
 
   if (corsProxy === undefined) {
-    corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
+    corsProxy = await config({ core, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })

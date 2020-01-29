@@ -1,7 +1,5 @@
 // @ts-check
-import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout.js'
 import { config } from './config.js'
@@ -15,7 +13,6 @@ import { init } from './init.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.url - The URL of the remote repository
@@ -37,7 +34,6 @@ import { init } from './init.js'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
@@ -57,8 +53,6 @@ export async function clone ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   url,
   noGitSuffix = false,
@@ -82,37 +76,29 @@ export async function clone ({
   noSubmodules = false,
   newSubmoduleBehavior = false,
   noTags = false,
-  headers = {},
-  // @ts-ignore
-  onprogress
+  headers = {}
 }) {
   try {
-    if (onprogress !== undefined) {
-      console.warn(
-        'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
-      )
-    }
-    const fs = new FileSystem(_fs)
     username = username === undefined ? authUsername : username
     password = password === undefined ? authPassword : password
-    await init({ gitdir, fs })
+    await init({ core, gitdir })
     // Add remote
     await config({
+      core,
       gitdir,
-      fs,
       path: `remote.${remote}.url`,
       value: url
     })
     await config({
+      core,
       gitdir,
-      fs,
       path: `remote.${remote}.fetch`,
       value: `+refs/heads/*:refs/remotes/${remote}/*`
     })
     if (corsProxy) {
       await config({
+        core,
         gitdir,
-        fs,
         path: `http.corsProxy`,
         value: corsProxy
       })
@@ -121,8 +107,6 @@ export async function clone ({
     const { defaultBranch, fetchHead } = await fetch({
       core,
       gitdir,
-      fs,
-      emitter,
       emitterPrefix,
       noGitSuffix,
       ref,
@@ -144,10 +128,9 @@ export async function clone ({
     ref = ref.replace('refs/heads/', '')
     // Checkout that branch
     await checkout({
+      core,
       dir,
       gitdir,
-      fs,
-      emitter,
       emitterPrefix,
       ref,
       remote,

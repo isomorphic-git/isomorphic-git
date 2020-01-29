@@ -8,10 +8,9 @@ export async function uploadPack ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   advertiseRefs = false
 }) {
-  const fs = new FileSystem(_fs)
+  const fs = new FileSystem(cores.get(core).get('fs'))
   try {
     if (advertiseRefs) {
       // Send a refs advertisement

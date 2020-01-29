@@ -15,7 +15,6 @@ import { readObject } from './readObject'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Return a list of all the files in the commit at `ref` instead of the files currently in the git index (aka staging area)
@@ -35,15 +34,14 @@ export async function listFiles ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ref
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     if (ref) {
       const oid = await GitRefManager.resolve({ gitdir, fs, ref })
       const filenames = []
-      await accumulateFilesFromOid({ gitdir, fs, oid, filenames, prefix: '' })
+      await accumulateFilesFromOid({ core, gitdir, oid, filenames, prefix: '' })
       return filenames
     } else {
       return GitIndexManager.acquire({ fs, gitdir }, async function (index) {
@@ -56,15 +54,21 @@ export async function listFiles ({
   }
 }
 
-async function accumulateFilesFromOid ({ gitdir, fs, oid, filenames, prefix }) {
-  const { object } = await readObject({ gitdir, fs, oid, filepath: '' })
+async function accumulateFilesFromOid ({
+  core,
+  gitdir,
+  oid,
+  filenames,
+  prefix
+}) {
+  const { object } = await readObject({ core, gitdir, oid, filepath: '' })
   // Note: this isn't parallelized because I'm too lazy to figure that out right now
   // @ts-ignore
   for (const entry of object.entries) {
     if (entry.type === 'tree') {
       await accumulateFilesFromOid({
+        core,
         gitdir,
-        fs,
         oid: entry.oid,
         filenames,
         prefix: join(prefix, entry.path)

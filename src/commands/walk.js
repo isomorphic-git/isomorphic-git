@@ -5,7 +5,7 @@ import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
-import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
+import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
  *
@@ -236,7 +236,6 @@ import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Walker[]} args.trees - The trees you want to traverse
@@ -252,7 +251,6 @@ export async function walk ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   trees,
   // @ts-ignore
   map = async (_, entry) => entry,
@@ -266,7 +264,7 @@ export async function walk ({
   iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     const walkers = trees.map(proxy =>
       proxy[GitWalkSymbol]({ fs, dir, gitdir })
     )
@@ -286,7 +284,7 @@ export async function walk ({
         .map(array => array[Symbol.iterator]())
       return {
         entries,
-        children: unionOfIterators2(iterators)
+        children: unionOfIterators(iterators)
       }
     }
 

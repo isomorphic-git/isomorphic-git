@@ -254,7 +254,7 @@ function gendoc (file, filepath) {
       oid,
       filepath: `src/commands/${entry.path}`
     })
-    const filetext = blob.toString('utf8')
+    const filetext = Buffer.from(blob).toString('utf8')
     const doctext = gendoc(filetext, entry.path)
     if (doctext !== '') {
       const docfilename = entry.path.replace(/js$/, 'md')
@@ -274,7 +274,7 @@ function gendoc (file, filepath) {
     oid,
     filepath: 'src/models/GitError.js'
   })
-  const sourceCode = blob.toString('utf8')
+  const sourceCode = Buffer.from(blob).toString('utf8')
 
   let contents = `---
 title: Error Codes

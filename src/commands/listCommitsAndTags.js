@@ -12,11 +12,10 @@ export async function listCommitsAndTags ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   start,
   finish
 }) {
-  const fs = new FileSystem(_fs)
+  const fs = new FileSystem(cores.get(core).get('fs'))
   const shallows = await GitShallowManager.read({ fs, gitdir })
   const startingSet = new Set()
   const finishingSet = new Set()
