@@ -534,8 +534,8 @@ async function analyze ({
               // If the file hasn't changed, there is no need to do anything.
               // Existing file modifications in the workdir can be be left as is.
               if (
-                (await stage.oid() === await commit.oid()) &&
-                (await stage.mode() === await commit.mode()) &&
+                (await stage.oid()) === (await commit.oid()) &&
+                (await stage.mode()) === (await commit.mode()) &&
                 !force
               ) {
                 return
