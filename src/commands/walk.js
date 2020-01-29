@@ -5,7 +5,7 @@ import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
-import { unionOfIterators2 } from '../utils/unionOfIterators2.js'
+import { unionOfIterators } from '../utils/unionOfIterators.js'
 
 /**
  *
@@ -284,7 +284,7 @@ export async function walk ({
         .map(array => array[Symbol.iterator]())
       return {
         entries,
-        children: unionOfIterators2(iterators)
+        children: unionOfIterators(iterators)
       }
     }
 
