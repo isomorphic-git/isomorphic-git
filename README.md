@@ -43,11 +43,11 @@ At the time of writing, the following breaking changes are planned:
 - [x] Commands that will be renamed:
   - [x] The `checkout` command will be replaced with the implementation used in the safer and faster `fastCheckout` command and `fastCheckout` will be removed.
   - [x] The `walkBeta2` command renamed to `walk`, and the `walkBeta1` command will be removed.
-- [ ] Deprecated commands and function arguments will be removed:
+- [x] Deprecated commands and function arguments will be removed:
   - [x] The `sign` command will be removed.
   - [x] The commands `utils.auth` and `utils.oauth2` will be removed.
   - [x] The `emitter` function argument will be removed.
-  - [ ] The `fs` function argument will be removed.
+  - [x] The `fs` function argument will be removed.
   - [x] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
   - [x] The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. **Update: Actually, it now returns the same kind of objects as `readCommit` because that just makes a lot of sense.** (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
 - [x] Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
