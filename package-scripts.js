@@ -69,7 +69,7 @@ module.exports = {
               `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
               `bundlewatch`
         )
-        : optional(`cross-env BUNDLEWATCH_GITHUB_TOKEN='' bundlewatch`)
+        : optional(`bundlewatch`)
     },
     website: {
       default: series.nps('website.build', 'website.publish'),
