@@ -4,7 +4,7 @@ const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 // @ts-ignore
 const snapshots = require('./__snapshots__/test-listCommitsAndTags.js.snap')
 
-const { listCommitsAndTags } = require('isomorphic-git/internal-apis')
+const { listCommitsAndTags, plugins } = require('isomorphic-git/internal-apis')
 
 describe('listCommitsAndTags', () => {
   beforeAll(() => {
@@ -13,6 +13,7 @@ describe('listCommitsAndTags', () => {
   it('listCommitsAndTags', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-listCommitsAndTags')
+    plugins.set('fs', fs)
     // Test
     const commits = await listCommitsAndTags({
       fs,

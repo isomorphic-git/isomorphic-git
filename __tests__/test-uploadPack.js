@@ -1,12 +1,13 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { uploadPack, collect } = require('isomorphic-git/internal-apis')
+const { uploadPack, collect, plugins } = require('isomorphic-git/internal-apis')
 
 describe('uploadPack', () => {
   it('advertiseRefs: true', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-uploadPack')
+    plugins.set('fs', fs)
     const res = await uploadPack({ fs, gitdir, advertiseRefs: true })
     const buffer = await collect(res)
     expect(buffer.toString('utf8')).toBe(
