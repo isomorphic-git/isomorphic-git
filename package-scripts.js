@@ -62,15 +62,14 @@ module.exports = {
       size: process.env.CI
         ? optional(
           `cross-env ` +
-              `GITHUB_TOKEN='${process.env.BUNDLESIZE_GITHUB_TOKEN}' ` +
+              `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}' ` +
               `CI_REPO_OWNER='isomorphic-git' ` +
               `CI_REPO_NAME='isomorphic-git' ` +
               `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
-              `CI_COMMIT_MESSAGE='${process.env.BUILD_SOURCEVERSIONMESSAGE.replace(/'/, `'"'"'`)}' ` +
-              `CI='true' ` +
-              `bundlesize`
+              `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
+              `bundlewatch`
         )
-        : optional(`cross-env GITHUB_TOKEN='' bundlesize`)
+        : optional(`cross-env BUNDLEWATCH_GITHUB_TOKEN='' bundlewatch`)
     },
     website: {
       default: series.nps('website.build', 'website.publish'),
