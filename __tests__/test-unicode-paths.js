@@ -9,7 +9,8 @@ const {
   commit,
   checkout,
   listFiles,
-  readObject
+  readCommit,
+  readTree
 } = require('isomorphic-git')
 
 describe('unicode filepath support', () => {
@@ -54,7 +55,7 @@ describe('unicode filepath support', () => {
       message: '日本語'
     })
     // Check GitCommit object
-    const { object: comm } = await readObject({ core, dir, gitdir, oid: sha })
+    const { commit: comm } = await readCommit({ core, dir, gitdir, oid: sha })
     expect(comm.author.name).toBe('日本語')
     expect(comm.author.email).toBe('日本語@example.com')
     expect(comm.message).toBe('日本語\n')
@@ -76,16 +77,16 @@ describe('unicode filepath support', () => {
       },
       message: '日本語'
     })
-    const { object: comm } = await readObject({ core, dir, gitdir, oid: sha })
+    const { commit: comm } = await readCommit({ core, dir, gitdir, oid: sha })
     // Test
     // Check GitTree object
-    const { object: tree } = await readObject({
+    const { tree } = await readTree({
       core,
       dir,
       gitdir,
       oid: comm.tree
     })
-    expect(tree.entries[0].path).toBe('日本語')
+    expect(tree[0].path).toBe('日本語')
   })
   it('checkout 日本語', async () => {
     // Setup

@@ -13,7 +13,6 @@ describe('packObjects', () => {
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
     const { filename, packfile } = await packObjects({
-      fs,
       gitdir,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',
@@ -47,7 +46,6 @@ describe('packObjects', () => {
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
     const { filename } = await packObjects({
-      fs,
       gitdir,
       oids: [
         '5a9da3272badb2d3c8dbab463aed5741acb15a33',

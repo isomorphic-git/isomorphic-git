@@ -21,7 +21,6 @@ import { cores } from './plugins.js'
  *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ourOid - The SHA-1 object id of our tree
@@ -39,7 +38,6 @@ export async function mergeTree ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ourOid,
   baseOid,
   theirOid,
@@ -48,14 +46,13 @@ export async function mergeTree ({
   theirName = 'theirs',
   dryRun = false
 }) {
-  const fs = new FileSystem(_fs)
+  const fs = new FileSystem(cores.get(core).get('fs'))
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
   const theirTree = TREE({ ref: theirOid })
 
   const results = await walk({
     core,
-    fs,
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],

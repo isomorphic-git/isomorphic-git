@@ -22,10 +22,8 @@ import { walk } from './walk.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md)
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  * @param {string} [args.ref = 'HEAD'] - Source to checkout files from
  * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
@@ -58,8 +56,6 @@ export async function checkout ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   remote = 'origin',
   ref: _ref,
@@ -75,7 +71,8 @@ export async function checkout ({
 }) {
   try {
     const ref = _ref || 'HEAD'
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
+    const emitter = cores.get(core).get('emitter')
     // Get tree oid
     let oid
     try {
@@ -94,14 +91,14 @@ export async function checkout ({
       })
       // Set up remote tracking branch
       await config({
+        core,
         gitdir,
-        fs,
         path: `branch.${ref}.remote`,
         value: `${remote}`
       })
       await config({
+        core,
         gitdir,
-        fs,
         path: `branch.${ref}.merge`,
         value: `refs/heads/${ref}`
       })
@@ -115,7 +112,7 @@ export async function checkout ({
       // First pass - just analyze files (not directories) and figure out what needs to be done
       try {
         ops = await analyze({
-          fs,
+          core,
           dir,
           gitdir,
           ref,
@@ -327,7 +324,7 @@ export async function checkout ({
 }
 
 async function analyze ({
-  fs,
+  core,
   dir,
   gitdir,
   ref,
@@ -340,7 +337,7 @@ async function analyze ({
 }) {
   let count = 0
   return walk({
-    fs,
+    core,
     dir,
     gitdir,
     trees: [TREE({ ref }), WORKDIR(), STAGE()],

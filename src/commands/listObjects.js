@@ -10,10 +10,9 @@ export async function listObjects ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   oids
 }) {
-  const fs = new FileSystem(_fs)
+  const fs = new FileSystem(cores.get(core).get('fs'))
   const visited = new Set()
   // We don't do the purest simplest recursion, because we can
   // avoid reading Blob objects entirely since the Tree objects

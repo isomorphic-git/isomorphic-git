@@ -12,7 +12,6 @@ import { cores } from '../utils/plugins.js'
  *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.filepath - The file directory to start searching in.
  *
  * @returns {Promise<string>} Resolves successfully with a root git directory path
@@ -25,13 +24,9 @@ import { cores } from '../utils/plugins.js'
  * console.log(gitroot) // '/path/to/some/gitrepo'
  *
  */
-export async function findRoot ({
-  core = 'default',
-  fs: _fs = cores.get(core).get('fs'),
-  filepath
-}) {
+export async function findRoot ({ core = 'default', filepath }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     return _findRoot(fs, filepath)
   } catch (err) {
     err.caller = 'git.findRoot'

@@ -1,12 +1,11 @@
 import { RunningMinimum } from '../models/RunningMinimum'
-import { basename } from '../utils/basename.js'
 
 // Take an array of length N of
 //   iterators of length Q_n
-//     of objects with a property 'fullname'
+//     of strings
 // and return an iterator of length max(Q_n) for all n
 //   of arrays of length N
-//     of objects who all have the same value for 'fullname'
+//     of string|null who all have the same string value
 export function * unionOfIterators (sets) {
   /* NOTE: We can assume all arrays are sorted.
    * Indexes are sorted because they are defined that way:
@@ -34,7 +33,7 @@ export function * unionOfIterators (sets) {
     // once they are done
     heads[i] = sets[i].next().value
     if (heads[i] !== undefined) {
-      min.consider(heads[i].fullpath)
+      min.consider(heads[i])
     }
   }
   if (min.value === null) return
@@ -44,24 +43,17 @@ export function * unionOfIterators (sets) {
     minimum = min.value
     min.reset()
     for (let i = 0; i < numsets; i++) {
-      if (heads[i] !== undefined && heads[i].fullpath === minimum) {
+      if (heads[i] !== undefined && heads[i] === minimum) {
         result[i] = heads[i]
         heads[i] = sets[i].next().value
       } else {
         // A little hacky, but eh
-        result[i] = {
-          fullpath: minimum,
-          basename: basename(minimum),
-          exists: false
-        }
+        result[i] = null
       }
       if (heads[i] !== undefined) {
-        min.consider(heads[i].fullpath)
+        min.consider(heads[i])
       }
     }
-    // if (result.reduce((y, a) => y && (a === null), true)) {
-    //   return
-    // }
     yield result
     if (min.value === null) return
   }

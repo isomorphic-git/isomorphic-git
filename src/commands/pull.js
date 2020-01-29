@@ -1,8 +1,5 @@
 // @ts-check
-// import diff3 from 'node-diff3'
-import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 import { checkout } from './checkout'
 import { config } from './config'
@@ -17,7 +14,6 @@ import { merge } from './merge'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Which branch to fetch. By default this is the currently checked out branch.
@@ -30,7 +26,6 @@ import { merge } from './merge'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {import('events').EventEmitter} [args.emitter] - [deprecated] Overrides the emitter set via the ['emitter' plugin](./plugin_emitter.md).
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
  * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
@@ -53,12 +48,10 @@ export async function pull ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ref,
   fastForwardOnly = false,
   noGitSuffix = false,
   corsProxy,
-  emitter = cores.get(core).get('emitter'),
   emitterPrefix = '',
   // @ts-ignore
   authUsername,
@@ -77,22 +70,20 @@ export async function pull ({
   newSubmoduleBehavior = false
 }) {
   try {
-    const fs = new FileSystem(_fs)
     // If ref is undefined, use 'HEAD'
     if (!ref) {
-      ref = await currentBranch({ fs, gitdir })
+      ref = await currentBranch({ core, gitdir })
     }
     // Fetch from the correct remote.
     const remote = await config({
+      core,
       gitdir,
-      fs,
       path: `branch.${ref}.remote`
     })
     const { fetchHead, fetchHeadDescription } = await fetch({
+      core,
       dir,
       gitdir,
-      fs,
-      emitter,
       emitterPrefix,
       noGitSuffix,
       corsProxy,
@@ -107,8 +98,8 @@ export async function pull ({
     })
     // Merge the remote tracking branch into the local one.
     await merge({
+      core,
       gitdir,
-      fs,
       ours: ref,
       theirs: fetchHead,
       fastForwardOnly,
@@ -118,11 +109,10 @@ export async function pull ({
       signingKey
     })
     await checkout({
+      core,
       dir,
       gitdir,
-      fs,
       ref,
-      emitter,
       emitterPrefix,
       noSubmodules,
       newSubmoduleBehavior

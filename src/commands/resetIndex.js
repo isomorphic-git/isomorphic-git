@@ -15,7 +15,6 @@ import { readObject } from './readObject.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to reset in the index
@@ -32,20 +31,19 @@ export async function resetIndex ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   filepath,
   ref = 'HEAD'
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     // Resolve commit
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
     let workdirOid
     try {
       // Resolve blob
       const obj = await readObject({
+        core,
         gitdir,
-        fs,
         oid,
         filepath,
         format: 'deflated'
