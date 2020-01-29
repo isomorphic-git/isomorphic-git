@@ -530,7 +530,7 @@ async function analyze ({
         /* eslint-disable no-fallthrough */
         // File missing from workdir
         case '110':
-        // Modified entries
+        // Possibly modified entries
         case '111': {
           /* eslint-enable no-fallthrough */
           switch (`${await stage.type()}-${await commit.type()}`) {
@@ -538,6 +538,16 @@ async function analyze ({
               return
             }
             case 'blob-blob': {
+              // If the file hasn't changed, there is no need to do anything.
+              // Existing file modifications in the workdir can be be left as is.
+              if (
+                (await stage.oid() === await commit.oid()) &&
+                (await stage.mode() === await commit.mode()) &&
+                !force
+              ) {
+                return
+              }
+
               // Check for local changes that would be lost
               if (workdir) {
                 // Note: canonical git only compares with the stage. But we're smart enough
