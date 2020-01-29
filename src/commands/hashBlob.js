@@ -18,7 +18,7 @@ import { hashObject } from '../storage/hashObject.js'
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {Uint8Array|string} args.object - The object to write. If `object` is a String then it will be converted to a Uint8Array using UTF-8 encoding.
  *
- * @returns {Promise<{HashBlobResult}>} Resolves successfully with the SHA-1 object id and the wrapped object Uint8Array.
+ * @returns {Promise<HashBlobResult>} Resolves successfully with the SHA-1 object id and the wrapped object Uint8Array.
  * @see HashBlobResult
  *
  * @example
