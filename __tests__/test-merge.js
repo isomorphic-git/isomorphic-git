@@ -160,16 +160,14 @@ describe('merge', () => {
 
   it("merge 'add-files' and 'remove-files'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     const commit = (await log({
-      fs,
       gitdir,
       depth: 1,
       ref: 'add-files-merge-remove-files'
     }))[0].commit
     // Test
     const report = await merge({
-      fs,
       gitdir,
       ours: 'add-files',
       theirs: 'remove-files',
@@ -190,16 +188,14 @@ describe('merge', () => {
 
   it("merge 'remove-files' and 'add-files'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     const commit = (await log({
-      fs,
       gitdir,
       depth: 1,
       ref: 'remove-files-merge-add-files'
     }))[0].commit
     // TestTest
     const report = await merge({
-      fs,
       gitdir,
       ours: 'remove-files',
       theirs: 'add-files',
@@ -223,12 +219,11 @@ describe('merge', () => {
 
   it("merge 'delete-first-half' and 'delete-second-half' (dryRun, missing author)", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     // Test
     let error = null
     try {
       await merge({
-        fs,
         gitdir,
         ours: 'delete-first-half',
         theirs: 'delete-second-half',
@@ -256,7 +251,6 @@ describe('merge', () => {
     }))[0]
     // Test
     const report = await merge({
-      fs,
       gitdir,
       ours: 'delete-first-half',
       theirs: 'delete-second-half',
@@ -300,7 +294,6 @@ describe('merge', () => {
     }))[0]
     // Test
     const report = await merge({
-      fs,
       gitdir,
       ours: 'delete-first-half',
       theirs: 'delete-second-half',
@@ -331,7 +324,7 @@ describe('merge', () => {
 
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       gitdir,
       depth: 1,
@@ -339,7 +332,6 @@ describe('merge', () => {
     }))[0].commit
     // Test
     const report = await merge({
-      fs,
       gitdir,
       ours: 'delete-first-half',
       theirs: 'delete-second-half',
@@ -363,12 +355,11 @@ describe('merge', () => {
 
   it("merge 'a-file' and 'a-folder'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     // Test
     let error = null
     try {
       await merge({
-        fs,
         gitdir,
         ours: 'a-file',
         theirs: 'a-folder',
@@ -388,7 +379,7 @@ describe('merge', () => {
 
   it("merge two branches that modified the same file (no conflict)'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       gitdir,
       depth: 1,
@@ -396,7 +387,6 @@ describe('merge', () => {
     }))[0].commit
     // Test
     const report = await merge({
-      fs,
       gitdir,
       ours: 'a',
       theirs: 'b',
@@ -420,7 +410,7 @@ describe('merge', () => {
 
   it("merge two branches where one modified file and the other modified file mode'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     const commit = (await log({
       gitdir,
       depth: 1,
@@ -428,7 +418,6 @@ describe('merge', () => {
     }))[0].commit
     // Test
     const report = await merge({
-      fs,
       gitdir,
       ours: 'a',
       theirs: 'd',
@@ -452,12 +441,11 @@ describe('merge', () => {
 
   it("merge two branches that modified the same file (should conflict)'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { gitdir } = await makeFixture('test-merge')
     // Test
     let error = null
     try {
       await merge({
-        fs,
         gitdir,
         ours: 'a',
         theirs: 'c',

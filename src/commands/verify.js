@@ -4,7 +4,6 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
-import { SignedGitCommit } from '../models/SignedGitCommit.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
@@ -26,12 +25,10 @@ import { cores } from '../utils/plugins.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - A reference to the commit or tag to verify
  * @param {string} args.publicKeys - A PGP public key in ASCII armor format.
- * @param {OpenPGP} [args.openpgp] - [deprecated] An instance of the [OpenPGP library](https://unpkg.com/openpgp@2.6.2). Deprecated in favor of using a [PGP plugin](./plugin_pgp.md).
  *
  * @returns {Promise<false | string[]>} The value `false` or the valid key ids (in hex format) used to sign the commit.
  *
@@ -52,13 +49,11 @@ export async function verify ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ref,
-  publicKeys,
-  openpgp
+  publicKeys
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     const oid = await GitRefManager.resolve({ fs, gitdir, ref })
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== 'commit' && type !== 'tag') {
@@ -68,35 +63,26 @@ export async function verify ({
         type
       })
     }
-    if (openpgp) {
-      // Old API
-      const commit = SignedGitCommit.from(object)
-      const keys = await commit.listSigningKeys(openpgp)
-      const validity = await commit.verify(openpgp, publicKeys)
-      if (!validity) return false
-      return keys
-    } else {
-      // Newer plugin API
-      const pgp = cores.get(core).get('pgp')
-      if (type === 'commit') {
-        const commit = GitCommit.from(object)
-        const { valid, invalid } = await GitCommit.verify(
-          commit,
-          pgp,
-          publicKeys
-        )
-        if (invalid.length > 0) return false
-        return valid
-      } else if (type === 'tag') {
-        const tag = GitAnnotatedTag.from(object)
-        const { valid, invalid } = await GitAnnotatedTag.verify(
-          tag,
-          pgp,
-          publicKeys
-        )
-        if (invalid.length > 0) return false
-        return valid
-      }
+    // Newer plugin API
+    const pgp = cores.get(core).get('pgp')
+    if (type === 'commit') {
+      const commit = GitCommit.from(object)
+      const { valid, invalid } = await GitCommit.verify(
+        commit,
+        pgp,
+        publicKeys
+      )
+      if (invalid.length > 0) return false
+      return valid
+    } else if (type === 'tag') {
+      const tag = GitAnnotatedTag.from(object)
+      const { valid, invalid } = await GitAnnotatedTag.verify(
+        tag,
+        pgp,
+        publicKeys
+      )
+      if (invalid.length > 0) return false
+      return valid
     }
   } catch (err) {
     err.caller = 'git.verify'

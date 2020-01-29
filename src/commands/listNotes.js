@@ -12,7 +12,6 @@ import { readTree } from './readTree'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
@@ -24,11 +23,10 @@ export async function listNotes ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ref = 'refs/notes/commits'
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
 
     // Get the current note commit
     let parent
@@ -42,8 +40,8 @@ export async function listNotes ({
 
     // Create the current note tree
     const result = await readTree({
+      core,
       gitdir,
-      fs,
       oid: parent
     })
 

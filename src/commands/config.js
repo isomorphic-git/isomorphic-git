@@ -13,7 +13,6 @@ import { cores } from '../utils/plugins.js'
  *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.path - The key of the git config entry
@@ -47,14 +46,13 @@ export async function config (args) {
     core = 'default',
     dir,
     gitdir = join(dir, '.git'),
-    fs: _fs = cores.get(core).get('fs'),
     all = false,
     append = false,
     path,
     value
   } = args
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     const config = await GitConfigManager.get({ fs, gitdir })
     // This carefully distinguishes between
     // 1) there is no 'value' argument (do a "get")

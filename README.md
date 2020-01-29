@@ -57,6 +57,7 @@ At the time of writing, the following breaking changes are planned:
 - [x] Update the README to recommend LightningFS rather than BrowserFS.
 - [x] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
 - [ ] I think I will change the `plugins` API. The current API (`plugins.set('fs', fs)`) uses a kinda-hacky run-time schema validation that just checks whether certain methods are defined. Static type checking would actually provide a better developer experience and better guarantees, but having `.set` be polymorphic is hard to accurately describe using JSDoc, so I might switch to an API like `plugins.fs(fs)`.
+- [ ] I think I'll tweak `readObject` and `writeObject` so that `readObject` doesn't have a crazy polymorphic return type and they somehow "fit" with all the more specific `read/write Blob/Commit/Tag/Tree` commands.
 
 ## Getting Started
 

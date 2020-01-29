@@ -42,7 +42,6 @@ import { config } from './config'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
@@ -85,7 +84,6 @@ export async function fetch ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   emitterPrefix = '',
   ref = 'HEAD',
   // @ts-ignore
@@ -122,11 +120,10 @@ export async function fetch ({
         'The `onprogress` callback has been deprecated. Please use the more generic `emitter` EventEmitter argument instead.'
       )
     }
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     const response = await fetchPackfile({
       core,
       gitdir,
-      fs,
       emitter,
       emitterPrefix,
       ref,
@@ -213,7 +210,6 @@ export async function fetch ({
 async function fetchPackfile ({
   core,
   gitdir,
-  fs: _fs,
   emitter,
   emitterPrefix,
   ref,
@@ -236,7 +232,7 @@ async function fetchPackfile ({
   prune,
   pruneTags
 }) {
-  const fs = new FileSystem(_fs)
+  const fs = new FileSystem(cores.get(core).get('fs'))
   // Sanity checks
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
@@ -248,14 +244,14 @@ async function fetchPackfile ({
   remote = remote || 'origin'
   if (url === undefined) {
     url = await config({
-      fs,
+      core,
       gitdir,
       path: `remote.${remote}.url`
     })
   }
 
   if (corsProxy === undefined) {
-    corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
+    corsProxy = await config({ core, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })

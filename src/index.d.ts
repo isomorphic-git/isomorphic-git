@@ -256,31 +256,22 @@ export const cores: {
 export { E } from './errors';
 
 export function WORKDIR(args: {
-  fs: any;
-  dir: string;
-  gitdir: string;
 }): Walker;
 
 export function TREE(args: {
-  fs: any;
-  gitdir: string;
   ref: string;
 }): Walker;
 
 export function STAGE(args: {
-  fs: any;
-  gitdir: string;
 }): Walker;
 
 export function add(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   filepath: string;
 }): Promise<void>;
 
 export function addNote(args: GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   oid: string;
   note: any;
@@ -304,7 +295,6 @@ export function addNote(args: GitDir & {
 
 export function addRemote(args: GitDir & {
   core?: string;
-  fs?: any;
   force?: boolean;
   remote: string;
   url: string;
@@ -312,7 +302,6 @@ export function addRemote(args: GitDir & {
 
 export function annotatedTag(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
   message: string;
   object?: string;
@@ -330,14 +319,12 @@ export function annotatedTag(args: GitDir & {
 
 export function branch(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
   checkout?: boolean;
 }): Promise<void>;
 
 export function checkout(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   emitterPrefix?: string;
   remote?: string;
   ref?: string;
@@ -353,7 +340,6 @@ export function checkout(args: WorkDir & GitDir & {
 
 export function clone(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   emitterPrefix?: string;
   url: string;
   corsProxy?: string;
@@ -378,7 +364,6 @@ export function clone(args: WorkDir & GitDir & {
 
 export function commit(args: GitDir & {
   core?: string;
-  fs?: any;
   message: string;
   author?: {
     name?: string;
@@ -404,7 +389,6 @@ export function commit(args: GitDir & {
 
 export function config(args: GitDir & {
   core?: string;
-  fs?: any;
   path: string;
   all?: boolean;
   value?: string | boolean | number | undefined;
@@ -412,49 +396,41 @@ export function config(args: GitDir & {
 
 export function currentBranch(args: GitDir & {
   core?: string;
-  fs?: any;
   fullname?: boolean;
 }): Promise<string | undefined>;
 
 export function deleteBranch(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
 }): Promise<void>;
 
 export function deleteRef(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
 }): Promise<void>;
 
 export function deleteRemote(args: GitDir & {
   core?: string;
-  fs?: any;
   remote: string;
 }): Promise<void>;
 
 export function deleteTag(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
 }): Promise<void>;
 
 export function expandRef(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
 }): Promise<string>;
 
 export function expandOid(args: GitDir & {
   core?: string;
-  fs?: any;
   oid: string;
 }): Promise<string>;
 
 export function fetch(args: GitDir & {
   core?: string;
-  fs?: any;
   emitterPrefix?: string;
   url?: string;
   corsProxy?: string;
@@ -478,7 +454,6 @@ export function fetch(args: GitDir & {
 
 export function findRoot(args: {
   core?: string;
-  fs?: any;
   filepath: string
 }): Promise<string>;
 
@@ -497,21 +472,18 @@ export function getRemoteInfo(args: {
 
 export function indexPack(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   emitterPrefix?: string;
   filepath: string;
 }): Promise<void>;
 
 export function init(args: GitDir & {
   core?: string;
-  fs?: any;
   bare?: boolean;
   noOverwrite?: boolean;
 }): Promise<void>;
 
 export function isDescendent(args: GitDir & {
   core?: string;
-  fs?: any;
   oid: string;
   ancestor: string;
   depth?: number;
@@ -519,36 +491,30 @@ export function isDescendent(args: GitDir & {
 
 export function listBranches(args: GitDir & {
   core?: string;
-  fs?: any;
   remote?: string;
 }): Promise<Array<string>>;
 
 export function listFiles(args: GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
 }): Promise<Array<string>>;
 
 export function listNotes(args: GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   oid?: string;
 }): Promise<Array<{ oid: string, path: string }>>;
 
 export function listRemotes(args: GitDir & {
   core?: string;
-  fs?: any;
 }): Promise<Array<RemoteDefinition>>;
 
 export function listTags(args: GitDir & {
   core?: string;
-  fs?: any;
 }): Promise<Array<string>>;
 
 export function log(args: GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   depth?: number;
   since?: Date;
@@ -556,7 +522,6 @@ export function log(args: GitDir & {
 
 export function merge(args: GitDir & {
   core?: string;
-  fs?: any;
   ours?: string;
   theirs: string;
   fastForwardOnly?: boolean;
@@ -582,14 +547,12 @@ export function merge(args: GitDir & {
 
 export function packObjects(args: GitDir & {
   core?: string;
-  fs?: any;
   oids: string[];
   write?: boolean;
 }): Promise<PackObjectsResponse>;
 
 export function pull(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   corsProxy?: string;
   singleBranch?: boolean;
@@ -621,7 +584,6 @@ export function pull(args: WorkDir & GitDir & {
 
 export function push(args: GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   remoteRef?: string;
   remote?: string;
@@ -640,27 +602,23 @@ export function push(args: GitDir & {
 
 export function readBlob(args: GitDir & {
   core?: string;
-  fs?: any;
   oid: string;
   filepath?: string;
 }): Promise<ReadBlobResult>;
 
 export function readCommit(args: GitDir & {
   core?: string;
-  fs?: any;
   oid: string;
 }): Promise<ReadCommitResult>;
 
 export function readNote(args: GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   oid: string;
 }): Promise<Uint8Array>;
 
 export function readObject(args: GitDir & {
   core?: string;
-  fs?: any;
   oid: string;
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
   filepath?: string;
@@ -669,26 +627,22 @@ export function readObject(args: GitDir & {
 
 export function readTag(args: GitDir & {
   core?: string;
-  fs?: any;
   oid: string;
 }): Promise<ReadTagResult>;
 
 export function readTree(args: GitDir & {
   core?: string;
-  fs?: any;
   oid: string;
   filepath?: string;
 }): Promise<ReadTreeResult>;
 
 export function remove(args: GitDir & {
   core?: string;
-  fs?: any;
   filepath: string;
 }): Promise<void>;
 
 export function removeNote(args: GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   oid: string;
   author?: {
@@ -717,20 +671,17 @@ export function resetIndex(args: Partial<WorkDir> & GitDir & {
 
 export function resolveRef(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
   depth?: number;
 }): Promise<string>;
 
 export function status(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   filepath: string;
 }): Promise<string>;
 
 export function statusMatrix(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   ref?: string;
   filepaths?: string[];
   filter?: (filepath: string) => boolean;
@@ -739,7 +690,6 @@ export function statusMatrix(args: WorkDir & GitDir & {
 
 export function tag(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
   object?: string;
   force?: boolean;
@@ -747,7 +697,6 @@ export function tag(args: GitDir & {
 
 export function verify(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
   publicKeys: string;
 }): Promise<false | Array<string>>;
@@ -756,7 +705,6 @@ export function version(): string;
 
 export function walk<T, Q>(args: WorkDir & GitDir & {
   core?: string;
-  fs?: any;
   trees: Walker[];
   filter?: (entries: WalkerEntry[]) => Promise<boolean>;
   map?: (entries: WalkerEntry[]) => Promise<T | undefined>;
@@ -766,19 +714,16 @@ export function walk<T, Q>(args: WorkDir & GitDir & {
 
 export function writeBlob(args: GitDir & {
   core?: string;
-  fs?: any;
   blob: Uint8Array;
 }): Promise<string>;
 
 export function writeCommit(args: GitDir & {
   core?: string;
-  fs?: any;
   commit: CommitObject;
 }): Promise<string>;
 
 export function writeObject(args: GitDir & {
   core?: string;
-  fs?: any;
   type?: 'blob' | 'tree' | 'commit' | 'tag';
   object: string | Uint8Array | CommitDescription | TreeDescription | TagDescription;
   format?: 'deflated' | 'wrapped' | 'content' | 'parsed';
@@ -788,13 +733,11 @@ export function writeObject(args: GitDir & {
 
 export function writeTag(args: GitDir & {
   core?: string;
-  fs?: any;
   tag: TagObject;
 }): Promise<string>;
 
 export function writeTree(args: GitDir & {
   core?: string;
-  fs?: any;
   tree: TreeObject;
 }): Promise<string>;
 
@@ -812,7 +755,6 @@ export function hashBlob(args: {
 
 export function writeRef(args: GitDir & {
   core?: string;
-  fs?: any;
   ref: string;
   value: string;
   force?: boolean;

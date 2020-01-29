@@ -15,7 +15,6 @@ import { currentBranch } from './currentBranch'
  *
  * @param {Object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - The branch to delete
@@ -31,11 +30,10 @@ export async function deleteBranch ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ref
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'deleteBranch',
@@ -61,7 +59,7 @@ export async function deleteBranch ({
       })
     }
 
-    const currentRef = await currentBranch({ fs, gitdir })
+    const currentRef = await currentBranch({ core, gitdir })
     if (ref === currentRef) {
       throw new GitError(E.BranchDeleteError, { ref })
     }

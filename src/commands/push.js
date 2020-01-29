@@ -46,7 +46,6 @@ import { pack } from './pack.js'
  *
  * @param {object} args
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Which branch to push. By default this is the currently checked out branch.
@@ -81,7 +80,6 @@ export async function push ({
   core = 'default',
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   emitterPrefix = '',
   ref,
   remoteRef,
@@ -102,16 +100,16 @@ export async function push ({
   headers = {}
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    const fs = new FileSystem(cores.get(core).get('fs'))
     const emitter = cores.get(core).get('emitter')
 
     // TODO: Figure out how pushing tags works. (This only works for branches.)
     if (url === undefined) {
-      url = await config({ fs, gitdir, path: `remote.${remote}.url` })
+      url = await config({ core, gitdir, path: `remote.${remote}.url` })
     }
 
     if (corsProxy === undefined) {
-      corsProxy = await config({ fs, gitdir, path: 'http.corsProxy' })
+      corsProxy = await config({ core, gitdir, path: 'http.corsProxy' })
     }
     let fullRef
     if (!ref) {
@@ -168,17 +166,17 @@ export async function push ({
       const finish = [...httpRemote.refs.values()]
       // hack to speed up common force push scenarios
       // @ts-ignore
-      const mergebase = await findMergeBase({ fs, gitdir, oids: [oid, oldoid] })
+      const mergebase = await findMergeBase({ core, gitdir, oids: [oid, oldoid] })
       for (const oid of mergebase) finish.push(oid)
       // @ts-ignore
       const commits = await listCommitsAndTags({
-        fs,
+        core,
         gitdir,
         start: [oid],
         finish
       })
       // @ts-ignore
-      objects = await listObjects({ fs, gitdir, oids: commits })
+      objects = await listObjects({ core, gitdir, oids: commits })
 
       if (!force) {
         // Is it a tag that already exists?
@@ -192,7 +190,7 @@ export async function push ({
         if (
           oid !== '0000000000000000000000000000000000000000' &&
           oldoid !== '0000000000000000000000000000000000000000' &&
-          !(await isDescendent({ fs, gitdir, oid, ancestor: oldoid }))
+          !(await isDescendent({ core, gitdir, oid, ancestor: oldoid }))
         ) {
           throw new GitError(E.PushRejectedNonFastForward, {})
         }
@@ -211,7 +209,7 @@ export async function push ({
     const packstream2 = _delete
       ? []
       : await pack({
-        fs,
+        core,
         gitdir,
         oids: [...objects]
       })
