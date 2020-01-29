@@ -61,12 +61,13 @@ module.exports = {
       docs: 'node ./__tests__/__helpers__/generate-docs.js',
       size: process.env.CI
         ? optional(
-          `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
-              `CI_REPO_OWNER=isomorphic-git ` +
-              `CI_REPO_NAME=isomorphic-git ` +
-              `CI_COMMIT_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} ` +
+          `cross-env ` +
+              `GITHUB_TOKEN='${process.env.BUNDLESIZE_GITHUB_TOKEN}' ` +
+              `CI_REPO_OWNER='isomorphic-git' ` +
+              `CI_REPO_NAME='isomorphic-git' ` +
+              `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
               `CI_COMMIT_MESSAGE='${process.env.BUILD_SOURCEVERSIONMESSAGE.replace(/'/, `'"'"'`)}' ` +
-              `CI=true ` +
+              `CI='true' ` +
               `bundlesize`
         )
         : optional(`cross-env GITHUB_TOKEN='' bundlesize`)
