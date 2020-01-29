@@ -61,16 +61,15 @@ module.exports = {
       docs: 'node ./__tests__/__helpers__/generate-docs.js',
       size: process.env.CI
         ? optional(
-          `cross-env TRAVIS=true ` +
-              `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
-              `TRAVIS_REPO_SLUG=${process.env.TRAVIS_REPO_SLUG ||
-                process.env.BUILD_REPOSITORY_NAME} ` +
-              (process.env.TRAVIS_PULL_REQUEST_SHA
-                ? `TRAVIS_PULL_REQUEST_SHA=${process.env.TRAVIS_PULL_REQUEST_SHA} `
-                : '') +
-              `bundlesize`
+          `cross-env ` +
+              `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}' ` +
+              `CI_REPO_OWNER='isomorphic-git' ` +
+              `CI_REPO_NAME='isomorphic-git' ` +
+              `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
+              `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
+              `bundlewatch`
         )
-        : optional(`cross-env-shell GITHUB_TOKEN='' bundlesize`)
+        : optional(`bundlewatch`)
     },
     website: {
       default: series.nps('website.build', 'website.publish'),
