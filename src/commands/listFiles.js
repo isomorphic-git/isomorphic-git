@@ -54,7 +54,13 @@ export async function listFiles ({
   }
 }
 
-async function accumulateFilesFromOid ({ core, gitdir, oid, filenames, prefix }) {
+async function accumulateFilesFromOid ({
+  core,
+  gitdir,
+  oid,
+  filenames,
+  prefix
+}) {
   const { object } = await readObject({ core, gitdir, oid, filepath: '' })
   // Note: this isn't parallelized because I'm too lazy to figure that out right now
   // @ts-ignore

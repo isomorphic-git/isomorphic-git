@@ -166,7 +166,11 @@ export async function push ({
       const finish = [...httpRemote.refs.values()]
       // hack to speed up common force push scenarios
       // @ts-ignore
-      const mergebase = await findMergeBase({ core, gitdir, oids: [oid, oldoid] })
+      const mergebase = await findMergeBase({
+        core,
+        gitdir,
+        oids: [oid, oldoid]
+      })
       for (const oid of mergebase) finish.push(oid)
       // @ts-ignore
       const commits = await listCommitsAndTags({
