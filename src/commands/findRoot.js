@@ -24,10 +24,7 @@ import { cores } from '../utils/plugins.js'
  * console.log(gitroot) // '/path/to/some/gitrepo'
  *
  */
-export async function findRoot ({
-  core = 'default',
-  filepath
-}) {
+export async function findRoot ({ core = 'default', filepath }) {
   try {
     const fs = new FileSystem(cores.get(core).get('fs'))
     return _findRoot(fs, filepath)

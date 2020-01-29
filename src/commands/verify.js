@@ -67,11 +67,7 @@ export async function verify ({
     const pgp = cores.get(core).get('pgp')
     if (type === 'commit') {
       const commit = GitCommit.from(object)
-      const { valid, invalid } = await GitCommit.verify(
-        commit,
-        pgp,
-        publicKeys
-      )
+      const { valid, invalid } = await GitCommit.verify(commit, pgp, publicKeys)
       if (invalid.length > 0) return false
       return valid
     } else if (type === 'tag') {

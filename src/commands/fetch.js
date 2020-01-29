@@ -108,7 +108,7 @@ export async function fetch ({
   singleBranch = false,
   headers = {},
   prune = false,
-  pruneTags = false,
+  pruneTags = false
 }) {
   try {
     const fs = new FileSystem(cores.get(core).get('fs'))
