@@ -79,12 +79,12 @@
     "@semantic-release/exec": "3.3.6",
     "@types/jest": "24.0.18",
     "@types/node": "12.7.2",
-    "agadoo": "git+https://github.com/wmhilton-contrib/agadoo.git#external-imports",
+    "agadoo": "2.0.0",
     "all-contributors-cli": "6.9.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.6",
     "browserfs": "2.0.0",
-    "bundlesize": "0.18.0",
+    "bundlewatch": "0.2.5",
     "cross-env": "6.0.0",
     "diff-lines": "1.1.1",
     "duplicate-package-checker-webpack-plugin": "3.0.0",
@@ -128,11 +128,14 @@
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.7"
   },
-  "bundlesize": [
-    {
-      "path": "./dist/bundle.umd.min.js"
-    }
-  ],
+  "bundlewatch": {
+    "files": [
+      {
+        "path": "./dist/bundle.umd.min.js",
+        "maxSize": "100kb"
+      }
+    ]
+  },
   "collective": {
     "type": "opencollective",
     "url": "https://opencollective.com/isomorphic-git",
