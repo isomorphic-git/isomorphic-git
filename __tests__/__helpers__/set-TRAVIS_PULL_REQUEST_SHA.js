@@ -7,5 +7,6 @@ if (!process.env.TRAVIS_PULL_REQUEST_SHA) {
   const parents = log.split(' ').map(x => x.trim())
   // parents[0] === master branch
   // parents[1] === pr branch
+  console.log(`parents[1] = ${parents[1]}`)
   process.env.TRAVIS_PULL_REQUEST_SHA = parents[1]
 }

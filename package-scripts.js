@@ -61,7 +61,7 @@ module.exports = {
       docs: 'node ./__tests__/__helpers__/generate-docs.js',
       size: process.env.CI
         ? optional(
-          `cross-env ` +
+          `cross-env-shell ` +
               `GITHUB_TOKEN=${process.env.BUNDLESIZE_GITHUB_TOKEN} ` +
               `CI_REPO_OWNER=isomorphic-git ` +
               `CI_REPO_NAME=isomorphic-git ` +
