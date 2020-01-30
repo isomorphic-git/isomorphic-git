@@ -4,7 +4,7 @@ const path = require('path')
 const table = require('markdown-table')
 const git = require('../..')
 
-git.plugins.set('fs', fs)
+git.plugins.fs(fs)
 
 const dir = path.join(__dirname, '..', '..')
 const ref = process.argv[2] || 'HEAD'

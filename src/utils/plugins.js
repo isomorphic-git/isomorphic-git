@@ -83,5 +83,10 @@ export const cores = {
       _cores.set(key, new Map())
       return _cores.get(key)
     }
+  },
+  delete (key) {
+    if (_cores.has(key)) {
+      return _cores.delete(key)
+    }
   }
 }
