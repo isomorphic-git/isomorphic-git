@@ -74,6 +74,7 @@ import { cores } from '../utils/plugins.js'
  * it should return an empty JSON object.
  *
  * If `useHttpPath` is true, then the path is should be considered when searching for matching credentials.
+ * Right now `useHttpPath` is always false. TODO: Actually read the value from the git config.
  *
  * Take a look at the examples below for inspiration:
  * - [credential-manager-node-cli](https://github.com/isomorphic-git/credential-manager-node-cli)

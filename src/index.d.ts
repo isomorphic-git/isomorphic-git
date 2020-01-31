@@ -246,7 +246,15 @@ export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 
 export type StatusMatrix = Array<[string, number, number, number]>;
 
-export const plugins: GitPluginCore
+export interface IGitPlugins {
+  credentialManager(plugin: GitCredentialManagerPlugin, core?: string);
+  fs(plugin: GitFsPlugin | GitFsPromisesPlugin, core?: string);
+  emitter(plugin: GitEmitterPlugin, core?: string);
+  pgp(plugin: GitPgpPlugin, core?: string);
+  http(plugin: GitHttpPlugin, core?: string);
+}
+
+export const plugins: IGitPlugins
 
 export const cores: {
   get: (arg: string) => GitPluginCore;
