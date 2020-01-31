@@ -247,6 +247,8 @@ export type GitPluginCore = Map<GitPluginName, AnyGitPlugin>
 export type StatusMatrix = Array<[string, number, number, number]>;
 
 export interface IGitPlugins {
+  createCore(core: string): void;
+  deleteCore(core: string): void;
   credentialManager(plugin: GitCredentialManagerPlugin, core?: string);
   fs(plugin: GitFsPlugin | GitFsPromisesPlugin, core?: string);
   emitter(plugin: GitEmitterPlugin, core?: string);

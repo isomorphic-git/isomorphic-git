@@ -10,8 +10,9 @@ const localhost =
 describe('credentialManager', () => {
   it('with valid credentials', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { gitdir, core } = await makeFixture('test-push')
     await config({
+      core,
       gitdir,
       path: 'remote.auth.url',
       value: `http://${localhost}:8888/test-push-server-auth.git`
@@ -34,8 +35,9 @@ describe('credentialManager', () => {
       async rejected (auth) {
         rejectedCalled = true
       }
-    })
+    }, core)
     await push({
+      core,
       gitdir,
       remote: 'auth',
       ref: 'master'
@@ -46,8 +48,9 @@ describe('credentialManager', () => {
   })
   it('with invalid credentials', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-push')
+    const { gitdir, core } = await makeFixture('test-push')
     await config({
+      core,
       gitdir,
       path: 'remote.auth.url',
       value: `http://${localhost}:8888/test-push-server-auth.git`
@@ -70,10 +73,11 @@ describe('credentialManager', () => {
       async rejected (auth) {
         rejectedCalled = true
       }
-    })
+    }, core)
     let err
     try {
       await push({
+        core,
         gitdir,
         remote: 'auth',
         ref: 'master'
