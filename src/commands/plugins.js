@@ -1,20 +1,7 @@
 // @ts-check
 import { credentialManager } from '../commands/plugin_credentialManager.js'
+import { emitter } from '../commands/plugin_emitter.js'
 import { cores } from '../utils/plugins.js'
-
-/**
- *
- * @typedef {Object} GitCredentialManagerPlugin
- * @property {function} fill
- * @property {function} approved
- * @property {function} rejected
- */
-
-/**
- *
- * @typedef {Object} GitEmitterPlugin
- * @property {function} emit
- */
 
 /**
  *
@@ -96,13 +83,7 @@ export const plugins = {
     cores.delete(core)
   },
   credentialManager,
-  /**
-   * @param {?GitEmitterPlugin} plugin
-   * @param {string} [core]
-   */
-  emitter (plugin, core = 'default') {
-    cores.get(core).set('emitter', plugin)
-  },
+  emitter,
   /**
    * @param {?GitFsPlugin} plugin
    * @param {string} [core]
