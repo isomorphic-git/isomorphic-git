@@ -1,34 +1,8 @@
 // @ts-check
 import { credentialManager } from '../commands/plugin_credentialManager.js'
 import { emitter } from '../commands/plugin_emitter.js'
+import { fs } from '../commands/plugin_fs.js'
 import { cores } from '../utils/plugins.js'
-
-/**
- *
- * @typedef {Object} GitFsPlugin
- * @property {function} readFile
- * @property {function} writeFile
- * @property {function} unlink
- * @property {function} readdir
- * @property {function} mkdir
- * @property {function} rmdir
- * @property {function} stat
- * @property {function} lstat
- */
-
-/**
- *
- * @typedef {Object} GitFsPromisesPlugin
- * @property {Object} promises
- * @property {function} promises.readFile
- * @property {function} promises.writeFile
- * @property {function} promises.unlink
- * @property {function} promises.readdir
- * @property {function} promises.mkdir
- * @property {function} promises.rmdir
- * @property {function} promises.stat
- * @property {function} promises.lstat
- */
 
 /**
  *
@@ -84,20 +58,7 @@ export const plugins = {
   },
   credentialManager,
   emitter,
-  /**
-   * @param {?GitFsPlugin} plugin
-   * @param {string} [core]
-   */
-  fs (plugin, core = 'default') {
-    cores.get(core).set('fs', plugin)
-  },
-  /**
-   * @param {?GitFsPromisesPlugin} plugin
-   * @param {string} [core]
-   */
-  promisesFs (plugin, core = 'default') {
-    cores.get(core).set('fs', plugin)
-  },
+  fs,
   /**
    * @param {?GitHttpPlugin} plugin
    * @param {string} [core]

@@ -249,8 +249,8 @@ async function gendoc (file, filepath) {
 
   const oid = await git.resolveRef({ dir, ref })
   const { tree } = await git.readTree({ dir, oid, filepath: 'src/commands' })
-  let entries = tree.filter(entry => entry.type === 'blob' && !entry.path.startsWith('_'))
-  let docs = []
+  const entries = tree.filter(entry => entry.type === 'blob' && !entry.path.startsWith('_'))
+  const docs = []
   await Promise.all(entries.map(async entry => {
     // Load file
     const { blob } = await git.readBlob({

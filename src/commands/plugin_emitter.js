@@ -140,7 +140,7 @@ import { cores } from '../utils/plugins.js'
  * >  git.plugins.set('emitter', emitter)
  * >  ```
  *
- * @param {?GitEmitterPlugin} plugin - The credential manager plugin
+ * @param {?GitEmitterPlugin} plugin - The emitter plugin
  * @param {string} [core = 'default'] - The plugin namespace to add the plugin to
  * @returns {void}
  *
