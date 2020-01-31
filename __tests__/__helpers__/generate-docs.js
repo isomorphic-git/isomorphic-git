@@ -95,12 +95,12 @@ function gentypedef (ast) {
   typedefs.set(ast.name, text)
 }
 
-function gendoc (file, filepath) {
+async function gendoc (file, filepath) {
   // Fix some TypeScript-isms that jsdoc doesn't like
   file = file.replace(/\{import\('events'\)\.EventEmitter\}/g, '{EventEmitter}')
   let ast
   try {
-    ast = jsdoc.explainSync({ source: file })
+    ast = await jsdoc.explain({ source: file })
   } catch (e) {
     console.log(`Unable to parse ${filepath}`, e.message)
     return ''
@@ -249,9 +249,9 @@ function gendoc (file, filepath) {
 
   const oid = await git.resolveRef({ dir, ref })
   const { tree } = await git.readTree({ dir, oid, filepath: 'src/commands' })
-  for (const entry of tree) {
-    if (entry.type !== 'blob') continue
-    if (entry.path.startsWith('_')) continue
+  let entries = tree.filter(entry => entry.type === 'blob' && !entry.path.startsWith('_'))
+  let docs = []
+  await Promise.all(entries.map(async entry => {
     // Load file
     const { blob } = await git.readBlob({
       dir,
@@ -259,13 +259,15 @@ function gendoc (file, filepath) {
       filepath: `src/commands/${entry.path}`
     })
     const filetext = Buffer.from(blob).toString('utf8')
-    const doctext = gendoc(filetext, entry.path)
+    const doctext = await gendoc(filetext, entry.path)
     if (doctext !== '') {
       const docfilename = entry.path.replace(/js$/, 'md')
       fs.writeFileSync(path.join(docDir, docfilename), doctext)
-      gitignoreContent += `docs/${docfilename}\n`
+      docs.push(`docs/${docfilename}`)
     }
-  }
+  }))
+  docs.sort()
+  gitignoreContent += docs.join('\n') + '\n'
   fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8')
 
   // Generate errors.md
