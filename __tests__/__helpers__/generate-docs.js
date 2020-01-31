@@ -160,15 +160,19 @@ function gendoc (file, filepath) {
           }
 
           let description = param.description
-          if (description.startsWith('[deprecated]')) {
-            description = description.replace('[deprecated] ', '')
-            name = name += ' [deprecated]'
-          }
-          // because of the `dir` / `gitdir` weirdness, some args are "required" but have default values
-          // and I have to distinguish them in a way that doesn't upset TypeScript
-          if (description.startsWith('[required]')) {
-            description = description.replace('[required] ', '')
-            name = `**${name}**`
+          if (!description) {
+            console.log(`User error: The function param ${param.name} is missing a description.`)
+          } else {
+            if (description.startsWith('[deprecated]')) {
+              description = description.replace('[deprecated] ', '')
+              name = name += ' [deprecated]'
+            }
+            // because of the `dir` / `gitdir` weirdness, some args are "required" but have default values
+            // and I have to distinguish them in a way that doesn't upset TypeScript
+            if (description.startsWith('[required]')) {
+              description = description.replace('[required] ', '')
+              name = `**${name}**`
+            }
           }
           rows.push([name, escapeType(type), escapeType(description)])
         }

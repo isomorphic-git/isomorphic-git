@@ -1,4 +1,5 @@
 // @ts-check
+import { credentialManager } from '../commands/plugin_credentialManager.js'
 import { cores } from '../utils/plugins.js'
 
 /**
@@ -94,13 +95,7 @@ export const plugins = {
   deleteCore (core) {
     cores.delete(core)
   },
-  /**
-   * @param {?GitCredentialManagerPlugin} plugin
-   * @param {string} [core]
-   */
-  credentialManager (plugin, core = 'default') {
-    cores.get(core).set('credentialManager', plugin)
-  },
+  credentialManager,
   /**
    * @param {?GitEmitterPlugin} plugin
    * @param {string} [core]

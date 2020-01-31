@@ -116,6 +116,7 @@ docs/listTags.md
 docs/log.md
 docs/merge.md
 docs/packObjects.md
+docs/plugin_credentialManager.md
 docs/pull.md
 docs/push.md
 docs/readBlob.md
