@@ -75,7 +75,7 @@ If you're only using `isomorphic-git` in Node, you can just use the native `fs` 
 ```js
 const git = require('isomorphic-git');
 const fs = require('fs');
-git.plugins.set('fs', fs)
+git.plugins.fs(fs)
 ```
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
@@ -87,7 +87,7 @@ If LightningFS doesn't meet your requirements, isomorphic-git should also work w
 <script src="https://unpkg.com/isomorphic-git"></script>
 <script>
 const fs = new LightningFS('fs')
-git.plugins.set('fs', fs)
+git.plugins.fs(fs)
 </script>
 ```
 
