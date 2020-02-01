@@ -21,21 +21,24 @@ describe('credentialManager', () => {
     let fillCalled = false
     let approvedCalled = false
     let rejectedCalled = false
-    plugins.credentialManager({
-      async fill ({ url }) {
-        fillCalled = true
-        return {
-          username: 'testuser',
-          password: 'testpassword'
+    plugins.credentialManager(
+      {
+        async fill ({ url }) {
+          fillCalled = true
+          return {
+            username: 'testuser',
+            password: 'testpassword'
+          }
+        },
+        async approved (auth) {
+          approvedCalled = true
+        },
+        async rejected (auth) {
+          rejectedCalled = true
         }
       },
-      async approved (auth) {
-        approvedCalled = true
-      },
-      async rejected (auth) {
-        rejectedCalled = true
-      }
-    }, core)
+      core
+    )
     await push({
       core,
       gitdir,
@@ -59,21 +62,24 @@ describe('credentialManager', () => {
     let fillCalled = false
     let approvedCalled = false
     let rejectedCalled = false
-    plugins.credentialManager({
-      async fill ({ url }) {
-        fillCalled = true
-        return {
-          username: 'testuser',
-          password: 'NoT_rIgHt'
+    plugins.credentialManager(
+      {
+        async fill ({ url }) {
+          fillCalled = true
+          return {
+            username: 'testuser',
+            password: 'NoT_rIgHt'
+          }
+        },
+        async approved (auth) {
+          approvedCalled = true
+        },
+        async rejected (auth) {
+          rejectedCalled = true
         }
       },
-      async approved (auth) {
-        approvedCalled = true
-      },
-      async rejected (auth) {
-        rejectedCalled = true
-      }
-    }, core)
+      core
+    )
     let err
     try {
       await push({

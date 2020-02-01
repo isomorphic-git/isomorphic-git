@@ -161,7 +161,9 @@ async function gendoc (file, filepath) {
 
           let description = param.description
           if (!description) {
-            console.log(`User error: The function param ${param.name} is missing a description.`)
+            console.log(
+              `User error: The function param ${param.name} is missing a description.`
+            )
           } else {
             if (description.startsWith('[deprecated]')) {
               description = description.replace('[deprecated] ', '')
@@ -249,23 +251,27 @@ async function gendoc (file, filepath) {
 
   const oid = await git.resolveRef({ dir, ref })
   const { tree } = await git.readTree({ dir, oid, filepath: 'src/commands' })
-  const entries = tree.filter(entry => entry.type === 'blob' && !entry.path.startsWith('_'))
+  const entries = tree.filter(
+    entry => entry.type === 'blob' && !entry.path.startsWith('_')
+  )
   const docs = []
-  await Promise.all(entries.map(async entry => {
-    // Load file
-    const { blob } = await git.readBlob({
-      dir,
-      oid,
-      filepath: `src/commands/${entry.path}`
+  await Promise.all(
+    entries.map(async entry => {
+      // Load file
+      const { blob } = await git.readBlob({
+        dir,
+        oid,
+        filepath: `src/commands/${entry.path}`
+      })
+      const filetext = Buffer.from(blob).toString('utf8')
+      const doctext = await gendoc(filetext, entry.path)
+      if (doctext !== '') {
+        const docfilename = entry.path.replace(/js$/, 'md')
+        fs.writeFileSync(path.join(docDir, docfilename), doctext)
+        docs.push(`docs/${docfilename}`)
+      }
     })
-    const filetext = Buffer.from(blob).toString('utf8')
-    const doctext = await gendoc(filetext, entry.path)
-    if (doctext !== '') {
-      const docfilename = entry.path.replace(/js$/, 'md')
-      fs.writeFileSync(path.join(docDir, docfilename), doctext)
-      docs.push(`docs/${docfilename}`)
-    }
-  }))
+  )
   docs.sort()
   gitignoreContent += docs.join('\n') + '\n'
   fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8')
