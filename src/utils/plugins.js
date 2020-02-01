@@ -14,12 +14,11 @@ class PluginCore extends Map {
   set (key, value) {
     const verifySchema = (key, value) => {
       // ugh. this sucks
-      if (
-        key === 'fs' &&
-        Object.getOwnPropertyDescriptor(value, 'promises') &&
-        Object.getOwnPropertyDescriptor(value, 'promises').enumerable
-      ) {
-        value = value.promises
+      if (key === 'fs') {
+        const promises = Object.getOwnPropertyDescriptor(value, 'promises')
+        if (promises && promises.enumerable) {
+          value = value.promises
+        }
       }
       const pluginSchemas = {
         credentialManager: ['fill', 'approved', 'rejected'],
@@ -49,6 +48,7 @@ class PluginCore extends Map {
     verifySchema(key, value)
     // There can be only one.
     super.set(key, value)
+    return this
   }
 
   get (key) {

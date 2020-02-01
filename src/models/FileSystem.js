@@ -28,10 +28,8 @@ export class FileSystem {
 
     if (typeof fs._original_unwrapped_fs !== 'undefined') return fs
 
-    if (
-      Object.getOwnPropertyDescriptor(fs, 'promises') &&
-      Object.getOwnPropertyDescriptor(fs, 'promises').enumerable
-    ) {
+    const promises = Object.getOwnPropertyDescriptor(fs, 'promises')
+    if (promises && promises.enumerable) {
       this._readFile = fs.promises.readFile.bind(fs.promises)
       this._writeFile = fs.promises.writeFile.bind(fs.promises)
       this._mkdir = fs.promises.mkdir.bind(fs.promises)
@@ -82,7 +80,7 @@ export class FileSystem {
    * @param {string} filepath
    * @param {object} [options]
    *
-   * @returns {Buffer|null}
+   * @returns {Promise<Buffer|string|null>}
    */
   async read (filepath, options = {}) {
     try {

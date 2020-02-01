@@ -4,7 +4,6 @@ import { E, GitError } from '../models/GitError.js'
 export async function writeObjectLoose ({
   fs: _fs,
   gitdir,
-  type,
   object,
   format,
   oid
