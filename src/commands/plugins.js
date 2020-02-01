@@ -2,6 +2,7 @@
 import { credentialManager } from '../commands/plugin_credentialManager.js'
 import { emitter } from '../commands/plugin_emitter.js'
 import { fs } from '../commands/plugin_fs.js'
+import { http } from '../commands/plugin_http.js'
 import { cores } from '../utils/plugins.js'
 
 /**
@@ -9,34 +10,6 @@ import { cores } from '../utils/plugins.js'
  * @typedef {Object} GitPgpPlugin
  * @property {function} sign
  * @property {function} verify
- */
-
-/**
- *
- * @typedef {Object} GitHttpRequest
- * @property {string} url
- * @property {string} [method]
- * @property {Object} [headers]
- * @property {AsyncIterableIterator<Uint8Array>} [body]
- * @property {string} [core]
- * @property {GitEmitterPlugin} [emitter]
- * @property {string} [emitterPrefix]
- */
-
-/**
- *
- * @typedef {Object} GitHttpResponse
- * @property {string} url
- * @property {string} [method]
- * @property {Object} [headers]
- * @property {AsyncIterableIterator<Uint8Array>} [body]
- * @property {number} statusCode
- * @property {string} statusMessage
- */
-
-/**
- *
- * @typedef {function(GitHttpRequest): GitHttpResponse} GitHttpPlugin
  */
 
 /**
@@ -59,13 +32,7 @@ export const plugins = {
   credentialManager,
   emitter,
   fs,
-  /**
-   * @param {?GitHttpPlugin} plugin
-   * @param {string} [core]
-   */
-  http (plugin, core = 'default') {
-    cores.get(core).set('http', plugin)
-  },
+  http,
   /**
    * @param {?GitPgpPlugin} plugin
    * @param {string} [core]

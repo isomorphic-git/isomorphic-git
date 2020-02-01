@@ -118,6 +118,8 @@ docs/merge.md
 docs/packObjects.md
 docs/plugin_credentialManager.md
 docs/plugin_emitter.md
+docs/plugin_fs.md
+docs/plugin_http.md
 docs/pull.md
 docs/push.md
 docs/readBlob.md
