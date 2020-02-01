@@ -63,6 +63,7 @@ import { config } from './config'
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
+ * @param {any} [args.emitter = ''] - Emitter
  *
  * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
  * @see FetchResponse
@@ -108,11 +109,12 @@ export async function fetch ({
   singleBranch = false,
   headers = {},
   prune = false,
-  pruneTags = false
+  pruneTags = false,
+  emitter
 }) {
   try {
     const fs = new FileSystem(cores.get(core).get('fs'))
-    const emitter = cores.get(core).get('emitter')
+    emitter = emitter || cores.get(core).get('emitter')
 
     const response = await fetchPackfile({
       core,
