@@ -46,11 +46,26 @@ import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  *
+ * @typedef {Object} TagDescription
+ * @property {string} object
+ * @property {'blob' | 'tree' | 'commit' | 'tag'} type
+ * @property {string} tag
+ * @property {Object} tagger
+ * @property {string} tagger.name - the tagger's name
+ * @property {string} tagger.email - the tagger's email
+ * @property {number} tagger.timestamp - UTC Unix timestamp in seconds
+ * @property {number} tagger.timezoneOffset - timezone difference from UTC in minutes
+ * @property {string} message
+ * @property {string} [signature] - PGP signature (if present)
+ */
+
+/**
+ *
  * @typedef {Object} GitObjectDescription - The object returned has the following schema:
  * @property {string} oid
  * @property {'blob' | 'tree' | 'commit' | 'tag'} [type]
  * @property {'deflated' | 'wrapped' | 'content' | 'parsed'} format
- * @property {Uint8Array | String | CommitDescription | TreeDescription} object
+ * @property {Uint8Array | String | CommitDescription | TreeDescription | TagDescription} object
  * @property {string} [source]
  *
  */

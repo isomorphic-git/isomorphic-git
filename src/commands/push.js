@@ -59,8 +59,8 @@ import { pack } from './pack.js'
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
- * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
+ * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<PushResponse>} Resolves successfully when push completes with a detailed description of the operation from the server.

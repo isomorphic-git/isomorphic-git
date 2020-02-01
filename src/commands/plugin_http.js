@@ -6,7 +6,7 @@ import { cores } from '../utils/plugins.js'
  * @typedef {Object} GitHttpRequest
  * @property {string} url - The URL to request
  * @property {string} [method='GET'] - The HTTP method to use
- * @property {Object} [headers={}] - Headers to include in the HTTP request
+ * @property {Object<string, string>} [headers={}] - Headers to include in the HTTP request
  * @property {AsyncIterableIterator<Uint8Array>} [body] - An async iterator of Uint8Arrays that make up the body of POST requests
  * @property {string} [core] - If your `http` plugin needs access to other plugins, it can do so via `git.cores.get(core)`
  * @property {GitEmitterPlugin} [emitter] - If your `http` plugin emits events, it can do so via `emitter.emit()`
@@ -18,7 +18,7 @@ import { cores } from '../utils/plugins.js'
  * @typedef {Object} GitHttpResponse
  * @property {string} url - The final URL that was fetched after any redirects
  * @property {string} [method] - The HTTP method that was used
- * @property {Object} [headers] - HTTP response headers
+ * @property {Object<string, string>} [headers] - HTTP response headers
  * @property {AsyncIterableIterator<Uint8Array>} [body] - An async iterator of Uint8Arrays that make up the body of the response
  * @property {number} statusCode - The HTTP status code
  * @property {string} statusMessage - The HTTP status message
@@ -26,7 +26,9 @@ import { cores } from '../utils/plugins.js'
 
 /**
  *
- * @typedef {function(GitHttpRequest): GitHttpResponse} GitHttpPlugin
+ * @callback GitHttpPlugin
+ * @param {GitHttpRequest} request
+ * @returns {Promise<GitHttpResponse>}
  */
 
 /**
