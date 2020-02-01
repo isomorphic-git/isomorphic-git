@@ -79,7 +79,8 @@ export class GitRemoteHTTP {
     if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
       // Acquire credentials and try again
       const credentialManager = cores.get(core).get('credentialManager')
-      auth = await credentialManager.fill({ url: _origUrl })
+      // TODO: actually read `useHttpPath` value from git config
+      auth = await credentialManager.fill({ url: _origUrl, useHttpPath: false })
       const _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)

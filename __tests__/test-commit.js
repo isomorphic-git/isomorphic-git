@@ -201,7 +201,7 @@ describe('commit', () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
     const { gitdir } = await makeFixture('test-commit')
-    plugins.set('pgp', pgp)
+    plugins.pgp(pgp)
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await commit({

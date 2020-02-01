@@ -34,6 +34,7 @@ import { walk } from './walk.js'
  * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
  * @param {boolean} [args.noSubmodules = false] - If true, will not print out errors about missing submodules support.
  * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
+ * @param {any} [args.emitter] - emitter
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -67,12 +68,13 @@ export async function checkout ({
   debug = false,
   force = false,
   noSubmodules = false,
-  newSubmoduleBehavior = false
+  newSubmoduleBehavior = false,
+  emitter
 }) {
   try {
     const ref = _ref || 'HEAD'
     const fs = new FileSystem(cores.get(core).get('fs'))
-    const emitter = cores.get(core).get('emitter')
+    emitter = emitter || cores.get(core).get('emitter')
     // Get tree oid
     let oid
     try {
