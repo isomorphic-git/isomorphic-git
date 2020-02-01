@@ -46,6 +46,7 @@ At the time of writing, the following breaking changes are planned:
 - [x] Deprecated commands and function arguments will be removed:
   - [x] The `sign` command will be removed.
   - [x] The commands `utils.auth` and `utils.oauth2` will be removed.
+  - [x] The undocumented param aliases `authUsername` and `authPassword` are removed in favor of `username` and `password`.
   - [x] The `emitter` function argument will be removed.
   - [x] The `fs` function argument will be removed.
   - [x] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.

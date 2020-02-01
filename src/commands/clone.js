@@ -59,10 +59,6 @@ export async function clone ({
   corsProxy = undefined,
   ref = undefined,
   remote = 'origin',
-  // @ts-ignore
-  authUsername,
-  // @ts-ignore
-  authPassword,
   username = undefined,
   password = undefined,
   token = undefined,
@@ -79,8 +75,6 @@ export async function clone ({
   headers = {}
 }) {
   try {
-    username = username === undefined ? authUsername : username
-    password = password === undefined ? authPassword : password
     await init({ core, gitdir })
     // Add remote
     await config({

@@ -45,13 +45,9 @@ export async function getRemoteInfo ({
   core = 'default',
   corsProxy,
   url,
-  // @ts-ignore
-  authUsername,
-  // @ts-ignore
-  authPassword,
   noGitSuffix = false,
-  username = authUsername,
-  password = authPassword,
+  username,
+  password,
   token,
   oauth2format,
   headers = {},

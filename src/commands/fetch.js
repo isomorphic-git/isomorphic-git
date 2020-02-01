@@ -92,12 +92,8 @@ export async function fetch ({
   url,
   noGitSuffix = false,
   corsProxy,
-  // @ts-ignore
-  authUsername,
-  // @ts-ignore
-  authPassword,
-  username = authUsername,
-  password = authPassword,
+  username,
+  password,
   token,
   oauth2format,
   depth = null,

@@ -89,12 +89,8 @@ export async function push ({
   delete: _delete = false,
   noGitSuffix = false,
   corsProxy,
-  // @ts-ignore
-  authUsername,
-  // @ts-ignore
-  authPassword,
-  username = authUsername,
-  password = authPassword,
+  username,
+  password,
   token,
   oauth2format,
   headers = {}

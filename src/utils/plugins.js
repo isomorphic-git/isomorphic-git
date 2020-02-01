@@ -69,8 +69,9 @@ const _cores = new Map([['default', plugins]])
 export const cores = {
   // 'get' validates that a core has been registered
   get (key) {
-    if (_cores.has(key)) {
-      return _cores.get(key)
+    const core = _cores.get(key)
+    if (core) {
+      return core
     } else {
       throw new GitError(E.CoreNotFound, { core: key })
     }

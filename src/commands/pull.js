@@ -53,12 +53,8 @@ export async function pull ({
   noGitSuffix = false,
   corsProxy,
   emitterPrefix = '',
-  // @ts-ignore
-  authUsername,
-  // @ts-ignore
-  authPassword,
-  username = authUsername,
-  password = authPassword,
+  username,
+  password,
   token,
   oauth2format,
   singleBranch,
