@@ -273,7 +273,9 @@ async function gendoc (file, filepath) {
   }
 
   // Generate the shared typedefs
-  const typedefsIndex = entries.findIndex(entry => entry.path.endsWith('typedefs.js'))
+  const typedefsIndex = entries.findIndex(entry =>
+    entry.path.endsWith('typedefs.js')
+  )
   const typedefsEntry = entries[typedefsIndex]
   entries.splice(typedefsIndex, 1)
   await processEntry(typedefsEntry)

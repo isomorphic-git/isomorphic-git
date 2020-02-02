@@ -1,5 +1,6 @@
 // @ts-check
 import '../commands/typedefs.js'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'

@@ -1,5 +1,6 @@
 // @ts-check
 import '../commands/typedefs.js'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { E, GitError } from '../models/GitError.js'

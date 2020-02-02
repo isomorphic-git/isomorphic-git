@@ -1,5 +1,6 @@
 // @ts-check
 import '../commands/typedefs.js'
+
 import { readCommit } from '../commands/readCommit.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
