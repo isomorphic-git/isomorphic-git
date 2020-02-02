@@ -63,3 +63,28 @@
  * @typedef Walker
  * @property {Symbol} Symbol('GitWalkerSymbol')
  */
+
+/**
+ *
+ * @typedef {Object} Stat Normalized subset of filesystem `stat` data:
+ * @property {number} ctimeSeconds
+ * @property {number} ctimeNanoseconds
+ * @property {number} mtimeSeconds
+ * @property {number} mtimeNanoseconds
+ * @property {number} dev
+ * @property {number} ino
+ * @property {number} mode
+ * @property {number} uid
+ * @property {number} gid
+ * @property {number} size
+ */
+
+/**
+ *
+ * @typedef {Object} WalkerEntry The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
+ * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
+ * @property {function(): Promise<number>} mode
+ * @property {function(): Promise<string>} oid
+ * @property {function(): Promise<Uint8Array|void>} content
+ * @property {function(): Promise<Stat>} stat
+ */
