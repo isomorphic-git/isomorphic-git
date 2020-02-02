@@ -50,6 +50,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('commit')
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
+    if (ref.format !== 'content') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('wrapped', async () => {
@@ -62,8 +63,9 @@ describe('readObject', () => {
       format: 'wrapped'
     })
     expect(ref.format).toEqual('wrapped')
-    expect(ref.type).toEqual(undefined)
+    expect(ref.type).toEqual('wrapped')
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
+    if (ref.format !== 'wrapped') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('deflated', async () => {
@@ -76,8 +78,9 @@ describe('readObject', () => {
       format: 'deflated'
     })
     expect(ref.format).toEqual('deflated')
-    expect(ref.type).toEqual(undefined)
+    expect(ref.type).toEqual('deflated')
     expect(ref.source).toBe('objects/e1/0ebb90d03eaacca84de1af0a59b444232da99e')
+    if (ref.format !== 'deflated') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('from packfile', async () => {
@@ -94,6 +97,7 @@ describe('readObject', () => {
     expect(ref.source).toBe(
       'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
+    if (ref.format !== 'content') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('blob with encoding', async () => {
@@ -129,6 +133,7 @@ describe('readObject', () => {
       'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     expect(ref.oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
+    if (ref.type !== 'blob' || ref.format !== 'content') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('with deep filepath to blob', async () => {
@@ -144,6 +149,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('blob')
     expect(ref.oid).toEqual('5264f23285d8be3ce45f95c102001ffa1d5391d3')
+    if (ref.type !== 'blob' || ref.format !== 'content') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('with simple filepath to tree', async () => {

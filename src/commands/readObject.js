@@ -11,72 +11,184 @@ import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  *
- * @typedef {Object} CommitDescription
- * @property {string} oid - SHA-1 object id of this commit
- * @property {string} message - commit message
+ * @typedef {Object} CommitObject
+ * @property {string} message - Commit message
  * @property {string} tree - SHA-1 object id of corresponding file tree
  * @property {string[]} parent - an array of zero or more SHA-1 object ids
  * @property {Object} author
- * @property {string} author.name - the author's name
- * @property {string} author.email - the author's email
+ * @property {string} author.name - The author's name
+ * @property {string} author.email - The author's email
  * @property {number} author.timestamp - UTC Unix timestamp in seconds
- * @property {number} author.timezoneOffset - timezone difference from UTC in minutes
+ * @property {number} author.timezoneOffset - Timezone difference from UTC in minutes
  * @property {Object} committer
- * @property {string} committer.name - the committer's name
- * @property {string} committer.email - the committer's email
+ * @property {string} committer.name - The committer's name
+ * @property {string} committer.email - The committer's email
  * @property {number} committer.timestamp - UTC Unix timestamp in seconds
- * @property {number} committer.timezoneOffset - timezone difference from UTC in minutes
+ * @property {number} committer.timezoneOffset - Timezone difference from UTC in minutes
  * @property {string} [gpgsig] - PGP signature (if present)
  */
 
 /**
  *
+ * @typedef {TreeEntry[]} TreeObject
+ */
+
+/**
+ *
  * @typedef {Object} TreeEntry
- * @property {string} mode
- * @property {string} path
- * @property {string} oid
- * @property {string} [type]
+ * @property {string} mode - the 6 digit hexadecimal mode
+ * @property {string} path - the name of the file or directory
+ * @property {string} oid - the SHA-1 object id of the blob or tree
+ * @property {'commit'|'blob'|'tree'} type - the type of object
  */
 
 /**
  *
- * @typedef {Object} TreeDescription
- * @property {TreeEntry[]} entries
- */
-
-/**
- *
- * @typedef {Object} TagDescription
- * @property {string} object
- * @property {'blob' | 'tree' | 'commit' | 'tag'} type
- * @property {string} tag
+ * @typedef {Object} TagObject
+ * @property {string} object - SHA-1 object id of object being tagged
+ * @property {'blob' | 'tree' | 'commit' | 'tag'} type - the type of the object being tagged
+ * @property {string} tag - the tag name
  * @property {Object} tagger
  * @property {string} tagger.name - the tagger's name
  * @property {string} tagger.email - the tagger's email
  * @property {number} tagger.timestamp - UTC Unix timestamp in seconds
  * @property {number} tagger.timezoneOffset - timezone difference from UTC in minutes
- * @property {string} message
+ * @property {string} message - tag message
  * @property {string} [signature] - PGP signature (if present)
  */
 
 /**
  *
- * @typedef {Object} GitObjectDescription - The object returned has the following schema:
+ * @typedef {Object} DeflatedObject
  * @property {string} oid
- * @property {'blob' | 'tree' | 'commit' | 'tag'} [type]
- * @property {'deflated' | 'wrapped' | 'content' | 'parsed'} format
- * @property {Uint8Array | String | CommitDescription | TreeDescription | TagDescription} object
+ * @property {'deflated'} type
+ * @property {'deflated'} format
+ * @property {Uint8Array} object
  * @property {string} [source]
  *
  */
 
 /**
+ *
+ * @typedef {Object} WrappedObject
+ * @property {string} oid
+ * @property {'wrapped'} type
+ * @property {'wrapped'} format
+ * @property {Uint8Array} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} RawBlobObject
+ * @property {string} oid
+ * @property {'blob'} type
+ * @property {'content'} format
+ * @property {Uint8Array} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} RawCommitObject
+ * @property {string} oid
+ * @property {'commit'} type
+ * @property {'content'} format
+ * @property {Uint8Array} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} RawTreeObject
+ * @property {string} oid
+ * @property {'tree'} type
+ * @property {'content'} format
+ * @property {Uint8Array} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} RawTagObject
+ * @property {string} oid
+ * @property {'tag'} type
+ * @property {'content'} format
+ * @property {Uint8Array} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {RawBlobObject | RawCommitObject | RawTreeObject | RawTagObject} RawObject
+ */
+
+/**
+ *
+ * @typedef {Object} ParsedBlobObject
+ * @property {string} oid
+ * @property {'blob'} type
+ * @property {'parsed'} format
+ * @property {string} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} ParsedCommitObject
+ * @property {string} oid
+ * @property {'commit'} type
+ * @property {'parsed'} format
+ * @property {CommitObject} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} ParsedTreeObject
+ * @property {string} oid
+ * @property {'tree'} type
+ * @property {'parsed'} format
+ * @property {TreeObject} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} ParsedTagObject
+ * @property {string} oid
+ * @property {'tag'} type
+ * @property {'parsed'} format
+ * @property {TagObject} object
+ * @property {string} [source]
+ *
+ */
+
+/**
+ *
+ * @typedef {ParsedBlobObject | ParsedCommitObject | ParsedTreeObject | ParsedTagObject} ParsedObject
+ */
+
+/**
+ *
+ * @typedef {DeflatedObject | WrappedObject | RawObject | ParsedObject } ReadObjectResult
+ */
+
+/**
  * Read a git object directly by its SHA-1 object id
  *
- * Regarding `GitObjectDescription`:
+ * Regarding `ReadObjectResult`:
  *
  * - `oid` will be the same as the `oid` argument unless the `filepath` argument is provided, in which case it will be the oid of the tree or blob being returned.
- * - `type` is not included for 'deflated' and 'wrapped' formatted objects because you likely don't care or plan to decode that information yourself.
+ * - `type` of deflated objects is `'deflated'`, and `type` of wrapped objects is `'wrapped'`
  * - `format` is usually, but not always, the format you requested. Packfiles do not store each object individually compressed so if you end up reading the object from a packfile it will be returned in format 'content' even if you requested 'deflated' or 'wrapped'.
  * - `object` will be an actual Object if format is 'parsed' and the object is a commit, tree, or annotated tag. Blobs are still formatted as Buffers unless an encoding is provided in which case they'll be strings. If format is anything other than 'parsed', object will be a Buffer.
  * - `source` is the name of the packfile or loose object file where the object was found.
@@ -105,8 +217,8 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the object at that filepath. To return the root directory of a tree set filepath to `''`
  * @param {string} [args.encoding] - A convenience argument that only affects blobs. Instead of returning `object` as a buffer, it returns a string parsed using the given encoding.
  *
- * @returns {Promise<GitObjectDescription>} Resolves successfully with a git object description
- * @see GitObjectDescription
+ * @returns {Promise<ReadObjectResult>} Resolves successfully with a git object description
+ * @see ReadObjectResult
  *
  * @example
  * // Get the contents of 'README.md' in the master branch.
@@ -217,8 +329,9 @@ export async function readObject ({
         default:
           throw new GitError(E.ObjectTypeUnknownFail, { type: result.type })
       }
+    } else if (result.format === 'deflated' || result.format === 'wrapped') {
+      result.type = result.format
     }
-    // @ts-ignore
     return result
   } catch (err) {
     err.caller = 'git.readObject'
