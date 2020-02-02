@@ -133,7 +133,7 @@ describe('readObject', () => {
       'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
     )
     expect(ref.oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
-    if (ref.type !== 'blob' || ref.format !== 'content') throw new Error('wrong type')
+    if (ref.format !== 'content') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('with deep filepath to blob', async () => {
@@ -149,7 +149,7 @@ describe('readObject', () => {
     expect(ref.format).toEqual('content')
     expect(ref.type).toEqual('blob')
     expect(ref.oid).toEqual('5264f23285d8be3ce45f95c102001ffa1d5391d3')
-    if (ref.type !== 'blob' || ref.format !== 'content') throw new Error('wrong type')
+    if (ref.format !== 'content') throw new Error('wrong type')
     expect(Buffer.from(ref.object).toString('hex')).toMatchSnapshot()
   })
   it('with simple filepath to tree', async () => {

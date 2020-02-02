@@ -81,51 +81,13 @@ import { resolveTree } from '../utils/resolveTree.js'
 
 /**
  *
- * @typedef {Object} RawBlobObject
+ * @typedef {Object} RawObject
  * @property {string} oid
- * @property {'blob'} type
+ * @property {'blob'|'commit'|'tree'|'tag'} type
  * @property {'content'} format
  * @property {Uint8Array} object
  * @property {string} [source]
  *
- */
-
-/**
- *
- * @typedef {Object} RawCommitObject
- * @property {string} oid
- * @property {'commit'} type
- * @property {'content'} format
- * @property {Uint8Array} object
- * @property {string} [source]
- *
- */
-
-/**
- *
- * @typedef {Object} RawTreeObject
- * @property {string} oid
- * @property {'tree'} type
- * @property {'content'} format
- * @property {Uint8Array} object
- * @property {string} [source]
- *
- */
-
-/**
- *
- * @typedef {Object} RawTagObject
- * @property {string} oid
- * @property {'tag'} type
- * @property {'content'} format
- * @property {Uint8Array} object
- * @property {string} [source]
- *
- */
-
-/**
- *
- * @typedef {RawBlobObject | RawCommitObject | RawTreeObject | RawTagObject} RawObject
  */
 
 /**
@@ -202,6 +164,41 @@ import { resolveTree } from '../utils/resolveTree.js'
  * | 'content'  | Return the object buffer without the git header.                                                                                                                                                          |
  * | 'parsed'   | Returns a parsed representation of the object.                                                                                                                                                            |
  *
+ * The result will be in one of the following schemas:
+ *
+ * ## `'deflated'` format
+ *
+ * {@link DeflatedObject typedef}
+ *
+ * ## `'wrapped'` format
+ *
+ * {@link WrappedObject typedef}
+ *
+ * ## `'content'` format
+ *
+ * {@link RawObject typedef}
+ *
+ * ## `'parsed'` format
+ *
+ * ### parsed `'blob'` type
+ *
+ * {@link ParsedBlobObject typedef}
+ *
+ * ### parsed `'commit'` type
+ *
+ * {@link ParsedCommitObject typedef}
+ * {@link CommitObject typedef}
+ *
+ * ### parsed `'tree'` type
+ *
+ * {@link ParsedTreeObject typedef}
+ * {@link TreeObject typedef}
+ *
+ * ### parsed `'tag'` type
+ *
+ * {@link ParsedTagObject typedef}
+ * {@link TagObject typedef}
+ *
  * @deprecated
  * > **Deprecated**
  * > This command is overly complicated.
@@ -241,7 +238,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  *
  * const searchTree = async ({oid, prefix = ''}) => {
  *   let { object: tree } = await git.readObject({ dir: '$input((/))', oid })
- *   for (let entry of tree.entries) {
+ *   for (let entry of tree) {
  *     if (entry.type === 'tree') {
  *       await searchTree({oid: entry.oid, prefix: `${prefix}/${entry.path}`})
  *     } else if (entry.type === 'blob') {
