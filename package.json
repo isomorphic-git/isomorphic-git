@@ -2,7 +2,7 @@
   "name": "isomorphic-git",
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
-  "typings": "./src/index.d.ts",
+  "typings": "./dist/index.d.ts",
   "main": "dist/index.cjs",
   "browser": {
     "isomorphic-git": "./dist/bundle.umd.min.js",
@@ -45,13 +45,12 @@
   "files": [
     "dist/index.js",
     "dist/index.cjs",
+    "dist/index.d.ts",
     "dist/browser-tests.json",
     "dist/bundle.umd.min.js",
     "dist/bundle.umd.min.js.map",
     "dist/size_report.html",
-    "cli.js",
-    "src/errors.d.ts",
-    "src/index.d.ts"
+    "cli.js"
   ],
   "dependencies": {
     "async-lock": "^1.1.0",

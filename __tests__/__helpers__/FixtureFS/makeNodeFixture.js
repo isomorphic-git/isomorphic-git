@@ -8,8 +8,9 @@ let i = 0
 async function makeNodeFixture (fixture) {
   const _fs = Object.assign({}, require('fs'))
   const core = `core-node-${i++}`
-  cores.create(core).set('fs', _fs)
-  plugins.set('fs', _fs) // deprecated
+  plugins.createCore(core)
+  plugins.fs(_fs, core)
+  plugins.fs(_fs) // deprecated
 
   const fs = new FileSystem(_fs)
 

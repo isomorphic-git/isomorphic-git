@@ -30,6 +30,7 @@ export * from './commands/listTags.js'
 export * from './commands/log.js'
 export * from './commands/merge.js'
 export * from './commands/packObjects.js'
+export * from './commands/plugins.js'
 export * from './commands/pull.js'
 export * from './commands/push.js'
 export * from './commands/readBlob.js'
@@ -59,5 +60,3 @@ export * from './commands/STAGE.js'
 export * from './commands/TREE.js'
 
 export { E } from './models/GitError'
-
-export * from './utils/plugins.js'

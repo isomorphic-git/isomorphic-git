@@ -13,7 +13,7 @@ describe('listCommitsAndTags', () => {
   it('listCommitsAndTags', async () => {
     // Setup
     const { _fs, gitdir } = await makeFixture('test-listCommitsAndTags')
-    plugins.set('fs', _fs)
+    plugins.fs(_fs)
     // Test
     const commits = await listCommitsAndTags({
       gitdir,

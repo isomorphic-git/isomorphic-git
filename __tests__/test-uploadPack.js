@@ -7,7 +7,7 @@ describe('uploadPack', () => {
   it('advertiseRefs: true', async () => {
     // Setup
     const { _fs, gitdir } = await makeFixture('test-uploadPack')
-    plugins.set('fs', _fs)
+    plugins.fs(_fs)
     const res = await uploadPack({ gitdir, advertiseRefs: true })
     const buffer = await collect(res)
     expect(buffer.toString('utf8')).toBe(

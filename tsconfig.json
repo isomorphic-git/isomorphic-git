@@ -17,7 +17,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "isomorphic-git": ["./src/index.d.ts"],
+      "isomorphic-git": ["./dist/index.d.ts"],
       "isomorphic-git/internal-apis": ["./src/internal-apis.d.ts"]
     }
   }

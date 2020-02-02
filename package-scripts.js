@@ -25,10 +25,9 @@ const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 module.exports = {
   scripts: {
     lint: {
-      default: series.nps('lint.js', 'lint.typescript'),
+      default: series.nps('lint.js'),
       js: `standard ${srcPaths}`,
       fix: `standard --fix ${srcPaths}`,
-      typescript: 'tsc src/index.d.ts --lib es6',
       typescriptTests: 'tsc -p tsconfig.json'
     },
     watch: {
@@ -45,15 +44,16 @@ module.exports = {
     build: {
       default: series.nps(
         'build.rollup',
+        'build.typings',
         'build.webpack',
-        'build.errors',
         'build.indexjson',
         'build.treeshake',
+        'build.docs',
         'build.size'
       ),
-      errors: 'node ./__tests__/__helpers__/generate-errors.js',
-      webpack: 'webpack',
       rollup: 'rollup -c',
+      typings: 'tsc -p declaration.tsconfig.json',
+      webpack: 'webpack',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.js',
@@ -91,19 +91,16 @@ module.exports = {
     test: {
       default: process.env.CI
         ? series.nps(
-          'lint.js',
+          'lint',
           'build',
-          'lint.typescript',
-          'build.docs',
           'test.setup',
           'test.jest',
           'test.karma',
           'test.teardown'
         )
         : series.nps(
-          'lint.js',
+          'lint',
           'build',
-          'lint.typescript',
           'test.setup',
           'test.jest',
           'test.karma',

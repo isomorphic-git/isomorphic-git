@@ -39,8 +39,7 @@ describe('fetch', () => {
     })
     const output = []
     const progress = []
-    plugins.set(
-      'emitter',
+    plugins.emitter(
       new EventEmitter()
         .on('fetch.message', output.push.bind(output))
         .on('fetch.progress', progress.push.bind(progress))
