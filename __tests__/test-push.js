@@ -24,8 +24,7 @@ describe('push', () => {
       value: `http://${localhost}:8888/test-push-server.git`
     })
     const output = []
-    plugins.set(
-      'emitter',
+    plugins.emitter(
       new EventEmitter().on('push.message', output.push.bind(output))
     )
     // Test

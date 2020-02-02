@@ -46,6 +46,7 @@ At the time of writing, the following breaking changes are planned:
 - [x] Deprecated commands and function arguments will be removed:
   - [x] The `sign` command will be removed.
   - [x] The commands `utils.auth` and `utils.oauth2` will be removed.
+  - [x] The undocumented param aliases `authUsername` and `authPassword` are removed in favor of `username` and `password`.
   - [x] The `emitter` function argument will be removed.
   - [x] The `fs` function argument will be removed.
   - [x] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
@@ -74,7 +75,7 @@ If you're only using `isomorphic-git` in Node, you can just use the native `fs` 
 ```js
 const git = require('isomorphic-git');
 const fs = require('fs');
-git.plugins.set('fs', fs)
+git.plugins.fs(fs)
 ```
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
@@ -86,7 +87,7 @@ If LightningFS doesn't meet your requirements, isomorphic-git should also work w
 <script src="https://unpkg.com/isomorphic-git"></script>
 <script>
 const fs = new LightningFS('fs')
-git.plugins.set('fs', fs)
+git.plugins.fs(fs)
 </script>
 ```
 

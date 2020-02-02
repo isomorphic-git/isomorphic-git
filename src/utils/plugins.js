@@ -14,12 +14,11 @@ class PluginCore extends Map {
   set (key, value) {
     const verifySchema = (key, value) => {
       // ugh. this sucks
-      if (
-        key === 'fs' &&
-        Object.getOwnPropertyDescriptor(value, 'promises') &&
-        Object.getOwnPropertyDescriptor(value, 'promises').enumerable
-      ) {
-        value = value.promises
+      if (key === 'fs') {
+        const promises = Object.getOwnPropertyDescriptor(value, 'promises')
+        if (promises && promises.enumerable) {
+          value = value.promises
+        }
       }
       const pluginSchemas = {
         credentialManager: ['fill', 'approved', 'rejected'],
@@ -49,6 +48,7 @@ class PluginCore extends Map {
     verifySchema(key, value)
     // There can be only one.
     super.set(key, value)
+    return this
   }
 
   get (key) {
@@ -69,8 +69,9 @@ const _cores = new Map([['default', plugins]])
 export const cores = {
   // 'get' validates that a core has been registered
   get (key) {
-    if (_cores.has(key)) {
-      return _cores.get(key)
+    const core = _cores.get(key)
+    if (core) {
+      return core
     } else {
       throw new GitError(E.CoreNotFound, { core: key })
     }
@@ -82,6 +83,11 @@ export const cores = {
     } else {
       _cores.set(key, new Map())
       return _cores.get(key)
+    }
+  },
+  delete (key) {
+    if (_cores.has(key)) {
+      return _cores.delete(key)
     }
   }
 }

@@ -28,7 +28,7 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
- * @param {object} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
  * @returns {Promise<RemoteDescription>} Resolves successfully with an object listing the branches, tags, and capabilities of the remote.
  * @see RemoteDescription
@@ -45,13 +45,9 @@ export async function getRemoteInfo ({
   core = 'default',
   corsProxy,
   url,
-  // @ts-ignore
-  authUsername,
-  // @ts-ignore
-  authPassword,
   noGitSuffix = false,
-  username = authUsername,
-  password = authPassword,
+  username,
+  password,
   token,
   oauth2format,
   headers = {},

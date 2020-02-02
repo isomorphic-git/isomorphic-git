@@ -34,8 +34,35 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
  * @property {function(): Promise<number>} mode
  * @property {function(): Promise<string>} oid
- * @property {function(): Promise<Buffer>} content
+ * @property {function(): Promise<Uint8Array|void>} content
  * @property {function(): Promise<Stat>} stat
+ */
+
+/**
+ * @callback WalkerMap
+ * @param {string} filename
+ * @param {?WalkerEntry[]} entries
+ * @returns {Promise<any>}
+ */
+
+/**
+ * @callback WalkerReduce
+ * @param {any} parent
+ * @param {any[]} children
+ * @returns {Promise<any>}
+ */
+
+/**
+ * @callback WalkerIterateCallback
+ * @param {WalkerEntry[]} entries
+ * @returns {Promise<any[]>}
+ */
+
+/**
+ * @callback WalkerIterate
+ * @param {WalkerIterateCallback} walk
+ * @param {IterableIterator<WalkerEntry[]>} children
+ * @returns {Promise<any[]>}
  */
 
 /**
@@ -239,12 +266,13 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Walker[]} args.trees - The trees you want to traverse
- * @param {function(string, ?WalkerEntry[]): Promise<any>} [args.map] - Transform `WalkerEntry`s into a result form
- * @param {function(any, any[]): Promise<any>} [args.reduce] - Control how mapped entries are combined with their parent result
- * @param {function(function(WalkerEntry[]): Promise<any[]>, IterableIterator<WalkerEntry[]>): Promise<any[]>} [args.iterate] - Fine-tune how entries within a tree are iterated over
+ * @param {WalkerMap} [args.map] - Transform `WalkerEntry`s into a result form
+ * @param {WalkerReduce} [args.reduce] - Control how mapped entries are combined with their parent result
+ * @param {WalkerIterate} [args.iterate] - Fine-tune how entries within a tree are iterated over
  *
  * @returns {Promise<any>} The finished tree-walking result
  *
+ * @see {WalkerMap}
  *
  */
 export async function walk ({

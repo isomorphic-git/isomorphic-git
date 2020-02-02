@@ -16,7 +16,7 @@ import { cores } from '../utils/plugins.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.path - The key of the git config entry
- * @param {string} [args.value] - (Optional) A value to store at that path
+ * @param {string | boolean | number | undefined} [args.value] - (Optional) A value to store at that path
  * @param {boolean} [args.all = false] - If the config file contains multiple values, return them all as an array.
  * @param {boolean} [args.append = false] - If true, will append rather than replace when setting (use with multi-valued config options).
  *

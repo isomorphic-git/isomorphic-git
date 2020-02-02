@@ -11,7 +11,7 @@ const localhost =
 describe('plugin - http', () => {
   let callCount = 0
   beforeAll(() => {
-    plugins.set('http', (...args) => {
+    plugins.http((...args) => {
       callCount++
       return http(...args)
     })
@@ -29,6 +29,6 @@ describe('plugin - http', () => {
     expect(callCount).toBe(2)
   })
   afterAll(() => {
-    plugins.delete('http')
+    plugins.http(null)
   })
 })

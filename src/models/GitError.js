@@ -77,77 +77,149 @@ const messages = {
 }
 
 export const E = {
+  /** @type {'FileReadError'} */
   FileReadError: `FileReadError`,
+  /** @type {'MissingRequiredParameterError'} */
   MissingRequiredParameterError: `MissingRequiredParameterError`,
+  /** @type {'InvalidRefNameError'} */
   InvalidRefNameError: `InvalidRefNameError`,
+  /** @type {'InvalidParameterCombinationError'} */
   InvalidParameterCombinationError: `InvalidParameterCombinationError`,
+  /** @type {'RefExistsError'} */
   RefExistsError: `RefExistsError`,
+  /** @type {'RefNotExistsError'} */
   RefNotExistsError: `RefNotExistsError`,
+  /** @type {'BranchDeleteError'} */
   BranchDeleteError: `BranchDeleteError`,
+  /** @type {'NoHeadCommitError'} */
   NoHeadCommitError: `NoHeadCommitError`,
+  /** @type {'CommitNotFetchedError'} */
   CommitNotFetchedError: `CommitNotFetchedError`,
+  /** @type {'ObjectTypeUnknownFail'} */
   ObjectTypeUnknownFail: `ObjectTypeUnknownFail`,
+  /** @type {'ObjectTypeAssertionFail'} */
   ObjectTypeAssertionFail: `ObjectTypeAssertionFail`,
+  /** @type {'ObjectTypeAssertionInTreeFail'} */
   ObjectTypeAssertionInTreeFail: `ObjectTypeAssertionInTreeFail`,
+  /** @type {'ObjectTypeAssertionInRefFail'} */
   ObjectTypeAssertionInRefFail: `ObjectTypeAssertionInRefFail`,
+  /** @type {'ObjectTypeAssertionInPathFail'} */
   ObjectTypeAssertionInPathFail: `ObjectTypeAssertionInPathFail`,
+  /** @type {'MissingAuthorError'} */
   MissingAuthorError: `MissingAuthorError`,
+  /** @type {'MissingCommitterError'} */
   MissingCommitterError: `MissingCommitterError`,
+  /** @type {'MissingTaggerError'} */
   MissingTaggerError: `MissingTaggerError`,
+  /** @type {'GitRootNotFoundError'} */
   GitRootNotFoundError: `GitRootNotFoundError`,
+  /** @type {'UnparseableServerResponseFail'} */
   UnparseableServerResponseFail: `UnparseableServerResponseFail`,
+  /** @type {'InvalidDepthParameterError'} */
   InvalidDepthParameterError: `InvalidDepthParameterError`,
+  /** @type {'RemoteDoesNotSupportShallowFail'} */
   RemoteDoesNotSupportShallowFail: `RemoteDoesNotSupportShallowFail`,
+  /** @type {'RemoteDoesNotSupportDeepenSinceFail'} */
   RemoteDoesNotSupportDeepenSinceFail: `RemoteDoesNotSupportDeepenSinceFail`,
+  /** @type {'RemoteDoesNotSupportDeepenNotFail'} */
   RemoteDoesNotSupportDeepenNotFail: `RemoteDoesNotSupportDeepenNotFail`,
+  /** @type {'RemoteDoesNotSupportDeepenRelativeFail'} */
   RemoteDoesNotSupportDeepenRelativeFail: `RemoteDoesNotSupportDeepenRelativeFail`,
+  /** @type {'RemoteDoesNotSupportSmartHTTP'} */
   RemoteDoesNotSupportSmartHTTP: `RemoteDoesNotSupportSmartHTTP`,
+  /** @type {'CorruptShallowOidFail'} */
   CorruptShallowOidFail: `CorruptShallowOidFail`,
+  /** @type {'FastForwardFail'} */
   FastForwardFail: `FastForwardFail`,
+  /** @type {'MergeNotSupportedFail'} */
   MergeNotSupportedFail: `MergeNotSupportedFail`,
+  /** @type {'DirectorySeparatorsError'} */
   DirectorySeparatorsError: `DirectorySeparatorsError`,
+  /** @type {'ResolveTreeError'} */
   ResolveTreeError: `ResolveTreeError`,
+  /** @type {'ResolveCommitError'} */
   ResolveCommitError: `ResolveCommitError`,
+  /** @type {'DirectoryIsAFileError'} */
   DirectoryIsAFileError: `DirectoryIsAFileError`,
+  /** @type {'TreeOrBlobNotFoundError'} */
   TreeOrBlobNotFoundError: `TreeOrBlobNotFoundError`,
+  /** @type {'NotImplementedFail'} */
   NotImplementedFail: `NotImplementedFail`,
+  /** @type {'ReadObjectFail'} */
   ReadObjectFail: `ReadObjectFail`,
+  /** @type {'NotAnOidFail'} */
   NotAnOidFail: `NotAnOidFail`,
+  /** @type {'NoRefspecConfiguredError'} */
   NoRefspecConfiguredError: `NoRefspecConfiguredError`,
+  /** @type {'MismatchRefValueError'} */
   MismatchRefValueError: `MismatchRefValueError`,
+  /** @type {'ResolveRefError'} */
   ResolveRefError: `ResolveRefError`,
+  /** @type {'ExpandRefError'} */
   ExpandRefError: `ExpandRefError`,
+  /** @type {'EmptyServerResponseFail'} */
   EmptyServerResponseFail: `EmptyServerResponseFail`,
+  /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
+  /** @type {'HTTPError'} */
   HTTPError: `HTTPError`,
+  /** @type {'RemoteUrlParseError'} */
   RemoteUrlParseError: `RemoteUrlParseError`,
+  /** @type {'UnknownTransportError'} */
   UnknownTransportError: `UnknownTransportError`,
+  /** @type {'AcquireLockFileFail'} */
   AcquireLockFileFail: `AcquireLockFileFail`,
+  /** @type {'DoubleReleaseLockFileFail'} */
   DoubleReleaseLockFileFail: `DoubleReleaseLockFileFail`,
+  /** @type {'InternalFail'} */
   InternalFail: `InternalFail`,
+  /** @type {'UnknownOauth2Format'} */
   UnknownOauth2Format: `UnknownOauth2Format`,
+  /** @type {'MissingPasswordTokenError'} */
   MissingPasswordTokenError: `MissingPasswordTokenError`,
+  /** @type {'MissingUsernameError'} */
   MissingUsernameError: `MissingUsernameError`,
+  /** @type {'MixPasswordTokenError'} */
   MixPasswordTokenError: `MixPasswordTokenError`,
+  /** @type {'MixUsernamePasswordTokenError'} */
   MixUsernamePasswordTokenError: `MixUsernamePasswordTokenError`,
+  /** @type {'MissingTokenError'} */
   MissingTokenError: `MissingTokenError`,
+  /** @type {'MixUsernameOauth2formatMissingTokenError'} */
   MixUsernameOauth2formatMissingTokenError: `MixUsernameOauth2formatMissingTokenError`,
+  /** @type {'MixPasswordOauth2formatMissingTokenError'} */
   MixPasswordOauth2formatMissingTokenError: `MixPasswordOauth2formatMissingTokenError`,
+  /** @type {'MixUsernamePasswordOauth2formatMissingTokenError'} */
   MixUsernamePasswordOauth2formatMissingTokenError: `MixUsernamePasswordOauth2formatMissingTokenError`,
+  /** @type {'MixUsernameOauth2formatTokenError'} */
   MixUsernameOauth2formatTokenError: `MixUsernameOauth2formatTokenError`,
+  /** @type {'MixPasswordOauth2formatTokenError'} */
   MixPasswordOauth2formatTokenError: `MixPasswordOauth2formatTokenError`,
+  /** @type {'MixUsernamePasswordOauth2formatTokenError'} */
   MixUsernamePasswordOauth2formatTokenError: `MixUsernamePasswordOauth2formatTokenError`,
+  /** @type {'MaxSearchDepthExceeded'} */
   MaxSearchDepthExceeded: `MaxSearchDepthExceeded`,
+  /** @type {'PushRejectedNonFastForward'} */
   PushRejectedNonFastForward: `PushRejectedNonFastForward`,
+  /** @type {'PushRejectedTagExists'} */
   PushRejectedTagExists: `PushRejectedTagExists`,
+  /** @type {'AddingRemoteWouldOverwrite'} */
   AddingRemoteWouldOverwrite: `AddingRemoteWouldOverwrite`,
+  /** @type {'PluginUndefined'} */
   PluginUndefined: `PluginUndefined`,
+  /** @type {'CoreNotFound'} */
   CoreNotFound: `CoreNotFound`,
+  /** @type {'PluginSchemaViolation'} */
   PluginSchemaViolation: `PluginSchemaViolation`,
+  /** @type {'PluginUnrecognized'} */
   PluginUnrecognized: `PluginUnrecognized`,
+  /** @type {'AmbiguousShortOid'} */
   AmbiguousShortOid: `AmbiguousShortOid`,
+  /** @type {'ShortOidNotFound'} */
   ShortOidNotFound: `ShortOidNotFound`,
+  /** @type {'CheckoutConflictError'} */
   CheckoutConflictError: `CheckoutConflictError`,
+  /** @type {'NoteAlreadyExistsError'} */
   NoteAlreadyExistsError: `NoteAlreadyExistsError`
 }
 

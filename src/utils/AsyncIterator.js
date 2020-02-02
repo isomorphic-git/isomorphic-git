@@ -38,10 +38,8 @@ export function fromValue (value) {
 // Convert a Node stream to an Async Iterator
 export function fromNodeStream (stream) {
   // Use native async iteration if it's available.
-  if (
-    Object.getOwnPropertyDescriptor(stream, Symbol.asyncIterator) &&
-    Object.getOwnPropertyDescriptor(stream, Symbol.asyncIterator).enumerable
-  ) {
+  const asyncIterator = Object.getOwnPropertyDescriptor(stream, Symbol.asyncIterator)
+  if (asyncIterator && asyncIterator.enumerable) {
     return stream
   }
   // Author's Note
