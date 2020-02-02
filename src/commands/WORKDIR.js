@@ -1,12 +1,7 @@
 // @ts-check
+import '../commands/typedefs.js'
 import { GitWalkerFs } from '../models/GitWalkerFs.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
-
-/**
- *
- * @typedef Walker
- * @property {Symbol} Symbol('GitWalkerSymbol')
- */
 
 /**
  * Get a working directory `Walker`

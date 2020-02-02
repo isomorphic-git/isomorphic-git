@@ -1,4 +1,5 @@
 // @ts-check
+import '../commands/typedefs.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
@@ -10,20 +11,6 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @typedef {Object} ReadTreeResult - The object returned has the following schema:
  * @property {string} oid - SHA-1 object id of this tree
  * @property {TreeObject} tree - the parsed tree object
- */
-
-/**
- *
- * @typedef {TreeEntry[]} TreeObject
- */
-
-/**
- *
- * @typedef {Object} TreeEntry
- * @property {string} mode - the 6 digit hexadecimal mode
- * @property {string} path - the name of the file or directory
- * @property {string} oid - the SHA-1 object id of the blob or tree
- * @property {'commit'|'blob'|'tree'} type - the type of object
  */
 
 /**

@@ -1,24 +1,10 @@
 // @ts-check
+import '../commands/typedefs.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-
-/**
- *
- * @typedef {Object} TagObject
- * @property {string} object - SHA-1 object id of object being tagged
- * @property {'blob' | 'tree' | 'commit' | 'tag'} type - the type of the object being tagged
- * @property {string} tag - the tag name
- * @property {Object} tagger
- * @property {string} tagger.name - the tagger's name
- * @property {string} tagger.email - the tagger's email
- * @property {number} tagger.timestamp - UTC Unix timestamp in seconds
- * @property {number} tagger.timezoneOffset - timezone difference from UTC in minutes
- * @property {string} message - tag message
- * @property {string} [signature] - PGP signature (if present)
- */
 
 /**
  * Write an annotated tag object directly

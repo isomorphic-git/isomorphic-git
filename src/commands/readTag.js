@@ -1,4 +1,5 @@
 // @ts-check
+import '../commands/typedefs.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { E, GitError } from '../models/GitError.js'
@@ -12,21 +13,6 @@ import { cores } from '../utils/plugins.js'
  * @property {string} oid - SHA-1 object id of this tag
  * @property {TagObject} tag - the parsed tag object
  * @property {string} payload - PGP signing payload
- */
-
-/**
- *
- * @typedef {Object} TagObject
- * @property {string} object - SHA-1 object id of object being tagged
- * @property {'blob' | 'tree' | 'commit' | 'tag'} type - the type of the object being tagged
- * @property {string} tag - the tag name
- * @property {Object} tagger
- * @property {string} tagger.name - the tagger's name
- * @property {string} tagger.email - the tagger's email
- * @property {number} tagger.timestamp - UTC Unix timestamp in seconds
- * @property {number} tagger.timezoneOffset - timezone difference from UTC in minutes
- * @property {string} message - tag message
- * @property {string} [signature] - PGP signature (if present)
  */
 
 /**

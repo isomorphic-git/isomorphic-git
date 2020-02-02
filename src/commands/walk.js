@@ -1,4 +1,5 @@
 // @ts-check
+import '../commands/typedefs.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'
@@ -6,12 +7,6 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
-
-/**
- *
- * @typedef {Object} Walker
- * @property {Symbol} Symbol('GitWalkSymbol')
- */
 
 /**
  *
