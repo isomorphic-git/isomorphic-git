@@ -3,7 +3,7 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
 
 /**
  *
- * @typedef {Object} RemoteDescription - The object returned has the following schema:
+ * @typedef {Object} GetRemoteInfoResult - The object returned has the following schema:
  * @property {string[]} capabilities - The list of capabilities returned by the server (part of the Git protocol)
  * @property {Object} [refs]
  * @property {Object<string, string>} [refs.heads] - The branches on the remote
@@ -30,8 +30,8 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
- * @returns {Promise<RemoteDescription>} Resolves successfully with an object listing the branches, tags, and capabilities of the remote.
- * @see RemoteDescription
+ * @returns {Promise<GetRemoteInfoResult>} Resolves successfully with an object listing the branches, tags, and capabilities of the remote.
+ * @see GetRemoteInfoResult
  *
  * @example
  * let info = await git.getRemoteInfo({

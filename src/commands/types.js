@@ -1,3 +1,6 @@
+/**
+ * @enum {number}
+ */
 export const types = {
   commit: 0b0010000,
   tree: 0b0100000,

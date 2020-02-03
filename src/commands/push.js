@@ -22,7 +22,7 @@ import { pack } from './pack.js'
 
 /**
  *
- * @typedef {Object} PushResponse - Returns an object with a schema like this:
+ * @typedef {Object} PushResult - Returns an object with a schema like this:
  * @property {string[]} [ok]
  * @property {string[]} [errors]
  * @property {object} [headers]
@@ -63,17 +63,17 @@ import { pack } from './pack.js'
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
- * @returns {Promise<PushResponse>} Resolves successfully when push completes with a detailed description of the operation from the server.
- * @see PushResponse
+ * @returns {Promise<PushResult>} Resolves successfully when push completes with a detailed description of the operation from the server.
+ * @see PushResult
  *
  * @example
- * let pushResponse = await git.push({
+ * let pushResult = await git.push({
  *   dir: '$input((/))',
  *   remote: '$input((origin))',
  *   ref: '$input((master))',
  *   token: $input((process.env.GITHUB_TOKEN)),
  * })
- * console.log(pushResponse)
+ * console.log(pushResult)
  *
  */
 export async function push ({

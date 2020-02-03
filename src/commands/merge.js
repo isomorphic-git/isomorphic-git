@@ -14,7 +14,7 @@ import { findMergeBase } from './findMergeBase.js'
 
 /**
  *
- * @typedef {Object} MergeReport - Returns an object with a schema like this:
+ * @typedef {Object} MergeResult - Returns an object with a schema like this:
  * @property {string} [oid] - The SHA-1 object id that is now at the head of the branch. Absent only if `dryRun` was specified and `mergeCommit` is true.
  * @property {boolean} [alreadyMerged] - True if the branch was already merged so no changes were made
  * @property {boolean} [fastForward] - True if it was a fast-forward merge
@@ -59,8 +59,8 @@ import { findMergeBase } from './findMergeBase.js'
  * @param {string} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
  *
- * @returns {Promise<MergeReport>} Resolves to a description of the merge operation
- * @see MergeReport
+ * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
+ * @see MergeResult
  *
  * @example
  * let m = await git.merge({ dir: '$input((/))', ours: '$input((master))', theirs: '$input((remotes/origin/master))' })

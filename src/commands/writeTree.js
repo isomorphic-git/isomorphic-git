@@ -1,23 +1,11 @@
 // @ts-check
+import '../commands/typedefs.js'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { GitTree } from '../models/GitTree.js'
 import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-
-/**
- *
- * @typedef {TreeEntry[]} TreeObject
- */
-
-/**
- *
- * @typedef {Object} TreeEntry
- * @property {string} mode - the 6 digit hexadecimal mode
- * @property {string} path - the name of the file or directory
- * @property {string} oid - the SHA-1 object id of the blob or tree
- * @property {'commit'|'blob'|'tree'} type - the type of object
- */
 
 /**
  * Write a tree object directly

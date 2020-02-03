@@ -1,28 +1,11 @@
 // @ts-check
+import '../commands/typedefs.js'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
-
-/**
- *
- * @typedef {Object} CommitObject
- * @property {string} message - Commit message
- * @property {string} tree - SHA-1 object id of corresponding file tree
- * @property {string[]} parent - an array of zero or more SHA-1 object ids
- * @property {Object} author
- * @property {string} author.name - The author's name
- * @property {string} author.email - The author's email
- * @property {number} author.timestamp - UTC Unix timestamp in seconds
- * @property {number} author.timezoneOffset - Timezone difference from UTC in minutes
- * @property {Object} committer
- * @property {string} committer.name - The committer's name
- * @property {string} committer.email - The committer's email
- * @property {number} committer.timestamp - UTC Unix timestamp in seconds
- * @property {number} committer.timezoneOffset - Timezone difference from UTC in minutes
- * @property {string} [gpgsig] - PGP signature (if present)
- */
 
 /**
  * Write a commit object directly

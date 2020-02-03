@@ -1,3 +1,5 @@
+import './commands/typedefs.js'
+
 export * from './commands/add.js'
 export * from './commands/addNote.js'
 export * from './commands/addRemote.js'

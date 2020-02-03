@@ -51,7 +51,7 @@ module.exports = {
         'build.docs',
         'build.size'
       ),
-      rollup: 'rollup -c',
+      rollup: 'rollup -c --no-treeshake',
       typings: 'tsc -p declaration.tsconfig.json',
       webpack: 'webpack',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
