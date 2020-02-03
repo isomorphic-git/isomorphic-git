@@ -57,10 +57,12 @@ At the time of writing, the following breaking changes are planned:
 - [x] Make the 'message' event behave like 'rawmessage' and remove 'rawmessage'.
 - [x] Update the README to recommend LightningFS rather than BrowserFS.
 - [x] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
-- [ ] I think I will change the `plugins` API. The current API (`plugins.set('fs', fs)`) uses a kinda-hacky run-time schema validation that just checks whether certain methods are defined. Static type checking would actually provide a better developer experience and better guarantees, but having `.set` be polymorphic is hard to accurately describe using JSDoc, so I might switch to an API like `plugins.fs(fs)`.
+- [x] I think I'll tweak `readObject` and `writeObject` so that `readObject` doesn't have a crazy polymorphic return type and they somehow "fit" with all the more specific `read/write Blob/Commit/Tag/Tree` commands.
+- [x] I think I will change the `plugins` API. The current API (`plugins.set('fs', fs)`) uses a kinda-hacky run-time schema validation that just checks whether certain methods are defined. Static type checking would actually provide a better developer experience and better guarantees, but having `.set` be polymorphic is hard to accurately describe using JSDoc, so I might switch to an API like `plugins.fs(fs)`.
   - this also means we can set `new FileSystem(_fs)` in the `plugins.fs(fs)` command, because _we don't have to expose a getter like `plugins.get()`!_
-
-- [ ] I think I'll tweak `readObject` and `writeObject` so that `readObject` doesn't have a crazy polymorphic return type and they somehow "fit" with all the more specific `read/write Blob/Commit/Tag/Tree` commands.
+- [ ] Actually, I'm thinking of eliminating the plugin system API and going back to function arguments. The plugin cores creates a mysterious "global state" that makes it easy to trip up (I've forgotten to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic but a much simpler model.
+- [ ] To go along with that, I'm experimenting with a way to make the API more aesthetic, eliminating the `emitter` plugin/argument and letting you chain event listeners onto running commands directly. NOTE: need to make sure there's no race condition between adding the event listeners and starting running the command.
+  - [ ] This also provides an aesthetic way to cancel / stop running commands.
 
 ## Getting Started
 

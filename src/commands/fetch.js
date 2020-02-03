@@ -24,7 +24,7 @@ import { config } from './config'
 
 /**
  *
- * @typedef {object} FetchResponse - The object returned has the following schema:
+ * @typedef {object} FetchResult - The object returned has the following schema:
  * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
  * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
  * @property {string | null} fetchHeadDescription - a textual description of the branch that was fetched
@@ -64,8 +64,8 @@ import { config } from './config'
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
  * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
- * @returns {Promise<FetchResponse>} Resolves successfully when fetch completes
- * @see FetchResponse
+ * @returns {Promise<FetchResult>} Resolves successfully when fetch completes
+ * @see FetchResult
  *
  * @example
  * await git.fetch({

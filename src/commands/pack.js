@@ -1,13 +1,12 @@
 import Hash from 'sha.js/sha1'
 
+import { types } from '../commands/types.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { readObject } from '../storage/readObject.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
 import { cores } from '../utils/plugins.js'
-
-import { types } from './types'
 
 /**
  * @param {object} args

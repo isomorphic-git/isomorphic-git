@@ -1,4 +1,6 @@
 // @ts-check
+import '../commands/typedefs.js'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'
@@ -6,37 +8,6 @@ import { join } from '../utils/join.js'
 import { cores } from '../utils/plugins.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
-
-/**
- *
- * @typedef {Object} Walker
- * @property {Symbol} Symbol('GitWalkSymbol')
- */
-
-/**
- *
- * @typedef {Object} Stat Normalized subset of filesystem `stat` data:
- * @property {number} ctimeSeconds
- * @property {number} ctimeNanoseconds
- * @property {number} mtimeSeconds
- * @property {number} mtimeNanoseconds
- * @property {number} dev
- * @property {number} ino
- * @property {number} mode
- * @property {number} uid
- * @property {number} gid
- * @property {number} size
- */
-
-/**
- *
- * @typedef {Object} WalkerEntry The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
- * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
- * @property {function(): Promise<number>} mode
- * @property {function(): Promise<string>} oid
- * @property {function(): Promise<Uint8Array|void>} content
- * @property {function(): Promise<Stat>} stat
- */
 
 /**
  * @callback WalkerMap

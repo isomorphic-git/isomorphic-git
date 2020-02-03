@@ -1,4 +1,5 @@
 // @ts-check
+import '../commands/typedefs.js'
 import { TREE } from '../commands/TREE.js'
 import { walk } from '../commands/walk.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -10,11 +11,6 @@ import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
 import { cores } from './plugins.js'
-
-/**
- *
- * @typedef {import('../commands/readObject').TreeEntry} TreeEntry
- */
 
 /**
  * Create a merged tree
@@ -147,8 +143,8 @@ export async function mergeTree ({
 
 /**
  *
- * @param {import('../commands/walk.js').WalkerEntry} entry
- * @param {import('../commands/walk.js').WalkerEntry} base
+ * @param {WalkerEntry} entry
+ * @param {WalkerEntry} base
  *
  */
 async function modified (entry, base) {
@@ -174,9 +170,9 @@ async function modified (entry, base) {
  * @param {FileSystem} args.fs
  * @param {string} args.gitdir
  * @param {string} args.path
- * @param {import('../commands/walk.js').WalkerEntry} args.ours
- * @param {import('../commands/walk.js').WalkerEntry} args.base
- * @param {import('../commands/walk.js').WalkerEntry} args.theirs
+ * @param {WalkerEntry} args.ours
+ * @param {WalkerEntry} args.base
+ * @param {WalkerEntry} args.theirs
  * @param {string} [args.ourName]
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]

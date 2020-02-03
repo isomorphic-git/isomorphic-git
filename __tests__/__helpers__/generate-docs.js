@@ -254,24 +254,35 @@ async function gendoc (file, filepath) {
   const entries = tree.filter(
     entry => entry.type === 'blob' && !entry.path.startsWith('_')
   )
+
   const docs = []
-  await Promise.all(
-    entries.map(async entry => {
-      // Load file
-      const { blob } = await git.readBlob({
-        dir,
-        oid,
-        filepath: `src/commands/${entry.path}`
-      })
-      const filetext = Buffer.from(blob).toString('utf8')
-      const doctext = await gendoc(filetext, entry.path)
-      if (doctext !== '') {
-        const docfilename = entry.path.replace(/js$/, 'md')
-        fs.writeFileSync(path.join(docDir, docfilename), doctext)
-        docs.push(`docs/${docfilename}`)
-      }
+  const processEntry = async entry => {
+    // Load file
+    const { blob } = await git.readBlob({
+      dir,
+      oid,
+      filepath: `src/commands/${entry.path}`
     })
+    const filetext = Buffer.from(blob).toString('utf8')
+    const doctext = await gendoc(filetext, entry.path)
+    if (doctext !== '') {
+      const docfilename = entry.path.replace(/js$/, 'md')
+      fs.writeFileSync(path.join(docDir, docfilename), doctext)
+      docs.push(`docs/${docfilename}`)
+    }
+  }
+
+  // Generate the shared typedefs
+  const typedefsIndex = entries.findIndex(entry =>
+    entry.path.endsWith('typedefs.js')
   )
+  const typedefsEntry = entries[typedefsIndex]
+  entries.splice(typedefsIndex, 1)
+  await processEntry(typedefsEntry)
+
+  // Generate all the docs
+  await Promise.all(entries.map(processEntry))
+
   docs.sort()
   gitignoreContent += docs.join('\n') + '\n'
   fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8')

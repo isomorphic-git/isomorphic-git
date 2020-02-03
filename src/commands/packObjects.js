@@ -8,7 +8,7 @@ import { pack } from './pack'
 
 /**
  *
- * @typedef {Object} PackObjectsResponse The packObjects command returns an object with two properties:
+ * @typedef {Object} PackObjectsResult The packObjects command returns an object with two properties:
  * @property {string} filename - The suggested filename for the packfile if you want to save it to disk somewhere. It includes the packfile SHA.
  * @property {Uint8Array} [packfile] - The packfile contents. Not present if `write` parameter was true, in which case the packfile was written straight to disk.
  */
@@ -23,8 +23,8 @@ import { pack } from './pack'
  * @param {string[]} args.oids - An array of SHA-1 object ids to be included in the packfile
  * @param {boolean} [args.write = false] - Whether to save the packfile to disk or not
  *
- * @returns {Promise<PackObjectsResponse>} Resolves successfully when the packfile is ready with the filename and buffer
- * @see PackObjectsResponse
+ * @returns {Promise<PackObjectsResult>} Resolves successfully when the packfile is ready with the filename and buffer
+ * @see PackObjectsResult
  *
  * @example
  * // Create a packfile containing only an empty tree

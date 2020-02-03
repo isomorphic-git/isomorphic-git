@@ -1,12 +1,8 @@
 // @ts-check
+import '../commands/typedefs.js'
+
 import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
-
-/**
- *
- * @typedef Walker
- * @property {Symbol} Symbol('GitWalkerSymbol')
- */
 
 /**
  * Get a git commit `Walker`
