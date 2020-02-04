@@ -4,20 +4,16 @@ import '../commands/typedefs.js'
 import cleanGitRef from 'clean-git-ref'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { join } from '../utils/join.js'
 
 /**
  * Create a branch
  *
  * @param {object} args
- * @param {FsClient} args.fs - a file system implementation
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} args.ref - What to name the branch
- * @param {boolean} [args.checkout = false] - Update `HEAD` to point at the newly created branch
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} args.gitdir
+ * @param {string} args.ref
+ * @param {boolean} [args.checkout = false]
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -27,61 +23,47 @@ import { join } from '../utils/join.js'
  *
  */
 export async function branch ({
-  fs: _fs,
-  dir,
-  gitdir = join(dir, '.git'),
+  fs,
+  gitdir,
   ref,
   checkout = false
 }) {
+  if (ref !== cleanGitRef.clean(ref)) {
+    throw new GitError(E.InvalidRefNameError, {
+      verb: 'create',
+      noun: 'branch',
+      ref,
+      suggestion: cleanGitRef.clean(ref)
+    })
+  }
+
+  const fullref = `refs/heads/${ref}`
+
+  const exist = await GitRefManager.exists({ fs, gitdir, ref: fullref })
+  if (exist) {
+    throw new GitError(E.RefExistsError, { noun: 'branch', ref })
+  }
+
+  // Get current HEAD tree oid
+  let oid
   try {
-    const fs = new FileSystem(_fs)
-    if (ref === undefined) {
-      throw new GitError(E.MissingRequiredParameterError, {
-        function: 'branch',
-        parameter: 'ref'
-      })
-    }
+    oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+  } catch (e) {
+    // Probably an empty repo
+  }
 
-    if (ref !== cleanGitRef.clean(ref)) {
-      throw new GitError(E.InvalidRefNameError, {
-        verb: 'create',
-        noun: 'branch',
-        ref,
-        suggestion: cleanGitRef.clean(ref)
-      })
-    }
+  // Create a new ref that points at the current commit
+  if (oid) {
+    await GitRefManager.writeRef({ fs, gitdir, ref: fullref, value: oid })
+  }
 
-    const fullref = `refs/heads/${ref}`
-
-    const exist = await GitRefManager.exists({ fs, gitdir, ref: fullref })
-    if (exist) {
-      throw new GitError(E.RefExistsError, { noun: 'branch', ref })
-    }
-
-    // Get current HEAD tree oid
-    let oid
-    try {
-      oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
-    } catch (e) {
-      // Probably an empty repo
-    }
-
-    // Create a new ref that points at the current commit
-    if (oid) {
-      await GitRefManager.writeRef({ fs, gitdir, ref: fullref, value: oid })
-    }
-
-    if (checkout) {
-      // Update HEAD
-      await GitRefManager.writeSymbolicRef({
-        fs,
-        gitdir,
-        ref: 'HEAD',
-        value: fullref
-      })
-    }
-  } catch (err) {
-    err.caller = 'git.branch'
-    throw err
+  if (checkout) {
+    // Update HEAD
+    await GitRefManager.writeSymbolicRef({
+      fs,
+      gitdir,
+      ref: 'HEAD',
+      value: fullref
+    })
   }
 }

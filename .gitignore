@@ -102,6 +102,7 @@ docs/deleteTag.md
 docs/expandOid.md
 docs/expandRef.md
 docs/fetch.md
+docs/findMergeBase.md
 docs/findRoot.md
 docs/getRemoteInfo.md
 docs/hashBlob.md
@@ -116,11 +117,6 @@ docs/listTags.md
 docs/log.md
 docs/merge.md
 docs/packObjects.md
-docs/plugin_credentialManager.md
-docs/plugin_emitter.md
-docs/plugin_fs.md
-docs/plugin_http.md
-docs/plugin_pgp.md
 docs/pull.md
 docs/push.md
 docs/readBlob.md
