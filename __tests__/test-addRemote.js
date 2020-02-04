@@ -1,14 +1,8 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-addRemote.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { addRemote, listRemotes } = require('isomorphic-git')
+const { E, addRemote, listRemotes } = require('isomorphic-git')
 
 describe('addRemote', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('addRemote', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-addRemote')
@@ -36,7 +30,7 @@ describe('addRemote', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.code).toBe(E.MissingRequiredParameterError)
   })
   it('invalid remote name', async () => {
     // Setup
@@ -51,6 +45,6 @@ describe('addRemote', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.code).toBe(E.InvalidRefNameError)
   })
 })

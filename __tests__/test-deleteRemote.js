@@ -1,14 +1,8 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-deleteRemote.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { deleteRemote, listRemotes } = require('isomorphic-git')
+const { E, deleteRemote, listRemotes } = require('isomorphic-git')
 
 describe('deleteRemote', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('deleteRemote', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-deleteRemote')
@@ -30,6 +24,6 @@ describe('deleteRemote', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.code).toBe(E.MissingRequiredParameterError)
   })
 })

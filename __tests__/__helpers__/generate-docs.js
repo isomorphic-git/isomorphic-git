@@ -96,6 +96,7 @@ function gentypedef (ast) {
 async function gendoc (file, filepath) {
   // Fix some TypeScript-isms that jsdoc doesn't like
   file = file.replace(/\{import\('events'\)\.EventEmitter\}/g, '{EventEmitter}')
+  file = file.replace(/\{import\('..\/models\/FileSystem\.js'\)\.FileSystem\}/g, '{FileSystem}')
   let ast
   try {
     ast = await jsdoc.explain({ source: file })

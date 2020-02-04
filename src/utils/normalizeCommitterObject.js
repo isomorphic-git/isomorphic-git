@@ -7,9 +7,11 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 export async function normalizeCommitterObject ({ fs, gitdir, author, committer }) {
   committer = Object.assign({}, committer || author)
   // Match committer's date to author's one, if omitted
-  committer.date = committer.date || author.date
-  committer.timestamp = committer.timestamp || author.timestamp
-  committer.timezoneOffset = committer.timezoneOffset || author.timezoneOffset
+  if (author) {
+    committer.date = committer.date || author.date
+    committer.timestamp = committer.timestamp || author.timestamp
+    committer.timezoneOffset = committer.timezoneOffset || author.timezoneOffset
+  }
   committer = await normalizeAuthorObject({ fs, gitdir, author: committer })
   return committer
 }

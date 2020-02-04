@@ -1,24 +1,17 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-branch.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
-const { branch, init, currentBranch } = require('isomorphic-git')
+const { E, branch, init, currentBranch } = require('isomorphic-git')
 
 describe('branch', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
-
   it('branch', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-branch')
     // Test
     await branch({ fs, dir, gitdir, ref: 'test-branch' })
     const files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
-    expect(files.sort()).toMatchSnapshot()
+    expect(files).toEqual(['master', 'test-branch'])
     expect(await currentBranch({ fs, dir, gitdir })).toEqual('master')
   })
 
@@ -41,7 +34,7 @@ describe('branch', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.code).toBe(E.InvalidRefNameError)
   })
 
   it('missing ref argument', async () => {
@@ -56,7 +49,7 @@ describe('branch', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.code).toBe(E.MissingRequiredParameterError)
   })
 
   it('empty repo', async () => {
