@@ -12,7 +12,10 @@ import { init } from './init.js'
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system implementation
+ * @param {HttpClient} [args.http] - an HTTP client
+ * @param {ProgressCallback} [args.onProgress] - optional progress event callback
+ * @param {MessageCallback} [args.onMessage] - optional message event callback
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.url - The URL of the remote repository
@@ -34,7 +37,6 @@ import { init } from './init.js'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {'github'|'bitbucket'|'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -50,10 +52,12 @@ import { init } from './init.js'
  *
  */
 export async function clone ({
-  core = 'default',
+  fs: _fs,
+  http,
+  onProgress,
+  onMessage,
   dir,
   gitdir = join(dir, '.git'),
-  emitterPrefix = '',
   url,
   noGitSuffix = false,
   corsProxy = undefined,
@@ -75,23 +79,23 @@ export async function clone ({
   headers = {}
 }) {
   try {
-    await init({ core, gitdir })
+    await init({ fs: _fs, gitdir })
     // Add remote
     await config({
-      core,
+      fs: _fs,
       gitdir,
       path: `remote.${remote}.url`,
       value: url
     })
     await config({
-      core,
+      fs: _fs,
       gitdir,
       path: `remote.${remote}.fetch`,
       value: `+refs/heads/*:refs/remotes/${remote}/*`
     })
     if (corsProxy) {
       await config({
-        core,
+        fs: _fs,
         gitdir,
         path: `http.corsProxy`,
         value: corsProxy
@@ -99,9 +103,11 @@ export async function clone ({
     }
     // Fetch commits
     const { defaultBranch, fetchHead } = await fetch({
-      core,
+      fs: _fs,
+      http,
+      onProgress,
+      onMessage,
       gitdir,
-      emitterPrefix,
       noGitSuffix,
       ref,
       remote,
@@ -122,10 +128,10 @@ export async function clone ({
     ref = ref.replace('refs/heads/', '')
     // Checkout that branch
     await checkout({
-      core,
+      fs: _fs,
+      onProgress,
       dir,
       gitdir,
-      emitterPrefix,
       ref,
       remote,
       noCheckout,

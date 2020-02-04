@@ -5,19 +5,19 @@ const { tag, resolveRef } = require('isomorphic-git')
 describe('tag', () => {
   it('creates a lightweight tag to HEAD', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-tag')
+    const { fs, gitdir } = await makeFixture('test-tag')
     // Test
-    await tag({ gitdir, ref: 'latest' })
-    const ref = await resolveRef({ gitdir, ref: 'refs/tags/latest' })
+    await tag({ fs, gitdir, ref: 'latest' })
+    const ref = await resolveRef({ fs, gitdir, ref: 'refs/tags/latest' })
     expect(ref).toEqual('cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69')
   })
   it('fails if tag already exists', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-tag')
+    const { fs, gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {
-      await tag({ gitdir, ref: 'existing-tag' })
+      await tag({ fs, gitdir, ref: 'existing-tag' })
     } catch (err) {
       error = err
     }
@@ -26,11 +26,11 @@ describe('tag', () => {
   })
   it('fails if tag already exists (packed)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-tag')
+    const { fs, gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {
-      await tag({ gitdir, ref: 'packed-tag' })
+      await tag({ fs, gitdir, ref: 'packed-tag' })
     } catch (err) {
       error = err
     }
@@ -39,11 +39,11 @@ describe('tag', () => {
   })
   it('force overwrite', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-tag')
+    const { fs, gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {
-      await tag({ gitdir, ref: 'existing-tag', force: true })
+      await tag({ fs, gitdir, ref: 'existing-tag', force: true })
     } catch (err) {
       error = err
     }
@@ -51,11 +51,11 @@ describe('tag', () => {
   })
   it('force overwrite (packed)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-tag')
+    const { fs, gitdir } = await makeFixture('test-tag')
     // Test
     let error = null
     try {
-      await tag({ gitdir, ref: 'packed-tag', force: true })
+      await tag({ fs, gitdir, ref: 'packed-tag', force: true })
     } catch (err) {
       error = err
     }

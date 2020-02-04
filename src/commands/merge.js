@@ -6,7 +6,6 @@ import { E, GitError } from '../models/GitError.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { join } from '../utils/join.js'
 import { mergeTree } from '../utils/mergeTree.js'
-import { cores } from '../utils/plugins.js'
 
 import { commit } from './commit'
 import { currentBranch } from './currentBranch.js'
@@ -36,7 +35,7 @@ import { findMergeBase } from './findMergeBase.js'
  * Currently it does not support selecting alternative merge strategies.
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
@@ -48,15 +47,15 @@ import { findMergeBase } from './findMergeBase.js'
  * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
  * @param {string} [args.author.name] - Default is `user.name` config.
  * @param {string} [args.author.email] - Default is `user.email` config.
- * @param {string} [args.author.date] - Set the author timestamp field. Default is the current date.
- * @param {string} [args.author.timestamp] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
- * @param {string} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
+ * @param {Date} [args.author.date] - Set the author timestamp field. Default is the current date.
+ * @param {number} [args.author.timestamp] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+ * @param {number} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
  * @param {string} [args.committer.name] - Default is `user.name` config.
  * @param {string} [args.committer.email] - Default is `user.email` config.
- * @param {string} [args.committer.date] - Set the committer timestamp field. Default is the current date.
- * @param {string} [args.committer.timestamp] - Set the committer timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
- * @param {string} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
+ * @param {Date} [args.committer.date] - Set the committer timestamp field. Default is the current date.
+ * @param {number} [args.committer.timestamp] - Set the committer timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+ * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
  *
  * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
@@ -68,7 +67,7 @@ import { findMergeBase } from './findMergeBase.js'
  *
  */
 export async function merge ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ours,
@@ -82,9 +81,9 @@ export async function merge ({
   signingKey
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (ours === undefined) {
-      ours = await currentBranch({ core, gitdir, fullname: true })
+      ours = await currentBranch({ fs: _fs, gitdir, fullname: true })
     }
     ours = await GitRefManager.expand({
       fs,
@@ -108,7 +107,7 @@ export async function merge ({
     })
     // find most recent common ancestor of ref a and ref b
     const baseOids = await findMergeBase({
-      core,
+      fs: _fs,
       dir,
       gitdir,
       oids: [ourOid, theirOid]
@@ -139,7 +138,7 @@ export async function merge ({
       }
       // try a fancier merge
       const tree = await mergeTree({
-        core,
+        fs: _fs,
         gitdir,
         ourOid,
         theirOid,
@@ -155,7 +154,7 @@ export async function merge ({
         )}`
       }
       const oid = await commit({
-        core,
+        fs: _fs,
         gitdir,
         message,
         ref: ours,

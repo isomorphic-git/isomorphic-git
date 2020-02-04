@@ -6,22 +6,21 @@ import { readObject } from '../storage/readObject.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids
  */
 export async function pack ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oids
 }) {
-  const fs = new FileSystem(cores.get(core).get('fs'))
+  const fs = new FileSystem(_fs)
   const hash = new Hash()
   const outputStream = []
   function write (chunk, enc) {

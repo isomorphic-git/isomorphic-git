@@ -1,16 +1,17 @@
 // @ts-check
 import cleanGitRef from 'clean-git-ref'
 
+import '../commands/typedefs.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Create a branch
  *
  * @param {object} args
+ * @param {FsClient} args.fs - a file system implementation
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
@@ -25,14 +26,14 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function branch ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref,
   checkout = false
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'branch',

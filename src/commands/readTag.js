@@ -6,7 +6,6 @@ import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  *
@@ -20,7 +19,7 @@ import { cores } from '../utils/plugins.js'
  * Read an annotated tag object directly
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get
@@ -31,13 +30,13 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function readTag ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oid
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     const { type, object } = await readObject({
       fs,
       gitdir,

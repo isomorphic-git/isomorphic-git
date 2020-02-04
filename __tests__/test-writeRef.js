@@ -11,35 +11,39 @@ describe('writeRef', () => {
   })
   it('writes a tag ref to HEAD', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeRef')
+    const { fs, gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
+      fs,
       gitdir,
       ref: 'refs/tags/latest',
       value: 'cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69'
     })
-    const ref = await resolveRef({ gitdir, ref: 'refs/tags/latest' })
+    const ref = await resolveRef({ fs, gitdir, ref: 'refs/tags/latest' })
     expect(ref).toMatchSnapshot()
   })
   it('sets current branch to another', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeRef')
+    const { fs, gitdir } = await makeFixture('test-writeRef')
     // Test
     await writeRef({
+      fs,
       gitdir,
       ref: 'refs/heads/another',
       value: 'HEAD'
     })
     await writeRef({
+      fs,
       gitdir,
       ref: 'HEAD',
       value: 'refs/heads/another',
       force: true,
       symbolic: true
     })
-    const newBranch = await currentBranch({ gitdir, fullname: true })
+    const newBranch = await currentBranch({ fs, gitdir, fullname: true })
     expect(newBranch).toBe('refs/heads/another')
-    const ref = await resolveRef({ gitdir, ref: newBranch })
+    if (!newBranch) throw new Error('type error')
+    const ref = await resolveRef({ fs, gitdir, ref: newBranch })
     expect(ref).toMatchSnapshot()
   })
 })

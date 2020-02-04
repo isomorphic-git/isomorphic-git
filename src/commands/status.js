@@ -10,7 +10,6 @@ import { readObject } from '../storage/readObject.js'
 import { compareStats } from '../utils/compareStats.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Tell whether a file has been changed
@@ -34,7 +33,7 @@ import { cores } from '../utils/plugins.js'
  * | `"*undeletemodified"` | file was deleted from the index, but is present with modifications in the working dir |
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to query
@@ -47,18 +46,18 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function status ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   filepath
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     const ignored = await GitIgnoreManager.isIgnored({
+      fs,
       gitdir,
       dir,
-      filepath,
-      fs
+      filepath
     })
     if (ignored) {
       return 'ignored'

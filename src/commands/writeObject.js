@@ -8,7 +8,6 @@ import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { writeObject as _writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Write a git object directly
@@ -39,7 +38,7 @@ import { cores } from '../utils/plugins.js'
  * > If you know the type of object you are writing, use [`writeBlob`](./writeBlob.md), [`writeCommit`](./writeCommit.md), [`writeTag`](./writeTag.md), or [`writeTree`](./writeTree.md).
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string | Uint8Array | CommitObject | TreeObject | TagObject} args.object - The object to write.
@@ -77,7 +76,7 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function writeObject ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   type,
@@ -87,7 +86,7 @@ export async function writeObject ({
   encoding = undefined
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     // Convert object to buffer
     if (format === 'parsed') {
       switch (type) {

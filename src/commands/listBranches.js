@@ -2,7 +2,6 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * List branches
@@ -14,7 +13,7 @@ import { cores } from '../utils/plugins.js'
  * (Which branch you fetch doesn't matter - the list of branches available on the remote is updated during the fetch handshake.)
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.remote] - Instead of the branches in `refs/heads`, list the branches in `refs/remotes/${remote}`.
@@ -29,13 +28,13 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function listBranches ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   remote = undefined
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     return GitRefManager.listBranches({ fs, gitdir, remote })
   } catch (err) {
     err.caller = 'git.listBranches'

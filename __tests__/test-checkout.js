@@ -21,10 +21,10 @@ describe('checkout', () => {
   it('checkout', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({ dir, gitdir, ref: 'test-branch' })
+    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchSnapshot()
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('ref: refs/heads/test-branch\n')
@@ -34,13 +34,14 @@ describe('checkout', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'v1.0.0'
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchSnapshot()
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
@@ -50,13 +51,14 @@ describe('checkout', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchSnapshot()
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
@@ -64,10 +66,10 @@ describe('checkout', () => {
 
   it('checkout unfetched branch', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-checkout')
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
     let error = null
     try {
-      await checkout({ dir, gitdir, ref: 'missing-branch' })
+      await checkout({ fs, dir, gitdir, ref: 'missing-branch' })
       throw new Error('Checkout should have failed.')
     } catch (err) {
       error = err
@@ -79,8 +81,8 @@ describe('checkout', () => {
 
   it('checkout file permissions', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await branch({ dir, gitdir, ref: 'other', checkout: true })
-    await checkout({ dir, gitdir, ref: 'test-branch' })
+    await branch({ fs, dir, gitdir, ref: 'other', checkout: true })
+    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
     await fs.write(dir + '/regular-file.txt', 'regular file', {
       mode: 0o666
     })
@@ -92,16 +94,17 @@ describe('checkout', () => {
     const expectedExecutableFileMode = (await fs.lstat(
       dir + '/executable-file.sh'
     )).mode
-    await add({ dir, gitdir, filepath: 'regular-file.txt' })
-    await add({ dir, gitdir, filepath: 'executable-file.sh' })
+    await add({ fs, dir, gitdir, filepath: 'regular-file.txt' })
+    await add({ fs, dir, gitdir, filepath: 'executable-file.sh' })
     await commit({
+      fs,
       dir,
       gitdir,
       author: { name: 'Git', email: 'git@example.org' },
       message: 'add files'
     })
-    await checkout({ dir, gitdir, ref: 'other' })
-    await checkout({ dir, gitdir, ref: 'test-branch' })
+    await checkout({ fs, dir, gitdir, ref: 'other' })
+    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
     const actualRegularFileMode = (await fs.lstat(dir + '/regular-file.txt'))
       .mode
     const actualExecutableFileMode = (await fs.lstat(
@@ -129,11 +132,11 @@ describe('checkout', () => {
     )
 
     // Test
-    await checkout({ dir, gitdir, ref: 'regular-file' })
+    await checkout({ fs, dir, gitdir, ref: 'regular-file' })
     const { mode: actualRegularFileMode } = await fs.lstat(dir + '/hello.sh')
     expect(actualRegularFileMode).toEqual(expectedRegularFileMode)
 
-    await checkout({ dir, gitdir, ref: 'executable-file' })
+    await checkout({ fs, dir, gitdir, ref: 'executable-file' })
     const { mode: actualExecutableFileMode } = await fs.lstat(dir + '/hello.sh')
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
@@ -142,6 +145,7 @@ describe('checkout', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'test-branch',
@@ -149,7 +153,7 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 
@@ -157,6 +161,7 @@ describe('checkout', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'test-branch',
@@ -164,7 +169,7 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchSnapshot()
-    const index = await listFiles({ dir, gitdir })
+    const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchSnapshot()
   })
 
@@ -176,6 +181,7 @@ describe('checkout', () => {
     let error = null
     try {
       await checkout({
+        fs,
         dir,
         gitdir,
         ref: 'test-branch'
@@ -196,6 +202,7 @@ describe('checkout', () => {
     let error = null
     try {
       await checkout({
+        fs,
         dir,
         gitdir,
         ref: 'test-branch',
@@ -217,6 +224,7 @@ describe('checkout', () => {
     let error = null
     try {
       await checkout({
+        fs,
         dir,
         gitdir,
         ref: 'test-branch',
@@ -233,6 +241,7 @@ describe('checkout', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'test-branch'
@@ -242,6 +251,7 @@ describe('checkout', () => {
     let error = null
     try {
       await checkout({
+        fs,
         dir,
         gitdir,
         force: true
@@ -257,11 +267,13 @@ describe('checkout', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'test-branch'
     })
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'test-branch',

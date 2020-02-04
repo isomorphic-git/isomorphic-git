@@ -1,4 +1,5 @@
 // @ts-check
+import '../commands/typedefs.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
@@ -6,7 +7,6 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Verify a signed commit or tag
@@ -24,7 +24,8 @@ import { cores } from '../utils/plugins.js'
  * should support verifying a single commit signed with multiple keys. Hence why the returned result is an array of key ids.
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
+ * @param {VerifyCallback} args.verify - a PGP verify implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - A reference to the commit or tag to verify
@@ -46,39 +47,38 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function verify ({
-  core = 'default',
+  fs: _fs,
+  verify,
   dir,
   gitdir = join(dir, '.git'),
   ref,
   publicKeys
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     const oid = await GitRefManager.resolve({ fs, gitdir, ref })
     const { type, object } = await readObject({ fs, gitdir, oid })
-    if (type !== 'commit' && type !== 'tag') {
-      throw new GitError(E.ObjectTypeAssertionInRefFail, {
-        expected: 'commit/tag',
-        ref,
-        type
-      })
-    }
-    // Newer plugin API
-    const pgp = cores.get(core).get('pgp')
+
     if (type === 'commit') {
       const commit = GitCommit.from(object)
-      const { valid, invalid } = await GitCommit.verify(commit, pgp, publicKeys)
+      const { valid, invalid } = await GitCommit.verify(commit, verify, publicKeys)
       if (invalid.length > 0) return false
       return valid
     } else if (type === 'tag') {
       const tag = GitAnnotatedTag.from(object)
       const { valid, invalid } = await GitAnnotatedTag.verify(
         tag,
-        pgp,
+        verify,
         publicKeys
       )
       if (invalid.length > 0) return false
       return valid
+    } else {
+      throw new GitError(E.ObjectTypeAssertionInRefFail, {
+        expected: 'commit/tag',
+        ref,
+        type
+      })
     }
   } catch (err) {
     err.caller = 'git.verify'

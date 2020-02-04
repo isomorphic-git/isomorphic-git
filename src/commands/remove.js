@@ -2,7 +2,6 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Remove a file from the git index (aka staging area)
@@ -10,7 +9,7 @@ import { cores } from '../utils/plugins.js'
  * Note that this does NOT delete the file in the working directory.
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to remove from the index
@@ -23,13 +22,13 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function remove ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   filepath
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
       index.delete({ filepath })
     })

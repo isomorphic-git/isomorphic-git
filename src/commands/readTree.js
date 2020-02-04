@@ -3,7 +3,6 @@ import '../commands/typedefs.js'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
@@ -18,7 +17,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  * Read a tree object directly
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get. Annotated tags and commits are peeled.
@@ -31,14 +30,14 @@ import { resolveTree } from '../utils/resolveTree.js'
  *
  */
 export async function readTree ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oid,
   filepath = undefined
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (filepath !== undefined) {
       oid = await resolveFilepath({ fs, gitdir, oid, filepath })
     }

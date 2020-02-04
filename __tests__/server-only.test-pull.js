@@ -13,16 +13,18 @@ describe('pull', () => {
   it('basic pull', async () => {
     // Setup
     const { nockDone } = await nock.back('pull - basic pull.json')
-    const { dir, gitdir } = await makeFixture('test-pull-client')
+    const { fs, dir, gitdir } = await makeFixture('test-pull-client')
     // Test
     const desiredOid = '97c024f73eaab2781bf3691597bc7c833cb0e22f'
     await pull({
+      fs,
       dir,
       gitdir,
       ref: 'master',
       fastForwardOnly: true
     })
     const oid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })

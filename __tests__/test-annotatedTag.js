@@ -1,19 +1,19 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const {
-  plugins,
   annotatedTag,
   verify,
   resolveRef,
-  readObject
+  readTag
 } = require('isomorphic-git')
 
 describe('annotatedTag', () => {
   it('creates an annotated tag to HEAD', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-annotatedTag')
+    const { fs, gitdir } = await makeFixture('test-annotatedTag')
     // Test
     await annotatedTag({
+      fs,
       gitdir,
       ref: 'latest',
       message: 'some tag message',
@@ -22,15 +22,16 @@ describe('annotatedTag', () => {
         email: 'mail@yuhr.org'
       }
     })
-    const tagRef = await resolveRef({ gitdir, ref: 'refs/tags/latest' })
-    const { object: tagObject } = await readObject({ gitdir, oid: tagRef })
-    expect(tagObject.object).toEqual('cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69')
+    const tagRef = await resolveRef({ fs, gitdir, ref: 'refs/tags/latest' })
+    const { tag } = await readTag({ fs, gitdir, oid: tagRef })
+    expect(tag.object).toEqual('cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69')
   })
   it('creates an annotated tag pointing to a blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-annotatedTag')
+    const { fs, gitdir } = await makeFixture('test-annotatedTag')
     // Test
     await annotatedTag({
+      fs,
       gitdir,
       ref: 'latest-blob',
       message: 'some tag message',
@@ -40,18 +41,18 @@ describe('annotatedTag', () => {
       },
       object: 'd670460b4b4aece5915caf5c68d12f560a9fe3e4'
     })
-    const tagRef = await resolveRef({ gitdir, ref: 'refs/tags/latest-blob' })
-    const { object: tagObject } = await readObject({ gitdir, oid: tagRef })
-    expect(tagObject.object).toEqual('d670460b4b4aece5915caf5c68d12f560a9fe3e4')
+    const tagRef = await resolveRef({ fs, gitdir, ref: 'refs/tags/latest-blob' })
+    const { tag } = await readTag({ fs, gitdir, oid: tagRef })
+    expect(tag.object).toEqual('d670460b4b4aece5915caf5c68d12f560a9fe3e4')
   })
   it('creates a signed tag to HEAD', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
-    const { gitdir } = await makeFixture('test-annotatedTag')
-    plugins.pgp(pgp)
+    const { fs, gitdir } = await makeFixture('test-annotatedTag')
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
     await annotatedTag({
+      fs,
       gitdir,
       ref: 'latest',
       message: 'some tag message',
@@ -59,12 +60,15 @@ describe('annotatedTag', () => {
         name: 'Yu Shimura',
         email: 'mail@yuhr.org'
       },
-      signingKey: privateKey
+      signingKey: privateKey,
+      sign: pgp.sign
     })
     const keys = await verify({
+      fs,
       gitdir,
       ref: 'latest',
-      publicKeys: publicKey
+      publicKeys: publicKey,
+      verify: pgp.verify
     })
     expect(keys[0]).toBe('f2f0ced8a52613c4')
   })

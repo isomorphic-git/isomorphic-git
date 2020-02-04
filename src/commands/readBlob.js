@@ -1,7 +1,6 @@
 // @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { resolveBlob } from '../utils/resolveBlob.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
@@ -17,7 +16,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * Read a blob object directly
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get. Annotated tags, commits, and trees are peeled.
@@ -39,14 +38,14 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  *
  */
 export async function readBlob ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oid,
   filepath = undefined
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (filepath !== undefined) {
       oid = await resolveFilepath({ fs, gitdir, oid, filepath })
     }

@@ -1,17 +1,17 @@
 // @ts-check
 import cleanGitRef from 'clean-git-ref'
 
+import '../commands/typedefs.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Add or update a remote
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.remote - The name of the remote
@@ -26,7 +26,7 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function addRemote ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   remote,
@@ -34,7 +34,7 @@ export async function addRemote ({
   force = false
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (remote === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'addRemote',

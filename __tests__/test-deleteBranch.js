@@ -16,18 +16,18 @@ describe('deleteBranch', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
     // Test
-    await deleteBranch({ dir, gitdir, ref: 'test' })
+    await deleteBranch({ fs, dir, gitdir, ref: 'test' })
     const files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
     expect(files.sort()).toMatchSnapshot()
   })
 
   it('invalid branch name', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-deleteBranch')
+    const { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
     let error = null
     // Test
     try {
-      await deleteBranch({ dir, gitdir, ref: 'inv@{id..branch.lock' })
+      await deleteBranch({ fs, dir, gitdir, ref: 'inv@{id..branch.lock' })
     } catch (err) {
       error = err
     }
@@ -37,11 +37,11 @@ describe('deleteBranch', () => {
 
   it('branch not exist', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-deleteBranch')
+    const { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
     let error = null
     // Test
     try {
-      await deleteBranch({ dir, gitdir, ref: 'branch-not-exist' })
+      await deleteBranch({ fs, dir, gitdir, ref: 'branch-not-exist' })
     } catch (err) {
       error = err
     }
@@ -51,12 +51,12 @@ describe('deleteBranch', () => {
 
   it('missing ref argument', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-deleteBranch')
+    const { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
     let error = null
     // Test
     try {
       // @ts-ignore
-      await deleteBranch({ dir, gitdir })
+      await deleteBranch({ fs, dir, gitdir })
     } catch (err) {
       error = err
     }
@@ -66,11 +66,11 @@ describe('deleteBranch', () => {
 
   it('checked out branch', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-deleteBranch')
+    const { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
     let error = null
     // Test
     try {
-      await deleteBranch({ dir, gitdir, ref: 'master' })
+      await deleteBranch({ fs, dir, gitdir, ref: 'master' })
     } catch (err) {
       error = err
     }

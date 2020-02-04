@@ -2,13 +2,12 @@
 import { FileSystem } from '../models/FileSystem.js'
 import { writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Write a blob object directly
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Uint8Array} args.blob - The blob object to write
@@ -26,13 +25,13 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function writeBlob ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   blob
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     const oid = await writeObject({
       fs,
       gitdir,

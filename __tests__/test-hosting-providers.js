@@ -19,9 +19,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await fetch({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'tester-at-260687965765',
@@ -43,9 +44,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await push({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'tester-at-260687965765',
@@ -69,9 +71,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await fetch({
+        fs,
         noGitSuffix: true,
         gitdir,
         // corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
@@ -92,9 +95,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await push({
+        fs,
         noGitSuffix: true,
         gitdir,
         // corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
@@ -121,9 +125,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await push({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git',
@@ -147,9 +152,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await fetch({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git',
@@ -173,9 +179,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await fetch({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         token: token,
@@ -196,9 +203,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await push({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         token: token,
@@ -223,9 +231,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await fetch({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git-test-push',
@@ -247,9 +256,10 @@ describe('Hosting Providers', () => {
         .reverse()
         .join('')
       // Setup
-      const { gitdir } = await makeFixture('test-hosting-providers')
+      const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
       const res = await push({
+        fs,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git-test-push',

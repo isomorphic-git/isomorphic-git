@@ -7,9 +7,10 @@ const { writeTag } = require('isomorphic-git')
 describe('writeTag', () => {
   it('annotated tag', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeTag')
+    const { fs, gitdir } = await makeFixture('test-writeTag')
     // Test
     const oid = await writeTag({
+      fs,
       gitdir,
       tag: {
         object: 'af4d84a6a9fa7a74acdad07fddf9f17ff3a974ae',

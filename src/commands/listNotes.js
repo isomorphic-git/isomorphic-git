@@ -3,7 +3,6 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E } from '../models/GitError.js'
 import { join } from '../utils/join'
-import { cores } from '../utils/plugins.js'
 
 import { readTree } from './readTree'
 
@@ -11,7 +10,7 @@ import { readTree } from './readTree'
  * List all the object notes
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
@@ -20,13 +19,13 @@ import { readTree } from './readTree'
  */
 
 export async function listNotes ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'refs/notes/commits'
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
 
     // Get the current note commit
     let parent
@@ -40,7 +39,7 @@ export async function listNotes ({
 
     // Create the current note tree
     const result = await readTree({
-      core,
+      fs: _fs,
       gitdir,
       oid: parent
     })

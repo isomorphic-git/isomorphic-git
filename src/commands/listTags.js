@@ -2,13 +2,12 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * List tags
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  *
@@ -20,12 +19,12 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function listTags ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git')
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     return GitRefManager.listTags({ fs, gitdir })
   } catch (err) {
     err.caller = 'git.listTags'

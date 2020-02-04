@@ -4,8 +4,6 @@ const path = require('path')
 const table = require('markdown-table')
 const git = require('../..')
 
-git.plugins.fs(fs)
-
 const dir = path.join(__dirname, '..', '..')
 const ref = process.argv[2] || 'HEAD'
 
@@ -249,8 +247,8 @@ async function gendoc (file, filepath) {
   gitignoreContent += '# AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE\n'
   gitignoreContent += 'docs/errors.md\n'
 
-  const oid = await git.resolveRef({ dir, ref })
-  const { tree } = await git.readTree({ dir, oid, filepath: 'src/commands' })
+  const oid = await git.resolveRef({ fs, dir, ref })
+  const { tree } = await git.readTree({ fs, dir, oid, filepath: 'src/commands' })
   const entries = tree.filter(
     entry => entry.type === 'blob' && !entry.path.startsWith('_')
   )
@@ -259,6 +257,7 @@ async function gendoc (file, filepath) {
   const processEntry = async entry => {
     // Load file
     const { blob } = await git.readBlob({
+      fs,
       dir,
       oid,
       filepath: `src/commands/${entry.path}`
@@ -293,6 +292,7 @@ async function gendoc (file, filepath) {
 
   const docFile = path.join(__dirname, '..', '..', 'docs', 'errors.md')
   const { blob } = await git.readBlob({
+    fs,
     dir,
     oid,
     filepath: 'src/models/GitError.js'

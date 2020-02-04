@@ -1,3 +1,4 @@
+import '../commands/typedefs.js'
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
@@ -5,7 +6,6 @@ import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
-import { cores } from '../utils/plugins.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
 // Try to accomodate known CORS proxy implementations:
@@ -21,8 +21,26 @@ export class GitRemoteHTTP {
     return ['discover', 'connect']
   }
 
+  /**
+   * @param {Object} args
+   * @param {HttpClient} [args.http]
+   * @param {ProgressCallback} [args.onProgress]
+   * @param {FillCallback} [args.onFill]
+   * @param {ApprovedCallback} [args.onApproved]
+   * @param {RejectedCallback} [args.onRejected]
+   * @param {string} [args.corsProxy]
+   * @param {string} args.service
+   * @param {string} args.url
+   * @param {boolean} args.noGitSuffix
+   * @param {GitAuth} [args.auth]
+   * @param {Object<string, string>} [args.headers]
+   */
   static async discover ({
-    core,
+    http = builtinHttp,
+    onProgress,
+    onFill,
+    onApproved,
+    onRejected,
     corsProxy,
     service,
     url,
@@ -50,8 +68,6 @@ export class GitRemoteHTTP {
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
     }
-    // Get the 'http' plugin
-    const http = cores.get(core).get('http') || builtinHttp
     // headers['Accept'] = `application/x-${service}-advertisement`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
@@ -71,31 +87,30 @@ export class GitRemoteHTTP {
       headers['Authorization'] = calculateBasicAuthHeader(_auth)
     }
     let res = await http({
-      core,
+      onProgress,
       method: 'GET',
       url: `${url}/info/refs?service=${service}`,
       headers
     })
-    if (res.statusCode === 401 && cores.get(core).has('credentialManager')) {
+    if (res.statusCode === 401 && onFill) {
       // Acquire credentials and try again
-      const credentialManager = cores.get(core).get('credentialManager')
       // TODO: actually read `useHttpPath` value from git config
-      auth = await credentialManager.fill({ url: _origUrl, useHttpPath: false })
+      auth = await onFill({ url: _origUrl, useHttpPath: false })
       const _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
       }
       res = await http({
-        core,
+        onProgress,
         method: 'GET',
         url: `${url}/info/refs?service=${service}`,
         headers
       })
       // Tell credential manager if the credentials were no good
-      if (res.statusCode === 401) {
-        await credentialManager.rejected({ url: _origUrl, auth })
-      } else if (res.statusCode === 200) {
-        await credentialManager.approved({ url: _origUrl, auth })
+      if (res.statusCode === 401 && onRejected) {
+        await onRejected({ url: _origUrl, auth })
+      } else if (res.statusCode === 200 && onApproved) {
+        await onApproved({ url: _origUrl, auth })
       }
     }
     if (res.statusCode !== 200) {
@@ -134,9 +149,8 @@ export class GitRemoteHTTP {
   }
 
   static async connect ({
-    core,
-    emitter,
-    emitterPrefix,
+    http = builtinHttp,
+    onProgress,
     corsProxy,
     service,
     url,
@@ -161,8 +175,6 @@ export class GitRemoteHTTP {
     }
     headers['content-type'] = `application/x-${service}-request`
     headers['accept'] = `application/x-${service}-result`
-    // Get the 'http' plugin
-    const http = cores.get(core).get('http') || builtinHttp
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
     // Solutions using 'process.browser' can't be used as they rely on bundler shims,
@@ -181,9 +193,7 @@ export class GitRemoteHTTP {
       headers['Authorization'] = calculateBasicAuthHeader(auth)
     }
     const res = await http({
-      core,
-      emitter,
-      emitterPrefix,
+      onProgress,
       method: 'POST',
       url: `${url}/${service}`,
       body,

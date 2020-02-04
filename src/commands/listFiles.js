@@ -1,11 +1,9 @@
 // @ts-check
+import { readTree } from '../commands/readTree'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join'
-import { cores } from '../utils/plugins.js'
-
-import { readObject } from './readObject'
 
 /**
  * List all the files in the git index or a commit
@@ -14,7 +12,7 @@ import { readObject } from './readObject'
  * > If you do not require a complete list of every file, better can be achieved by using [readObject](./readObject.html) directly and ignoring subdirectories you don't care about.
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Return a list of all the files in the commit at `ref` instead of the files currently in the git index (aka staging area)
@@ -31,17 +29,17 @@ import { readObject } from './readObject'
  *
  */
 export async function listFiles ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (ref) {
       const oid = await GitRefManager.resolve({ gitdir, fs, ref })
       const filenames = []
-      await accumulateFilesFromOid({ core, gitdir, oid, filenames, prefix: '' })
+      await accumulateFilesFromOid({ fs, gitdir, oid, filenames, prefix: '' })
       return filenames
     } else {
       return GitIndexManager.acquire({ fs, gitdir }, async function (index) {
@@ -55,19 +53,19 @@ export async function listFiles ({
 }
 
 async function accumulateFilesFromOid ({
-  core,
+  fs,
   gitdir,
   oid,
   filenames,
   prefix
 }) {
-  const { object } = await readObject({ core, gitdir, oid, filepath: '' })
+  const { tree } = await readTree({ fs, gitdir, oid })
   // Note: this isn't parallelized because I'm too lazy to figure that out right now
   // @ts-ignore
-  for (const entry of object.entries) {
+  for (const entry of tree) {
     if (entry.type === 'tree') {
       await accumulateFilesFromOid({
-        core,
+        fs,
         gitdir,
         oid: entry.oid,
         filenames,

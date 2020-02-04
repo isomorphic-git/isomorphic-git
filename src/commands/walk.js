@@ -5,7 +5,6 @@ import { FileSystem } from '../models/FileSystem.js'
 import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
 import { unionOfIterators } from '../utils/unionOfIterators.js'
 
@@ -233,7 +232,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * However you could use a custom function to traverse children serially or use a global queue to throttle recursion.
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {Walker[]} args.trees - The trees you want to traverse
@@ -247,7 +246,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  *
  */
 export async function walk ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   trees,
@@ -263,7 +262,7 @@ export async function walk ({
   iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     const walkers = trees.map(proxy =>
       proxy[GitWalkSymbol]({ fs, dir, gitdir })
     )

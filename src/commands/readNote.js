@@ -2,7 +2,6 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join'
-import { cores } from '../utils/plugins.js'
 
 import { readBlob } from './readBlob'
 
@@ -10,7 +9,7 @@ import { readBlob } from './readBlob'
  * Read the contents of a note
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
@@ -20,18 +19,18 @@ import { readBlob } from './readBlob'
  */
 
 export async function readNote ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'refs/notes/commits',
   oid
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
 
     const parent = await GitRefManager.resolve({ gitdir, fs, ref })
     const { blob } = await readBlob({
-      core,
+      fs: _fs,
       gitdir,
       oid: parent,
       filepath: oid

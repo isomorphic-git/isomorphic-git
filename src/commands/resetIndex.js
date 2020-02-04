@@ -4,9 +4,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
-
-import { readObject } from './readObject.js'
+import { resolveFilepath } from '../utils/resolveFilepath.js'
 
 /**
  * Reset a file in the git index (aka staging area)
@@ -14,7 +12,7 @@ import { readObject } from './readObject.js'
  * Note that this does NOT modify the file in the working directory.
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to reset in the index
@@ -28,27 +26,25 @@ import { readObject } from './readObject.js'
  *
  */
 export async function resetIndex ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   filepath,
   ref = 'HEAD'
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     // Resolve commit
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
     let workdirOid
     try {
       // Resolve blob
-      const obj = await readObject({
-        core,
+      oid = await resolveFilepath({
+        fs,
         gitdir,
         oid,
-        filepath,
-        format: 'deflated'
+        filepath
       })
-      oid = obj && obj.oid
     } catch (e) {
       // This means we're resetting the file to a "deleted" state
       oid = null

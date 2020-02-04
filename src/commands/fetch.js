@@ -15,7 +15,6 @@ import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
-import { cores } from '../utils/plugins.js'
 import { splitLines } from '../utils/splitLines.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
@@ -41,7 +40,13 @@ import { config } from './config'
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
+ * @param {HttpClient} [args.http] - an HTTP client
+ * @param {ProgressCallback} [args.onProgress] - optional progress event callback
+ * @param {MessageCallback} [args.onMessage] - optional message event callback
+ * @param {FillCallback} [args.onFill] - optional auth fill callback
+ * @param {ApprovedCallback} [args.onApproved] - optional auth approved callback
+ * @param {RejectedCallback} [args.onRejected] - optional auth rejected callback
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
@@ -62,7 +67,6 @@ import { config } from './config'
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
- * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<FetchResult>} Resolves successfully when fetch completes
  * @see FetchResult
@@ -81,10 +85,15 @@ import { config } from './config'
  *
  */
 export async function fetch ({
-  core = 'default',
+  fs: _fs,
+  http,
+  onProgress,
+  onMessage,
+  onFill,
+  onApproved,
+  onRejected,
   dir,
   gitdir = join(dir, '.git'),
-  emitterPrefix = '',
   ref = 'HEAD',
   // @ts-ignore
   refs,
@@ -107,14 +116,17 @@ export async function fetch ({
   pruneTags = false
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
-    const emitter = cores.get(core).get('emitter')
+    const fs = new FileSystem(_fs)
 
     const response = await fetchPackfile({
-      core,
+      fs,
+      http,
+      onProgress,
+      onMessage,
+      onFill,
+      onApproved,
+      onRejected,
       gitdir,
-      emitter,
-      emitterPrefix,
       ref,
       refs,
       remote,
@@ -142,18 +154,19 @@ export async function fetch ({
         fetchHeadDescription: null
       }
     }
-    if (emitter) {
+    if (onProgress || onMessage) {
       const lines = splitLines(response.progress)
       forAwait(lines, line => {
-        emitter.emit(`${emitterPrefix}message`, line)
-        const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
-        if (matches) {
-          emitter.emit(`${emitterPrefix}progress`, {
-            phase: matches[1].trim(),
-            loaded: parseInt(matches[2], 10),
-            total: parseInt(matches[3], 10),
-            lengthComputable: true
-          })
+        if (onMessage) onMessage(line)
+        if (onProgress) {
+          const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
+          if (matches) {
+            onProgress({
+              phase: matches[1].trim(),
+              loaded: parseInt(matches[2], 10),
+              total: parseInt(matches[3], 10)
+            })
+          }
         }
       })
     }
@@ -184,8 +197,7 @@ export async function fetch ({
       const idx = await GitPackIndex.fromPack({
         pack: packfile,
         getExternalRefDelta,
-        emitter,
-        emitterPrefix
+        onProgress
       })
       await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
     }
@@ -197,10 +209,14 @@ export async function fetch ({
 }
 
 async function fetchPackfile ({
-  core,
+  fs: _fs,
+  http,
   gitdir,
-  emitter,
-  emitterPrefix,
+  onProgress,
+  onMessage,
+  onFill,
+  onApproved,
+  onRejected,
   ref,
   refs = [ref],
   remote,
@@ -221,7 +237,7 @@ async function fetchPackfile ({
   prune,
   pruneTags
 }) {
-  const fs = new FileSystem(cores.get(core).get('fs'))
+  const fs = new FileSystem(_fs)
   // Sanity checks
   if (depth !== null) {
     if (Number.isNaN(parseInt(depth))) {
@@ -233,19 +249,22 @@ async function fetchPackfile ({
   remote = remote || 'origin'
   if (url === undefined) {
     url = await config({
-      core,
+      fs: _fs,
       gitdir,
       path: `remote.${remote}.url`
     })
   }
 
   if (corsProxy === undefined) {
-    corsProxy = await config({ core, gitdir, path: 'http.corsProxy' })
+    corsProxy = await config({ fs: _fs, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const remoteHTTP = await GitRemoteHTTP.discover({
-    core,
+    http,
+    onFill,
+    onApproved,
+    onRejected,
     corsProxy,
     service: 'git-upload-pack',
     url,
@@ -343,9 +362,8 @@ async function fetchPackfile ({
   // so we can't stream the body.
   const packbuffer = await collect(packstream)
   const raw = await GitRemoteHTTP.connect({
-    core,
-    emitter,
-    emitterPrefix,
+    http,
+    onProgress,
     corsProxy,
     service: 'git-upload-pack',
     url,

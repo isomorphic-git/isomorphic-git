@@ -2,7 +2,6 @@
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Read and/or write to the git config files.
@@ -12,7 +11,7 @@ import { cores } from '../utils/plugins.js'
  * - The current parser does not support the more exotic features of the git-config file format such as `[include]` and `[includeIf]`.
  *
  * @param {Object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.path - The key of the git config entry
@@ -43,7 +42,7 @@ export async function config (args) {
   // as a result of a bit of a design flaw that requires the un-destructured argument object
   // in order to call args.hasOwnProperty('value') later on.
   const {
-    core = 'default',
+    fs: _fs,
     dir,
     gitdir = join(dir, '.git'),
     all = false,
@@ -52,7 +51,7 @@ export async function config (args) {
     value
   } = args
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     const config = await GitConfigManager.get({ fs, gitdir })
     // This carefully distinguishes between
     // 1) there is no 'value' argument (do a "get")

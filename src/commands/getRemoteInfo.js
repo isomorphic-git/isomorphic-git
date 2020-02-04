@@ -19,7 +19,7 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  * It just communicates to a remote git server, using the first step of the `git-upload-pack` handshake, but stopping short of fetching the packfile.
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {HttpClient} [args.http] - an HTTP client
  * @param {string} args.url - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities.
@@ -42,7 +42,7 @@ import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
  *
  */
 export async function getRemoteInfo ({
-  core = 'default',
+  http,
   corsProxy,
   url,
   noGitSuffix = false,
@@ -56,7 +56,7 @@ export async function getRemoteInfo ({
   try {
     let auth = { username, password, token, oauth2format }
     const remote = await GitRemoteHTTP.discover({
-      core,
+      http,
       corsProxy,
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,

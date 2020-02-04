@@ -1,8 +1,6 @@
 // @ts-check
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
 import { STAGE } from './STAGE.js'
@@ -131,7 +129,7 @@ import { walk } from './walk.js'
  * | 1    | 2       | 3     | `MM`                            |
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref = 'HEAD'] - Optionally specify a different commit to compare against the workdir and stage instead of the HEAD
@@ -142,7 +140,7 @@ import { walk } from './walk.js'
  * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
  */
 export async function statusMatrix ({
-  core = 'default',
+  fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'HEAD',
@@ -151,9 +149,8 @@ export async function statusMatrix ({
   noSubmodules = false
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
     const results = await walk({
-      core,
+      fs,
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],

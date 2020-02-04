@@ -3,16 +3,19 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Find the merge base for a set of commits
  *
- * @link https://isomorphic-git.github.io/docs/findMergeBase.html
+ * @param {object} args
+ * @param {FsClient} args.fs - a file system client
+ * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string[]} [args.oids] - Which commits
+ *
  */
-// TODO: Should I rename this nearestCommonAncestor?
 export async function findMergeBase ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oids
@@ -22,7 +25,7 @@ export async function findMergeBase ({
   // because without the --octopus flag, git's output seems to depend on the ORDER of the oids,
   // and computing virtual merge bases is just too much for me to fathom right now.
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     // If we start N independent walkers, one at each of the given `oids`, and walk backwards
     // through ancestors, eventually we'll discover a commit where each one of these N walkers
     // has passed through. So we just need to keep track of which walkers have visited each commit

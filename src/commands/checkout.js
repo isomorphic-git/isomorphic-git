@@ -6,7 +6,6 @@ import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { flat } from '../utils/flat.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
 import { STAGE } from './STAGE.js'
@@ -21,10 +20,11 @@ import { walk } from './walk.js'
  * If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
  *
  * @param {object} args
+ * @param {FsClient} args.fs - a file system implementation
+ * @param {ProgressCallback} [args.onProgress] - optional progress event callback
  * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name
  * @param {string} [args.ref = 'HEAD'] - Source to checkout files from
  * @param {string[]} [args.filepaths = ['.']] - Limit the checkout to the given files and directories
  * @param {string} [args.remote = 'origin'] - Which remote repository to use
@@ -53,10 +53,10 @@ import { walk } from './walk.js'
  * console.log('done')
  */
 export async function checkout ({
-  core = 'default',
+  fs: _fs,
+  onProgress,
   dir,
   gitdir = join(dir, '.git'),
-  emitterPrefix = '',
   remote = 'origin',
   ref: _ref,
   filepaths = ['.'],
@@ -71,8 +71,7 @@ export async function checkout ({
 }) {
   try {
     const ref = _ref || 'HEAD'
-    const fs = new FileSystem(cores.get(core).get('fs'))
-    const emitter = cores.get(core).get('emitter')
+    const fs = new FileSystem(_fs)
     // Get tree oid
     let oid
     try {
@@ -91,13 +90,13 @@ export async function checkout ({
       })
       // Set up remote tracking branch
       await config({
-        core,
+        fs: _fs,
         gitdir,
         path: `branch.${ref}.remote`,
         value: `${remote}`
       })
       await config({
-        core,
+        fs: _fs,
         gitdir,
         path: `branch.${ref}.merge`,
         value: `refs/heads/${ref}`
@@ -112,14 +111,13 @@ export async function checkout ({
       // First pass - just analyze files (not directories) and figure out what needs to be done
       try {
         ops = await analyze({
-          core,
+          fs,
+          onProgress,
           dir,
           gitdir,
           ref,
           force,
           filepaths,
-          emitter,
-          emitterPrefix,
           noSubmodules,
           newSubmoduleBehavior
         })
@@ -175,8 +173,8 @@ export async function checkout ({
                 await fs.rm(filepath)
               }
               index.delete({ filepath: fullpath })
-              if (emitter) {
-                emitter.emit(`${emitterPrefix}progress`, {
+              if (onProgress) {
+                onProgress({
                   phase: 'Updating workdir',
                   loaded: ++count,
                   total
@@ -196,8 +194,8 @@ export async function checkout ({
                 index.delete({ filepath: fullpath })
               }
               await fs.rmdir(filepath)
-              if (emitter) {
-                emitter.emit(`${emitterPrefix}progress`, {
+              if (onProgress) {
+                onProgress({
                   phase: 'Updating workdir',
                   loaded: ++count,
                   total
@@ -222,8 +220,8 @@ export async function checkout ({
           .map(async function ([_, fullpath]) {
             const filepath = `${dir}/${fullpath}`
             await fs.mkdir(filepath)
-            if (emitter) {
-              emitter.emit(`${emitterPrefix}progress`, {
+            if (onProgress) {
+              onProgress({
                 phase: 'Updating workdir',
                 loaded: ++count,
                 total
@@ -287,8 +285,8 @@ export async function checkout ({
                   stats,
                   oid
                 })
-                if (emitter) {
-                  emitter.emit(`${emitterPrefix}progress`, {
+                if (onProgress) {
+                  onProgress({
                     phase: 'Updating workdir',
                     loaded: ++count,
                     total
@@ -324,20 +322,19 @@ export async function checkout ({
 }
 
 async function analyze ({
-  core,
+  fs,
+  onProgress,
   dir,
   gitdir,
   ref,
   force,
   filepaths,
-  emitter,
-  emitterPrefix,
   noSubmodules,
   newSubmoduleBehavior
 }) {
   let count = 0
   return walk({
-    core,
+    fs,
     dir,
     gitdir,
     trees: [TREE({ ref }), WORKDIR(), STAGE()],
@@ -348,13 +345,8 @@ async function analyze ({
         return null
       }
       // Emit progress event
-      if (emitter) {
-        emitter.emit(`${emitterPrefix}progress`, {
-          phase: 'Analyzing workdir',
-          loaded: ++count,
-          lengthComputable: false
-        })
-      }
+      if (onProgress) onProgress({ phase: 'Analyzing workdir', loaded: ++count })
+
       // This is a kind of silly pattern but it worked so well for me in calculateBasicAuthUsernamePasswordPair.js
       // and it makes intuitively demonstrating exhaustiveness so *easy*.
       // This checks for the presense and/or absense of each of the 3 entries,

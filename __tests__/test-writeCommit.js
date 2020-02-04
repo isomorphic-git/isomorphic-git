@@ -6,9 +6,10 @@ const { writeCommit } = require('isomorphic-git')
 describe('writeCommit', () => {
   it('parsed', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeCommit')
+    const { fs, gitdir } = await makeFixture('test-writeCommit')
     // Test
     const oid = await writeCommit({
+      fs,
       gitdir,
       commit: {
         author: {

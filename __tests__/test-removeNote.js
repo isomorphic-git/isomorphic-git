@@ -6,13 +6,15 @@ const { listNotes, removeNote } = require('isomorphic-git')
 describe('removeNote', () => {
   it('from default branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-removeNote')
+    const { fs, gitdir } = await makeFixture('test-removeNote')
     // Test
     let notes = await listNotes({
+      fs,
       gitdir
     })
     expect(notes.length).toBe(3)
     const oid = await removeNote({
+      fs,
       gitdir,
       author: {
         name: 'William Hilton',
@@ -23,6 +25,7 @@ describe('removeNote', () => {
       oid: '199948939a0b95c6f27668689102496574b2c332'
     })
     notes = await listNotes({
+      fs,
       gitdir
     })
     expect(notes.length).toBe(2)
@@ -30,14 +33,16 @@ describe('removeNote', () => {
   })
   it('from alternate branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-removeNote')
+    const { fs, gitdir } = await makeFixture('test-removeNote')
     // Test
     let notes = await listNotes({
+      fs,
       gitdir,
       ref: 'refs/notes/alt'
     })
     expect(notes.length).toBe(1)
     const oid = await removeNote({
+      fs,
       gitdir,
       author: {
         name: 'William Hilton',
@@ -49,6 +54,7 @@ describe('removeNote', () => {
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164'
     })
     notes = await listNotes({
+      fs,
       gitdir,
       ref: 'refs/notes/alt'
     })

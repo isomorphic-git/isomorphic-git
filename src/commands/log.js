@@ -7,13 +7,12 @@ import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { compareAge } from '../utils/compareAge.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Get commit descriptions from the git history
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref = 'HEAD'] - The commit to begin walking backwards through the history from
@@ -30,7 +29,7 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function log ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'HEAD',
@@ -38,7 +37,7 @@ export async function log ({
   since = undefined // Date
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     const sinceTimestamp =
       since === undefined ? undefined : Math.floor(since.valueOf() / 1000)
     // TODO: In the future, we may want to have an API where we return a
@@ -46,7 +45,7 @@ export async function log ({
     const commits = []
     const shallowCommits = await GitShallowManager.read({ fs, gitdir })
     const oid = await GitRefManager.resolve({ fs, gitdir, ref })
-    const tips = [await readCommit({ core, gitdir, oid })]
+    const tips = [await readCommit({ fs: _fs, gitdir, oid })]
 
     while (true) {
       const commit = tips.pop()
@@ -69,7 +68,7 @@ export async function log ({
         // Add the parents of this commit to the queue
         // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
         for (const oid of commit.commit.parent) {
-          const commit = await readCommit({ core, gitdir, oid })
+          const commit = await readCommit({ fs: _fs, gitdir, oid })
           if (!tips.map(commit => commit.oid).includes(commit.oid)) {
             tips.push(commit)
           }

@@ -1,13 +1,12 @@
 // @ts-check
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Initialize a new repository
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {boolean} [args.bare = false] - Initialize a bare repository
@@ -20,14 +19,14 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function init ({
-  core = 'default',
+  fs: _fs,
   bare = false,
   dir,
   gitdir = bare ? dir : join(dir, '.git'),
   noOverwrite = false
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (noOverwrite && (await fs.exists(gitdir + '/config'))) return
     let folders = [
       'hooks',

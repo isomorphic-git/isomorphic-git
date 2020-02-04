@@ -88,3 +88,163 @@
  * @property {function(): Promise<Uint8Array|void>} content
  * @property {function(): Promise<Stat>} stat
  */
+
+/**
+ *
+ * @typedef {Object} GitAuth
+ * @property {string} [username]
+ * @property {string} [password]
+ * @property {string} [token]
+ * @property {string} [oauth2format]
+ */
+
+/**
+ *
+ * @typedef {Object} GitProgressEvent
+ * @property {string} phase
+ * @property {number} loaded
+ * @property {number} total
+ */
+
+/**
+ *
+ * @typedef {Object} GitFsPlugin
+ * @property {function} readFile - https://nodejs.org/api/fs.html#fs_fs_readfile_path_options_callback
+ * @property {function} writeFile - https://nodejs.org/api/fs.html#fs_fs_writefile_file_data_options_callback
+ * @property {function} unlink - https://nodejs.org/api/fs.html#fs_fs_unlink_path_callback
+ * @property {function} readdir - https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback
+ * @property {function} mkdir - https://nodejs.org/api/fs.html#fs_fs_mkdir_path_mode_callback
+ * @property {function} rmdir - https://nodejs.org/api/fs.html#fs_fs_rmdir_path_callback
+ * @property {function} stat - https://nodejs.org/api/fs.html#fs_fs_stat_path_options_callback
+ * @property {function} lstat - https://nodejs.org/api/fs.html#fs_fs_lstat_path_options_callback
+ * @property {function} [readlink] - https://nodejs.org/api/fs.html#fs_fs_readlink_path_options_callback
+ * @property {function} [symlink] - https://nodejs.org/api/fs.html#fs_fs_symlink_target_path_type_callback
+ * @property {function} [chmod] - https://nodejs.org/api/fs.html#fs_fs_chmod_path_mode_callback
+ */
+
+/**
+ *
+ * @typedef {Object} GitFsPromisesPlugin
+ * @property {Object} promises
+ * @property {function} promises.readFile - https://nodejs.org/api/fs.html#fs_fspromises_readfile_path_options
+ * @property {function} promises.writeFile - https://nodejs.org/api/fs.html#fs_fspromises_writefile_file_data_options
+ * @property {function} promises.unlink - https://nodejs.org/api/fs.html#fs_fspromises_unlink_path
+ * @property {function} promises.readdir - https://nodejs.org/api/fs.html#fs_fspromises_readdir_path_options
+ * @property {function} promises.mkdir - https://nodejs.org/api/fs.html#fs_fspromises_mkdir_path_options
+ * @property {function} promises.rmdir - https://nodejs.org/api/fs.html#fs_fspromises_rmdir_path
+ * @property {function} promises.stat - https://nodejs.org/api/fs.html#fs_fspromises_stat_path_options
+ * @property {function} promises.lstat - https://nodejs.org/api/fs.html#fs_fspromises_lstat_path_options
+ * @property {function} [promises.readlink] - https://nodejs.org/api/fs.html#fs_fspromises_readlink_path_options
+ * @property {function} [promises.symlink] - https://nodejs.org/api/fs.html#fs_fspromises_symlink_target_path_type
+ * @property {function} [promises.chmod] - https://nodejs.org/api/fs.html#fs_fspromises_chmod_path_mode
+ */
+
+/**
+ * @typedef {GitFsPlugin|GitFsPromisesPlugin} FsClient
+ */
+
+/**
+ * @callback MessageCallback
+ * @param {string} message
+ * @returns {Promise<void>}
+ */
+
+/**
+ * @callback ProgressCallback
+ * @param {GitProgressEvent} progress
+ * @returns {Promise<void>}
+ */
+
+/**
+ * @typedef {Object} FillParams
+ * @property {string} url
+ * @property {boolean} useHttpPath
+ */
+
+/**
+ * @callback FillCallback
+ * @param {FillParams} args
+ * @returns {Promise<GitAuth>}
+ */
+
+/**
+ * @typedef {Object} ApprovedParams
+ * @property {string} url
+ * @property {IAuthJSON} auth
+ */
+
+/**
+ * @callback ApprovedCallback
+ * @param {ApprovedParams} args
+ * @returns {Promise<void>}
+ */
+
+/**
+ * @typedef {Object} RejectededParams
+ * @property {string} url
+ * @property {IAuthJSON} auth
+ */
+
+/**
+ * @callback RejectedCallback
+ * @param {RejectededParams} args
+ * @returns {Promise<void>}
+ */
+
+/**
+ * @typedef {Object} SignParams
+ * @property {string} payload - a plaintext message
+ * @property {string} secretKey - an 'ASCII armor' encoded PGP key (technically can actually contain _multiple_ keys)
+ */
+
+/**
+ *
+ * @callback SignCallback
+ * @param {SignParams} args
+ * @return {Promise<{signature: string}>} - an 'ASCII armor' encoded "detached" signature
+ */
+
+/**
+ *
+ * @typedef {Object} VerifyParams
+ * @property {string} payload - a plaintext message
+ * @property {string} publicKey - an 'ASCII armor' encoded PGP key (technically can actually contain _multiple_ keys)
+ * @property {string} signature - an 'ASCII armor' encoded PGP "detached" signature (technically can actually contain _multiple_ signatures)
+ */
+
+/**
+ *
+ * @callback VerifyCallback
+ * @param {VerifyParams} args
+ * @return {Promise<{valid: string[], invalid: string[]}>} - two arrays containing the key ids of the valid and invalid signatures respectively
+ */
+
+/**
+ *
+ * @typedef {Object} GitHttpRequest
+ * @property {string} url - The URL to request
+ * @property {string} [method='GET'] - The HTTP method to use
+ * @property {Object<string, string>} [headers={}] - Headers to include in the HTTP request
+ * @property {AsyncIterableIterator<Uint8Array>} [body] - An async iterator of Uint8Arrays that make up the body of POST requests
+ * @property {string} [core] - If your `http` plugin needs access to other plugins, it can do so via `git.cores.get(core)`
+ * @property {GitEmitterPlugin} [emitter] - If your `http` plugin emits events, it can do so via `emitter.emit()`
+ * @property {string} [emitterPrefix] - The `emitterPrefix` passed by the user when calling a function. If your plugin emits events, prefix the event name with this.
+ */
+
+/**
+ *
+ * @typedef {Object} GitHttpResponse
+ * @property {string} url - The final URL that was fetched after any redirects
+ * @property {string} [method] - The HTTP method that was used
+ * @property {Object<string, string>} [headers] - HTTP response headers
+ * @property {AsyncIterableIterator<Uint8Array>} [body] - An async iterator of Uint8Arrays that make up the body of the response
+ * @property {number} statusCode - The HTTP status code
+ * @property {string} statusMessage - The HTTP status message
+ */
+
+/**
+ *
+ * @callback HttpClient
+ * @param {GitHttpRequest} request
+ * @returns {Promise<GitHttpResponse>}
+ */

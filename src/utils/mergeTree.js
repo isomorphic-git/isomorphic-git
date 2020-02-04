@@ -10,13 +10,12 @@ import { writeObject } from '../storage/writeObject.js'
 import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
-import { cores } from './plugins.js'
 
 /**
  * Create a merged tree
  *
  * @param {Object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ourOid - The SHA-1 object id of our tree
@@ -31,7 +30,7 @@ import { cores } from './plugins.js'
  *
  */
 export async function mergeTree ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ourOid,
@@ -42,13 +41,13 @@ export async function mergeTree ({
   theirName = 'theirs',
   dryRun = false
 }) {
-  const fs = new FileSystem(cores.get(core).get('fs'))
+  const fs = new FileSystem(_fs)
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
   const theirTree = TREE({ ref: theirOid })
 
   const results = await walk({
-    core,
+    fs: _fs,
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],

@@ -6,13 +6,15 @@ const { E, merge, resolveRef, log } = require('isomorphic-git')
 describe('merge', () => {
   it('merge master into master', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     const desiredOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
     const m = await merge({
+      fs,
       gitdir,
       ours: 'master',
       theirs: 'master',
@@ -22,6 +24,7 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeTruthy()
     expect(m.fastForward).toBeFalsy()
     const oid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
@@ -30,13 +33,15 @@ describe('merge', () => {
 
   it('merge medium into master', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     const desiredOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'medium'
     })
     const m = await merge({
+      fs,
       gitdir,
       ours: 'master',
       theirs: 'medium',
@@ -46,6 +51,7 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeTruthy()
     expect(m.fastForward).toBeFalsy()
     const oid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
@@ -54,13 +60,15 @@ describe('merge', () => {
 
   it('merge oldest into master', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     const desiredOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
     const m = await merge({
+      fs,
       gitdir,
       ours: 'master',
       theirs: 'oldest',
@@ -70,6 +78,7 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeTruthy()
     expect(m.fastForward).toBeFalsy()
     const oid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
@@ -78,13 +87,15 @@ describe('merge', () => {
 
   it('merge newest into master', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     const desiredOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'newest'
     })
     const m = await merge({
+      fs,
       gitdir,
       ours: 'master',
       theirs: 'newest',
@@ -94,6 +105,7 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeFalsy()
     expect(m.fastForward).toBeTruthy()
     const oid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
@@ -102,17 +114,20 @@ describe('merge', () => {
 
   it('merge newest into master --dryRun (no author needed since fastForward)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     const originalOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
     const desiredOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'newest'
     })
     const m = await merge({
+      fs,
       gitdir,
       ours: 'master',
       theirs: 'newest',
@@ -123,6 +138,7 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeFalsy()
     expect(m.fastForward).toBeTruthy()
     const oid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
@@ -131,17 +147,20 @@ describe('merge', () => {
 
   it('merge newest into master --noUpdateBranch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     const originalOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
     const desiredOid = await resolveRef({
+      fs,
       gitdir,
       ref: 'newest'
     })
     const m = await merge({
+      fs,
       gitdir,
       ours: 'master',
       theirs: 'newest',
@@ -152,6 +171,7 @@ describe('merge', () => {
     expect(m.alreadyMerged).toBeFalsy()
     expect(m.fastForward).toBeTruthy()
     const oid = await resolveRef({
+      fs,
       gitdir,
       ref: 'master'
     })
@@ -160,14 +180,16 @@ describe('merge', () => {
 
   it("merge 'add-files' and 'remove-files'", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
+      fs,
       gitdir,
       depth: 1,
       ref: 'add-files-merge-remove-files'
     }))[0].commit
     // Test
     const report = await merge({
+      fs,
       gitdir,
       ours: 'add-files',
       theirs: 'remove-files',
@@ -178,7 +200,7 @@ describe('merge', () => {
         timezoneOffset: -0
       }
     })
-    const mergeCommit = (await log({ gitdir, ref: 'add-files', depth: 1 }))[0]
+    const mergeCommit = (await log({ fs, gitdir, ref: 'add-files', depth: 1 }))[0]
       .commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
@@ -188,14 +210,16 @@ describe('merge', () => {
 
   it("merge 'remove-files' and 'add-files'", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
+      fs,
       gitdir,
       depth: 1,
       ref: 'remove-files-merge-add-files'
     }))[0].commit
     // TestTest
     const report = await merge({
+      fs,
       gitdir,
       ours: 'remove-files',
       theirs: 'add-files',
@@ -207,6 +231,7 @@ describe('merge', () => {
       }
     })
     const mergeCommit = (await log({
+      fs,
       gitdir,
       ref: 'remove-files',
       depth: 1
@@ -219,11 +244,12 @@ describe('merge', () => {
 
   it("merge 'delete-first-half' and 'delete-second-half' (dryRun, missing author)", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     let error = null
     try {
       await merge({
+        fs,
         gitdir,
         ours: 'delete-first-half',
         theirs: 'delete-second-half',
@@ -240,17 +266,20 @@ describe('merge', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
+      fs,
       gitdir,
       depth: 1,
       ref: 'delete-first-half-merge-delete-second-half'
     }))[0]
     const originalCommit = (await log({
+      fs,
       gitdir,
       ref: 'delete-first-half',
       depth: 1
     }))[0]
     // Test
     const report = await merge({
+      fs,
       gitdir,
       ours: 'delete-first-half',
       theirs: 'delete-second-half',
@@ -265,6 +294,7 @@ describe('merge', () => {
     expect(report.tree).toBe(commit.commit.tree)
     // make sure branch hasn't been moved
     const notMergeCommit = (await log({
+      fs,
       gitdir,
       ref: 'delete-first-half',
       depth: 1
@@ -283,17 +313,20 @@ describe('merge', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
+      fs,
       gitdir,
       depth: 1,
       ref: 'delete-first-half-merge-delete-second-half'
     }))[0]
     const originalCommit = (await log({
+      fs,
       gitdir,
       ref: 'delete-first-half',
       depth: 1
     }))[0]
     // Test
     const report = await merge({
+      fs,
       gitdir,
       ours: 'delete-first-half',
       theirs: 'delete-second-half',
@@ -308,6 +341,7 @@ describe('merge', () => {
     expect(report.tree).toBe(commit.commit.tree)
     // make sure branch hasn't been moved
     const notMergeCommit = (await log({
+      fs,
       gitdir,
       ref: 'delete-first-half',
       depth: 1
@@ -324,14 +358,16 @@ describe('merge', () => {
 
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
+      fs,
       gitdir,
       depth: 1,
       ref: 'delete-first-half-merge-delete-second-half'
     }))[0].commit
     // Test
     const report = await merge({
+      fs,
       gitdir,
       ours: 'delete-first-half',
       theirs: 'delete-second-half',
@@ -343,6 +379,7 @@ describe('merge', () => {
       }
     })
     const mergeCommit = (await log({
+      fs,
       gitdir,
       ref: 'delete-first-half',
       depth: 1
@@ -355,11 +392,12 @@ describe('merge', () => {
 
   it("merge 'a-file' and 'a-folder'", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     let error = null
     try {
       await merge({
+        fs,
         gitdir,
         ours: 'a-file',
         theirs: 'a-folder',
@@ -379,14 +417,16 @@ describe('merge', () => {
 
   it("merge two branches that modified the same file (no conflict)'", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
+      fs,
       gitdir,
       depth: 1,
       ref: 'a-merge-b'
     }))[0].commit
     // Test
     const report = await merge({
+      fs,
       gitdir,
       ours: 'a',
       theirs: 'b',
@@ -398,6 +438,7 @@ describe('merge', () => {
       }
     })
     const mergeCommit = (await log({
+      fs,
       gitdir,
       ref: 'a',
       depth: 1
@@ -410,14 +451,16 @@ describe('merge', () => {
 
   it("merge two branches where one modified file and the other modified file mode'", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     const commit = (await log({
+      fs,
       gitdir,
       depth: 1,
       ref: 'a-merge-d'
     }))[0].commit
     // Test
     const report = await merge({
+      fs,
       gitdir,
       ours: 'a',
       theirs: 'd',
@@ -429,6 +472,7 @@ describe('merge', () => {
       }
     })
     const mergeCommit = (await log({
+      fs,
       gitdir,
       ref: 'a',
       depth: 1
@@ -441,11 +485,12 @@ describe('merge', () => {
 
   it("merge two branches that modified the same file (should conflict)'", async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir } = await makeFixture('test-merge')
     // Test
     let error = null
     try {
       await merge({
+        fs,
         gitdir,
         ours: 'a',
         theirs: 'c',

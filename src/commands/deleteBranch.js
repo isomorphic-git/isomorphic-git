@@ -4,7 +4,6 @@ import cleanGitRef from 'clean-git-ref'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 import { currentBranch } from './currentBranch'
 
@@ -14,7 +13,7 @@ import { currentBranch } from './currentBranch'
  * > Note: This only deletes loose branches - it should be fixed in the future to delete packed branches as well.
  *
  * @param {Object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - The branch to delete
@@ -27,13 +26,13 @@ import { currentBranch } from './currentBranch'
  *
  */
 export async function deleteBranch ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'deleteBranch',
@@ -59,7 +58,7 @@ export async function deleteBranch ({
       })
     }
 
-    const currentRef = await currentBranch({ core, gitdir })
+    const currentRef = await currentBranch({ fs: _fs, gitdir })
     if (ref === currentRef) {
       throw new GitError(E.BranchDeleteError, { ref })
     }

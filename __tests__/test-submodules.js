@@ -9,8 +9,9 @@ const localhost =
 
 describe('submodule "support"', () => {
   it('submodules are still staged after fresh clone', async () => {
-    const { dir, gitdir } = await makeFixture('test-clone-submodules')
+    const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
+      fs,
       dir,
       gitdir,
       url: `http://${localhost}:8888/test-submodules.git`,
@@ -18,12 +19,13 @@ describe('submodule "support"', () => {
       newSubmoduleBehavior: true
     })
     // Test
-    expect(await listFiles({ gitdir })).toContain('test.empty')
+    expect(await listFiles({ fs, gitdir })).toContain('test.empty')
   })
 
   it('submodules are still staged after making a commit', async () => {
-    const { dir, gitdir } = await makeFixture('test-clone-submodules')
+    const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
+      fs,
       dir,
       gitdir,
       url: `http://${localhost}:8888/test-submodules.git`,
@@ -32,6 +34,7 @@ describe('submodule "support"', () => {
     })
     // Test
     await commit({
+      fs,
       gitdir,
       author: {
         name: 'Mr. Test',
@@ -41,12 +44,13 @@ describe('submodule "support"', () => {
       },
       message: 'test commit'
     })
-    expect(await listFiles({ gitdir })).toContain('test.empty')
+    expect(await listFiles({ fs, gitdir })).toContain('test.empty')
   })
 
   it('submodules are staged when switching to a branch that has them', async () => {
-    const { dir, gitdir } = await makeFixture('test-clone-submodules')
+    const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
+      fs,
       dir,
       gitdir,
       ref: 'no-modules',
@@ -56,18 +60,20 @@ describe('submodule "support"', () => {
     })
     // Test
     await checkout({
+      fs,
       dir,
       gitdir,
       ref: 'master',
       noSubmodules: true,
       newSubmoduleBehavior: true
     })
-    expect(await listFiles({ gitdir })).toContain('test.empty')
+    expect(await listFiles({ fs, gitdir })).toContain('test.empty')
   })
 
   it("submodules are unstaged when switching to a branch that doesn't have them", async () => {
-    const { dir, gitdir } = await makeFixture('test-clone-submodules')
+    const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
+      fs,
       dir,
       gitdir,
       url: `http://${localhost}:8888/test-submodules.git`,
@@ -75,7 +81,7 @@ describe('submodule "support"', () => {
       newSubmoduleBehavior: true
     })
     // Test
-    await checkout({ dir, gitdir, ref: 'no-modules' })
-    expect(await listFiles({ gitdir })).not.toContain('test.empty')
+    await checkout({ fs, dir, gitdir, ref: 'no-modules' })
+    expect(await listFiles({ fs, gitdir })).not.toContain('test.empty')
   })
 })

@@ -3,13 +3,12 @@ import { GitRefManager } from '../managers/GitRefManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Create a lightweight tag
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - What to name the tag
@@ -24,7 +23,7 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function tag ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref,
@@ -32,7 +31,7 @@ export async function tag ({
   force = false
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
 
     if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {

@@ -2,7 +2,6 @@
 import { FileSystem } from '../models/FileSystem.js'
 import { collect } from '../utils/collect.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 import { pack } from './pack'
 
@@ -17,7 +16,7 @@ import { pack } from './pack'
  * Create a packfile from an array of SHA-1 object ids
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids - An array of SHA-1 object ids to be included in the packfile
@@ -36,15 +35,15 @@ import { pack } from './pack'
  *
  */
 export async function packObjects ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oids,
   write = false
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
-    const buffers = await pack({ core, gitdir, oids })
+    const fs = new FileSystem(_fs)
+    const buffers = await pack({ fs: _fs, gitdir, oids })
     const packfile = await collect(buffers)
     const packfileSha = packfile.slice(-20).toString('hex')
     const filename = `pack-${packfileSha}.pack`

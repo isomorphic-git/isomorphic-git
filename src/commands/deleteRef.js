@@ -2,7 +2,6 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Delete a local ref
@@ -10,7 +9,7 @@ import { cores } from '../utils/plugins.js'
  * > Note: This only deletes loose refs - it should be fixed in the future to delete packed refs as well.
  *
  * @param {Object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - The ref to delete
@@ -23,13 +22,13 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function deleteRef ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
     await GitRefManager.deleteRef({ fs, gitdir, ref })
   } catch (err) {
     err.caller = 'git.deleteRef'

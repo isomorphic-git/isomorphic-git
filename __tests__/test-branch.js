@@ -16,27 +16,27 @@ describe('branch', () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-branch')
     // Test
-    await branch({ dir, gitdir, ref: 'test-branch' })
+    await branch({ fs, dir, gitdir, ref: 'test-branch' })
     const files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
     expect(files.sort()).toMatchSnapshot()
-    expect(await currentBranch({ dir, gitdir })).toEqual('master')
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('master')
   })
 
   it('branch --checkout', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-branch')
+    const { fs, dir, gitdir } = await makeFixture('test-branch')
     // Test
-    await branch({ dir, gitdir, ref: 'test-branch', checkout: true })
-    expect(await currentBranch({ dir, gitdir })).toEqual('test-branch')
+    await branch({ fs, dir, gitdir, ref: 'test-branch', checkout: true })
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('test-branch')
   })
 
   it('invalid branch name', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-branch')
+    const { fs, dir, gitdir } = await makeFixture('test-branch')
     let error = null
     // Test
     try {
-      await branch({ dir, gitdir, ref: 'inv@{id..branch.lock' })
+      await branch({ fs, dir, gitdir, ref: 'inv@{id..branch.lock' })
     } catch (err) {
       error = err
     }
@@ -46,12 +46,12 @@ describe('branch', () => {
 
   it('missing ref argument', async () => {
     // Setup
-    const { dir, gitdir } = await makeFixture('test-branch')
+    const { fs, dir, gitdir } = await makeFixture('test-branch')
     let error = null
     // Test
     try {
       // @ts-ignore
-      await branch({ dir, gitdir })
+      await branch({ fs, dir, gitdir })
     } catch (err) {
       error = err
     }
@@ -62,11 +62,11 @@ describe('branch', () => {
   it('empty repo', async () => {
     // Setup
     const { dir, fs, gitdir } = await makeFixture('test-branch-empty-repo')
-    await init({ dir, gitdir })
+    await init({ fs, dir, gitdir })
     let error = null
     // Test
     try {
-      await branch({ dir, gitdir, ref: 'test-branch', checkout: true })
+      await branch({ fs, dir, gitdir, ref: 'test-branch', checkout: true })
     } catch (err) {
       error = err
     }
@@ -81,7 +81,7 @@ describe('branch', () => {
     let error = null
     // Test
     try {
-      await branch({ dir, gitdir, ref: 'origin' })
+      await branch({ fs, dir, gitdir, ref: 'origin' })
     } catch (err) {
       error = err
     }
@@ -97,7 +97,7 @@ describe('branch', () => {
     let error = null
     // Test
     try {
-      await branch({ dir, gitdir, ref: 'HEAD' })
+      await branch({ fs, dir, gitdir, ref: 'HEAD' })
     } catch (err) {
       error = err
     }

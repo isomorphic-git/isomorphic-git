@@ -8,7 +8,6 @@ import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
 import { join } from '../utils/join.js'
 import { pkg } from '../utils/pkg.js'
-import { cores } from '../utils/plugins.js'
 import { splitLines } from '../utils/splitLines.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
@@ -45,7 +44,13 @@ import { pack } from './pack.js'
  * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system client
+ * @param {HttpClient} [args.http] - an HTTP client
+ * @param {ProgressCallback} [args.onProgress] - optional progress event callback
+ * @param {MessageCallback} [args.onMessage] - optional message event callback
+ * @param {FillCallback} [args.onFill] - optional auth fill callback
+ * @param {ApprovedCallback} [args.onApproved] - optional auth approved callback
+ * @param {RejectedCallback} [args.onRejected] - optional auth rejected callback
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Which branch to push. By default this is the currently checked out branch.
@@ -61,7 +66,6 @@ import { pack } from './pack.js'
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
  * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {string} [args.emitterPrefix = ''] - Scope emitted events by prepending `emitterPrefix` to the event name.
  *
  * @returns {Promise<PushResult>} Resolves successfully when push completes with a detailed description of the operation from the server.
  * @see PushResult
@@ -77,10 +81,15 @@ import { pack } from './pack.js'
  *
  */
 export async function push ({
-  core = 'default',
+  fs: _fs,
+  http,
+  onProgress,
+  onMessage,
+  onFill,
+  onApproved,
+  onRejected,
   dir,
   gitdir = join(dir, '.git'),
-  emitterPrefix = '',
   ref,
   remoteRef,
   remote = 'origin',
@@ -96,16 +105,15 @@ export async function push ({
   headers = {}
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
-    const emitter = cores.get(core).get('emitter')
+    const fs = new FileSystem(_fs)
 
     // TODO: Figure out how pushing tags works. (This only works for branches.)
     if (url === undefined) {
-      url = await config({ core, gitdir, path: `remote.${remote}.url` })
+      url = await config({ fs: _fs, gitdir, path: `remote.${remote}.url` })
     }
 
     if (corsProxy === undefined) {
-      corsProxy = await config({ core, gitdir, path: 'http.corsProxy' })
+      corsProxy = await config({ fs: _fs, gitdir, path: 'http.corsProxy' })
     }
     let fullRef
     if (!ref) {
@@ -124,7 +132,10 @@ export async function push ({
     let auth = { username, password, token, oauth2format }
     const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     const httpRemote = await GitRemoteHTTP.discover({
-      core,
+      http,
+      onFill,
+      onApproved,
+      onRejected,
       corsProxy,
       service: 'git-receive-pack',
       url,
@@ -163,20 +174,20 @@ export async function push ({
       // hack to speed up common force push scenarios
       // @ts-ignore
       const mergebase = await findMergeBase({
-        core,
+        fs: _fs,
         gitdir,
         oids: [oid, oldoid]
       })
       for (const oid of mergebase) finish.push(oid)
       // @ts-ignore
       const commits = await listCommitsAndTags({
-        core,
+        fs,
         gitdir,
         start: [oid],
         finish
       })
       // @ts-ignore
-      objects = await listObjects({ core, gitdir, oids: commits })
+      objects = await listObjects({ fs, gitdir, oids: commits })
 
       if (!force) {
         // Is it a tag that already exists?
@@ -190,7 +201,7 @@ export async function push ({
         if (
           oid !== '0000000000000000000000000000000000000000' &&
           oldoid !== '0000000000000000000000000000000000000000' &&
-          !(await isDescendent({ core, gitdir, oid, ancestor: oldoid }))
+          !(await isDescendent({ fs: _fs, gitdir, oid, ancestor: oldoid }))
         ) {
           throw new GitError(E.PushRejectedNonFastForward, {})
         }
@@ -209,14 +220,13 @@ export async function push ({
     const packstream2 = _delete
       ? []
       : await pack({
-        core,
+        fs: _fs,
         gitdir,
         oids: [...objects]
       })
     const res = await GitRemoteHTTP.connect({
-      core,
-      emitter,
-      emitterPrefix,
+      http,
+      onProgress,
       corsProxy,
       service: 'git-receive-pack',
       url,
@@ -226,10 +236,10 @@ export async function push ({
       body: [...packstream1, ...packstream2]
     })
     const { packfile, progress } = await GitSideBand.demux(res.body)
-    if (emitter) {
+    if (onMessage) {
       const lines = splitLines(progress)
       forAwait(lines, line => {
-        emitter.emit(`${emitterPrefix}message`, line)
+        onMessage(line)
       })
     }
     // Parse the response!

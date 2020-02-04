@@ -9,28 +9,28 @@ import { writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
-import { cores } from '../utils/plugins.js'
 
 /**
  * Create a new commit
  *
  * @param {Object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
+ * @param {FsClient} args.fs - a file system implementation
+ * @param {SignCallback} [args.sign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.message - The commit message to use.
  * @param {Object} [args.author] - The details about the author.
  * @param {string} [args.author.name] - Default is `user.name` config.
  * @param {string} [args.author.email] - Default is `user.email` config.
- * @param {string} [args.author.date] - Set the author timestamp field. Default is the current date.
- * @param {string} [args.author.timestamp] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
- * @param {string} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
+ * @param {Date} [args.author.date] - Set the author timestamp field. Default is the current date.
+ * @param {number} [args.author.timestamp] - Set the author timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+ * @param {number} [args.author.timezoneOffset] - Set the author timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {Object} [args.committer = author] - The details about the commit committer, in the same format as the author parameter. If not specified, the author details are used.
  * @param {string} [args.committer.name] - Default is `user.name` config.
  * @param {string} [args.committer.email] - Default is `user.email` config.
- * @param {string} [args.committer.date] - Set the committer timestamp field. Default is the current date.
- * @param {string} [args.committer.timestamp] - Set the committer timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
- * @param {string} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
+ * @param {Date} [args.committer.date] - Set the committer timestamp field. Default is the current date.
+ * @param {number} [args.committer.timestamp] - Set the committer timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+ * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key.
  * @param {boolean} [args.dryRun = false] - If true, simulates making a commit so you can test whether it would succeed. Implies `noUpdateBranch`.
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
@@ -53,7 +53,8 @@ import { cores } from '../utils/plugins.js'
  *
  */
 export async function commit ({
-  core = 'default',
+  fs: _fs,
+  sign,
   dir,
   gitdir = join(dir, '.git'),
   message,
@@ -67,7 +68,7 @@ export async function commit ({
   tree
 }) {
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
+    const fs = new FileSystem(_fs)
 
     if (!ref) {
       ref = await GitRefManager.resolve({
@@ -127,8 +128,7 @@ export async function commit ({
         message
       })
       if (signingKey) {
-        const pgp = cores.get(core).get('pgp')
-        comm = await GitCommit.sign(comm, pgp, signingKey)
+        comm = await GitCommit.sign(comm, sign, signingKey)
       }
       const oid = await writeObject({
         fs,
