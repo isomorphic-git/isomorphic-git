@@ -34,10 +34,10 @@ export async function add ({
   filepath
 }) {
   try {
-    assertParameter('addRemote', 'fs', fs)
-    assertParameter('addRemote', 'dir', dir)
-    assertParameter('addRemote', 'gitdir', gitdir)
-    assertParameter('addRemote', 'filepath', filepath)
+    assertParameter('fs', fs)
+    assertParameter('dir', dir)
+    assertParameter('gitdir', gitdir)
+    assertParameter('filepath', filepath)
     return await _add({ fs: new FileSystem(fs), dir, gitdir, filepath })
   } catch (err) {
     err.caller = 'git.add'

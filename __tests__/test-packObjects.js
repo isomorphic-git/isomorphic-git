@@ -31,6 +31,7 @@ describe('packObjects', () => {
       ]
     })
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
+    if (!packfile) throw new Error('type error')
     expect(fixture.buffer).toEqual(packfile.buffer)
     expect(
       Buffer.compare(Buffer.from(fixture), Buffer.from(packfile)) === 0

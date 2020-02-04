@@ -1,145 +1,114 @@
 // @ts-check
-import { join } from '../utils/join.js'
+import '../commands/typedefs.js'
 
-import { checkout } from './checkout.js'
-import { config } from './config.js'
-import { fetch } from './fetch.js'
-import { init } from './init.js'
+import { checkout } from '../commands/checkout.js'
+import { config } from '../commands/config.js'
+import { fetch } from '../commands/fetch.js'
+import { init } from '../commands/init.js'
+import { addRemote } from './addRemote.js'
 
 /**
- * Clone a repository
- *
- * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
- *
  * @param {object} args
- * @param {FsClient} args.fs - a file system implementation
- * @param {HttpClient} [args.http] - an HTTP client
- * @param {ProgressCallback} [args.onProgress] - optional progress event callback
- * @param {MessageCallback} [args.onMessage] - optional message event callback
- * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} args.url - The URL of the remote repository
- * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo.
- * @param {string} [args.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
- * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
- * @param {boolean} [args.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
- * @param {boolean} [args.noSubmodules = false] - If true, clone will not log an error about missing submodule support. TODO: Make this not check out submodules when ther's submodule support
- * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
- * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**.)
- * @param {boolean} [args.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
- * @param {string} [args.remote = 'origin'] - What to name the remote that is created.
- * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
- * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
- * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
- * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {'github'|'bitbucket'|'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
- * @param {Object<string, string>} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {HttpClient} args.http
+ * @param {ProgressCallback} [args.onProgress]
+ * @param {MessageCallback} [args.onMessage]
+ * @param {string} [args.dir]
+ * @param {string} args.gitdir
+ * @param {string} args.url
+ * @param {string} args.corsProxy
+ * @param {string} args.ref
+ * @param {boolean} args.singleBranch
+ * @param {boolean} args.noCheckout
+ * @param {boolean} args.noSubmodules
+ * @param {boolean} args.newSubmoduleBehavior
+ * @param {boolean} args.noGitSuffix
+ * @param {boolean} args.noTags
+ * @param {string} args.remote
+ * @param {number} args.depth
+ * @param {Date} args.since
+ * @param {string[]} args.exclude
+ * @param {boolean} args.relative
+ * @param {string} args.username
+ * @param {string} args.password
+ * @param {string} args.token
+ * @param {'github'|'bitbucket'|'gitlab'} args.oauth2format
+ * @param {Object<string, string>} args.headers
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
- * @example
- * await git.clone({
- *   dir: '$input((/))',
- *   corsProxy: 'https://cors.isomorphic-git.org',
- *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
- *   $textarea((singleBranch: true,
- *   depth: 1))
- * })
- * console.log('done')
- *
  */
 export async function clone ({
-  fs: _fs,
+  fs,
   http,
   onProgress,
   onMessage,
   dir,
-  gitdir = join(dir, '.git'),
+  gitdir,
   url,
-  noGitSuffix = false,
-  corsProxy = undefined,
-  ref = undefined,
-  remote = 'origin',
-  username = undefined,
-  password = undefined,
-  token = undefined,
-  oauth2format = undefined,
-  depth = undefined,
-  since = undefined,
-  exclude = [],
-  relative = false,
-  singleBranch = false,
-  noCheckout = false,
-  noSubmodules = false,
-  newSubmoduleBehavior = false,
-  noTags = false,
-  headers = {}
+  noGitSuffix,
+  corsProxy,
+  ref,
+  remote,
+  username,
+  password,
+  token,
+  oauth2format,
+  depth,
+  since,
+  exclude,
+  relative,
+  singleBranch,
+  noCheckout,
+  noSubmodules,
+  newSubmoduleBehavior,
+  noTags,
+  headers
 }) {
-  try {
-    await init({ fs: _fs, gitdir })
-    // Add remote
+  await init({ fs, gitdir })
+  await addRemote({ fs, gitdir, remote, url, force: false })
+  if (corsProxy) {
     await config({
-      fs: _fs,
+      fs,
       gitdir,
-      path: `remote.${remote}.url`,
-      value: url
+      path: `http.corsProxy`,
+      value: corsProxy
     })
-    await config({
-      fs: _fs,
-      gitdir,
-      path: `remote.${remote}.fetch`,
-      value: `+refs/heads/*:refs/remotes/${remote}/*`
-    })
-    if (corsProxy) {
-      await config({
-        fs: _fs,
-        gitdir,
-        path: `http.corsProxy`,
-        value: corsProxy
-      })
-    }
-    // Fetch commits
-    const { defaultBranch, fetchHead } = await fetch({
-      fs: _fs,
-      http,
-      onProgress,
-      onMessage,
-      gitdir,
-      noGitSuffix,
-      ref,
-      remote,
-      username,
-      password,
-      token,
-      oauth2format,
-      depth,
-      since,
-      exclude,
-      relative,
-      singleBranch,
-      headers,
-      tags: !noTags
-    })
-    if (fetchHead === null) return
-    ref = ref || defaultBranch
-    ref = ref.replace('refs/heads/', '')
-    // Checkout that branch
-    await checkout({
-      fs: _fs,
-      onProgress,
-      dir,
-      gitdir,
-      ref,
-      remote,
-      noCheckout,
-      noSubmodules,
-      newSubmoduleBehavior
-    })
-  } catch (err) {
-    err.caller = 'git.clone'
-    throw err
   }
+  const { defaultBranch, fetchHead } = await fetch({
+    fs,
+    http,
+    onProgress,
+    onMessage,
+    gitdir,
+    noGitSuffix,
+    ref,
+    remote,
+    username,
+    password,
+    token,
+    oauth2format,
+    depth,
+    since,
+    exclude,
+    relative,
+    singleBranch,
+    headers,
+    tags: !noTags
+  })
+  if (fetchHead === null) return
+  ref = ref || defaultBranch
+  ref = ref.replace('refs/heads/', '')
+  // Checkout that branch
+  await checkout({
+    fs,
+    onProgress,
+    dir,
+    gitdir,
+    ref,
+    remote,
+    noCheckout,
+    noSubmodules,
+    newSubmoduleBehavior
+  })
 }

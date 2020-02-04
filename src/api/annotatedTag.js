@@ -55,11 +55,11 @@ export async function annotatedTag ({
   force = false
 }) {
   try {
-    assertParameter('annotatedTag', 'fs', fs)
-    assertParameter('annotatedTag', 'gitdir', gitdir)
-    assertParameter('annotatedTag', 'ref', ref)
+    assertParameter('fs', fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('ref', ref)
     if (signingKey) {
-      assertParameter('addNote', 'sign', sign)
+      assertParameter('sign', sign)
     }
     return await _annotatedTag({
       fs: new FileSystem(fs),

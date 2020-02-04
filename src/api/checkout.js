@@ -61,9 +61,9 @@ export async function checkout ({
   newSubmoduleBehavior = false
 }) {
   try {
-    assertParameter('checkout', 'fs', fs)
-    assertParameter('checkout', 'dir', dir)
-    assertParameter('checkout', 'gitdir', gitdir)
+    assertParameter('fs', fs)
+    assertParameter('dir', dir)
+    assertParameter('gitdir', gitdir)
 
     const ref = _ref || 'HEAD'
     return await _checkout({

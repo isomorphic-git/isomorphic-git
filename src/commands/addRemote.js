@@ -22,7 +22,7 @@ export async function addRemote ({
   gitdir,
   remote,
   url,
-  force = false
+  force
 }) {
   if (remote !== cleanGitRef.clean(remote)) {
     throw new GitError(E.InvalidRefNameError, {

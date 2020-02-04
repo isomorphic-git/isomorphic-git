@@ -31,9 +31,9 @@ export async function branch ({
   checkout = false
 }) {
   try {
-    assertParameter('branch', 'fs', fs)
-    assertParameter('branch', 'gitdir', gitdir)
-    assertParameter('branch', 'ref', ref)
+    assertParameter('fs', fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('ref', ref)
     return await _branch({
       fs: new FileSystem(fs),
       gitdir,

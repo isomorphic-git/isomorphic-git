@@ -1,5 +1,6 @@
 // @ts-check
 import '../commands/typedefs.js'
+
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
@@ -21,15 +22,15 @@ import { walk } from './walk.js'
  * @param {string} args.dir
  * @param {string} args.gitdir
  * @param {string} args.ref
- * @param {string[]} args.filepaths
+ * @param {string[]} [args.filepaths]
  * @param {string} args.remote
  * @param {boolean} args.noCheckout
- * @param {boolean} args.noUpdateHead
- * @param {boolean} args.dryRun
- * @param {boolean} args.debug
- * @param {boolean} args.force
- * @param {boolean} args.noSubmodules
- * @param {boolean} args.newSubmoduleBehavior
+ * @param {boolean} [args.noUpdateHead]
+ * @param {boolean} [args.dryRun]
+ * @param {boolean} [args.debug]
+ * @param {boolean} [args.force]
+ * @param {boolean} [args.noSubmodules]
+ * @param {boolean} [args.newSubmoduleBehavior]
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *

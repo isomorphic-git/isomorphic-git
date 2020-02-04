@@ -49,12 +49,12 @@ export async function addNote ({
   signingKey
 }) {
   try {
-    assertParameter('addNote', 'fs', fs)
-    assertParameter('addNote', 'gitdir', gitdir)
-    assertParameter('addNote', 'oid', oid)
-    assertParameter('addNote', 'note', note)
+    assertParameter('fs', fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('oid', oid)
+    assertParameter('note', note)
     if (signingKey) {
-      assertParameter('addNote', 'sign', sign)
+      assertParameter('sign', sign)
     }
     return await _addNote({
       fs: new FileSystem(fs),

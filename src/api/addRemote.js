@@ -33,10 +33,10 @@ export async function addRemote ({
   force = false
 }) {
   try {
-    assertParameter('addRemote', 'fs', fs)
-    assertParameter('addRemote', 'gitdir', gitdir)
-    assertParameter('addRemote', 'remote', remote)
-    assertParameter('addRemote', 'url', url)
+    assertParameter('fs', fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('remote', remote)
+    assertParameter('url', url)
     return await _addRemote({
       fs: new FileSystem(fs),
       gitdir,

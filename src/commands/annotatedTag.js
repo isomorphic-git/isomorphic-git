@@ -1,4 +1,6 @@
 // @ts-check
+import '../commands/typedefs.js'
+
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 import { E, GitError } from '../models/GitError.js'
@@ -75,9 +77,7 @@ export async function annotatedTag ({
 
   // Fill in missing arguments with default values
   tagger = await normalizeAuthorObject({ fs, gitdir, author: tagger })
-  if (tagger === undefined) {
-    throw new GitError(E.MissingTaggerError)
-  }
+  if (!tagger) throw new GitError(E.MissingTaggerError)
 
   const { type } = await readObject({ fs, gitdir, oid })
   let tagObject = GitAnnotatedTag.from({
