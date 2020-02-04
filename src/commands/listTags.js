@@ -18,11 +18,7 @@ import { join } from '../utils/join.js'
  * console.log(tags)
  *
  */
-export async function listTags ({
-  fs: _fs,
-  dir,
-  gitdir = join(dir, '.git')
-}) {
+export async function listTags ({ fs: _fs, dir, gitdir = join(dir, '.git') }) {
   try {
     const fs = new FileSystem(_fs)
     return GitRefManager.listTags({ fs, gitdir })

@@ -45,8 +45,12 @@ describe('fetch', () => {
     await fetch({
       fs,
       gitdir,
-      onMessage: async x => { output.push(x) },
-      onProgress: async y => { progress.push(y) },
+      onMessage: async x => {
+        output.push(x)
+      },
+      onProgress: async y => {
+        progress.push(y)
+      },
       depth: 1,
       singleBranch: true,
       remote: 'origin',

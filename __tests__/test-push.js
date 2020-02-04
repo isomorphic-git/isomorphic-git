@@ -28,7 +28,9 @@ describe('push', () => {
     const res = await push({
       fs,
       gitdir,
-      onMessage: async m => { output.push(m) },
+      onMessage: async m => {
+        output.push(m)
+      },
       remote: 'karma',
       ref: 'refs/heads/master'
     })
@@ -79,7 +81,9 @@ describe('push', () => {
     expect(res.ok).toBeTruthy()
     expect(res.ok[0]).toBe('unpack')
     expect(res.ok[1]).toBe('refs/heads/foobar')
-    expect(await listBranches({ fs, gitdir, remote: 'karma' })).toContain('foobar')
+    expect(await listBranches({ fs, gitdir, remote: 'karma' })).toContain(
+      'foobar'
+    )
   })
   it('push with lightweight tag', async () => {
     // Setup
@@ -139,7 +143,9 @@ describe('push', () => {
       ref: 'master',
       remoteRef: 'foobar'
     })
-    expect(await listBranches({ fs, gitdir, remote: 'karma' })).toContain('foobar')
+    expect(await listBranches({ fs, gitdir, remote: 'karma' })).toContain(
+      'foobar'
+    )
     // Test
     const res = await push({
       fs,

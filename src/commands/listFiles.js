@@ -52,13 +52,7 @@ export async function listFiles ({
   }
 }
 
-async function accumulateFilesFromOid ({
-  fs,
-  gitdir,
-  oid,
-  filenames,
-  prefix
-}) {
+async function accumulateFilesFromOid ({ fs, gitdir, oid, filenames, prefix }) {
   const { tree } = await readTree({ fs, gitdir, oid })
   // Note: this isn't parallelized because I'm too lazy to figure that out right now
   // @ts-ignore

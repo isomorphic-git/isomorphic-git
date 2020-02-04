@@ -1,11 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const {
-  annotatedTag,
-  verify,
-  resolveRef,
-  readTag
-} = require('isomorphic-git')
+const { annotatedTag, verify, resolveRef, readTag } = require('isomorphic-git')
 
 describe('annotatedTag', () => {
   it('creates an annotated tag to HEAD', async () => {
@@ -41,7 +36,11 @@ describe('annotatedTag', () => {
       },
       object: 'd670460b4b4aece5915caf5c68d12f560a9fe3e4'
     })
-    const tagRef = await resolveRef({ fs, gitdir, ref: 'refs/tags/latest-blob' })
+    const tagRef = await resolveRef({
+      fs,
+      gitdir,
+      ref: 'refs/tags/latest-blob'
+    })
     const { tag } = await readTag({ fs, gitdir, oid: tagRef })
     expect(tag.object).toEqual('d670460b4b4aece5915caf5c68d12f560a9fe3e4')
   })

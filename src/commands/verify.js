@@ -1,5 +1,6 @@
 // @ts-check
 import '../commands/typedefs.js'
+
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
@@ -61,7 +62,11 @@ export async function verify ({
 
     if (type === 'commit') {
       const commit = GitCommit.from(object)
-      const { valid, invalid } = await GitCommit.verify(commit, verify, publicKeys)
+      const { valid, invalid } = await GitCommit.verify(
+        commit,
+        verify,
+        publicKeys
+      )
       if (invalid.length > 0) return false
       return valid
     } else if (type === 'tag') {

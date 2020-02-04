@@ -14,12 +14,7 @@ import { padHex } from '../utils/padHex.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids
  */
-export async function pack ({
-  fs: _fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  oids
-}) {
+export async function pack ({ fs: _fs, dir, gitdir = join(dir, '.git'), oids }) {
   const fs = new FileSystem(_fs)
   const hash = new Hash()
   const outputStream = []

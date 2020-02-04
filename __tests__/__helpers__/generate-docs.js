@@ -248,7 +248,12 @@ async function gendoc (file, filepath) {
   gitignoreContent += 'docs/errors.md\n'
 
   const oid = await git.resolveRef({ fs, dir, ref })
-  const { tree } = await git.readTree({ fs, dir, oid, filepath: 'src/commands' })
+  const { tree } = await git.readTree({
+    fs,
+    dir,
+    oid,
+    filepath: 'src/commands'
+  })
   const entries = tree.filter(
     entry => entry.type === 'blob' && !entry.path.startsWith('_')
   )
