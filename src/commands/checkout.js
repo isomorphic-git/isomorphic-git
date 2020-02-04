@@ -1,18 +1,17 @@
 // @ts-check
 import '../commands/typedefs.js'
 
+import { STAGE } from '../commands/STAGE.js'
+import { TREE } from '../commands/TREE.js'
+import { WORKDIR } from '../commands/WORKDIR.js'
+import { getConfig } from '../commands/getConfig.js'
+import { walk } from '../commands/walk.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { flat } from '../utils/flat.js'
 import { worthWalking } from '../utils/worthWalking.js'
-
-import { STAGE } from './STAGE.js'
-import { TREE } from './TREE.js'
-import { WORKDIR } from './WORKDIR.js'
-import { config } from './config.js'
-import { walk } from './walk.js'
 
 /**
  * @param {object} args
@@ -68,13 +67,13 @@ export async function checkout ({
       ref: remoteRef
     })
     // Set up remote tracking branch
-    await config({
+    await getConfig({
       fs,
       gitdir,
       path: `branch.${ref}.remote`,
       value: `${remote}`
     })
-    await config({
+    await getConfig({
       fs,
       gitdir,
       path: `branch.${ref}.merge`,

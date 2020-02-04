@@ -1,4 +1,10 @@
 // @ts-check
+import { getConfig } from '../commands/getConfig.js'
+import { findMergeBase } from '../commands/findMergeBase.js'
+import { isDescendent } from '../commands/isDescendent.js'
+import { listCommitsAndTags } from '../commands/listCommitsAndTags.js'
+import { listObjects } from '../commands/listObjects.js'
+import { pack } from '../commands/pack.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -11,13 +17,6 @@ import { pkg } from '../utils/pkg.js'
 import { splitLines } from '../utils/splitLines.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
-
-import { config } from './config.js'
-import { findMergeBase } from './findMergeBase.js'
-import { isDescendent } from './isDescendent.js'
-import { listCommitsAndTags } from './listCommitsAndTags.js'
-import { listObjects } from './listObjects.js'
-import { pack } from './pack.js'
 
 /**
  *
@@ -109,11 +108,11 @@ export async function push ({
 
     // TODO: Figure out how pushing tags works. (This only works for branches.)
     if (url === undefined) {
-      url = await config({ fs: _fs, gitdir, path: `remote.${remote}.url` })
+      url = await getConfig({ fs, gitdir, path: `remote.${remote}.url` })
     }
 
     if (corsProxy === undefined) {
-      corsProxy = await config({ fs: _fs, gitdir, path: 'http.corsProxy' })
+      corsProxy = await getConfig({ fs, gitdir, path: 'http.corsProxy' })
     }
     let fullRef
     if (!ref) {

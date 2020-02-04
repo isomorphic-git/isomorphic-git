@@ -2,7 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { sleep } = require('isomorphic-git/internal-apis')
-const { E, config, fetch } = require('isomorphic-git')
+const { E, setConfig, fetch } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -11,7 +11,7 @@ const localhost =
 describe('fetch', () => {
   it('fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -33,7 +33,7 @@ describe('fetch', () => {
 
   it('shallow fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -78,7 +78,7 @@ describe('fetch', () => {
 
   it('throws UnknownTransportError if using shorter scp-like syntax', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -104,7 +104,7 @@ describe('fetch', () => {
 
   it('the SSH -> HTTPS UnknownTransportError suggestion feature', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -133,7 +133,7 @@ describe('fetch', () => {
 
   it('shallow fetch since (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -155,7 +155,7 @@ describe('fetch', () => {
 
   it('shallow fetch exclude (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -177,7 +177,7 @@ describe('fetch', () => {
 
   it('shallow fetch relative (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -212,7 +212,7 @@ describe('fetch', () => {
 
   it('errors if missing refspec', async () => {
     const { fs, gitdir } = await makeFixture('test-issue-84')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'http.corsProxy',
@@ -255,7 +255,7 @@ describe('fetch', () => {
 
   it('fetch --prune from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'remote.origin.url',
@@ -279,7 +279,7 @@ describe('fetch', () => {
 
   it('fetch --prune-tags from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'remote.origin.url',

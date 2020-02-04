@@ -1,4 +1,5 @@
 // @ts-check
+import { getConfig } from '../commands/getConfig.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -18,8 +19,6 @@ import { pkg } from '../utils/pkg.js'
 import { splitLines } from '../utils/splitLines.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
-
-import { config } from './config'
 
 /**
  *
@@ -248,7 +247,7 @@ async function fetchPackfile ({
   // Set missing values
   remote = remote || 'origin'
   if (url === undefined) {
-    url = await config({
+    url = await getConfig({
       fs: _fs,
       gitdir,
       path: `remote.${remote}.url`
@@ -256,7 +255,7 @@ async function fetchPackfile ({
   }
 
   if (corsProxy === undefined) {
-    corsProxy = await config({ fs: _fs, gitdir, path: 'http.corsProxy' })
+    corsProxy = await getConfig({ fs: _fs, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })

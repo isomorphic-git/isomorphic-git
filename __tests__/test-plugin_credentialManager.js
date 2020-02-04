@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { config, push, E } = require('isomorphic-git')
+const { setConfig, push, E } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -11,7 +11,7 @@ describe('credentialManager', () => {
   it('with valid credentials', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-push')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'remote.auth.url',
@@ -47,7 +47,7 @@ describe('credentialManager', () => {
   it('with invalid credentials', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-push')
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: 'remote.auth.url',

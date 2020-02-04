@@ -1,11 +1,11 @@
 // @ts-check
-import { join } from '../utils/join.js'
 
-import { checkout } from './checkout'
-import { config } from './config'
-import { currentBranch } from './currentBranch'
-import { fetch } from './fetch'
-import { merge } from './merge'
+import { checkout } from '../commands/checkout.js'
+import { getConfig } from '../commands/getConfig.js'
+import { currentBranch } from '../commands/currentBranch.js'
+import { fetch } from '../commands/fetch.js'
+import { merge } from '../commands/merge.js'
+import { join } from '../utils/join.js'
 
 /**
  * Fetch and merge commits from a remote repository *(Currently, only fast-forward merges are implemented.)*
@@ -91,7 +91,7 @@ export async function pull ({
       ref = await currentBranch({ fs, gitdir })
     }
     // Fetch from the correct remote.
-    const remote = await config({
+    const remote = await getConfig({
       fs,
       gitdir,
       path: `branch.${ref}.remote`

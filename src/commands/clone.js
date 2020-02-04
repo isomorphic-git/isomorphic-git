@@ -2,7 +2,7 @@
 import '../commands/typedefs.js'
 
 import { checkout } from '../commands/checkout.js'
-import { config } from '../commands/config.js'
+import { setConfig } from '../commands/setConfig.js'
 import { fetch } from '../commands/fetch.js'
 import { init } from '../commands/init.js'
 import { addRemote } from './addRemote.js'
@@ -68,11 +68,12 @@ export async function clone ({
   await init({ fs, gitdir })
   await addRemote({ fs, gitdir, remote, url, force: false })
   if (corsProxy) {
-    await config({
+    await setConfig({
       fs,
       gitdir,
       path: `http.corsProxy`,
-      value: corsProxy
+      value: corsProxy,
+      append: false
     })
   }
   const { defaultBranch, fetchHead } = await fetch({

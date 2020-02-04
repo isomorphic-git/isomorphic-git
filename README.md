@@ -63,7 +63,7 @@ At the time of writing, the following breaking changes are planned:
 - [x] Actually, I'm thinking of eliminating the plugin system API and going back to function arguments. The plugin cores creates a mysterious "global state" that makes it easy to trip up (I've forgotten to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic but a much simpler model.
 - [ ] To go along with that, I'm experimenting with a way to make the API more aesthetic, eliminating the `emitter` plugin/argument and letting you chain event listeners onto running commands directly. NOTE: need to make sure there's no race condition between adding the event listeners and starting running the command.
   - [ ] This also provides an aesthetic way to cancel / stop running commands.
-- [ ] break `config` into `getConfig` and `setConfig` or something.
+- [x] break `config` into `getConfig` and `setConfig` or something.
 - [ ] I should probably normalize the timestamps to `Date`s.
 
 ## Getting Started
