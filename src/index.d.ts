@@ -287,19 +287,19 @@ export const cores: {
 export { E } from './errors';
 
 export function WORKDIR(args: {
-  fs: any;
+  fs?: any;
   dir: string;
   gitdir: string;
 }): Walker;
 
 export function TREE(args: {
-  fs: any;
+  fs?: any;
   gitdir: string;
   ref: string;
 }): Walker;
 
 export function STAGE(args: {
-  fs: any;
+  fs?: any;
   gitdir: string;
 }): Walker;
 
