@@ -2,6 +2,7 @@
 import { FileSystem } from '../models/FileSystem.js'
 import { expandOid as _expandOid } from '../storage/expandOid.js'
 import { join } from '../utils/join.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  * Expand and resolve a short oid into a full oid
@@ -20,19 +21,20 @@ import { join } from '../utils/join.js'
  *
  */
 export async function expandOid ({
-  fs: _fs,
+  fs,
   dir,
   gitdir = join(dir, '.git'),
   oid
 }) {
   try {
-    const fs = new FileSystem(_fs)
-    const fullOid = await _expandOid({
-      fs,
+    assertParameter('fs', fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('oid', oid)
+    return await _expandOid({
+      fs: new FileSystem(fs),
       gitdir,
       oid
     })
-    return fullOid
   } catch (err) {
     err.caller = 'git.expandOid'
     throw err
