@@ -844,7 +844,7 @@ export function walkBeta2<T, Q>(args: WorkDir & GitDir & {
   fs?: any;
   trees: Walker[];
   filter?: (entries: WalkerEntry2[]) => Promise<boolean>;
-  map?: (entries: WalkerEntry2[]) => Promise<T | undefined>;
+  map?: (fullpath: string, entries: WalkerEntry2[]) => Promise<T | undefined>;
   reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
   iterate?: (walk: (parent: WalkerEntry2[]) => Promise<Q>, children: Iterable<WalkerEntry2[]>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
