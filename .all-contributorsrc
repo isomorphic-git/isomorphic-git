@@ -378,6 +378,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "raon0211",
+      "name": "Sojin Park",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3102175?v=4",
+      "profile": "https://sojin.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
