@@ -3,7 +3,6 @@ import { getConfig } from '../commands/getConfig.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
@@ -32,70 +31,49 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  */
 
 /**
- * Fetch commits from a remote repository
- *
- * Future versions of isomorphic-git might return additional metadata.
- *
- * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
- *
  * @param {object} args
- * @param {FsClient} args.fs - a file system client
- * @param {HttpClient} [args.http] - an HTTP client
- * @param {ProgressCallback} [args.onProgress] - optional progress event callback
- * @param {MessageCallback} [args.onMessage] - optional message event callback
- * @param {FillCallback} [args.onFill] - optional auth fill callback
- * @param {ApprovedCallback} [args.onApproved] - optional auth approved callback
- * @param {RejectedCallback} [args.onRejected] - optional auth rejected callback
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
- * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
- * @param {string} [args.ref = 'HEAD'] - Which branch to fetch. By default this is the currently checked out branch.
- * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
- * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
- * @param {boolean} [args.tags = false] - Also fetch tags
- * @param {string} [args.remote] - What to name the remote that is created.
- * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
- * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
- * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
- * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
- * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
- * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
- * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {HttpClient} [args.http]
+ * @param {ProgressCallback} [args.onProgress]
+ * @param {MessageCallback} [args.onMessage]
+ * @param {FillCallback} [args.onFill]
+ * @param {ApprovedCallback} [args.onApproved]
+ * @param {RejectedCallback} [args.onRejected]
+ * @param {string} args.gitdir
+ * @param {string} [args.url]
+ * @param {string} [args.corsProxy]
+ * @param {string} [args.ref = 'HEAD']
+ * @param {string[]} [args.refs = [ref]]
+ * @param {boolean} [args.singleBranch = false]
+ * @param {boolean} [args.noGitSuffix = false]
+ * @param {boolean} [args.tags = false]
+ * @param {string} [args.remote]
+ * @param {number} [args.depth]
+ * @param {Date} [args.since]
+ * @param {string[]} [args.exclude = []]
+ * @param {boolean} [args.relative = false]
+ * @param {string} [args.username]
+ * @param {string} [args.password]
+ * @param {string} [args.token]
+ * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format]
+ * @param {Object<string, string>} [args.headers]
+ * @param {boolean} [args.prune]
+ * @param {boolean} [args.pruneTags]
  *
- * @returns {Promise<FetchResult>} Resolves successfully when fetch completes
+ * @returns {Promise<FetchResult>}
  * @see FetchResult
- *
- * @example
- * await git.fetch({
- *   dir: '$input((/))',
- *   corsProxy: 'https://cors.isomorphic-git.org',
- *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
- *   ref: '$input((master))',
- *   depth: $input((1)),
- *   singleBranch: $input((true)),
- *   tags: $input((false))
- * })
- * console.log('done')
- *
  */
 export async function fetch ({
-  fs: _fs,
+  fs,
   http,
   onProgress,
   onMessage,
   onFill,
   onApproved,
   onRejected,
-  dir,
-  gitdir = join(dir, '.git'),
+  gitdir,
   ref = 'HEAD',
-  // @ts-ignore
-  refs,
+  refs = [ref],
   remote,
   url,
   noGitSuffix = false,
@@ -114,148 +92,19 @@ export async function fetch ({
   prune = false,
   pruneTags = false
 }) {
-  try {
-    const fs = new FileSystem(_fs)
-
-    const response = await fetchPackfile({
-      fs,
-      http,
-      onProgress,
-      onMessage,
-      onFill,
-      onApproved,
-      onRejected,
-      gitdir,
-      ref,
-      refs,
-      remote,
-      url,
-      noGitSuffix,
-      corsProxy,
-      username,
-      password,
-      token,
-      oauth2format,
-      depth,
-      since,
-      exclude,
-      relative,
-      tags,
-      singleBranch,
-      headers,
-      prune,
-      pruneTags
-    })
-    if (response === null) {
-      return {
-        defaultBranch: null,
-        fetchHead: null,
-        fetchHeadDescription: null
-      }
-    }
-    if (onProgress || onMessage) {
-      const lines = splitLines(response.progress)
-      forAwait(lines, line => {
-        if (onMessage) onMessage(line)
-        if (onProgress) {
-          const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
-          if (matches) {
-            onProgress({
-              phase: matches[1].trim(),
-              loaded: parseInt(matches[2], 10),
-              total: parseInt(matches[3], 10)
-            })
-          }
-        }
-      })
-    }
-    const packfile = await collect(response.packfile)
-    const packfileSha = packfile.slice(-20).toString('hex')
-    const res = {
-      defaultBranch: response.HEAD,
-      fetchHead: response.FETCH_HEAD.oid,
-      fetchHeadDescription: response.FETCH_HEAD.description
-    }
-    if (response.headers) {
-      res.headers = response.headers
-    }
-    if (prune) {
-      res.pruned = response.pruned
-    }
-    // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
-    // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
-    // TODO: Longer term, we should actually:
-    // a) NOT concatenate the entire packfile into memory (line 78),
-    // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
-    // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
-    if (packfileSha !== '' && !emptyPackfile(packfile)) {
-      res.packfile = `objects/pack/pack-${packfileSha}.pack`
-      const fullpath = join(gitdir, res.packfile)
-      await fs.write(fullpath, packfile)
-      const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
-      const idx = await GitPackIndex.fromPack({
-        pack: packfile,
-        getExternalRefDelta,
-        onProgress
-      })
-      await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
-    }
-    return res
-  } catch (err) {
-    err.caller = 'git.fetch'
-    throw err
-  }
-}
-
-async function fetchPackfile ({
-  fs: _fs,
-  http,
-  gitdir,
-  onProgress,
-  onMessage,
-  onFill,
-  onApproved,
-  onRejected,
-  ref,
-  refs = [ref],
-  remote,
-  url,
-  noGitSuffix,
-  corsProxy,
-  username,
-  password,
-  token,
-  oauth2format,
-  depth,
-  since,
-  exclude,
-  relative,
-  tags,
-  singleBranch,
-  headers,
-  prune,
-  pruneTags
-}) {
-  const fs = new FileSystem(_fs)
-  // Sanity checks
-  if (depth !== null) {
-    if (Number.isNaN(parseInt(depth))) {
-      throw new GitError(E.InvalidDepthParameterError, { depth })
-    }
-    depth = parseInt(depth)
-  }
+  // TODO: Lookup remote tracking branch.
   // Set missing values
   remote = remote || 'origin'
   if (url === undefined) {
     url = await getConfig({
-      fs: _fs,
+      fs,
       gitdir,
       path: `remote.${remote}.url`
     })
   }
 
   if (corsProxy === undefined) {
-    corsProxy = await getConfig({ fs: _fs, gitdir, path: 'http.corsProxy' })
+    corsProxy = await getConfig({ fs, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
@@ -275,7 +124,11 @@ async function fetchPackfile ({
   const remoteRefs = remoteHTTP.refs
   // For the special case of an empty repository with no refs, return null.
   if (remoteRefs.size === 0) {
-    return null
+    return {
+      defaultBranch: null,
+      fetchHead: null,
+      fetchHeadDescription: null
+    }
   }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
@@ -466,5 +319,53 @@ async function fetchPackfile ({
     oid,
     description: `${noun} '${abbreviateRef(fullref)}' of ${url}`
   }
-  return response
+
+  if (onProgress || onMessage) {
+    const lines = splitLines(response.progress)
+    forAwait(lines, line => {
+      if (onMessage) onMessage(line)
+      if (onProgress) {
+        const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
+        if (matches) {
+          onProgress({
+            phase: matches[1].trim(),
+            loaded: parseInt(matches[2], 10),
+            total: parseInt(matches[3], 10)
+          })
+        }
+      }
+    })
+  }
+  const packfile = await collect(response.packfile)
+  const packfileSha = packfile.slice(-20).toString('hex')
+  const res = {
+    defaultBranch: response.HEAD,
+    fetchHead: response.FETCH_HEAD.oid,
+    fetchHeadDescription: response.FETCH_HEAD.description
+  }
+  if (response.headers) {
+    res.headers = response.headers
+  }
+  if (prune) {
+    res.pruned = response.pruned
+  }
+  // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
+  // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
+  // TODO: Longer term, we should actually:
+  // a) NOT concatenate the entire packfile into memory (line 78),
+  // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
+  // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
+  if (packfileSha !== '' && !emptyPackfile(packfile)) {
+    res.packfile = `objects/pack/pack-${packfileSha}.pack`
+    const fullpath = join(gitdir, res.packfile)
+    await fs.write(fullpath, packfile)
+    const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
+    const idx = await GitPackIndex.fromPack({
+      pack: packfile,
+      getExternalRefDelta,
+      onProgress
+    })
+    await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
+  }
+  return res
 }
