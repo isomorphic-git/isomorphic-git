@@ -3,6 +3,7 @@ import { GitRefManager } from '../managers/GitRefManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
+import { assertParameter } from '../utils/assertParameter'
 
 /**
  * Create a lightweight tag
@@ -31,6 +32,10 @@ export async function tag ({
   force = false
 }) {
   try {
+    assertParameter('fs', _fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('ref', ref)
+
     const fs = new FileSystem(_fs)
 
     if (ref === undefined) {

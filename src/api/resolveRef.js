@@ -2,6 +2,7 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  * Get the value of a symbolic ref or resolve a ref to its SHA-1 object id
@@ -23,16 +24,19 @@ import { join } from '../utils/join.js'
  *
  */
 export async function resolveRef ({
-  fs: _fs,
+  fs,
   dir,
   gitdir = join(dir, '.git'),
   ref,
   depth
 }) {
   try {
-    const fs = new FileSystem(_fs)
+    assertParameter('fs', fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('ref', ref)
+
     const oid = await GitRefManager.resolve({
-      fs,
+      fs: new FileSystem(fs),
       gitdir,
       ref,
       depth

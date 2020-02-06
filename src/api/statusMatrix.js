@@ -7,6 +7,8 @@ import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { WORKDIR } from './WORKDIR.js'
 import { walk } from './walk.js'
+import { assertParameter } from '../utils/assertParameter.js'
+import { FileSystem } from '../models/FileSystem.js'
 
 /**
  * Efficiently get the status of multiple files at once.
@@ -149,8 +151,12 @@ export async function statusMatrix ({
   noSubmodules = false
 }) {
   try {
-    const results = await walk({
-      fs,
+    assertParameter('fs', fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('ref', ref)
+
+    return await walk({
+      fs: new FileSystem(fs),
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],
@@ -209,7 +215,6 @@ export async function statusMatrix ({
         return [filepath, ...result]
       }
     })
-    return results
   } catch (err) {
     err.caller = 'git.statusMatrix'
     throw err

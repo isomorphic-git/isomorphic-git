@@ -10,6 +10,7 @@ import { readObject } from '../storage/readObject.js'
 import { compareStats } from '../utils/compareStats.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  * Tell whether a file has been changed
@@ -52,6 +53,10 @@ export async function status ({
   filepath
 }) {
   try {
+    assertParameter('fs', _fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('filepath', filepath)
+
     const fs = new FileSystem(_fs)
     const ignored = await GitIgnoreManager.isIgnored({
       fs,

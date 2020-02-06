@@ -2,6 +2,7 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertParameter } from '../utils/assertParameter.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
@@ -33,6 +34,11 @@ export async function resetIndex ({
   ref = 'HEAD'
 }) {
   try {
+    assertParameter('fs', _fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('filepath', filepath)
+    assertParameter('ref', ref)
+
     const fs = new FileSystem(_fs)
     // Resolve commit
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
