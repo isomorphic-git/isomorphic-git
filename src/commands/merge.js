@@ -23,17 +23,6 @@ import { mergeTree } from '../utils/mergeTree.js'
  */
 
 /**
- * Merge two branches
- *
- * ## Limitations
- *
- * Currently it does not support incomplete merges. That is, if there are merge conflicts it cannot solve
- * with the built in diff3 algorithm it will not modify the working dir, and will throw a [`MergeNotSupportedFail`](./errors.md#mergenotsupportedfail) error.
- *
- * Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
- *
- * Currently it does not support selecting alternative merge strategies.
- *
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {string} args.gitdir

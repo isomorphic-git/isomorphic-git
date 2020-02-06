@@ -40,7 +40,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {ApprovedCallback} [args.onApproved]
  * @param {RejectedCallback} [args.onRejected]
  * @param {string} args.gitdir
- * @param {string} [args.url]
+ * @param {string|void} [args.url]
  * @param {string} [args.corsProxy]
  * @param {string} [args.ref = 'HEAD']
  * @param {string[]} [args.refs = [ref]]
@@ -92,18 +92,24 @@ export async function fetch ({
   prune = false,
   pruneTags = false
 }) {
-  // TODO: Lookup remote tracking branch.
+  // Lookup remote tracking branch.
+  remote = remote || await getConfig({
+    fs,
+    gitdir,
+    path: `branch.${ref}.remote`
+  }) || 'origin'
   // Set missing values
-  remote = remote || 'origin'
-  if (url === undefined) {
+  if (typeof url === 'undefined') {
     url = await getConfig({
       fs,
       gitdir,
       path: `remote.${remote}.url`
     })
+    // TODO: throw better error
+    if (typeof url === 'undefined') throw new GitError(E.MissingRequiredParameterError, { parameter: 'remote OR url' })
   }
 
-  if (corsProxy === undefined) {
+  if (corsProxy === void 0) {
     corsProxy = await getConfig({ fs, gitdir, path: 'http.corsProxy' })
   }
   let auth = { username, password, token, oauth2format }

@@ -9,7 +9,7 @@ import { padHex } from '../utils/padHex.js'
 
 /**
  * @param {object} args
- * @param {FsClient} args.fs - a file system client
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids
