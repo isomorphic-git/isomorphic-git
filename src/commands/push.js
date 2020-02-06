@@ -200,7 +200,7 @@ export async function push ({
         if (
           oid !== '0000000000000000000000000000000000000000' &&
           oldoid !== '0000000000000000000000000000000000000000' &&
-          !(await isDescendent({ fs: _fs, gitdir, oid, ancestor: oldoid }))
+          !(await isDescendent({ fs, gitdir, oid, ancestor: oldoid, depth: -1 }))
         ) {
           throw new GitError(E.PushRejectedNonFastForward, {})
         }

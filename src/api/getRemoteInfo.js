@@ -1,5 +1,8 @@
 // @ts-check
+import '../commands/typedefs.js'
+
 import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  *
@@ -54,6 +57,8 @@ export async function getRemoteInfo ({
   forPush = false
 }) {
   try {
+    assertParameter('url', url)
+
     let auth = { username, password, token, oauth2format }
     const remote = await GitRemoteHTTP.discover({
       http,

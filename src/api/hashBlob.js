@@ -1,5 +1,6 @@
 // @ts-check
 import { hashObject } from '../storage/hashObject.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  *
@@ -15,7 +16,6 @@ import { hashObject } from '../storage/hashObject.js'
  * Compute what the SHA-1 object id of a file would be
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {Uint8Array|string} args.object - The object to write. If `object` is a String then it will be converted to a Uint8Array using UTF-8 encoding.
  *
  * @returns {Promise<HashBlobResult>} Resolves successfully with the SHA-1 object id and the wrapped object Uint8Array.
@@ -32,8 +32,10 @@ import { hashObject } from '../storage/hashObject.js'
  * console.log('format', format)
  *
  */
-export async function hashBlob ({ core = 'default', object }) {
+export async function hashBlob ({ object }) {
   try {
+    assertParameter('object', object)
+
     // Convert object to buffer
     if (typeof object === 'string') {
       object = Buffer.from(object, 'utf8')

@@ -253,7 +253,7 @@ async function gendoc (file, filepath) {
     fs,
     dir,
     oid,
-    filepath: 'src/commands'
+    filepath: 'src/api'
   })
   const entries = tree.filter(
     entry => entry.type === 'blob' && !entry.path.startsWith('_')
@@ -266,7 +266,7 @@ async function gendoc (file, filepath) {
       fs,
       dir,
       oid,
-      filepath: `src/commands/${entry.path}`
+      filepath: `src/api/${entry.path}`
     })
     const filetext = Buffer.from(blob).toString('utf8')
     const doctext = await gendoc(filetext, entry.path)
