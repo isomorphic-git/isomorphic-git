@@ -1,7 +1,10 @@
 // @ts-check
+import '../commands/typedefs.js'
+
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  * Remove a file from the git index (aka staging area)
@@ -28,11 +31,13 @@ export async function remove ({
   filepath
 }) {
   try {
-    const fs = new FileSystem(_fs)
-    await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+    assertParameter('fs', _fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('filepath', filepath)
+
+    await GitIndexManager.acquire({ fs: new FileSystem(_fs), gitdir }, async function (index) {
       index.delete({ filepath })
     })
-    // TODO: return oid?
   } catch (err) {
     err.caller = 'git.remove'
     throw err

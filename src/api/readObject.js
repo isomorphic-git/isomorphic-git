@@ -9,6 +9,7 @@ import { GitTree } from '../models/GitTree.js'
 import { readObject as _readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 import { resolveTree } from '../utils/resolveTree.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  *
@@ -219,6 +220,10 @@ export async function readObject ({
   encoding = undefined
 }) {
   try {
+    assertParameter('fs', _fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('oid', oid)
+
     const fs = new FileSystem(_fs)
     if (filepath !== undefined) {
       // Ensure there are no leading or trailing directory separators.
