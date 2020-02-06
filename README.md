@@ -67,6 +67,7 @@ At the time of writing, the following breaking changes are planned:
 - [ ] Make `http` an external required dependency just like `fs` [#938](https://github.com/isomorphic-git/isomorphic-git/issues/938)
 - [ ] I should probably normalize the timestamps to `Date`s.
 - [x] Remove the `noOverwrite` option from `init` and make that the new behavior.
+- [ ] Oh, and I should move all the error strings into a separate JSON file that can be fetched lazily in production.
 
 ## Getting Started
 
