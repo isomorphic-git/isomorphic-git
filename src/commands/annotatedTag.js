@@ -6,24 +6,23 @@ import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { writeObject } from '../storage/writeObject.js'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 
 /**
  * Create an annotated tag.
  *
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {SignCallback} [args.onPgpSign]
+ * @param {SignCallback} [args.onSign]
  * @param {string} args.gitdir
  * @param {string} args.ref
  * @param {string} [args.message = ref]
  * @param {string} [args.object = 'HEAD']
  * @param {object} [args.tagger]
- * @param {string} [args.tagger.name]
- * @param {string} [args.tagger.email]
- * @param {string} [args.tagger.date]
- * @param {string} [args.tagger.timestamp]
- * @param {string} [args.tagger.timezoneOffset]
+ * @param {string} args.tagger.name
+ * @param {string} args.tagger.email
+ * @param {Date} args.tagger.date
+ * @param {number} args.tagger.timestamp
+ * @param {number} args.tagger.timezoneOffset
  * @param {string} [args.signature]
  * @param {string} [args.signingKey]
  * @param {boolean} [args.force = false]
@@ -45,7 +44,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  */
 export async function annotatedTag ({
   fs,
-  onPgpSign,
+  onSign,
   gitdir,
   ref,
   tagger,
@@ -75,10 +74,6 @@ export async function annotatedTag ({
     })
   }
 
-  // Fill in missing arguments with default values
-  tagger = await normalizeAuthorObject({ fs, gitdir, author: tagger })
-  if (!tagger) throw new GitError(E.MissingTaggerError)
-
   const { type } = await readObject({ fs, gitdir, oid })
   let tagObject = GitAnnotatedTag.from({
     object: oid,
@@ -89,7 +84,7 @@ export async function annotatedTag ({
     signature
   })
   if (signingKey) {
-    tagObject = await GitAnnotatedTag.sign(tagObject, onPgpSign, signingKey)
+    tagObject = await GitAnnotatedTag.sign(tagObject, onSign, signingKey)
   }
   const value = await writeObject({
     fs,

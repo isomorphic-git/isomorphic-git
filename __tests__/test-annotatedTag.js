@@ -60,14 +60,14 @@ describe('annotatedTag', () => {
         email: 'mail@yuhr.org'
       },
       signingKey: privateKey,
-      onPgpSign: pgp.sign
+      onSign: pgp.sign
     })
     const keys = await verify({
       fs,
       gitdir,
       ref: 'latest',
       publicKeys: publicKey,
-      onPgpVerify: pgp.verify
+      onVerify: pgp.verify
     })
     expect(keys[0]).toBe('f2f0ced8a52613c4')
   })

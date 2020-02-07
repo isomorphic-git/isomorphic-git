@@ -27,7 +27,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
- * @param {VerifyCallback} args.onPgpVerify - a PGP verify implementation
+ * @param {VerifyCallback} args.onVerify - a PGP verify implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - A reference to the commit or tag to verify
@@ -50,7 +50,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  */
 export async function verify ({
   fs: _fs,
-  onPgpVerify,
+  onVerify,
   dir,
   gitdir = join(dir, '.git'),
   ref,
@@ -58,7 +58,7 @@ export async function verify ({
 }) {
   try {
     assertParameter('fs', _fs)
-    assertParameter('onPgpVerify', onPgpVerify)
+    assertParameter('onVerify', onVerify)
     assertParameter('gitdir', gitdir)
     assertParameter('ref', ref)
     assertParameter('publicKeys', publicKeys)
@@ -71,7 +71,7 @@ export async function verify ({
       const commit = GitCommit.from(object)
       const { valid, invalid } = await GitCommit.verify(
         commit,
-        onPgpVerify,
+        onVerify,
         publicKeys
       )
       if (invalid.length > 0) return false
@@ -80,7 +80,7 @@ export async function verify ({
       const tag = GitAnnotatedTag.from(object)
       const { valid, invalid } = await GitAnnotatedTag.verify(
         tag,
-        onPgpVerify,
+        onVerify,
         publicKeys
       )
       if (invalid.length > 0) return false

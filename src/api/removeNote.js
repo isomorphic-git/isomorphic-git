@@ -14,7 +14,7 @@ import { GitError, E } from '../models/GitError.js'
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
- * @param {SignCallback} [args.onPgpSign] - a PGP signing implementation
+ * @param {SignCallback} [args.onSign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
@@ -38,7 +38,7 @@ import { GitError, E } from '../models/GitError.js'
 
 export async function removeNote ({
   fs: _fs,
-  onPgpSign,
+  onSign,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'refs/notes/commits',
@@ -62,7 +62,7 @@ export async function removeNote ({
 
     return await _removeNote({
       fs,
-      onPgpSign,
+      onSign,
       gitdir,
       ref,
       oid,

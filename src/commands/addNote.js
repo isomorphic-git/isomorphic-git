@@ -11,24 +11,24 @@ import { E, GitError } from '../models/GitError.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {SignCallback} [args.onPgpSign]
+ * @param {SignCallback} [args.onSign]
  * @param {string} args.gitdir
  * @param {string} args.ref
  * @param {string} args.oid
  * @param {string|Uint8Array} args.note
  * @param {boolean} [args.force]
- * @param {Object} [args.author]
- * @param {string} [args.author.name]
- * @param {string} [args.author.email]
- * @param {Date} [args.author.date]
- * @param {number} [args.author.timestamp]
- * @param {number} [args.author.timezoneOffset]
- * @param {Object} [args.committer = author]
- * @param {string} [args.committer.name]
- * @param {string} [args.committer.email]
- * @param {Date} [args.committer.date]
- * @param {number} [args.committer.timestamp]
- * @param {number} [args.committer.timezoneOffset]
+ * @param {Object} args.author
+ * @param {string} args.author.name
+ * @param {string} args.author.email
+ * @param {Date} args.author.date
+ * @param {number} args.author.timestamp
+ * @param {number} args.author.timezoneOffset
+ * @param {Object} args.committer
+ * @param {string} args.committer.name
+ * @param {string} args.committer.email
+ * @param {Date} args.committer.date
+ * @param {number} args.committer.timestamp
+ * @param {number} args.committer.timezoneOffset
  * @param {string} [args.signingKey]
  *
  * @returns {Promise<string>}
@@ -36,7 +36,7 @@ import { E, GitError } from '../models/GitError.js'
 
 export async function addNote ({
   fs,
-  onPgpSign,
+  onSign,
   gitdir,
   ref,
   oid,
@@ -99,7 +99,7 @@ export async function addNote ({
   // Create the new note commit
   const commitOid = await commit({
     fs,
-    onPgpSign,
+    onSign,
     gitdir,
     ref,
     tree: treeOid,

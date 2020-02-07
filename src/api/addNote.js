@@ -5,13 +5,17 @@ import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join'
 import { addNote as _addNote } from '../commands/addNote.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
+import { GitError } from '../models/GitError.js'
+import { E } from '../index.js'
+import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
 /**
  * Add or update an object note
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
- * @param {SignCallback} [args.onPgpSign] - a PGP signing implementation
+ * @param {SignCallback} [args.onSign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
@@ -36,29 +40,37 @@ import { assertParameter } from '../utils/assertParameter.js'
  */
 
 export async function addNote ({
-  fs,
-  onPgpSign,
+  fs: _fs,
+  onSign,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'refs/notes/commits',
   oid,
   note,
   force,
-  author,
-  committer,
+  author: _author,
+  committer: _committer,
   signingKey
 }) {
   try {
-    assertParameter('fs', fs)
+    assertParameter('fs', _fs)
     assertParameter('gitdir', gitdir)
     assertParameter('oid', oid)
     assertParameter('note', note)
     if (signingKey) {
-      assertParameter('onPgpSign', onPgpSign)
+      assertParameter('onSign', onSign)
     }
+    const fs = new FileSystem(_fs)
+
+    const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
+    if (!author) throw new GitError(E.MissingAuthorError)
+
+    const committer = await normalizeCommitterObject({ fs, gitdir, author, committer: _committer })
+    if (!committer) throw new GitError(E.MissingCommitterError)
+
     return await _addNote({
       fs: new FileSystem(fs),
-      onPgpSign,
+      onSign,
       gitdir,
       ref,
       oid,

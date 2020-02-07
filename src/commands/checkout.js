@@ -4,7 +4,7 @@ import '../commands/typedefs.js'
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
-import { getConfig } from '../commands/getConfig.js'
+import { setConfig } from '../commands/setConfig.js'
 import { walk } from '../commands/walk.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -66,17 +66,19 @@ export async function checkout ({
       ref: remoteRef
     })
     // Set up remote tracking branch
-    await getConfig({
+    await setConfig({
       fs,
       gitdir,
       path: `branch.${ref}.remote`,
-      value: `${remote}`
+      value: `${remote}`,
+      append: false
     })
-    await getConfig({
+    await setConfig({
       fs,
       gitdir,
       path: `branch.${ref}.merge`,
-      value: `refs/heads/${ref}`
+      value: `refs/heads/${ref}`,
+      append: false
     })
     // Create a new branch that points at that same commit
     await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')

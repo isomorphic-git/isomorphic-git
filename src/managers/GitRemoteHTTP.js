@@ -95,8 +95,8 @@ export class GitRemoteHTTP {
     })
     if (res.statusCode === 401 && onAuth) {
       // Acquire credentials and try again
-      // TODO: actually read `useHttpPath` value from git config
-      auth = await onAuth({ url: _origUrl, useHttpPath: false })
+      // TODO: read `useHttpPath` value from git config and pass as 2nd argument
+      auth = await onAuth(_origUrl)
       const _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
