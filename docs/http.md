@@ -20,8 +20,8 @@ git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git
   .then(console.log)
 ```
 
-If need features that aren't supported currently, like detecting and handling `HTTP_PROXY` environment variables, you can
-make your own HTTP client. (See section below.)
+If you need features that aren't supported currently, like detecting and handling `HTTP_PROXY` environment variables, you can
+wrap your own HTTP client. (See section below.)
 
 ## Browser Client:
 

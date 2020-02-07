@@ -10,7 +10,7 @@ import { E, GitError } from '../models/GitError.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {HttpClient} args.http - [required] an HTTP client
+ * @param {HttpClient} args.http - an HTTP client
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
  * @param {MessageCallback} [args.onMessage] - optional message event callback
  * @param {AuthCallback} [args.onAuth] - optional auth fill callback

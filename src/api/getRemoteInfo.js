@@ -22,7 +22,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * It just communicates to a remote git server, using the first step of the `git-upload-pack` handshake, but stopping short of fetching the packfile.
  *
  * @param {object} args
- * @param {HttpClient} args.http - [required] an HTTP client
+ * @param {HttpClient} args.http - an HTTP client
  * @param {string} args.url - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities.

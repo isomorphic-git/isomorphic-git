@@ -16,7 +16,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
- * @param {HttpClient} args.http - [required] an HTTP client
+ * @param {HttpClient} args.http - an HTTP client
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
  * @param {MessageCallback} [args.onMessage] - optional message event callback
  * @param {AuthCallback} [args.onAuth] - optional auth fill callback
