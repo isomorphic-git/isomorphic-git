@@ -14,7 +14,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  *
  * @param {Object} args
  * @param {FsClient} args.fs - a file system implementation
- * @param {SignCallback} [args.sign] - a PGP signing implementation
+ * @param {SignCallback} [args.onPgpSign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.message - The commit message to use.
@@ -53,7 +53,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  */
 export async function commit ({
   fs: _fs,
-  sign,
+  onPgpSign,
   dir,
   gitdir = join(dir, '.git'),
   message,
@@ -70,7 +70,7 @@ export async function commit ({
     assertParameter('fs', _fs)
     assertParameter('message', message)
     if (signingKey) {
-      assertParameter('sign', sign)
+      assertParameter('onPgpSign', onPgpSign)
     }
     const fs = new FileSystem(_fs)
 
@@ -82,7 +82,7 @@ export async function commit ({
 
     return await _commit({
       fs,
-      sign,
+      onPgpSign,
       gitdir,
       message,
       author,

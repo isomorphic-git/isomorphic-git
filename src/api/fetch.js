@@ -30,9 +30,9 @@ import { GitError, E } from '../models/GitError.js'
  * @param {HttpClient} [args.http] - an HTTP client
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
  * @param {MessageCallback} [args.onMessage] - optional message event callback
- * @param {FillCallback} [args.onFill] - optional auth fill callback
- * @param {ApprovedCallback} [args.onApproved] - optional auth approved callback
- * @param {RejectedCallback} [args.onRejected] - optional auth rejected callback
+ * @param {AuthCallback} [args.onAuth] - optional auth fill callback
+ * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
+ * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.url] - The URL of the remote repository. Will be gotten from gitconfig if absent.
@@ -75,9 +75,9 @@ export async function fetch ({
   http,
   onProgress,
   onMessage,
-  onFill,
-  onApproved,
-  onRejected,
+  onAuth,
+  onAuthSuccess,
+  onAuthFailure,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'HEAD',
@@ -120,9 +120,9 @@ export async function fetch ({
       http,
       onProgress,
       onMessage,
-      onFill,
-      onApproved,
-      onRejected,
+      onAuth,
+      onAuthSuccess,
+      onAuthFailure,
       gitdir,
       ref,
       refs,

@@ -34,7 +34,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
- * @param {SignCallback} [args.sign] - a PGP signing implementation
+ * @param {SignCallback} [args.onPgpSign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
@@ -67,7 +67,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  */
 export async function merge ({
   fs: _fs,
-  sign,
+  onPgpSign,
   dir,
   gitdir = join(dir, '.git'),
   ours,
@@ -83,7 +83,7 @@ export async function merge ({
   try {
     assertParameter('fs', _fs)
     if (signingKey) {
-      assertParameter('sign', sign)
+      assertParameter('onPgpSign', onPgpSign)
     }
     const fs = new FileSystem(_fs)
 

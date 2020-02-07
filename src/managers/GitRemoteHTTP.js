@@ -26,9 +26,9 @@ export class GitRemoteHTTP {
    * @param {Object} args
    * @param {HttpClient} [args.http]
    * @param {ProgressCallback} [args.onProgress]
-   * @param {FillCallback} [args.onFill]
-   * @param {ApprovedCallback} [args.onApproved]
-   * @param {RejectedCallback} [args.onRejected]
+   * @param {AuthCallback} [args.onAuth]
+   * @param {AuthSuccessCallback} [args.onAuthSuccess]
+   * @param {AuthFailureCallback} [args.onAuthFailure]
    * @param {string} [args.corsProxy]
    * @param {string} args.service
    * @param {string} args.url
@@ -39,9 +39,9 @@ export class GitRemoteHTTP {
   static async discover ({
     http = builtinHttp,
     onProgress,
-    onFill,
-    onApproved,
-    onRejected,
+    onAuth,
+    onAuthSuccess,
+    onAuthFailure,
     corsProxy,
     service,
     url,
@@ -93,10 +93,10 @@ export class GitRemoteHTTP {
       url: `${url}/info/refs?service=${service}`,
       headers
     })
-    if (res.statusCode === 401 && onFill) {
+    if (res.statusCode === 401 && onAuth) {
       // Acquire credentials and try again
       // TODO: actually read `useHttpPath` value from git config
-      auth = await onFill({ url: _origUrl, useHttpPath: false })
+      auth = await onAuth({ url: _origUrl, useHttpPath: false })
       const _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
         headers['Authorization'] = calculateBasicAuthHeader(_auth)
@@ -108,10 +108,10 @@ export class GitRemoteHTTP {
         headers
       })
       // Tell credential manager if the credentials were no good
-      if (res.statusCode === 401 && onRejected) {
-        await onRejected({ url: _origUrl, auth })
-      } else if (res.statusCode === 200 && onApproved) {
-        await onApproved({ url: _origUrl, auth })
+      if (res.statusCode === 401 && onAuthFailure) {
+        await onAuthFailure({ url: _origUrl, auth })
+      } else if (res.statusCode === 200 && onAuthSuccess) {
+        await onAuthSuccess({ url: _origUrl, auth })
       }
     }
     if (res.statusCode !== 200) {

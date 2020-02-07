@@ -13,7 +13,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  *
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {SignCallback} [args.sign]
+ * @param {SignCallback} [args.onPgpSign]
  * @param {string} args.gitdir
  * @param {string} args.ref
  * @param {string} [args.message = ref]
@@ -45,7 +45,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  */
 export async function annotatedTag ({
   fs,
-  sign,
+  onPgpSign,
   gitdir,
   ref,
   tagger,
@@ -89,7 +89,7 @@ export async function annotatedTag ({
     signature
   })
   if (signingKey) {
-    tagObject = await GitAnnotatedTag.sign(tagObject, sign, signingKey)
+    tagObject = await GitAnnotatedTag.sign(tagObject, onPgpSign, signingKey)
   }
   const value = await writeObject({
     fs,

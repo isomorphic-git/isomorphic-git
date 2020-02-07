@@ -11,7 +11,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
- * @param {SignCallback} [args.sign] - a PGP signing implementation
+ * @param {SignCallback} [args.onPgpSign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
@@ -37,7 +37,7 @@ import { assertParameter } from '../utils/assertParameter.js'
 
 export async function addNote ({
   fs,
-  sign,
+  onPgpSign,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'refs/notes/commits',
@@ -54,11 +54,11 @@ export async function addNote ({
     assertParameter('oid', oid)
     assertParameter('note', note)
     if (signingKey) {
-      assertParameter('sign', sign)
+      assertParameter('onPgpSign', onPgpSign)
     }
     return await _addNote({
       fs: new FileSystem(fs),
-      sign,
+      onPgpSign,
       gitdir,
       ref,
       oid,

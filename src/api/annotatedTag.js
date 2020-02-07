@@ -10,7 +10,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
- * @param {SignCallback} [args.sign] - a PGP signing implementation
+ * @param {SignCallback} [args.onPgpSign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ref - What to name the tag
@@ -43,7 +43,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  */
 export async function annotatedTag ({
   fs,
-  sign,
+  onPgpSign,
   dir,
   gitdir = join(dir, '.git'),
   ref,
@@ -59,11 +59,11 @@ export async function annotatedTag ({
     assertParameter('gitdir', gitdir)
     assertParameter('ref', ref)
     if (signingKey) {
-      assertParameter('sign', sign)
+      assertParameter('onPgpSign', onPgpSign)
     }
     return await _annotatedTag({
       fs: new FileSystem(fs),
-      sign,
+      onPgpSign,
       gitdir,
       ref,
       tagger,

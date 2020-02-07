@@ -162,7 +162,7 @@
  */
 
 /**
- * @callback FillCallback
+ * @callback AuthCallback
  * @param {FillParams} args
  * @returns {Promise<GitAuth>}
  */
@@ -174,7 +174,7 @@
  */
 
 /**
- * @callback ApprovedCallback
+ * @callback AuthSuccessCallback
  * @param {ApprovedParams} args
  * @returns {Promise<void>}
  */
@@ -186,7 +186,7 @@
  */
 
 /**
- * @callback RejectedCallback
+ * @callback AuthFailureCallback
  * @param {RejectededParams} args
  * @returns {Promise<void>}
  */

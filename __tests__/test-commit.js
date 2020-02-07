@@ -223,14 +223,14 @@ describe('commit', () => {
         timezoneOffset: 0
       },
       signingKey: privateKey,
-      sign: pgp.sign
+      onPgpSign: pgp.sign
     })
     const keys = await verify({
       fs,
       gitdir,
       ref: 'HEAD',
       publicKeys: publicKey,
-      verify: pgp.verify
+      onPgpVerify: pgp.verify
     })
     expect(keys[0]).toBe('f2f0ced8a52613c4')
   })

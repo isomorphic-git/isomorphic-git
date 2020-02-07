@@ -12,7 +12,7 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
  *
  * @param {Object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {SignCallback} [args.sign]
+ * @param {SignCallback} [args.onPgpSign]
  * @param {string} args.gitdir
  * @param {string} args.message
  * @param {Object} args.author
@@ -36,7 +36,7 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
  */
 export async function commit ({
   fs,
-  sign,
+  onPgpSign,
   gitdir,
   message,
   author,
@@ -85,7 +85,7 @@ export async function commit ({
       message
     })
     if (signingKey) {
-      comm = await GitCommit.sign(comm, sign, signingKey)
+      comm = await GitCommit.sign(comm, onPgpSign, signingKey)
     }
     const oid = await writeObject({
       fs,

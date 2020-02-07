@@ -33,9 +33,9 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {HttpClient} [args.http]
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
- * @param {FillCallback} [args.onFill]
- * @param {ApprovedCallback} [args.onApproved]
- * @param {RejectedCallback} [args.onRejected]
+ * @param {AuthCallback} [args.onAuth]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
+ * @param {AuthFailureCallback} [args.onAuthFailure]
  * @param {string} args.gitdir
  * @param {string} [args.ref]
  * @param {string} [args.remoteRef]
@@ -69,9 +69,9 @@ export async function push ({
   http,
   onProgress,
   onMessage,
-  onFill,
-  onApproved,
-  onRejected,
+  onAuth,
+  onAuthSuccess,
+  onAuthFailure,
   gitdir,
   ref,
   remoteRef,
@@ -113,9 +113,9 @@ export async function push ({
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const httpRemote = await GitRemoteHTTP.discover({
     http,
-    onFill,
-    onApproved,
-    onRejected,
+    onAuth,
+    onAuthSuccess,
+    onAuthFailure,
     corsProxy,
     service: 'git-receive-pack',
     url,

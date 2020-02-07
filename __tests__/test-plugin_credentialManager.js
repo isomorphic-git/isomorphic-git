@@ -26,17 +26,17 @@ describe('credentialManager', () => {
       gitdir,
       remote: 'auth',
       ref: 'master',
-      async onFill ({ url }) {
+      async onAuth ({ url }) {
         fillCalled = true
         return {
           username: 'testuser',
           password: 'testpassword'
         }
       },
-      async onApproved (auth) {
+      async onAuthSuccess (auth) {
         approvedCalled = true
       },
-      async onRejected (auth) {
+      async onAuthFailure (auth) {
         rejectedCalled = true
       }
     })
@@ -64,17 +64,17 @@ describe('credentialManager', () => {
         gitdir,
         remote: 'auth',
         ref: 'master',
-        async onFill ({ url }) {
+        async onAuth ({ url }) {
           fillCalled = true
           return {
             username: 'testuser',
             password: 'NoT_rIgHt'
           }
         },
-        async onApproved (auth) {
+        async onAuthSuccess (auth) {
           approvedCalled = true
         },
-        async onRejected (auth) {
+        async onAuthFailure (auth) {
           rejectedCalled = true
         }
       })

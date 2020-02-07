@@ -9,7 +9,7 @@ import { writeTree } from './writeTree.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {SignCallback} [args.sign]
+ * @param {SignCallback} [args.onPgpSign]
  * @param {string} [args.dir]
  * @param {string} [args.gitdir=join(dir,'.git')]
  * @param {string} [args.ref]
@@ -31,7 +31,7 @@ import { writeTree } from './writeTree.js'
 
 export async function removeNote ({
   fs,
-  sign,
+  onPgpSign,
   gitdir,
   ref = 'refs/notes/commits',
   oid,
@@ -70,7 +70,7 @@ export async function removeNote ({
   // Create the new note commit
   const commitOid = await commit({
     fs,
-    sign,
+    onPgpSign,
     gitdir,
     ref,
     tree: treeOid,

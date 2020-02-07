@@ -36,9 +36,9 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {HttpClient} [args.http]
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
- * @param {FillCallback} [args.onFill]
- * @param {ApprovedCallback} [args.onApproved]
- * @param {RejectedCallback} [args.onRejected]
+ * @param {AuthCallback} [args.onAuth]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
+ * @param {AuthFailureCallback} [args.onAuthFailure]
  * @param {string} args.gitdir
  * @param {string|void} [args.url]
  * @param {string} [args.corsProxy]
@@ -68,9 +68,9 @@ export async function fetch ({
   http,
   onProgress,
   onMessage,
-  onFill,
-  onApproved,
-  onRejected,
+  onAuth,
+  onAuthSuccess,
+  onAuthFailure,
   gitdir,
   ref = 'HEAD',
   refs = [ref],
@@ -116,9 +116,9 @@ export async function fetch ({
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const remoteHTTP = await GitRemoteHTTP.discover({
     http,
-    onFill,
-    onApproved,
-    onRejected,
+    onAuth,
+    onAuthSuccess,
+    onAuthFailure,
     corsProxy,
     service: 'git-upload-pack',
     url,

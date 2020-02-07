@@ -11,7 +11,7 @@ import { E, GitError } from '../models/GitError.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {SignCallback} [args.sign]
+ * @param {SignCallback} [args.onPgpSign]
  * @param {string} args.gitdir
  * @param {string} args.ref
  * @param {string} args.oid
@@ -36,7 +36,7 @@ import { E, GitError } from '../models/GitError.js'
 
 export async function addNote ({
   fs,
-  sign,
+  onPgpSign,
   gitdir,
   ref,
   oid,
@@ -99,7 +99,7 @@ export async function addNote ({
   // Create the new note commit
   const commitOid = await commit({
     fs,
-    sign,
+    onPgpSign,
     gitdir,
     ref,
     tree: treeOid,

@@ -13,9 +13,9 @@ import { GitError, E } from '../models/GitError.js'
  * @param {HttpClient} [args.http] - an HTTP client
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
  * @param {MessageCallback} [args.onMessage] - optional message event callback
- * @param {FillCallback} [args.onFill] - optional auth fill callback
- * @param {ApprovedCallback} [args.onApproved] - optional auth approved callback
- * @param {RejectedCallback} [args.onRejected] - optional auth rejected callback
+ * @param {AuthCallback} [args.onAuth] - optional auth fill callback
+ * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
+ * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
  * @param {string} args.dir
  * @param {string} args.gitdir
  * @param {string} args.ref - Which branch to fetch. By default this is the currently checked out branch.
@@ -50,9 +50,9 @@ export async function pull ({
   http,
   onProgress,
   onMessage,
-  onFill,
-  onApproved,
-  onRejected,
+  onAuth,
+  onAuthSuccess,
+  onAuthFailure,
   dir,
   gitdir,
   ref,
@@ -90,9 +90,9 @@ export async function pull ({
       http,
       onProgress,
       onMessage,
-      onFill,
-      onApproved,
-      onRejected,
+      onAuth,
+      onAuthSuccess,
+      onAuthFailure,
       gitdir,
       noGitSuffix,
       corsProxy,
