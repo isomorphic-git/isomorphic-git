@@ -2,6 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { fetch, push } = require('isomorphic-git')
+const { http } = require('isomorphic-git/http')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -23,6 +24,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await fetch({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'tester-at-260687965765',
@@ -48,6 +50,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await push({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'tester-at-260687965765',
@@ -75,6 +78,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await fetch({
         fs,
+        http,
         noGitSuffix: true,
         gitdir,
         // corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
@@ -99,6 +103,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await push({
         fs,
+        http,
         noGitSuffix: true,
         gitdir,
         // corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
@@ -129,6 +134,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await push({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git',
@@ -156,6 +162,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await fetch({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git',
@@ -183,6 +190,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await fetch({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         token: token,
@@ -207,6 +215,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await push({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         token: token,
@@ -235,6 +244,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await fetch({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git-test-push',
@@ -260,6 +270,7 @@ describe('Hosting Providers', () => {
       // Test
       const res = await push({
         fs,
+        http,
         gitdir,
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphic-git-test-push',

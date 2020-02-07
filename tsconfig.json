@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "isomorphic-git": ["./dist/index.d.ts"],
-      "isomorphic-git/internal-apis": ["./src/internal-apis.d.ts"]
+      "isomorphic-git/internal-apis": ["./src/internal-apis.d.ts"],
+      "isomorphic-git/http": ["./src/http.d.ts"]
     }
   }
 }

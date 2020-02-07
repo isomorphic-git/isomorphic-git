@@ -2,6 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { clone, checkout, listFiles, commit } = require('isomorphic-git')
+const { http } = require('isomorphic-git/http')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -12,6 +13,7 @@ describe('submodule "support"', () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       url: `http://${localhost}:8888/test-submodules.git`,
@@ -26,6 +28,7 @@ describe('submodule "support"', () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       url: `http://${localhost}:8888/test-submodules.git`,
@@ -51,6 +54,7 @@ describe('submodule "support"', () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       ref: 'no-modules',
@@ -74,6 +78,7 @@ describe('submodule "support"', () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-submodules')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       url: `http://${localhost}:8888/test-submodules.git`,

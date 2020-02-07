@@ -2,6 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { clone } = require('isomorphic-git')
+const { http } = require('isomorphic-git/http')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -16,6 +17,7 @@ describe('clone', () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       depth: 1,
@@ -37,6 +39,7 @@ describe('clone', () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       depth: 1,
@@ -58,6 +61,7 @@ describe('clone', () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       depth: 1,
@@ -82,6 +86,7 @@ describe('clone', () => {
     try {
       await clone({
         fs,
+        http,
         dir,
         gitdir,
         depth: 1,
@@ -101,6 +106,7 @@ describe('clone', () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       depth: 1,
@@ -123,6 +129,7 @@ describe('clone', () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-empty')
     await clone({
       fs,
+      http,
       dir,
       gitdir,
       depth: 1,
