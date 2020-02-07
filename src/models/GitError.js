@@ -3,9 +3,9 @@
 
 const messages = {
   FileReadError: `Could not read file "{ filepath }".`,
-  MissingRequiredParameterError: `The function "{ function }" requires a "{ parameter }" parameter but none was provided.`,
+  MissingRequiredParameterError: `The function requires a "{ parameter }" parameter but none was provided.`,
   InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
-  InvalidParameterCombinationError: `The function "{ function }" doesn't take these parameters simultaneously: { parameters }`,
+  InvalidParameterCombinationError: `The function doesn't take these parameters simultaneously: { parameters }`,
   RefExistsError: `Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`,
   RefNotExistsError: `Failed to { verb } { noun } "{ ref }" because { noun } "{ ref }" does not exists.`,
   BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,

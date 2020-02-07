@@ -15,6 +15,7 @@ describe('clone', () => {
   xit('clone with noTags', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
+      fs,
       dir,
       gitdir,
       depth: 1,
@@ -35,6 +36,7 @@ describe('clone', () => {
   it('clone with noCheckout', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
+      fs,
       dir,
       gitdir,
       depth: 1,
@@ -55,6 +57,7 @@ describe('clone', () => {
   it('clone a tag', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
+      fs,
       dir,
       gitdir,
       depth: 1,
@@ -73,11 +76,12 @@ describe('clone', () => {
     expect(await fs.exists(`${dir}/package.json`)).toBe(true)
   })
   it('clone with an unregistered protocol', async () => {
-    const { dir, gitdir } = await makeFixture('isomorphic-git')
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     const url = `foobar://github.com/isomorphic-git/isomorphic-git`
     let error = null
     try {
       await clone({
+        fs,
         dir,
         gitdir,
         depth: 1,
@@ -96,6 +100,7 @@ describe('clone', () => {
   it('clone from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
     await clone({
+      fs,
       dir,
       gitdir,
       depth: 1,
@@ -117,6 +122,7 @@ describe('clone', () => {
   it('clone empty repository from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-empty')
     await clone({
+      fs,
       dir,
       gitdir,
       depth: 1,

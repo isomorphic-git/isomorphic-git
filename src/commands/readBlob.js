@@ -1,7 +1,4 @@
 // @ts-check
-import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { resolveBlob } from '../utils/resolveBlob.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
@@ -14,50 +11,23 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  */
 
 /**
- * Read a blob object directly
- *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} args.oid - The SHA-1 object id to get. Annotated tags, commits, and trees are peeled.
- * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the blob object at that filepath.
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} args.gitdir
+ * @param {string} args.oid
+ * @param {string} [args.filepath]
  *
  * @returns {Promise<ReadBlobResult>} Resolves successfully with a blob object description
  * @see ReadBlobResult
- *
- * @example
- * // Get the contents of 'README.md' in the master branch.
- * let commitOid = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
- * console.log(commitOid)
- * let { object: blob } = await git.readBlob({
- *   dir: '$input((/))',
- *   oid: $input((commitOid)),
- *   $textarea((filepath: 'README.md'
- * })
- * console.log(blob.toString('utf8'))
- *
  */
-export async function readBlob ({
-  core = 'default',
-  dir,
-  gitdir = join(dir, '.git'),
-  oid,
-  filepath = undefined
-}) {
-  try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
-    if (filepath !== undefined) {
-      oid = await resolveFilepath({ fs, gitdir, oid, filepath })
-    }
-    const blob = await resolveBlob({
-      fs,
-      gitdir,
-      oid
-    })
-    return blob
-  } catch (err) {
-    err.caller = 'git.readBlob'
-    throw err
+export async function readBlob ({ fs, gitdir, oid, filepath = undefined }) {
+  if (filepath !== undefined) {
+    oid = await resolveFilepath({ fs, gitdir, oid, filepath })
   }
+  const blob = await resolveBlob({
+    fs,
+    gitdir,
+    oid
+  })
+  return blob
 }

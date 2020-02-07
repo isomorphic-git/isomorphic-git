@@ -4,8 +4,6 @@ const path = require('path')
 const table = require('markdown-table')
 const git = require('../..')
 
-git.plugins.fs(fs)
-
 const dir = path.join(__dirname, '..', '..')
 const ref = process.argv[2] || 'HEAD'
 
@@ -98,6 +96,10 @@ function gentypedef (ast) {
 async function gendoc (file, filepath) {
   // Fix some TypeScript-isms that jsdoc doesn't like
   file = file.replace(/\{import\('events'\)\.EventEmitter\}/g, '{EventEmitter}')
+  file = file.replace(
+    /\{import\('..\/models\/FileSystem\.js'\)\.FileSystem\}/g,
+    '{FileSystem}'
+  )
   let ast
   try {
     ast = await jsdoc.explain({ source: file })
@@ -146,7 +148,9 @@ async function gendoc (file, filepath) {
           if (param.name === '_' || param.name === 'args') continue
 
           let name = param.name.replace('_.', '').replace('args.', '')
+          const shouldLink = name.startsWith('on')
           if (!param.optional) name = `**${name}**`
+          if (shouldLink) name = `[${name}](./${name})`
 
           let type = param.type.names.map(escapeType).join(' | ')
           if (param.type.names[0] === 'function') {
@@ -249,39 +253,40 @@ async function gendoc (file, filepath) {
   gitignoreContent += '# AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE\n'
   gitignoreContent += 'docs/errors.md\n'
 
-  const oid = await git.resolveRef({ dir, ref })
-  const { tree } = await git.readTree({ dir, oid, filepath: 'src/commands' })
+  const oid = await git.resolveRef({ fs, dir, ref })
+  const { tree } = await git.readTree({
+    fs,
+    dir,
+    oid,
+    filepath: 'src/api'
+  })
   const entries = tree.filter(
     entry => entry.type === 'blob' && !entry.path.startsWith('_')
   )
 
   const docs = []
-  const processEntry = async entry => {
+  const processEntry = async (prefix, name) => {
     // Load file
     const { blob } = await git.readBlob({
+      fs,
       dir,
       oid,
-      filepath: `src/commands/${entry.path}`
+      filepath: `${prefix}/${name}`
     })
     const filetext = Buffer.from(blob).toString('utf8')
-    const doctext = await gendoc(filetext, entry.path)
+    const doctext = await gendoc(filetext, name)
     if (doctext !== '') {
-      const docfilename = entry.path.replace(/js$/, 'md')
+      const docfilename = name.replace(/js$/, 'md')
       fs.writeFileSync(path.join(docDir, docfilename), doctext)
       docs.push(`docs/${docfilename}`)
     }
   }
 
   // Generate the shared typedefs
-  const typedefsIndex = entries.findIndex(entry =>
-    entry.path.endsWith('typedefs.js')
-  )
-  const typedefsEntry = entries[typedefsIndex]
-  entries.splice(typedefsIndex, 1)
-  await processEntry(typedefsEntry)
+  await processEntry('src/commands', 'typedefs.js')
 
   // Generate all the docs
-  await Promise.all(entries.map(processEntry))
+  await Promise.all(entries.map(entry => processEntry('src/api', entry.path)))
 
   docs.sort()
   gitignoreContent += docs.join('\n') + '\n'
@@ -293,6 +298,7 @@ async function gendoc (file, filepath) {
 
   const docFile = path.join(__dirname, '..', '..', 'docs', 'errors.md')
   const { blob } = await git.readBlob({
+    fs,
     dir,
     oid,
     filepath: 'src/models/GitError.js'

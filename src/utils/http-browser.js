@@ -2,9 +2,7 @@ import { fromStream } from './AsyncIterator.js'
 import { collect } from './collect.js'
 
 export async function http ({
-  core,
-  emitter,
-  emitterPrefix,
+  onProgress,
   url,
   method = 'GET',
   headers = {},

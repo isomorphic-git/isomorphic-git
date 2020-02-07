@@ -6,9 +6,10 @@ const { listNotes } = require('isomorphic-git')
 describe('listNotes', () => {
   it('from default branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listNotes')
+    const { fs, gitdir } = await makeFixture('test-listNotes')
     // Test
     const notes = await listNotes({
+      fs,
       gitdir
     })
     expect(notes.length).toBe(3)
@@ -29,9 +30,10 @@ describe('listNotes', () => {
   })
   it('from alternate branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listNotes')
+    const { fs, gitdir } = await makeFixture('test-listNotes')
     // Test
     const notes = await listNotes({
+      fs,
       gitdir,
       ref: 'refs/notes/alt'
     })
@@ -45,9 +47,10 @@ describe('listNotes', () => {
   })
   it('from non-existant branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listNotes')
+    const { fs, gitdir } = await makeFixture('test-listNotes')
     // Test
     const notes = await listNotes({
+      fs,
       gitdir,
       ref: 'refs/notes/alt2'
     })

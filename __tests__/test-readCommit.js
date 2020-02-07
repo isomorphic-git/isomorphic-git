@@ -12,11 +12,12 @@ describe('readCommit', () => {
   })
   it('test missing', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readCommit')
+    const { fs, gitdir } = await makeFixture('test-readCommit')
     // Test
     let error = null
     try {
       await readCommit({
+        fs,
         gitdir,
         oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
       })
@@ -28,9 +29,10 @@ describe('readCommit', () => {
   })
   it('parsed', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readCommit')
+    const { fs, gitdir } = await makeFixture('test-readCommit')
     // Test
     const result = await readCommit({
+      fs,
       gitdir,
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
@@ -38,9 +40,10 @@ describe('readCommit', () => {
   })
   it('from packfile', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readCommit')
+    const { fs, gitdir } = await makeFixture('test-readCommit')
     // Test
     const result = await readCommit({
+      fs,
       gitdir,
       oid: '0b8faa11b353db846b40eb064dfb299816542a46'
     })
@@ -48,9 +51,10 @@ describe('readCommit', () => {
   })
   it('peels tags', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readCommit')
+    const { fs, gitdir } = await makeFixture('test-readCommit')
     // Test
     const result = await readCommit({
+      fs,
       gitdir,
       oid: '587d3f8290b513e2ee85ecd317e6efecd545aee6'
     })

@@ -5,15 +5,9 @@ import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
 
 /**
- * Get a git commit `Walker`
- *
- * See [walk](./walk.md)
- *
  * @param {object} args
- * @param {string} [args.ref='HEAD'] - The commit to walk
- *
- * @returns {Walker} Returns a git commit Walker
- *
+ * @param {string} [args.ref='HEAD']
+ * @returns {Walker}
  */
 export function TREE ({ ref = 'HEAD' }) {
   const o = Object.create(null)

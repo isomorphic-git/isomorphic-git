@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { plugins, config, push, E } = require('isomorphic-git')
+const { setConfig, push, E } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -10,9 +10,9 @@ const localhost =
 describe('credentialManager', () => {
   it('with valid credentials', async () => {
     // Setup
-    const { gitdir, core } = await makeFixture('test-push')
-    await config({
-      core,
+    const { fs, gitdir } = await makeFixture('test-push')
+    await setConfig({
+      fs,
       gitdir,
       path: 'remote.auth.url',
       value: `http://${localhost}:8888/test-push-server-auth.git`
@@ -21,29 +21,24 @@ describe('credentialManager', () => {
     let fillCalled = false
     let approvedCalled = false
     let rejectedCalled = false
-    plugins.credentialManager(
-      {
-        async fill ({ url }) {
-          fillCalled = true
-          return {
-            username: 'testuser',
-            password: 'testpassword'
-          }
-        },
-        async approved (auth) {
-          approvedCalled = true
-        },
-        async rejected (auth) {
-          rejectedCalled = true
-        }
-      },
-      core
-    )
     await push({
-      core,
+      fs,
       gitdir,
       remote: 'auth',
-      ref: 'master'
+      ref: 'master',
+      async onAuth ({ url }) {
+        fillCalled = true
+        return {
+          username: 'testuser',
+          password: 'testpassword'
+        }
+      },
+      async onAuthSuccess (auth) {
+        approvedCalled = true
+      },
+      async onAuthFailure (auth) {
+        rejectedCalled = true
+      }
     })
     expect(fillCalled).toBe(true)
     expect(approvedCalled).toBe(true)
@@ -51,9 +46,9 @@ describe('credentialManager', () => {
   })
   it('with invalid credentials', async () => {
     // Setup
-    const { gitdir, core } = await makeFixture('test-push')
-    await config({
-      core,
+    const { fs, gitdir } = await makeFixture('test-push')
+    await setConfig({
+      fs,
       gitdir,
       path: 'remote.auth.url',
       value: `http://${localhost}:8888/test-push-server-auth.git`
@@ -62,31 +57,26 @@ describe('credentialManager', () => {
     let fillCalled = false
     let approvedCalled = false
     let rejectedCalled = false
-    plugins.credentialManager(
-      {
-        async fill ({ url }) {
+    let err
+    try {
+      await push({
+        fs,
+        gitdir,
+        remote: 'auth',
+        ref: 'master',
+        async onAuth ({ url }) {
           fillCalled = true
           return {
             username: 'testuser',
             password: 'NoT_rIgHt'
           }
         },
-        async approved (auth) {
+        async onAuthSuccess (auth) {
           approvedCalled = true
         },
-        async rejected (auth) {
+        async onAuthFailure (auth) {
           rejectedCalled = true
         }
-      },
-      core
-    )
-    let err
-    try {
-      await push({
-        core,
-        gitdir,
-        remote: 'auth',
-        ref: 'master'
       })
     } catch (e) {
       err = e

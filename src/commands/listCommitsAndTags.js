@@ -6,16 +6,15 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 export async function listCommitsAndTags ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   start,
   finish
 }) {
-  const fs = new FileSystem(cores.get(core).get('fs'))
+  const fs = new FileSystem(_fs)
   const shallows = await GitShallowManager.read({ fs, gitdir })
   const startingSet = new Set()
   const finishingSet = new Set()

@@ -146,10 +146,10 @@ export class GitCommit {
     return outdent(signature)
   }
 
-  static async sign (commit, pgp, secretKey) {
+  static async sign (commit, sign, secretKey) {
     const payload = commit.withoutSignature()
     const message = GitCommit.justMessage(commit._commit)
-    let { signature } = await pgp.sign({ payload, secretKey })
+    let { signature } = await sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
     const headers = GitCommit.justHeaders(commit._commit)
@@ -159,9 +159,9 @@ export class GitCommit {
     return GitCommit.from(signedCommit)
   }
 
-  static async verify (commit, pgp, publicKey) {
+  static async verify (commit, verify, publicKey) {
     const payload = commit.withoutSignature()
     const signature = commit.isolateSignature()
-    return pgp.verify({ payload, publicKey, signature })
+    return verify({ payload, publicKey, signature })
   }
 }

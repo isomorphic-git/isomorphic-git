@@ -11,19 +11,20 @@ describe('log', () => {
     registerSnapshots(snapshots)
   })
   it('HEAD', async () => {
-    const { gitdir } = await makeFixture('test-log')
-    const commits = await log({ gitdir, ref: 'HEAD' })
+    const { fs, gitdir } = await makeFixture('test-log')
+    const commits = await log({ fs, gitdir, ref: 'HEAD' })
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
   })
   it('HEAD depth', async () => {
-    const { gitdir } = await makeFixture('test-log')
-    const commits = await log({ gitdir, ref: 'HEAD', depth: 1 })
+    const { fs, gitdir } = await makeFixture('test-log')
+    const commits = await log({ fs, gitdir, ref: 'HEAD', depth: 1 })
     expect(commits.length).toBe(1)
   })
   it('HEAD since', async () => {
-    const { gitdir } = await makeFixture('test-log')
+    const { fs, gitdir } = await makeFixture('test-log')
     const commits = await log({
+      fs,
       gitdir,
       ref: 'HEAD',
       since: new Date(1501462174000)
@@ -31,15 +32,15 @@ describe('log', () => {
     expect(commits.length).toBe(2)
   })
   it('shallow branch', async () => {
-    const { gitdir } = await makeFixture('test-log')
-    const commits = await log({ gitdir, ref: 'origin/shallow-branch' })
+    const { fs, gitdir } = await makeFixture('test-log')
+    const commits = await log({ fs, gitdir, ref: 'origin/shallow-branch' })
     expect(commits).toMatchSnapshot()
   })
   it('has signing payloads', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-log')
+    const { fs, gitdir } = await makeFixture('test-log')
     // Test
-    const commits = await log({ gitdir, ref: 'HEAD' })
+    const commits = await log({ fs, gitdir, ref: 'HEAD' })
     expect(commits.length).toBe(5)
     expect(commits).toMatchSnapshot()
     // Verify
@@ -103,8 +104,8 @@ dGs=
     }
   })
   it('with complex merging history', async () => {
-    const { gitdir } = await makeFixture('test-log-complex')
-    const commits = await log({ gitdir, ref: 'master' })
+    const { fs, gitdir } = await makeFixture('test-log-complex')
+    const commits = await log({ fs, gitdir, ref: 'master' })
     expect(commits).toMatchSnapshot()
   })
 })
