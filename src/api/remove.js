@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Remove a file from the git index (aka staging area)
@@ -35,9 +35,12 @@ export async function remove ({
     assertParameter('gitdir', gitdir)
     assertParameter('filepath', filepath)
 
-    await GitIndexManager.acquire({ fs: new FileSystem(_fs), gitdir }, async function (index) {
-      index.delete({ filepath })
-    })
+    await GitIndexManager.acquire(
+      { fs: new FileSystem(_fs), gitdir },
+      async function (index) {
+        index.delete({ filepath })
+      }
+    )
   } catch (err) {
     err.caller = 'git.remove'
     throw err

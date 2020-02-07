@@ -1,9 +1,10 @@
 // @ts-check
 import '../commands/typedefs.js'
+
 import { checkout as _checkout } from '../commands/checkout.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Checkout a branch

@@ -90,8 +90,13 @@ export async function merge ({
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author && !fastForwardOnly) throw new GitError(E.MissingAuthorError)
 
-    const committer = await normalizeCommitterObject({ fs, gitdir, author, committer: _committer })
-    if (!committer && !fastForwardOnly) throw new GitError(E.MissingCommitterError)
+    const committer = await normalizeCommitterObject({
+      fs,
+      gitdir,
+      author,
+      committer: _committer
+    })
+    if (!committer && !fastForwardOnly) { throw new GitError(E.MissingCommitterError) }
 
     return await _merge({
       fs,

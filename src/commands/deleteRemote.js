@@ -9,11 +9,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  *
  * @returns {Promise<void>}
  */
-export async function deleteRemote ({
-  fs,
-  gitdir,
-  remote
-}) {
+export async function deleteRemote ({ fs, gitdir, remote }) {
   const config = await GitConfigManager.get({ fs, gitdir })
   await config.deleteSection('remote', remote)
   await GitConfigManager.save({ fs, gitdir, config })

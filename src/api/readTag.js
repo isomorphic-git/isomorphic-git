@@ -1,10 +1,9 @@
-
 import '../commands/typedefs.js'
 
-import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { readTag as _readTag } from '../commands/readTag.js'
+import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  *
@@ -28,12 +27,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @see TagObject
  *
  */
-export async function readTag ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  oid
-}) {
+export async function readTag ({ fs, dir, gitdir = join(dir, '.git'), oid }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

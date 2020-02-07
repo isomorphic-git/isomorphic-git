@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { addRemote as _addRemote } from '../commands/addRemote.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Add or update a remote

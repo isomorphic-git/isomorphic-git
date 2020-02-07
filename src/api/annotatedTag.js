@@ -1,11 +1,12 @@
 // @ts-check
 import '../commands/typedefs.js'
+
 import { annotatedTag as _annotatedTag } from '../commands/annotatedTag.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
+import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
-import { GitError, E } from '../models/GitError.js'
 
 /**
  * Create an annotated tag.

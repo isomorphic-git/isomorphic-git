@@ -37,9 +37,7 @@ export async function walk ({
   // The default iterate function walks all children concurrently
   iterate = (walk, children) => Promise.all([...children].map(walk))
 }) {
-  const walkers = trees.map(proxy =>
-    proxy[GitWalkSymbol]({ fs, dir, gitdir })
-  )
+  const walkers = trees.map(proxy => proxy[GitWalkSymbol]({ fs, dir, gitdir }))
 
   const root = new Array(walkers.length).fill('.')
   const range = arrayRange(0, walkers.length)

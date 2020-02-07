@@ -93,11 +93,14 @@ export async function fetch ({
   pruneTags = false
 }) {
   // Lookup remote tracking branch.
-  remote = remote || await getConfig({
-    fs,
-    gitdir,
-    path: `branch.${ref}.remote`
-  }) || 'origin'
+  remote =
+    remote ||
+    (await getConfig({
+      fs,
+      gitdir,
+      path: `branch.${ref}.remote`
+    })) ||
+    'origin'
   // Set missing values
   if (typeof url === 'undefined') {
     url = await getConfig({
@@ -106,7 +109,11 @@ export async function fetch ({
       path: `remote.${remote}.url`
     })
     // TODO: throw better error
-    if (typeof url === 'undefined') throw new GitError(E.MissingRequiredParameterError, { parameter: 'remote OR url' })
+    if (typeof url === 'undefined') {
+      throw new GitError(E.MissingRequiredParameterError, {
+        parameter: 'remote OR url'
+      })
+    }
   }
 
   if (corsProxy === void 0) {

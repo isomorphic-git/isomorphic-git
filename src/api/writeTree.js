@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { writeTree as _writeTree } from '../commands/writeTree.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Write a tree object directly
@@ -20,12 +20,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @see TreeEntry
  *
  */
-export async function writeTree ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  tree
-}) {
+export async function writeTree ({ fs, dir, gitdir = join(dir, '.git'), tree }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

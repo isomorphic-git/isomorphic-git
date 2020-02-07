@@ -21,11 +21,7 @@ import { readObject } from '../storage/readObject.js'
  *
  * @returns {Promise<ReadTagResult>}
  */
-export async function readTag ({
-  fs,
-  gitdir,
-  oid
-}) {
+export async function readTag ({ fs, gitdir, oid }) {
   const { type, object } = await readObject({
     fs,
     gitdir,

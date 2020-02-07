@@ -1,8 +1,6 @@
 // @ts-check
 import '../commands/typedefs.js'
 
-// import diff3 from 'node-diff3'
-
 import { commit } from '../commands/commit'
 import { currentBranch } from '../commands/currentBranch.js'
 import { findMergeBase } from '../commands/findMergeBase.js'
@@ -11,6 +9,7 @@ import { E, GitError } from '../models/GitError.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { mergeTree } from '../utils/mergeTree.js'
 
+// import diff3 from 'node-diff3'
 /**
  *
  * @typedef {Object} MergeResult - Returns an object with a schema like this:

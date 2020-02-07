@@ -7,9 +7,9 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { readObject as _readObject } from '../storage/readObject.js'
+import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 import { resolveTree } from '../utils/resolveTree.js'
-import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  *

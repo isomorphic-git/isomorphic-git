@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Expand an abbreviated ref to its full name
@@ -22,12 +22,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * console.log(fullRef)
  *
  */
-export async function expandRef ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  ref
-}) {
+export async function expandRef ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

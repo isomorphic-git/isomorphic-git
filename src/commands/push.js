@@ -1,8 +1,8 @@
 // @ts-check
 import '../commands/typedefs.js'
 
-import { getConfig } from '../commands/getConfig.js'
 import { findMergeBase } from '../commands/findMergeBase.js'
+import { getConfig } from '../commands/getConfig.js'
 import { isDescendent } from '../commands/isDescendent.js'
 import { listCommitsAndTags } from '../commands/listCommitsAndTags.js'
 import { listObjects } from '../commands/listObjects.js'

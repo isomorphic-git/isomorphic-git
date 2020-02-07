@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { getConfigAll as _getConfigAll } from '../commands/getConfigAll.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Read multi-valued entry from the git config files.

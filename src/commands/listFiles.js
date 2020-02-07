@@ -12,11 +12,7 @@ import { join } from '../utils/join'
  *
  * @returns {Promise<Array<string>>}
  */
-export async function listFiles ({
-  fs,
-  gitdir,
-  ref
-}) {
+export async function listFiles ({ fs, gitdir, ref }) {
   if (ref) {
     const oid = await GitRefManager.resolve({ gitdir, fs, ref })
     const filenames = []

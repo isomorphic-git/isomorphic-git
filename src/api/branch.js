@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { branch as _branch } from '../commands/branch.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Create a branch

@@ -14,13 +14,7 @@ import { readObject } from '../storage/readObject.js'
  *
  * @returns {Promise<boolean>}
  */
-export async function isDescendent ({
-  fs,
-  gitdir,
-  oid,
-  ancestor,
-  depth
-}) {
+export async function isDescendent ({ fs, gitdir, oid, ancestor, depth }) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   if (!oid) {
     throw new GitError(E.MissingRequiredParameterError, {

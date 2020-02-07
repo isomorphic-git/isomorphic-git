@@ -2,9 +2,9 @@
 import '../commands/typedefs.js'
 
 import { setConfig as _setConfig } from '../commands/setConfig.js'
-import { join } from '../utils/join.js'
-import { assertParameter } from '../utils/assertParameter.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Write an entry to the git config files.

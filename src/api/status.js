@@ -7,10 +7,10 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
+import { assertParameter } from '../utils/assertParameter.js'
 import { compareStats } from '../utils/compareStats.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
-import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  * Tell whether a file has been changed

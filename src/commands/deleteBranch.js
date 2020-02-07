@@ -13,11 +13,7 @@ import { E, GitError } from '../models/GitError.js'
  *
  * @returns {Promise<void>}
  */
-export async function deleteBranch ({
-  fs,
-  gitdir,
-  ref
-}) {
+export async function deleteBranch ({ fs, gitdir, ref }) {
   if (ref !== cleanGitRef.clean(ref)) {
     throw new GitError(E.InvalidRefNameError, {
       verb: 'delete',

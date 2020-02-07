@@ -1,13 +1,13 @@
 // @ts-check
 import '../commands/typedefs.js'
 
-import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join'
 import { addNote as _addNote } from '../commands/addNote.js'
-import { assertParameter } from '../utils/assertParameter.js'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
-import { GitError } from '../models/GitError.js'
 import { E } from '../index.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { GitError } from '../models/GitError.js'
+import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
 /**
@@ -65,7 +65,12 @@ export async function addNote ({
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author) throw new GitError(E.MissingAuthorError)
 
-    const committer = await normalizeCommitterObject({ fs, gitdir, author, committer: _committer })
+    const committer = await normalizeCommitterObject({
+      fs,
+      gitdir,
+      author,
+      committer: _committer
+    })
     if (!committer) throw new GitError(E.MissingCommitterError)
 
     return await _addNote({

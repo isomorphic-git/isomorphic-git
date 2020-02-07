@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { writeTag as _writeTag } from '../commands/writeTag.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Write an annotated tag object directly
@@ -42,12 +42,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * console.log('tag', oid)
  *
  */
-export async function writeTag ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  tag
-}) {
+export async function writeTag ({ fs, dir, gitdir = join(dir, '.git'), tag }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

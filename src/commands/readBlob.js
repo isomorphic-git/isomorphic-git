@@ -20,12 +20,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @returns {Promise<ReadBlobResult>} Resolves successfully with a blob object description
  * @see ReadBlobResult
  */
-export async function readBlob ({
-  fs,
-  gitdir,
-  oid,
-  filepath = undefined
-}) {
+export async function readBlob ({ fs, gitdir, oid, filepath = undefined }) {
   if (filepath !== undefined) {
     oid = await resolveFilepath({ fs, gitdir, oid, filepath })
   }

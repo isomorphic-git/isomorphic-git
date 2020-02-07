@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { indexPack as _indexPack } from '../commands/indexPack.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Create the .idx file for a given .pack file

@@ -1,10 +1,10 @@
 // @ts-check
 import '../commands/typedefs.js'
 
-import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { readBlob as _readBlob } from '../commands/readBlob.js'
+import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  *

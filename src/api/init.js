@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { init as _init } from '../commands/init.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Initialize a new repository

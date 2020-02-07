@@ -12,11 +12,7 @@ import { writeObject } from '../storage/writeObject.js'
  *
  * @returns {Promise<string>}
  */
-export async function writeTag ({
-  fs,
-  gitdir,
-  tag
-}) {
+export async function writeTag ({ fs, gitdir, tag }) {
   // Convert object to buffer
   const object = GitAnnotatedTag.from(tag).toObject()
   const oid = await writeObject({

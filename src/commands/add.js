@@ -15,12 +15,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.filepath
  * @returns {Promise<void>}
  */
-export async function add ({
-  fs,
-  dir,
-  gitdir,
-  filepath
-}) {
+export async function add ({ fs, dir, gitdir, filepath }) {
   await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
     await addToIndex({ dir, gitdir, fs, filepath, index })
   })

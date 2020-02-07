@@ -10,11 +10,7 @@ import { writeObject } from '../storage/writeObject.js'
  * @returns {Promise<string>}
  *
  */
-export async function writeBlob ({
-  fs,
-  gitdir,
-  blob
-}) {
+export async function writeBlob ({ fs, gitdir, blob }) {
   const oid = await writeObject({
     fs,
     gitdir,

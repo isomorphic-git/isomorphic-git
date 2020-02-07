@@ -77,7 +77,12 @@ export async function commit ({
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author) throw new GitError(E.MissingAuthorError)
 
-    const committer = await normalizeCommitterObject({ fs, gitdir, author, committer: _committer })
+    const committer = await normalizeCommitterObject({
+      fs,
+      gitdir,
+      author,
+      committer: _committer
+    })
     if (!committer) throw new GitError(E.MissingCommitterError)
 
     return await _commit({

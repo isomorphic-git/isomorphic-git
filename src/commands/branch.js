@@ -22,12 +22,7 @@ import { E, GitError } from '../models/GitError.js'
  * console.log('done')
  *
  */
-export async function branch ({
-  fs,
-  gitdir,
-  ref,
-  checkout = false
-}) {
+export async function branch ({ fs, gitdir, ref, checkout = false }) {
   if (ref !== cleanGitRef.clean(ref)) {
     throw new GitError(E.InvalidRefNameError, {
       verb: 'create',

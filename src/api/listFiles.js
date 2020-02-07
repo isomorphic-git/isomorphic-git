@@ -2,9 +2,9 @@
 import '../commands/typedefs.js'
 
 import { listFiles as _listFiles } from '../commands/listFiles'
-import { join } from '../utils/join'
-import { assertParameter } from '../utils/assertParameter.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join'
 
 /**
  * List all the files in the git index or a commit
@@ -29,12 +29,7 @@ import { FileSystem } from '../models/FileSystem.js'
  * console.log(files)
  *
  */
-export async function listFiles ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  ref
-}) {
+export async function listFiles ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

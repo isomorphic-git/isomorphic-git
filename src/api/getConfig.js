@@ -2,9 +2,9 @@
 import '../commands/typedefs.js'
 
 import { getConfig as _getConfig } from '../commands/getConfig.js'
-import { join } from '../utils/join.js'
-import { assertParameter } from '../utils/assertParameter.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Read an entry from the git config files.
@@ -30,12 +30,7 @@ import { FileSystem } from '../models/FileSystem.js'
  * console.log(value)
  *
  */
-export async function getConfig ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  path
-}) {
+export async function getConfig ({ fs, dir, gitdir = join(dir, '.git'), path }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

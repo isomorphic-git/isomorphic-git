@@ -1,11 +1,11 @@
 // @ts-check
 
 import { checkout } from '../commands/checkout.js'
-import { getConfig } from '../commands/getConfig.js'
 import { currentBranch } from '../commands/currentBranch.js'
 import { fetch } from '../commands/fetch.js'
+import { getConfig } from '../commands/getConfig.js'
 import { merge } from '../commands/merge.js'
-import { GitError, E } from '../models/GitError.js'
+import { E, GitError } from '../models/GitError.js'
 
 /**
  * @param {object} args
@@ -76,7 +76,11 @@ export async function pull ({
     if (!ref) {
       const head = await currentBranch({ fs, gitdir })
       // TODO: use a better error.
-      if (!head) throw new GitError(E.MissingRequiredParameterError, { parameter: 'ref' })
+      if (!head) {
+        throw new GitError(E.MissingRequiredParameterError, {
+          parameter: 'ref'
+        })
+      }
       ref = head
     }
     // Fetch from the correct remote.

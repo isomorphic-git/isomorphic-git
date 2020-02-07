@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { add as _add } from '../commands/add.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Add a file to the git index (aka staging area)
@@ -27,12 +27,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * console.log('done')
  *
  */
-export async function add ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  filepath
-}) {
+export async function add ({ fs, dir, gitdir = join(dir, '.git'), filepath }) {
   try {
     assertParameter('fs', fs)
     assertParameter('dir', dir)

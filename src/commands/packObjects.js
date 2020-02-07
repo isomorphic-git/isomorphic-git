@@ -21,12 +21,7 @@ import { pack } from './pack'
  * @returns {Promise<PackObjectsResult>}
  * @see PackObjectsResult
  */
-export async function packObjects ({
-  fs,
-  gitdir,
-  oids,
-  write
-}) {
+export async function packObjects ({ fs, gitdir, oids, write }) {
   const buffers = await pack({ fs, gitdir, oids })
   const packfile = await collect(buffers)
   const packfileSha = packfile.slice(-20).toString('hex')

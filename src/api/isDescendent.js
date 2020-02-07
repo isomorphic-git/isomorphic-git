@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { isDescendent as _isDescendent } from '../commands/isDescendent.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Check whether a git commit is descended from another

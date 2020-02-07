@@ -14,10 +14,6 @@ import { GitRefManager } from '../managers/GitRefManager.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  */
-export async function deleteRef ({
-  fs,
-  gitdir,
-  ref
-}) {
+export async function deleteRef ({ fs, gitdir, ref }) {
   await GitRefManager.deleteRef({ fs, gitdir, ref })
 }

@@ -14,11 +14,7 @@ import { E } from '../models/GitError.js'
  * @returns {Promise<Array<{target: string, note: string}>>}
  */
 
-export async function listNotes ({
-  fs,
-  gitdir,
-  ref
-}) {
+export async function listNotes ({ fs, gitdir, ref }) {
   // Get the current note commit
   let parent
   try {

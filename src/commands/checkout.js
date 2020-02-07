@@ -320,7 +320,9 @@ async function analyze ({
         return null
       }
       // Emit progress event
-      if (onProgress) { onProgress({ phase: 'Analyzing workdir', loaded: ++count }) }
+      if (onProgress) {
+        onProgress({ phase: 'Analyzing workdir', loaded: ++count })
+      }
 
       // This is a kind of silly pattern but it worked so well for me in calculateBasicAuthUsernamePasswordPair.js
       // and it makes intuitively demonstrating exhaustiveness so *easy*.

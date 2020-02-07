@@ -22,12 +22,7 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function deleteRef ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git'),
-  ref
-}) {
+export async function deleteRef ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
   try {
     assertParameter('fs', fs)
     assertParameter('ref', ref)

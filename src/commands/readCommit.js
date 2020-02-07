@@ -14,11 +14,7 @@ import { resolveCommit } from '../utils/resolveCommit.js'
  * @see CommitObject
  *
  */
-export async function readCommit ({
-  fs,
-  gitdir,
-  oid
-}) {
+export async function readCommit ({ fs, gitdir, oid }) {
   const { commit, oid: commitOid } = await resolveCommit({
     fs,
     gitdir,

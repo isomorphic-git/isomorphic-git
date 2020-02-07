@@ -3,8 +3,8 @@ import '../commands/typedefs.js'
 
 import { listRemotes as _listRemotes } from '../commands/listRemotes.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { join } from '../utils/join.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * List remotes
@@ -21,11 +21,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * console.log(remotes)
  *
  */
-export async function listRemotes ({
-  fs,
-  dir,
-  gitdir = join(dir, '.git')
-}) {
+export async function listRemotes ({ fs, dir, gitdir = join(dir, '.git') }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

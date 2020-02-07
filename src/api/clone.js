@@ -1,11 +1,10 @@
 // @ts-check
 import '../commands/typedefs.js'
 
-import { join } from '../utils/join.js'
-
 import { clone as _clone } from '../commands/clone.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { join } from '../utils/join.js'
 
 /**
  * Clone a repository

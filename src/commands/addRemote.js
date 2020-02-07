@@ -17,13 +17,7 @@ import { E, GitError } from '../models/GitError.js'
  * @returns {Promise<void>}
  *
  */
-export async function addRemote ({
-  fs,
-  gitdir,
-  remote,
-  url,
-  force
-}) {
+export async function addRemote ({ fs, gitdir, remote, url, force }) {
   if (remote !== cleanGitRef.clean(remote)) {
     throw new GitError(E.InvalidRefNameError, {
       verb: 'add',

@@ -2,9 +2,10 @@
 import '../commands/typedefs.js'
 
 import { checkout } from '../commands/checkout.js'
-import { setConfig } from '../commands/setConfig.js'
 import { fetch } from '../commands/fetch.js'
 import { init } from '../commands/init.js'
+import { setConfig } from '../commands/setConfig.js'
+
 import { addRemote } from './addRemote.js'
 
 /**
