@@ -5,7 +5,6 @@ import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
 import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
-import { http as builtinHttp } from '../utils/http.js'
 import { pkg } from '../utils/pkg.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
@@ -24,7 +23,7 @@ export class GitRemoteHTTP {
 
   /**
    * @param {Object} args
-   * @param {HttpClient} [args.http]
+   * @param {HttpClient} args.http
    * @param {ProgressCallback} [args.onProgress]
    * @param {AuthCallback} [args.onAuth]
    * @param {AuthSuccessCallback} [args.onAuthSuccess]
@@ -37,7 +36,7 @@ export class GitRemoteHTTP {
    * @param {Object<string, string>} [args.headers]
    */
   static async discover ({
-    http = builtinHttp,
+    http,
     onProgress,
     onAuth,
     onAuthSuccess,
@@ -150,7 +149,7 @@ export class GitRemoteHTTP {
   }
 
   static async connect ({
-    http = builtinHttp,
+    http,
     onProgress,
     corsProxy,
     service,

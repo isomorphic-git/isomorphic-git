@@ -2,6 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { sleep } = require('isomorphic-git/internal-apis')
+const { http } = require('isomorphic-git/http')
 const { E, setConfig, fetch } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
@@ -20,6 +21,7 @@ describe('fetch', () => {
     // Smoke Test
     await fetch({
       fs,
+      http,
       gitdir,
       singleBranch: true,
       remote: 'origin',
@@ -44,6 +46,7 @@ describe('fetch', () => {
     // Test
     await fetch({
       fs,
+      http,
       gitdir,
       onMessage: async x => {
         output.push(x)
@@ -65,6 +68,7 @@ describe('fetch', () => {
     // Now test deepen
     await fetch({
       fs,
+      http,
       gitdir,
       depth: 2,
       singleBranch: true,
@@ -89,6 +93,7 @@ describe('fetch', () => {
     try {
       await fetch({
         fs,
+        http,
         gitdir,
         depth: 1,
         singleBranch: true,
@@ -115,6 +120,7 @@ describe('fetch', () => {
     try {
       await fetch({
         fs,
+        http,
         gitdir,
         depth: 1,
         singleBranch: true,
@@ -142,6 +148,7 @@ describe('fetch', () => {
     // Test
     await fetch({
       fs,
+      http,
       gitdir,
       since: new Date(1506571200000),
       singleBranch: true,
@@ -164,6 +171,7 @@ describe('fetch', () => {
     // Test
     await fetch({
       fs,
+      http,
       gitdir,
       exclude: ['v0.0.5'],
       singleBranch: true,
@@ -186,6 +194,7 @@ describe('fetch', () => {
     // Test
     await fetch({
       fs,
+      http,
       gitdir,
       depth: 1,
       singleBranch: true,
@@ -198,6 +207,7 @@ describe('fetch', () => {
     // Now test deepen
     await fetch({
       fs,
+      http,
       gitdir,
       relative: true,
       depth: 1,
@@ -223,6 +233,7 @@ describe('fetch', () => {
     try {
       await fetch({
         fs,
+        http,
         gitdir,
         since: new Date(1506571200000),
         singleBranch: true,
@@ -239,8 +250,9 @@ describe('fetch', () => {
   it('fetch empty repository from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-empty')
     await fetch({
-      dir,
       fs,
+      http,
+      dir,
       gitdir,
       depth: 1,
       url: `http://${localhost}:8888/test-empty.git`
@@ -265,8 +277,9 @@ describe('fetch', () => {
       true
     )
     const { pruned } = await fetch({
-      dir,
       fs,
+      http,
+      dir,
       gitdir,
       depth: 1,
       prune: true
@@ -289,8 +302,9 @@ describe('fetch', () => {
     const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
     try {
       await fetch({
-        dir,
         fs,
+        http,
+        dir,
         gitdir,
         depth: 1,
         tags: true,

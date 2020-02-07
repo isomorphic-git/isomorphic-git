@@ -33,7 +33,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {HttpClient} [args.http]
+ * @param {HttpClient} args.http
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
  * @param {AuthCallback} [args.onAuth]

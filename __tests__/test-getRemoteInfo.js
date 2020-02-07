@@ -3,6 +3,7 @@
 const snapshots = require('./__snapshots__/test-getRemoteInfo.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { E, getRemoteInfo } = require('isomorphic-git')
+const { http } = require('isomorphic-git/http')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -14,6 +15,7 @@ describe('getRemoteInfo', () => {
   })
   it('getRemoteInfo', async () => {
     const info = await getRemoteInfo({
+      http,
       url: `http://${localhost}:8888/test-dumb-http-server.git`
     })
     expect(info).not.toBeNull()
@@ -27,6 +29,7 @@ describe('getRemoteInfo', () => {
       let error = null
       try {
         await getRemoteInfo({
+          http,
           url: `http://${localhost}:9876/base/__tests__/__fixtures__/test-dumb-http-server.git`
         })
       } catch (err) {

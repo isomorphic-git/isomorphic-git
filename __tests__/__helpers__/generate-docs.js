@@ -148,9 +148,10 @@ async function gendoc (file, filepath) {
           if (param.name === '_' || param.name === 'args') continue
 
           let name = param.name.replace('_.', '').replace('args.', '')
-          const shouldLink = name.startsWith('on')
+          const actualName = name
+          const shouldLink =
+            actualName.startsWith('on') || name === 'http' || name === 'fs'
           if (!param.optional) name = `**${name}**`
-          if (shouldLink) name = `[${name}](./${name})`
 
           let type = param.type.names.map(escapeType).join(' | ')
           if (param.type.names[0] === 'function') {
@@ -180,6 +181,7 @@ async function gendoc (file, filepath) {
               name = `**${name}**`
             }
           }
+          if (shouldLink) name = `[${name}](./${actualName})`
           rows.push([name, escapeType(type), escapeType(description)])
         }
       }

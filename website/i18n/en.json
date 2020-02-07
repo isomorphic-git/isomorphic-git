@@ -212,26 +212,6 @@
         "title": "packObjects",
         "sidebar_label": "packObjects"
       },
-      "plugin_credentialManager": {
-        "title": "credentialManager",
-        "sidebar_label": "credentialManager"
-      },
-      "plugin_emitter": {
-        "title": "emitter",
-        "sidebar_label": "emitter"
-      },
-      "plugin_fs": {
-        "title": "fs",
-        "sidebar_label": "fs"
-      },
-      "plugin_http": {
-        "title": "http",
-        "sidebar_label": "http"
-      },
-      "plugin_pgp": {
-        "title": "pgp",
-        "sidebar_label": "pgp"
-      },
       "pull": {
         "title": "pull",
         "sidebar_label": "pull"
