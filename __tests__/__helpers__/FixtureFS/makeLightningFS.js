@@ -1,7 +1,4 @@
-const { plugins } = require('isomorphic-git')
 const { FileSystem } = require('isomorphic-git/internal-apis')
-
-let i = 0
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -13,16 +10,12 @@ async function makeLightningFS (dir) {
     wipe: true,
     url: `http://${localhost}:9876/base/__tests__/__fixtures__`
   })
-  const core = `core-lightningfs-${i++}`
-  plugins.createCore(core)
-  plugins.fs(_fs, core)
-  plugins.fs(_fs) // deprecated
   const fs = new FileSystem(_fs)
   dir = `/${dir}`
   const gitdir = `/${dir}.git`
   await fs.mkdir(dir)
   await fs.mkdir(gitdir)
-  return { _fs, fs, dir, gitdir, core }
+  return { _fs, fs, dir, gitdir }
 }
 
 module.exports.makeLightningFS = makeLightningFS

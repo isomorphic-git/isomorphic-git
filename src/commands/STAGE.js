@@ -5,12 +5,7 @@ import { GitWalkerIndex } from '../models/GitWalkerIndex.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
 
 /**
- * Get a git index Walker
- *
- * See [walk](./walk.md)
- *
- * @returns {Walker} Returns a git index `Walker`
- *
+ * @returns {Walker}
  */
 export function STAGE () {
   const o = Object.create(null)

@@ -106,9 +106,9 @@ ${obj.signature ? obj.signature : ''}`
     return Buffer.from(this._tag, 'utf8')
   }
 
-  static async sign (tag, pgp, secretKey) {
+  static async sign (tag, sign, secretKey) {
     const payload = tag.payload()
-    let { signature } = await pgp.sign({ payload, secretKey })
+    let { signature } = await sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
     const signedTag = payload + signature
@@ -116,9 +116,9 @@ ${obj.signature ? obj.signature : ''}`
     return GitAnnotatedTag.from(signedTag)
   }
 
-  static async verify (tag, pgp, publicKey) {
+  static async verify (tag, verify, publicKey) {
     const payload = tag.payload()
     const signature = tag.signature()
-    return pgp.verify({ payload, publicKey, signature })
+    return verify({ payload, publicKey, signature })
   }
 }

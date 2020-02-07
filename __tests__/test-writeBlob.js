@@ -6,9 +6,10 @@ const { writeBlob } = require('isomorphic-git')
 describe('writeBlob', () => {
   it('empty blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeBlob')
+    const { fs, gitdir } = await makeFixture('test-writeBlob')
     // Test
     const oid = await writeBlob({
+      fs,
       gitdir,
       blob: new Uint8Array([])
     })
@@ -16,9 +17,10 @@ describe('writeBlob', () => {
   })
   it('blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeBlob')
+    const { fs, gitdir } = await makeFixture('test-writeBlob')
     // Test
     const oid = await writeBlob({
+      fs,
       gitdir,
       blob: Buffer.from(
         `#!/usr/bin/env node

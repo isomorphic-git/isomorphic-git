@@ -82,9 +82,6 @@ typings/
 
 # AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE
 docs/errors.md
-docs/STAGE.md
-docs/TREE.md
-docs/WORKDIR.md
 docs/add.md
 docs/addNote.md
 docs/addRemote.md
@@ -93,7 +90,6 @@ docs/branch.md
 docs/checkout.md
 docs/clone.md
 docs/commit.md
-docs/config.md
 docs/currentBranch.md
 docs/deleteBranch.md
 docs/deleteRef.md
@@ -102,7 +98,10 @@ docs/deleteTag.md
 docs/expandOid.md
 docs/expandRef.md
 docs/fetch.md
+docs/findMergeBase.md
 docs/findRoot.md
+docs/getConfig.md
+docs/getConfigAll.md
 docs/getRemoteInfo.md
 docs/hashBlob.md
 docs/indexPack.md
@@ -116,11 +115,6 @@ docs/listTags.md
 docs/log.md
 docs/merge.md
 docs/packObjects.md
-docs/plugin_credentialManager.md
-docs/plugin_emitter.md
-docs/plugin_fs.md
-docs/plugin_http.md
-docs/plugin_pgp.md
 docs/pull.md
 docs/push.md
 docs/readBlob.md
@@ -133,6 +127,7 @@ docs/remove.md
 docs/removeNote.md
 docs/resetIndex.md
 docs/resolveRef.md
+docs/setConfig.md
 docs/status.md
 docs/statusMatrix.md
 docs/tag.md

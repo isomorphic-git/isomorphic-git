@@ -1,18 +1,23 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-const { config } = require('isomorphic-git')
+const { getConfig, getConfigAll, setConfig } = require('isomorphic-git')
 
 describe('config', () => {
   it('getting', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-config')
+    const { fs, gitdir } = await makeFixture('test-config')
     // Test
-    const sym = await config({ gitdir, path: 'core.symlinks' })
-    const rfv = await config({ gitdir, path: 'core.repositoryformatversion' })
-    const url = await config({ gitdir, path: 'remote.origin.url' })
-    const fetch = await config({ gitdir, path: 'remote.upstream.fetch' })
-    const fetches = await config({
+    const sym = await getConfig({ fs, gitdir, path: 'core.symlinks' })
+    const rfv = await getConfig({
+      fs,
+      gitdir,
+      path: 'core.repositoryformatversion'
+    })
+    const url = await getConfig({ fs, gitdir, path: 'remote.origin.url' })
+    const fetch = await getConfig({ fs, gitdir, path: 'remote.upstream.fetch' })
+    const fetches = await getConfigAll({
+      fs,
       gitdir,
       path: 'remote.upstream.fetch',
       all: true
@@ -30,28 +35,29 @@ describe('config', () => {
 
   it('setting', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-config')
+    const { fs, gitdir } = await makeFixture('test-config')
     // Test
     let bare
     // set to true
-    await config({ gitdir, path: 'core.bare', value: true })
-    bare = await config({ gitdir, path: 'core.bare' })
+    await setConfig({ fs, gitdir, path: 'core.bare', value: true })
+    bare = await getConfig({ fs, gitdir, path: 'core.bare' })
     expect(bare).toBe(true)
     // set to false
-    await config({ gitdir, path: 'core.bare', value: false })
-    bare = await config({ gitdir, path: 'core.bare' })
+    await setConfig({ fs, gitdir, path: 'core.bare', value: false })
+    bare = await getConfig({ fs, gitdir, path: 'core.bare' })
     expect(bare).toBe(false)
     // set to undefined
-    await config({ gitdir, path: 'core.bare', value: undefined })
-    bare = await config({ gitdir, path: 'core.bare' })
+    await setConfig({ fs, gitdir, path: 'core.bare', value: undefined })
+    bare = await getConfig({ fs, gitdir, path: 'core.bare' })
     expect(bare).toBe(undefined)
     // change a remote
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'remote.origin.url',
       value: 'https://github.com/isomorphic-git/isomorphic-git'
     })
-    const url = await config({ gitdir, path: 'remote.origin.url' })
+    const url = await getConfig({ fs, gitdir, path: 'remote.origin.url' })
     expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')
   })
 })

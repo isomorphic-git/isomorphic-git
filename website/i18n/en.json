@@ -93,9 +93,25 @@
         "title": "fetch",
         "sidebar_label": "fetch"
       },
+      "findMergeBase": {
+        "title": "findMergeBase",
+        "sidebar_label": "findMergeBase"
+      },
       "findRoot": {
         "title": "findRoot",
         "sidebar_label": "findRoot"
+      },
+      "fs": {
+        "title": "Bring Your Own FS",
+        "sidebar_label": "Bring Your Own FS"
+      },
+      "getConfig": {
+        "title": "getConfig",
+        "sidebar_label": "getConfig"
+      },
+      "getConfigAll": {
+        "title": "getConfigAll",
+        "sidebar_label": "getConfigAll"
       },
       "getRemoteInfo": {
         "title": "getRemoteInfo",
@@ -109,10 +125,6 @@
         "title": "isogit CLI",
         "sidebar_label": "isogit CLI"
       },
-      "fs": {
-        "title": "Bring Your Own FS",
-        "sidebar_label": "Bring Your Own FS"
-      },
       "quickstart": {
         "title": "Quick Start",
         "sidebar_label": "Quick Start"
@@ -124,6 +136,10 @@
       "hashBlob": {
         "title": "hashBlob",
         "sidebar_label": "hashBlob"
+      },
+      "http": {
+        "title": "http",
+        "sidebar_label": "http"
       },
       "in-the-news": {
         "title": "In The News"
@@ -168,28 +184,52 @@
         "title": "merge",
         "sidebar_label": "merge"
       },
+      "onAuth": {
+        "title": "onAuth",
+        "sidebar_label": "onAuth"
+      },
+      "onAuthFailure": {
+        "title": "onAuthFailure",
+        "sidebar_label": "onAuthFailure"
+      },
+      "onAuthSuccess": {
+        "title": "onAuthSuccess",
+        "sidebar_label": "onAuthSuccess"
+      },
+      "onMessage": {
+        "title": "onMessage",
+        "sidebar_label": "onMessage"
+      },
+      "onProgress": {
+        "title": "onProgress",
+        "sidebar_label": "onProgress"
+      },
+      "onSign": {
+        "title": "onSign & onVerify",
+        "sidebar_label": "onSign & onVerify"
+      },
       "packObjects": {
         "title": "packObjects",
         "sidebar_label": "packObjects"
       },
       "plugin_credentialManager": {
-        "title": "'credentialManager' plugin",
+        "title": "credentialManager",
         "sidebar_label": "credentialManager"
       },
       "plugin_emitter": {
-        "title": "'emitter' plugin",
+        "title": "emitter",
         "sidebar_label": "emitter"
       },
       "plugin_fs": {
-        "title": "'fs' plugin",
+        "title": "fs",
         "sidebar_label": "fs"
       },
       "plugin_http": {
-        "title": "'http' plugin",
+        "title": "http",
         "sidebar_label": "http"
       },
       "plugin_pgp": {
-        "title": "'pgp' plugin",
+        "title": "pgp",
         "sidebar_label": "pgp"
       },
       "pull": {
@@ -239,6 +279,10 @@
       "resolveRef": {
         "title": "resolveRef",
         "sidebar_label": "resolveRef"
+      },
+      "setConfig": {
+        "title": "setConfig",
+        "sidebar_label": "setConfig"
       },
       "snippets": {
         "title": "Useful Code Snippets",
@@ -704,13 +748,14 @@
       "Remotes": "Remotes",
       "Notes": "Notes",
       "Walking": "Walking",
-      "Plugins": "Plugins",
+      "Callbacks": "Callbacks",
       "Raw Objects": "Raw Objects",
       "Plumbing Commands": "Plumbing Commands",
       "Misc Commands": "Misc Commands",
       "Deprecated Commands": "Deprecated Commands",
       "Getting Started": "Getting Started",
-      "More": "More"
+      "More": "More",
+      "Plugins": "Plugins"
     }
   },
   "pages-strings": {

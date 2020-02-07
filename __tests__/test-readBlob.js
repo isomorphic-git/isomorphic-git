@@ -12,11 +12,12 @@ describe('readBlob', () => {
   })
   it('test missing', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     let error = null
     try {
       await readBlob({
+        fs,
         gitdir,
         oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
       })
@@ -28,9 +29,10 @@ describe('readBlob', () => {
   })
   it('blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     const { blob } = await readBlob({
+      fs,
       gitdir,
       oid: '4551a1856279dde6ae9d65862a1dff59a5f199d8'
     })
@@ -38,9 +40,10 @@ describe('readBlob', () => {
   })
   it('peels tags', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     const { oid } = await readBlob({
+      fs,
       gitdir,
       oid: 'cdf8e34555b62edbbe978f20d7b4796cff781f9d'
     })
@@ -48,9 +51,10 @@ describe('readBlob', () => {
   })
   it('with simple filepath to blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     const { oid, blob } = await readBlob({
+      fs,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       filepath: 'cli.js'
@@ -60,9 +64,10 @@ describe('readBlob', () => {
   })
   it('with deep filepath to blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     const { oid, blob } = await readBlob({
+      fs,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
       filepath: 'src/commands/clone.js'
@@ -72,11 +77,12 @@ describe('readBlob', () => {
   })
   it('with simple filepath to tree', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     let error = null
     try {
       await readBlob({
+        fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         filepath: ''
@@ -89,11 +95,12 @@ describe('readBlob', () => {
   })
   it('with erroneous filepath (directory is a file)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     let error = null
     try {
       await readBlob({
+        fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         filepath: 'src/commands/clone.js/isntafolder.txt'
@@ -106,11 +113,12 @@ describe('readBlob', () => {
   })
   it('with erroneous filepath (no such directory)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     let error = null
     try {
       await readBlob({
+        fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         filepath: 'src/isntafolder'
@@ -123,11 +131,12 @@ describe('readBlob', () => {
   })
   it('with erroneous filepath (leading slash)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     let error = null
     try {
       await readBlob({
+        fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         filepath: '/src'
@@ -140,11 +149,12 @@ describe('readBlob', () => {
   })
   it('with erroneous filepath (trailing slash)', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readBlob')
+    const { fs, gitdir } = await makeFixture('test-readBlob')
     // Test
     let error = null
     try {
       await readBlob({
+        fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
         filepath: 'src/'

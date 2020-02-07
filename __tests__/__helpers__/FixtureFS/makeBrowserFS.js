@@ -1,9 +1,6 @@
 const pify = require('pify')
 
-const { plugins } = require('isomorphic-git')
 const { FileSystem } = require('isomorphic-git/internal-apis')
-
-let i = 0
 
 let browserFS = null
 let browserFSwritable = null
@@ -27,11 +24,6 @@ async function makeBrowserFS (dir) {
   const _fs = Object.assign({}, browserFS)
   browserFSwritable.empty()
 
-  const core = `core-browserfs-${i++}`
-  plugins.createCore(core)
-  plugins.fs(_fs, core)
-  plugins.fs(_fs) // deprecated
-
   const fs = new FileSystem(_fs)
 
   dir = `/${dir}`
@@ -42,8 +34,7 @@ async function makeBrowserFS (dir) {
     _fs,
     fs,
     dir,
-    gitdir,
-    core
+    gitdir
   }
 }
 

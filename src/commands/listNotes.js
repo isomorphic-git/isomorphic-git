@@ -1,58 +1,41 @@
 // @ts-check
+import { readTree } from '../commands/readTree'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { E } from '../models/GitError.js'
-import { join } from '../utils/join'
-import { cores } from '../utils/plugins.js'
-
-import { readTree } from './readTree'
 
 /**
  * List all the object notes
  *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.ref] - The notes ref to look under
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} args.gitdir
+ * @param {string} args.ref
  *
- * @returns {Promise<Array<{target: string, note: string}>>} Resolves successfully with an array of entries containing SHA-1 object ids of the note and the object the note targets
+ * @returns {Promise<Array<{target: string, note: string}>>}
  */
 
-export async function listNotes ({
-  core = 'default',
-  dir,
-  gitdir = join(dir, '.git'),
-  ref = 'refs/notes/commits'
-}) {
+export async function listNotes ({ fs, gitdir, ref }) {
+  // Get the current note commit
+  let parent
   try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
-
-    // Get the current note commit
-    let parent
-    try {
-      parent = await GitRefManager.resolve({ gitdir, fs, ref })
-    } catch (err) {
-      if (err.code === E.ResolveRefError) {
-        return []
-      }
-    }
-
-    // Create the current note tree
-    const result = await readTree({
-      core,
-      gitdir,
-      oid: parent
-    })
-
-    // Format the tree entries
-    const notes = result.tree.map(entry => ({
-      target: entry.path,
-      note: entry.oid
-    }))
-    return notes
+    parent = await GitRefManager.resolve({ gitdir, fs, ref })
   } catch (err) {
-    err.caller = 'git.listNotes'
-    throw err
+    if (err.code === E.ResolveRefError) {
+      return []
+    }
   }
+
+  // Create the current note tree
+  const result = await readTree({
+    fs,
+    gitdir,
+    oid: parent
+  })
+
+  // Format the tree entries
+  const notes = result.tree.map(entry => ({
+    target: entry.path,
+    note: entry.oid
+  }))
+  return notes
 }

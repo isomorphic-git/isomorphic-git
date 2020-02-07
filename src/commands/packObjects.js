@@ -1,8 +1,6 @@
 // @ts-check
-import { FileSystem } from '../models/FileSystem.js'
 import { collect } from '../utils/collect.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 import { pack } from './pack'
 
@@ -14,50 +12,26 @@ import { pack } from './pack'
  */
 
 /**
- * Create a packfile from an array of SHA-1 object ids
- *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string[]} args.oids - An array of SHA-1 object ids to be included in the packfile
- * @param {boolean} [args.write = false] - Whether to save the packfile to disk or not
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} args.gitdir
+ * @param {string[]} args.oids
+ * @param {boolean} args.write
  *
- * @returns {Promise<PackObjectsResult>} Resolves successfully when the packfile is ready with the filename and buffer
+ * @returns {Promise<PackObjectsResult>}
  * @see PackObjectsResult
- *
- * @example
- * // Create a packfile containing only an empty tree
- * let { packfile } = await git.packObjects({
- *   dir: '$input((/))',
- *   oids: [$input(('4b825dc642cb6eb9a060e54bf8d69288fbee4904'))]
- * })
- * console.log(packfile)
- *
  */
-export async function packObjects ({
-  core = 'default',
-  dir,
-  gitdir = join(dir, '.git'),
-  oids,
-  write = false
-}) {
-  try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
-    const buffers = await pack({ core, gitdir, oids })
-    const packfile = await collect(buffers)
-    const packfileSha = packfile.slice(-20).toString('hex')
-    const filename = `pack-${packfileSha}.pack`
-    if (write) {
-      await fs.write(join(gitdir, `objects/pack/${filename}`), packfile)
-      return { filename }
-    }
-    return {
-      filename,
-      packfile: new Uint8Array(packfile)
-    }
-  } catch (err) {
-    err.caller = 'git.packObjects'
-    throw err
+export async function packObjects ({ fs, gitdir, oids, write }) {
+  const buffers = await pack({ fs, gitdir, oids })
+  const packfile = await collect(buffers)
+  const packfileSha = packfile.slice(-20).toString('hex')
+  const filename = `pack-${packfileSha}.pack`
+  if (write) {
+    await fs.write(join(gitdir, `objects/pack/${filename}`), packfile)
+    return { filename }
+  }
+  return {
+    filename,
+    packfile: new Uint8Array(packfile)
   }
 }

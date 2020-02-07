@@ -1,9 +1,13 @@
-import { config } from '../commands/config'
+import { getConfig } from '../commands/getConfig'
 
+/**
+ *
+ * @returns {Promise<void | {name: string, email: string, date: Date, timestamp: number, timezoneOffset: number }>}
+ */
 export async function normalizeAuthorObject ({ fs, gitdir, author = {} }) {
   let { name, email, date, timestamp, timezoneOffset } = author
-  name = name || (await config({ fs, gitdir, path: 'user.name' }))
-  email = email || (await config({ fs, gitdir, path: 'user.email' }))
+  name = name || (await getConfig({ fs, gitdir, path: 'user.name' }))
+  email = email || (await getConfig({ fs, gitdir, path: 'user.email' }))
 
   if (name === undefined || email === undefined) {
     return undefined

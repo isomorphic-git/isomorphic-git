@@ -1,45 +1,16 @@
 // @ts-check
 import { GitConfigManager } from '../managers/GitConfigManager.js'
-import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
-import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 /**
- * Removes the local config entry for a given remote
- *
  * @param {Object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} args.remote - The name of the remote to delete
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} args.gitdir
+ * @param {string} args.remote
  *
- * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
- *
- * @example
- * await git.deleteRemote({ dir: '$input((/))', remote: '$input((upstream))' })
- * console.log('done')
- *
+ * @returns {Promise<void>}
  */
-export async function deleteRemote ({
-  core = 'default',
-  dir,
-  gitdir = join(dir, '.git'),
-  remote
-}) {
-  try {
-    const fs = new FileSystem(cores.get(core).get('fs'))
-    if (remote === undefined) {
-      throw new GitError(E.MissingRequiredParameterError, {
-        function: 'deleteRemote',
-        parameter: 'remote'
-      })
-    }
-    const config = await GitConfigManager.get({ fs, gitdir })
-    await config.deleteSection('remote', remote)
-    await GitConfigManager.save({ fs, gitdir, config })
-  } catch (err) {
-    err.caller = 'git.deleteRemote'
-    throw err
-  }
+export async function deleteRemote ({ fs, gitdir, remote }) {
+  const config = await GitConfigManager.get({ fs, gitdir })
+  await config.deleteSection('remote', remote)
+  await GitConfigManager.save({ fs, gitdir, config })
 }

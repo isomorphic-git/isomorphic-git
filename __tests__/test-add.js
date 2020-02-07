@@ -13,35 +13,35 @@ const writeGitIgnore = async (fs, dir) =>
 describe('add', () => {
   it('file', async () => {
     // Setup
-    const { core, dir } = await makeFixture('test-add')
+    const { fs, dir } = await makeFixture('test-add')
     // Test
-    await init({ core, dir })
-    await add({ core, dir, filepath: 'a.txt' })
-    expect((await listFiles({ core, dir })).length).toEqual(1)
-    await add({ core, dir, filepath: 'a.txt' })
-    expect((await listFiles({ core, dir })).length).toEqual(1)
-    await add({ core, dir, filepath: 'a-copy.txt' })
-    expect((await listFiles({ core, dir })).length).toEqual(2)
-    await add({ core, dir, filepath: 'b.txt' })
-    expect((await listFiles({ core, dir })).length).toEqual(3)
+    await init({ fs, dir })
+    await add({ fs, dir, filepath: 'a.txt' })
+    expect((await listFiles({ fs, dir })).length).toEqual(1)
+    await add({ fs, dir, filepath: 'a.txt' })
+    expect((await listFiles({ fs, dir })).length).toEqual(1)
+    await add({ fs, dir, filepath: 'a-copy.txt' })
+    expect((await listFiles({ fs, dir })).length).toEqual(2)
+    await add({ fs, dir, filepath: 'b.txt' })
+    expect((await listFiles({ fs, dir })).length).toEqual(3)
   })
   it('ignored file', async () => {
     // Setup
-    const { fs, core, dir } = await makeFixture('test-add')
+    const { fs, dir } = await makeFixture('test-add')
     await writeGitIgnore(fs, dir)
     // Test
-    await init({ core, dir })
-    await add({ core, dir, filepath: 'i.txt' })
-    expect((await listFiles({ core, dir })).length).toEqual(0)
+    await init({ fs, dir })
+    await add({ fs, dir, filepath: 'i.txt' })
+    expect((await listFiles({ fs, dir })).length).toEqual(0)
   })
   it('non-existant file', async () => {
     // Setup
-    const { core, dir } = await makeFixture('test-add')
+    const { fs, dir } = await makeFixture('test-add')
     // Test
-    await init({ core, dir })
+    await init({ fs, dir })
     let err = null
     try {
-      await add({ core, dir, filepath: 'asdf.txt' })
+      await add({ fs, dir, filepath: 'asdf.txt' })
     } catch (e) {
       err = e
     }
@@ -49,31 +49,31 @@ describe('add', () => {
   })
   it('folder', async () => {
     // Setup
-    const { core, dir } = await makeFixture('test-add')
+    const { fs, dir } = await makeFixture('test-add')
     // Test
-    await init({ core, dir })
-    expect((await listFiles({ core, dir })).length).toEqual(0)
-    await add({ core, dir, filepath: 'c' })
-    expect((await listFiles({ core, dir })).length).toEqual(4)
+    await init({ fs, dir })
+    expect((await listFiles({ fs, dir })).length).toEqual(0)
+    await add({ fs, dir, filepath: 'c' })
+    expect((await listFiles({ fs, dir })).length).toEqual(4)
   })
   it('folder with .gitignore', async () => {
     // Setup
-    const { fs, core, dir } = await makeFixture('test-add')
+    const { fs, dir } = await makeFixture('test-add')
     await writeGitIgnore(fs, dir)
     // Test
-    await init({ core, dir })
-    expect((await listFiles({ core, dir })).length).toEqual(0)
-    await add({ core, dir, filepath: 'c' })
-    expect((await listFiles({ core, dir })).length).toEqual(3)
+    await init({ fs, dir })
+    expect((await listFiles({ fs, dir })).length).toEqual(0)
+    await add({ fs, dir, filepath: 'c' })
+    expect((await listFiles({ fs, dir })).length).toEqual(3)
   })
   it('git add .', async () => {
     // Setup
-    const { fs, core, dir } = await makeFixture('test-add')
+    const { fs, dir } = await makeFixture('test-add')
     await writeGitIgnore(fs, dir)
     // Test
-    await init({ core, dir })
-    expect((await listFiles({ core, dir })).length).toEqual(0)
-    await add({ core, dir, filepath: '.' })
-    expect((await listFiles({ core, dir })).length).toEqual(7)
+    await init({ fs, dir })
+    expect((await listFiles({ fs, dir })).length).toEqual(0)
+    await add({ fs, dir, filepath: '.' })
+    expect((await listFiles({ fs, dir })).length).toEqual(7)
   })
 })

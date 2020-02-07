@@ -6,9 +6,10 @@ const { readNote } = require('isomorphic-git')
 describe('readNote', () => {
   it('to a commit', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readNote')
+    const { fs, gitdir } = await makeFixture('test-readNote')
     // Test
     const note = await readNote({
+      fs,
       gitdir,
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164'
     })
@@ -18,9 +19,10 @@ describe('readNote', () => {
   })
   it('to a tree', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readNote')
+    const { fs, gitdir } = await makeFixture('test-readNote')
     // Test
     const note = await readNote({
+      fs,
       gitdir,
       oid: '199948939a0b95c6f27668689102496574b2c332'
     })
@@ -30,9 +32,10 @@ describe('readNote', () => {
   })
   it('to a blob', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readNote')
+    const { fs, gitdir } = await makeFixture('test-readNote')
     // Test
     const note = await readNote({
+      fs,
       gitdir,
       oid: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
     })
@@ -42,9 +45,10 @@ describe('readNote', () => {
   })
   it('from an alternate branch', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readNote')
+    const { fs, gitdir } = await makeFixture('test-readNote')
     // Test
     const note = await readNote({
+      fs,
       gitdir,
       ref: 'refs/notes/alt',
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164'

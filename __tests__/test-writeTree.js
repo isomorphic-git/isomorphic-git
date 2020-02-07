@@ -7,9 +7,10 @@ const { writeTree } = require('isomorphic-git')
 describe('writeTree', () => {
   it('tree', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeTree')
+    const { fs, gitdir } = await makeFixture('test-writeTree')
     // Test
     const oid = await writeTree({
+      fs,
       gitdir,
       tree: [
         {
@@ -126,9 +127,10 @@ describe('writeTree', () => {
   })
   it('tree entries sorted correctly', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-writeTree')
+    const { fs, gitdir } = await makeFixture('test-writeTree')
     // Test
     const oid = await writeTree({
+      fs,
       gitdir,
       tree: [
         {

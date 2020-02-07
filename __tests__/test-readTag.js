@@ -12,9 +12,10 @@ describe('readTag', () => {
   })
   it('annotated tag', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-readTag')
+    const { fs, gitdir } = await makeFixture('test-readTag')
     // Test
     const tag = await readTag({
+      fs,
       gitdir,
       oid: '587d3f8290b513e2ee85ecd317e6efecd545aee6'
     })

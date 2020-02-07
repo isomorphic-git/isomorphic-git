@@ -4,15 +4,14 @@ import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
 export async function listObjects ({
-  core = 'default',
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oids
 }) {
-  const fs = new FileSystem(cores.get(core).get('fs'))
+  const fs = new FileSystem(_fs)
   const visited = new Set()
   // We don't do the purest simplest recursion, because we can
   // avoid reading Blob objects entirely since the Tree objects

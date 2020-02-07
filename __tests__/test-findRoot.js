@@ -15,6 +15,7 @@ describe('findRoot', () => {
     await fs.mkdir(path.join(dir, 'foobar/bar', '.git'))
     // Test
     const root = await findRoot({
+      fs,
       filepath: path.join(dir, 'foobar')
     })
     expect(path.basename(root)).toBe('foobar')
@@ -26,6 +27,7 @@ describe('findRoot', () => {
     await fs.mkdir(path.join(dir, 'foobar/bar', '.git'))
     // Test
     const root = await findRoot({
+      fs,
       filepath: path.join(dir, 'foobar/bar/baz/buzz')
     })
     expect(path.basename(root)).toBe('bar')

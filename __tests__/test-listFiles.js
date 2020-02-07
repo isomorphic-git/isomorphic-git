@@ -11,16 +11,16 @@ describe('listFiles', () => {
   })
   it('index', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listFiles')
+    const { fs, gitdir } = await makeFixture('test-listFiles')
     // Test
-    const files = await listFiles({ gitdir })
+    const files = await listFiles({ fs, gitdir })
     expect(files).toMatchSnapshot()
   })
   it('ref', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-checkout')
+    const { fs, gitdir } = await makeFixture('test-checkout')
     // Test
-    const files = await listFiles({ gitdir, ref: 'test-branch' })
+    const files = await listFiles({ fs, gitdir, ref: 'test-branch' })
     expect(files).toMatchSnapshot()
   })
 })

@@ -3,7 +3,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 // @ts-ignore
 const snapshots = require('./__snapshots__/test-listObjects.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { listObjects, plugins } = require('isomorphic-git/internal-apis')
+const { listObjects } = require('isomorphic-git/internal-apis')
 
 describe('listObjects', () => {
   beforeAll(() => {
@@ -11,10 +11,10 @@ describe('listObjects', () => {
   })
   it('listObjects', async () => {
     // Setup
-    const { _fs, gitdir } = await makeFixture('test-listObjects')
-    plugins.fs(_fs)
+    const { fs, gitdir } = await makeFixture('test-listObjects')
     // Test
     const objects = await listObjects({
+      fs,
       gitdir,
       oids: [
         'c60bbbe99e96578105c57c4b3f2b6ebdf863edbc',

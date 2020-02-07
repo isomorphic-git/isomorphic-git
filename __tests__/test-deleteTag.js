@@ -11,13 +11,15 @@ describe('deleteTag', () => {
   })
   it('deletes the latest tag to HEAD', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-deleteTag')
+    const { fs, gitdir } = await makeFixture('test-deleteTag')
     // Test
     await deleteTag({
+      fs,
       gitdir,
       ref: 'latest'
     })
     const refs = await listTags({
+      fs,
       gitdir
     })
     expect(refs).toMatchSnapshot()

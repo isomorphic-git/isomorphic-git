@@ -8,16 +8,18 @@ const { findMergeBase } = require('isomorphic-git')
 describe('findMergeBase', () => {
   it('silly edge cases', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-findMergeBase')
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: ['9ec6646dd454e8f530c478c26f8b06e57f880bd6']
     })
     expect(base).toEqual(['9ec6646dd454e8f530c478c26f8b06e57f880bd6'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '9ec6646dd454e8f530c478c26f8b06e57f880bd6',
@@ -28,9 +30,10 @@ describe('findMergeBase', () => {
   })
   it('no common ancestor scenarios', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-findMergeBase')
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
     // Test
     const base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '9ec6646dd454e8f530c478c26f8b06e57f880bd6', // A
@@ -41,10 +44,11 @@ describe('findMergeBase', () => {
   })
   it('fast-forward scenarios', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-findMergeBase')
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '9ec6646dd454e8f530c478c26f8b06e57f880bd6', // A
@@ -54,6 +58,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['f79577b91d302d87e310c8b5af8c274bbf45502f'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '21605c3fda133ae46f000a375c92c889fa0688ba', // F
@@ -63,6 +68,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['21605c3fda133ae46f000a375c92c889fa0688ba'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '21605c3fda133ae46f000a375c92c889fa0688ba', // F
@@ -72,6 +78,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['21605c3fda133ae46f000a375c92c889fa0688ba'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '21605c3fda133ae46f000a375c92c889fa0688ba', // F
@@ -83,10 +90,11 @@ describe('findMergeBase', () => {
   })
   it('diverging scenarios', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-findMergeBase')
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         'c91a8aab1f086c8cc8914558f035e718a8a5c503', // B
@@ -96,6 +104,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['0526923cafece3d898dbe55ee2c2d69bfcc54c60'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '8d01f1824e6818db3461c06f09a0965810396a45', // G
@@ -105,6 +114,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['21605c3fda133ae46f000a375c92c889fa0688ba'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '8a7e4628451951581c6ce84850bd474e107ee750', // D
@@ -114,6 +124,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['592ad92519d993cc44c77663d85bb7e0f961a840'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '8a7e4628451951581c6ce84850bd474e107ee750', // D
@@ -123,6 +134,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['592ad92519d993cc44c77663d85bb7e0f961a840'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '8a7e4628451951581c6ce84850bd474e107ee750', // D
@@ -133,6 +145,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['592ad92519d993cc44c77663d85bb7e0f961a840'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '8a7e4628451951581c6ce84850bd474e107ee750', // D
@@ -145,10 +158,11 @@ describe('findMergeBase', () => {
   })
   it('merge commit scenarios', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-findMergeBase')
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
     let base
     // Test
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '423489657e9529ecf285637eb21f40c8657ece3f', // M
@@ -158,6 +172,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['21605c3fda133ae46f000a375c92c889fa0688ba'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '423489657e9529ecf285637eb21f40c8657ece3f', // M
@@ -167,6 +182,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['423489657e9529ecf285637eb21f40c8657ece3f'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '423489657e9529ecf285637eb21f40c8657ece3f', // M
@@ -176,6 +192,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['592ad92519d993cc44c77663d85bb7e0f961a840'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '423489657e9529ecf285637eb21f40c8657ece3f', // M
@@ -185,6 +202,7 @@ describe('findMergeBase', () => {
     expect(base).toEqual(['21605c3fda133ae46f000a375c92c889fa0688ba'])
 
     base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '423489657e9529ecf285637eb21f40c8657ece3f', // M
@@ -196,9 +214,10 @@ describe('findMergeBase', () => {
   })
   it('recursive merge base scenarios', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-findMergeBase')
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
     // Test
     const base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '85303393b9fd415d48913dfec47d42db184dc4d8', // Z1
@@ -213,9 +232,10 @@ describe('findMergeBase', () => {
 
   it('fork & rejoin in one branch base scenarios', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-findMergeBase')
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
     // Test
     const base = await findMergeBase({
+      fs,
       gitdir,
       oids: [
         '815474b6e581921cbe05825631decac922803d28', // issue819-upstream
