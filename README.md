@@ -69,6 +69,7 @@ At the time of writing, the following breaking changes are planned:
 - [x] Remove the `noOverwrite` option from `init` and make that the new behavior.
 - [ ] Oh, and I should move all the error strings into a separate JSON file that can be fetched lazily in production.
 - [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
+- [ ] Fix `push` to use the remote tracking branch by default for `remtoeRef`
 
 ## Getting Started
 
@@ -83,7 +84,6 @@ If you're only using `isomorphic-git` in Node, you can just use the native `fs` 
 ```js
 const git = require('isomorphic-git');
 const fs = require('fs');
-git.plugins.fs(fs)
 ```
 
 If you're writing code for the browser though, you'll need something that emulates the `fs` API.
@@ -95,7 +95,6 @@ If LightningFS doesn't meet your requirements, isomorphic-git should also work w
 <script src="https://unpkg.com/isomorphic-git"></script>
 <script>
 const fs = new LightningFS('fs')
-git.plugins.fs(fs)
 </script>
 ```
 
@@ -227,13 +226,6 @@ unless there is a major version bump.
 - [writeTag](https://isomorphic-git.github.io/docs/writeTag.html)
 - [writeTree](https://isomorphic-git.github.io/docs/writeTree.html)
 - [writeRef](https://isomorphic-git.github.io/docs/writeRef.html)
-
-### plugins
-- [credentialManager](https://isomorphic-git.github.io/docs/plugin_credentialManager.html)
-- [emitter](https://isomorphic-git.github.io/docs/plugin_emitter.html)
-- [fs](https://isomorphic-git.github.io/docs/plugin_fs.html)
-- [http](https://isomorphic-git.github.io/docs/plugin_http.html)
-- [pgp](https://isomorphic-git.github.io/docs/plugin_pgp.html)
 
 ## Community
 
