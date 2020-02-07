@@ -148,7 +148,7 @@ async function gendoc (file, filepath) {
           if (param.name === '_' || param.name === 'args') continue
 
           let name = param.name.replace('_.', '').replace('args.', '')
-          const shouldLink = name.startsWith('on')
+          const shouldLink = name.startsWith('on') || name === 'http' || name === 'fs'
           if (!param.optional) name = `**${name}**`
           if (shouldLink) name = `[${name}](./${name})`
 

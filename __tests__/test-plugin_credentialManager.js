@@ -2,6 +2,7 @@
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { setConfig, push, E } = require('isomorphic-git')
+const { http } = require('isomorphic-git/http')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -23,6 +24,7 @@ describe('credentialManager', () => {
     let rejectedCalled = false
     await push({
       fs,
+      http,
       gitdir,
       remote: 'auth',
       ref: 'master',
@@ -61,6 +63,7 @@ describe('credentialManager', () => {
     try {
       await push({
         fs,
+        http,
         gitdir,
         remote: 'auth',
         ref: 'master',

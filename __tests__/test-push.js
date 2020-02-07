@@ -5,6 +5,7 @@ const snapshots = require('./__snapshots__/test-push.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
 const { setConfig, push, listBranches } = require('isomorphic-git')
+const { http } = require('isomorphic-git/http')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -27,6 +28,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       onMessage: async m => {
         output.push(m)
@@ -52,6 +54,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       remote: 'karma'
     })
@@ -72,6 +75,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       remote: 'karma',
       ref: 'master',
@@ -97,6 +101,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       remote: 'karma',
       ref: 'lightweight-tag'
@@ -118,6 +123,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       remote: 'karma',
       ref: 'annotated-tag'
@@ -138,6 +144,7 @@ describe('push', () => {
     })
     await push({
       fs,
+      http,
       gitdir,
       remote: 'karma',
       ref: 'master',
@@ -149,6 +156,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       remote: 'karma',
       remoteRef: 'foobar',
@@ -175,6 +183,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       username: 'testuser',
       password: 'testpassword',
@@ -198,6 +207,7 @@ describe('push', () => {
     // Test
     const res = await push({
       fs,
+      http,
       gitdir,
       remote: 'url',
       ref: 'master'
@@ -221,6 +231,7 @@ describe('push', () => {
     try {
       await push({
         fs,
+        http,
         gitdir,
         remote: 'auth',
         ref: 'master'
@@ -244,6 +255,7 @@ describe('push', () => {
     try {
       await push({
         fs,
+        http,
         gitdir,
         username: 'test',
         password: 'test',

@@ -64,7 +64,7 @@ At the time of writing, the following breaking changes are planned:
 - [ ] To go along with that, I'm experimenting with a way to make the API more aesthetic, eliminating the `emitter` plugin/argument and letting you chain event listeners onto running commands directly. NOTE: need to make sure there's no race condition between adding the event listeners and starting running the command.
   - [ ] This also provides an aesthetic way to cancel / stop running commands.
 - [x] break `config` into `getConfig` and `setConfig` or something.
-- [ ] Make `http` an external required dependency just like `fs` [#938](https://github.com/isomorphic-git/isomorphic-git/issues/938)
+- [x] Make `http` an external required dependency just like `fs` [#938](https://github.com/isomorphic-git/isomorphic-git/issues/938)
 - [ ] I should probably normalize on timestamps and get rid of the `date` options.
 - [x] Remove the `noOverwrite` option from `init` and make that the new behavior.
 - [ ] Oh, and I should move all the error strings into a separate JSON file that can be fetched lazily in production.

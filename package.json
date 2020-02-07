@@ -6,8 +6,7 @@
   "main": "dist/index.cjs",
   "browser": {
     "isomorphic-git": "./dist/bundle.umd.min.js",
-    "isomorphic-git/internal-apis": "./dist/internal.umd.min.js",
-    "./src/utils/http.js": "./src/utils/http-browser.js"
+    "isomorphic-git/internal-apis": "./dist/internal.umd.min.js"
   },
   "module": "dist/index.js",
   "unpkg": "dist/bundle.umd.min.js",

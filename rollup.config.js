@@ -21,7 +21,7 @@ const moduleConfig = input => ({
     {
       format: 'es',
       name: 'git',
-      file: `dist/${input}`
+      file: `dist/${path.basename(input)}`
     }
   ],
   plugins: [resolve({ browser: true })]
@@ -42,4 +42,4 @@ const nodeConfig = input => ({
 
 const inputs = ['index.js', 'internal-apis.js']
 
-export default [...inputs.map(nodeConfig), ...inputs.map(moduleConfig)]
+export default [...inputs.map(nodeConfig), ...inputs.map(moduleConfig), nodeConfig('builtin-node/http.js'), moduleConfig('builtin-browser/http.js')]

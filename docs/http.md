@@ -3,27 +3,33 @@ title: http
 sidebar_label: http
 ---
 
-You need to pass an HTTP client into `isomorphic-git` for functions that make HTTP requests.
-The `isomorphic-git` package already includes both a node client and a browser client, but you have to tell it which one to use.
+You need to pass an HTTP client into `isomorphic-git` functions that make HTTP requests.
+Both a node client (`.cjs`) and a browser client (`.js`) are included in the npm package, but you have to pick which one to use.
 Or you can provide your own!
 
-Node usage:
+(In the past, we tried to be clever and automatically select the client for you. But that can be really hard to determine in edge cases like Electron.)
+
+## Node Client
+
+The Node client uses the [`simple-get`](https://npm.im/simple-get) package under the hood.
 
 ```js
 const git = require("isomorphic-git");
-const http = require("isomorphic-git/node/http");
+const http = require("isomorphic-git/http.cjs");
 git.clone({ ..., http })
 ```
 
-Browser usage:
+## Browser Client:
+
+The Browser client uses the [`Fetch API`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) under the hood.
 
 ```js
 const git = require("isomorphic-git");
-const http = require("isomorphic-git/browser/http");
+const http = require("isomorphic-git/http.js");
 git.clone({ ..., http })
 ```
 
-### Implementing your own `http` plugin
+### Implementing your own `http` client
 
 An `http` client is just one function that implements the following API:
 
