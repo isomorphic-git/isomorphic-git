@@ -15,18 +15,23 @@ The Node client uses the [`simple-get`](https://npm.im/simple-get) package under
 
 ```js
 const git = require("isomorphic-git");
-const http = require("isomorphic-git/http.cjs");
-git.clone({ ..., http })
+const { http } = require("isomorphic-git/dist/http.cjs");
+git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
+  .then(console.log)
 ```
+
+If need features that aren't supported currently, like detecting and handling `HTTP_PROXY` environment variables, you can
+make your own HTTP client. (See section below.)
 
 ## Browser Client:
 
 The Browser client uses the [`Fetch API`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) under the hood.
 
 ```js
-const git = require("isomorphic-git");
-const http = require("isomorphic-git/http.js");
-git.clone({ ..., http })
+import { getRemoteInfo } from "isomorphic-git";
+import { http } from "isomorphic-git/dist/http.js";
+getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
+  .then(console.log)
 ```
 
 ### Implementing your own `http` client
@@ -83,3 +88,6 @@ Both requests and responses are "streaming" in the sense that they are async ite
 You don't _have_ to support streaming (and in some cases, like uploads in the browser, it may not be possible yet) but it is nice to have.
 If you are not streaming responses, you can simply fake it by returning an array with a single `Uint8Array` inside it.
 This works because the async iteration protocol (`for await ... of`) will fallback to the sync iteration protocol, which is supported by plain Arrays.
+
+To get started, you might want to look at [`src/builtin-node/http.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/builtin-node/http.js)
+and [`src/builtin-browser/http.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/builtin-browser/http.js).
