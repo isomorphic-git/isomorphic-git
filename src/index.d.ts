@@ -201,7 +201,7 @@ export interface WalkerEntry2 {
   type: () => Promise<'tree' | 'blob' | 'special'>;
   mode: () => Promise<number>;
   oid: () => Promise<string>;
-  content: () => Promise<Buffer|void>;
+  content: () => Promise<Buffer|undefined>;
   stat: () => Promise<{
     ctimeSeconds: number;
     mtimeSeconds: number;
@@ -287,19 +287,19 @@ export const cores: {
 export { E } from './errors';
 
 export function WORKDIR(args: {
-  fs: any;
+  fs?: any;
   dir: string;
   gitdir: string;
 }): Walker;
 
 export function TREE(args: {
-  fs: any;
+  fs?: any;
   gitdir: string;
   ref: string;
 }): Walker;
 
 export function STAGE(args: {
-  fs: any;
+  fs?: any;
   gitdir: string;
 }): Walker;
 
@@ -844,7 +844,7 @@ export function walkBeta2<T, Q>(args: WorkDir & GitDir & {
   fs?: any;
   trees: Walker[];
   filter?: (entries: WalkerEntry2[]) => Promise<boolean>;
-  map?: (entries: WalkerEntry2[]) => Promise<T | undefined>;
+  map?: (fullpath: string, entries: WalkerEntry2[]) => Promise<T | undefined>;
   reduce?: (parent: T | undefined, children: Q[]) => Promise<Q>;
   iterate?: (walk: (parent: WalkerEntry2[]) => Promise<Q>, children: Iterable<WalkerEntry2[]>) => Promise<Array<Q|undefined>>;
 }): Promise<Q|undefined>;
