@@ -42,4 +42,9 @@ const nodeConfig = input => ({
 
 const inputs = ['index.js', 'internal-apis.js']
 
-export default [...inputs.map(nodeConfig), ...inputs.map(moduleConfig), nodeConfig('builtin-node/http.js'), moduleConfig('builtin-browser/http.js')]
+export default [
+  ...inputs.map(nodeConfig),
+  ...inputs.map(moduleConfig),
+  nodeConfig('builtin-node/http.js'),
+  moduleConfig('builtin-browser/http.js')
+]
