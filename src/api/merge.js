@@ -96,7 +96,9 @@ export async function merge ({
       author,
       committer: _committer
     })
-    if (!committer && !fastForwardOnly) { throw new GitError(E.MissingCommitterError) }
+    if (!committer && !fastForwardOnly) {
+      throw new GitError(E.MissingCommitterError)
+    }
 
     return await _merge({
       fs,
