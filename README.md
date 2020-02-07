@@ -70,6 +70,7 @@ At the time of writing, the following breaking changes are planned:
 - [ ] Oh, and I should move all the error strings into a separate JSON file that can be fetched lazily in production.
 - [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
 - [ ] Fix `push` to use the remote tracking branch by default for `remtoeRef`
+- [ ] Auto-generate `docs/alphabetic.md` and `README` list from filenames in `src/api`.
 
 ## Getting Started
 
@@ -170,6 +171,10 @@ unless there is a major version bump.
 
 ### commands
 
+<!-- API-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
 - [add](https://isomorphic-git.github.io/docs/add.html)
 - [addNote](https://isomorphic-git.github.io/docs/addNote.html)
 - [addRemote](https://isomorphic-git.github.io/docs/addRemote.html)
@@ -226,6 +231,10 @@ unless there is a major version bump.
 - [writeTag](https://isomorphic-git.github.io/docs/writeTag.html)
 - [writeTree](https://isomorphic-git.github.io/docs/writeTree.html)
 - [writeRef](https://isomorphic-git.github.io/docs/writeRef.html)
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- API-LIST:END -->
 
 ## Community
 

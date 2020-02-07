@@ -18,7 +18,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
- * @param {string} args.oid - [required] The SHA-1 object id of the object to remove the note from.
+ * @param {string} args.oid - The SHA-1 object id of the object to remove the note from.
  * @param {Object} [args.author] - The details about the author.
  * @param {string} [args.author.name] - Default is `user.name` config.
  * @param {string} [args.author.email] - Default is `user.email` config.
