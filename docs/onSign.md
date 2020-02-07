@@ -1,6 +1,6 @@
 ---
-title: pgp
-sidebar_label: pgp
+title: onSign & onVerify
+sidebar_label: onSign & onVerify
 ---
 
 In order to use the PGP signing feature of [commit](./commit.md), you have to provide a PGP signing callback like so:

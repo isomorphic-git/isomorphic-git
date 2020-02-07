@@ -82,9 +82,6 @@ typings/
 
 # AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE
 docs/errors.md
-docs/STAGE.md
-docs/TREE.md
-docs/WORKDIR.md
 docs/add.md
 docs/addNote.md
 docs/addRemote.md
@@ -93,7 +90,6 @@ docs/branch.md
 docs/checkout.md
 docs/clone.md
 docs/commit.md
-docs/config.md
 docs/currentBranch.md
 docs/deleteBranch.md
 docs/deleteRef.md
@@ -104,6 +100,8 @@ docs/expandRef.md
 docs/fetch.md
 docs/findMergeBase.md
 docs/findRoot.md
+docs/getConfig.md
+docs/getConfigAll.md
 docs/getRemoteInfo.md
 docs/hashBlob.md
 docs/indexPack.md
@@ -129,6 +127,7 @@ docs/remove.md
 docs/removeNote.md
 docs/resetIndex.md
 docs/resolveRef.md
+docs/setConfig.md
 docs/status.md
 docs/statusMatrix.md
 docs/tag.md

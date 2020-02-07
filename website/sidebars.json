@@ -53,12 +53,13 @@
       "STAGE",
       "TREE"
     ],
-    "Plugins": [
-      "plugin_credentialManager",
-      "plugin_emitter",
-      "plugin_fs",
-      "plugin_http",
-      "plugin_pgp"
+    "Callbacks": [
+      "onAuth",
+      "onAuthSuccess",
+      "onAuthFailure",
+      "onMessage",
+      "onProgress",
+      "onSign"
     ],
     "Raw Objects": [
       "readBlob",
