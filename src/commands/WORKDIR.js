@@ -5,12 +5,7 @@ import { GitWalkerFs } from '../models/GitWalkerFs.js'
 import { GitWalkSymbol } from '../utils/symbols.js'
 
 /**
- * Get a working directory `Walker`
- *
- * See [walk](./walk.md)
- *
- * @returns {Walker} Returns a working directory Walker
- *
+ * @returns {Walker}
  */
 export function WORKDIR () {
   const o = Object.create(null)

@@ -248,3 +248,30 @@
  * @param {GitHttpRequest} request
  * @returns {Promise<GitHttpResponse>}
  */
+
+/**
+ * @callback WalkerMap
+ * @param {string} filename
+ * @param {?WalkerEntry[]} entries
+ * @returns {Promise<any>}
+ */
+
+/**
+ * @callback WalkerReduce
+ * @param {any} parent
+ * @param {any[]} children
+ * @returns {Promise<any>}
+ */
+
+/**
+ * @callback WalkerIterateCallback
+ * @param {WalkerEntry[]} entries
+ * @returns {Promise<any[]>}
+ */
+
+/**
+ * @callback WalkerIterate
+ * @param {WalkerIterateCallback} walk
+ * @param {IterableIterator<WalkerEntry[]>} children
+ * @returns {Promise<any[]>}
+ */

@@ -5,6 +5,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { join } from '../utils/join.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  * Write a ref which refers to the specified SHA-1 object id, or a symbolic ref which refers to the specified ref.
@@ -46,6 +47,11 @@ export async function writeRef ({
   symbolic = false
 }) {
   try {
+    assertParameter('fs', _fs)
+    assertParameter('gitdir', gitdir)
+    assertParameter('ref', ref)
+    assertParameter('value', value)
+
     const fs = new FileSystem(_fs)
 
     if (ref !== cleanGitRef.clean(ref)) {

@@ -13,7 +13,6 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref = 'HEAD'] - Source to checkout files from

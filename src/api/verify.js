@@ -8,6 +8,7 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
+import { assertParameter } from '../utils/assertParameter.js'
 
 /**
  * Verify a signed commit or tag
@@ -56,6 +57,12 @@ export async function verify ({
   publicKeys
 }) {
   try {
+    assertParameter('fs', _fs)
+    assertParameter('verify', verify)
+    assertParameter('gitdir', gitdir)
+    assertParameter('ref', ref)
+    assertParameter('publicKeys', publicKeys)
+
     const fs = new FileSystem(_fs)
     const oid = await GitRefManager.resolve({ fs, gitdir, ref })
     const { type, object } = await readObject({ fs, gitdir, oid })

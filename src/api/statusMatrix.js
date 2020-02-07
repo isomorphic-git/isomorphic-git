@@ -1,14 +1,15 @@
 // @ts-check
+import '../commands/typedefs.js'
+
+import { STAGE } from '../commands/STAGE.js'
+import { TREE } from '../commands/TREE.js'
+import { WORKDIR } from '../commands/WORKDIR.js'
+import { walk } from '../commands/walk.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 import { worthWalking } from '../utils/worthWalking.js'
-
-import { STAGE } from './STAGE.js'
-import { TREE } from './TREE.js'
-import { WORKDIR } from './WORKDIR.js'
-import { walk } from './walk.js'
-import { assertParameter } from '../utils/assertParameter.js'
-import { FileSystem } from '../models/FileSystem.js'
 
 /**
  * Efficiently get the status of multiple files at once.

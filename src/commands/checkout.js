@@ -17,7 +17,6 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {ProgressCallback} [args.onProgress]
- * @param {string} [args.core = 'default']
  * @param {string} args.dir
  * @param {string} args.gitdir
  * @param {string} args.ref
