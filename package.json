@@ -42,14 +42,16 @@
   },
   "homepage": "https://isomorphic-git.org/",
   "files": [
-    "dist/index.js",
-    "dist/index.cjs",
-    "dist/index.d.ts",
+    "cli.js",
     "dist/browser-tests.json",
     "dist/bundle.umd.min.js",
     "dist/bundle.umd.min.js.map",
-    "dist/size_report.html",
-    "cli.js"
+    "dist/http.cjs",
+    "dist/http.js",
+    "dist/index.cjs",
+    "dist/index.d.ts",
+    "dist/index.js",
+    "dist/size_report.html"
   ],
   "dependencies": {
     "async-lock": "^1.1.0",
