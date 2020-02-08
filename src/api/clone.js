@@ -9,8 +9,6 @@ import { join } from '../utils/join.js'
 /**
  * Clone a repository
  *
- * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
- *
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
  * @param {HttpClient} args.http - an HTTP client

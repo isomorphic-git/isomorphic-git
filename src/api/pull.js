@@ -10,9 +10,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
 /**
- * Fetch and merge commits from a remote repository *(Currently, only fast-forward merges are implemented.)*
- *
- * To monitor progress events, see the documentation for the [`'emitter'` plugin](./plugin_emitter.md).
+ * Fetch and merge commits from a remote repository
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
