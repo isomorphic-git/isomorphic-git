@@ -46,11 +46,6 @@ footer img[src="/img/isomorphic-git-logo.svg"] {
   /* height: 80px; */
 }
 
-img[src="https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&microsoftedge=17&safari=11&android=7.1&iphone=11.2"] {
-  padding-top: 40px;
-  padding-bottom: 20px;
-}
-
 .isomorphic-git-feature-list {
   list-style: none;
   margin: 40px;
@@ -61,6 +56,44 @@ img[src="https://badges.herokuapp.com/browsers?googlechrome=+66&firefox=60&micro
 }
 .isomorphic-git-feature-list li {
   width: fit-content;
+}
+.isomorphic-git-feature-list img {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.isomorphic-git-browser-list {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 86px;
+  display: flex;
+  justify-content: space-evenly;
+  width: calc(90px * 6);
+  flex-wrap: wrap;
+}
+@media only screen and (max-width: 1024px) {
+  .isomorphic-git-browser-list {
+    width: calc(85px * 3);
+  }
+}
+@media only screen and (max-width: 1024px) {
+  .isomorphic-git-browser-list-header {
+    margin-top: 3em;
+  }
+}
+@media only screen and (max-width: 735px) {
+  .isomorphic-git-browser-list-header-2 {
+    margin-top: 1em;
+  }
+  .isomorphic-git-browser-list-block-2 {
+    margin-top: 4em;
+  }
+}
+@media only screen and (max-width: 1499px) {
+  .projectLogo {
+    display: none !important;
+  }
 }
 
 .input {
