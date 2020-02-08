@@ -1,12 +1,13 @@
 // @ts-check
 import '../commands/typedefs.js'
 
+import { currentBranch } from '../commands/currentBranch.js'
 import { findMergeBase } from '../commands/findMergeBase.js'
-import { getConfig } from '../commands/getConfig.js'
 import { isDescendent } from '../commands/isDescendent.js'
 import { listCommitsAndTags } from '../commands/listCommitsAndTags.js'
 import { listObjects } from '../commands/listObjects.js'
 import { pack } from '../commands/pack.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { E, GitError } from '../models/GitError.js'
@@ -73,10 +74,10 @@ export async function push ({
   onAuthSuccess,
   onAuthFailure,
   gitdir,
-  ref,
-  remoteRef,
-  remote = 'origin',
-  url,
+  ref: _ref,
+  remoteRef: _remoteRef,
+  remote,
+  url: _url,
   force = false,
   delete: _delete = false,
   noGitSuffix = false,
@@ -87,25 +88,45 @@ export async function push ({
   oauth2format,
   headers = {}
 }) {
-  // TODO: Figure out how pushing tags works. (This only works for branches.)
-  if (url === undefined) {
-    url = await getConfig({ fs, gitdir, path: `remote.${remote}.url` })
+  const ref = _ref || await currentBranch({ fs, gitdir })
+  if (typeof ref === 'undefined') {
+    throw new GitError(E.MissingRequiredParameterError, {
+      parameter: 'ref'
+    })
+  }
+  const config = await GitConfigManager.get({ fs, gitdir })
+  // Figure out what remote to use.
+  remote =
+    remote ||
+    (await config.get(`branch.${ref}.pushRemote`)) ||
+    (await config.get('remote.pushDefault')) ||
+    (await config.get(`branch.${ref}.remote`)) ||
+    'origin'
+  // Lookup the URL for the given remote.
+  const url =
+    _url ||
+    (await config.get(`remote.${remote}.pushurl`)) ||
+    (await config.get(`remote.${remote}.url`))
+  if (typeof url === 'undefined') {
+    throw new GitError(E.MissingRequiredParameterError, {
+      parameter: 'remote OR url'
+    })
+  }
+  // Figure out what remote ref to use.
+  const remoteRef =
+    _remoteRef ||
+    (await config.get(`branch.${ref}.merge`))
+  if (typeof url === 'undefined') {
+    throw new GitError(E.MissingRequiredParameterError, {
+      parameter: 'remoteRef'
+    })
   }
 
   if (corsProxy === undefined) {
-    corsProxy = await getConfig({ fs, gitdir, path: 'http.corsProxy' })
+    corsProxy = await config.get('http.corsProxy')
   }
-  let fullRef
-  if (!ref) {
-    fullRef = await GitRefManager.resolve({
-      fs,
-      gitdir,
-      ref: 'HEAD',
-      depth: 2
-    })
-  } else {
-    fullRef = await GitRefManager.expand({ fs, gitdir, ref })
-  }
+
+  const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
   const oid = _delete
     ? '0000000000000000000000000000000000000000'
     : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
@@ -229,6 +250,7 @@ export async function push ({
   }
 
   // Update the local copy of the remote ref
+  // TODO: I think this should actually be using a refspec transform rather than assuming 'refs/remotes/{remote}'
   if (remote && result.ok && result.ok.includes(fullRemoteRef)) {
     const ref = `refs/remotes/${remote}/${fullRemoteRef.replace(
       'refs/heads',

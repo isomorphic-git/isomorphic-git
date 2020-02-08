@@ -1,5 +1,8 @@
 // @ts-check
-import { getConfig } from '../commands/getConfig.js'
+import '../commands/typedefs.js'
+
+import { currentBranch } from '../commands/currentBranch.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -42,12 +45,12 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {string} args.gitdir
  * @param {string|void} [args.url]
  * @param {string} [args.corsProxy]
- * @param {string} [args.ref = 'HEAD']
- * @param {string[]} [args.refs = [ref]]
+ * @param {string} [args.ref]
+ * @param {string} [args.remoteRef]
+ * @param {string} [args.remote]
  * @param {boolean} [args.singleBranch = false]
  * @param {boolean} [args.noGitSuffix = false]
  * @param {boolean} [args.tags = false]
- * @param {string} [args.remote]
  * @param {number} [args.depth]
  * @param {Date} [args.since]
  * @param {string[]} [args.exclude = []]
@@ -72,10 +75,10 @@ export async function fetch ({
   onAuthSuccess,
   onAuthFailure,
   gitdir,
-  ref = 'HEAD',
-  refs = [ref],
-  remote,
-  url,
+  ref: _ref,
+  remoteRef: _remoteRef,
+  remote: _remote,
+  url: _url,
   noGitSuffix = false,
   corsProxy,
   username,
@@ -92,33 +95,37 @@ export async function fetch ({
   prune = false,
   pruneTags = false
 }) {
-  // Lookup remote tracking branch.
-  remote =
-    remote ||
-    (await getConfig({
-      fs,
-      gitdir,
-      path: `branch.${ref}.remote`
-    })) ||
-    'origin'
-  // Set missing values
-  if (typeof url === 'undefined') {
-    url = await getConfig({
-      fs,
-      gitdir,
-      path: `remote.${remote}.url`
+  const ref = _ref || await currentBranch({ fs, gitdir })
+  if (typeof ref === 'undefined') {
+    throw new GitError(E.MissingRequiredParameterError, {
+      parameter: 'ref'
     })
-    // TODO: throw better error
-    if (typeof url === 'undefined') {
-      throw new GitError(E.MissingRequiredParameterError, {
-        parameter: 'remote OR url'
-      })
-    }
   }
+  const config = await GitConfigManager.get({ fs, gitdir })
+  // Figure out what remote to use.
+  const remote =
+    _remote ||
+    (await config.get(`branch.${ref}.remote`)) ||
+    'origin'
+  // Lookup the URL for the given remote.
+  const url =
+    _url ||
+    (await config.get(`remote.${remote}.url`))
+  if (typeof url === 'undefined') {
+    throw new GitError(E.MissingRequiredParameterError, {
+      parameter: 'remote OR url'
+    })
+  }
+  // Figure out what remote ref to use.
+  const remoteRef =
+    _remoteRef ||
+    (await config.get(`branch.${ref}.merge`)) ||
+    ref
 
   if (corsProxy === void 0) {
-    corsProxy = await getConfig({ fs, gitdir, path: 'http.corsProxy' })
+    corsProxy = await config.get('http.corsProxy')
   }
+
   let auth = { username, password, token, oauth2format }
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const remoteHTTP = await GitRemoteHTTP.discover({
@@ -158,7 +165,7 @@ export async function fetch ({
   }
   // Figure out the SHA for the requested ref
   const { oid, fullref } = GitRefManager.resolveAgainstMap({
-    ref,
+    ref: remoteRef,
     map: remoteRefs
   })
   // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
@@ -195,7 +202,7 @@ export async function fetch ({
   // Come up with a reasonable list of oids to tell the remote we already have
   // (preferably oids that are close ancestors of the branch heads we're fetching)
   const haveRefs = singleBranch
-    ? refs
+    ? [ref]
     : await GitRefManager.listRefs({
       fs,
       gitdir,
