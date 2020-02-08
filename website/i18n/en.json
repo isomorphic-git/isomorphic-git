@@ -45,10 +45,6 @@
         "title": "commit",
         "sidebar_label": "commit"
       },
-      "config": {
-        "title": "config",
-        "sidebar_label": "config"
-      },
       "currentBranch": {
         "title": "currentBranch",
         "sidebar_label": "currentBranch"

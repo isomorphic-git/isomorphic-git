@@ -6,33 +6,29 @@ You are very welcome here and any contribution is appreciated. :+1:
 
 # Tips
 
-The code is written in "plain" JavaScript and as a rule of thumb shouldn't require transpilation. (The glaring exception being browser's lack of support for bare imports.) However, until recently Webpack and Jest threw a parse error when they encountered object spread properties (like `{... args}`). So for now I ask that you use `Object.assign`. Too many people ran into issues with object spread. See https://gitter.im/isomorphic-git/Lobby?at=5bd8a0ed435c2a518e2cc779 for background. We'll upgrade all the Object.assign uses to object spread properties when we do a breaking release.
+The code is written in "plain" JavaScript and as a rule of thumb shouldn't require transpilation. (The glaring exception being browser's lack of support for bare imports.)
 
 ## New feature checklists :sparkles:️
 I'm honestly documenting these steps just so I don't forget them myself.
 
 To add a parameter to an existing command `X`:
 
-- [ ] add parameter to the function in `src/commands/X.js`
-- [ ] add parameter to [docs](https://github.com/isomorphic-git/isomorphic-git.github.io/tree/source/docs)/X.md
-- [ ] add parameter to the TypeScript library definition for X in `src/index.d.ts`
+- [ ] add parameter to the function in `src/api/X.js` (and `src/commands/X.js` if necessary)
+- [ ] document the parameter in the JSDoc comment above the function
 - [ ] add a test case in `__tests__/test-X.js` if possible
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
-- [ ] make a feature commit "feat: Added 'bar' parameter to X command"
+- [ ] squash merge the PR with commit message "feat(X): Added 'bar' parameter"
 
 To create a new command:
 
-- [ ] add as a new file in `src/commands`
+- [ ] add as a new file in `src/api` (and `src/commands` if necessary)
 - [ ] add command to `src/index.js`
-- [ ] add TypeScript definition in `src/index.d.ts`
 - [ ] update `__tests__/__snapshots__/test-exports.js.snap`
-- [ ] add command to README list of commands
 - [ ] create a test in `src/__tests__`
-- [ ] create a new doc page [docs](https://github.com/isomorphic-git/isomorphic-git.github.io/tree/source/docs)/X.md
-  - [ ] add page to the [Alphabetical Index](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/docs/alphabetic.md)
-  - [ ] add page to the [sidebar](https://github.com/isomorphic-git/isomorphic-git.github.io/blob/source/website/sidebars.json)
+- [ ] document the command with a JSDoc comment
+- [ ] add page to the Docs Sidebar `website/sidebars.json`
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
-- [ ] make a feature commit "feat: Added 'X' command"
+- [ ] squash merge the PR with commit message "feat: Added 'X' command"
 
 # Overview
 
