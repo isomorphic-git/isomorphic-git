@@ -305,7 +305,7 @@ async function gendoc (file, filepath) {
       'docs',
       'alphabetic.md'
     )
-    let contents = `---
+    const contents = `---
 title: All Commands
 sidebar_label: Alphabetical Index
 ---
@@ -326,7 +326,7 @@ ${docs
   // Update alphabetic listing in README.md
   {
     const readmeFile = path.join(__dirname, '..', '..', 'README.md')
-    let commandList = `API-LIST:START - Do not remove or modify this section -->
+    const commandList = `API-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 
