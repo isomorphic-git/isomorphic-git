@@ -95,7 +95,7 @@ export async function fetch ({
   prune = false,
   pruneTags = false
 }) {
-  const ref = _ref || await currentBranch({ fs, gitdir })
+  const ref = _ref || (await currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
       parameter: 'ref'
@@ -104,13 +104,9 @@ export async function fetch ({
   const config = await GitConfigManager.get({ fs, gitdir })
   // Figure out what remote to use.
   const remote =
-    _remote ||
-    (await config.get(`branch.${ref}.remote`)) ||
-    'origin'
+    _remote || (await config.get(`branch.${ref}.remote`)) || 'origin'
   // Lookup the URL for the given remote.
-  const url =
-    _url ||
-    (await config.get(`remote.${remote}.url`))
+  const url = _url || (await config.get(`remote.${remote}.url`))
   if (typeof url === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
       parameter: 'remote OR url'
@@ -118,9 +114,7 @@ export async function fetch ({
   }
   // Figure out what remote ref to use.
   const remoteRef =
-    _remoteRef ||
-    (await config.get(`branch.${ref}.merge`)) ||
-    ref
+    _remoteRef || (await config.get(`branch.${ref}.merge`)) || ref
 
   if (corsProxy === void 0) {
     corsProxy = await config.get('http.corsProxy')

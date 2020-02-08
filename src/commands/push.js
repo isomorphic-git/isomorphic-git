@@ -88,7 +88,7 @@ export async function push ({
   oauth2format,
   headers = {}
 }) {
-  const ref = _ref || await currentBranch({ fs, gitdir })
+  const ref = _ref || (await currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
       parameter: 'ref'
@@ -113,9 +113,7 @@ export async function push ({
     })
   }
   // Figure out what remote ref to use.
-  const remoteRef =
-    _remoteRef ||
-    (await config.get(`branch.${ref}.merge`))
+  const remoteRef = _remoteRef || (await config.get(`branch.${ref}.merge`))
   if (typeof url === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
       parameter: 'remoteRef'
