@@ -7,15 +7,6 @@ import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
 /**
- *
- * @typedef {Object} PushResult - Returns an object with a schema like this:
- * @property {string[]} [ok]
- * @property {string[]} [errors]
- * @property {object} [headers]
- *
- */
-
-/**
  * Push a branch or tag
  *
  * The push command returns an object that describes the result of the attempted push operation.
@@ -52,6 +43,7 @@ import { join } from '../utils/join.js'
  *
  * @returns {Promise<PushResult>} Resolves successfully when push completes with a detailed description of the operation from the server.
  * @see PushResult
+ * @see RefUpdateStatus
  *
  * @example
  * let pushResult = await git.push({

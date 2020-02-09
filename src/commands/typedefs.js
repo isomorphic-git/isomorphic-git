@@ -275,3 +275,21 @@
  * @param {IterableIterator<WalkerEntry[]>} children
  * @returns {Promise<any[]>}
  */
+
+/**
+ *
+ * @typedef {Object} RefUpdateStatus
+ * @property {boolean} ok
+ * @property {string} error
+ *
+ */
+
+/**
+ *
+ * @typedef {Object} PushResult
+ * @property {boolean} ok
+ * @property {?string} error
+ * @property {Object<string, RefUpdateStatus>} refs
+ * @property {Object<string, string>} [headers]
+ *
+ */
