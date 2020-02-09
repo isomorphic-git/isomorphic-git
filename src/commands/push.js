@@ -243,7 +243,10 @@ export async function push ({
   if (result.ok && Object.values(result.refs).every(result => result.ok)) {
     return result
   } else {
-    const prettyDetails = Object.entries(result.refs).filter(([k, v]) => !v.ok).map(([k, v]) => `\n  - ${k}: ${v.error}`).join('')
+    const prettyDetails = Object.entries(result.refs)
+      .filter(([k, v]) => !v.ok)
+      .map(([k, v]) => `\n  - ${k}: ${v.error}`)
+      .join('')
     throw new GitError(E.GitPushError, Object.assign({ prettyDetails }, result))
   }
 }

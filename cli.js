@@ -9,7 +9,9 @@ const { http } = require('./dist/http.cjs')
 
 minimisted(async function ({ _: [command, ...args], ...opts }) {
   try {
-    const result = await git[command](Object.assign({ fs, http, dir: '.' }, opts))
+    const result = await git[command](
+      Object.assign({ fs, http, dir: '.' }, opts)
+    )
     if (result === undefined) return
     // detect streams
     if (typeof result.on === 'function') {
