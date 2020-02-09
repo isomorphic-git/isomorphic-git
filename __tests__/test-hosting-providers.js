@@ -60,9 +60,8 @@ describe('Hosting Providers', () => {
         force: true
       })
       expect(res).toBeTruthy()
-      expect(res.ok).toBeTruthy()
-      expect(res.ok[0]).toBe('unpack')
-      expect(res.ok[1]).toBe('refs/heads/master')
+      expect(res.ok).toBe(true)
+      expect(res.refs['refs/heads/master'].ok).toBe(true)
     })
   })
   describe('Azure DevOps', () => {
@@ -114,9 +113,8 @@ describe('Hosting Providers', () => {
         force: true
       })
       expect(res).toBeTruthy()
-      expect(res.ok).toBeTruthy()
-      expect(res.ok[0]).toBe('unpack')
-      expect(res.ok[1]).toBe('refs/heads/master')
+      expect(res.ok).toBe(true)
+      expect(res.refs['refs/heads/master'].ok).toBe(true)
     })
   })
   describe('Bitbucket', () => {
@@ -144,9 +142,8 @@ describe('Hosting Providers', () => {
         force: true
       })
       expect(res).toBeTruthy()
-      expect(res.ok).toBeTruthy()
-      expect(res.ok[0]).toBe('unpack')
-      expect(res.ok[1]).toBe('refs/heads/master')
+      expect(res.ok).toBe(true)
+      expect(res.refs['refs/heads/master'].ok).toBe(true)
     })
     it('fetch', async () => {
       // This App Password is for the test account 'isomorphic-git' user on Bitbucket,
@@ -224,9 +221,8 @@ describe('Hosting Providers', () => {
         force: true
       })
       expect(res).toBeTruthy()
-      expect(res.ok).toBeTruthy()
-      expect(res.ok[0]).toBe('unpack')
-      expect(res.ok[1]).toBe('refs/heads/master')
+      expect(res.ok).toBe(true)
+      expect(res.refs['refs/heads/master'].ok).toBe(true)
     })
   })
   describe('GitLab', () => {
@@ -280,9 +276,8 @@ describe('Hosting Providers', () => {
         force: true
       })
       expect(res).toBeTruthy()
-      expect(res.ok).toBeTruthy()
-      expect(res.ok[0]).toBe('unpack')
-      expect(res.ok[1]).toBe('refs/heads/master')
+      expect(res.ok).toBe(true)
+      expect(res.refs['refs/heads/master'].ok).toBe(true)
     })
   })
 })

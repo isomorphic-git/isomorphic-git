@@ -19,8 +19,7 @@ describe('config', () => {
     const fetches = await getConfigAll({
       fs,
       gitdir,
-      path: 'remote.upstream.fetch',
-      all: true
+      path: 'remote.upstream.fetch'
     })
     expect(sym).toBe(false)
     expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')

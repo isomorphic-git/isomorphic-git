@@ -1,7 +1,10 @@
+import '../commands/typedefs.js'
+
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
 export async function parseReceivePackResponse (packfile) {
+  /** @type PushResult */
   const result = {}
   let response = ''
   const read = GitPktLine.streamReader(packfile)
@@ -17,20 +20,22 @@ export async function parseReceivePackResponse (packfile) {
   if (!line.startsWith('unpack ')) {
     throw new GitError(E.UnparseableServerResponseFail, { line })
   }
-  if (line === 'unpack ok') {
-    result.ok = ['unpack']
-  } else {
-    result.errors = [line.trim()]
+  result.ok = line === 'unpack ok'
+  if (!result.ok) {
+    result.error = line.slice('unpack '.length)
   }
+  result.refs = {}
   for (const line of lines) {
+    if (line.trim() === '') continue
     const status = line.slice(0, 2)
     const refAndMessage = line.slice(3)
-    if (status === 'ok') {
-      result.ok = result.ok || []
-      result.ok.push(refAndMessage)
-    } else if (status === 'ng') {
-      result.errors = result.errors || []
-      result.errors.push(refAndMessage)
+    let space = refAndMessage.indexOf(' ')
+    if (space === -1) space = refAndMessage.length
+    const ref = refAndMessage.slice(0, space)
+    const error = refAndMessage.slice(space + 1)
+    result.refs[ref] = {
+      ok: status === 'ok',
+      error
     }
   }
   return result
