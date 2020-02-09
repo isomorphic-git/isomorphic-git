@@ -37,9 +37,8 @@ describe('push', () => {
       ref: 'refs/heads/master'
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/master'].ok).toBe(true)
     expect(output).toMatchSnapshot()
   })
   it('push without ref', async () => {
@@ -59,9 +58,8 @@ describe('push', () => {
       remote: 'karma'
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/master'].ok).toBe(true)
   })
   it('push with ref !== remoteRef', async () => {
     // Setup
@@ -82,9 +80,8 @@ describe('push', () => {
       remoteRef: 'foobar'
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/foobar')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/foobar'].ok).toBe(true)
     expect(await listBranches({ fs, gitdir, remote: 'karma' })).toContain(
       'foobar'
     )
@@ -107,9 +104,8 @@ describe('push', () => {
       ref: 'lightweight-tag'
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/tags/lightweight-tag')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/tags/lightweight-tag'].ok).toBe(true)
   })
   it('push with annotated tag', async () => {
     // Setup
@@ -129,9 +125,8 @@ describe('push', () => {
       ref: 'annotated-tag'
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/tags/annotated-tag')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/tags/annotated-tag'].ok).toBe(true)
   })
   it('push delete', async () => {
     // Setup
@@ -163,9 +158,8 @@ describe('push', () => {
       delete: true
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/foobar')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/foobar'].ok).toBe(true)
     expect(await listBranches({ fs, gitdir, remote: 'karma' })).not.toContain(
       'foobar'
     )
@@ -191,9 +185,8 @@ describe('push', () => {
       ref: 'master'
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/master'].ok).toBe(true)
   })
   it('push with Basic Auth credentials in the URL', async () => {
     // Setup
@@ -213,9 +206,8 @@ describe('push', () => {
       ref: 'master'
     })
     expect(res).toBeTruthy()
-    expect(res.ok).toBeTruthy()
-    expect(res.ok[0]).toBe('unpack')
-    expect(res.ok[1]).toBe('refs/heads/master')
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/master'].ok).toBe(true)
   })
   it('throws an Error if no credentials supplied', async () => {
     // Setup

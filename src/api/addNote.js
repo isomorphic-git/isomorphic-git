@@ -2,9 +2,8 @@
 import '../commands/typedefs.js'
 
 import { addNote as _addNote } from '../commands/addNote.js'
-import { E } from '../index.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { GitError } from '../models/GitError.js'
+import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'

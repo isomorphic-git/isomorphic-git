@@ -304,10 +304,10 @@ describe('merge', () => {
       depth: 1
     }))[0]
     expect(notMergeCommit.oid).toEqual(originalCommit.oid)
+    if (!report.oid) throw new Error('type error')
     // make sure no commit object was created
     expect(
       await fs.exists(
-        // @ts-ignore
         `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
       )
     ).toBe(false)
@@ -351,10 +351,10 @@ describe('merge', () => {
       depth: 1
     }))[0]
     expect(notMergeCommit.oid).toEqual(originalCommit.oid)
+    if (!report.oid) throw new Error('type error')
     // but make sure the commit object exists
     expect(
       await fs.exists(
-        // @ts-ignore
         `${gitdir}/objects/${report.oid.slice(0, 2)}/${report.oid.slice(2)}`
       )
     ).toBe(true)

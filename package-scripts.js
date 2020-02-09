@@ -25,7 +25,7 @@ const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 module.exports = {
   scripts: {
     lint: {
-      default: series.nps('lint.js'),
+      default: series.nps('lint.js', 'lint.typescriptTests'),
       js: `standard ${srcPaths}`,
       fix: `standard --fix ${srcPaths}`,
       typescriptTests: 'tsc -p tsconfig.json'
