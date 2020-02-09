@@ -20,7 +20,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * await git.addRemote({ dir: '$input((/))', remote: '$input((upstream))', url: '$input((https://github.com/isomorphic-git/isomorphic-git))' })
+ * await git.addRemote({ fs, dir: '/tutorial', remote: 'upstream', url: 'https://github.com/isomorphic-git/isomorphic-git' })
  * console.log('done')
  *
  */

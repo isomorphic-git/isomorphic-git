@@ -29,8 +29,9 @@ import { join } from '../utils/join.js'
  * @example
  * // Create a packfile containing only an empty tree
  * let { packfile } = await git.packObjects({
- *   dir: '$input((/))',
- *   oids: [$input(('4b825dc642cb6eb9a060e54bf8d69288fbee4904'))]
+ *   fs,
+ *   dir: '/tutorial',
+ *   oids: ['4b825dc642cb6eb9a060e54bf8d69288fbee4904']
  * })
  * console.log(packfile)
  *

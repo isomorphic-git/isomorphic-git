@@ -52,9 +52,11 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  *
  * @example
  * await git.pull({
- *   dir: '$input((/))',
- *   ref: '$input((master))',
- *   singleBranch: $input((true))
+ *   fs,
+ *   http,
+ *   dir: '/tutorial',
+ *   ref: 'master',
+ *   singleBranch: true
  * })
  * console.log('done')
  *

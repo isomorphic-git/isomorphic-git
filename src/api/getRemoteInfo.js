@@ -38,8 +38,9 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  * @example
  * let info = await git.getRemoteInfo({
+ *   http,
  *   url:
- *     "$input((https://cors.isomorphic-git.org/github.com/isomorphic-git/isomorphic-git.git))"
+ *     "https://cors.isomorphic-git.org/github.com/isomorphic-git/isomorphic-git.git"
  * });
  * console.log(info);
  *

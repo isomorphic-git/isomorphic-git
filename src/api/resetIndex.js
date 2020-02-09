@@ -22,7 +22,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
  * @example
- * await git.resetIndex({ dir: '$input((/))', filepath: '$input((README.md))' })
+ * await git.resetIndex({ fs, dir: '/tutorial', filepath: 'README.md' })
  * console.log('done')
  *
  */

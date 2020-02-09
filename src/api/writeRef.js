@@ -23,16 +23,18 @@ import { join } from '../utils/join.js'
  *
  * @example
  * await git.writeRef({
- *   dir: '$input((/))',
- *   ref: '$input((refs/heads/another-branch))',
- *   value: '$input((HEAD))'
+ *   fs,
+ *   dir: '/tutorial',
+ *   ref: 'refs/heads/another-branch',
+ *   value: 'HEAD'
  * })
  * await git.writeRef({
- *   dir: '$input((/))',
- *   ref: '$input((HEAD))',
- *   value: '$input((refs/heads/another-branch))',
- *   force: $input((true)),
- *   symbolic: $input((true))
+ *   fs,
+ *   dir: '/tutorial',
+ *   ref: 'HEAD',
+ *   value: 'refs/heads/another-branch',
+ *   force: true,
+ *   symbolic: true
  * })
  * console.log('done')
  *

@@ -19,7 +19,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * await git.tag({ dir: '$input((/))', ref: '$input((test-tag))' })
+ * await git.tag({ fs, dir: '/tutorial', ref: 'test-tag' })
  * console.log('done')
  *
  */

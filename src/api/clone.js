@@ -40,7 +40,9 @@ import { join } from '../utils/join.js'
  *
  * @example
  * await git.clone({
- *   dir: '/',
+ *   fs,
+ *   http,
+ *   dir: '/tutorial',
  *   corsProxy: 'https://cors.isomorphic-git.org',
  *   url: 'https://github.com/isomorphic-git/isomorphic-git',
  *   singleBranch: true,

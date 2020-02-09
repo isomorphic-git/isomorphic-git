@@ -22,10 +22,10 @@ import { join } from '../utils/join'
  *
  * @example
  * // All the files in the previous commit
- * let files = await git.listFiles({ dir: '$input((/))', ref: '$input((HEAD))' })
+ * let files = await git.listFiles({ fs, dir: '/tutorial', ref: 'HEAD' })
  * console.log(files)
  * // All the files in the current staging area
- * files = await git.listFiles({ dir: '$input((/))' })
+ * files = await git.listFiles({ fs, dir: '/tutorial' })
  * console.log(files)
  *
  */

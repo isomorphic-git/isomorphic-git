@@ -24,8 +24,9 @@ import { join } from '../utils/join.js'
  * @example
  * // Read config value
  * let value = await git.getConfig({
- *   dir: '$input((/))',
- *   path: '$input((user.name))'
+ *   fs,
+ *   dir: '/tutorial',
+ *   path: 'user.name'
  * })
  * console.log(value)
  *

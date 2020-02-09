@@ -172,42 +172,30 @@ import { resolveTree } from '../utils/resolveTree.js'
  * @see ReadObjectResult
  *
  * @example
- * // Get the contents of 'README.md' in the master branch.
- * let sha = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
- * console.log(sha)
- * let { object: blob } = await git.readObject({
- *   dir: '$input((/))',
- *   oid: $input((sha)),
- *   $textarea((filepath: 'README.md',
- *   encoding: 'utf8'))
+ * // Given a ransom SHA-1 object id, figure out what it is
+ * let { type, object } = await git.readObject({
+ *   fs,
+ *   dir: '/tutorial',
+ *   oid: '0698a781a02264a6f37ba3ff41d78067eaf0f075'
  * })
- * console.log(blob)
- *
- * @example
- * // Find all the .js files in the current master branch containing the word 'commit'
- * let sha = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
- * console.log(sha)
- * let { object: commit } = await git.readObject({ dir: '$input((/))', oid: sha })
- * console.log(commit)
- *
- * const searchTree = async ({oid, prefix = ''}) => {
- *   let { object: tree } = await git.readObject({ dir: '$input((/))', oid })
- *   for (let entry of tree) {
- *     if (entry.type === 'tree') {
- *       await searchTree({oid: entry.oid, prefix: `${prefix}/${entry.path}`})
- *     } else if (entry.type === 'blob') {
- *       if ($input((entry.path.endsWith('.js')))) {
- *         let { object: blob } = await git.readObject({ dir: '$input((/))', oid: entry.oid })
- *         if ($input((blob.toString('utf8').includes('commit')))) {
- *           console.log(`${prefix}/${entry.path}`)
- *         }
- *       }
- *     }
+ * switch (type) {
+ *   case 'commit': {
+ *     console.log(object)
+ *     break
+ *   }
+ *   case 'tree': {
+ *     console.log(object)
+ *     break
+ *   }
+ *   case 'blob': {
+ *     console.log(object)
+ *     break
+ *   }
+ *   case 'tag': {
+ *     console.log(object)
+ *     break
  *   }
  * }
- *
- * await searchTree({oid: commit.tree})
- * console.log('done')
  *
  */
 export async function readObject ({

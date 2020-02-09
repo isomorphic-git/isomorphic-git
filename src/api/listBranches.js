@@ -24,9 +24,9 @@ import { join } from '../utils/join.js'
  * @returns {Promise<Array<string>>} Resolves successfully with an array of branch names
  *
  * @example
- * let branches = await git.listBranches({ dir: '$input((/))' })
+ * let branches = await git.listBranches({ fs, dir: '/tutorial' })
  * console.log(branches)
- * let remoteBranches = await git.listBranches({ dir: '$input((/))', remote: '$input((origin))' })
+ * let remoteBranches = await git.listBranches({ fs, dir: '/tutorial', remote: 'origin' })
  * console.log(remoteBranches)
  *
  */

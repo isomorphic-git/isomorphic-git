@@ -29,14 +29,15 @@ import { join } from '../utils/join.js'
  *
  * @example
  * // Get the contents of 'README.md' in the master branch.
- * let commitOid = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
+ * let commitOid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'master' })
  * console.log(commitOid)
- * let { object: blob } = await git.readBlob({
- *   dir: '$input((/))',
- *   oid: $input((commitOid)),
- *   $textarea((filepath: 'README.md'
+ * let { blob } = await git.readBlob({
+ *   fs,
+ *   dir: '/tutorial',
+ *   oid: commitOid,
+ *   filepath: 'README.md'
  * })
- * console.log(blob.toString('utf8'))
+ * console.log(Buffer.from(blob).toString('utf8'))
  *
  */
 export async function readBlob ({

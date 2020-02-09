@@ -23,7 +23,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  * @example
  * let { oid, type, object, format } = await git.hashBlob({
- *   object: '$input((Hello world!))',
+ *   object: 'Hello world!',
  * })
  *
  * console.log('oid', oid)

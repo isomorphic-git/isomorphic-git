@@ -95,6 +95,23 @@ function gentypedef (ast) {
   typedefs.set(ast.name, text)
 }
 
+try {
+  fs.mkdirSync(path.join(__dirname, '..', '..', 'dist', 'examples'))
+} catch (_) {}
+
+function writeExample (text, filepath) {
+  const exampleFilepath = path.join(__dirname, '..', '..', 'dist', 'examples', filepath)
+  text = `const fs = require('fs')
+const git = require('isomorphic-git')
+const { http } = require('isomorphic-git/http')
+const { pgp } = require('@isomorphic-git/pgp-plugin')
+
+export {};
+
+${text}`
+  fs.writeFileSync(exampleFilepath, text, 'utf8')
+}
+
 async function gendoc (file, filepath) {
   // Fix some TypeScript-isms that jsdoc doesn't like
   file = file.replace(/\{import\('events'\)\.EventEmitter\}/g, '{EventEmitter}')
@@ -219,10 +236,12 @@ async function gendoc (file, filepath) {
       if (description !== '') text += `\n${description}\n`
       if (obj.examples) {
         text += `\nExample Code:\n`
+        let n = 1
         for (const example of obj.examples) {
           text += '\n```js live\n'
           text += example
           text += '\n```\n'
+          writeExample(example, `${path.basename(filepath, '.js')}_${n++}.js`)
         }
       }
       if (obj.name) {

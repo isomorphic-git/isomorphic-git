@@ -18,12 +18,8 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
  * @example
- * await new Promise((resolve, reject) => fs.writeFile(
- *   '$input((/README.md))',
- *   `$textarea((# TEST))`,
- *   (err) => err ? reject(err) : resolve()
- * ))
- * await git.add({ dir: '$input((/))', filepath: '$input((README.md))' })
+ * await fs.promises.writeFile('/tutorial/README.md', `# TEST`)
+ * await git.add({ fs, dir: '/tutorial', filepath: 'README.md' })
  * console.log('done')
  *
  */
