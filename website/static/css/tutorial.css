@@ -1,0 +1,108 @@
+code {
+  overflow: auto;
+  min-height: 3.5em;
+}
+.codemirror-content[contenteditable] {
+  border-bottom: none;
+}
+.codemirror-content {
+  border: 1px solid #dfe2e5;
+}
+.eval-button-wrapper {
+  background-color: #f6f8fa;
+  border-bottom: 1px solid #dfe2e5;
+  border-left: 1px solid #dfe2e5;
+  border-right: 1px solid #dfe2e5;
+  display: flex;
+  flex-direction: column-reverse;
+}
+.eval-button {
+  background: #2E8555;
+  color: #fff;
+}
+.eval-button:hover {
+  filter: brightness(85%);
+}
+.eval-button.busy {
+  font-style: italic;
+}
+.eval-button.busy:after {
+  content: 'NING...';
+}
+.eval-output {
+  margin-top: 8px;
+  padding: 10px;
+  padding-top: 20px;
+  background: white;
+  border: 3px solid lightgray;
+  position: relative;
+  overflow: auto;
+}
+.eval-output::before {
+  content: 'return value';
+  font-style: italic;
+  font-size: 12px;
+  color: rgb(194, 194, 194);
+  position: absolute;
+  top: -3px;
+  left: 3px;
+}
+.eval-log-output-box {
+  margin-top: 8px;
+  padding: 10px;
+  padding-top: 20px;
+  background: white;
+  border: 3px solid lightgray;
+  display: flex;
+  position: relative;
+  overflow: auto;
+}
+.eval-log-output-box::before {
+  content: 'console.log';
+  font-style: italic;
+  font-size: 12px;
+  color: rgb(194, 194, 194);
+  position: absolute;
+  top: -3px;
+  left: 3px;
+}
+.eval-log-output-item {
+  margin-right: 1em;
+}
+
+.eval-error-output {
+  margin-top: 8px;
+  padding: 10px;
+  padding-top: 20px;
+  background: white;
+  border: 3px solid red;
+  position: relative;
+  overflow: auto;
+}
+.eval-error-output::before {
+  content: 'Threw Error';
+  font-style: italic;
+  font-size: 12px;
+  color: red;
+  position: absolute;
+  top: -3px;
+  left: 3px;
+}
+[contenteditable] {
+  border-bottom: 1px dotted;
+}
+
+.close-button {
+  font-size: 12px;
+  color: rgb(194, 194, 194);
+  position: absolute;
+  padding-right: 0;
+  top: 0;
+  right: 3px;
+  border: none;
+  background: none;
+}
+.close-button:hover {
+  font-style: italic;
+  color: red;
+}

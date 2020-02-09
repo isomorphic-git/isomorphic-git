@@ -1,0 +1,84 @@
+# Node.js
+# Build a general Node.js application with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/vsts/pipelines/languages/javascript
+jobs:
+- job: Linux
+
+  pool:
+    vmImage: 'Ubuntu 18.04'
+
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '10.x'
+    displayName: 'Install Node.js'
+
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
+    inputs:
+      keyfile: 'package-lock.json'
+      targetfolder: 'node_modules'
+      vstsFeed: $(ARTIFACT_FEED)
+
+  - script: npm ci
+    displayName: 'Install dependencies'
+    condition: ne(variables['CacheRestored'], 'true')
+
+  - script: npm test
+    displayName: 'Run tests'
+    env:
+      BROWSER_STACK_ACCESS_KEY: $(BROWSER_STACK_ACCESS_KEY)
+      BROWSER_STACK_USERNAME: $(BROWSER_STACK_USERNAME)
+      BUNDLEWATCH_GITHUB_TOKEN: $(BUNDLEWATCH_GITHUB_TOKEN)
+      SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
+      SAUCE_USERNAME: $(SAUCE_USERNAME)
+      TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome'
+
+  - task: PublishTestResults@2
+    displayName: 'Save test results'
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Save code coverage'
+    condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+
+  - script: npm pack
+    displayName: 'Prepare installable tarball'
+    condition: succeededOrFailed()
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Save npm-tarball.tgz'
+    condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
+    inputs:
+      artifactName: 'npm-tarball.tgz'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/isomorphic-git-0.0.0-development.tgz'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Save bundle.umd.min.js'
+    condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
+    inputs:
+      artifactName: 'bundle.umd.min.js'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)/dist/bundle.umd.min.js'
+
+  - script: npm run semantic-release
+    displayName: 'Publish to npm'
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/beta')))
+    env:
+      GH_TOKEN: $(GITHUB_TOKEN)
+      NPM_TOKEN: $(Npm.Token)
+      TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
+      TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
+
+  - script: npm run publish-website
+    displayName: 'Update website'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    env:
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
+      NPM_TOKEN: $(Npm.Token)

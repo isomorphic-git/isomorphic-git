@@ -1,0 +1,111 @@
+{
+  "docs": {
+    "All Commands": [
+      "alphabetic",
+      "errors"
+    ],
+    "Repository": [
+      "init",
+      "clone",
+      "commit",
+      "log",
+      "config",
+      "fetch",
+      "checkout",
+      "push",
+      "pull",
+      "merge",
+      "verify"
+    ],
+    "Files": [
+      "add",
+      "remove",
+      "listFiles",
+      "status"
+    ],
+    "Branches": [
+      "currentBranch",
+      "branch",
+      "deleteBranch",
+      "listBranches"
+    ],
+    "Tags": [
+      "tag",
+      "annotatedTag",
+      "deleteTag",
+      "listTags"
+    ],
+    "Remotes": [
+      "getRemoteInfo",
+      "addRemote",
+      "deleteRemote",
+      "listRemotes"
+    ],
+    "Notes": [
+      "addNote",
+      "readNote",
+      "removeNote",
+      "listNotes"
+    ],
+    "Walking": [
+      "walk",
+      "WORKDIR",
+      "STAGE",
+      "TREE"
+    ],
+    "Callbacks": [
+      "onAuth",
+      "onAuthSuccess",
+      "onAuthFailure",
+      "onMessage",
+      "onProgress",
+      "onSign"
+    ],
+    "Raw Objects": [
+      "readBlob",
+      "readCommit",
+      "readTag",
+      "readTree",
+      "writeBlob",
+      "writeCommit",
+      "writeTag",
+      "writeTree"
+    ],
+    "Plumbing Commands": [
+      "findRoot",
+      "expandRef",
+      "expandOid",
+      "resetIndex",
+      "resolveRef",
+      "writeRef",
+      "deleteRef",
+      "hashBlob",
+      "statusMatrix",
+      "isDescendent",
+      "indexPack",
+      "packObjects"
+    ],
+    "Misc Commands": [
+      "version"
+    ],
+    "Deprecated Commands": [
+      "readObject",
+      "writeObject"
+    ]
+  },
+  "guide": {
+    "Getting Started": [
+      "quickstart",
+      "browser",
+      "fs",
+      "authentication",
+      "cli",
+      "dir-vs-gitdir"
+    ],
+    "More": [
+      "faq",
+      "snippets",
+      "webworker"
+    ]
+  }
+}

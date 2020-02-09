@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`listBranches listBranches 1`] = `
+Array [
+  "feature/supercool",
+  "greenkeeper/initial",
+  "master",
+  "test-branch",
+]
+`;
+
+exports[`listBranches remote 1`] = `Array []`;
