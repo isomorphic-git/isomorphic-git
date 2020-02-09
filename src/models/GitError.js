@@ -73,7 +73,8 @@ const messages = {
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
   CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`,
-  NoteAlreadyExistsError: `A note object { note } already exists on object { oid }. Use 'force: true' parameter to overwrite existing notes.`
+  NoteAlreadyExistsError: `A note object { note } already exists on object { oid }. Use 'force: true' parameter to overwrite existing notes.`,
+  GitPushError: `One or more branches were not updated: { prettyDetails }`
 }
 
 export const E = {
@@ -220,7 +221,9 @@ export const E = {
   /** @type {'CheckoutConflictError'} */
   CheckoutConflictError: `CheckoutConflictError`,
   /** @type {'NoteAlreadyExistsError'} */
-  NoteAlreadyExistsError: `NoteAlreadyExistsError`
+  NoteAlreadyExistsError: `NoteAlreadyExistsError`,
+  /** @type {'GitPushError'} */
+  GitPushError: `GitPushError`
 }
 
 function renderTemplate (template, values) {

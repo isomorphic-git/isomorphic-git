@@ -93,6 +93,7 @@ module.exports = {
         ? series.nps(
           'lint',
           'build',
+          'lint.typescriptTests',
           'test.setup',
           'test.jest',
           'test.karma',
@@ -101,6 +102,7 @@ module.exports = {
         : series.nps(
           'lint',
           'build',
+          'lint.typescriptTests',
           'test.setup',
           'test.jest',
           'test.karma',

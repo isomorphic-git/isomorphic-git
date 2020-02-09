@@ -20,15 +20,6 @@ import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 
 /**
- *
- * @typedef {Object} PushResult - Returns an object with a schema like this:
- * @property {string[]} [ok]
- * @property {string[]} [errors]
- * @property {object} [headers]
- *
- */
-
-/**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {HttpClient} args.http
@@ -52,18 +43,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format]
  * @param {Object<string, string>} [args.headers]
  *
- * @returns {Promise<PushResult>} Resolves successfully when push completes with a detailed description of the operation from the server.
- * @see PushResult
- *
- * @example
- * let pushResult = await git.push({
- *   dir: '$input((/))',
- *   remote: '$input((origin))',
- *   ref: '$input((master))',
- *   token: $input((process.env.GITHUB_TOKEN)),
- * })
- * console.log(pushResult)
- *
+ * @returns {Promise<PushResult>}
  */
 export async function push ({
   fs,
@@ -248,8 +228,8 @@ export async function push ({
   }
 
   // Update the local copy of the remote ref
-  // TODO: I think this should actually be using a refspec transform rather than assuming 'refs/remotes/{remote}'
-  if (remote && result.ok && result.ok.includes(fullRemoteRef)) {
+  if (remote && result.ok && result.refs[fullRemoteRef].ok) {
+    // TODO: I think this should actually be using a refspec transform rather than assuming 'refs/remotes/{remote}'
     const ref = `refs/remotes/${remote}/${fullRemoteRef.replace(
       'refs/heads',
       ''
@@ -260,5 +240,13 @@ export async function push ({
       await GitRefManager.writeRef({ fs, gitdir, ref, value: oid })
     }
   }
-  return result
+  if (result.ok && Object.values(result.refs).every(result => result.ok)) {
+    return result
+  } else {
+    const prettyDetails = Object.entries(result.refs)
+      .filter(([k, v]) => !v.ok)
+      .map(([k, v]) => `\n  - ${k}: ${v.error}`)
+      .join('')
+    throw new GitError(E.GitPushError, Object.assign({ prettyDetails }, result))
+  }
 }
