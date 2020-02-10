@@ -52,6 +52,7 @@ const siteConfig = {
     // Highlight.js theme to use for syntax highlighting in code blocks
     theme: 'default'
   },
+  docsSideNavCollapsible: true,
   scripts: [
     '/js/announcement.js',
   ],

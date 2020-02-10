@@ -55,7 +55,7 @@ import { join } from '../utils/join.js'
  * @see FetchResult
  *
  * @example
- * await git.fetch({
+ * let result = await git.fetch({
  *   fs,
  *   http,
  *   dir: '/tutorial',
@@ -66,7 +66,7 @@ import { join } from '../utils/join.js'
  *   singleBranch: true,
  *   tags: false
  * })
- * console.log('done')
+ * console.log(result)
  *
  */
 export async function fetch ({

@@ -31,6 +31,10 @@ import { join } from '../utils/join.js'
  *   path: 'user.name',
  *   value: 'Mr. Test'
  * })
+ * 
+ * // Print out config file
+ * let file = await pfs.readFile('/tutorial/.git/config', 'utf8')
+ * console.log(file)
  *
  * // Delete a config entry
  * await git.setConfig({
@@ -40,6 +44,9 @@ import { join } from '../utils/join.js'
  *   value: void 0
  * })
  *
+ * // Print out config file
+ * file = await pfs.readFile('/tutorial/.git/config', 'utf8')
+ * console.log(file)
  */
 export async function setConfig ({
   fs,

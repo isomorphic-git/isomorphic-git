@@ -7,7 +7,7 @@ import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
 /**
- * Read multi-valued entry from the git config files.
+ * Read a multi-valued entry from the git config files.
  *
  * *Caveats:*
  * - Currently only the local `$GIT_DIR/config` file can be read or written. However support for the global `~/.gitconfig` and system `$(prefix)/etc/gitconfig` will be added in the future.

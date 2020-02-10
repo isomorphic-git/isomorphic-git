@@ -70,8 +70,8 @@ At the time of writing, the following breaking changes are planned:
 - [ ] I should probably normalize on timestamps and get rid of the `date` options.
 - [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
 - [ ] Make sure that the payload output of `readTag` and `readCommit` is newline-correct to easily verify. Then remove the `verify` command.
-- [ ] TODO: Make sure all the example code works.
-- [ ] TODO: Update the Getting Started guide.
+- [x] Make sure all the example code works.
+- [x] Update the Getting Started guide.
 
 ## Getting Started
 

@@ -26,7 +26,7 @@ import { join } from '../utils/join.js'
  * let value = await git.getConfig({
  *   fs,
  *   dir: '/tutorial',
- *   path: 'user.name'
+ *   path: 'remote.origin.url'
  * })
  * console.log(value)
  *

@@ -9,19 +9,26 @@
       "clone",
       "commit",
       "log",
-      "config",
       "fetch",
       "checkout",
       "push",
       "pull",
       "merge",
-      "verify"
+      "verify",
+      "walk"
     ],
-    "Files": [
-      "add",
-      "remove",
-      "listFiles",
-      "status"
+    "Callbacks": [
+      "onAuth",
+      "onAuthSuccess",
+      "onAuthFailure",
+      "onMessage",
+      "onProgress",
+      "onSign"
+    ],
+    "Config": [
+      "setConfig",
+      "getConfig",
+      "getConfigAll"
     ],
     "Branches": [
       "currentBranch",
@@ -35,11 +42,11 @@
       "deleteTag",
       "listTags"
     ],
-    "Remotes": [
-      "getRemoteInfo",
-      "addRemote",
-      "deleteRemote",
-      "listRemotes"
+    "Files": [
+      "add",
+      "remove",
+      "listFiles",
+      "status"
     ],
     "Notes": [
       "addNote",
@@ -47,21 +54,13 @@
       "removeNote",
       "listNotes"
     ],
-    "Walking": [
-      "walk",
-      "WORKDIR",
-      "STAGE",
-      "TREE"
+    "Remotes": [
+      "getRemoteInfo",
+      "addRemote",
+      "deleteRemote",
+      "listRemotes"
     ],
-    "Callbacks": [
-      "onAuth",
-      "onAuthSuccess",
-      "onAuthFailure",
-      "onMessage",
-      "onProgress",
-      "onSign"
-    ],
-    "Raw Objects": [
+    "Objects": [
       "readBlob",
       "readCommit",
       "readTag",
@@ -69,7 +68,9 @@
       "writeBlob",
       "writeCommit",
       "writeTag",
-      "writeTree"
+      "writeTree",
+      "readObject",
+      "writeObject"
     ],
     "Plumbing Commands": [
       "findRoot",
@@ -83,24 +84,16 @@
       "statusMatrix",
       "isDescendent",
       "indexPack",
-      "packObjects"
-    ],
-    "Misc Commands": [
+      "packObjects",
       "version"
-    ],
-    "Deprecated Commands": [
-      "readObject",
-      "writeObject"
     ]
   },
   "guide": {
     "Getting Started": [
       "quickstart",
-      "browser",
       "fs",
-      "authentication",
-      "cli",
-      "dir-vs-gitdir"
+      "dir-vs-gitdir",
+      "cli"
     ],
     "More": [
       "faq",

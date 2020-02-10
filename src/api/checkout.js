@@ -30,17 +30,33 @@ import { join } from '../utils/join.js'
  *
  * @example
  * // switch to the master branch
- * await git.checkout({ fs, dir: '/tutorial', ref: 'master' })
+ * await git.checkout({
+ *   fs,
+ *   dir: '/tutorial',
+ *   ref: 'master'
+ * })
  * console.log('done')
  *
  * @example
  * // restore the 'docs' and 'src/docs' folders to the way they were, overwriting any changes
- * await git.checkout({ fs, dir: '/tutorial', force: true, filepaths: ['docs', 'src/docs'] })
+ * await git.checkout({
+ *   fs,
+ *   dir: '/tutorial',
+ *   force: true,
+ *   filepaths: ['docs', 'src/docs']
+ * })
  * console.log('done')
  *
  * @example
  * // restore the 'docs' and 'src/docs' folders to the way they are in the 'develop' branch, overwriting any changes
- * await git.checkout({ fs, dir: '/tutorial', ref: 'develop', noUpdateHead: true, force: true, filepaths: ['docs', 'src/docs'] })
+ * await git.checkout({
+ *   fs,
+ *   dir: '/tutorial',
+ *   ref: 'develop',
+ *   noUpdateHead: true,
+ *   force: true,
+ *   filepaths: ['docs', 'src/docs']
+ * })
  * console.log('done')
  */
 export async function checkout ({

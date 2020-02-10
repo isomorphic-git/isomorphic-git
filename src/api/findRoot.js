@@ -20,9 +20,9 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @example
  * let gitroot = await git.findRoot({
  *   fs,
- *   filepath: '/path/to/some/gitrepo/path/to/some/file.txt'
+ *   filepath: '/tutorial/src/utils'
  * })
- * console.log(gitroot) // '/path/to/some/gitrepo'
+ * console.log(gitroot)
  *
  */
 export async function findRoot ({ fs, filepath }) {
