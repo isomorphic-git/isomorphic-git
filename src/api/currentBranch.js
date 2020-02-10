@@ -19,7 +19,7 @@ import { join } from '../utils/join.js'
  *
  * @example
  * // Get the current branch name
- * let branch = await git.currentBranch({ dir: '$input((/))', fullname: $input((false)) })
+ * let branch = await git.currentBranch({ fs, dir: '/tutorial', fullname: false })
  * console.log(branch)
  *
  */

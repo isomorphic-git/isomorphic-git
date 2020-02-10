@@ -15,7 +15,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<Array<string>>} Resolves successfully with an array of tag names
  *
  * @example
- * let tags = await git.listTags({ dir: '$input((/))' })
+ * let tags = await git.listTags({ fs, dir: '/tutorial' })
  * console.log(tags)
  *
  */

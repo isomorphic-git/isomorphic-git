@@ -18,7 +18,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * await git.deleteRemote({ dir: '$input((/))', remote: '$input((upstream))' })
+ * await git.deleteRemote({ fs, dir: '/tutorial', remote: 'upstream' })
  * console.log('done')
  *
  */

@@ -18,7 +18,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<string>} Resolves successfully with the full oid (like "0414d2a286d7bbc7a4a326a61c1f9f888a8ab87f")
  *
  * @example
- * let oid = await git.expandOid({ dir: '$input((/))', oid: '$input((0414d2a))'})
+ * let oid = await git.expandOid({ fs, dir: '/tutorial', oid: '0414d2a'})
  * console.log(oid)
  *
  */

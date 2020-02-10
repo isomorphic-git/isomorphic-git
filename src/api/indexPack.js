@@ -19,7 +19,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves when filesystem operations are complete
  *
  * @example
- * await git.indexPack({ dir: '$input((/))', filepath: '$input((pack-9cbd243a1caa4cb4bef976062434a958d82721a9.pack))' })
+ * await git.indexPack({ fs, dir: '/tutorial', filepath: 'pack-9cbd243a1caa4cb4bef976062434a958d82721a9.pack' })
  * console.log('done')
  *
  */

@@ -56,13 +56,15 @@ import { join } from '../utils/join.js'
  *
  * @example
  * await git.fetch({
- *   dir: '$input((/))',
+ *   fs,
+ *   http,
+ *   dir: '/tutorial',
  *   corsProxy: 'https://cors.isomorphic-git.org',
- *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
- *   ref: '$input((master))',
- *   depth: $input((1)),
- *   singleBranch: $input((true)),
- *   tags: $input((false))
+ *   url: 'https://github.com/isomorphic-git/isomorphic-git',
+ *   ref: 'master',
+ *   depth: 1,
+ *   singleBranch: true,
+ *   tags: false
  * })
  * console.log('done')
  *

@@ -19,7 +19,8 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  * @example
  * let gitroot = await git.findRoot({
- *   filepath: '$input((/path/to/some/gitrepo/path/to/some/file.txt))'
+ *   fs,
+ *   filepath: '/path/to/some/gitrepo/path/to/some/file.txt'
  * })
  * console.log(gitroot) // '/path/to/some/gitrepo'
  *

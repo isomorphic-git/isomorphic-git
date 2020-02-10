@@ -18,7 +18,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * await git.deleteRef({ dir: '$input((/))', ref: '$input((refs/tags/test-tag))' })
+ * await git.deleteRef({ fs, dir: '/tutorial', ref: 'refs/tags/test-tag' })
  * console.log('done')
  *
  */

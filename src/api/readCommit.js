@@ -21,9 +21,9 @@ import { join } from '../utils/join.js'
  *
  * @example
  * // Read a commit object
- * let sha = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
+ * let sha = await git.resolveRef({ fs, dir: '/tutorial', ref: 'master' })
  * console.log(sha)
- * let commit = await git.readCommit({ dir: '$input((/))', oid: sha })
+ * let commit = await git.readCommit({ fs, dir: '/tutorial', oid: sha })
  * console.log(commit)
  *
  */

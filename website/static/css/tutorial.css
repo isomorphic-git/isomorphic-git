@@ -2,17 +2,26 @@ code {
   overflow: auto;
   min-height: 3.5em;
 }
+.codemirror-content[contenteditable] {
+  border-bottom: none;
+}
+.codemirror-content {
+  border: 1px solid #dfe2e5;
+}
+.eval-button-wrapper {
+  background-color: #f6f8fa;
+  border-bottom: 1px solid #dfe2e5;
+  border-left: 1px solid #dfe2e5;
+  border-right: 1px solid #dfe2e5;
+  display: flex;
+  flex-direction: column-reverse;
+}
 .eval-button {
   background: #2E8555;
   color: #fff;
-  opacity: 0.5;
-  transition: opacity 0.2s;
-  position: absolute;
-  right: 5px;
-  margin-top: 10px;
 }
 .eval-button:hover {
-  opacity: 1;
+  filter: brightness(85%);
 }
 .eval-button.busy {
   font-style: italic;
