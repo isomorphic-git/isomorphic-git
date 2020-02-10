@@ -100,7 +100,14 @@ try {
 } catch (_) {}
 
 function writeExample (text, filepath) {
-  const exampleFilepath = path.join(__dirname, '..', '..', 'dist', 'examples', filepath)
+  const exampleFilepath = path.join(
+    __dirname,
+    '..',
+    '..',
+    'dist',
+    'examples',
+    filepath
+  )
   text = `const fs = require('fs')
 const git = require('isomorphic-git')
 const { http } = require('isomorphic-git/http')
