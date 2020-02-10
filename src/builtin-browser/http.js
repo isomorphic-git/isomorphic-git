@@ -1,4 +1,5 @@
-import { fromStream } from '../utils/AsyncIterator.js'
+/* eslint-env browser */
+import { fromStream } from '../utils/fromStream'
 import { collect } from '../utils/collect.js'
 
 export async function http ({
@@ -12,7 +13,7 @@ export async function http ({
   if (body) {
     body = await collect(body)
   }
-  const res = await global.fetch(url, { method, headers, body })
+  const res = await fetch(url, { method, headers, body })
   const iter =
     res.body && res.body.getReader
       ? fromStream(res.body)

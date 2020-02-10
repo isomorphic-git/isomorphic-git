@@ -21,13 +21,13 @@ import { worthWalking } from '../utils/worthWalking.js'
  *
  * ```js live
  * // get the status of all the files in 'src'
- * let status = await git.statusMatrix({ fs, dir: '/tutorial', pattern: 'src/**' })
+ * let status = await git.statusMatrix({ fs, dir: '/tutorial', filter: f => f.startsWith('src/') })
  * console.log(status)
  * ```
  *
  * ```js live
  * // get the status of all the JSON and Markdown files
- * let status = await git.statusMatrix({ fs, dir: '/tutorial', pattern: '**\/*.{json,md}' })
+ * let status = await git.statusMatrix({ fs, dir: '/tutorial', filter: f => f.endsWith('.json') || f.endsWith('.md') })
  * console.log(status)
  * ```
  *

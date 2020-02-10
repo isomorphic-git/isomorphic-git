@@ -67,13 +67,19 @@ class Footer extends React.Component {
         {/* External scripts */}
         {this.props.config.footerscripts &&
           this.props.config.footerscripts.map(function(source, idx) {
-            return (
-              <script
-                type="text/javascript"
-                key={'script' + idx}
-                src={source}
-              />
-            );
+            if (typeof source === 'string') {
+              return (
+                <script
+                  type="text/javascript"
+                  key={'script' + idx}
+                  src={source}
+                />
+              );
+            } else {
+              return (
+                <script key={'script' + idx} {...source} />
+              );
+            }
           })}
 
       </footer>

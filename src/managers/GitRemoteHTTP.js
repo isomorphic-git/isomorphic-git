@@ -130,7 +130,7 @@ export class GitRemoteHTTP {
       // If they don't send the correct content-type header, that's a good indicator it is either a "dumb" HTTP
       // server, or the user specified an incorrect remote URL and the response is actually an HTML page.
       // In this case, we save the response as plain text so we can generate a better error message if needed.
-      const data = await collect(res.body)
+      const data = Buffer.from(await collect(res.body))
       const response = data.toString('utf8')
       const preview =
         response.length < 256 ? response : response.slice(0, 256) + '...'

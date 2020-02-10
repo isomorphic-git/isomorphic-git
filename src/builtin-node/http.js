@@ -1,5 +1,5 @@
-import { fromNodeStream } from '../utils/AsyncIterator.js'
 import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
+import { fromNodeStream } from '../utils/fromNodeStream.js'
 import { collect } from '../utils/collect.js'
 
 export async function http ({
@@ -11,7 +11,7 @@ export async function http ({
 }) {
   // If we can, we should send it as a single buffer so it sets a Content-Length header.
   if (body && Array.isArray(body)) {
-    body = await collect(body)
+    body = Buffer.from(await collect(body))
   } else if (body) {
     body = asyncIteratorToStream(body)
   }

@@ -23,7 +23,7 @@ import { pack } from './pack'
  */
 export async function packObjects ({ fs, gitdir, oids, write }) {
   const buffers = await pack({ fs, gitdir, oids })
-  const packfile = await collect(buffers)
+  const packfile = Buffer.from(await collect(buffers))
   const packfileSha = packfile.slice(-20).toString('hex')
   const filename = `pack-${packfileSha}.pack`
   if (write) {

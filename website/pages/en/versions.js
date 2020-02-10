@@ -45,15 +45,12 @@ function Versions(props) {
           </table>
           <h3 id="rc">Upcoming versions</h3>
           <p>
-            The 1.0 release is planned to coincide with the stable release of the new Chromium-based <a href="https://blogs.windows.com/msedgedev/2019/11/04/edge-chromium-release-candidate-get-ready/#QU89TOA8e8dE8Hev.97">Micorosoft Edge</a> in January 2020, so that we can drop support for the old Edge browser.
-          </p>
-          <p>
-            The docs are not representative of the 1.0 API — at the moment they are just a copy of the current stable docs. I just wanted to start putting the website structure in place.
+            The 1.0 release is planned for sometime in February / early March. Originally it was to coincide with the stable release of the new Chromium-based <a href="https://blogs.windows.com/msedgedev/2019/11/04/edge-chromium-release-candidate-get-ready/#QU89TOA8e8dE8Hev.97">Micorosoft Edge</a> in January 2020, so that we can drop support for the old Edge browser. However, I keep discovering breaking changes I want to make to improve the library.
           </p>
           <table className="versions">
             <tbody>
               <tr>
-                <th>1.0.0</th>
+                <th>1.0.0-beta.X</th>
                 <td>
                   {/* You are supposed to change this href where appropriate
                         Example: href="<baseUrl>/docs(/:language)/next/:id" */}
