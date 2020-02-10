@@ -42,7 +42,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<'ignored'|'unmodified'|'*modified'|'*deleted'|'*added'|'absent'|'modified'|'deleted'|'added'|'*unmodified'|'*absent'|'*undeleted'|'*undeletemodified'>} Resolves successfully with the file's git status
  *
  * @example
- * let status = await git.status({ dir: '$input((/))', filepath: '$input((README.md))' })
+ * let status = await git.status({ fs, dir: '/tutorial', filepath: 'README.md' })
  * console.log(status)
  *
  */

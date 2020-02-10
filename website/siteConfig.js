@@ -65,6 +65,7 @@ const siteConfig = {
     '/js/fs.js',
     'https://unpkg.com/@webcomponents/shadydom',
     '/js/object-inspector.min.js',
+    '/js/codemirrorify.js',
     '/js/tutorial.js',
     '/js/try-it-out-giturl.js',
     '//static.getclicky.com/js',

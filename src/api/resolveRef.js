@@ -17,9 +17,9 @@ import { join } from '../utils/join.js'
  * @returns {Promise<string>} Resolves successfully with a SHA-1 object id or the value of a symbolic ref
  *
  * @example
- * let currentCommit = await git.resolveRef({ dir: '$input((/))', ref: '$input((HEAD))' })
+ * let currentCommit = await git.resolveRef({ fs, dir: '/tutorial', ref: 'HEAD' })
  * console.log(currentCommit)
- * let currentBranch = await git.resolveRef({ dir: '$input((/))', ref: '$input((HEAD))', depth: $input((2)) })
+ * let currentBranch = await git.resolveRef({ fs, dir: '/tutorial', ref: 'HEAD', depth: 2 })
  * console.log(currentBranch)
  *
  */

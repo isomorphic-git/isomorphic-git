@@ -20,7 +20,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
  * @example
- * await git.remove({ dir: '$input((/))', filepath: '$input((README.md))' })
+ * await git.remove({ fs, dir: '/tutorial', filepath: 'README.md' })
  * console.log('done')
  *
  */

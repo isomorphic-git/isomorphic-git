@@ -28,28 +28,31 @@ async function evalToFakeConsole (text, printOut) {
 
 async function onEvalButtonClick () {
   this.classList.add('busy')
-  if (this.parentNode) {
-    let el = this.parentNode.querySelector('code')
+  if (this.parentNode && this.parentNode.parentNode) {
+    const pre = this.parentNode.parentNode
+    let el = pre.querySelector('.codemirror-content')
+    console.log(el)
     if (el) {
+      const code = el.innerText
       try {
         const printOut = results => {
           let output = createLogOutputBox(results)
           let close = createCloseButton()
           output.appendChild(close)
-          this.parentNode.appendChild(output)
+          pre.appendChild(output)
         }
-        let result = await evalToFakeConsole(el.innerText, printOut)
+        let result = await evalToFakeConsole(code, printOut)
         if (result !== undefined) {
           let output = createReturnOutput(result)
           let close = createCloseButton()
           output.appendChild(close)
-          this.parentNode.appendChild(output)
+          pre.appendChild(output)
         }
       } catch (err) {
         let output = createErrorOutput(err)
         let close = createCloseButton()
         output.appendChild(close)
-        this.parentNode.appendChild(output)
+        pre.appendChild(output)
       }
     }
   }
@@ -63,12 +66,15 @@ function onCloseButtonClick (event) {
 }
 
 function createButton () {
+  let d = document.createElement('div')
+  d.className = 'eval-button-wrapper'
   let b = document.createElement('button')
-  b.innerText = 'RUN'
+  b.innerText = '▶️ RUN'
   b.className = 'eval-button button'
   b.type = 'button'
   b.onclick = onEvalButtonClick
-  return b
+  d.appendChild(b)
+  return d
 }
 
 function createCloseButton () {
@@ -121,28 +127,9 @@ function listener () {
   // Add the RUN buttons
   let blocks = document.querySelectorAll('pre > code.language-js.live')
   for (let block of blocks) {
-    block.parentNode.insertBefore(createButton(), block)
-  }
-  // Make parts of the code editable
-  let spans = document.querySelectorAll('code')
-  for (let span of spans) {
-    let currentHTML = span.innerHTML
-    if (currentHTML.includes('$input((') || currentHTML.includes('$textarea((')) {
-      // Indicate multi-line placeholders with $textarea((Here be text))
-      let newHTML = currentHTML.replace(
-        /\$textarea\(\(([\s\S]+?)\)\)/g,
-        '<span contenteditable>$1</span>'
-      )
-      // Indicate single-line (no line breaks) placeholders with $input((Here be text))
-      newHTML = newHTML.replace(
-        /\$input\(\((.+?)\)\)/g,
-        '<span contenteditable onkeydown="disableEnterKey(event)">$1</span>'
-      )
-      // This tries to minimize needless DOM trashing
-      if (newHTML !== currentHTML) {
-        span.innerHTML = newHTML
-      }
-    }
+    const parent = block.parentNode
+    parent.replaceChild(codemirrorify.codemirrorify(block.innerText), block)
+    parent.appendChild(createButton())
   }
 }
 

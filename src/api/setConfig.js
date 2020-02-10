@@ -26,15 +26,17 @@ import { join } from '../utils/join.js'
  * @example
  * // Write config value
  * await git.setConfig({
- *   dir: '$input((/))',
- *   path: '$input((user.name))',
- *   value: '$input((Mr. Test))'
+ *   fs,
+ *   dir: '/tutorial',
+ *   path: 'user.name',
+ *   value: 'Mr. Test'
  * })
  *
  * // Delete a config entry
  * await git.setConfig({
- *   dir: '$input((/))',
- *   path: '$input((user.name))',
+ *   fs,
+ *   dir: '/tutorial',
+ *   path: 'user.name',
  *   value: void 0
  * })
  *

@@ -37,13 +37,14 @@ import { join } from '../utils/join.js'
  *
  * @example
  * let keyids = await git.verify({
- *   dir: '$input((/))',
- *   openpgp,
- *   ref: '$input((HEAD))',
- *   publicKeys: `$textarea((
+ *   fs,
+ *   dir: '/tutorial',
+ *   onVerify: pgp.verify,
+ *   ref: 'HEAD',
+ *   publicKeys: `
  * -----BEGIN PGP PUBLIC KEY BLOCK-----
  * ...
- * ))`
+ * `
  * })
  * console.log(keyids)
  *

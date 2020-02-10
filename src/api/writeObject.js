@@ -51,23 +51,24 @@ import { join } from '../utils/join.js'
  *
  * @example
  * // Manually create an annotated tag.
- * let sha = await git.resolveRef({ dir: '$input((/))', ref: '$input((HEAD))' })
+ * let sha = await git.resolveRef({ fs, dir: '/tutorial', ref: 'HEAD' })
  * console.log('commit', sha)
  *
  * let oid = await git.writeObject({
- *   dir: '$input((/))',
+ *   fs,
+ *   dir: '/tutorial',
  *   type: 'tag',
  *   object: {
  *     object: sha,
  *     type: 'commit',
- *     tag: '$input((my-tag))',
+ *     tag: 'my-tag',
  *     tagger: {
- *       name: '$input((your name))',
- *       email: '$input((email@example.com))',
+ *       name: 'your name',
+ *       email: 'email@example.com',
  *       timestamp: Math.floor(Date.now()/1000),
  *       timezoneOffset: new Date().getTimezoneOffset()
  *     },
- *     message: '$input((Optional message))',
+ *     message: 'Optional message',
  *     signature: ''
  *   }
  * })

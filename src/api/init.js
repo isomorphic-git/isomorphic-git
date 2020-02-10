@@ -17,7 +17,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
  *
  * @example
- * await git.init({ dir: '$input((/))' })
+ * await git.init({ fs, dir: '/tutorial' })
  * console.log('done')
  *
  */

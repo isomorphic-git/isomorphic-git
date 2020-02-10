@@ -41,12 +41,13 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  *
  * @example
  * let sha = await git.commit({
- *   dir: '$input((/))',
+ *   fs,
+ *   dir: '/tutorial',
  *   author: {
- *     name: '$input((Mr. Test))',
- *     email: '$input((mrtest@example.com))'
+ *     name: 'Mr. Test',
+ *     email: 'mrtest@example.com'
  *   },
- *   message: '$input((Added the a.txt file))'
+ *   message: 'Added the a.txt file'
  * })
  * console.log(sha)
  *

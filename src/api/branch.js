@@ -19,7 +19,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * await git.branch({ dir: '$input((/))', ref: '$input((develop))' })
+ * await git.branch({ fs, dir: '/tutorial', ref: 'develop' })
  * console.log('done')
  *
  */

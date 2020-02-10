@@ -1,5 +1,5 @@
 {
-  "include": ["__tests__"],
+  "include": ["__tests__", "dist/examples"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "strictNullChecks": true,
@@ -7,9 +7,9 @@
     "allowJs": true,
     "checkJs": true,
     "moduleResolution": "node",
-    "target": "es6",
-    "module": "es2015",
-    "lib": ["es2015", "es2016", "es2017", "dom"],
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["es2015", "es2016", "es2017", "es2018", "es2019", "dom"],
     "suppressImplicitAnyIndexErrors": true,
     "resolveJsonModule": true,
     "sourceMap": true,

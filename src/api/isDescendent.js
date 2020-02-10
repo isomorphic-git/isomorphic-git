@@ -20,10 +20,10 @@ import { join } from '../utils/join.js'
  * @returns {Promise<boolean>} Resolves to true if `oid` is a descendent of `ancestor`
  *
  * @example
- * let oid = await git.resolveRef({ dir: '$input((/))', ref: '$input((master))' })
- * let ancestor = await git.resolveRef({ dir: '$input((/))', ref: '$input((v0.20.0))' })
+ * let oid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'master' })
+ * let ancestor = await git.resolveRef({ fs, dir: '/tutorial', ref: 'v0.20.0' })
  * console.log(oid, ancestor)
- * await git.isDescendent({ dir: '$input((/))', oid, ancestor, depth: $input((-1)) })
+ * await git.isDescendent({ fs, dir: '/tutorial', oid, ancestor, depth: -1 })
  *
  */
 export async function isDescendent ({

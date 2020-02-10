@@ -40,11 +40,13 @@ import { join } from '../utils/join.js'
  *
  * @example
  * await git.clone({
- *   dir: '$input((/))',
+ *   fs,
+ *   http,
+ *   dir: '/tutorial',
  *   corsProxy: 'https://cors.isomorphic-git.org',
- *   url: '$input((https://github.com/isomorphic-git/isomorphic-git))',
- *   $textarea((singleBranch: true,
- *   depth: 1))
+ *   url: 'https://github.com/isomorphic-git/isomorphic-git',
+ *   singleBranch: true,
+ *   depth: 1
  * })
  * console.log('done')
  *

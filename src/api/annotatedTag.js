@@ -33,12 +33,13 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  *
  * @example
  * await git.annotatedTag({
- *   dir: '$input((/))',
- *   ref: '$input((test-tag))',
- *   message: '$input((This commit is awesome))',
+ *   fs,
+ *   dir: '/tutorial',
+ *   ref: 'test-tag',
+ *   message: 'This commit is awesome',
  *   tagger: {
- *     name: '$input((Mr. Test))',
- *     email: '$input((mrtest@example.com))'
+ *     name: 'Mr. Test',
+ *     email: 'mrtest@example.com'
  *   }
  * })
  * console.log('done')

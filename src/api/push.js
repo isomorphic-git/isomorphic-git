@@ -47,10 +47,12 @@ import { join } from '../utils/join.js'
  *
  * @example
  * let pushResult = await git.push({
- *   dir: '$input((/))',
- *   remote: '$input((origin))',
- *   ref: '$input((master))',
- *   token: $input((process.env.GITHUB_TOKEN)),
+ *   fs,
+ *   http,
+ *   dir: '/tutorial',
+ *   remote: 'origin',
+ *   ref: 'master',
+ *   token: process.env.GITHUB_TOKEN,
  * })
  * console.log(pushResult)
  *

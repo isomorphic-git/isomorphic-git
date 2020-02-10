@@ -27,8 +27,7 @@ module.exports = {
     lint: {
       default: series.nps('lint.js'),
       js: `standard ${srcPaths}`,
-      fix: `standard --fix ${srcPaths}`,
-      typescriptTests: 'tsc -p tsconfig.json'
+      fix: `standard --fix ${srcPaths}`
     },
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
@@ -93,7 +92,7 @@ module.exports = {
         ? series.nps(
           'lint',
           'build',
-          'lint.typescriptTests',
+          'test.typecheck',
           'test.setup',
           'test.jest',
           'test.karma',
@@ -102,12 +101,13 @@ module.exports = {
         : series.nps(
           'lint',
           'build',
-          'lint.typescriptTests',
+          'test.typecheck',
           'test.setup',
           'test.jest',
           'test.karma',
           'test.teardown'
         ),
+      typecheck: 'tsc -p tsconfig.json',
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
       jest: process.env.CI

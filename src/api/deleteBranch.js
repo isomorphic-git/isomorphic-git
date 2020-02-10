@@ -20,7 +20,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * await git.deleteBranch({ dir: '$input((/))', ref: '$input((local-branch))' })
+ * await git.deleteBranch({ fs, dir: '/tutorial', ref: 'local-branch' })
  * console.log('done')
  *
  */
