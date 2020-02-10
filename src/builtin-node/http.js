@@ -1,6 +1,6 @@
 import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
-import { fromNodeStream } from '../utils/fromNodeStream.js'
 import { collect } from '../utils/collect.js'
+import { fromNodeStream } from '../utils/fromNodeStream.js'
 
 export async function http ({
   onProgress,
