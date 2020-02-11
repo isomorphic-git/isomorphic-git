@@ -1,4 +1,14 @@
-;(function () {
+import { http } from './http.js'
+
+// Initialize isomorphic-git with a file system
+window.fs = new LightningFS('fs')
+
+// make a Promisified version for convenience
+window.pfs = window.fs.promises
+
+window.dir = '/tutorial'
+
+window.http = http
 
 function disableEnterKey (event) {
   if (event.key === 'Enter') {
@@ -138,5 +148,3 @@ if (document.readyState === "loading") {
 } else {
   listener()
 }
-
-})();

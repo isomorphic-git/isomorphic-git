@@ -22,7 +22,12 @@ import { join } from '../utils/join.js'
  * @see CommitObject
  *
  * @example
- * let commits = await git.log({ fs, dir: '/tutorial', depth: 5, ref: 'master' })
+ * let commits = await git.log({
+ *   fs,
+ *   dir: '/tutorial',
+ *   depth: 5,
+ *   ref: 'master'
+ * })
  * console.log(commits)
  *
  */

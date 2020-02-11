@@ -61,16 +61,17 @@ At the time of writing, the following breaking changes are planned:
 - [x] I think I will change the `plugins` API. The current API (`plugins.set('fs', fs)`) uses a kinda-hacky run-time schema validation that just checks whether certain methods are defined. Static type checking would actually provide a better developer experience and better guarantees, but having `.set` be polymorphic is hard to accurately describe using JSDoc, so I might switch to an API like `plugins.fs(fs)`.
   - this also means we can set `new FileSystem(_fs)` in the `plugins.fs(fs)` command, because _we don't have to expose a getter like `plugins.get()`!_
 - [x] Actually, I'm thinking of eliminating the plugin system API and going back to function arguments. The plugin cores creates a mysterious "global state" that makes it easy to trip up (I've forgotten to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic but a much simpler model.
-- [ ] To go along with that, I'm experimenting with a way to make the API more aesthetic, eliminating the `emitter` plugin/argument and letting you chain event listeners onto running commands directly. NOTE: need to make sure there's no race condition between adding the event listeners and starting running the command.
-  - [ ] This also provides an aesthetic way to cancel / stop running commands.
 - [x] break `config` into `getConfig` and `setConfig` or something.
 - [x] Make `http` an external required dependency just like `fs` [#938](https://github.com/isomorphic-git/isomorphic-git/issues/938)
-- [ ] I should probably normalize on timestamps and get rid of the `date` options.
 - [x] Remove the `noOverwrite` option from `init` and make that the new behavior.
-- [ ] Oh, and I should move all the error strings into a separate JSON file that can be fetched lazily in production.
-- [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
 - [x] Fix `push` to use the remote tracking branch by default for `remtoeRef`
 - [x] Auto-generate `docs/alphabetic.md` and `README` list from filenames in `src/api`.
+- [x] Type-check all the example code in JSDoc.
+- [ ] I should probably normalize on timestamps and get rid of the `date` options.
+- [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
+- [ ] Make sure that the payload output of `readTag` and `readCommit` is newline-correct to easily verify. Then remove the `verify` command.
+- [x] Make sure all the example code works.
+- [x] Update the Getting Started guide.
 
 ## Getting Started
 

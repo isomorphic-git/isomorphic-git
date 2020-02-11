@@ -10,7 +10,7 @@ import { join } from '../utils/join'
  * List all the files in the git index or a commit
  *
  * > Note: This function is efficient for listing the files in the staging area, but listing all the files in a commit requires recursively walking through the git object store.
- * > If you do not require a complete list of every file, better can be achieved by using [readObject](./readObject.html) directly and ignoring subdirectories you don't care about.
+ * > If you do not require a complete list of every file, better performance can be achieved by using [walk](./walk) and ignoring subdirectories you don't care about.
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
