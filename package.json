@@ -60,7 +60,6 @@
     "diff3": "0.0.3",
     "git-apply-delta": "0.0.7",
     "ignore": "^5.1.4",
-    "marky": "^1.2.1",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
     "pify": "^4.0.1",

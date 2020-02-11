@@ -1,12 +1,10 @@
 import crc32 from 'crc-32'
 import applyDelta from 'git-apply-delta'
-import * as marky from 'marky'
 
 import { E, GitError } from '../models/GitError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { listpack } from '../utils/git-list-pack.js'
 import { inflate } from '../utils/inflate.js'
-import { log } from '../utils/log.js'
 import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject'
@@ -51,7 +49,6 @@ export class GitPackIndex {
   }
 
   static async fromIdx ({ idx, getExternalRefDelta }) {
-    marky.mark('fromIdx')
     const reader = new BufferCursor(idx)
     const magic = reader.slice(4).toString('hex')
     // Check for IDX v2 magic number
@@ -73,24 +70,19 @@ export class GitPackIndex {
     reader.seek(reader.tell() + 4 * 255)
     // Get hashes
     const size = reader.readUInt32BE()
-    marky.mark('hashes')
     const hashes = []
     for (let i = 0; i < size; i++) {
       const hash = reader.slice(20).toString('hex')
       hashes[i] = hash
     }
-    log(`hashes ${marky.stop('hashes').duration}`)
     reader.seek(reader.tell() + 4 * size)
     // Skip over CRCs
-    marky.mark('offsets')
     // Get offsets
     const offsets = new Map()
     for (let i = 0; i < size; i++) {
       offsets.set(hashes[i], reader.readUInt32BE())
     }
-    log(`offsets ${marky.stop('offsets').duration}`)
     const packfileSha = reader.slice(20).toString('hex')
-    log(`fromIdx ${marky.stop('fromIdx').duration}`)
     return new GitPackIndex({
       hashes,
       crcs: {},
@@ -121,30 +113,7 @@ export class GitPackIndex {
     const offsets = new Map()
     let totalObjectCount = null
     let lastPercent = null
-    const times = {
-      hash: 0,
-      readSlice: 0,
-      offsets: 0,
-      crcs: 0,
-      sort: 0
-    }
-    let histogram = {
-      commit: 0,
-      tree: 0,
-      blob: 0,
-      tag: 0,
-      'ofs-delta': 0,
-      'ref-delta': 0
-    }
-    let bytesProcessed = 0
 
-    log('Indexing objects')
-    log(
-      `percent\tmilliseconds\tbytesProcessed\tcommits\ttrees\tblobs\ttags\tofs-deltas\tref-deltas`
-    )
-    marky.mark('total')
-    marky.mark('offsets')
-    marky.mark('percent')
     await listpack([pack], ({ data, type, reference, offset, num }) => {
       if (totalObjectCount === null) totalObjectCount = num
       const percent = Math.floor(
@@ -158,33 +127,10 @@ export class GitPackIndex {
             total: totalObjectCount
           })
         }
-        log(
-          `${percent}%\t${Math.floor(
-            marky.stop('percent').duration
-          )}\t${bytesProcessed}\t${histogram.commit}\t${histogram.tree}\t${
-            histogram.blob
-          }\t${histogram.tag}\t${histogram['ofs-delta']}\t${
-            histogram['ref-delta']
-          }`
-        )
-
-        histogram = {
-          commit: 0,
-          tree: 0,
-          blob: 0,
-          tag: 0,
-          'ofs-delta': 0,
-          'ref-delta': 0
-        }
-        bytesProcessed = 0
-        marky.mark('percent')
       }
       lastPercent = percent
       // Change type from a number to a meaningful string
       type = listpackTypes[type]
-
-      histogram[type]++
-      bytesProcessed += data.byteLength
 
       if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
         offsetToObject[offset] = {
@@ -203,10 +149,7 @@ export class GitPackIndex {
         }
       }
     })
-    times['offsets'] = Math.floor(marky.stop('offsets').duration)
 
-    log('Computing CRCs')
-    marky.mark('crcs')
     // We need to know the lengths of the slices to compute the CRCs.
     const offsetArray = Object.keys(offsetToObject).map(Number)
     for (const [i, start] of offsetArray.entries()) {
@@ -217,7 +160,6 @@ export class GitPackIndex {
       o.end = end
       o.crc = crc
     }
-    times['crcs'] = Math.floor(marky.stop('crcs').duration)
 
     // We don't have the hashes yet. But we can generate them using the .readSlice function!
     const p = new GitPackIndex({
@@ -230,24 +172,13 @@ export class GitPackIndex {
     })
 
     // Resolve deltas and compute the oids
-    log('Resolving deltas')
-    log(`percent2\tmilliseconds2\tcallsToReadSlice\tcallsToGetExternal`)
-    marky.mark('percent')
     lastPercent = null
     let count = 0
-    let callsToReadSlice = 0
-    let callsToGetExternal = 0
-    const timeByDepth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     const objectsByDepth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for (let offset in offsetToObject) {
       offset = Number(offset)
       const percent = Math.floor((count++ * 100) / totalObjectCount)
       if (percent !== lastPercent) {
-        log(
-          `${percent}%\t${Math.floor(
-            marky.stop('percent').duration
-          )}\t${callsToReadSlice}\t${callsToGetExternal}`
-        )
         if (onProgress) {
           onProgress({
             phase: 'Resolving deltas',
@@ -255,9 +186,6 @@ export class GitPackIndex {
             total: totalObjectCount
           })
         }
-        marky.mark('percent')
-        callsToReadSlice = 0
-        callsToGetExternal = 0
       }
       lastPercent = percent
 
@@ -266,47 +194,19 @@ export class GitPackIndex {
       try {
         p.readDepth = 0
         p.externalReadDepth = 0
-        marky.mark('readSlice')
         const { type, object } = await p.readSlice({ start: offset })
-        const time = marky.stop('readSlice').duration
-        times.readSlice += time
-        callsToReadSlice += p.readDepth
-        callsToGetExternal += p.externalReadDepth
-        timeByDepth[p.readDepth] += time
         objectsByDepth[p.readDepth] += 1
-        marky.mark('hash')
         const oid = await shasum(GitObject.wrap({ type, object }))
-        times.hash += marky.stop('hash').duration
         o.oid = oid
         hashes.push(oid)
         offsets.set(oid, offset)
         crcs[oid] = o.crc
       } catch (err) {
-        log('ERROR', err)
         continue
       }
     }
 
-    marky.mark('sort')
     hashes.sort()
-    times['sort'] = Math.floor(marky.stop('sort').duration)
-    const totalElapsedTime = marky.stop('total').duration
-    times.hash = Math.floor(times.hash)
-    times.readSlice = Math.floor(times.readSlice)
-    times.misc = Math.floor(
-      Object.values(times).reduce((a, b) => a - b, totalElapsedTime)
-    )
-    log(Object.keys(times).join('\t'))
-    log(Object.values(times).join('\t'))
-    log('by depth:')
-    log([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].join('\t'))
-    log(objectsByDepth.slice(0, 12).join('\t'))
-    log(
-      timeByDepth
-        .map(Math.floor)
-        .slice(0, 12)
-        .join('\t')
-    )
     return p
   }
 
