@@ -1,4 +1,3 @@
-import { log } from './log.js'
 import { normalizeStats } from './normalizeStats.js'
 
 export function compareStats (entry, stats) {
@@ -14,21 +13,5 @@ export function compareStats (entry, stats) {
     e.gid !== s.gid ||
     e.ino !== s.ino ||
     e.size !== s.size
-  // console.log(staleness ? 'stale:' : 'fresh:')
-  if (staleness && log.enabled) {
-    console.table([justWhatMatters(e), justWhatMatters(s)])
-  }
   return staleness
-}
-
-function justWhatMatters (e) {
-  return {
-    mode: e.mode,
-    mtimeSeconds: e.mtimeSeconds,
-    ctimeSeconds: e.ctimeSeconds,
-    uid: e.uid,
-    gid: e.gid,
-    ino: e.ino,
-    size: e.size
-  }
 }

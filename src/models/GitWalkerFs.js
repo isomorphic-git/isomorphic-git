@@ -1,7 +1,6 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
 import { join } from '../utils/join'
-import { log } from '../utils/log.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
 
@@ -121,7 +120,6 @@ export class GitWalkerFs {
         const stage = index.entriesMap.get(entry._fullpath)
         const stats = await entry.stat()
         if (!stage || compareStats(stats, stage)) {
-          log(`INDEX CACHE MISS: calculating SHA for ${entry._fullpath}`)
           const content = await entry.content()
           if (content === void 0) {
             oid = void 0
