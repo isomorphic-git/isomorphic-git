@@ -33,7 +33,7 @@ import { join } from '../utils/join.js'
  * })
  *
  * // Print out config file
- * let file = await pfs.readFile('/tutorial/.git/config', 'utf8')
+ * let file = await fs.promises.readFile('/tutorial/.git/config', 'utf8')
  * console.log(file)
  *
  * // Delete a config entry
@@ -45,7 +45,7 @@ import { join } from '../utils/join.js'
  * })
  *
  * // Print out config file
- * file = await pfs.readFile('/tutorial/.git/config', 'utf8')
+ * file = await fs.promises.readFile('/tutorial/.git/config', 'utf8')
  * console.log(file)
  */
 export async function setConfig ({

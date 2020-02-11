@@ -19,7 +19,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves when filesystem operations are complete
  *
  * @example
- * let packfiles = await pfs.readdir('/tutorial/.git/objects/pack')
+ * let packfiles = await fs.promises.readdir('/tutorial/.git/objects/pack')
  * packfiles = packfiles.filter(name => name.endsWith('.pack'))
  * console.log('packfiles', packfiles)
  *
@@ -27,7 +27,7 @@ import { join } from '../utils/join.js'
  *   fs,
  *   dir: '/tutorial',
  *   filepath: `.git/objects/pack/${packfiles[0]}`,
- *   onProgress (evt) {
+ *   async onProgress (evt) {
  *     console.log(`${evt.phase}: ${evt.loaded} / ${evt.total}`)
  *   }
  * })
