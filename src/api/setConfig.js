@@ -31,7 +31,7 @@ import { join } from '../utils/join.js'
  *   path: 'user.name',
  *   value: 'Mr. Test'
  * })
- * 
+ *
  * // Print out config file
  * let file = await pfs.readFile('/tutorial/.git/config', 'utf8')
  * console.log(file)

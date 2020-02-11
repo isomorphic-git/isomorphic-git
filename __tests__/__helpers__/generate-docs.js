@@ -36,10 +36,12 @@ function inlineFunctionType (ast) {
     text += `()`
   } else {
     text += `(`
-    text += ast.params.map(param => {
-      const type = cleanType(param.type.names[0])
-      return `${param.name}: ${type}`
-    }).join(', ')
+    text += ast.params
+      .map(param => {
+        const type = cleanType(param.type.names[0])
+        return `${param.name}: ${type}`
+      })
+      .join(', ')
     text += ')'
   }
   text += ` => ${cleanType(ast.returns[0].type.names[0])}`
