@@ -152,6 +152,8 @@ import { join } from '../utils/join.js'
  *
  * ## map(string, Array<WalkerEntry|null>) => Promise<any>
  *
+ * {@link WalkerMap typedef}
+ *
  * This is the function that is called once per entry BEFORE visiting the children of that node.
  *
  * If you return `null` for a `tree` entry, then none of the children of that `tree` entry will be walked.
@@ -208,6 +210,8 @@ import { join } from '../utils/join.js'
  *
  * ## reduce(parent, children)
  *
+ * {@link WalkerReduce typedef}
+ *
  * This is the function that is called once per entry AFTER visiting the children of that node.
  *
  * Default: `async (parent, children) => parent === undefined ? children.flat() : [parent, children].flat()`
@@ -224,6 +228,10 @@ import { join } from '../utils/join.js'
  *
  * ## iterate(walk, children)
  *
+ * {@link WalkerIterate typedef}
+ *
+ * {@link WalkerIterateCallback typedef}
+ *
  * Default: `(walk, children) => Promise.all([...children].map(walk))`
  *
  * The default implementation recurses all children concurrently using Promise.all.
@@ -239,9 +247,6 @@ import { join } from '../utils/join.js'
  * @param {WalkerIterate} [args.iterate] - Fine-tune how entries within a tree are iterated over
  *
  * @returns {Promise<any>} The finished tree-walking result
- *
- * @see {WalkerMap}
- *
  */
 export async function walk ({
   fs,

@@ -30,6 +30,24 @@ function recoverFunctionSignature (name, text) {
 
 const typedefs = new Map()
 
+function inlineFunctionType (ast) {
+  let text = ''
+  if (!ast.params) {
+    text += `()`
+  } else {
+    text += `(`
+    text += ast.params
+      .map(param => {
+        const type = cleanType(param.type.names[0])
+        return `${param.name}: ${type}`
+      })
+      .join(', ')
+    text += ')'
+  }
+  text += ` => ${cleanType(ast.returns[0].type.names[0])}`
+  return text
+}
+
 function gentypedef (ast) {
   let text = ''
   if (ast.description) {
@@ -37,7 +55,11 @@ function gentypedef (ast) {
   }
   text += '\n```ts\n'
   if (!ast.properties) {
-    text += `type ${ast.name} = ${cleanType(ast.type.names[0])};\n`
+    if (cleanType(ast.type.names[0]) === 'function') {
+      text += `type ${ast.name} = ${inlineFunctionType(ast)};\n`
+    } else {
+      text += `type ${ast.name} = ${cleanType(ast.type.names[0])};\n`
+    }
   } else {
     text += `type ${ast.name} = {\n`
     let currentprop = null
@@ -133,15 +155,14 @@ async function gendoc (file, filepath) {
     console.log(`Unable to parse ${filepath}`, e.message)
     return ''
   }
-
   let text = ''
   for (const obj of ast) {
     if (!obj.undocumented) {
+      if (obj.kind === 'package') continue
       if (obj.kind === 'typedef') {
         gentypedef(obj)
         continue
       }
-      if (obj.kind === 'package') continue
       if ((!obj.params && !obj.returns) || !obj.description) continue
       text += `---\n`
       text += `title: ${obj.name}\n`
@@ -252,6 +273,21 @@ async function gendoc (file, filepath) {
         }
       }
       if (obj.name) {
+        // This provides a handy footer
+        text += `
+
+---
+
+<details>
+<summary><i>Tip: If you need a clean slate, expand and run this snippet to clean up the file system.</i></summary>
+
+\`\`\`js live
+window.fs = new LightningFS('fs', { wipe: true })
+window.pfs = window.fs.promises
+console.log('done')
+\`\`\`
+</details>
+`
         // This rewrites the "Edit" button on the docs page to point to the JSDoc page instead of the raw Markdown page.
         text += `
 <script>

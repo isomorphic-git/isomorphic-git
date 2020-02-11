@@ -19,7 +19,18 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves when filesystem operations are complete
  *
  * @example
- * await git.indexPack({ fs, dir: '/tutorial', filepath: 'pack-9cbd243a1caa4cb4bef976062434a958d82721a9.pack' })
+ * let packfiles = await fs.promises.readdir('/tutorial/.git/objects/pack')
+ * packfiles = packfiles.filter(name => name.endsWith('.pack'))
+ * console.log('packfiles', packfiles)
+ *
+ * await git.indexPack({
+ *   fs,
+ *   dir: '/tutorial',
+ *   filepath: `.git/objects/pack/${packfiles[0]}`,
+ *   async onProgress (evt) {
+ *     console.log(`${evt.phase}: ${evt.loaded} / ${evt.total}`)
+ *   }
+ * })
  * console.log('done')
  *
  */

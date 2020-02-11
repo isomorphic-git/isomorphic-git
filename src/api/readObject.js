@@ -147,6 +147,7 @@ import { resolveTree } from '../utils/resolveTree.js'
  *
  * {@link ParsedTreeObject typedef}
  * {@link TreeObject typedef}
+ * {@link TreeEntry typedef}
  *
  * ### parsed `'tag'` type
  *
@@ -154,7 +155,6 @@ import { resolveTree } from '../utils/resolveTree.js'
  * {@link TagObject typedef}
  *
  * @deprecated
- * > **Deprecated**
  * > This command is overly complicated.
  * >
  * > If you know the type of object you are reading, use [`readBlob`](./readBlob.md), [`readCommit`](./readCommit.md), [`readTag`](./readTag.md), or [`readTree`](./readTree.md).

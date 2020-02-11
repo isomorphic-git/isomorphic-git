@@ -32,7 +32,6 @@ import { join } from '../utils/join.js'
  * If `format` is `'content'`, `'wrapped'`, or `'deflated'`, `object` should be a `Uint8Array`.
  *
  * @deprecated
- * > **Deprecated**
  * > This command is overly complicated.
  * >
  * > If you know the type of object you are writing, use [`writeBlob`](./writeBlob.md), [`writeCommit`](./writeCommit.md), [`writeTag`](./writeTag.md), or [`writeTree`](./writeTree.md).

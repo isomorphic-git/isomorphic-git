@@ -98,8 +98,8 @@
         "sidebar_label": "findRoot"
       },
       "fs": {
-        "title": "Bring Your Own FS",
-        "sidebar_label": "Bring Your Own FS"
+        "title": "fs",
+        "sidebar_label": "fs"
       },
       "getConfig": {
         "title": "getConfig",
@@ -112,10 +112,6 @@
       "getRemoteInfo": {
         "title": "getRemoteInfo",
         "sidebar_label": "getRemoteInfo"
-      },
-      "browser": {
-        "title": "Browser Quick Start",
-        "sidebar_label": "Browser Quick Start"
       },
       "cli": {
         "title": "isogit CLI",
@@ -718,20 +714,22 @@
     "categories": {
       "All Commands": "All Commands",
       "Repository": "Repository",
-      "Files": "Files",
+      "Callbacks": "Callbacks",
+      "Config": "Config",
       "Branches": "Branches",
       "Tags": "Tags",
-      "Remotes": "Remotes",
+      "Files": "Files",
       "Notes": "Notes",
-      "Walking": "Walking",
-      "Callbacks": "Callbacks",
-      "Raw Objects": "Raw Objects",
+      "Remotes": "Remotes",
+      "Objects": "Objects",
       "Plumbing Commands": "Plumbing Commands",
-      "Misc Commands": "Misc Commands",
-      "Deprecated Commands": "Deprecated Commands",
       "Getting Started": "Getting Started",
       "More": "More",
-      "Plugins": "Plugins"
+      "Walking": "Walking",
+      "Plugins": "Plugins",
+      "Raw Objects": "Raw Objects",
+      "Misc Commands": "Misc Commands",
+      "Deprecated Commands": "Deprecated Commands"
     }
   },
   "pages-strings": {

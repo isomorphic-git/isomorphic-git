@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-    "build": "webpack --mode=production --output-library=codemirrorify && cp dist/main.js ../../static/js/codemirrorify.js"
+    "build": "webpack --mode=production --output-library=codemirrorify"
   },
   "keywords": [],
   "author": "William Hilton <wmhilton@gmail.com>",

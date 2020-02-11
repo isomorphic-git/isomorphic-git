@@ -113,7 +113,7 @@ describe('git wire protocol', () => {
         'refs/heads/master5': 'e5c144897b64a44bd1164a0db60738452c9eaf87'
       }
     })
-    const buffer = await collect(res)
+    const buffer = Buffer.from(await collect(res))
     expect(buffer.toString('utf8')).toBe(
       `01149ea43b479f5fedc679e3eb37803275d727bf51b7 HEAD\0multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed no-done symref=HEAD:refs/heads/master agent=git/isomorphic-git@0.0.0-development
 003cfb74ea1a9b6a9601df18c38d3de751c51f064bf7 refs/heads/js2
@@ -295,7 +295,7 @@ access it.
       ]
     }
     const result = writeUploadPackRequest(req)
-    const buffer = await collect(result)
+    const buffer = Buffer.from(await collect(result))
     expect(buffer.toString('utf8'))
       .toEqual(`008awant fb74ea1a9b6a9601df18c38d3de751c51f064bf7 multi_ack_detailed no-done side-band-64k thin-pack ofs-delta agent=git/2.10.1.windows.1
 0032want 5faa96fe725306e060386975a70e4b6eacb576ed
