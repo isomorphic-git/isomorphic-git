@@ -10,12 +10,7 @@ import { join } from '../utils/join.js'
 // TODO: Implement .git/info/exclude
 
 export class GitIgnoreManager {
-  static async isIgnored ({
-    fs,
-    dir,
-    gitdir = join(dir, '.git'),
-    filepath
-  }) {
+  static async isIgnored ({ fs, dir, gitdir = join(dir, '.git'), filepath }) {
     // ALWAYS ignore ".git" folders.
     if (basename(filepath) === '.git') return true
     // '.' is not a valid gitignore entry, so '.' is never ignored

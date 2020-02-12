@@ -1,12 +1,6 @@
 import { E, GitError } from '../models/GitError.js'
 
-export async function writeObjectLoose ({
-  fs,
-  gitdir,
-  object,
-  format,
-  oid
-}) {
+export async function writeObjectLoose ({ fs, gitdir, object, format, oid }) {
   if (format !== 'deflated') {
     throw new GitError(E.InternalFail, {
       message:
