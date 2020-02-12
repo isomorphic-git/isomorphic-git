@@ -1,5 +1,4 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
@@ -23,7 +22,7 @@ const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
 
 export class GitRefManager {
   static async updateRemoteRefs ({
-    fs: _fs,
+    fs,
     gitdir,
     remote,
     refs,
@@ -33,7 +32,6 @@ export class GitRefManager {
     prune = false,
     pruneTags = false
   }) {
-    const fs = new FileSystem(_fs)
     // Validate input
     for (const value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
@@ -132,8 +130,7 @@ export class GitRefManager {
   }
 
   // TODO: make this less crude?
-  static async writeRef ({ fs: _fs, gitdir, ref, value }) {
-    const fs = new FileSystem(_fs)
+  static async writeRef ({ fs, gitdir, ref, value }) {
     // Validate input
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new GitError(E.NotAnOidFail, { value })
@@ -141,8 +138,7 @@ export class GitRefManager {
     await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
   }
 
-  static async writeSymbolicRef ({ fs: _fs, gitdir, ref, value }) {
-    const fs = new FileSystem(_fs)
+  static async writeSymbolicRef ({ fs, gitdir, ref, value }) {
     await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
   }
 
@@ -150,8 +146,7 @@ export class GitRefManager {
     return GitRefManager.deleteRefs({ fs, gitdir, refs: [ref] })
   }
 
-  static async deleteRefs ({ fs: _fs, gitdir, refs }) {
-    const fs = new FileSystem(_fs)
+  static async deleteRefs ({ fs, gitdir, refs }) {
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref
@@ -169,8 +164,7 @@ export class GitRefManager {
     }
   }
 
-  static async resolve ({ fs: _fs, gitdir, ref, depth = undefined }) {
-    const fs = new FileSystem(_fs)
+  static async resolve ({ fs, gitdir, ref, depth = undefined }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {
@@ -213,8 +207,7 @@ export class GitRefManager {
     }
   }
 
-  static async expand ({ fs: _fs, gitdir, ref }) {
-    const fs = new FileSystem(_fs)
+  static async expand ({ fs, gitdir, ref }) {
     // Is it a complete and valid SHA?
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
       return ref
@@ -274,16 +267,14 @@ export class GitRefManager {
     throw new GitError(E.ResolveRefError, { ref })
   }
 
-  static async packedRefs ({ fs: _fs, gitdir }) {
-    const fs = new FileSystem(_fs)
+  static async packedRefs ({ fs, gitdir }) {
     const text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     const packed = GitPackedRefs.from(text)
     return packed.refs
   }
 
   // List all the refs that match the `filepath` prefix
-  static async listRefs ({ fs: _fs, gitdir, filepath }) {
-    const fs = new FileSystem(_fs)
+  static async listRefs ({ fs, gitdir, filepath }) {
     const packedMap = GitRefManager.packedRefs({ fs, gitdir })
     let files = null
     try {
@@ -309,8 +300,7 @@ export class GitRefManager {
     return files
   }
 
-  static async listBranches ({ fs: _fs, gitdir, remote }) {
-    const fs = new FileSystem(_fs)
+  static async listBranches ({ fs, gitdir, remote }) {
     if (remote) {
       return GitRefManager.listRefs({
         fs,
@@ -322,8 +312,7 @@ export class GitRefManager {
     }
   }
 
-  static async listTags ({ fs: _fs, gitdir }) {
-    const fs = new FileSystem(_fs)
+  static async listTags ({ fs, gitdir }) {
     const tags = await GitRefManager.listRefs({
       fs,
       gitdir,

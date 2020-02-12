@@ -1,6 +1,5 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
@@ -8,13 +7,12 @@ import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 
 export async function listCommitsAndTags ({
-  fs: _fs,
+  fs,
   dir,
   gitdir = join(dir, '.git'),
   start,
   finish
 }) {
-  const fs = new FileSystem(_fs)
   const shallows = await GitShallowManager.read({ fs, gitdir })
   const startingSet = new Set()
   const finishingSet = new Set()

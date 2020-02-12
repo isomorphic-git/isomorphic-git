@@ -1,7 +1,6 @@
 // import LockManager from 'travix-lock-manager'
 import AsyncLock from 'async-lock'
 
-import { FileSystem } from '../models/FileSystem.js'
 import { GitIndex } from '../models/GitIndex.js'
 import { DeepMap } from '../utils/DeepMap.js'
 import { compareStats } from '../utils/compareStats.js'
@@ -42,8 +41,7 @@ export class GitIndexManager {
    * @param {object} opts
    * @param {function(GitIndex): any} closure
    */
-  static async acquire ({ fs: _fs, gitdir }, closure) {
-    const fs = new FileSystem(_fs)
+  static async acquire ({ fs, gitdir }, closure) {
     const filepath = `${gitdir}/index`
     if (lock === null) lock = new AsyncLock({ maxPending: Infinity })
     let result
