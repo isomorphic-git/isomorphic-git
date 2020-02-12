@@ -9,7 +9,6 @@
   "exports": {
     ".": "./dist/index.cjs",
     "./dist/index.js": "./dist/index.js",
-    "./http": "./dist/http.cjs",
     "./dist/http.cjs": "./dist/http.cjs",
     "./dist/http.js": "./dist/http.js"
   },

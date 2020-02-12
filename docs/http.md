@@ -13,26 +13,12 @@ Or you can provide your own!
 
 The Node client uses the [`simple-get`](https://npm.im/simple-get) package under the hood.
 
-<!--DOCUSAURUS_CODE_TABS-->
-<!--Node LTS-->
-
 ```js
 const git = require("isomorphic-git");
 const http = require("isomorphic-git/dist/http.cjs");
 git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
   .then(console.log)
 ```
-
-<!--Node 13-->
-
-```js
-const git = require("isomorphic-git");
-const http = require("isomorphic-git/http");
-git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
-  .then(console.log)
-```
-
-<!--END_DOCUSAURUS_CODE_TABS-->
 
 If you need features that aren't supported currently, like detecting and handling `HTTP_PROXY` environment variables, you can
 wrap your own HTTP client. (See section below.)
