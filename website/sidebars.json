@@ -25,6 +25,10 @@
       "onProgress",
       "onSign"
     ],
+    "Clients": [
+      "fs",
+      "http"
+    ],
     "Config": [
       "setConfig",
       "getConfig",
@@ -91,7 +95,6 @@
   "guide": {
     "Getting Started": [
       "quickstart",
-      "fs",
       "dir-vs-gitdir",
       "cli"
     ],

@@ -3,12 +3,19 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "typings": "./dist/index.d.ts",
-  "main": "dist/index.cjs",
+  "type": "commonjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.cjs",
+    "./http": "./dist/http.cjs",
+    "./dist/http.cjs": "./dist/http.cjs",
+    "./dist/http.js": "./dist/http.js"
+  },
   "browser": {
     "isomorphic-git": "./dist/bundle.umd.min.js",
     "isomorphic-git/internal-apis": "./dist/internal.umd.min.js"
   },
-  "module": "dist/index.js",
   "unpkg": "dist/bundle.umd.min.js",
   "bin": {
     "isogit": "./cli.js"

@@ -2,7 +2,7 @@
 import { collect } from '../utils/collect.js'
 import { fromStream } from '../utils/fromStream'
 
-export async function http ({
+export default async function http ({
   onProgress,
   url,
   method = 'GET',

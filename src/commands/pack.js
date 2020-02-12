@@ -1,4 +1,4 @@
-import Hash from 'sha.js/sha1'
+import Hash from 'sha.js/sha1.js'
 
 import { types } from '../commands/types.js'
 import { FileSystem } from '../models/FileSystem.js'
