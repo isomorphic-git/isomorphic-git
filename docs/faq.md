@@ -88,6 +88,33 @@ I haven't had time to review them all.
 > It seems that there's no default export which should just contain all the functions
 > I'm suggesting to have a default export that gathers all the functions together.
 
+In 0.x.x I withheld adding a `default` export for the reasons explained below. However in 1.x.x there _is_ a default export - with a caveat!
+The CommonJS format does _not_ have a default export. This actually makes the most sense because it means this Just Works (TM):
+
+```js
+const git = require('isomorphic-git')
+```
+
+If you have a default export _and_ a named export, Rollup spits out a file that has to be consumed like this...
+
+```js
+const git = require('isomorphic-git').default
+```
+
+which nobody wants.
+
+To benefit from tree-shaking, you still should use named exports. But for convenience there is a default export now! So either of these work:
+
+```js
+import git from 'isomorphic-git'
+// or
+import * as git from 'isomorphic-git'
+```
+
+which strays from my usual Pythonic "there should only be one way to do it, and that way should be the best way" attitude... but having a default export also makes using the library _simpler_ because you don't have to think about whether to use a namespace import or a default import. And it looks nicer.
+
+Old Answer preserved for posterity:
+
 _Answer by Will Hilton (@wmhilton):_
 
 Default exports are actually really bad for tree-shaking. If you do `import * as git from 'isomorphic-git'` and only use `git.log`, rollup and webpack are smart enough to only bundle `git.log`.
@@ -137,3 +164,5 @@ A slightly more efficient way of telling if you have the full history, would be 
 ## Does it support wire protocol version 2?
 
 Not yet, but you can go [upvote the issue](https://github.com/isomorphic-git/isomorphic-git/issues/585)
+As soon as GitHub supports the [fetch filter feature](https://git-scm.com/docs/protocol-v2#_fetch) I'll have a reason to work on it, because that would be extremely useful in browser environments!
+But until then, there's no advantage to using the new protocol.

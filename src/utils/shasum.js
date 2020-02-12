@@ -1,5 +1,5 @@
 /* eslint-env node, browser */
-import Hash from 'sha.js/sha1'
+import Hash from 'sha.js/sha1.js'
 
 import { toHex } from './toHex.js'
 

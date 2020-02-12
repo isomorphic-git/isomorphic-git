@@ -15,6 +15,7 @@ Array [
   "clone",
   "commit",
   "currentBranch",
+  "default",
   "deleteBranch",
   "deleteRef",
   "deleteRemote",

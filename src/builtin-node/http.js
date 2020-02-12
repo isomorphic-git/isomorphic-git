@@ -2,7 +2,7 @@ import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { collect } from '../utils/collect.js'
 import { fromNodeStream } from '../utils/fromNodeStream.js'
 
-export async function http ({
+export default async function http ({
   onProgress,
   url,
   method = 'GET',

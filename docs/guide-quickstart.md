@@ -12,7 +12,7 @@ First, let's set up LightningFS and isomorphic-git. *Note: I've already done thi
 <script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
 <script src="https://unpkg.com/isomorphic-git@beta"></script>
 <script type="module">
-import { http } from 'https://unpkg.com/isomorphic-git@beta/dist/http.js'
+import http from 'https://unpkg.com/isomorphic-git@beta/dist/http.js'
 // Initialize isomorphic-git with a file system
 window.fs = new LightningFS('fs')
 // I prefer using the Promisified version honestly
