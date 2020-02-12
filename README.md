@@ -72,6 +72,8 @@ At the time of writing, the following breaking changes are planned:
 - [ ] Make sure that the payload output of `readTag` and `readCommit` is newline-correct to easily verify. Then remove the `verify` command.
 - [x] Make sure all the example code works.
 - [x] Update the Getting Started guide.
+- [ ] Update the WebWorker Guide.
+- [ ] Update the Useful Snippets.
 
 ## Getting Started
 
@@ -100,12 +102,12 @@ const fs = new LightningFS('fs')
 </script>
 ```
 
-If you're using ES module syntax, use either a namespace import or named imports to benefit from tree-shaking:
+If you're using ES module syntax, you can use either the default import or named imports to benefit from tree-shaking:
 
 ```js
-import * as git from 'isomorphic-git'
+import git from 'isomorphic-git'
 // or
-import {plugins, clone, commit, push} from 'isomorphic-git
+import {plugins, clone, commit, push} from 'isomorphic-git'
 ```
 
 View the full [Getting Started guide](https://isomorphic-git.github.io/docs/quickstart.html) on the docs website.
@@ -150,9 +152,9 @@ In the package.json you'll see there are actually 3 different versions:
 
 This deserves a brief explanation.
 
-- the "main" version is for node.
-- the "module" version is for webpack or other browser bundlers.
-- the "unpkg" version is the UMD build.
+- the "main" version is a CommonJS build
+- the "module" version is an ES Module build
+- the "unpkg" version is a minified UMD build with dependencies already bundled
 
 ### `isogit` CLI
 

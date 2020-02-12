@@ -69,18 +69,24 @@ module.exports = {
         : optional(`cross-env bundlewatch dist/bundle.umd.min.js`)
     },
     website: {
-      default: series.nps(
-        'website.codemirorify',
-        'website.cpstatic',
-        'website.build',
-        'website.publish'
-      ),
-      dev: '(cd website && npm start)',
+      default: process.env.CI
+        ? series.nps(
+          'website.codemirrorify',
+          'website.cpstatic',
+          'website.build',
+          'website.publish'
+        )
+        : series.nps(
+          'website.codemirrorify',
+          'website.cpstatic',
+          'website.dev'
+        ),
       codemirrorify:
         '(cd website/packages/codemirrorify && npm install && npm run build)',
       cpstatic:
         'cp dist/bundle.umd.min.* website/static/js && cp dist/http.js website/static/js && cp website/packages/codemirrorify/dist/main.js website/static/js/codemirrorify.js',
       build: '(cd website && npm install && npm run build)',
+      dev: '(cd website && npm start)',
       publish: '(cd website && node ./scripts/deploy-gh-pages.js)'
     },
     // ATTENTION:

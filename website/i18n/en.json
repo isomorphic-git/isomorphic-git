@@ -260,10 +260,6 @@
         "title": "Useful Code Snippets",
         "sidebar_label": "Useful Snippets"
       },
-      "STAGE": {
-        "title": "STAGE",
-        "sidebar_label": "STAGE"
-      },
       "status": {
         "title": "status",
         "sidebar_label": "status"
@@ -276,10 +272,6 @@
         "title": "tag",
         "sidebar_label": "tag"
       },
-      "TREE": {
-        "title": "TREE",
-        "sidebar_label": "TREE"
-      },
       "verify": {
         "title": "verify",
         "sidebar_label": "verify"
@@ -291,10 +283,6 @@
       "walk": {
         "title": "walk",
         "sidebar_label": "walk"
-      },
-      "WORKDIR": {
-        "title": "WORKDIR",
-        "sidebar_label": "WORKDIR"
       },
       "writeBlob": {
         "title": "writeBlob",
@@ -715,6 +703,7 @@
       "All Commands": "All Commands",
       "Repository": "Repository",
       "Callbacks": "Callbacks",
+      "Clients": "Clients",
       "Config": "Config",
       "Branches": "Branches",
       "Tags": "Tags",

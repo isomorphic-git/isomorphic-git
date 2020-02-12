@@ -1,9 +1,10 @@
 /* eslint-env node, browser, jasmine */
+import http from 'isomorphic-git/http'
+
 // @ts-ignore
 const snapshots = require('./__snapshots__/test-getRemoteInfo.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { E, getRemoteInfo } = require('isomorphic-git')
-const { http } = require('isomorphic-git/http')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
