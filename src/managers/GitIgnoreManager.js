@@ -1,6 +1,5 @@
 import ignore from 'ignore'
 
-import { FileSystem } from '../models/FileSystem.js'
 import { basename } from '../utils/basename.js'
 import { dirname } from '../utils/dirname.js'
 import { join } from '../utils/join.js'
@@ -12,12 +11,11 @@ import { join } from '../utils/join.js'
 
 export class GitIgnoreManager {
   static async isIgnored ({
-    fs: _fs,
+    fs,
     dir,
     gitdir = join(dir, '.git'),
     filepath
   }) {
-    const fs = new FileSystem(_fs)
     // ALWAYS ignore ".git" folders.
     if (basename(filepath) === '.git') return true
     // '.' is not a valid gitignore entry, so '.' is never ignored

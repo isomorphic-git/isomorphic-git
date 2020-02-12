@@ -1,15 +1,13 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
 import { writeRefsAdResponse } from '../wire/writeRefsAdResponse.js'
 
 export async function uploadPack ({
-  fs: _fs,
+  fs,
   dir,
   gitdir = join(dir, '.git'),
   advertiseRefs = false
 }) {
-  const fs = new FileSystem(_fs)
   try {
     if (advertiseRefs) {
       // Send a refs advertisement
