@@ -17,9 +17,7 @@ describe('submodule "support"', () => {
       http,
       dir,
       gitdir,
-      url: `http://${localhost}:8888/test-submodules.git`,
-      noSubmodules: true,
-      newSubmoduleBehavior: true
+      url: `http://${localhost}:8888/test-submodules.git`
     })
     // Test
     expect(await listFiles({ fs, gitdir })).toContain('test.empty')
@@ -32,9 +30,7 @@ describe('submodule "support"', () => {
       http,
       dir,
       gitdir,
-      url: `http://${localhost}:8888/test-submodules.git`,
-      noSubmodules: true,
-      newSubmoduleBehavior: true
+      url: `http://${localhost}:8888/test-submodules.git`
     })
     // Test
     await commit({
@@ -59,18 +55,14 @@ describe('submodule "support"', () => {
       dir,
       gitdir,
       ref: 'no-modules',
-      url: `http://${localhost}:8888/test-submodules.git`,
-      noSubmodules: true,
-      newSubmoduleBehavior: true
+      url: `http://${localhost}:8888/test-submodules.git`
     })
     // Test
     await checkout({
       fs,
       dir,
       gitdir,
-      ref: 'master',
-      noSubmodules: true,
-      newSubmoduleBehavior: true
+      ref: 'master'
     })
     expect(await listFiles({ fs, gitdir })).toContain('test.empty')
   })
@@ -82,9 +74,7 @@ describe('submodule "support"', () => {
       http,
       dir,
       gitdir,
-      url: `http://${localhost}:8888/test-submodules.git`,
-      noSubmodules: true,
-      newSubmoduleBehavior: true
+      url: `http://${localhost}:8888/test-submodules.git`
     })
     // Test
     await checkout({ fs, dir, gitdir, ref: 'no-modules' })

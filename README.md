@@ -32,77 +32,101 @@ The following environments are tested in CI and will continue to be supported un
 </tr>
 </table>
 
-## 1.0 Release Plans
+## 1.0 Breaking Changes
 
-The 1.0 release is planned to coincide with the stable release of the new Chromium-based [Micorosoft Edge](https://blogs.windows.com/msedgedev/2019/11/04/edge-chromium-release-candidate-get-ready/#QU89TOA8e8dE8Hev.97) in January 2020, so that we can drop support for the old Edge browser.
-*Update: The new Edge browser is out, so I'm working on getting 1.0 out now.*
-
-At the time of writing, the following breaking changes are planned:
-
-- [x] The supported browser versions will be bumped.
-- [x] Commands that will be renamed:
-  - [x] The `checkout` command will be replaced with the implementation used in the safer and faster `fastCheckout` command and `fastCheckout` will be removed.
-  - [x] The `walkBeta2` command renamed to `walk`, and the `walkBeta1` command will be removed.
-- [x] Deprecated commands and function arguments will be removed:
-  - [x] The `sign` command will be removed.
-  - [x] The commands `utils.auth` and `utils.oauth2` will be removed.
-  - [x] The undocumented param aliases `authUsername` and `authPassword` are removed in favor of `username` and `password`.
-  - [x] The `emitter` function argument will be removed.
-  - [x] The `fs` function argument will be removed.
-  - [x] The `fast` argument to `pull` will be removed since it will always use the `fastCheckout` implementation.
-  - [x] The `signing` function argument of `log` will be removed, and `log` will simply always return a payload. **Update: Actually, it now returns the same kind of objects as `readCommit` because that just makes a lot of sense.** (This change is to simplify the type signature of `log` so we don't need function overloading; it is the only thing blocking me from abandoning the hand-crafted `index.d.ts` file and generating the TypeScript definitions directly from the JSDoc tags that already power the website docs.)
-- [x] Any functions that currently return `Buffer` objects will instead return `Uint8Array` so we can eventually drop the bloated Buffer browser polyfill.
-- [x] The `pattern` and globbing options will be removed from `statusMatrix` so we can drop the dependencies on `globalyzer` and `globrex`, but you'll be able to bring your own `filter` function instead.
-- [x] The `autoTranslateSSH` feature will be removed, since it's trivial to implement using just the `UnknownTransportError.data.suggestion`
-- [x] Make the 'message' event behave like 'rawmessage' and remove 'rawmessage'.
-- [x] Update the README to recommend LightningFS rather than BrowserFS.
-- [x] The `internal-apis` will be excluded from `dist` before publishing. Because those are only exposed so I could unit test them and no one should be using them lol.
-- [x] I think I'll tweak `readObject` and `writeObject` so that `readObject` doesn't have a crazy polymorphic return type and they somehow "fit" with all the more specific `read/write Blob/Commit/Tag/Tree` commands.
-- [x] I think I will change the `plugins` API. The current API (`plugins.set('fs', fs)`) uses a kinda-hacky run-time schema validation that just checks whether certain methods are defined. Static type checking would actually provide a better developer experience and better guarantees, but having `.set` be polymorphic is hard to accurately describe using JSDoc, so I might switch to an API like `plugins.fs(fs)`.
-  - this also means we can set `new FileSystem(_fs)` in the `plugins.fs(fs)` command, because _we don't have to expose a getter like `plugins.get()`!_
-- [x] Actually, I'm thinking of eliminating the plugin system API and going back to function arguments. The plugin cores creates a mysterious "global state" that makes it easy to trip up (I've forgotten to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic but a much simpler model.
-- [x] break `config` into `getConfig` and `setConfig` or something.
-- [x] Make `http` an external required dependency just like `fs` [#938](https://github.com/isomorphic-git/isomorphic-git/issues/938)
-- [x] Remove the `noOverwrite` option from `init` and make that the new behavior.
-- [x] Fix `push` to use the remote tracking branch by default for `remtoeRef`
-- [x] Auto-generate `docs/alphabetic.md` and `README` list from filenames in `src/api`.
-- [x] Type-check all the example code in JSDoc.
+TODO:
 - [ ] I should probably normalize on timestamps and get rid of the `date` options.
 - [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
 - [ ] Make sure that the payload output of `readTag` and `readCommit` is newline-correct to easily verify. Then remove the `verify` command.
-- [x] Make sure all the example code works.
-- [x] Update the Getting Started guide.
 - [ ] Update the WebWorker Guide.
 - [ ] Update the Useful Snippets.
 
+### Big changes
+- [x] The supported node & browser versions have been bumped. (See beautiful table above.)
+- [x] The plugin system has been eliminated and we're back to plain old dependency injection via function arguments! The plugin cores created a mysterious "global state" that makes it easy to trip up (I myself sometimes forgot to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic and more verbose, but it is a much simpler model than the plugin core model, and much safer because it makes it impossible for dependencies to accidentally share the default plugin core.
+- [x] There is an additional setup step to choose which `http` client to use, and functions that make HTTP requests have a new required `http` parameter. Previously I used a mix of bundler and runtime magic to try and pick between a build that used `fetch` and one that used `require('http')` but that didn't always work. For instance, if you were bundling a Node application using Webpack, it would pick the wrong build [(#938)](https://github.com/isomorphic-git/isomorphic-git/issues/938). Another example: in an Electron renderer thread, _both_ options could work (if the window is launched with `nodeIntegration: true`) but in a Web Worker thread only the fetch option should work (_unless_ you have `nodeIntegrationInWorker: true` set). See "Getting Started" below to see the extra line of code you need.
+
+### Some functions have been renamed or removed:
+  - [x] The `walkBeta2` function was renamed to `walk`.
+  - [x] The `walkBeta1` function was removed.
+  - [x] The `fastCheckout` function has been renamed `checkout` and the old `checkout` has been removed.
+  - [x] The (previously deprecated) `sign` function was removed.
+  - [x] The (previously deprecated) `utils.auth` function was removed.
+  - [x] The (previously deprecated) `utils.oauth2` was removed.
+  - [x] The `config` function has been removed and replaced by `getConfig`, `getConfigAll`, and `setConfig`.
+
+### Some function parameters have been removed or replaced:
+  - [x] The undocumented parameter aliases `authUsername` and `authPassword` were removed.
+  - [x] The `emitter` parameter was removed and replaced with the `onMessage` and `onProgress` callbacks. (Note that `onMessage` emits un-trimmed strings, so you get those `\r`s.)
+  - [x] The `fast` parameter of `pull` was removed, since there is no "slow" implementation anymore.
+  - [x] The `signing` parameter of `log` was removed, since `log` will always return a payload.
+  - [x] The `pattern` parameter was removed from `statusMatrix` and replaced with a new `filter` function. (This is so we can drop the dependencies on `globalyzer` and `globrex`.)
+  - [x] The `newSubmoduleBehavior` parameter was removed and is now the default and only behavior, because it makes much more sense to have non-destructive defaults!
+  - [x] The `noSubmodules` parameter was removed because with the new submodule behavior it is no longer necessary to print console warnings about how submodules aren't supported. (When submodule support IS added to isomorphic-git, it will be opt-in using `recurseSubmodules: true` or something like that.)
+  - [x] The `autoTranslateSSH` feature was removed, since it is trivial to implement your own version using just the `UnknownTransportError.data.suggestion`
+  - [x] The `writeObject` function when used to write a tree now expects a plain array rather than an object with a property called `entries` which is the array. (This is so that argument to `writeObject` has the same shame as the arguments to `writeBlob`/`writeCommit`/`writeTag`/`writeTree`.)
+  - [x] The `noOverwrite` parameter was removed from `init` and is the new behavior.
+
+### The return types of some functions have changed:
+  - [x] Functions that used to return `Buffer` objects now return `Uint8Array` objects. (This is so we can eventually remove all internal dependencies on the Buffer browser polyfill, which is quite heavy!)
+  - [x] The `log` function now returns an array of the same kind of objects that `readCommit` returns. (This change simplifies the type signature of `log` so we don't need function overloading; that function overloading was the one thing preventing me from auto-generating `index.d.ts`.)
+  - [x] The `readObject` function returns a proper discriminated union so TypeScript can infer the type of `.object` once you establish the value of `.format` and `.type`. Also `.object` has the same shape as as the return value of `readBlob`/`readCommit`/`readTag`/`readTree`. (Meaning trees are now plain arrays rather than objects with a `.entries` property that is the array.)
+
+### Some functions behavior changed
+- [x] The `push` function now pushes to the remote tracking branch (rather than a branch with the same name) by default.
+
+### Docs and DX improvements
+- [x] The `docs/alphabetic.md` and function list in `README.md` are auto-generated from the filenames in `src/api`.
+- [x] The entire docs website is auto-generated from the JSDoc actually so from now on the docs website and source code will always be in sync.
+- [x] All the example code in JSDoc is now type-checked during CI tests.
+- [x] The live code examples on the website are displayed in a full-blown mobile-friendly code editor (CodeMirror 6).
+- [x] Each page with live code examples includes a code snippet at the bottom to reset the browser file system.
+- [x] The Getting Started guide has been updated.
+- [x] All the example code in JSDoc has been updated.
+
+### Miscellaneous stuff
+- [x] Update the README to recommend LightningFS rather than BrowserFS.
+- [x] The `internal-apis` bundle is no longer included in the published package. Those were only exposed so I could run unit tests and no one should have been using them I hope.
+
 ## Getting Started
 
-The "isomorphic" in `isomorphic-git` means it works equally well on the server or the browser.
-That's tricky to do since git uses the file system, and browsers don't have an `fs` module.
-So rather than relying on the `fs` module, `isomorphic-git` is BYOFS (Bring Your Own File System).
-Before you can use most `isomorphic-git` functions, you need to set the `fs` module
-via the plugin system.
+The "isomorphic" in `isomorphic-git` means that the same code runs in either the server or the browser.
+That's tricky to do since git uses the file system and makes HTTP requests. Browsers don't have an `fs` module.
+And node and browsers have different APIs for making HTTP requests!
 
-If you're only using `isomorphic-git` in Node, you can just use the native `fs` module.
+So rather than relying on the `fs` and `http` modules, `isomorphic-git` lets you bring your own file system
+and HTTP client.
+
+If you're using `isomorphic-git` in Node, you use the native `fs` module and the include Node HTTP client.
 
 ```js
+// node.js example
+const path = require('path')
 const git = require('isomorphic-git');
+const http = require('isomorphic-git/dist/http.cjs') // NOTE THE FILE EXTENSION IS .cjs
 const fs = require('fs');
+
+const dir = path.join(process.cwd(), 'test-clone')
+git.clone({ fs, http, dir, url: 'https://github.com/isomorphic-git/lightning-fs' }).then(console.log)
 ```
 
-If you're writing code for the browser though, you'll need something that emulates the `fs` API.
-The easiest to setup and most performant library is [LightningFS](https://github.com/isomorphic-git/lightning-fs) which is maintained by the same author and basically part of the `isomorphic-git` suite.
+If you're using `isomorphic-git` in the browser, you'll need something that emulates the `fs` API.
+The easiest to setup and most performant library is [LightningFS](https://github.com/isomorphic-git/lightning-fs) which is written and maintained by the same author and is part of the `isomorphic-git` suite.
 If LightningFS doesn't meet your requirements, isomorphic-git should also work with [BrowserFS](https://github.com/jvilk/BrowserFS) and [Filer](https://github.com/filerjs/filer).
 
 ```html
 <script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
 <script src="https://unpkg.com/isomorphic-git"></script>
-<script>
+<script type="module">
+import http from 'https://unpkg.com/isomorphic-git@beta/dist/http.js' // NOTE THE FILE EXTENSION IS .js
 const fs = new LightningFS('fs')
+
+const dir = '/test-clone'
+git.clone({ fs, http, dir, url: 'https://github.com/isomorphic-git/lightning-fs', corsProxy: 'https://cors.isomorphic-git.org' }).then(console.log)
 </script>
 ```
 
-If you're using ES module syntax, you can use either the default import or named imports to benefit from tree-shaking:
+If you're using ES module syntax, you can use either the default import for convenience, or named imports to benefit from tree-shaking if you are using a bundler:
 
 ```js
 import git from 'isomorphic-git'
@@ -123,14 +147,14 @@ For testing or small projects, you can also use [https://cors.isomorphic-git.org
 
 I'm hoping to get CORS headers added to all the major Git hosting platforms eventually, and will list my progress here:
 
-| Service | Supports CORS requests |
-| --- | --- |
-| Gogs (self-hosted) | [✔](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html) |
-| Gitea (self-hosted) | [✔](https://github.com/go-gitea/gitea/pull/5719) |
-| Azure DevOps | [✔](https://github.com/isomorphic-git/isomorphic-git/issues/678#issuecomment-452402740) (Usage Note: requires `noGitSuffix: true` and authentication)
-| Gitlab | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open!
-| Bitbucket | ❌ |
-| Github | ❌ |
+| Service             | Supports CORS requests                                                                                                                                                       |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gogs (self-hosted)  | [✔](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)                                                                         |
+| Gitea (self-hosted) | [✔](https://github.com/go-gitea/gitea/pull/5719)                                                                                                                             |
+| Azure DevOps        | [✔](https://github.com/isomorphic-git/isomorphic-git/issues/678#issuecomment-452402740) (Usage Note: requires `noGitSuffix: true` and authentication)                        |
+| Gitlab              | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open! |
+| Bitbucket           | ❌                                                                                                                                                                            |
+| Github              | ❌                                                                                                                                                                            |
 
 It is literally just two lines of code to add the CORS headers!! Easy stuff. Surely it will happen.
 

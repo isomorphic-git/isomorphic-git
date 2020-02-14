@@ -146,7 +146,6 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {string} [args.ref = 'HEAD'] - Optionally specify a different commit to compare against the workdir and stage instead of the HEAD
  * @param {string[]} [args.filepaths = ['.']] - Limit the query to the given files and directories
  * @param {function(string): boolean} [args.filter] - Filter the results to only those whose filepath matches a function.
- * @param {boolean} [args.noSubmodules = false] - If true, will skip over submodules completely
  *
  * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
  */
@@ -156,8 +155,7 @@ export async function statusMatrix ({
   gitdir = join(dir, '.git'),
   ref = 'HEAD',
   filepaths = ['.'],
-  filter,
-  noSubmodules = false
+  filter
 }) {
   try {
     assertParameter('fs', fs)
@@ -194,17 +192,13 @@ export async function statusMatrix ({
         // For now, just bail on directories
         const headType = head && (await head.type())
         if (headType === 'tree' || headType === 'special') return
-        if (noSubmodules) {
-          if (headType === 'commit') return null
-        }
+        if (headType === 'commit') return null
 
         const workdirType = workdir && (await workdir.type())
         if (workdirType === 'tree' || workdirType === 'special') return
 
         const stageType = stage && (await stage.type())
-        if (noSubmodules) {
-          if (stageType === 'commit') return null
-        }
+        if (stageType === 'commit') return null
         if (stageType === 'tree' || stageType === 'special') return
 
         // Figure out the oids, using the staged oid for the working dir oid if the stats match.

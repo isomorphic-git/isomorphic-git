@@ -45,8 +45,6 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {number} [args.committer.timestamp] - Set the committer timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
  * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
- * @param {boolean} [args.noSubmodules = false] - If true, will not print out an error about missing submodules support. TODO: Skip checkout out submodules when supported instead.
- * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -83,9 +81,7 @@ export async function pull ({
   headers = {},
   author: _author,
   committer: _committer,
-  signingKey,
-  noSubmodules = false,
-  newSubmoduleBehavior = false
+  signingKey
 }) {
   try {
     assertParameter('fs', _fs)
@@ -126,9 +122,7 @@ export async function pull ({
       headers,
       author,
       committer,
-      signingKey,
-      noSubmodules,
-      newSubmoduleBehavior
+      signingKey
     })
   } catch (err) {
     err.caller = 'git.pull'
