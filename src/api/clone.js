@@ -21,8 +21,6 @@ import { join } from '../utils/join.js'
  * @param {string} [args.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
- * @param {boolean} [args.noSubmodules = false] - If true, clone will not log an error about missing submodule support. TODO: Make this not check out submodules when ther's submodule support
- * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**.)
  * @param {boolean} [args.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
  * @param {string} [args.remote = 'origin'] - What to name the remote that is created.
@@ -73,8 +71,6 @@ export async function clone ({
   relative = false,
   singleBranch = false,
   noCheckout = false,
-  noSubmodules = false,
-  newSubmoduleBehavior = false,
   noTags = false,
   headers = {}
 }) {
@@ -108,8 +104,6 @@ export async function clone ({
       relative,
       singleBranch,
       noCheckout,
-      noSubmodules,
-      newSubmoduleBehavior,
       noTags,
       headers
     })
