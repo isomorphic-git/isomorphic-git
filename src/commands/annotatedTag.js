@@ -23,7 +23,7 @@ import { writeObject } from '../storage/writeObject.js'
  * @param {Date} args.tagger.date
  * @param {number} args.tagger.timestamp
  * @param {number} args.tagger.timezoneOffset
- * @param {string} [args.signature]
+ * @param {string} [args.gpgsig]
  * @param {string} [args.signingKey]
  * @param {boolean} [args.force = false]
  *
@@ -49,7 +49,7 @@ export async function annotatedTag ({
   ref,
   tagger,
   message = ref,
-  signature,
+  gpgsig,
   object,
   signingKey,
   force = false
@@ -67,10 +67,10 @@ export async function annotatedTag ({
     ref: object || 'HEAD'
   })
 
-  if (signature && signingKey) {
+  if (gpgsig && signingKey) {
     throw new GitError(E.InvalidParameterCombinationError, {
       function: 'annotatedTag',
-      parameters: ['signature', 'signingKey']
+      parameters: ['gpgsig', 'signingKey']
     })
   }
 
@@ -81,7 +81,7 @@ export async function annotatedTag ({
     tag: ref.replace('refs/tags/', ''),
     tagger,
     message,
-    signature
+    gpgsig
   })
   if (signingKey) {
     tagObject = await GitAnnotatedTag.sign(tagObject, onSign, signingKey)
