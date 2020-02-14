@@ -21,8 +21,6 @@ import { addRemote } from './addRemote.js'
  * @param {string} args.ref
  * @param {boolean} args.singleBranch
  * @param {boolean} args.noCheckout
- * @param {boolean} args.noSubmodules
- * @param {boolean} args.newSubmoduleBehavior
  * @param {boolean} args.noGitSuffix
  * @param {boolean} args.noTags
  * @param {string} args.remote
@@ -61,8 +59,6 @@ export async function clone ({
   relative,
   singleBranch,
   noCheckout,
-  noSubmodules,
-  newSubmoduleBehavior,
   noTags,
   headers
 }) {
@@ -109,8 +105,6 @@ export async function clone ({
     gitdir,
     ref,
     remote,
-    noCheckout,
-    noSubmodules,
-    newSubmoduleBehavior
+    noCheckout
   })
 }

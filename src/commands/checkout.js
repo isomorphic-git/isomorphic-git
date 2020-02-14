@@ -27,8 +27,6 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {boolean} [args.dryRun]
  * @param {boolean} [args.debug]
  * @param {boolean} [args.force]
- * @param {boolean} [args.noSubmodules]
- * @param {boolean} [args.newSubmoduleBehavior]
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -45,9 +43,7 @@ export async function checkout ({
   noUpdateHead,
   dryRun,
   debug,
-  force,
-  noSubmodules,
-  newSubmoduleBehavior
+  force
 }) {
   // Get tree oid
   let oid
@@ -96,9 +92,7 @@ export async function checkout ({
         gitdir,
         ref,
         force,
-        filepaths,
-        noSubmodules,
-        newSubmoduleBehavior
+        filepaths
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
@@ -303,9 +297,7 @@ async function analyze ({
   gitdir,
   ref,
   force,
-  filepaths,
-  noSubmodules,
-  newSubmoduleBehavior
+  filepaths
 }) {
   let count = 0
   return walk({
@@ -356,24 +348,12 @@ async function analyze ({
               ]
             }
             case 'commit': {
-              // gitlinks
-              if (!noSubmodules) {
-                console.log(
-                  new GitError(E.NotImplementedFail, {
-                    thing: 'submodule support'
-                  })
-                )
-              }
-              if (newSubmoduleBehavior) {
-                return [
-                  'mkdir-index',
-                  fullpath,
-                  await commit.oid(),
-                  await commit.mode()
-                ]
-              } else {
-                return
-              }
+              return [
+                'mkdir-index',
+                fullpath,
+                await commit.oid(),
+                await commit.mode()
+              ]
             }
             default: {
               return [
@@ -570,19 +550,12 @@ async function analyze ({
               return ['update-blob-to-tree', fullpath]
             }
             case 'commit-commit': {
-              if (newSubmoduleBehavior) {
-                return [
-                  'mkdir-index',
-                  fullpath,
-                  await commit.oid(),
-                  await commit.mode()
-                ]
-              } else {
-                return [
-                  'error',
-                  `update entry Unhandled type ${await stage.type()}-${await commit.type()}`
-                ]
-              }
+              return [
+                'mkdir-index',
+                fullpath,
+                await commit.oid(),
+                await commit.mode()
+              ]
             }
             default: {
               return [

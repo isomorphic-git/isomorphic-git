@@ -23,8 +23,6 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.noUpdateHead] - If true, will update the working directory but won't update HEAD. Defaults to `false` when `ref` is provided, and `true` if `ref` is not provided.
  * @param {boolean} [args.dryRun = false] - If true, simulates a checkout so you can test whether it would succeed.
  * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
- * @param {boolean} [args.noSubmodules = false] - If true, will not print out errors about missing submodules support.
- * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -72,9 +70,7 @@ export async function checkout ({
   dryRun = false,
   // @ts-ignore
   debug = false,
-  force = false,
-  noSubmodules = false,
-  newSubmoduleBehavior = false
+  force = false
 }) {
   try {
     assertParameter('fs', fs)
@@ -94,9 +90,7 @@ export async function checkout ({
       noUpdateHead,
       dryRun,
       debug,
-      force,
-      noSubmodules,
-      newSubmoduleBehavior
+      force
     })
   } catch (err) {
     err.caller = 'git.checkout'

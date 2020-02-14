@@ -39,8 +39,6 @@ import { E, GitError } from '../models/GitError.js'
  * @param {number} args.committer.timestamp
  * @param {number} args.committer.timezoneOffset
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
- * @param {boolean} [args.noSubmodules = false] - If true, will not print out an error about missing submodules support. TODO: Skip checkout out submodules when supported instead.
- * @param {boolean} [args.newSubmoduleBehavior = false] - If true, will opt into a newer behavior that improves submodule non-support by at least not accidentally deleting them.
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -67,9 +65,7 @@ export async function pull ({
   headers,
   author,
   committer,
-  signingKey,
-  noSubmodules,
-  newSubmoduleBehavior
+  signingKey
 }) {
   try {
     // If ref is undefined, use 'HEAD'
@@ -130,8 +126,6 @@ export async function pull ({
       gitdir,
       ref,
       remote,
-      noSubmodules,
-      newSubmoduleBehavior,
       noCheckout: false
     })
   } catch (err) {
