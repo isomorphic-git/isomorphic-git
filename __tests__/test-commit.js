@@ -227,8 +227,16 @@ describe('commit', () => {
       signingKey: privateKey,
       onSign: pgp.sign
     })
-    const { commit: commitObject, payload } = await readCommit({ fs, gitdir, oid })
-    const { valid, invalid } = await pgp.verify({ payload, publicKey, signature: commitObject.gpgsig })
+    const { commit: commitObject, payload } = await readCommit({
+      fs,
+      gitdir,
+      oid
+    })
+    const { valid, invalid } = await pgp.verify({
+      payload,
+      publicKey,
+      signature: commitObject.gpgsig
+    })
     expect(invalid).toEqual([])
     expect(valid).toEqual(['f2f0ced8a52613c4'])
   })

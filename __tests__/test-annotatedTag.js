@@ -64,7 +64,11 @@ describe('annotatedTag', () => {
     })
     const oid = await resolveRef({ fs, gitdir, ref: 'latest' })
     const { tag, payload } = await readTag({ fs, gitdir, oid })
-    const { valid, invalid } = await pgp.verify({ payload, publicKey, signature: tag.gpgsig })
+    const { valid, invalid } = await pgp.verify({
+      payload,
+      publicKey,
+      signature: tag.gpgsig
+    })
     expect(invalid).toEqual([])
     expect(valid).toEqual(['f2f0ced8a52613c4'])
   })
