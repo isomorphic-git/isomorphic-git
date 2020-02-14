@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { packObjects as _packObjects } from '../commands/packObjects.js'
 import { FileSystem } from '../models/FileSystem.js'

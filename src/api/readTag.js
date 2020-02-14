@@ -1,4 +1,4 @@
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { readTag as _readTag } from '../commands/readTag.js'
 import { FileSystem } from '../models/FileSystem.js'

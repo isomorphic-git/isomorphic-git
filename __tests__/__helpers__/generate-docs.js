@@ -349,7 +349,7 @@ console.log('done')
   }
 
   // Generate the shared typedefs
-  await processEntry('src/commands', 'typedefs.js')
+  await processEntry('src', 'typedefs.js')
 
   // Generate all the docs
   await Promise.all(entries.map(entry => processEntry('src/api', entry.path)))

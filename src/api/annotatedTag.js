@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { annotatedTag as _annotatedTag } from '../commands/annotatedTag.js'
 import { FileSystem } from '../models/FileSystem.js'

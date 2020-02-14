@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { commit } from '../commands/commit.js'
 import { readTree } from '../commands/readTree.js'

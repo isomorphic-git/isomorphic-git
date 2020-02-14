@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { pull as _pull } from '../commands/pull.js'
 import { FileSystem } from '../models/FileSystem.js'

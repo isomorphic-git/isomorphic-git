@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { writeTag as _writeTag } from '../commands/writeTag.js'
 import { FileSystem } from '../models/FileSystem.js'

@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { readCommit as _readCommit } from '../commands/readCommit.js'
 import { FileSystem } from '../models/FileSystem.js'

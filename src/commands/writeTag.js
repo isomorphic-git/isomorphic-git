@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { writeObject } from '../storage/writeObject.js'

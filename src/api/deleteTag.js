@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { deleteTag as _deleteTag } from '../commands/deleteTag.js'
 import { FileSystem } from '../models/FileSystem.js'

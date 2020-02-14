@@ -1,4 +1,4 @@
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 export * from './add.js'
 export * from './addNote.js'

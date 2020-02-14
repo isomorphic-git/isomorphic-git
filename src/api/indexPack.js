@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { indexPack as _indexPack } from '../commands/indexPack.js'
 import { FileSystem } from '../models/FileSystem.js'

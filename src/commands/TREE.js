@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
 import { GitWalkSymbol } from '../utils/symbols.js'

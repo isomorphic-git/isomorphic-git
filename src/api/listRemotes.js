@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { listRemotes as _listRemotes } from '../commands/listRemotes.js'
 import { FileSystem } from '../models/FileSystem.js'

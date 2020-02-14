@@ -1,4 +1,4 @@
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
