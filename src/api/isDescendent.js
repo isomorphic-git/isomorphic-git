@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { isDescendent as _isDescendent } from '../commands/isDescendent.js'
 import { FileSystem } from '../models/FileSystem.js'

@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { readNote as _readNote } from '../commands/readNote.js'
 import { FileSystem } from '../models/FileSystem.js'

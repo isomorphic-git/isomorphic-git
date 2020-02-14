@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { readBlob as _readBlob } from '../commands/readBlob.js'
 import { FileSystem } from '../models/FileSystem.js'

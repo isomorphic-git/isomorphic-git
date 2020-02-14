@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { readTree as _readTree } from '../commands/readTree.js'
 import { FileSystem } from '../models/FileSystem.js'

@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { TREE } from '../commands/TREE.js'
 import { walk } from '../commands/walk.js'

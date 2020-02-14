@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { addNote as _addNote } from '../commands/addNote.js'
 import { FileSystem } from '../models/FileSystem.js'

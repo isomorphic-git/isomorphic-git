@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { push as _push } from '../commands/push.js'
 import { FileSystem } from '../models/FileSystem.js'

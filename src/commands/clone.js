@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { checkout } from '../commands/checkout.js'
 import { fetch } from '../commands/fetch.js'

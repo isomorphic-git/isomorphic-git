@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { currentBranch as _currentBranch } from '../commands/currentBranch.js'
 import { FileSystem } from '../models/FileSystem.js'

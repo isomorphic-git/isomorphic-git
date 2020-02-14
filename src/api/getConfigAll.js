@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { getConfigAll as _getConfigAll } from '../commands/getConfigAll.js'
 import { FileSystem } from '../models/FileSystem.js'

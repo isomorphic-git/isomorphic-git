@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { fetch as _fetch } from '../commands/fetch.js'
 import { FileSystem } from '../models/FileSystem.js'

@@ -1,4 +1,4 @@
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'

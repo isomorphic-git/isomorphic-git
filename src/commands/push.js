@@ -1,5 +1,5 @@
 // @ts-check
-import '../commands/typedefs.js'
+import '../typedefs.js'
 
 import { currentBranch } from '../commands/currentBranch.js'
 import { findMergeBase } from '../commands/findMergeBase.js'
