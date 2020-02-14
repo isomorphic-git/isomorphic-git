@@ -29,7 +29,7 @@ tag ${obj.tag}
 tagger ${formatAuthor(obj.tagger)}
 
 ${obj.message}
-${obj.signature ? obj.signature : ''}`
+${obj.gpgsig ? obj.gpgsig : ''}`
   }
 
   justHeaders () {
@@ -44,7 +44,7 @@ ${obj.signature ? obj.signature : ''}`
   parse () {
     return Object.assign(this.headers(), {
       message: this.message(),
-      signature: this.signature()
+      gpgsig: this.gpgsig()
     })
   }
 
@@ -88,7 +88,7 @@ ${obj.signature ? obj.signature : ''}`
     return tag.slice(0, tag.lastIndexOf('\n-----BEGIN PGP SIGNATURE-----'))
   }
 
-  signature () {
+  gpgsig () {
     if (this._tag.indexOf('\n-----BEGIN PGP SIGNATURE-----') === -1) return
     const signature = this._tag.slice(
       this._tag.indexOf('-----BEGIN PGP SIGNATURE-----'),
@@ -114,11 +114,5 @@ ${obj.signature ? obj.signature : ''}`
     const signedTag = payload + signature
     // return a new tag object
     return GitAnnotatedTag.from(signedTag)
-  }
-
-  static async verify (tag, verify, publicKey) {
-    const payload = tag.payload()
-    const signature = tag.signature()
-    return verify({ payload, publicKey, signature })
   }
 }

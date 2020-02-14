@@ -67,8 +67,7 @@ import { join } from '../utils/join.js'
  *       timestamp: Math.floor(Date.now()/1000),
  *       timezoneOffset: new Date().getTimezoneOffset()
  *     },
- *     message: 'Optional message',
- *     signature: ''
+ *     message: 'Optional message'
  *   }
  * })
  *

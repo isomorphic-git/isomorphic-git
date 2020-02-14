@@ -37,7 +37,7 @@ const tagObject = {
     timezoneOffset: 240
   },
   message: '0.0.9',
-  signature: `-----BEGIN PGP SIGNATURE-----
+  gpgsig: `-----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
 iQIcBAABAgAGBQJZ1BW2AAoJEJYJuKWSi6a5S6EQAJQkK+wIXijDf4ZfVeP1E7Be

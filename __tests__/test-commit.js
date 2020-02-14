@@ -1,9 +1,11 @@
+import { readCommit } from 'isomorphic-git'
+
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 // @ts-ignore
 const snapshots = require('./__snapshots__/test-commit.js.snap')
 const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { commit, verify, log } = require('isomorphic-git')
+const { commit, log } = require('isomorphic-git')
 
 describe('commit', () => {
   beforeAll(() => {
@@ -206,13 +208,13 @@ describe('commit', () => {
     expect(error.toJSON()).toMatchSnapshot()
   })
 
-  it('pgp plugin signing', async () => {
+  it('create signed commit', async () => {
     // Setup
     const { pgp } = require('@isomorphic-git/pgp-plugin')
     const { fs, gitdir } = await makeFixture('test-commit')
     // Test
     const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
-    await commit({
+    const oid = await commit({
       fs,
       gitdir,
       message: 'Initial commit',
@@ -225,14 +227,18 @@ describe('commit', () => {
       signingKey: privateKey,
       onSign: pgp.sign
     })
-    const keys = await verify({
+    const { commit: commitObject, payload } = await readCommit({
       fs,
       gitdir,
-      ref: 'HEAD',
-      publicKeys: publicKey,
-      onVerify: pgp.verify
+      oid
     })
-    expect(keys[0]).toBe('f2f0ced8a52613c4')
+    const { valid, invalid } = await pgp.verify({
+      payload,
+      publicKey,
+      signature: commitObject.gpgsig
+    })
+    expect(invalid).toEqual([])
+    expect(valid).toEqual(['f2f0ced8a52613c4'])
   })
 
   it('with timezone', async () => {

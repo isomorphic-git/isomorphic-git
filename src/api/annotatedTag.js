@@ -25,8 +25,8 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  * @param {Date} [args.tagger.date] - Set the tagger timestamp field. Default is the current date.
  * @param {number} [args.tagger.timestamp] - Set the tagger timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
  * @param {number} [args.tagger.timezoneOffset] - Set the tagger timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
- * @param {string} [args.signature] - The signature attatched to the tag object. (Mutually exclusive with the `signingKey` option.)
- * @param {string} [args.signingKey] - Sign the tag object using this private PGP key. (Mutually exclusive with the `signature` option.)
+ * @param {string} [args.gpgsig] - The gpgsig attatched to the tag object. (Mutually exclusive with the `signingKey` option.)
+ * @param {string} [args.signingKey] - Sign the tag object using this private PGP key. (Mutually exclusive with the `gpgsig` option.)
  * @param {boolean} [args.force = false] - Instead of throwing an error if a tag named `ref` already exists, overwrite the existing tag. Note that this option does not modify the original tag object itself.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
@@ -53,7 +53,7 @@ export async function annotatedTag ({
   ref,
   tagger: _tagger,
   message = ref,
-  signature,
+  gpgsig,
   object,
   signingKey,
   force = false
@@ -78,7 +78,7 @@ export async function annotatedTag ({
       ref,
       tagger,
       message,
-      signature,
+      gpgsig,
       object,
       signingKey,
       force

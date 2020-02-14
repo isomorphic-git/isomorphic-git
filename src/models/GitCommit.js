@@ -158,10 +158,4 @@ export class GitCommit {
     // return a new commit object
     return GitCommit.from(signedCommit)
   }
-
-  static async verify (commit, verify, publicKey) {
-    const payload = commit.withoutSignature()
-    const signature = commit.isolateSignature()
-    return verify({ payload, publicKey, signature })
-  }
 }
