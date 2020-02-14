@@ -290,15 +290,7 @@ export async function checkout ({
   }
 }
 
-async function analyze ({
-  fs,
-  onProgress,
-  dir,
-  gitdir,
-  ref,
-  force,
-  filepaths
-}) {
+async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
   let count = 0
   return walk({
     fs,
