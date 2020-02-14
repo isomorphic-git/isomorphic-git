@@ -53,7 +53,6 @@ sidebar_label: Alphabetical Index
 - [status](status)
 - [statusMatrix](statusMatrix)
 - [tag](tag)
-- [verify](verify)
 - [version](version)
 - [walk](walk)
 - [writeBlob](writeBlob)

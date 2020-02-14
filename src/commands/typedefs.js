@@ -47,7 +47,7 @@
  * @property {number} tagger.timestamp UTC Unix timestamp in seconds
  * @property {number} tagger.timezoneOffset timezone difference from UTC in minutes
  * @property {string} message tag message
- * @property {string} [signature] PGP signature (if present)
+ * @property {string} [gpgsig] PGP signature (if present)
  */
 
 /**
@@ -202,21 +202,6 @@
  * @callback SignCallback
  * @param {SignParams} args
  * @return {Promise<{signature: string}>} - an 'ASCII armor' encoded "detached" signature
- */
-
-/**
- *
- * @typedef {Object} VerifyParams
- * @property {string} payload - a plaintext message
- * @property {string} publicKey - an 'ASCII armor' encoded PGP key (technically can actually contain _multiple_ keys)
- * @property {string} signature - an 'ASCII armor' encoded PGP "detached" signature (technically can actually contain _multiple_ signatures)
- */
-
-/**
- *
- * @callback VerifyCallback
- * @param {VerifyParams} args
- * @return {Promise<{valid: string[], invalid: string[]}>} - two arrays containing the key ids of the valid and invalid signatures respectively
  */
 
 /**

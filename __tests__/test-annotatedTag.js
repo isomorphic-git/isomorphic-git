@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-const { annotatedTag, verify, resolveRef, readTag } = require('isomorphic-git')
+const { annotatedTag, resolveRef, readTag } = require('isomorphic-git')
 
 describe('annotatedTag', () => {
   it('creates an annotated tag to HEAD', async () => {
@@ -62,13 +62,10 @@ describe('annotatedTag', () => {
       signingKey: privateKey,
       onSign: pgp.sign
     })
-    const keys = await verify({
-      fs,
-      gitdir,
-      ref: 'latest',
-      publicKeys: publicKey,
-      onVerify: pgp.verify
-    })
-    expect(keys[0]).toBe('f2f0ced8a52613c4')
+    const oid = await resolveRef({ fs, gitdir, ref: 'latest' })
+    const { tag, payload } = await readTag({ fs, gitdir, oid })
+    const { valid, invalid } = await pgp.verify({ payload, publicKey, signature: tag.gpgsig })
+    expect(invalid).toEqual([])
+    expect(valid).toEqual(['f2f0ced8a52613c4'])
   })
 })

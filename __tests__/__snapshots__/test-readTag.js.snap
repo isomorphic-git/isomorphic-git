@@ -12,10 +12,10 @@ This is a tag message.
 
 ",
   "tag": Object {
+    "gpgsig": undefined,
     "message": "This is a tag message.
 ",
     "object": "033417ae18b174f078f2f44232cb7a374f4c60ce",
-    "signature": undefined,
     "tag": "mytag",
     "tagger": Object {
       "email": "wmhilton@gmail.com",

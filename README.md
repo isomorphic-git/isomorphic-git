@@ -37,7 +37,6 @@ The following environments are tested in CI and will continue to be supported un
 TODO:
 - [ ] I should probably normalize on timestamps and get rid of the `date` options.
 - [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
-- [ ] Make sure that the payload output of `readTag` and `readCommit` is newline-correct to easily verify. Then remove the `verify` command.
 - [ ] Update the WebWorker Guide.
 - [ ] Update the Useful Snippets.
 
@@ -54,6 +53,7 @@ TODO:
   - [x] The (previously deprecated) `utils.auth` function was removed.
   - [x] The (previously deprecated) `utils.oauth2` was removed.
   - [x] The `config` function has been removed and replaced by `getConfig`, `getConfigAll`, and `setConfig`.
+  - [x] The `verify` function has been removed, but `log`, `readCommit`, and `readTag` all return the `gpgsig` and signing `payload` now. This actually makes verification simpler and more efficient, because it can be done in batch on `git.log` output and the `gpgsig` itself can be parsed and used to lookup the public key. See [onSign](https://isomorphic-git.org/docs/en/onSign) for complete code examples.
 
 ### Some function parameters have been removed or replaced:
   - [x] The undocumented parameter aliases `authUsername` and `authPassword` were removed.
@@ -253,7 +253,6 @@ unless there is a major version bump.
 - [status](https://isomorphic-git.github.io/docs/status.html)
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [tag](https://isomorphic-git.github.io/docs/tag.html)
-- [verify](https://isomorphic-git.github.io/docs/verify.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
 - [walk](https://isomorphic-git.github.io/docs/walk.html)
 - [writeBlob](https://isomorphic-git.github.io/docs/writeBlob.html)
