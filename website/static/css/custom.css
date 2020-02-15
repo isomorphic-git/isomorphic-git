@@ -112,6 +112,9 @@ footer img[src="/img/isomorphic-git-logo.svg"] {
 .try-it-out {
   line-height: 2em;
 }
+.try-it-out h2 {
+  margin-top: 0;
+}
 
 #giturl_branches,
 #giturl_tags {

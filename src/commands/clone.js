@@ -14,6 +14,9 @@ import { addRemote } from './addRemote.js'
  * @param {HttpClient} args.http
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
+ * @param {AuthCallback} [args.onAuth]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
+ * @param {AuthFailureCallback} [args.onAuthFailure]
  * @param {string} [args.dir]
  * @param {string} args.gitdir
  * @param {string} args.url
@@ -42,6 +45,9 @@ export async function clone ({
   http,
   onProgress,
   onMessage,
+  onAuth,
+  onAuthSuccess,
+  onAuthFailure,
   dir,
   gitdir,
   url,
@@ -78,6 +84,9 @@ export async function clone ({
     http,
     onProgress,
     onMessage,
+    onAuth,
+    onAuthSuccess,
+    onAuthFailure,
     gitdir,
     noGitSuffix,
     ref,

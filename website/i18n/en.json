@@ -122,8 +122,8 @@
         "sidebar_label": "Quick Start"
       },
       "webworker": {
-        "title": "WebWorker Guide",
-        "sidebar_label": "WebWorker Guide"
+        "title": "WebWorker Example",
+        "sidebar_label": "WebWorker Example"
       },
       "hashBlob": {
         "title": "hashBlob",
@@ -197,8 +197,8 @@
         "sidebar_label": "onProgress"
       },
       "onSign": {
-        "title": "onSign & onVerify",
-        "sidebar_label": "onSign & onVerify"
+        "title": "onSign",
+        "sidebar_label": "onSign"
       },
       "packObjects": {
         "title": "packObjects",
@@ -271,10 +271,6 @@
       "tag": {
         "title": "tag",
         "sidebar_label": "tag"
-      },
-      "verify": {
-        "title": "verify",
-        "sidebar_label": "verify"
       },
       "version": {
         "title": "version",
