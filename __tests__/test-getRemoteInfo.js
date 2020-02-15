@@ -1,9 +1,6 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-getRemoteInfo.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { E, getRemoteInfo } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
@@ -11,9 +8,6 @@ const localhost =
   typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 describe('getRemoteInfo', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('getRemoteInfo', async () => {
     const info = await getRemoteInfo({
       http,
@@ -22,7 +16,14 @@ describe('getRemoteInfo', () => {
     expect(info).not.toBeNull()
     expect(info.capabilities).not.toBeNull()
     expect(info.refs).not.toBeNull()
-    expect(info.refs).toMatchSnapshot()
+    expect(info.refs).toMatchInlineSnapshot(`
+      Object {
+        "heads": Object {
+          "master": "97c024f73eaab2781bf3691597bc7c833cb0e22f",
+          "test": "5a8905a02e181fe1821068b8c0f48cb6633d5b81",
+        },
+      }
+    `)
   })
   ;(process.browser ? it : xit)(
     'detects "dumb" HTTP server responses',

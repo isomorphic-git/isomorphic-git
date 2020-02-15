@@ -1,9 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-GitPackIndex.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const path = require('path')
+
 const {
   GitPackIndex,
   GitObject,
@@ -11,9 +9,6 @@ const {
 } = require('isomorphic-git/internal-apis')
 
 describe('GitPackIndex', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('from .idx', async () => {
     const { fs, gitdir } = await makeFixture('test-GitPackIndex')
     const idx = await fs.read(
@@ -25,7 +20,7 @@ describe('GitPackIndex', () => {
     const p = await GitPackIndex.fromIdx({ idx })
     expect(
       await shasum(Buffer.from(JSON.stringify(p.hashes)))
-    ).toMatchSnapshot()
+    ).toMatchInlineSnapshot('"fd2404a29d1e5dc72066541366d5f75bc9d51c9b"')
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets.get('0b8faa11b353db846b40eb064dfb299816542a46')).toEqual(
@@ -55,7 +50,7 @@ describe('GitPackIndex', () => {
     const p = await GitPackIndex.fromPack({ pack })
     expect(
       await shasum(Buffer.from(JSON.stringify(p.hashes)))
-    ).toMatchSnapshot()
+    ).toMatchInlineSnapshot('"fd2404a29d1e5dc72066541366d5f75bc9d51c9b"')
     expect(p.packfileSha).toBe('1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888')
     // Test a handful of known offsets.
     expect(p.offsets.get('0b8faa11b353db846b40eb064dfb299816542a46')).toEqual(
@@ -113,9 +108,18 @@ describe('GitPackIndex', () => {
       oid: '637c4e69d85e0dcc18898ec251377453d0891585'
     })
     expect(type).toBe('commit')
-    expect(object.toString('utf8')).toMatchSnapshot()
     const oid = await shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('637c4e69d85e0dcc18898ec251377453d0891585')
+    expect(object.toString('utf8')).toMatchInlineSnapshot(`
+      "tree cbd2a3d7e00a972faaf0ef59d9b421de9f1a7532
+      parent fbd56b49d400a19ee185ae735417bdb34c084621
+      parent 0b8faa11b353db846b40eb064dfb299816542a46
+      author William Hilton <wmhilton@gmail.com> 1508204014 -0400
+      committer William Hilton <wmhilton@gmail.com> 1508204014 -0400
+      
+      WIP on master: fbd56b4 Add 'unpkg' key to package.json
+      "
+    `)
   })
   it('read deltified object', async () => {
     const { fs, gitdir } = await makeFixture('test-GitPackIndex')
@@ -137,7 +141,6 @@ describe('GitPackIndex', () => {
       oid: '7fb539a8e8488c3fd2793e7dda8a44693e25cce1' // 9 levels deep of deltification.
     })
     expect(type).toBe('blob')
-    expect(object.toString('utf8')).toMatchSnapshot()
     const oid = await shasum(GitObject.wrap({ type, object }))
     expect(oid).toBe('7fb539a8e8488c3fd2793e7dda8a44693e25cce1')
   })
