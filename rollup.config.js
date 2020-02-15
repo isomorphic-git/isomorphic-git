@@ -41,11 +41,24 @@ const nodeConfig = (input, output = input) => ({
   ]
 })
 
+// Browser environments that still don't support `import` (Workers and ServiceWorkers)
+const umdConfig = (input, name) => ({
+  input: `src/${input}`,
+  output: [
+    {
+      format: 'umd',
+      name,
+      file: `dist/${path.basename(input, '.js')}.umd.min.js`
+    }
+  ]
+})
+
 export default [
   moduleConfig('index.js'),
   nodeConfig('api/_index.js', 'index.js'),
   moduleConfig('internal-apis.js'),
   nodeConfig('internal-apis.js'),
   nodeConfig('builtin-node/http.js'),
-  moduleConfig('builtin-browser/http.js')
+  moduleConfig('builtin-browser/http.js'),
+  umdConfig('builtin-browser/http.js', 'GitHttp')
 ]

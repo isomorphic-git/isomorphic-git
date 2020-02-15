@@ -37,7 +37,6 @@ The following environments are tested in CI and will continue to be supported un
 TODO:
 - [ ] I should probably normalize on timestamps and get rid of the `date` options.
 - [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
-- [ ] Update the WebWorker Guide.
 - [ ] Update the Useful Snippets.
 
 ### Big changes

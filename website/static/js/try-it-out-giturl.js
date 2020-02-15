@@ -1,3 +1,5 @@
+import http from './http.js'
+
 document.addEventListener('DOMContentLoaded', function listener () {
   document.removeEventListener('DOMContentLoaded', listener)
   let $input = document.getElementById('giturl_input')
@@ -7,7 +9,9 @@ document.addEventListener('DOMContentLoaded', function listener () {
     value = value.replace(/^https?:\/\//, '')
     if (!value.endsWith('.git')) value += '.git'
     let info = await git.getRemoteInfo({
-      url: `https://cors.isomorphic-git.org/${value}`
+      http,
+      url: value,
+      corsProxy: 'https://cors.isomorphic-git.org'
     })
     const limit = 100;
     if (info.refs.tags) {

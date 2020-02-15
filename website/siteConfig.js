@@ -67,7 +67,7 @@ const siteConfig = {
     '/js/object-inspector.min.js',
     '/js/codemirrorify.js',
     { type: 'module', src: '/js/tutorial.js' },
-    '/js/try-it-out-giturl.js',
+    { type: 'module', src: '/js/try-it-out-giturl.js' },
     '//static.getclicky.com/js',
     '/js/analytics.js',
   ],

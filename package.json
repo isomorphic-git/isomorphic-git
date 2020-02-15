@@ -55,6 +55,7 @@
     "dist/bundle.umd.min.js.map",
     "dist/http.cjs",
     "dist/http.js",
+    "dist/http.umd.min.js",
     "dist/index.cjs",
     "dist/index.d.ts",
     "dist/index.js",
