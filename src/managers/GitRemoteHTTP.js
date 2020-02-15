@@ -92,7 +92,7 @@ export class GitRemoteHTTP {
       url: `${url}/info/refs?service=${service}`,
       headers
     })
-    if (res.statusCode === 401 && onAuth) {
+    if (res.statusCode >= 400 && res.statusCode < 500 && onAuth) {
       // Acquire credentials and try again
       // TODO: read `useHttpPath` value from git config and pass as 2nd argument
       auth = await onAuth(_origUrl)
@@ -113,7 +113,7 @@ export class GitRemoteHTTP {
         await onAuthSuccess({ url: _origUrl, auth })
       }
     }
-    if (res.statusCode !== 200) {
+    if (res.statusCode > 300 || res.statusCode < 200) {
       throw new GitError(E.HTTPError, {
         statusCode: res.statusCode,
         statusMessage: res.statusMessage

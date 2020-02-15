@@ -180,10 +180,12 @@ describe('push', () => {
       fs,
       http,
       gitdir,
-      username: 'testuser',
-      password: 'testpassword',
       remote: 'auth',
-      ref: 'master'
+      ref: 'master',
+      onAuth: () => ({
+        username: 'testuser',
+        password: 'testpassword'
+      })
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -250,10 +252,12 @@ describe('push', () => {
         fs,
         http,
         gitdir,
-        username: 'test',
-        password: 'test',
         remote: 'auth',
-        ref: 'master'
+        ref: 'master',
+        onAuth: () => ({
+          username: 'test',
+          password: 'test'
+        })
       })
     } catch (err) {
       error = err.message

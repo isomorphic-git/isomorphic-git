@@ -146,13 +146,13 @@
 /**
  * @callback MessageCallback
  * @param {string} message
- * @returns {Promise<void>}
+ * @returns {Promise<void> | void}
  */
 
 /**
  * @callback ProgressCallback
  * @param {GitProgressEvent} progress
- * @returns {Promise<void>}
+ * @returns {Promise<void> | void}
  */
 
 /**
@@ -164,7 +164,7 @@
 /**
  * @callback AuthCallback
  * @param {FillParams} args
- * @returns {Promise<GitAuth>}
+ * @returns {Promise<GitAuth> | GitAuth}
  */
 
 /**
@@ -176,7 +176,7 @@
 /**
  * @callback AuthSuccessCallback
  * @param {ApprovedParams} args
- * @returns {Promise<void>}
+ * @returns {Promise<void> | void}
  */
 
 /**
@@ -188,7 +188,7 @@
 /**
  * @callback AuthFailureCallback
  * @param {RejectededParams} args
- * @returns {Promise<void>}
+ * @returns {Promise<void> | void}
  */
 
 /**
