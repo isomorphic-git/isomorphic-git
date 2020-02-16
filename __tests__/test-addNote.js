@@ -15,10 +15,10 @@ describe('addNote', () => {
         name: 'William Hilton',
         email: 'wmhilton@gmail.com',
         timestamp: 1578937310,
-        timezoneOffset: 300
+        timezoneOffset: 300,
       },
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
-      note: 'This is a note about a commit.'
+      note: 'This is a note about a commit.',
     })
     const commit = await resolveRef({ fs, gitdir, ref: 'refs/notes/commits' })
     expect(commit).toEqual('3b4b7a6c2382ea60a0b4c7ff69920af9a2e6408d')
@@ -27,7 +27,7 @@ describe('addNote', () => {
       fs,
       gitdir,
       oid: '3b4b7a6c2382ea60a0b4c7ff69920af9a2e6408d',
-      filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164'
+      filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164',
     })
     expect(Buffer.from(blob).toString('utf8')).toEqual(
       'This is a note about a commit.'
@@ -44,10 +44,10 @@ describe('addNote', () => {
         name: 'William Hilton',
         email: 'wmhilton@gmail.com',
         timestamp: 1578937310,
-        timezoneOffset: 300
+        timezoneOffset: 300,
       },
       oid: '199948939a0b95c6f27668689102496574b2c332',
-      note: 'This is a note about a tree.'
+      note: 'This is a note about a tree.',
     })
     const commit = await resolveRef({ fs, gitdir, ref: 'refs/notes/commits' })
     expect(commit).toEqual('4b52ff827d2b5fe1786bf52a1b78dd25517b6cdd')
@@ -56,7 +56,7 @@ describe('addNote', () => {
       fs,
       gitdir,
       oid: '4b52ff827d2b5fe1786bf52a1b78dd25517b6cdd',
-      filepath: '199948939a0b95c6f27668689102496574b2c332'
+      filepath: '199948939a0b95c6f27668689102496574b2c332',
     })
     expect(Buffer.from(blob).toString('utf8')).toEqual(
       'This is a note about a tree.'
@@ -73,10 +73,10 @@ describe('addNote', () => {
         name: 'William Hilton',
         email: 'wmhilton@gmail.com',
         timestamp: 1578937310,
-        timezoneOffset: 300
+        timezoneOffset: 300,
       },
       oid: '68aba62e560c0ebc3396e8ae9335232cd93a3f60',
-      note: 'This is a note about a blob.'
+      note: 'This is a note about a blob.',
     })
     const commit = await resolveRef({ fs, gitdir, ref: 'refs/notes/commits' })
     expect(commit).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
@@ -85,7 +85,7 @@ describe('addNote', () => {
       fs,
       gitdir,
       oid: '6428616e2600d3cd4b66059d5c561a85ce4b33ff',
-      filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
+      filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60',
     })
     expect(Buffer.from(blob).toString('utf8')).toEqual(
       'This is a note about a blob.'
@@ -103,10 +103,10 @@ describe('addNote', () => {
           name: 'William Hilton',
           email: 'wmhilton@gmail.com',
           timestamp: 1578937310,
-          timezoneOffset: 300
+          timezoneOffset: 300,
         },
         oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
-        note: 'This is a note about a commit.'
+        note: 'This is a note about a commit.',
       })
       const { tree } = await readTree({ fs, gitdir, oid })
       expect(tree.length).toBe(1)
@@ -119,10 +119,10 @@ describe('addNote', () => {
           name: 'William Hilton',
           email: 'wmhilton@gmail.com',
           timestamp: 1578937310,
-          timezoneOffset: 300
+          timezoneOffset: 300,
         },
         oid: '199948939a0b95c6f27668689102496574b2c332',
-        note: 'This is a note about a tree.'
+        note: 'This is a note about a tree.',
       })
       const { tree } = await readTree({ fs, gitdir, oid })
       expect(tree.length).toBe(2)
@@ -135,10 +135,10 @@ describe('addNote', () => {
           name: 'William Hilton',
           email: 'wmhilton@gmail.com',
           timestamp: 1578937310,
-          timezoneOffset: 300
+          timezoneOffset: 300,
         },
         oid: '68aba62e560c0ebc3396e8ae9335232cd93a3f60',
-        note: 'This is a note about a blob.'
+        note: 'This is a note about a blob.',
       })
       const { tree } = await readTree({ fs, gitdir, oid })
       expect(tree.length).toBe(3)
@@ -156,10 +156,10 @@ describe('addNote', () => {
         name: 'William Hilton',
         email: 'wmhilton@gmail.com',
         timestamp: 1578937310,
-        timezoneOffset: 300
+        timezoneOffset: 300,
       },
       oid: '68aba62e560c0ebc3396e8ae9335232cd93a3f60',
-      note: 'This is a note about a blob.'
+      note: 'This is a note about a blob.',
     })
     const commit = await resolveRef({ fs, gitdir, ref: 'refs/notes/alt' })
     expect(commit).toEqual('6428616e2600d3cd4b66059d5c561a85ce4b33ff')
@@ -168,7 +168,7 @@ describe('addNote', () => {
       fs,
       gitdir,
       oid: '6428616e2600d3cd4b66059d5c561a85ce4b33ff',
-      filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60'
+      filepath: '68aba62e560c0ebc3396e8ae9335232cd93a3f60',
     })
     expect(Buffer.from(blob).toString('utf8')).toEqual(
       'This is a note about a blob.'
@@ -184,10 +184,10 @@ describe('addNote', () => {
         name: 'William Hilton',
         email: 'wmhilton@gmail.com',
         timestamp: 1578937310,
-        timezoneOffset: 300
+        timezoneOffset: 300,
       },
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
-      note: 'This is a note about a commit.'
+      note: 'This is a note about a commit.',
     })
     // Test
     let error = null
@@ -199,10 +199,10 @@ describe('addNote', () => {
           name: 'William Hilton',
           email: 'wmhilton@gmail.com',
           timestamp: 1578937310,
-          timezoneOffset: 300
+          timezoneOffset: 300,
         },
         oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
-        note: 'This is a note about a commit.'
+        note: 'This is a note about a commit.',
       })
     } catch (err) {
       error = err
@@ -220,10 +220,10 @@ describe('addNote', () => {
         name: 'William Hilton',
         email: 'wmhilton@gmail.com',
         timestamp: 1578937310,
-        timezoneOffset: 300
+        timezoneOffset: 300,
       },
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
-      note: 'This is a note about a commit.'
+      note: 'This is a note about a commit.',
     })
     // Test
     const oid = await addNote({
@@ -233,17 +233,17 @@ describe('addNote', () => {
         name: 'William Hilton',
         email: 'wmhilton@gmail.com',
         timestamp: 1578937310,
-        timezoneOffset: 300
+        timezoneOffset: 300,
       },
       oid: 'f6d51b1f9a449079f6999be1fb249c359511f164',
       note: 'This is the newer note about a commit.',
-      force: true
+      force: true,
     })
     const { blob } = await readBlob({
       fs,
       gitdir,
       oid,
-      filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164'
+      filepath: 'f6d51b1f9a449079f6999be1fb249c359511f164',
     })
     expect(Buffer.from(blob).toString('utf8')).toEqual(
       'This is the newer note about a commit.'

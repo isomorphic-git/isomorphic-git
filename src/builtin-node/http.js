@@ -2,12 +2,12 @@ import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { collect } from '../utils/collect.js'
 import { fromNodeStream } from '../utils/fromNodeStream.js'
 
-export default async function http ({
+export default async function http({
   onProgress,
   url,
   method = 'GET',
   headers = {},
-  body
+  body,
 }) {
   // If we can, we should send it as a single buffer so it sets a Content-Length header.
   if (body && Array.isArray(body)) {
@@ -22,7 +22,7 @@ export default async function http ({
         url,
         method,
         headers,
-        body
+        body,
       },
       (err, res) => {
         if (err) return reject(err)
@@ -33,7 +33,7 @@ export default async function http ({
           statusCode: res.statusCode,
           statusMessage: res.statusMessage,
           body: iter,
-          headers: res.headers
+          headers: res.headers,
         })
       }
     )

@@ -17,7 +17,7 @@ describe('credentialManager', () => {
       fs,
       gitdir,
       path: 'remote.auth.url',
-      value: `http://${localhost}:8888/test-push-server-auth.git`
+      value: `http://${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
     let fillCalled = false
@@ -29,19 +29,19 @@ describe('credentialManager', () => {
       gitdir,
       remote: 'auth',
       ref: 'master',
-      async onAuth ({ url }) {
+      async onAuth({ url }) {
         fillCalled = true
         return {
           username: 'testuser',
-          password: 'testpassword'
+          password: 'testpassword',
         }
       },
-      async onAuthSuccess (auth) {
+      async onAuthSuccess(auth) {
         approvedCalled = true
       },
-      async onAuthFailure (auth) {
+      async onAuthFailure(auth) {
         rejectedCalled = true
-      }
+      },
     })
     expect(fillCalled).toBe(true)
     expect(approvedCalled).toBe(true)
@@ -54,7 +54,7 @@ describe('credentialManager', () => {
       fs,
       gitdir,
       path: 'remote.auth.url',
-      value: `http://${localhost}:8888/test-push-server-auth.git`
+      value: `http://${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
     let fillCalled = false
@@ -68,19 +68,19 @@ describe('credentialManager', () => {
         gitdir,
         remote: 'auth',
         ref: 'master',
-        async onAuth ({ url }) {
+        async onAuth({ url }) {
           fillCalled = true
           return {
             username: 'testuser',
-            password: 'NoT_rIgHt'
+            password: 'NoT_rIgHt',
           }
         },
-        async onAuthSuccess (auth) {
+        async onAuthSuccess(auth) {
           approvedCalled = true
         },
-        async onAuthFailure (auth) {
+        async onAuthFailure(auth) {
           rejectedCalled = true
-        }
+        },
       })
     } catch (e) {
       err = e

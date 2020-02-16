@@ -16,7 +16,7 @@ import { deleteRef } from '../commands/deleteRef'
  * console.log('done')
  *
  */
-export async function deleteTag ({ fs, gitdir, ref }) {
+export async function deleteTag({ fs, gitdir, ref }) {
   ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
   await deleteRef({ fs, gitdir, ref })
 }

@@ -15,15 +15,15 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: 'Initial commit'
+      message: 'Initial commit',
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // updates branch pointer
     const {
       oid: currentOid,
-      commit: { parent }
+      commit: { parent },
     } = (await log({ fs, gitdir, depth: 1 }))[0]
     expect(parent).toEqual([originalOid])
     expect(currentOid).not.toEqual(originalOid)
@@ -42,10 +42,10 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
       message: 'Initial commit',
-      noUpdateBranch: true
+      noUpdateBranch: true,
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // does NOT update branch pointer
@@ -72,10 +72,10 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
       message: 'Initial commit',
-      dryRun: true
+      dryRun: true,
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // does NOT update branch pointer
@@ -102,10 +102,10 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
       message: 'Initial commit',
-      ref: 'refs/heads/master-copy'
+      ref: 'refs/heads/master-copy',
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // does NOT update master branch pointer
@@ -113,12 +113,14 @@ describe('commit', () => {
     expect(currentOid).toEqual(originalOid)
     expect(currentOid).not.toEqual(sha)
     // but DOES update master-copy
-    const { oid: copyOid } = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'master-copy'
-    }))[0]
+    const { oid: copyOid } = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'master-copy',
+      })
+    )[0]
     expect(sha).toEqual(copyOid)
   })
 
@@ -130,7 +132,7 @@ describe('commit', () => {
     const parent = [
       '1111111111111111111111111111111111111111',
       '2222222222222222222222222222222222222222',
-      '3333333333333333333333333333333333333333'
+      '3333333333333333333333333333333333333333',
     ]
     const tree = '4444444444444444444444444444444444444444'
     const sha = await commit({
@@ -142,17 +144,19 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: 'Initial commit'
+      message: 'Initial commit',
     })
     expect(sha).toBe('43fbc94f2c1db655a833e08c72d005954ff32f32')
     // does NOT update master branch pointer
-    const { parent: parents, tree: _tree } = (await log({
-      fs,
-      gitdir,
-      depth: 1
-    }))[0].commit
+    const { parent: parents, tree: _tree } = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+      })
+    )[0].commit
     expect(parents).not.toEqual([originalOid])
     expect(parents).toEqual(parent)
     expect(_tree).toEqual(tree)
@@ -170,9 +174,9 @@ describe('commit', () => {
         author: {
           email: 'mrtest@example.com',
           timestamp: 1262356920,
-          timezoneOffset: 0
+          timezoneOffset: 0,
         },
-        message: 'Initial commit'
+        message: 'Initial commit',
       })
     } catch (err) {
       error = err
@@ -188,9 +192,9 @@ describe('commit', () => {
         author: {
           name: 'Mr. Test',
           timestamp: 1262356920,
-          timezoneOffset: 0
+          timezoneOffset: 0,
         },
-        message: 'Initial commit'
+        message: 'Initial commit',
       })
     } catch (err) {
       error = err
@@ -213,20 +217,20 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1504842425,
-        timezoneOffset: 0
+        timezoneOffset: 0,
       },
       signingKey: privateKey,
-      onSign: pgp.sign
+      onSign: pgp.sign,
     })
     const { commit: commitObject, payload } = await readCommit({
       fs,
       gitdir,
-      oid
+      oid,
     })
     const { valid, invalid } = await pgp.verify({
       payload,
       publicKey,
-      signature: commitObject.gpgsig
+      signature: commitObject.gpgsig,
     })
     expect(invalid).toEqual([])
     expect(valid).toEqual(['f2f0ced8a52613c4'])
@@ -244,9 +248,9 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: '-0 offset'
+      message: '-0 offset',
     })
     commits = await log({ fs, gitdir, depth: 1 })
     expect(Object.is(commits[0].commit.author.timezoneOffset, -0)).toBeTruthy()
@@ -258,9 +262,9 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: 0
+        timezoneOffset: 0,
       },
-      message: '+0 offset'
+      message: '+0 offset',
     })
     commits = await log({ fs, gitdir, depth: 1 })
     expect(Object.is(commits[0].commit.author.timezoneOffset, 0)).toBeTruthy()
@@ -272,9 +276,9 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: 240
+        timezoneOffset: 240,
       },
-      message: '+240 offset'
+      message: '+240 offset',
     })
     commits = await log({ fs, gitdir, depth: 1 })
     expect(Object.is(commits[0].commit.author.timezoneOffset, 240)).toBeTruthy()
@@ -286,9 +290,9 @@ describe('commit', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -240
+        timezoneOffset: -240,
       },
-      message: '-240 offset'
+      message: '-240 offset',
     })
     commits = await log({ fs, gitdir, depth: 1 })
     expect(

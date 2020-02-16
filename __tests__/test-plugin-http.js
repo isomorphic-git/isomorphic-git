@@ -15,7 +15,7 @@ describe('plugin - http', () => {
     const { fs, dir, gitdir } = await makeFixture('test-plugin-http')
     callCount = 0
     await clone({
-      http (...args) {
+      http(...args) {
         callCount++
         return http(...args)
       },
@@ -24,7 +24,7 @@ describe('plugin - http', () => {
       gitdir,
       depth: 1,
       singleBranch: true,
-      url: `http://${localhost}:8888/test-status.git`
+      url: `http://${localhost}:8888/test-status.git`,
     })
     expect(callCount).toBe(2)
   })

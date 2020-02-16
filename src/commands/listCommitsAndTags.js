@@ -6,12 +6,12 @@ import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 
-export async function listCommitsAndTags ({
+export async function listCommitsAndTags({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   start,
-  finish
+  finish,
 }) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   const startingSet = new Set()
@@ -30,7 +30,7 @@ export async function listCommitsAndTags ({
   // Because git commits are named by their hash, there is no
   // way to construct a cycle. Therefore we won't worry about
   // setting a default recursion limit.
-  async function walk (oid) {
+  async function walk(oid) {
     visited.add(oid)
     const { type, object } = await readObject({ fs, gitdir, oid })
     // Recursively resolve annotated tags
@@ -43,7 +43,7 @@ export async function listCommitsAndTags ({
       throw new GitError(E.ObjectTypeAssertionFail, {
         oid,
         type,
-        expected: 'commit'
+        expected: 'commit',
       })
     }
     if (!shallows.has(oid)) {

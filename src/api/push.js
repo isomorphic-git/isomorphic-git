@@ -57,7 +57,7 @@ import { join } from '../utils/join.js'
  * console.log(pushResult)
  *
  */
-export async function push ({
+export async function push({
   fs,
   http,
   onProgress,
@@ -79,7 +79,7 @@ export async function push ({
   password,
   token,
   oauth2format,
-  headers = {}
+  headers = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -106,7 +106,7 @@ export async function push ({
       password,
       token,
       oauth2format,
-      headers
+      headers,
     })
   } catch (err) {
     err.caller = 'git.push'

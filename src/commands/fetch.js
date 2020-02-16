@@ -66,7 +66,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @returns {Promise<FetchResult>}
  * @see FetchResult
  */
-export async function fetch ({
+export async function fetch({
   fs,
   http,
   onProgress,
@@ -93,12 +93,12 @@ export async function fetch ({
   singleBranch = false,
   headers = {},
   prune = false,
-  pruneTags = false
+  pruneTags = false,
 }) {
   const ref = _ref || (await currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'ref'
+      parameter: 'ref',
     })
   }
   const config = await GitConfigManager.get({ fs, gitdir })
@@ -109,14 +109,14 @@ export async function fetch ({
   const url = _url || (await config.get(`remote.${remote}.url`))
   if (typeof url === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remote OR url'
+      parameter: 'remote OR url',
     })
   }
   // Figure out what remote ref to use.
   const remoteRef =
     _remoteRef || (await config.get(`branch.${ref}.merge`)) || ref
 
-  if (corsProxy === void 0) {
+  if (corsProxy === undefined) {
     corsProxy = await config.get('http.corsProxy')
   }
 
@@ -132,7 +132,7 @@ export async function fetch ({
     url,
     noGitSuffix,
     auth,
-    headers
+    headers,
   })
   auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
@@ -141,7 +141,7 @@ export async function fetch ({
     return {
       defaultBranch: null,
       fetchHead: null,
-      fetchHeadDescription: null
+      fetchHeadDescription: null,
     }
   }
   // Check that the remote supports the requested features
@@ -160,7 +160,7 @@ export async function fetch ({
   // Figure out the SHA for the requested ref
   const { oid, fullref } = GitRefManager.resolveAgainstMap({
     ref: remoteRef,
-    map: remoteRefs
+    map: remoteRefs,
   })
   // Filter out refs we want to ignore: only keep ref we're cloning, HEAD, branches, and tags (if we're keeping them)
   for (const remoteRef of remoteRefs.keys()) {
@@ -187,7 +187,7 @@ export async function fetch ({
       // isomorphic-git is perfectly happy with thin packfiles in .git/objects/pack but
       // canonical git it turns out is NOT.
       'ofs-delta',
-      `agent=${pkg.agent}`
+      `agent=${pkg.agent}`,
     ]
   )
   if (relative) capabilities.push('deepen-relative')
@@ -198,10 +198,10 @@ export async function fetch ({
   const haveRefs = singleBranch
     ? [ref]
     : await GitRefManager.listRefs({
-      fs,
-      gitdir,
-      filepath: `refs`
-    })
+        fs,
+        gitdir,
+        filepath: `refs`,
+      })
   let haves = []
   for (let ref of haveRefs) {
     try {
@@ -222,7 +222,7 @@ export async function fetch ({
     shallows,
     depth,
     since,
-    exclude
+    exclude,
   })
   // CodeCommit will hang up if we don't send a Content-Length header
   // so we can't stream the body.
@@ -236,7 +236,7 @@ export async function fetch ({
     noGitSuffix,
     auth,
     body: [packbuffer],
-    headers
+    headers,
   })
   const response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
@@ -290,7 +290,7 @@ export async function fetch ({
       refs,
       symrefs,
       tags,
-      prune
+      prune,
     })
     if (prune) {
       response.pruned = pruned
@@ -304,7 +304,7 @@ export async function fetch ({
       symrefs: remoteHTTP.symrefs,
       tags,
       prune,
-      pruneTags
+      pruneTags,
     })
     if (prune) {
       response.pruned = pruned
@@ -317,7 +317,7 @@ export async function fetch ({
   if (response.HEAD === undefined) {
     const { oid } = GitRefManager.resolveAgainstMap({
       ref: 'HEAD',
-      map: remoteRefs
+      map: remoteRefs,
     })
     // Use the name of the first branch that's not called HEAD that has
     // the same SHA as the branch called HEAD.
@@ -331,7 +331,7 @@ export async function fetch ({
   const noun = fullref.startsWith('refs/tags') ? 'tag' : 'branch'
   response.FETCH_HEAD = {
     oid,
-    description: `${noun} '${abbreviateRef(fullref)}' of ${url}`
+    description: `${noun} '${abbreviateRef(fullref)}' of ${url}`,
   }
 
   if (onProgress || onMessage) {
@@ -344,7 +344,7 @@ export async function fetch ({
           onProgress({
             phase: matches[1].trim(),
             loaded: parseInt(matches[2], 10),
-            total: parseInt(matches[3], 10)
+            total: parseInt(matches[3], 10),
           })
         }
       }
@@ -355,7 +355,7 @@ export async function fetch ({
   const res = {
     defaultBranch: response.HEAD,
     fetchHead: response.FETCH_HEAD.oid,
-    fetchHeadDescription: response.FETCH_HEAD.description
+    fetchHeadDescription: response.FETCH_HEAD.description,
   }
   if (response.headers) {
     res.headers = response.headers
@@ -377,7 +377,7 @@ export async function fetch ({
     const idx = await GitPackIndex.fromPack({
       pack: packfile,
       getExternalRefDelta,
-      onProgress
+      onProgress,
     })
     await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
   }

@@ -1,6 +1,6 @@
 import { forAwait } from './forAwait.js'
 
-export async function collect (iterable) {
+export async function collect(iterable) {
   let size = 0
   const buffers = []
   // This will be easier once `for await ... of` loops are available.

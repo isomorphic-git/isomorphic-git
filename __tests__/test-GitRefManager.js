@@ -87,7 +87,7 @@ describe('GitRefManager', () => {
     let refs = await GitRefManager.listRefs({
       fs,
       gitdir,
-      filepath: 'refs/remotes/origin'
+      filepath: 'refs/remotes/origin',
     })
     expect(refs).toMatchInlineSnapshot(`
       Array [
@@ -104,7 +104,7 @@ describe('GitRefManager', () => {
     refs = await GitRefManager.listRefs({
       fs,
       gitdir,
-      filepath: 'refs/tags'
+      filepath: 'refs/tags',
     })
     expect(refs).toMatchInlineSnapshot(`
       Array [
@@ -181,7 +181,7 @@ describe('GitRefManager', () => {
     refs = await GitRefManager.listBranches({
       fs,
       gitdir,
-      remote: 'origin'
+      remote: 'origin',
     })
     expect(refs).toMatchInlineSnapshot(`
       Array [

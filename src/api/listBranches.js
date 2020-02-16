@@ -30,11 +30,11 @@ import { join } from '../utils/join.js'
  * console.log(remoteBranches)
  *
  */
-export async function listBranches ({
+export async function listBranches({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  remote
+  remote,
 }) {
   try {
     assertParameter('fs', fs)
@@ -43,7 +43,7 @@ export async function listBranches ({
     return GitRefManager.listBranches({
       fs: new FileSystem(fs),
       gitdir,
-      remote
+      remote,
     })
   } catch (err) {
     err.caller = 'git.listBranches'

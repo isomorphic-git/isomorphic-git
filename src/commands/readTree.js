@@ -20,14 +20,14 @@ import { resolveTree } from '../utils/resolveTree.js'
  *
  * @returns {Promise<ReadTreeResult>}
  */
-export async function readTree ({ fs, gitdir, oid, filepath = undefined }) {
+export async function readTree({ fs, gitdir, oid, filepath = undefined }) {
   if (filepath !== undefined) {
     oid = await resolveFilepath({ fs, gitdir, oid, filepath })
   }
   const { tree, oid: treeOid } = await resolveTree({ fs, gitdir, oid })
   const result = {
     oid: treeOid,
-    tree: tree.entries()
+    tree: tree.entries(),
   }
   return result
 }

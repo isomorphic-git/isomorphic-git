@@ -22,11 +22,11 @@ import { join } from '../utils/join.js'
  * @returns {Promise<Array<any>>} Resolves with the config value
  *
  */
-export async function getConfigAll ({
+export async function getConfigAll({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  path
+  path,
 }) {
   try {
     assertParameter('fs', fs)
@@ -36,7 +36,7 @@ export async function getConfigAll ({
     return await _getConfigAll({
       fs: new FileSystem(fs),
       gitdir,
-      path
+      path,
     })
   } catch (err) {
     err.caller = 'git.getConfigAll'

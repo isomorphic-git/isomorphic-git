@@ -2,7 +2,7 @@ import { hasObjectLoose } from '../storage/hasObjectLoose.js'
 import { hasObjectPacked } from '../storage/hasObjectPacked.js'
 import { readObject } from '../storage/readObject.js'
 
-export async function hasObject ({ fs, gitdir, oid, format = 'content' }) {
+export async function hasObject({ fs, gitdir, oid, format = 'content' }) {
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
   const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })

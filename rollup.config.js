@@ -11,7 +11,7 @@ const external = [
   'crc/lib/crc32.js',
   'sha.js/sha1',
   'sha.js/sha1.js',
-  ...Object.keys(pkg.dependencies)
+  ...Object.keys(pkg.dependencies),
 ]
 
 // Bleeding edge
@@ -22,10 +22,10 @@ const moduleConfig = input => ({
     {
       format: 'es',
       name: 'git',
-      file: `dist/${path.basename(input)}`
-    }
+      file: `dist/${path.basename(input)}`,
+    },
   ],
-  plugins: [resolve({ browser: true })]
+  plugins: [resolve({ browser: true })],
 })
 
 // Node.js
@@ -36,9 +36,9 @@ const nodeConfig = (input, output = input) => ({
     {
       format: 'cjs',
       name: 'git',
-      file: `dist/${path.basename(output, '.js')}.cjs`
-    }
-  ]
+      file: `dist/${path.basename(output, '.js')}.cjs`,
+    },
+  ],
 })
 
 // Browser environments that still don't support `import` (Workers and ServiceWorkers)
@@ -48,9 +48,9 @@ const umdConfig = (input, name) => ({
     {
       format: 'umd',
       name,
-      file: `dist/${path.basename(input, '.js')}.umd.min.js`
-    }
-  ]
+      file: `dist/${path.basename(input, '.js')}.umd.min.js`,
+    },
+  ],
 })
 
 export default [
@@ -60,5 +60,5 @@ export default [
   nodeConfig('internal-apis.js'),
   nodeConfig('builtin-node/http.js'),
   moduleConfig('builtin-browser/http.js'),
-  umdConfig('builtin-browser/http.js', 'GitHttp')
+  umdConfig('builtin-browser/http.js', 'GitHttp'),
 ]

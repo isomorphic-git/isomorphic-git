@@ -20,7 +20,7 @@ describe('writeTag', () => {
           name: 'Will Hilton',
           email: 'wmhilton@gmail.com',
           timestamp: 1507071414,
-          timezoneOffset: 240
+          timezoneOffset: 240,
         },
         message: '0.0.9',
         gpgsig: `-----BEGIN PGP SIGNATURE-----
@@ -40,8 +40,8 @@ Zp4YxnShDkMTV3rxZc27vehq2g9gKJzQsueLyZPJTzCHqujumiLbdYV4i4X4CZjy
 dBWrLc3kdnemrlhSRzR2
 =PrR1
 -----END PGP SIGNATURE-----
-`
-      }
+`,
+      },
     })
     expect(oid).toEqual('6e90dfd7573404a225888071ecaa572882b4e45c')
   })

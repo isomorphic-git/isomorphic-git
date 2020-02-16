@@ -34,7 +34,7 @@ import { E, GitError } from '../models/GitError.js'
  * @returns {Promise<string>}
  */
 
-export async function addNote ({
+export async function addNote({
   fs,
   onSign,
   gitdir,
@@ -44,7 +44,7 @@ export async function addNote ({
   force,
   author,
   committer,
-  signingKey
+  signingKey,
 }) {
   // Get the current note commit
   let parent
@@ -60,7 +60,7 @@ export async function addNote ({
   const result = await readTree({
     fs,
     gitdir,
-    oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+    oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
   })
   let tree = result.tree
 
@@ -72,7 +72,7 @@ export async function addNote ({
       if (entry.path === oid) {
         throw new GitError(E.NoteAlreadyExistsError, {
           note: entry.oid,
-          oid
+          oid,
         })
       }
     }
@@ -85,7 +85,7 @@ export async function addNote ({
   const noteOid = await writeBlob({
     fs,
     gitdir,
-    blob: note
+    blob: note,
   })
 
   // Create the new note tree
@@ -93,7 +93,7 @@ export async function addNote ({
   const treeOid = await writeTree({
     fs,
     gitdir,
-    tree
+    tree,
   })
 
   // Create the new note commit
@@ -107,7 +107,7 @@ export async function addNote ({
     message: `Note added by 'isomorphic-git addNote'\n`,
     author,
     committer,
-    signingKey
+    signingKey,
   })
 
   return commitOid

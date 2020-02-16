@@ -25,9 +25,11 @@ import { compareAge } from '../utils/compareAge.js'
  * console.log(commits)
  *
  */
-export async function log ({ fs, gitdir, ref, depth, since }) {
+export async function log({ fs, gitdir, ref, depth, since }) {
   const sinceTimestamp =
-    typeof since === 'undefined' ? void 0 : Math.floor(since.valueOf() / 1000)
+    typeof since === 'undefined'
+      ? undefined
+      : Math.floor(since.valueOf() / 1000)
   // TODO: In the future, we may want to have an API where we return a
   // async iterator that emits commits.
   const commits = []

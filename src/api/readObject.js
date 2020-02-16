@@ -198,14 +198,14 @@ import { resolveTree } from '../utils/resolveTree.js'
  * }
  *
  */
-export async function readObject ({
+export async function readObject({
   fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   oid,
   format = 'parsed',
   filepath = undefined,
-  encoding = undefined
+  encoding = undefined,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -234,7 +234,7 @@ export async function readObject ({
           tree,
           pathArray,
           oid: _oid,
-          filepath
+          filepath,
         })
       }
     }
@@ -244,7 +244,7 @@ export async function readObject ({
       fs,
       gitdir,
       oid,
-      format: _format
+      format: _format,
     })
     result.oid = oid
     if (format === 'parsed') {
@@ -282,7 +282,7 @@ export async function readObject ({
   }
 }
 
-async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
+async function resolveFile({ fs, gitdir, tree, pathArray, oid, filepath }) {
   const name = pathArray.shift()
   for (const entry of tree) {
     if (entry.path === name) {
@@ -292,7 +292,7 @@ async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
         const { type, object } = await _readObject({
           fs,
           gitdir,
-          oid: entry.oid
+          oid: entry.oid,
         })
         if (type === 'blob') {
           throw new GitError(E.DirectoryIsAFileError, { oid, filepath })
@@ -301,7 +301,7 @@ async function resolveFile ({ fs, gitdir, tree, pathArray, oid, filepath }) {
           throw new GitError(E.ObjectTypeAssertionInTreeFail, {
             oid: entry.oid,
             entrypath: filepath,
-            type
+            type,
           })
         }
         tree = GitTree.from(object)

@@ -74,7 +74,7 @@ const messages = {
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
   CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`,
   NoteAlreadyExistsError: `A note object { note } already exists on object { oid }. Use 'force: true' parameter to overwrite existing notes.`,
-  GitPushError: `One or more branches were not updated: { prettyDetails }`
+  GitPushError: `One or more branches were not updated: { prettyDetails }`,
 }
 
 export const E = {
@@ -223,10 +223,10 @@ export const E = {
   /** @type {'NoteAlreadyExistsError'} */
   NoteAlreadyExistsError: `NoteAlreadyExistsError`,
   /** @type {'GitPushError'} */
-  GitPushError: `GitPushError`
+  GitPushError: `GitPushError`,
 }
 
-function renderTemplate (template, values) {
+function renderTemplate(template, values) {
   let result = template
   for (const key of Object.keys(values)) {
     let subs
@@ -241,7 +241,7 @@ function renderTemplate (template, values) {
 }
 
 export class GitError extends Error {
-  constructor (code, data) {
+  constructor(code, data) {
     super()
     this.name = code
     this.code = code
@@ -250,16 +250,16 @@ export class GitError extends Error {
     if (Error.captureStackTrace) Error.captureStackTrace(this, this.constructor)
   }
 
-  toJSON () {
+  toJSON() {
     return {
       code: this.code,
       data: this.data,
       caller: this.caller,
-      message: this.message
+      message: this.message,
     }
   }
 
-  toString () {
+  toString() {
     return this.stack.toString()
   }
 }

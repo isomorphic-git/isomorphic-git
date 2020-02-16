@@ -1,11 +1,11 @@
 import { GitObject } from '../models/GitObject.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function hashObject ({
+export async function hashObject({
   type,
   object,
   format = 'content',
-  oid = undefined
+  oid = undefined,
 }) {
   if (format !== 'deflated') {
     if (format !== 'wrapped') {

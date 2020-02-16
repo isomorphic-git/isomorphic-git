@@ -32,7 +32,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * console.log('format', format)
  *
  */
-export async function hashBlob ({ object }) {
+export async function hashBlob({ object }) {
   try {
     assertParameter('object', object)
 
@@ -47,7 +47,7 @@ export async function hashBlob ({ object }) {
     const { oid, object: _object } = await hashObject({
       type: 'blob',
       format: 'content',
-      object
+      object,
     })
     return { oid, type, object: new Uint8Array(_object), format: 'wrapped' }
   } catch (err) {

@@ -12,14 +12,14 @@ describe('config', () => {
     const rfv = await getConfig({
       fs,
       gitdir,
-      path: 'core.repositoryformatversion'
+      path: 'core.repositoryformatversion',
     })
     const url = await getConfig({ fs, gitdir, path: 'remote.origin.url' })
     const fetch = await getConfig({ fs, gitdir, path: 'remote.upstream.fetch' })
     const fetches = await getConfigAll({
       fs,
       gitdir,
-      path: 'remote.upstream.fetch'
+      path: 'remote.upstream.fetch',
     })
     expect(sym).toBe(false)
     expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')
@@ -28,7 +28,7 @@ describe('config', () => {
     expect(fetches).toEqual([
       '+refs/heads/master:refs/remotes/upstream/master',
       'refs/heads/develop:refs/remotes/upstream/develop',
-      'refs/heads/qa/*:refs/remotes/upstream/qa/*'
+      'refs/heads/qa/*:refs/remotes/upstream/qa/*',
     ])
   })
 
@@ -54,7 +54,7 @@ describe('config', () => {
       fs,
       gitdir,
       path: 'remote.origin.url',
-      value: 'https://github.com/isomorphic-git/isomorphic-git'
+      value: 'https://github.com/isomorphic-git/isomorphic-git',
     })
     const url = await getConfig({ fs, gitdir, path: 'remote.origin.url' })
     expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')

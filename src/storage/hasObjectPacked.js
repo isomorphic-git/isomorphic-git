@@ -2,11 +2,11 @@ import { E, GitError } from '../models/GitError.js'
 import { readPackIndex } from '../storage/readPackIndex.js'
 import { join } from '../utils/join.js'
 
-export async function hasObjectPacked ({
+export async function hasObjectPacked({
   fs,
   gitdir,
   oid,
-  getExternalRefDelta
+  getExternalRefDelta,
 }) {
   // Check to see if it's in a packfile.
   // Iterate through all the .idx files
@@ -17,7 +17,7 @@ export async function hasObjectPacked ({
     const p = await readPackIndex({
       fs,
       filename: indexFile,
-      getExternalRefDelta
+      getExternalRefDelta,
     })
     if (p.error) throw new GitError(E.InternalFail, { message: p.error })
     // If the packfile DOES have the oid we're looking for...

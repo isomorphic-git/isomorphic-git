@@ -7,13 +7,13 @@ import { E, GitError } from '../models/GitError.js'
 
 import { StreamReader } from './StreamReader.js'
 
-export async function listpack (stream, onData) {
+export async function listpack(stream, onData) {
   const reader = new StreamReader(stream)
   let PACK = await reader.read(4)
   PACK = PACK.toString('utf8')
   if (PACK !== 'PACK') {
     throw new GitError(E.InternalFail, {
-      message: `Invalid PACK header '${PACK}'`
+      message: `Invalid PACK header '${PACK}'`,
     })
   }
 
@@ -21,7 +21,7 @@ export async function listpack (stream, onData) {
   version = version.readUInt32BE(0)
   if (version !== 2) {
     throw new GitError(E.InternalFail, {
-      message: `Invalid packfile version: ${version}`
+      message: `Invalid packfile version: ${version}`,
     })
   }
 
@@ -40,13 +40,13 @@ export async function listpack (stream, onData) {
       inflator.push(chunk, false)
       if (inflator.err) {
         throw new GitError(E.InternalFail, {
-          message: `Pako error: ${inflator.msg}`
+          message: `Pako error: ${inflator.msg}`,
         })
       }
       if (inflator.result) {
         if (inflator.result.length !== length) {
           throw new GitError(E.InternalFail, {
-            message: `Inflated object size is different from that stated in packfile.`
+            message: `Inflated object size is different from that stated in packfile.`,
           })
         }
 
@@ -61,14 +61,14 @@ export async function listpack (stream, onData) {
           offset,
           end,
           reference,
-          ofs
+          ofs,
         })
       }
     }
   }
 }
 
-async function parseHeader (reader) {
+async function parseHeader(reader) {
   // Object type is encoded in bits 654
   let byte = await reader.byte()
   const type = (byte >> 4) & 0b111

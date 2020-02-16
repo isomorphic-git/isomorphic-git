@@ -8,7 +8,7 @@ const binaryFiles = [
   'browserconfig.gz',
   'browserconfig.zip',
   'favicon-16x16.gif',
-  'favicon-16x16.png'
+  'favicon-16x16.png',
 ]
 const textFiles = ['browserconfig.xml', 'manifest.json']
 

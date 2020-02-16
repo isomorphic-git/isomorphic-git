@@ -13,7 +13,7 @@ describe('GitObjectManager', () => {
       await readObject({
         fs,
         gitdir,
-        oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       })
     } catch (err) {
       error = err

@@ -5,15 +5,15 @@ import { mode2type } from '../utils/mode2type'
 import { normalizeStats } from '../utils/normalizeStats'
 
 export class GitWalkerIndex {
-  constructor ({ fs, gitdir }) {
-    this.treePromise = GitIndexManager.acquire({ fs, gitdir }, async function (
+  constructor({ fs, gitdir }) {
+    this.treePromise = GitIndexManager.acquire({ fs, gitdir }, async function(
       index
     ) {
       return flatFileListToDirectoryStructure(index.entries)
     })
     const walker = this
     this.ConstructEntry = class StageEntry {
-      constructor (fullpath) {
+      constructor(fullpath) {
         this._fullpath = fullpath
         this._type = false
         this._mode = false
@@ -21,29 +21,29 @@ export class GitWalkerIndex {
         this._oid = false
       }
 
-      async type () {
+      async type() {
         return walker.type(this)
       }
 
-      async mode () {
+      async mode() {
         return walker.mode(this)
       }
 
-      async stat () {
+      async stat() {
         return walker.stat(this)
       }
 
-      async content () {
+      async content() {
         return walker.content(this)
       }
 
-      async oid () {
+      async oid() {
         return walker.oid(this)
       }
     }
   }
 
-  async readdir (entry) {
+  async readdir(entry) {
     const filepath = entry._fullpath
     const tree = await this.treePromise
     const inode = tree.get(filepath)
@@ -57,21 +57,21 @@ export class GitWalkerIndex {
     return names
   }
 
-  async type (entry) {
+  async type(entry) {
     if (entry._type === false) {
       await entry.stat()
     }
     return entry._type
   }
 
-  async mode (entry) {
+  async mode(entry) {
     if (entry._mode === false) {
       await entry.stat()
     }
     return entry._mode
   }
 
-  async stat (entry) {
+  async stat(entry) {
     if (entry._stat === false) {
       const tree = await this.treePromise
       const inode = tree.get(entry._fullpath)
@@ -84,7 +84,7 @@ export class GitWalkerIndex {
       entry._type = inode.type === 'tree' ? 'tree' : mode2type(stats.mode)
       entry._mode = stats.mode
       if (inode.type === 'tree') {
-        entry._stat = void 0
+        entry._stat = undefined
       } else {
         entry._stat = stats
       }
@@ -92,11 +92,11 @@ export class GitWalkerIndex {
     return entry._stat
   }
 
-  async content (_entry) {
+  async content(_entry) {
     // Cannot get content for an index entry
   }
 
-  async oid (entry) {
+  async oid(entry) {
     if (entry._oid === false) {
       const tree = await this.treePromise
       const inode = tree.get(entry._fullpath)

@@ -4,7 +4,7 @@ import pako from 'pako'
 
 let supportsDecompressionStream = false
 
-export async function inflate (buffer) {
+export async function inflate(buffer) {
   if (supportsDecompressionStream === null) {
     supportsDecompressionStream = testDecompressionStream()
   }
@@ -13,13 +13,13 @@ export async function inflate (buffer) {
     : pako.inflate(buffer)
 }
 
-async function browserInflate (buffer) {
+async function browserInflate(buffer) {
   const ds = new DecompressionStream('deflate')
   const d = new Blob([buffer]).stream().pipeThrough(ds)
   return new Uint8Array(await new Response(d).arrayBuffer())
 }
 
-function testDecompressionStream () {
+function testDecompressionStream() {
   try {
     const ds = new DecompressionStream('deflate')
     if (ds) return true

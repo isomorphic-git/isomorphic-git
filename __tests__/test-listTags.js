@@ -10,7 +10,7 @@ describe('listTags', () => {
     // Test
     const refs = await listTags({
       fs,
-      gitdir
+      gitdir,
     })
     expect(refs).toMatchInlineSnapshot(`
       Array [

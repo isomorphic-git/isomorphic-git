@@ -24,11 +24,11 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function deleteBranch ({
+export async function deleteBranch({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  ref
+  ref,
 }) {
   try {
     assertParameter('fs', fs)
@@ -36,7 +36,7 @@ export async function deleteBranch ({
     return await _deleteBranch({
       fs: new FileSystem(fs),
       gitdir,
-      ref
+      ref,
     })
   } catch (err) {
     err.caller = 'git.deleteBranch'

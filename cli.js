@@ -7,7 +7,7 @@ const { http } = require('./dist/http.cjs')
 // This really isn't much of a CLI. It's mostly for testing.
 // But it's very versatile and works surprisingly well.
 
-minimisted(async function ({ _: [command, ...args], ...opts }) {
+minimisted(async function({ _: [command, ...args], ...opts }) {
   try {
     const result = await git[command](
       Object.assign({ fs, http, dir: '.' }, opts)

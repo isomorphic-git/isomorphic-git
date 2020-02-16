@@ -3,7 +3,7 @@ import { expandOidLoose } from '../storage/expandOidLoose.js'
 import { expandOidPacked } from '../storage/expandOidPacked.js'
 import { readObject } from '../storage/readObject.js'
 
-export async function expandOid ({ fs, gitdir, oid: short }) {
+export async function expandOid({ fs, gitdir, oid: short }) {
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
   const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
@@ -13,7 +13,7 @@ export async function expandOid ({ fs, gitdir, oid: short }) {
     fs,
     gitdir,
     oid: short,
-    getExternalRefDelta
+    getExternalRefDelta,
   })
   const results = results1.concat(results2)
 
@@ -23,7 +23,7 @@ export async function expandOid ({ fs, gitdir, oid: short }) {
   if (results.length > 1) {
     throw new GitError(E.AmbiguousShortOid, {
       short,
-      matches: results.join(', ')
+      matches: results.join(', '),
     })
   }
   throw new GitError(E.ShortOidNotFound, { short })

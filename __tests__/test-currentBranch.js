@@ -17,7 +17,7 @@ describe('currentBranch', () => {
     const branch = await currentBranch({
       fs,
       gitdir,
-      fullname: true
+      fullname: true,
     })
     expect(branch).toEqual('refs/heads/master')
   })

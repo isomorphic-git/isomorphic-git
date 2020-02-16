@@ -10,11 +10,11 @@ describe('deleteTag', () => {
     await deleteTag({
       fs,
       gitdir,
-      ref: 'latest'
+      ref: 'latest',
     })
     const refs = await listTags({
       fs,
-      gitdir
+      gitdir,
     })
     expect(refs).toEqual(['prev'])
   })

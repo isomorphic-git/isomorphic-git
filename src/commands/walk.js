@@ -21,7 +21,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @see {WalkerMap}
  *
  */
-export async function walk ({
+export async function walk({
   fs,
   dir,
   gitdir,
@@ -35,7 +35,7 @@ export async function walk ({
     return flatten
   },
   // The default iterate function walks all children concurrently
-  iterate = (walk, children) => Promise.all([...children].map(walk))
+  iterate = (walk, children) => Promise.all([...children].map(walk)),
 }) {
   const walkers = trees.map(proxy => proxy[GitWalkSymbol]({ fs, dir, gitdir }))
 
@@ -54,7 +54,7 @@ export async function walk ({
       .map(array => array[Symbol.iterator]())
     return {
       entries,
-      children: unionOfIterators(iterators)
+      children: unionOfIterators(iterators),
     }
   }
 

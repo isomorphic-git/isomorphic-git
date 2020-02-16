@@ -52,7 +52,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * console.log(sha)
  *
  */
-export async function commit ({
+export async function commit({
   fs: _fs,
   onSign,
   dir,
@@ -65,7 +65,7 @@ export async function commit ({
   noUpdateBranch = false,
   ref,
   parent,
-  tree
+  tree,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -82,7 +82,7 @@ export async function commit ({
       fs,
       gitdir,
       author,
-      committer: _committer
+      committer: _committer,
     })
     if (!committer) throw new GitError(E.MissingCommitterError)
 
@@ -98,7 +98,7 @@ export async function commit ({
       noUpdateBranch,
       ref,
       parent,
-      tree
+      tree,
     })
   } catch (err) {
     err.caller = 'git.commit'

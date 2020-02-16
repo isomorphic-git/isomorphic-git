@@ -43,7 +43,7 @@ import { join } from '../utils/join.js'
  * console.log('tag', oid)
  *
  */
-export async function writeTag ({ fs, dir, gitdir = join(dir, '.git'), tag }) {
+export async function writeTag({ fs, dir, gitdir = join(dir, '.git'), tag }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -52,7 +52,7 @@ export async function writeTag ({ fs, dir, gitdir = join(dir, '.git'), tag }) {
     return await _writeTag({
       fs: new FileSystem(fs),
       gitdir,
-      tag
+      tag,
     })
   } catch (err) {
     err.caller = 'git.writeTag'

@@ -29,7 +29,7 @@ import { join } from '../utils/join'
  * console.log(files)
  *
  */
-export async function listFiles ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
+export async function listFiles({ fs, dir, gitdir = join(dir, '.git'), ref }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -37,7 +37,7 @@ export async function listFiles ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
     return await _listFiles({
       fs: new FileSystem(fs),
       gitdir,
-      ref
+      ref,
     })
   } catch (err) {
     err.caller = 'git.listFiles'

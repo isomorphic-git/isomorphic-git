@@ -2,12 +2,12 @@
 import { collect } from '../utils/collect.js'
 import { fromStream } from '../utils/fromStream'
 
-export default async function http ({
+export default async function http({
   onProgress,
   url,
   method = 'GET',
   headers = {},
-  body
+  body,
 }) {
   // streaming uploads aren't possible yet in the browser
   if (body) {
@@ -29,6 +29,6 @@ export default async function http ({
     statusCode: res.status,
     statusMessage: res.statusText,
     body: iter,
-    headers: headers
+    headers: headers,
   }
 }

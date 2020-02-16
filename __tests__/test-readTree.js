@@ -11,7 +11,7 @@ describe('readTree', () => {
     const { oid, tree } = await readTree({
       fs,
       gitdir,
-      oid: '6257985e3378ec42a03a57a7dc8eb952d69a5ff3'
+      oid: '6257985e3378ec42a03a57a7dc8eb952d69a5ff3',
     })
     expect(oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
     expect(tree).toMatchInlineSnapshot(`
@@ -134,7 +134,7 @@ describe('readTree', () => {
     const { oid, tree } = await readTree({
       fs,
       gitdir,
-      oid: '86167ce7861387275b2fbd188e031e00aff446f9'
+      oid: '86167ce7861387275b2fbd188e031e00aff446f9',
     })
     expect(oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
     expect(tree).toMatchInlineSnapshot(`
@@ -258,7 +258,7 @@ describe('readTree', () => {
       fs,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
-      filepath: ''
+      filepath: '',
     })
     expect(oid).toEqual('6257985e3378ec42a03a57a7dc8eb952d69a5ff3')
     expect(tree).toMatchInlineSnapshot(`
@@ -382,7 +382,7 @@ describe('readTree', () => {
       fs,
       gitdir,
       oid: 'be1e63da44b26de8877a184359abace1cddcb739',
-      filepath: 'src/commands'
+      filepath: 'src/commands',
     })
     expect(oid).toEqual('7704a6e8a802efcdbe6cf3dfa114c105f1d5c67a')
     expect(tree).toMatchInlineSnapshot(`
@@ -514,7 +514,7 @@ describe('readTree', () => {
         fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
-        filepath: 'src/commands/clone.js/isntafolder.txt'
+        filepath: 'src/commands/clone.js/isntafolder.txt',
       })
     } catch (err) {
       error = err
@@ -532,7 +532,7 @@ describe('readTree', () => {
         fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
-        filepath: 'src/isntafolder'
+        filepath: 'src/isntafolder',
       })
     } catch (err) {
       error = err
@@ -550,7 +550,7 @@ describe('readTree', () => {
         fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
-        filepath: '/src'
+        filepath: '/src',
       })
     } catch (err) {
       error = err
@@ -568,7 +568,7 @@ describe('readTree', () => {
         fs,
         gitdir,
         oid: 'be1e63da44b26de8877a184359abace1cddcb739',
-        filepath: 'src/'
+        filepath: 'src/',
       })
     } catch (err) {
       error = err

@@ -31,7 +31,7 @@ import { join } from '../utils/join.js'
  * console.log(value)
  *
  */
-export async function getConfig ({ fs, dir, gitdir = join(dir, '.git'), path }) {
+export async function getConfig({ fs, dir, gitdir = join(dir, '.git'), path }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -40,7 +40,7 @@ export async function getConfig ({ fs, dir, gitdir = join(dir, '.git'), path }) 
     return await _getConfig({
       fs: new FileSystem(fs),
       gitdir,
-      path
+      path,
     })
   } catch (err) {
     err.caller = 'git.getConfig'

@@ -17,7 +17,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Smoke Test
     await fetch({
@@ -26,7 +26,7 @@ describe('fetch', () => {
       gitdir,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(
       await fs.exists(`${gitdir}/refs/remotes/origin/test-branch-shallow-clone`)
@@ -40,7 +40,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     const output = []
     const progress = []
@@ -58,7 +58,7 @@ describe('fetch', () => {
       depth: 1,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     await sleep(1000) // seems to be a problem spot
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
@@ -74,7 +74,7 @@ describe('fetch', () => {
       depth: 2,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     await sleep(1000) // seems to be a problem spot
     shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -87,7 +87,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     let err
@@ -99,7 +99,7 @@ describe('fetch', () => {
         depth: 1,
         singleBranch: true,
         remote: 'ssh',
-        ref: 'test-branch-shallow-clone'
+        ref: 'test-branch-shallow-clone',
       })
     } catch (e) {
       err = e
@@ -114,7 +114,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     let err
@@ -126,7 +126,7 @@ describe('fetch', () => {
         depth: 1,
         singleBranch: true,
         remote: 'ssh',
-        ref: 'test-branch-shallow-clone'
+        ref: 'test-branch-shallow-clone',
       })
     } catch (e) {
       err = e
@@ -144,7 +144,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     await fetch({
@@ -154,7 +154,7 @@ describe('fetch', () => {
       since: new Date(1506571200000),
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
     const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -167,7 +167,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     await fetch({
@@ -177,7 +177,7 @@ describe('fetch', () => {
       exclude: ['v0.0.5'],
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
     const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -190,7 +190,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     await fetch({
@@ -200,7 +200,7 @@ describe('fetch', () => {
       depth: 1,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
     let shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -214,7 +214,7 @@ describe('fetch', () => {
       depth: 1,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     await sleep(1000) // seems to be a problem spot
     shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -227,7 +227,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     let err = null
@@ -239,7 +239,7 @@ describe('fetch', () => {
         since: new Date(1506571200000),
         singleBranch: true,
         remote: 'origin',
-        ref: 'test-branch-shallow-clone'
+        ref: 'test-branch-shallow-clone',
       })
     } catch (e) {
       err = e
@@ -256,7 +256,7 @@ describe('fetch', () => {
       dir,
       gitdir,
       depth: 1,
-      url: `http://${localhost}:8888/test-empty.git`
+      url: `http://${localhost}:8888/test-empty.git`,
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
     expect(await fs.exists(`${gitdir}/HEAD`)).toBe(true)
@@ -272,7 +272,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-fetch-server.git`
+      value: `http://${localhost}:8888/test-fetch-server.git`,
     })
     expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
       true
@@ -283,7 +283,7 @@ describe('fetch', () => {
       dir,
       gitdir,
       depth: 1,
-      prune: true
+      prune: true,
     })
     expect(pruned).toEqual(['refs/remotes/origin/test-prune'])
     expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
@@ -297,7 +297,7 @@ describe('fetch', () => {
       fs,
       gitdir,
       path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-fetch-server.git`
+      value: `http://${localhost}:8888/test-fetch-server.git`,
     })
     expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(true)
     const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
@@ -309,7 +309,7 @@ describe('fetch', () => {
         gitdir,
         depth: 1,
         tags: true,
-        pruneTags: true
+        pruneTags: true,
       })
     } catch (err) {
       // shrug

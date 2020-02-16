@@ -31,13 +31,13 @@ import { join } from '../utils/join.js'
  * console.log(commits)
  *
  */
-export async function log ({
+export async function log({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'HEAD',
   depth,
-  since // Date
+  since, // Date
 }) {
   try {
     assertParameter('fs', fs)
@@ -49,7 +49,7 @@ export async function log ({
       gitdir,
       ref,
       depth,
-      since
+      since,
     })
   } catch (err) {
     err.caller = 'git.log'

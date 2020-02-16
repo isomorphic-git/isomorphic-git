@@ -1,14 +1,14 @@
 import { E, GitError } from '../models/GitError.js'
 
 export class GitObject {
-  static wrap ({ type, object }) {
+  static wrap({ type, object }) {
     return Buffer.concat([
       Buffer.from(`${type} ${object.byteLength.toString()}\x00`),
-      Buffer.from(object)
+      Buffer.from(object),
     ])
   }
 
-  static unwrap (buffer) {
+  static unwrap(buffer) {
     const s = buffer.indexOf(32) // first space
     const i = buffer.indexOf(0) // first null value
     const type = buffer.slice(0, s).toString('utf8') // get type of object
@@ -17,12 +17,12 @@ export class GitObject {
     // verify length
     if (parseInt(length) !== actualLength) {
       throw new GitError(E.InternalFail, {
-        message: `Length mismatch: expected ${length} bytes but got ${actualLength} instead.`
+        message: `Length mismatch: expected ${length} bytes but got ${actualLength} instead.`,
       })
     }
     return {
       type,
-      object: Buffer.from(buffer.slice(i + 1))
+      object: Buffer.from(buffer.slice(i + 1)),
     }
   }
 }

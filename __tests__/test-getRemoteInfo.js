@@ -11,7 +11,7 @@ describe('getRemoteInfo', () => {
   it('getRemoteInfo', async () => {
     const info = await getRemoteInfo({
       http,
-      url: `http://${localhost}:8888/test-dumb-http-server.git`
+      url: `http://${localhost}:8888/test-dumb-http-server.git`,
     })
     expect(info).not.toBeNull()
     expect(info.capabilities).not.toBeNull()
@@ -32,7 +32,7 @@ describe('getRemoteInfo', () => {
       try {
         await getRemoteInfo({
           http,
-          url: `http://${localhost}:9876/base/__tests__/__fixtures__/test-dumb-http-server.git`
+          url: `http://${localhost}:9876/base/__tests__/__fixtures__/test-dumb-http-server.git`,
         })
       } catch (err) {
         error = err

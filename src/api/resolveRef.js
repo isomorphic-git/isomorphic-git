@@ -23,12 +23,12 @@ import { join } from '../utils/join.js'
  * console.log(currentBranch)
  *
  */
-export async function resolveRef ({
+export async function resolveRef({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   ref,
-  depth
+  depth,
 }) {
   try {
     assertParameter('fs', fs)
@@ -39,7 +39,7 @@ export async function resolveRef ({
       fs: new FileSystem(fs),
       gitdir,
       ref,
-      depth
+      depth,
     })
     return oid
   } catch (err) {

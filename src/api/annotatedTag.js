@@ -45,7 +45,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  * console.log('done')
  *
  */
-export async function annotatedTag ({
+export async function annotatedTag({
   fs: _fs,
   onSign,
   dir,
@@ -56,7 +56,7 @@ export async function annotatedTag ({
   gpgsig,
   object,
   signingKey,
-  force = false
+  force = false,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -81,7 +81,7 @@ export async function annotatedTag ({
       gpgsig,
       object,
       signingKey,
-      force
+      force,
     })
   } catch (err) {
     err.caller = 'git.annotatedTag'

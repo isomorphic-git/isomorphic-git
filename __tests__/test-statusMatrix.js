@@ -13,7 +13,7 @@ describe('statusMatrix', () => {
       ['a.txt', 1, 1, 1],
       ['b.txt', 1, 2, 1],
       ['c.txt', 1, 0, 1],
-      ['d.txt', 0, 2, 0]
+      ['d.txt', 0, 2, 0],
     ])
 
     await add({ fs, dir, gitdir, filepath: 'a.txt' })
@@ -25,7 +25,7 @@ describe('statusMatrix', () => {
       ['a.txt', 1, 1, 1],
       ['b.txt', 1, 2, 2],
       ['c.txt', 1, 0, 0],
-      ['d.txt', 0, 2, 2]
+      ['d.txt', 0, 2, 2],
     ])
 
     // And finally the weirdo cases
@@ -73,11 +73,14 @@ describe('statusMatrix', () => {
       ['g/g.txt', 0, 2, 0],
       ['h/h.txt', 0, 2, 0],
       ['i/.gitignore', 0, 2, 0],
-      ['i/i.txt', 0, 2, 0]
+      ['i/i.txt', 0, 2, 0],
     ])
 
     matrix = await statusMatrix({ fs, dir, gitdir, filepaths: ['i'] })
-    expect(matrix).toEqual([['i/.gitignore', 0, 2, 0], ['i/i.txt', 0, 2, 0]])
+    expect(matrix).toEqual([
+      ['i/.gitignore', 0, 2, 0],
+      ['i/i.txt', 0, 2, 0],
+    ])
 
     matrix = await statusMatrix({ fs, dir, gitdir, filepaths: [] })
     expect(matrix).toBeUndefined()
@@ -86,7 +89,7 @@ describe('statusMatrix', () => {
     expect(matrix).toEqual([
       ['h/h.txt', 0, 2, 0],
       ['i/.gitignore', 0, 2, 0],
-      ['i/i.txt', 0, 2, 0]
+      ['i/i.txt', 0, 2, 0],
     ])
   })
 
@@ -98,20 +101,20 @@ describe('statusMatrix', () => {
       fs,
       dir,
       gitdir,
-      filter: filepath => !filepath.includes('/') && filepath.endsWith('.txt')
+      filter: filepath => !filepath.includes('/') && filepath.endsWith('.txt'),
     })
     expect(matrix).toEqual([
       ['a.txt', 1, 1, 1],
       ['b.txt', 1, 2, 1],
       ['c.txt', 1, 0, 1],
-      ['d.txt', 0, 2, 0]
+      ['d.txt', 0, 2, 0],
     ])
 
     matrix = await statusMatrix({
       fs,
       dir,
       gitdir,
-      filter: filepath => filepath.endsWith('.gitignore')
+      filter: filepath => filepath.endsWith('.gitignore'),
     })
     expect(matrix).toEqual([['i/.gitignore', 0, 2, 0]])
 
@@ -120,7 +123,7 @@ describe('statusMatrix', () => {
       dir,
       gitdir,
       filter: filepath => filepath.endsWith('.txt'),
-      filepaths: ['i']
+      filepaths: ['i'],
     })
     expect(matrix).toEqual([['i/i.txt', 0, 2, 0]])
   })

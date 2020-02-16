@@ -15,19 +15,19 @@ import { join } from '../utils/join.js'
  * @param {string} args.filepath
  * @returns {Promise<void>}
  */
-export async function add ({ fs, dir, gitdir, filepath }) {
-  await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+export async function add({ fs, dir, gitdir, filepath }) {
+  await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
     await addToIndex({ dir, gitdir, fs, filepath, index })
   })
 }
 
-async function addToIndex ({ dir, gitdir, fs, filepath, index }) {
+async function addToIndex({ dir, gitdir, fs, filepath, index }) {
   // TODO: Should ignore UNLESS it's already in the index.
   const ignored = await GitIgnoreManager.isIgnored({
     fs,
     dir,
     gitdir,
-    filepath
+    filepath,
   })
   if (ignored) return
   const stats = await fs.lstat(join(dir, filepath))

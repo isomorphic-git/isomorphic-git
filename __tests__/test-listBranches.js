@@ -25,7 +25,7 @@ describe('listBranches', () => {
     const commits = await listBranches({
       fs,
       gitdir,
-      remote: 'origin'
+      remote: 'origin',
     })
     expect(commits).toMatchInlineSnapshot(`
       Array [

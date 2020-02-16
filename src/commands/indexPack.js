@@ -13,7 +13,7 @@ import { join } from '../utils/join.js'
  *
  * @returns {Promise<void>}
  */
-export async function indexPack ({ fs, onProgress, dir, gitdir, filepath }) {
+export async function indexPack({ fs, onProgress, dir, gitdir, filepath }) {
   try {
     filepath = join(dir, filepath)
     const pack = await fs.read(filepath)
@@ -21,7 +21,7 @@ export async function indexPack ({ fs, onProgress, dir, gitdir, filepath }) {
     const idx = await GitPackIndex.fromPack({
       pack,
       getExternalRefDelta,
-      onProgress
+      onProgress,
     })
     await fs.write(filepath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
   } catch (err) {

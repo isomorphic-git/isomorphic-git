@@ -1,4 +1,4 @@
-export function outdent (str) {
+export function outdent(str) {
   return str
     .split('\n')
     .map(x => x.replace(/^ /, ''))

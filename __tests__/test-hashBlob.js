@@ -35,14 +35,14 @@ const buffer = Buffer.from(string, 'utf8')
 
 const wrapped = Buffer.concat([
   Buffer.from(`blob ${buffer.byteLength}\x00`),
-  buffer
+  buffer,
 ])
 
 describe('hashBlob', () => {
   it('object as Uint8Array', async () => {
     // Test
     const { oid, object, format } = await hashBlob({
-      object: buffer
+      object: buffer,
     })
     expect(oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
     expect(format).toEqual('wrapped')
@@ -52,7 +52,7 @@ describe('hashBlob', () => {
   it('object as String', async () => {
     // Test
     const { oid, object, format } = await hashBlob({
-      object: string
+      object: string,
     })
     expect(oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
     expect(format).toEqual('wrapped')

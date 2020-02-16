@@ -16,7 +16,7 @@ describe('utils/join', () => {
       ['.', '.', '.'],
       ['/', '.'],
       ['/', '.git'],
-      ['.', '.git']
+      ['.', '.git'],
     ]
     for (const fixture of fixtures) {
       expect(join(...fixture)).toEqual(path.join(...fixture))
@@ -50,7 +50,7 @@ describe('utils/join', () => {
       [[' ', ''], ' '],
       [['/', '/foo'], '/foo'],
       [['/', '//foo'], '/foo'],
-      [['/', '', '/foo'], '/foo']
+      [['/', '', '/foo'], '/foo'],
     ]
     for (const [args, result] of fixtures) {
       expect(join(...args)).toEqual(result)
@@ -66,7 +66,7 @@ describe('utils/join', () => {
       [['', '', '/foo'], 'foo'],
       [['foo/', ''], 'foo'],
       [['', '/', 'foo'], 'foo'],
-      [['', '/', '/foo'], 'foo']
+      [['', '/', '/foo'], 'foo'],
     ]
     for (const [args, result] of disagreeFixtures) {
       expect(join(...args)).toEqual(result)

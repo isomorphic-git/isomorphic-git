@@ -8,7 +8,7 @@ import { resolveTree } from '../utils/resolveTree.js'
 import { GitTree } from './GitTree.js'
 
 export class GitWalkerRepo {
-  constructor ({ fs, gitdir, ref }) {
+  constructor({ fs, gitdir, ref }) {
     this.fs = fs
     this.gitdir = gitdir
     this.mapPromise = (async () => {
@@ -30,7 +30,7 @@ export class GitWalkerRepo {
     })()
     const walker = this
     this.ConstructEntry = class TreeEntry {
-      constructor (fullpath) {
+      constructor(fullpath) {
         this._fullpath = fullpath
         this._type = false
         this._mode = false
@@ -39,29 +39,29 @@ export class GitWalkerRepo {
         this._oid = false
       }
 
-      async type () {
+      async type() {
         return walker.type(this)
       }
 
-      async mode () {
+      async mode() {
         return walker.mode(this)
       }
 
-      async stat () {
+      async stat() {
         return walker.stat(this)
       }
 
-      async content () {
+      async content() {
         return walker.content(this)
       }
 
-      async oid () {
+      async oid() {
         return walker.oid(this)
       }
     }
   }
 
-  async readdir (entry) {
+  async readdir(entry) {
     const filepath = entry._fullpath
     const { fs, gitdir } = this
     const map = await this.mapPromise
@@ -78,7 +78,7 @@ export class GitWalkerRepo {
       throw new GitError(E.ObjectTypeAssertionFail, {
         oid,
         expected: obj.type,
-        type
+        type,
       })
     }
     const tree = GitTree.from(object)
@@ -89,7 +89,7 @@ export class GitWalkerRepo {
     return tree.entries().map(entry => join(filepath, entry.path))
   }
 
-  async type (entry) {
+  async type(entry) {
     if (entry._type === false) {
       const map = await this.mapPromise
       const { type } = map.get(entry._fullpath)
@@ -98,7 +98,7 @@ export class GitWalkerRepo {
     return entry._type
   }
 
-  async mode (entry) {
+  async mode(entry) {
     if (entry._mode === false) {
       const map = await this.mapPromise
       const { mode } = map.get(entry._fullpath)
@@ -107,9 +107,9 @@ export class GitWalkerRepo {
     return entry._mode
   }
 
-  async stat (_entry) {}
+  async stat(_entry) {}
 
-  async content (entry) {
+  async content(entry) {
     if (entry._content === false) {
       const map = await this.mapPromise
       const { fs, gitdir } = this
@@ -117,7 +117,7 @@ export class GitWalkerRepo {
       const oid = obj.oid
       const { type, object } = await readObject({ fs, gitdir, oid })
       if (type !== 'blob') {
-        entry._content = void 0
+        entry._content = undefined
       } else {
         entry._content = new Uint8Array(object)
       }
@@ -125,7 +125,7 @@ export class GitWalkerRepo {
     return entry._content
   }
 
-  async oid (entry) {
+  async oid(entry) {
     if (entry._oid === false) {
       const map = await this.mapPromise
       const obj = map.get(entry._fullpath)

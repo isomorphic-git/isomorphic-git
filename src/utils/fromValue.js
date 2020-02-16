@@ -1,17 +1,17 @@
 // Convert a value to an Async Iterator
 // This will be easier with async generator functions.
-export function fromValue (value) {
+export function fromValue(value) {
   let queue = [value]
   return {
-    next () {
+    next() {
       return Promise.resolve({ done: queue.length === 0, value: queue.pop() })
     },
-    return () {
+    return() {
       queue = []
       return {}
     },
-    [Symbol.asyncIterator] () {
+    [Symbol.asyncIterator]() {
       return this
-    }
+    },
   }
 }

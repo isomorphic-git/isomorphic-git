@@ -1,5 +1,5 @@
 // Convert a Node stream to an Async Iterator
-export function fromNodeStream (stream) {
+export function fromNodeStream(stream) {
   // Use native async iteration if it's available.
   const asyncIterator = Object.getOwnPropertyDescriptor(
     stream,
@@ -39,7 +39,7 @@ export function fromNodeStream (stream) {
     }
   })
   return {
-    next () {
+    next() {
       return new Promise((resolve, reject) => {
         if (queue.length === 0 && ended) {
           return resolve({ done: true })
@@ -50,12 +50,12 @@ export function fromNodeStream (stream) {
         }
       })
     },
-    return () {
+    return() {
       stream.removeAllListeners()
       if (stream.destroy) stream.destroy()
     },
-    [Symbol.asyncIterator] () {
+    [Symbol.asyncIterator]() {
       return this
-    }
+    },
   }
 }

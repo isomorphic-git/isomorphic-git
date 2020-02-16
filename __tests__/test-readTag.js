@@ -10,7 +10,7 @@ describe('readTag', () => {
     const tag = await readTag({
       fs,
       gitdir,
-      oid: '587d3f8290b513e2ee85ecd317e6efecd545aee6'
+      oid: '587d3f8290b513e2ee85ecd317e6efecd545aee6',
     })
     expect(tag).toMatchInlineSnapshot(`
       Object {

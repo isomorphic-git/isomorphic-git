@@ -1,8 +1,5 @@
 {
   "extends": [
-    "prettier-standard/eslint-file"
-  ],
-  "rules": {
-    "space-before-function-paren": ["error", "always"]
-  }
+    "prettier-standard/prettier-file"
+  ]
 }

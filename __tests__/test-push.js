@@ -17,7 +17,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.karma.url',
-      value: `http://${localhost}:8888/test-push-server.git`
+      value: `http://${localhost}:8888/test-push-server.git`,
     })
     const output = []
     // Test
@@ -29,7 +29,7 @@ describe('push', () => {
         output.push(m)
       },
       remote: 'karma',
-      ref: 'refs/heads/master'
+      ref: 'refs/heads/master',
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -60,14 +60,14 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.karma.url',
-      value: `http://${localhost}:8888/test-push-server.git`
+      value: `http://${localhost}:8888/test-push-server.git`,
     })
     // Test
     const res = await push({
       fs,
       http,
       gitdir,
-      remote: 'karma'
+      remote: 'karma',
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -80,7 +80,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.karma.url',
-      value: `http://${localhost}:8888/test-push-server.git`
+      value: `http://${localhost}:8888/test-push-server.git`,
     })
     // Test
     const res = await push({
@@ -89,7 +89,7 @@ describe('push', () => {
       gitdir,
       remote: 'karma',
       ref: 'master',
-      remoteRef: 'foobar'
+      remoteRef: 'foobar',
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -105,7 +105,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.karma.url',
-      value: `http://${localhost}:8888/test-push-server.git`
+      value: `http://${localhost}:8888/test-push-server.git`,
     })
     // Test
     const res = await push({
@@ -113,7 +113,7 @@ describe('push', () => {
       http,
       gitdir,
       remote: 'karma',
-      ref: 'lightweight-tag'
+      ref: 'lightweight-tag',
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -126,7 +126,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.karma.url',
-      value: `http://${localhost}:8888/test-push-server.git`
+      value: `http://${localhost}:8888/test-push-server.git`,
     })
     // Test
     const res = await push({
@@ -134,7 +134,7 @@ describe('push', () => {
       http,
       gitdir,
       remote: 'karma',
-      ref: 'annotated-tag'
+      ref: 'annotated-tag',
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -147,7 +147,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.karma.url',
-      value: `http://${localhost}:8888/test-push-server.git`
+      value: `http://${localhost}:8888/test-push-server.git`,
     })
     await push({
       fs,
@@ -155,7 +155,7 @@ describe('push', () => {
       gitdir,
       remote: 'karma',
       ref: 'master',
-      remoteRef: 'foobar'
+      remoteRef: 'foobar',
     })
     expect(await listBranches({ fs, gitdir, remote: 'karma' })).toContain(
       'foobar'
@@ -167,7 +167,7 @@ describe('push', () => {
       gitdir,
       remote: 'karma',
       remoteRef: 'foobar',
-      delete: true
+      delete: true,
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -184,7 +184,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.auth.url',
-      value: `http://${localhost}:8888/test-push-server-auth.git`
+      value: `http://${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
     const res = await push({
@@ -194,7 +194,7 @@ describe('push', () => {
       username: 'testuser',
       password: 'testpassword',
       remote: 'auth',
-      ref: 'master'
+      ref: 'master',
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -207,7 +207,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.url.url',
-      value: `http://testuser:testpassword@${localhost}:8888/test-push-server-auth.git`
+      value: `http://testuser:testpassword@${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
     const res = await push({
@@ -215,7 +215,7 @@ describe('push', () => {
       http,
       gitdir,
       remote: 'url',
-      ref: 'master'
+      ref: 'master',
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -228,7 +228,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.auth.url',
-      value: `http://${localhost}:8888/test-push-server-auth.git`
+      value: `http://${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
     let error = null
@@ -238,7 +238,7 @@ describe('push', () => {
         http,
         gitdir,
         remote: 'auth',
-        ref: 'master'
+        ref: 'master',
       })
     } catch (err) {
       error = err.message
@@ -252,7 +252,7 @@ describe('push', () => {
       fs,
       gitdir,
       path: 'remote.auth.url',
-      value: `http://${localhost}:8888/test-push-server-auth.git`
+      value: `http://${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
     let error = null
@@ -264,7 +264,7 @@ describe('push', () => {
         username: 'test',
         password: 'test',
         remote: 'auth',
-        ref: 'master'
+        ref: 'master',
       })
     } catch (err) {
       error = err.message
