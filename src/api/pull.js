@@ -26,7 +26,6 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.fastForwardOnly = false] - Only perform simple fast-forward merges. (Don't create merge commits.)
- * @param {boolean} [args.noGitSuffix = false] - If true, do not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
@@ -71,7 +70,6 @@ export async function pull({
   gitdir = join(dir, '.git'),
   ref,
   fastForwardOnly = false,
-  noGitSuffix = false,
   corsProxy,
   username,
   password,
@@ -112,7 +110,6 @@ export async function pull({
       gitdir,
       ref,
       fastForwardOnly,
-      noGitSuffix,
       corsProxy,
       username,
       password,
