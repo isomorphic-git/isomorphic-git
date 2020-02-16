@@ -23,7 +23,7 @@ describe('clone', () => {
       depth: 1,
       ref: 'test-branch',
       noTags: true,
-      url: 'https://github.com/isomorphic-git/isomorphic-git',
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
       corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
       noCheckout: true,
     })
@@ -55,7 +55,7 @@ describe('clone', () => {
       ref: 'test-branch',
       singleBranch: true,
       noCheckout: true,
-      url: 'https://github.com/isomorphic-git/isomorphic-git',
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
       corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
@@ -76,7 +76,7 @@ describe('clone', () => {
       depth: 1,
       singleBranch: true,
       ref: 'test-tag',
-      url: 'https://github.com/isomorphic-git/isomorphic-git',
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
       corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
     })
     expect(await fs.exists(`${dir}`)).toBe(true)

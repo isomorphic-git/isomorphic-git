@@ -5,7 +5,6 @@ import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
 import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
-import { pkg } from '../utils/pkg.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
 // Try to accomodate known CORS proxy implementations:
@@ -31,7 +30,6 @@ export class GitRemoteHTTP {
    * @param {string} [args.corsProxy]
    * @param {string} args.service
    * @param {string} args.url
-   * @param {boolean} args.noGitSuffix
    * @param {GitAuth} [args.auth]
    * @param {Object<string, string>} [args.headers]
    */
@@ -44,13 +42,10 @@ export class GitRemoteHTTP {
     corsProxy,
     service,
     url,
-    noGitSuffix,
     auth,
     headers,
   }) {
     const _origUrl = url
-    // Auto-append the (necessary) .git if it's missing.
-    if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     const urlAuth = extractAuthFromUrl(url)
     if (urlAuth) {
       url = urlAuth.url
@@ -69,14 +64,6 @@ export class GitRemoteHTTP {
       url = corsProxify(corsProxy, url)
     }
     // headers['Accept'] = `application/x-${service}-advertisement`
-    // Only send a user agent in Node and to CORS proxies by default,
-    // because Gogs and others might not whitelist 'user-agent' in allowed headers.
-    // Solutions using 'process.browser' can't be used as they rely on bundler shims,
-    // ans solutions using 'process.versions.node' had to be discarded because the
-    // BrowserFS 'process' shim is too complete.
-    if (typeof window === 'undefined' || corsProxy) {
-      headers['user-agent'] = headers['user-agent'] || pkg.agent
-    }
     // If the username came from the URL, we want to allow the password to be missing.
     // This is because Github allows using the token as the username with an empty password
     // so that is a style of git clone URL we might encounter and we don't want to throw a "Missing password or token" error.
@@ -154,13 +141,10 @@ export class GitRemoteHTTP {
     corsProxy,
     service,
     url,
-    noGitSuffix,
     auth,
     body,
     headers,
   }) {
-    // Auto-append the (necessary) .git if it's missing.
-    if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
     const urlAuth = extractAuthFromUrl(url)
     if (urlAuth) {
       url = urlAuth.url
@@ -175,14 +159,6 @@ export class GitRemoteHTTP {
     }
     headers['content-type'] = `application/x-${service}-request`
     headers.accept = `application/x-${service}-result`
-    // Only send a user agent in Node and to CORS proxies by default,
-    // because Gogs and others might not whitelist 'user-agent' in allowed headers.
-    // Solutions using 'process.browser' can't be used as they rely on bundler shims,
-    // ans solutions using 'process.versions.node' had to be discarded because the
-    // BrowserFS 'process' shim is too complete.
-    if (typeof window === 'undefined' || corsProxy) {
-      headers['user-agent'] = headers['user-agent'] || pkg.agent
-    }
     // If the username came from the URL, we want to allow the password to be missing.
     // This is because Github allows using the token as the username with an empty password
     // so that is a style of git clone URL we might encounter and we don't want to throw a "Missing password or token" error.

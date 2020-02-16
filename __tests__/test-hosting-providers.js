@@ -79,7 +79,6 @@ describe('Hosting Providers', () => {
       const res = await fetch({
         fs,
         http,
-        noGitSuffix: true,
         gitdir,
         // corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphicgittestpush',
@@ -104,7 +103,6 @@ describe('Hosting Providers', () => {
       const res = await push({
         fs,
         http,
-        noGitSuffix: true,
         gitdir,
         // corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         username: 'isomorphicgittestpush',

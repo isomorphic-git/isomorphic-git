@@ -33,7 +33,6 @@ import { join } from '../utils/join.js'
  * @param {string} [args.remoteRef] - The name of the receiving branch on the remote. By default this is the configured remote tracking branch.
  * @param {boolean} [args.force = false] - If true, behaves the same as `git push --force`
  * @param {boolean} [args.delete = false] - If true, delete the remote ref
- * @param {boolean} [args.noGitSuffix = false] - If true, do not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
@@ -73,7 +72,6 @@ export async function push({
   url,
   force = false,
   delete: _delete = false,
-  noGitSuffix = false,
   corsProxy,
   username,
   password,
@@ -100,7 +98,6 @@ export async function push({
       url,
       force,
       delete: _delete,
-      noGitSuffix,
       corsProxy,
       username,
       password,

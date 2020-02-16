@@ -34,7 +34,6 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {string} [args.remote]
  * @param {boolean} [args.force = false]
  * @param {boolean} [args.delete = false]
- * @param {boolean} [args.noGitSuffix = false]
  * @param {string} [args.url]
  * @param {string} [args.corsProxy]
  * @param {string} [args.username]
@@ -60,7 +59,6 @@ export async function push({
   url: _url,
   force = false,
   delete: _delete = false,
-  noGitSuffix = false,
   corsProxy,
   username,
   password,
@@ -118,7 +116,6 @@ export async function push({
     corsProxy,
     service: 'git-receive-pack',
     url,
-    noGitSuffix,
     auth,
     headers,
   })
@@ -209,7 +206,6 @@ export async function push({
     corsProxy,
     service: 'git-receive-pack',
     url,
-    noGitSuffix,
     auth,
     headers,
     body: [...packstream1, ...packstream2],

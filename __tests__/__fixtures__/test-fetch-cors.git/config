@@ -5,7 +5,7 @@
 	symlinks = false
 	ignorecase = true
 [remote "origin"]
-	url = https://github.com/isomorphic-git/isomorphic-git
+	url = https://github.com/isomorphic-git/isomorphic-git.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [remote "ssh"]
 	url = git@github.com:isomorphic-git/isomorphic-git.git
