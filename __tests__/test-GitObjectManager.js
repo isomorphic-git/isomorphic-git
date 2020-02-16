@@ -1,15 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-GitObjectManager.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { readObject } = require('isomorphic-git/internal-apis')
+
+const { E, readObject } = require('isomorphic-git/internal-apis')
 
 describe('GitObjectManager', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
-
   it('test missing', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-GitObjectManager')
@@ -25,6 +19,6 @@ describe('GitObjectManager', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error).toMatchSnapshot()
+    expect(error.code).toBe(E.ReadObjectFail)
   })
 })

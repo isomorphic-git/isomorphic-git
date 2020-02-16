@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`GitObjectManager test missing 1`] = `[ReadObjectFail: Failed to read git object with oid aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]`;

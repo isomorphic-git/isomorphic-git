@@ -1,14 +1,8 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-resolveRef.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 const { resolveRef } = require('isomorphic-git')
 
 describe('resolveRef', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-resolveRef')
@@ -18,7 +12,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9'
     })
-    expect(ref).toMatchSnapshot()
+    expect(ref).toBe('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9')
   })
   it('test-branch', async () => {
     // Setup
@@ -29,7 +23,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'origin/test-branch'
     })
-    expect(ref).toMatchSnapshot()
+    expect(ref).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
   })
   it('config', async () => {
     // Setup
@@ -40,7 +34,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'config'
     })
-    expect(ref).toMatchSnapshot()
+    expect(ref).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
   })
   it('test-tag', async () => {
     // Setup
@@ -51,7 +45,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'test-tag'
     })
-    expect(ref).toMatchSnapshot()
+    expect(ref).toBe('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9')
   })
   it('HEAD', async () => {
     // Setup
@@ -62,7 +56,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'HEAD'
     })
-    expect(ref).toMatchSnapshot()
+    expect(ref).toBe('033417ae18b174f078f2f44232cb7a374f4c60ce')
   })
   it('HEAD depth', async () => {
     // Setup
@@ -74,7 +68,7 @@ describe('resolveRef', () => {
       ref: 'HEAD',
       depth: 2
     })
-    expect(ref).toMatchSnapshot()
+    expect(ref).toBe('refs/heads/master')
   })
   it('packed-refs', async () => {
     // Setup
@@ -85,7 +79,7 @@ describe('resolveRef', () => {
       gitdir,
       ref: 'v0.0.1'
     })
-    expect(ref).toMatchSnapshot()
+    expect(ref).toBe('1a2149e96a9767b281a8f10fd014835322da2d14')
   })
   it('non-existant refs', async () => {
     // Setup

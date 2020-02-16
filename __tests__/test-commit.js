@@ -1,17 +1,8 @@
-import { readCommit } from 'isomorphic-git'
-
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-commit.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { commit, log } = require('isomorphic-git')
+const { E, readCommit, commit, log } = require('isomorphic-git')
 
 describe('commit', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
-
   it('commit', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-commit')
@@ -187,7 +178,7 @@ describe('commit', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.code).toBe(E.MissingAuthorError)
     // reset for test 2
     error = null
     try {
@@ -205,7 +196,7 @@ describe('commit', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.code).toBe(E.MissingAuthorError)
   })
 
   it('create signed commit', async () => {

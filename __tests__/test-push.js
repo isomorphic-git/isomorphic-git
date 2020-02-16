@@ -2,9 +2,6 @@
 import http from 'isomorphic-git/http'
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-push.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
 const { setConfig, push, listBranches } = require('isomorphic-git')
 
@@ -13,9 +10,6 @@ const localhost =
   typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 describe('push', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('push', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-push')
@@ -40,7 +34,24 @@ describe('push', () => {
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
     expect(res.refs['refs/heads/master'].ok).toBe(true)
-    expect(output).toMatchSnapshot()
+    expect(output).toMatchInlineSnapshot(`
+      Array [
+        "build started...
+      ",
+        "build completed...
+      ",
+        "tests started...
+      ",
+        "tests completed...
+      ",
+        "starting server...
+      ",
+        "server running
+      ",
+        "Here is a message from 'post-receive' hook.
+      ",
+      ]
+    `)
   })
   it('push without ref', async () => {
     // Setup
