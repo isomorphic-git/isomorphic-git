@@ -28,8 +28,8 @@ module.exports = {
       default: series.nps('lint.js'),
       js: `eslint ${srcPaths}`,
       fix: series.nps('lint.prettier', 'lint.esfix', 'lint.prettier'),
-      prettier: `prettier --write ${srcPaths}`,
-      esfix: `eslint --fix ${srcPaths}`,
+      prettier: optional(`prettier --write ${srcPaths}`),
+      esfix: optional(`eslint --fix ${srcPaths}`),
     },
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
