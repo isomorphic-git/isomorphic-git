@@ -1,5 +1,21 @@
 {
   "extends": [
     "prettier-standard/prettier-file"
-  ]
+  ],
+  "rules": {
+    "import/order": ["error", {
+      "alphabetize": {
+        "order": "asc",
+        "caseInsensitive": false
+      },
+      "groups": [
+        "builtin",
+        "external",
+        "parent",
+        "index",
+        "sibling"
+      ],
+      "newlines-between": "always"
+    }]
+  }
 }
