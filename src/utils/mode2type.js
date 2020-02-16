@@ -4,7 +4,7 @@ import { E, GitError } from '../models/GitError.js'
  *
  * @param {number} mode
  */
-export function mode2type (mode) {
+export function mode2type(mode) {
   // prettier-ignore
   switch (mode) {
     case 0o040000: return 'tree'
@@ -14,6 +14,6 @@ export function mode2type (mode) {
     case 0o160000: return 'commit'
   }
   throw new GitError(E.InternalFail, {
-    message: `Unexpected GitTree entry mode: ${mode.toString(8)}`
+    message: `Unexpected GitTree entry mode: ${mode.toString(8)}`,
   })
 }

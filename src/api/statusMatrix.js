@@ -149,13 +149,13 @@ import { worthWalking } from '../utils/worthWalking.js'
  *
  * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
  */
-export async function statusMatrix ({
+export async function statusMatrix({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'HEAD',
   filepaths = ['.'],
-  filter
+  filter,
 }) {
   try {
     assertParameter('fs', fs)
@@ -167,14 +167,14 @@ export async function statusMatrix ({
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],
-      map: async function (filepath, [head, workdir, stage]) {
+      map: async function(filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
         if (!head && !stage && workdir) {
           if (
             await GitIgnoreManager.isIgnored({
               fs,
               dir,
-              filepath
+              filepath,
             })
           ) {
             return null
@@ -216,7 +216,7 @@ export async function statusMatrix ({
         const result = entry.map(value => entry.indexOf(value))
         result.shift() // remove leading undefined entry
         return [filepath, ...result]
-      }
+      },
     })
   } catch (err) {
     err.caller = 'git.statusMatrix'

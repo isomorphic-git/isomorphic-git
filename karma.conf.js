@@ -1,6 +1,7 @@
 // Karma configuration
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 const path = require('path')
+
 const webpack = require('webpack')
 
 const REPO = process.env.BUILD_REPOSITORY_NAME
@@ -9,7 +10,7 @@ const ISSUE =
   process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
 const COMMIT = process.env.BUILD_SOURCEVERSION
 
-module.exports = function (config) {
+module.exports = function(config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
@@ -26,27 +27,27 @@ module.exports = function (config) {
         pattern: '__tests__/__fixtures__/**/*',
         served: true,
         watched: false,
-        included: false
+        included: false,
       },
       {
         pattern: '__tests__/__fixtures__/**/.superblock.txt',
         served: true,
         watched: false,
-        included: false
+        included: false,
       },
       {
         pattern: '__tests__/__fixtures__/**/.gitignore',
         served: true,
         watched: false,
-        included: false
-      }
+        included: false,
+      },
     ],
     // list of files to exclude
     exclude: [],
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '__tests__/index.webpack.js': ['webpack']
+      '__tests__/index.webpack.js': ['webpack'],
     },
     // web server port
     port: 9876,
@@ -63,22 +64,22 @@ module.exports = function (config) {
       XXXsl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
-        extendedDebugging: true
+        extendedDebugging: true,
       },
       XXXsl_firefox: {
         base: 'SauceLabs',
-        browserName: 'firefox'
+        browserName: 'firefox',
       },
       sl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge',
-        version: '79.0'
+        version: '79.0',
       },
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
         platform: 'macOS 10.15',
-        version: '13.0'
+        version: '13.0',
       },
       sl_ios_safari: {
         base: 'SauceLabs',
@@ -86,7 +87,7 @@ module.exports = function (config) {
         platformName: 'iOS',
         platformVersion: '13.0',
         browserName: 'Safari',
-        appiumVersion: '1.15.0'
+        appiumVersion: '1.15.0',
       },
       XXXsl_android_chrome: {
         base: 'SauceLabs',
@@ -95,7 +96,7 @@ module.exports = function (config) {
         platformName: 'Android',
         platformVersion: '7.1',
         browserName: 'Chrome',
-        appiumVersion: '1.15.0'
+        appiumVersion: '1.15.0',
       },
       bs_android_chrome: {
         base: 'BrowserStack',
@@ -103,20 +104,20 @@ module.exports = function (config) {
         os_version: '10.0',
         browser: 'android',
         device: 'Google Pixel 4',
-        real_mobile: true
+        real_mobile: true,
       },
       FirefoxHeadless: {
         base: 'Firefox',
-        flags: ['-headless']
+        flags: ['-headless'],
       },
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox']
+        flags: ['--no-sandbox'],
       },
       ChromeCanaryHeadlessNoSandbox: {
         base: 'ChromeCanaryHeadless',
-        flags: ['--no-sandbox']
-      }
+        flags: ['--no-sandbox'],
+      },
     },
     sauceLabs: {
       // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
@@ -129,7 +130,7 @@ module.exports = function (config) {
       tags: [ISSUE],
       recordScreenshots: false,
       recordVideo: false,
-      public: 'public restricted'
+      public: 'public restricted',
     },
     concurrency: 6,
     // Continuous Integration mode
@@ -139,7 +140,7 @@ module.exports = function (config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['browsers', 'verbose', 'pr-comment', 'junit'],
     junitReporter: {
-      outputDir: './junit'
+      outputDir: './junit',
     },
     webpack: {
       mode: 'development',
@@ -147,8 +148,8 @@ module.exports = function (config) {
       plugins: [
         new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/),
         new webpack.DefinePlugin({
-          'process.env.TEST_PUSH_GITHUB_TOKEN': `'${process.env.TEST_PUSH_GITHUB_TOKEN}'`
-        })
+          'process.env.TEST_PUSH_GITHUB_TOKEN': `'${process.env.TEST_PUSH_GITHUB_TOKEN}'`,
+        }),
       ],
       resolve: {
         alias: {
@@ -162,9 +163,9 @@ module.exports = function (config) {
             __dirname,
             'dist/bundle.umd.min.js'
             // 'src/index.js'
-          )
-        }
-      }
+          ),
+        },
+      },
     },
     plugins: [
       'karma-browserstack-launcher',
@@ -182,16 +183,16 @@ module.exports = function (config) {
       {
         'reporter:browsers': [
           'type',
-          require('./__tests__/__helpers__/karma-successful-browsers-reporter')
-        ]
+          require('./__tests__/__helpers__/karma-successful-browsers-reporter'),
+        ],
       },
       {
         'reporter:pr-comment': [
           'type',
-          require('./__tests__/__helpers__/karma-pr-comment-reporter')
-        ]
-      }
-    ]
+          require('./__tests__/__helpers__/karma-pr-comment-reporter'),
+        ],
+      },
+    ],
   }
 
   // Speed things up, at the cost of not saving the test results (except in the stdout log).

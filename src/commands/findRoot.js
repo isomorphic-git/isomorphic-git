@@ -14,7 +14,7 @@ import { join } from '../utils/join.js'
  *
  * @returns {Promise<string>} Resolves successfully with a root git directory path
  */
-export async function findRoot ({ fs, filepath }) {
+export async function findRoot({ fs, filepath }) {
   if (await fs.exists(join(filepath, '.git'))) {
     return filepath
   } else {

@@ -25,8 +25,8 @@ const schema = {
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
-    bigFileThreshold: num
-  }
+    bigFileThreshold: num,
+  },
 }
 
 // https://git-scm.com/docs/git-config#_syntax
@@ -121,7 +121,7 @@ const findLastIndex = (array, callback) => {
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
 export class GitConfig {
-  constructor (text) {
+  constructor(text) {
     let section = null
     let subsection = null
     this.parsedConfig = text.split('\n').map(line => {
@@ -146,11 +146,11 @@ export class GitConfig {
     })
   }
 
-  static from (text) {
+  static from(text) {
     return new GitConfig(text)
   }
 
-  async get (path, getall = false) {
+  async get(path, getall = false) {
     const allValues = this.parsedConfig
       .filter(config => config.path === path.toLowerCase())
       .map(({ section, name, value }) => {
@@ -160,28 +160,28 @@ export class GitConfig {
     return getall ? allValues : allValues.pop()
   }
 
-  async getall (path) {
+  async getall(path) {
     return this.get(path, true)
   }
 
-  async getSubsections (section) {
+  async getSubsections(section) {
     return this.parsedConfig
       .filter(config => config.section === section && config.isSection)
       .map(config => config.subsection)
   }
 
-  async deleteSection (section, subsection) {
+  async deleteSection(section, subsection) {
     this.parsedConfig = this.parsedConfig.filter(
       config =>
         !(config.section === section && config.subsection === subsection)
     )
   }
 
-  async append (path, value) {
+  async append(path, value) {
     return this.set(path, value, true)
   }
 
-  async set (path, value, append = false) {
+  async set(path, value, append = false) {
     const configIndex = findLastIndex(
       this.parsedConfig,
       config => config.path === path.toLowerCase()
@@ -195,7 +195,7 @@ export class GitConfig {
         const config = this.parsedConfig[configIndex]
         const modifiedConfig = Object.assign({}, config, {
           value,
-          modified: true
+          modified: true,
         })
         if (append) {
           this.parsedConfig.splice(configIndex + 1, 0, modifiedConfig)
@@ -219,7 +219,7 @@ export class GitConfig {
           name,
           value,
           modified: true,
-          path: getPath(section, subsection, name)
+          path: getPath(section, subsection, name),
         }
         if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
           if (sectionIndex >= 0) {
@@ -231,7 +231,7 @@ export class GitConfig {
               section,
               subsection,
               modified: true,
-              path: getPath(section, subsection, null)
+              path: getPath(section, subsection, null),
             }
             this.parsedConfig.push(newSection, newConfig)
           }
@@ -240,7 +240,7 @@ export class GitConfig {
     }
   }
 
-  toString () {
+  toString() {
     return this.parsedConfig
       .map(({ line, section, subsection, name, value, modified = false }) => {
         if (!modified) {

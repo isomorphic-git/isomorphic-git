@@ -1,12 +1,12 @@
 // This is convenient for computing unions/joins of sorted lists.
 export class RunningMinimum {
-  constructor () {
+  constructor() {
     // Using a getter for 'value' would just bloat the code.
     // You know better than to set it directly right?
     this.value = null
   }
 
-  consider (value) {
+  consider(value) {
     if (value === null || value === undefined) return
     if (this.value === null) {
       this.value = value
@@ -15,7 +15,7 @@ export class RunningMinimum {
     }
   }
 
-  reset () {
+  reset() {
     this.value = null
   }
 }

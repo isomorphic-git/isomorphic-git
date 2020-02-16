@@ -31,7 +31,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  */
-export async function checkout ({
+export async function checkout({
   fs,
   onProgress,
   dir,
@@ -43,7 +43,7 @@ export async function checkout ({
   noUpdateHead,
   dryRun,
   debug,
-  force
+  force,
 }) {
   // Get tree oid
   let oid
@@ -59,7 +59,7 @@ export async function checkout ({
     oid = await GitRefManager.resolve({
       fs,
       gitdir,
-      ref: remoteRef
+      ref: remoteRef,
     })
     // Set up remote tracking branch
     await setConfig({
@@ -67,14 +67,14 @@ export async function checkout ({
       gitdir,
       path: `branch.${ref}.remote`,
       value: `${remote}`,
-      append: false
+      append: false,
     })
     await setConfig({
       fs,
       gitdir,
       path: `branch.${ref}.merge`,
       value: `refs/heads/${ref}`,
-      append: false
+      append: false,
     })
     // Create a new branch that points at that same commit
     await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
@@ -92,7 +92,7 @@ export async function checkout ({
         gitdir,
         ref,
         force,
-        filepaths
+        filepaths,
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
@@ -134,13 +134,13 @@ export async function checkout ({
 
     let count = 0
     const total = ops.length
-    await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
       await Promise.all(
         ops
           .filter(
             ([method]) => method === 'delete' || method === 'delete-index'
           )
-          .map(async function ([method, fullpath]) {
+          .map(async function([method, fullpath]) {
             const filepath = `${dir}/${fullpath}`
             if (method === 'delete') {
               await fs.rm(filepath)
@@ -150,7 +150,7 @@ export async function checkout ({
               onProgress({
                 phase: 'Updating workdir',
                 loaded: ++count,
-                total
+                total,
               })
             }
           })
@@ -158,7 +158,7 @@ export async function checkout ({
     })
 
     // Note: this is cannot be done naively in parallel
-    await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
       for (const [method, fullpath] of ops) {
         if (method === 'rmdir' || method === 'rmdir-index') {
           const filepath = `${dir}/${fullpath}`
@@ -171,7 +171,7 @@ export async function checkout ({
               onProgress({
                 phase: 'Updating workdir',
                 loaded: ++count,
-                total
+                total,
               })
             }
           } catch (e) {
@@ -190,20 +190,20 @@ export async function checkout ({
     await Promise.all(
       ops
         .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
-        .map(async function ([_, fullpath]) {
+        .map(async function([_, fullpath]) {
           const filepath = `${dir}/${fullpath}`
           await fs.mkdir(filepath)
           if (onProgress) {
             onProgress({
               phase: 'Updating workdir',
               loaded: ++count,
-              total
+              total,
             })
           }
         })
     )
 
-    await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
       await Promise.all(
         ops
           .filter(
@@ -213,7 +213,7 @@ export async function checkout ({
               method === 'update' ||
               method === 'mkdir-index'
           )
-          .map(async function ([method, fullpath, oid, mode, chmod]) {
+          .map(async function([method, fullpath, oid, mode, chmod]) {
             const filepath = `${dir}/${fullpath}`
             try {
               if (method !== 'create-index' && method !== 'mkdir-index') {
@@ -237,7 +237,7 @@ export async function checkout ({
                   throw new GitError(E.InternalFail, {
                     message: `Invalid mode 0o${mode.toString(
                       8
-                    )} detected in blob ${oid}`
+                    )} detected in blob ${oid}`,
                   })
                 }
               }
@@ -256,13 +256,13 @@ export async function checkout ({
               index.insert({
                 filepath: fullpath,
                 stats,
-                oid
+                oid,
               })
               if (onProgress) {
                 onProgress({
                   phase: 'Updating workdir',
                   loaded: ++count,
-                  total
+                  total,
                 })
               }
             } catch (e) {
@@ -281,7 +281,7 @@ export async function checkout ({
         fs,
         gitdir,
         ref: 'HEAD',
-        value: fullRef
+        value: fullRef,
       })
     } else {
       // detached head
@@ -290,14 +290,14 @@ export async function checkout ({
   }
 }
 
-async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
+async function analyze({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
   let count = 0
   return walk({
     fs,
     dir,
     gitdir,
     trees: [TREE({ ref }), WORKDIR(), STAGE()],
-    map: async function (fullpath, [commit, workdir, stage]) {
+    map: async function(fullpath, [commit, workdir, stage]) {
       if (fullpath === '.') return
       // match against base paths
       if (filepaths && !filepaths.some(base => worthWalking(fullpath, base))) {
@@ -336,7 +336,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                 'create',
                 fullpath,
                 await commit.oid(),
-                await commit.mode()
+                await commit.mode(),
               ]
             }
             case 'commit': {
@@ -344,13 +344,13 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                 'mkdir-index',
                 fullpath,
                 await commit.oid(),
-                await commit.mode()
+                await commit.mode(),
               ]
             }
             default: {
               return [
                 'error',
-                `new entry Unhandled type ${await commit.type()}`
+                `new entry Unhandled type ${await commit.type()}`,
               ]
             }
           }
@@ -374,7 +374,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                     fullpath,
                     await commit.oid(),
                     await commit.mode(),
-                    (await commit.mode()) !== (await workdir.mode())
+                    (await commit.mode()) !== (await workdir.mode()),
                   ]
                 } else {
                   return ['conflict', fullpath]
@@ -388,7 +388,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                       fullpath,
                       await commit.oid(),
                       await commit.mode(),
-                      true
+                      true,
                     ]
                   } else {
                     return ['conflict', fullpath]
@@ -398,7 +398,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                     'create-index',
                     fullpath,
                     await commit.oid(),
-                    await commit.mode()
+                    await commit.mode(),
                   ]
                 }
               }
@@ -410,7 +410,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
               // gitlinks
               console.log(
                 new GitError(E.NotImplementedFail, {
-                  thing: 'submodule support'
+                  thing: 'submodule support',
                 })
               )
               return
@@ -456,7 +456,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
             default: {
               return [
                 'error',
-                `delete entry Unhandled type ${await stage.type()}`
+                `delete entry Unhandled type ${await stage.type()}`,
               ]
             }
           }
@@ -496,7 +496,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                       fullpath,
                       await commit.oid(),
                       await commit.mode(),
-                      (await commit.mode()) !== (await workdir.mode())
+                      (await commit.mode()) !== (await workdir.mode()),
                     ]
                   } else {
                     return ['conflict', fullpath]
@@ -508,7 +508,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                   fullpath,
                   await commit.oid(),
                   await commit.mode(),
-                  (await commit.mode()) !== (await stage.mode())
+                  (await commit.mode()) !== (await stage.mode()),
                 ]
               }
               // Has file mode changed?
@@ -518,7 +518,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                   fullpath,
                   await commit.oid(),
                   await commit.mode(),
-                  true
+                  true,
                 ]
               }
               // TODO: HANDLE SYMLINKS
@@ -529,7 +529,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                   fullpath,
                   await commit.oid(),
                   await commit.mode(),
-                  false
+                  false,
                 ]
               } else {
                 return
@@ -546,13 +546,13 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
                 'mkdir-index',
                 fullpath,
                 await commit.oid(),
-                await commit.mode()
+                await commit.mode(),
               ]
             }
             default: {
               return [
                 'error',
-                `update entry Unhandled type ${await stage.type()}-${await commit.type()}`
+                `update entry Unhandled type ${await stage.type()}-${await commit.type()}`,
               ]
             }
           }
@@ -560,7 +560,7 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
       }
     },
     // Modify the default flat mapping
-    reduce: async function (parent, children) {
+    reduce: async function(parent, children) {
       children = flat(children)
       if (!parent) {
         return children
@@ -571,6 +571,6 @@ async function analyze ({ fs, onProgress, dir, gitdir, ref, force, filepaths }) 
         children.unshift(parent)
         return children
       }
-    }
+    },
   })
 }

@@ -2,11 +2,11 @@ import { E, GitError } from '../models/GitError.js'
 import { readPackIndex } from '../storage/readPackIndex.js'
 import { join } from '../utils/join.js'
 
-export async function expandOidPacked ({
+export async function expandOidPacked({
   fs,
   gitdir,
   oid: short,
-  getExternalRefDelta
+  getExternalRefDelta,
 }) {
   // Iterate through all the .pack files
   const results = []
@@ -17,7 +17,7 @@ export async function expandOidPacked ({
     const p = await readPackIndex({
       fs,
       filename: indexFile,
-      getExternalRefDelta
+      getExternalRefDelta,
     })
     if (p.error) throw new GitError(E.InternalFail, { message: p.error })
     // Search through the list of oids in the packfile

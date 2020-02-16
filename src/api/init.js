@@ -21,11 +21,11 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function init ({
+export async function init({
   fs,
   bare = false,
   dir,
-  gitdir = bare ? dir : join(dir, '.git')
+  gitdir = bare ? dir : join(dir, '.git'),
 }) {
   try {
     assertParameter('fs', fs)
@@ -38,7 +38,7 @@ export async function init ({
       fs: new FileSystem(fs),
       bare,
       dir,
-      gitdir
+      gitdir,
     })
   } catch (err) {
     err.caller = 'git.init'

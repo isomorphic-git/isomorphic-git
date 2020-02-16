@@ -51,7 +51,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * console.log(m)
  *
  */
-export async function merge ({
+export async function merge({
   fs,
   gitdir,
   ours,
@@ -62,7 +62,7 @@ export async function merge ({
   message,
   author,
   committer,
-  signingKey
+  signingKey,
 }) {
   if (ours === undefined) {
     ours = await currentBranch({ fs, gitdir, fullname: true })
@@ -70,28 +70,28 @@ export async function merge ({
   ours = await GitRefManager.expand({
     fs,
     gitdir,
-    ref: ours
+    ref: ours,
   })
   theirs = await GitRefManager.expand({
     fs,
     gitdir,
-    ref: theirs
+    ref: theirs,
   })
   const ourOid = await GitRefManager.resolve({
     fs,
     gitdir,
-    ref: ours
+    ref: ours,
   })
   const theirOid = await GitRefManager.resolve({
     fs,
     gitdir,
-    ref: theirs
+    ref: theirs,
   })
   // find most recent common ancestor of ref a and ref b
   const baseOids = await findMergeBase({
     fs,
     gitdir,
-    oids: [ourOid, theirOid]
+    oids: [ourOid, theirOid],
   })
   if (baseOids.length !== 1) {
     throw new GitError(E.MergeNotSupportedFail)
@@ -101,7 +101,7 @@ export async function merge ({
   if (baseOid === theirOid) {
     return {
       oid: ourOid,
-      alreadyMerged: true
+      alreadyMerged: true,
     }
   }
   if (baseOid === ourOid) {
@@ -110,7 +110,7 @@ export async function merge ({
     }
     return {
       oid: theirOid,
-      fastForward: true
+      fastForward: true,
     }
   } else {
     // not a simple fast-forward
@@ -127,7 +127,7 @@ export async function merge ({
       ourName: ours,
       baseName: 'base',
       theirName: theirs,
-      dryRun
+      dryRun,
     })
     if (!message) {
       message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(
@@ -145,12 +145,12 @@ export async function merge ({
       committer,
       signingKey,
       dryRun,
-      noUpdateBranch
+      noUpdateBranch,
     })
     return {
       oid,
       tree,
-      mergeCommit: true
+      mergeCommit: true,
     }
   }
 }

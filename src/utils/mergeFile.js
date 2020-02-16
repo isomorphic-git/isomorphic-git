@@ -2,7 +2,7 @@ import diff3Merge from 'diff3'
 
 const LINEBREAKS = /^.*(\r?\n|$)/gm
 
-export function mergeFile ({
+export function mergeFile({
   ourContent,
   baseContent,
   theirContent,
@@ -10,7 +10,7 @@ export function mergeFile ({
   baseName = 'base',
   theirName = 'theirs',
   format = 'diff',
-  markerSize = 7
+  markerSize = 7,
 }) {
   const ours = ourContent.match(LINEBREAKS)
   const base = baseContent.match(LINEBREAKS)

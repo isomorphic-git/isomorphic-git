@@ -26,12 +26,12 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * console.log('done')
  *
  */
-export async function resetIndex ({
+export async function resetIndex({
   fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   filepath,
-  ref = 'HEAD'
+  ref = 'HEAD',
 }) {
   try {
     assertParameter('fs', _fs)
@@ -49,7 +49,7 @@ export async function resetIndex ({
         fs,
         gitdir,
         oid,
-        filepath
+        filepath,
       })
     } catch (e) {
       // This means we're resetting the file to a "deleted" state
@@ -64,7 +64,7 @@ export async function resetIndex ({
       mode: 0,
       uid: 0,
       gid: 0,
-      size: 0
+      size: 0,
     }
     // If the file exists in the workdir...
     const object = dir && (await fs.read(join(dir, filepath)))
@@ -73,14 +73,14 @@ export async function resetIndex ({
       workdirOid = await hashObject({
         gitdir,
         type: 'blob',
-        object
+        object,
       })
       if (oid === workdirOid) {
         // ... use the workdir Stats object
         stats = await fs.lstat(join(dir, filepath))
       }
     }
-    await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
       index.delete({ filepath })
       if (oid) {
         index.insert({ filepath, stats, oid })

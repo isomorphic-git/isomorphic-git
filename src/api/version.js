@@ -13,7 +13,7 @@ import { pkg } from '../utils/pkg.js'
  * console.log(git.version())
  *
  */
-export function version () {
+export function version() {
   try {
     return pkg.version
   } catch (err) {

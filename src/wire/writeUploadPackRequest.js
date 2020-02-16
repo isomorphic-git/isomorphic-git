@@ -1,13 +1,13 @@
 import { GitPktLine } from '../models/GitPktLine.js'
 
-export function writeUploadPackRequest ({
+export function writeUploadPackRequest({
   capabilities = [],
   wants = [],
   haves = [],
   shallows = [],
   depth = null,
   since = null,
-  exclude = []
+  exclude = [],
 }) {
   const packstream = []
   wants = [...new Set(wants)] // remove duplicates

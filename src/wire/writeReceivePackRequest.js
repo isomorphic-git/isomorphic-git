@@ -1,8 +1,8 @@
 import { GitPktLine } from '../models/GitPktLine.js'
 
-export async function writeReceivePackRequest ({
+export async function writeReceivePackRequest({
   capabilities = [],
-  triplets = []
+  triplets = [],
 }) {
   const packstream = []
   let capsFirstLine = `\x00 ${capabilities.join(' ')}`

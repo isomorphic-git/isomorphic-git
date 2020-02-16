@@ -4,11 +4,11 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  *
  * @returns {Promise<void | {name: string, email: string, date: Date, timestamp: number, timezoneOffset: number }>}
  */
-export async function normalizeCommitterObject ({
+export async function normalizeCommitterObject({
   fs,
   gitdir,
   author,
-  committer
+  committer,
 }) {
   committer = Object.assign({}, committer || author)
   // Match committer's date to author's one, if omitted

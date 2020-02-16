@@ -21,14 +21,14 @@ import { join } from '../utils/join.js'
  * console.log(remotes)
  *
  */
-export async function listRemotes ({ fs, dir, gitdir = join(dir, '.git') }) {
+export async function listRemotes({ fs, dir, gitdir = join(dir, '.git') }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
 
     return await _listRemotes({
       fs: new FileSystem(fs),
-      gitdir
+      gitdir,
     })
   } catch (err) {
     err.caller = 'git.listRemotes'

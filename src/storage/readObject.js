@@ -5,7 +5,7 @@ import { readObjectPacked } from '../storage/readObjectPacked.js'
 import { inflate } from '../utils/inflate.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function readObject ({ fs, gitdir, oid, format = 'content' }) {
+export async function readObject({ fs, gitdir, oid, format = 'content' }) {
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
   const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
@@ -38,30 +38,34 @@ export async function readObject ({ fs, gitdir, oid, format = 'content' }) {
   // eslint-ignore
   /* eslint-disable no-fallthrough */
   switch (result.format) {
-    case 'deflated':
+    case 'deflated': {
       result.object = Buffer.from(await inflate(result.object))
       result.format = 'wrapped'
-    case 'wrapped':
+    }
+    case 'wrapped': {
       if (format === 'wrapped' && result.format === 'wrapped') {
         return result
       }
       const sha = await shasum(result.object)
       if (sha !== oid) {
         throw new GitError(E.InternalFail, {
-          message: `SHA check failed! Expected ${oid}, computed ${sha}`
+          message: `SHA check failed! Expected ${oid}, computed ${sha}`,
         })
       }
       const { object, type } = GitObject.unwrap(result.object)
       result.type = type
       result.object = object
       result.format = 'content'
-    case 'content':
+    }
+    case 'content': {
       if (format === 'content') return result
       break
-    default:
+    }
+    default: {
       throw new GitError(E.InternalFail, {
-        message: `invalid format "${result.format}"`
+        message: `invalid format "${result.format}"`,
       })
+    }
   }
   /* eslint-enable no-fallthrough */
 }

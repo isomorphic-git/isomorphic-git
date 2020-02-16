@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { writeBlob } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('writeBlob', () => {
   it('empty blob', async () => {
@@ -11,7 +11,7 @@ describe('writeBlob', () => {
     const oid = await writeBlob({
       fs,
       gitdir,
-      blob: new Uint8Array([])
+      blob: new Uint8Array([]),
     })
     expect(oid).toEqual('e69de29bb2d1d6434b8b29ae775ad8c2e48c5391')
   })
@@ -52,7 +52,7 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
 })
 `,
         'utf8'
-      )
+      ),
     })
     expect(oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
   })

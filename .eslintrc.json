@@ -1,8 +1,21 @@
 {
   "extends": [
-    "prettier-standard/eslint-file"
+    "prettier-standard/prettier-file"
   ],
   "rules": {
-    "space-before-function-paren": ["error", "always"]
+    "import/order": ["error", {
+      "alphabetize": {
+        "order": "asc",
+        "caseInsensitive": false
+      },
+      "groups": [
+        "builtin",
+        "external",
+        "parent",
+        "index",
+        "sibling"
+      ],
+      "newlines-between": "always"
+    }]
   }
 }

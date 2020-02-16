@@ -9,7 +9,7 @@ import { shasum } from '../utils/shasum.js'
 
 import { GitObject } from './GitObject'
 
-function decodeVarInt (reader) {
+function decodeVarInt(reader) {
   const bytes = []
   let byte = 0
   let multibyte = 0
@@ -30,7 +30,7 @@ function decodeVarInt (reader) {
 
 // I'm pretty much copying this one from the git C source code,
 // because it makes no sense.
-function otherVarIntDecode (reader, startWith) {
+function otherVarIntDecode(reader, startWith) {
   let result = startWith
   let shift = 4
   let byte = null
@@ -43,12 +43,12 @@ function otherVarIntDecode (reader, startWith) {
 }
 
 export class GitPackIndex {
-  constructor (stuff) {
+  constructor(stuff) {
     Object.assign(this, stuff)
     this.offsetCache = {}
   }
 
-  static async fromIdx ({ idx, getExternalRefDelta }) {
+  static async fromIdx({ idx, getExternalRefDelta }) {
     const reader = new BufferCursor(idx)
     const magic = reader.slice(4).toString('hex')
     // Check for IDX v2 magic number
@@ -58,12 +58,12 @@ export class GitPackIndex {
     const version = reader.readUInt32BE()
     if (version !== 2) {
       throw new GitError(E.InternalFail, {
-        message: `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
+        message: `Unable to read version ${version} packfile IDX. (Only version 2 supported)`,
       })
     }
     if (idx.byteLength > 2048 * 1024 * 1024) {
       throw new GitError(E.InternalFail, {
-        message: `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
+        message: `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`,
       })
     }
     // Skip over fanout table
@@ -88,18 +88,18 @@ export class GitPackIndex {
       crcs: {},
       offsets,
       packfileSha,
-      getExternalRefDelta
+      getExternalRefDelta,
     })
   }
 
-  static async fromPack ({ pack, getExternalRefDelta, onProgress }) {
+  static async fromPack({ pack, getExternalRefDelta, onProgress }) {
     const listpackTypes = {
       1: 'commit',
       2: 'tree',
       3: 'blob',
       4: 'tag',
       6: 'ofs-delta',
-      7: 'ref-delta'
+      7: 'ref-delta',
     }
     const offsetToObject = {}
 
@@ -124,7 +124,7 @@ export class GitPackIndex {
           onProgress({
             phase: 'Receiving objects',
             loaded: totalObjectCount - num,
-            total: totalObjectCount
+            total: totalObjectCount,
           })
         }
       }
@@ -135,17 +135,17 @@ export class GitPackIndex {
       if (['commit', 'tree', 'blob', 'tag'].includes(type)) {
         offsetToObject[offset] = {
           type,
-          offset
+          offset,
         }
       } else if (type === 'ofs-delta') {
         offsetToObject[offset] = {
           type,
-          offset
+          offset,
         }
       } else if (type === 'ref-delta') {
         offsetToObject[offset] = {
           type,
-          offset
+          offset,
         }
       }
     })
@@ -168,7 +168,7 @@ export class GitPackIndex {
       crcs,
       hashes,
       offsets,
-      getExternalRefDelta
+      getExternalRefDelta,
     })
 
     // Resolve deltas and compute the oids
@@ -183,7 +183,7 @@ export class GitPackIndex {
           onProgress({
             phase: 'Resolving deltas',
             loaded: count,
-            total: totalObjectCount
+            total: totalObjectCount,
           })
         }
       }
@@ -210,7 +210,7 @@ export class GitPackIndex {
     return p
   }
 
-  async toBuffer () {
+  async toBuffer() {
     const buffers = []
     const write = (str, encoding) => {
       buffers.push(Buffer.from(str, encoding))
@@ -255,22 +255,22 @@ export class GitPackIndex {
     return Buffer.concat([totalBuffer, shaBuffer])
   }
 
-  async load ({ pack }) {
+  async load({ pack }) {
     this.pack = pack
   }
 
-  async unload () {
+  async unload() {
     this.pack = null
   }
 
-  async read ({ oid }) {
+  async read({ oid }) {
     if (!this.offsets.get(oid)) {
       if (this.getExternalRefDelta) {
         this.externalReadDepth++
         return this.getExternalRefDelta(oid)
       } else {
         throw new GitError(E.InternalFail, {
-          message: `Could not read object ${oid} from packfile`
+          message: `Could not read object ${oid} from packfile`,
         })
       }
     }
@@ -278,7 +278,7 @@ export class GitPackIndex {
     return this.readSlice({ start })
   }
 
-  async readSlice ({ start }) {
+  async readSlice({ start }) {
     if (this.offsetCache[start]) {
       return Object.assign({}, this.offsetCache[start])
     }
@@ -289,12 +289,12 @@ export class GitPackIndex {
       0b0110000: 'blob',
       0b1000000: 'tag',
       0b1100000: 'ofs_delta',
-      0b1110000: 'ref_delta'
+      0b1110000: 'ref_delta',
     }
     if (!this.pack) {
       throw new GitError(E.InternalFail, {
         message:
-          'Tried to read from a GitPackIndex with no packfile loaded into memory'
+          'Tried to read from a GitPackIndex with no packfile loaded into memory',
       })
     }
     const raw = (await this.pack).slice(start)
@@ -305,7 +305,7 @@ export class GitPackIndex {
     let type = types[btype]
     if (type === undefined) {
       throw new GitError(E.InternalFail, {
-        message: 'Unrecognized type: 0b' + btype.toString(2)
+        message: 'Unrecognized type: 0b' + btype.toString(2),
       })
     }
     // The length encoding get complicated.
@@ -336,7 +336,7 @@ export class GitPackIndex {
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
       throw new GitError(E.InternalFail, {
-        message: `Packfile told us object would have length ${length} but it had length ${object.byteLength}`
+        message: `Packfile told us object would have length ${length} but it had length ${object.byteLength}`,
       })
     }
     if (base) {

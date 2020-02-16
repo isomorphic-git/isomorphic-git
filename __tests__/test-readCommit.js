@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { readCommit } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('readCommit', () => {
   it('test missing', async () => {
@@ -13,7 +13,7 @@ describe('readCommit', () => {
       await readCommit({
         fs,
         gitdir,
-        oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        oid: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       })
     } catch (err) {
       error = err
@@ -37,7 +37,7 @@ describe('readCommit', () => {
     const result = await readCommit({
       fs,
       gitdir,
-      oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+      oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
     })
     expect(result).toMatchInlineSnapshot(`
       Object {
@@ -96,7 +96,7 @@ describe('readCommit', () => {
     const result = await readCommit({
       fs,
       gitdir,
-      oid: '0b8faa11b353db846b40eb064dfb299816542a46'
+      oid: '0b8faa11b353db846b40eb064dfb299816542a46',
     })
     expect(result).toMatchInlineSnapshot(`
       Object {
@@ -138,7 +138,7 @@ describe('readCommit', () => {
     const result = await readCommit({
       fs,
       gitdir,
-      oid: '587d3f8290b513e2ee85ecd317e6efecd545aee6'
+      oid: '587d3f8290b513e2ee85ecd317e6efecd545aee6',
     })
     expect(result.oid).toBe('033417ae18b174f078f2f44232cb7a374f4c60ce')
   })

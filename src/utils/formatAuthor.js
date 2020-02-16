@@ -1,4 +1,4 @@
-export function formatAuthor ({ name, email, timestamp, timezoneOffset }) {
+export function formatAuthor({ name, email, timestamp, timezoneOffset }) {
   timezoneOffset = formatTimezoneOffset(timezoneOffset)
   return `${name} <${email}> ${timestamp} ${timezoneOffset}`
 }
@@ -7,7 +7,7 @@ export function formatAuthor ({ name, email, timestamp, timezoneOffset }) {
 // -0 (just so we don't lose that information when parsing and reconstructing)
 // but can also default to +0 was extraordinary.
 
-function formatTimezoneOffset (minutes) {
+function formatTimezoneOffset(minutes) {
   const sign = simpleSign(negateExceptForZero(minutes))
   minutes = Math.abs(minutes)
   const hours = Math.floor(minutes / 60)
@@ -19,10 +19,10 @@ function formatTimezoneOffset (minutes) {
   return (sign === -1 ? '-' : '+') + strHours + strMinutes
 }
 
-function simpleSign (n) {
+function simpleSign(n) {
   return Math.sign(n) || (Object.is(n, -0) ? -1 : 1)
 }
 
-function negateExceptForZero (n) {
+function negateExceptForZero(n) {
   return n === 0 ? n : -n
 }

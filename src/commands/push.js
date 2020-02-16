@@ -45,7 +45,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  *
  * @returns {Promise<PushResult>}
  */
-export async function push ({
+export async function push({
   fs,
   http,
   onProgress,
@@ -66,12 +66,12 @@ export async function push ({
   password,
   token,
   oauth2format,
-  headers = {}
+  headers = {},
 }) {
   const ref = _ref || (await currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'ref'
+      parameter: 'ref',
     })
   }
   const config = await GitConfigManager.get({ fs, gitdir })
@@ -89,14 +89,14 @@ export async function push ({
     (await config.get(`remote.${remote}.url`))
   if (typeof url === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remote OR url'
+      parameter: 'remote OR url',
     })
   }
   // Figure out what remote ref to use.
   const remoteRef = _remoteRef || (await config.get(`branch.${ref}.merge`))
   if (typeof url === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remoteRef'
+      parameter: 'remoteRef',
     })
   }
 
@@ -120,7 +120,7 @@ export async function push ({
     url,
     noGitSuffix,
     auth,
-    headers
+    headers,
   })
   auth = httpRemote.auth // hack to get new credentials from CredentialManager API
   let fullRemoteRef
@@ -130,7 +130,7 @@ export async function push ({
     try {
       fullRemoteRef = await GitRefManager.expandAgainstMap({
         ref: remoteRef,
-        map: httpRemote.refs
+        map: httpRemote.refs,
       })
     } catch (err) {
       if (err.code === E.ExpandRefError) {
@@ -155,7 +155,7 @@ export async function push ({
     const mergebase = await findMergeBase({
       fs,
       gitdir,
-      oids: [oid, oldoid]
+      oids: [oid, oldoid],
     })
     for (const oid of mergebase) finish.push(oid)
     // @ts-ignore
@@ -163,7 +163,7 @@ export async function push ({
       fs,
       gitdir,
       start: [oid],
-      finish
+      finish,
     })
     // @ts-ignore
     objects = await listObjects({ fs, gitdir, oids: commits })
@@ -194,15 +194,15 @@ export async function push ({
   )
   const packstream1 = await writeReceivePackRequest({
     capabilities,
-    triplets: [{ oldoid, oid, fullRef: fullRemoteRef }]
+    triplets: [{ oldoid, oid, fullRef: fullRemoteRef }],
   })
   const packstream2 = _delete
     ? []
     : await pack({
-      fs,
-      gitdir,
-      oids: [...objects]
-    })
+        fs,
+        gitdir,
+        oids: [...objects],
+      })
   const res = await GitRemoteHTTP.connect({
     http,
     onProgress,
@@ -212,7 +212,7 @@ export async function push ({
     noGitSuffix,
     auth,
     headers,
-    body: [...packstream1, ...packstream2]
+    body: [...packstream1, ...packstream2],
   })
   const { packfile, progress } = await GitSideBand.demux(res.body)
   if (onMessage) {

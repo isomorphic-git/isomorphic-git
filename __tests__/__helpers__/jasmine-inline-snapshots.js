@@ -1,8 +1,8 @@
 /* eslint-env jasmine */
-const prettyFormat = require('pretty-format')
 const diff = require('diff-lines')
+const prettyFormat = require('pretty-format')
 
-function assertSnapshot (object, snapshot) {
+function assertSnapshot(object, snapshot) {
   let actual = prettyFormat(object)
   if (snapshot.includes('\n')) {
     // we must unindent
@@ -25,24 +25,24 @@ ${diff(actual, snapshot)}`)
 if (typeof jest === 'undefined' && typeof jasmine !== 'undefined') {
   beforeAll(() => {
     jasmine.addMatchers({
-      toMatchInlineSnapshot (_util, _customEqualityTesters) {
+      toMatchInlineSnapshot(_util, _customEqualityTesters) {
         return {
-          compare (actual, expected) {
+          compare(actual, expected) {
             try {
               assertSnapshot(actual, expected)
               return {
                 pass: true,
-                message: () => `matched inline snapshot`
+                message: () => `matched inline snapshot`,
               }
             } catch (err) {
               return {
                 pass: false,
-                message: () => err.message
+                message: () => err.message,
               }
             }
-          }
+          },
         }
-      }
+      },
     })
   })
 }

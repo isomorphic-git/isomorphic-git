@@ -22,14 +22,14 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function deleteTag ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
+export async function deleteTag({ fs, dir, gitdir = join(dir, '.git'), ref }) {
   try {
     assertParameter('fs', fs)
     assertParameter('ref', ref)
     return await _deleteTag({
       fs: new FileSystem(fs),
       gitdir,
-      ref
+      ref,
     })
   } catch (err) {
     err.caller = 'git.deleteTag'

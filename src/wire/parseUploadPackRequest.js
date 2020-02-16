@@ -1,6 +1,6 @@
 import { GitPktLine } from '../models/GitPktLine.js'
 
-export async function parseUploadPackRequest (stream) {
+export async function parseUploadPackRequest(stream) {
   const read = GitPktLine.streamReader(stream)
   let done = false
   let capabilities = null
@@ -56,6 +56,6 @@ export async function parseUploadPackRequest (stream) {
     since,
     exclude,
     relative,
-    done
+    done,
   }
 }

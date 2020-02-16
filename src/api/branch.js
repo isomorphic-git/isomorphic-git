@@ -23,12 +23,12 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function branch ({
+export async function branch({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   ref,
-  checkout = false
+  checkout = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -38,7 +38,7 @@ export async function branch ({
       fs: new FileSystem(fs),
       gitdir,
       ref,
-      checkout
+      checkout,
     })
   } catch (err) {
     err.caller = 'git.branch'

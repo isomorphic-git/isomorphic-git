@@ -15,18 +15,18 @@ import { readBlob } from './readBlob'
  * @returns {Promise<Uint8Array>} Resolves successfully with note contents as a Buffer.
  */
 
-export async function readNote ({
+export async function readNote({
   fs,
   gitdir,
   ref = 'refs/notes/commits',
-  oid
+  oid,
 }) {
   const parent = await GitRefManager.resolve({ gitdir, fs, ref })
   const { blob } = await readBlob({
     fs,
     gitdir,
     oid: parent,
-    filepath: oid
+    filepath: oid,
   })
 
   return blob

@@ -27,7 +27,7 @@ import { join } from '../utils/join.js'
  * console.log(commit)
  *
  */
-export async function readCommit ({ fs, dir, gitdir = join(dir, '.git'), oid }) {
+export async function readCommit({ fs, dir, gitdir = join(dir, '.git'), oid }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -36,7 +36,7 @@ export async function readCommit ({ fs, dir, gitdir = join(dir, '.git'), oid }) 
     return await _readCommit({
       fs: new FileSystem(fs),
       gitdir,
-      oid
+      oid,
     })
   } catch (err) {
     err.caller = 'git.readCommit'

@@ -29,12 +29,12 @@ import { join } from '../utils/join.js'
  * @see TreeEntry
  *
  */
-export async function readTree ({
+export async function readTree({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   oid,
-  filepath = undefined
+  filepath = undefined,
 }) {
   try {
     assertParameter('fs', fs)
@@ -45,7 +45,7 @@ export async function readTree ({
       fs: new FileSystem(fs),
       gitdir,
       oid,
-      filepath
+      filepath,
     })
   } catch (err) {
     err.caller = 'git.readTree'

@@ -27,11 +27,11 @@ import { join } from '../utils/join.js'
  * console.log(branch)
  *
  */
-export async function currentBranch ({
+export async function currentBranch({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  fullname = false
+  fullname = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -39,7 +39,7 @@ export async function currentBranch ({
     return await _currentBranch({
       fs: new FileSystem(fs),
       gitdir,
-      fullname
+      fullname,
     })
   } catch (err) {
     err.caller = 'git.currentBranch'

@@ -3,14 +3,14 @@ import { writeObjectLoose } from '../storage/writeObjectLoose.js'
 import { deflate } from '../utils/deflate.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function writeObject ({
+export async function writeObject({
   fs,
   gitdir,
   type,
   object,
   format = 'content',
   oid = undefined,
-  dryRun = false
+  dryRun = false,
 }) {
   if (format !== 'deflated') {
     if (format !== 'wrapped') {

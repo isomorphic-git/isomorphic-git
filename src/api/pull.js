@@ -59,7 +59,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * console.log('done')
  *
  */
-export async function pull ({
+export async function pull({
   fs: _fs,
   http,
   onProgress,
@@ -81,7 +81,7 @@ export async function pull ({
   headers = {},
   author: _author,
   committer: _committer,
-  signingKey
+  signingKey,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -96,7 +96,7 @@ export async function pull ({
       fs,
       gitdir,
       author,
-      committer: _committer
+      committer: _committer,
     })
     if (!committer) throw new GitError(E.MissingCommitterError)
 
@@ -122,7 +122,7 @@ export async function pull ({
       headers,
       author,
       committer,
-      signingKey
+      signingKey,
     })
   } catch (err) {
     err.caller = 'git.pull'

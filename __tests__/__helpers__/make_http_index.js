@@ -2,12 +2,13 @@
 // forked from https://github.com/jvilk/BrowserFS/blob/master/scripts/make_http_index.ts
 var fs = require('fs')
 var path = require('path')
+
 var superblocktxt = require('@isomorphic-git/lightning-fs/src/superblocktxt.js')
 var symLinks = {}
 
-function rdSync (dpath, tree, name) {
+function rdSync(dpath, tree, name) {
   var files = fs.readdirSync(dpath)
-  files.forEach(function (file) {
+  files.forEach(function(file) {
     var fpath = dpath + '/' + file
     try {
       // Avoid infinite loops.

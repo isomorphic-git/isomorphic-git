@@ -42,7 +42,7 @@ import { writeObject } from '../storage/writeObject.js'
  * console.log('done')
  *
  */
-export async function annotatedTag ({
+export async function annotatedTag({
   fs,
   onSign,
   gitdir,
@@ -52,7 +52,7 @@ export async function annotatedTag ({
   gpgsig,
   object,
   signingKey,
-  force = false
+  force = false,
 }) {
   ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
@@ -64,13 +64,13 @@ export async function annotatedTag ({
   const oid = await GitRefManager.resolve({
     fs,
     gitdir,
-    ref: object || 'HEAD'
+    ref: object || 'HEAD',
   })
 
   if (gpgsig && signingKey) {
     throw new GitError(E.InvalidParameterCombinationError, {
       function: 'annotatedTag',
-      parameters: ['gpgsig', 'signingKey']
+      parameters: ['gpgsig', 'signingKey'],
     })
   }
 
@@ -81,7 +81,7 @@ export async function annotatedTag ({
     tag: ref.replace('refs/tags/', ''),
     tagger,
     message,
-    gpgsig
+    gpgsig,
   })
   if (signingKey) {
     tagObject = await GitAnnotatedTag.sign(tagObject, onSign, signingKey)
@@ -90,7 +90,7 @@ export async function annotatedTag ({
     fs,
     gitdir,
     type: 'tag',
-    object: tagObject.toObject()
+    object: tagObject.toObject(),
   })
 
   await GitRefManager.writeRef({ fs, gitdir, ref, value })

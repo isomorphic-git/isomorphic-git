@@ -13,12 +13,12 @@ import { abbreviateRef } from '../utils/abbreviateRef.js'
  * @returns {Promise<string|void>} The name of the current branch or undefined if the HEAD is detached.
  *
  */
-export async function currentBranch ({ fs, gitdir, fullname = false }) {
+export async function currentBranch({ fs, gitdir, fullname = false }) {
   const ref = await GitRefManager.resolve({
     fs,
     gitdir,
     ref: 'HEAD',
-    depth: 2
+    depth: 2,
   })
   // Return `undefined` for detached HEAD
   if (!ref.startsWith('refs/')) return

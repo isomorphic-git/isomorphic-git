@@ -3,7 +3,7 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { readObject } from '../storage/readObject.js'
 
-export async function resolveCommit ({ fs, gitdir, oid }) {
+export async function resolveCommit({ fs, gitdir, oid }) {
   const { type, object } = await readObject({ fs, gitdir, oid })
   // Resolve annotated tag objects to whatever
   if (type === 'tag') {
@@ -14,7 +14,7 @@ export async function resolveCommit ({ fs, gitdir, oid }) {
     throw new GitError(E.ObjectTypeAssertionFail, {
       oid,
       type,
-      expected: 'commit'
+      expected: 'commit',
     })
   }
   return { commit: GitCommit.from(object), oid }

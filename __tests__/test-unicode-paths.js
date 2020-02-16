@@ -1,6 +1,5 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const {
   init,
@@ -10,8 +9,10 @@ const {
   checkout,
   listFiles,
   readCommit,
-  readTree
+  readTree,
 } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('unicode filepath support', () => {
   it('write/read index 日本語', async () => {
@@ -50,9 +51,9 @@ describe('unicode filepath support', () => {
         name: '日本語',
         email: '日本語@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: '日本語'
+      message: '日本語',
     })
     // Check GitCommit object
     const { commit: comm } = await readCommit({ fs, dir, gitdir, oid: sha })
@@ -73,9 +74,9 @@ describe('unicode filepath support', () => {
         name: '日本語',
         email: '日本語@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: '日本語'
+      message: '日本語',
     })
     const { commit: comm } = await readCommit({ fs, dir, gitdir, oid: sha })
     // Test
@@ -84,7 +85,7 @@ describe('unicode filepath support', () => {
       fs,
       dir,
       gitdir,
-      oid: comm.tree
+      oid: comm.tree,
     })
     expect(tree[0].path).toBe('日本語')
   })
@@ -101,9 +102,9 @@ describe('unicode filepath support', () => {
         name: '日本語',
         email: '日本語@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: '日本語'
+      message: '日本語',
     })
     await remove({ fs, dir, gitdir, filepath: '日本語' })
     // Test
@@ -126,9 +127,9 @@ describe('unicode filepath support', () => {
         name: '日本語',
         email: '日本語@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: '日本語'
+      message: '日本語',
     })
     await remove({ fs, dir, gitdir, filepath: 'docs/日本語' })
     // Test

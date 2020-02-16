@@ -19,11 +19,11 @@ import { join } from '../utils/join.js'
  * @see CommitObject
  *
  */
-export async function writeCommit ({
+export async function writeCommit({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  commit
+  commit,
 }) {
   try {
     assertParameter('fs', fs)
@@ -33,7 +33,7 @@ export async function writeCommit ({
     return await _writeCommit({
       fs: new FileSystem(fs),
       gitdir,
-      commit
+      commit,
     })
   } catch (err) {
     err.caller = 'git.writeCommit'

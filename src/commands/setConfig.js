@@ -14,7 +14,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @returns {Promise<void>} Resolves with the config value
 
  */
-export async function setConfig ({ fs, gitdir, append, path, value }) {
+export async function setConfig({ fs, gitdir, append, path, value }) {
   const config = await GitConfigManager.get({ fs, gitdir })
   if (append) {
     await config.append(path, value)

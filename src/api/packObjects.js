@@ -36,12 +36,12 @@ import { join } from '../utils/join.js'
  * console.log(packfile)
  *
  */
-export async function packObjects ({
+export async function packObjects({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   oids,
-  write = false
+  write = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -52,7 +52,7 @@ export async function packObjects ({
       fs: new FileSystem(fs),
       gitdir,
       oids,
-      write
+      write,
     })
   } catch (err) {
     err.caller = 'git.packObjects'

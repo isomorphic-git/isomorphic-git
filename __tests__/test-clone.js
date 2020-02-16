@@ -1,20 +1,19 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+const { E, clone, resolveRef } = require('isomorphic-git')
 
-const { clone } = require('isomorphic-git')
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
   typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 describe('clone', () => {
-  // Unfortunately, cloning without singleBranch: true means the test time increases
-  // linearly with the number of branches in the repo... which increases with the number
-  // of pull requests. So automated tools to update dependencies via PRs can overwhelm
-  // the system and make this test take way too long.
-  xit('clone with noTags', async () => {
+  // Note: for a long time this test was disabled because it took too long.
+  // It seems to only take a couple seconds longer than the "shallow fetch" tests now,
+  // so I'm enabling it.
+  it('clone with noTags', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
       fs,
@@ -25,16 +24,25 @@ describe('clone', () => {
       ref: 'test-branch',
       noTags: true,
       url: 'https://github.com/isomorphic-git/isomorphic-git',
-      corsProxy: process.browser ? `http://${localhost}:9999` : undefined
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+      noCheckout: true,
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
     expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
-    expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-branch`)).toBe(
-      true
-    )
-    expect(await fs.exists(`${gitdir}/refs/heads/test-branch`)).toBe(true)
-    expect(await fs.exists(`${dir}/package.json`)).toBe(true)
-    expect(await fs.exists(`${gitdir}/refs/tags/v0.0.1`)).toBe(false)
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/test-branch' })
+    ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/heads/test-branch' })
+    ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
+    let err = null
+    try {
+      await resolveRef({ fs, gitdir, ref: 'refs/tags/v0.0.1' })
+    } catch (e) {
+      err = e
+    }
+    expect(err).not.toBeNull()
+    expect(err.code).toBe(E.ResolveRefError)
   })
   it('clone with noCheckout', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
@@ -48,7 +56,7 @@ describe('clone', () => {
       singleBranch: true,
       noCheckout: true,
       url: 'https://github.com/isomorphic-git/isomorphic-git',
-      corsProxy: process.browser ? `http://${localhost}:9999` : undefined
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
     expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
@@ -69,7 +77,7 @@ describe('clone', () => {
       singleBranch: true,
       ref: 'test-tag',
       url: 'https://github.com/isomorphic-git/isomorphic-git',
-      corsProxy: process.browser ? `http://${localhost}:9999` : undefined
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
     expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
@@ -93,7 +101,7 @@ describe('clone', () => {
         depth: 1,
         singleBranch: true,
         ref: 'test-tag',
-        url
+        url,
       })
     } catch (err) {
       error = err
@@ -112,7 +120,7 @@ describe('clone', () => {
       gitdir,
       depth: 1,
       singleBranch: true,
-      url: `http://${localhost}:8888/test-status.git`
+      url: `http://${localhost}:8888/test-status.git`,
     })
     expect(await fs.exists(`${dir}`)).toBe(true, `'dir' exists`)
     expect(await fs.exists(`${gitdir}/objects`)).toBe(
@@ -134,7 +142,7 @@ describe('clone', () => {
       dir,
       gitdir,
       depth: 1,
-      url: `http://${localhost}:8888/test-empty.git`
+      url: `http://${localhost}:8888/test-empty.git`,
     })
     expect(await fs.exists(`${dir}`)).toBe(true, `'dir' exists`)
     expect(await fs.exists(`${gitdir}/HEAD`)).toBe(true, `'gitdir/HEAD' exists`)

@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { currentBranch } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('currentBranch', () => {
   it('resolve HEAD to master', async () => {
@@ -17,7 +18,7 @@ describe('currentBranch', () => {
     const branch = await currentBranch({
       fs,
       gitdir,
-      fullname: true
+      fullname: true,
     })
     expect(branch).toEqual('refs/heads/master')
   })

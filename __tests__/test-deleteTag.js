@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { E, deleteTag, listTags } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('deleteTag', () => {
   it('deletes the latest tag to HEAD', async () => {
@@ -10,11 +11,11 @@ describe('deleteTag', () => {
     await deleteTag({
       fs,
       gitdir,
-      ref: 'latest'
+      ref: 'latest',
     })
     const refs = await listTags({
       fs,
-      gitdir
+      gitdir,
     })
     expect(refs).toEqual(['prev'])
   })

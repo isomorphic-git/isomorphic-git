@@ -16,11 +16,11 @@ import { join } from '../utils/join.js'
  * @param {string[]} args.oids - Which commits
  *
  */
-export async function findMergeBase ({
+export async function findMergeBase({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  oids
+  oids,
 }) {
   try {
     assertParameter('fs', fs)
@@ -30,7 +30,7 @@ export async function findMergeBase ({
     return await _findMergeBase({
       fs: new FileSystem(fs),
       gitdir,
-      oids
+      oids,
     })
   } catch (err) {
     err.caller = 'git.findMergeBase'

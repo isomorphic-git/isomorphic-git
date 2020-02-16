@@ -12,7 +12,7 @@ import { writeObject } from '../storage/writeObject.js'
  *
  * @returns {Promise<string>}
  */
-export async function writeTree ({ fs, gitdir, tree }) {
+export async function writeTree({ fs, gitdir, tree }) {
   // Convert object to buffer
   const object = GitTree.from(tree).toObject()
   const oid = await writeObject({
@@ -20,7 +20,7 @@ export async function writeTree ({ fs, gitdir, tree }) {
     gitdir,
     type: 'tree',
     object,
-    format: 'content'
+    format: 'content',
   })
   return oid
 }

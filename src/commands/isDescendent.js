@@ -14,18 +14,18 @@ import { readObject } from '../storage/readObject.js'
  *
  * @returns {Promise<boolean>}
  */
-export async function isDescendent ({ fs, gitdir, oid, ancestor, depth }) {
+export async function isDescendent({ fs, gitdir, oid, ancestor, depth }) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   if (!oid) {
     throw new GitError(E.MissingRequiredParameterError, {
       function: 'isDescendent',
-      parameter: 'oid'
+      parameter: 'oid',
     })
   }
   if (!ancestor) {
     throw new GitError(E.MissingRequiredParameterError, {
       function: 'isDescendent',
-      parameter: 'ancestor'
+      parameter: 'ancestor',
     })
   }
   // If you don't like this behavior, add your own check.
@@ -44,7 +44,7 @@ export async function isDescendent ({ fs, gitdir, oid, ancestor, depth }) {
     const { type, object } = await readObject({
       fs,
       gitdir,
-      oid
+      oid,
     })
     if (type !== 'commit') {
       throw new GitError(E.ResolveCommitError, { oid })

@@ -28,7 +28,7 @@ import { join } from '../utils/join.js'
  * console.log('oid', oid) // should be 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391'
  *
  */
-export async function writeBlob ({ fs, dir, gitdir = join(dir, '.git'), blob }) {
+export async function writeBlob({ fs, dir, gitdir = join(dir, '.git'), blob }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -37,7 +37,7 @@ export async function writeBlob ({ fs, dir, gitdir = join(dir, '.git'), blob }) 
     return await _writeBlob({
       fs: new FileSystem(fs),
       gitdir,
-      blob
+      blob,
     })
   } catch (err) {
     err.caller = 'git.writeBlob'

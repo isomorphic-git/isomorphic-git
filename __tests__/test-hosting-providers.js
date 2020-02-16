@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { fetch, push } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -31,7 +31,7 @@ describe('Hosting Providers', () => {
         username: 'tester-at-260687965765',
         password: token,
         remote: 'awscc',
-        ref: 'master'
+        ref: 'master',
       })
       expect(res).toBeTruthy()
       expect(res.defaultBranch).toBe('refs/heads/master')
@@ -58,7 +58,7 @@ describe('Hosting Providers', () => {
         password: token,
         remote: 'awscc',
         ref: 'master',
-        force: true
+        force: true,
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBe(true)
@@ -85,7 +85,7 @@ describe('Hosting Providers', () => {
         username: 'isomorphicgittestpush',
         password: token,
         remote: 'azure',
-        ref: 'master'
+        ref: 'master',
       })
       expect(res).toBeTruthy()
       expect(res.defaultBranch).toBe('refs/heads/master')
@@ -111,7 +111,7 @@ describe('Hosting Providers', () => {
         password: token,
         remote: 'azure',
         ref: 'master',
-        force: true
+        force: true,
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBe(true)
@@ -140,7 +140,7 @@ describe('Hosting Providers', () => {
         password: token,
         remote: 'bitbucket',
         ref: 'master',
-        force: true
+        force: true,
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBe(true)
@@ -166,7 +166,7 @@ describe('Hosting Providers', () => {
         username: 'isomorphic-git',
         password: token,
         remote: 'bitbucket',
-        ref: 'master'
+        ref: 'master',
       })
       expect(res).toBeTruthy()
       expect(res.defaultBranch).toBe('refs/heads/master')
@@ -193,7 +193,7 @@ describe('Hosting Providers', () => {
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         token: token,
         remote: 'github',
-        ref: 'master'
+        ref: 'master',
       })
       expect(res).toBeTruthy()
       expect(res.defaultBranch).toBe('refs/heads/test')
@@ -219,7 +219,7 @@ describe('Hosting Providers', () => {
         token: token,
         remote: 'github',
         ref: 'master',
-        force: true
+        force: true,
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBe(true)
@@ -247,7 +247,7 @@ describe('Hosting Providers', () => {
         username: 'isomorphic-git-test-push',
         password: token,
         remote: 'gitlab',
-        ref: 'master'
+        ref: 'master',
       })
       expect(res).toBeTruthy()
       expect(res.defaultBranch).toBe('refs/heads/master')
@@ -274,7 +274,7 @@ describe('Hosting Providers', () => {
         password: token,
         remote: 'gitlab',
         ref: 'master',
-        force: true
+        force: true,
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBe(true)

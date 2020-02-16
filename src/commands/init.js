@@ -16,11 +16,11 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function init ({
+export async function init({
   fs,
   bare = false,
   dir,
-  gitdir = bare ? dir : join(dir, '.git')
+  gitdir = bare ? dir : join(dir, '.git'),
 }) {
   // Don't overwrite an existing config
   if (await fs.exists(gitdir + '/config')) return
@@ -31,7 +31,7 @@ export async function init ({
     'objects/info',
     'objects/pack',
     'refs/heads',
-    'refs/tags'
+    'refs/tags',
   ]
   folders = folders.map(dir => gitdir + '/' + dir)
   for (const folder of folders) {

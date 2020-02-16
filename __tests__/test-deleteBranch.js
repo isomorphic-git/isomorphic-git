@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { E, deleteBranch } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('deleteBranch', () => {
   it('delete branch', async () => {

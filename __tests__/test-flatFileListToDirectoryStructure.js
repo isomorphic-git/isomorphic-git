@@ -1,12 +1,12 @@
 /* eslint-env node, browser, jasmine */
 const {
-  flatFileListToDirectoryStructure
+  flatFileListToDirectoryStructure,
 } = require('isomorphic-git/internal-apis')
 
 describe('flatFileListToDirectoryStructure', () => {
   it('simple', async () => {
     const inode = flatFileListToDirectoryStructure([
-      { path: 'hello/there.txt' }
+      { path: 'hello/there.txt' },
     ]).get('.')
     expect(inode.fullpath).toBe('.')
     expect(inode.type).toBe('tree')
@@ -56,7 +56,7 @@ describe('flatFileListToDirectoryStructure', () => {
       'test/test-clone.js',
       'test/test-config.js',
       'test/test-init.js',
-      'test/test-resolveRef.js'
+      'test/test-resolveRef.js',
     ]
     const files = filelist.map(f => ({ path: f, someMeta: f.length }))
     const inodes = flatFileListToDirectoryStructure(files)

@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { annotatedTag, resolveRef, readTag } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('annotatedTag', () => {
   it('creates an annotated tag to HEAD', async () => {
@@ -14,8 +15,8 @@ describe('annotatedTag', () => {
       message: 'some tag message',
       tagger: {
         name: 'Yu Shimura',
-        email: 'mail@yuhr.org'
-      }
+        email: 'mail@yuhr.org',
+      },
     })
     const tagRef = await resolveRef({ fs, gitdir, ref: 'refs/tags/latest' })
     const { tag } = await readTag({ fs, gitdir, oid: tagRef })
@@ -32,14 +33,14 @@ describe('annotatedTag', () => {
       message: 'some tag message',
       tagger: {
         name: 'Yu Shimura',
-        email: 'mail@yuhr.org'
+        email: 'mail@yuhr.org',
       },
-      object: 'd670460b4b4aece5915caf5c68d12f560a9fe3e4'
+      object: 'd670460b4b4aece5915caf5c68d12f560a9fe3e4',
     })
     const tagRef = await resolveRef({
       fs,
       gitdir,
-      ref: 'refs/tags/latest-blob'
+      ref: 'refs/tags/latest-blob',
     })
     const { tag } = await readTag({ fs, gitdir, oid: tagRef })
     expect(tag.object).toEqual('d670460b4b4aece5915caf5c68d12f560a9fe3e4')
@@ -57,17 +58,17 @@ describe('annotatedTag', () => {
       message: 'some tag message',
       tagger: {
         name: 'Yu Shimura',
-        email: 'mail@yuhr.org'
+        email: 'mail@yuhr.org',
       },
       signingKey: privateKey,
-      onSign: pgp.sign
+      onSign: pgp.sign,
     })
     const oid = await resolveRef({ fs, gitdir, ref: 'latest' })
     const { tag, payload } = await readTag({ fs, gitdir, oid })
     const { valid, invalid } = await pgp.verify({
       payload,
       publicKey,
-      signature: tag.gpgsig
+      signature: tag.gpgsig,
     })
     expect(invalid).toEqual([])
     expect(valid).toEqual(['f2f0ced8a52613c4'])

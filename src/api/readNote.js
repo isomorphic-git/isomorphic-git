@@ -19,12 +19,12 @@ import { join } from '../utils/join.js'
  * @returns {Promise<Uint8Array>} Resolves successfully with note contents as a Buffer.
  */
 
-export async function readNote ({
+export async function readNote({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'refs/notes/commits',
-  oid
+  oid,
 }) {
   try {
     assertParameter('fs', fs)
@@ -36,7 +36,7 @@ export async function readNote ({
       fs: new FileSystem(fs),
       gitdir,
       ref,
-      oid
+      oid,
     })
   } catch (err) {
     err.caller = 'git.readNote'

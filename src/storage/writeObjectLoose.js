@@ -1,10 +1,10 @@
 import { E, GitError } from '../models/GitError.js'
 
-export async function writeObjectLoose ({ fs, gitdir, object, format, oid }) {
+export async function writeObjectLoose({ fs, gitdir, object, format, oid }) {
   if (format !== 'deflated') {
     throw new GitError(E.InternalFail, {
       message:
-        'GitObjectStoreLoose expects objects to write to be in deflated format'
+        'GitObjectStoreLoose expects objects to write to be in deflated format',
     })
   }
   const source = `objects/${oid.slice(0, 2)}/${oid.slice(2)}`

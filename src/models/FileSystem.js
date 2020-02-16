@@ -11,7 +11,7 @@ const fsmap = new WeakMap()
  * This is just a collection of helper functions really. At least that's how it started.
  */
 export class FileSystem {
-  constructor (fs) {
+  constructor(fs) {
     // This is not actually the most logical place to put this, but in practice
     // putting the check here should work great.
     if (fs === undefined) {
@@ -60,7 +60,7 @@ export class FileSystem {
    * Return true if a file exists, false if it doesn't exist.
    * Rethrows errors that aren't related to file existance.
    */
-  async exists (filepath, options = {}) {
+  async exists(filepath, options = {}) {
     try {
       await this._stat(filepath)
       return true
@@ -82,7 +82,7 @@ export class FileSystem {
    *
    * @returns {Promise<Buffer|string|null>}
    */
-  async read (filepath, options = {}) {
+  async read(filepath, options = {}) {
     try {
       let buffer = await this._readFile(filepath, options)
       // Convert plain ArrayBuffers to Buffers
@@ -102,7 +102,7 @@ export class FileSystem {
    * @param {Buffer|Uint8Array|string} contents
    * @param {object|string} [options]
    */
-  async write (filepath, contents, options = {}) {
+  async write(filepath, contents, options = {}) {
     try {
       await this._writeFile(filepath, contents, options)
       return
@@ -116,7 +116,7 @@ export class FileSystem {
   /**
    * Make a directory (or series of nested directories) without throwing an error if it already exists.
    */
-  async mkdir (filepath, _selfCall = false) {
+  async mkdir(filepath, _selfCall = false) {
     try {
       await this._mkdir(filepath)
       return
@@ -142,7 +142,7 @@ export class FileSystem {
   /**
    * Delete a file without throwing an error if it is already deleted.
    */
-  async rm (filepath) {
+  async rm(filepath) {
     try {
       await this._unlink(filepath)
     } catch (err) {
@@ -153,7 +153,7 @@ export class FileSystem {
   /**
    * Delete a directory without throwing an error if it is already deleted.
    */
-  async rmdir (filepath) {
+  async rmdir(filepath) {
     try {
       await this._rmdir(filepath)
     } catch (err) {
@@ -164,7 +164,7 @@ export class FileSystem {
   /**
    * Read a directory without throwing an error is the directory doesn't exist
    */
-  async readdir (filepath) {
+  async readdir(filepath) {
     try {
       const names = await this._readdir(filepath)
       // Ordering is not guaranteed, and system specific (Windows vs Unix)
@@ -183,7 +183,7 @@ export class FileSystem {
    * Based on an elegant concurrent recursive solution from SO
    * https://stackoverflow.com/a/45130990/2168416
    */
-  async readdirDeep (dir) {
+  async readdirDeep(dir) {
     const subdirs = await this._readdir(dir)
     const files = await Promise.all(
       subdirs.map(async subdir => {
@@ -200,7 +200,7 @@ export class FileSystem {
    * Return the Stats of a file/symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
    */
-  async lstat (filename) {
+  async lstat(filename) {
     try {
       const stats = await this._lstat(filename)
       return stats
@@ -216,7 +216,7 @@ export class FileSystem {
    * Reads the contents of a symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
    */
-  async readlink (filename, opts = { encoding: 'buffer' }) {
+  async readlink(filename, opts = { encoding: 'buffer' }) {
     // Note: FileSystem.readlink returns a buffer by default
     // so we can dump it into GitObject.write just like any other file.
     try {
@@ -232,11 +232,11 @@ export class FileSystem {
   /**
    * Write the contents of buffer to a symlink.
    */
-  async writelink (filename, buffer) {
+  async writelink(filename, buffer) {
     return this._symlink(buffer.toString('utf8'), filename)
   }
 
-  async lock (filename, triesLeft = 3) {
+  async lock(filename, triesLeft = 3) {
     // check to see if we still have it
     if (delayedReleases.has(filename)) {
       clearTimeout(delayedReleases.get(filename))
@@ -256,7 +256,7 @@ export class FileSystem {
     }
   }
 
-  async unlock (filename, delayRelease = 50) {
+  async unlock(filename, delayRelease = 50) {
     if (delayedReleases.has(filename)) {
       throw new GitError(E.DoubleReleaseLockFileFail, { filename })
     }

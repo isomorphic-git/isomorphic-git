@@ -45,7 +45,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * console.log(info);
  *
  */
-export async function getRemoteInfo ({
+export async function getRemoteInfo({
   http,
   corsProxy,
   url,
@@ -55,7 +55,7 @@ export async function getRemoteInfo ({
   token,
   oauth2format,
   headers = {},
-  forPush = false
+  forPush = false,
 }) {
   try {
     assertParameter('url', url)
@@ -68,14 +68,14 @@ export async function getRemoteInfo ({
       url,
       noGitSuffix,
       auth,
-      headers
+      headers,
     })
     auth = remote.auth // hack to get new credentials from CredentialManager API
     // Note: remote.capabilities, remote.refs, and remote.symrefs are Set and Map objects,
     // but one of the objectives of the public API is to always return JSON-compatible objects
     // so we must JSONify them.
     const result = {
-      capabilities: [...remote.capabilities]
+      capabilities: [...remote.capabilities],
     }
     // Convert the flat list into an object tree, because I figure 99% of the time
     // that will be easier to use.

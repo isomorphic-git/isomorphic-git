@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { init, add, listFiles } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // NOTE: we cannot actually commit a real .gitignore file in fixtures or fixtures won't be included in this repo
 const writeGitIgnore = async (fs, dir) =>

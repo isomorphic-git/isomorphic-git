@@ -22,11 +22,11 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function deleteRemote ({
+export async function deleteRemote({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  remote
+  remote,
 }) {
   try {
     assertParameter('fs', fs)
@@ -34,7 +34,7 @@ export async function deleteRemote ({
     return await _deleteRemote({
       fs: new FileSystem(fs),
       gitdir,
-      remote
+      remote,
     })
   } catch (err) {
     err.caller = 'git.deleteRemote'

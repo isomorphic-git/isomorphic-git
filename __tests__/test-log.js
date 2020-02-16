@@ -1,8 +1,8 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
-const { log } = require('isomorphic-git')
 const { pgp } = require('@isomorphic-git/pgp-plugin')
+const { log } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('log', () => {
   it('HEAD', async () => {
@@ -257,7 +257,7 @@ describe('log', () => {
       fs,
       gitdir,
       ref: 'HEAD',
-      since: new Date(1501462174000)
+      since: new Date(1501462174000),
     })
     expect(commits.length).toBe(2)
   })
@@ -377,7 +377,7 @@ prSfV9EyYLuhyvuVN3qmeuyOUbLBEYfeGUZXZ1rOZWY9JP5m4AaT9nl+jVw8hy1+
 dGs=
 =QSo+
 -----END PGP PUBLIC KEY BLOCK-----`,
-        signature: commit.commit.gpgsig
+        signature: commit.commit.gpgsig,
       })
       expect(valid).toEqual(['9609b8a5928ba6b9'])
     }

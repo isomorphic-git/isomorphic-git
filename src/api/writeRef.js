@@ -39,14 +39,14 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function writeRef ({
+export async function writeRef({
   fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref,
   value,
   force = false,
-  symbolic = false
+  symbolic = false,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -61,7 +61,7 @@ export async function writeRef ({
         verb: 'write',
         noun: 'ref',
         ref,
-        suggestion: cleanGitRef.clean(ref)
+        suggestion: cleanGitRef.clean(ref),
       })
     }
 
@@ -74,19 +74,19 @@ export async function writeRef ({
         fs,
         gitdir,
         ref,
-        value
+        value,
       })
     } else {
       value = await GitRefManager.resolve({
         fs,
         gitdir,
-        ref: value
+        ref: value,
       })
       await GitRefManager.writeRef({
         fs,
         gitdir,
         ref,
-        value
+        value,
       })
     }
   } catch (err) {

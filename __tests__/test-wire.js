@@ -6,7 +6,7 @@ const {
   parseUploadPackRequest,
   writeRefsAdResponse,
   writeUploadPackRequest,
-  E
+  E,
 } = require('isomorphic-git/internal-apis')
 // const stream = require('stream')
 
@@ -99,7 +99,7 @@ describe('git wire protocol', () => {
         'no-progress',
         'include-tag',
         'multi_ack_detailed',
-        'no-done'
+        'no-done',
       ],
       symrefs: { HEAD: 'refs/heads/master' },
       refs: {
@@ -110,8 +110,8 @@ describe('git wire protocol', () => {
         'refs/heads/master2': 'c1751a5447a7b025e5bca507af483dde7b0b956f',
         'refs/heads/master3': 'd85135a47c42c9c906e20c08def2fbceac4c2a4f',
         'refs/heads/master4': '18f4b62440abf61285fbfdcbfd990ab8434ff35c',
-        'refs/heads/master5': 'e5c144897b64a44bd1164a0db60738452c9eaf87'
-      }
+        'refs/heads/master5': 'e5c144897b64a44bd1164a0db60738452c9eaf87',
+      },
     })
     const buffer = Buffer.from(await collect(res))
     expect(buffer.toString('utf8')).toBe(
@@ -137,10 +137,10 @@ describe('git wire protocol', () => {
 0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
-0000`)
+0000`),
     ]
     const result = await parseRefsAdResponse(res, {
-      service: 'git-upload-pack'
+      service: 'git-upload-pack',
     })
     expect([...result.capabilities]).toEqual([
       'multi_ack',
@@ -157,7 +157,7 @@ describe('git wire protocol', () => {
       'multi_ack_detailed',
       'no-done',
       'symref=HEAD:refs/heads/master',
-      'agent=git/isomorphic-git@0.0.0-development'
+      'agent=git/isomorphic-git@0.0.0-development',
     ])
     expect([...result.symrefs]).toEqual([['HEAD', 'refs/heads/master']])
     expect([...result.refs]).toEqual([
@@ -168,7 +168,7 @@ describe('git wire protocol', () => {
       ['refs/heads/master2', 'c1751a5447a7b025e5bca507af483dde7b0b956f'],
       ['refs/heads/master3', 'd85135a47c42c9c906e20c08def2fbceac4c2a4f'],
       ['refs/heads/master4', '18f4b62440abf61285fbfdcbfd990ab8434ff35c'],
-      ['refs/heads/master5', 'e5c144897b64a44bd1164a0db60738452c9eaf87']
+      ['refs/heads/master5', 'e5c144897b64a44bd1164a0db60738452c9eaf87'],
     ])
   })
   it('parseRefsAdResponse bad service', async () => {
@@ -182,18 +182,18 @@ describe('git wire protocol', () => {
 0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
-0000`)
+0000`),
     ]
     try {
       await parseRefsAdResponse(res, {
-        service: 'git-upload-pack'
+        service: 'git-upload-pack',
       })
       fail('expected an error')
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
         expected: '# service=git-upload-pack\\n',
-        actual: '# noservice=git-upload-pac'
+        actual: '# noservice=git-upload-pac',
       })
     }
   })
@@ -203,11 +203,11 @@ describe('git wire protocol', () => {
 0072ERR Repository not found
 The requested repository does not exist, or you do not have permission to
 access it.
-`)
+`),
     ]
     try {
       await parseRefsAdResponse(res, {
-        service: 'git-upload-pack'
+        service: 'git-upload-pack',
       })
       fail('expected an error')
     } catch (error) {
@@ -217,7 +217,7 @@ access it.
         actual: `ERR Repository not found
 The requested repository does not exist, or you do not have permission to
 access it.
-`
+`,
       })
     }
   })
@@ -233,18 +233,18 @@ access it.
 0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
-0000`)
+0000`),
     ]
     try {
       await parseRefsAdResponse(res, {
-        service: 'git-upload-pack'
+        service: 'git-upload-pack',
       })
       fail('expected an error')
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
         expected: `Two strings separated by ' '`,
-        actual: '9ea43b479f5fedc679e3eb37803275d727bf51b7  HEAD'
+        actual: '9ea43b479f5fedc679e3eb37803275d727bf51b7  HEAD',
       })
     }
   })
@@ -259,18 +259,18 @@ access it.
 0040d85135a47c42c9c906e20c08def2fbceac4c2a4f refs/heads/master3
 004018f4b62440abf61285fbfdcbfd990ab8434ff35c refs/heads/master4
 0040e5c144897b64a44bd1164a0db60738452c9eaf87 refs/heads/master5
-0000`)
+0000`),
     ]
     try {
       await parseRefsAdResponse(res, {
-        service: 'git-upload-pack'
+        service: 'git-upload-pack',
       })
       fail('expected an error')
     } catch (error) {
       expect(error.code).toEqual(E.AssertServerResponseFail)
       expect(error.data).toEqual({
         expected: `Two strings separated by ' '`,
-        actual: 'fb74ea1a9b6a9601df18c38d3de751c51f064bf7refs/heads/js2\n0'
+        actual: 'fb74ea1a9b6a9601df18c38d3de751c51f064bf7refs/heads/js2\n0',
       })
     }
   })
@@ -282,7 +282,7 @@ access it.
         'side-band-64k',
         'thin-pack',
         'ofs-delta',
-        'agent=git/2.10.1.windows.1'
+        'agent=git/2.10.1.windows.1',
       ],
       wants: [
         'fb74ea1a9b6a9601df18c38d3de751c51f064bf7',
@@ -291,8 +291,8 @@ access it.
         'c1751a5447a7b025e5bca507af483dde7b0b956f',
         'd85135a47c42c9c906e20c08def2fbceac4c2a4f',
         '18f4b62440abf61285fbfdcbfd990ab8434ff35c',
-        'e5c144897b64a44bd1164a0db60738452c9eaf87'
-      ]
+        'e5c144897b64a44bd1164a0db60738452c9eaf87',
+      ],
     }
     const result = writeUploadPackRequest(req)
     const buffer = Buffer.from(await collect(result))
@@ -317,7 +317,7 @@ access it.
 0032want 18f4b62440abf61285fbfdcbfd990ab8434ff35c
 0032want e5c144897b64a44bd1164a0db60738452c9eaf87
 00000009done
-`)
+`),
     ]
     const result = await parseUploadPackRequest(req)
     expect([...result.capabilities]).toEqual([
@@ -326,7 +326,7 @@ access it.
       'side-band-64k',
       'thin-pack',
       'ofs-delta',
-      'agent=git/2.10.1.windows.1'
+      'agent=git/2.10.1.windows.1',
     ])
     expect([...result.wants]).toEqual([
       'fb74ea1a9b6a9601df18c38d3de751c51f064bf7',
@@ -335,7 +335,7 @@ access it.
       'c1751a5447a7b025e5bca507af483dde7b0b956f',
       'd85135a47c42c9c906e20c08def2fbceac4c2a4f',
       '18f4b62440abf61285fbfdcbfd990ab8434ff35c',
-      'e5c144897b64a44bd1164a0db60738452c9eaf87'
+      'e5c144897b64a44bd1164a0db60738452c9eaf87',
     ])
     expect(result.done).toBe(true)
   })
@@ -391,13 +391,13 @@ access it.
     const res = [
       Buffer.from(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue
 0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d
-`)
+`),
     ]
     const result = await parseUploadPackResponse(res)
     expect(result.nak).toBe(false)
     expect(result.acks).toEqual([
       { oid: '7e47fe2bd8d01d481f44d7af0531bd93d3b21c01', status: 'continue' },
-      { oid: '74730d410fcb6603ace96f1dc55ea6196122532d', status: undefined }
+      { oid: '74730d410fcb6603ace96f1dc55ea6196122532d', status: undefined },
     ])
   })
 })

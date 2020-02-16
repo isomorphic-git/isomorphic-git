@@ -1,7 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
+
 const { status, add, remove } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('status', () => {
   it('status', async () => {

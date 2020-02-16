@@ -24,11 +24,11 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function remove ({
+export async function remove({
   fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
-  filepath
+  filepath,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -37,7 +37,7 @@ export async function remove ({
 
     await GitIndexManager.acquire(
       { fs: new FileSystem(_fs), gitdir },
-      async function (index) {
+      async function(index) {
         index.delete({ filepath })
       }
     )

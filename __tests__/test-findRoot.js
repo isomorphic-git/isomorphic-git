@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
 
 const { findRoot } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // NOTE: Because ".git" is not allowed as a path name in git,
 // we can't actually store the ".git" folders in our fixture,
@@ -16,7 +17,7 @@ describe('findRoot', () => {
     // Test
     const root = await findRoot({
       fs,
-      filepath: path.join(dir, 'foobar')
+      filepath: path.join(dir, 'foobar'),
     })
     expect(path.basename(root)).toBe('foobar')
   })
@@ -28,7 +29,7 @@ describe('findRoot', () => {
     // Test
     const root = await findRoot({
       fs,
-      filepath: path.join(dir, 'foobar/bar/baz/buzz')
+      filepath: path.join(dir, 'foobar/bar/baz/buzz'),
     })
     expect(path.basename(root)).toBe('bar')
   })
