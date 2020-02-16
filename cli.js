@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 const fs = require('fs')
+
 const minimisted = require('minimisted')
+
 const git = require('.')
+
 const { http } = require('./dist/http.cjs')
 
 // This really isn't much of a CLI. It's mostly for testing.

@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { deleteRef, listTags } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('deleteRef', () => {
   it('deletes a loose tag', async () => {

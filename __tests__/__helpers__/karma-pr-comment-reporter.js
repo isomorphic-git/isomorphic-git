@@ -1,6 +1,6 @@
 // const comment = require('github-comment')
-const fetch = require('simple-get')
 const table = require('markdown-table')
+const fetch = require('simple-get')
 
 let commit =
   process.env.TRAVIS_PULL_REQUEST_SHA ||

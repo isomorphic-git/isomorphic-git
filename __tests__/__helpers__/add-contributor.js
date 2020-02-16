@@ -1,4 +1,5 @@
 var { execSync } = require('child_process')
+
 var inquirer = require('inquirer')
 inquirer
   .prompt([

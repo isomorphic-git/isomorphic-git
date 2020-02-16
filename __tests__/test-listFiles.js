@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { listFiles } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('listFiles', () => {
   it('index', async () => {

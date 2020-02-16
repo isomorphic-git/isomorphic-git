@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { E, readObject } = require('isomorphic-git/internal-apis')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('GitObjectManager', () => {
   it('test missing', async () => {

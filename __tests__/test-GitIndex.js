@@ -1,9 +1,10 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const path = require('path')
 
 const { GitIndex } = require('isomorphic-git/internal-apis')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('GitIndex', () => {
   it('GitIndex.from(buffer) - Simple', async () => {

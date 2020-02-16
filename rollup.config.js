@@ -1,4 +1,5 @@
 import path from 'path'
+
 import resolve from 'rollup-plugin-node-resolve'
 
 import pkg from './package.json'

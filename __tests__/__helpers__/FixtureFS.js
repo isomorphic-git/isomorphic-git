@@ -1,8 +1,8 @@
 /* eslint-env node, browser, jasmine */
 
+const { makeBrowserFS } = require('./FixtureFS/makeBrowserFS.js')
 const { makeLightningFS } = require('./FixtureFS/makeLightningFS.js')
 const { makeNodeFixture } = require('./FixtureFS/makeNodeFixture.js')
-const { makeBrowserFS } = require('./FixtureFS/makeBrowserFS.js')
 const setTestTimeout = require('./set-test-timeout')
 setTestTimeout(60000)
 

@@ -1,7 +1,8 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { walk, WORKDIR, TREE, STAGE } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('walk', () => {
   it('can walk using WORKDIR, TREE, and STAGE', async () => {

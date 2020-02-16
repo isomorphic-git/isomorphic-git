@@ -2,6 +2,7 @@
 // forked from https://github.com/jvilk/BrowserFS/blob/master/scripts/make_http_index.ts
 var fs = require('fs')
 var path = require('path')
+
 var superblocktxt = require('@isomorphic-git/lightning-fs/src/superblocktxt.js')
 var symLinks = {}
 

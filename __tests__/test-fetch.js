@@ -1,10 +1,10 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
-const { sleep } = require('isomorphic-git/internal-apis')
 const { E, setConfig, fetch } = require('isomorphic-git')
+const { sleep } = require('isomorphic-git/internal-apis')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =

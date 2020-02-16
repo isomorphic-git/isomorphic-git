@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
 
 const { isBinary } = require('isomorphic-git/internal-apis')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const binaryFiles = [
   'browserconfig.gz',
