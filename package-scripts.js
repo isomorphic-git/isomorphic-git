@@ -27,8 +27,9 @@ module.exports = {
     lint: {
       default: series.nps('lint.js'),
       js: `eslint ${srcPaths}`,
+      fix: series.nps('lint.prettier', 'lint.esfix', 'lint.prettier'),
       prettier: `prettier --write ${srcPaths}`,
-      fix: `eslint --fix ${srcPaths}`,
+      esfix: `eslint --fix ${srcPaths}`,
     },
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
