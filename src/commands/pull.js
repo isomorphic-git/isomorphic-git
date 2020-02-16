@@ -22,7 +22,6 @@ import { E, GitError } from '../models/GitError.js'
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} args.singleBranch
  * @param {boolean} args.fastForwardOnly
- * @param {boolean} args.noGitSuffix
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
@@ -55,7 +54,6 @@ export async function pull({
   gitdir,
   ref,
   fastForwardOnly,
-  noGitSuffix,
   corsProxy,
   username,
   password,
@@ -94,7 +92,6 @@ export async function pull({
       onAuthSuccess,
       onAuthFailure,
       gitdir,
-      noGitSuffix,
       corsProxy,
       ref,
       remote,

@@ -49,7 +49,6 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {string} [args.remoteRef]
  * @param {string} [args.remote]
  * @param {boolean} [args.singleBranch = false]
- * @param {boolean} [args.noGitSuffix = false]
  * @param {boolean} [args.tags = false]
  * @param {number} [args.depth]
  * @param {Date} [args.since]
@@ -79,7 +78,6 @@ export async function fetch({
   remoteRef: _remoteRef,
   remote: _remote,
   url: _url,
-  noGitSuffix = false,
   corsProxy,
   username,
   password,
@@ -130,7 +128,6 @@ export async function fetch({
     corsProxy,
     service: 'git-upload-pack',
     url,
-    noGitSuffix,
     auth,
     headers,
   })
@@ -233,7 +230,6 @@ export async function fetch({
     corsProxy,
     service: 'git-upload-pack',
     url,
-    noGitSuffix,
     auth,
     body: [packbuffer],
     headers,

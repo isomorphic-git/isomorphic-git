@@ -24,7 +24,6 @@ import { addRemote } from './addRemote.js'
  * @param {string} args.ref
  * @param {boolean} args.singleBranch
  * @param {boolean} args.noCheckout
- * @param {boolean} args.noGitSuffix
  * @param {boolean} args.noTags
  * @param {string} args.remote
  * @param {number} args.depth
@@ -51,7 +50,6 @@ export async function clone({
   dir,
   gitdir,
   url,
-  noGitSuffix,
   corsProxy,
   ref,
   remote,
@@ -88,7 +86,6 @@ export async function clone({
     onAuthSuccess,
     onAuthFailure,
     gitdir,
-    noGitSuffix,
     ref,
     remote,
     username,

@@ -26,7 +26,6 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @param {string} args.url - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities.
- * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
@@ -49,7 +48,6 @@ export async function getRemoteInfo({
   http,
   corsProxy,
   url,
-  noGitSuffix = false,
   username,
   password,
   token,
@@ -66,7 +64,6 @@ export async function getRemoteInfo({
       corsProxy,
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,
-      noGitSuffix,
       auth,
       headers,
     })

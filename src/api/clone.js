@@ -24,7 +24,6 @@ import { join } from '../utils/join.js'
  * @param {string} [args.ref] - Which branch to clone. By default this is the designated "main branch" of the repository.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
- * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**.)
  * @param {boolean} [args.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
  * @param {string} [args.remote = 'origin'] - What to name the remote that is created.
  * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
@@ -63,7 +62,6 @@ export async function clone({
   dir,
   gitdir = join(dir, '.git'),
   url,
-  noGitSuffix = false,
   corsProxy = undefined,
   ref = undefined,
   remote = 'origin',
@@ -99,7 +97,6 @@ export async function clone({
       dir,
       gitdir,
       url,
-      noGitSuffix,
       corsProxy,
       ref,
       remote,

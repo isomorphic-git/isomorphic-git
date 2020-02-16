@@ -43,7 +43,6 @@ import { join } from '../utils/join.js'
  * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
- * @param {boolean} [args.noGitSuffix = false] - If true, clone will not auto-append a `.git` suffix to the `url`. (**AWS CodeCommit needs this option**)
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
  * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
@@ -83,7 +82,6 @@ export async function fetch({
   remote,
   remoteRef,
   url,
-  noGitSuffix = false,
   corsProxy,
   username,
   password,
@@ -126,7 +124,6 @@ export async function fetch({
       remote,
       remoteRef,
       url,
-      noGitSuffix,
       corsProxy,
       username,
       password,
