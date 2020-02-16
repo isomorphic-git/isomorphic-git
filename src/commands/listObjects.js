@@ -4,17 +4,17 @@ import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 
-export async function listObjects ({
+export async function listObjects({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  oids
+  oids,
 }) {
   const visited = new Set()
   // We don't do the purest simplest recursion, because we can
   // avoid reading Blob objects entirely since the Tree objects
   // tell us which oids are Blobs and which are Trees.
-  async function walk (oid) {
+  async function walk(oid) {
     visited.add(oid)
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type === 'tag') {

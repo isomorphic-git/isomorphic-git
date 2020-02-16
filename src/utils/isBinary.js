@@ -17,7 +17,7 @@
  *
  * Yup, that's how git does it. We could try to be smarter
  */
-export function isBinary (buffer) {
+export function isBinary(buffer) {
   // in canonical git, this check happens in builtins/merge-file.c
   // but I think it's DRYer to do it here.
   // The value picked is explained here: https://github.com/git/git/blob/ab15ad1a3b4b04a29415aef8c9afa2f64fc194a2/xdiff-interface.h#L12

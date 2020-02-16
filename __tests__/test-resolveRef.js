@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { resolveRef } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('resolveRef', () => {
   it('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9', async () => {
@@ -10,7 +11,7 @@ describe('resolveRef', () => {
     const ref = await resolveRef({
       fs,
       gitdir,
-      ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9'
+      ref: '1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9',
     })
     expect(ref).toBe('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9')
   })
@@ -21,7 +22,7 @@ describe('resolveRef', () => {
     const ref = await resolveRef({
       fs,
       gitdir,
-      ref: 'origin/test-branch'
+      ref: 'origin/test-branch',
     })
     expect(ref).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
   })
@@ -32,7 +33,7 @@ describe('resolveRef', () => {
     const ref = await resolveRef({
       fs,
       gitdir,
-      ref: 'config'
+      ref: 'config',
     })
     expect(ref).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
   })
@@ -43,7 +44,7 @@ describe('resolveRef', () => {
     const ref = await resolveRef({
       fs,
       gitdir,
-      ref: 'test-tag'
+      ref: 'test-tag',
     })
     expect(ref).toBe('1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9')
   })
@@ -54,7 +55,7 @@ describe('resolveRef', () => {
     const ref = await resolveRef({
       fs,
       gitdir,
-      ref: 'HEAD'
+      ref: 'HEAD',
     })
     expect(ref).toBe('033417ae18b174f078f2f44232cb7a374f4c60ce')
   })
@@ -66,7 +67,7 @@ describe('resolveRef', () => {
       fs,
       gitdir,
       ref: 'HEAD',
-      depth: 2
+      depth: 2,
     })
     expect(ref).toBe('refs/heads/master')
   })
@@ -77,7 +78,7 @@ describe('resolveRef', () => {
     const ref = await resolveRef({
       fs,
       gitdir,
-      ref: 'v0.0.1'
+      ref: 'v0.0.1',
     })
     expect(ref).toBe('1a2149e96a9767b281a8f10fd014835322da2d14')
   })
@@ -90,7 +91,7 @@ describe('resolveRef', () => {
       await resolveRef({
         fs,
         gitdir,
-        ref: 'this-is-not-a-ref'
+        ref: 'this-is-not-a-ref',
       })
     } catch (err) {
       error = err

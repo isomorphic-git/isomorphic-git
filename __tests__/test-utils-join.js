@@ -1,5 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path').posix || require('path')
+
 const { join } = require('isomorphic-git/internal-apis')
 
 describe('utils/join', () => {
@@ -16,7 +17,7 @@ describe('utils/join', () => {
       ['.', '.', '.'],
       ['/', '.'],
       ['/', '.git'],
-      ['.', '.git']
+      ['.', '.git'],
     ]
     for (const fixture of fixtures) {
       expect(join(...fixture)).toEqual(path.join(...fixture))
@@ -50,7 +51,7 @@ describe('utils/join', () => {
       [[' ', ''], ' '],
       [['/', '/foo'], '/foo'],
       [['/', '//foo'], '/foo'],
-      [['/', '', '/foo'], '/foo']
+      [['/', '', '/foo'], '/foo'],
     ]
     for (const [args, result] of fixtures) {
       expect(join(...args)).toEqual(result)
@@ -66,7 +67,7 @@ describe('utils/join', () => {
       [['', '', '/foo'], 'foo'],
       [['foo/', ''], 'foo'],
       [['', '/', 'foo'], 'foo'],
-      [['', '/', '/foo'], 'foo']
+      [['', '/', '/foo'], 'foo'],
     ]
     for (const [args, result] of disagreeFixtures) {
       expect(join(...args)).toEqual(result)

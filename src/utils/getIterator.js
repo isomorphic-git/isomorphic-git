@@ -1,6 +1,6 @@
 import { fromValue } from '../utils/fromValue.js'
 
-export function getIterator (iterable) {
+export function getIterator(iterable) {
   if (iterable[Symbol.asyncIterator]) {
     return iterable[Symbol.asyncIterator]()
   }

@@ -14,7 +14,7 @@ import { writeObject } from '../storage/writeObject.js'
  * @see CommitObject
  *
  */
-export async function writeCommit ({ fs, gitdir, commit }) {
+export async function writeCommit({ fs, gitdir, commit }) {
   // Convert object to buffer
   const object = GitCommit.from(commit).toObject()
   const oid = await writeObject({
@@ -22,7 +22,7 @@ export async function writeCommit ({ fs, gitdir, commit }) {
     gitdir,
     type: 'commit',
     object,
-    format: 'content'
+    format: 'content',
   })
   return oid
 }

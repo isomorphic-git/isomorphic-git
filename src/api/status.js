@@ -46,11 +46,11 @@ import { join } from '../utils/join.js'
  * console.log(status)
  *
  */
-export async function status ({
+export async function status({
   fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
-  filepath
+  filepath,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -62,7 +62,7 @@ export async function status ({
       fs,
       gitdir,
       dir,
-      filepath
+      filepath,
     })
     if (ignored) {
       return 'ignored'
@@ -72,11 +72,11 @@ export async function status ({
       fs,
       gitdir,
       tree: headTree,
-      path: filepath
+      path: filepath,
     })
     const indexEntry = await GitIndexManager.acquire(
       { fs, gitdir },
-      async function (index) {
+      async function(index) {
         for (const entry of index) {
           if (entry.path === filepath) return entry
         }
@@ -97,7 +97,7 @@ export async function status ({
         const workdirOid = await hashObject({
           gitdir,
           type: 'blob',
-          object
+          object,
         })
         // If the oid in the index === working dir oid but stats differed update cache
         if (I && indexEntry.oid === workdirOid) {
@@ -106,7 +106,7 @@ export async function status ({
           // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
           if (stats.size !== -1) {
             // We don't await this so we can return faster for one-off cases.
-            GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+            GitIndexManager.acquire({ fs, gitdir }, async function(index) {
               index.insert({ filepath, stats, oid: workdirOid })
             })
           }
@@ -164,7 +164,7 @@ export async function status ({
   }
 }
 
-async function getOidAtPath ({ fs, gitdir, tree, path }) {
+async function getOidAtPath({ fs, gitdir, tree, path }) {
   if (typeof path === 'string') path = path.split('/')
   const dirname = path.shift()
   for (const entry of tree) {
@@ -175,7 +175,7 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
       const { type, object } = await readObject({
         fs,
         gitdir,
-        oid: entry.oid
+        oid: entry.oid,
       })
       if (type === 'tree') {
         const tree = GitTree.from(object)
@@ -184,7 +184,7 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
       if (type === 'blob') {
         throw new GitError(E.ObjectTypeAssertionInPathFail, {
           oid: entry.oid,
-          path: path.join('/')
+          path: path.join('/'),
         })
       }
     }
@@ -192,7 +192,7 @@ async function getOidAtPath ({ fs, gitdir, tree, path }) {
   return null
 }
 
-async function getHeadTree ({ fs, gitdir }) {
+async function getHeadTree({ fs, gitdir }) {
   // Get the tree from the HEAD commit.
   let oid
   try {
@@ -212,11 +212,11 @@ async function getHeadTree ({ fs, gitdir }) {
   return getTree({ fs, gitdir, oid })
 }
 
-async function getTree ({ fs, gitdir, oid }) {
+async function getTree({ fs, gitdir, oid }) {
   const { type, object } = await readObject({
     fs,
     gitdir,
-    oid
+    oid,
   })
   if (type !== 'tree') {
     throw new GitError(E.ResolveTreeError, { oid })

@@ -34,12 +34,12 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function indexPack ({
+export async function indexPack({
   fs,
   onProgress,
   dir,
   gitdir = join(dir, '.git'),
-  filepath
+  filepath,
 }) {
   try {
     assertParameter('fs', fs)
@@ -52,7 +52,7 @@ export async function indexPack ({
       onProgress,
       dir,
       gitdir,
-      filepath
+      filepath,
     })
   } catch (err) {
     err.caller = 'git.indexPack'

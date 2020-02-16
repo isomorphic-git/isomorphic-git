@@ -4,7 +4,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
 
-export async function resolveTree ({ fs, gitdir, oid }) {
+export async function resolveTree({ fs, gitdir, oid }) {
   // Empty tree - bypass `readObject`
   if (oid === '4b825dc642cb6eb9a060e54bf8d69288fbee4904') {
     return { tree: GitTree.from([]), oid }

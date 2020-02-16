@@ -36,7 +36,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the commit object for the note removal.
  */
 
-export async function removeNote ({
+export async function removeNote({
   fs: _fs,
   onSign,
   dir,
@@ -45,7 +45,7 @@ export async function removeNote ({
   oid,
   author: _author,
   committer: _committer,
-  signingKey
+  signingKey,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -61,7 +61,7 @@ export async function removeNote ({
       fs,
       gitdir,
       author,
-      committer: _committer
+      committer: _committer,
     })
     if (!committer) throw new GitError(E.MissingCommitterError)
 
@@ -73,7 +73,7 @@ export async function removeNote ({
       oid,
       author,
       committer,
-      signingKey
+      signingKey,
     })
   } catch (err) {
     err.caller = 'git.removeNote'

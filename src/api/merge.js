@@ -70,7 +70,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * console.log(m)
  *
  */
-export async function merge ({
+export async function merge({
   fs: _fs,
   onSign,
   dir,
@@ -83,7 +83,7 @@ export async function merge ({
   message,
   author: _author,
   committer: _committer,
-  signingKey
+  signingKey,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -99,7 +99,7 @@ export async function merge ({
       fs,
       gitdir,
       author,
-      committer: _committer
+      committer: _committer,
     })
     if (!committer && !fastForwardOnly) {
       throw new GitError(E.MissingCommitterError)
@@ -116,7 +116,7 @@ export async function merge ({
       message,
       author,
       committer,
-      signingKey
+      signingKey,
     })
   } catch (err) {
     err.caller = 'git.merge'

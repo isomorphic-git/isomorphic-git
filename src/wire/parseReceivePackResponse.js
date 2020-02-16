@@ -3,7 +3,7 @@ import '../typedefs.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
-export async function parseReceivePackResponse (packfile) {
+export async function parseReceivePackResponse(packfile) {
   /** @type PushResult */
   const result = {}
   let response = ''
@@ -35,7 +35,7 @@ export async function parseReceivePackResponse (packfile) {
     const error = refAndMessage.slice(space + 1)
     result.refs[ref] = {
       ok: status === 'ok',
-      error
+      error,
     }
   }
   return result

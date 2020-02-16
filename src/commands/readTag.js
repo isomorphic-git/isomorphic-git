@@ -21,25 +21,25 @@ import { readObject } from '../storage/readObject.js'
  *
  * @returns {Promise<ReadTagResult>}
  */
-export async function readTag ({ fs, gitdir, oid }) {
+export async function readTag({ fs, gitdir, oid }) {
   const { type, object } = await readObject({
     fs,
     gitdir,
     oid,
-    format: 'content'
+    format: 'content',
   })
   if (type !== 'tag') {
     throw new GitError(E.ObjectTypeAssertionFail, {
       oid,
       type,
-      expected: 'tag'
+      expected: 'tag',
     })
   }
   const tag = GitAnnotatedTag.from(object)
   const result = {
     oid,
     tag: tag.parse(),
-    payload: tag.payload()
+    payload: tag.payload(),
   }
   // @ts-ignore
   return result

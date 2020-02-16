@@ -69,7 +69,7 @@ import { join } from '../utils/join.js'
  * console.log(result)
  *
  */
-export async function fetch ({
+export async function fetch({
   fs,
   http,
   onProgress,
@@ -97,7 +97,7 @@ export async function fetch ({
   singleBranch = false,
   headers = {},
   prune = false,
-  pruneTags = false
+  pruneTags = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -140,7 +140,7 @@ export async function fetch ({
       singleBranch,
       headers,
       prune,
-      pruneTags
+      pruneTags,
     })
   } catch (err) {
     err.caller = 'git.fetch'

@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { listBranches } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('listBranches', () => {
   it('listBranches', async () => {
@@ -25,7 +25,7 @@ describe('listBranches', () => {
     const commits = await listBranches({
       fs,
       gitdir,
-      remote: 'origin'
+      remote: 'origin',
     })
     expect(commits).toMatchInlineSnapshot(`
       Array [

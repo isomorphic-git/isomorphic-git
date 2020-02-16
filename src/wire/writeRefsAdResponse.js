@@ -1,7 +1,7 @@
 import { GitPktLine } from '../models/GitPktLine.js'
 import { pkg } from '../utils/pkg'
 
-export async function writeRefsAdResponse ({ capabilities, refs, symrefs }) {
+export async function writeRefsAdResponse({ capabilities, refs, symrefs }) {
   const stream = []
   // Compose capabilities string
   let syms = ''

@@ -1,20 +1,20 @@
 const path = require('path')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin
+
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 module.exports = [
   {
     target: 'webworker',
     entry: {
       bundle: './src/index.js',
-      internal: './src/internal-apis.js'
+      internal: './src/internal-apis.js',
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].umd.min.js',
       library: 'git',
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
     },
     mode: 'production',
     devtool: 'source-map',
@@ -24,17 +24,17 @@ module.exports = [
         analyzerMode: 'static',
         reportFilename: 'size_report.html',
         defaultSizes: 'gzip',
-        excludeAssets: 'internal\\.umd\\.min\\.js'
+        excludeAssets: 'internal\\.umd\\.min\\.js',
       }),
       new DuplicatePackageCheckerPlugin({
-        strict: true
-      })
+        strict: true,
+      }),
     ],
     resolve: {
       alias: {
         // 'bops' depends on 0.0.2 but 1.x (used by node-libs-browser) is compatible
-        'base64-js': require.resolve('base64-js')
-      }
+        'base64-js': require.resolve('base64-js'),
+      },
     },
     module: {
       rules: [
@@ -47,12 +47,12 @@ module.exports = [
               babelrc: false,
               plugins: [
                 '@babel/plugin-proposal-object-rest-spread',
-                '@babel/plugin-transform-async-to-generator'
-              ]
-            }
-          }
-        }
-      ]
-    }
-  }
+                '@babel/plugin-transform-async-to-generator',
+              ],
+            },
+          },
+        },
+      ],
+    },
+  },
 ]

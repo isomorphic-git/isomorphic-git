@@ -22,7 +22,7 @@ import { join } from '../utils/join.js'
  * console.log(fullRef)
  *
  */
-export async function expandRef ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
+export async function expandRef({ fs, dir, gitdir = join(dir, '.git'), ref }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -30,7 +30,7 @@ export async function expandRef ({ fs, dir, gitdir = join(dir, '.git'), ref }) {
     return await GitRefManager.expand({
       fs: new FileSystem(fs),
       gitdir,
-      ref
+      ref,
     })
   } catch (err) {
     err.caller = 'git.expandRef'

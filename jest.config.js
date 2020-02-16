@@ -3,7 +3,7 @@ module.exports = {
   moduleNameMapper: {
     '^isomorphic-git$': '<rootDir>/src',
     '^isomorphic-git/http$': '<rootDir>/dist/http.cjs',
-    '^isomorphic-git/(.+)$': '<rootDir>/src/$1'
+    '^isomorphic-git/(.+)$': '<rootDir>/src/$1',
   },
   collectCoverageFrom: ['src/*.js', 'src/**/*.js'],
   testEnvironment: 'node',
@@ -14,9 +14,9 @@ module.exports = {
       {
         output: `./junit/TESTS-node-${process.version}-${
           process.platform
-        }-${require('os').release()}.xml`
-      }
-    ]
+        }-${require('os').release()}.xml`,
+      },
+    ],
   ],
-  coverageReporters: ['lcov', 'cobertura']
+  coverageReporters: ['lcov', 'cobertura'],
 }

@@ -74,7 +74,7 @@ import { join } from '../utils/join.js'
  * console.log('tag', oid)
  *
  */
-export async function writeObject ({
+export async function writeObject({
   fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
@@ -82,7 +82,7 @@ export async function writeObject ({
   object,
   format = 'parsed',
   oid,
-  encoding = undefined
+  encoding = undefined,
 }) {
   try {
     const fs = new FileSystem(_fs)
@@ -113,7 +113,7 @@ export async function writeObject ({
       type,
       object,
       oid,
-      format
+      format,
     })
     return oid
   } catch (err) {

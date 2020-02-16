@@ -40,12 +40,12 @@ import { join } from '../utils/join.js'
  * console.log(Buffer.from(blob).toString('utf8'))
  *
  */
-export async function readBlob ({
+export async function readBlob({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   oid,
-  filepath
+  filepath,
 }) {
   try {
     assertParameter('fs', fs)
@@ -56,7 +56,7 @@ export async function readBlob ({
       fs: new FileSystem(fs),
       gitdir,
       oid,
-      filepath
+      filepath,
     })
   } catch (err) {
     err.caller = 'git.readBlob'

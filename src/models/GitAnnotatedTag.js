@@ -4,7 +4,7 @@ import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
 
 export class GitAnnotatedTag {
-  constructor (tag) {
+  constructor(tag) {
     if (typeof tag === 'string') {
       this._tag = tag
     } else if (Buffer.isBuffer(tag)) {
@@ -13,16 +13,16 @@ export class GitAnnotatedTag {
       this._tag = GitAnnotatedTag.render(tag)
     } else {
       throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitAnnotatedTag constructor'
+        message: 'invalid type passed to GitAnnotatedTag constructor',
       })
     }
   }
 
-  static from (tag) {
+  static from(tag) {
     return new GitAnnotatedTag(tag)
   }
 
-  static render (obj) {
+  static render(obj) {
     return `object ${obj.object}
 type ${obj.type}
 tag ${obj.tag}
@@ -32,27 +32,27 @@ ${obj.message}
 ${obj.gpgsig ? obj.gpgsig : ''}`
   }
 
-  justHeaders () {
+  justHeaders() {
     return this._tag.slice(0, this._tag.indexOf('\n\n'))
   }
 
-  message () {
+  message() {
     const tag = this.withoutSignature()
     return tag.slice(tag.indexOf('\n\n') + 2)
   }
 
-  parse () {
+  parse() {
     return Object.assign(this.headers(), {
       message: this.message(),
-      gpgsig: this.gpgsig()
+      gpgsig: this.gpgsig(),
     })
   }
 
-  render () {
+  render() {
     return this._tag
   }
 
-  headers () {
+  headers() {
     const headers = this.justHeaders().split('\n')
     const hs = []
     for (const h of headers) {
@@ -82,13 +82,13 @@ ${obj.gpgsig ? obj.gpgsig : ''}`
     return obj
   }
 
-  withoutSignature () {
+  withoutSignature() {
     const tag = normalizeNewlines(this._tag)
     if (tag.indexOf('\n-----BEGIN PGP SIGNATURE-----') === -1) return tag
     return tag.slice(0, tag.lastIndexOf('\n-----BEGIN PGP SIGNATURE-----'))
   }
 
-  gpgsig () {
+  gpgsig() {
     if (this._tag.indexOf('\n-----BEGIN PGP SIGNATURE-----') === -1) return
     const signature = this._tag.slice(
       this._tag.indexOf('-----BEGIN PGP SIGNATURE-----'),
@@ -98,15 +98,15 @@ ${obj.gpgsig ? obj.gpgsig : ''}`
     return normalizeNewlines(signature)
   }
 
-  payload () {
+  payload() {
     return this.withoutSignature() + '\n'
   }
 
-  toObject () {
+  toObject() {
     return Buffer.from(this._tag, 'utf8')
   }
 
-  static async sign (tag, sign, secretKey) {
+  static async sign(tag, sign, secretKey) {
     const payload = tag.payload()
     let { signature } = await sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending

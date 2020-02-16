@@ -34,7 +34,7 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  */
-export async function commit ({
+export async function commit({
   fs,
   onSign,
   gitdir,
@@ -46,18 +46,18 @@ export async function commit ({
   noUpdateBranch = false,
   ref,
   parent,
-  tree
+  tree,
 }) {
   if (!ref) {
     ref = await GitRefManager.resolve({
       fs,
       gitdir,
       ref: 'HEAD',
-      depth: 2
+      depth: 2,
     })
   }
 
-  return GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+  return GitIndexManager.acquire({ fs, gitdir }, async function(index) {
     const inodes = flatFileListToDirectoryStructure(index.entries)
     const inode = inodes.get('.')
     if (!tree) {
@@ -69,8 +69,8 @@ export async function commit ({
           await GitRefManager.resolve({
             fs,
             gitdir,
-            ref
-          })
+            ref,
+          }),
         ]
       } catch (err) {
         // Probably an initial commit
@@ -82,7 +82,7 @@ export async function commit ({
       parent,
       author,
       committer,
-      message
+      message,
     })
     if (signingKey) {
       comm = await GitCommit.sign(comm, onSign, signingKey)
@@ -92,7 +92,7 @@ export async function commit ({
       gitdir,
       type: 'commit',
       object: comm.toObject(),
-      dryRun
+      dryRun,
     })
     if (!noUpdateBranch && !dryRun) {
       // Update branch pointer
@@ -100,14 +100,14 @@ export async function commit ({
         fs,
         gitdir,
         ref,
-        value: oid
+        value: oid,
       })
     }
     return oid
   })
 }
 
-async function constructTree ({ fs, gitdir, inode, dryRun }) {
+async function constructTree({ fs, gitdir, inode, dryRun }) {
   // use depth first traversal
   const children = inode.children
   for (const inode of children) {
@@ -120,7 +120,7 @@ async function constructTree ({ fs, gitdir, inode, dryRun }) {
     mode: inode.metadata.mode,
     path: inode.basename,
     oid: inode.metadata.oid,
-    type: inode.type
+    type: inode.type,
   }))
   const tree = GitTree.from(entries)
   const oid = await writeObject({
@@ -128,7 +128,7 @@ async function constructTree ({ fs, gitdir, inode, dryRun }) {
     gitdir,
     type: 'tree',
     object: tree.toObject(),
-    dryRun
+    dryRun,
   })
   return oid
 }

@@ -23,7 +23,7 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function add ({ fs, dir, gitdir = join(dir, '.git'), filepath }) {
+export async function add({ fs, dir, gitdir = join(dir, '.git'), filepath }) {
   try {
     assertParameter('fs', fs)
     assertParameter('dir', dir)

@@ -57,7 +57,7 @@ import { join } from '../utils/join.js'
  * })
  * console.log('done')
  */
-export async function checkout ({
+export async function checkout({
   fs,
   onProgress,
   dir,
@@ -66,11 +66,11 @@ export async function checkout ({
   ref: _ref,
   filepaths,
   noCheckout = false,
-  noUpdateHead = _ref === void 0,
+  noUpdateHead = _ref === undefined,
   dryRun = false,
   // @ts-ignore
   debug = false,
-  force = false
+  force = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -90,7 +90,7 @@ export async function checkout ({
       noUpdateHead,
       dryRun,
       debug,
-      force
+      force,
     })
   } catch (err) {
     err.caller = 'git.checkout'

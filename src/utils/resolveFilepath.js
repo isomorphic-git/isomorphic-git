@@ -4,7 +4,7 @@ import { GitTree } from '../models/GitTree.js'
 import { readObject } from '../storage/readObject.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
-export async function resolveFilepath ({ fs, gitdir, oid, filepath }) {
+export async function resolveFilepath({ fs, gitdir, oid, filepath }) {
   // Ensure there are no leading or trailing directory separators.
   // I was going to do this automatically, but then found that the Git Terminal for Windows
   // auto-expands --filepath=/src/utils to --filepath=C:/Users/Will/AppData/Local/Programs/Git/src/utils
@@ -25,19 +25,19 @@ export async function resolveFilepath ({ fs, gitdir, oid, filepath }) {
       tree,
       pathArray,
       oid: _oid,
-      filepath
+      filepath,
     })
   }
   return oid
 }
 
-async function _resolveFilepath ({
+async function _resolveFilepath({
   fs,
   gitdir,
   tree,
   pathArray,
   oid,
-  filepath
+  filepath,
 }) {
   const name = pathArray.shift()
   for (const entry of tree) {
@@ -48,7 +48,7 @@ async function _resolveFilepath ({
         const { type, object } = await readObject({
           fs,
           gitdir,
-          oid: entry.oid
+          oid: entry.oid,
         })
         if (type === 'blob') {
           throw new GitError(E.DirectoryIsAFileError, { oid, filepath })
@@ -57,7 +57,7 @@ async function _resolveFilepath ({
           throw new GitError(E.ObjectTypeAssertionInTreeFail, {
             oid: entry.oid,
             entrypath: filepath,
-            type
+            type,
           })
         }
         tree = GitTree.from(object)

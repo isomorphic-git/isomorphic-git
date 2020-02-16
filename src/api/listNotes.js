@@ -18,11 +18,11 @@ import { join } from '../utils/join'
  * @returns {Promise<Array<{target: string, note: string}>>} Resolves successfully with an array of entries containing SHA-1 object ids of the note and the object the note targets
  */
 
-export async function listNotes ({
+export async function listNotes({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  ref = 'refs/notes/commits'
+  ref = 'refs/notes/commits',
 }) {
   try {
     assertParameter('fs', fs)
@@ -32,7 +32,7 @@ export async function listNotes ({
     return await _listNotes({
       fs: new FileSystem(fs),
       gitdir,
-      ref
+      ref,
     })
   } catch (err) {
     err.caller = 'git.listNotes'

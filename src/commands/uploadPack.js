@@ -2,11 +2,11 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { join } from '../utils/join.js'
 import { writeRefsAdResponse } from '../wire/writeRefsAdResponse.js'
 
-export async function uploadPack ({
+export async function uploadPack({
   fs,
   dir,
   gitdir = join(dir, '.git'),
-  advertiseRefs = false
+  advertiseRefs = false,
 }) {
   try {
     if (advertiseRefs) {
@@ -19,12 +19,12 @@ export async function uploadPack ({
         'deepen-since',
         'deepen-not',
         'allow-tip-sha1-in-want',
-        'allow-reachable-sha1-in-want'
+        'allow-reachable-sha1-in-want',
       ]
       let keys = await GitRefManager.listRefs({
         fs,
         gitdir,
-        filepath: 'refs'
+        filepath: 'refs',
       })
       keys = keys.map(ref => `refs/${ref}`)
       const refs = {}
@@ -33,16 +33,16 @@ export async function uploadPack ({
         refs[key] = await GitRefManager.resolve({ fs, gitdir, ref: key })
       }
       const symrefs = {}
-      symrefs['HEAD'] = await GitRefManager.resolve({
+      symrefs.HEAD = await GitRefManager.resolve({
         fs,
         gitdir,
         ref: 'HEAD',
-        depth: 2
+        depth: 2,
       })
       return writeRefsAdResponse({
         capabilities,
         refs,
-        symrefs
+        symrefs,
       })
     }
   } catch (err) {

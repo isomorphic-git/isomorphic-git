@@ -25,7 +25,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * console.log(gitroot)
  *
  */
-export async function findRoot ({ fs, filepath }) {
+export async function findRoot({ fs, filepath }) {
   try {
     assertParameter('fs', fs)
     assertParameter('filepath', filepath)

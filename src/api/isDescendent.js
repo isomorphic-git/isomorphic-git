@@ -26,13 +26,13 @@ import { join } from '../utils/join.js'
  * await git.isDescendent({ fs, dir: '/tutorial', oid, ancestor, depth: -1 })
  *
  */
-export async function isDescendent ({
+export async function isDescendent({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   oid,
   ancestor,
-  depth = -1
+  depth = -1,
 }) {
   try {
     assertParameter('fs', fs)
@@ -45,7 +45,7 @@ export async function isDescendent ({
       gitdir,
       oid,
       ancestor,
-      depth
+      depth,
     })
   } catch (err) {
     err.caller = 'git.isDescendent'

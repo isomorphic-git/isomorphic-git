@@ -248,14 +248,14 @@ import { join } from '../utils/join.js'
  *
  * @returns {Promise<any>} The finished tree-walking result
  */
-export async function walk ({
+export async function walk({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   trees,
   map,
   reduce,
-  iterate
+  iterate,
 }) {
   try {
     assertParameter('fs', fs)
@@ -269,7 +269,7 @@ export async function walk ({
       trees,
       map,
       reduce,
-      iterate
+      iterate,
     })
   } catch (err) {
     err.caller = 'git.walk'

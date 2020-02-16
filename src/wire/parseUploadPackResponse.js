@@ -2,7 +2,7 @@ import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { forAwait } from '../utils/forAwait.js'
 
-export async function parseUploadPackResponse (stream) {
+export async function parseUploadPackResponse(stream) {
   const { packetlines, packfile, progress } = GitSideBand.demux(stream)
   const shallows = []
   const unshallows = []

@@ -1,11 +1,12 @@
 var { execSync } = require('child_process')
+
 var inquirer = require('inquirer')
 inquirer
   .prompt([
     {
       type: 'input',
       name: 'username',
-      message: 'GitHub username:'
+      message: 'GitHub username:',
     },
     {
       type: 'checkbox',
@@ -15,110 +16,110 @@ inquirer
       choices: [
         {
           value: 'code',
-          name: 'Code'
+          name: 'Code',
         },
         {
           value: 'doc',
-          name: 'Documentation'
+          name: 'Documentation',
         },
         {
           value: 'test',
-          name: 'Tests'
+          name: 'Tests',
         },
         {
           value: 'question',
-          name: 'Answering Questions'
+          name: 'Answering Questions',
         },
         {
           value: 'bug',
-          name: 'Bug reports'
+          name: 'Bug reports',
         },
         {
           value: 'blog',
-          name: 'Blogposts'
+          name: 'Blogposts',
         },
         {
           value: 'business',
-          name: 'Business Development'
+          name: 'Business Development',
         },
         {
           value: 'content',
-          name: 'Content (e.g. website copy)'
+          name: 'Content (e.g. website copy)',
         },
         {
           value: 'design',
-          name: 'Design'
+          name: 'Design',
         },
         {
           value: 'example',
-          name: 'Examples'
+          name: 'Examples',
         },
         {
           value: 'eventOrganizing',
-          name: 'Event Organizers'
+          name: 'Event Organizers',
         },
         {
           value: 'fundingFinding',
-          name: 'Funding/Grant Finders'
+          name: 'Funding/Grant Finders',
         },
         {
           value: 'ideas',
-          name: 'Ideas & Planning'
+          name: 'Ideas & Planning',
         },
         {
           value: 'infra',
-          name: 'Infrastructure'
+          name: 'Infrastructure',
         },
         {
           value: 'maintenance',
-          name: 'Maintenance'
+          name: 'Maintenance',
         },
         {
           value: 'platform',
-          name: 'Packaging'
+          name: 'Packaging',
         },
         {
           value: 'plugin',
-          name: 'Plugin/utility libraries'
+          name: 'Plugin/utility libraries',
         },
         {
           value: 'projectManagement',
-          name: 'Project Management'
+          name: 'Project Management',
         },
         {
           value: 'review',
-          name: 'Reviewed Pull Requests'
+          name: 'Reviewed Pull Requests',
         },
         {
           value: 'security',
-          name: 'Security'
+          name: 'Security',
         },
         {
           value: 'tool',
-          name: 'Tools'
+          name: 'Tools',
         },
         {
           value: 'translation',
-          name: 'Translation'
+          name: 'Translation',
         },
         {
           value: 'tutorials',
-          name: 'Tutorials'
+          name: 'Tutorials',
         },
         {
           value: 'talk',
-          name: 'Talks'
+          name: 'Talks',
         },
         {
           value: 'userTesting',
-          name: 'User Testing'
+          name: 'User Testing',
         },
         {
           value: 'video',
-          name: 'Videos'
-        }
-      ]
-    }
+          name: 'Videos',
+        },
+      ],
+    },
   ])
   .then(answers => {
     console.log(

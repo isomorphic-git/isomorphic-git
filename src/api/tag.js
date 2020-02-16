@@ -23,13 +23,13 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function tag ({
+export async function tag({
   fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref,
   object,
-  force = false
+  force = false,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -41,7 +41,7 @@ export async function tag ({
     if (ref === undefined) {
       throw new GitError(E.MissingRequiredParameterError, {
         function: 'tag',
-        parameter: 'ref'
+        parameter: 'ref',
       })
     }
 
@@ -51,7 +51,7 @@ export async function tag ({
     const value = await GitRefManager.resolve({
       fs,
       gitdir,
-      ref: object || 'HEAD'
+      ref: object || 'HEAD',
     })
 
     if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {

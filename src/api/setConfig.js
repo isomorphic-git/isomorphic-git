@@ -41,20 +41,20 @@ import { join } from '../utils/join.js'
  *   fs,
  *   dir: '/tutorial',
  *   path: 'user.name',
- *   value: void 0
+ *   value: undefined
  * })
  *
  * // Print out config file
  * file = await fs.promises.readFile('/tutorial/.git/config', 'utf8')
  * console.log(file)
  */
-export async function setConfig ({
+export async function setConfig({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   path,
   value,
-  append = false
+  append = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -67,7 +67,7 @@ export async function setConfig ({
       gitdir,
       append,
       path,
-      value
+      value,
     })
   } catch (err) {
     err.caller = 'git.setConfig'

@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { E, merge, resolveRef, log } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('merge', () => {
   it('merge master into master', async () => {
@@ -11,14 +11,14 @@ describe('merge', () => {
     const desiredOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     const m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'master',
-      fastForwardOnly: true
+      fastForwardOnly: true,
     })
     expect(m.oid).toEqual(desiredOid)
     expect(m.alreadyMerged).toBeTruthy()
@@ -26,7 +26,7 @@ describe('merge', () => {
     const oid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     expect(oid).toEqual(desiredOid)
   })
@@ -38,14 +38,14 @@ describe('merge', () => {
     const desiredOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'medium'
+      ref: 'medium',
     })
     const m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'medium',
-      fastForwardOnly: true
+      fastForwardOnly: true,
     })
     expect(m.oid).toEqual(desiredOid)
     expect(m.alreadyMerged).toBeTruthy()
@@ -53,7 +53,7 @@ describe('merge', () => {
     const oid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     expect(oid).toEqual(desiredOid)
   })
@@ -65,14 +65,14 @@ describe('merge', () => {
     const desiredOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     const m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'oldest',
-      fastForwardOnly: true
+      fastForwardOnly: true,
     })
     expect(m.oid).toEqual(desiredOid)
     expect(m.alreadyMerged).toBeTruthy()
@@ -80,7 +80,7 @@ describe('merge', () => {
     const oid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     expect(oid).toEqual(desiredOid)
   })
@@ -92,14 +92,14 @@ describe('merge', () => {
     const desiredOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'newest'
+      ref: 'newest',
     })
     const m = await merge({
       fs,
       gitdir,
       ours: 'master',
       theirs: 'newest',
-      fastForwardOnly: true
+      fastForwardOnly: true,
     })
     expect(m.oid).toEqual(desiredOid)
     expect(m.alreadyMerged).toBeFalsy()
@@ -107,7 +107,7 @@ describe('merge', () => {
     const oid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     expect(oid).toEqual(desiredOid)
   })
@@ -119,12 +119,12 @@ describe('merge', () => {
     const originalOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     const desiredOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'newest'
+      ref: 'newest',
     })
     const m = await merge({
       fs,
@@ -132,7 +132,7 @@ describe('merge', () => {
       ours: 'master',
       theirs: 'newest',
       fastForwardOnly: true,
-      dryRun: true
+      dryRun: true,
     })
     expect(m.oid).toEqual(desiredOid)
     expect(m.alreadyMerged).toBeFalsy()
@@ -140,7 +140,7 @@ describe('merge', () => {
     const oid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     expect(oid).toEqual(originalOid)
   })
@@ -152,12 +152,12 @@ describe('merge', () => {
     const originalOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     const desiredOid = await resolveRef({
       fs,
       gitdir,
-      ref: 'newest'
+      ref: 'newest',
     })
     const m = await merge({
       fs,
@@ -165,7 +165,7 @@ describe('merge', () => {
       ours: 'master',
       theirs: 'newest',
       fastForwardOnly: true,
-      dryRun: true
+      dryRun: true,
     })
     expect(m.oid).toEqual(desiredOid)
     expect(m.alreadyMerged).toBeFalsy()
@@ -173,7 +173,7 @@ describe('merge', () => {
     const oid = await resolveRef({
       fs,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     expect(oid).toEqual(originalOid)
   })
@@ -181,12 +181,14 @@ describe('merge', () => {
   it("merge 'add-files' and 'remove-files'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
-    const commit = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'add-files-merge-remove-files'
-    }))[0].commit
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'add-files-merge-remove-files',
+      })
+    )[0].commit
     // Test
     const report = await merge({
       fs,
@@ -197,15 +199,17 @@ describe('merge', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
-      }
+        timezoneOffset: -0,
+      },
     })
-    const mergeCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'add-files',
-      depth: 1
-    }))[0].commit
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'add-files',
+        depth: 1,
+      })
+    )[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -215,12 +219,14 @@ describe('merge', () => {
   it("merge 'remove-files' and 'add-files'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
-    const commit = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'remove-files-merge-add-files'
-    }))[0].commit
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'remove-files-merge-add-files',
+      })
+    )[0].commit
     // TestTest
     const report = await merge({
       fs,
@@ -231,15 +237,17 @@ describe('merge', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
-      }
+        timezoneOffset: -0,
+      },
     })
-    const mergeCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'remove-files',
-      depth: 1
-    }))[0].commit
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'remove-files',
+        depth: 1,
+      })
+    )[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -257,7 +265,7 @@ describe('merge', () => {
         gitdir,
         ours: 'delete-first-half',
         theirs: 'delete-second-half',
-        dryRun: true
+        dryRun: true,
       })
     } catch (e) {
       error = e
@@ -269,18 +277,22 @@ describe('merge', () => {
   it("merge 'delete-first-half' and 'delete-second-half' (dryRun)", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
-    const commit = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'delete-first-half-merge-delete-second-half'
-    }))[0]
-    const originalCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'delete-first-half',
-      depth: 1
-    }))[0]
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'delete-first-half-merge-delete-second-half',
+      })
+    )[0]
+    const originalCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'delete-first-half',
+        depth: 1,
+      })
+    )[0]
     // Test
     const report = await merge({
       fs,
@@ -291,18 +303,20 @@ describe('merge', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      dryRun: true
+      dryRun: true,
     })
     expect(report.tree).toBe(commit.commit.tree)
     // make sure branch hasn't been moved
-    const notMergeCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'delete-first-half',
-      depth: 1
-    }))[0]
+    const notMergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'delete-first-half',
+        depth: 1,
+      })
+    )[0]
     expect(notMergeCommit.oid).toEqual(originalCommit.oid)
     if (!report.oid) throw new Error('type error')
     // make sure no commit object was created
@@ -316,18 +330,22 @@ describe('merge', () => {
   it("merge 'delete-first-half' and 'delete-second-half' (noUpdateBranch)", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
-    const commit = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'delete-first-half-merge-delete-second-half'
-    }))[0]
-    const originalCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'delete-first-half',
-      depth: 1
-    }))[0]
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'delete-first-half-merge-delete-second-half',
+      })
+    )[0]
+    const originalCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'delete-first-half',
+        depth: 1,
+      })
+    )[0]
     // Test
     const report = await merge({
       fs,
@@ -338,18 +356,20 @@ describe('merge', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      noUpdateBranch: true
+      noUpdateBranch: true,
     })
     expect(report.tree).toBe(commit.commit.tree)
     // make sure branch hasn't been moved
-    const notMergeCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'delete-first-half',
-      depth: 1
-    }))[0]
+    const notMergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'delete-first-half',
+        depth: 1,
+      })
+    )[0]
     expect(notMergeCommit.oid).toEqual(originalCommit.oid)
     if (!report.oid) throw new Error('type error')
     // but make sure the commit object exists
@@ -363,12 +383,14 @@ describe('merge', () => {
   it("merge 'delete-first-half' and 'delete-second-half'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
-    const commit = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'delete-first-half-merge-delete-second-half'
-    }))[0].commit
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'delete-first-half-merge-delete-second-half',
+      })
+    )[0].commit
     // Test
     const report = await merge({
       fs,
@@ -379,15 +401,17 @@ describe('merge', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
-      }
+        timezoneOffset: -0,
+      },
     })
-    const mergeCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'delete-first-half',
-      depth: 1
-    }))[0].commit
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'delete-first-half',
+        depth: 1,
+      })
+    )[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -409,8 +433,8 @@ describe('merge', () => {
           name: 'Mr. Test',
           email: 'mrtest@example.com',
           timestamp: 1262356920,
-          timezoneOffset: -0
-        }
+          timezoneOffset: -0,
+        },
       })
     } catch (e) {
       error = e
@@ -422,12 +446,14 @@ describe('merge', () => {
   it("merge two branches that modified the same file (no conflict)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
-    const commit = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'a-merge-b'
-    }))[0].commit
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-b',
+      })
+    )[0].commit
     // Test
     const report = await merge({
       fs,
@@ -438,15 +464,17 @@ describe('merge', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
-      }
+        timezoneOffset: -0,
+      },
     })
-    const mergeCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'a',
-      depth: 1
-    }))[0].commit
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -456,12 +484,14 @@ describe('merge', () => {
   it("merge two branches where one modified file and the other modified file mode'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
-    const commit = (await log({
-      fs,
-      gitdir,
-      depth: 1,
-      ref: 'a-merge-d'
-    }))[0].commit
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-d',
+      })
+    )[0].commit
     // Test
     const report = await merge({
       fs,
@@ -472,15 +502,17 @@ describe('merge', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
-      }
+        timezoneOffset: -0,
+      },
     })
-    const mergeCommit = (await log({
-      fs,
-      gitdir,
-      ref: 'a',
-      depth: 1
-    }))[0].commit
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -502,8 +534,8 @@ describe('merge', () => {
           name: 'Mr. Test',
           email: 'mrtest@example.com',
           timestamp: 1262356920,
-          timezoneOffset: -0
-        }
+          timezoneOffset: -0,
+        },
       })
     } catch (e) {
       error = e

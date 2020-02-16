@@ -27,7 +27,7 @@ import { join } from '../utils/join.js'
  * @see TagObject
  *
  */
-export async function readTag ({ fs, dir, gitdir = join(dir, '.git'), oid }) {
+export async function readTag({ fs, dir, gitdir = join(dir, '.git'), oid }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -36,7 +36,7 @@ export async function readTag ({ fs, dir, gitdir = join(dir, '.git'), oid }) {
     return await _readTag({
       fs: new FileSystem(fs),
       gitdir,
-      oid
+      oid,
     })
   } catch (err) {
     err.caller = 'git.readTag'

@@ -14,16 +14,16 @@ import { resolveCommit } from '../utils/resolveCommit.js'
  * @see CommitObject
  *
  */
-export async function readCommit ({ fs, gitdir, oid }) {
+export async function readCommit({ fs, gitdir, oid }) {
   const { commit, oid: commitOid } = await resolveCommit({
     fs,
     gitdir,
-    oid
+    oid,
   })
   const result = {
     oid: commitOid,
     commit: commit.parse(),
-    payload: commit.withoutSignature()
+    payload: commit.withoutSignature(),
   }
   // @ts-ignore
   return result

@@ -29,7 +29,7 @@ import { writeTree } from './writeTree.js'
  * @returns {Promise<string>}
  */
 
-export async function removeNote ({
+export async function removeNote({
   fs,
   onSign,
   gitdir,
@@ -37,7 +37,7 @@ export async function removeNote ({
   oid,
   author,
   committer,
-  signingKey
+  signingKey,
 }) {
   // Get the current note commit
   let parent
@@ -53,7 +53,7 @@ export async function removeNote ({
   const result = await readTree({
     fs,
     gitdir,
-    oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+    oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
   })
   let tree = result.tree
 
@@ -64,7 +64,7 @@ export async function removeNote ({
   const treeOid = await writeTree({
     fs,
     gitdir,
-    tree
+    tree,
   })
 
   // Create the new note commit
@@ -78,7 +78,7 @@ export async function removeNote ({
     message: `Note removed by 'isomorphic-git removeNote'\n`,
     author,
     committer,
-    signingKey
+    signingKey,
   })
 
   return commitOid

@@ -40,7 +40,7 @@ import { addRemote } from './addRemote.js'
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
  */
-export async function clone ({
+export async function clone({
   fs,
   http,
   onProgress,
@@ -66,7 +66,7 @@ export async function clone ({
   singleBranch,
   noCheckout,
   noTags,
-  headers
+  headers,
 }) {
   await init({ fs, gitdir })
   await addRemote({ fs, gitdir, remote, url, force: false })
@@ -76,7 +76,7 @@ export async function clone ({
       gitdir,
       path: `http.corsProxy`,
       value: corsProxy,
-      append: false
+      append: false,
     })
   }
   const { defaultBranch, fetchHead } = await fetch({
@@ -101,7 +101,7 @@ export async function clone ({
     relative,
     singleBranch,
     headers,
-    tags: !noTags
+    tags: !noTags,
   })
   if (fetchHead === null) return
   ref = ref || defaultBranch
@@ -114,6 +114,6 @@ export async function clone ({
     gitdir,
     ref,
     remote,
-    noCheckout
+    noCheckout,
   })
 }

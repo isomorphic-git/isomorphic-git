@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const { clone, checkout, listFiles, commit } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -17,7 +17,7 @@ describe('submodule "support"', () => {
       http,
       dir,
       gitdir,
-      url: `http://${localhost}:8888/test-submodules.git`
+      url: `http://${localhost}:8888/test-submodules.git`,
     })
     // Test
     expect(await listFiles({ fs, gitdir })).toContain('test.empty')
@@ -30,7 +30,7 @@ describe('submodule "support"', () => {
       http,
       dir,
       gitdir,
-      url: `http://${localhost}:8888/test-submodules.git`
+      url: `http://${localhost}:8888/test-submodules.git`,
     })
     // Test
     await commit({
@@ -40,9 +40,9 @@ describe('submodule "support"', () => {
         name: 'Mr. Test',
         email: 'mrtest@example.com',
         timestamp: 1262356920,
-        timezoneOffset: -0
+        timezoneOffset: -0,
       },
-      message: 'test commit'
+      message: 'test commit',
     })
     expect(await listFiles({ fs, gitdir })).toContain('test.empty')
   })
@@ -55,14 +55,14 @@ describe('submodule "support"', () => {
       dir,
       gitdir,
       ref: 'no-modules',
-      url: `http://${localhost}:8888/test-submodules.git`
+      url: `http://${localhost}:8888/test-submodules.git`,
     })
     // Test
     await checkout({
       fs,
       dir,
       gitdir,
-      ref: 'master'
+      ref: 'master',
     })
     expect(await listFiles({ fs, gitdir })).toContain('test.empty')
   })
@@ -74,7 +74,7 @@ describe('submodule "support"', () => {
       http,
       dir,
       gitdir,
-      url: `http://${localhost}:8888/test-submodules.git`
+      url: `http://${localhost}:8888/test-submodules.git`,
     })
     // Test
     await checkout({ fs, dir, gitdir, ref: 'no-modules' })

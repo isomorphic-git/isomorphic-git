@@ -2,7 +2,7 @@ import { E, GitError } from '../models/GitError.js'
 
 import { oauth2 } from './oauth2'
 
-export function calculateBasicAuthUsernamePasswordPair (
+export function calculateBasicAuthUsernamePasswordPair(
   { username, password, token, oauth2format } = {},
   allowEmptyPassword = false
 ) {

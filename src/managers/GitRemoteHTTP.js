@@ -17,7 +17,7 @@ const corsProxify = (corsProxy, url) =>
     : `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
 
 export class GitRemoteHTTP {
-  static async capabilities () {
+  static async capabilities() {
     return ['discover', 'connect']
   }
 
@@ -35,7 +35,7 @@ export class GitRemoteHTTP {
    * @param {GitAuth} [args.auth]
    * @param {Object<string, string>} [args.headers]
    */
-  static async discover ({
+  static async discover({
     http,
     onProgress,
     onAuth,
@@ -46,7 +46,7 @@ export class GitRemoteHTTP {
     url,
     noGitSuffix,
     auth,
-    headers
+    headers,
   }) {
     const _origUrl = url
     // Auto-append the (necessary) .git if it's missing.
@@ -84,13 +84,13 @@ export class GitRemoteHTTP {
     // had an opportunity to provide the password.
     const _auth = calculateBasicAuthUsernamePasswordPair(auth, !!urlAuth)
     if (_auth) {
-      headers['Authorization'] = calculateBasicAuthHeader(_auth)
+      headers.Authorization = calculateBasicAuthHeader(_auth)
     }
     let res = await http({
       onProgress,
       method: 'GET',
       url: `${url}/info/refs?service=${service}`,
-      headers
+      headers,
     })
     if (res.statusCode === 401 && onAuth) {
       // Acquire credentials and try again
@@ -98,13 +98,13 @@ export class GitRemoteHTTP {
       auth = await onAuth(_origUrl)
       const _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
-        headers['Authorization'] = calculateBasicAuthHeader(_auth)
+        headers.Authorization = calculateBasicAuthHeader(_auth)
       }
       res = await http({
         onProgress,
         method: 'GET',
         url: `${url}/info/refs?service=${service}`,
-        headers
+        headers,
       })
       // Tell credential manager if the credentials were no good
       if (res.statusCode === 401 && onAuthFailure) {
@@ -116,7 +116,7 @@ export class GitRemoteHTTP {
     if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
         statusCode: res.statusCode,
-        statusMessage: res.statusMessage
+        statusMessage: res.statusMessage,
       })
     }
     // Git "smart" HTTP servers should respond with the correct Content-Type header.
@@ -142,13 +142,13 @@ export class GitRemoteHTTP {
       } catch (e) {
         throw new GitError(E.RemoteDoesNotSupportSmartHTTP, {
           preview,
-          response
+          response,
         })
       }
     }
   }
 
-  static async connect ({
+  static async connect({
     http,
     onProgress,
     corsProxy,
@@ -157,7 +157,7 @@ export class GitRemoteHTTP {
     noGitSuffix,
     auth,
     body,
-    headers
+    headers,
   }) {
     // Auto-append the (necessary) .git if it's missing.
     if (!url.endsWith('.git') && !noGitSuffix) url = url += '.git'
@@ -174,7 +174,7 @@ export class GitRemoteHTTP {
       url = corsProxify(corsProxy, url)
     }
     headers['content-type'] = `application/x-${service}-request`
-    headers['accept'] = `application/x-${service}-result`
+    headers.accept = `application/x-${service}-result`
     // Only send a user agent in Node and to CORS proxies by default,
     // because Gogs and others might not whitelist 'user-agent' in allowed headers.
     // Solutions using 'process.browser' can't be used as they rely on bundler shims,
@@ -190,19 +190,19 @@ export class GitRemoteHTTP {
     // had an opportunity to provide the password.
     auth = calculateBasicAuthUsernamePasswordPair(auth, !!urlAuth)
     if (auth) {
-      headers['Authorization'] = calculateBasicAuthHeader(auth)
+      headers.Authorization = calculateBasicAuthHeader(auth)
     }
     const res = await http({
       onProgress,
       method: 'POST',
       url: `${url}/${service}`,
       body,
-      headers
+      headers,
     })
     if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
         statusCode: res.statusCode,
-        statusMessage: res.statusMessage
+        statusMessage: res.statusMessage,
       })
     }
     return res

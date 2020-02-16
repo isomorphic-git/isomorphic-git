@@ -1,7 +1,7 @@
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
-export async function parseRefsAdResponse (stream, { service }) {
+export async function parseRefsAdResponse(stream, { service }) {
   const capabilities = new Set()
   const refs = new Map()
   const symrefs = new Map()
@@ -17,7 +17,7 @@ export async function parseRefsAdResponse (stream, { service }) {
   if (lineOne.toString('utf8').replace(/\n$/, '') !== `# service=${service}`) {
     throw new GitError(E.AssertServerResponseFail, {
       expected: `# service=${service}\\n`,
-      actual: lineOne.toString('utf8')
+      actual: lineOne.toString('utf8'),
     })
   }
   let lineTwo = await read()
@@ -54,12 +54,12 @@ export async function parseRefsAdResponse (stream, { service }) {
   return { capabilities, refs, symrefs }
 }
 
-function splitAndAssert (line, sep, expected) {
+function splitAndAssert(line, sep, expected) {
   const split = line.trim().split(sep)
   if (split.length !== 2) {
     throw new GitError(E.AssertServerResponseFail, {
       expected: `Two strings separated by '${expected}'`,
-      actual: line.toString('utf8')
+      actual: line.toString('utf8'),
     })
   }
   return split

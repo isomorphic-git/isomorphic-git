@@ -52,7 +52,7 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function clone ({
+export async function clone({
   fs,
   http,
   onProgress,
@@ -78,7 +78,7 @@ export async function clone ({
   singleBranch = false,
   noCheckout = false,
   noTags = false,
-  headers = {}
+  headers = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -114,7 +114,7 @@ export async function clone ({
       singleBranch,
       noCheckout,
       noTags,
-      headers
+      headers,
     })
   } catch (err) {
     err.caller = 'git.clone'

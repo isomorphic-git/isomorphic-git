@@ -29,13 +29,13 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function addRemote ({
+export async function addRemote({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   remote,
   url,
-  force = false
+  force = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -47,7 +47,7 @@ export async function addRemote ({
       gitdir,
       remote,
       url,
-      force
+      force,
     })
   } catch (err) {
     err.caller = 'git.addRemote'

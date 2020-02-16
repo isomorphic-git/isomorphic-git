@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { listRemotes } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('listRemotes', () => {
   it('listRemotes', async () => {
@@ -10,7 +11,7 @@ describe('listRemotes', () => {
     const a = await listRemotes({ fs, dir, gitdir })
     expect(a).toEqual([
       { remote: 'foo', url: 'git@github.com:foo/foo.git' },
-      { remote: 'bar', url: 'git@github.com:bar/bar.git' }
+      { remote: 'bar', url: 'git@github.com:bar/bar.git' },
     ])
   })
 })

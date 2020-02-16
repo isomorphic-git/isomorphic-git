@@ -1,9 +1,10 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const path = require('path')
 
 const { GitIndex } = require('isomorphic-git/internal-apis')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('GitIndex', () => {
   it('GitIndex.from(buffer) - Simple', async () => {
@@ -11,7 +12,9 @@ describe('GitIndex', () => {
     const buffer = await fs.read(path.join(dir, 'simple-index'))
     const index = await GitIndex.from(buffer)
     const rendering = index.render()
-    expect(rendering).toMatchInlineSnapshot('"100644 323fae03f4606ea9991df8befbb2fca795e648fa    world.txt"')
+    expect(rendering).toMatchInlineSnapshot(
+      '"100644 323fae03f4606ea9991df8befbb2fca795e648fa    world.txt"'
+    )
     const buffer2 = await index.toObject()
     expect(buffer.slice(0, buffer2.length - 20).buffer).toEqual(
       buffer2.slice(0, -20).buffer

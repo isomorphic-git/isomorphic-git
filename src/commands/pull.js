@@ -43,7 +43,7 @@ import { E, GitError } from '../models/GitError.js'
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
  */
-export async function pull ({
+export async function pull({
   fs,
   http,
   onProgress,
@@ -65,7 +65,7 @@ export async function pull ({
   headers,
   author,
   committer,
-  signingKey
+  signingKey,
 }) {
   try {
     // If ref is undefined, use 'HEAD'
@@ -74,7 +74,7 @@ export async function pull ({
       // TODO: use a better error.
       if (!head) {
         throw new GitError(E.MissingRequiredParameterError, {
-          parameter: 'ref'
+          parameter: 'ref',
         })
       }
       ref = head
@@ -83,7 +83,7 @@ export async function pull ({
     const remote = await getConfig({
       fs,
       gitdir,
-      path: `branch.${ref}.remote`
+      path: `branch.${ref}.remote`,
     })
     const { fetchHead, fetchHeadDescription } = await fetch({
       fs,
@@ -103,7 +103,7 @@ export async function pull ({
       token,
       oauth2format,
       singleBranch,
-      headers
+      headers,
     })
     // Merge the remote tracking branch into the local one.
     await merge({
@@ -117,7 +117,7 @@ export async function pull ({
       committer,
       signingKey,
       dryRun: false,
-      noUpdateBranch: false
+      noUpdateBranch: false,
     })
     await checkout({
       fs,
@@ -126,7 +126,7 @@ export async function pull ({
       gitdir,
       ref,
       remote,
-      noCheckout: false
+      noCheckout: false,
     })
   } catch (err) {
     err.caller = 'git.pull'

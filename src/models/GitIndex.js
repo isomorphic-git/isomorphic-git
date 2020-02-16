@@ -6,16 +6,16 @@ import { shasum } from '../utils/shasum.js'
 import { E, GitError } from './GitError.js'
 
 // Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
-function parseCacheEntryFlags (bits) {
+function parseCacheEntryFlags(bits) {
   return {
     assumeValid: Boolean(bits & 0b1000000000000000),
     extended: Boolean(bits & 0b0100000000000000),
     stage: (bits & 0b0011000000000000) >> 12,
-    nameLength: bits & 0b0000111111111111
+    nameLength: bits & 0b0000111111111111,
   }
 }
 
-function renderCacheEntryFlags (entry) {
+function renderCacheEntryFlags(entry) {
   const flags = entry.flags
   // 1-bit extended flag (must be zero in version 2)
   flags.extended = false
@@ -35,30 +35,30 @@ export class GitIndex {
    _entries: Map<string, CacheEntry>
    _dirty: boolean // Used to determine if index needs to be saved to filesystem
    */
-  constructor (entries) {
+  constructor(entries) {
     this._dirty = false
     this._entries = entries || new Map()
   }
 
-  static async from (buffer) {
+  static async from(buffer) {
     if (Buffer.isBuffer(buffer)) {
       return GitIndex.fromBuffer(buffer)
     } else if (buffer === null) {
       return new GitIndex(null)
     } else {
       throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitIndex.from'
+        message: 'invalid type passed to GitIndex.from',
       })
     }
   }
 
-  static async fromBuffer (buffer) {
+  static async fromBuffer(buffer) {
     // Verify shasum
     const shaComputed = await shasum(buffer.slice(0, -20))
     const shaClaimed = buffer.slice(-20).toString('hex')
     if (shaClaimed !== shaComputed) {
       throw new GitError(E.InternalFail, {
-        message: `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
+        message: `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`,
       })
     }
     const reader = new BufferCursor(buffer)
@@ -66,13 +66,13 @@ export class GitIndex {
     const magic = reader.toString('utf8', 4)
     if (magic !== 'DIRC') {
       throw new GitError(E.InternalFail, {
-        message: `Inavlid dircache magic file number: ${magic}`
+        message: `Inavlid dircache magic file number: ${magic}`,
       })
     }
     const version = reader.readUInt32BE()
     if (version !== 2) {
       throw new GitError(E.InternalFail, {
-        message: `Unsupported dircache version: ${version}`
+        message: `Unsupported dircache version: ${version}`,
       })
     }
     const numEntries = reader.readUInt32BE()
@@ -96,7 +96,7 @@ export class GitIndex {
       const pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
       if (pathlength < 1) {
         throw new GitError(E.InternalFail, {
-          message: `Got a path length of: ${pathlength}`
+          message: `Got a path length of: ${pathlength}`,
         })
       }
       // TODO: handle pathnames larger than 12 bits
@@ -110,11 +110,11 @@ export class GitIndex {
         const tmp = reader.readUInt8()
         if (tmp !== 0) {
           throw new GitError(E.InternalFail, {
-            message: `Expected 1-8 null characters but got '${tmp}' after ${entry.path}`
+            message: `Expected 1-8 null characters but got '${tmp}' after ${entry.path}`,
           })
         } else if (reader.eof()) {
           throw new GitError(E.InternalFail, {
-            message: 'Unexpected end of file'
+            message: 'Unexpected end of file',
           })
         }
       }
@@ -125,21 +125,21 @@ export class GitIndex {
     return new GitIndex(_entries)
   }
 
-  get entries () {
+  get entries() {
     return [...this._entries.values()].sort(comparePath)
   }
 
-  get entriesMap () {
+  get entriesMap() {
     return this._entries
   }
 
-  * [Symbol.iterator] () {
+  *[Symbol.iterator]() {
     for (const entry of this.entries) {
       yield entry
     }
   }
 
-  insert ({ filepath, stats, oid }) {
+  insert({ filepath, stats, oid }) {
     stats = normalizeStats(stats)
     const bfilepath = Buffer.from(filepath)
     const entry = {
@@ -162,14 +162,14 @@ export class GitIndex {
         assumeValid: false,
         extended: false,
         stage: 0,
-        nameLength: bfilepath.length < 0xfff ? bfilepath.length : 0xfff
-      }
+        nameLength: bfilepath.length < 0xfff ? bfilepath.length : 0xfff,
+      },
     }
     this._entries.set(entry.path, entry)
     this._dirty = true
   }
 
-  delete ({ filepath }) {
+  delete({ filepath }) {
     if (this._entries.has(filepath)) {
       this._entries.delete(filepath)
     } else {
@@ -182,18 +182,18 @@ export class GitIndex {
     this._dirty = true
   }
 
-  clear () {
+  clear() {
     this._entries.clear()
     this._dirty = true
   }
 
-  render () {
+  render() {
     return this.entries
       .map(entry => `${entry.mode.toString(8)} ${entry.oid}    ${entry.path}`)
       .join('\n')
   }
 
-  async toObject () {
+  async toObject() {
     const header = Buffer.alloc(12)
     const writer = new BufferCursor(header)
     writer.write('DIRC', 4, 'utf8')

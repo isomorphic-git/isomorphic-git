@@ -1,9 +1,10 @@
 const fs = require('fs')
 const path = require('path')
+
 const translateBrowser = require('./karma-translate-browser.js')
 
 module.exports = {
-  load () {
+  load() {
     // Append to the existing list of successful browsers
     try {
       const browsers = JSON.parse(
@@ -18,7 +19,7 @@ module.exports = {
       return [[], []]
     }
   },
-  filter (browsers) {
+  filter(browsers) {
     const [, successfulBrowsers] = module.exports.load()
     console.log('skipping browsers:', successfulBrowsers)
     const newbrowsers = browsers.filter(b => !successfulBrowsers.includes(b))
@@ -32,11 +33,11 @@ module.exports = {
     }
     return newbrowsers
   },
-  save (successfulBrowsersFullNames) {
+  save(successfulBrowsersFullNames) {
     fs.writeFileSync(
       path.join(process.cwd(), 'dist', 'browser-tests.json'),
       JSON.stringify(successfulBrowsersFullNames, null, 2),
       'utf8'
     )
-  }
+  },
 }

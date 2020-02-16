@@ -1,12 +1,13 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
 
 const {
   GitPackIndex,
   GitObject,
-  shasum
+  shasum,
 } = require('isomorphic-git/internal-apis')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('GitPackIndex', () => {
   it('from .idx', async () => {
@@ -105,7 +106,7 @@ describe('GitPackIndex', () => {
     const p = await GitPackIndex.fromIdx({ idx })
     await p.load({ pack })
     const { type, object } = await p.read({
-      oid: '637c4e69d85e0dcc18898ec251377453d0891585'
+      oid: '637c4e69d85e0dcc18898ec251377453d0891585',
     })
     expect(type).toBe('commit')
     const oid = await shasum(GitObject.wrap({ type, object }))
@@ -138,7 +139,7 @@ describe('GitPackIndex', () => {
     const p = await GitPackIndex.fromIdx({ idx })
     await p.load({ pack })
     const { type, object } = await p.read({
-      oid: '7fb539a8e8488c3fd2793e7dda8a44693e25cce1' // 9 levels deep of deltification.
+      oid: '7fb539a8e8488c3fd2793e7dda8a44693e25cce1', // 9 levels deep of deltification.
     })
     expect(type).toBe('blob')
     const oid = await shasum(GitObject.wrap({ type, object }))

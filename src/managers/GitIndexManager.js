@@ -13,7 +13,7 @@ const stats = new DeepMap()
 // const lm = new LockManager()
 let lock = null
 
-async function updateCachedIndexFile (fs, filepath) {
+async function updateCachedIndexFile(fs, filepath) {
   const stat = await fs.lstat(filepath)
   const rawIndexFile = await fs.read(filepath)
   const index = await GitIndex.from(rawIndexFile)
@@ -26,7 +26,7 @@ async function updateCachedIndexFile (fs, filepath) {
 }
 
 // Determine whether our copy of the index file is stale
-async function isIndexStale (fs, filepath) {
+async function isIndexStale(fs, filepath) {
   const savedStats = stats.get([fs, filepath])
   if (savedStats === undefined) return true
   const currStats = await fs.lstat(filepath)
@@ -41,11 +41,11 @@ export class GitIndexManager {
    * @param {object} opts
    * @param {function(GitIndex): any} closure
    */
-  static async acquire ({ fs, gitdir }, closure) {
+  static async acquire({ fs, gitdir }, closure) {
     const filepath = `${gitdir}/index`
     if (lock === null) lock = new AsyncLock({ maxPending: Infinity })
     let result
-    await lock.acquire(filepath, async function () {
+    await lock.acquire(filepath, async function() {
       // Acquire a file lock while we're reading the index
       // to make sure other processes aren't writing to it
       // simultaneously, which could result in a corrupted index.

@@ -29,7 +29,7 @@ import { mergeFile } from './mergeFile.js'
  * @returns {Promise<string>} - The SHA-1 object id of the merged tree
  *
  */
-export async function mergeTree ({
+export async function mergeTree({
   fs,
   dir,
   gitdir = join(dir, '.git'),
@@ -39,7 +39,7 @@ export async function mergeTree ({
   ourName = 'ours',
   baseName = 'base',
   theirName = 'theirs',
-  dryRun = false
+  dryRun = false,
 }) {
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
@@ -50,7 +50,7 @@ export async function mergeTree ({
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],
-    map: async function (filepath, [ours, base, theirs]) {
+    map: async function(filepath, [ours, base, theirs]) {
       const path = basename(filepath)
       // What we did, what they did
       const ourChange = await modified(ours, base)
@@ -61,28 +61,28 @@ export async function mergeTree ({
             mode: await base.mode(),
             path,
             oid: await base.oid(),
-            type: await base.type()
+            type: await base.type(),
           }
         }
         case 'false-true': {
           return theirs
             ? {
-              mode: await theirs.mode(),
-              path,
-              oid: await theirs.oid(),
-              type: await theirs.type()
-            }
-            : void 0
+                mode: await theirs.mode(),
+                path,
+                oid: await theirs.oid(),
+                type: await theirs.type(),
+              }
+            : undefined
         }
         case 'true-false': {
           return ours
             ? {
-              mode: await ours.mode(),
-              path,
-              oid: await ours.oid(),
-              type: await ours.type()
-            }
-            : void 0
+                mode: await ours.mode(),
+                path,
+                oid: await ours.oid(),
+                type: await ours.type(),
+              }
+            : undefined
         }
         case 'true-true': {
           // Modifications
@@ -103,7 +103,7 @@ export async function mergeTree ({
               theirs,
               ourName,
               baseName,
-              theirName
+              theirName,
             })
           }
           // all other types of conflicts fail
@@ -129,12 +129,12 @@ export async function mergeTree ({
           gitdir,
           type: 'tree',
           object,
-          dryRun
+          dryRun,
         })
         parent.oid = oid
       }
       return parent
-    }
+    },
   })
   return results.oid
 }
@@ -145,7 +145,7 @@ export async function mergeTree ({
  * @param {WalkerEntry} base
  *
  */
-async function modified (entry, base) {
+async function modified(entry, base) {
   if (!entry && !base) return false
   if (entry && !base) return true
   if (!entry && base) return true
@@ -179,7 +179,7 @@ async function modified (entry, base) {
  * @param {boolean} [args.dryRun = false]
  *
  */
-async function mergeBlobs ({
+async function mergeBlobs({
   fs,
   gitdir,
   path,
@@ -191,7 +191,7 @@ async function mergeBlobs ({
   baseName,
   format,
   markerSize,
-  dryRun
+  dryRun,
 }) {
   const type = 'blob'
   // Compute the new mode.
@@ -220,7 +220,7 @@ async function mergeBlobs ({
     theirName,
     baseName,
     format,
-    markerSize
+    markerSize,
   })
   if (!cleanMerge) {
     // all other types of conflicts fail
@@ -231,7 +231,7 @@ async function mergeBlobs ({
     gitdir,
     type: 'blob',
     object: Buffer.from(mergedText, 'utf8'),
-    dryRun
+    dryRun,
   })
   return { mode, path, oid, type }
 }

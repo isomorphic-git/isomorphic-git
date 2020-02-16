@@ -22,7 +22,7 @@ import { join } from '../utils/join.js'
  * console.log(oid)
  *
  */
-export async function expandOid ({ fs, dir, gitdir = join(dir, '.git'), oid }) {
+export async function expandOid({ fs, dir, gitdir = join(dir, '.git'), oid }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -30,7 +30,7 @@ export async function expandOid ({ fs, dir, gitdir = join(dir, '.git'), oid }) {
     return await _expandOid({
       fs: new FileSystem(fs),
       gitdir,
-      oid
+      oid,
     })
   } catch (err) {
     err.caller = 'git.expandOid'

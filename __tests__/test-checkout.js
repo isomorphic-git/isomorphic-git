@@ -1,14 +1,14 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-
 const {
   E,
   checkout,
   listFiles,
   add,
   commit,
-  branch
+  branch,
 } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('checkout', () => {
   it('checkout', async () => {
@@ -76,7 +76,7 @@ describe('checkout', () => {
       fs,
       dir,
       gitdir,
-      ref: 'v1.0.0'
+      ref: 'v1.0.0',
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
@@ -139,7 +139,7 @@ describe('checkout', () => {
       fs,
       dir,
       gitdir,
-      ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+      ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
@@ -225,16 +225,16 @@ describe('checkout', () => {
     await branch({ fs, dir, gitdir, ref: 'other', checkout: true })
     await checkout({ fs, dir, gitdir, ref: 'test-branch' })
     await fs.write(dir + '/regular-file.txt', 'regular file', {
-      mode: 0o666
+      mode: 0o666,
     })
     await fs.write(dir + '/executable-file.sh', 'executable file', {
-      mode: 0o777
+      mode: 0o777,
     })
     const expectedRegularFileMode = (await fs.lstat(dir + '/regular-file.txt'))
       .mode
-    const expectedExecutableFileMode = (await fs.lstat(
-      dir + '/executable-file.sh'
-    )).mode
+    const expectedExecutableFileMode = (
+      await fs.lstat(dir + '/executable-file.sh')
+    ).mode
     await add({ fs, dir, gitdir, filepath: 'regular-file.txt' })
     await add({ fs, dir, gitdir, filepath: 'executable-file.sh' })
     await commit({
@@ -242,15 +242,15 @@ describe('checkout', () => {
       dir,
       gitdir,
       author: { name: 'Git', email: 'git@example.org' },
-      message: 'add files'
+      message: 'add files',
     })
     await checkout({ fs, dir, gitdir, ref: 'other' })
     await checkout({ fs, dir, gitdir, ref: 'test-branch' })
     const actualRegularFileMode = (await fs.lstat(dir + '/regular-file.txt'))
       .mode
-    const actualExecutableFileMode = (await fs.lstat(
-      dir + '/executable-file.sh'
-    )).mode
+    const actualExecutableFileMode = (
+      await fs.lstat(dir + '/executable-file.sh')
+    ).mode
     expect(actualRegularFileMode).toEqual(expectedRegularFileMode)
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
@@ -260,10 +260,10 @@ describe('checkout', () => {
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
 
     await fs.write(dir + '/regular-file.txt', 'regular file', {
-      mode: 0o666
+      mode: 0o666,
     })
     await fs.write(dir + '/executable-file.sh', 'executable file', {
-      mode: 0o777
+      mode: 0o777,
     })
     const { mode: expectedRegularFileMode } = await fs.lstat(
       dir + '/regular-file.txt'
@@ -290,7 +290,7 @@ describe('checkout', () => {
       dir,
       gitdir,
       ref: 'test-branch',
-      filepaths: ['src/models', 'test']
+      filepaths: ['src/models', 'test'],
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
@@ -322,7 +322,7 @@ describe('checkout', () => {
       dir,
       gitdir,
       ref: 'test-branch',
-      filepaths: ['src/models/GitBlob.js', 'src/utils/write.js']
+      filepaths: ['src/models/GitBlob.js', 'src/utils/write.js'],
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
@@ -350,7 +350,7 @@ describe('checkout', () => {
         fs,
         dir,
         gitdir,
-        ref: 'test-branch'
+        ref: 'test-branch',
       })
     } catch (e) {
       error = e
@@ -373,7 +373,7 @@ describe('checkout', () => {
         gitdir,
         ref: 'test-branch',
         force: true,
-        dryRun: true
+        dryRun: true,
       })
     } catch (e) {
       error = e
@@ -394,7 +394,7 @@ describe('checkout', () => {
         dir,
         gitdir,
         ref: 'test-branch',
-        force: true
+        force: true,
       })
     } catch (e) {
       error = e
@@ -410,7 +410,7 @@ describe('checkout', () => {
       fs,
       dir,
       gitdir,
-      ref: 'test-branch'
+      ref: 'test-branch',
     })
     await fs.write(`${dir}/README.md`, 'Hello world', 'utf8')
     // Test
@@ -420,7 +420,7 @@ describe('checkout', () => {
         fs,
         dir,
         gitdir,
-        force: true
+        force: true,
       })
     } catch (e) {
       error = e
@@ -436,14 +436,14 @@ describe('checkout', () => {
       fs,
       dir,
       gitdir,
-      ref: 'test-branch'
+      ref: 'test-branch',
     })
     await checkout({
       fs,
       dir,
       gitdir,
       ref: 'test-branch',
-      filepaths: ['src/utils', 'test']
+      filepaths: ['src/utils', 'test'],
     })
     const files = await fs.readdir(dir)
     expect(files).toContain('README.md')

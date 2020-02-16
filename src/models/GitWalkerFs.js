@@ -7,13 +7,13 @@ import { shasum } from '../utils/shasum.js'
 import { GitObject } from './GitObject.js'
 
 export class GitWalkerFs {
-  constructor ({ fs, dir, gitdir }) {
+  constructor({ fs, dir, gitdir }) {
     this.fs = fs
     this.dir = dir
     this.gitdir = gitdir
     const walker = this
     this.ConstructEntry = class WorkdirEntry {
-      constructor (fullpath) {
+      constructor(fullpath) {
         this._fullpath = fullpath
         this._type = false
         this._mode = false
@@ -22,29 +22,29 @@ export class GitWalkerFs {
         this._oid = false
       }
 
-      async type () {
+      async type() {
         return walker.type(this)
       }
 
-      async mode () {
+      async mode() {
         return walker.mode(this)
       }
 
-      async stat () {
+      async stat() {
         return walker.stat(this)
       }
 
-      async content () {
+      async content() {
         return walker.content(this)
       }
 
-      async oid () {
+      async oid() {
         return walker.oid(this)
       }
     }
   }
 
-  async readdir (entry) {
+  async readdir(entry) {
     const filepath = entry._fullpath
     const { fs, dir } = this
     const names = await fs.readdir(join(dir, filepath))
@@ -52,21 +52,21 @@ export class GitWalkerFs {
     return names.map(name => join(filepath, name))
   }
 
-  async type (entry) {
+  async type(entry) {
     if (entry._type === false) {
       await entry.stat()
     }
     return entry._type
   }
 
-  async mode (entry) {
+  async mode(entry) {
     if (entry._mode === false) {
       await entry.stat()
     }
     return entry._mode
   }
 
-  async stat (entry) {
+  async stat(entry) {
     if (entry._stat === false) {
       const { fs, dir } = this
       let stat = await fs.lstat(`${dir}/${entry._fullpath}`)
@@ -91,11 +91,11 @@ export class GitWalkerFs {
     return entry._stat
   }
 
-  async content (entry) {
+  async content(entry) {
     if (entry._content === false) {
       const { fs, dir } = this
       if ((await entry.type()) === 'tree') {
-        entry._content = void 0
+        entry._content = undefined
       } else {
         const content = await fs.read(`${dir}/${entry._fullpath}`)
         // workaround for a BrowserFS edge case
@@ -109,18 +109,18 @@ export class GitWalkerFs {
     return entry._content
   }
 
-  async oid (entry) {
+  async oid(entry) {
     if (entry._oid === false) {
       const { fs, gitdir } = this
       let oid
       // See if we can use the SHA1 hash in the index.
-      await GitIndexManager.acquire({ fs, gitdir }, async function (index) {
+      await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
         const stage = index.entriesMap.get(entry._fullpath)
         const stats = await entry.stat()
         if (!stage || compareStats(stats, stage)) {
           const content = await entry.content()
-          if (content === void 0) {
-            oid = void 0
+          if (content === undefined) {
+            oid = undefined
           } else {
             oid = await shasum(
               GitObject.wrap({ type: 'blob', object: await entry.content() })
@@ -129,7 +129,7 @@ export class GitWalkerFs {
               index.insert({
                 filepath: entry._fullpath,
                 stats,
-                oid: oid
+                oid: oid,
               })
             }
           }

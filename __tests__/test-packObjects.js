@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const path = require('path')
 
 const { packObjects } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('packObjects', () => {
   it('makes a packfile', async () => {
@@ -27,8 +28,8 @@ describe('packObjects', () => {
         'f03ae7b490022507f83729b9227e723ab1587a38',
         'a59efbcd7640e659ec81887a2599711f8d9ef801',
         'e5abf40a5b37382c700f51ac5c2aeefdadb8e184',
-        '5477471ab5a6a8f2c217023532475044117a8f2c'
-      ]
+        '5477471ab5a6a8f2c217023532475044117a8f2c',
+      ],
     })
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     if (!packfile) throw new Error('type error')
@@ -62,9 +63,9 @@ describe('packObjects', () => {
         'f03ae7b490022507f83729b9227e723ab1587a38',
         'a59efbcd7640e659ec81887a2599711f8d9ef801',
         'e5abf40a5b37382c700f51ac5c2aeefdadb8e184',
-        '5477471ab5a6a8f2c217023532475044117a8f2c'
+        '5477471ab5a6a8f2c217023532475044117a8f2c',
       ],
-      write: true
+      write: true,
     })
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     const filepath = path.join(gitdir, `objects/pack/${filename}`)

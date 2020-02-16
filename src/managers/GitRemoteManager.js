@@ -3,12 +3,12 @@ import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
-function parseRemoteUrl ({ url }) {
+function parseRemoteUrl({ url }) {
   // the stupid "shorter scp-like syntax"
   if (url.startsWith('git@')) {
     return {
       transport: 'ssh',
-      address: url
+      address: url,
     }
   }
   const matches = url.match(/(\w+)(:\/\/|::)(.*)/)
@@ -23,7 +23,7 @@ function parseRemoteUrl ({ url }) {
   if (matches[2] === '://') {
     return {
       transport: matches[1],
-      address: matches[0]
+      address: matches[0],
     }
   }
   /*
@@ -35,13 +35,13 @@ function parseRemoteUrl ({ url }) {
   if (matches[2] === '::') {
     return {
       transport: matches[1],
-      address: matches[3]
+      address: matches[3],
     }
   }
 }
 
 export class GitRemoteManager {
-  static getRemoteHelperFor ({ url }) {
+  static getRemoteHelperFor({ url }) {
     // TODO: clean up the remoteHelper API and move into PluginCore
     const remoteHelpers = new Map()
     remoteHelpers.set('http', GitRemoteHTTP)
@@ -57,7 +57,8 @@ export class GitRemoteManager {
     throw new GitError(E.UnknownTransportError, {
       url,
       transport: parts.transport,
-      suggestion: parts.transport === 'ssh' ? translateSSHtoHTTP(url) : void 0
+      suggestion:
+        parts.transport === 'ssh' ? translateSSHtoHTTP(url) : undefined,
     })
   }
 }

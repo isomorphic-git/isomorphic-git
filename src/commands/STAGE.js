@@ -7,12 +7,12 @@ import { GitWalkSymbol } from '../utils/symbols.js'
 /**
  * @returns {Walker}
  */
-export function STAGE () {
+export function STAGE() {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkSymbol, {
-    value: function ({ fs, gitdir }) {
+    value: function({ fs, gitdir }) {
       return new GitWalkerIndex({ fs, gitdir })
-    }
+    },
   })
   Object.freeze(o)
   return o

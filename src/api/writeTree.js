@@ -20,7 +20,7 @@ import { join } from '../utils/join.js'
  * @see TreeEntry
  *
  */
-export async function writeTree ({ fs, dir, gitdir = join(dir, '.git'), tree }) {
+export async function writeTree({ fs, dir, gitdir = join(dir, '.git'), tree }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -29,7 +29,7 @@ export async function writeTree ({ fs, dir, gitdir = join(dir, '.git'), tree }) 
     return await _writeTree({
       fs: new FileSystem(fs),
       gitdir,
-      tree
+      tree,
     })
   } catch (err) {
     err.caller = 'git.writeTree'

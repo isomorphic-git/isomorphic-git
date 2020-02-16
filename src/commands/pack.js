@@ -13,15 +13,15 @@ import { padHex } from '../utils/padHex.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids
  */
-export async function pack ({ fs, dir, gitdir = join(dir, '.git'), oids }) {
+export async function pack({ fs, dir, gitdir = join(dir, '.git'), oids }) {
   const hash = new Hash()
   const outputStream = []
-  function write (chunk, enc) {
+  function write(chunk, enc) {
     const buff = Buffer.from(chunk, enc)
     outputStream.push(buff)
     hash.update(buff)
   }
-  async function writeObject ({ stype, object }) {
+  async function writeObject({ stype, object }) {
     // Object type is encoded in bits 654
     const type = types[stype]
     // The length encoding gets complicated.

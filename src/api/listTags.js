@@ -19,7 +19,7 @@ import { join } from '../utils/join.js'
  * console.log(tags)
  *
  */
-export async function listTags ({ fs, dir, gitdir = join(dir, '.git') }) {
+export async function listTags({ fs, dir, gitdir = join(dir, '.git') }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)

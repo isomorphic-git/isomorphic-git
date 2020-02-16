@@ -14,7 +14,7 @@ import { E } from '../models/GitError.js'
  * @returns {Promise<Array<{target: string, note: string}>>}
  */
 
-export async function listNotes ({ fs, gitdir, ref }) {
+export async function listNotes({ fs, gitdir, ref }) {
   // Get the current note commit
   let parent
   try {
@@ -29,13 +29,13 @@ export async function listNotes ({ fs, gitdir, ref }) {
   const result = await readTree({
     fs,
     gitdir,
-    oid: parent
+    oid: parent,
   })
 
   // Format the tree entries
   const notes = result.tree.map(entry => ({
     target: entry.path,
-    note: entry.oid
+    note: entry.oid,
   }))
   return notes
 }
