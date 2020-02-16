@@ -1,8 +1,5 @@
 /* eslint-env node, browser, jasmine */
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-checkout.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
 
 const {
   E,
@@ -14,18 +11,60 @@ const {
 } = require('isomorphic-git')
 
 describe('checkout', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
-
   it('checkout', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await checkout({ fs, dir, gitdir, ref: 'test-branch' })
     const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
+    expect(files.sort()).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        "LICENSE.md",
+        "README.md",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src",
+        "test",
+      ]
+    `)
     const index = await listFiles({ fs, dir, gitdir })
-    expect(index).toMatchSnapshot()
+    expect(index).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        "LICENSE.md",
+        "README.md",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src/commands/checkout.js",
+        "src/commands/config.js",
+        "src/commands/fetch.js",
+        "src/commands/init.js",
+        "src/index.js",
+        "src/models/GitBlob.js",
+        "src/models/GitCommit.js",
+        "src/models/GitConfig.js",
+        "src/models/GitTree.js",
+        "src/utils/combinePayloadAndSignature.js",
+        "src/utils/commitSha.js",
+        "src/utils/exists.js",
+        "src/utils/mkdirs.js",
+        "src/utils/read.js",
+        "src/utils/resolveRef.js",
+        "src/utils/unwrapObject.js",
+        "src/utils/wrapCommit.js",
+        "src/utils/write.js",
+        "test/resolveRef.js",
+        "test/smoke.js",
+        "test/snapshots/resolveRef.js.md",
+        "test/snapshots/resolveRef.js.snap",
+      ]
+    `)
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('ref: refs/heads/test-branch\n')
   })
@@ -40,9 +79,55 @@ describe('checkout', () => {
       ref: 'v1.0.0'
     })
     const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
+    expect(files.sort()).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        "LICENSE.md",
+        "README.md",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src",
+        "test",
+      ]
+    `)
     const index = await listFiles({ fs, dir, gitdir })
-    expect(index).toMatchSnapshot()
+    expect(index).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        "LICENSE.md",
+        "README.md",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src/commands/checkout.js",
+        "src/commands/config.js",
+        "src/commands/fetch.js",
+        "src/commands/init.js",
+        "src/index.js",
+        "src/models/GitBlob.js",
+        "src/models/GitCommit.js",
+        "src/models/GitConfig.js",
+        "src/models/GitTree.js",
+        "src/utils/combinePayloadAndSignature.js",
+        "src/utils/commitSha.js",
+        "src/utils/exists.js",
+        "src/utils/mkdirs.js",
+        "src/utils/read.js",
+        "src/utils/resolveRef.js",
+        "src/utils/unwrapObject.js",
+        "src/utils/wrapCommit.js",
+        "src/utils/write.js",
+        "test/resolveRef.js",
+        "test/smoke.js",
+        "test/snapshots/resolveRef.js.md",
+        "test/snapshots/resolveRef.js.snap",
+      ]
+    `)
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
   })
@@ -57,9 +142,55 @@ describe('checkout', () => {
       ref: 'e10ebb90d03eaacca84de1af0a59b444232da99e'
     })
     const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
+    expect(files.sort()).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        "LICENSE.md",
+        "README.md",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src",
+        "test",
+      ]
+    `)
     const index = await listFiles({ fs, dir, gitdir })
-    expect(index).toMatchSnapshot()
+    expect(index).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        "LICENSE.md",
+        "README.md",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src/commands/checkout.js",
+        "src/commands/config.js",
+        "src/commands/fetch.js",
+        "src/commands/init.js",
+        "src/index.js",
+        "src/models/GitBlob.js",
+        "src/models/GitCommit.js",
+        "src/models/GitConfig.js",
+        "src/models/GitTree.js",
+        "src/utils/combinePayloadAndSignature.js",
+        "src/utils/commitSha.js",
+        "src/utils/exists.js",
+        "src/utils/mkdirs.js",
+        "src/utils/read.js",
+        "src/utils/resolveRef.js",
+        "src/utils/unwrapObject.js",
+        "src/utils/wrapCommit.js",
+        "src/utils/write.js",
+        "test/resolveRef.js",
+        "test/smoke.js",
+        "test/snapshots/resolveRef.js.md",
+        "test/snapshots/resolveRef.js.snap",
+      ]
+    `)
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
   })
@@ -75,7 +206,17 @@ describe('checkout', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchSnapshot()
+    expect(error.toJSON()).toMatchInlineSnapshot(`
+      Object {
+        "caller": "git.checkout",
+        "code": "CommitNotFetchedError",
+        "data": Object {
+          "oid": "033417ae18b174f078f2f44232cb7a374f4c60ce",
+          "ref": "missing-branch",
+        },
+        "message": "Failed to checkout \\"missing-branch\\" because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally.",
+      }
+    `)
     expect(error.caller).toEqual('git.checkout')
   })
 
@@ -152,9 +293,25 @@ describe('checkout', () => {
       filepaths: ['src/models', 'test']
     })
     const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
+    expect(files.sort()).toMatchInlineSnapshot(`
+      Array [
+        "src",
+        "test",
+      ]
+    `)
     const index = await listFiles({ fs, dir, gitdir })
-    expect(index).toMatchSnapshot()
+    expect(index).toMatchInlineSnapshot(`
+      Array [
+        "src/models/GitBlob.js",
+        "src/models/GitCommit.js",
+        "src/models/GitConfig.js",
+        "src/models/GitTree.js",
+        "test/resolveRef.js",
+        "test/smoke.js",
+        "test/snapshots/resolveRef.js.md",
+        "test/snapshots/resolveRef.js.snap",
+      ]
+    `)
   })
 
   it('checkout files using filepaths', async () => {
@@ -168,9 +325,18 @@ describe('checkout', () => {
       filepaths: ['src/models/GitBlob.js', 'src/utils/write.js']
     })
     const files = await fs.readdir(dir)
-    expect(files.sort()).toMatchSnapshot()
+    expect(files.sort()).toMatchInlineSnapshot(`
+      Array [
+        "src",
+      ]
+    `)
     const index = await listFiles({ fs, dir, gitdir })
-    expect(index).toMatchSnapshot()
+    expect(index).toMatchInlineSnapshot(`
+      Array [
+        "src/models/GitBlob.js",
+        "src/utils/write.js",
+      ]
+    `)
   })
 
   it('checkout detects conflicts', async () => {
