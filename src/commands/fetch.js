@@ -54,10 +54,6 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {Date} [args.since]
  * @param {string[]} [args.exclude = []]
  * @param {boolean} [args.relative = false]
- * @param {string} [args.username]
- * @param {string} [args.password]
- * @param {string} [args.token]
- * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format]
  * @param {Object<string, string>} [args.headers]
  * @param {boolean} [args.prune]
  * @param {boolean} [args.pruneTags]
@@ -79,10 +75,6 @@ export async function fetch({
   remote: _remote,
   url: _url,
   corsProxy,
-  username,
-  password,
-  token,
-  oauth2format,
   depth = null,
   since = null,
   exclude = [],
@@ -118,7 +110,7 @@ export async function fetch({
     corsProxy = await config.get('http.corsProxy')
   }
 
-  let auth = { username, password, token, oauth2format }
+  let auth = {}
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const remoteHTTP = await GitRemoteHTTP.discover({
     http,

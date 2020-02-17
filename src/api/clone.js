@@ -30,10 +30,6 @@ import { join } from '../utils/join.js'
  * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
  * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
  * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {'github'|'bitbucket'|'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
@@ -65,10 +61,6 @@ export async function clone({
   corsProxy = undefined,
   ref = undefined,
   remote = 'origin',
-  username = undefined,
-  password = undefined,
-  token = undefined,
-  oauth2format = undefined,
   depth = undefined,
   since = undefined,
   exclude = [],
@@ -100,10 +92,6 @@ export async function clone({
       corsProxy,
       ref,
       remote,
-      username,
-      password,
-      token,
-      oauth2format,
       depth,
       since,
       exclude,

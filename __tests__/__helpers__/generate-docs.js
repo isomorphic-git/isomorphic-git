@@ -199,7 +199,10 @@ async function gendoc(file, filepath) {
           let name = param.name.replace('_.', '').replace('args.', '')
           const actualName = name
           const shouldLink =
-            actualName.startsWith('on') || name === 'http' || name === 'fs'
+            actualName.startsWith('on') ||
+            name === 'http' ||
+            name === 'fs' ||
+            name === 'headers'
           if (!param.optional) name = `**${name}**`
 
           let type = param.type.names.map(escapeType).join(' | ')

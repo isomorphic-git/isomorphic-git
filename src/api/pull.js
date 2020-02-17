@@ -26,10 +26,6 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.fastForwardOnly = false] - Only perform simple fast-forward merges. (Don't create merge commits.)
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {Object} [args.author] - The details about the author.
  * @param {string} [args.author.name] - Default is `user.name` config.
@@ -71,10 +67,6 @@ export async function pull({
   ref,
   fastForwardOnly = false,
   corsProxy,
-  username,
-  password,
-  token,
-  oauth2format,
   singleBranch,
   headers = {},
   author: _author,
@@ -111,10 +103,6 @@ export async function pull({
       ref,
       fastForwardOnly,
       corsProxy,
-      username,
-      password,
-      token,
-      oauth2format,
       singleBranch,
       headers,
       author,

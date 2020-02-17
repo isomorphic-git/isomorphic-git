@@ -30,10 +30,6 @@ import { addRemote } from './addRemote.js'
  * @param {Date} args.since
  * @param {string[]} args.exclude
  * @param {boolean} args.relative
- * @param {string} args.username
- * @param {string} args.password
- * @param {string} args.token
- * @param {'github'|'bitbucket'|'gitlab'} args.oauth2format
  * @param {Object<string, string>} args.headers
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
@@ -53,10 +49,6 @@ export async function clone({
   corsProxy,
   ref,
   remote,
-  username,
-  password,
-  token,
-  oauth2format,
   depth,
   since,
   exclude,
@@ -88,10 +80,6 @@ export async function clone({
     gitdir,
     ref,
     remote,
-    username,
-    password,
-    token,
-    oauth2format,
     depth,
     since,
     exclude,
