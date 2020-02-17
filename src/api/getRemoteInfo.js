@@ -23,13 +23,12 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  * @param {object} args
  * @param {HttpClient} args.http - an HTTP client
+ * @param {AuthCallback} [args.onAuth] - optional auth fill callback
+ * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
+ * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
  * @param {string} args.url - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities.
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
  * @returns {Promise<GetRemoteInfoResult>} Resolves successfully with an object listing the branches, tags, and capabilities of the remote.
@@ -46,21 +45,23 @@ import { assertParameter } from '../utils/assertParameter.js'
  */
 export async function getRemoteInfo({
   http,
+  onAuth,
+  onAuthSuccess,
+  onAuthFailure,
   corsProxy,
   url,
-  username,
-  password,
-  token,
-  oauth2format,
   headers = {},
   forPush = false,
 }) {
   try {
     assertParameter('url', url)
 
-    let auth = { username, password, token, oauth2format }
+    let auth = {}
     const remote = await GitRemoteHTTP.discover({
       http,
+      onAuth,
+      onAuthSuccess,
+      onAuthFailure,
       corsProxy,
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,

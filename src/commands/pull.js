@@ -22,10 +22,6 @@ import { E, GitError } from '../models/GitError.js'
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} args.singleBranch
  * @param {boolean} args.fastForwardOnly
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {Object} args.author
  * @param {string} args.author.name
@@ -55,10 +51,6 @@ export async function pull({
   ref,
   fastForwardOnly,
   corsProxy,
-  username,
-  password,
-  token,
-  oauth2format,
   singleBranch,
   headers,
   author,
@@ -95,10 +87,6 @@ export async function pull({
       corsProxy,
       ref,
       remote,
-      username,
-      password,
-      token,
-      oauth2format,
       singleBranch,
       headers,
     })

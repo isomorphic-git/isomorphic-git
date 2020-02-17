@@ -36,10 +36,6 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {boolean} [args.delete = false]
  * @param {string} [args.url]
  * @param {string} [args.corsProxy]
- * @param {string} [args.username]
- * @param {string} [args.password]
- * @param {string} [args.token]
- * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format]
  * @param {Object<string, string>} [args.headers]
  *
  * @returns {Promise<PushResult>}
@@ -60,10 +56,6 @@ export async function push({
   force = false,
   delete: _delete = false,
   corsProxy,
-  username,
-  password,
-  token,
-  oauth2format,
   headers = {},
 }) {
   const ref = _ref || (await currentBranch({ fs, gitdir }))
@@ -106,7 +98,7 @@ export async function push({
   const oid = _delete
     ? '0000000000000000000000000000000000000000'
     : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
-  let auth = { username, password, token, oauth2format }
+  let auth = {}
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const httpRemote = await GitRemoteHTTP.discover({
     http,

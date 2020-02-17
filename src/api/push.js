@@ -34,10 +34,6 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.force = false] - If true, behaves the same as `git push --force`
  * @param {boolean} [args.delete = false] - If true, delete the remote ref
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
  * @returns {Promise<PushResult>} Resolves successfully when push completes with a detailed description of the operation from the server.
@@ -51,7 +47,7 @@ import { join } from '../utils/join.js'
  *   dir: '/tutorial',
  *   remote: 'origin',
  *   ref: 'master',
- *   token: process.env.GITHUB_TOKEN,
+ *   onAuth: () => ({ token: process.env.GITHUB_TOKEN }),
  * })
  * console.log(pushResult)
  *
@@ -73,10 +69,6 @@ export async function push({
   force = false,
   delete: _delete = false,
   corsProxy,
-  username,
-  password,
-  token,
-  oauth2format,
   headers = {},
 }) {
   try {
@@ -99,10 +91,6 @@ export async function push({
       force,
       delete: _delete,
       corsProxy,
-      username,
-      password,
-      token,
-      oauth2format,
       headers,
     })
   } catch (err) {
