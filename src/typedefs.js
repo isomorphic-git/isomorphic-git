@@ -237,7 +237,7 @@
 /**
  * @callback WalkerMap
  * @param {string} filename
- * @param {?WalkerEntry[]} entries
+ * @param {WalkerEntry[]} entries
  * @returns {Promise<any>}
  */
 
@@ -277,4 +277,18 @@
  * @property {Object<string, RefUpdateStatus>} refs
  * @property {Object<string, string>} [headers]
  *
+ */
+
+/**
+ * @typedef {0|1} HeadStatus
+ */
+/**
+ * @typedef {0|1|2} WorkdirStatus
+ */
+/**
+ * @typedef {0|1|2|3} StageStatus
+ */
+
+/**
+ * @typedef {[string, HeadStatus, WorkdirStatus, StageStatus]} StatusRow
  */

@@ -147,7 +147,8 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {string[]} [args.filepaths = ['.']] - Limit the query to the given files and directories
  * @param {function(string): boolean} [args.filter] - Filter the results to only those whose filepath matches a function.
  *
- * @returns {Promise<number[][]>} Resolves with a status matrix, described below.
+ * @returns {Promise<Array<StatusRow>>} Resolves with a status matrix, described below.
+ * @see StatusRow
  */
 export async function statusMatrix({
   fs,
