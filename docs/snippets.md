@@ -20,7 +20,7 @@ All snippets are published under the MIT License.
 const globby = require('globby');
 const paths = await globby(['./**', './**/.*'], { gitignore: true });
 for (const filepath of paths) {
-    await git.add({ fs, dir, filepath });
+  await git.add({ fs, dir, filepath });
 }
 ```
 
@@ -28,13 +28,12 @@ for (const filepath of paths) {
 
 ```js
 await git.statusMatrix(repo).then((status) =>
-    Promise.all(
-        status.map(([filepath, , worktreeStatus]) =>
-            // isomorphic-git may report a changed file as unmodified, so always add if not removing
-            worktreeStatus ? git.add({ ...repo, filepath }) : git.remove({ ...repo, filepath })
-        );
-    );
-);
+  Promise.all(
+    status.map(([filepath, , worktreeStatus]) =>
+      worktreeStatus ? git.add({ ...repo, filepath }) : git.remove({ ...repo, filepath })
+    )
+  )
+)
 ```
 
 ## Use native git credential manager
@@ -42,43 +41,31 @@ await git.statusMatrix(repo).then((status) =>
 Adapted from the [Antora docs](https://gitlab.com/antora/antora/blob/master/docs/modules/playbook/pages/private-repository-auth.adoc):
 
 ```js
-const git = require('isomorphic-git')
 const { spawn } = require('child_process')
 const { URL } = require('url')
 
-const systemGitCredentialManager = {
-  async fill ({ url }) {
-    const { protocol, host } = new URL(url)
-    return new Promise((resolve, reject) => {
-      const output = []
-      const process = spawn('git', ['credential', 'fill'])
-      process.on('close', (code) => {
-        if (code) return reject(code)
-        const { username, password } = output.join('\n').split('\n').reduce((acc, line) => {
-          if (line.startsWith('username') || line.startsWith('password')) {
-            const [ key, val ] = line.split('=')
-            acc[key] = val
-          }
-          return acc
-        }, {})
-        resolve({ username, password })
-      })
-      process.stdout.on('data', (data) => output.push(data.toString().trim()))
-      process.stdin.write(`protocol=${protocol.slice(0, -1)}\nhost=${host}\n\n`)
+async function onAuth (url) {
+  const { protocol, host } = new URL(url)
+  return new Promise((resolve, reject) => {
+    const output = []
+    const process = spawn('git', ['credential', 'fill'])
+    process.on('close', (code) => {
+      if (code) return reject(code)
+      const { username, password } = output.join('\n').split('\n').reduce((acc, line) => {
+        if (line.startsWith('username') || line.startsWith('password')) {
+          const [ key, val ] = line.split('=')
+          acc[key] = val
+        }
+        return acc
+      }, {})
+      resolve({ username, password })
     })
-  },
-  async approved ({ url }) {},
-  async rejected ({ url, auth }) {
-    const data = { statusCode: 401, statusMessage: 'HTTP Basic: Access Denied' }
-    const err = new Error(`HTTP Error: ${data.statusCode} ${data.statusMessage}`)
-    err.name = err.code = 'HTTPError'
-    err.data = data
-    err.rejected = !!auth
-    throw err
-  },
+    process.stdout.on('data', (data) => output.push(data.toString().trim()))
+    process.stdin.write(`protocol=${protocol.slice(0, -1)}\nhost=${host}\n\n`)
+  })
 }
 
-git.plugins.set('credentialManager', systemGitCredentialManager)
+await git.clone({ ...repo, onAuth })
 ```
 
 ## GitHub Pages deploy script
@@ -87,47 +74,54 @@ git.plugins.set('credentialManager', systemGitCredentialManager)
 const path = require('path')
 const fs = require('fs')
 const git = require('isomorphic-git')
-git.plugins.set('fs', fs)
+const http = require('isomorphic-git/dist/http.cjs')
 
 // PARAMETERS - CHANGE THESE FOR YOUR CODE
-let url = 'https://github.com/isomorphic-git/isomorphic-git.github.io'
-let sourceDir = path.join(__dirname, '../..')
-let buildDir = path.join(sourceDir, 'website/build/isomorphic-git.github.io')
+const url = 'https://github.com/isomorphic-git/isomorphic-git.github.io'
+const sourceDir = path.join(__dirname, '../..')
+const buildDir = path.join(sourceDir, 'website/build/isomorphic-git.github.io')
 
 ;(async () => {
-  dir = sourceDir
-  let commit = await git.log({ dir, depth: 1 })
-  commit = commit[0]
-  let message = commit.message
+  let dir = sourceDir
+  const commits = await git.log({ fs, dir, depth: 1 })
+  const commit = commits[0].commit
 
   dir = buildDir
-  await git.init({ dir })
-  await git.addRemote({ dir, url, remote: 'origin' })
-  await git.fetch({ dir, ref: 'master', depth: 1 })
-  await git.checkout({ dir, ref: 'master', noCheckout: true })
-  await git.add({ dir, filepath: '.' })
-  await git.commit({ dir, author: commit.author, message: commit.message })
-  await git.push({ dir, oauth2format: 'github', token: process.env.GITHUB_TOKEN })
+  await git.init({ fs, dir })
+  await git.addRemote({ fs, dir, url, remote: 'origin' })
+  await git.fetch({ http, fs, dir, ref: 'master', depth: 1 })
+  await git.checkout({ fs, dir, ref: 'master', noCheckout: true })
+  await git.add({ fs, dir, filepath: '.' })
+  await git.commit({ fs, dir, author: commit.author, message: commit.message })
+  await git.push({
+    http,
+    fs,
+    dir,
+    onAuth: () => ({
+      oauth2format: 'github',
+      token: process.env.GITHUB_TOKEN,
+    }),
+  })
 })()
 ```
 
 ## git log -- path/to/file
 ```js
+const fs = require('fs')
 const git = require('.')
-git.plugins.set('fs', require('fs'))
 
 // PARAMETERS - CHANGE THESE FOR YOUR CODE
 const dir = '.'
 const filepath = 'path/to/file'
 
 ;(async () => {
-  let commits = await git.log({dir: '.'})
+  const commits = await git.log({ fs, dir })
   let lastSHA = null
   let lastCommit = null
-  let commitsThatMatter = []
-  for (let commit of commits) {
+  const commitsThatMatter = []
+  for (const commit of commits) {
     try {
-      let o = await git.readObject({ dir, oid: commit.oid, filepath })
+      const o = await git.readObject({ fs, dir, oid: commit.oid, filepath })
       if (o.oid !== lastSHA) {
         if (lastSHA !== null) commitsThatMatter.push(lastCommit)
         lastSHA = o.oid
@@ -135,7 +129,7 @@ const filepath = 'path/to/file'
     } catch (err) {
       // file no longer there
       commitsThatMatter.push(lastCommit)
-      break;
+      break
     }
     lastCommit = commit
   }
@@ -146,52 +140,46 @@ const filepath = 'path/to/file'
 ## git diff --name-status \<commitHash1\> \<commitHash2\>
 Adapted from [GitViz](https://github.com/kpj/GitViz/blob/83dfc65624f5dae41ffb9e8a97d2ee61512c1365/src/git-handler.js) by @kpj
 ```js
-async function getFileStateChanges (commitHash1, commitHash2, dir) {
-  return git.walkBeta1({
-    trees: [
-      git.TREE({ dir: dir, ref: commitHash1 }),
-      git.TREE({ dir: dir, ref: commitHash2 })
-    ],
-    map: async function ([A, B]) {
+async function getFileStateChanges(commitHash1, commitHash2, dir) {
+  return git.walk({
+    fs,
+    dir,
+    trees: [git.TREE({ ref: commitHash1 }), git.TREE({ ref: commitHash2 })],
+    map: async function(filepath, [A, B]) {
       // ignore directories
-      if (A.fullpath === '.') {
+      if (filepath === '.') {
         return
       }
-      await A.populateStat()
-      if (A.type === 'tree') {
-        return
-      }
-      await B.populateStat()
-      if (B.type === 'tree') {
+      if ((await A.type()) === 'tree' || (await B.type()) === 'tree') {
         return
       }
 
       // generate ids
-      await A.populateHash()
-      await B.populateHash()
+      const Aoid = await A.oid()
+      const Boid = await B.oid()
 
       // determine modification type
       let type = 'equal'
-      if (A.oid !== B.oid) {
+      if (Aoid !== Boid) {
         type = 'modify'
       }
-      if (A.oid === undefined) {
+      if (Aoid === undefined) {
         type = 'add'
       }
-      if (B.oid === undefined) {
+      if (Boid === undefined) {
         type = 'remove'
       }
-      if (A.oid === undefined && B.oid === undefined) {
+      if (Aoid === undefined && Boid === undefined) {
         console.log('Something weird happened:')
         console.log(A)
         console.log(B)
       }
 
       return {
-        path: `/${A.fullpath}`,
-        type: type
+        path: `/${filepath}`,
+        type: type,
       }
-    }
+    },
   })
 }
 ```

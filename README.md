@@ -36,7 +36,6 @@ The following environments are tested in CI and will continue to be supported un
 
 TODO:
 - [ ] I should probably normalize on timestamps and get rid of the `date` options.
-- [ ] Update the Useful Snippets.
 
 ### Big changes
 - [x] The supported node & browser versions have been bumped. (See beautiful table above.)
