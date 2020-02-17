@@ -79,7 +79,9 @@ export class GitRemoteHTTP {
       url: `${url}/info/refs?service=${service}`,
       headers,
     })
-    if (res.statusCode === 401 && onAuth) {
+    // 401 is the "correct" response. 203 is Non-Authoritative Information and comes from Azure DevOps, which
+    // apparently doesn't realize this is a git request and is returning the HTML for the "Azure DevOps Services | Sign In" page.
+    if ((res.statusCode === 401 || res.statusCode === 203) && onAuth) {
       // Acquire credentials and try again
       // TODO: read `useHttpPath` value from git config and pass as 2nd argument
       auth = await onAuth(_origUrl)
