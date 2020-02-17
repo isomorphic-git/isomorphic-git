@@ -34,9 +34,6 @@ The following environments are tested in CI and will continue to be supported un
 
 ## 1.0 Breaking Changes
 
-TODO:
-- [ ] I should probably normalize on timestamps and get rid of the `date` options.
-
 ### Big changes
 - [x] The supported node & browser versions have been bumped. (See beautiful table above.)
 - [x] The plugin system has been eliminated and we're back to plain old dependency injection via function arguments! The plugin cores created a mysterious "global state" that makes it easy to trip up (I myself sometimes forgot to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic and more verbose, but it is a much simpler model than the plugin core model, and much safer because it makes it impossible for dependencies to accidentally share the default plugin core.
@@ -64,6 +61,7 @@ TODO:
   - [x] The `autoTranslateSSH` feature was removed, since it is trivial to implement your own version using just the `UnknownTransportError.data.suggestion`
   - [x] The `writeObject` function when used to write a tree now expects a plain array rather than an object with a property called `entries` which is the array. (This is so that argument to `writeObject` has the same shame as the arguments to `writeBlob`/`writeCommit`/`writeTag`/`writeTree`.)
   - [x] The `noOverwrite` parameter was removed from `init` and is the new behavior.
+  - [x] The `author.date`, `committer.date`, `tagger.date` parameters were removed in favor of `author.timestamp`, `comitter.timestamp`, `tagger.timestamp` in order to be clear about what is actually written and better reflect the return types in `readCommit`, `log`, and `readTag`.
 
 ### The return types of some functions have changed:
   - [x] Functions that used to return `Buffer` objects now return `Uint8Array` objects. (This is so we can eventually remove all internal dependencies on the Buffer browser polyfill, which is quite heavy!)
