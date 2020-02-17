@@ -22,8 +22,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  * @param {object} [args.tagger] - The details about the tagger.
  * @param {string} [args.tagger.name] - Default is `user.name` config.
  * @param {string} [args.tagger.email] - Default is `user.email` config.
- * @param {Date} [args.tagger.date] - Set the tagger timestamp field. Default is the current date.
- * @param {number} [args.tagger.timestamp] - Set the tagger timestamp field. This is an alternative to using `date` using an integer number of seconds since the Unix epoch instead of a JavaScript date object.
+ * @param {number} [args.tagger.timestamp=Math.floor(Date.now()/1000)] - Set the tagger timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).
  * @param {number} [args.tagger.timezoneOffset] - Set the tagger timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.gpgsig] - The gpgsig attatched to the tag object. (Mutually exclusive with the `signingKey` option.)
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key. (Mutually exclusive with the `gpgsig` option.)
