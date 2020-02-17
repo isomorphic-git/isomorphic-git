@@ -20,13 +20,11 @@ import { E, GitError } from '../models/GitError.js'
  * @param {Object} args.author
  * @param {string} args.author.name
  * @param {string} args.author.email
- * @param {Date} args.author.date
  * @param {number} args.author.timestamp
  * @param {number} args.author.timezoneOffset
  * @param {Object} args.committer
  * @param {string} args.committer.name
  * @param {string} args.committer.email
- * @param {Date} args.committer.date
  * @param {number} args.committer.timestamp
  * @param {number} args.committer.timezoneOffset
  * @param {string} [args.signingKey]

@@ -2,7 +2,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 
 /**
  *
- * @returns {Promise<void | {name: string, email: string, date: Date, timestamp: number, timezoneOffset: number }>}
+ * @returns {Promise<void | {name: string, email: string, timestamp: number, timezoneOffset: number }>}
  */
 export async function normalizeCommitterObject({
   fs,
@@ -13,7 +13,6 @@ export async function normalizeCommitterObject({
   committer = Object.assign({}, committer || author)
   // Match committer's date to author's one, if omitted
   if (author) {
-    committer.date = committer.date || author.date
     committer.timestamp = committer.timestamp || author.timestamp
     committer.timezoneOffset = committer.timezoneOffset || author.timezoneOffset
   }

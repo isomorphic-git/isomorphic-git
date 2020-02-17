@@ -20,7 +20,6 @@ import { writeObject } from '../storage/writeObject.js'
  * @param {object} [args.tagger]
  * @param {string} args.tagger.name
  * @param {string} args.tagger.email
- * @param {Date} args.tagger.date
  * @param {number} args.tagger.timestamp
  * @param {number} args.tagger.timezoneOffset
  * @param {string} [args.gpgsig]
