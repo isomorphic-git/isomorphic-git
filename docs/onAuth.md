@@ -13,14 +13,19 @@ Git does all its authentication using HTTPS Basic Authentication.
 An `onAuth` function is called with a `url` and should return a credential object:
 
 ```ts
-type AuthCallback = (url: string) => Promise<GitAuth>;
+/**
+ * @callback AuthCallback
+ * @param {string} url
+ * @returns {GitAuth | Promise<GitAuth>}
+ */
 
-type GitAuth = {
-  username?: string;
-  password?: string;
-  token?: string;
-  oauth2format?: string;
-}
+/**
+ * @typedef {Object} GitAuth
+ * @property {string} [username]
+ * @property {string} [password]
+ * @property {string} [token]
+ * @property {string} [oauth2format]
+ */
 ```
 
 ## Option 1: Username & Password

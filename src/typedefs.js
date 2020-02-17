@@ -156,38 +156,22 @@
  */
 
 /**
- * @typedef {Object} FillParams
- * @property {string} url
- * @property {boolean} useHttpPath
- */
-
-/**
  * @callback AuthCallback
- * @param {FillParams} args
+ * @param {string} url
  * @returns {GitAuth | Promise<GitAuth>}
  */
 
 /**
- * @typedef {Object} ApprovedParams
- * @property {string} url
- * @property {IAuthJSON} auth
- */
-
-/**
  * @callback AuthSuccessCallback
- * @param {ApprovedParams} args
+ * @param {string} url
+ * @param {GitAuth} auth
  * @returns {void | Promise<void>}
  */
 
 /**
- * @typedef {Object} RejectededParams
- * @property {string} url
- * @property {IAuthJSON} auth
- */
-
-/**
  * @callback AuthFailureCallback
- * @param {RejectededParams} args
+ * @param {string} url
+ * @param {GitAuth} auth
  * @returns {void | Promise<void>}
  */
 

@@ -282,29 +282,46 @@ describe('push', () => {
     let fillCalled = false
     let approvedCalled = false
     let rejectedCalled = false
+    let onAuthArgs = null
+    let onAuthSuccessArgs = null
+    let onAuthFailureArgs = null
     await push({
       fs,
       http,
       gitdir,
       remote: 'auth',
       ref: 'master',
-      async onAuth({ url }) {
+      async onAuth(...args) {
         fillCalled = true
+        onAuthArgs = args
         return {
           username: 'testuser',
           password: 'testpassword',
         }
       },
-      async onAuthSuccess(auth) {
+      async onAuthSuccess(...args) {
         approvedCalled = true
+        onAuthSuccessArgs = args
       },
-      async onAuthFailure(auth) {
+      async onAuthFailure(...args) {
         rejectedCalled = true
+        onAuthFailureArgs = args
       },
     })
     expect(fillCalled).toBe(true)
     expect(approvedCalled).toBe(true)
     expect(rejectedCalled).toBe(false)
+    expect(onAuthArgs).toEqual([
+      `http://${localhost}:8888/test-push-server-auth.git`,
+    ])
+    expect(onAuthSuccessArgs).toEqual([
+      `http://${localhost}:8888/test-push-server-auth.git`,
+      {
+        username: 'testuser',
+        password: 'testpassword',
+      },
+    ])
+    expect(onAuthFailureArgs).toBeNull()
   })
   it('onAuthFailure', async () => {
     // Setup
@@ -320,6 +337,10 @@ describe('push', () => {
     let approvedCalled = false
     let rejectedCalled = false
     let err
+    let onAuthArgs = null
+    let onAuthSuccessArgs = null
+    let onAuthFailureArgs = null
+
     try {
       await push({
         fs,
@@ -327,18 +348,21 @@ describe('push', () => {
         gitdir,
         remote: 'auth',
         ref: 'master',
-        async onAuth({ url }) {
+        async onAuth(...args) {
           fillCalled = true
+          onAuthArgs = args
           return {
             username: 'testuser',
             password: 'NoT_rIgHt',
           }
         },
-        async onAuthSuccess(auth) {
+        async onAuthSuccess(...args) {
           approvedCalled = true
+          onAuthSuccessArgs = args
         },
-        async onAuthFailure(auth) {
+        async onAuthFailure(...args) {
           rejectedCalled = true
+          onAuthFailureArgs = args
         },
       })
     } catch (e) {
@@ -349,5 +373,16 @@ describe('push', () => {
     expect(fillCalled).toBe(true)
     expect(approvedCalled).toBe(false)
     expect(rejectedCalled).toBe(true)
+    expect(onAuthArgs).toEqual([
+      `http://${localhost}:8888/test-push-server-auth.git`,
+    ])
+    expect(onAuthSuccessArgs).toBeNull()
+    expect(onAuthFailureArgs).toEqual([
+      `http://${localhost}:8888/test-push-server-auth.git`,
+      {
+        username: 'testuser',
+        password: 'NoT_rIgHt',
+      },
+    ])
   })
 })

@@ -83,7 +83,7 @@ export class GitRemoteHTTP {
     // apparently doesn't realize this is a git request and is returning the HTML for the "Azure DevOps Services | Sign In" page.
     if ((res.statusCode === 401 || res.statusCode === 203) && onAuth) {
       // Acquire credentials and try again
-      // TODO: read `useHttpPath` value from git config and pass as 2nd argument
+      // TODO: read `useHttpPath` value from git config and pass as 2nd argument?
       auth = await onAuth(_origUrl)
       const _auth = calculateBasicAuthUsernamePasswordPair(auth)
       if (_auth) {
@@ -97,9 +97,9 @@ export class GitRemoteHTTP {
       })
       // Tell credential manager if the credentials were no good
       if (res.statusCode === 401 && onAuthFailure) {
-        await onAuthFailure({ url: _origUrl, auth })
+        await onAuthFailure(_origUrl, auth)
       } else if (res.statusCode === 200 && onAuthSuccess) {
-        await onAuthSuccess({ url: _origUrl, auth })
+        await onAuthSuccess(_origUrl, auth)
       }
     }
     if (res.statusCode !== 200) {
