@@ -36,7 +36,6 @@ The following environments are tested in CI and will continue to be supported un
 
 TODO:
 - [ ] I should probably normalize on timestamps and get rid of the `date` options.
-- [ ] I should probably remove `username`, `password`, `token`, and `oauth2format` and make everyone use `onAuth` callback for that.
 - [ ] Update the Useful Snippets.
 
 ### Big changes
@@ -57,6 +56,7 @@ TODO:
 ### Some function parameters have been removed or replaced:
   - [x] The undocumented parameter aliases `authUsername` and `authPassword` were removed.
   - [x] The `emitter` parameter was removed and replaced with the `onMessage` and `onProgress` callbacks. (Note that `onMessage` emits un-trimmed strings, so you get those `\r`s.)
+  - [x] The `username`, `password`, `token`, and `oauth2format` parameters were removed and replaced with the `onAuth` callback.
   - [x] The `fast` parameter of `pull` was removed, since there is no "slow" implementation anymore.
   - [x] The `signing` parameter of `log` was removed, since `log` will always return a payload.
   - [x] The `pattern` parameter was removed from `statusMatrix` and replaced with a new `filter` function. (This is so we can drop the dependencies on `globalyzer` and `globrex`.)

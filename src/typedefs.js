@@ -146,13 +146,13 @@
 /**
  * @callback MessageCallback
  * @param {string} message
- * @returns {Promise<void>}
+ * @returns {void | Promise<void>}
  */
 
 /**
  * @callback ProgressCallback
  * @param {GitProgressEvent} progress
- * @returns {Promise<void>}
+ * @returns {void | Promise<void>}
  */
 
 /**
@@ -164,7 +164,7 @@
 /**
  * @callback AuthCallback
  * @param {FillParams} args
- * @returns {Promise<GitAuth>}
+ * @returns {GitAuth | Promise<GitAuth>}
  */
 
 /**
@@ -176,7 +176,7 @@
 /**
  * @callback AuthSuccessCallback
  * @param {ApprovedParams} args
- * @returns {Promise<void>}
+ * @returns {void | Promise<void>}
  */
 
 /**
@@ -188,7 +188,7 @@
 /**
  * @callback AuthFailureCallback
  * @param {RejectededParams} args
- * @returns {Promise<void>}
+ * @returns {void | Promise<void>}
  */
 
 /**
@@ -201,7 +201,7 @@
  *
  * @callback SignCallback
  * @param {SignParams} args
- * @return {Promise<{signature: string}>} - an 'ASCII armor' encoded "detached" signature
+ * @return {{signature: string} | Promise<{signature: string}>} - an 'ASCII armor' encoded "detached" signature
  */
 
 /**

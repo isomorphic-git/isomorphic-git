@@ -44,10 +44,6 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.prune] - Delete local remote-tracking branches that are not present on the remote
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
- * @param {string} [args.username] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.password] - See the [Authentication](./authentication.html) documentation
- * @param {string} [args.token] - See the [Authentication](./authentication.html) documentation
- * @param {'github' | 'bitbucket' | 'gitlab'} [args.oauth2format] - See the [Authentication](./authentication.html) documentation
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
  * @returns {Promise<FetchResult>} Resolves successfully when fetch completes
@@ -83,10 +79,6 @@ export async function fetch({
   remoteRef,
   url,
   corsProxy,
-  username,
-  password,
-  token,
-  oauth2format,
   depth = null,
   since = null,
   exclude = [],
@@ -125,10 +117,6 @@ export async function fetch({
       remoteRef,
       url,
       corsProxy,
-      username,
-      password,
-      token,
-      oauth2format,
       depth,
       since,
       exclude,

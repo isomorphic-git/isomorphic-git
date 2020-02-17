@@ -129,6 +129,10 @@
         "title": "hashBlob",
         "sidebar_label": "hashBlob"
       },
+      "headers": {
+        "title": "headers",
+        "sidebar_label": "headers"
+      },
       "http": {
         "title": "http",
         "sidebar_label": "http"
