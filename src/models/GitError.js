@@ -50,18 +50,6 @@ const messages = {
   AcquireLockFileFail: `Unable to acquire lockfile "{ filename }". Exhausted tries.`,
   DoubleReleaseLockFileFail: `Cannot double-release lockfile "{ filename }".`,
   InternalFail: `An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: { message }`,
-  UnknownOauth2Format: `I do not know how { company } expects its Basic Auth headers to be formatted for OAuth2 usage. If you do, you can use the regular username and password parameters to set the basic auth header yourself.`,
-  MissingPasswordTokenError: `Missing password or token`,
-  MissingUsernameError: `Missing username`,
-  MixPasswordTokenError: `Cannot mix "password" with "token"`,
-  MixUsernamePasswordTokenError: `Cannot mix "username" and "password" with "token"`,
-  MissingTokenError: `Missing token`,
-  MixUsernameOauth2formatMissingTokenError: `Cannot mix "username" with "oauth2format". Missing token.`,
-  MixPasswordOauth2formatMissingTokenError: `Cannot mix "password" with "oauth2format". Missing token.`,
-  MixUsernamePasswordOauth2formatMissingTokenError: `Cannot mix "username" and "password" with "oauth2format". Missing token.`,
-  MixUsernameOauth2formatTokenError: `Cannot mix "username" with "oauth2format" and "token"`,
-  MixPasswordOauth2formatTokenError: `Cannot mix "password" with "oauth2format" and "token"`,
-  MixUsernamePasswordOauth2formatTokenError: `Cannot mix "username" and "password" with "oauth2format" and "token"`,
   MaxSearchDepthExceeded: `Maximum search depth of { depth } exceeded.`,
   PushRejectedNonFastForward: `Push rejected because it was not a simple fast-forward. Use "force: true" to override.`,
   PushRejectedTagExists: `Push rejected because tag already exists. Use "force: true" to override.`,
@@ -174,30 +162,6 @@ export const E = {
   DoubleReleaseLockFileFail: `DoubleReleaseLockFileFail`,
   /** @type {'InternalFail'} */
   InternalFail: `InternalFail`,
-  /** @type {'UnknownOauth2Format'} */
-  UnknownOauth2Format: `UnknownOauth2Format`,
-  /** @type {'MissingPasswordTokenError'} */
-  MissingPasswordTokenError: `MissingPasswordTokenError`,
-  /** @type {'MissingUsernameError'} */
-  MissingUsernameError: `MissingUsernameError`,
-  /** @type {'MixPasswordTokenError'} */
-  MixPasswordTokenError: `MixPasswordTokenError`,
-  /** @type {'MixUsernamePasswordTokenError'} */
-  MixUsernamePasswordTokenError: `MixUsernamePasswordTokenError`,
-  /** @type {'MissingTokenError'} */
-  MissingTokenError: `MissingTokenError`,
-  /** @type {'MixUsernameOauth2formatMissingTokenError'} */
-  MixUsernameOauth2formatMissingTokenError: `MixUsernameOauth2formatMissingTokenError`,
-  /** @type {'MixPasswordOauth2formatMissingTokenError'} */
-  MixPasswordOauth2formatMissingTokenError: `MixPasswordOauth2formatMissingTokenError`,
-  /** @type {'MixUsernamePasswordOauth2formatMissingTokenError'} */
-  MixUsernamePasswordOauth2formatMissingTokenError: `MixUsernamePasswordOauth2formatMissingTokenError`,
-  /** @type {'MixUsernameOauth2formatTokenError'} */
-  MixUsernameOauth2formatTokenError: `MixUsernameOauth2formatTokenError`,
-  /** @type {'MixPasswordOauth2formatTokenError'} */
-  MixPasswordOauth2formatTokenError: `MixPasswordOauth2formatTokenError`,
-  /** @type {'MixUsernamePasswordOauth2formatTokenError'} */
-  MixUsernamePasswordOauth2formatTokenError: `MixUsernamePasswordOauth2formatTokenError`,
   /** @type {'MaxSearchDepthExceeded'} */
   MaxSearchDepthExceeded: `MaxSearchDepthExceeded`,
   /** @type {'PushRejectedNonFastForward'} */
