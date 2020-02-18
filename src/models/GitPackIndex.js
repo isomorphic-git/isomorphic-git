@@ -114,14 +114,14 @@ export class GitPackIndex {
     let totalObjectCount = null
     let lastPercent = null
 
-    await listpack([pack], ({ data, type, reference, offset, num }) => {
+    await listpack([pack], async ({ data, type, reference, offset, num }) => {
       if (totalObjectCount === null) totalObjectCount = num
       const percent = Math.floor(
         ((totalObjectCount - num) * 100) / totalObjectCount
       )
       if (percent !== lastPercent) {
         if (onProgress) {
-          onProgress({
+          await onProgress({
             phase: 'Receiving objects',
             loaded: totalObjectCount - num,
             total: totalObjectCount,
@@ -180,7 +180,7 @@ export class GitPackIndex {
       const percent = Math.floor((count++ * 100) / totalObjectCount)
       if (percent !== lastPercent) {
         if (onProgress) {
-          onProgress({
+          await onProgress({
             phase: 'Resolving deltas',
             loaded: count,
             total: totalObjectCount,

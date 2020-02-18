@@ -147,7 +147,7 @@ export async function checkout({
             }
             index.delete({ filepath: fullpath })
             if (onProgress) {
-              onProgress({
+              await onProgress({
                 phase: 'Updating workdir',
                 loaded: ++count,
                 total,
@@ -168,7 +168,7 @@ export async function checkout({
             }
             await fs.rmdir(filepath)
             if (onProgress) {
-              onProgress({
+              await onProgress({
                 phase: 'Updating workdir',
                 loaded: ++count,
                 total,
@@ -194,7 +194,7 @@ export async function checkout({
           const filepath = `${dir}/${fullpath}`
           await fs.mkdir(filepath)
           if (onProgress) {
-            onProgress({
+            await onProgress({
               phase: 'Updating workdir',
               loaded: ++count,
               total,
@@ -259,7 +259,7 @@ export async function checkout({
                 oid,
               })
               if (onProgress) {
-                onProgress({
+                await onProgress({
                   phase: 'Updating workdir',
                   loaded: ++count,
                   total,
@@ -305,7 +305,7 @@ async function analyze({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
       }
       // Emit progress event
       if (onProgress) {
-        onProgress({ phase: 'Analyzing workdir', loaded: ++count })
+        await onProgress({ phase: 'Analyzing workdir', loaded: ++count })
       }
 
       // This is a kind of silly pattern but it worked so well for me in calculateBasicAuthUsernamePasswordPair.js
