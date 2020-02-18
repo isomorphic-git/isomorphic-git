@@ -93,8 +93,6 @@
  * @typedef {Object} GitAuth
  * @property {string} [username]
  * @property {string} [password]
- * @property {string} [token]
- * @property {string} [oauth2format]
  * @property {Object<string, string>} [headers]
  */
 

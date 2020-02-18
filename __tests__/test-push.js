@@ -313,6 +313,9 @@ describe('push', () => {
     expect(rejectedCalled).toBe(false)
     expect(onAuthArgs).toEqual([
       `http://${localhost}:8888/test-push-server-auth.git`,
+      {
+        headers: {},
+      },
     ])
     expect(onAuthSuccessArgs).toEqual([
       `http://${localhost}:8888/test-push-server-auth.git`,
@@ -375,6 +378,9 @@ describe('push', () => {
     expect(rejectedCalled).toBe(true)
     expect(onAuthArgs).toEqual([
       `http://${localhost}:8888/test-push-server-auth.git`,
+      {
+        headers: {},
+      },
     ])
     expect(onAuthSuccessArgs).toBeNull()
     expect(onAuthFailureArgs).toEqual([

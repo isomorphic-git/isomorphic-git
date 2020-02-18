@@ -29,7 +29,6 @@ export * from './storage/readObject'
 export * from './storage/writeObject'
 
 export * from './utils/calculateBasicAuthHeader'
-export * from './utils/calculateBasicAuthUsernamePasswordPair'
 export * from './utils/collect'
 export * from './utils/comparePath'
 export * from './utils/flatFileListToDirectoryStructure'
