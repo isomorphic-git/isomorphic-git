@@ -3,10 +3,12 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "typings": "./dist/index.d.ts",
+  "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "exports": {
     ".": "./dist/index.cjs",
+    "./dist/index.cjs": "./dist/index.cjs",
     "./dist/index.js": "./dist/index.js",
     "./dist/http.cjs": "./dist/http.cjs",
     "./dist/http.js": "./dist/http.js"
