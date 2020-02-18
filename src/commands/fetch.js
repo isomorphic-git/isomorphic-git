@@ -110,7 +110,6 @@ export async function fetch({
     corsProxy = await config.get('http.corsProxy')
   }
 
-  let auth = {}
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const remoteHTTP = await GitRemoteHTTP.discover({
     http,
@@ -120,10 +119,9 @@ export async function fetch({
     corsProxy,
     service: 'git-upload-pack',
     url,
-    auth,
     headers,
   })
-  auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
+  const auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
   // For the special case of an empty repository with no refs, return null.
   if (remoteRefs.size === 0) {

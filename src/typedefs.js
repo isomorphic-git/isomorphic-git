@@ -95,6 +95,7 @@
  * @property {string} [password]
  * @property {string} [token]
  * @property {string} [oauth2format]
+ * @property {Object<string, string>} [headers]
  */
 
 /**
@@ -154,6 +155,7 @@
 /**
  * @callback AuthCallback
  * @param {string} url
+ * @param {GitAuth} auth
  * @returns {GitAuth | Promise<GitAuth>}
  */
 

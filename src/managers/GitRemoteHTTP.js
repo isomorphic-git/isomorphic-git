@@ -30,7 +30,6 @@ export class GitRemoteHTTP {
    * @param {string} [args.corsProxy]
    * @param {string} args.service
    * @param {string} args.url
-   * @param {GitAuth} [args.auth]
    * @param {Object<string, string>} [args.headers]
    */
   static async discover({
@@ -42,23 +41,15 @@ export class GitRemoteHTTP {
     corsProxy,
     service,
     url,
-    auth,
     headers,
   }) {
     const _origUrl = url
     const urlAuth = extractAuthFromUrl(url)
+    let auth = {}
     if (urlAuth) {
       url = urlAuth.url
-      // To try to be backwards compatible with simple-get's behavior, which uses Node's http.request
-      // setting an Authorization header will override what is in the URL.
-      // Ergo manually specified auth parameters will override those in the URL.
-      // However, since the oauth2 option is incompatible with usernames and passwords, rather than throw an
-      // E.MixUsernamePasswordOauth2formatTokenError error, we'll avoid that situation by ignoring the username
-      // and/or password in the url.
-      if (!auth.oauth2format) {
-        auth.username = auth.username || urlAuth.username
-        auth.password = auth.password || urlAuth.password
-      }
+      auth.username = urlAuth.username
+      auth.password = urlAuth.password
     }
     if (corsProxy) {
       url = corsProxify(corsProxy, url)
@@ -84,10 +75,20 @@ export class GitRemoteHTTP {
     if ((res.statusCode === 401 || res.statusCode === 203) && onAuth) {
       // Acquire credentials and try again
       // TODO: read `useHttpPath` value from git config and pass as 2nd argument?
-      auth = await onAuth(_origUrl)
-      const _auth = calculateBasicAuthUsernamePasswordPair(auth)
-      if (_auth) {
-        headers.Authorization = calculateBasicAuthHeader(_auth)
+      auth = await onAuth(_origUrl, {
+        headers: { ...headers },
+        ...(urlAuth && {
+          username: urlAuth.username,
+          password: urlAuth.password,
+        }),
+      })
+      if (auth.headers) {
+        headers = { ...headers, ...auth.headers }
+      } else {
+        const _auth = calculateBasicAuthUsernamePasswordPair(auth)
+        if (_auth) {
+          headers.Authorization = calculateBasicAuthHeader(_auth)
+        }
       }
       res = await http({
         onProgress,
@@ -148,27 +149,19 @@ export class GitRemoteHTTP {
     headers,
   }) {
     const urlAuth = extractAuthFromUrl(url)
-    if (urlAuth) {
-      url = urlAuth.url
-      // To try to be backwards compatible with simple-get's behavior, which uses Node's http.request
-      // setting an Authorization header will override what is in the URL.
-      // Ergo manually specified auth parameters will override those in the URL.
-      auth.username = auth.username || urlAuth.username
-      auth.password = auth.password || urlAuth.password
-    }
-    if (corsProxy) {
-      url = corsProxify(corsProxy, url)
-    }
+    if (urlAuth) url = urlAuth.url
+    if (corsProxy) url = corsProxify(corsProxy, url)
+
     headers['content-type'] = `application/x-${service}-request`
     headers.accept = `application/x-${service}-result`
-    // If the username came from the URL, we want to allow the password to be missing.
-    // This is because Github allows using the token as the username with an empty password
-    // so that is a style of git clone URL we might encounter and we don't want to throw a "Missing password or token" error.
-    // Also, we don't want to prematurely throw an error before the credentialManager plugin has
-    // had an opportunity to provide the password.
-    auth = calculateBasicAuthUsernamePasswordPair(auth, !!urlAuth)
-    if (auth) {
-      headers.Authorization = calculateBasicAuthHeader(auth)
+
+    if (auth.headers) {
+      headers = { ...headers, ...auth.headers }
+    } else {
+      const _auth = calculateBasicAuthUsernamePasswordPair(auth)
+      if (_auth) {
+        headers.Authorization = calculateBasicAuthHeader(_auth)
+      }
     }
     const res = await http({
       onProgress,

@@ -98,7 +98,7 @@ export async function push({
   const oid = _delete
     ? '0000000000000000000000000000000000000000'
     : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
-  let auth = {}
+
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const httpRemote = await GitRemoteHTTP.discover({
     http,
@@ -108,10 +108,9 @@ export async function push({
     corsProxy,
     service: 'git-receive-pack',
     url,
-    auth,
     headers,
   })
-  auth = httpRemote.auth // hack to get new credentials from CredentialManager API
+  const auth = httpRemote.auth // hack to get new credentials from CredentialManager API
   let fullRemoteRef
   if (!remoteRef) {
     fullRemoteRef = fullRef

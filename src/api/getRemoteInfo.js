@@ -56,7 +56,6 @@ export async function getRemoteInfo({
   try {
     assertParameter('url', url)
 
-    let auth = {}
     const remote = await GitRemoteHTTP.discover({
       http,
       onAuth,
@@ -65,10 +64,9 @@ export async function getRemoteInfo({
       corsProxy,
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,
-      auth,
       headers,
     })
-    auth = remote.auth // hack to get new credentials from CredentialManager API
+
     // Note: remote.capabilities, remote.refs, and remote.symrefs are Set and Map objects,
     // but one of the objectives of the public API is to always return JSON-compatible objects
     // so we must JSONify them.
