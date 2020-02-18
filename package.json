@@ -3,7 +3,6 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "typings": "./dist/index.d.ts",
-  "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "exports": {
@@ -54,6 +53,7 @@
     "dist/bundle.umd.min.js",
     "dist/bundle.umd.min.js.map",
     "dist/http.cjs",
+    "dist/http.d.ts",
     "dist/http.js",
     "dist/http.umd.min.js",
     "dist/index.cjs",
