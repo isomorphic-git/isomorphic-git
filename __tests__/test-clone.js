@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { E, clone, resolveRef } = require('isomorphic-git')
+const { E, currentBranch, clone, resolveRef } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -111,6 +111,7 @@ describe('clone', () => {
     )
     expect(error.caller).toEqual('git.clone')
   })
+
   it('clone from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
     await clone({
@@ -120,7 +121,7 @@ describe('clone', () => {
       gitdir,
       depth: 1,
       singleBranch: true,
-      url: `http://${localhost}:8888/test-status.git`,
+      url: `http://${localhost}:8888/test-clone.git`,
     })
     expect(await fs.exists(`${dir}`)).toBe(true, `'dir' exists`)
     expect(await fs.exists(`${gitdir}/objects`)).toBe(
@@ -132,6 +133,20 @@ describe('clone', () => {
       `'gitdir/refs/heads/master' exists`
     )
     expect(await fs.exists(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
+  })
+
+  it('clone default branch with --singleBranch', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      url: `http://${localhost}:8888/test-clone-no-master.git`,
+    })
+    expect(await currentBranch({ fs, dir, gitdir })).toBe('i-am-not-master')
   })
 
   it('clone empty repository from git-http-mock-server', async () => {
