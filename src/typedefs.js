@@ -51,7 +51,6 @@
  */
 
 /**
- *
  * @typedef {Object} ReadCommitResult
  * @property {string} oid - SHA-1 object id of this commit
  * @property {CommitObject} commit - the parsed commit object
@@ -59,14 +58,14 @@
  */
 
 /**
- *
  * @typedef Walker
  * @property {Symbol} Symbol('GitWalkerSymbol')
  */
 
 /**
+ * Normalized subset of filesystem `stat` data:
  *
- * @typedef {Object} Stat Normalized subset of filesystem `stat` data:
+ * @typedef {Object} Stat
  * @property {number} ctimeSeconds
  * @property {number} ctimeNanoseconds
  * @property {number} mtimeSeconds
@@ -80,8 +79,9 @@
  */
 
 /**
+ * The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
  *
- * @typedef {Object} WalkerEntry The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
+ * @typedef {Object} WalkerEntry
  * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
  * @property {function(): Promise<number>} mode
  * @property {function(): Promise<string>} oid
@@ -90,7 +90,6 @@
  */
 
 /**
- *
  * @typedef {Object} GitAuth
  * @property {string} [username]
  * @property {string} [password]
@@ -99,7 +98,6 @@
  */
 
 /**
- *
  * @typedef {Object} GitProgressEvent
  * @property {string} phase
  * @property {number} loaded
@@ -107,8 +105,7 @@
  */
 
 /**
- *
- * @typedef {Object} GitFsPlugin
+ * @typedef {Object} CallbackFsClient
  * @property {function} readFile - https://nodejs.org/api/fs.html#fs_fs_readfile_path_options_callback
  * @property {function} writeFile - https://nodejs.org/api/fs.html#fs_fs_writefile_file_data_options_callback
  * @property {function} unlink - https://nodejs.org/api/fs.html#fs_fs_unlink_path_callback
@@ -123,8 +120,7 @@
  */
 
 /**
- *
- * @typedef {Object} GitFsPromisesPlugin
+ * @typedef {Object} PromiseFsClient
  * @property {Object} promises
  * @property {function} promises.readFile - https://nodejs.org/api/fs.html#fs_fspromises_readfile_path_options
  * @property {function} promises.writeFile - https://nodejs.org/api/fs.html#fs_fspromises_writefile_file_data_options
@@ -140,7 +136,7 @@
  */
 
 /**
- * @typedef {GitFsPlugin|GitFsPromisesPlugin} FsClient
+ * @typedef {CallbackFsClient | PromiseFsClient} FsClient
  */
 
 /**
@@ -156,38 +152,22 @@
  */
 
 /**
- * @typedef {Object} FillParams
- * @property {string} url
- * @property {boolean} useHttpPath
- */
-
-/**
  * @callback AuthCallback
- * @param {FillParams} args
+ * @param {string} url
  * @returns {GitAuth | Promise<GitAuth>}
  */
 
 /**
- * @typedef {Object} ApprovedParams
- * @property {string} url
- * @property {IAuthJSON} auth
- */
-
-/**
  * @callback AuthSuccessCallback
- * @param {ApprovedParams} args
+ * @param {string} url
+ * @param {GitAuth} auth
  * @returns {void | Promise<void>}
  */
 
 /**
- * @typedef {Object} RejectededParams
- * @property {string} url
- * @property {IAuthJSON} auth
- */
-
-/**
  * @callback AuthFailureCallback
- * @param {RejectededParams} args
+ * @param {string} url
+ * @param {GitAuth} auth
  * @returns {void | Promise<void>}
  */
 
@@ -198,14 +178,12 @@
  */
 
 /**
- *
  * @callback SignCallback
  * @param {SignParams} args
  * @return {{signature: string} | Promise<{signature: string}>} - an 'ASCII armor' encoded "detached" signature
  */
 
 /**
- *
  * @typedef {Object} GitHttpRequest
  * @property {string} url - The URL to request
  * @property {string} [method='GET'] - The HTTP method to use
@@ -217,7 +195,6 @@
  */
 
 /**
- *
  * @typedef {Object} GitHttpResponse
  * @property {string} url - The final URL that was fetched after any redirects
  * @property {string} [method] - The HTTP method that was used
@@ -228,7 +205,6 @@
  */
 
 /**
- *
  * @callback HttpClient
  * @param {GitHttpRequest} request
  * @returns {Promise<GitHttpResponse>}
@@ -262,29 +238,27 @@
  */
 
 /**
- *
  * @typedef {Object} RefUpdateStatus
  * @property {boolean} ok
  * @property {string} error
- *
  */
 
 /**
- *
  * @typedef {Object} PushResult
  * @property {boolean} ok
  * @property {?string} error
  * @property {Object<string, RefUpdateStatus>} refs
  * @property {Object<string, string>} [headers]
- *
  */
 
 /**
  * @typedef {0|1} HeadStatus
  */
+
 /**
  * @typedef {0|1|2} WorkdirStatus
  */
+
 /**
  * @typedef {0|1|2|3} StageStatus
  */
