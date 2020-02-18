@@ -5,16 +5,14 @@ sidebar_label: onAuthFailure
 
 The `onAuthFailure` callback is called when credentials fail. This is helpful to know if say, you have saved password and want to offer to delete ones that fail.
 
-An `onAuthFailure` function is called with a `{ url, auth }` object.
+An `onAuthFailure` function is called with a `url` and an `auth` object.
 
 ```js
 /**
  * @callback AuthFailureCallback
- * @param {object} args.
- * @param {string} args.url
- * @param {GitAuth} args.auth
- *
- * @returns {Promise<void>}
+ * @param {string} url
+ * @param {GitAuth} auth
+ * @returns {void | Promise<void>}
  */
 
 /**
@@ -32,7 +30,7 @@ An `onAuthFailure` function is called with a `{ url, auth }` object.
 const git = require('isomorphic-git')
 git.clone({
   ...,
-  onAuthFailure: ({ url, auth }) => {
+  onAuthFailure: (url, auth) => {
     if (confirm('Access was denied. Delete saved password?')) {
       forgetSavedPassword(url)
     }
