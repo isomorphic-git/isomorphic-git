@@ -34,6 +34,12 @@ The following environments are tested in CI and will continue to be supported un
 
 ## 1.0 Breaking Changes
 
+TODO:
+- [ ] Rename `dist/http.js` to `dist/http-web.js` and `dist/http-web.cjs`, rename `dist/http.cjs` to `dist/http-node.js` and `dist/http-node.cjs`
+- [ ] Rename `bundle.umd.min.js` to `index.umd.min.js`?
+- [ ] Strongly consider lifting stuff out of `dist` so it's less to type. e.g. `import http from 'isomorphic-git/http-web'`
+- [ ] Oooooooh I'm thinking about tweaking `onAuth` again. _Really_ all you need to do is update the `Authorization` header. But for future-proofing, updating _any_ header would be fun. And the `oauth2format` function could be moved to `@isomorphic-git/quirksmode` or something....
+
 ### Big changes
 - [x] The supported node & browser versions have been bumped. (See beautiful table above.)
 - [x] The plugin system has been eliminated and we're back to plain old dependency injection via function arguments! The plugin cores created a mysterious "global state" that makes it easy to trip up (I myself sometimes forgot to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic and more verbose, but it is a much simpler model than the plugin core model, and much safer because it makes it impossible for dependencies to accidentally share the default plugin core.

@@ -322,12 +322,12 @@ export async function fetch({
 
   if (onProgress || onMessage) {
     const lines = splitLines(response.progress)
-    forAwait(lines, line => {
-      if (onMessage) onMessage(line)
+    forAwait(lines, async line => {
+      if (onMessage) await onMessage(line)
       if (onProgress) {
         const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
         if (matches) {
-          onProgress({
+          await onProgress({
             phase: matches[1].trim(),
             loaded: parseInt(matches[2], 10),
             total: parseInt(matches[3], 10),
