@@ -205,8 +205,8 @@ export async function push({
   const { packfile, progress } = await GitSideBand.demux(res.body)
   if (onMessage) {
     const lines = splitLines(progress)
-    forAwait(lines, line => {
-      onMessage(line)
+    forAwait(lines, async line => {
+      await onMessage(line)
     })
   }
   // Parse the response!
