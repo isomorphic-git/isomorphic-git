@@ -63,6 +63,7 @@ const messages = {
   CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`,
   NoteAlreadyExistsError: `A note object { note } already exists on object { oid }. Use 'force: true' parameter to overwrite existing notes.`,
   GitPushError: `One or more branches were not updated: { prettyDetails }`,
+  UserCancelledError: `The operation was canceled.`,
 }
 
 export const E = {
@@ -188,6 +189,8 @@ export const E = {
   NoteAlreadyExistsError: `NoteAlreadyExistsError`,
   /** @type {'GitPushError'} */
   GitPushError: `GitPushError`,
+  /** @type {'UserCancelledError'} */
+  UserCancelledError: `UserCancelledError`,
 }
 
 function renderTemplate(template, values) {

@@ -26,8 +26,8 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
  * @param {AuthCallback} [args.onAuth]
- * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {AuthFailureCallback} [args.onAuthFailure]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {string} args.gitdir
  * @param {string} [args.ref]
  * @param {string} [args.remoteRef]

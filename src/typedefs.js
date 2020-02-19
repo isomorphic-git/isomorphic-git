@@ -90,20 +90,6 @@
  */
 
 /**
- * @typedef {Object} GitAuth
- * @property {string} [username]
- * @property {string} [password]
- * @property {Object<string, string>} [headers]
- */
-
-/**
- * @typedef {Object} GitProgressEvent
- * @property {string} phase
- * @property {number} loaded
- * @property {number} total
- */
-
-/**
  * @typedef {Object} CallbackFsClient
  * @property {function} readFile - https://nodejs.org/api/fs.html#fs_fs_readfile_path_options_callback
  * @property {function} writeFile - https://nodejs.org/api/fs.html#fs_fs_writefile_file_data_options_callback
@@ -145,27 +131,42 @@
  */
 
 /**
+ * @typedef {Object} GitProgressEvent
+ * @property {string} phase
+ * @property {number} loaded
+ * @property {number} total
+ */
+
+/**
  * @callback ProgressCallback
  * @param {GitProgressEvent} progress
  * @returns {void | Promise<void>}
  */
 
 /**
- * @callback AuthCallback
- * @param {string} url
- * @param {GitAuth} auth
- * @returns {GitAuth | Promise<GitAuth>}
+ * @typedef {Object} GitAuth
+ * @property {string} [username]
+ * @property {string} [password]
+ * @property {Object<string, string>} [headers]
+ * @property {boolean} [cancel] Tells git to throw a `UserCancelledError` (instead of an `HTTPError`).
  */
 
 /**
- * @callback AuthSuccessCallback
+ * @callback AuthCallback
  * @param {string} url
- * @param {GitAuth} auth
- * @returns {void | Promise<void>}
+ * @param {GitAuth} auth Might have some values if the URL itself originally contained a username or password.
+ * @returns {GitAuth | void | Promise<GitAuth | void>}
  */
 
 /**
  * @callback AuthFailureCallback
+ * @param {string} url
+ * @param {GitAuth} auth The credentials that failed
+ * @returns {GitAuth | void | Promise<GitAuth | void>}
+ */
+
+/**
+ * @callback AuthSuccessCallback
  * @param {string} url
  * @param {GitAuth} auth
  * @returns {void | Promise<void>}

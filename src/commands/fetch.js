@@ -40,8 +40,8 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
  * @param {AuthCallback} [args.onAuth]
- * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {AuthFailureCallback} [args.onAuthFailure]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {string} args.gitdir
  * @param {string|void} [args.url]
  * @param {string} [args.corsProxy]

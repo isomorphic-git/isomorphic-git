@@ -269,6 +269,7 @@ describe('push', () => {
     }
     expect(error).toContain('401')
   })
+
   it('onAuthSuccess', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-push')
@@ -279,12 +280,9 @@ describe('push', () => {
       value: `http://${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
-    let fillCalled = false
-    let approvedCalled = false
-    let rejectedCalled = false
-    let onAuthArgs = null
-    let onAuthSuccessArgs = null
-    let onAuthFailureArgs = null
+    const onAuthArgs = []
+    const onAuthSuccessArgs = []
+    const onAuthFailureArgs = []
     await push({
       fs,
       http,
@@ -292,40 +290,39 @@ describe('push', () => {
       remote: 'auth',
       ref: 'master',
       async onAuth(...args) {
-        fillCalled = true
-        onAuthArgs = args
+        onAuthArgs.push(args)
         return {
           username: 'testuser',
           password: 'testpassword',
         }
       },
       async onAuthSuccess(...args) {
-        approvedCalled = true
-        onAuthSuccessArgs = args
+        onAuthSuccessArgs.push(args)
       },
       async onAuthFailure(...args) {
-        rejectedCalled = true
-        onAuthFailureArgs = args
+        onAuthFailureArgs.push(args)
       },
     })
-    expect(fillCalled).toBe(true)
-    expect(approvedCalled).toBe(true)
-    expect(rejectedCalled).toBe(false)
     expect(onAuthArgs).toEqual([
-      `http://${localhost}:8888/test-push-server-auth.git`,
-      {
-        headers: {},
-      },
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {},
+        },
+      ],
     ])
     expect(onAuthSuccessArgs).toEqual([
-      `http://${localhost}:8888/test-push-server-auth.git`,
-      {
-        username: 'testuser',
-        password: 'testpassword',
-      },
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          username: 'testuser',
+          password: 'testpassword',
+        },
+      ],
     ])
-    expect(onAuthFailureArgs).toBeNull()
+    expect(onAuthFailureArgs).toEqual([])
   })
+
   it('onAuthFailure', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-push')
@@ -336,14 +333,10 @@ describe('push', () => {
       value: `http://${localhost}:8888/test-push-server-auth.git`,
     })
     // Test
-    let fillCalled = false
-    let approvedCalled = false
-    let rejectedCalled = false
     let err
-    let onAuthArgs = null
-    let onAuthSuccessArgs = null
-    let onAuthFailureArgs = null
-
+    const onAuthArgs = []
+    const onAuthSuccessArgs = []
+    const onAuthFailureArgs = []
     try {
       await push({
         fs,
@@ -352,20 +345,31 @@ describe('push', () => {
         remote: 'auth',
         ref: 'master',
         async onAuth(...args) {
-          fillCalled = true
-          onAuthArgs = args
+          onAuthArgs.push(args)
           return {
             username: 'testuser',
             password: 'NoT_rIgHt',
           }
         },
         async onAuthSuccess(...args) {
-          approvedCalled = true
-          onAuthSuccessArgs = args
+          onAuthSuccessArgs.push(args)
         },
         async onAuthFailure(...args) {
-          rejectedCalled = true
-          onAuthFailureArgs = args
+          onAuthFailureArgs.push(args)
+          switch (onAuthFailureArgs.length) {
+            case 1:
+              return {
+                username: 'testuser',
+                password: 'St1ll_NoT_rIgHt',
+              }
+            case 2:
+              return {
+                headers: {
+                  Authorization: 'Bearer Big Bear',
+                  'X-Authorization': 'supersecret',
+                },
+              }
+          }
         },
       })
     } catch (e) {
@@ -373,22 +377,182 @@ describe('push', () => {
     }
     expect(err).toBeDefined()
     expect(err.code).toBe(E.HTTPError)
-    expect(fillCalled).toBe(true)
-    expect(approvedCalled).toBe(false)
-    expect(rejectedCalled).toBe(true)
     expect(onAuthArgs).toEqual([
-      `http://${localhost}:8888/test-push-server-auth.git`,
-      {
-        headers: {},
-      },
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {},
+        },
+      ],
     ])
-    expect(onAuthSuccessArgs).toBeNull()
+    expect(onAuthSuccessArgs).toEqual([])
     expect(onAuthFailureArgs).toEqual([
-      `http://${localhost}:8888/test-push-server-auth.git`,
-      {
-        username: 'testuser',
-        password: 'NoT_rIgHt',
-      },
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {
+            Authorization: 'Basic dGVzdHVzZXI6Tm9UX3JJZ0h0',
+          },
+          username: 'testuser',
+          password: 'NoT_rIgHt',
+        },
+      ],
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {
+            Authorization: 'Basic dGVzdHVzZXI6U3QxbGxfTm9UX3JJZ0h0',
+          },
+          username: 'testuser',
+          password: 'St1ll_NoT_rIgHt',
+        },
+      ],
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {
+            Authorization: 'Bearer Big Bear',
+            'X-Authorization': 'supersecret',
+          },
+        },
+      ],
     ])
+  })
+
+  it('onAuthFailure then onAuthSuccess', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-push')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.auth.url',
+      value: `http://${localhost}:8888/test-push-server-auth.git`,
+    })
+    // Test
+    const onAuthArgs = []
+    const onAuthSuccessArgs = []
+    const onAuthFailureArgs = []
+    await push({
+      fs,
+      http,
+      gitdir,
+      remote: 'auth',
+      ref: 'master',
+      async onAuth(...args) {
+        onAuthArgs.push(args)
+        return {
+          username: 'testuser',
+          password: 'NoT_rIgHt',
+        }
+      },
+      async onAuthSuccess(...args) {
+        onAuthSuccessArgs.push(args)
+      },
+      async onAuthFailure(...args) {
+        onAuthFailureArgs.push(args)
+        switch (onAuthFailureArgs.length) {
+          case 1:
+            return {
+              username: 'testuser',
+              password: 'St1ll_NoT_rIgHt',
+            }
+          case 2:
+            return {
+              username: 'testuser',
+              password: 'testpassword',
+            }
+        }
+      },
+    })
+    expect(onAuthArgs).toEqual([
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {},
+        },
+      ],
+    ])
+    expect(onAuthSuccessArgs).toEqual([
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          username: 'testuser',
+          password: 'testpassword',
+        },
+      ],
+    ])
+    expect(onAuthFailureArgs).toEqual([
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {
+            Authorization: 'Basic dGVzdHVzZXI6Tm9UX3JJZ0h0',
+          },
+          username: 'testuser',
+          password: 'NoT_rIgHt',
+        },
+      ],
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {
+            Authorization: 'Basic dGVzdHVzZXI6U3QxbGxfTm9UX3JJZ0h0',
+          },
+          username: 'testuser',
+          password: 'St1ll_NoT_rIgHt',
+        },
+      ],
+    ])
+  })
+
+  it('onAuth + cancel', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-push')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.auth.url',
+      value: `http://${localhost}:8888/test-push-server-auth.git`,
+    })
+    // Test
+    let err
+    const onAuthArgs = []
+    const onAuthSuccessArgs = []
+    const onAuthFailureArgs = []
+    try {
+      await push({
+        fs,
+        http,
+        gitdir,
+        remote: 'auth',
+        ref: 'master',
+        async onAuth(...args) {
+          onAuthArgs.push(args)
+          return {
+            cancel: true,
+          }
+        },
+        async onAuthSuccess(...args) {
+          onAuthSuccessArgs.push(args)
+        },
+        async onAuthFailure(...args) {
+          onAuthFailureArgs.push(args)
+        },
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err).toBeDefined()
+    expect(err.code).toBe(E.UserCancelledError)
+    expect(onAuthArgs).toEqual([
+      [
+        `http://${localhost}:8888/test-push-server-auth.git`,
+        {
+          headers: {},
+        },
+      ],
+    ])
+    expect(onAuthSuccessArgs).toEqual([])
+    expect(onAuthFailureArgs).toEqual([])
   })
 })

@@ -14,6 +14,17 @@ const corsProxify = (corsProxy, url) =>
     ? `${corsProxy}${url}`
     : `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
 
+const updateHeaders = (headers, auth) => {
+  // Update the basic auth header
+  if (auth.username || auth.password) {
+    headers.Authorization = calculateBasicAuthHeader(auth)
+  }
+  // but any manually provided headers take precedence
+  if (auth.headers) {
+    Object.assign(headers, auth.headers)
+  }
+}
+
 export class GitRemoteHTTP {
   static async capabilities() {
     return ['discover', 'connect']
@@ -24,8 +35,8 @@ export class GitRemoteHTTP {
    * @param {HttpClient} args.http
    * @param {ProgressCallback} [args.onProgress]
    * @param {AuthCallback} [args.onAuth]
-   * @param {AuthSuccessCallback} [args.onAuthSuccess]
    * @param {AuthFailureCallback} [args.onAuthFailure]
+   * @param {AuthSuccessCallback} [args.onAuthSuccess]
    * @param {string} [args.corsProxy]
    * @param {string} args.service
    * @param {string} args.url
@@ -47,44 +58,51 @@ export class GitRemoteHTTP {
     if (auth.username || auth.password) {
       headers.Authorization = calculateBasicAuthHeader(auth)
     }
-    // TODO: let onAuthFailure return an auth, to indicate retrying
-    let res = await http({
-      onProgress,
-      method: 'GET',
-      url: `${proxifiedURL}/info/refs?service=${service}`,
-      headers,
-    })
-    // 401 is the "correct" response. 203 is Non-Authoritative Information and comes from Azure DevOps, which
-    // apparently doesn't realize this is a git request and is returning the HTML for the "Azure DevOps Services | Sign In" page.
-    if ((res.statusCode === 401 || res.statusCode === 203) && onAuth) {
-      // Acquire credentials and try again
-      // TODO: read `useHttpPath` value from git config and pass along?
-      auth = await onAuth(url, {
-        ...auth,
-        headers: { ...headers },
-      })
-      // Update the basic auth header
-      if (auth.username || auth.password) {
-        headers.Authorization = calculateBasicAuthHeader(auth)
-      }
-      // but any manually provided headers take precedence
-      if (auth.headers) {
-        headers = { ...headers, ...auth.headers }
-      }
-      // Try again
+
+    let res
+    let tryAgain
+    let providedAuthBefore = false
+    do {
       res = await http({
         onProgress,
         method: 'GET',
         url: `${proxifiedURL}/info/refs?service=${service}`,
         headers,
       })
-      // Tell credential manager if the credentials were no good
-      if (res.statusCode === 401 && onAuthFailure) {
-        await onAuthFailure(_origUrl, auth)
-      } else if (res.statusCode === 200 && onAuthSuccess) {
-        await onAuthSuccess(_origUrl, auth)
+
+      // the default loop behavior
+      tryAgain = false
+
+      // 401 is the "correct" response for access denied. 203 is Non-Authoritative Information and comes from Azure DevOps, which
+      // apparently doesn't realize this is a git request and is returning the HTML for the "Azure DevOps Services | Sign In" page.
+      if (res.statusCode === 401 || res.statusCode === 203) {
+        // On subsequent 401s, call `onAuthFailure` instead of `onAuth`.
+        // This is so that naive `onAuth` callbacks that return a fixed value don't create an infinite loop of retrying.
+        const getAuth = providedAuthBefore ? onAuthFailure : onAuth
+        if (getAuth) {
+          // Acquire credentials and try again
+          // TODO: read `useHttpPath` value from git config and pass along?
+          auth = await getAuth(url, {
+            ...auth,
+            headers: { ...headers },
+          })
+          if (auth && auth.cancel) {
+            throw new GitError(E.UserCancelledError)
+          } else if (auth) {
+            updateHeaders(headers, auth)
+            providedAuthBefore = true
+            tryAgain = true
+          }
+        }
+      } else if (
+        res.statusCode === 200 &&
+        providedAuthBefore &&
+        onAuthSuccess
+      ) {
+        await onAuthSuccess(url, auth)
       }
-    }
+    } while (tryAgain)
+
     if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
         statusCode: res.statusCode,
@@ -107,6 +125,7 @@ export class GitRemoteHTTP {
       const preview =
         response.length < 256 ? response : response.slice(0, 256) + '...'
       // For backwards compatibility, try to parse it anyway.
+      // TODO: maybe just throw instead of trying?
       try {
         const remoteHTTP = await parseRefsAdResponse([data], { service })
         remoteHTTP.auth = auth
@@ -130,21 +149,17 @@ export class GitRemoteHTTP {
     body,
     headers,
   }) {
+    // We already have the "correct" auth value at this point, but
+    // we need to strip out the username/password from the URL yet again.
     const urlAuth = extractAuthFromUrl(url)
     if (urlAuth) url = urlAuth.url
+
     if (corsProxy) url = corsProxify(corsProxy, url)
 
     headers['content-type'] = `application/x-${service}-request`
     headers.accept = `application/x-${service}-result`
+    updateHeaders(headers, auth)
 
-    // Update the basic auth header
-    if (auth.username || auth.password) {
-      headers.Authorization = calculateBasicAuthHeader(auth)
-    }
-    // but any manually provided headers take precedence
-    if (auth.headers) {
-      headers = { ...headers, ...auth.headers }
-    }
     const res = await http({
       onProgress,
       method: 'POST',

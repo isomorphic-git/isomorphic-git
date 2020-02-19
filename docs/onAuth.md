@@ -10,13 +10,14 @@ Authentication is normally required for pushing to a git repository.
 It may also be required to clone or fetch from a private repository.
 Git does all its authentication using HTTPS Basic Authentication.
 
-An `onAuth` function is called with a `url` and should return a credential object:
+An `onAuth` function is called with a `url` and an `auth` object and should return a GitAuth object:
 
 ```ts
 /**
  * @callback AuthCallback
  * @param {string} url
- * @returns {GitAuth | Promise<GitAuth>}
+ * @param {GitAuth} auth - Might have some values if the URL itself originally contained a username or password.
+ * @returns {GitAuth | void | Promise<GitAuth | void>}
  */
 
 /**
@@ -24,7 +25,30 @@ An `onAuth` function is called with a `url` and should return a credential objec
  * @property {string} [username]
  * @property {string} [password]
  * @property {Object<string, string>} [headers]
+ * @property {boolean} cancel - Tells git to throw a `UserCancelledError` (instead of an `HTTPError`).
  */
+```
+
+## Example
+
+```js
+await git.clone({
+  ...,
+  onAuth: url => {
+    let auth = lookupSavedPassword(url)
+    if (auth) return auth
+
+    if (confirm('This repo is password protected. Ready to enter a username & password?')) {
+      auth = {
+        username: prompt('Enter username'),
+        password: prompt('Enter password'),
+      }
+      return auth
+    } else {
+      return { cancel: true }
+    }
+  }
+})
 ```
 
 ## Option 1: Username & Password
@@ -96,21 +120,3 @@ let auth = {
 ```
 
 You can also pass `headers` into the initial call to clone, fetch, push, etc though. So maybe a more useful example would be a proxy server that stores OAuth2 tokens and generates the Basic Auth header in the proxy, but only prompts the user to login when they try to `push`. (Therefore the auth token for the proxy might not be present when `push` is initially called and therefore not provided in the initial `headers`.)
-
-## Example
-
-```js
-git.clone({
-  ...,
-  onAuth: url => {
-    let auth = lookupSavedPassword(url)
-    if (!auth.username) {
-      auth.username = prompt('Enter username')
-    }
-    if (!auth.password) {
-      auth.password = prompt('Enter password')
-    }
-    return auth
-  }
-})
-```
