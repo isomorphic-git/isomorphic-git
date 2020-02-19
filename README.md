@@ -38,7 +38,6 @@ TODO:
 - [ ] Rename `dist/http.js` to `dist/http-web.js` and `dist/http-web.cjs`, rename `dist/http.cjs` to `dist/http-node.js` and `dist/http-node.cjs`
 - [ ] Rename `bundle.umd.min.js` to `index.umd.min.js`?
 - [ ] Strongly consider lifting stuff out of `dist` so it's less to type. e.g. `import http from 'isomorphic-git/http-web'`
-- [ ] Oooooooh I'm thinking about tweaking `onAuth` again. _Really_ all you need to do is update the `Authorization` header. But for future-proofing, updating _any_ header would be fun. And the `oauth2format` function could be moved to `@isomorphic-git/quirksmode` or something....
 
 ### Big changes
 - [x] The supported node & browser versions have been bumped. (See beautiful table above.)

@@ -1,5 +1,3 @@
-import path from 'path'
-
 import resolve from 'rollup-plugin-node-resolve'
 
 import pkg from './package.json'
@@ -16,50 +14,51 @@ const external = [
 ]
 
 // Bleeding edge
-const moduleConfig = input => ({
+const ecmaConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
+  plugins: [resolve({ browser: true })],
   output: [
     {
       format: 'es',
       name: 'git',
-      file: `dist/${path.basename(input)}`,
+      file: `dist/${output}`,
     },
   ],
-  plugins: [resolve({ browser: true })],
 })
 
 // Node.js
-const nodeConfig = (input, output = input) => ({
+const nodeConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
   output: [
     {
       format: 'cjs',
       name: 'git',
-      file: `dist/${path.basename(output, '.js')}.cjs`,
+      file: `dist/${output}`,
     },
   ],
 })
 
 // Browser environments that still don't support `import` (Workers and ServiceWorkers)
-const umdConfig = (input, name) => ({
+const umdConfig = (input, output, name) => ({
   input: `src/${input}`,
   output: [
     {
       format: 'umd',
       name,
-      file: `dist/${path.basename(input, '.js')}.umd.min.js`,
+      file: `dist/${output}`,
     },
   ],
 })
 
 export default [
-  moduleConfig('index.js'),
-  nodeConfig('api/_index.js', 'index.js'),
-  moduleConfig('internal-apis.js'),
-  nodeConfig('internal-apis.js'),
-  nodeConfig('builtin-node/http.js'),
-  moduleConfig('builtin-browser/http.js'),
-  umdConfig('builtin-browser/http.js', 'GitHttp'),
+  ecmaConfig('index.js', 'index.js'),
+  nodeConfig('api/_index.js', 'index.cjs'),
+  ecmaConfig('internal-apis.js', 'internal-apis.js'),
+  nodeConfig('internal-apis.js', 'internal-apis.cjs'),
+  ecmaConfig('http/node.js', 'http/node.js'),
+  umdConfig('http/node.js', 'http/node.cjs', 'GitHttp'),
+  ecmaConfig('http/web.js', 'http/web.js'),
+  umdConfig('http/web.js', 'http/web.cjs', 'GitHttp'),
 ]

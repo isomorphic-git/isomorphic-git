@@ -2,6 +2,10 @@
 // It's like package.json scripts, but more flexible.
 const { concurrent, series, runInNewWindow } = require('nps-utils')
 
+const pkg = require('./package.json')
+
+const builtFiles = pkg.files.filter(f => !['cli.js'].includes(f))
+
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.js')
 
@@ -24,6 +28,9 @@ const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
 
 module.exports = {
   scripts: {
+    clean: {
+      default: `rm ${builtFiles.join(' ')}`,
+    },
     lint: {
       default: series.nps('lint.js'),
       js: `eslint ${srcPaths}`,
