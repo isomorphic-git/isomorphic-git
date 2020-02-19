@@ -23,8 +23,8 @@ import { join } from '../utils/join.js'
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
  * @param {MessageCallback} [args.onMessage] - optional message event callback
  * @param {AuthCallback} [args.onAuth] - optional auth fill callback
- * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
+ * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Which branch to push. By default this is the currently checked out branch.
@@ -47,7 +47,7 @@ import { join } from '../utils/join.js'
  *   dir: '/tutorial',
  *   remote: 'origin',
  *   ref: 'master',
- *   onAuth: () => ({ token: process.env.GITHUB_TOKEN }),
+ *   onAuth: () => ({ username: process.env.GITHUB_TOKEN }),
  * })
  * console.log(pushResult)
  *

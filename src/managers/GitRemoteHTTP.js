@@ -2,7 +2,6 @@ import '../typedefs.js'
 
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
-import { calculateBasicAuthUsernamePasswordPair } from '../utils/calculateBasicAuthUsernamePasswordPair.js'
 import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
@@ -15,6 +14,17 @@ const corsProxify = (corsProxy, url) =>
     ? `${corsProxy}${url}`
     : `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
 
+const updateHeaders = (headers, auth) => {
+  // Update the basic auth header
+  if (auth.username || auth.password) {
+    headers.Authorization = calculateBasicAuthHeader(auth)
+  }
+  // but any manually provided headers take precedence
+  if (auth.headers) {
+    Object.assign(headers, auth.headers)
+  }
+}
+
 export class GitRemoteHTTP {
   static async capabilities() {
     return ['discover', 'connect']
@@ -25,12 +35,11 @@ export class GitRemoteHTTP {
    * @param {HttpClient} args.http
    * @param {ProgressCallback} [args.onProgress]
    * @param {AuthCallback} [args.onAuth]
-   * @param {AuthSuccessCallback} [args.onAuthSuccess]
    * @param {AuthFailureCallback} [args.onAuthFailure]
+   * @param {AuthSuccessCallback} [args.onAuthSuccess]
    * @param {string} [args.corsProxy]
    * @param {string} args.service
    * @param {string} args.url
-   * @param {GitAuth} [args.auth]
    * @param {Object<string, string>} [args.headers]
    */
   static async discover({
@@ -41,67 +50,59 @@ export class GitRemoteHTTP {
     onAuthFailure,
     corsProxy,
     service,
-    url,
-    auth,
+    url: _origUrl,
     headers,
   }) {
-    const _origUrl = url
-    const urlAuth = extractAuthFromUrl(url)
-    if (urlAuth) {
-      url = urlAuth.url
-      // To try to be backwards compatible with simple-get's behavior, which uses Node's http.request
-      // setting an Authorization header will override what is in the URL.
-      // Ergo manually specified auth parameters will override those in the URL.
-      // However, since the oauth2 option is incompatible with usernames and passwords, rather than throw an
-      // E.MixUsernamePasswordOauth2formatTokenError error, we'll avoid that situation by ignoring the username
-      // and/or password in the url.
-      if (!auth.oauth2format) {
-        auth.username = auth.username || urlAuth.username
-        auth.password = auth.password || urlAuth.password
-      }
+    let { url, auth } = extractAuthFromUrl(_origUrl)
+    const proxifiedURL = corsProxy ? corsProxify(corsProxy, url) : url
+    if (auth.username || auth.password) {
+      headers.Authorization = calculateBasicAuthHeader(auth)
     }
-    if (corsProxy) {
-      url = corsProxify(corsProxy, url)
-    }
-    // headers['Accept'] = `application/x-${service}-advertisement`
-    // If the username came from the URL, we want to allow the password to be missing.
-    // This is because Github allows using the token as the username with an empty password
-    // so that is a style of git clone URL we might encounter and we don't want to throw a "Missing password or token" error.
-    // Also, we don't want to prematurely throw an error before the credentialManager plugin has
-    // had an opportunity to provide the password.
-    const _auth = calculateBasicAuthUsernamePasswordPair(auth, !!urlAuth)
-    if (_auth) {
-      headers.Authorization = calculateBasicAuthHeader(_auth)
-    }
-    let res = await http({
-      onProgress,
-      method: 'GET',
-      url: `${url}/info/refs?service=${service}`,
-      headers,
-    })
-    // 401 is the "correct" response. 203 is Non-Authoritative Information and comes from Azure DevOps, which
-    // apparently doesn't realize this is a git request and is returning the HTML for the "Azure DevOps Services | Sign In" page.
-    if ((res.statusCode === 401 || res.statusCode === 203) && onAuth) {
-      // Acquire credentials and try again
-      // TODO: read `useHttpPath` value from git config and pass as 2nd argument?
-      auth = await onAuth(_origUrl)
-      const _auth = calculateBasicAuthUsernamePasswordPair(auth)
-      if (_auth) {
-        headers.Authorization = calculateBasicAuthHeader(_auth)
-      }
+
+    let res
+    let tryAgain
+    let providedAuthBefore = false
+    do {
       res = await http({
         onProgress,
         method: 'GET',
-        url: `${url}/info/refs?service=${service}`,
+        url: `${proxifiedURL}/info/refs?service=${service}`,
         headers,
       })
-      // Tell credential manager if the credentials were no good
-      if (res.statusCode === 401 && onAuthFailure) {
-        await onAuthFailure(_origUrl, auth)
-      } else if (res.statusCode === 200 && onAuthSuccess) {
-        await onAuthSuccess(_origUrl, auth)
+
+      // the default loop behavior
+      tryAgain = false
+
+      // 401 is the "correct" response for access denied. 203 is Non-Authoritative Information and comes from Azure DevOps, which
+      // apparently doesn't realize this is a git request and is returning the HTML for the "Azure DevOps Services | Sign In" page.
+      if (res.statusCode === 401 || res.statusCode === 203) {
+        // On subsequent 401s, call `onAuthFailure` instead of `onAuth`.
+        // This is so that naive `onAuth` callbacks that return a fixed value don't create an infinite loop of retrying.
+        const getAuth = providedAuthBefore ? onAuthFailure : onAuth
+        if (getAuth) {
+          // Acquire credentials and try again
+          // TODO: read `useHttpPath` value from git config and pass along?
+          auth = await getAuth(url, {
+            ...auth,
+            headers: { ...headers },
+          })
+          if (auth && auth.cancel) {
+            throw new GitError(E.UserCancelledError)
+          } else if (auth) {
+            updateHeaders(headers, auth)
+            providedAuthBefore = true
+            tryAgain = true
+          }
+        }
+      } else if (
+        res.statusCode === 200 &&
+        providedAuthBefore &&
+        onAuthSuccess
+      ) {
+        await onAuthSuccess(url, auth)
       }
-    }
+    } while (tryAgain)
+
     if (res.statusCode !== 200) {
       throw new GitError(E.HTTPError, {
         statusCode: res.statusCode,
@@ -124,6 +125,7 @@ export class GitRemoteHTTP {
       const preview =
         response.length < 256 ? response : response.slice(0, 256) + '...'
       // For backwards compatibility, try to parse it anyway.
+      // TODO: maybe just throw instead of trying?
       try {
         const remoteHTTP = await parseRefsAdResponse([data], { service })
         remoteHTTP.auth = auth
@@ -147,29 +149,17 @@ export class GitRemoteHTTP {
     body,
     headers,
   }) {
+    // We already have the "correct" auth value at this point, but
+    // we need to strip out the username/password from the URL yet again.
     const urlAuth = extractAuthFromUrl(url)
-    if (urlAuth) {
-      url = urlAuth.url
-      // To try to be backwards compatible with simple-get's behavior, which uses Node's http.request
-      // setting an Authorization header will override what is in the URL.
-      // Ergo manually specified auth parameters will override those in the URL.
-      auth.username = auth.username || urlAuth.username
-      auth.password = auth.password || urlAuth.password
-    }
-    if (corsProxy) {
-      url = corsProxify(corsProxy, url)
-    }
+    if (urlAuth) url = urlAuth.url
+
+    if (corsProxy) url = corsProxify(corsProxy, url)
+
     headers['content-type'] = `application/x-${service}-request`
     headers.accept = `application/x-${service}-result`
-    // If the username came from the URL, we want to allow the password to be missing.
-    // This is because Github allows using the token as the username with an empty password
-    // so that is a style of git clone URL we might encounter and we don't want to throw a "Missing password or token" error.
-    // Also, we don't want to prematurely throw an error before the credentialManager plugin has
-    // had an opportunity to provide the password.
-    auth = calculateBasicAuthUsernamePasswordPair(auth, !!urlAuth)
-    if (auth) {
-      headers.Authorization = calculateBasicAuthHeader(auth)
-    }
+    updateHeaders(headers, auth)
+
     const res = await http({
       onProgress,
       method: 'POST',

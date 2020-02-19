@@ -26,8 +26,8 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
  * @param {AuthCallback} [args.onAuth]
- * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {AuthFailureCallback} [args.onAuthFailure]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {string} args.gitdir
  * @param {string} [args.ref]
  * @param {string} [args.remoteRef]
@@ -98,7 +98,7 @@ export async function push({
   const oid = _delete
     ? '0000000000000000000000000000000000000000'
     : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
-  let auth = {}
+
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const httpRemote = await GitRemoteHTTP.discover({
     http,
@@ -108,10 +108,9 @@ export async function push({
     corsProxy,
     service: 'git-receive-pack',
     url,
-    auth,
     headers,
   })
-  auth = httpRemote.auth // hack to get new credentials from CredentialManager API
+  const auth = httpRemote.auth // hack to get new credentials from CredentialManager API
   let fullRemoteRef
   if (!remoteRef) {
     fullRemoteRef = fullRef

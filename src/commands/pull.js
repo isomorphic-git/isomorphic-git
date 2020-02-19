@@ -14,8 +14,8 @@ import { E, GitError } from '../models/GitError.js'
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
  * @param {MessageCallback} [args.onMessage] - optional message event callback
  * @param {AuthCallback} [args.onAuth] - optional auth fill callback
- * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
+ * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {string} args.dir
  * @param {string} args.gitdir
  * @param {string} args.ref - Which branch to fetch. By default this is the currently checked out branch.

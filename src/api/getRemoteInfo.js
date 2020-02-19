@@ -24,8 +24,8 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @param {object} args
  * @param {HttpClient} args.http - an HTTP client
  * @param {AuthCallback} [args.onAuth] - optional auth fill callback
- * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
+ * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {string} args.url - The URL of the remote repository. Will be gotten from gitconfig if absent.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.forPush = false] - By default, the command queries the 'fetch' capabilities. If true, it will ask for the 'push' capabilities.
@@ -56,7 +56,6 @@ export async function getRemoteInfo({
   try {
     assertParameter('url', url)
 
-    let auth = {}
     const remote = await GitRemoteHTTP.discover({
       http,
       onAuth,
@@ -65,10 +64,9 @@ export async function getRemoteInfo({
       corsProxy,
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,
-      auth,
       headers,
     })
-    auth = remote.auth // hack to get new credentials from CredentialManager API
+
     // Note: remote.capabilities, remote.refs, and remote.symrefs are Set and Map objects,
     // but one of the objectives of the public API is to always return JSON-compatible objects
     // so we must JSONify them.
