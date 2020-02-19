@@ -1,5 +1,5 @@
 {
-  "include": ["__tests__", "dist/examples"],
+  "include": ["__tests__"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "strictNullChecks": true,
@@ -17,9 +17,9 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "isomorphic-git": ["./dist/index.d.ts"],
+      "isomorphic-git": ["./index.d.ts"],
       "isomorphic-git/internal-apis": ["./src/internal-apis.d.ts"],
-      "isomorphic-git/http": ["./src/http.d.ts"]
+      "isomorphic-git/http": ["./http/node.d.ts"]
     }
   }
 }

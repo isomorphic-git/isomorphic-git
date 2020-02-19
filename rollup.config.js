@@ -13,7 +13,7 @@ const external = [
   ...Object.keys(pkg.dependencies),
 ]
 
-// Bleeding edge
+// Modern modules
 const ecmaConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
@@ -22,12 +22,12 @@ const ecmaConfig = (input, output) => ({
     {
       format: 'es',
       name: 'git',
-      file: `dist/${output}`,
+      file: `${output}`,
     },
   ],
 })
 
-// Node.js
+// Legacy CommonJS2 modules
 const nodeConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
@@ -35,19 +35,20 @@ const nodeConfig = (input, output) => ({
     {
       format: 'cjs',
       name: 'git',
-      file: `dist/${output}`,
+      file: `${output}`,
     },
   ],
 })
 
-// Browser environments that still don't support `import` (Workers and ServiceWorkers)
+// Script tags that "export" a global var for those browser environments that
+// still don't support `import` (Workers and ServiceWorkers)
 const umdConfig = (input, output, name) => ({
   input: `src/${input}`,
   output: [
     {
       format: 'umd',
       name,
-      file: `dist/${output}`,
+      file: `${output}`,
     },
   ],
 })

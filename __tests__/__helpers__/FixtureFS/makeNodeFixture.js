@@ -2,7 +2,7 @@ const path = require('path')
 
 const { FileSystem } = require('isomorphic-git/internal-apis')
 
-async function makeNodeFixture (fixture) {
+async function makeNodeFixture(fixture) {
   const _fs = Object.assign({}, require('fs'))
 
   const fs = new FileSystem(_fs)
@@ -10,7 +10,7 @@ async function makeNodeFixture (fixture) {
   const {
     getFixturePath,
     createTempDir,
-    copyFixtureIntoTempDir
+    copyFixtureIntoTempDir,
   } = require('jest-fixtures')
 
   const testsDir = path.resolve(__dirname, '..')

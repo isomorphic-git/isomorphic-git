@@ -2,22 +2,22 @@
   "name": "isomorphic-git",
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
-  "typings": "./dist/index.d.ts",
+  "typings": "./index.d.ts",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./index.cjs",
+  "module": "./index.js",
   "exports": {
-    ".": "./dist/index.cjs",
-    "./dist/index.cjs": "./dist/index.cjs",
-    "./dist/index.js": "./dist/index.js",
-    "./dist/http.cjs": "./dist/http.cjs",
-    "./dist/http.js": "./dist/http.js"
+    ".": "./index.js",
+    "./index.cjs": "./index.cjs",
+    "./index.js": "./index.js",
+    "./http.cjs": "./http.cjs",
+    "./http.js": "./http.js"
   },
   "browser": {
-    "isomorphic-git": "./dist/bundle.umd.min.js",
-    "isomorphic-git/internal-apis": "./dist/internal.umd.min.js"
+    "isomorphic-git": "./index.umd.min.js",
+    "isomorphic-git/internal-apis": "./internal.umd.min.js"
   },
-  "unpkg": "dist/bundle.umd.min.js",
+  "unpkg": "index.umd.min.js",
   "bin": {
     "isogit": "./cli.js"
   },
@@ -51,19 +51,19 @@
   "homepage": "https://isomorphic-git.org/",
   "files": [
     "cli.js",
-    "dist/browser-tests.json",
-    "dist/bundle.umd.min.js",
-    "dist/bundle.umd.min.js.map",
-    "dist/http/node.cjs",
-    "dist/http/node.d.ts",
-    "dist/http/node.js",
-    "dist/http/web.cjs",
-    "dist/http/web.d.ts",
-    "dist/http/web.js",
-    "dist/index.cjs",
-    "dist/index.d.ts",
-    "dist/index.js",
-    "dist/size_report.html"
+    "browser-tests.json",
+    "http/node.cjs",
+    "http/node.d.ts",
+    "http/node.js",
+    "http/web.cjs",
+    "http/web.d.ts",
+    "http/web.js",
+    "index.cjs",
+    "index.d.ts",
+    "index.js",
+    "index.umd.min.js",
+    "index.umd.min.js.map",
+    "size_report.html"
   ],
   "dependencies": {
     "async-lock": "^1.1.0",
@@ -153,7 +153,7 @@
   "bundlewatch": {
     "files": [
       {
-        "path": "./dist/bundle.umd.min.js",
+        "path": "./index.umd.min.js",
         "maxSize": "100kb"
       }
     ]

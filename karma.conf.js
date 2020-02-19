@@ -155,15 +155,10 @@ module.exports = function(config) {
         alias: {
           'isomorphic-git/internal-apis': path.resolve(
             __dirname,
-            'dist/internal.umd.min.js'
-            // 'src/internal-apis.js'
+            'internal-apis.umd.min.js'
           ),
-          'isomorphic-git/http': path.resolve(__dirname, 'dist/http/web.js'),
-          'isomorphic-git': path.resolve(
-            __dirname,
-            'dist/bundle.umd.min.js'
-            // 'src/index.js'
-          ),
+          'isomorphic-git/http': path.resolve(__dirname, 'http/web.js'),
+          'isomorphic-git': path.resolve(__dirname, 'index.umd.min.js'),
         },
       },
     },
