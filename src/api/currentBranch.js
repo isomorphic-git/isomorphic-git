@@ -14,6 +14,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {boolean} [args.fullname = false] - Return the full path (e.g. "refs/heads/master") instead of the abbreviated form.
+ * @param {boolean} [args.test = false] - If the current branch doesn't actually exist (such as 'master' right after git init) then return `undefined`.
  *
  * @returns {Promise<string|void>} The name of the current branch or undefined if the HEAD is detached.
  *
@@ -32,6 +33,7 @@ export async function currentBranch({
   dir,
   gitdir = join(dir, '.git'),
   fullname = false,
+  test = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -40,6 +42,7 @@ export async function currentBranch({
       fs: new FileSystem(fs),
       gitdir,
       fullname,
+      test,
     })
   } catch (err) {
     err.caller = 'git.currentBranch'

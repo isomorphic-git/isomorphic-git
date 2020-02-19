@@ -154,7 +154,14 @@ async function gendoc(file, filepath) {
   try {
     ast = await jsdoc.explain({ source: file })
   } catch (e) {
-    console.log(`Unable to parse ${filepath}`, e.message)
+    // Don't complain about this one particular known issue which is a TS tuple type.
+    if (
+      !e.message.includes(
+        'tag title "typedef" and text "{[string, HeadStatus, WorkdirStatus, StageStatus]} StatusRow"'
+      )
+    ) {
+      console.log(`Unable to parse ${filepath}`, e.message)
+    }
     return ''
   }
   let text = ''
