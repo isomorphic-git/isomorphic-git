@@ -95,7 +95,7 @@ But if there's interest in maintaining this table as some kind of function, I'm 
 ## Option 2: Headers
 
 This is the super flexible option. Just return the HTTP headers you want to add as an object with `{ headers }`.
-If you can provide `{ username, password, headers }` if you want, although if `headers` include an `Authentication` property that will override whatever you would normally get from `username`/`password`.
+If you can provide `{ username, password, headers }` if you want. (Although if `headers` includes an `Authentication` property that overwrites what you would normally get from `username`/`password`.)
 
 To re-implement the default Basic Auth behavior, do something like this:
 
@@ -107,7 +107,7 @@ let auth = {
 }
 ```
 
-If you are using a custom proxy server that has it's OWN authentication in addition to the destination authentication, you could inject it like so:
+If you are using a custom proxy server that has its own authentication in addition to the destination authentication, you could inject it like so:
 
 ```js
 let auth = {
@@ -118,5 +118,3 @@ let auth = {
   }
 }
 ```
-
-You can also pass `headers` into the initial call to clone, fetch, push, etc though. So maybe a more useful example would be a proxy server that stores OAuth2 tokens and generates the Basic Auth header in the proxy, but only prompts the user to login when they try to `push`. (Therefore the auth token for the proxy might not be present when `push` is initially called and therefore not provided in the initial `headers`.)
