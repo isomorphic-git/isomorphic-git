@@ -5,9 +5,12 @@ export function extractAuthFromUrl(url) {
   // and compute the Authorization header.
   // Note: I tried using new URL(url) but that throws a security exception in Edge. :rolleyes:
   let userpass = url.match(/^https?:\/\/([^/]+)@/)
-  if (userpass == null) return null
+  // No credentials, return the url unmodified and an empty auth object
+  if (userpass == null) return { url, auth: {} }
   userpass = userpass[1]
   const [username, password] = userpass.split(':')
+  // Remove credentials from URL
   url = url.replace(`${userpass}@`, '')
-  return { url, username, password }
+  // Has credentials, return the fetch-safe URL and the parsed credentials
+  return { url, auth: { username, password } }
 }

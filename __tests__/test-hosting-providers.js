@@ -151,7 +151,8 @@ describe('Hosting Providers', () => {
     // with "public_repo" access. The only repo it has write access to is
     // https://github.com/isomorphic-git/test.empty
     // It is stored reversed to avoid Github's auto-revoking feature.
-    const token = reverse('e8df25b340c98b7eec57a4976bd9074b93a7dc1c')
+    const password = reverse('e8df25b340c98b7eec57a4976bd9074b93a7dc1c')
+    const username = 'isomorphic-git-test-push'
     it('fetch', async () => {
       // Setup
       const { fs, gitdir } = await makeFixture('test-hosting-providers')
@@ -163,7 +164,7 @@ describe('Hosting Providers', () => {
         corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
         remote: 'github',
         ref: 'master',
-        onAuth: () => ({ token }),
+        onAuth: () => ({ username, password }),
       })
       expect(res).toBeTruthy()
       expect(res.defaultBranch).toBe('refs/heads/test')
@@ -181,7 +182,7 @@ describe('Hosting Providers', () => {
         remote: 'github',
         ref: 'master',
         force: true,
-        onAuth: () => ({ token }),
+        onAuth: () => ({ username, password }),
       })
       expect(res).toBeTruthy()
       expect(res.ok).toBe(true)

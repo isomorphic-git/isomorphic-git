@@ -308,7 +308,7 @@ async function analyze({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
         await onProgress({ phase: 'Analyzing workdir', loaded: ++count })
       }
 
-      // This is a kind of silly pattern but it worked so well for me in calculateBasicAuthUsernamePasswordPair.js
+      // This is a kind of silly pattern but it worked so well for me in the past
       // and it makes intuitively demonstrating exhaustiveness so *easy*.
       // This checks for the presense and/or absense of each of the 3 entries,
       // converts that to a 3-bit binary representation, and then handles

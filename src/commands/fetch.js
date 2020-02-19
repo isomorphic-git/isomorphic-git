@@ -40,8 +40,8 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
  * @param {AuthCallback} [args.onAuth]
- * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {AuthFailureCallback} [args.onAuthFailure]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {string} args.gitdir
  * @param {string|void} [args.url]
  * @param {string} [args.corsProxy]
@@ -108,7 +108,6 @@ export async function fetch({
     corsProxy = await config.get('http.corsProxy')
   }
 
-  let auth = {}
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const remoteHTTP = await GitRemoteHTTP.discover({
     http,
@@ -118,10 +117,9 @@ export async function fetch({
     corsProxy,
     service: 'git-upload-pack',
     url,
-    auth,
     headers,
   })
-  auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
+  const auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
   // For the special case of an empty repository with no refs, return null.
   if (remoteRefs.size === 0) {

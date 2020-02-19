@@ -15,8 +15,8 @@ import { addRemote } from './addRemote.js'
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
  * @param {AuthCallback} [args.onAuth]
- * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {AuthFailureCallback} [args.onAuthFailure]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {string} [args.dir]
  * @param {string} args.gitdir
  * @param {string} args.url
