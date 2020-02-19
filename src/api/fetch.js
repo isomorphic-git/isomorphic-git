@@ -31,11 +31,11 @@ import { join } from '../utils/join.js'
  * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.ref] - Which branch to fetch. By default this is the currently checked out branch.
  * @param {string} [args.url] - The URL of the remote repository. The default is the value set in the git config for that remote.
  * @param {string} [args.remote] - If URL is not specified, determines which remote to use.
- * @param {string} [args.remoteRef] - The name of the branch on the remote to fetch. By default this is the configured remote tracking branch.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {string} [args.ref] - Which branch to fetch if `singleBranch` is true. By default this is the current branch or the remote's default branch.
+ * @param {string} [args.remoteRef] - The name of the branch on the remote to fetch if `singleBranch` is true. By default this is the configured remote tracking branch.
  * @param {boolean} [args.tags = false] - Also fetch tags
  * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
  * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
@@ -74,7 +74,7 @@ export async function fetch({
   onAuthFailure,
   dir,
   gitdir = join(dir, '.git'),
-  ref = 'HEAD',
+  ref,
   remote,
   remoteRef,
   url,
