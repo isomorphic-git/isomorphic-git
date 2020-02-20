@@ -387,6 +387,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ef4",
+      "name": "Edward Faulkner",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/319282?v=4",
+      "profile": "http://eaf4.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
