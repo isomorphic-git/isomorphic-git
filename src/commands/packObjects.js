@@ -2,7 +2,7 @@
 import { collect } from '../utils/collect.js'
 import { join } from '../utils/join.js'
 
-import { pack } from './pack'
+import { _pack } from './pack'
 
 /**
  *
@@ -21,8 +21,8 @@ import { pack } from './pack'
  * @returns {Promise<PackObjectsResult>}
  * @see PackObjectsResult
  */
-export async function packObjects({ fs, gitdir, oids, write }) {
-  const buffers = await pack({ fs, gitdir, oids })
+export async function _packObjects({ fs, gitdir, oids, write }) {
+  const buffers = await _pack({ fs, gitdir, oids })
   const packfile = Buffer.from(await collect(buffers))
   const packfileSha = packfile.slice(-20).toString('hex')
   const filename = `pack-${packfileSha}.pack`

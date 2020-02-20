@@ -4,7 +4,7 @@ import { _checkout } from '../commands/checkout.js'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _fetch } from '../commands/fetch.js'
 import { _getConfig } from '../commands/getConfig.js'
-import { merge } from '../commands/merge.js'
+import { _merge } from '../commands/merge.js'
 import { E, GitError } from '../models/GitError.js'
 
 /**
@@ -38,7 +38,7 @@ import { E, GitError } from '../models/GitError.js'
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
  */
-export async function pull({
+export async function _pull({
   fs,
   http,
   onProgress,
@@ -91,7 +91,7 @@ export async function pull({
       headers,
     })
     // Merge the remote tracking branch into the local one.
-    await merge({
+    await _merge({
       fs,
       gitdir,
       ours: ref,

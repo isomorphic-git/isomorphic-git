@@ -5,7 +5,7 @@ import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
-import { writeObject } from '../storage/writeObject.js'
+import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
@@ -70,7 +70,7 @@ async function addToIndex({ dir, gitdir, fs, filepath, index }) {
       ? await fs.readlink(join(dir, filepath))
       : await fs.read(join(dir, filepath))
     if (object === null) throw new GitError(E.FileReadError, { filepath })
-    const oid = await writeObject({ fs, gitdir, type: 'blob', object })
+    const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
     index.insert({ filepath, stats, oid })
   }
 }

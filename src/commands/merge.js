@@ -51,7 +51,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * console.log(m)
  *
  */
-export async function merge({
+export async function _merge({
   fs,
   gitdir,
   ours,

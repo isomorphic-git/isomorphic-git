@@ -8,7 +8,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  *
  * @returns {Promise<Array<{remote: string, url: string}>>}
  */
-export async function listRemotes({ fs, gitdir }) {
+export async function _listRemotes({ fs, gitdir }) {
   const config = await GitConfigManager.get({ fs, gitdir })
   const remoteNames = await config.getSubsections('remote')
   const remotes = Promise.all(

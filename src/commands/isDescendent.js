@@ -2,7 +2,7 @@
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 
 /**
  * @param {object} args

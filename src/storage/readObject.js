@@ -5,10 +5,10 @@ import { readObjectPacked } from '../storage/readObjectPacked.js'
 import { inflate } from '../utils/inflate.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function readObject({ fs, gitdir, oid, format = 'content' }) {
+export async function _readObject({ fs, gitdir, oid, format = 'content' }) {
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
-  const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
+  const getExternalRefDelta = oid => _readObject({ fs, gitdir, oid })
 
   let result
   // Empty tree - hard-coded so we can use it as a shorthand.

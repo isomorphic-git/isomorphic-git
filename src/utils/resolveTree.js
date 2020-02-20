@@ -2,7 +2,7 @@ import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 
 export async function resolveTree({ fs, gitdir, oid }) {
   // Empty tree - bypass `readObject`

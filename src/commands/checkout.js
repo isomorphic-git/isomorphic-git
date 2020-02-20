@@ -4,12 +4,12 @@ import '../typedefs.js'
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
-import { setConfig } from '../commands/setConfig.js'
-import { walk } from '../commands/walk.js'
+import { _walk } from '../commands/walk.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { flat } from '../utils/flat.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
@@ -62,22 +62,17 @@ export async function _checkout({
       ref: remoteRef,
     })
     // Set up remote tracking branch
-    await setConfig({
-      fs,
-      gitdir,
-      path: `branch.${ref}.remote`,
-      value: `${remote}`,
-      append: false,
-    })
-    await setConfig({
-      fs,
-      gitdir,
-      path: `branch.${ref}.merge`,
-      value: `refs/heads/${ref}`,
-      append: false,
-    })
+    const config = await GitConfigManager.get({ fs, gitdir })
+    await config.set(`branch.${ref}.remote`, remote)
+    await config.set(`branch.${ref}.merge`, `refs/heads/${ref}`)
+    await GitConfigManager.save({ fs, gitdir, config })
     // Create a new branch that points at that same commit
-    await fs.write(`${gitdir}/refs/heads/${ref}`, oid + '\n')
+    await GitRefManager.writeRef({
+      fs,
+      gitdir,
+      ref: `refs/heads/${ref}`,
+      value: oid,
+    })
   }
 
   // Update working dir
@@ -292,7 +287,7 @@ export async function _checkout({
 
 async function analyze({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
   let count = 0
-  return walk({
+  return _walk({
     fs,
     dir,
     gitdir,

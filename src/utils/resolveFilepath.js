@@ -1,7 +1,7 @@
 // @ts-check
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
 export async function resolveFilepath({ fs, gitdir, oid, filepath }) {

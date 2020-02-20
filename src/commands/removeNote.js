@@ -3,8 +3,8 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { E } from '../models/GitError.js'
 
 import { _commit } from './commit.js'
-import { readTree } from './readTree.js'
-import { writeTree } from './writeTree.js'
+import { _readTree } from './readTree.js'
+import { _writeTree } from './writeTree.js'
 
 /**
  * @param {object} args
@@ -29,7 +29,7 @@ import { writeTree } from './writeTree.js'
  * @returns {Promise<string>}
  */
 
-export async function removeNote({
+export async function _removeNote({
   fs,
   onSign,
   gitdir,
@@ -50,7 +50,7 @@ export async function removeNote({
   }
 
   // I'm using the "empty tree" magic number here for brevity
-  const result = await readTree({
+  const result = await _readTree({
     fs,
     gitdir,
     oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
@@ -61,7 +61,7 @@ export async function removeNote({
   tree = tree.filter(entry => entry.path !== oid)
 
   // Create the new note tree
-  const treeOid = await writeTree({
+  const treeOid = await _writeTree({
     fs,
     gitdir,
     tree,

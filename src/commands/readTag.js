@@ -3,7 +3,7 @@ import '../typedefs.js'
 
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 
 /**
  *
@@ -21,7 +21,7 @@ import { readObject } from '../storage/readObject.js'
  *
  * @returns {Promise<ReadTagResult>}
  */
-export async function readTag({ fs, gitdir, oid }) {
+export async function _readTag({ fs, gitdir, oid }) {
   const { type, object } = await readObject({
     fs,
     gitdir,

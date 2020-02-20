@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { readBlob as _readBlob } from '../commands/readBlob.js'
+import { _readBlob } from '../commands/readBlob.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

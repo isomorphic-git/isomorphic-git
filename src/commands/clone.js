@@ -1,12 +1,11 @@
 // @ts-check
 import '../typedefs.js'
 
+import { _addRemote } from '../commands/addRemote.js'
 import { _checkout } from '../commands/checkout.js'
 import { _fetch } from '../commands/fetch.js'
 import { _init } from '../commands/init.js'
-import { setConfig } from '../commands/setConfig.js'
-
-import { _addRemote } from './addRemote.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 
 /**
  * @param {object} args
@@ -61,13 +60,9 @@ export async function _clone({
   await _init({ fs, gitdir })
   await _addRemote({ fs, gitdir, remote, url, force: false })
   if (corsProxy) {
-    await setConfig({
-      fs,
-      gitdir,
-      path: `http.corsProxy`,
-      value: corsProxy,
-      append: false,
-    })
+    const config = await GitConfigManager.get({ fs, gitdir })
+    await config.set(`http.corsProxy`, corsProxy)
+    await GitConfigManager.save({ fs, gitdir, config })
   }
   const { defaultBranch, fetchHead } = await _fetch({
     fs,

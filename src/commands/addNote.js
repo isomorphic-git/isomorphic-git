@@ -2,11 +2,11 @@
 import '../typedefs.js'
 
 import { _commit } from '../commands/commit.js'
-import { readTree } from '../commands/readTree.js'
-import { writeBlob } from '../commands/writeBlob.js'
-import { writeTree } from '../commands/writeTree.js'
+import { _readTree } from '../commands/readTree.js'
+import { _writeTree } from '../commands/writeTree.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
+import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 /**
  * @param {object} args
@@ -55,7 +55,7 @@ export async function _addNote({
   }
 
   // I'm using the "empty tree" magic number here for brevity
-  const result = await readTree({
+  const result = await _readTree({
     fs,
     gitdir,
     oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
@@ -80,15 +80,17 @@ export async function _addNote({
   if (typeof note === 'string') {
     note = Buffer.from(note, 'utf8')
   }
-  const noteOid = await writeBlob({
+  const noteOid = await writeObject({
     fs,
     gitdir,
-    blob: note,
+    type: 'blob',
+    object: note,
+    format: 'content',
   })
 
   // Create the new note tree
   tree.push({ mode: '100644', path: oid, oid: noteOid, type: 'blob' })
-  const treeOid = await writeTree({
+  const treeOid = await _writeTree({
     fs,
     gitdir,
     tree,

@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { log as _log } from '../commands/log.js'
+import { _log } from '../commands/log.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

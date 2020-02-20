@@ -1,7 +1,7 @@
 import Hash from 'sha.js/sha1.js'
 
 import { types } from '../commands/types.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
@@ -13,7 +13,7 @@ import { padHex } from '../utils/padHex.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids
  */
-export async function pack({ fs, dir, gitdir = join(dir, '.git'), oids }) {
+export async function _pack({ fs, dir, gitdir = join(dir, '.git'), oids }) {
   const hash = new Hash()
   const outputStream = []
   function write(chunk, enc) {
