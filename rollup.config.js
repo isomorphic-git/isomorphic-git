@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+
 import resolve from 'rollup-plugin-node-resolve'
 
 import pkg from './package.json'
@@ -53,13 +56,27 @@ const umdConfig = (input, output, name) => ({
   ],
 })
 
+const template = `{
+  "type": "module",
+  "main": "index.cjs",
+  "module": "index.js",
+  "typings": "index.d.ts"
+}`
+
+const pkgify = (input, output, name) => {
+  fs.mkdirSync(path.join(__dirname, output), { recursive: true })
+  fs.writeFileSync(path.join(__dirname, output, 'package.json'), template)
+  return [
+    ecmaConfig(input, `${output}/index.js`),
+    umdConfig(input, `${output}/index.cjs`, name),
+  ]
+}
+
 export default [
   ecmaConfig('index.js', 'index.js'),
   nodeConfig('api/_index.js', 'index.cjs'),
   ecmaConfig('internal-apis.js', 'internal-apis.js'),
   nodeConfig('internal-apis.js', 'internal-apis.cjs'),
-  ecmaConfig('http/node.js', 'http/node.js'),
-  umdConfig('http/node.js', 'http/node.cjs', 'GitHttp'),
-  ecmaConfig('http/web.js', 'http/web.js'),
-  umdConfig('http/web.js', 'http/web.cjs', 'GitHttp'),
+  ...pkgify('http/node.js', 'http/node', 'GitHttp'),
+  ...pkgify('http/web.js', 'http/web', 'GitHttp'),
 ]

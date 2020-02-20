@@ -157,7 +157,7 @@ module.exports = function(config) {
             __dirname,
             'internal-apis.umd.min.js'
           ),
-          'isomorphic-git/http': path.resolve(__dirname, 'http/web.js'),
+          'isomorphic-git/http': path.resolve(__dirname, 'http/web/index.js'),
           'isomorphic-git': path.resolve(__dirname, 'index.umd.min.js'),
         },
       },

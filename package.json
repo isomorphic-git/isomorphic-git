@@ -6,13 +6,6 @@
   "type": "module",
   "main": "./index.cjs",
   "module": "./index.js",
-  "exports": {
-    ".": "./index.js",
-    "./index.cjs": "./index.cjs",
-    "./index.js": "./index.js",
-    "./http.cjs": "./http.cjs",
-    "./http.js": "./http.js"
-  },
   "browser": {
     "isomorphic-git": "./index.umd.min.js",
     "isomorphic-git/internal-apis": "./internal.umd.min.js"
@@ -23,7 +16,7 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=7.6.0"
+    "node": ">=10"
   },
   "scripts": {
     "start": "nps",
@@ -52,12 +45,7 @@
   "files": [
     "cli.js",
     "browser-tests.json",
-    "http/node.cjs",
-    "http/node.d.ts",
-    "http/node.js",
-    "http/web.cjs",
-    "http/web.d.ts",
-    "http/web.js",
+    "http/*",
     "index.cjs",
     "index.d.ts",
     "index.js",

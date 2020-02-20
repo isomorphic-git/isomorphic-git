@@ -1,3 +1,5 @@
+import get from 'simple-get'
+
 import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
 import { collect } from '../utils/collect.js'
 import { fromNodeStream } from '../utils/fromNodeStream.js'
@@ -46,7 +48,6 @@ export default async function http({
     body = asyncIteratorToStream(body)
   }
   return new Promise((resolve, reject) => {
-    const get = require('simple-get')
     get(
       {
         url,

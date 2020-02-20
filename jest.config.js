@@ -2,7 +2,7 @@ module.exports = {
   testRegex: '/__tests__/(server-only\\.)?test-[^\\/]+\\.js',
   moduleNameMapper: {
     '^isomorphic-git$': '<rootDir>/src',
-    '^isomorphic-git/http$': '<rootDir>/http/node.cjs',
+    '^isomorphic-git/http$': '<rootDir>/http/node',
     '^isomorphic-git/(.+)$': '<rootDir>/src/$1',
   },
   collectCoverageFrom: ['src/*.js', 'src/**/*.js'],

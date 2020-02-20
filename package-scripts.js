@@ -27,7 +27,7 @@ const timeout5 = timeout(5)
 module.exports = {
   scripts: {
     clean: {
-      default: `rm -f ${builtFiles.join(' ')} internal-apis.*`,
+      default: `rm -rf ${builtFiles.join(' ')} internal-apis.*`,
     },
     lint: {
       default: `eslint .`,
