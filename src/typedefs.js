@@ -206,9 +206,14 @@
  */
 
 /**
- * @callback HttpClient
+ * @callback HttpFetch
  * @param {GitHttpRequest} request
  * @returns {Promise<GitHttpResponse>}
+ */
+
+/**
+ * @typedef {Object} HttpClient
+ * @property {HttpFetch} request
  */
 
 /**
