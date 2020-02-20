@@ -1,25 +1,25 @@
 # stuff that gets generated during test setup
-__tests__/__fixtures__/.superblock.txt
-__tests__/__fixtures__/index.json
+/__tests__/__fixtures__/.superblock.txt
+/__tests__/__fixtures__/index.json
 
 # Dist
-http
-index.cjs
-index.d.ts
-index.js
-index.umd.min.js
-index.umd.min.js.map
-internal-apis.js
-internal-apis.d.ts
-internal-apis.cjs
-internal-apis.umd.min.js
-internal-apis.umd.min.js.map
+/http
+/index.cjs
+/index.d.ts
+/index.js
+/index.umd.min.js
+/index.umd.min.js.map
+/internal-apis.js
+/internal-apis.d.ts
+/internal-apis.cjs
+/internal-apis.umd.min.js
+/internal-apis.umd.min.js.map
 
 # Test run artifacts
-coverage
-junit
-browser-tests.json
-size_report.html
+/coverage
+/junit
+/browser-tests.json
+/size_report.html
 /__tests__/__examples__/**
 
 # PGP misc
@@ -27,11 +27,11 @@ openpgp.store/
 private.key
 
 # Website Stuff
-website/build/
-website/node_modules
-website/translated_docs
-website/yarn.lock
-website/i18n/*
+/website/build/
+/website/node_modules
+/website/translated_docs
+/website/yarn.lock
+/website/i18n/*
 !website/i18n/en.json
 
 # Logs
