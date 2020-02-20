@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { addNote as _addNote } from '../commands/addNote.js'
+import { _addNote } from '../commands/addNote.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'

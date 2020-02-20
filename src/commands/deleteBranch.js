@@ -1,7 +1,7 @@
 // @ts-check
 import cleanGitRef from 'clean-git-ref'
 
-import { currentBranch } from '../commands/currentBranch'
+import { _currentBranch } from '../commands/currentBranch'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
 
@@ -13,7 +13,7 @@ import { E, GitError } from '../models/GitError.js'
  *
  * @returns {Promise<void>}
  */
-export async function deleteBranch({ fs, gitdir, ref }) {
+export async function _deleteBranch({ fs, gitdir, ref }) {
   if (ref !== cleanGitRef.clean(ref)) {
     throw new GitError(E.InvalidRefNameError, {
       verb: 'delete',
@@ -33,7 +33,7 @@ export async function deleteBranch({ fs, gitdir, ref }) {
   }
 
   const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
-  const currentRef = await currentBranch({ fs, gitdir, fullname: true })
+  const currentRef = await _currentBranch({ fs, gitdir, fullname: true })
   if (fullRef === currentRef) {
     throw new GitError(E.BranchDeleteError, { ref })
   }

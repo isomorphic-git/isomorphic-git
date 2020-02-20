@@ -1,9 +1,9 @@
 // @ts-check
 import '../typedefs.js'
 
-import { commit } from '../commands/commit'
-import { currentBranch } from '../commands/currentBranch.js'
-import { findMergeBase } from '../commands/findMergeBase.js'
+import { _commit } from '../commands/commit'
+import { _currentBranch } from '../commands/currentBranch.js'
+import { _findMergeBase } from '../commands/findMergeBase.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
@@ -65,7 +65,7 @@ export async function merge({
   signingKey,
 }) {
   if (ours === undefined) {
-    ours = await currentBranch({ fs, gitdir, fullname: true })
+    ours = await _currentBranch({ fs, gitdir, fullname: true })
   }
   ours = await GitRefManager.expand({
     fs,
@@ -88,7 +88,7 @@ export async function merge({
     ref: theirs,
   })
   // find most recent common ancestor of ref a and ref b
-  const baseOids = await findMergeBase({
+  const baseOids = await _findMergeBase({
     fs,
     gitdir,
     oids: [ourOid, theirOid],
@@ -134,7 +134,7 @@ export async function merge({
         ours
       )}`
     }
-    const oid = await commit({
+    const oid = await _commit({
       fs,
       gitdir,
       message,

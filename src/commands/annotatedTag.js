@@ -41,7 +41,7 @@ import { writeObject } from '../storage/writeObject.js'
  * console.log('done')
  *
  */
-export async function annotatedTag({
+export async function _annotatedTag({
   fs,
   onSign,
   gitdir,

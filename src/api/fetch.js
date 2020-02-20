@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { fetch as _fetch } from '../commands/fetch.js'
+import { _fetch } from '../commands/fetch.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'

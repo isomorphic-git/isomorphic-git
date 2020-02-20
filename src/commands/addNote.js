@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { commit } from '../commands/commit.js'
+import { _commit } from '../commands/commit.js'
 import { readTree } from '../commands/readTree.js'
 import { writeBlob } from '../commands/writeBlob.js'
 import { writeTree } from '../commands/writeTree.js'
@@ -32,7 +32,7 @@ import { E, GitError } from '../models/GitError.js'
  * @returns {Promise<string>}
  */
 
-export async function addNote({
+export async function _addNote({
   fs,
   onSign,
   gitdir,
@@ -95,7 +95,7 @@ export async function addNote({
   })
 
   // Create the new note commit
-  const commitOid = await commit({
+  const commitOid = await _commit({
     fs,
     onSign,
     gitdir,

@@ -20,7 +20,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * console.log(value)
  *
  */
-export async function getConfig({ fs, gitdir, path }) {
+export async function _getConfig({ fs, gitdir, path }) {
   const config = await GitConfigManager.get({ fs, gitdir })
   return config.get(path)
 }

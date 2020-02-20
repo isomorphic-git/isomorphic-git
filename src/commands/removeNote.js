@@ -2,7 +2,7 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E } from '../models/GitError.js'
 
-import { commit } from './commit.js'
+import { _commit } from './commit.js'
 import { readTree } from './readTree.js'
 import { writeTree } from './writeTree.js'
 
@@ -68,7 +68,7 @@ export async function removeNote({
   })
 
   // Create the new note commit
-  const commitOid = await commit({
+  const commitOid = await _commit({
     fs,
     onSign,
     gitdir,

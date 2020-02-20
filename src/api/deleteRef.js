@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { deleteRef as _deleteRef } from '../commands/deleteRef.js'
+import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
@@ -26,11 +26,7 @@ export async function deleteRef({ fs, dir, gitdir = join(dir, '.git'), ref }) {
   try {
     assertParameter('fs', fs)
     assertParameter('ref', ref)
-    return await _deleteRef({
-      fs: new FileSystem(fs),
-      gitdir,
-      ref,
-    })
+    await GitRefManager.deleteRef({ fs: new FileSystem(fs), gitdir, ref })
   } catch (err) {
     err.caller = 'git.deleteRef'
     throw err

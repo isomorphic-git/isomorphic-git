@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { findRoot as _findRoot } from '../commands/findRoot.js'
+import { _findRoot } from '../commands/findRoot.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 

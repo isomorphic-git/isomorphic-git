@@ -1,5 +1,5 @@
 // @ts-check
-import { deleteRef } from '../commands/deleteRef'
+import { GitRefManager } from '../managers/GitRefManager.js'
 
 /**
  * Delete a local tag ref
@@ -16,7 +16,7 @@ import { deleteRef } from '../commands/deleteRef'
  * console.log('done')
  *
  */
-export async function deleteTag({ fs, gitdir, ref }) {
+export async function _deleteTag({ fs, gitdir, ref }) {
   ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
-  await deleteRef({ fs, gitdir, ref })
+  await GitRefManager.deleteRef({ fs, gitdir, ref })
 }

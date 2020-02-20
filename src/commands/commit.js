@@ -34,7 +34,7 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  */
-export async function commit({
+export async function _commit({
   fs,
   onSign,
   gitdir,

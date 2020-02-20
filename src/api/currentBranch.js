@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { currentBranch as _currentBranch } from '../commands/currentBranch.js'
+import { _currentBranch } from '../commands/currentBranch.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

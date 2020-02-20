@@ -31,7 +31,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  */
-export async function checkout({
+export async function _checkout({
   fs,
   onProgress,
   dir,

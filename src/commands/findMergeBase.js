@@ -9,7 +9,7 @@ import { readObject } from '../storage/readObject.js'
  * @param {string[]} args.oids
  *
  */
-export async function findMergeBase({ fs, gitdir, oids }) {
+export async function _findMergeBase({ fs, gitdir, oids }) {
   // Note: right now, the tests are geared so that the output should match that of
   // `git merge-base --all --octopus`
   // because without the --octopus flag, git's output seems to depend on the ORDER of the oids,

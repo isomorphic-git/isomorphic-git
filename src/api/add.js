@@ -1,8 +1,11 @@
 // @ts-check
 import '../typedefs.js'
 
-import { add as _add } from '../commands/add.js'
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
+import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { E, GitError } from '../models/GitError.js'
+import { writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
@@ -23,15 +26,51 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function add({ fs, dir, gitdir = join(dir, '.git'), filepath }) {
+export async function add({
+  fs: _fs,
+  dir,
+  gitdir = join(dir, '.git'),
+  filepath,
+}) {
   try {
-    assertParameter('fs', fs)
+    assertParameter('fs', _fs)
     assertParameter('dir', dir)
     assertParameter('gitdir', gitdir)
     assertParameter('filepath', filepath)
-    return await _add({ fs: new FileSystem(fs), dir, gitdir, filepath })
+
+    const fs = new FileSystem(_fs)
+    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
+      await addToIndex({ dir, gitdir, fs, filepath, index })
+    })
   } catch (err) {
     err.caller = 'git.add'
     throw err
+  }
+}
+
+async function addToIndex({ dir, gitdir, fs, filepath, index }) {
+  // TODO: Should ignore UNLESS it's already in the index.
+  const ignored = await GitIgnoreManager.isIgnored({
+    fs,
+    dir,
+    gitdir,
+    filepath,
+  })
+  if (ignored) return
+  const stats = await fs.lstat(join(dir, filepath))
+  if (!stats) throw new GitError(E.FileReadError, { filepath })
+  if (stats.isDirectory()) {
+    const children = await fs.readdir(join(dir, filepath))
+    const promises = children.map(child =>
+      addToIndex({ dir, gitdir, fs, filepath: join(filepath, child), index })
+    )
+    await Promise.all(promises)
+  } else {
+    const object = stats.isSymbolicLink()
+      ? await fs.readlink(join(dir, filepath))
+      : await fs.read(join(dir, filepath))
+    if (object === null) throw new GitError(E.FileReadError, { filepath })
+    const oid = await writeObject({ fs, gitdir, type: 'blob', object })
+    index.insert({ filepath, stats, oid })
   }
 }
