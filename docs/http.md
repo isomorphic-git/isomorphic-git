@@ -15,7 +15,7 @@ The Node client uses the [`simple-get`](https://npm.im/simple-get) package under
 
 ```js
 const git = require("isomorphic-git");
-const http = require("isomorphic-git/dist/http.cjs");
+const http = require("isomorphic-git/http/node");
 git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
   .then(console.log)
 ```
@@ -29,7 +29,7 @@ The Browser client uses the [`Fetch API`](https://developer.mozilla.org/en-US/do
 
 ```js
 import git from "isomorphic-git";
-import http from "isomorphic-git/dist/http.js";
+import http from "isomorphic-git/http/web";
 git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
   .then(console.log)
 ```

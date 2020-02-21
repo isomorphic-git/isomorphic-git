@@ -74,7 +74,7 @@ await git.clone({ ...repo, onAuth })
 const path = require('path')
 const fs = require('fs')
 const git = require('isomorphic-git')
-const http = require('isomorphic-git/dist/http.cjs')
+const http = require('isomorphic-git/http/node')
 
 // PARAMETERS - CHANGE THESE FOR YOUR CODE
 const url = 'https://github.com/isomorphic-git/isomorphic-git.github.io'
