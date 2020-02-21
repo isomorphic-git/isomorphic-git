@@ -62,7 +62,7 @@ class Footer extends React.Component {
 
         {/* Correct sidebar nav scroll position */}
         <script type="text/javascript" dangerouslySetInnerHTML={{
-          __html: `document.querySelector('.navListItemActive').scrollIntoView({ block: 'nearest' })`
+          __html: `let el = document.querySelector('.navListItemActive'); if (el) el.scrollIntoView({ block: 'nearest' })`
         }}></script>
         {/* External scripts */}
         {this.props.config.footerscripts &&

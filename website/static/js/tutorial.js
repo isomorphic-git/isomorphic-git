@@ -1,4 +1,4 @@
-import http from './http.js'
+import http from './isomorphic-git/http/web/index.js'
 
 // Initialize isomorphic-git with a file system
 window.fs = new LightningFS('fs')

@@ -61,6 +61,10 @@ footer img[src="/img/isomorphic-git-logo.svg"] {
   margin-left: auto;
   margin-right: auto;
 }
+.isomorphic-git-feature-list li a {
+  color: black;
+  text-decoration: underline;
+}
 
 .isomorphic-git-browser-list {
   display: block;
@@ -111,9 +115,20 @@ footer img[src="/img/isomorphic-git-logo.svg"] {
 
 .try-it-out {
   line-height: 2em;
+  text-align: center;
 }
 .try-it-out h2 {
   margin-top: 0;
+}
+#try-it-output {
+  text-align: left;
+  display: none;
+}
+#try-it-output .more {
+  text-align: center;
+}
+#try-it-output.show {
+  display: block;
 }
 
 #giturl_branches,
