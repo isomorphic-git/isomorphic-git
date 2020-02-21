@@ -5,7 +5,7 @@ const minimisted = require('minimisted')
 
 const git = require('.')
 
-const http = require('./dist/http.cjs')
+const http = require('./http/node')
 
 // This really isn't much of a CLI. It's mostly for testing.
 // But it's very versatile and works surprisingly well.
