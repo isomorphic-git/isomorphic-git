@@ -56,20 +56,26 @@ const siteConfig = {
   scripts: [
     '/js/announcement.js',
   ],
-  footerscripts: [
+  homepagescripts: [
     'https://platform.twitter.com/widgets.js',
+  ],
+  footerscripts: [
     '/js/gitter.js',
     '/js/sidecar.v1.js',
+    // Used to transform the code blocks into editable examples
+    '/js/codemirrorify.js',
+    // isomorphic-git itself
     'https://unpkg.com/@isomorphic-git/lightning-fs',
-    '/js/bundle.umd.min.js',
-    'https://unpkg.com/openpgp@2.6.2/dist/openpgp.min.js',
+    '/js/isomorphic-git/index.umd.min.js',
+    // the tutorial
+    { type: 'module', src: '/js/tutorial.js' },
+    // the button on the home page
+    { type: 'module', src: '/js/try-it-out-giturl.js' },
+    // The object inspector - only appears after users run examples
     'https://unpkg.com/@webcomponents/shadydom',
     '/js/object-inspector.min.js',
-    '/js/codemirrorify.js',
-    { type: 'module', src: '/js/tutorial.js' },
-    { type: 'module', src: '/js/try-it-out-giturl.js' },
-    '//static.getclicky.com/js',
-    '/js/analytics.js',
+    // minimal analytics
+    { 'data-domain': 'isomorphic-git.org', src: 'https://plausible.io/js/plausible.js' }
   ],
   // stylesheets: ['./css/tutorial.css'],
   // You may provide arbitrary config keys to be used as needed by your template.

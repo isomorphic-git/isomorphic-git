@@ -13,6 +13,7 @@ const GoSettings = require("react-icons/lib/go/settings");
 const GoFileBinary = require("react-icons/lib/go/file-binary");
 const GoDiffModified = require("react-icons/lib/go/diff-modified");
 const GoGitBranch = require("react-icons/lib/go/git-branch");
+const GoGitMerge = require("react-icons/lib/go/git-merge");
 const GoGitCommit = require("react-icons/lib/go/git-commit");
 const GoRepo = require("react-icons/lib/go/repo");
 const GoRepoClone = require("react-icons/lib/go/repo-clone");
@@ -94,7 +95,7 @@ class HomeSplash extends React.Component {
             <Button href={docUrl("browser.html", language)}>
               Getting Started
             </Button>
-            <Button href={docUrl("init.html", language)}>
+            <Button href={docUrl("alphabetic.html", language)}>
               Interactive Docs
             </Button>
             <Button href="https://github.com/isomorphic-git/isomorphic-git/releases">
@@ -192,7 +193,7 @@ const Features = props => (
   </Container>
 );
 
-const FeatureCallout = props => (
+const FeatureCallout = ({ language }) => (
   <div
     className="productShowcaseSection paddingBottom"
     style={{ textAlign: "center" }}
@@ -200,77 +201,106 @@ const FeatureCallout = props => (
     <h2>Features</h2>
     <ul className="isomorphic-git-feature-list">
       <li>
-        <GoRepoClone size="3em" /> clone repos
+        <a href={docUrl("clone.html", language)} >
+          <GoRepoClone size="3.5em" style={{paddingRight: '10px'}} />clone repos
+        </a>
       </li>
       <li>
-        <GoRepo size="3em" /> init new repos
+        <a href={docUrl("init.html", language)} >
+          <GoRepo size="3.5em" style={{paddingRight: '10px'}} />init new repos
+        </a>
       </li>
       <li>
-        <GoGitBranch size="3em" /> list branches and tags
+        <a href={docUrl("listBranches.html", language)} >
+          <GoGitBranch size="3.5em" style={{paddingRight: '10px'}} />list branches and tags
+        </a>
       </li>
       <li>
-        <GoHistory size="3em" /> list commit history
+        <a href={docUrl("log.html", language)} >
+          <GoHistory size="3.5em" style={{paddingRight: '10px'}} />list commit history
+        </a>
       </li>
       <li>
-        <GoRepoPull size="3em" />
-        checkout branches
+        <a href={docUrl("checkout.html", language)} >
+          <GoRepoPull size="3.5em" style={{paddingRight: '10px'}} />checkout branches
+        </a>
       </li>
       <li>
-        <GoRepoPush size="3em" /> push branches to remotes
-        <a title="via a proxy server">*</a>
+        <a href={docUrl("push.html", language)} >
+          <GoRepoPush size="3.5em" style={{paddingRight: '10px'}} />push branches to remotes
+        </a>
       </li>
       <li>
-        <GoGitCommit size="3em" /> create new commits
+        <a href={docUrl("commit.html", language)} >
+          <GoGitCommit size="3.5em" style={{paddingRight: '10px'}} />create new commits
+        </a>
       </li>
       <li>
-        <GoSettings size="3em" /> read & write to .git/config
+        <a href={docUrl("getConfig.html", language)} >
+          <GoSettings size="3.5em" style={{paddingRight: '10px'}} />git config
+        </a>
       </li>
       <li>
-        <GoFileBinary size="3em" /> read & write raw git objects
+        <a href={docUrl("readCommit.html", language)} >
+          <GoFileBinary size="3.5em" style={{paddingRight: '10px'}} />read & write raw git objects
+        </a>
       </li>
       <li>
-        <GoLock size="3em" /> sign commits
+        <a href={docUrl("onSign.html", language)} >
+          <GoKey size="3.5em" style={{paddingRight: '10px'}} />PGP signing
+        </a>
       </li>
       <li>
-        <GoKey size="3em" /> verify signed commits
+        <a href={docUrl("statusMatrix.html", language)} >
+          <GoDiffModified size="3.5em" style={{paddingRight: '10px'}} />file status
+        </a>
       </li>
       <li>
-        <GoDiffModified size="3em" /> working file status
+        <a href={docUrl("merge.html", language)} >
+          <GoGitMerge size="3.5em" style={{paddingRight: '10px'}} />merge branches
+        </a>
       </li>
     </ul>
   </div>
 );
 
 const TryGitRemoteInfo = props => (
-  <div className="try-it-out">
-    <h2>Try it out</h2>
-    <label htmlFor="giturl">Enter a git URL:</label>
-    <div>
-      <input
-        id="giturl_input"
-        name="giturl"
-        type="text"
-        className="input"
-        defaultValue="https://github.com/facebook/react"
-        size="50"
-        style={{ maxWidth: "80%" }}
-      />
-      <button
-        id="giturl_button"
-        type="button"
-        className="button"
-        value="Fetch Info"
-      >
-        Fetch Info
-      </button>
+  <Container padding={["bottom", "top"]} id={props.id} background="light">
+    <div className="try-it-out">
+      <h2>Try it out!</h2>
+      <label htmlFor="giturl">Enter in the URL of a git repository, and we'll retrive the list of branches and tags using the git HTTP protocol.</label>
       <div>
-        <b>Branches:</b> <span id="giturl_branches"></span>
-      </div>
-      <div>
-        <b>Tags:</b> <span id="giturl_tags"></span>
+        <input
+          id="giturl_input"
+          name="giturl"
+          type="text"
+          className="input"
+          defaultValue="https://github.com/facebook/react"
+          size="50"
+          style={{ maxWidth: "80%" }}
+        />
+        <button
+          id="giturl_button"
+          type="button"
+          className="button"
+          value="Fetch Info"
+        >
+          Fetch Info
+        </button>
+        <div id="try-it-output">
+          <div>
+            <b>Branches:</b> <span id="giturl_branches"></span>
+          </div>
+          <div>
+            <b>Tags:</b> <span id="giturl_tags"></span>
+          </div>
+          <p className="more">
+            <em>Cool, huh?</em> There are a whole bunch more live examples in the <a href={docUrl("alphabetic.html", props.language)}>docs</a>!
+          </p>
+        </div>
       </div>
     </div>
-  </div>
+  </Container>
 );
 
 const LearnHow = props => (
@@ -289,9 +319,6 @@ const LearnHow = props => (
   The API has been designed with modern tools like Rollup and Webpack in mind.
   By providing functionality as individual functions, code bundlers can produce smaller bundles by including only the functions your application uses.
       `}</MarkdownBlock>
-      </div>
-      <div className="blockElement fourByGridBlock">
-        <TryGitRemoteInfo />
       </div>
     </div>
   </Container>
@@ -352,11 +379,29 @@ class Index extends React.Component {
         <HomeSplash language={language} />
         <div className="mainContainer">
           <Features />
-          <FeatureCallout />
+          <FeatureCallout language={language} />
           <LearnHow />
+          <TryGitRemoteInfo language={language} />
           <Praise />
           <Showcase language={language} />
         </div>
+        {this.props.config.homepagescripts &&
+          this.props.config.homepagescripts.map(function (source, idx) {
+            if (typeof source === 'string') {
+              return (
+                <script
+                  defer
+                  type="text/javascript"
+                  key={'script' + idx}
+                  src={source}
+                />
+              );
+            } else {
+              return (
+                <script defer key={'script' + idx} {...source} />
+              );
+            }
+          })}
       </div>
     );
   }

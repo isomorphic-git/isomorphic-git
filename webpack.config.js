@@ -24,7 +24,7 @@ module.exports = [
         analyzerMode: 'static',
         reportFilename: 'size_report.html',
         defaultSizes: 'gzip',
-        excludeAssets: 'internal\\.umd\\.min\\.js',
+        excludeAssets: 'internal-apis\\.umd\\.min\\.js',
       }),
       new DuplicatePackageCheckerPlugin({
         strict: true,
