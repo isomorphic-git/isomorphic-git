@@ -2,15 +2,11 @@
   "name": "isomorphic-git",
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
-  "typings": "./index.d.ts",
   "type": "module",
+  "typings": "./index.d.ts",
   "main": "./index.cjs",
   "module": "./index.js",
-  "browser": {
-    "isomorphic-git": "./index.umd.min.js",
-    "isomorphic-git/internal-apis": "./internal.umd.min.js"
-  },
-  "unpkg": "index.umd.min.js",
+  "unpkg": "./index.umd.min.js",
   "bin": {
     "isogit": "./cli.js"
   },
