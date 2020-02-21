@@ -81,6 +81,7 @@
     "browserfs": "2.0.0",
     "bundlewatch": "0.2.5",
     "cross-env": "6.0.0",
+    "decompress": "^4.2.0",
     "diff-lines": "1.1.1",
     "duplicate-package-checker-webpack-plugin": "3.0.0",
     "envify": "4.1.0",

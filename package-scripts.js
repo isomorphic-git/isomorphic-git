@@ -88,7 +88,7 @@ module.exports = {
       codemirrorify:
         '(cd website/packages/codemirrorify && npm install && npm run build)',
       cpstatic:
-        'cp index.umd.min.* website/static/js && cp http/web.cjs website/static/js && cp website/packages/codemirrorify/dist/main.js website/static/js/codemirrorify.js',
+        'cp website/packages/codemirrorify/dist/main.js website/static/js/codemirrorify.js && node __tests__/__helpers__/copy-to-website.js',
       build: '(cd website && npm install && npm run build)',
       dev: '(cd website && npm start)',
       publish: '(cd website && node ./scripts/deploy-gh-pages.js)',

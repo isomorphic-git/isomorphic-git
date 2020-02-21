@@ -8,7 +8,7 @@ const git = require('../..')
 const { E } = require('../..')
 
 const dir = path.join(__dirname, '..', '..')
-const thisFile = path.relative(dir, __filename)
+const thisFile = path.relative(dir, __filename).replace(/\\/g, '/')
 const ref = process.argv[2] || 'HEAD'
 
 function cleanType(type) {

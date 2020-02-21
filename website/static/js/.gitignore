@@ -1,4 +1,2 @@
-bundle.umd.min.js
-bundle.umd.min.js.map
-codemirrorify.js
-http.js
+/isomorphic-git
+/codemirrorify.js
