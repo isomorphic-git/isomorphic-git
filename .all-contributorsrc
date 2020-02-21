@@ -378,6 +378,24 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "raon0211",
+      "name": "Sojin Park",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3102175?v=4",
+      "profile": "https://sojin.io",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ef4",
+      "name": "Edward Faulkner",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/319282?v=4",
+      "profile": "http://eaf4.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
