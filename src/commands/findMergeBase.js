@@ -52,7 +52,9 @@ export async function findMergeBase ({
           const commit = GitCommit.from(object)
           const { parent } = commit.parseHeaders()
           for (const oid of parent) {
-            newheads.push({ oid, index })
+            if (!visits[oid] || !visits[oid].has(index)) {
+              newheads.push({ oid, index })
+            }
           }
         } catch (err) {
           // do nothing
