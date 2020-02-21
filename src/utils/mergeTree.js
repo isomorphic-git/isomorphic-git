@@ -2,10 +2,10 @@
 import '../typedefs.js'
 
 import { TREE } from '../commands/TREE.js'
-import { walk } from '../commands/walk.js'
+import { _walk } from '../commands/walk.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
-import { writeObject } from '../storage/writeObject.js'
+import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 import { basename } from './basename.js'
 import { join } from './join.js'
@@ -45,7 +45,7 @@ export async function mergeTree({
   const baseTree = TREE({ ref: baseOid })
   const theirTree = TREE({ ref: theirOid })
 
-  const results = await walk({
+  const results = await _walk({
     fs,
     dir,
     gitdir,
@@ -165,7 +165,7 @@ async function modified(entry, base) {
 /**
  *
  * @param {Object} args
- * @param {FileSystem} args.fs
+ * @param {import('../models/FileSystem').FileSystem} args.fs
  * @param {string} args.gitdir
  * @param {string} args.path
  * @param {WalkerEntry} args.ours

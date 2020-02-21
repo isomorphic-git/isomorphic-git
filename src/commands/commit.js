@@ -5,7 +5,7 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
-import { writeObject } from '../storage/writeObject.js'
+import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 
 /**
@@ -34,7 +34,7 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  */
-export async function commit({
+export async function _commit({
   fs,
   onSign,
   gitdir,

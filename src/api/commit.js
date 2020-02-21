@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { commit as _commit } from '../commands/commit.js'
+import { _commit } from '../commands/commit.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'

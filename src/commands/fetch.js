@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { currentBranch } from '../commands/currentBranch.js'
+import { _currentBranch } from '../commands/currentBranch.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -10,7 +10,7 @@ import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
 import { hasObject } from '../storage/hasObject.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { collect } from '../utils/collect.js'
 import { emptyPackfile } from '../utils/emptyPackfile.js'
@@ -61,7 +61,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @returns {Promise<FetchResult>}
  * @see FetchResult
  */
-export async function fetch({
+export async function _fetch({
   fs,
   http,
   onProgress,
@@ -85,7 +85,7 @@ export async function fetch({
   prune = false,
   pruneTags = false,
 }) {
-  const ref = _ref || (await currentBranch({ fs, gitdir, test: true }))
+  const ref = _ref || (await _currentBranch({ fs, gitdir, test: true }))
   const config = await GitConfigManager.get({ fs, gitdir })
   // Figure out what remote to use.
   const remote =

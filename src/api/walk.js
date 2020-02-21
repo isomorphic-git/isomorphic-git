@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { walk as _walk } from '../commands/walk.js'
+import { _walk } from '../commands/walk.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

@@ -1,6 +1,8 @@
-import { asyncIteratorToStream } from '../utils/asyncIteratorToStream.js'
-import { collect } from '../utils/collect.js'
-import { fromNodeStream } from '../utils/fromNodeStream.js'
+import get from 'simple-get'
+
+import { asyncIteratorToStream } from '../../utils/asyncIteratorToStream.js'
+import { collect } from '../../utils/collect.js'
+import { fromNodeStream } from '../../utils/fromNodeStream.js'
 
 // Sorry for the copy & paste from typedefs.js but if we import typedefs.js we'll get a whole bunch of extra comments
 // in the rollup output
@@ -32,7 +34,7 @@ import { fromNodeStream } from '../utils/fromNodeStream.js'
  * @param {GitHttpRequest} request
  * @returns {Promise<GitHttpResponse>}
  */
-export default async function http({
+export async function request({
   onProgress,
   url,
   method = 'GET',
@@ -46,7 +48,6 @@ export default async function http({
     body = asyncIteratorToStream(body)
   }
   return new Promise((resolve, reject) => {
-    const get = require('simple-get')
     get(
       {
         url,
@@ -69,3 +70,5 @@ export default async function http({
     )
   })
 }
+
+export default { request }

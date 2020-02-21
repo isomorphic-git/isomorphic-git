@@ -21,7 +21,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  * @see {WalkerMap}
  *
  */
-export async function walk({
+export async function _walk({
   fs,
   dir,
   gitdir,

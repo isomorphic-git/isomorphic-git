@@ -1,8 +1,8 @@
 // @ts-check
 import '../typedefs.js'
 
-import { writeBlob as _writeBlob } from '../commands/writeBlob.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { _writeObject } from '../storage/writeObject'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
@@ -34,10 +34,12 @@ export async function writeBlob({ fs, dir, gitdir = join(dir, '.git'), blob }) {
     assertParameter('gitdir', gitdir)
     assertParameter('blob', blob)
 
-    return await _writeBlob({
+    return await _writeObject({
       fs: new FileSystem(fs),
       gitdir,
-      blob,
+      type: 'blob',
+      object: blob,
+      format: 'content',
     })
   } catch (err) {
     err.caller = 'git.writeBlob'

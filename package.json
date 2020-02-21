@@ -2,28 +2,17 @@
   "name": "isomorphic-git",
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
-  "typings": "./dist/index.d.ts",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "exports": {
-    ".": "./dist/index.cjs",
-    "./dist/index.cjs": "./dist/index.cjs",
-    "./dist/index.js": "./dist/index.js",
-    "./dist/http.cjs": "./dist/http.cjs",
-    "./dist/http.js": "./dist/http.js"
-  },
-  "browser": {
-    "isomorphic-git": "./dist/bundle.umd.min.js",
-    "isomorphic-git/internal-apis": "./dist/internal.umd.min.js"
-  },
-  "unpkg": "dist/bundle.umd.min.js",
+  "typings": "./index.d.ts",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "unpkg": "./index.umd.min.js",
   "bin": {
     "isogit": "./cli.js"
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=7.6.0"
+    "node": ">=10"
   },
   "scripts": {
     "start": "nps",
@@ -51,17 +40,14 @@
   "homepage": "https://isomorphic-git.org/",
   "files": [
     "cli.js",
-    "dist/browser-tests.json",
-    "dist/bundle.umd.min.js",
-    "dist/bundle.umd.min.js.map",
-    "dist/http.cjs",
-    "dist/http.d.ts",
-    "dist/http.js",
-    "dist/http.umd.min.js",
-    "dist/index.cjs",
-    "dist/index.d.ts",
-    "dist/index.js",
-    "dist/size_report.html"
+    "browser-tests.json",
+    "http/*",
+    "index.cjs",
+    "index.d.ts",
+    "index.js",
+    "index.umd.min.js",
+    "index.umd.min.js.map",
+    "size_report.html"
   ],
   "dependencies": {
     "async-lock": "^1.1.0",
@@ -151,7 +137,7 @@
   "bundlewatch": {
     "files": [
       {
-        "path": "./dist/bundle.umd.min.js",
+        "path": "./index.umd.min.js",
         "maxSize": "100kb"
       }
     ]

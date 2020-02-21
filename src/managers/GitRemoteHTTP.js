@@ -63,7 +63,7 @@ export class GitRemoteHTTP {
     let tryAgain
     let providedAuthBefore = false
     do {
-      res = await http({
+      res = await http.request({
         onProgress,
         method: 'GET',
         url: `${proxifiedURL}/info/refs?service=${service}`,
@@ -160,7 +160,7 @@ export class GitRemoteHTTP {
     headers.accept = `application/x-${service}-result`
     updateHeaders(headers, auth)
 
-    const res = await http({
+    const res = await http.request({
       onProgress,
       method: 'POST',
       url: `${url}/${service}`,

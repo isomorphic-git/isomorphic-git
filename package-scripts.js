@@ -2,6 +2,10 @@
 // It's like package.json scripts, but more flexible.
 const { concurrent, series, runInNewWindow } = require('nps-utils')
 
+const pkg = require('./package.json')
+
+const builtFiles = pkg.files.filter(f => !['cli.js'].includes(f))
+
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.js')
 
@@ -20,16 +24,14 @@ const optional = cmd =>
 const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
 const timeout5 = timeout(5)
 
-const srcPaths = '*.js src/*.js src/**/*.js __tests__/*.js __tests__/**/*.js'
-
 module.exports = {
   scripts: {
+    clean: {
+      default: `rm -rf ${builtFiles.join(' ')} internal-apis.*`,
+    },
     lint: {
-      default: series.nps('lint.js'),
-      js: `eslint ${srcPaths}`,
-      fix: series.nps('lint.prettier', 'lint.esfix', 'lint.prettier'),
-      prettier: optional(`prettier --write ${srcPaths}`),
-      esfix: optional(`eslint --fix ${srcPaths}`),
+      default: `eslint .`,
+      fix: optional(`eslint --fix .`),
     },
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
@@ -68,7 +70,7 @@ module.exports = {
               `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
               `bundlewatch`
           )
-        : optional(`cross-env bundlewatch dist/bundle.umd.min.js`),
+        : optional(`cross-env bundlewatch`),
     },
     website: {
       default: process.env.CI
@@ -86,7 +88,7 @@ module.exports = {
       codemirrorify:
         '(cd website/packages/codemirrorify && npm install && npm run build)',
       cpstatic:
-        'cp dist/bundle.umd.min.* website/static/js && cp dist/http.js website/static/js && cp website/packages/codemirrorify/dist/main.js website/static/js/codemirrorify.js',
+        'cp index.umd.min.* website/static/js && cp http/web.cjs website/static/js && cp website/packages/codemirrorify/dist/main.js website/static/js/codemirrorify.js',
       build: '(cd website && npm install && npm run build)',
       dev: '(cd website && npm start)',
       publish: '(cd website && node ./scripts/deploy-gh-pages.js)',

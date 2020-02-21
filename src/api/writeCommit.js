@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { writeCommit as _writeCommit } from '../commands/writeCommit.js'
+import { _writeCommit } from '../commands/writeCommit.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

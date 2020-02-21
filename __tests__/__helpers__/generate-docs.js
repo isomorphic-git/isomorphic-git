@@ -120,21 +120,14 @@ function gentypedef(ast) {
 }
 
 try {
-  fs.mkdirSync(path.join(__dirname, '..', '..', 'dist', 'examples'))
+  fs.mkdirSync(path.join(__dirname, '..', '__examples__'))
 } catch (_) {}
 
 function writeExample(text, filepath) {
-  const exampleFilepath = path.join(
-    __dirname,
-    '..',
-    '..',
-    'dist',
-    'examples',
-    filepath
-  )
-  text = `const fs = require('fs')
-const git = require('isomorphic-git')
-const { http } = require('isomorphic-git/http')
+  const exampleFilepath = path.join(__dirname, '..', '__examples__', filepath)
+  text = `import * as fs from 'fs'
+import git from 'isomorphic-git'
+import http from 'isomorphic-git/http'
 const { pgp } = require('@isomorphic-git/pgp-plugin')
 
 export {};

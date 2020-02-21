@@ -1,12 +1,12 @@
 // @ts-check
 import '../typedefs.js'
 
-import { currentBranch } from '../commands/currentBranch.js'
-import { findMergeBase } from '../commands/findMergeBase.js'
-import { isDescendent } from '../commands/isDescendent.js'
+import { _currentBranch } from '../commands/currentBranch.js'
+import { _findMergeBase } from '../commands/findMergeBase.js'
+import { _isDescendent } from '../commands/isDescendent.js'
 import { listCommitsAndTags } from '../commands/listCommitsAndTags.js'
 import { listObjects } from '../commands/listObjects.js'
-import { pack } from '../commands/pack.js'
+import { _pack } from '../commands/pack.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -40,7 +40,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  *
  * @returns {Promise<PushResult>}
  */
-export async function push({
+export async function _push({
   fs,
   http,
   onProgress,
@@ -58,7 +58,7 @@ export async function push({
   corsProxy,
   headers = {},
 }) {
-  const ref = _ref || (await currentBranch({ fs, gitdir }))
+  const ref = _ref || (await _currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
     throw new GitError(E.MissingRequiredParameterError, {
       parameter: 'ref',
@@ -140,7 +140,7 @@ export async function push({
     const finish = [...httpRemote.refs.values()]
     // hack to speed up common force push scenarios
     // @ts-ignore
-    const mergebase = await findMergeBase({
+    const mergebase = await _findMergeBase({
       fs,
       gitdir,
       oids: [oid, oldoid],
@@ -168,7 +168,7 @@ export async function push({
       if (
         oid !== '0000000000000000000000000000000000000000' &&
         oldoid !== '0000000000000000000000000000000000000000' &&
-        !(await isDescendent({ fs, gitdir, oid, ancestor: oldoid, depth: -1 }))
+        !(await _isDescendent({ fs, gitdir, oid, ancestor: oldoid, depth: -1 }))
       ) {
         throw new GitError(E.PushRejectedNonFastForward, {})
       }
@@ -186,7 +186,7 @@ export async function push({
   })
   const packstream2 = _delete
     ? []
-    : await pack({
+    : await _pack({
         fs,
         gitdir,
         oids: [...objects],

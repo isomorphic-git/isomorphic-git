@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { annotatedTag as _annotatedTag } from '../commands/annotatedTag.js'
+import { _annotatedTag } from '../commands/annotatedTag.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'

@@ -16,7 +16,7 @@ import { join } from '../utils/join.js'
  * console.log('done')
  *
  */
-export async function init({
+export async function _init({
   fs,
   bare = false,
   dir,

@@ -6,7 +6,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject } from '../storage/readObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { compareStats } from '../utils/compareStats.js'
 import { hashObject } from '../utils/hashObject.js'
@@ -172,7 +172,7 @@ async function getOidAtPath({ fs, gitdir, tree, path }) {
       if (path.length === 0) {
         return entry.oid
       }
-      const { type, object } = await readObject({
+      const { type, object } = await _readObject({
         fs,
         gitdir,
         oid: entry.oid,
@@ -203,7 +203,7 @@ async function getHeadTree({ fs, gitdir }) {
       return []
     }
   }
-  const { type, object } = await readObject({ fs, gitdir, oid })
+  const { type, object } = await _readObject({ fs, gitdir, oid })
   if (type !== 'commit') {
     throw new GitError(E.ResolveCommitError, { oid })
   }
@@ -213,7 +213,7 @@ async function getHeadTree({ fs, gitdir }) {
 }
 
 async function getTree({ fs, gitdir, oid }) {
-  const { type, object } = await readObject({
+  const { type, object } = await _readObject({
     fs,
     gitdir,
     oid,

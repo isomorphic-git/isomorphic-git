@@ -3,7 +3,7 @@ import { writeObjectLoose } from '../storage/writeObjectLoose.js'
 import { deflate } from '../utils/deflate.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function writeObject({
+export async function _writeObject({
   fs,
   gitdir,
   type,

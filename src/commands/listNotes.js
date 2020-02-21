@@ -1,5 +1,5 @@
 // @ts-check
-import { readTree } from '../commands/readTree'
+import { _readTree } from '../commands/readTree'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E } from '../models/GitError.js'
 
@@ -14,7 +14,7 @@ import { E } from '../models/GitError.js'
  * @returns {Promise<Array<{target: string, note: string}>>}
  */
 
-export async function listNotes({ fs, gitdir, ref }) {
+export async function _listNotes({ fs, gitdir, ref }) {
   // Get the current note commit
   let parent
   try {
@@ -26,7 +26,7 @@ export async function listNotes({ fs, gitdir, ref }) {
   }
 
   // Create the current note tree
-  const result = await readTree({
+  const result = await _readTree({
     fs,
     gitdir,
     oid: parent,

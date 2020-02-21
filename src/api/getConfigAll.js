@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { getConfigAll as _getConfigAll } from '../commands/getConfigAll.js'
+import { _getConfigAll } from '../commands/getConfigAll.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

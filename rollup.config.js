@@ -1,6 +1,5 @@
+import fs from 'fs'
 import path from 'path'
-
-import resolve from 'rollup-plugin-node-resolve'
 
 import pkg from './package.json'
 
@@ -15,51 +14,68 @@ const external = [
   ...Object.keys(pkg.dependencies),
 ]
 
-// Bleeding edge
-const moduleConfig = input => ({
+// Modern modules
+const ecmaConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
   output: [
     {
       format: 'es',
-      name: 'git',
-      file: `dist/${path.basename(input)}`,
+      file: `${output}`,
     },
   ],
-  plugins: [resolve({ browser: true })],
 })
 
-// Node.js
-const nodeConfig = (input, output = input) => ({
+// Legacy CommonJS2 modules
+const nodeConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
   output: [
     {
       format: 'cjs',
-      name: 'git',
-      file: `dist/${path.basename(output, '.js')}.cjs`,
+      file: `${output}`,
+      exports: 'named',
     },
   ],
 })
 
-// Browser environments that still don't support `import` (Workers and ServiceWorkers)
-const umdConfig = (input, name) => ({
+// Script tags that "export" a global var for those browser environments that
+// still don't support `import` (Workers and ServiceWorkers)
+const umdConfig = (input, output, name) => ({
   input: `src/${input}`,
   output: [
     {
       format: 'umd',
+      file: `${output}`,
       name,
-      file: `dist/${path.basename(input, '.js')}.umd.min.js`,
+      exports: 'named',
     },
   ],
 })
 
+const template = `{
+  "type": "module",
+  "main": "index.cjs",
+  "module": "index.js",
+  "typings": "index.d.ts"
+}`
+
+const pkgify = (input, output, name) => {
+  fs.mkdirSync(path.join(__dirname, output), { recursive: true })
+  fs.writeFileSync(path.join(__dirname, output, 'package.json'), template)
+  return [
+    ecmaConfig(`${input}/index.js`, `${output}/index.js`),
+    name === 'commonjs'
+      ? nodeConfig(`${input}/index.js`, `${output}/index.cjs`)
+      : umdConfig(`${input}/index.js`, `${output}/index.cjs`, name),
+  ]
+}
+
 export default [
-  moduleConfig('index.js'),
-  nodeConfig('api/_index.js', 'index.js'),
-  moduleConfig('internal-apis.js'),
-  nodeConfig('internal-apis.js'),
-  nodeConfig('builtin-node/http.js'),
-  moduleConfig('builtin-browser/http.js'),
-  umdConfig('builtin-browser/http.js', 'GitHttp'),
+  ecmaConfig('index.js', 'index.js'),
+  nodeConfig('index.js', 'index.cjs'),
+  ecmaConfig('internal-apis.js', 'internal-apis.js'),
+  nodeConfig('internal-apis.js', 'internal-apis.cjs'),
+  ...pkgify('http/node', 'http/node', 'commonjs'),
+  ...pkgify('http/web', 'http/web', 'GitHttp'),
 ]

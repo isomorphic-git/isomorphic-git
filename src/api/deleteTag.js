@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { deleteTag as _deleteTag } from '../commands/deleteTag.js'
+import { _deleteTag } from '../commands/deleteTag.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

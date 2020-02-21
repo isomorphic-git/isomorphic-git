@@ -2,7 +2,7 @@
 import '../typedefs.js'
 
 import { FileSystem } from '../models/FileSystem.js'
-import { expandOid as _expandOid } from '../storage/expandOid.js'
+import { _expandOid } from '../storage/expandOid.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 

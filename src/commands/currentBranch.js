@@ -14,7 +14,7 @@ import { abbreviateRef } from '../utils/abbreviateRef.js'
  * @returns {Promise<string|void>} The name of the current branch or undefined if the HEAD is detached.
  *
  */
-export async function currentBranch({
+export async function _currentBranch({
   fs,
   gitdir,
   fullname = false,
