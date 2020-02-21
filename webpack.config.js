@@ -7,11 +7,11 @@ module.exports = [
   {
     target: 'webworker',
     entry: {
-      bundle: './src/index.js',
-      internal: './src/internal-apis.js',
+      index: './src/index.js',
+      'internal-apis': './src/internal-apis.js',
     },
     output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname),
       filename: '[name].umd.min.js',
       library: 'git',
       libraryTarget: 'umd',

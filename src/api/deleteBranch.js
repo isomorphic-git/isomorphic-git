@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { deleteBranch as _deleteBranch } from '../commands/deleteBranch.js'
+import { _deleteBranch } from '../commands/deleteBranch.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

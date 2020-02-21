@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { pull as _pull } from '../commands/pull.js'
+import { _pull } from '../commands/pull.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'

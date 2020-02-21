@@ -1,5 +1,5 @@
 // @ts-check
-import { readTree } from '../commands/readTree'
+import { _readTree } from '../commands/readTree'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { join } from '../utils/join'
@@ -12,7 +12,7 @@ import { join } from '../utils/join'
  *
  * @returns {Promise<Array<string>>}
  */
-export async function listFiles({ fs, gitdir, ref }) {
+export async function _listFiles({ fs, gitdir, ref }) {
   if (ref) {
     const oid = await GitRefManager.resolve({ gitdir, fs, ref })
     const filenames = []
@@ -26,7 +26,7 @@ export async function listFiles({ fs, gitdir, ref }) {
 }
 
 async function accumulateFilesFromOid({ fs, gitdir, oid, filenames, prefix }) {
-  const { tree } = await readTree({ fs, gitdir, oid })
+  const { tree } = await _readTree({ fs, gitdir, oid })
   // TODO: Use `walk` to do this. Should be faster.
   for (const entry of tree) {
     if (entry.type === 'tree') {

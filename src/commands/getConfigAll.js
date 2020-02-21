@@ -12,7 +12,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @returns {Promise<Array<any>>} Resolves with an array of the config value
  *
  */
-export async function getConfigAll({ fs, gitdir, path }) {
+export async function _getConfigAll({ fs, gitdir, path }) {
   const config = await GitConfigManager.get({ fs, gitdir })
   return config.getall(path)
 }

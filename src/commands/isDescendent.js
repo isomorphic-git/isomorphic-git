@@ -2,7 +2,7 @@
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 
 /**
  * @param {object} args
@@ -14,7 +14,7 @@ import { readObject } from '../storage/readObject.js'
  *
  * @returns {Promise<boolean>}
  */
-export async function isDescendent({ fs, gitdir, oid, ancestor, depth }) {
+export async function _isDescendent({ fs, gitdir, oid, ancestor, depth }) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   if (!oid) {
     throw new GitError(E.MissingRequiredParameterError, {

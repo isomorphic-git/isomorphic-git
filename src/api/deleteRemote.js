@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { deleteRemote as _deleteRemote } from '../commands/deleteRemote.js'
+import { _deleteRemote } from '../commands/deleteRemote.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

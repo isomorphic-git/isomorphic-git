@@ -1,5 +1,5 @@
 {
-  "include": ["dist/index.js", "dist/http.js"],
+  "include": ["index.js", "http/web/index.js", "http/node/index.js"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "strictNullChecks": true,

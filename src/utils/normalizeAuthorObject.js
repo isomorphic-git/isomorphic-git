@@ -1,4 +1,4 @@
-import { getConfig } from '../commands/getConfig'
+import { _getConfig } from '../commands/getConfig'
 
 /**
  *
@@ -6,8 +6,8 @@ import { getConfig } from '../commands/getConfig'
  */
 export async function normalizeAuthorObject({ fs, gitdir, author = {} }) {
   let { name, email, timestamp, timezoneOffset } = author
-  name = name || (await getConfig({ fs, gitdir, path: 'user.name' }))
-  email = email || (await getConfig({ fs, gitdir, path: 'user.email' }))
+  name = name || (await _getConfig({ fs, gitdir, path: 'user.name' }))
+  email = email || (await _getConfig({ fs, gitdir, path: 'user.email' }))
 
   if (name === undefined || email === undefined) {
     return undefined

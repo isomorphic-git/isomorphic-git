@@ -1,10 +1,10 @@
 // @ts-check
 
-import { checkout } from '../commands/checkout.js'
-import { currentBranch } from '../commands/currentBranch.js'
-import { fetch } from '../commands/fetch.js'
-import { getConfig } from '../commands/getConfig.js'
-import { merge } from '../commands/merge.js'
+import { _checkout } from '../commands/checkout.js'
+import { _currentBranch } from '../commands/currentBranch.js'
+import { _fetch } from '../commands/fetch.js'
+import { _getConfig } from '../commands/getConfig.js'
+import { _merge } from '../commands/merge.js'
 import { E, GitError } from '../models/GitError.js'
 
 /**
@@ -38,7 +38,7 @@ import { E, GitError } from '../models/GitError.js'
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
  */
-export async function pull({
+export async function _pull({
   fs,
   http,
   onProgress,
@@ -60,7 +60,7 @@ export async function pull({
   try {
     // If ref is undefined, use 'HEAD'
     if (!ref) {
-      const head = await currentBranch({ fs, gitdir })
+      const head = await _currentBranch({ fs, gitdir })
       // TODO: use a better error.
       if (!head) {
         throw new GitError(E.MissingRequiredParameterError, {
@@ -70,12 +70,12 @@ export async function pull({
       ref = head
     }
     // Fetch from the correct remote.
-    const remote = await getConfig({
+    const remote = await _getConfig({
       fs,
       gitdir,
       path: `branch.${ref}.remote`,
     })
-    const { fetchHead, fetchHeadDescription } = await fetch({
+    const { fetchHead, fetchHeadDescription } = await _fetch({
       fs,
       http,
       onProgress,
@@ -91,7 +91,7 @@ export async function pull({
       headers,
     })
     // Merge the remote tracking branch into the local one.
-    await merge({
+    await _merge({
       fs,
       gitdir,
       ours: ref,
@@ -104,7 +104,7 @@ export async function pull({
       dryRun: false,
       noUpdateBranch: false,
     })
-    await checkout({
+    await _checkout({
       fs,
       onProgress,
       dir,

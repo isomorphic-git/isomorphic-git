@@ -4,8 +4,8 @@ import '../typedefs.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../storage/readObject.js'
-import { writeObject } from '../storage/writeObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
+import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 /**
  * Create an annotated tag.
@@ -41,7 +41,7 @@ import { writeObject } from '../storage/writeObject.js'
  * console.log('done')
  *
  */
-export async function annotatedTag({
+export async function _annotatedTag({
   fs,
   onSign,
   gitdir,

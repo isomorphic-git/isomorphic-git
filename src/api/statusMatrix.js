@@ -4,7 +4,7 @@ import '../typedefs.js'
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
-import { walk } from '../commands/walk.js'
+import { _walk } from '../commands/walk.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
@@ -163,7 +163,7 @@ export async function statusMatrix({
     assertParameter('gitdir', gitdir)
     assertParameter('ref', ref)
 
-    return await walk({
+    return await _walk({
       fs: new FileSystem(fs),
       dir,
       gitdir,

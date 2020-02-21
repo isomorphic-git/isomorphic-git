@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { listRemotes as _listRemotes } from '../commands/listRemotes.js'
+import { _listRemotes } from '../commands/listRemotes.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

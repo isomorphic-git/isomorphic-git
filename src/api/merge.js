@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { merge as _merge } from '../commands/merge.js'
+import { _merge } from '../commands/merge.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'

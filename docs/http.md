@@ -15,7 +15,7 @@ The Node client uses the [`simple-get`](https://npm.im/simple-get) package under
 
 ```js
 const git = require("isomorphic-git");
-const http = require("isomorphic-git/dist/http.cjs");
+const http = require("isomorphic-git/http/node");
 git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
   .then(console.log)
 ```
@@ -29,35 +29,37 @@ The Browser client uses the [`Fetch API`](https://developer.mozilla.org/en-US/do
 
 ```js
 import git from "isomorphic-git";
-import http from "isomorphic-git/dist/http.js";
+import http from "isomorphic-git/http/web";
 git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git' })
   .then(console.log)
 ```
 
 ### Implementing your own `http` client
 
-An `http` client is just one function that implements the following API:
+An `http` client is an object with a single `request` method that implements the following API:
 
 #### GitHttpPlugin
 
 ```js
-async function http ({
-  url,
-  method,
-  headers,
-  body,
-  onProgress
-}) {
-  ...
-  // Do stuff
-  ...
-  return {
+const http = {
+  async request ({
     url,
     method,
     headers,
     body,
-    statusCode,
-    statusMessage
+    onProgress
+  }) {
+    ...
+    // Do stuff
+    ...
+    return {
+      url,
+      method,
+      headers,
+      body,
+      statusCode,
+      statusMessage
+    }
   }
 }
 ```
@@ -89,5 +91,5 @@ You don't _have_ to support streaming (and in some cases, like uploads in the br
 If you are not streaming responses, you can simply fake it by returning an array with a single `Uint8Array` inside it.
 This works because the async iteration protocol (`for await ... of`) will fallback to the sync iteration protocol, which is supported by plain Arrays.
 
-To get started, you might want to look at [`src/builtin-node/http.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/builtin-node/http.js)
-and [`src/builtin-browser/http.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/builtin-browser/http.js).
+To get started, you might want to look at [`src/http/node.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/http/node.js)
+and [`src/http/web.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/http/web.js).

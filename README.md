@@ -34,61 +34,72 @@ The following environments are tested in CI and will continue to be supported un
 
 ## 1.0 Breaking Changes
 
-TODO:
-- [ ] Rename `dist/http.js` to `dist/http-web.js` and `dist/http-web.cjs`, rename `dist/http.cjs` to `dist/http-node.js` and `dist/http-node.cjs`
-- [ ] Rename `bundle.umd.min.js` to `index.umd.min.js`?
-- [ ] Strongly consider lifting stuff out of `dist` so it's less to type. e.g. `import http from 'isomorphic-git/http-web'`
-- [ ] Oooooooh I'm thinking about tweaking `onAuth` again. _Really_ all you need to do is update the `Authorization` header. But for future-proofing, updating _any_ header would be fun. And the `oauth2format` function could be moved to `@isomorphic-git/quirksmode` or something....
-
 ### Big changes
-- [x] The supported node & browser versions have been bumped. (See beautiful table above.)
-- [x] The plugin system has been eliminated and we're back to plain old dependency injection via function arguments! The plugin cores created a mysterious "global state" that makes it easy to trip up (I myself sometimes forgot to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic and more verbose, but it is a much simpler model than the plugin core model, and much safer because it makes it impossible for dependencies to accidentally share the default plugin core.
-- [x] There is an additional setup step to choose which `http` client to use, and functions that make HTTP requests have a new required `http` parameter. Previously I used a mix of bundler and runtime magic to try and pick between a build that used `fetch` and one that used `require('http')` but that didn't always work. For instance, if you were bundling a Node application using Webpack, it would pick the wrong build [(#938)](https://github.com/isomorphic-git/isomorphic-git/issues/938). Another example: in an Electron renderer thread, _both_ options could work (if the window is launched with `nodeIntegration: true`) but in a Web Worker thread only the fetch option should work (_unless_ you have `nodeIntegrationInWorker: true` set). See "Getting Started" below to see the extra line of code you need.
+- The supported node & browser versions have been bumped. (See beautiful table above.)
+- The plugin system has been eliminated and we're back to plain old dependency injection via function arguments! The plugin cores created a mysterious "global state" that makes it easy to trip up (I myself sometimes forgot to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic and more verbose, but it is a much simpler model than the plugin core model, and much safer because it makes it impossible for dependencies to accidentally share the default plugin core.
+  - The `emitter` plugin has been replaced with `onMessage` and `onProgress` callbacks.
+  - The `credentialManager` plugin has been replaced with `onAuth`, `onAuthFailure` and `onAuthSuccess` callbacks
+  - The `fs` plugin has been replaced with an `fs` parameter.
+  - The `http` plugin has been replaced with an `http` parameter.
+  - The `pgp` plugin has been replaced with an `onSign` callback.
+- There is an additional setup step to choose which `http` client to use, and functions that make HTTP requests have a new required `http` parameter. Previously I used a mix of bundler and runtime magic to try and pick between a build that used `fetch` and one that used `require('http')` but that didn't always work. For instance, if you were bundling a node application using Webpack, it would pick the wrong build [(#938)](https://github.com/isomorphic-git/isomorphic-git/issues/938). Another example: in an Electron renderer thread, _both_ options could work (if the window is launched with `nodeIntegration: true`) but in a Web Worker thread only the fetch option should work (_unless_ you have `nodeIntegrationInWorker: true` set). See "Getting Started" below to see the extra line of code you need.
+- The files in the package have been renamed so the import paths are short and sweet:
+  - `dist/bundle.umd.min.js` -> `index.umd.min.js`
+  - `dist/for-future/isomorphic-git/index.js` -> `index.js` (the future has arrived)
+  - `dist/for-node/isomorphic-git/index.js` -> `index.cjs`
 
 ### Some functions have been renamed or removed:
-  - [x] The `walkBeta2` function was renamed to `walk`.
-  - [x] The `walkBeta1` function was removed.
-  - [x] The `fastCheckout` function has been renamed `checkout` and the old `checkout` has been removed.
-  - [x] The (previously deprecated) `sign` function was removed.
-  - [x] The (previously deprecated) `utils.auth` function was removed.
-  - [x] The (previously deprecated) `utils.oauth2` was removed.
-  - [x] The `config` function has been removed and replaced by `getConfig`, `getConfigAll`, and `setConfig`.
-  - [x] The `verify` function has been removed, but `log`, `readCommit`, and `readTag` all return the `gpgsig` and signing `payload` now. This actually makes verification simpler and more efficient, because it can be done in batch on `git.log` output and the `gpgsig` itself can be parsed and used to lookup the public key. See [onSign](https://isomorphic-git.org/docs/en/onSign) for complete code examples.
+- The `walkBeta2` function was renamed to `walk`.
+- The `walkBeta1` function was removed.
+- The `fastCheckout` function has been renamed `checkout` and the old `checkout` has been removed.
+- The (previously deprecated) `sign` function was removed.
+- The (previously deprecated) `utils.auth` function was removed.
+- The (previously deprecated) `utils.oauth2` was removed.
+- The `config` function has been removed and replaced by `getConfig`, `getConfigAll`, and `setConfig`.
+- The `verify` function has been removed, but `log`, `readCommit`, and `readTag` all return the `gpgsig` and signing `payload` now. This actually makes verification simpler and more efficient, because it can be done in batch on `git.log` output and the `gpgsig` itself can be parsed and used to lookup the public key. See [onSign](https://isomorphic-git.org/docs/en/onSign) for complete code examples.
 
 ### Some function parameters have been removed or replaced:
-  - [x] The undocumented parameter aliases `authUsername` and `authPassword` were removed.
-  - [x] The `emitter` parameter was removed and replaced with the `onMessage` and `onProgress` callbacks. (Note that `onMessage` emits un-trimmed strings, so you get those `\r`s.)
-  - [x] The `username`, `password`, `token`, and `oauth2format` parameters were removed and replaced with the `onAuth` callback.
-  - [x] The `fast` parameter of `pull` was removed, since there is no "slow" implementation anymore.
-  - [x] The `signing` parameter of `log` was removed, since `log` will always return a payload.
-  - [x] The `pattern` parameter was removed from `statusMatrix` and replaced with a new `filter` function. (This is so we can drop the dependencies on `globalyzer` and `globrex`.)
-  - [x] The `newSubmoduleBehavior` parameter was removed and is now the default and only behavior, because it makes much more sense to have non-destructive defaults!
-  - [x] The `noSubmodules` parameter was removed because with the new submodule behavior it is no longer necessary to print console warnings about how submodules aren't supported. (When submodule support IS added to isomorphic-git, it will be opt-in using `recurseSubmodules: true` or something like that.)
-  - [x] The `autoTranslateSSH` feature was removed, since it is trivial to implement your own version using just the `UnknownTransportError.data.suggestion`
-  - [x] The `writeObject` function when used to write a tree now expects a plain array rather than an object with a property called `entries` which is the array. (This is so that argument to `writeObject` has the same shame as the arguments to `writeBlob`/`writeCommit`/`writeTag`/`writeTree`.)
-  - [x] The `noOverwrite` parameter was removed from `init` and is the new behavior.
-  - [x] The `author.date`, `committer.date`, `tagger.date` parameters were removed in favor of `author.timestamp`, `comitter.timestamp`, `tagger.timestamp` in order to be clear about what is actually written and better reflect the return types in `readCommit`, `log`, and `readTag`.
+- The undocumented parameter aliases `authUsername` and `authPassword` were removed.
+- The `emitter` parameter was removed and replaced with the `onMessage` and `onProgress` callbacks. (Note that `onMessage` emits un-trimmed strings, so you get those `\r`s.)
+- The `username`, `password`, `token`, and `oauth2format` parameters were removed and replaced with the `onAuth` callback.
+- The `fast` parameter of `pull` was removed, since there is no "slow" implementation anymore.
+- The `signing` parameter of `log` was removed, since `log` will always return a payload.
+- The `pattern` parameter was removed from `statusMatrix` and replaced with a new `filter` function. (This is so we can drop the dependencies on `globalyzer` and `globrex`.)
+- The `newSubmoduleBehavior` parameter was removed and is now the default and only behavior, because it makes much more sense to have non-destructive defaults!
+- The `noSubmodules` parameter was removed because with the new submodule behavior it is no longer necessary to print console warnings about how submodules aren't supported. (When submodule support IS added to isomorphic-git, it will be opt-in using `recurseSubmodules: true` or something like that.)
+- The `autoTranslateSSH` feature was removed, since it is trivial to implement your own version using just the `UnknownTransportError.data.suggestion`
+- The `writeObject` function when used to write a tree now expects a plain array rather than an object with a property called `entries` which is the array. (This is so that argument to `writeObject` has the same shame as the arguments to `writeBlob`/`writeCommit`/`writeTag`/`writeTree`.)
+- The `noOverwrite` parameter was removed from `init` and is the new behavior.
+- The `author.date`, `committer.date`, `tagger.date` parameters were removed in favor of `author.timestamp`, `comitter.timestamp`, `tagger.timestamp` in order to be clear about what is actually written and better reflect the return types in `readCommit`, `log`, and `readTag`.
 
 ### The return types of some functions have changed:
-  - [x] Functions that used to return `Buffer` objects now return `Uint8Array` objects. (This is so we can eventually remove all internal dependencies on the Buffer browser polyfill, which is quite heavy!)
-  - [x] The `log` function now returns an array of the same kind of objects that `readCommit` returns. (This change simplifies the type signature of `log` so we don't need function overloading; that function overloading was the one thing preventing me from auto-generating `index.d.ts`.)
-  - [x] The `readObject` function returns a proper discriminated union so TypeScript can infer the type of `.object` once you establish the value of `.format` and `.type`. Also `.object` has the same shape as as the return value of `readBlob`/`readCommit`/`readTag`/`readTree`. (Meaning trees are now plain arrays rather than objects with a `.entries` property that is the array.)
+- Functions that used to return `Buffer` objects now return `Uint8Array` objects. (This is so we can eventually remove all internal dependencies on the Buffer browser polyfill, which is quite heavy!)
+- The `log` function now returns an array of the same kind of objects that `readCommit` returns. (This change simplifies the type signature of `log` so we don't need function overloading; that function overloading was the one thing preventing me from auto-generating `index.d.ts`.)
+- The `readObject` function returns a proper discriminated union so TypeScript can infer the type of `.object` once you establish the value of `.format` and `.type`. Also `.object` has the same shape as as the return value of `readBlob`/`readCommit`/`readTag`/`readTree`. (Meaning trees are now plain arrays rather than objects with a `.entries` property that is the array.)
 
-### Some functions behavior changed
-- [x] The `push` function now pushes to the remote tracking branch (rather than a branch with the same name) by default.
+### Some function behaviors have changed
+- The `push` function now pushes to the remote tracking branch (rather than a branch with the same name) by default.
 
 ### Docs and DX improvements
-- [x] The `docs/alphabetic.md` and function list in `README.md` are auto-generated from the filenames in `src/api`.
-- [x] The entire docs website is auto-generated from the JSDoc actually so from now on the docs website and source code will always be in sync.
-- [x] All the example code in JSDoc is now type-checked during CI tests.
-- [x] The live code examples on the website are displayed in a full-blown mobile-friendly code editor (CodeMirror 6).
-- [x] Each page with live code examples includes a code snippet at the bottom to reset the browser file system.
-- [x] The Getting Started guide has been updated.
-- [x] All the example code in JSDoc has been updated.
+- The `docs/alphabetic.md` and function list in `README.md` are auto-generated from the filenames in `src/api`.
+- Nearly the entire docs website is auto-generated from the JSDoc actually so keeping the docs website and source code in sync is easier.
+- All the example code in JSDoc is now type-checked during CI tests.
+- The live code examples on the website are displayed in a full-blown mobile-friendly code editor (CodeMirror 6).
+- Each page with live code examples includes a code snippet at the bottom to reset the browser file system.
+- The Getting Started guide has been updated.
+- All the example code in JSDoc has been updated.
 
 ### Miscellaneous stuff
-- [x] Update the README to recommend LightningFS rather than BrowserFS.
-- [x] The `internal-apis` bundle is no longer included in the published package. Those were only exposed so I could run unit tests and no one should have been using them I hope.
+- Update the README to recommend LightningFS rather than BrowserFS.
+- The `internal-apis` bundle is no longer included in the published package. Those were only exposed so I could run unit tests and no one should have been using them I hope.
+
+## Install
+
+You can install it from npm:
+
+```
+npm install --save isomorphic-git
+```
 
 ## Getting Started
 
@@ -99,13 +110,13 @@ And node and browsers have different APIs for making HTTP requests!
 So rather than relying on the `fs` and `http` modules, `isomorphic-git` lets you bring your own file system
 and HTTP client.
 
-If you're using `isomorphic-git` in Node, you use the native `fs` module and the include Node HTTP client.
+If you're using `isomorphic-git` in node, you use the native `fs` module and the provided node HTTP client.
 
 ```js
 // node.js example
 const path = require('path')
 const git = require('isomorphic-git');
-const http = require('isomorphic-git/dist/http.cjs') // NOTE THE FILE EXTENSION IS .cjs
+const http = require('isomorphic-git/http/node')
 const fs = require('fs');
 
 const dir = path.join(process.cwd(), 'test-clone')
@@ -115,12 +126,13 @@ git.clone({ fs, http, dir, url: 'https://github.com/isomorphic-git/lightning-fs'
 If you're using `isomorphic-git` in the browser, you'll need something that emulates the `fs` API.
 The easiest to setup and most performant library is [LightningFS](https://github.com/isomorphic-git/lightning-fs) which is written and maintained by the same author and is part of the `isomorphic-git` suite.
 If LightningFS doesn't meet your requirements, isomorphic-git should also work with [BrowserFS](https://github.com/jvilk/BrowserFS) and [Filer](https://github.com/filerjs/filer).
+Instead of `isomorphic-git/http/node` this time import `isomorphic-git/http/web`:
 
 ```html
 <script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
 <script src="https://unpkg.com/isomorphic-git"></script>
 <script type="module">
-import http from 'https://unpkg.com/isomorphic-git@beta/dist/http.js' // NOTE THE FILE EXTENSION IS .js
+import http from 'https://unpkg.com/isomorphic-git@beta/http/web/index.js'
 const fs = new LightningFS('fs')
 
 const dir = '/test-clone'
@@ -132,6 +144,8 @@ If you're using ES module syntax, you can use either the default import for conv
 
 ```js
 import git from 'isomorphic-git'
+// or
+import * as git from 'isomorphic-git'
 // or
 import {plugins, clone, commit, push} from 'isomorphic-git'
 ```
@@ -159,28 +173,6 @@ I'm hoping to get CORS headers added to all the major Git hosting platforms even
 | Github              | ❌                                                                                                                                                                            |
 
 It is literally just two lines of code to add the CORS headers!! Easy stuff. Surely it will happen.
-
-### Using as an npm module
-
-You can install it from npm.
-
-```
-npm install --save isomorphic-git
-```
-
-In the package.json you'll see there are actually 3 different versions:
-
-```json
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "unpkg": "dist/bundle.umd.min.js",
-```
-
-This deserves a brief explanation.
-
-- the "main" version is a CommonJS build
-- the "module" version is an ES Module build
-- the "unpkg" version is a minified UMD build with dependencies already bundled
 
 ### `isogit` CLI
 
@@ -284,7 +276,7 @@ tests will also run in the browser using [Jasmine](https://jasmine.github.io/) v
 We even have our own [mock server](https://github.com/isomorphic-git/git-http-mock-server) for serving
 git repository test fixtures!
 
-You'll need [Node.js](https://nodejs.org) installed, but everything else is a devDependency.
+You'll need [node.js](https://nodejs.org) installed, but everything else is a devDependency.
 
 ```sh
 git clone https://github.com/isomorphic-git/isomorphic-git

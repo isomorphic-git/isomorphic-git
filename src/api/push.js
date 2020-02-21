@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { push as _push } from '../commands/push.js'
+import { _push } from '../commands/push.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

@@ -1,6 +1,6 @@
 /* eslint-env browser */
-import { collect } from '../utils/collect.js'
-import { fromStream } from '../utils/fromStream'
+import { collect } from '../../utils/collect.js'
+import { fromStream } from '../../utils/fromStream'
 
 // Sorry for the copy & paste from typedefs.js but if we import typedefs.js we'll get a whole bunch of extra comments
 // in the rollup output
@@ -32,7 +32,7 @@ import { fromStream } from '../utils/fromStream'
  * @param {GitHttpRequest} request
  * @returns {Promise<GitHttpResponse>}
  */
-export default async function http({
+export async function request({
   onProgress,
   url,
   method = 'GET',
@@ -62,3 +62,5 @@ export default async function http({
     headers: headers,
   }
 }
+
+export default { request }
