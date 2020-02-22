@@ -1,6 +1,7 @@
 import '../typedefs.js'
 
 import { E, GitError } from '../models/GitError.js'
+import { UserCanceledError } from '../errors/UserCanceledError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
@@ -87,7 +88,7 @@ export class GitRemoteHTTP {
             headers: { ...headers },
           })
           if (auth && auth.cancel) {
-            throw new GitError(E.UserCancelledError)
+            throw new UserCanceledError()
           } else if (auth) {
             updateHeaders(headers, auth)
             providedAuthBefore = true

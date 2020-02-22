@@ -7,6 +7,7 @@ describe('exports', () => {
     expect(names.sort()).toMatchInlineSnapshot(`
       Array [
         "E",
+        "Errors",
         "STAGE",
         "TREE",
         "WORKDIR",

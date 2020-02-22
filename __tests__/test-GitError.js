@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 
 const { E } = require('isomorphic-git')
-const { GitError } = require('isomorphic-git/internal-apis')
+const { GitError, errors } = require('isomorphic-git/internal-apis')
 
 describe('GitError', () => {
   it('creates an Error', async () => {
@@ -20,6 +20,29 @@ describe('GitError', () => {
     expect(e.toJSON()).toMatchInlineSnapshot(`
       Object {
         "caller": undefined,
+        "code": "FileReadError",
+        "data": Object {
+          "filepath": "foobar.txt",
+        },
+        "message": "Could not read file \\"foobar.txt\\".",
+      }
+    `)
+  })
+  it('create a FileReadError', async () => {
+    let e = null
+    try {
+      throw new errors.FileReadError('foobar.txt')
+    } catch (err) {
+      e = err
+    }
+    expect(e).not.toBeNull()
+    expect(e.code).toBe('FileReadError')
+    expect(e instanceof Error).toBe(true)
+    e = e.toJSON()
+    delete e.stack
+    expect(e).toMatchInlineSnapshot(`
+      Object {
+        "caller": "",
         "code": "FileReadError",
         "data": Object {
           "filepath": "foobar.txt",

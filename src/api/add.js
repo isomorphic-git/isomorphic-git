@@ -4,7 +4,7 @@ import '../typedefs.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
+import { FileReadError } from '../errors/FileReadError.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
@@ -58,7 +58,7 @@ async function addToIndex({ dir, gitdir, fs, filepath, index }) {
   })
   if (ignored) return
   const stats = await fs.lstat(join(dir, filepath))
-  if (!stats) throw new GitError(E.FileReadError, { filepath })
+  if (!stats) throw new FileReadError(filepath)
   if (stats.isDirectory()) {
     const children = await fs.readdir(join(dir, filepath))
     const promises = children.map(child =>
@@ -69,7 +69,7 @@ async function addToIndex({ dir, gitdir, fs, filepath, index }) {
     const object = stats.isSymbolicLink()
       ? await fs.readlink(join(dir, filepath))
       : await fs.read(join(dir, filepath))
-    if (object === null) throw new GitError(E.FileReadError, { filepath })
+    if (object === null) throw new FileReadError(filepath)
     const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
     index.insert({ filepath, stats, oid })
   }

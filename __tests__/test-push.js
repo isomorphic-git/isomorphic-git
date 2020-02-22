@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { E, setConfig, push, listBranches } = require('isomorphic-git')
+const { E, Errors, setConfig, push, listBranches } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -543,7 +543,8 @@ describe('push', () => {
       err = e
     }
     expect(err).toBeDefined()
-    expect(err.code).toBe(E.UserCancelledError)
+    expect(err instanceof Errors.UserCanceledError).toBe(true)
+    expect(err.code).toBe('UserCanceledError')
     expect(onAuthArgs).toEqual([
       [
         `http://${localhost}:8888/test-push-server-auth.git`,
