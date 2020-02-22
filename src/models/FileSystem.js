@@ -12,11 +12,6 @@ const fsmap = new WeakMap()
  */
 export class FileSystem {
   constructor(fs) {
-    // This is not actually the most logical place to put this, but in practice
-    // putting the check here should work great.
-    if (fs === undefined) {
-      throw new GitError(E.PluginUndefined, { plugin: 'fs' })
-    }
     // This is sad... but preserving reference equality is now necessary
     // to deal with cache invalidation in GitIndexManager.
     if (fsmap.has(fs)) {
