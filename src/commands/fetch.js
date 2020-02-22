@@ -131,16 +131,28 @@ export async function _fetch({
   }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
-    throw new GitError(E.RemoteDoesNotSupportShallowFail)
+    throw new GitError(E.RemoteLacksCapabilityFail, {
+      capability: 'shallow',
+      parameter: 'depth',
+    })
   }
   if (since !== null && !remoteHTTP.capabilities.has('deepen-since')) {
-    throw new GitError(E.RemoteDoesNotSupportDeepenSinceFail)
+    throw new GitError(E.RemoteLacksCapabilityFail, {
+      capability: 'deepen-since',
+      parameter: 'since',
+    })
   }
   if (exclude.length > 0 && !remoteHTTP.capabilities.has('deepen-not')) {
-    throw new GitError(E.RemoteDoesNotSupportDeepenNotFail)
+    throw new GitError(E.RemoteLacksCapabilityFail, {
+      capability: 'deepen-not',
+      parameter: 'exclude',
+    })
   }
   if (relative === true && !remoteHTTP.capabilities.has('deepen-relative')) {
-    throw new GitError(E.RemoteDoesNotSupportDeepenRelativeFail)
+    throw new GitError(E.RemoteLacksCapabilityFail, {
+      capability: 'deepen-relative',
+      parameter: 'relative',
+    })
   }
   // Figure out the SHA for the requested ref
   const { oid, fullref } = GitRefManager.resolveAgainstMap({
