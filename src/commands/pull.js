@@ -5,7 +5,7 @@ import { _currentBranch } from '../commands/currentBranch.js'
 import { _fetch } from '../commands/fetch.js'
 import { _getConfig } from '../commands/getConfig.js'
 import { _merge } from '../commands/merge.js'
-import { E, GitError } from '../models/GitError.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
 
 /**
  * @param {object} args
@@ -63,9 +63,7 @@ export async function _pull({
       const head = await _currentBranch({ fs, gitdir })
       // TODO: use a better error.
       if (!head) {
-        throw new GitError(E.MissingRequiredParameterError, {
-          parameter: 'ref',
-        })
+        throw new MissingParameterError('ref')
       }
       ref = head
     }

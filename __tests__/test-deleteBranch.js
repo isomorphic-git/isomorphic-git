@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
 
-const { E, deleteBranch } = require('isomorphic-git')
+const { E, Errors, deleteBranch } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -55,7 +55,7 @@ describe('deleteBranch', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MissingRequiredParameterError)
+    expect(error instanceof Errors.MissingParameterError).toBe(true)
   })
 
   it('checked out branch', async () => {

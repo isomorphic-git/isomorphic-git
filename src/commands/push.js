@@ -7,6 +7,8 @@ import { _isDescendent } from '../commands/isDescendent.js'
 import { listCommitsAndTags } from '../commands/listCommitsAndTags.js'
 import { listObjects } from '../commands/listObjects.js'
 import { _pack } from '../commands/pack.js'
+import { GitPushError } from '../errors/GitPushError.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -60,9 +62,7 @@ export async function _push({
 }) {
   const ref = _ref || (await _currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'ref',
-    })
+    throw new MissingParameterError('ref')
   }
   const config = await GitConfigManager.get({ fs, gitdir })
   // Figure out what remote to use.
@@ -78,16 +78,12 @@ export async function _push({
     (await config.get(`remote.${remote}.pushurl`)) ||
     (await config.get(`remote.${remote}.url`))
   if (typeof url === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remote OR url',
-    })
+    throw new MissingParameterError('remote OR url')
   }
   // Figure out what remote ref to use.
   const remoteRef = _remoteRef || (await config.get(`branch.${ref}.merge`))
   if (typeof url === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remoteRef',
-    })
+    throw new MissingParameterError('remoteRef')
   }
 
   if (corsProxy === undefined) {
@@ -234,6 +230,6 @@ export async function _push({
       .filter(([k, v]) => !v.ok)
       .map(([k, v]) => `\n  - ${k}: ${v.error}`)
       .join('')
-    throw new GitError(E.GitPushError, Object.assign({ prettyDetails }, result))
+    throw new GitPushError(prettyDetails, result)
   }
 }

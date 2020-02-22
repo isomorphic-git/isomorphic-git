@@ -2,6 +2,7 @@
 import '../typedefs.js'
 
 import { _currentBranch } from '../commands/currentBranch.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -93,9 +94,7 @@ export async function _fetch({
   // Lookup the URL for the given remote.
   const url = _url || (await config.get(`remote.${remote}.url`))
   if (typeof url === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remote OR url',
-    })
+    throw new MissingParameterError('remote OR url')
   }
   // Figure out what remote ref to use.
   const remoteRef =

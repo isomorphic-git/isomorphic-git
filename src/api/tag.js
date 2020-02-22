@@ -1,4 +1,5 @@
 // @ts-check
+import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitRefManager } from '../managers/GitRefManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { E, GitError } from '../models/GitError.js'
@@ -39,10 +40,7 @@ export async function tag({
     const fs = new FileSystem(_fs)
 
     if (ref === undefined) {
-      throw new GitError(E.MissingRequiredParameterError, {
-        function: 'tag',
-        parameter: 'ref',
-      })
+      throw new MissingParameterError('ref')
     }
 
     ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`

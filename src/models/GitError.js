@@ -2,8 +2,6 @@
 // but with the goal of being much lighter weight.
 
 const messages = {
-  FileReadError: `Could not read file "{ filepath }".`,
-  MissingRequiredParameterError: `The function requires a "{ parameter }" parameter but none was provided.`,
   InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
   InvalidParameterCombinationError: `The function doesn't take these parameters simultaneously: { parameters }`,
   RefExistsError: `Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`,
@@ -52,15 +50,9 @@ const messages = {
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
   CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`,
   NoteAlreadyExistsError: `A note object { note } already exists on object { oid }. Use 'force: true' parameter to overwrite existing notes.`,
-  GitPushError: `One or more branches were not updated: { prettyDetails }`,
-  UserCancelledError: `The operation was canceled.`,
 }
 
 export const E = {
-  /** @type {'FileReadError'} */
-  FileReadError: `FileReadError`,
-  /** @type {'MissingRequiredParameterError'} */
-  MissingRequiredParameterError: `MissingRequiredParameterError`,
   /** @type {'InvalidRefNameError'} */
   InvalidRefNameError: `InvalidRefNameError`,
   /** @type {'InvalidParameterCombinationError'} */
@@ -157,10 +149,6 @@ export const E = {
   CheckoutConflictError: `CheckoutConflictError`,
   /** @type {'NoteAlreadyExistsError'} */
   NoteAlreadyExistsError: `NoteAlreadyExistsError`,
-  /** @type {'GitPushError'} */
-  GitPushError: `GitPushError`,
-  /** @type {'UserCancelledError'} */
-  UserCancelledError: `UserCancelledError`,
 }
 
 function renderTemplate(template, values) {

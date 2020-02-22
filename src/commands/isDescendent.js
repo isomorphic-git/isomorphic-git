@@ -1,4 +1,5 @@
 // @ts-check
+import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
@@ -17,16 +18,10 @@ import { _readObject as readObject } from '../storage/readObject.js'
 export async function _isDescendent({ fs, gitdir, oid, ancestor, depth }) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   if (!oid) {
-    throw new GitError(E.MissingRequiredParameterError, {
-      function: 'isDescendent',
-      parameter: 'oid',
-    })
+    throw new MissingParameterError('oid')
   }
   if (!ancestor) {
-    throw new GitError(E.MissingRequiredParameterError, {
-      function: 'isDescendent',
-      parameter: 'ancestor',
-    })
+    throw new MissingParameterError('ancestor')
   }
   // If you don't like this behavior, add your own check.
   // Edge cases are hard to define a perfect solution.
