@@ -1,10 +1,10 @@
 // @ts-check
 import '../typedefs.js'
 
+import { FileReadError } from '../errors/FileReadError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { FileReadError } from '../errors/FileReadError.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'

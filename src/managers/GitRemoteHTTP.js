@@ -1,7 +1,7 @@
 import '../typedefs.js'
 
-import { E, GitError } from '../models/GitError.js'
 import { UserCanceledError } from '../errors/UserCanceledError.js'
+import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
