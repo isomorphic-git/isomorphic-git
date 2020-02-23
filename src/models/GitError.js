@@ -18,7 +18,6 @@ const messages = {
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
   UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`,
   InvalidDepthParameterError: `Invalid value for depth parameter: { depth }`,
-  RemoteLacksCapabilityFail: `Remote does not support the "{ capability }" so the "{ parameter }" parameter cannot be used.`,
   RemoteDoesNotSupportSmartHTTP: `Remote did not reply using the "smart" HTTP protocol. Expected "001e# service=git-upload-pack" but received: { preview }`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
@@ -83,8 +82,6 @@ export const E = {
   UnparseableServerResponseFail: `UnparseableServerResponseFail`,
   /** @type {'InvalidDepthParameterError'} */
   InvalidDepthParameterError: `InvalidDepthParameterError`,
-  /** @type {'RemoteLacksCapabilityFail'} */
-  RemoteLacksCapabilityFail: `RemoteLacksCapabilityFail`,
   /** @type {'RemoteDoesNotSupportSmartHTTP'} */
   RemoteDoesNotSupportSmartHTTP: `RemoteDoesNotSupportSmartHTTP`,
   /** @type {'CorruptShallowOidFail'} */
