@@ -1,4 +1,3 @@
-import '../typedefs.js'
 import { BaseError } from './BaseError.js'
 
 export class RemoteCapabilityError extends BaseError {

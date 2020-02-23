@@ -1,5 +1,5 @@
+import { UnknownTransportError } from '../errors/UnknownTransportError.js'
 import { UrlParseError } from '../errors/UrlParseError.js'
-import { E, GitError } from '../models/GitError.js'
 import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 
 import { GitRemoteHTTP } from './GitRemoteHTTP'
@@ -55,11 +55,10 @@ export class GitRemoteManager {
     if (remoteHelpers.has(parts.transport)) {
       return remoteHelpers.get(parts.transport)
     }
-    throw new GitError(E.UnknownTransportError, {
+    throw new UnknownTransportError(
       url,
-      transport: parts.transport,
-      suggestion:
-        parts.transport === 'ssh' ? translateSSHtoHTTP(url) : undefined,
-    })
+      parts.transport,
+      parts.transport === 'ssh' ? translateSSHtoHTTP(url) : undefined
+    )
   }
 }

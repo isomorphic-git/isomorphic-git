@@ -26,7 +26,6 @@ const messages = {
   ResolveRefError: `Could not resolve reference "{ ref }".`,
   ExpandRefError: `Could not expand reference "{ ref }".`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
-  UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`,
   InternalFail: `An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: { message }`,
   AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
@@ -88,8 +87,6 @@ export const E = {
   ExpandRefError: `ExpandRefError`,
   /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
-  /** @type {'UnknownTransportError'} */
-  UnknownTransportError: `UnknownTransportError`,
   /** @type {'InternalFail'} */
   InternalFail: `InternalFail`,
   /** @type {'AddingRemoteWouldOverwrite'} */

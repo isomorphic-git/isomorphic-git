@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { E, setConfig, fetch } = require('isomorphic-git')
+const { E, Errors, setConfig, fetch } = require('isomorphic-git')
 const { sleep } = require('isomorphic-git/internal-apis')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -105,7 +105,7 @@ describe('fetch', () => {
       err = e
     }
     expect(err).toBeDefined()
-    expect(err.code).toEqual(E.UnknownTransportError)
+    expect(err.code).toEqual(Errors.UnknownTransportError.code)
   })
 
   it('the SSH -> HTTPS UnknownTransportError suggestion feature', async () => {
@@ -132,7 +132,7 @@ describe('fetch', () => {
       err = e
     }
     expect(err).toBeDefined()
-    expect(err.code).toBe(E.UnknownTransportError)
+    expect(err.code).toBe(Errors.UnknownTransportError.code)
     expect(err.data.suggestion).toBe(
       'https://github.com/isomorphic-git/isomorphic-git.git'
     )
