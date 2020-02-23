@@ -20,7 +20,6 @@ const messages = {
   RemoteDoesNotSupportSmartHTTP: `Remote did not reply using the "smart" HTTP protocol. Expected "001e# service=git-upload-pack" but received: { preview }`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
-  MergeNotSupportedFail: `Merges with conflicts are not supported yet.`,
   DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
   ResolveTreeError: `Could not resolve { oid } to a tree.`,
   ResolveCommitError: `Could not resolve { oid } to a commit.`,
@@ -79,8 +78,6 @@ export const E = {
   CorruptShallowOidFail: `CorruptShallowOidFail`,
   /** @type {'FastForwardFail'} */
   FastForwardFail: `FastForwardFail`,
-  /** @type {'MergeNotSupportedFail'} */
-  MergeNotSupportedFail: `MergeNotSupportedFail`,
   /** @type {'DirectorySeparatorsError'} */
   DirectorySeparatorsError: `DirectorySeparatorsError`,
   /** @type {'ResolveTreeError'} */

@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, merge, resolveRef, log } = require('isomorphic-git')
+const { E, Errors, merge, resolveRef, log } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -440,7 +440,7 @@ describe('merge', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MergeNotSupportedFail)
+    expect(error.code).toBe(Errors.MergeNotSupportedError.code)
   })
 
   it("merge two branches that modified the same file (no conflict)'", async () => {
@@ -541,6 +541,6 @@ describe('merge', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MergeNotSupportedFail)
+    expect(error.code).toBe(Errors.MergeNotSupportedError.code)
   })
 })

@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _commit } from '../commands/commit'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _findMergeBase } from '../commands/findMergeBase.js'
+import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
@@ -94,7 +95,7 @@ export async function _merge({
     oids: [ourOid, theirOid],
   })
   if (baseOids.length !== 1) {
-    throw new GitError(E.MergeNotSupportedFail)
+    throw new MergeNotSupportedError()
   }
   const baseOid = baseOids[0]
   // handle fast-forward case

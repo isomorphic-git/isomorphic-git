@@ -1,8 +1,11 @@
 export * from './CheckoutConflictError.js'
+export * from './EmptyServerResponseError.js'
 export * from './FileReadError.js'
 export * from './GitPushError.js'
 export * from './HttpError.js'
+// index.js
 export * from './MaxDepthError.js'
+export * from './MergeNotSupportedError.js'
 export * from './MissingParameterError.js'
 export * from './NoteExistsError.js'
 export * from './PushRejectedError.js'

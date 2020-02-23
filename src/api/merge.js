@@ -26,7 +26,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * ## Limitations
  *
  * Currently it does not support incomplete merges. That is, if there are merge conflicts it cannot solve
- * with the built in diff3 algorithm it will not modify the working dir, and will throw a [`MergeNotSupportedFail`](./errors.md#mergenotsupportedfail) error.
+ * with the built in diff3 algorithm it will not modify the working dir, and will throw a [`MergeNotSupportedError`](./errors.md#mergenotsupportedError) error.
  *
  * Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
  *
