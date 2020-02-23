@@ -1,6 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
+import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
 import { E, GitError } from '../models/GitError.js'
@@ -56,7 +57,7 @@ export async function _annotatedTag({
   ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
   if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {
-    throw new GitError(E.RefExistsError, { noun: 'tag', ref })
+    throw new AlreadyExistsError('tag', ref)
   }
 
   // Resolve passed value

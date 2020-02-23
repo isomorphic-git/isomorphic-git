@@ -1,8 +1,8 @@
 // @ts-check
 import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { GitRefManager } from '../managers/GitRefManager'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter'
 import { join } from '../utils/join.js'
 
@@ -53,7 +53,7 @@ export async function tag({
     })
 
     if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {
-      throw new GitError(E.RefExistsError, { noun: 'tag', ref })
+      throw new AlreadyExistsError('tag', ref)
     }
 
     await GitRefManager.writeRef({ fs, gitdir, ref, value })

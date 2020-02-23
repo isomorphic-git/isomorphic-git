@@ -1,7 +1,6 @@
 const messages = {
   InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
   InvalidParameterCombinationError: `The function doesn't take these parameters simultaneously: { parameters }`,
-  RefExistsError: `Failed to create { noun } "{ ref }" because { noun } "{ ref }" already exists.`,
   RefNotExistsError: `Failed to { verb } { noun } "{ ref }" because { noun } "{ ref }" does not exists.`,
   BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,
   CommitNotFetchedError: `Failed to checkout "{ ref }" because commit { oid } is not available locally. Do a git fetch to make the branch available locally.`,

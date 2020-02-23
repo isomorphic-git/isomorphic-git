@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { tag, resolveRef } = require('isomorphic-git')
+const { Errors, tag, resolveRef } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -23,7 +23,7 @@ describe('tag', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe('RefExistsError')
+    expect(error instanceof Errors.AlreadyExistsError).toBe(true)
   })
   it('fails if tag already exists (packed)', async () => {
     // Setup
@@ -36,7 +36,7 @@ describe('tag', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe('RefExistsError')
+    expect(error instanceof Errors.AlreadyExistsError).toBe(true)
   })
   it('force overwrite', async () => {
     // Setup

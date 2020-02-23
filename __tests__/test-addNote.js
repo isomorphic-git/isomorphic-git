@@ -214,7 +214,7 @@ describe('addNote', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error instanceof Errors.NoteExistsError).toBe(true)
+    expect(error instanceof Errors.AlreadyExistsError).toBe(true)
   })
   it('replaces existing note with --force', async () => {
     // Setup

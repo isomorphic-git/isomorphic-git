@@ -3,6 +3,7 @@ import '../typedefs.js'
 
 import cleanGitRef from 'clean-git-ref'
 
+import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
 
@@ -36,7 +37,7 @@ export async function _branch({ fs, gitdir, ref, checkout = false }) {
 
   const exist = await GitRefManager.exists({ fs, gitdir, ref: fullref })
   if (exist) {
-    throw new GitError(E.RefExistsError, { noun: 'branch', ref })
+    throw new AlreadyExistsError('branch', ref, false)
   }
 
   // Get current HEAD tree oid
