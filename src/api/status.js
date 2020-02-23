@@ -1,10 +1,10 @@
 // @ts-check
+import { _readTree } from '../commands/readTree.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { GitCommit } from '../models/GitCommit.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject } from '../storage/readObject.js'
@@ -204,24 +204,6 @@ async function getHeadTree({ fs, gitdir }) {
       return []
     }
   }
-  const { type, object } = await _readObject({ fs, gitdir, oid })
-  if (type !== 'commit') {
-    throw new GitError(E.ResolveCommitError, { oid })
-  }
-  const commit = GitCommit.from(object)
-  oid = commit.parseHeaders().tree
-  return getTree({ fs, gitdir, oid })
-}
-
-async function getTree({ fs, gitdir, oid }) {
-  const { type, object } = await _readObject({
-    fs,
-    gitdir,
-    oid,
-  })
-  if (type !== 'tree') {
-    throw new GitError(E.ResolveTreeError, { oid })
-  }
-  const tree = GitTree.from(object).entries()
+  const { tree } = await _readTree({ fs, gitdir, oid })
   return tree
 }

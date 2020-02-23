@@ -1,5 +1,5 @@
-import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
@@ -17,8 +17,8 @@ export class GitWalkerRepo {
       try {
         oid = await GitRefManager.resolve({ fs, gitdir, ref })
       } catch (e) {
-        // Handle fresh branches with no commits
         if (e instanceof NotFoundError) {
+          // Handle fresh branches with no commits
           oid = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
         }
       }

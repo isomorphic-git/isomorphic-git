@@ -12,7 +12,6 @@ const messages = {
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
   DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
-  ResolveTreeError: `Could not resolve { oid } to a tree.`,
   ResolveCommitError: `Could not resolve { oid } to a commit.`,
   DirectoryIsAFileError: `Unable to read "{ oid }:{ filepath }" because encountered a file where a directory was expected.`,
   ReadObjectFail: `Failed to read git object with oid { oid }`,
@@ -50,8 +49,6 @@ export const E = {
   FastForwardFail: `FastForwardFail`,
   /** @type {'DirectorySeparatorsError'} */
   DirectorySeparatorsError: `DirectorySeparatorsError`,
-  /** @type {'ResolveTreeError'} */
-  ResolveTreeError: `ResolveTreeError`,
   /** @type {'ResolveCommitError'} */
   ResolveCommitError: `ResolveCommitError`,
   /** @type {'DirectoryIsAFileError'} */
