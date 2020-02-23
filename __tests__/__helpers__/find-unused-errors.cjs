@@ -14,8 +14,8 @@ const errors = Object.keys(E).map(name => `E.${name}`)
     })
     files = files.filter(file => file.numMatches > 0).map(file => file.file)
     // console.log(`${error}: ${files.length}`)
-    if (files.length === 0) {
-      console.log(`${error}`)
+    if (files.length > 0) {
+      console.log(`${files.length} ${error}`)
     }
   }
 })()

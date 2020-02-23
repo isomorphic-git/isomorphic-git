@@ -6,6 +6,7 @@ import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
 import { CheckoutConflictError } from '../errors/CheckoutConflictError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -112,7 +113,7 @@ export async function _checkout({
       .filter(([method]) => method === 'error')
       .map(([method, fullpath]) => fullpath)
     if (errors.length > 0) {
-      throw new GitError(E.InternalFail, { message: errors })
+      throw new InternalError(errors.join(', '))
     }
 
     if (dryRun) {
@@ -230,11 +231,9 @@ export async function _checkout({
                   // symlink
                   await fs.writelink(filepath, object)
                 } else {
-                  throw new GitError(E.InternalFail, {
-                    message: `Invalid mode 0o${mode.toString(
-                      8
-                    )} detected in blob ${oid}`,
-                  })
+                  throw new InternalError(
+                    `Invalid mode 0o${mode.toString(8)} detected in blob ${oid}`
+                  )
                 }
               }
 

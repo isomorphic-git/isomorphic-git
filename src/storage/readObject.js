@@ -1,3 +1,4 @@
+import { InternalError } from '../errors/InternalError.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitObject } from '../models/GitObject.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
@@ -48,9 +49,9 @@ export async function _readObject({ fs, gitdir, oid, format = 'content' }) {
       }
       const sha = await shasum(result.object)
       if (sha !== oid) {
-        throw new GitError(E.InternalFail, {
-          message: `SHA check failed! Expected ${oid}, computed ${sha}`,
-        })
+        throw new InternalError(
+          `SHA check failed! Expected ${oid}, computed ${sha}`
+        )
       }
       const { object, type } = GitObject.unwrap(result.object)
       result.type = type
@@ -62,9 +63,7 @@ export async function _readObject({ fs, gitdir, oid, format = 'content' }) {
       break
     }
     default: {
-      throw new GitError(E.InternalFail, {
-        message: `invalid format "${result.format}"`,
-      })
+      throw new InternalError(`invalid format "${result.format}"`)
     }
   }
   /* eslint-enable no-fallthrough */
