@@ -10,8 +10,7 @@ export class CheckoutConflictError extends BaseError {
         ', '
       )}`
     )
-    /** @type {'CheckoutConflictError'} */
-    this.code = this.name = 'CheckoutConflictError'
+    this.code = this.name = CheckoutConflictError.code
     this.data = { filepaths }
   }
 }

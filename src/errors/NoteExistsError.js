@@ -10,8 +10,7 @@ export class NoteExistsError extends BaseError {
     super(
       `A note object ${note} already exists on object ${oid}. Use 'force: true' parameter to overwrite existing notes.`
     )
-    /** @type {'NoteExistsError'} */
-    this.code = this.name = 'NoteExistsError'
+    this.code = this.name = NoteExistsError.code
     this.data = { note, oid }
   }
 }

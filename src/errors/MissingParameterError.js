@@ -8,8 +8,7 @@ export class MissingParameterError extends BaseError {
     super(
       `The function requires a "${parameter}" parameter but none was provided.`
     )
-    /** @type {'MissingParameterError'} */
-    this.code = this.name = 'MissingParameterError'
+    this.code = this.name = MissingParameterError.code
     this.data = { parameter }
   }
 }

@@ -8,8 +8,7 @@ export class GitPushError extends BaseError {
    */
   constructor(prettyDetails, result) {
     super(`One or more branches were not updated: ${prettyDetails}`)
-    /** @type {'GitPushError'} */
-    this.code = this.name = 'GitPushError'
+    this.code = this.name = GitPushError.code
     this.data = { prettyDetails, result }
   }
 }

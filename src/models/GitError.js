@@ -48,7 +48,6 @@ const messages = {
   AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
-  CheckoutConflictError: `Your local changes to the following files would be overwritten by checkout: { filepaths }`,
 }
 
 export const E = {
@@ -144,8 +143,6 @@ export const E = {
   AmbiguousShortOid: `AmbiguousShortOid`,
   /** @type {'ShortOidNotFound'} */
   ShortOidNotFound: `ShortOidNotFound`,
-  /** @type {'CheckoutConflictError'} */
-  CheckoutConflictError: `CheckoutConflictError`,
 }
 
 function renderTemplate(template, values) {
