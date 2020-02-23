@@ -2,8 +2,8 @@
 import '../typedefs.js'
 
 import { _merge } from '../commands/merge.js'
+import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
@@ -91,7 +91,7 @@ export async function merge({
     const fs = new FileSystem(_fs)
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
-    if (!author && !fastForwardOnly) throw new GitError(E.MissingAuthorError)
+    if (!author && !fastForwardOnly) throw new MissingNameError('author')
 
     const committer = await normalizeCommitterObject({
       fs,
@@ -100,7 +100,7 @@ export async function merge({
       committer: _committer,
     })
     if (!committer && !fastForwardOnly) {
-      throw new GitError(E.MissingCommitterError)
+      throw new MissingNameError('committer')
     }
 
     return await _merge({

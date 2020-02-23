@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, Errors, merge, resolveRef, log } = require('isomorphic-git')
+const { Errors, merge, resolveRef, log } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -271,7 +271,7 @@ describe('merge', () => {
       error = e
     }
     expect(error).not.toBe(null)
-    expect(error.code).toBe(E.MissingAuthorError)
+    expect(error.code).toBe(Errors.MissingNameError.code)
   })
 
   it("merge 'delete-first-half' and 'delete-second-half' (dryRun)", async () => {

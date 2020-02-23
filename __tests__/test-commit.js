@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, readCommit, commit, log } = require('isomorphic-git')
+const { Errors, readCommit, commit, log } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -183,7 +183,7 @@ describe('commit', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MissingAuthorError)
+    expect(error.code).toBe(Errors.MissingNameError.code)
     // reset for test 2
     error = null
     try {
@@ -201,7 +201,7 @@ describe('commit', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MissingAuthorError)
+    expect(error.code).toBe(Errors.MissingNameError.code)
   })
 
   it('create signed commit', async () => {

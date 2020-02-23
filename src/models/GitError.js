@@ -1,6 +1,3 @@
-// modeled after Therror https://github.com/therror/therror/
-// but with the goal of being much lighter weight.
-
 const messages = {
   InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
   InvalidParameterCombinationError: `The function doesn't take these parameters simultaneously: { parameters }`,
@@ -12,9 +9,6 @@ const messages = {
   ObjectTypeAssertionFail: `Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`,
   ObjectTypeAssertionInTreeFail: `Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`,
   ObjectTypeAssertionInPathFail: `Found a blob { oid } in the path "{ path }" where a tree was expected.`,
-  MissingAuthorError: `Author name and email must be specified as an argument or in the .git/config file.`,
-  MissingCommitterError: `Committer name and email must be specified if a committer object is passed.`,
-  MissingTaggerError: `Tagger name and email must be specified as an argument or in the .git/config file.`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
   UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`,
   RemoteDoesNotSupportSmartHTTP: `Remote did not reply using the "smart" HTTP protocol. Expected "001e# service=git-upload-pack" but received: { preview }`,
@@ -60,12 +54,6 @@ export const E = {
   ObjectTypeAssertionInTreeFail: `ObjectTypeAssertionInTreeFail`,
   /** @type {'ObjectTypeAssertionInPathFail'} */
   ObjectTypeAssertionInPathFail: `ObjectTypeAssertionInPathFail`,
-  /** @type {'MissingAuthorError'} */
-  MissingAuthorError: `MissingAuthorError`,
-  /** @type {'MissingCommitterError'} */
-  MissingCommitterError: `MissingCommitterError`,
-  /** @type {'MissingTaggerError'} */
-  MissingTaggerError: `MissingTaggerError`,
   /** @type {'GitRootNotFoundError'} */
   GitRootNotFoundError: `GitRootNotFoundError`,
   /** @type {'UnparseableServerResponseFail'} */

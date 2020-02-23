@@ -7,9 +7,9 @@ import { _getConfig } from '../commands/getConfig'
 export async function normalizeAuthorObject({ fs, gitdir, author = {} }) {
   let { name, email, timestamp, timezoneOffset } = author
   name = name || (await _getConfig({ fs, gitdir, path: 'user.name' }))
-  email = email || (await _getConfig({ fs, gitdir, path: 'user.email' }))
+  email = email || (await _getConfig({ fs, gitdir, path: 'user.email' })) || ''
 
-  if (name === undefined || email === undefined) {
+  if (name === undefined) {
     return undefined
   }
 

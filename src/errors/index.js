@@ -6,6 +6,7 @@ export * from './HttpError.js'
 // index.js
 export * from './MaxDepthError.js'
 export * from './MergeNotSupportedError.js'
+export * from './MissingNameError.js'
 export * from './MissingParameterError.js'
 export * from './NoteExistsError.js'
 export * from './PushRejectedError.js'
