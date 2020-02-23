@@ -403,11 +403,6 @@ async function analyze({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
               // We'll ignore submodule directories for now.
               // Users prefer we not throw an error for lack of submodule support.
               // gitlinks
-              console.log(
-                new GitError(E.NotImplementedFail, {
-                  thing: 'submodule support',
-                })
-              )
               return
             }
             case 'commit-blob': {
