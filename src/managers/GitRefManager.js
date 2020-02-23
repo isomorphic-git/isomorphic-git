@@ -1,4 +1,5 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
+import { ResolveRefError } from '../errors/ResolveRefError.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
@@ -197,7 +198,7 @@ export class GitRefManager {
       }
     }
     // Do we give up?
-    throw new GitError(E.ResolveRefError, { ref })
+    throw new ResolveRefError(ref)
   }
 
   static async exists({ fs, gitdir, ref }) {
@@ -266,7 +267,7 @@ export class GitRefManager {
       }
     }
     // Do we give up?
-    throw new GitError(E.ResolveRefError, { ref })
+    throw new ResolveRefError(ref)
   }
 
   static async packedRefs({ fs, gitdir }) {

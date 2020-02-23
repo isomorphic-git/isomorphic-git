@@ -1,10 +1,9 @@
 // @ts-check
+import { _commit } from '../commands/commit.js'
+import { _readTree } from '../commands/readTree.js'
+import { _writeTree } from '../commands/writeTree.js'
+import { ResolveRefError } from '../errors/ResolveRefError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E } from '../models/GitError.js'
-
-import { _commit } from './commit.js'
-import { _readTree } from './readTree.js'
-import { _writeTree } from './writeTree.js'
 
 /**
  * @param {object} args
@@ -44,7 +43,7 @@ export async function _removeNote({
   try {
     parent = await GitRefManager.resolve({ gitdir, fs, ref })
   } catch (err) {
-    if (err.code !== E.ResolveRefError) {
+    if (!(err instanceof ResolveRefError)) {
       throw err
     }
   }

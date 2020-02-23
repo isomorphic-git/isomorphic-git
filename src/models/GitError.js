@@ -22,7 +22,6 @@ const messages = {
   ReadObjectFail: `Failed to read git object with oid { oid }`,
   NotAnOidFail: `Expected a 40-char hex object id but saw "{ value }".`,
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
-  ResolveRefError: `Could not resolve reference "{ ref }".`,
   ExpandRefError: `Could not expand reference "{ ref }".`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
   AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
@@ -77,8 +76,6 @@ export const E = {
   NotAnOidFail: `NotAnOidFail`,
   /** @type {'NoRefspecConfiguredError'} */
   NoRefspecConfiguredError: `NoRefspecConfiguredError`,
-  /** @type {'ResolveRefError'} */
-  ResolveRefError: `ResolveRefError`,
   /** @type {'ExpandRefError'} */
   ExpandRefError: `ExpandRefError`,
   /** @type {'AssertServerResponseFail'} */

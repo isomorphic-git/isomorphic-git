@@ -1,11 +1,11 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
+import { GitTree } from '../models/GitTree.js'
+import { ResolveRefError } from '../errors/ResolveRefError.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join'
 import { normalizeMode } from '../utils/normalizeMode.js'
 import { resolveTree } from '../utils/resolveTree.js'
-
-import { GitTree } from './GitTree.js'
 
 export class GitWalkerRepo {
   constructor({ fs, gitdir, ref }) {
@@ -18,7 +18,7 @@ export class GitWalkerRepo {
         oid = await GitRefManager.resolve({ fs, gitdir, ref })
       } catch (e) {
         // Handle fresh branches with no commits
-        if (e.code === E.ResolveRefError) {
+        if (e instanceof ResolveRefError) {
           oid = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
         }
       }

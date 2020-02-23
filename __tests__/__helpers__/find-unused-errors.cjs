@@ -2,6 +2,7 @@ const { E } = require('../..')
 const replace = require('replace-in-file')
 
 const errors = Object.keys(E).map(name => `E.${name}`)
+const bal = []
 
 ;(async () => {
   for (const error of errors) {
@@ -15,7 +16,9 @@ const errors = Object.keys(E).map(name => `E.${name}`)
     files = files.filter(file => file.numMatches > 0).map(file => file.file)
     // console.log(`${error}: ${files.length}`)
     if (files.length > 0) {
-      console.log(`${files.length} ${error}`)
+      bal.push(`${files.length} ${error}`)
     }
   }
+  bal.sort()
+  console.log(bal.join('\n'))
 })()

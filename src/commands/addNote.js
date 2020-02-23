@@ -5,8 +5,8 @@ import { _commit } from '../commands/commit.js'
 import { _readTree } from '../commands/readTree.js'
 import { _writeTree } from '../commands/writeTree.js'
 import { NoteExistsError } from '../errors/NoteExistsError.js'
+import { ResolveRefError } from '../errors/ResolveRefError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E } from '../models/GitError.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 /**
@@ -50,7 +50,7 @@ export async function _addNote({
   try {
     parent = await GitRefManager.resolve({ gitdir, fs, ref })
   } catch (err) {
-    if (err.code !== E.ResolveRefError) {
+    if (!(err instanceof ResolveRefError)) {
       throw err
     }
   }
