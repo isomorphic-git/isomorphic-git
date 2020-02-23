@@ -13,3 +13,5 @@ export class MissingParameterError extends BaseError {
     this.data = { parameter }
   }
 }
+/** @type {'MissingParameterError'} */
+MissingParameterError.code = 'MissingParameterError'

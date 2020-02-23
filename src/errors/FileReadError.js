@@ -11,3 +11,5 @@ export class FileReadError extends BaseError {
     this.data = { filepath }
   }
 }
+/** @type {'FileReadError'} */
+FileReadError.code = FileReadError

@@ -15,3 +15,5 @@ export class CheckoutConflictError extends BaseError {
     this.data = { filepaths }
   }
 }
+/** @type {'CheckoutConflictError'} */
+CheckoutConflictError.code = 'CheckoutConflictError'

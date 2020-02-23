@@ -13,3 +13,5 @@ export class GitPushError extends BaseError {
     this.data = { prettyDetails, result }
   }
 }
+/** @type {'GitPushError'} */
+GitPushError.code = 'GitPushError'

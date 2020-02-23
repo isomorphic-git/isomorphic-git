@@ -8,3 +8,5 @@ export class UserCanceledError extends BaseError {
     this.data = {}
   }
 }
+/** @type {'UserCanceledError'} */
+UserCanceledError.code = UserCanceledError

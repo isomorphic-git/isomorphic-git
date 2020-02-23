@@ -15,3 +15,5 @@ export class NoteExistsError extends BaseError {
     this.data = { note, oid }
   }
 }
+/** @type {'NoteExistsError'} */
+NoteExistsError.code = 'NoteExistsError'

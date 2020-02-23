@@ -6,7 +6,7 @@ describe('GitError', () => {
   it('all error codes work properly', async () => {
     for (const [name, Value] of Object.entries(Errors)) {
       // @ts-ignore
-      expect(name).toBe(new Value().code)
+      expect(name).toBe(Value.code)
     }
   })
   it('create a FileReadError', async () => {

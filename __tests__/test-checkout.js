@@ -356,7 +356,7 @@ describe('checkout', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(new Errors.CheckoutConflictError([]).code)
+    expect(error instanceof Errors.CheckoutConflictError).toBe(true)
     expect(error.data.filepaths).toEqual(['README.md'])
   })
 
