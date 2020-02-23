@@ -6,7 +6,6 @@ const messages = {
   BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,
   CommitNotFetchedError: `Failed to checkout "{ ref }" because commit { oid } is not available locally. Do a git fetch to make the branch available locally.`,
   ObjectTypeUnknownFail: `Object { oid } has unknown type "{ type }".`,
-  ObjectTypeAssertionFail: `Object { oid } was anticipated to be a { expected } but it is a { type }. This is probably a bug deep in isomorphic-git!`,
   ObjectTypeAssertionInTreeFail: `Object { oid } in tree for "{ entrypath }" was an unexpected object type "{ type }".`,
   ObjectTypeAssertionInPathFail: `Found a blob { oid } in the path "{ path }" where a tree was expected.`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
@@ -44,8 +43,6 @@ export const E = {
   CommitNotFetchedError: `CommitNotFetchedError`,
   /** @type {'ObjectTypeUnknownFail'} */
   ObjectTypeUnknownFail: `ObjectTypeUnknownFail`,
-  /** @type {'ObjectTypeAssertionFail'} */
-  ObjectTypeAssertionFail: `ObjectTypeAssertionFail`,
   /** @type {'ObjectTypeAssertionInTreeFail'} */
   ObjectTypeAssertionInTreeFail: `ObjectTypeAssertionInTreeFail`,
   /** @type {'ObjectTypeAssertionInPathFail'} */

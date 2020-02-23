@@ -1,7 +1,7 @@
-import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
-import { GitTree } from '../models/GitTree.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { ResolveRefError } from '../errors/ResolveRefError.js'
+import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join'
 import { normalizeMode } from '../utils/normalizeMode.js'
@@ -75,11 +75,7 @@ export class GitWalkerRepo {
     }
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== obj.type) {
-      throw new GitError(E.ObjectTypeAssertionFail, {
-        oid,
-        expected: obj.type,
-        type,
-      })
+      throw new ObjectTypeError(oid, type, obj.type)
     }
     const tree = GitTree.from(object)
     // cache all entries

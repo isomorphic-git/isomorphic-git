@@ -1,5 +1,5 @@
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
-import { E, GitError } from '../models/GitError.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 
 export async function resolveBlob({ fs, gitdir, oid }) {
@@ -10,11 +10,7 @@ export async function resolveBlob({ fs, gitdir, oid }) {
     return resolveBlob({ fs, gitdir, oid })
   }
   if (type !== 'blob') {
-    throw new GitError(E.ObjectTypeAssertionFail, {
-      oid,
-      type,
-      expected: 'blob',
-    })
+    throw new ObjectTypeError(oid, type, 'blob')
   }
   return { oid, blob: new Uint8Array(object) }
 }

@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { readBlob, E } = require('isomorphic-git')
+const { E, Errors, readBlob } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -127,7 +127,7 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.ObjectTypeAssertionFail)
+    expect(error instanceof Errors.ObjectTypeError).toBe(true)
   })
   it('with erroneous filepath (directory is a file)', async () => {
     // Setup
