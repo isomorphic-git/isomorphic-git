@@ -33,8 +33,6 @@ const messages = {
   ExpandRefError: `Could not expand reference "{ ref }".`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
   UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`,
-  AcquireLockFileFail: `Unable to acquire lockfile "{ filename }". Exhausted tries.`,
-  DoubleReleaseLockFileFail: `Cannot double-release lockfile "{ filename }".`,
   InternalFail: `An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: { message }`,
   AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
@@ -104,10 +102,6 @@ export const E = {
   AssertServerResponseFail: `AssertServerResponseFail`,
   /** @type {'UnknownTransportError'} */
   UnknownTransportError: `UnknownTransportError`,
-  /** @type {'AcquireLockFileFail'} */
-  AcquireLockFileFail: `AcquireLockFileFail`,
-  /** @type {'DoubleReleaseLockFileFail'} */
-  DoubleReleaseLockFileFail: `DoubleReleaseLockFileFail`,
   /** @type {'InternalFail'} */
   InternalFail: `InternalFail`,
   /** @type {'AddingRemoteWouldOverwrite'} */

@@ -1,11 +1,8 @@
 import pify from 'pify'
 
-import { E, GitError } from '../models/GitError.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
-import { sleep } from '../utils/sleep.js'
 
-const delayedReleases = new Map()
 const fsmap = new WeakMap()
 /**
  * This is just a collection of helper functions really. At least that's how it started.
@@ -229,40 +226,5 @@ export class FileSystem {
    */
   async writelink(filename, buffer) {
     return this._symlink(buffer.toString('utf8'), filename)
-  }
-
-  async lock(filename, triesLeft = 3) {
-    // check to see if we still have it
-    if (delayedReleases.has(filename)) {
-      clearTimeout(delayedReleases.get(filename))
-      delayedReleases.delete(filename)
-      return
-    }
-    if (triesLeft === 0) {
-      throw new GitError(E.AcquireLockFileFail, { filename })
-    }
-    try {
-      await this._mkdir(`${filename}.lock`)
-    } catch (err) {
-      if (err.code === 'EEXIST') {
-        await sleep(100)
-        await this.lock(filename, triesLeft - 1)
-      }
-    }
-  }
-
-  async unlock(filename, delayRelease = 50) {
-    if (delayedReleases.has(filename)) {
-      throw new GitError(E.DoubleReleaseLockFileFail, { filename })
-    }
-    // Basically, we lie and say it was deleted ASAP.
-    // But really we wait a bit to see if you want to acquire it again.
-    delayedReleases.set(
-      filename,
-      setTimeout(async () => {
-        delayedReleases.delete(filename)
-        await this._rmdir(`${filename}.lock`)
-      }, delayRelease)
-    )
   }
 }
