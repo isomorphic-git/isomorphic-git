@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const {
-  E,
+  Errors,
   checkout,
   listFiles,
   add,
@@ -356,7 +356,7 @@ describe('checkout', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.CheckoutConflictError)
+    expect(error.code).toBe(new Errors.CheckoutConflictError([]).code)
     expect(error.data.filepaths).toEqual(['README.md'])
   })
 

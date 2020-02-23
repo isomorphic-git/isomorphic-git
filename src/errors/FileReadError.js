@@ -6,7 +6,7 @@ export class FileReadError extends BaseError {
    */
   constructor(filepath) {
     super(`Could not read file "${filepath}".`)
-    /** @type { 'FileReadError'} */
+    /** @type {'FileReadError'} */
     this.code = this.name = 'FileReadError'
     this.data = { filepath }
   }

@@ -1,3 +1,4 @@
+export * from './CheckoutConflictError.js'
 export * from './FileReadError.js'
 export * from './GitPushError.js'
 export * from './MissingParameterError.js'

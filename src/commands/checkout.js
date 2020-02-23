@@ -5,6 +5,7 @@ import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
+import { CheckoutConflictError } from '../errors/CheckoutConflictError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -103,7 +104,7 @@ export async function _checkout({
       .filter(([method]) => method === 'conflict')
       .map(([method, fullpath]) => fullpath)
     if (conflicts.length > 0) {
-      throw new GitError(E.CheckoutConflictError, { filepaths: conflicts })
+      throw new CheckoutConflictError(conflicts)
     }
 
     // Collect errors
