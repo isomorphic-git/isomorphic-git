@@ -2,7 +2,7 @@
 import { _commit } from '../commands/commit.js'
 import { _readTree } from '../commands/readTree.js'
 import { _writeTree } from '../commands/writeTree.js'
-import { ResolveRefError } from '../errors/ResolveRefError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 
 /**
@@ -43,7 +43,7 @@ export async function _removeNote({
   try {
     parent = await GitRefManager.resolve({ gitdir, fs, ref })
   } catch (err) {
-    if (!(err instanceof ResolveRefError)) {
+    if (!(err instanceof NotFoundError)) {
       throw err
     }
   }

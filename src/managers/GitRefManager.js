@@ -1,5 +1,5 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import { ResolveRefError } from '../errors/ResolveRefError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
@@ -198,7 +198,7 @@ export class GitRefManager {
       }
     }
     // Do we give up?
-    throw new ResolveRefError(ref)
+    throw new NotFoundError(ref)
   }
 
   static async exists({ fs, gitdir, ref }) {
@@ -224,7 +224,7 @@ export class GitRefManager {
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
-    throw new GitError(E.ExpandRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
   static async expandAgainstMap({ ref, map }) {
@@ -234,7 +234,7 @@ export class GitRefManager {
       if (await map.has(ref)) return ref
     }
     // Do we give up?
-    throw new GitError(E.ExpandRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
   static resolveAgainstMap({ ref, fullref = ref, depth = undefined, map }) {
@@ -267,7 +267,7 @@ export class GitRefManager {
       }
     }
     // Do we give up?
-    throw new ResolveRefError(ref)
+    throw new NotFoundError(ref)
   }
 
   static async packedRefs({ fs, gitdir }) {

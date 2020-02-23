@@ -18,7 +18,6 @@ const messages = {
   ReadObjectFail: `Failed to read git object with oid { oid }`,
   NotAnOidFail: `Expected a 40-char hex object id but saw "{ value }".`,
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
-  ExpandRefError: `Could not expand reference "{ ref }".`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
 }
 
@@ -63,8 +62,6 @@ export const E = {
   NotAnOidFail: `NotAnOidFail`,
   /** @type {'NoRefspecConfiguredError'} */
   NoRefspecConfiguredError: `NoRefspecConfiguredError`,
-  /** @type {'ExpandRefError'} */
-  ExpandRefError: `ExpandRefError`,
   /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
 }

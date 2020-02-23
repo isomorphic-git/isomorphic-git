@@ -1,5 +1,5 @@
 // @ts-check
-import { ResolveRefError } from '../errors/ResolveRefError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -200,7 +200,7 @@ async function getHeadTree({ fs, gitdir }) {
     oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
   } catch (e) {
     // Handle fresh branches with no commits
-    if (e instanceof ResolveRefError) {
+    if (e instanceof NotFoundError) {
       return []
     }
   }

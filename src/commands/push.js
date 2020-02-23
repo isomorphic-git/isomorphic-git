@@ -9,11 +9,11 @@ import { listObjects } from '../commands/listObjects.js'
 import { _pack } from '../commands/pack.js'
 import { GitPushError } from '../errors/GitPushError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { PushRejectedError } from '../errors/PushRejectedError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
-import { E } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
@@ -118,7 +118,7 @@ export async function _push({
         map: httpRemote.refs,
       })
     } catch (err) {
-      if (err.code === E.ExpandRefError) {
+      if (err instanceof NotFoundError) {
         // The remote reference doesn't exist yet.
         // If it is fully specified, use that value. Otherwise, treat it as a branch.
         fullRemoteRef = remoteRef.startsWith('refs/')
