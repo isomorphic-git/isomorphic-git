@@ -1,6 +1,6 @@
 // @ts-check
-import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitRefManager } from '../managers/GitRefManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter'

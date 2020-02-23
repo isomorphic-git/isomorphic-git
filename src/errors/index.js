@@ -1,3 +1,4 @@
+export * from './AmbiguousError.js'
 export * from './AlreadyExistsError.js'
 export * from './CheckoutConflictError.js'
 export * from './EmptyServerResponseError.js'

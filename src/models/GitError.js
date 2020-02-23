@@ -21,7 +21,6 @@ const messages = {
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
   ExpandRefError: `Could not expand reference "{ ref }".`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
-  AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
 }
 
@@ -72,8 +71,6 @@ export const E = {
   ExpandRefError: `ExpandRefError`,
   /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
-  /** @type {'AmbiguousShortOid'} */
-  AmbiguousShortOid: `AmbiguousShortOid`,
   /** @type {'ShortOidNotFound'} */
   ShortOidNotFound: `ShortOidNotFound`,
 }

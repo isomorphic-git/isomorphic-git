@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, expandOid } = require('isomorphic-git')
+const { E, Errors, expandOid } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -40,7 +40,7 @@ describe('expandOid', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.AmbiguousShortOid)
+    expect(error instanceof Errors.AmbiguousError).toBe(true)
   })
 
   it('expand short oid from packfile', async () => {
