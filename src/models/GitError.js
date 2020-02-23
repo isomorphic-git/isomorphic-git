@@ -34,13 +34,10 @@ const messages = {
   ExpandRefError: `Could not expand reference "{ ref }".`,
   EmptyServerResponseFail: `Empty response from git server.`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
-  RemoteUrlParseError: `Cannot parse remote URL: "{ url }"`,
   UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`,
   AcquireLockFileFail: `Unable to acquire lockfile "{ filename }". Exhausted tries.`,
   DoubleReleaseLockFileFail: `Cannot double-release lockfile "{ filename }".`,
   InternalFail: `An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: { message }`,
-  PushRejectedNonFastForward: `Push rejected because it was not a simple fast-forward. Use "force: true" to override.`,
-  PushRejectedTagExists: `Push rejected because tag already exists. Use "force: true" to override.`,
   AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
@@ -111,8 +108,6 @@ export const E = {
   EmptyServerResponseFail: `EmptyServerResponseFail`,
   /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
-  /** @type {'RemoteUrlParseError'} */
-  RemoteUrlParseError: `RemoteUrlParseError`,
   /** @type {'UnknownTransportError'} */
   UnknownTransportError: `UnknownTransportError`,
   /** @type {'AcquireLockFileFail'} */
@@ -121,10 +116,6 @@ export const E = {
   DoubleReleaseLockFileFail: `DoubleReleaseLockFileFail`,
   /** @type {'InternalFail'} */
   InternalFail: `InternalFail`,
-  /** @type {'PushRejectedNonFastForward'} */
-  PushRejectedNonFastForward: `PushRejectedNonFastForward`,
-  /** @type {'PushRejectedTagExists'} */
-  PushRejectedTagExists: `PushRejectedTagExists`,
   /** @type {'AddingRemoteWouldOverwrite'} */
   AddingRemoteWouldOverwrite: `AddingRemoteWouldOverwrite`,
   /** @type {'AmbiguousShortOid'} */

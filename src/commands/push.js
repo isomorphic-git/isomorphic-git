@@ -9,6 +9,7 @@ import { listObjects } from '../commands/listObjects.js'
 import { _pack } from '../commands/pack.js'
 import { GitPushError } from '../errors/GitPushError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { PushRejectedError } from '../errors/PushRejectedError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -158,7 +159,7 @@ export async function _push({
         fullRef.startsWith('refs/tags') &&
         oldoid !== '0000000000000000000000000000000000000000'
       ) {
-        throw new GitError(E.PushRejectedTagExists, {})
+        throw new PushRejectedError('tag already exists')
       }
       // Is it a non-fast-forward commit?
       if (
@@ -166,7 +167,7 @@ export async function _push({
         oldoid !== '0000000000000000000000000000000000000000' &&
         !(await _isDescendent({ fs, gitdir, oid, ancestor: oldoid, depth: -1 }))
       ) {
-        throw new GitError(E.PushRejectedNonFastForward, {})
+        throw new PushRejectedError('it was not a simple fast-forward')
       }
     }
   }
