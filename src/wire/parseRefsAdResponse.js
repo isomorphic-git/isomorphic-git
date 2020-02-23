@@ -1,3 +1,4 @@
+import { EmptyServerResponseError } from '../errors/EmptyServerResponseError.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
@@ -12,7 +13,7 @@ export async function parseRefsAdResponse(stream, { service }) {
   let lineOne = await read()
   // skip past any flushes
   while (lineOne === null) lineOne = await read()
-  if (lineOne === true) throw new GitError(E.EmptyServerResponseFail)
+  if (lineOne === true) throw new EmptyServerResponseError()
   // Clients MUST ignore an LF at the end of the line.
   if (lineOne.toString('utf8').replace(/\n$/, '') !== `# service=${service}`) {
     throw new GitError(E.AssertServerResponseFail, {

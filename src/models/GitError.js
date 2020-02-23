@@ -32,7 +32,6 @@ const messages = {
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
   ResolveRefError: `Could not resolve reference "{ ref }".`,
   ExpandRefError: `Could not expand reference "{ ref }".`,
-  EmptyServerResponseFail: `Empty response from git server.`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
   UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`,
   AcquireLockFileFail: `Unable to acquire lockfile "{ filename }". Exhausted tries.`,
@@ -104,8 +103,6 @@ export const E = {
   ResolveRefError: `ResolveRefError`,
   /** @type {'ExpandRefError'} */
   ExpandRefError: `ExpandRefError`,
-  /** @type {'EmptyServerResponseFail'} */
-  EmptyServerResponseFail: `EmptyServerResponseFail`,
   /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
   /** @type {'UnknownTransportError'} */
