@@ -15,7 +15,6 @@ const messages = {
   ResolveTreeError: `Could not resolve { oid } to a tree.`,
   ResolveCommitError: `Could not resolve { oid } to a commit.`,
   DirectoryIsAFileError: `Unable to read "{ oid }:{ filepath }" because encountered a file where a directory was expected.`,
-  TreeOrBlobNotFoundError: `No file or directory found at "{ oid }:{ filepath }".`,
   ReadObjectFail: `Failed to read git object with oid { oid }`,
   NotAnOidFail: `Expected a 40-char hex object id but saw "{ value }".`,
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
@@ -58,8 +57,6 @@ export const E = {
   ResolveCommitError: `ResolveCommitError`,
   /** @type {'DirectoryIsAFileError'} */
   DirectoryIsAFileError: `DirectoryIsAFileError`,
-  /** @type {'TreeOrBlobNotFoundError'} */
-  TreeOrBlobNotFoundError: `TreeOrBlobNotFoundError`,
   /** @type {'ReadObjectFail'} */
   ReadObjectFail: `ReadObjectFail`,
   /** @type {'NotAnOidFail'} */

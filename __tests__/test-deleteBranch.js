@@ -15,20 +15,6 @@ describe('deleteBranch', () => {
     expect(files).toEqual(['master'])
   })
 
-  it('invalid branch name', async () => {
-    // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-deleteBranch')
-    let error = null
-    // Test
-    try {
-      await deleteBranch({ fs, dir, gitdir, ref: 'inv@{id..branch.lock' })
-    } catch (err) {
-      error = err
-    }
-    expect(error).not.toBeNull()
-    expect(error instanceof Errors.InvalidRefNameError).toBe(true)
-  })
-
   it('branch not exist', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-deleteBranch')

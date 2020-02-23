@@ -1,6 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -309,5 +310,5 @@ async function resolveFile({ fs, gitdir, tree, pathArray, oid, filepath }) {
       }
     }
   }
-  throw new GitError(E.TreeOrBlobNotFoundError, { oid, filepath })
+  throw new NotFoundError(`file or directory found at "${oid}:${filepath}"`)
 }

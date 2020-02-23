@@ -1,4 +1,5 @@
 // @ts-check
+import { NotFoundError } from '../errors/index.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
@@ -65,5 +66,5 @@ async function _resolveFilepath({
       }
     }
   }
-  throw new GitError(E.TreeOrBlobNotFoundError, { oid, filepath })
+  throw new NotFoundError(`file or directory found at "${oid}:${filepath}"`)
 }

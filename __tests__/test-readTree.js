@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, readTree } = require('isomorphic-git')
+const { E, Errors, readTree } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -538,7 +538,7 @@ describe('readTree', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.TreeOrBlobNotFoundError)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
   it('with erroneous filepath (leading slash)', async () => {
     // Setup

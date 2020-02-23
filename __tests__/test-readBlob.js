@@ -163,7 +163,7 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.TreeOrBlobNotFoundError)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
   it('with erroneous filepath (leading slash)', async () => {
     // Setup
