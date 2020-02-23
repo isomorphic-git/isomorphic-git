@@ -26,7 +26,7 @@ describe('deleteBranch', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.InvalidRefNameError)
+    expect(error instanceof Errors.InvalidRefNameError).toBe(true)
   })
 
   it('branch not exist', async () => {

@@ -1,6 +1,4 @@
 // @ts-check
-import cleanGitRef from 'clean-git-ref'
-
 import { _currentBranch } from '../commands/currentBranch'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
@@ -14,15 +12,6 @@ import { E, GitError } from '../models/GitError.js'
  * @returns {Promise<void>}
  */
 export async function _deleteBranch({ fs, gitdir, ref }) {
-  if (ref !== cleanGitRef.clean(ref)) {
-    throw new GitError(E.InvalidRefNameError, {
-      verb: 'delete',
-      noun: 'branch',
-      ref,
-      suggestion: cleanGitRef.clean(ref),
-    })
-  }
-
   const exist = await GitRefManager.exists({ fs, gitdir, ref })
   if (!exist) {
     throw new GitError(E.RefNotExistsError, {

@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, Errors, addRemote, listRemotes } = require('isomorphic-git')
+const { Errors, addRemote, listRemotes } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -46,6 +46,6 @@ describe('addRemote', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.InvalidRefNameError)
+    expect(error instanceof Errors.InvalidRefNameError).toBe(true)
   })
 })

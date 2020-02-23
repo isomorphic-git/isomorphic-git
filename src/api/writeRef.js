@@ -2,9 +2,9 @@
 import cleanGitRef from 'clean-git-ref'
 
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
+import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
@@ -58,12 +58,7 @@ export async function writeRef({
     const fs = new FileSystem(_fs)
 
     if (ref !== cleanGitRef.clean(ref)) {
-      throw new GitError(E.InvalidRefNameError, {
-        verb: 'write',
-        noun: 'ref',
-        ref,
-        suggestion: cleanGitRef.clean(ref),
-      })
+      throw new InvalidRefNameError(ref, cleanGitRef.clean(ref))
     }
 
     if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {

@@ -1,5 +1,4 @@
 const messages = {
-  InvalidRefNameError: `Failed to { verb } { noun } "{ ref }" because that name would not be a valid git reference. A valid alternative would be "{ suggestion }".`,
   InvalidParameterCombinationError: `The function doesn't take these parameters simultaneously: { parameters }`,
   RefNotExistsError: `Failed to { verb } { noun } "{ ref }" because { noun } "{ ref }" does not exists.`,
   BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,
@@ -22,14 +21,11 @@ const messages = {
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
   ExpandRefError: `Could not expand reference "{ ref }".`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
-  AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
   AmbiguousShortOid: `Found multiple oids matching "{ short }" ({ matches }). Use a longer abbreviation length to disambiguate them.`,
   ShortOidNotFound: `Could not find an object matching "{ short }".`,
 }
 
 export const E = {
-  /** @type {'InvalidRefNameError'} */
-  InvalidRefNameError: `InvalidRefNameError`,
   /** @type {'InvalidParameterCombinationError'} */
   InvalidParameterCombinationError: `InvalidParameterCombinationError`,
   /** @type {'RefExistsError'} */
@@ -76,8 +72,6 @@ export const E = {
   ExpandRefError: `ExpandRefError`,
   /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
-  /** @type {'AddingRemoteWouldOverwrite'} */
-  AddingRemoteWouldOverwrite: `AddingRemoteWouldOverwrite`,
   /** @type {'AmbiguousShortOid'} */
   AmbiguousShortOid: `AmbiguousShortOid`,
   /** @type {'ShortOidNotFound'} */
