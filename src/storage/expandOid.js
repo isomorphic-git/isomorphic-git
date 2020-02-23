@@ -1,5 +1,5 @@
 import { AmbiguousError } from '../errors/AmbiguousError.js'
-import { E, GitError } from '../models/GitError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { expandOidLoose } from '../storage/expandOidLoose.js'
 import { expandOidPacked } from '../storage/expandOidPacked.js'
 import { _readObject as readObject } from '../storage/readObject.js'
@@ -24,5 +24,5 @@ export async function _expandOid({ fs, gitdir, oid: short }) {
   if (results.length > 1) {
     throw new AmbiguousError('oids', short, results)
   }
-  throw new GitError(E.ShortOidNotFound, { short })
+  throw new NotFoundError(`an object matching "${short}"`)
 }
