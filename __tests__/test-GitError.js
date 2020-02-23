@@ -5,6 +5,7 @@ const { Errors } = require('isomorphic-git')
 describe('GitError', () => {
   it('all error codes work properly', async () => {
     for (const [name, Value] of Object.entries(Errors)) {
+      // @ts-ignore
       expect(name).toBe(new Value().code)
     }
   })

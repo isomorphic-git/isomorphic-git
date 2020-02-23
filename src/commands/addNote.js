@@ -4,8 +4,9 @@ import '../typedefs.js'
 import { _commit } from '../commands/commit.js'
 import { _readTree } from '../commands/readTree.js'
 import { _writeTree } from '../commands/writeTree.js'
+import { NoteExistsError } from '../errors/NoteExistsError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
+import { E } from '../models/GitError.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 /**
@@ -68,10 +69,7 @@ export async function _addNote({
   } else {
     for (const entry of tree) {
       if (entry.path === oid) {
-        throw new GitError(E.NoteAlreadyExistsError, {
-          note: entry.oid,
-          oid,
-        })
+        throw new NoteExistsError(entry.oid, oid)
       }
     }
   }
