@@ -1,4 +1,5 @@
 // @ts-check
+import { MaxDepthError } from '../errors/MaxDepthError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -33,7 +34,7 @@ export async function _isDescendent({ fs, gitdir, oid, ancestor, depth }) {
   let searchdepth = 0
   while (queue.length) {
     if (searchdepth++ === depth) {
-      throw new GitError(E.MaxSearchDepthExceeded, { depth })
+      throw new MaxDepthError(depth)
     }
     const oid = queue.shift()
     const { type, object } = await readObject({

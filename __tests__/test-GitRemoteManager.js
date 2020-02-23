@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E } = require('isomorphic-git')
+const { E, Errors } = require('isomorphic-git')
 const {
   GitRemoteManager,
   GitRemoteHTTP,
@@ -94,6 +94,6 @@ describe('GitRemoteManager', () => {
       error = err
     }
     expect(helper).toBeNull()
-    expect(error.code).toBe(E.RemoteUrlParseError)
+    expect(error.code).toBe(Errors.UrlParseError.code)
   })
 })

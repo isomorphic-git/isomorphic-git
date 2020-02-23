@@ -39,7 +39,6 @@ const messages = {
   AcquireLockFileFail: `Unable to acquire lockfile "{ filename }". Exhausted tries.`,
   DoubleReleaseLockFileFail: `Cannot double-release lockfile "{ filename }".`,
   InternalFail: `An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: { message }`,
-  MaxSearchDepthExceeded: `Maximum search depth of { depth } exceeded.`,
   PushRejectedNonFastForward: `Push rejected because it was not a simple fast-forward. Use "force: true" to override.`,
   PushRejectedTagExists: `Push rejected because tag already exists. Use "force: true" to override.`,
   AddingRemoteWouldOverwrite: `Adding remote { remote } would overwrite the existing remote. Use "force: true" to override.`,
@@ -122,8 +121,6 @@ export const E = {
   DoubleReleaseLockFileFail: `DoubleReleaseLockFileFail`,
   /** @type {'InternalFail'} */
   InternalFail: `InternalFail`,
-  /** @type {'MaxSearchDepthExceeded'} */
-  MaxSearchDepthExceeded: `MaxSearchDepthExceeded`,
   /** @type {'PushRejectedNonFastForward'} */
   PushRejectedNonFastForward: `PushRejectedNonFastForward`,
   /** @type {'PushRejectedTagExists'} */

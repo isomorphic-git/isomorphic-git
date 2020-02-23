@@ -1,3 +1,4 @@
+import { UrlParseError } from '../errors/UrlParseError.js'
 import { E, GitError } from '../models/GitError.js'
 import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 
@@ -49,7 +50,7 @@ export class GitRemoteManager {
 
     const parts = parseRemoteUrl({ url })
     if (!parts) {
-      throw new GitError(E.RemoteUrlParseError, { url })
+      throw new UrlParseError(url)
     }
     if (remoteHelpers.has(parts.transport)) {
       return remoteHelpers.get(parts.transport)
