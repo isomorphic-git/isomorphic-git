@@ -1,5 +1,6 @@
 import '../typedefs.js'
 
+import { HttpError } from '../errors/HttpError.js'
 import { UserCanceledError } from '../errors/UserCanceledError.js'
 import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
@@ -105,10 +106,7 @@ export class GitRemoteHTTP {
     } while (tryAgain)
 
     if (res.statusCode !== 200) {
-      throw new GitError(E.HTTPError, {
-        statusCode: res.statusCode,
-        statusMessage: res.statusMessage,
-      })
+      throw new HttpError(res.statusCode, res.statusMessage)
     }
     // Git "smart" HTTP servers should respond with the correct Content-Type header.
     if (
@@ -169,10 +167,7 @@ export class GitRemoteHTTP {
       headers,
     })
     if (res.statusCode !== 200) {
-      throw new GitError(E.HTTPError, {
-        statusCode: res.statusCode,
-        statusMessage: res.statusMessage,
-      })
+      throw new HttpError(res.statusCode, res.statusMessage)
     }
     return res
   }

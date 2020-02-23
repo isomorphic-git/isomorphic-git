@@ -376,7 +376,7 @@ describe('push', () => {
       err = e
     }
     expect(err).toBeDefined()
-    expect(err.code).toBe(E.HTTPError)
+    expect(err.code).toBe(Errors.HttpError.code)
     expect(onAuthArgs).toEqual([
       [
         `http://${localhost}:8888/test-push-server-auth.git`,

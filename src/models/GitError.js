@@ -17,7 +17,6 @@ const messages = {
   MissingTaggerError: `Tagger name and email must be specified as an argument or in the .git/config file.`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
   UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`,
-  InvalidDepthParameterError: `Invalid value for depth parameter: { depth }`,
   RemoteDoesNotSupportSmartHTTP: `Remote did not reply using the "smart" HTTP protocol. Expected "001e# service=git-upload-pack" but received: { preview }`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
@@ -35,7 +34,6 @@ const messages = {
   ExpandRefError: `Could not expand reference "{ ref }".`,
   EmptyServerResponseFail: `Empty response from git server.`,
   AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
-  HTTPError: `HTTP Error: { statusCode } { statusMessage }`,
   RemoteUrlParseError: `Cannot parse remote URL: "{ url }"`,
   UnknownTransportError: `Git remote "{ url }" uses an unrecognized transport protocol: "{ transport }"`,
   AcquireLockFileFail: `Unable to acquire lockfile "{ filename }". Exhausted tries.`,
@@ -80,8 +78,6 @@ export const E = {
   GitRootNotFoundError: `GitRootNotFoundError`,
   /** @type {'UnparseableServerResponseFail'} */
   UnparseableServerResponseFail: `UnparseableServerResponseFail`,
-  /** @type {'InvalidDepthParameterError'} */
-  InvalidDepthParameterError: `InvalidDepthParameterError`,
   /** @type {'RemoteDoesNotSupportSmartHTTP'} */
   RemoteDoesNotSupportSmartHTTP: `RemoteDoesNotSupportSmartHTTP`,
   /** @type {'CorruptShallowOidFail'} */
@@ -116,8 +112,6 @@ export const E = {
   EmptyServerResponseFail: `EmptyServerResponseFail`,
   /** @type {'AssertServerResponseFail'} */
   AssertServerResponseFail: `AssertServerResponseFail`,
-  /** @type {'HTTPError'} */
-  HTTPError: `HTTPError`,
   /** @type {'RemoteUrlParseError'} */
   RemoteUrlParseError: `RemoteUrlParseError`,
   /** @type {'UnknownTransportError'} */
