@@ -1,4 +1,5 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
+import { InvalidOidError } from '../errors/InvalidOidError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { E, GitError } from '../models/GitError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
@@ -36,7 +37,7 @@ export class GitRefManager {
     // Validate input
     for (const value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
-        throw new GitError(E.NotAnOidFail, { value })
+        throw new InvalidOidError(value)
       }
     }
     const config = await GitConfigManager.get({ fs, gitdir })
@@ -136,7 +137,7 @@ export class GitRefManager {
   static async writeRef({ fs, gitdir, ref, value }) {
     // Validate input
     if (!value.match(/[0-9a-f]{40}/)) {
-      throw new GitError(E.NotAnOidFail, { value })
+      throw new InvalidOidError(value)
     }
     await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
   }

@@ -94,7 +94,7 @@ export async function _checkout({
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
-      if (err instanceof NotFoundError && err.data.oid === oid) {
+      if (err instanceof NotFoundError && err.data.what === oid) {
         throw new GitError(E.CommitNotFetchedError, { ref, oid })
       } else {
         throw err

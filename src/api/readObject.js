@@ -1,10 +1,10 @@
 // @ts-check
 import '../typedefs.js'
 
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject } from '../storage/readObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
@@ -253,7 +253,11 @@ export async function readObject({
           result.object = GitAnnotatedTag.from(result.object).parse()
           break
         default:
-          throw new GitError(E.ObjectTypeUnknownFail, { type: result.type })
+          throw new ObjectTypeError(
+            result.oid,
+            result.type,
+            'blob|commit|tag|tree'
+          )
       }
     } else if (result.format === 'deflated' || result.format === 'wrapped') {
       result.type = result.format

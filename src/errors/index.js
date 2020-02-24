@@ -8,6 +8,7 @@ export * from './HttpError.js'
 // index.js
 export * from './InternalError.js'
 export * from './InvalidRefNameError.js'
+export * from './InvalidOidError.js'
 export * from './MaxDepthError.js'
 export * from './MergeNotSupportedError.js'
 export * from './MissingNameError.js'
