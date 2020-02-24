@@ -3,8 +3,8 @@ import { BaseError } from './BaseError.js'
 export class ObjectTypeError extends BaseError {
   /**
    * @param {string} oid
-   * @param {string} actual
-   * @param {string} expected
+   * @param {'blob'|'commit'|'tag'|'tree'} actual
+   * @param {'blob'|'commit'|'tag'|'tree'} expected
    * @param {string} [filepath]
    */
   constructor(oid, actual, expected, filepath) {
