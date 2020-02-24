@@ -2,7 +2,7 @@ import { BaseError } from './BaseError.js'
 
 export class AlreadyExistsError extends BaseError {
   /**
-   * @param {string} noun
+   * @param {'note'|'remote'|'tag'|'branch'} noun
    * @param {string} where
    * @param {boolean} canForce
    */

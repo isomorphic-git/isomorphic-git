@@ -2,7 +2,7 @@ import { BaseError } from './BaseError.js'
 
 export class AmbiguousError extends BaseError {
   /**
-   * @param {string} nouns
+   * @param {'oids'|'refs'} nouns
    * @param {string} short
    * @param {string[]} matches
    */

@@ -2,8 +2,8 @@ import { BaseError } from './BaseError.js'
 
 export class RemoteCapabilityError extends BaseError {
   /**
-   * @param {string} capability
-   * @param {string} parameter
+   * @param {'shallow'|'deepen-since'|'deepen-not'|'deepen-relative'} capability
+   * @param {'depth'|'since'|'exclude'|'relative'} parameter
    */
   constructor(capability, parameter) {
     super(
