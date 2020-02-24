@@ -1,5 +1,5 @@
 // @ts-check
-import { E, GitError } from '../models/GitError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { dirname } from '../utils/dirname.js'
 import { join } from '../utils/join.js'
 
@@ -20,7 +20,7 @@ export async function _findRoot({ fs, filepath }) {
   } else {
     const parent = dirname(filepath)
     if (parent === filepath) {
-      throw new GitError(E.GitRootNotFoundError, { filepath })
+      throw new NotFoundError(`git root for ${filepath}`)
     }
     return _findRoot({ fs, filepath: parent })
   }

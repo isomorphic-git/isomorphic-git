@@ -7,6 +7,7 @@ import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
 import { CheckoutConflictError } from '../errors/CheckoutConflictError.js'
 import { InternalError } from '../errors/InternalError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -93,7 +94,7 @@ export async function _checkout({
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
-      if (err.code === E.ReadObjectFail && err.data.oid === oid) {
+      if (err instanceof NotFoundError && err.data.oid === oid) {
         throw new GitError(E.CommitNotFetchedError, { ref, oid })
       } else {
         throw err

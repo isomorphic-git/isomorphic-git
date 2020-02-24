@@ -1,5 +1,5 @@
 import { InternalError } from '../errors/InternalError.js'
-import { E, GitError } from '../models/GitError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitObject } from '../models/GitObject.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { readObjectPacked } from '../storage/readObjectPacked.js'
@@ -28,7 +28,7 @@ export async function _readObject({ fs, gitdir, oid, format = 'content' }) {
   }
   // Finally
   if (!result) {
-    throw new GitError(E.ReadObjectFail, { oid })
+    throw new NotFoundError(oid)
   }
 
   if (format === 'deflated') {

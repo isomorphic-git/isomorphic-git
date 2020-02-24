@@ -26,7 +26,7 @@ describe('deleteBranch', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.RefNotExistsError)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
 
   it('missing ref argument', async () => {

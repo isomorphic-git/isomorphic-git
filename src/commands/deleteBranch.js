@@ -1,5 +1,6 @@
 // @ts-check
 import { _currentBranch } from '../commands/currentBranch'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { E, GitError } from '../models/GitError.js'
 
@@ -14,11 +15,7 @@ import { E, GitError } from '../models/GitError.js'
 export async function _deleteBranch({ fs, gitdir, ref }) {
   const exist = await GitRefManager.exists({ fs, gitdir, ref })
   if (!exist) {
-    throw new GitError(E.RefNotExistsError, {
-      verb: 'delete',
-      noun: 'branch',
-      ref,
-    })
+    throw new NotFoundError(ref)
   }
 
   const fullRef = await GitRefManager.expand({ fs, gitdir, ref })

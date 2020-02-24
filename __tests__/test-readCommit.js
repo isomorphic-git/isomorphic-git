@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { readCommit } = require('isomorphic-git')
+const { Errors, readCommit } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -19,16 +19,7 @@ describe('readCommit', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchInlineSnapshot(`
-      Object {
-        "caller": "git.readCommit",
-        "code": "ReadObjectFail",
-        "data": Object {
-          "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        },
-        "message": "Failed to read git object with oid aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      }
-    `)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
   it('parsed', async () => {
     // Setup

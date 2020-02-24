@@ -19,16 +19,7 @@ describe('readObject', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchInlineSnapshot(`
-      Object {
-        "caller": "git.readObject",
-        "code": "ReadObjectFail",
-        "data": Object {
-          "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        },
-        "message": "Failed to read git object with oid aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      }
-    `)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
   it('parsed', async () => {
     // Setup
