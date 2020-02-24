@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, Errors, readObject } = require('isomorphic-git')
+const { Errors, readObject } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -562,7 +562,8 @@ describe('readObject', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectorySeparatorsError)
+    expect(error instanceof Errors.InvalidFilepathError).toBe(true)
+    expect(error.data.reason).toBe('leading-slash')
   })
   it('with erroneous filepath (trailing slash)', async () => {
     // Setup
@@ -581,6 +582,7 @@ describe('readObject', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectorySeparatorsError)
+    expect(error instanceof Errors.InvalidFilepathError).toBe(true)
+    expect(error.data.reason).toBe('trailing-slash')
   })
 })

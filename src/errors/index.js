@@ -9,6 +9,7 @@ export * from './GitPushError.js'
 export * from './HttpError.js'
 // index.js
 export * from './InternalError.js'
+export * from './InvalidFilepathError.js'
 export * from './InvalidRefNameError.js'
 export * from './InvalidOidError.js'
 export * from './MaxDepthError.js'

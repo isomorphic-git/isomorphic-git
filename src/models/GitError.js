@@ -1,14 +1,11 @@
 const messages = {
   BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,
-  DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
 }
 
 export const E = {
   /** @type {'BranchDeleteError'} */
   BranchDeleteError: `BranchDeleteError`,
-  /** @type {'DirectorySeparatorsError'} */
-  DirectorySeparatorsError: `DirectorySeparatorsError`,
   /** @type {'NoRefspecConfiguredError'} */
   NoRefspecConfiguredError: `NoRefspecConfiguredError`,
 }
