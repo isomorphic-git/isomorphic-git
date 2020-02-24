@@ -9,27 +9,27 @@ describe('Errors', () => {
       expect(name).toBe(Value.code)
     }
   })
-  it('create a FileReadError', async () => {
+  it('create a NotFoundError', async () => {
     let e = null
     try {
-      throw new Errors.FileReadError('foobar.txt')
+      throw new Errors.NotFoundError('foobar.txt')
     } catch (err) {
       e = err
     }
     expect(e).not.toBeNull()
-    expect(e.code).toBe('FileReadError')
+    expect(e.code).toBe('NotFoundError')
     expect(e instanceof Error).toBe(true)
-    expect(e instanceof Errors.FileReadError).toBe(true)
+    expect(e instanceof Errors.NotFoundError).toBe(true)
     e = e.toJSON()
     delete e.stack
     expect(e).toMatchInlineSnapshot(`
       Object {
         "caller": "",
-        "code": "FileReadError",
+        "code": "NotFoundError",
         "data": Object {
-          "filepath": "foobar.txt",
+          "what": "foobar.txt",
         },
-        "message": "Could not read file \\"foobar.txt\\".",
+        "message": "Could not find foobar.txt.",
       }
     `)
   })

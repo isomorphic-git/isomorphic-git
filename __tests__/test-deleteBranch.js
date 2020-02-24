@@ -14,8 +14,8 @@ describe('deleteBranch', () => {
     const { fs, gitdir } = await makeFixture('test-deleteBranch')
     // Test
     await deleteBranch({ fs, gitdir, ref: 'test' })
-    const files = await listBranches({ fs, gitdir })
-    expect(files).toEqual(['master'])
+    const branches = await listBranches({ fs, gitdir })
+    expect(branches.includes('test')).toBe(false)
   })
 
   it('branch not exist', async () => {

@@ -5,7 +5,6 @@ export * from './CheckoutConflictError.js'
 export * from './CommitNotFetchedError.js'
 export * from './EmptyServerResponseError.js'
 export * from './FastForwardError.js'
-export * from './FileReadError.js'
 export * from './GitPushError.js'
 export * from './HttpError.js'
 // index.js
