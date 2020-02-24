@@ -159,7 +159,7 @@ export async function _push({
         fullRef.startsWith('refs/tags') &&
         oldoid !== '0000000000000000000000000000000000000000'
       ) {
-        throw new PushRejectedError('tag already exists')
+        throw new PushRejectedError('tag-exists')
       }
       // Is it a non-fast-forward commit?
       if (
@@ -167,7 +167,7 @@ export async function _push({
         oldoid !== '0000000000000000000000000000000000000000' &&
         !(await _isDescendent({ fs, gitdir, oid, ancestor: oldoid, depth: -1 }))
       ) {
-        throw new PushRejectedError('it was not a simple fast-forward')
+        throw new PushRejectedError('not-fast-forward')
       }
     }
   }
