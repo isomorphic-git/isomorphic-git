@@ -1,22 +1,16 @@
 const messages = {
   BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,
-  UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`,
   DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
   NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
-  AssertServerResponseFail: `Expected "{ expected }" but got "{ actual }".`,
 }
 
 export const E = {
   /** @type {'BranchDeleteError'} */
   BranchDeleteError: `BranchDeleteError`,
-  /** @type {'UnparseableServerResponseFail'} */
-  UnparseableServerResponseFail: `UnparseableServerResponseFail`,
   /** @type {'DirectorySeparatorsError'} */
   DirectorySeparatorsError: `DirectorySeparatorsError`,
   /** @type {'NoRefspecConfiguredError'} */
   NoRefspecConfiguredError: `NoRefspecConfiguredError`,
-  /** @type {'AssertServerResponseFail'} */
-  AssertServerResponseFail: `AssertServerResponseFail`,
 }
 
 function renderTemplate(template, values) {

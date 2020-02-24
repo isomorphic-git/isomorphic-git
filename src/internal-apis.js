@@ -1,5 +1,5 @@
-import * as errors from './errors/index.js'
-export { errors }
+import * as Errors from './errors/index.js'
+export { Errors }
 
 export * from './commands/listCommitsAndTags'
 export * from './commands/listObjects'

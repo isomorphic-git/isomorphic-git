@@ -1,5 +1,5 @@
 import { EmptyServerResponseError } from '../errors/EmptyServerResponseError.js'
-import { E, GitError } from '../models/GitError.js'
+import { ParseError } from '../errors/ParseError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
 export async function parseRefsAdResponse(stream, { service }) {
@@ -16,10 +16,7 @@ export async function parseRefsAdResponse(stream, { service }) {
   if (lineOne === true) throw new EmptyServerResponseError()
   // Clients MUST ignore an LF at the end of the line.
   if (lineOne.toString('utf8').replace(/\n$/, '') !== `# service=${service}`) {
-    throw new GitError(E.AssertServerResponseFail, {
-      expected: `# service=${service}\\n`,
-      actual: lineOne.toString('utf8'),
-    })
+    throw new ParseError(`# service=${service}\\n`, lineOne.toString('utf8'))
   }
   let lineTwo = await read()
   // skip past any flushes
@@ -58,10 +55,10 @@ export async function parseRefsAdResponse(stream, { service }) {
 function splitAndAssert(line, sep, expected) {
   const split = line.trim().split(sep)
   if (split.length !== 2) {
-    throw new GitError(E.AssertServerResponseFail, {
-      expected: `Two strings separated by '${expected}'`,
-      actual: line.toString('utf8'),
-    })
+    throw new ParseError(
+      `Two strings separated by '${expected}'`,
+      line.toString('utf8')
+    )
   }
   return split
 }
