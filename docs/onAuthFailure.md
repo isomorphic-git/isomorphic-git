@@ -25,7 +25,7 @@ An `onAuthFailure` function is called with a `url` and an `auth` object and can 
  * @property {string} [username]
  * @property {string} [password]
  * @property {Object<string, string>} [headers]
- * @property {boolean} cancel - Tells git to throw a `UserCancelledError` (instead of an `HTTPError`).
+ * @property {boolean} cancel - Tells git to throw a `UserCanceledError` (instead of an `HTTPError`).
  */
 ```
 
