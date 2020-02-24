@@ -6,12 +6,12 @@ import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
 import { CheckoutConflictError } from '../errors/CheckoutConflictError.js'
+import { CommitNotFetchedError } from '../errors/CommitNotFetchedError.js'
 import { InternalError } from '../errors/InternalError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { flat } from '../utils/flat.js'
 import { worthWalking } from '../utils/worthWalking.js'
@@ -95,7 +95,7 @@ export async function _checkout({
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
       if (err instanceof NotFoundError && err.data.what === oid) {
-        throw new GitError(E.CommitNotFetchedError, { ref, oid })
+        throw new CommitNotFetchedError(ref, oid)
       } else {
         throw err
       }

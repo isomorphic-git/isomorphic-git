@@ -4,7 +4,7 @@ import { BaseError } from './BaseError.js'
 export class GitPushError extends BaseError {
   /**
    * @param {string} prettyDetails
-   * @param {PushResult} prettyDetails
+   * @param {PushResult} result
    */
   constructor(prettyDetails, result) {
     super(`One or more branches were not updated: ${prettyDetails}`)

@@ -206,6 +206,7 @@ describe('checkout', () => {
       error = err
     }
     expect(error).not.toBeNull()
+    delete error.stack
     expect(error.toJSON()).toMatchInlineSnapshot(`
       Object {
         "caller": "git.checkout",
