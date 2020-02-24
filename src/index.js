@@ -61,11 +61,9 @@ import { writeRef } from './api/writeRef.js'
 import { writeTag } from './api/writeTag.js'
 import { writeTree } from './api/writeTree.js'
 import * as Errors from './errors/index.js'
-import { E } from './models/GitError'
 
 // named exports
 export {
-  E,
   Errors,
   STAGE,
   TREE,
@@ -131,7 +129,6 @@ export {
 
 // default export
 export default {
-  E,
   Errors,
   STAGE,
   TREE,

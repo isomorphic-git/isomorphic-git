@@ -6,7 +6,6 @@ describe('exports', () => {
     const names = Object.keys(git)
     expect(names.sort()).toMatchInlineSnapshot(`
       Array [
-        "E",
         "Errors",
         "STAGE",
         "TREE",

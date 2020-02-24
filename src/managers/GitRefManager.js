@@ -1,7 +1,7 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import { InvalidOidError } from '../errors/InvalidOidError.js'
-import { NotFoundError } from '../errors/NotFoundError.js'
 import { NoRefspecError } from '../errors/NoRefspecError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
