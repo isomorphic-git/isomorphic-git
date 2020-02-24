@@ -1,7 +1,7 @@
 import crc32 from 'crc-32'
 import applyDelta from 'git-apply-delta'
 
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { listpack } from '../utils/git-list-pack.js'
 import { inflate } from '../utils/inflate.js'
@@ -57,14 +57,14 @@ export class GitPackIndex {
     }
     const version = reader.readUInt32BE()
     if (version !== 2) {
-      throw new GitError(E.InternalFail, {
-        message: `Unable to read version ${version} packfile IDX. (Only version 2 supported)`,
-      })
+      throw new InternalError(
+        `Unable to read version ${version} packfile IDX. (Only version 2 supported)`
+      )
     }
     if (idx.byteLength > 2048 * 1024 * 1024) {
-      throw new GitError(E.InternalFail, {
-        message: `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`,
-      })
+      throw new InternalError(
+        `To keep implementation simple, I haven't implemented the layer 5 feature needed to support packfiles > 2GB in size.`
+      )
     }
     // Skip over fanout table
     reader.seek(reader.tell() + 4 * 255)
@@ -269,9 +269,7 @@ export class GitPackIndex {
         this.externalReadDepth++
         return this.getExternalRefDelta(oid)
       } else {
-        throw new GitError(E.InternalFail, {
-          message: `Could not read object ${oid} from packfile`,
-        })
+        throw new InternalError(`Could not read object ${oid} from packfile`)
       }
     }
     const start = this.offsets.get(oid)
@@ -292,10 +290,9 @@ export class GitPackIndex {
       0b1110000: 'ref_delta',
     }
     if (!this.pack) {
-      throw new GitError(E.InternalFail, {
-        message:
-          'Tried to read from a GitPackIndex with no packfile loaded into memory',
-      })
+      throw new InternalError(
+        'Tried to read from a GitPackIndex with no packfile loaded into memory'
+      )
     }
     const raw = (await this.pack).slice(start)
     const reader = new BufferCursor(raw)
@@ -304,9 +301,7 @@ export class GitPackIndex {
     const btype = byte & 0b1110000
     let type = types[btype]
     if (type === undefined) {
-      throw new GitError(E.InternalFail, {
-        message: 'Unrecognized type: 0b' + btype.toString(2),
-      })
+      throw new InternalError('Unrecognized type: 0b' + btype.toString(2))
     }
     // The length encoding get complicated.
     // Last four bits of length is encoded in bits 3210
@@ -335,9 +330,9 @@ export class GitPackIndex {
     object = Buffer.from(await inflate(buffer))
     // Assert that the object length is as expected.
     if (object.byteLength !== length) {
-      throw new GitError(E.InternalFail, {
-        message: `Packfile told us object would have length ${length} but it had length ${object.byteLength}`,
-      })
+      throw new InternalError(
+        `Packfile told us object would have length ${length} but it had length ${object.byteLength}`
+      )
     }
     if (base) {
       object = Buffer.from(applyDelta(object, base))

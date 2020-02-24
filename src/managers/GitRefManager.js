@@ -1,5 +1,7 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import { E, GitError } from '../models/GitError.js'
+import { InvalidOidError } from '../errors/InvalidOidError.js'
+import { NoRefspecError } from '../errors/NoRefspecError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
@@ -35,14 +37,14 @@ export class GitRefManager {
     // Validate input
     for (const value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
-        throw new GitError(E.NotAnOidFail, { value })
+        throw new InvalidOidError(value)
       }
     }
     const config = await GitConfigManager.get({ fs, gitdir })
     if (!refspecs) {
       refspecs = await config.getall(`remote.${remote}.fetch`)
       if (refspecs.length === 0) {
-        throw new GitError(E.NoRefspecConfiguredError, { remote })
+        throw new NoRefspecError(remote)
       }
       // There's some interesting behavior with HEAD that doesn't follow the refspec.
       refspecs.unshift(`+HEAD:refs/remotes/${remote}/HEAD`)
@@ -135,7 +137,7 @@ export class GitRefManager {
   static async writeRef({ fs, gitdir, ref, value }) {
     // Validate input
     if (!value.match(/[0-9a-f]{40}/)) {
-      throw new GitError(E.NotAnOidFail, { value })
+      throw new InvalidOidError(value)
     }
     await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
   }
@@ -197,7 +199,7 @@ export class GitRefManager {
       }
     }
     // Do we give up?
-    throw new GitError(E.ResolveRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
   static async exists({ fs, gitdir, ref }) {
@@ -223,7 +225,7 @@ export class GitRefManager {
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
-    throw new GitError(E.ExpandRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
   static async expandAgainstMap({ ref, map }) {
@@ -233,7 +235,7 @@ export class GitRefManager {
       if (await map.has(ref)) return ref
     }
     // Do we give up?
-    throw new GitError(E.ExpandRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
   static resolveAgainstMap({ ref, fullref = ref, depth = undefined, map }) {
@@ -266,7 +268,7 @@ export class GitRefManager {
       }
     }
     // Do we give up?
-    throw new GitError(E.ResolveRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
   static async packedRefs({ fs, gitdir }) {

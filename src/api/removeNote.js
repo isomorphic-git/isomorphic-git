@@ -2,8 +2,8 @@
 import '../typedefs.js'
 
 import { _removeNote } from '../commands/removeNote.js'
+import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
@@ -53,7 +53,7 @@ export async function removeNote({
     const fs = new FileSystem(_fs)
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
-    if (!author) throw new GitError(E.MissingAuthorError)
+    if (!author) throw new MissingNameError('author')
 
     const committer = await normalizeCommitterObject({
       fs,
@@ -61,7 +61,7 @@ export async function removeNote({
       author,
       committer: _committer,
     })
-    if (!committer) throw new GitError(E.MissingCommitterError)
+    if (!committer) throw new MissingNameError('committer')
 
     return await _removeNote({
       fs,

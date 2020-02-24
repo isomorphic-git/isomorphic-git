@@ -1,9 +1,8 @@
+import { InternalError } from '../errors/InternalError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
-
-import { E, GitError } from './GitError.js'
 
 // Extract 1-bit assume-valid, 1-bit extended flag, 2-bit merge state flag, 12-bit path length flag
 function parseCacheEntryFlags(bits) {
@@ -46,9 +45,7 @@ export class GitIndex {
     } else if (buffer === null) {
       return new GitIndex(null)
     } else {
-      throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitIndex.from',
-      })
+      throw new InternalError('invalid type passed to GitIndex.from')
     }
   }
 
@@ -57,23 +54,19 @@ export class GitIndex {
     const shaComputed = await shasum(buffer.slice(0, -20))
     const shaClaimed = buffer.slice(-20).toString('hex')
     if (shaClaimed !== shaComputed) {
-      throw new GitError(E.InternalFail, {
-        message: `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`,
-      })
+      throw new InternalError(
+        `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
+      )
     }
     const reader = new BufferCursor(buffer)
     const _entries = new Map()
     const magic = reader.toString('utf8', 4)
     if (magic !== 'DIRC') {
-      throw new GitError(E.InternalFail, {
-        message: `Inavlid dircache magic file number: ${magic}`,
-      })
+      throw new InternalError(`Inavlid dircache magic file number: ${magic}`)
     }
     const version = reader.readUInt32BE()
     if (version !== 2) {
-      throw new GitError(E.InternalFail, {
-        message: `Unsupported dircache version: ${version}`,
-      })
+      throw new InternalError(`Unsupported dircache version: ${version}`)
     }
     const numEntries = reader.readUInt32BE()
     let i = 0
@@ -95,9 +88,7 @@ export class GitIndex {
       // TODO: handle if (version === 3 && entry.flags.extended)
       const pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
       if (pathlength < 1) {
-        throw new GitError(E.InternalFail, {
-          message: `Got a path length of: ${pathlength}`,
-        })
+        throw new InternalError(`Got a path length of: ${pathlength}`)
       }
       // TODO: handle pathnames larger than 12 bits
       entry.path = reader.toString('utf8', pathlength)
@@ -109,13 +100,11 @@ export class GitIndex {
       while (padding--) {
         const tmp = reader.readUInt8()
         if (tmp !== 0) {
-          throw new GitError(E.InternalFail, {
-            message: `Expected 1-8 null characters but got '${tmp}' after ${entry.path}`,
-          })
+          throw new InternalError(
+            `Expected 1-8 null characters but got '${tmp}' after ${entry.path}`
+          )
         } else if (reader.eof()) {
-          throw new GitError(E.InternalFail, {
-            message: 'Unexpected end of file',
-          })
+          throw new InternalError('Unexpected end of file')
         }
       }
       // end of awkward part

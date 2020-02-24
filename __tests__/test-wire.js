@@ -6,7 +6,7 @@ const {
   parseUploadPackRequest,
   writeRefsAdResponse,
   writeUploadPackRequest,
-  E,
+  Errors,
 } = require('isomorphic-git/internal-apis')
 // const stream = require('stream')
 
@@ -190,7 +190,7 @@ describe('git wire protocol', () => {
       })
       fail('expected an error')
     } catch (error) {
-      expect(error.code).toEqual(E.AssertServerResponseFail)
+      expect(error instanceof Errors.ParseError).toBe(true)
       expect(error.data).toEqual({
         expected: '# service=git-upload-pack\\n',
         actual: '# noservice=git-upload-pac',
@@ -211,7 +211,7 @@ access it.
       })
       fail('expected an error')
     } catch (error) {
-      expect(error.code).toEqual(E.AssertServerResponseFail)
+      expect(error instanceof Errors.ParseError).toBe(true)
       expect(error.data).toEqual({
         expected: `Two strings separated by '\\x00'`,
         actual: `ERR Repository not found
@@ -241,7 +241,7 @@ access it.
       })
       fail('expected an error')
     } catch (error) {
-      expect(error.code).toEqual(E.AssertServerResponseFail)
+      expect(error instanceof Errors.ParseError).toBe(true)
       expect(error.data).toEqual({
         expected: `Two strings separated by ' '`,
         actual: '9ea43b479f5fedc679e3eb37803275d727bf51b7  HEAD',
@@ -267,7 +267,7 @@ access it.
       })
       fail('expected an error')
     } catch (error) {
-      expect(error.code).toEqual(E.AssertServerResponseFail)
+      expect(error instanceof Errors.ParseError).toBe(true)
       expect(error.data).toEqual({
         expected: `Two strings separated by ' '`,
         actual: 'fb74ea1a9b6a9601df18c38d3de751c51f064bf7refs/heads/js2\n0',

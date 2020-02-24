@@ -1,10 +1,10 @@
 // @ts-check
 import '../typedefs.js'
 
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { join } from '../utils/join.js'
@@ -102,7 +102,7 @@ export async function writeObject({
           object = GitAnnotatedTag.from(object).toObject()
           break
         default:
-          throw new GitError(E.ObjectTypeUnknownFail, { type })
+          throw new ObjectTypeError(oid || '', type, 'blob|commit|tag|tree')
       }
       // GitObjectManager does not know how to serialize content, so we tweak that parameter before passing it.
       format = 'content'

@@ -2,8 +2,8 @@
 import '../typedefs.js'
 
 import { _annotatedTag } from '../commands/annotatedTag.js'
+import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
@@ -68,7 +68,7 @@ export async function annotatedTag({
 
     // Fill in missing arguments with default values
     const tagger = await normalizeAuthorObject({ fs, gitdir, author: _tagger })
-    if (!tagger) throw new GitError(E.MissingTaggerError)
+    if (!tagger) throw new MissingNameError('tagger')
 
     return await _annotatedTag({
       fs,

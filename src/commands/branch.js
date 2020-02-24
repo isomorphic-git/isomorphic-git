@@ -3,8 +3,9 @@ import '../typedefs.js'
 
 import cleanGitRef from 'clean-git-ref'
 
+import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
+import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
 
 /**
  * Create a branch
@@ -24,19 +25,14 @@ import { E, GitError } from '../models/GitError.js'
  */
 export async function _branch({ fs, gitdir, ref, checkout = false }) {
   if (ref !== cleanGitRef.clean(ref)) {
-    throw new GitError(E.InvalidRefNameError, {
-      verb: 'create',
-      noun: 'branch',
-      ref,
-      suggestion: cleanGitRef.clean(ref),
-    })
+    throw new InvalidRefNameError(ref, cleanGitRef.clean(ref))
   }
 
   const fullref = `refs/heads/${ref}`
 
   const exist = await GitRefManager.exists({ fs, gitdir, ref: fullref })
   if (exist) {
-    throw new GitError(E.RefExistsError, { noun: 'branch', ref })
+    throw new AlreadyExistsError('branch', ref, false)
   }
 
   // Get current HEAD tree oid

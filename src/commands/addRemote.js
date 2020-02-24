@@ -3,8 +3,9 @@ import '../typedefs.js'
 
 import cleanGitRef from 'clean-git-ref'
 
+import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
+import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
-import { E, GitError } from '../models/GitError.js'
 
 /**
  * @param {object} args
@@ -19,12 +20,7 @@ import { E, GitError } from '../models/GitError.js'
  */
 export async function _addRemote({ fs, gitdir, remote, url, force }) {
   if (remote !== cleanGitRef.clean(remote)) {
-    throw new GitError(E.InvalidRefNameError, {
-      verb: 'add',
-      noun: 'remote',
-      ref: remote,
-      suggestion: cleanGitRef.clean(remote),
-    })
+    throw new InvalidRefNameError(remote, cleanGitRef.clean(remote))
   }
   const config = await GitConfigManager.get({ fs, gitdir })
   if (!force) {
@@ -34,7 +30,7 @@ export async function _addRemote({ fs, gitdir, remote, url, force }) {
       // Throw an error if it would overwrite an existing remote,
       // but not if it's simply setting the same value again.
       if (url !== (await config.get(`remote.${remote}.url`))) {
-        throw new GitError(E.AddingRemoteWouldOverwrite, { remote })
+        throw new AlreadyExistsError('remote', remote)
       }
     }
   }

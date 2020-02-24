@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
 
-const { E, branch, init, currentBranch } = require('isomorphic-git')
+const { Errors, branch, init, currentBranch } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -35,7 +35,7 @@ describe('branch', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.InvalidRefNameError)
+    expect(error instanceof Errors.InvalidRefNameError).toBe(true)
   })
 
   it('missing ref argument', async () => {
@@ -50,7 +50,7 @@ describe('branch', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MissingRequiredParameterError)
+    expect(error instanceof Errors.MissingParameterError).toBe(true)
   })
 
   it('empty repo', async () => {

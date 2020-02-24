@@ -1,9 +1,9 @@
 // @ts-check
 import '../typedefs.js'
 
+import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
-import { E, GitError } from '../models/GitError.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
@@ -56,7 +56,7 @@ export async function _annotatedTag({
   ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
   if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {
-    throw new GitError(E.RefExistsError, { noun: 'tag', ref })
+    throw new AlreadyExistsError('tag', ref)
   }
 
   // Resolve passed value
@@ -65,13 +65,6 @@ export async function _annotatedTag({
     gitdir,
     ref: object || 'HEAD',
   })
-
-  if (gpgsig && signingKey) {
-    throw new GitError(E.InvalidParameterCombinationError, {
-      function: 'annotatedTag',
-      parameters: ['gpgsig', 'signingKey'],
-    })
-  }
 
   const { type } = await readObject({ fs, gitdir, oid })
   let tagObject = GitAnnotatedTag.from({

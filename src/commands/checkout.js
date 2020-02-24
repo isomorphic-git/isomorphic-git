@@ -5,10 +5,13 @@ import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
+import { CheckoutConflictError } from '../errors/CheckoutConflictError.js'
+import { CommitNotFetchedError } from '../errors/CommitNotFetchedError.js'
+import { InternalError } from '../errors/InternalError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { flat } from '../utils/flat.js'
 import { worthWalking } from '../utils/worthWalking.js'
@@ -91,8 +94,8 @@ export async function _checkout({
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
-      if (err.code === E.ReadObjectFail && err.data.oid === oid) {
-        throw new GitError(E.CommitNotFetchedError, { ref, oid })
+      if (err instanceof NotFoundError && err.data.what === oid) {
+        throw new CommitNotFetchedError(ref, oid)
       } else {
         throw err
       }
@@ -103,7 +106,7 @@ export async function _checkout({
       .filter(([method]) => method === 'conflict')
       .map(([method, fullpath]) => fullpath)
     if (conflicts.length > 0) {
-      throw new GitError(E.CheckoutConflictError, { filepaths: conflicts })
+      throw new CheckoutConflictError(conflicts)
     }
 
     // Collect errors
@@ -111,7 +114,7 @@ export async function _checkout({
       .filter(([method]) => method === 'error')
       .map(([method, fullpath]) => fullpath)
     if (errors.length > 0) {
-      throw new GitError(E.InternalFail, { message: errors })
+      throw new InternalError(errors.join(', '))
     }
 
     if (dryRun) {
@@ -229,11 +232,9 @@ export async function _checkout({
                   // symlink
                   await fs.writelink(filepath, object)
                 } else {
-                  throw new GitError(E.InternalFail, {
-                    message: `Invalid mode 0o${mode.toString(
-                      8
-                    )} detected in blob ${oid}`,
-                  })
+                  throw new InternalError(
+                    `Invalid mode 0o${mode.toString(8)} detected in blob ${oid}`
+                  )
                 }
               }
 
@@ -403,11 +404,6 @@ async function analyze({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
               // We'll ignore submodule directories for now.
               // Users prefer we not throw an error for lack of submodule support.
               // gitlinks
-              console.log(
-                new GitError(E.NotImplementedFail, {
-                  thing: 'submodule support',
-                })
-              )
               return
             }
             case 'commit-blob': {

@@ -1,6 +1,6 @@
 import '../typedefs.js'
 
-import { E, GitError } from '../models/GitError.js'
+import { ParseError } from '../errors/ParseError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
 
 export async function parseReceivePackResponse(packfile) {
@@ -18,7 +18,7 @@ export async function parseReceivePackResponse(packfile) {
   // We're expecting "unpack {unpack-result}"
   line = lines.shift()
   if (!line.startsWith('unpack ')) {
-    throw new GitError(E.UnparseableServerResponseFail, { line })
+    throw new ParseError('unpack ok" or "unpack [error message]', line)
   }
   result.ok = line === 'unpack ok'
   if (!result.ok) {

@@ -3,7 +3,6 @@ import '../typedefs.js'
 
 import { _fetch } from '../commands/fetch.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
@@ -92,16 +91,6 @@ export async function fetch({
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
-
-    // Sanity checks
-    if (depth !== null) {
-      // @ts-ignore
-      if (Number.isNaN(parseInt(depth))) {
-        throw new GitError(E.InvalidDepthParameterError, { depth })
-      }
-      // @ts-ignore
-      depth = parseInt(depth)
-    }
 
     return await _fetch({
       fs: new FileSystem(fs),

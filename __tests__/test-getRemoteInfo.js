@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { E, getRemoteInfo } = require('isomorphic-git')
+const { Errors, getRemoteInfo } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -38,7 +38,7 @@ describe('getRemoteInfo', () => {
         error = err
       }
       expect(error).not.toBeNull()
-      expect(error.code).toBe(E.RemoteDoesNotSupportSmartHTTP)
+      expect(error instanceof Errors.SmartHttpError).toBe(true)
     }
   )
 })

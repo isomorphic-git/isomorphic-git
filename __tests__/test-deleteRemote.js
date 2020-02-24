@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, deleteRemote, listRemotes } = require('isomorphic-git')
+const { Errors, deleteRemote, listRemotes } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -25,6 +25,6 @@ describe('deleteRemote', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.MissingRequiredParameterError)
+    expect(error instanceof Errors.MissingParameterError).toBe(true)
   })
 })

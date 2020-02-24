@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E } = require('isomorphic-git')
+const { Errors } = require('isomorphic-git')
 const {
   GitRemoteManager,
   GitRemoteHTTP,
@@ -64,7 +64,7 @@ describe('GitRemoteManager', () => {
       error = err
     }
     expect(helper).toBeNull()
-    expect(error.code).toBe(E.UnknownTransportError)
+    expect(error.code).toBe(Errors.UnknownTransportError.code)
   })
 
   it('getRemoteHelperFor (unknown override)', async () => {
@@ -79,7 +79,7 @@ describe('GitRemoteManager', () => {
       error = err
     }
     expect(helper).toBeNull()
-    expect(error.code).toBe(E.UnknownTransportError)
+    expect(error.code).toBe(Errors.UnknownTransportError.code)
   })
 
   it('getRemoteHelperFor (unparseable)', async () => {
@@ -94,6 +94,6 @@ describe('GitRemoteManager', () => {
       error = err
     }
     expect(helper).toBeNull()
-    expect(error.code).toBe(E.RemoteUrlParseError)
+    expect(error.code).toBe(Errors.UrlParseError.code)
   })
 })

@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 
 export class GitObject {
   static wrap({ type, object }) {
@@ -16,9 +16,9 @@ export class GitObject {
     const actualLength = buffer.length - (i + 1)
     // verify length
     if (parseInt(length) !== actualLength) {
-      throw new GitError(E.InternalFail, {
-        message: `Length mismatch: expected ${length} bytes but got ${actualLength} instead.`,
-      })
+      throw new InternalError(
+        `Length mismatch: expected ${length} bytes but got ${actualLength} instead.`
+      )
     }
     return {
       type,

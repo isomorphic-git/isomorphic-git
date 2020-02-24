@@ -1,7 +1,7 @@
 // @ts-check
 import { _readTree } from '../commands/readTree'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E } from '../models/GitError.js'
 
 /**
  * List all the object notes
@@ -20,7 +20,7 @@ export async function _listNotes({ fs, gitdir, ref }) {
   try {
     parent = await GitRefManager.resolve({ gitdir, fs, ref })
   } catch (err) {
-    if (err.code === E.ResolveRefError) {
+    if (err instanceof NotFoundError) {
       return []
     }
   }
