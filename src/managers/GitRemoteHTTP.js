@@ -1,8 +1,8 @@
 import '../typedefs.js'
 
 import { HttpError } from '../errors/HttpError.js'
+import { SmartHttpError } from '../errors/SmartHttpError.js'
 import { UserCanceledError } from '../errors/UserCanceledError.js'
-import { E, GitError } from '../models/GitError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
@@ -130,10 +130,7 @@ export class GitRemoteHTTP {
         remoteHTTP.auth = auth
         return remoteHTTP
       } catch (e) {
-        throw new GitError(E.RemoteDoesNotSupportSmartHTTP, {
-          preview,
-          response,
-        })
+        throw new SmartHttpError(preview, response)
       }
     }
   }

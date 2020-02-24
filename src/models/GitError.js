@@ -6,7 +6,6 @@ const messages = {
   ObjectTypeUnknownFail: `Object { oid } has unknown type "{ type }".`,
   GitRootNotFoundError: `Unable to find git root for { filepath }.`,
   UnparseableServerResponseFail: `Unparsable response from server! Expected "unpack ok" or "unpack [error message]" but received "{ line }".`,
-  RemoteDoesNotSupportSmartHTTP: `Remote did not reply using the "smart" HTTP protocol. Expected "001e# service=git-upload-pack" but received: { preview }`,
   CorruptShallowOidFail: `non-40 character shallow oid: { oid }`,
   FastForwardFail: `A simple fast-forward merge was not possible.`,
   DirectorySeparatorsError: `"filepath" parameter should not include leading or trailing directory separators because these can cause problems on some platforms`,
@@ -34,8 +33,6 @@ export const E = {
   GitRootNotFoundError: `GitRootNotFoundError`,
   /** @type {'UnparseableServerResponseFail'} */
   UnparseableServerResponseFail: `UnparseableServerResponseFail`,
-  /** @type {'RemoteDoesNotSupportSmartHTTP'} */
-  RemoteDoesNotSupportSmartHTTP: `RemoteDoesNotSupportSmartHTTP`,
   /** @type {'CorruptShallowOidFail'} */
   CorruptShallowOidFail: `CorruptShallowOidFail`,
   /** @type {'FastForwardFail'} */
