@@ -1,7 +1,7 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import { InvalidOidError } from '../errors/InvalidOidError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
-import { E, GitError } from '../models/GitError.js'
+import { NoRefspecError } from '../errors/NoRefspecError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
@@ -44,7 +44,7 @@ export class GitRefManager {
     if (!refspecs) {
       refspecs = await config.getall(`remote.${remote}.fetch`)
       if (refspecs.length === 0) {
-        throw new GitError(E.NoRefspecConfiguredError, { remote })
+        throw new NoRefspecError(remote)
       }
       // There's some interesting behavior with HEAD that doesn't follow the refspec.
       refspecs.unshift(`+HEAD:refs/remotes/${remote}/HEAD`)

@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { E, Errors, setConfig, fetch } = require('isomorphic-git')
+const { Errors, setConfig, fetch } = require('isomorphic-git')
 const { sleep } = require('isomorphic-git/internal-apis')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -245,7 +245,7 @@ describe('fetch', () => {
       err = e
     }
     expect(err).toBeDefined()
-    expect(err.code).toEqual(E.NoRefspecConfiguredError)
+    expect(err instanceof Errors.NoRefspecError).toBe(true)
   })
 
   it('fetch empty repository from git-http-mock-server', async () => {

@@ -2,7 +2,6 @@
 import { _currentBranch } from '../commands/currentBranch'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
 
 /**
  * @param {Object} args
@@ -21,7 +20,9 @@ export async function _deleteBranch({ fs, gitdir, ref }) {
   const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
   const currentRef = await _currentBranch({ fs, gitdir, fullname: true })
   if (fullRef === currentRef) {
-    throw new GitError(E.BranchDeleteError, { ref })
+    // detach HEAD
+    const value = await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
+    await GitRefManager.writeRef({ fs, gitdir, ref: 'HEAD', value })
   }
 
   // Delete a specified branch

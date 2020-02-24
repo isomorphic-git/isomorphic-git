@@ -1,14 +1,6 @@
-const messages = {
-  BranchDeleteError: `Failed to delete branch "{ ref }" because branch "{ ref }" checked out now.`,
-  NoRefspecConfiguredError: `Could not find a fetch refspec for remote "{ remote }".\\nMake sure the config file has an entry like the following:\\n[remote "{ remote }"]\\nfetch = +refs/heads/*:refs/remotes/origin/*`,
-}
+const messages = {}
 
-export const E = {
-  /** @type {'BranchDeleteError'} */
-  BranchDeleteError: `BranchDeleteError`,
-  /** @type {'NoRefspecConfiguredError'} */
-  NoRefspecConfiguredError: `NoRefspecConfiguredError`,
-}
+export const E = {}
 
 function renderTemplate(template, values) {
   let result = template

@@ -2,7 +2,6 @@
 import { InvalidFilepathError } from '../errors/InvalidFilepathError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { ObjectTypeError } from '../errors/ObjectTypeError.js'
-import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { resolveTree } from '../utils/resolveTree.js'
