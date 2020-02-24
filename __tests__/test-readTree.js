@@ -520,7 +520,7 @@ describe('readTree', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectoryIsAFileError)
+    expect(error instanceof Errors.ObjectTypeError).toBe(true)
   })
   it('with erroneous filepath (no such directory)', async () => {
     // Setup

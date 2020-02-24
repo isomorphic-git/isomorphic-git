@@ -5,13 +5,13 @@ import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject } from '../storage/readObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { compareStats } from '../utils/compareStats.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
+import { ObjectTypeError } from '../errors/index.js'
 
 /**
  * Tell whether a file has been changed
@@ -183,10 +183,7 @@ async function getOidAtPath({ fs, gitdir, tree, path }) {
         return getOidAtPath({ fs, gitdir, tree, path })
       }
       if (type === 'blob') {
-        throw new GitError(E.ObjectTypeAssertionInPathFail, {
-          oid: entry.oid,
-          path: path.join('/'),
-        })
+        throw new ObjectTypeError(entry.oid, type, 'blob', path.join('/'))
       }
     }
   }
