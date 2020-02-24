@@ -1,8 +1,8 @@
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 
@@ -40,11 +40,7 @@ export async function listCommitsAndTags({
       return walk(commit)
     }
     if (type !== 'commit') {
-      throw new GitError(E.ObjectTypeAssertionFail, {
-        oid,
-        type,
-        expected: 'commit',
-      })
+      throw new ObjectTypeError(oid, type, 'commit')
     }
     if (!shallows.has(oid)) {
       const commit = GitCommit.from(object)

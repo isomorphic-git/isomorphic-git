@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
@@ -12,9 +12,9 @@ export class GitAnnotatedTag {
     } else if (typeof tag === 'object') {
       this._tag = GitAnnotatedTag.render(tag)
     } else {
-      throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitAnnotatedTag constructor',
-      })
+      throw new InternalError(
+        'invalid type passed to GitAnnotatedTag constructor'
+      )
     }
   }
 

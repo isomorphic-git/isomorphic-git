@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 
 /**
  *
@@ -13,7 +13,5 @@ export function mode2type(mode) {
     case 0o120000: return 'blob'
     case 0o160000: return 'commit'
   }
-  throw new GitError(E.InternalFail, {
-    message: `Unexpected GitTree entry mode: ${mode.toString(8)}`,
-  })
+  throw new InternalError(`Unexpected GitTree entry mode: ${mode.toString(8)}`)
 }

@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { readPackIndex } from '../storage/readPackIndex.js'
 import { join } from '../utils/join.js'
 
@@ -19,7 +19,7 @@ export async function hasObjectPacked({
       filename: indexFile,
       getExternalRefDelta,
     })
-    if (p.error) throw new GitError(E.InternalFail, { message: p.error })
+    if (p.error) throw new InternalError(p.error)
     // If the packfile DOES have the oid we're looking for...
     if (p.offsets.has(oid)) {
       return true

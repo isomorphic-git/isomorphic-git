@@ -1,5 +1,11 @@
 /* eslint-env node, browser, jasmine */
-const { E, addNote, readBlob, resolveRef, readTree } = require('isomorphic-git')
+const {
+  Errors,
+  addNote,
+  readBlob,
+  resolveRef,
+  readTree,
+} = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -208,7 +214,7 @@ describe('addNote', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.NoteAlreadyExistsError)
+    expect(error instanceof Errors.AlreadyExistsError).toBe(true)
   })
   it('replaces existing note with --force', async () => {
     // Setup

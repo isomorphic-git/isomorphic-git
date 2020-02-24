@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { E, readTree } = require('isomorphic-git')
+const { Errors, readTree } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -520,7 +520,7 @@ describe('readTree', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectoryIsAFileError)
+    expect(error instanceof Errors.ObjectTypeError).toBe(true)
   })
   it('with erroneous filepath (no such directory)', async () => {
     // Setup
@@ -538,7 +538,7 @@ describe('readTree', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.TreeOrBlobNotFoundError)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
   it('with erroneous filepath (leading slash)', async () => {
     // Setup
@@ -556,7 +556,8 @@ describe('readTree', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectorySeparatorsError)
+    expect(error instanceof Errors.InvalidFilepathError).toBe(true)
+    expect(error.data.reason).toBe('leading-slash')
   })
   it('with erroneous filepath (trailing slash)', async () => {
     // Setup
@@ -574,6 +575,7 @@ describe('readTree', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectorySeparatorsError)
+    expect(error instanceof Errors.InvalidFilepathError).toBe(true)
+    expect(error.data.reason).toBe('trailing-slash')
   })
 })

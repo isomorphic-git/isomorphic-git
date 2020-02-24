@@ -1,6 +1,6 @@
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 
 export async function resolveCommit({ fs, gitdir, oid }) {
@@ -11,11 +11,7 @@ export async function resolveCommit({ fs, gitdir, oid }) {
     return resolveCommit({ fs, gitdir, oid })
   }
   if (type !== 'commit') {
-    throw new GitError(E.ObjectTypeAssertionFail, {
-      oid,
-      type,
-      expected: 'commit',
-    })
+    throw new ObjectTypeError(oid, type, 'commit')
   }
   return { commit: GitCommit.from(object), oid }
 }

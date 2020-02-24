@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { E, currentBranch, clone, resolveRef } = require('isomorphic-git')
+const { Errors, currentBranch, clone, resolveRef } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -42,7 +42,7 @@ describe('clone', () => {
       err = e
     }
     expect(err).not.toBeNull()
-    expect(err.code).toBe(E.ResolveRefError)
+    expect(err.code).toBe(Errors.NotFoundError.code)
   })
   it('clone with noCheckout', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')

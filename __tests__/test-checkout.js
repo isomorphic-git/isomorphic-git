@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 const {
-  E,
+  Errors,
   checkout,
   listFiles,
   add,
@@ -206,7 +206,10 @@ describe('checkout', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchInlineSnapshot(`
+    expect(error.caller).toEqual('git.checkout')
+    error = error.toJSON()
+    delete error.stack
+    expect(error).toMatchInlineSnapshot(`
       Object {
         "caller": "git.checkout",
         "code": "CommitNotFetchedError",
@@ -217,7 +220,6 @@ describe('checkout', () => {
         "message": "Failed to checkout \\"missing-branch\\" because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally.",
       }
     `)
-    expect(error.caller).toEqual('git.checkout')
   })
 
   it('checkout file permissions', async () => {
@@ -356,7 +358,7 @@ describe('checkout', () => {
       error = e
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.CheckoutConflictError)
+    expect(error instanceof Errors.CheckoutConflictError).toBe(true)
     expect(error.data.filepaths).toEqual(['README.md'])
   })
 

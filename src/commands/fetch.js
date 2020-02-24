@@ -2,12 +2,13 @@
 import '../typedefs.js'
 
 import { _currentBranch } from '../commands/currentBranch.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { RemoteCapabilityError } from '../errors/RemoteCapabilityError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
 import { GitPackIndex } from '../models/GitPackIndex.js'
 import { hasObject } from '../storage/hasObject.js'
 import { _readObject as readObject } from '../storage/readObject.js'
@@ -93,9 +94,7 @@ export async function _fetch({
   // Lookup the URL for the given remote.
   const url = _url || (await config.get(`remote.${remote}.url`))
   if (typeof url === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remote OR url',
-    })
+    throw new MissingParameterError('remote OR url')
   }
   // Figure out what remote ref to use.
   const remoteRef =
@@ -131,16 +130,16 @@ export async function _fetch({
   }
   // Check that the remote supports the requested features
   if (depth !== null && !remoteHTTP.capabilities.has('shallow')) {
-    throw new GitError(E.RemoteDoesNotSupportShallowFail)
+    throw new RemoteCapabilityError('shallow', 'depth')
   }
   if (since !== null && !remoteHTTP.capabilities.has('deepen-since')) {
-    throw new GitError(E.RemoteDoesNotSupportDeepenSinceFail)
+    throw new RemoteCapabilityError('deepen-since', 'since')
   }
   if (exclude.length > 0 && !remoteHTTP.capabilities.has('deepen-not')) {
-    throw new GitError(E.RemoteDoesNotSupportDeepenNotFail)
+    throw new RemoteCapabilityError('deepen-not', 'exclude')
   }
   if (relative === true && !remoteHTTP.capabilities.has('deepen-relative')) {
-    throw new GitError(E.RemoteDoesNotSupportDeepenRelativeFail)
+    throw new RemoteCapabilityError('deepen-relative', 'relative')
   }
   // Figure out the SHA for the requested ref
   const { oid, fullref } = GitRefManager.resolveAgainstMap({

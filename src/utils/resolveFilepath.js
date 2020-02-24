@@ -1,5 +1,7 @@
 // @ts-check
-import { E, GitError } from '../models/GitError.js'
+import { InvalidFilepathError } from '../errors/InvalidFilepathError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { resolveTree } from '../utils/resolveTree.js'
@@ -9,8 +11,10 @@ export async function resolveFilepath({ fs, gitdir, oid, filepath }) {
   // I was going to do this automatically, but then found that the Git Terminal for Windows
   // auto-expands --filepath=/src/utils to --filepath=C:/Users/Will/AppData/Local/Programs/Git/src/utils
   // so I figured it would be wise to promote the behavior in the application layer not just the library layer.
-  if (filepath.startsWith('/') || filepath.endsWith('/')) {
-    throw new GitError(E.DirectorySeparatorsError)
+  if (filepath.startsWith('/')) {
+    throw new InvalidFilepathError('leading-slash')
+  } else if (filepath.endsWith('/')) {
+    throw new InvalidFilepathError('trailing-slash')
   }
   const _oid = oid
   const result = await resolveTree({ fs, gitdir, oid })
@@ -50,20 +54,13 @@ async function _resolveFilepath({
           gitdir,
           oid: entry.oid,
         })
-        if (type === 'blob') {
-          throw new GitError(E.DirectoryIsAFileError, { oid, filepath })
-        }
         if (type !== 'tree') {
-          throw new GitError(E.ObjectTypeAssertionInTreeFail, {
-            oid: entry.oid,
-            entrypath: filepath,
-            type,
-          })
+          throw new ObjectTypeError(oid, type, 'blob', filepath)
         }
         tree = GitTree.from(object)
         return _resolveFilepath({ fs, gitdir, tree, pathArray, oid, filepath })
       }
     }
   }
-  throw new GitError(E.TreeOrBlobNotFoundError, { oid, filepath })
+  throw new NotFoundError(`file or directory found at "${oid}:${filepath}"`)
 }

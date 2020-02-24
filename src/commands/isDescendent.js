@@ -1,8 +1,10 @@
 // @ts-check
+import { MaxDepthError } from '../errors/MaxDepthError.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
-import { _readObject as readObject } from '../storage/readObject.js'
+import { _readObject } from '../storage/readObject.js'
 
 /**
  * @param {object} args
@@ -17,16 +19,10 @@ import { _readObject as readObject } from '../storage/readObject.js'
 export async function _isDescendent({ fs, gitdir, oid, ancestor, depth }) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   if (!oid) {
-    throw new GitError(E.MissingRequiredParameterError, {
-      function: 'isDescendent',
-      parameter: 'oid',
-    })
+    throw new MissingParameterError('oid')
   }
   if (!ancestor) {
-    throw new GitError(E.MissingRequiredParameterError, {
-      function: 'isDescendent',
-      parameter: 'ancestor',
-    })
+    throw new MissingParameterError('ancestor')
   }
   // If you don't like this behavior, add your own check.
   // Edge cases are hard to define a perfect solution.
@@ -38,16 +34,16 @@ export async function _isDescendent({ fs, gitdir, oid, ancestor, depth }) {
   let searchdepth = 0
   while (queue.length) {
     if (searchdepth++ === depth) {
-      throw new GitError(E.MaxSearchDepthExceeded, { depth })
+      throw new MaxDepthError(depth)
     }
     const oid = queue.shift()
-    const { type, object } = await readObject({
+    const { type, object } = await _readObject({
       fs,
       gitdir,
       oid,
     })
     if (type !== 'commit') {
-      throw new GitError(E.ResolveCommitError, { oid })
+      throw new ObjectTypeError(oid, type, 'commit')
     }
     const commit = GitCommit.from(object).parse()
     // Are any of the parents the sought-after ancestor?

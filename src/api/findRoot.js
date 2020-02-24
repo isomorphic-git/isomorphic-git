@@ -15,7 +15,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @param {string} args.filepath - The file directory to start searching in.
  *
  * @returns {Promise<string>} Resolves successfully with a root git directory path
- * @throws {GitRootNotFoundError}
+ * @throws {NotFoundError}
  *
  * @example
  * let gitroot = await git.findRoot({

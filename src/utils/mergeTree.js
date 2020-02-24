@@ -3,7 +3,7 @@ import '../typedefs.js'
 
 import { TREE } from '../commands/TREE.js'
 import { _walk } from '../commands/walk.js'
-import { E, GitError } from '../models/GitError.js'
+import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
@@ -107,7 +107,7 @@ export async function mergeTree({
             })
           }
           // all other types of conflicts fail
-          throw new GitError(E.MergeNotSupportedFail)
+          throw new MergeNotSupportedError()
         }
       }
     },
@@ -224,7 +224,7 @@ async function mergeBlobs({
   })
   if (!cleanMerge) {
     // all other types of conflicts fail
-    throw new GitError(E.MergeNotSupportedFail)
+    throw new MergeNotSupportedError()
   }
   const oid = await writeObject({
     fs,

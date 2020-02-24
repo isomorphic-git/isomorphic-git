@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { readBlob, E } = require('isomorphic-git')
+const { Errors, readBlob } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -19,16 +19,7 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.toJSON()).toMatchInlineSnapshot(`
-      Object {
-        "caller": "git.readBlob",
-        "code": "ReadObjectFail",
-        "data": Object {
-          "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        },
-        "message": "Failed to read git object with oid aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      }
-    `)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
   it('blob', async () => {
     // Setup
@@ -127,7 +118,7 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.ObjectTypeAssertionFail)
+    expect(error instanceof Errors.ObjectTypeError).toBe(true)
   })
   it('with erroneous filepath (directory is a file)', async () => {
     // Setup
@@ -145,7 +136,7 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectoryIsAFileError)
+    expect(error instanceof Errors.ObjectTypeError).toBe(true)
   })
   it('with erroneous filepath (no such directory)', async () => {
     // Setup
@@ -163,7 +154,7 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.TreeOrBlobNotFoundError)
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
   it('with erroneous filepath (leading slash)', async () => {
     // Setup
@@ -181,7 +172,8 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectorySeparatorsError)
+    expect(error instanceof Errors.InvalidFilepathError).toBe(true)
+    expect(error.data.reason).toBe('leading-slash')
   })
   it('with erroneous filepath (trailing slash)', async () => {
     // Setup
@@ -199,6 +191,7 @@ describe('readBlob', () => {
       error = err
     }
     expect(error).not.toBeNull()
-    expect(error.code).toBe(E.DirectorySeparatorsError)
+    expect(error instanceof Errors.InvalidFilepathError).toBe(true)
+    expect(error.data.reason).toBe('trailing-slash')
   })
 })

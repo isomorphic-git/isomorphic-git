@@ -1,11 +1,11 @@
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
+import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join'
 import { normalizeMode } from '../utils/normalizeMode.js'
 import { resolveTree } from '../utils/resolveTree.js'
-
-import { GitTree } from './GitTree.js'
 
 export class GitWalkerRepo {
   constructor({ fs, gitdir, ref }) {
@@ -17,8 +17,8 @@ export class GitWalkerRepo {
       try {
         oid = await GitRefManager.resolve({ fs, gitdir, ref })
       } catch (e) {
-        // Handle fresh branches with no commits
-        if (e.code === E.ResolveRefError) {
+        if (e instanceof NotFoundError) {
+          // Handle fresh branches with no commits
           oid = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
         }
       }
@@ -75,11 +75,7 @@ export class GitWalkerRepo {
     }
     const { type, object } = await readObject({ fs, gitdir, oid })
     if (type !== obj.type) {
-      throw new GitError(E.ObjectTypeAssertionFail, {
-        oid,
-        expected: obj.type,
-        type,
-      })
+      throw new ObjectTypeError(oid, type, obj.type)
     }
     const tree = GitTree.from(object)
     // cache all entries

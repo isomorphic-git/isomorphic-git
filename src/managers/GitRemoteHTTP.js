@@ -1,6 +1,8 @@
 import '../typedefs.js'
 
-import { E, GitError } from '../models/GitError.js'
+import { HttpError } from '../errors/HttpError.js'
+import { SmartHttpError } from '../errors/SmartHttpError.js'
+import { UserCanceledError } from '../errors/UserCanceledError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
 import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
@@ -87,7 +89,7 @@ export class GitRemoteHTTP {
             headers: { ...headers },
           })
           if (auth && auth.cancel) {
-            throw new GitError(E.UserCancelledError)
+            throw new UserCanceledError()
           } else if (auth) {
             updateHeaders(headers, auth)
             providedAuthBefore = true
@@ -104,10 +106,7 @@ export class GitRemoteHTTP {
     } while (tryAgain)
 
     if (res.statusCode !== 200) {
-      throw new GitError(E.HTTPError, {
-        statusCode: res.statusCode,
-        statusMessage: res.statusMessage,
-      })
+      throw new HttpError(res.statusCode, res.statusMessage)
     }
     // Git "smart" HTTP servers should respond with the correct Content-Type header.
     if (
@@ -131,10 +130,7 @@ export class GitRemoteHTTP {
         remoteHTTP.auth = auth
         return remoteHTTP
       } catch (e) {
-        throw new GitError(E.RemoteDoesNotSupportSmartHTTP, {
-          preview,
-          response,
-        })
+        throw new SmartHttpError(preview, response)
       }
     }
   }
@@ -168,10 +164,7 @@ export class GitRemoteHTTP {
       headers,
     })
     if (res.statusCode !== 200) {
-      throw new GitError(E.HTTPError, {
-        statusCode: res.statusCode,
-        statusMessage: res.statusMessage,
-      })
+      throw new HttpError(res.statusCode, res.statusMessage)
     }
     return res
   }

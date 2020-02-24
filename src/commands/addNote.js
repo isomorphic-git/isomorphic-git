@@ -4,8 +4,9 @@ import '../typedefs.js'
 import { _commit } from '../commands/commit.js'
 import { _readTree } from '../commands/readTree.js'
 import { _writeTree } from '../commands/writeTree.js'
+import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { E, GitError } from '../models/GitError.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 /**
@@ -49,7 +50,7 @@ export async function _addNote({
   try {
     parent = await GitRefManager.resolve({ gitdir, fs, ref })
   } catch (err) {
-    if (err.code !== E.ResolveRefError) {
+    if (!(err instanceof NotFoundError)) {
       throw err
     }
   }
@@ -68,10 +69,7 @@ export async function _addNote({
   } else {
     for (const entry of tree) {
       if (entry.path === oid) {
-        throw new GitError(E.NoteAlreadyExistsError, {
-          note: entry.oid,
-          oid,
-        })
+        throw new AlreadyExistsError('note', oid)
       }
     }
   }

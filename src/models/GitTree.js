@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { comparePath } from '../utils/comparePath.js'
 import { compareTreeEntryPath } from '../utils/compareTreeEntryPath.js'
 
@@ -20,9 +20,7 @@ function mode2type(mode) {
     case '120000': return 'blob'
     case '160000': return 'commit'
   }
-  throw new GitError(E.InternalFail, {
-    message: `Unexpected GitTree entry mode: ${mode}`,
-  })
+  throw new InternalError(`Unexpected GitTree entry mode: ${mode}`)
 }
 
 function parseBuffer(buffer) {
@@ -31,15 +29,15 @@ function parseBuffer(buffer) {
   while (cursor < buffer.length) {
     const space = buffer.indexOf(32, cursor)
     if (space === -1) {
-      throw new GitError(E.InternalFail, {
-        message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`,
-      })
+      throw new InternalError(
+        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
+      )
     }
     const nullchar = buffer.indexOf(0, cursor)
     if (nullchar === -1) {
-      throw new GitError(E.InternalFail, {
-        message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`,
-      })
+      throw new InternalError(
+        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
+      )
     }
     let mode = buffer.slice(cursor, space).toString('utf8')
     if (mode === '40000') mode = '040000' // makes it line up neater in printed output
@@ -62,9 +60,7 @@ function limitModeToAllowed(mode) {
   if (mode.match(/^1007.*/)) return '100755' // Regular executable file
   if (mode.match(/^120.*/)) return '120000' // Symbolic link
   if (mode.match(/^160.*/)) return '160000' // Commit (git submodule reference)
-  throw new GitError(E.InternalFail, {
-    message: `Could not understand file mode: ${mode}`,
-  })
+  throw new InternalError(`Could not understand file mode: ${mode}`)
 }
 
 function nudgeIntoShape(entry) {
@@ -85,9 +81,7 @@ export class GitTree {
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {
-      throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitTree constructor',
-      })
+      throw new InternalError('invalid type passed to GitTree constructor')
     }
     // Tree entries are not sorted alphabetically in the usual sense (see `compareTreeEntryPath`)
     // but it is important later on that these be sorted in the same order as they would be returned from readdir.

@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { indent } from '../utils/indent.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
@@ -14,9 +14,7 @@ export class GitCommit {
     } else if (typeof commit === 'object') {
       this._commit = GitCommit.render(commit)
     } else {
-      throw new GitError(E.InternalFail, {
-        message: 'invalid type passed to GitCommit constructor',
-      })
+      throw new InternalError('invalid type passed to GitCommit constructor')
     }
   }
 
@@ -100,9 +98,7 @@ export class GitCommit {
     }
     if (obj.parent) {
       if (obj.parent.length === undefined) {
-        throw new GitError(E.InternalFail, {
-          message: `commit 'parent' property should be an array`,
-        })
+        throw new InternalError(`commit 'parent' property should be an array`)
       }
       for (const p of obj.parent) {
         headers += `parent ${p}\n`

@@ -7,10 +7,13 @@ import { _isDescendent } from '../commands/isDescendent.js'
 import { listCommitsAndTags } from '../commands/listCommitsAndTags.js'
 import { listObjects } from '../commands/listObjects.js'
 import { _pack } from '../commands/pack.js'
+import { GitPushError } from '../errors/GitPushError.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { PushRejectedError } from '../errors/PushRejectedError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
-import { E, GitError } from '../models/GitError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
@@ -60,9 +63,7 @@ export async function _push({
 }) {
   const ref = _ref || (await _currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'ref',
-    })
+    throw new MissingParameterError('ref')
   }
   const config = await GitConfigManager.get({ fs, gitdir })
   // Figure out what remote to use.
@@ -78,16 +79,12 @@ export async function _push({
     (await config.get(`remote.${remote}.pushurl`)) ||
     (await config.get(`remote.${remote}.url`))
   if (typeof url === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remote OR url',
-    })
+    throw new MissingParameterError('remote OR url')
   }
   // Figure out what remote ref to use.
   const remoteRef = _remoteRef || (await config.get(`branch.${ref}.merge`))
   if (typeof url === 'undefined') {
-    throw new GitError(E.MissingRequiredParameterError, {
-      parameter: 'remoteRef',
-    })
+    throw new MissingParameterError('remoteRef')
   }
 
   if (corsProxy === undefined) {
@@ -121,7 +118,7 @@ export async function _push({
         map: httpRemote.refs,
       })
     } catch (err) {
-      if (err.code === E.ExpandRefError) {
+      if (err instanceof NotFoundError) {
         // The remote reference doesn't exist yet.
         // If it is fully specified, use that value. Otherwise, treat it as a branch.
         fullRemoteRef = remoteRef.startsWith('refs/')
@@ -162,7 +159,7 @@ export async function _push({
         fullRef.startsWith('refs/tags') &&
         oldoid !== '0000000000000000000000000000000000000000'
       ) {
-        throw new GitError(E.PushRejectedTagExists, {})
+        throw new PushRejectedError('tag already exists')
       }
       // Is it a non-fast-forward commit?
       if (
@@ -170,7 +167,7 @@ export async function _push({
         oldoid !== '0000000000000000000000000000000000000000' &&
         !(await _isDescendent({ fs, gitdir, oid, ancestor: oldoid, depth: -1 }))
       ) {
-        throw new GitError(E.PushRejectedNonFastForward, {})
+        throw new PushRejectedError('it was not a simple fast-forward')
       }
     }
   }
@@ -234,6 +231,6 @@ export async function _push({
       .filter(([k, v]) => !v.ok)
       .map(([k, v]) => `\n  - ${k}: ${v.error}`)
       .join('')
-    throw new GitError(E.GitPushError, Object.assign({ prettyDetails }, result))
+    throw new GitPushError(prettyDetails, result)
   }
 }
