@@ -32,66 +32,9 @@ The following environments are tested in CI and will continue to be supported un
 </tr>
 </table>
 
-## 1.0 Breaking Changes
+## Upgrading from version 0.x to version 1.x?
 
-### Big changes
-- The supported node & browser versions have been bumped. (See beautiful table above.)
-- The plugin system has been eliminated and we're back to plain old dependency injection via function arguments! The plugin cores created a mysterious "global state" that makes it easy to trip up (I myself sometimes forgot to unset plugins after running tests). The old style of passing `fs` as a function argument was less aesthetic and more verbose, but it is a much simpler model than the plugin core model, and much safer because it makes it impossible for dependencies to accidentally share the default plugin core.
-  - The `emitter` plugin has been replaced with `onMessage` and `onProgress` callbacks.
-  - The `credentialManager` plugin has been replaced with `onAuth`, `onAuthFailure` and `onAuthSuccess` callbacks
-  - The `fs` plugin has been replaced with an `fs` parameter.
-  - The `http` plugin has been replaced with an `http` parameter.
-  - The `pgp` plugin has been replaced with an `onSign` callback.
-- There is an additional setup step to choose which `http` client to use, and functions that make HTTP requests have a new required `http` parameter. Previously I used a mix of bundler and runtime magic to try and pick between a build that used `fetch` and one that used `require('http')` but that didn't always work. For instance, if you were bundling a node application using Webpack, it would pick the wrong build [(#938)](https://github.com/isomorphic-git/isomorphic-git/issues/938). Another example: in an Electron renderer thread, _both_ options could work (if the window is launched with `nodeIntegration: true`) but in a Web Worker thread only the fetch option should work (_unless_ you have `nodeIntegrationInWorker: true` set). See "Getting Started" below to see the extra line of code you need.
-- The files in the package have been renamed so the import paths are short and sweet:
-  - `dist/bundle.umd.min.js` -> `index.umd.min.js`
-  - `dist/for-future/isomorphic-git/index.js` -> `index.js` (the future has arrived)
-  - `dist/for-node/isomorphic-git/index.js` -> `index.cjs`
-
-### Some functions have been renamed or removed:
-- The `walkBeta2` function was renamed to `walk`.
-- The `walkBeta1` function was removed.
-- The `fastCheckout` function has been renamed `checkout` and the old `checkout` has been removed.
-- The (previously deprecated) `sign` function was removed.
-- The (previously deprecated) `utils.auth` function was removed.
-- The (previously deprecated) `utils.oauth2` was removed.
-- The `config` function has been removed and replaced by `getConfig`, `getConfigAll`, and `setConfig`.
-- The `verify` function has been removed, but `log`, `readCommit`, and `readTag` all return the `gpgsig` and signing `payload` now. This actually makes verification simpler and more efficient, because it can be done in batch on `git.log` output and the `gpgsig` itself can be parsed and used to lookup the public key. See [onSign](https://isomorphic-git.org/docs/en/onSign) for complete code examples.
-
-### Some function parameters have been removed or replaced:
-- The undocumented parameter aliases `authUsername` and `authPassword` were removed.
-- The `emitter` parameter was removed and replaced with the `onMessage` and `onProgress` callbacks. (Note that `onMessage` emits un-trimmed strings, so you get those `\r`s.)
-- The `username`, `password`, `token`, and `oauth2format` parameters were removed and replaced with the `onAuth` callback.
-- The `fast` parameter of `pull` was removed, since there is no "slow" implementation anymore.
-- The `signing` parameter of `log` was removed, since `log` will always return a payload.
-- The `pattern` parameter was removed from `statusMatrix` and replaced with a new `filter` function. (This is so we can drop the dependencies on `globalyzer` and `globrex`.)
-- The `newSubmoduleBehavior` parameter was removed and is now the default and only behavior, because it makes much more sense to have non-destructive defaults!
-- The `noSubmodules` parameter was removed because with the new submodule behavior it is no longer necessary to print console warnings about how submodules aren't supported. (When submodule support IS added to isomorphic-git, it will be opt-in using `recurseSubmodules: true` or something like that.)
-- The `autoTranslateSSH` feature was removed, since it is trivial to implement your own version using just the `UnknownTransportError.data.suggestion`
-- The `writeObject` function when used to write a tree now expects a plain array rather than an object with a property called `entries` which is the array. (This is so that argument to `writeObject` has the same shame as the arguments to `writeBlob`/`writeCommit`/`writeTag`/`writeTree`.)
-- The `noOverwrite` parameter was removed from `init` and is the new behavior.
-- The `author.date`, `committer.date`, `tagger.date` parameters were removed in favor of `author.timestamp`, `comitter.timestamp`, `tagger.timestamp` in order to be clear about what is actually written and better reflect the return types in `readCommit`, `log`, and `readTag`.
-
-### The return types of some functions have changed:
-- Functions that used to return `Buffer` objects now return `Uint8Array` objects. (This is so we can eventually remove all internal dependencies on the Buffer browser polyfill, which is quite heavy!)
-- The `log` function now returns an array of the same kind of objects that `readCommit` returns. (This change simplifies the type signature of `log` so we don't need function overloading; that function overloading was the one thing preventing me from auto-generating `index.d.ts`.)
-- The `readObject` function returns a proper discriminated union so TypeScript can infer the type of `.object` once you establish the value of `.format` and `.type`. Also `.object` has the same shape as as the return value of `readBlob`/`readCommit`/`readTag`/`readTree`. (Meaning trees are now plain arrays rather than objects with a `.entries` property that is the array.)
-
-### Some function behaviors have changed
-- The `push` function now pushes to the remote tracking branch (rather than a branch with the same name) by default.
-
-### Docs and DX improvements
-- The `docs/alphabetic.md` and function list in `README.md` are auto-generated from the filenames in `src/api`.
-- Nearly the entire docs website is auto-generated from the JSDoc actually so keeping the docs website and source code in sync is easier.
-- All the example code in JSDoc is now type-checked during CI tests.
-- The live code examples on the website are displayed in a full-blown mobile-friendly code editor (CodeMirror 6).
-- Each page with live code examples includes a code snippet at the bottom to reset the browser file system.
-- The Getting Started guide has been updated.
-- All the example code in JSDoc has been updated.
-
-### Miscellaneous stuff
-- Update the README to recommend LightningFS rather than BrowserFS.
-- The `internal-apis` bundle is no longer included in the published package. Those were only exposed so I could run unit tests and no one should have been using them I hope.
+See the full [Release Notes](https://github.com/isomorphic-git/isomorphic-git/releases/tag/v1.0.0) on GitHub and the release [Blog Post](https://isomorphic-git.org/blog/2020/02/25/version-1-0-0).
 
 ## Install
 
