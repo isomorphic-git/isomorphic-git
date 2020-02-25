@@ -53,21 +53,31 @@ const umdConfig = (input, output, name) => ({
   ],
 })
 
-const template = `{
-  "type": "module",
-  "main": "index.cjs",
-  "module": "index.js",
-  "typings": "index.d.ts"
-}`
+const template = umd =>
+  JSON.stringify(
+    {
+      type: 'module',
+      main: 'index.cjs',
+      module: 'index.js',
+      typings: 'index.d.ts',
+      unpkg: umd ? 'index.umd.js' : undefined,
+    },
+    null,
+    2
+  )
 
 const pkgify = (input, output, name) => {
   fs.mkdirSync(path.join(__dirname, output), { recursive: true })
-  fs.writeFileSync(path.join(__dirname, output, 'package.json'), template)
+  fs.writeFileSync(
+    path.join(__dirname, output, 'package.json'),
+    template(!!name)
+  )
   return [
     ecmaConfig(`${input}/index.js`, `${output}/index.js`),
-    name === 'commonjs'
-      ? nodeConfig(`${input}/index.js`, `${output}/index.cjs`)
-      : umdConfig(`${input}/index.js`, `${output}/index.cjs`, name),
+    nodeConfig(`${input}/index.js`, `${output}/index.cjs`),
+    ...(name
+      ? [umdConfig(`${input}/index.js`, `${output}/index.umd.js`, name)]
+      : []),
   ]
 }
 
@@ -76,6 +86,6 @@ export default [
   nodeConfig('index.js', 'index.cjs'),
   ecmaConfig('internal-apis.js', 'internal-apis.js'),
   nodeConfig('internal-apis.js', 'internal-apis.cjs'),
-  ...pkgify('http/node', 'http/node', 'commonjs'),
+  ...pkgify('http/node', 'http/node'),
   ...pkgify('http/web', 'http/web', 'GitHttp'),
 ]
