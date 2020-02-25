@@ -69,10 +69,6 @@
         "title": "`dir` vs `gitdir`",
         "sidebar_label": "dir vs gitdir"
       },
-      "errors": {
-        "title": "Error Codes",
-        "sidebar_label": "Error Code Index"
-      },
       "expandOid": {
         "title": "expandOid",
         "sidebar_label": "expandOid"

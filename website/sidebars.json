@@ -1,8 +1,7 @@
 {
   "docs": {
     "All Commands": [
-      "alphabetic",
-      "errors"
+      "alphabetic"
     ],
     "Repository": [
       "init",
