@@ -686,6 +686,290 @@
       "version-0.78.0/version-0.78.0-pull": {
         "title": "pull",
         "sidebar_label": "pull"
+      },
+      "version-1.0.x/version-1.0.x-add": {
+        "title": "add",
+        "sidebar_label": "add"
+      },
+      "version-1.0.x/version-1.0.x-addNote": {
+        "title": "addNote",
+        "sidebar_label": "addNote"
+      },
+      "version-1.0.x/version-1.0.x-addRemote": {
+        "title": "addRemote",
+        "sidebar_label": "addRemote"
+      },
+      "version-1.0.x/version-1.0.x-alphabetic": {
+        "title": "All Commands",
+        "sidebar_label": "Alphabetical Index"
+      },
+      "version-1.0.x/version-1.0.x-annotatedTag": {
+        "title": "annotatedTag",
+        "sidebar_label": "annotatedTag"
+      },
+      "version-1.0.x/version-1.0.x-branch": {
+        "title": "branch",
+        "sidebar_label": "branch"
+      },
+      "version-1.0.x/version-1.0.x-checkout": {
+        "title": "checkout",
+        "sidebar_label": "checkout"
+      },
+      "version-1.0.x/version-1.0.x-clone": {
+        "title": "clone",
+        "sidebar_label": "clone"
+      },
+      "version-1.0.x/version-1.0.x-commit": {
+        "title": "commit",
+        "sidebar_label": "commit"
+      },
+      "version-1.0.x/version-1.0.x-currentBranch": {
+        "title": "currentBranch",
+        "sidebar_label": "currentBranch"
+      },
+      "version-1.0.x/version-1.0.x-deleteBranch": {
+        "title": "deleteBranch",
+        "sidebar_label": "deleteBranch"
+      },
+      "version-1.0.x/version-1.0.x-deleteRef": {
+        "title": "deleteRef",
+        "sidebar_label": "deleteRef"
+      },
+      "version-1.0.x/version-1.0.x-deleteRemote": {
+        "title": "deleteRemote",
+        "sidebar_label": "deleteRemote"
+      },
+      "version-1.0.x/version-1.0.x-deleteTag": {
+        "title": "deleteTag",
+        "sidebar_label": "deleteTag"
+      },
+      "version-1.0.x/version-1.0.x-expandOid": {
+        "title": "expandOid",
+        "sidebar_label": "expandOid"
+      },
+      "version-1.0.x/version-1.0.x-expandRef": {
+        "title": "expandRef",
+        "sidebar_label": "expandRef"
+      },
+      "version-1.0.x/version-1.0.x-faq": {
+        "title": "Frequently Asked Questions",
+        "sidebar_label": "FAQ"
+      },
+      "version-1.0.x/version-1.0.x-fetch": {
+        "title": "fetch",
+        "sidebar_label": "fetch"
+      },
+      "version-1.0.x/version-1.0.x-findMergeBase": {
+        "title": "findMergeBase",
+        "sidebar_label": "findMergeBase"
+      },
+      "version-1.0.x/version-1.0.x-findRoot": {
+        "title": "findRoot",
+        "sidebar_label": "findRoot"
+      },
+      "version-1.0.x/version-1.0.x-fs": {
+        "title": "fs",
+        "sidebar_label": "fs"
+      },
+      "version-1.0.x/version-1.0.x-getConfig": {
+        "title": "getConfig",
+        "sidebar_label": "getConfig"
+      },
+      "version-1.0.x/version-1.0.x-getConfigAll": {
+        "title": "getConfigAll",
+        "sidebar_label": "getConfigAll"
+      },
+      "version-1.0.x/version-1.0.x-getRemoteInfo": {
+        "title": "getRemoteInfo",
+        "sidebar_label": "getRemoteInfo"
+      },
+      "version-1.0.x/version-1.0.x-quickstart": {
+        "title": "Quick Start",
+        "sidebar_label": "Quick Start"
+      },
+      "version-1.0.x/version-1.0.x-webworker": {
+        "title": "WebWorker Example",
+        "sidebar_label": "WebWorker Example"
+      },
+      "version-1.0.x/version-1.0.x-hashBlob": {
+        "title": "hashBlob",
+        "sidebar_label": "hashBlob"
+      },
+      "version-1.0.x/version-1.0.x-headers": {
+        "title": "headers",
+        "sidebar_label": "headers"
+      },
+      "version-1.0.x/version-1.0.x-http": {
+        "title": "http",
+        "sidebar_label": "http"
+      },
+      "version-1.0.x/version-1.0.x-indexPack": {
+        "title": "indexPack",
+        "sidebar_label": "indexPack"
+      },
+      "version-1.0.x/version-1.0.x-init": {
+        "title": "init",
+        "sidebar_label": "init"
+      },
+      "version-1.0.x/version-1.0.x-isDescendent": {
+        "title": "isDescendent",
+        "sidebar_label": "isDescendent"
+      },
+      "version-1.0.x/version-1.0.x-listBranches": {
+        "title": "listBranches",
+        "sidebar_label": "listBranches"
+      },
+      "version-1.0.x/version-1.0.x-listFiles": {
+        "title": "listFiles",
+        "sidebar_label": "listFiles"
+      },
+      "version-1.0.x/version-1.0.x-listNotes": {
+        "title": "listNotes",
+        "sidebar_label": "listNotes"
+      },
+      "version-1.0.x/version-1.0.x-listRemotes": {
+        "title": "listRemotes",
+        "sidebar_label": "listRemotes"
+      },
+      "version-1.0.x/version-1.0.x-listTags": {
+        "title": "listTags",
+        "sidebar_label": "listTags"
+      },
+      "version-1.0.x/version-1.0.x-log": {
+        "title": "log",
+        "sidebar_label": "log"
+      },
+      "version-1.0.x/version-1.0.x-merge": {
+        "title": "merge",
+        "sidebar_label": "merge"
+      },
+      "version-1.0.x/version-1.0.x-onAuth": {
+        "title": "onAuth",
+        "sidebar_label": "onAuth"
+      },
+      "version-1.0.x/version-1.0.x-onAuthFailure": {
+        "title": "onAuthFailure",
+        "sidebar_label": "onAuthFailure"
+      },
+      "version-1.0.x/version-1.0.x-onAuthSuccess": {
+        "title": "onAuthSuccess",
+        "sidebar_label": "onAuthSuccess"
+      },
+      "version-1.0.x/version-1.0.x-onMessage": {
+        "title": "onMessage",
+        "sidebar_label": "onMessage"
+      },
+      "version-1.0.x/version-1.0.x-onProgress": {
+        "title": "onProgress",
+        "sidebar_label": "onProgress"
+      },
+      "version-1.0.x/version-1.0.x-onSign": {
+        "title": "onSign",
+        "sidebar_label": "onSign"
+      },
+      "version-1.0.x/version-1.0.x-packObjects": {
+        "title": "packObjects",
+        "sidebar_label": "packObjects"
+      },
+      "version-1.0.x/version-1.0.x-pull": {
+        "title": "pull",
+        "sidebar_label": "pull"
+      },
+      "version-1.0.x/version-1.0.x-push": {
+        "title": "push",
+        "sidebar_label": "push"
+      },
+      "version-1.0.x/version-1.0.x-readBlob": {
+        "title": "readBlob",
+        "sidebar_label": "readBlob"
+      },
+      "version-1.0.x/version-1.0.x-readCommit": {
+        "title": "readCommit",
+        "sidebar_label": "readCommit"
+      },
+      "version-1.0.x/version-1.0.x-readNote": {
+        "title": "readNote",
+        "sidebar_label": "readNote"
+      },
+      "version-1.0.x/version-1.0.x-readObject": {
+        "title": "readObject",
+        "sidebar_label": "readObject"
+      },
+      "version-1.0.x/version-1.0.x-readTag": {
+        "title": "readTag",
+        "sidebar_label": "readTag"
+      },
+      "version-1.0.x/version-1.0.x-readTree": {
+        "title": "readTree",
+        "sidebar_label": "readTree"
+      },
+      "version-1.0.x/version-1.0.x-remove": {
+        "title": "remove",
+        "sidebar_label": "remove"
+      },
+      "version-1.0.x/version-1.0.x-removeNote": {
+        "title": "removeNote",
+        "sidebar_label": "removeNote"
+      },
+      "version-1.0.x/version-1.0.x-resetIndex": {
+        "title": "resetIndex",
+        "sidebar_label": "resetIndex"
+      },
+      "version-1.0.x/version-1.0.x-resolveRef": {
+        "title": "resolveRef",
+        "sidebar_label": "resolveRef"
+      },
+      "version-1.0.x/version-1.0.x-setConfig": {
+        "title": "setConfig",
+        "sidebar_label": "setConfig"
+      },
+      "version-1.0.x/version-1.0.x-snippets": {
+        "title": "Useful Code Snippets",
+        "sidebar_label": "Useful Snippets"
+      },
+      "version-1.0.x/version-1.0.x-status": {
+        "title": "status",
+        "sidebar_label": "status"
+      },
+      "version-1.0.x/version-1.0.x-statusMatrix": {
+        "title": "statusMatrix",
+        "sidebar_label": "statusMatrix"
+      },
+      "version-1.0.x/version-1.0.x-tag": {
+        "title": "tag",
+        "sidebar_label": "tag"
+      },
+      "version-1.0.x/version-1.0.x-version": {
+        "title": "version",
+        "sidebar_label": "version"
+      },
+      "version-1.0.x/version-1.0.x-walk": {
+        "title": "walk",
+        "sidebar_label": "walk"
+      },
+      "version-1.0.x/version-1.0.x-writeBlob": {
+        "title": "writeBlob",
+        "sidebar_label": "writeBlob"
+      },
+      "version-1.0.x/version-1.0.x-writeCommit": {
+        "title": "writeCommit",
+        "sidebar_label": "writeCommit"
+      },
+      "version-1.0.x/version-1.0.x-writeObject": {
+        "title": "writeObject",
+        "sidebar_label": "writeObject"
+      },
+      "version-1.0.x/version-1.0.x-writeRef": {
+        "title": "writeRef",
+        "sidebar_label": "writeRef"
+      },
+      "version-1.0.x/version-1.0.x-writeTag": {
+        "title": "writeTag",
+        "sidebar_label": "writeTag"
+      },
+      "version-1.0.x/version-1.0.x-writeTree": {
+        "title": "writeTree",
+        "sidebar_label": "writeTree"
       }
     },
     "links": {
