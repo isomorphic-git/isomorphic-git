@@ -36,7 +36,7 @@ git.getRemoteInfo({ http, url: 'https://github.com/isomorphic-git/isomorphic-git
 
 If you are using ES modules directly, you can import it like this:
 ```js
-import http from 'https://unpkg.com/isomorphic-git@1/http/web/index.js'
+import http from 'https://unpkg.com/isomorphic-git/http/web/index.js'
 ```
 
 If you need to use a script tag (such as in a [WebWorker](./guide-webworker)), then use the UMD build. But note that the global var is called `GitHttp` not `http` because I was worried that would be too generic:

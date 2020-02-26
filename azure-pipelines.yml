@@ -49,10 +49,6 @@ jobs:
           summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
           reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
 
-      - script: npm pack
-        displayName: 'Prepare installable tarball'
-        condition: succeededOrFailed()
-
       - task: PublishBuildArtifacts@1
         displayName: 'Save npm-tarball.tgz'
         condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
