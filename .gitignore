@@ -29,6 +29,8 @@ private.key
 # Website Stuff
 /website/build/
 /website/node_modules
+/website/static/js/isomorphic-git
+/website/static/js/codemirrorify.js
 /website/translated_docs
 /website/yarn.lock
 /website/i18n/*
