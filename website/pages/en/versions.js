@@ -5,19 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const React = require('react');
+const React = require('react')
 
-const CompLibrary = require('../../core/CompLibrary');
+const CompLibrary = require('../../core/CompLibrary')
 
-const Container = CompLibrary.Container;
+const Container = CompLibrary.Container
 
-const CWD = process.cwd();
+const CWD = process.cwd()
 
-const versions = require(`${CWD}/versions.json`);
+const versions = require(`${CWD}/versions.json`)
 
 function Versions(props) {
-  const {config: siteConfig} = props;
-  const latestVersion = versions[0];
+  const { config: siteConfig } = props
+  const latestVersion = versions[0]
   return (
     <div className="docMainWrapper wrapper">
       <Container className="mainContainer versionsContainer">
@@ -43,27 +43,6 @@ function Versions(props) {
               </tr>
             </tbody>
           </table>
-          <h3 id="rc">Upcoming versions</h3>
-          <p>
-            The 1.0 release is planned for sometime in February / early March. Originally it was to coincide with the stable release of the new Chromium-based <a href="https://blogs.windows.com/msedgedev/2019/11/04/edge-chromium-release-candidate-get-ready/#QU89TOA8e8dE8Hev.97">Micorosoft Edge</a> in January 2020, so that we can drop support for the old Edge browser. However, I keep discovering breaking changes I want to make to improve the library.
-          </p>
-          <table className="versions">
-            <tbody>
-              <tr>
-                <th>1.0.0-beta.X</th>
-                <td>
-                  {/* You are supposed to change this href where appropriate
-                        Example: href="<baseUrl>/docs(/:language)/next/:id" */}
-                  <a
-                    href={`${siteConfig.baseUrl}${siteConfig.docsUrl}/${
-                      props.language ? props.language + '/' : ''
-                    }next/alphabetic`}>
-                    Documentation
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
           <h3 id="archive">Past Versions</h3>
           <table className="versions">
             <tbody>
@@ -83,14 +62,14 @@ function Versions(props) {
                         </a>
                       </td>
                     </tr>
-                  ),
+                  )
               )}
             </tbody>
           </table>
         </div>
       </Container>
     </div>
-  );
+  )
 }
 
-module.exports = Versions;
+module.exports = Versions
