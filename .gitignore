@@ -69,7 +69,6 @@ node_modules
 .env
 
 # AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE
-docs/errors.md
 docs/add.md
 docs/addNote.md
 docs/addRemote.md

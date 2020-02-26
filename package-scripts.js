@@ -52,7 +52,8 @@ module.exports = {
         'build.indexjson',
         'build.treeshake',
         'build.docs',
-        'build.size'
+        'build.size',
+        'build.pack'
       ),
       rollup: 'rollup -c --no-treeshake',
       typings: 'tsc -p declaration.tsconfig.json',
@@ -71,6 +72,7 @@ module.exports = {
               `bundlewatch`
           )
         : optional(`cross-env bundlewatch`),
+      pack: 'npm pack',
     },
     website: {
       default: process.env.CI
