@@ -29,8 +29,6 @@ The example below will use MagicPortal.
 Here is a complete example that runs git in a WebWorker.
 The worker wraps some git functions and exposes them to the main thread, while the main thread exposes some functions to the worker for use in callbacks like `onProgress`, `onMessage`, and `onAuth`.
 
-Gist: https://gist.github.com/wmhilton/c311070034bc8d99e3e82d97636d0fd8
-
 <iframe
   src="https://codesandbox.io/embed/magic-portal-with-isomorphic-git-ejdoo?fontsize=14&hidenavigation=1&module=%2Fworker.js&theme=dark"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"

@@ -142,20 +142,11 @@ async function gendoc(file, filepath) {
     /\{import\('..\/models\/FileSystem\.js'\)\.FileSystem\}/g,
     '{FileSystem}'
   )
-  let ast
-  try {
-    ast = await jsdoc.explain({ source: file })
-  } catch (e) {
-    // Don't complain about this one particular known issue which is a TS tuple type.
-    if (
-      !e.message.includes(
-        'tag title "typedef" and text "{[string, HeadStatus, WorkdirStatus, StageStatus]} StatusRow"'
-      )
-    ) {
-      console.log(`Unable to parse ${filepath}`, e.message)
-    }
-    return ''
-  }
+  file = file.replace(
+    /\{\[string, HeadStatus, WorkdirStatus, StageStatus\]\}/g,
+    '{Array<string|number>}'
+  )
+  const ast = await jsdoc.explain({ source: file })
   let text = ''
   for (const obj of ast) {
     if (!obj.undocumented) {
@@ -298,7 +289,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/${obj.name}.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/${obj.name}.js';
   }
 })();
 </script>`
@@ -321,7 +312,6 @@ console.log('done')
   )
   gitignoreContent = gitignoreContent.slice(0, idx)
   gitignoreContent += '# AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE\n'
-  gitignoreContent += 'docs/errors.md\n'
 
   const oid = await git.resolveRef({ fs, dir, ref })
   const { tree } = await git.readTree({
@@ -381,10 +371,6 @@ ${docs
   .map(doc => doc.replace(/^docs\/(.*)\.md$/, '$1'))
   .map(doc => `- [${doc}](${doc})`)
   .join('\n')}
-
-# Errors
-(added here so Algolia indexes the page)
-- [Error Code Index](errors)
 `
     fs.writeFileSync(alphabeticFile, contents)
   }

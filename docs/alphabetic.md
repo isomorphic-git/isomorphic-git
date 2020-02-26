@@ -61,7 +61,3 @@ sidebar_label: Alphabetical Index
 - [writeRef](writeRef)
 - [writeTag](writeTag)
 - [writeTree](writeTree)
-
-# Errors
-(added here so Algolia indexes the page)
-- [Error Code Index](errors)
