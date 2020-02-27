@@ -31,7 +31,7 @@ import { fromNodeStream } from '../../utils/fromNodeStream.js'
 /**
  * HttpClient
  *
- * @param {GitHttpRequest} request
+ * @param {GitHttpRequest & {onProgress: ProgressCallback}} request
  * @returns {Promise<GitHttpResponse>}
  */
 export async function request({
