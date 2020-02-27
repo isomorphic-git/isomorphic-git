@@ -3,26 +3,28 @@
 import { _checkout } from '../commands/checkout.js'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _fetch } from '../commands/fetch.js'
-import { _getConfig } from '../commands/getConfig.js'
 import { _merge } from '../commands/merge.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {HttpClient} args.http - an HTTP client
- * @param {ProgressCallback} [args.onProgress] - optional progress event callback
- * @param {MessageCallback} [args.onMessage] - optional message event callback
- * @param {AuthCallback} [args.onAuth] - optional auth fill callback
- * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
- * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
+ * @param {HttpClient} args.http
+ * @param {ProgressCallback} [args.onProgress]
+ * @param {MessageCallback} [args.onMessage]
+ * @param {AuthCallback} [args.onAuth]
+ * @param {AuthFailureCallback} [args.onAuthFailure]
+ * @param {AuthSuccessCallback} [args.onAuthSuccess]
  * @param {string} args.dir
  * @param {string} args.gitdir
- * @param {string} args.ref - Which branch to fetch. By default this is the currently checked out branch.
- * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
+ * @param {string} args.ref
+ * @param {string} [args.url]
+ * @param {string} [args.remote]
+ * @param {string} [args.remoteRef]
+ * @param {string} [args.corsProxy]
  * @param {boolean} args.singleBranch
  * @param {boolean} args.fastForwardOnly
- * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {Object<string, string>} [args.headers]
  * @param {Object} args.author
  * @param {string} args.author.name
  * @param {string} args.author.email
@@ -33,7 +35,7 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
  * @param {string} args.committer.email
  * @param {number} args.committer.timestamp
  * @param {number} args.committer.timezoneOffset
- * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
+ * @param {string} [args.signingKey]
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -49,6 +51,9 @@ export async function _pull({
   dir,
   gitdir,
   ref,
+  url,
+  remote,
+  remoteRef,
   fastForwardOnly,
   corsProxy,
   singleBranch,
@@ -67,12 +72,7 @@ export async function _pull({
       }
       ref = head
     }
-    // Fetch from the correct remote.
-    const remote = await _getConfig({
-      fs,
-      gitdir,
-      path: `branch.${ref}.remote`,
-    })
+
     const { fetchHead, fetchHeadDescription } = await _fetch({
       fs,
       http,
@@ -84,7 +84,9 @@ export async function _pull({
       gitdir,
       corsProxy,
       ref,
+      url,
       remote,
+      remoteRef,
       singleBranch,
       headers,
     })
