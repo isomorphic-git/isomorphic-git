@@ -783,6 +783,10 @@
         "title": "getRemoteInfo",
         "sidebar_label": "getRemoteInfo"
       },
+      "version-1.0.x/version-1.0.x-browser": {
+        "title": "Browser Quick Start",
+        "sidebar_label": "Browser Quick Start"
+      },
       "version-1.0.x/version-1.0.x-quickstart": {
         "title": "Quick Start",
         "sidebar_label": "Quick Start"
