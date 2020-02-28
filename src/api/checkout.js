@@ -68,8 +68,6 @@ export async function checkout({
   noCheckout = false,
   noUpdateHead = _ref === undefined,
   dryRun = false,
-  // @ts-ignore
-  debug = false,
   force = false,
 }) {
   try {
@@ -89,7 +87,6 @@ export async function checkout({
       noCheckout,
       noUpdateHead,
       dryRun,
-      debug,
       force,
     })
   } catch (err) {
