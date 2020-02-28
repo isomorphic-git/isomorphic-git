@@ -159,6 +159,8 @@ async function gendoc(file, filepath) {
       text += `---\n`
       text += `title: ${obj.name}\n`
       text += `sidebar_label: ${obj.name}\n`
+      text += `id: version-1.x-${obj.name}\n`
+      text += `original_id: ${obj.name}\n`
       text += `---\n`
       if (obj.deprecated) {
         text += `\n${obj.deprecated}\n`
@@ -301,9 +303,14 @@ console.log('done')
 
 ;(async () => {
   const docDir = path.join(__dirname, '..', '..', 'docs')
-  if (!fs.existsSync(docDir)) {
-    fs.mkdirSync(docDir)
-  }
+  const docDir2 = path.join(
+    __dirname,
+    '..',
+    '..',
+    'website',
+    'versioned_docs',
+    'version-1.x'
+  )
 
   const gitignorePath = path.join(__dirname, '..', '..', '.gitignore')
   let gitignoreContent = fs.readFileSync(gitignorePath, 'utf8')
@@ -338,6 +345,7 @@ console.log('done')
     if (doctext !== '') {
       const docfilename = name.replace(/js$/, 'md')
       fs.writeFileSync(path.join(docDir, docfilename), doctext)
+      fs.writeFileSync(path.join(docDir2, docfilename), doctext)
       docs.push(`docs/${docfilename}`)
     }
   }
