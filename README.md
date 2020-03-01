@@ -315,6 +315,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://justamouse.com"><img src="https://avatars0.githubusercontent.com/u/1086421?v=4" width="60px;" alt="Clemens Wolff"/><br /><sub><b>Clemens Wolff</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=c-w" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=c-w" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=c-w" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://sojin.io"><img src="https://avatars1.githubusercontent.com/u/3102175?v=4" width="60px;" alt="Sojin Park"/><br /><sub><b>Sojin Park</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=raon0211" title="Code">💻</a></td>
     <td align="center"><a href="http://eaf4.com"><img src="https://avatars0.githubusercontent.com/u/319282?v=4" width="60px;" alt="Edward Faulkner"/><br /><sub><b>Edward Faulkner</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=ef4" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/KSXGitHub"><img src="https://avatars2.githubusercontent.com/u/11488886?v=4" width="60px;" alt="Khải"/><br /><sub><b>Khải</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3AKSXGitHub" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 

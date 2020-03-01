@@ -56,7 +56,8 @@ module.exports = {
         'build.pack'
       ),
       rollup: 'rollup -c --no-treeshake',
-      typings: 'tsc -p declaration.tsconfig.json',
+      typings:
+        'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
       webpack: 'webpack',
       indexjson: `node __tests__/__helpers__/make_http_index.js`,
       treeshake: 'agadoo',
