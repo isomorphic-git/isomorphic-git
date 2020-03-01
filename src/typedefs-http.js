@@ -18,7 +18,7 @@
  * @property {Object<string, string>} [headers={}] - Headers to include in the HTTP request
  * @property {AsyncIterableIterator<Uint8Array>} [body] - An async iterator of Uint8Arrays that make up the body of POST requests
  * @property {ProgressCallback} [onProgress] - Reserved for future use (emitting `GitProgressEvent`s)
- * @property {AbortSignal} [signal] - Reserved for future use (canceling a request)
+ * @property {object} [signal] - Reserved for future use (canceling a request)
  */
 
 /**
