@@ -46,6 +46,7 @@
     "index.d.ts",
     "index.js",
     "index.umd.min.js",
+    "index.umd.min.d.ts",
     "index.umd.min.js.map",
     "size_report.html"
   ],
