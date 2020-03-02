@@ -84,7 +84,8 @@ const siteConfig = {
     apiKey: 'ac63b0df4513e31143eef156f520056c',
     indexName: 'isomorphic_git',
     algoliaOptions: {
-      typoTolerance: 'min'
+      typoTolerance: 'min',
+      facetFilters: [ "language:LANGUAGE", "version:VERSION" ],
     }
   },
   cleanUrl: true,
