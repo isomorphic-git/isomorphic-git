@@ -13,7 +13,6 @@
       "version-1.x-push",
       "version-1.x-pull",
       "version-1.x-merge",
-      "version-1.x-verify",
       "version-1.x-walk"
     ],
     "Callbacks": [

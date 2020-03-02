@@ -13,7 +13,6 @@
       "push",
       "pull",
       "merge",
-      "verify",
       "walk"
     ],
     "Callbacks": [

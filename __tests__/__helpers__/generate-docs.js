@@ -341,11 +341,13 @@ console.log('done')
       filepath: `${prefix}/${name}`,
     })
     const filetext = Buffer.from(blob).toString('utf8')
-    const doctext = await gendoc(filetext, name)
+    let doctext = await gendoc(filetext, name)
     if (doctext !== '') {
       const docfilename = name.replace(/js$/, 'md')
-      fs.writeFileSync(path.join(docDir, docfilename), doctext)
       fs.writeFileSync(path.join(docDir2, docfilename), doctext)
+      doctext = doctext.replace(/\nid: version-1\.x-.*\n/, '\n')
+      doctext = doctext.replace(/\noriginal_id: .*\n/, '\n')
+      fs.writeFileSync(path.join(docDir, docfilename), doctext)
       docs.push(`docs/${docfilename}`)
     }
   }
