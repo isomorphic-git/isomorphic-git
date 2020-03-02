@@ -5,7 +5,7 @@ id: version-1.x-onSign
 original_id: onSign
 ---
 
-In order to use the PGP signing feature of [commit](./commit.md), you have to provide a PGP signing callback like so:
+In order to use the PGP signing feature of [commit](./commit), you have to provide a PGP signing callback like so:
 
 ```js
 import { pgp } from '@isomorphic-git/pgp-plugin'

@@ -723,6 +723,9 @@
         "title": "commit",
         "sidebar_label": "commit"
       },
+      "version-1.x/version-1.x-config": {
+        "title": "version-1.x/version-1.x-config"
+      },
       "version-1.x/version-1.x-currentBranch": {
         "title": "currentBranch",
         "sidebar_label": "currentBranch"
@@ -743,6 +746,9 @@
         "title": "deleteTag",
         "sidebar_label": "deleteTag"
       },
+      "version-1.x/version-1.x-errors": {
+        "title": "version-1.x/version-1.x-errors"
+      },
       "version-1.x/version-1.x-expandOid": {
         "title": "expandOid",
         "sidebar_label": "expandOid"
@@ -754,6 +760,9 @@
       "version-1.x/version-1.x-faq": {
         "title": "Frequently Asked Questions",
         "sidebar_label": "FAQ"
+      },
+      "version-1.x/version-1.x-fastCheckout": {
+        "title": "version-1.x/version-1.x-fastCheckout"
       },
       "version-1.x/version-1.x-fetch": {
         "title": "fetch",
@@ -786,6 +795,10 @@
       "version-1.x/version-1.x-browser": {
         "title": "Browser Quick Start",
         "sidebar_label": "Browser Quick Start"
+      },
+      "version-1.x/version-1.x-cli": {
+        "title": "isogit CLI",
+        "sidebar_label": "isogit CLI"
       },
       "version-1.x/version-1.x-quickstart": {
         "title": "Quick Start",
@@ -875,6 +888,21 @@
         "title": "packObjects",
         "sidebar_label": "packObjects"
       },
+      "version-1.x/version-1.x-plugin_credentialManager": {
+        "title": "version-1.x/version-1.x-plugin_credentialManager"
+      },
+      "version-1.x/version-1.x-plugin_emitter": {
+        "title": "version-1.x/version-1.x-plugin_emitter"
+      },
+      "version-1.x/version-1.x-plugin_fs": {
+        "title": "version-1.x/version-1.x-plugin_fs"
+      },
+      "version-1.x/version-1.x-plugin_http": {
+        "title": "version-1.x/version-1.x-plugin_http"
+      },
+      "version-1.x/version-1.x-plugin_pgp": {
+        "title": "version-1.x/version-1.x-plugin_pgp"
+      },
       "version-1.x/version-1.x-pull": {
         "title": "pull",
         "sidebar_label": "pull"
@@ -927,9 +955,15 @@
         "title": "setConfig",
         "sidebar_label": "setConfig"
       },
+      "version-1.x/version-1.x-sign": {
+        "title": "version-1.x/version-1.x-sign"
+      },
       "version-1.x/version-1.x-snippets": {
         "title": "Useful Code Snippets",
         "sidebar_label": "Useful Snippets"
+      },
+      "version-1.x/version-1.x-STAGE": {
+        "title": "version-1.x/version-1.x-STAGE"
       },
       "version-1.x/version-1.x-status": {
         "title": "status",
@@ -943,6 +977,12 @@
         "title": "tag",
         "sidebar_label": "tag"
       },
+      "version-1.x/version-1.x-TREE": {
+        "title": "version-1.x/version-1.x-TREE"
+      },
+      "version-1.x/version-1.x-verify": {
+        "title": "version-1.x/version-1.x-verify"
+      },
       "version-1.x/version-1.x-version": {
         "title": "version",
         "sidebar_label": "version"
@@ -950,6 +990,15 @@
       "version-1.x/version-1.x-walk": {
         "title": "walk",
         "sidebar_label": "walk"
+      },
+      "version-1.x/version-1.x-walkBeta1": {
+        "title": "version-1.x/version-1.x-walkBeta1"
+      },
+      "version-1.x/version-1.x-walkBeta2": {
+        "title": "version-1.x/version-1.x-walkBeta2"
+      },
+      "version-1.x/version-1.x-WORKDIR": {
+        "title": "version-1.x/version-1.x-WORKDIR"
       },
       "version-1.x/version-1.x-writeBlob": {
         "title": "writeBlob",
