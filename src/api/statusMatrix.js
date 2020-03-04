@@ -151,7 +151,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @see StatusRow
  */
 export async function statusMatrix({
-  fs,
+  fs: _fs,
   dir,
   gitdir = join(dir, '.git'),
   ref = 'HEAD',
@@ -159,12 +159,13 @@ export async function statusMatrix({
   filter,
 }) {
   try {
-    assertParameter('fs', fs)
+    assertParameter('fs', _fs)
     assertParameter('gitdir', gitdir)
     assertParameter('ref', ref)
 
+    const fs = new FileSystem(_fs)
     return await _walk({
-      fs: new FileSystem(fs),
+      fs,
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],
