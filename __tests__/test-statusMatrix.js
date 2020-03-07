@@ -62,6 +62,17 @@ describe('statusMatrix', () => {
     expect(b).toEqual([['b.txt', 0, 2, 2]])
   })
 
+  it('statusMatrix in an fresh git repo with no commits and .gitignore', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, '.gitignore'), 'ignoreme.txt\n')
+    await fs.write(path.join(dir, 'ignoreme.txt'), 'ignored')
+    await add({ fs, dir, gitdir, filepath: '.' })
+    // Test
+    const a = await statusMatrix({ fs, dir, gitdir })
+    expect(a).toEqual([['.gitignore', 0, 2, 2]])
+  })
+
   it('statusMatrix with filepaths', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
