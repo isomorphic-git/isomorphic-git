@@ -237,7 +237,7 @@ export async function readObject({
           result.object = GitCommit.from(result.object).parse()
           break
         case 'tree':
-          result.object = { entries: GitTree.from(result.object).entries() }
+          result.object = GitTree.from(result.object).entries()
           break
         case 'blob':
           // Here we consider returning a raw Buffer as the 'content' format
