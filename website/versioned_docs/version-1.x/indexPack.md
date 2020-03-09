@@ -7,14 +7,14 @@ original_id: indexPack
 
 Create the .idx file for a given .pack file
 
-| param                      | type [= default]          | description                                         |
-| -------------------------- | ------------------------- | --------------------------------------------------- |
-| [**fs**](./fs)             | FsClient                  | a file system client                                |
-| [onProgress](./onProgress) | ProgressCallback          | optional progress event callback                    |
-| **dir**                    | string                    | The [working tree](dir-vs-gitdir.md) directory path |
-| **gitdir**                 | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path          |
-| **filepath**               | string                    | The path to the .pack file to index                 |
-| return                     | Promise\<void\>           | Resolves when filesystem operations are complete    |
+| param                      | type [= default]                   | description                                                            |
+| -------------------------- | ---------------------------------- | ---------------------------------------------------------------------- |
+| [**fs**](./fs)             | FsClient                           | a file system client                                                   |
+| [onProgress](./onProgress) | ProgressCallback                   | optional progress event callback                                       |
+| **dir**                    | string                             | The [working tree](dir-vs-gitdir.md) directory path                    |
+| **gitdir**                 | string = join(dir,'.git')          | The [git directory](dir-vs-gitdir.md) path                             |
+| **filepath**               | string                             | The path to the .pack file to index                                    |
+| return                     | Promise\<{oids: Array\<string\>}\> | Resolves with a list of the SHA-1 object ids contained in the packfile |
 
 Example Code:
 
@@ -23,7 +23,7 @@ let packfiles = await fs.promises.readdir('/tutorial/.git/objects/pack')
 packfiles = packfiles.filter(name => name.endsWith('.pack'))
 console.log('packfiles', packfiles)
 
-await git.indexPack({
+const { oids } = await git.indexPack({
   fs,
   dir: '/tutorial',
   filepath: `.git/objects/pack/${packfiles[0]}`,
@@ -31,7 +31,7 @@ await git.indexPack({
     console.log(`${evt.phase}: ${evt.loaded} / ${evt.total}`)
   }
 })
-console.log('done')
+console.log(oids)
 ```
 
 

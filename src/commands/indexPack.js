@@ -11,7 +11,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.gitdir
  * @param {string} args.filepath
  *
- * @returns {Promise<void>}
+ * @returns {Promise<{oids: string[]}>}
  */
 export async function _indexPack({ fs, onProgress, dir, gitdir, filepath }) {
   try {
@@ -24,6 +24,9 @@ export async function _indexPack({ fs, onProgress, dir, gitdir, filepath }) {
       onProgress,
     })
     await fs.write(filepath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
+    return {
+      oids: [...idx.hashes],
+    }
   } catch (err) {
     err.caller = 'git.indexPack'
     throw err
