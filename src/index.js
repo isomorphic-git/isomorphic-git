@@ -18,6 +18,7 @@ import { deleteRemote } from './api/deleteRemote.js'
 import { deleteTag } from './api/deleteTag.js'
 import { expandOid } from './api/expandOid.js'
 import { expandRef } from './api/expandRef.js'
+import { fastForward } from './api/fastForward.js'
 import { fetch } from './api/fetch.js'
 import { findMergeBase } from './api/findMergeBase.js'
 import { findRoot } from './api/findRoot.js'
@@ -86,6 +87,7 @@ export {
   deleteTag,
   expandOid,
   expandRef,
+  fastForward,
   fetch,
   findMergeBase,
   findRoot,
@@ -151,6 +153,7 @@ export default {
   deleteTag,
   expandOid,
   expandRef,
+  fastForward,
   fetch,
   findMergeBase,
   findRoot,
