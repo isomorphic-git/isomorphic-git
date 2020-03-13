@@ -19,6 +19,7 @@ sidebar_label: Alphabetical Index
 - [deleteTag](deleteTag)
 - [expandOid](expandOid)
 - [expandRef](expandRef)
+- [fastForward](fastForward)
 - [fetch](fetch)
 - [findMergeBase](findMergeBase)
 - [findRoot](findRoot)

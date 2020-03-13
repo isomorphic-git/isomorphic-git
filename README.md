@@ -156,6 +156,7 @@ unless there is a major version bump.
 - [deleteTag](https://isomorphic-git.github.io/docs/deleteTag.html)
 - [expandOid](https://isomorphic-git.github.io/docs/expandOid.html)
 - [expandRef](https://isomorphic-git.github.io/docs/expandRef.html)
+- [fastForward](https://isomorphic-git.github.io/docs/fastForward.html)
 - [fetch](https://isomorphic-git.github.io/docs/fetch.html)
 - [findMergeBase](https://isomorphic-git.github.io/docs/findMergeBase.html)
 - [findRoot](https://isomorphic-git.github.io/docs/findRoot.html)

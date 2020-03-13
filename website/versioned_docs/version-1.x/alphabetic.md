@@ -21,6 +21,7 @@ original_id: alphabetic
 - [deleteTag](deleteTag)
 - [expandOid](expandOid)
 - [expandRef](expandRef)
+- [fastForward](fastForward)
 - [fetch](fetch)
 - [findMergeBase](findMergeBase)
 - [findRoot](findRoot)

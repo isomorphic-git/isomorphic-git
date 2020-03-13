@@ -26,6 +26,7 @@ describe('exports', () => {
         "deleteTag",
         "expandOid",
         "expandRef",
+        "fastForward",
         "fetch",
         "findMergeBase",
         "findRoot",
