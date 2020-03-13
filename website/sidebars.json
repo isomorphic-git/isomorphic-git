@@ -12,6 +12,7 @@
       "checkout",
       "push",
       "pull",
+      "fastForward",
       "merge",
       "walk"
     ],
