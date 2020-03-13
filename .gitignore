@@ -87,6 +87,7 @@ docs/deleteRemote.md
 docs/deleteTag.md
 docs/expandOid.md
 docs/expandRef.md
+docs/fastForward.md
 docs/fetch.md
 docs/findMergeBase.md
 docs/findRoot.md

@@ -81,6 +81,10 @@
         "title": "Frequently Asked Questions",
         "sidebar_label": "FAQ"
       },
+      "fastForward": {
+        "title": "fastForward",
+        "sidebar_label": "fastForward"
+      },
       "fetch": {
         "title": "fetch",
         "sidebar_label": "fetch"
@@ -763,6 +767,10 @@
       },
       "version-1.x/version-1.x-fastCheckout": {
         "title": "version-1.x/version-1.x-fastCheckout"
+      },
+      "version-1.x/version-1.x-fastForward": {
+        "title": "fastForward",
+        "sidebar_label": "fastForward"
       },
       "version-1.x/version-1.x-fetch": {
         "title": "fetch",

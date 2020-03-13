@@ -23,5 +23,6 @@
 - [ ] create a test in `src/__tests__`
 - [ ] document the command with a JSDoc comment
 - [ ] add page to the Docs Sidebar `website/sidebars.json`
+- [ ] add page to the v1 Docs Sidebar `website/versioned_sidebars/version-1.x-sidebars.json`
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] squash merge the PR with commit message "feat: Added 'X' command"
