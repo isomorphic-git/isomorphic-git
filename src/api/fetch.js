@@ -90,6 +90,7 @@ export async function fetch({
 }) {
   try {
     assertParameter('fs', fs)
+    assertParameter('http', http)
     assertParameter('gitdir', gitdir)
 
     return await _fetch({

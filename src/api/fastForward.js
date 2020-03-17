@@ -60,6 +60,7 @@ export async function fastForward({
 }) {
   try {
     assertParameter('fs', fs)
+    assertParameter('http', http)
     assertParameter('gitdir', gitdir)
 
     const thisWillNotBeUsed = {
