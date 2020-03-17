@@ -54,6 +54,7 @@ export async function getRemoteInfo({
   forPush = false,
 }) {
   try {
+    assertParameter('http', http)
     assertParameter('url', url)
 
     const remote = await GitRemoteHTTP.discover({
