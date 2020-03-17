@@ -73,6 +73,7 @@ export async function push({
 }) {
   try {
     assertParameter('fs', fs)
+    assertParameter('http', http)
     assertParameter('gitdir', gitdir)
 
     return await _push({
