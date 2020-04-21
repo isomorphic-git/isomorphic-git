@@ -7,8 +7,9 @@ import { shasum } from '../utils/shasum.js'
 import { GitObject } from './GitObject.js'
 
 export class GitWalkerFs {
-  constructor({ fs, dir, gitdir }) {
+  constructor({ fs, dir, gitdir, cache }) {
     this.fs = fs
+    this.cache = cache
     this.dir = dir
     this.gitdir = gitdir
     const walker = this
@@ -111,10 +112,12 @@ export class GitWalkerFs {
 
   async oid(entry) {
     if (entry._oid === false) {
-      const { fs, gitdir } = this
+      const { fs, gitdir, cache } = this
       let oid
       // See if we can use the SHA1 hash in the index.
-      await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
+      await GitIndexManager.acquire({ fs, gitdir, cache }, async function(
+        index
+      ) {
         const stage = index.entriesMap.get(entry._fullpath)
         const stats = await entry.stat()
         if (!stage || compareStats(stats, stage)) {

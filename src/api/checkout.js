@@ -78,6 +78,7 @@ export async function checkout({
     const ref = _ref || 'HEAD'
     return await _checkout({
       fs: new FileSystem(fs),
+      cache: {},
       onProgress,
       dir,
       gitdir,

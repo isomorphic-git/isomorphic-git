@@ -8,6 +8,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {SignCallback} [args.onSign]
  * @param {string} [args.dir]
  * @param {string} [args.gitdir=join(dir,'.git')]
@@ -30,6 +31,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 
 export async function _removeNote({
   fs,
+  cache,
   onSign,
   gitdir,
   ref = 'refs/notes/commits',
@@ -69,6 +71,7 @@ export async function _removeNote({
   // Create the new note commit
   const commitOid = await _commit({
     fs,
+    cache,
     onSign,
     gitdir,
     ref,

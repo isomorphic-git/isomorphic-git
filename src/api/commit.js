@@ -72,6 +72,7 @@ export async function commit({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
+    const cache = {}
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author) throw new MissingNameError('author')
@@ -86,6 +87,7 @@ export async function commit({
 
     return await _commit({
       fs,
+      cache,
       onSign,
       gitdir,
       message,

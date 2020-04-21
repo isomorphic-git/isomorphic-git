@@ -58,6 +58,7 @@ export async function addNote({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
+    const cache = {}
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author) throw new MissingNameError('author')
@@ -72,6 +73,7 @@ export async function addNote({
 
     return await _addNote({
       fs: new FileSystem(fs),
+      cache,
       onSign,
       gitdir,
       ref,

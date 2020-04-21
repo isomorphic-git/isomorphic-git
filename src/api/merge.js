@@ -89,6 +89,7 @@ export async function merge({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
+    const cache = {}
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author && !fastForwardOnly) throw new MissingNameError('author')
@@ -105,6 +106,7 @@ export async function merge({
 
     return await _merge({
       fs,
+      cache,
       gitdir,
       ours,
       theirs,

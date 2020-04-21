@@ -9,6 +9,7 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {HttpClient} args.http
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
@@ -42,6 +43,7 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
  */
 export async function _pull({
   fs,
+  cache,
   http,
   onProgress,
   onMessage,
@@ -106,6 +108,7 @@ export async function _pull({
     })
     await _checkout({
       fs,
+      cache,
       onProgress,
       dir,
       gitdir,

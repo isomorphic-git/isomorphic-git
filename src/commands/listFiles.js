@@ -7,19 +7,22 @@ import { join } from '../utils/join'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {string} args.gitdir
  * @param {string} [args.ref]
  *
  * @returns {Promise<Array<string>>}
  */
-export async function _listFiles({ fs, gitdir, ref }) {
+export async function _listFiles({ fs, gitdir, ref, cache }) {
   if (ref) {
     const oid = await GitRefManager.resolve({ gitdir, fs, ref })
     const filenames = []
     await accumulateFilesFromOid({ fs, gitdir, oid, filenames, prefix: '' })
     return filenames
   } else {
-    return GitIndexManager.acquire({ fs, gitdir }, async function(index) {
+    return GitIndexManager.acquire({ fs, gitdir, cache }, async function(
+      index
+    ) {
       return index.entries.map(x => x.path)
     })
   }

@@ -264,6 +264,7 @@ export async function walk({
 
     return await _walk({
       fs: new FileSystem(fs),
+      cache: {},
       dir,
       gitdir,
       trees,

@@ -3,21 +3,11 @@ import pify from 'pify'
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
 
-const fsmap = new WeakMap()
 /**
  * This is just a collection of helper functions really. At least that's how it started.
  */
 export class FileSystem {
   constructor(fs) {
-    // This is sad... but preserving reference equality is now necessary
-    // to deal with cache invalidation in GitIndexManager.
-    if (fsmap.has(fs)) {
-      return fsmap.get(fs)
-    }
-    if (fsmap.has(fs._original_unwrapped_fs)) {
-      return fsmap.get(fs._original_unwrapped_fs)
-    }
-
     if (typeof fs._original_unwrapped_fs !== 'undefined') return fs
 
     const promises = Object.getOwnPropertyDescriptor(fs, 'promises')
@@ -45,7 +35,6 @@ export class FileSystem {
       this._symlink = pify(fs.symlink.bind(fs))
     }
     this._original_unwrapped_fs = fs
-    fsmap.set(fs, this)
   }
 
   /**
