@@ -51,6 +51,7 @@ export async function removeNote({
     assertParameter('oid', oid)
 
     const fs = new FileSystem(_fs)
+    const cache = {}
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author) throw new MissingNameError('author')
@@ -65,6 +66,7 @@ export async function removeNote({
 
     return await _removeNote({
       fs,
+      cache,
       onSign,
       gitdir,
       ref,

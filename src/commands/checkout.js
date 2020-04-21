@@ -19,6 +19,7 @@ import { worthWalking } from '../utils/worthWalking.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {ProgressCallback} [args.onProgress]
  * @param {string} args.dir
  * @param {string} args.gitdir
@@ -35,6 +36,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  */
 export async function _checkout({
   fs,
+  cache,
   onProgress,
   dir,
   gitdir,
@@ -83,6 +85,7 @@ export async function _checkout({
     try {
       ops = await analyze({
         fs,
+        cache,
         onProgress,
         dir,
         gitdir,
@@ -127,7 +130,7 @@ export async function _checkout({
 
     let count = 0
     const total = ops.length
-    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
       await Promise.all(
         ops
           .filter(
@@ -151,7 +154,7 @@ export async function _checkout({
     })
 
     // Note: this is cannot be done naively in parallel
-    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
       for (const [method, fullpath] of ops) {
         if (method === 'rmdir' || method === 'rmdir-index') {
           const filepath = `${dir}/${fullpath}`
@@ -196,7 +199,7 @@ export async function _checkout({
         })
     )
 
-    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
       await Promise.all(
         ops
           .filter(
@@ -281,10 +284,20 @@ export async function _checkout({
   }
 }
 
-async function analyze({ fs, onProgress, dir, gitdir, ref, force, filepaths }) {
+async function analyze({
+  fs,
+  cache,
+  onProgress,
+  dir,
+  gitdir,
+  ref,
+  force,
+  filepaths,
+}) {
   let count = 0
   return _walk({
     fs,
+    cache,
     dir,
     gitdir,
     trees: [TREE({ ref }), WORKDIR(), STAGE()],

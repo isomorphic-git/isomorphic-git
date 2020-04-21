@@ -81,6 +81,7 @@ export async function clone({
 
     return await _clone({
       fs: new FileSystem(fs),
+      cache: {},
       http,
       onProgress,
       onMessage,

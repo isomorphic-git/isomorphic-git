@@ -12,6 +12,7 @@ import { _writeObject as writeObject } from '../storage/writeObject.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {SignCallback} [args.onSign]
  * @param {string} args.gitdir
  * @param {string} args.ref
@@ -35,6 +36,7 @@ import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 export async function _addNote({
   fs,
+  cache,
   onSign,
   gitdir,
   ref,
@@ -97,6 +99,7 @@ export async function _addNote({
   // Create the new note commit
   const commitOid = await _commit({
     fs,
+    cache,
     onSign,
     gitdir,
     ref,

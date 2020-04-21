@@ -72,6 +72,7 @@ export async function fastForward({
 
     return await _pull({
       fs: new FileSystem(fs),
+      cache: {},
       http,
       onProgress,
       onMessage,

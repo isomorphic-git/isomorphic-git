@@ -9,6 +9,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {string} [args.dir]
  * @param {string} [args.gitdir=join(dir,'.git')]
  * @param {Walker[]} args.trees
@@ -23,6 +24,7 @@ import { unionOfIterators } from '../utils/unionOfIterators.js'
  */
 export async function _walk({
   fs,
+  cache,
   dir,
   gitdir,
   trees,
@@ -37,7 +39,9 @@ export async function _walk({
   // The default iterate function walks all children concurrently
   iterate = (walk, children) => Promise.all([...children].map(walk)),
 }) {
-  const walkers = trees.map(proxy => proxy[GitWalkSymbol]({ fs, dir, gitdir }))
+  const walkers = trees.map(proxy =>
+    proxy[GitWalkSymbol]({ fs, dir, gitdir, cache })
+  )
 
   const root = new Array(walkers.length).fill('.')
   const range = arrayRange(0, walkers.length)

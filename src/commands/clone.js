@@ -10,6 +10,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {HttpClient} args.http
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
@@ -36,6 +37,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  */
 export async function _clone({
   fs,
+  cache,
   http,
   onProgress,
   onMessage,
@@ -89,6 +91,7 @@ export async function _clone({
   // Checkout that branch
   await _checkout({
     fs,
+    cache,
     onProgress,
     dir,
     gitdir,
