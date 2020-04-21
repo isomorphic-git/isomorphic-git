@@ -96,6 +96,7 @@ export async function pull({
 
     return await _pull({
       fs,
+      cache: {},
       http,
       onProgress,
       onMessage,

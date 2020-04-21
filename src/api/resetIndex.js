@@ -40,6 +40,7 @@ export async function resetIndex({
     assertParameter('ref', ref)
 
     const fs = new FileSystem(_fs)
+    const cache = {}
     // Resolve commit
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
     let workdirOid
@@ -80,7 +81,7 @@ export async function resetIndex({
         stats = await fs.lstat(join(dir, filepath))
       }
     }
-    await GitIndexManager.acquire({ fs, gitdir }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
       index.delete({ filepath })
       if (oid) {
         index.insert({ filepath, stats, oid })

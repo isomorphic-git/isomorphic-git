@@ -25,6 +25,7 @@ import { mergeTree } from '../utils/mergeTree.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {string} args.gitdir
  * @param {string} [args.ours]
  * @param {string} args.theirs
@@ -54,6 +55,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  */
 export async function _merge({
   fs,
+  cache,
   gitdir,
   ours,
   theirs,
@@ -137,6 +139,7 @@ export async function _merge({
     }
     const oid = await _commit({
       fs,
+      cache,
       gitdir,
       message,
       ref: ours,

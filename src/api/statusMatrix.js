@@ -164,8 +164,10 @@ export async function statusMatrix({
     assertParameter('ref', ref)
 
     const fs = new FileSystem(_fs)
+    const cache = {}
     return await _walk({
       fs,
+      cache,
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],

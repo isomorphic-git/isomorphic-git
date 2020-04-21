@@ -35,8 +35,9 @@ export async function remove({
     assertParameter('gitdir', gitdir)
     assertParameter('filepath', filepath)
 
+    const cache = {}
     await GitIndexManager.acquire(
-      { fs: new FileSystem(_fs), gitdir },
+      { fs: new FileSystem(_fs), gitdir, cache },
       async function(index) {
         index.delete({ filepath })
       }

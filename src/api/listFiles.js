@@ -36,6 +36,7 @@ export async function listFiles({ fs, dir, gitdir = join(dir, '.git'), ref }) {
 
     return await _listFiles({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       ref,
     })
