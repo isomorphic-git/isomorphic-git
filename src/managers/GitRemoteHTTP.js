@@ -27,6 +27,24 @@ const updateHeaders = (headers, auth) => {
   }
 }
 
+/**
+ * @param {GitHttpResponse} res
+ *
+ * @returns {{ preview: string, response: string, data: Buffer }}
+ */
+const stringifyBody = async res => {
+  try {
+    // Some services provide a meaningful error message in the body of 403s like "token lacks the scopes necessary to perform this action"
+    const data = Buffer.from(await collect(res.body))
+    const response = data.toString('utf8')
+    const preview =
+      response.length < 256 ? response : response.slice(0, 256) + '...'
+    return { preview, response, data }
+  } catch (e) {
+    return {}
+  }
+}
+
 export class GitRemoteHTTP {
   static async capabilities() {
     return ['discover', 'connect']
@@ -106,7 +124,8 @@ export class GitRemoteHTTP {
     } while (tryAgain)
 
     if (res.statusCode !== 200) {
-      throw new HttpError(res.statusCode, res.statusMessage)
+      const { response } = await stringifyBody(res)
+      throw new HttpError(res.statusCode, res.statusMessage, response)
     }
     // Git "smart" HTTP servers should respond with the correct Content-Type header.
     if (
@@ -119,10 +138,7 @@ export class GitRemoteHTTP {
       // If they don't send the correct content-type header, that's a good indicator it is either a "dumb" HTTP
       // server, or the user specified an incorrect remote URL and the response is actually an HTML page.
       // In this case, we save the response as plain text so we can generate a better error message if needed.
-      const data = Buffer.from(await collect(res.body))
-      const response = data.toString('utf8')
-      const preview =
-        response.length < 256 ? response : response.slice(0, 256) + '...'
+      const { preview, response, data } = await stringifyBody(res)
       // For backwards compatibility, try to parse it anyway.
       // TODO: maybe just throw instead of trying?
       try {
@@ -164,7 +180,8 @@ export class GitRemoteHTTP {
       headers,
     })
     if (res.statusCode !== 200) {
-      throw new HttpError(res.statusCode, res.statusMessage)
+      const { response } = stringifyBody(res)
+      throw new HttpError(res.statusCode, res.statusMessage, response)
     }
     return res
   }
