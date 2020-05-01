@@ -1,7 +1,7 @@
-import '../typedefs.js'
+import 'typedefs'
 
-import { ParseError } from '../errors/ParseError.js'
-import { GitPktLine } from '../models/GitPktLine.js'
+import { ParseError } from 'errors/ParseError'
+import { GitPktLine } from 'models/GitPktLine'
 
 export async function parseReceivePackResponse(packfile) {
   /** @type PushResult */

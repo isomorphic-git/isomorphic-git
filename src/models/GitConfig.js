@@ -37,21 +37,49 @@ const schema = {
 // subsection is optionnal
 // subsection is specified after section and one or more spaces
 // subsection is specified between double quotes
-const SECTION_LINE_REGEX = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/
-const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
+class REGEX {
+	static cache = [];
+	get SECTION_LINE() {
+		if (REGEX.cache.SECTION_LINE)
+			return REGEX.cache.SECTION_LINE;
+		REGEX.cache.SECTION_LINE = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/;
+	}
+	get SECTION() {
+		if (REGEX.cache.SECTION)
+			return REGEX.cache.SECTION;
+		REGEX.cache.SECTION = /^[A-Za-z0-9-.]+$/;
+	}
+	get VARIABLE_LINE() {
+		if (REGEX.cache.VARIABLE_LINE)
+			return REGEX.cache.VARIABLE_LINE;
+		REGEX.cache.VARIABLE_LINE = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/;
+	}
+	get VARIABLE_NAME() {
+		if (REGEX.cache.VARIABLE_NAME)
+			return REGEX.cache.VARIABLE_NAME;
+		REGEX.cache.VARIABLE_NAME = /^[A-Za-z][A-Za-z-]*$/
+	}
+	get VARIABLE_VALUE_COMMENT() {
+		if (REGEX.cache.VARIABLE_VALUE_COMMENT)
+			return REGEX.cache.VARIABLE_VALUE_COMMENT;
+		REGEX.cache.VARIABLE_VALUE_COMMENT = /^(.*?)( *[#;].*)$/
+	}
+}
+//const SECTION_LINE_REGEX = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/
+//const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 
 // variable lines contain a name, and equal sign and then a value
 // variable lines can also only contain a name (the implicit value is a boolean true)
 // variable name is alphanumeric (ASCII) with -
 // variable name starts with an alphabetic character
 // variable name is case insensitive
-const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/
-const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z-]*$/
-
-const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
+//const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/
+//const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z-]*$/
+//
+//const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
 
 const extractSectionLine = line => {
-  const matches = SECTION_LINE_REGEX.exec(line)
+  const matches = REGEXP.SECTION_LINE.exec(line)
   if (matches != null) {
     const [section, subsection] = matches.slice(1)
     return [section, subsection]
@@ -60,7 +88,7 @@ const extractSectionLine = line => {
 }
 
 const extractVariableLine = line => {
-  const matches = VARIABLE_LINE_REGEX.exec(line)
+  const matches = REGEXP.VARIABLE_LINE.exec(line)
   if (matches != null) {
     const [name, rawValue = 'true'] = matches.slice(1)
     const valueWithoutComments = removeComments(rawValue)
@@ -71,7 +99,7 @@ const extractVariableLine = line => {
 }
 
 const removeComments = rawValue => {
-  const commentMatches = VARIABLE_VALUE_COMMENT_REGEX.exec(rawValue)
+  const commentMatches = REGEXP.VARIABLE_VALUE_COMMENT.exec(rawValue)
   if (commentMatches == null) {
     return rawValue
   }
@@ -221,7 +249,7 @@ export class GitConfig {
           modified: true,
           path: getPath(section, subsection, name),
         }
-        if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
+        if (REGEXP.SECTION.test(section) && REGEXP.VARIABLE_NAME.test(name)) {
           if (sectionIndex >= 0) {
             // Reuse existing section
             this.parsedConfig.splice(sectionIndex + 1, 0, newConfig)

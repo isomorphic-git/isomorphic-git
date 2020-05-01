@@ -1,8 +1,8 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { _readCommit } from '../commands/readCommit.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitRefManager } from 'managers/GitRefManager'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { compareAge } from '../utils/compareAge.js'
 

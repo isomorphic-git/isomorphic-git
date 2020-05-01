@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { _listFiles } from '../commands/listFiles'
-import { FileSystem } from '../models/FileSystem.js'
-import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join'
+import { _listFiles } from 'commands/listFiles'
+import { FileSystem } from 'models/FileSystem'
+import { assertParameter } from 'utils/assertParameter'
+import { join } from 'utils/join'
 
 /**
  * List all the files in the git index or a commit

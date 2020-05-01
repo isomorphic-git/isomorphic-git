@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { resolveCommit } from '../utils/resolveCommit.js'
 

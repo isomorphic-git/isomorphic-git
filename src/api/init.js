@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { _init } from '../commands/init.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Initialize a new repository

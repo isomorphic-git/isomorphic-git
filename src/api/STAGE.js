@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 /**
  * Get a git index Walker
@@ -9,4 +9,4 @@ import '../typedefs.js'
  * @returns {Walker} Returns a git index `Walker`
  *
  */
-export { STAGE } from '../commands/STAGE.js'
+export { STAGE } from 'commands/STAGE'

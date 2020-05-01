@@ -1,8 +1,8 @@
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { GitTree } from '../models/GitTree.js'
-import { _readObject as readObject } from '../storage/readObject.js'
-import { join } from '../utils/join.js'
+import { GitTree } from 'models/GitTree'
+import { _readObject as readObject } from 'storage/readObject'
+import { join } from 'utils/join'
 
 export async function listObjects({
   fs,

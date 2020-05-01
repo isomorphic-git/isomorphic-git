@@ -1,13 +1,13 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { NotFoundError } from '../errors/NotFoundError.js'
+import { NotFoundError } from 'errors/NotFoundError'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
-import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { GitIndexManager } from 'managers/GitIndexManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Add a file to the git index (aka staging area)

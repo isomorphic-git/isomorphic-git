@@ -1,12 +1,12 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitIndexManager } from 'managers/GitIndexManager'
+import { GitRefManager } from 'managers/GitRefManager'
 import { GitCommit } from '../models/GitCommit.js'
-import { GitTree } from '../models/GitTree.js'
+import { GitTree } from 'models/GitTree'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
-import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
+import { flatFileListToDirectoryStructure } from 'utils/flatFileListToDirectoryStructure'
 
 /**
  *

@@ -1,11 +1,11 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import cleanGitRef from 'clean-git-ref'
 
-import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
-import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
-import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { AlreadyExistsError } from 'errors/AlreadyExistsError'
+import { InvalidRefNameError } from 'errors/InvalidRefNameError'
+import { GitConfigManager } from 'managers/GitConfigManager'
 
 /**
  * @param {object} args

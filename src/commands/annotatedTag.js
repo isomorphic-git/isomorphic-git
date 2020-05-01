@@ -1,11 +1,11 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
-import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
-import { _readObject as readObject } from '../storage/readObject.js'
-import { _writeObject as writeObject } from '../storage/writeObject.js'
+import { AlreadyExistsError } from 'errors/AlreadyExistsError'
+import { GitRefManager } from 'managers/GitRefManager'
+import { GitAnnotatedTag } from 'models/GitAnnotatedTag'
+import { _readObject as readObject } from 'storage/readObject'
+import { _writeObject as writeObject } from 'storage/writeObject'
 
 /**
  * Create an annotated tag.

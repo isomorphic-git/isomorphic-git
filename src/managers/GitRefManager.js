@@ -1,13 +1,13 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import { InvalidOidError } from '../errors/InvalidOidError.js'
-import { NoRefspecError } from '../errors/NoRefspecError.js'
-import { NotFoundError } from '../errors/NotFoundError.js'
-import { GitPackedRefs } from '../models/GitPackedRefs.js'
-import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
-import { compareRefNames } from '../utils/compareRefNames.js'
-import { join } from '../utils/join.js'
+import { InvalidOidError } from 'errors/InvalidOidError'
+import { NoRefspecError } from 'errors/NoRefspecError'
+import { NotFoundError } from 'errors/NotFoundError'
+import { GitPackedRefs } from 'models/GitPackedRefs'
+import { GitRefSpecSet } from 'models/GitRefSpecSet'
+import { compareRefNames } from 'utils/compareRefNames'
+import { join } from 'utils/join'
 
-import { GitConfigManager } from './GitConfigManager'
+import { GitConfigManager } from 'managers/GitConfigManager'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [

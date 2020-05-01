@@ -3,8 +3,8 @@
 // (I tried to make it API identical, but that ended up being 2x slower than this version.)
 import pako from 'pako'
 
-import { InternalError } from '../errors/InternalError.js'
-import { StreamReader } from '../utils/StreamReader.js'
+import { InternalError } from 'errors/InternalError'
+import { StreamReader } from 'utils/StreamReader'
 
 export async function listpack(stream, onData) {
   const reader = new StreamReader(stream)

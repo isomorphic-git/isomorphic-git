@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { _currentBranch } from '../commands/currentBranch.js'
-import { FileSystem } from '../models/FileSystem.js'
-import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { _currentBranch } from 'commands/currentBranch'
+import { FileSystem } from 'models/FileSystem'
+import { assertParameter } from 'utils/assertParameter'
+import { join } from 'utils/join'
 
 /**
  * Get the name of the branch currently pointed to by .git/HEAD

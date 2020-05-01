@@ -1,11 +1,11 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { _addRemote } from '../commands/addRemote.js'
-import { _checkout } from '../commands/checkout.js'
-import { _fetch } from '../commands/fetch.js'
-import { _init } from '../commands/init.js'
-import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { _addRemote } from 'commands/addRemote'
+import { _checkout } from 'commands/checkout'
+import { _fetch } from 'commands/fetch'
+import { _init } from 'commands/init'
+import { GitConfigManager } from 'managers/GitConfigManager'
 
 /**
  * @param {object} args

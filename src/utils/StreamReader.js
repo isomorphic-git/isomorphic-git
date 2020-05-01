@@ -1,4 +1,4 @@
-import { getIterator } from './getIterator.js'
+import { getIterator } from 'utils/getIterator'
 
 // inspired by 'gartal' but lighter-weight and more battle-tested.
 export class StreamReader {

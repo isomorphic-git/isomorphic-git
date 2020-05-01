@@ -1,6 +1,6 @@
-import { EmptyServerResponseError } from '../errors/EmptyServerResponseError.js'
-import { ParseError } from '../errors/ParseError.js'
-import { GitPktLine } from '../models/GitPktLine.js'
+import { EmptyServerResponseError } from 'errors/EmptyServerResponseError'
+import { ParseError } from 'errors/ParseError'
+import { GitPktLine } from 'models/GitPktLine'
 
 export async function parseRefsAdResponse(stream, { service }) {
   const capabilities = new Set()

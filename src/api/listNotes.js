@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { _listNotes } from '../commands/listNotes.js'
-import { FileSystem } from '../models/FileSystem.js'
-import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join'
+import { _listNotes } from 'commands/listNotes'
+import { FileSystem } from 'models/FileSystem'
+import { assertParameter } from 'utils/assertParameter'
+import { join } from 'utils/join'
 
 /**
  * List all the object notes

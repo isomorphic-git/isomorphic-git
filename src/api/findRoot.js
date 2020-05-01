@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { _findRoot } from '../commands/findRoot.js'
 import { FileSystem } from '../models/FileSystem.js'

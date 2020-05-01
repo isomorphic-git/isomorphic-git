@@ -1,10 +1,10 @@
 // @ts-check
-import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
-import { MissingParameterError } from '../errors/MissingParameterError.js'
-import { GitRefManager } from '../managers/GitRefManager'
-import { FileSystem } from '../models/FileSystem.js'
-import { assertParameter } from '../utils/assertParameter'
-import { join } from '../utils/join.js'
+import { AlreadyExistsError } from 'errors/AlreadyExistsError'
+import { MissingParameterError } from 'errors/MissingParameterError'
+import { GitRefManager } from 'managers/GitRefManager'
+import { FileSystem } from 'models/FileSystem'
+import { assertParameter } from 'utils/assertParameter'
+import { join } from 'utils/join'
 
 /**
  * Create a lightweight tag

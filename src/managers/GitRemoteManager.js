@@ -1,8 +1,8 @@
-import { UnknownTransportError } from '../errors/UnknownTransportError.js'
-import { UrlParseError } from '../errors/UrlParseError.js'
-import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
+import { UnknownTransportError } from 'errors/UnknownTransportError'
+import { UrlParseError } from 'errors/UrlParseError'
+import { translateSSHtoHTTP } from 'utils/translateSSHtoHTTP'
 
-import { GitRemoteHTTP } from './GitRemoteHTTP'
+import { GitRemoteHTTP } from 'managers/GitRemoteHTTP'
 
 function parseRemoteUrl({ url }) {
   // the stupid "shorter scp-like syntax"

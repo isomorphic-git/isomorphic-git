@@ -1,13 +1,13 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { ObjectTypeError } from '../errors/ObjectTypeError.js'
+import { ObjectTypeError } from 'errors/ObjectTypeError'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { GitTree } from '../models/GitTree.js'
+import { GitTree } from 'models/GitTree'
 import { _writeObject } from '../storage/writeObject.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Write a git object directly

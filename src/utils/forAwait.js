@@ -1,4 +1,4 @@
-import { getIterator } from './getIterator.js'
+import { getIterator } from 'utils/getIterator'
 
 // Currently 'for await' upsets my linters.
 export async function forAwait(iterable, cb) {

@@ -1,5 +1,5 @@
 // @ts-check
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Initialize a new repository

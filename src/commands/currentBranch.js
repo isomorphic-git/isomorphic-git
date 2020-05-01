@@ -1,8 +1,8 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { GitRefManager } from '../managers/GitRefManager.js'
-import { abbreviateRef } from '../utils/abbreviateRef.js'
+import { GitRefManager } from 'managers/GitRefManager'
+import { abbreviateRef } from 'utils/abbreviateRef'
 
 /**
  * @param {Object} args

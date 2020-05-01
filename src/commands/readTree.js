@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 import { resolveTree } from '../utils/resolveTree.js'

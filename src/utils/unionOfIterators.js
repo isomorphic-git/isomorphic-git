@@ -1,4 +1,4 @@
-import { RunningMinimum } from '../models/RunningMinimum'
+import { RunningMinimum } from 'models/RunningMinimum'
 
 // Take an array of length N of
 //   iterators of length Q_n

@@ -1,4 +1,4 @@
-import { GitPktLine } from '../models/GitPktLine.js'
+import { GitPktLine } from 'models/GitPktLine'
 
 export function writeUploadPackRequest({
   capabilities = [],

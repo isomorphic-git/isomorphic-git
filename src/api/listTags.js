@@ -1,8 +1,8 @@
 // @ts-check
-import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitRefManager } from 'managers/GitRefManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * List tags

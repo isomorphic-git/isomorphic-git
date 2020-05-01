@@ -1,9 +1,9 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { ObjectTypeError } from '../errors/ObjectTypeError.js'
+import { ObjectTypeError } from 'errors/ObjectTypeError'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
-import { _readObject as readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from 'storage/readObject'
 
 /**
  *

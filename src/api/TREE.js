@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 /**
  * Get a git commit `Walker`
@@ -12,4 +12,4 @@ import '../typedefs.js'
  * @returns {Walker} Returns a git commit Walker
  *
  */
-export { TREE } from '../commands/TREE.js'
+export { TREE } from 'commands/TREE'

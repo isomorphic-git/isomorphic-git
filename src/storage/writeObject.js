@@ -1,7 +1,7 @@
-import { GitObject } from '../models/GitObject.js'
-import { writeObjectLoose } from '../storage/writeObjectLoose.js'
-import { deflate } from '../utils/deflate.js'
-import { shasum } from '../utils/shasum.js'
+import { GitObject } from 'models/GitObject'
+import { writeObjectLoose } from 'storage/writeObjectLoose'
+import { deflate } from 'utils/deflate'
+import { shasum } from 'utils/shasum'
 
 export async function _writeObject({
   fs,

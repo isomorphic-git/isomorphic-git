@@ -1,4 +1,4 @@
-import { BaseError } from './BaseError.js'
+import { BaseError } from 'BaseError'
 
 export class InvalidOidError extends BaseError {
   /**

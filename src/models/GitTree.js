@@ -1,6 +1,6 @@
-import { InternalError } from '../errors/InternalError.js'
-import { comparePath } from '../utils/comparePath.js'
-import { compareTreeEntryPath } from '../utils/compareTreeEntryPath.js'
+import { InternalError } from 'errors/InternalError'
+import { comparePath } from 'utils/comparePath'
+import { compareTreeEntryPath } from 'utils/compareTreeEntryPath'
 
 /**
  *

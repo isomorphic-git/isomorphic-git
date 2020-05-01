@@ -1,7 +1,7 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { GitConfigManager } from 'managers/GitConfigManager'
 
 /**
  * @param {Object} args

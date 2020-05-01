@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { _isDescendent } from '../commands/isDescendent.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Check whether a git commit is descended from another

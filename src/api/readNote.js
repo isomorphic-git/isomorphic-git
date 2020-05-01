@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { _readNote } from '../commands/readNote.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Read the contents of a note

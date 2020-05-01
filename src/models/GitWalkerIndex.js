@@ -1,8 +1,8 @@
-import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { compareStrings } from '../utils/compareStrings.js'
-import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
-import { mode2type } from '../utils/mode2type'
-import { normalizeStats } from '../utils/normalizeStats'
+import { GitIndexManager } from 'managers/GitIndexManager'
+import { compareStrings } from 'utils/compareStrings'
+import { flatFileListToDirectoryStructure } from 'utils/flatFileListToDirectoryStructure'
+import { mode2type } from 'utils/mode2type'
+import { normalizeStats } from 'utils/normalizeStats'
 
 export class GitWalkerIndex {
   constructor({ fs, gitdir, cache }) {

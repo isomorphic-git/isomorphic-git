@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { arrayRange } from '../utils/arrayRange.js'
-import { flat } from '../utils/flat.js'
-import { GitWalkSymbol } from '../utils/symbols.js'
-import { unionOfIterators } from '../utils/unionOfIterators.js'
+import { arrayRange } from 'utils/arrayRange'
+import { flat } from 'utils/flat'
+import { GitWalkSymbol } from 'utils/symbols'
+import { unionOfIterators } from 'utils/unionOfIterators'
 
 /**
  * @param {object} args

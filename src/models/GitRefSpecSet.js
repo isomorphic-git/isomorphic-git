@@ -1,4 +1,4 @@
-import { GitRefSpec } from './GitRefSpec'
+import { GitRefSpec } from 'models/GitRefSpec'
 
 export class GitRefSpecSet {
   constructor(rules = []) {

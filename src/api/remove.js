@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { GitIndexManager } from 'managers/GitIndexManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Remove a file from the git index (aka staging area)

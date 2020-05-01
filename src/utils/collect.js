@@ -1,4 +1,4 @@
-import { forAwait } from './forAwait.js'
+import { forAwait } from 'utils/forAwait'
 
 export async function collect(iterable) {
   let size = 0

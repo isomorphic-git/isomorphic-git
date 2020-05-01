@@ -1,5 +1,5 @@
-import '../typedefs.js'
-import { BaseError } from './BaseError.js'
+import 'typedefs'
+import { BaseError } from 'BaseError'
 
 export class GitPushError extends BaseError {
   /**

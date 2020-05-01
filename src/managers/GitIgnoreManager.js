@@ -1,8 +1,8 @@
 import ignore from 'ignore'
 
-import { basename } from '../utils/basename.js'
-import { dirname } from '../utils/dirname.js'
-import { join } from '../utils/join.js'
+import { basename } from 'utils/basename'
+import { dirname } from 'utils/dirname'
+import { join } from 'utils/join'
 
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of cacheing.

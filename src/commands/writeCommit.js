@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { GitCommit } from '../models/GitCommit.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'

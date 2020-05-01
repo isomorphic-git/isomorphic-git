@@ -1,6 +1,6 @@
-import { InternalError } from '../errors/InternalError.js'
-import { readPackIndex } from '../storage/readPackIndex.js'
-import { join } from '../utils/join.js'
+import { InternalError } from 'errors/InternalError'
+import { readPackIndex } from 'storage/readPackIndex'
+import { join } from 'utils/join'
 
 export async function hasObjectPacked({
   fs,

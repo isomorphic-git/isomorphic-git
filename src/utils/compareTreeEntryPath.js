@@ -1,4 +1,4 @@
-import { compareStrings } from './compareStrings'
+import { compareStrings } from 'utils/compareStrings'
 
 export function compareTreeEntryPath(a, b) {
   // Git sorts tree entries as if there is a trailing slash on directory names.

@@ -1,7 +1,7 @@
-import { InternalError } from '../errors/InternalError.js'
-import { formatAuthor } from '../utils/formatAuthor.js'
-import { normalizeNewlines } from '../utils/normalizeNewlines.js'
-import { parseAuthor } from '../utils/parseAuthor.js'
+import { InternalError } from 'errors/InternalError'
+import { formatAuthor } from 'utils/formatAuthor'
+import { normalizeNewlines } from 'utils/normalizeNewlines'
+import { parseAuthor } from 'utils/parseAuthor'
 
 export class GitAnnotatedTag {
   constructor(tag) {

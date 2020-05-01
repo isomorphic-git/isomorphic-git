@@ -1,11 +1,11 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { _addNote } from '../commands/addNote.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join'
+import { join } from 'utils/join'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 

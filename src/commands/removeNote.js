@@ -2,8 +2,8 @@
 import { _commit } from '../commands/commit.js'
 import { _readTree } from '../commands/readTree.js'
 import { _writeTree } from '../commands/writeTree.js'
-import { NotFoundError } from '../errors/NotFoundError.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
+import { NotFoundError } from 'errors/NotFoundError'
+import { GitRefManager } from 'managers/GitRefManager'
 
 /**
  * @param {object} args

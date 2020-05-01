@@ -1,8 +1,8 @@
 // @ts-check
-import { _readTree } from '../commands/readTree'
-import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
-import { join } from '../utils/join'
+import { _readTree } from 'commands/readTree'
+import { GitIndexManager } from 'managers/GitIndexManager'
+import { GitRefManager } from 'managers/GitRefManager'
+import { join } from 'utils/join'
 
 /**
  * @param {object} args

@@ -1,4 +1,4 @@
-import { InternalError } from '../errors/InternalError.js'
+import { InternalError } from 'errors/InternalError'
 
 export class GitObject {
   static wrap({ type, object }) {

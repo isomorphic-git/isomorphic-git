@@ -1,5 +1,5 @@
 // @ts-check
-import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitRefManager } from 'managers/GitRefManager'
 
 import { _readBlob } from './readBlob'
 

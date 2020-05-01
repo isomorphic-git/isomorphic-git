@@ -1,9 +1,9 @@
-import { InternalError } from '../errors/InternalError.js'
-import { formatAuthor } from '../utils/formatAuthor.js'
-import { indent } from '../utils/indent.js'
-import { normalizeNewlines } from '../utils/normalizeNewlines.js'
-import { outdent } from '../utils/outdent.js'
-import { parseAuthor } from '../utils/parseAuthor.js'
+import { InternalError } from 'errors/InternalError'
+import { formatAuthor } from 'utils/formatAuthor'
+import { indent } from 'utils/indent'
+import { normalizeNewlines } from 'utils/normalizeNewlines'
+import { outdent } from 'utils/outdent'
+import { parseAuthor } from 'utils/parseAuthor'
 
 export class GitCommit {
   constructor(commit) {

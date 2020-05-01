@@ -1,12 +1,12 @@
-import '../typedefs.js'
+import 'typedefs'
 
-import { HttpError } from '../errors/HttpError.js'
-import { SmartHttpError } from '../errors/SmartHttpError.js'
-import { UserCanceledError } from '../errors/UserCanceledError.js'
-import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
-import { collect } from '../utils/collect.js'
-import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
-import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
+import { HttpError } from 'errors/HttpError'
+import { SmartHttpError } from 'errors/SmartHttpError'
+import { UserCanceledError } from 'errors/UserCanceledError'
+import { calculateBasicAuthHeader } from 'utils/calculateBasicAuthHeader'
+import { collect } from 'utils/collect'
+import { extractAuthFromUrl } from 'utils/extractAuthFromUrl'
+import { parseRefsAdResponse } from 'wire/parseRefsAdResponse'
 
 // Try to accomodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string

@@ -1,4 +1,4 @@
-import { InternalError } from '../errors/InternalError.js'
+import { InternalError } from 'errors/InternalError'
 
 export async function writeObjectLoose({ fs, gitdir, object, format, oid }) {
   if (format !== 'deflated') {

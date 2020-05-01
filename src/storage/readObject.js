@@ -1,10 +1,10 @@
-import { InternalError } from '../errors/InternalError.js'
-import { NotFoundError } from '../errors/NotFoundError.js'
-import { GitObject } from '../models/GitObject.js'
-import { readObjectLoose } from '../storage/readObjectLoose.js'
-import { readObjectPacked } from '../storage/readObjectPacked.js'
-import { inflate } from '../utils/inflate.js'
-import { shasum } from '../utils/shasum.js'
+import { InternalError } from 'errors/InternalError'
+import { NotFoundError } from 'errors/NotFoundError'
+import { GitObject } from 'models/GitObject'
+import { readObjectLoose } from 'storage/readObjectLoose'
+import { readObjectPacked } from 'storage/readObjectPacked'
+import { inflate } from 'utils/inflate'
+import { shasum } from 'utils/shasum'
 
 export async function _readObject({ fs, gitdir, oid, format = 'content' }) {
   // Curry the current read method so that the packfile un-deltification

@@ -1,6 +1,6 @@
-import { InvalidOidError } from '../errors/InvalidOidError.js'
-import { GitSideBand } from '../models/GitSideBand.js'
-import { forAwait } from '../utils/forAwait.js'
+import { InvalidOidError } from 'errors/InvalidOidError'
+import { GitSideBand } from 'models/GitSideBand'
+import { forAwait } from 'utils/forAwait'
 
 export async function parseUploadPackResponse(stream) {
   const { packetlines, packfile, progress } = GitSideBand.demux(stream)

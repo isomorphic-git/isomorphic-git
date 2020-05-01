@@ -1,7 +1,7 @@
 // @ts-check
-import { GitPackIndex } from '../models/GitPackIndex.js'
-import { _readObject as readObject } from '../storage/readObject.js'
-import { join } from '../utils/join.js'
+import { GitPackIndex } from 'models/GitPackIndex'
+import { _readObject as readObject } from 'storage/readObject'
+import { join } from 'utils/join'
 
 /**
  * @param {object} args

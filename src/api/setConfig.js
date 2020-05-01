@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { GitConfigManager } from 'managers/GitConfigManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Write an entry to the git config files.

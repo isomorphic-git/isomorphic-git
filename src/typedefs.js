@@ -1,4 +1,4 @@
-import './typedefs-http.js'
+import 'typedefs-http'
 
 /**
  * A git commit object.

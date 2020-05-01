@@ -1,6 +1,6 @@
 // @ts-check
 import { GitCommit } from '../models/GitCommit.js'
-import { _readObject as readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from 'storage/readObject'
 
 /**
  * @param {object} args

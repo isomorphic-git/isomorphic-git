@@ -1,4 +1,4 @@
-import { normalizeMode } from './normalizeMode'
+import { normalizeMode } from 'utils/normalizeMode'
 
 const MAX_UINT32 = 2 ** 32
 

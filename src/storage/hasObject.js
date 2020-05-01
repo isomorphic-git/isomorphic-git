@@ -1,6 +1,6 @@
-import { hasObjectLoose } from '../storage/hasObjectLoose.js'
-import { hasObjectPacked } from '../storage/hasObjectPacked.js'
-import { _readObject as readObject } from '../storage/readObject.js'
+import { hasObjectLoose } from 'storage/hasObjectLoose'
+import { hasObjectPacked } from 'storage/hasObjectPacked'
+import { _readObject as readObject } from 'storage/readObject'
 
 export async function hasObject({ fs, gitdir, oid, format = 'content' }) {
   // Curry the current read method so that the packfile un-deltification

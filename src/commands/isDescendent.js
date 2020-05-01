@@ -1,10 +1,10 @@
 // @ts-check
-import { MaxDepthError } from '../errors/MaxDepthError.js'
-import { MissingParameterError } from '../errors/MissingParameterError.js'
-import { ObjectTypeError } from '../errors/ObjectTypeError.js'
-import { GitShallowManager } from '../managers/GitShallowManager.js'
-import { GitCommit } from '../models/GitCommit.js'
-import { _readObject } from '../storage/readObject.js'
+import { MaxDepthError } from 'errors/MaxDepthError'
+import { MissingParameterError } from 'errors/MissingParameterError'
+import { ObjectTypeError } from 'errors/ObjectTypeError'
+import { GitShallowManager } from 'managers/GitShallowManager'
+import { GitCommit } from 'models/GitCommit'
+import { _readObject } from 'storage/readObject'
 
 /**
  * @param {object} args

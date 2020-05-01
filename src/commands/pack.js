@@ -1,9 +1,9 @@
 import Hash from 'sha.js/sha1.js'
 
 import { types } from '../commands/types.js'
-import { _readObject as readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from 'storage/readObject'
 import { deflate } from '../utils/deflate.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 import { padHex } from '../utils/padHex.js'
 
 /**

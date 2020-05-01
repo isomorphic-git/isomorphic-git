@@ -1,15 +1,15 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { TREE } from '../commands/TREE.js'
-import { _walk } from '../commands/walk.js'
-import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
-import { GitTree } from '../models/GitTree.js'
-import { _writeObject as writeObject } from '../storage/writeObject.js'
+import { TREE } from 'commands/TREE'
+import { _walk } from 'commands/walk'
+import { MergeNotSupportedError } from 'errors/MergeNotSupportedError'
+import { GitTree } from 'models/GitTree'
+import { _writeObject as writeObject } from 'storage/writeObject'
 
-import { basename } from './basename.js'
-import { join } from './join.js'
-import { mergeFile } from './mergeFile.js'
+import { basename } from 'utils/basename'
+import { join } from 'utils/join'
+import { mergeFile } from 'utils/mergeFile'
 
 /**
  * Create a merged tree

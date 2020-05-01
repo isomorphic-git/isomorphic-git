@@ -1,10 +1,10 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { _expandOid } from '../storage/expandOid.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 
 /**
  * Expand and resolve a short oid into a full oid

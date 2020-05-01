@@ -1,8 +1,8 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { GitWalkerFs } from '../models/GitWalkerFs.js'
-import { GitWalkSymbol } from '../utils/symbols.js'
+import { GitWalkerFs } from 'models/GitWalkerFs'
+import { GitWalkSymbol } from 'utils/symbols'
 
 /**
  * @returns {Walker}

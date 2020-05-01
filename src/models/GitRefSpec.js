@@ -1,4 +1,4 @@
-import { InternalError } from '../errors/InternalError.js'
+import { InternalError } from 'errors/InternalError'
 
 export class GitRefSpec {
   constructor({ remotePath, localPath, force, matchPrefix }) {

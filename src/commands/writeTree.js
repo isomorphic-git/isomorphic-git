@@ -1,7 +1,7 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { GitTree } from '../models/GitTree.js'
+import { GitTree } from 'models/GitTree'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 /**

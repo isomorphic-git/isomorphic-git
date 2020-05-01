@@ -1,4 +1,4 @@
-import { GitPktLine } from '../models/GitPktLine.js'
+import { GitPktLine } from 'models/GitPktLine'
 
 export async function parseUploadPackRequest(stream) {
   const read = GitPktLine.streamReader(stream)

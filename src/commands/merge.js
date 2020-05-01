@@ -1,14 +1,14 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
 import { _commit } from '../commands/commit'
-import { _currentBranch } from '../commands/currentBranch.js'
+import { _currentBranch } from 'commands/currentBranch'
 import { _findMergeBase } from '../commands/findMergeBase.js'
 import { FastForwardError } from '../errors/FastForwardError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
-import { abbreviateRef } from '../utils/abbreviateRef.js'
-import { mergeTree } from '../utils/mergeTree.js'
+import { GitRefManager } from 'managers/GitRefManager'
+import { abbreviateRef } from 'utils/abbreviateRef'
+import { mergeTree } from 'utils/mergeTree'
 
 // import diff3 from 'node-diff3'
 /**

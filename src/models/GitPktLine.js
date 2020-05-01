@@ -49,8 +49,8 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
-import { StreamReader } from '../utils/StreamReader.js'
-import { padHex } from '../utils/padHex.js'
+import { StreamReader } from 'utils/StreamReader'
+import { padHex } from 'utils/padHex'
 
 // I'm really using this more as a namespace.
 // There's not a lot of "state" in a pkt-line

@@ -1,10 +1,10 @@
-import { ObjectTypeError } from '../errors/ObjectTypeError.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
+import { ObjectTypeError } from 'errors/ObjectTypeError'
+import { GitRefManager } from 'managers/GitRefManager'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { _readObject as readObject } from '../storage/readObject.js'
-import { join } from '../utils/join.js'
+import { _readObject as readObject } from 'storage/readObject'
+import { join } from 'utils/join'
 
 export async function listCommitsAndTags({
   fs,

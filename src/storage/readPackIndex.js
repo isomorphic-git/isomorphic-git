@@ -1,4 +1,4 @@
-import { GitPackIndex } from '../models/GitPackIndex.js'
+import { GitPackIndex } from 'models/GitPackIndex'
 
 const PackfileCache = new Map()
 

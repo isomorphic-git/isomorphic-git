@@ -1,5 +1,5 @@
-import { GitPktLine } from '../models/GitPktLine.js'
-import { pkg } from '../utils/pkg'
+import { GitPktLine } from 'models/GitPktLine'
+import { pkg } from 'utils/pkg'
 
 export async function writeRefsAdResponse({ capabilities, refs, symrefs }) {
   const stream = []

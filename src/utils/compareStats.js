@@ -1,4 +1,4 @@
-import { normalizeStats } from './normalizeStats.js'
+import { normalizeStats } from 'utils/normalizeStats'
 
 export function compareStats(entry, stats) {
   // Comparison based on the description in Paragraph 4 of

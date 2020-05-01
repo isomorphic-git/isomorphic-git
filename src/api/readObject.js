@@ -1,14 +1,14 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { ObjectTypeError } from '../errors/ObjectTypeError.js'
+import { ObjectTypeError } from 'errors/ObjectTypeError'
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { GitTree } from '../models/GitTree.js'
-import { _readObject } from '../storage/readObject.js'
+import { GitTree } from 'models/GitTree'
+import { _readObject } from 'storage/readObject'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from '../utils/join.js'
+import { join } from 'utils/join'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
 /**

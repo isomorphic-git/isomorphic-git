@@ -1,5 +1,5 @@
 // @ts-check
-import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { GitConfigManager } from 'managers/GitConfigManager'
 
 /**
  * @param {object} args

@@ -1,10 +1,10 @@
-import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { compareStats } from '../utils/compareStats.js'
-import { join } from '../utils/join'
-import { normalizeStats } from '../utils/normalizeStats.js'
-import { shasum } from '../utils/shasum.js'
+import { GitIndexManager } from 'managers/GitIndexManager'
+import { compareStats } from 'utils/compareStats'
+import { join } from 'utils/join'
+import { normalizeStats } from 'utils/normalizeStats'
+import { shasum } from 'utils/shasum'
 
-import { GitObject } from './GitObject.js'
+import { GitObject } from 'models/GitObject'
 
 export class GitWalkerFs {
   constructor({ fs, dir, gitdir, cache }) {

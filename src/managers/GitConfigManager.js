@@ -1,4 +1,4 @@
-import { GitConfig } from '../models/GitConfig.js'
+import { GitConfig } from 'models/GitConfig'
 
 export class GitConfigManager {
   static async get({ fs, gitdir }) {

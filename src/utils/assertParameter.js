@@ -1,4 +1,4 @@
-import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { MissingParameterError } from 'errors/MissingParameterError'
 
 export function assertParameter(name, value) {
   if (value === undefined) {

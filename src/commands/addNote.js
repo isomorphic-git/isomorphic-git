@@ -1,13 +1,13 @@
 // @ts-check
-import '../typedefs.js'
+import 'typedefs'
 
-import { _commit } from '../commands/commit.js'
-import { _readTree } from '../commands/readTree.js'
-import { _writeTree } from '../commands/writeTree.js'
-import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
-import { NotFoundError } from '../errors/NotFoundError.js'
-import { GitRefManager } from '../managers/GitRefManager.js'
-import { _writeObject as writeObject } from '../storage/writeObject.js'
+import { _commit } from 'commands/commit'
+import { _readTree } from 'commands/readTree'
+import { _writeTree } from 'commands/writeTree'
+import { AlreadyExistsError } from 'errors/AlreadyExistsError'
+import { NotFoundError } from 'errors/NotFoundError'
+import { GitRefManager } from 'managers/GitRefManager'
+import { _writeObject as writeObject } from 'storage/writeObject'
 
 /**
  * @param {object} args

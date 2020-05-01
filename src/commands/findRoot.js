@@ -1,7 +1,7 @@
 // @ts-check
-import { NotFoundError } from '../errors/NotFoundError.js'
-import { dirname } from '../utils/dirname.js'
-import { join } from '../utils/join.js'
+import { NotFoundError } from 'errors/NotFoundError'
+import { dirname } from 'utils/dirname'
+import { join } from 'utils/join'
 
 /**
  * Find the root git directory

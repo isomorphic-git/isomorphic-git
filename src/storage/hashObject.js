@@ -1,5 +1,5 @@
-import { GitObject } from '../models/GitObject.js'
-import { shasum } from '../utils/shasum.js'
+import { GitObject } from 'models/GitObject'
+import { shasum } from 'utils/shasum'
 
 export async function hashObject({
   type,

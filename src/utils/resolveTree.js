@@ -1,8 +1,8 @@
-import { ObjectTypeError } from '../errors/index.js'
-import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
-import { GitCommit } from '../models/GitCommit.js'
-import { GitTree } from '../models/GitTree.js'
-import { _readObject } from '../storage/readObject.js'
+import { ObjectTypeError } from 'errors/index'
+import { GitAnnotatedTag } from 'models/GitAnnotatedTag'
+import { GitCommit } from 'models/GitCommit'
+import { GitTree } from 'models/GitTree'
+import { _readObject } from 'storage/readObject'
 
 export async function resolveTree({ fs, gitdir, oid }) {
   // Empty tree - bypass `readObject`
