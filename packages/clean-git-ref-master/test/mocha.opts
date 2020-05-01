@@ -1,0 +1,5 @@
+test/js/setup.js
+test/src-test/**/*.js
+--compilers js:babel-register
+-R dot
+-u bdd

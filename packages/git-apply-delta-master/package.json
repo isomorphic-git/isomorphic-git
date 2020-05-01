@@ -1,0 +1,56 @@
+{
+  "name": "git-apply-delta",
+  "version": "0.0.7",
+  "description": "apply delta buffer to target buffer",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chrisdickinson/git-apply-delta.git"
+  },
+  "keywords": [
+    "git",
+    "delta",
+    "buffer",
+    "apply"
+  ],
+  "author": "Chris Dickinson <chris@neversaw.us>",
+  "license": "MIT",
+  "dependencies": {
+    "varint": "0.0.3",
+    "bops": "~0.0.6"
+  },
+  "testling": {
+    "files": [
+      "test.js"
+    ],
+    "browsers": {
+      "ie": [
+        9,
+        10
+      ],
+      "firefox": [
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "chrome": [
+        20,
+        21,
+        22,
+        23,
+        "canary"
+      ],
+      "safari": [
+        6
+      ]
+    }
+  },
+  "devDependencies": {
+    "tape": "~1.0.1"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "generator-wf-npm": {
+    "prompts": {
+      "packageName": "clean-git-ref",
+      "targetEnv": [
+        "Node"
+      ]
+    }
+  }
+}

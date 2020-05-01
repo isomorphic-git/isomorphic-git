@@ -1,0 +1,8 @@
+{
+  "extends": "./node_modules/wealthfront-javascript/.eslintrc",
+  "parser": "babel-eslint",
+  "env": {
+    "node": true,
+    "es6": true
+  }
+}

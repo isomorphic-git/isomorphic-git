@@ -1,0 +1,17 @@
+language: node_js
+script: npm test
+node_js:
+- node
+- '6'
+- '4'
+notifications:
+  email: false
+deploy:
+  provider: npm
+  email: npm@eli-white.com
+  api_key:
+    secure: CCwu+jbVxYYyXTdGMEeVoKhXjFSAha0orZUiAt9mR2EVrLpaKeywGHnfbBVPtyPZKxc0GGUa+yfRaM87R1jqusKoBsBwOS6wEzN+fQLQ9gHYvQW2/5SzsbvRNl80gNcT73mkH1e3aMqrGi4o3orO61bxkZaxZ8make18BwLVDddI7XRuncoc6upFaMm/BkxB7Eu2hVBR7K9VzUZKrVSmxHroUTS44S0WK3ffqLTW/axEin0+DwKgqRHryG/+EbW2uCKcf9puCumA2UX+Y47sGJIrSiy110n/mRBhufUIuXKQI7Ej64bKOh9AI5yqpY19HfrOVdNrpnFtKIABKUz+2Vv8jd96QvbMELeeV5WG9GytsuCgZoYYen4w5AHpWfVJcOOHNNXcnw3hA5AO/hSlbVqnt2iNyoXV32cQ/sXiz/mFRHRyi1DiuTHYBF2rU/WkaAA+u2gUDbGeUVbIAjeqMAsifLBgmPIA9bt+zmav5Hmxfib+tq7cP6XPhB0SG/4TEsKRsMu1sOqu5rHCTkU6aZBGZRb66ixqWugNnGlBYRNawcANXJo+zbmZYv5UEJ+UuNQzRE0oUeJ/rVhscGXtmaI5tzAm7fVtTjm5JIpa+IoUcF+lKzkjuYYJr1JMGs0YnS3V5kFUmMT5QwUOFgCTwu5XBerbERovudb9qwHUhVQ=
+  on:
+    tags: true
+    repo: TheSavior/clean-git-ref
+    node: node
