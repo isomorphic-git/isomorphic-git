@@ -8,7 +8,7 @@
  */
 
 // Code originally from https://github.com/crypto-browserify/sha.js/commit/100edf9c567e1e1079dc1d6d7c7725a0644e425c
-// This code has been modified to use modern ECMAScript. -WMH
+// This code has been modified to use Typed ArrayBuffers. -WMH
 
 var K = [
   0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0
@@ -21,18 +21,14 @@ function Hash () {
   this.init()
   this._w = W
 
-  this._block = Buffer.alloc(64)
+  this._buffer = new ArrayBuffer(64)
+  this._block = new DataView(this._buffer)
   this._finalSize = 56
   this._blockSize = 64
   this._len = 0
 }
 
-Hash.prototype.update = function (data, enc) {
-  if (typeof data === 'string') {
-    enc = enc || 'utf8'
-    data = Buffer.from(data, enc)
-  }
-
+Hash.prototype.update = function (data) {
   var block = this._block
   var blockSize = this._blockSize
   var length = data.length
@@ -43,7 +39,7 @@ Hash.prototype.update = function (data, enc) {
     var remainder = Math.min(length - offset, blockSize - assigned)
 
     for (var i = 0; i < remainder; i++) {
-      block[assigned + i] = data[offset + i]
+      block.setUint8(assigned + i, data[offset + i])
     }
 
     accum += remainder
@@ -61,36 +57,36 @@ Hash.prototype.update = function (data, enc) {
 Hash.prototype.digest = function (enc) {
   var rem = this._len % this._blockSize
 
-  this._block[rem] = 0x80
+  this._block.setUint8(rem, 0x80)
 
   // zero (rem + 1) trailing bits, where (rem + 1) is the smallest
   // non-negative solution to the equation (length + 1 + (rem + 1)) === finalSize mod blockSize
-  this._block.fill(0, rem + 1)
+  for (var i = rem + 1; i < this._blockSize; i++) this._block.setUint8(i, 0)
 
   if (rem >= this._finalSize) {
     this._update(this._block)
-    this._block.fill(0)
+    for (i = 0; i < this._blockSize; i++) this._block.setUint8(i, 0)
   }
 
   var bits = this._len * 8
 
   // uint32
   if (bits <= 0xffffffff) {
-    this._block.writeUInt32BE(bits, this._blockSize - 4)
+    this._block.setUint32(this._blockSize - 4, bits)
 
   // uint64
   } else {
     var lowBits = (bits & 0xffffffff) >>> 0
     var highBits = (bits - lowBits) / 0x100000000
 
-    this._block.writeUInt32BE(highBits, this._blockSize - 8)
-    this._block.writeUInt32BE(lowBits, this._blockSize - 4)
+    this._block.setUint32(this._blockSize - 8, highBits)
+    this._block.setUint32(this._blockSize - 4, lowBits)
   }
 
   this._update(this._block)
   var hash = this._hash()
 
-  return enc ? hash.toString(enc) : hash
+  return hash
 }
 
 Hash.prototype.init = function () {
@@ -130,7 +126,7 @@ Hash.prototype._update = function (M) {
   var d = this._d | 0
   var e = this._e | 0
 
-  for (var i = 0; i < 16; ++i) W[i] = M.readInt32BE(i * 4)
+  for (var i = 0; i < 16; ++i) W[i] = M.getUint32(i * 4)
   for (; i < 80; ++i) W[i] = rotl1(W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16])
 
   for (var j = 0; j < 80; ++j) {
