@@ -1,5 +1,5 @@
 # Port of Isomorphic-Git to Moddable SDK
-#### Updated May 1, 2020
+#### Updated May 2, 2020
 #### Peter Hoddie
 
 ## Introduction
@@ -21,15 +21,56 @@ At this time, the port does nothing useful. But it does build, link, and launch.
 
 The original code uses relative paths to import modules. On embedded targets, the Moddable SDK does not support relative paths, only bare module specifiers. All relative path module specifiers needed to build and launch have been converted to bare specifiers. This is incompatible with web hosts. Eventually a better solution is needed
 
-
 ### Resolved issues
 
 - `models/GitConfig.js` - cannot preload as-is because it creates `RegExp` instances at the top level. Worked around with lazy creation of the `RegExp` instances.
 - Avoided need for `pify`  implementing promise support directly in host provided FS
+- asyncLock relies on `process.domain`. Providing a stub works.
+- Code uses `Buffer`, a subclass of Uint8Array Implemented a few needed methods.
+- Implemented http object
+- Added `console.log` that maps to `trace` for XS
+- `BaseError` implements getter/setter to allow error objects to be preloaded (works around "override mistake")
+- XS does not support nulls in strings. The `splitAndAssert` code depends on those. Workaround implemented. It looks like this may appear in other places (`readObject`)
 
 ### Open issues 
 
-- `models/FileSystem.js` - assumes a global `Buffer` which is not part of standard JavaScipt
-- Moddable File is flat FS only.... OK... let's fix that.
+- Moddable File is flat FS only.... OK... let's fix that. (`createDirectory` implemented for macOS simulator for development)
 - SHA module should use Moddable SDK crypto -- smaller and faster
 - Pako will be crazy slow and heavy. Is it required or optional? We have a zlib decoder for PNG but needs a script API to be used here.
+
+### Patches
+
+The `createDirectory` function is needed. For macOS hosts, patch it in as follows:
+
+- In `file.js` add this to the `File` class:
+
+```
+	static createDirectory(path) @ "xs_file_createeDirectory";
+```
+- In mac/modFile.c add this:
+
+```
+void xs_file_createeDirectory(xsMachine *the)
+{
+	char *path = xsmcToString(xsArg(0));
+	int result = mkdir(path, 0755);
+	if (result) {
+		switch (errno) {
+			case EEXIST:
+				break;
+			default:
+				xsUnknownError("failed");
+				break;
+		}
+	}
+	xsResult = xsArg(0);
+}
+```
+
+The same should work for Linux. It should also work for Windows by replacing the call to `mkdir` with:
+
+```
+	int result = _mkdir(path);
+```
+
+There's no patch yet for ESP32.
