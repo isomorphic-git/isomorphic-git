@@ -10,14 +10,12 @@
 // Code originally from https://github.com/crypto-browserify/sha.js/commit/100edf9c567e1e1079dc1d6d7c7725a0644e425c
 // This code has been modified to use Typed ArrayBuffers. -WMH
 
-var K = [
-  0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0
-]
+var K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc | 0, 0xca62c1d6 | 0]
 
 var W = new Array(80)
 
 // prototype class for hash functions
-function Hash () {
+function Hash() {
   this.init()
   this._w = W
 
@@ -28,13 +26,13 @@ function Hash () {
   this._len = 0
 }
 
-Hash.prototype.update = function (data) {
+Hash.prototype.update = function(data) {
   var block = this._block
   var blockSize = this._blockSize
   var length = data.length
   var accum = this._len
 
-  for (var offset = 0; offset < length;) {
+  for (var offset = 0; offset < length; ) {
     var assigned = accum % blockSize
     var remainder = Math.min(length - offset, blockSize - assigned)
 
@@ -45,7 +43,7 @@ Hash.prototype.update = function (data) {
     accum += remainder
     offset += remainder
 
-    if ((accum % blockSize) === 0) {
+    if (accum % blockSize === 0) {
       this._update(block)
     }
   }
@@ -54,7 +52,7 @@ Hash.prototype.update = function (data) {
   return this
 }
 
-Hash.prototype.digest = function (enc) {
+Hash.prototype.digest = function(enc) {
   var rem = this._len % this._blockSize
 
   this._block.setUint8(rem, 0x80)
@@ -74,7 +72,7 @@ Hash.prototype.digest = function (enc) {
   if (bits <= 0xffffffff) {
     this._block.setUint32(this._blockSize - 4, bits)
 
-  // uint64
+    // uint64
   } else {
     var lowBits = (bits & 0xffffffff) >>> 0
     var highBits = (bits - lowBits) / 0x100000000
@@ -89,7 +87,7 @@ Hash.prototype.digest = function (enc) {
   return hash
 }
 
-Hash.prototype.init = function () {
+Hash.prototype.init = function() {
   this._a = 0x67452301
   this._b = 0xefcdab89
   this._c = 0x98badcfe
@@ -99,25 +97,25 @@ Hash.prototype.init = function () {
   return this
 }
 
-function rotl1 (num) {
+function rotl1(num) {
   return (num << 1) | (num >>> 31)
 }
 
-function rotl5 (num) {
+function rotl5(num) {
   return (num << 5) | (num >>> 27)
 }
 
-function rotl30 (num) {
+function rotl30(num) {
   return (num << 30) | (num >>> 2)
 }
 
-function ft (s, b, c, d) {
-  if (s === 0) return (b & c) | ((~b) & d)
+function ft(s, b, c, d) {
+  if (s === 0) return (b & c) | (~b & d)
   if (s === 2) return (b & c) | (b & d) | (c & d)
   return b ^ c ^ d
 }
 
-Hash.prototype._update = function (M) {
+Hash.prototype._update = function(M) {
   var W = this._w
 
   var a = this._a | 0
@@ -147,7 +145,7 @@ Hash.prototype._update = function (M) {
   this._e = (e + this._e) | 0
 }
 
-Hash.prototype._hash = function () {
+Hash.prototype._hash = function() {
   var B = new ArrayBuffer(20)
   var H = new DataView(B)
 
