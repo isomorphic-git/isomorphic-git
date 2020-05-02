@@ -1,11 +1,14 @@
 {
 	"include": [
 		"$(MODDABLE)/examples/manifest_base.json",
+		"$(MODDABLE)/examples/manifest_net.json",
+		"$(MODDABLE)/modules/crypt/tls.json",
 		"$(MODDABLE)/modules/files/file/manifest.json",
 	],
 	"modules": {
 		"*": [
 			"./main",
+			"$(MODULES)/network/http/*",
 		],
 
 		"typedefs": "./typedefs",
@@ -148,6 +151,8 @@
 		"sha.js/sha1": "../packages/stub/sha1",
 	},
 	"preload": [
+		"http",
+
 		"api/*",
 		"commands/*",
 		"errors/*",
@@ -163,5 +168,10 @@
 		"keys": {
 			"available": 32,
 		},
+	},
+	"resources": {
+		"*": [
+			"$(MODULES)/crypt/data/ca107",
+		]
 	},
 }
