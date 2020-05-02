@@ -75,13 +75,37 @@ class http {
 			headers: {},
 		};
 
+		let body;
+		if (options.body) {
+			if (1 !== options.body.length)
+				throw new Error;
+			body = options.body[0].buffer;
+		}
+		const headers = [];
+		if (options.headers) {
+			for (let property in options.headers)
+				headers.push(property, options.headers[property]);
+		}
+
 		return new Promise((resolve, reject) => {
-			const request = new Request({host, path, response: ArrayBuffer, method,
-					port: 443, Socket: SecureSocket, secure: {protocolVersion: 0x303}});
+			const request = new Request({
+					host,
+					path,
+					method,
+					headers,
+					body,
+					response: ArrayBuffer,
+					Socket: SecureSocket,
+					secure: {
+						protocolVersion: 0x303,
+						trace: false
+					},
+					port: 443,
+				});
 			request.callback = function(message, value, etc) {
 				if (Request.status === message)
 					result.statusCode = value;		//@@ statusMessage too
-				if (Request.header === message)
+				else if (Request.header === message)
 					result.headers[value] = etc;
 				else if (Request.responseComplete === message) {
 					result.body = [new Uint8Array(value)];
@@ -96,9 +120,14 @@ class http {
 
 globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclass of the Uint8Array class...
     toString(format) {
-		if ('utf8' !== format)
-			throw new Error("unsupported");
-		return String.fromArrayBuffer(this.buffer);		//@@ incorrect if view is not entire buffer
+		if ('utf8' === format)
+			return String.fromArrayBuffer(this.buffer);		//@@ incorrect if view is not entire buffer
+
+		if ('hex' === format)
+			debugger;
+
+
+		throw new Error("unsupported");
     }
 
 	static concat(buffers, totalLength) {
@@ -117,10 +146,20 @@ globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclas
 		if (!format)
 			return super.from(iterable);
 
-		if ("utf8" !== format)
-			throw new Error;
+		if ("utf8" === format)
+			return new Buffer(ArrayBuffer.fromString(iterable));
 
-		return new Buffer(ArrayBuffer.fromString(iterable));
+		if ("hex" === format)
+			debugger;
+
+		throw new Error;
+
+	}
+	static isBuffer(buffer) {
+		debugger;
+	}
+	static alloc(length) {
+		debugger;
 	}
 }
 
