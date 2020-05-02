@@ -1,6 +1,5 @@
 /* eslint-env node, browser */
-import Hash from 'sha.js/sha1.js'
-
+import Hash from './sha1.js'
 import { toHex } from './toHex.js'
 
 let supportsSubtleSHA1 = null
@@ -16,7 +15,7 @@ export async function shasum(buffer) {
 // but without the 'json-stable-stringify' dependency and
 // extra type-casting features.
 function shasumSync(buffer) {
-  return new Hash().update(buffer).digest('hex')
+  return toHex(new Hash().update(buffer).digest())
 }
 
 async function subtleSHA1(buffer) {
