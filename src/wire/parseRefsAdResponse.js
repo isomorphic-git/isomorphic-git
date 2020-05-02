@@ -63,8 +63,8 @@ function splitAndAssert(line, sep, expected) {
 		)
 	}
 	return [
-		String.fromArrayBuffer(line.slice(0, position).buffer),
-		String.fromArrayBuffer(line.slice(position + 1).buffer),
+		String.fromArrayBuffer(line.slice(0, position).buffer).trimStart(),
+		String.fromArrayBuffer(line.slice(position + 1).buffer).trimEnd(),
 	];
   }
 
