@@ -148,15 +148,16 @@ Hash.prototype._update = function (M) {
 }
 
 Hash.prototype._hash = function () {
-  var H = Buffer.allocUnsafe(20)
+  var B = new ArrayBuffer(20)
+  var H = new DataView(B)
 
-  H.writeInt32BE(this._a | 0, 0)
-  H.writeInt32BE(this._b | 0, 4)
-  H.writeInt32BE(this._c | 0, 8)
-  H.writeInt32BE(this._d | 0, 12)
-  H.writeInt32BE(this._e | 0, 16)
+  H.setUint32(0, this._a | 0)
+  H.setUint32(4, this._b | 0)
+  H.setUint32(8, this._c | 0)
+  H.setUint32(12, this._d | 0)
+  H.setUint32(16, this._e | 0)
 
-  return H
+  return B
 }
 
 export default Hash
