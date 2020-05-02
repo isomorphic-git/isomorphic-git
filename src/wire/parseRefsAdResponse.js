@@ -24,9 +24,10 @@ export async function parseRefsAdResponse(stream, { service }) {
   // In the edge case of a brand new repo, zero refs (and zero capabilities)
   // are returned.
   if (lineTwo === true) return { capabilities, refs, symrefs }
+
   const [firstRef, capabilitiesLine] = splitAndAssert(
-    lineTwo.toString('utf8'),
-    '\x00',
+    lineTwo,
+    0,
     '\\x00'
   )
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
@@ -36,7 +37,7 @@ export async function parseRefsAdResponse(stream, { service }) {
     const line = await read()
     if (line === true) break
     if (line !== null) {
-      const [ref, name] = splitAndAssert(line.toString('utf8'), ' ', ' ')
+      const [ref, name] = splitAndAssert(line, ' '.charCodeAt(), ' ')
       refs.set(name, ref)
     }
   }
@@ -53,6 +54,20 @@ export async function parseRefsAdResponse(stream, { service }) {
 }
 
 function splitAndAssert(line, sep, expected) {
+  if ("string" !== typeof line) {
+    const position = line.indexOf(sep);
+    if ((position < 0) || (line.indexOf(sep, position + 1) >= 0)) {
+		throw new ParseError(
+		  `Two strings separated by '${expected}'`,
+		  line.toString('utf8')
+		)
+	}
+	return [
+		String.fromArrayBuffer(line.slice(0, position).buffer),
+		String.fromArrayBuffer(line.slice(position + 1).buffer),
+	];
+  }
+
   const split = line.trim().split(sep)
   if (split.length !== 2) {
     throw new ParseError(
