@@ -113,7 +113,24 @@ globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclas
 
 		return result;
 	}
+	static from(iterable, format) {
+		if (!format)
+			return super.from(iterable);
+
+		if ("utf8" !== format)
+			throw new Error;
+
+		return new Buffer(ArrayBuffer.fromString(iterable));
+	}
 }
+
+globalThis.console = class {
+	static log(msg) {
+		trace(log, "\n");
+	}
+}
+
+globalThis.process = Object.freeze({domain: null});
 
 await clone({
   fs: {promises: FileSystem},
