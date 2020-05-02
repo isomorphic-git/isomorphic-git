@@ -1,4 +1,6 @@
 export class BaseError extends Error {
+  #name;
+
   constructor(message) {
     super(message)
     // Setting this here allows TS to infer that all git errors have a `caller` property and
@@ -26,6 +28,13 @@ export class BaseError extends Error {
     return e
   }
 
+  // work around "the override mistake"
+  get name() {
+	return this.#name;
+  }
+  set name(value) {
+	this.#name = value;
+  }
   get isIsomorphicGitError() {
     return true
   }
