@@ -61,6 +61,7 @@ class http {
 		debugger;
 	}
 	static async request(options) {
+		const method = options.method ?? "GET";
 		const parts = options.url.split("/");
 		if ("https:" !== parts.shift())
 			throw new Error("https only");
@@ -68,14 +69,24 @@ class http {
 			throw new Error("malformed");
 		const host = parts.shift();
 		const path = "/" + parts.join("/");
+		const result = {
+			url: options.url,
+			method,
+			headers: {},
+		};
 
 		return new Promise((resolve, reject) => {
-			const request = new Request({host, path, response: String,
+			const request = new Request({host, path, response: ArrayBuffer, method,
 					port: 443, Socket: SecureSocket, secure: {protocolVersion: 0x303}});
-			request.callback = function(message, value) {
-			//@@ form eexpect reseponse
-				if (Request.responseComplete === message)
-					resolve(value);
+			request.callback = function(message, value, etc) {
+				if (Request.status === message)
+					result.statusCode = value;		//@@ statusMessage too
+				if (Request.header === message)
+					result.headers[value] = etc;
+				else if (Request.responseComplete === message) {
+					result.body = [new Uint8Array(value)];
+					resolve(result);
+				}
 				else if (message < 0)
 					reject(-1);
 			}
@@ -83,11 +94,32 @@ class http {
 	}
 }
 
+globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclass of the Uint8Array class...
+    toString(format) {
+		if ('utf8' !== format)
+			throw new Error("unsupported");
+		return String.fromArrayBuffer(this.buffer);		//@@ incorrect if view is not entire buffer
+    }
+
+	static concat(buffers, totalLength) {
+		if (undefined === totalLength) {
+			totalLength = 0;
+			for (let i = 0; i < buffers.length; i++)
+				totalLength += buffers[i].length;
+		}
+		const result = new Uint8Array(totalLength);
+		for (let i = 0, position = 0; i < buffers.length; position += buffers[i].length, i++)
+			result.set(buffers[i], position);
+
+		return result;
+	}
+}
+
 await clone({
   fs: {promises: FileSystem},
   http,
   dir,
-  url: 'https://github.com/isomorphic-git/isomorphic-git',
+  url: 'https://github.com/isomorphic-git/isomorphic-git.git',
   ref: 'master',
   singleBranch: true,
   depth: 10
