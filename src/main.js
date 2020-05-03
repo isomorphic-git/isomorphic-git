@@ -1,7 +1,7 @@
 import http from "http/moddable"
 import fs from "fs/moddable"
 
-import { clone } from 'api/clone'
+import { fetch } from 'api/fetch'
 import { getRemoteInfo } from 'api/getRemoteInfo'
 import { init } from 'api/init'
 
@@ -120,3 +120,27 @@ await init({
 	fs,
 	dir: '/tmp/moddable-test',
 })
+let files = await fs.promises.readdir('/tmp/moddable-test/.git')
+// should print:
+// [
+//   "config",
+//   "objects",
+//   "HEAD",
+//   "info",
+//   "hooks",
+//   "refs"
+// ]
+console.log(JSON.stringify(files, null, 2))
+
+// This should create a packfile and a packfile index in
+// /tmp/moddable-test/.git/objects/pack
+const fetchResult = await fetch({
+	http,
+	fs,
+	dir: '/tmp/moddable-test',
+	onMessage (msg) {
+		console.log(msg)
+	}
+})
+
+console.log(JSON.stringify(fetchResult, null, 2))

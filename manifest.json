@@ -14,6 +14,7 @@
 		"typedefs": "./typedefs",
 		"typedefs-http": "./typedefs-http",
 		"api/clone": "./api/clone",
+		"api/fetch": "./api/fetch",
 		"api/getRemoteInfo": "./api/getRemoteInfo",
 		"api/init": "./api/init",
 
