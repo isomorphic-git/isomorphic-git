@@ -3,9 +3,9 @@ import 'typedefs'
 
 import { join } from 'utils/join'
 
-import { _init } from '../commands/init.js'
-import { FileSystem } from '../models/FileSystem.js'
-import { assertParameter } from '../utils/assertParameter.js'
+import { _init } from 'commands/init'
+import { FileSystem } from 'models/FileSystem'
+import { assertParameter } from 'utils/assertParameter'
 
 /**
  * Initialize a new repository
