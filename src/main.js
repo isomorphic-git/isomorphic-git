@@ -65,7 +65,8 @@ globalThis.process = Object.freeze({domain: null});
 
 // Main code
 const result = await getRemoteInfo({
-  http,
+	http,
+	corsProxy: 'http://localhost:9998',
   url: 'https://github.com/isomorphic-git/test.empty.git',
 });
 
@@ -154,6 +155,7 @@ console.log(JSON.stringify(branch, null, 2))
 const fetchResult = await fetch({
 	http,
 	fs,
+	corsProxy: 'http://localhost:9998',
 	dir: '/tmp/moddable-test',
 	onMessage (msg) {
 		console.log(msg)

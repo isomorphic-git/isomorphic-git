@@ -12,6 +12,7 @@ At this time, the port does nothing useful. But it does build, link, and launch.
 
 - Download the latest Moddable SDK (May 1 or later)
 - `cd ${isomorphic-git}/src`
+- `./node_modules/.bin/cors-proxy start -p 9998` to launch the CORS proxy (not technically needed, but eliminates TLS as a possible source of error)
 - `mcconfig -d -m` to build for and run on simulator
 - `mcconfig -d -m -p esp32` to build for and run on ESP32
 
