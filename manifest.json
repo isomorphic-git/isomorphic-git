@@ -14,6 +14,7 @@
 		"typedefs": "./typedefs",
 		"typedefs-http": "./typedefs-http",
 		"api/clone": "./api/clone",
+		"api/getRemoteInfo": "./api/getRemoteInfo",
 		"commands/STAGE": "./commands/STAGE",
 		"commands/TREE": "./commands/TREE",
 		"commands/WORKDIR": "./commands/WORKDIR",
@@ -53,6 +54,10 @@
 		"errors/MergeNotSupportedError": "./errors/MergeNotSupportedError",
 		"errors/ObjectTypeError": "./errors/ObjectTypeError",
 		"errors/UnknownTransportError": "./errors/UnknownTransportError",
+
+		"fs/moddable": "./fs/moddable/index",
+
+		"http/moddable": "./http/moddable/index",
 
 		"managers/GitConfigManager": "./managers/GitConfigManager",
 		"managers/GitIndexManager": "./managers/GitIndexManager",
@@ -134,7 +139,6 @@
 
 		"wire/parseRefsAdResponse": "./wire/parseRefsAdResponse",
 		"wire/parseReceivePackResponse": "./wire/parseReceivePackResponse",
-		"wire/parseUploadPackRequest": "./wire/parseUploadPackRequest",
 		"wire/parseUploadPackRequest": "./wire/parseUploadPackRequest",
 		"wire/writeReceivePackRequest": "./wire/writeReceivePackRequest",
 		"wire/writeUploadPackRequest": "./wire/writeUploadPackRequest",

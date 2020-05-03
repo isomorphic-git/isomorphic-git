@@ -2,12 +2,11 @@
 import { InvalidOidError } from 'errors/InvalidOidError'
 import { NoRefspecError } from 'errors/NoRefspecError'
 import { NotFoundError } from 'errors/NotFoundError'
+import { GitConfigManager } from 'managers/GitConfigManager'
 import { GitPackedRefs } from 'models/GitPackedRefs'
 import { GitRefSpecSet } from 'models/GitRefSpecSet'
 import { compareRefNames } from 'utils/compareRefNames'
 import { join } from 'utils/join'
-
-import { GitConfigManager } from 'managers/GitConfigManager'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [

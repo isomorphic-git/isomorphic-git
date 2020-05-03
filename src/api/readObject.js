@@ -2,13 +2,14 @@
 import 'typedefs'
 
 import { ObjectTypeError } from 'errors/ObjectTypeError'
+import { GitTree } from 'models/GitTree'
+import { _readObject } from 'storage/readObject'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { GitTree } from 'models/GitTree'
-import { _readObject } from 'storage/readObject'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
 /**

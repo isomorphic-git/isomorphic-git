@@ -1,8 +1,8 @@
 // @ts-check
 import 'typedefs'
 
-import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
-import { assertParameter } from '../utils/assertParameter.js'
+import { GitRemoteHTTP } from 'managers/GitRemoteHTTP'
+import { assertParameter } from 'utils/assertParameter'
 
 /**
  *

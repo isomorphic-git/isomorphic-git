@@ -2,9 +2,10 @@
 import 'typedefs'
 
 import { GitConfigManager } from 'managers/GitConfigManager'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Write an entry to the git config files.

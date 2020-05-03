@@ -6,7 +6,6 @@ import { _walk } from 'commands/walk'
 import { MergeNotSupportedError } from 'errors/MergeNotSupportedError'
 import { GitTree } from 'models/GitTree'
 import { _writeObject as writeObject } from 'storage/writeObject'
-
 import { basename } from 'utils/basename'
 import { join } from 'utils/join'
 import { mergeFile } from 'utils/mergeFile'

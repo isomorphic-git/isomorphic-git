@@ -1,10 +1,11 @@
 // @ts-check
 import 'typedefs'
 
+import { join } from 'utils/join'
+
 import { _walk } from '../commands/walk.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * @callback WalkerMap

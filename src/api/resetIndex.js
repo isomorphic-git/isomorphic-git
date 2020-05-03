@@ -1,10 +1,11 @@
 // @ts-check
 import { GitIndexManager } from 'managers/GitIndexManager'
 import { GitRefManager } from 'managers/GitRefManager'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { hashObject } from '../utils/hashObject.js'
-import { join } from 'utils/join'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
 /**

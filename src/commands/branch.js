@@ -2,7 +2,6 @@
 import 'typedefs'
 
 import cleanGitRef from 'clean-git-ref'
-
 import { AlreadyExistsError } from 'errors/AlreadyExistsError'
 import { InvalidRefNameError } from 'errors/InvalidRefNameError'
 import { GitRefManager } from 'managers/GitRefManager'

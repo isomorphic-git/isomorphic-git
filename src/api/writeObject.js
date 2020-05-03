@@ -2,12 +2,13 @@
 import 'typedefs'
 
 import { ObjectTypeError } from 'errors/ObjectTypeError'
+import { GitTree } from 'models/GitTree'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { GitTree } from 'models/GitTree'
 import { _writeObject } from '../storage/writeObject.js'
-import { join } from 'utils/join'
 
 /**
  * Write a git object directly

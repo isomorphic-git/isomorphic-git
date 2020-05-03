@@ -1,10 +1,11 @@
 // @ts-check
 import 'typedefs'
 
+import { join } from 'utils/join'
+
 import { _deleteTag } from '../commands/deleteTag.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Delete a local tag ref

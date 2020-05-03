@@ -1,9 +1,10 @@
 // @ts-check
-import { InvalidFilepathError } from '../errors/InvalidFilepathError.js'
 import { NotFoundError } from 'errors/NotFoundError'
 import { ObjectTypeError } from 'errors/ObjectTypeError'
 import { GitTree } from 'models/GitTree'
 import { _readObject as readObject } from 'storage/readObject'
+
+import { InvalidFilepathError } from '../errors/InvalidFilepathError.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
 export async function resolveFilepath({ fs, gitdir, oid, filepath }) {

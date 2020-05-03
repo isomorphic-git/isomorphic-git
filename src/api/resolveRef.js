@@ -1,8 +1,9 @@
 // @ts-check
 import { GitRefManager } from 'managers/GitRefManager'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Get the value of a symbolic ref or resolve a ref to its SHA-1 object id

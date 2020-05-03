@@ -1,7 +1,8 @@
 // @ts-check
-import { _readTree } from '../commands/readTree'
 import { NotFoundError } from 'errors/NotFoundError'
 import { GitRefManager } from 'managers/GitRefManager'
+
+import { _readTree } from '../commands/readTree'
 
 /**
  * List all the object notes

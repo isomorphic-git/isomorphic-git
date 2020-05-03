@@ -1,10 +1,11 @@
 // @ts-check
 import 'typedefs'
 
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Write a blob object directly

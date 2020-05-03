@@ -1,10 +1,11 @@
 // @ts-check
 import 'typedefs'
 
+import { join } from 'utils/join'
+
 import { _deleteRemote } from '../commands/deleteRemote.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Removes the local config entry for a given remote

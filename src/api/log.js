@@ -1,10 +1,11 @@
 // @ts-check
 import 'typedefs'
 
+import { join } from 'utils/join'
+
 import { _log } from '../commands/log.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Get commit descriptions from the git history

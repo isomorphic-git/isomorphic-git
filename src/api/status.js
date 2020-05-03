@@ -1,17 +1,18 @@
 // @ts-check
-import { _readTree } from '../commands/readTree.js'
 import { NotFoundError } from 'errors/NotFoundError'
-import { ObjectTypeError } from '../errors/ObjectTypeError'
-import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from 'managers/GitIndexManager'
 import { GitRefManager } from 'managers/GitRefManager'
-import { FileSystem } from '../models/FileSystem.js'
 import { GitTree } from 'models/GitTree'
 import { _readObject } from 'storage/readObject'
-import { assertParameter } from '../utils/assertParameter.js'
 import { compareStats } from 'utils/compareStats'
-import { hashObject } from '../utils/hashObject.js'
 import { join } from 'utils/join'
+
+import { _readTree } from '../commands/readTree.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError'
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
+import { FileSystem } from '../models/FileSystem.js'
+import { assertParameter } from '../utils/assertParameter.js'
+import { hashObject } from '../utils/hashObject.js'
 
 /**
  * Tell whether a file has been changed

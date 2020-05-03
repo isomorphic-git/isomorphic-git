@@ -1,6 +1,5 @@
 /* eslint-env node, browser */
 import Hash from 'sha.js/sha1'
-
 import { toHex } from 'sha.js/toHex'
 
 let supportsSubtleSHA1 = null

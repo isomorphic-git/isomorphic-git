@@ -1,5 +1,4 @@
 import ignore from 'ignore'
-
 import { basename } from 'utils/basename'
 import { dirname } from 'utils/dirname'
 import { join } from 'utils/join'

@@ -1,7 +1,8 @@
 // @ts-check
-import { _currentBranch } from '../commands/currentBranch'
 import { NotFoundError } from 'errors/NotFoundError'
 import { GitRefManager } from 'managers/GitRefManager'
+
+import { _currentBranch } from '../commands/currentBranch'
 
 /**
  * @param {Object} args

@@ -2,9 +2,10 @@
 import 'typedefs'
 
 import { GitRefManager } from 'managers/GitRefManager'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * List branches

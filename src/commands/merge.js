@@ -1,14 +1,15 @@
 // @ts-check
 import 'typedefs'
 
-import { _commit } from '../commands/commit'
 import { _currentBranch } from 'commands/currentBranch'
-import { _findMergeBase } from '../commands/findMergeBase.js'
-import { FastForwardError } from '../errors/FastForwardError.js'
-import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitRefManager } from 'managers/GitRefManager'
 import { abbreviateRef } from 'utils/abbreviateRef'
 import { mergeTree } from 'utils/mergeTree'
+
+import { _commit } from '../commands/commit'
+import { _findMergeBase } from '../commands/findMergeBase.js'
+import { FastForwardError } from '../errors/FastForwardError.js'
+import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 
 // import diff3 from 'node-diff3'
 /**

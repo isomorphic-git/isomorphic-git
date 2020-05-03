@@ -19,9 +19,8 @@ information.
 If no 'side-band' capability was specified, the server will stream the
 entire packfile without multiplexing.
 */
-import { FIFO } from 'utils/FIFO'
-
 import { GitPktLine } from 'models/GitPktLine'
+import { FIFO } from 'utils/FIFO'
 
 export class GitSideBand {
   static demux(input) {

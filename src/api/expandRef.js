@@ -2,9 +2,10 @@
 import 'typedefs'
 
 import { GitRefManager } from 'managers/GitRefManager'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Expand an abbreviated ref to its full name

@@ -1,5 +1,4 @@
 import pify from 'pify'
-
 import { compareStrings } from 'utils/compareStrings'
 import { dirname } from 'utils/dirname'
 

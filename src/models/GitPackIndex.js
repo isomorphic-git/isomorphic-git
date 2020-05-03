@@ -1,13 +1,11 @@
 import crc32 from 'crc-32'
-import applyDelta from 'git-apply-delta'
-
 import { InternalError } from 'errors/InternalError'
+import applyDelta from 'git-apply-delta'
+import { GitObject } from 'models/GitObject'
 import { BufferCursor } from 'utils/BufferCursor'
 import { listpack } from 'utils/git-list-pack'
 import { inflate } from 'utils/inflate'
 import { shasum } from 'utils/shasum'
-
-import { GitObject } from 'models/GitObject'
 
 function decodeVarInt(reader) {
   const bytes = []

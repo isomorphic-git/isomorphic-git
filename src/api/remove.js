@@ -2,9 +2,10 @@
 import 'typedefs'
 
 import { GitIndexManager } from 'managers/GitIndexManager'
+import { join } from 'utils/join'
+
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Remove a file from the git index (aka staging area)

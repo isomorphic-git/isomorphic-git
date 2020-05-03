@@ -1,7 +1,8 @@
 import { ObjectTypeError } from 'errors/ObjectTypeError'
+import { _readObject as readObject } from 'storage/readObject'
+
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { _readObject as readObject } from 'storage/readObject'
 
 export async function resolveCommit({ fs, gitdir, oid }) {
   const { type, object } = await readObject({ fs, gitdir, oid })

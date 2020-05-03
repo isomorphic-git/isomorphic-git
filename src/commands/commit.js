@@ -3,10 +3,11 @@ import 'typedefs'
 
 import { GitIndexManager } from 'managers/GitIndexManager'
 import { GitRefManager } from 'managers/GitRefManager'
-import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from 'models/GitTree'
-import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from 'utils/flatFileListToDirectoryStructure'
+
+import { GitCommit } from '../models/GitCommit.js'
+import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 /**
  *

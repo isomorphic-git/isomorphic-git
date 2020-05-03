@@ -25,11 +25,7 @@ export async function parseRefsAdResponse(stream, { service }) {
   // are returned.
   if (lineTwo === true) return { capabilities, refs, symrefs }
 
-  const [firstRef, capabilitiesLine] = splitAndAssert(
-    lineTwo,
-    0,
-    '\\x00'
-  )
+  const [firstRef, capabilitiesLine] = splitAndAssert(lineTwo, 0, '\\x00')
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
   const [ref, name] = splitAndAssert(firstRef, ' ', ' ')
   refs.set(name, ref)
@@ -54,18 +50,18 @@ export async function parseRefsAdResponse(stream, { service }) {
 }
 
 function splitAndAssert(line, sep, expected) {
-  if ("string" !== typeof line) {
-    const position = line.indexOf(sep);
-    if ((position < 0) || (line.indexOf(sep, position + 1) >= 0)) {
-		throw new ParseError(
-		  `Two strings separated by '${expected}'`,
-		  line.toString('utf8')
-		)
-	}
-	return [
-		String.fromArrayBuffer(line.slice(0, position).buffer).trimStart(),
-		String.fromArrayBuffer(line.slice(position + 1).buffer).trimEnd(),
-	];
+  if (typeof line !== 'string') {
+    const position = line.indexOf(sep)
+    if (position < 0 || line.indexOf(sep, position + 1) >= 0) {
+      throw new ParseError(
+        `Two strings separated by '${expected}'`,
+        line.toString('utf8')
+      )
+    }
+    return [
+      String.fromArrayBuffer(line.slice(0, position).buffer).trimStart(),
+      String.fromArrayBuffer(line.slice(position + 1).buffer).trimEnd(),
+    ]
   }
 
   const split = line.trim().split(sep)

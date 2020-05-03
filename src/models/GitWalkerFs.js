@@ -1,10 +1,9 @@
 import { GitIndexManager } from 'managers/GitIndexManager'
+import { GitObject } from 'models/GitObject'
 import { compareStats } from 'utils/compareStats'
 import { join } from 'utils/join'
 import { normalizeStats } from 'utils/normalizeStats'
 import { shasum } from 'utils/shasum'
-
-import { GitObject } from 'models/GitObject'
 
 export class GitWalkerFs {
   constructor({ fs, dir, gitdir, cache }) {

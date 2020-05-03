@@ -2,12 +2,13 @@
 import 'typedefs'
 
 import { NotFoundError } from 'errors/NotFoundError'
-import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from 'managers/GitIndexManager'
+import { join } from 'utils/join'
+
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
-import { join } from 'utils/join'
 
 /**
  * Add a file to the git index (aka staging area)

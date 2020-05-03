@@ -1,8 +1,9 @@
-import { AmbiguousError } from '../errors/AmbiguousError.js'
 import { NotFoundError } from 'errors/NotFoundError'
+import { _readObject as readObject } from 'storage/readObject'
+
+import { AmbiguousError } from '../errors/AmbiguousError.js'
 import { expandOidLoose } from '../storage/expandOidLoose.js'
 import { expandOidPacked } from '../storage/expandOidPacked.js'
-import { _readObject as readObject } from 'storage/readObject'
 
 export async function _expandOid({ fs, gitdir, oid: short }) {
   // Curry the current read method so that the packfile un-deltification
