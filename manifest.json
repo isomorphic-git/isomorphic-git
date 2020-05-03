@@ -13,7 +13,9 @@
 
 		"typedefs": "./typedefs",
 		"typedefs-http": "./typedefs-http",
+		"api/addRemote": "./api/addRemote",
 		"api/clone": "./api/clone",
+		"api/currentBranch": "./api/currentBranch",
 		"api/fetch": "./api/fetch",
 		"api/getRemoteInfo": "./api/getRemoteInfo",
 		"api/init": "./api/init",
@@ -171,7 +173,7 @@
 	],
 	"creation": {
 		"static": 98304,
-		"stack": 512,
+		"stack": 1024,
 		"keys": {
 			"available": 32,
 		},

@@ -1,6 +1,8 @@
 import http from "http/moddable"
 import fs from "fs/moddable"
 
+import { addRemote } from 'api/addRemote'
+import { currentBranch } from 'api/currentBranch'
 import { fetch } from 'api/fetch'
 import { getRemoteInfo } from 'api/getRemoteInfo'
 import { init } from 'api/init'
@@ -132,6 +134,21 @@ let files = await fs.promises.readdir('/tmp/moddable-test/.git')
 // ]
 console.log(JSON.stringify(files, null, 2))
 
+
+await addRemote({
+	fs,
+	dir: '/tmp/moddable-test',
+	remote: 'origin',
+	url: 'https://github.com/isomorphic-git/test.empty.git',
+	force: false,
+})
+
+const branch = await currentBranch({
+	fs,
+	dir: '/tmp/moddable-test',
+})
+console.log(JSON.stringify(branch, null, 2))
+
 // This should create a packfile and a packfile index in
 // /tmp/moddable-test/.git/objects/pack
 const fetchResult = await fetch({
@@ -140,7 +157,7 @@ const fetchResult = await fetch({
 	dir: '/tmp/moddable-test',
 	onMessage (msg) {
 		console.log(msg)
-	}
+	},
 })
 
 console.log(JSON.stringify(fetchResult, null, 2))

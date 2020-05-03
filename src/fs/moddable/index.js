@@ -13,6 +13,11 @@ class FsPromisesClient {
       result = f.read(String)
       f.close()
     } catch (e) {
+      if (e.message === 'File: file not found') {
+        const err = new Error('ENOENT')
+        err.code = 'ENOENT'
+        throw err
+      }
       console.log(
         `Error reading file "${path}" with options ${JSON.stringify(options)}`
       )
@@ -70,6 +75,10 @@ class FsPromisesClient {
   }
 
   static async symlink() {
+    debugger
+  }
+
+  static async chmod() {
     debugger
   }
 }
