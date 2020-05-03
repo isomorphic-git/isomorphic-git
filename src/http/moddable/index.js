@@ -36,7 +36,9 @@ export default class HttpClient {
 
     let body
     if (options.body) {
-      if (options.body.length !== 1) throw new Error()
+      if (options.body.length !== 1) {
+        throw new Error('Need to handle iterable case')
+      }
       body = options.body[0].buffer
     }
     const headers = []

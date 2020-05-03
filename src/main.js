@@ -9,41 +9,47 @@ import { init } from 'api/init'
 
 // Buffer shim
 globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclass of the Uint8Array class...
-    toString(format) {
+  toString(format) {
 		if ('utf8' === format)
 			return String.fromArrayBuffer(this.buffer);		//@@ incorrect if view is not entire buffer
 
-		if ('hex' === format)
-			debugger;
-
+		if ('hex' === format) {
+			let hex = ''
+			for (const byte of this) {
+				if (byte < 16) hex += '0'
+				hex += byte.toString(16)
+			}
+			return hex
+		}
 
 		throw new Error("unsupported");
-    }
+  }
 
-	static concat(buffers, totalLength) {
-		if (undefined === totalLength) {
-			totalLength = 0;
-			for (let i = 0; i < buffers.length; i++)
-				totalLength += buffers[i].length;
+	static concat(buffers) {
+		let size = 0
+		for (const buffer of buffers) {
+			size += buffer.byteLength
 		}
-		const result = new Uint8Array(totalLength);
-		for (let i = 0, position = 0; i < buffers.length; position += buffers[i].length, i++)
-			result.set(buffers[i], position);
-
-		return result;
+		const result = new globalThis.Buffer(size)
+		let nextIndex = 0
+		for (const buffer of buffers) {
+			result.set(buffer, nextIndex)
+			nextIndex += buffer.byteLength
+		}
+		return result
 	}
-	static from(iterable, format) {
-		if (!format)
-			return super.from(iterable);
 
-		if ("utf8" === format)
+	static from(iterable, format) {
+		if (typeof iterable === 'string') {
+			if (!format || "utf8" === format)
 			return new Buffer(ArrayBuffer.fromString(iterable));
 
-		if ("hex" === format)
-			debugger;
+			if ("hex" === format)
+				debugger;
+		}
 
-		throw new Error;
-
+		if (!format)
+			return super.from(iterable);
 	}
 	static isBuffer(buffer) {
 		debugger;
@@ -67,7 +73,7 @@ globalThis.process = Object.freeze({domain: null});
 const result = await getRemoteInfo({
 	http,
 	corsProxy: 'http://localhost:9998',
-  url: 'https://github.com/isomorphic-git/test.empty.git',
+  url: 'https://github.com/isomorphic-git/test.empty',
 });
 
 // This should print:
@@ -141,7 +147,7 @@ await addRemote({
 	dir: '/tmp/moddable-test',
 	remote: 'origin',
 	url: 'https://github.com/isomorphic-git/test.empty.git',
-	force: false,
+	force: true,
 })
 
 const branch = await currentBranch({
