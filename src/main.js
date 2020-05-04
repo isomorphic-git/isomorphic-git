@@ -33,8 +33,8 @@ class FileSystem {
 	static async rmdir() {
 		debugger;
 	}
-	static async unlink() {
-		debugger;
+	static async unlink(path) {
+		File.delete(path);
 	}
 	static async stat(path) {
 		if (File.exists(path))
