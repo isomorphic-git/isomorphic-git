@@ -39,8 +39,9 @@ export class ModdableBuffer extends Uint8Array {
           throw new Error('Buffer.from with hex encoding should have even number of characters')
         }
         const buffer = new ModdableBuffer(iterable.length / 2)
-        for (let i = 0, j = 0; i < iterable.length; i++, j += 2) {
+        for (let i = 0, j = 0; i < iterable.length / 2; i++, j += 2) {
           buffer[i] = parseInt(iterable.slice(j, j + 2), 16)
+          console.log(`buffer[${i}] = ${buffer[i]}`)
         }
         return buffer
       }
@@ -83,8 +84,7 @@ export class ModdableBuffer extends Uint8Array {
     if (!encoding) encoding = 'utf8'
     if (length) debugger
     if (!offset) offset = 0
-
     const buffer = ModdableBuffer.from(content, encoding)
-    this.set(buffer.buffer, offset)
+    this.set(buffer, offset)
   }
 }
