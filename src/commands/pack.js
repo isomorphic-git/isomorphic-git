@@ -1,6 +1,6 @@
-import Hash from 'sha.js/sha1.js'
 import { _readObject as readObject } from 'storage/readObject'
 import { join } from 'utils/join'
+import Hash from 'utils/sha1.js'
 
 import { types } from '../commands/types.js'
 import { deflate } from '../utils/deflate.js'
@@ -57,6 +57,6 @@ export async function _pack({ fs, dir, gitdir = join(dir, '.git'), oids }) {
   }
   // Write SHA1 checksum
   const digest = hash.digest()
-  outputStream.push(digest)
+  outputStream.push(Buffer.from(digest))
   return outputStream
 }
