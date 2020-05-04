@@ -9,7 +9,7 @@ export class ModdableBuffer extends Uint8Array {
         if (byte < 16) hex += '0'
         hex += byte.toString(16)
       }
-      return hex
+      return hex.toLowerCase()
     }
 
     throw new Error('unsupported')
