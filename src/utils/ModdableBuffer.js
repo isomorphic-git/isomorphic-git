@@ -50,7 +50,15 @@ export class ModdableBuffer extends Uint8Array {
 
   readUInt32BE(pos) {
     if (!this.view) this.view = new DataView(this.buffer)
-    const a = this.view.getUint32(pos)
-    return a
+    return this.view.getUint32(pos)
+  }
+
+  writeUInt32BE(val, pos) {
+    if (!this.view) this.view = new DataView(this.buffer)
+    this.view.setUint32(pos, val)
+  }
+
+  readUInt8(pos) {
+    return this[pos]
   }
 }

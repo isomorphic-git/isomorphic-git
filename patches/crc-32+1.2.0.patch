@@ -1,0 +1,10 @@
+diff --git a/node_modules/crc-32/crc32.js b/node_modules/crc-32/crc32.js
+index 6bcecef..d8c6018 100644
+--- a/node_modules/crc-32/crc32.js
++++ b/node_modules/crc-32/crc32.js
+@@ -116,3 +116,5 @@ CRC32.buf = crc32_buf;
+ // $FlowIgnore
+ CRC32.str = crc32_str;
+ }));
++
++export default CRC32;

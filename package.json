@@ -22,7 +22,8 @@
     "publish-website": "nps website",
     "prepublishOnly": "nps prepublish",
     "semantic-release": "semantic-release",
-    "add-contributor": "nps contributors.add"
+    "add-contributor": "nps contributors.add",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -59,6 +60,7 @@
     "ignore": "^5.1.4",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
+    "patch-package": "^6.2.2",
     "pify": "^4.0.1",
     "readable-stream": "^3.4.0",
     "sha.js": "^2.4.9",

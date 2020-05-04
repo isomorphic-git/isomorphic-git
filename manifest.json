@@ -153,9 +153,9 @@
 
 		"async-lock": "../packages/async-lock-master/lib/index",
 		"clean-git-ref": "../packages/clean-git-ref-master/src/index",
-		"crc-32": "../packages/stub/crc32",
+		"crc-32": "../node_modules/crc-32/crc32",
 		"git-apply-delta": "../packages/git-apply-delta-master/index",
-		"pako": "../packages/stub/pako",
+		"pako": "../node_modules/pako/dist/pako.min",
 		"pify": "../packages/stub/pify",
 		"sha.js/toHex": "../packages/stub/toHex",
 		"sha.js/sha1": "../packages/stub/sha1",
@@ -184,4 +184,5 @@
 			"$(MODULES)/crypt/data/ca107",
 		]
 	},
+	"strip": [],
 }
