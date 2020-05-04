@@ -51,7 +51,7 @@ export class GitPackIndex {
     const magic = reader.slice(4).toString('hex')
     // Check for IDX v2 magic number
     if (magic !== 'ff744f63') {
-      return // undefined
+      throw new Error('Unrecognized packfile version')
     }
     const version = reader.readUInt32BE()
     if (version !== 2) {

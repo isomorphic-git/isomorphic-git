@@ -1,6 +1,6 @@
 import { GitPackIndex } from 'models/GitPackIndex'
 
-const PackfileCache = new Map()
+let PackfileCache
 
 async function loadPackIndex({
   fs,
@@ -20,6 +20,9 @@ export function readPackIndex({
   emitter,
   emitterPrefix,
 }) {
+  // Lazy instantiate PackfileCache
+  if (!PackfileCache) PackfileCache = new Map()
+
   // Try to get the packfile index from the in-memory cache
   let p = PackfileCache.get(filename)
   if (!p) {

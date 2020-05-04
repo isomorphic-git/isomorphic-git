@@ -6,14 +6,22 @@ import { Stat } from 'fs/moddable/Stat'
 
 class FsPromisesClient {
   static async readFile(path, options = {}) {
-    if (options && options.encoding !== 'utf8') {
+    if (typeof options === 'string') {
+      options = { encoding: options }
+    } else if (!options) {
+      options = {}
+    }
+
+    const { encoding } = options
+
+    if (encoding && encoding !== 'utf8') {
       throw new Error('unrecognized encoding')
     }
 
     let result = null
     try {
       const f = new File(path)
-      result = f.read(String)
+      result = f.read(encoding ? String : ArrayBuffer)
       f.close()
     } catch (e) {
       if (e.message === 'File: file not found') {
@@ -27,7 +35,7 @@ class FsPromisesClient {
       console.log(e.message)
       throw e
     }
-    return result
+    return encoding ? result : new Uint8Array(result)
   }
 
   static async writeFile(path, content, options) {
@@ -99,7 +107,6 @@ class FsPromisesClient {
       })
     } catch (e) {
       console.log(`new File(${path})`)
-      debugger
       const err = new Error()
       err.code = 'ENOENT'
       throw err
