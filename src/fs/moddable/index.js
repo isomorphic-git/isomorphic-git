@@ -2,6 +2,7 @@
 
 // import { File, Iterator, System } from 'file'
 import { File, Iterator } from 'file'
+import { Stat } from 'fs/moddable/Stat'
 
 class FsPromisesClient {
   static async readFile(path, options = {}) {
@@ -82,8 +83,27 @@ class FsPromisesClient {
     throw e
   }
 
-  static async lstat() {
-    debugger
+  static async lstat(path) {
+    try {
+      const f = new File(path)
+      return new Stat({
+        type: 'file',
+        mode: 0o644,
+        size: f.length,
+        ino: 1,
+        mtimeMs: 0,
+        ctimeMs: 0,
+        uid: 1,
+        gid: 1,
+        dev: 1,
+      })
+    } catch (e) {
+      console.log(`new File(${path})`)
+      debugger
+      const err = new Error()
+      err.code = 'ENOENT'
+      throw err
+    }
   }
 
   static async readdir(path) {

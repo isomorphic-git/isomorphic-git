@@ -50,7 +50,7 @@ export class ModdableBuffer extends Uint8Array {
   }
 
   static isBuffer(buffer) {
-    debugger
+    return buffer instanceof ModdableBuffer
   }
 
   static alloc(length) {
