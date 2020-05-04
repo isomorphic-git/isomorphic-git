@@ -120,13 +120,28 @@ class http {
 	}
 }
 
+const hexdigits = "0123456789abcdef";
 globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclass of the Uint8Array class...
+	#dataView = new DataView(this.buffer);
+
+	readUInt32BE(offset = 0) {
+		return this.#dataView.getUint32(offset, false);
+	}
+	readUInt32LE(offset = 0) {
+		return this.#dataView.getUint32(offset, true);
+	}
     toString(format) {
 		if ('utf8' === format)
 			return String.fromArrayBuffer(this.buffer);		//@@ incorrect if view is not entire buffer
 
-		if ('hex' === format)
-			debugger;
+		if ('hex' === format) {
+			let result = "";
+			for (let i = 0, length = this.length; i < length; i++) {
+				const value = this[i];
+				result += hexdigits[value >> 4] + hexdigits[value & 15];
+			}
+			return result;
+		}
 
 
 		throw new Error("unsupported");
