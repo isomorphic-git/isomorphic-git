@@ -131,6 +131,13 @@ globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclas
     }
 
 	static concat(buffers, totalLength) {
+		for (let i = 0; i < buffers.length; i++) {
+			if (!(buffers[i] instanceof Uint8Array))
+				debugger;
+			if (0 !== buffers[i].byteOffset)
+				debugger;
+		}
+
 		if (undefined === totalLength) {
 			totalLength = 0;
 			for (let i = 0; i < buffers.length; i++)
@@ -143,8 +150,12 @@ globalThis.Buffer = class extends Uint8Array {		// The Buffer class is a subclas
 		return result;
 	}
 	static from(iterable, format) {
-		if (!format)
+		if (!format) {
+			if ("string" === typeof iterable)
+				return new Buffer(ArrayBuffer.fromString(iterable));
+
 			return super.from(iterable);
+		}
 
 		if ("utf8" === format)
 			return new Buffer(ArrayBuffer.fromString(iterable));
