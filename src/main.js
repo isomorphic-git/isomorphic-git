@@ -17,6 +17,8 @@ class FileSystem {
 	static async writeFile(path, content, options) {
 		File.delete(path);
 		const f = new File(path, true);
+		if (ArrayBuffer.isView(content))		//@@ incorrect if byteOffset or length is not default
+			content = content.buffer;
 		f.write(content)
 		f.close();
 	}
