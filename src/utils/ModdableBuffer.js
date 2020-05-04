@@ -34,7 +34,16 @@ export class ModdableBuffer extends Uint8Array {
       if (!format || format === 'utf8')
         return new ModdableBuffer(ArrayBuffer.fromString(iterable))
 
-      if (format === 'hex') debugger
+      if (format === 'hex') {
+        if (iterable.length % 2 === 1) {
+          throw new Error('Buffer.from with hex encoding should have even number of characters')
+        }
+        const buffer = new ModdableBuffer(iterable.length / 2)
+        for (let i = 0, j = 0; i < iterable.length; i++, j += 2) {
+          buffer[i] = parseInt(iterable.slice(j, j + 2), 16)
+        }
+        return buffer
+      }
     }
 
     if (!format) return super.from(iterable)
@@ -45,7 +54,7 @@ export class ModdableBuffer extends Uint8Array {
   }
 
   static alloc(length) {
-    debugger
+    return new ModdableBuffer(length)
   }
 
   readUInt32BE(pos) {
@@ -60,5 +69,22 @@ export class ModdableBuffer extends Uint8Array {
 
   readUInt8(pos) {
     return this[pos]
+  }
+
+  write(content, offset, length, encoding) {
+    if (typeof offset === 'string') {
+      encoding = offset
+      offset = undefined
+    }
+    if (typeof length === 'string') {
+      encoding = length
+      length = undefined
+    }
+    if (!encoding) encoding = 'utf8'
+    if (length) debugger
+    if (!offset) offset = 0
+
+    const buffer = ModdableBuffer.from(content, encoding)
+    this.set(buffer.buffer, offset)
   }
 }
