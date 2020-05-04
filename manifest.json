@@ -125,6 +125,7 @@
 		"utils/indent": "./utils/indent",
 		"utils/outdent": "./utils/outdent",
 		"utils/join": "./utils/join",
+		"utils/ModdableBuffer": "./utils/ModdableBuffer",
 		"utils/mode2type": "./utils/mode2type",
 		"utils/normalizeMode": "./utils/normalizeMode",
 		"utils/normalizeNewlines": "./utils/normalizeNewlines",

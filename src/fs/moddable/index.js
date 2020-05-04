@@ -5,7 +5,9 @@ import { File, Iterator } from 'file'
 
 class FsPromisesClient {
   static async readFile(path, options = {}) {
-    if (options.encoding !== 'utf8') throw new Error('unrecognized encoding')
+    if (options && options.encoding !== 'utf8') {
+      throw new Error('unrecognized encoding')
+    }
 
     let result = null
     try {
@@ -28,6 +30,21 @@ class FsPromisesClient {
   }
 
   static async writeFile(path, content, options) {
+    if (typeof options === 'string') options = { encoding: options }
+    if (typeof content === 'string') {
+      if (!options || options.encoding === 'utf8') {
+        content = ArrayBuffer.fromString(content)
+      } else {
+        console.log(
+          `Error writing file "${path}" with options ${JSON.stringify(options)}`
+        )
+        throw new Error('unrecognized encoding')
+      }
+    }
+    // Unwrap Uint8Array into raw ArrayBuffer
+    if (content.buffer) {
+      content = content.buffer
+    }
     File.delete(path)
     const f = new File(path, true)
     f.write(content)
@@ -47,8 +64,8 @@ class FsPromisesClient {
     debugger
   }
 
-  static async unlink() {
-    debugger
+  static async unlink(path) {
+    File.delete(path)
   }
 
   static async stat(path) {

@@ -1,11 +1,10 @@
 // @ts-check
 import 'typedefs'
 
-import { join } from 'utils/join'
-
 import { _fetch } from 'commands/fetch'
 import { FileSystem } from 'models/FileSystem'
 import { assertParameter } from 'utils/assertParameter'
+import { join } from 'utils/join'
 
 /**
  *

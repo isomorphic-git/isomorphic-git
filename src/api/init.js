@@ -1,11 +1,10 @@
 // @ts-check
 import 'typedefs'
 
-import { join } from 'utils/join'
-
 import { _init } from 'commands/init'
 import { FileSystem } from 'models/FileSystem'
 import { assertParameter } from 'utils/assertParameter'
+import { join } from 'utils/join'
 
 /**
  * Initialize a new repository
