@@ -30,9 +30,14 @@ class FsPromisesClient {
   }
 
   static async writeFile(path, content, options) {
-    if (typeof options === 'string') options = { encoding: options }
+    if (typeof options === 'string') {
+      options = { encoding: options }
+    } else if (!options) {
+      options = {}
+    }
+
     if (typeof content === 'string') {
-      if (!options || options.encoding === 'utf8') {
+      if (!options.encoding || options.encoding === 'utf8') {
         content = ArrayBuffer.fromString(content)
       } else {
         console.log(
@@ -41,6 +46,7 @@ class FsPromisesClient {
         throw new Error('unrecognized encoding')
       }
     }
+
     // Unwrap Uint8Array into raw ArrayBuffer
     if (content.buffer) {
       content = content.buffer
