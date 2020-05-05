@@ -41,7 +41,6 @@ export class ModdableBuffer extends Uint8Array {
         const buffer = new ModdableBuffer(iterable.length / 2)
         for (let i = 0, j = 0; i < iterable.length / 2; i++, j += 2) {
           buffer[i] = parseInt(iterable.slice(j, j + 2), 16)
-          console.log(`buffer[${i}] = ${buffer[i]}`)
         }
         return buffer
       }
@@ -63,9 +62,14 @@ export class ModdableBuffer extends Uint8Array {
     return this.view.getUint32(pos)
   }
 
-  writeUInt32BE(val, pos) {
+  writeUInt32BE(val, pos = 0) {
     if (!this.view) this.view = new DataView(this.buffer)
     this.view.setUint32(pos, val)
+  }
+
+  writeUInt16BE(val, pos = 0) {
+    if (!this.view) this.view = new DataView(this.buffer)
+    this.view.setUint16(pos, val)
   }
 
   readUInt8(pos) {
@@ -82,9 +86,14 @@ export class ModdableBuffer extends Uint8Array {
       length = undefined
     }
     if (!encoding) encoding = 'utf8'
-    if (length) debugger
     if (!offset) offset = 0
-    const buffer = ModdableBuffer.from(content, encoding)
+    if (!length) {
+      length = this.length - offset
+    } else {
+      length = Math.min(length, this.length - offset)
+    }
+
+    const buffer = ModdableBuffer.from(content, encoding).slice(0, length)
     this.set(buffer, offset)
   }
 }

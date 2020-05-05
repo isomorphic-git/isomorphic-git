@@ -33,7 +33,7 @@ class FsPromisesClient {
         `Error reading file "${path}" with options ${JSON.stringify(options)}`
       )
       console.log(e.message)
-      throw e
+      debugger
     }
     return encoding ? result : new Uint8Array(result)
   }
@@ -52,7 +52,7 @@ class FsPromisesClient {
         console.log(
           `Error writing file "${path}" with options ${JSON.stringify(options)}`
         )
-        throw new Error('unrecognized encoding')
+        debugger
       }
     }
 
@@ -96,7 +96,7 @@ class FsPromisesClient {
       const f = new File(path)
       return new Stat({
         type: 'file',
-        mode: 0o644,
+        mode: 0o100644,
         size: f.length,
         ino: 1,
         mtimeMs: 0,
@@ -106,7 +106,6 @@ class FsPromisesClient {
         dev: 1,
       })
     } catch (e) {
-      console.log(`new File(${path})`)
       const err = new Error()
       err.code = 'ENOENT'
       throw err
@@ -114,10 +113,29 @@ class FsPromisesClient {
   }
 
   static async readdir(path) {
-    const files = [...new Iterator(path)]
-      .map(entry => entry.name)
-      .filter(name => name !== '.' && name !== '..')
-    return files
+    let d
+    try {
+      d = new Iterator(path)
+    } catch (e) {
+      if (e.message === 'Iterator: failed to open directory') {
+        const err = new Error()
+        if (File.exists(path)) {
+          err.code = 'ENOTDIR'
+        } else {
+          err.code = 'ENOENT'
+        }
+        throw err
+      }
+    }
+    try {
+      const files = [...d]
+        .map(entry => entry.name)
+        .filter(name => name !== '.' && name !== '..')
+      return files
+    } catch (e) {
+      console.log(e.message)
+      debugger
+    }
   }
 
   static async readlink() {

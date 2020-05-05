@@ -146,13 +146,17 @@ console.log(JSON.stringify(fetchResult, null, 2))
 
 const { defaultBranch } = fetchResult
 const ref = defaultBranch.replace('refs/heads/', '')
-await checkout({
-	fs,
-	dir: '/tmp/moddable-test',
-	ref,
-	onProgress (val) {
-		console.log(JSON.stringify(val))
-	}
-})
+try {
+	await checkout({
+		fs,
+		dir: '/tmp/moddable-test',
+		ref,
+		onProgress (val) {
+			console.log(JSON.stringify(val))
+		}
+	})
+} catch (e) {
+	console.log(e.message)
+}
 
 debugger
