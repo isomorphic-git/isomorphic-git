@@ -3,7 +3,8 @@ import { InternalError } from 'errors/InternalError'
 export class GitObject {
   static wrap({ type, object }) {
     return Buffer.concat([
-      Buffer.from(`${type} ${object.byteLength.toString()}\x00`),
+      Buffer.from(`${type} ${object.byteLength.toString()}`),
+      Buffer.from([0]),
       Buffer.from(object),
     ])
   }
