@@ -9,7 +9,10 @@
 		"*": [
 			"./main",
 			"$(MODULES)/network/http/*",
+			"$(MODDABLE)/modules/data/inflate/miniz",
 		],
+
+		"mod/inflate": "$(MODDABLE)/modules/data/inflate/inflate",
 
 		"typedefs": "./typedefs",
 		"typedefs-http": "./typedefs-http",
@@ -152,6 +155,7 @@
 	},
 	"preload": [
 		"http",
+		"mod/inflate",
 
 		"api/*",
 		"commands/*",
