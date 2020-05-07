@@ -1,8 +1,12 @@
 export function toHex(buffer) {
   let hex = ''
+  // NOTE: Originally I used .toString(16)
+  // However, I ran into upper/lower case issues and the ES2021 spec literally says
+  // "The precise algorithm [of .toString(radix)] is implementation-dependent" so screw that.
+  const chars = '0123456789abcdef'
   for (const byte of new Uint8Array(buffer)) {
-    if (byte < 16) hex += '0'
-    hex += byte.toString(16)
+    hex += chars[byte >> 4]
+    hex += chars[byte % 16]
   }
   return hex
 }

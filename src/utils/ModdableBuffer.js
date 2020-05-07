@@ -67,6 +67,11 @@ export class ModdableBuffer extends Uint8Array {
     this.view.setUint32(pos, val)
   }
 
+  readUInt16BE(pos) {
+    if (!this.view) this.view = new DataView(this.buffer)
+    return this.view.getUint16(pos)
+  }
+
   writeUInt16BE(val, pos = 0) {
     if (!this.view) this.view = new DataView(this.buffer)
     this.view.setUint16(pos, val)
