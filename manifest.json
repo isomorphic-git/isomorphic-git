@@ -4,6 +4,7 @@
 		"$(MODDABLE)/examples/manifest_net.json",
 		"$(MODDABLE)/modules/crypt/tls.json",
 		"$(MODDABLE)/examples/manifest_piu.json",
+		"$(MODDABLE)/modules/files/preference/manifest.json",
 	],
 	"modules": {
 		"~": [
@@ -171,6 +172,7 @@
 	"preload": [
 		"assets",
 		"http",
+		"preference",
 		"scroller",
 
 		"api/*",

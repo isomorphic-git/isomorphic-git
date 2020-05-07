@@ -12,7 +12,16 @@ import { ModdableBuffer } from 'utils/ModdableBuffer'
 import {} from 'piu/MC'
 import Net from 'net'
 import WiFi from 'wifi'
+import Preference from "preference";
 import { VerticalScrollerBehavior } from 'scroller'
+
+// // ATTN: UNCOMMENT THESE LINES TO SAVE YOUR WIFI INFORMATION TO SPI FLASH MEMORY
+// Preference.set('wifi', 'ssid', 'PUT_YOUR_SSID_HERE');
+// Preference.set('wifi', 'password', 'PUT_YOUR_WIFI_PASSWORD_HERE');
+
+// Retrieve wifi info from flash memory
+const ssid = Preference.get('wifi', 'ssid');
+const password = Preference.get('wifi', 'password');
 
 // Buffer shim
 globalThis.Buffer = ModdableBuffer
@@ -30,11 +39,12 @@ globalThis.process = Object.freeze({domain: null});
 // Main code
 const userAgent = 'git/isomorphic-git moddable-branch'
 let string = ''
+let stopInterval = false;
 
 const monitor = new WiFi(
   {
-    ssid: 'fishnet',
-    password: '',
+    ssid,
+    password,
     // channel: 8,
     // hidden: false
   },
@@ -61,7 +71,8 @@ const monitor = new WiFi(
 					}
 				}).then(result => {
 					string = JSON.stringify(result, null, 2)
-					console.log(string)
+          console.log(string)
+          stopInterval = true
 				});
         break
       case 'disconnect':
@@ -130,7 +141,7 @@ class ApplicationBehavior extends Behavior {
     global.application = application
     // WiFi.mode = 1
     this.doNext(application, 'HOME', { title: '[title]', string })
-    application.interval = 2000
+    application.interval = 1000
     application.start()
   }
 
@@ -155,6 +166,7 @@ class ApplicationBehavior extends Behavior {
     switch (nextScreenName) {
       case 'HOME':
         application.add(new HomeScreen(nextScreenData))
+        if (stopInterval) application.interval = 100000000
         break
     }
   }
