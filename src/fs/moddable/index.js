@@ -67,12 +67,12 @@ class FsPromisesClient {
   }
 
   static async mkdir(path) {
-    const parts = path.split('/')
-    const dir = [parts.shift()]
-    while (parts.length) {
-      dir.push(parts.shift())
-      File.createDirectory(dir.join('/'))
-    }
+    // const parts = path.split('/')
+    // const dir = [parts.shift()]
+    // while (parts.length) {
+    //   dir.push(parts.shift())
+    //   File.createDirectory(dir.join('/'))
+    // }
   }
 
   static async rmdir() {

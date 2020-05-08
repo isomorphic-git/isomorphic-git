@@ -1,19 +1,38 @@
+// console.log shim
+globalThis.console = class {
+	static log(msg) {
+		trace(msg, "\n");
+	}
+}
+
 import http from "http/moddable"
-// import fs from "fs/moddable"
+import fs from "fs/moddable"
 
 // import { addRemote } from 'api/addRemote'
 // import { checkout } from 'api/checkout'
 // import { currentBranch } from 'api/currentBranch'
 // import { fetch } from 'api/fetch'
 import { getRemoteInfo } from 'api/getRemoteInfo'
-// import { init } from 'api/init'
+import { init } from 'api/init'
 import { ModdableBuffer } from 'utils/ModdableBuffer'
 
 import {} from 'piu/MC'
+import config from "mc/config";
 import Net from 'net'
 import WiFi from 'wifi'
-import Preference from "preference";
+import Preference from 'preference'
+import { System, File } from 'file'
 import { VerticalScrollerBehavior } from 'scroller'
+
+console.log(`maxPathLength=${System.config().maxPathLength}`)
+console.log(`config.file.root=${config.file.root}`)
+
+const ROOT = config.file.root
+
+await fs.promises.writeFile(`${ROOT}/hello.txt`, 'Hello World\n', 'utf8')
+await init({ fs, dir: ROOT })
+console.log(JSON.stringify(await fs.promises.readdir(ROOT)))
+debugger;
 
 // // ATTN: UNCOMMENT THESE LINES TO SAVE YOUR WIFI INFORMATION TO SPI FLASH MEMORY
 // Preference.set('wifi', 'ssid', 'PUT_YOUR_SSID_HERE');
@@ -25,13 +44,6 @@ const password = Preference.get('wifi', 'password');
 
 // Buffer shim
 globalThis.Buffer = ModdableBuffer
-
-// console.log shim
-globalThis.console = class {
-	static log(msg) {
-		trace(msg, "\n");
-	}
-}
 
 // process.domain shim (used by 'async-lock'?!)
 globalThis.process = Object.freeze({domain: null});

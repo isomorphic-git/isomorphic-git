@@ -4,6 +4,7 @@
 		"$(MODDABLE)/examples/manifest_net.json",
 		"$(MODDABLE)/modules/crypt/tls.json",
 		"$(MODDABLE)/examples/manifest_piu.json",
+		"$(MODDABLE)/modules/files/file/manifest.json",
 		"$(MODDABLE)/modules/files/preference/manifest.json",
 	],
 	"modules": {
@@ -171,6 +172,7 @@
 	},
 	"preload": [
 		"assets",
+		"file",
 		"http",
 		"preference",
 		"scroller",
@@ -192,9 +194,13 @@
 			}
 		},
 		"qca4020": {},
+		"mac": {},
 		"...": {
 			"error": "WiFi module unsupported"
 		}
+	},
+	"config": {
+		"brightness": 50
 	},
 	"creation": {
 		"static": 98304,

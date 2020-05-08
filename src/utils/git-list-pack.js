@@ -44,6 +44,7 @@ export async function listpack(stream, onData) {
 
         // Backtrack parser to where deflated data ends
         await reader.undo()
+        console.log(`numObjects=${numObjects}, type=${type}, length=${length}, inflator.strm.avail_in=${inflator.strm.avail_in}`)
         await reader.read(chunk.length - inflator.strm.avail_in)
         const end = reader.tell()
         await onData({
