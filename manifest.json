@@ -17,7 +17,10 @@
 			"./main",
 			"$(MODULES)/network/http/*",
 			"$(MODDABLE)/examples/piu/scroller/*",
+			"$(MODDABLE)/modules/data/inflate/miniz",
 		],
+
+		"mod/inflate": "$(MODDABLE)/modules/data/inflate/inflate",
 
 		"typedefs": "./typedefs",
 		"typedefs-http": "./typedefs-http",
@@ -176,6 +179,7 @@
 		"http",
 		"preference",
 		"scroller",
+		"mod/inflate",
 
 		"api/*",
 		"commands/*",
@@ -194,7 +198,11 @@
 			}
 		},
 		"qca4020": {},
-		"mac": {},
+		"mac": {
+			"config": {
+				"skipwifi": true
+			}
+		},
 		"...": {
 			"error": "WiFi module unsupported"
 		}

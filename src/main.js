@@ -6,7 +6,6 @@ globalThis.console = class {
 }
 
 import http from "http/moddable"
-import fs from "fs/moddable"
 
 // import { addRemote } from 'api/addRemote'
 // import { checkout } from 'api/checkout'
@@ -33,13 +32,11 @@ import { VerticalScrollerBehavior } from 'scroller'
 // await init({ fs, dir: ROOT })
 // console.log(JSON.stringify(await fs.promises.readdir(ROOT)))
 
-// // ATTN: UNCOMMENT THESE LINES TO SAVE YOUR WIFI INFORMATION TO SPI FLASH MEMORY
-// Preference.set('wifi', 'ssid', 'PUT_YOUR_SSID_HERE');
-// Preference.set('wifi', 'password', 'PUT_YOUR_WIFI_PASSWORD_HERE');
-
-// Retrieve wifi info from flash memory
-const ssid = Preference.get('wifi', 'ssid');
-const password = Preference.get('wifi', 'password');
+// ATTN: UNCOMMENT THESE LINES TO SAVE YOUR WIFI INFORMATION TO SPI FLASH MEMORY
+// if (!config.skipwifi) {
+// 	Preference.set('wifi', 'ssid', 'PUT_YOUR_SSID_HERE');
+// 	Preference.set('wifi', 'password', 'PUT_YOUR_WIFI_PASSWORD_HERE');
+// }
 
 // Buffer shim
 globalThis.Buffer = ModdableBuffer
@@ -51,49 +48,6 @@ globalThis.process = Object.freeze({domain: null});
 const userAgent = 'git/isomorphic-git moddable-branch'
 let string = ''
 let stopInterval = false;
-
-const monitor = new WiFi(
-  {
-    ssid,
-    password,
-    // channel: 8,
-    // hidden: false
-  },
-  msg => {
-    trace(msg + '\n')
-    switch (msg) {
-      case 'connect':
-        title = 'Connecting'
-        break // still waiting for IP address
-      case 'gotIP':
-        title = Net.get('IP')
-        trace(`IP address ${Net.get('IP')}\n`)
-        string = `IP address ${Net.get('IP')}\n`
-				getRemoteInfo({
-					http,
-					// corsProxy: 'http://localhost:9998',
-					/* this is interesting:
-					date validation failed on received certificate
-				/Users/wmhilton/code/Moddable-OpenSource/moddable/modules/crypt/ssl/ssl_handshake.js (495) # Exception: throw!
-				*/
-					url: 'https://github.com/isomorphic-git/test.empty',
-					headers: {
-						'User-Agent': userAgent
-					}
-				}).then(result => {
-					string = JSON.stringify(result, null, 2)
-          console.log(string)
-          stopInterval = true
-				});
-        break
-      case 'disconnect':
-        title = 'Disconnected!'
-        string = 'Oh dear!'
-        break // connection lost
-    }
-  }
-)
-
 
 let title = 'Hello world'
 
@@ -193,3 +147,56 @@ export default function() {
   })
 }
 
+function doStuff () {
+	title = Net.get('IP')
+	trace(`IP address ${Net.get('IP')}\n`)
+	string = `IP address ${Net.get('IP')}\n`
+	getRemoteInfo({
+		http,
+		// corsProxy: 'http://localhost:9998',
+		/* this is interesting:
+		date validation failed on received certificate
+	/Users/wmhilton/code/Moddable-OpenSource/moddable/modules/crypt/ssl/ssl_handshake.js (495) # Exception: throw!
+	*/
+		url: 'https://github.com/isomorphic-git/test.empty',
+		headers: {
+			'User-Agent': userAgent
+		}
+	}).then(result => {
+		string = JSON.stringify(result, null, 2)
+		console.log(string)
+		stopInterval = true
+	});
+}
+
+if (config.skipwifi) {
+	doStuff();
+} else {
+	// Retrieve wifi info from flash memory
+	const ssid = Preference.get('wifi', 'ssid');
+	const password = Preference.get('wifi', 'password');
+
+	const monitor = new WiFi(
+		{
+			ssid,
+			password,
+			// channel: 8,
+			// hidden: false
+		},
+		msg => {
+			trace(msg + '\n')
+			switch (msg) {
+				case 'connect':
+					title = 'Connecting'
+					break // still waiting for IP address
+				case 'gotIP':
+					doStuff();
+					break
+				case 'disconnect':
+					title = 'Disconnected!'
+					string = 'Oh dear!'
+					break // connection lost
+			}
+		}
+	)
+}
