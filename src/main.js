@@ -24,15 +24,14 @@ import Preference from 'preference'
 import { System, File } from 'file'
 import { VerticalScrollerBehavior } from 'scroller'
 
-console.log(`maxPathLength=${System.config().maxPathLength}`)
-console.log(`config.file.root=${config.file.root}`)
-
-const ROOT = config.file.root
-
-await fs.promises.writeFile(`${ROOT}/hello.txt`, 'Hello World\n', 'utf8')
-await init({ fs, dir: ROOT })
-console.log(JSON.stringify(await fs.promises.readdir(ROOT)))
-debugger;
+// console.log(`maxPathLength=${System.config().maxPathLength}`)
+// console.log(`config.file.root=${config.file.root}`)
+//
+// const ROOT = config.file.root
+//
+// await fs.promises.writeFile(`${ROOT}/hello.txt`, 'Hello World\n', 'utf8')
+// await init({ fs, dir: ROOT })
+// console.log(JSON.stringify(await fs.promises.readdir(ROOT)))
 
 // // ATTN: UNCOMMENT THESE LINES TO SAVE YOUR WIFI INFORMATION TO SPI FLASH MEMORY
 // Preference.set('wifi', 'ssid', 'PUT_YOUR_SSID_HERE');
