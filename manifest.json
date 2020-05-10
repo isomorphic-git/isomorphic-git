@@ -194,13 +194,18 @@
 		"esp": {},
 		"esp32": {
 			"config": {
-				"rotation": 90
+				"rotation": 90,
+				"wifi": true,
+				"fs": false,
+				"proxy": false
 			}
 		},
 		"qca4020": {},
 		"mac": {
 			"config": {
-				"skipwifi": true
+				"wifi": false,
+				"fs": true,
+				"proxy": true
 			}
 		},
 		"...": {
