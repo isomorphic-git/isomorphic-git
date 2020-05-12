@@ -2,7 +2,7 @@
 import Hash from 'utils/sha1'
 import { toHex } from 'utils/toHex'
 
-let supportsSubtleSHA1 = null
+let supportsSubtleSHA1 = false
 
 export async function shasum(buffer) {
   if (supportsSubtleSHA1 === null) {

@@ -24,7 +24,10 @@ class FsPromisesClient {
       result = f.read(encoding ? String : ArrayBuffer)
       f.close()
     } catch (e) {
-      if (e.message === 'File: file not found') {
+      if (
+        e.message === 'File: file not found' ||
+        e.message === '(host): file read failed'
+      ) {
         const err = new Error('ENOENT')
         err.code = 'ENOENT'
         throw err
@@ -84,11 +87,25 @@ class FsPromisesClient {
   }
 
   static async stat(path) {
-    if (File.exists(path)) return {} // @@
-
-    const e = new Error()
-    e.code = 'ENOENT'
-    throw e
+    try {
+      const f = new File(path)
+      console.log(`${path} ${f.length}`)
+      return new Stat({
+        type: 'file',
+        mode: 0o100644,
+        size: f.length,
+        ino: 1,
+        mtimeMs: 0,
+        ctimeMs: 0,
+        uid: 1,
+        gid: 1,
+        dev: 1,
+      })
+    } catch (e) {
+      const err = new Error()
+      err.code = 'ENOENT'
+      throw err
+    }
   }
 
   static async lstat(path) {

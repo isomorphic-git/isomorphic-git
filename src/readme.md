@@ -48,7 +48,7 @@ The `createDirectory` function is needed. For macOS hosts, patch it in as follow
 ```
 	static createDirectory(path) @ "xs_file_createeDirectory";
 ```
-- In mac/modFile.c add this:
+- In `mac/modFile.c` add this:
 
 ```
 void xs_file_createeDirectory(xsMachine *the)
@@ -74,4 +74,12 @@ The same should work for Linux. It should also work for Windows by replacing the
 	int result = _mkdir(path);
 ```
 
-There's no patch yet for ESP32.
+There's no patch yet for ESP32 so for now put this in `esp32/modFile.c`:
+
+```
+void xs_file_createeDirectory(xsMachine *the)
+{
+  xsDebugger();
+	xsResult = xsArg(0);
+}
+```

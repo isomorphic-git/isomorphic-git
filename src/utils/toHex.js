@@ -5,8 +5,12 @@ export function toHex(buffer) {
   // "The precise algorithm [of .toString(radix)] is implementation-dependent" so screw that.
   const chars = '0123456789abcdef'
   for (const byte of new Uint8Array(buffer)) {
-    hex += chars[byte >> 4]
-    hex += chars[byte % 16]
+    const i = chars[byte >> 4]
+    if (i === undefined) debugger;
+    hex += i
+    const x = chars[byte % 16]
+    if (x === undefined) debugger;
+    hex += x
   }
   return hex
 }
