@@ -22,6 +22,15 @@
 
 		"mod/inflate": "$(MODDABLE)/modules/data/inflate/inflate",
 
+		"async-lock": "../packages/async-lock-master/lib/index",
+		"clean-git-ref": "../packages/clean-git-ref-master/src/index",
+		"crc-32": "../node_modules/crc-32/crc32",
+		"git-apply-delta": "../packages/git-apply-delta-master/index",
+		"pako": "../node_modules/pako/dist/pako.min",
+		"pify": "../packages/stub/pify",
+		"utils/sha1": "./utils/sha1",
+		"utils/toHex": "./utils/toHex",
+
 		"typedefs": "./typedefs",
 		"typedefs-http": "./typedefs-http",
 		"api/addRemote": "./api/addRemote",
@@ -148,12 +157,10 @@
 		"utils/parseAuthor": "./utils/parseAuthor",
 		"utils/pkg": "./utils/pkg",
 		"utils/resolveTree": "./utils/resolveTree",
-		"utils/sha1": "./utils/sha1",
 		"utils/shasum": "./utils/shasum",
 		"utils/splitLines": "./utils/splitLines",
 		"utils/StreamReader": "./utils/StreamReader",
 		"utils/symbols": "./utils/symbols",
-		"utils/toHex": "./utils/toHex",
 		"utils/translateSSHtoHTTP": "./utils/translateSSHtoHTTP",
 		"utils/unionOfIterators": "./utils/unionOfIterators",
 		"utils/worthWalking": "./utils/worthWalking",
@@ -165,13 +172,6 @@
 		"wire/writeUploadPackRequest": "./wire/writeUploadPackRequest",
 		"wire/parseUploadPackResponse": "./wire/parseUploadPackResponse",
 		"wire/writeRefsAdResponse": "./wire/writeRefsAdResponse",
-
-		"async-lock": "../packages/async-lock-master/lib/index",
-		"clean-git-ref": "../packages/clean-git-ref-master/src/index",
-		"crc-32": "../node_modules/crc-32/crc32",
-		"git-apply-delta": "../packages/git-apply-delta-master/index",
-		"pako": "../packages/stub/pako",
-		"pify": "../packages/stub/pify",
 	},
 	"preload": [
 		"assets",

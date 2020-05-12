@@ -89,7 +89,6 @@ class FsPromisesClient {
   static async stat(path) {
     try {
       const f = new File(path)
-      console.log(`${path} ${f.length}`)
       return new Stat({
         type: 'file',
         mode: 0o100644,

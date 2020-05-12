@@ -8,7 +8,7 @@ export function toHex(buffer) {
     const i = chars[byte >> 4]
     if (i === undefined) debugger;
     hex += i
-    const x = chars[byte % 16]
+    const x = chars[byte & 15]
     if (x === undefined) debugger;
     hex += x
   }
