@@ -26,7 +26,7 @@
 		"clean-git-ref": "../packages/clean-git-ref-master/src/index",
 		"crc-32": "../node_modules/crc-32/crc32",
 		"git-apply-delta": "../packages/git-apply-delta-master/index",
-		"pako": "../node_modules/pako/dist/pako.min",
+		"pako": "../packages/stub/pako",
 		"pify": "../packages/stub/pify",
 		"utils/sha1": "../packages/stub/sha1",
 		"utils/toHex": "../packages/stub/toHex",

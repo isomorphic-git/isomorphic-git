@@ -13,10 +13,31 @@ At this time, the port does nothing useful. But it does build, link, and launch.
 - Download the latest Moddable SDK (May 1 or later)
 - `cd ${isomorphic-git}/src`
 - `./node_modules/.bin/cors-proxy start -p 9998` to launch the CORS proxy (not technically needed, but eliminates TLS as a possible source of error)
-- `mcconfig -d -m` to build for and run on simulator
+- `rm -rf /tmp/moddable-test/ && mcconfig -d -m -p mac` to build for and run on Mac simulator
+  - if you get this error (`/moddable/modules/network/http/http.js (193) # Exception: throw!`) then kill and restart the `cors-proxy` from the step above
 - `mcconfig -d -m -p esp32` to build for and run on ESP32
 
 > Note: All modules are preloaded. This saves RAM and decreases load time, both critical for embedded targets.
+
+To verify the results run:
+
+```sh
+cd /tmp/moddable-test
+git verify-pack -v .git/objects/pack/pack-fb367774ad41abbfdc2f4be55149f57987e47eea.idx
+```
+
+you should see:
+```
+a7a551b6710166fe65c4894a4f88f785e4fb7393 commit 223 152 12
+c03e131196f43a78888415924bcdcbf3090f3316 commit 1049 794 164
+5a8905a02e181fe1821068b8c0f48cb6633d5b81 commit 1021 771 958
+48af7b9b559ef89fc4a41d492282c927d63f306b tree   66 71 1729
+e965047ad7c57865823c7d992b1d046ea66edf78 blob   6 15 1800
+18df7980ddf987c2e3e20eb8007727c659b37216 blob   7 16 1815
+a69b2f53db7b7ba59f43ee15f5c42166297c4262 tree   33 43 1831
+non delta: 7 objects
+.git/objects/pack/pack-fb367774ad41abbfdc2f4be55149f57987e47eea.pack: ok
+```
 
 ### Module specifiers
 
@@ -35,9 +56,13 @@ The original code uses relative paths to import modules. On embedded targets, th
 
 ### Open issues 
 
-- Moddable File is flat FS only.... OK... let's fix that. (`createDirectory` implemented for macOS simulator for development)
-- SHA module should use Moddable SDK crypto -- smaller and faster
-- Pako will be crazy slow and heavy. Is it required or optional? We have a zlib decoder for PNG but needs a script API to be used here.
+- [ ] Moddable File is flat FS only.... OK... let's fix that.
+  - [x] `createDirectory` implemented for macOS simulator for development
+  - [ ] FAT32 support for ESP32 added
+- [x] SHA module should use Moddable SDK crypto -- smaller and faster
+- Use native miniz instead of pako.
+  - [x] inflate, including streaming API
+  - [ ] deflate (TODO: do we need this? It's only used for loose object file format)
 
 ### Patches
 
@@ -83,3 +108,33 @@ void xs_file_createeDirectory(xsMachine *the)
 	xsResult = xsArg(0);
 }
 ```
+
+Stub Notes:
+
+## "utils/sha1": "../packages/stub/sha1"
+
+This seems to work now! To swap in pure JS version, use "./utils/sha1"
+
+## "pako": "../packages/stub/pako"
+
+This seems to work now! To swap in pure JS version, use "../node_modules/pako/dist/pako.min" (Uses patch in `patches` folder applied by `npm run postinstall`)
+
+## "utils/toHex": "../packages/stub/toHex"
+
+This seems to work now! To swap in pure JS version, use "./utils/toHex"
+
+## "crc-32": "../node_modules/crc-32/crc32"
+
+Uses patch in `patches` folder applied by `npm run postinstall`
+
+## "async-lock": "../packages/async-lock-master/lib/index"
+
+- [ ] TODO: port to a patch
+
+## "clean-git-ref": "../packages/clean-git-ref-master/src/index"
+
+- [ ] TODO: port to a patch
+
+## "git-apply-delta": "../packages/git-apply-delta-master/index"
+
+- [ ] TODO: port to a patch
