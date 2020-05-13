@@ -29,7 +29,7 @@
 		"pako": "../node_modules/pako/dist/pako.min",
 		"pify": "../packages/stub/pify",
 		"utils/sha1": "./utils/sha1",
-		"utils/toHex": "./utils/toHex",
+		"utils/toHex": "../packages/stub/toHex",
 
 		"typedefs": "./typedefs",
 		"typedefs-http": "./typedefs-http",

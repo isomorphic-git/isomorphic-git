@@ -227,9 +227,20 @@ export class GitPackIndex {
       fanoutBuffer.writeUInt32BE(count)
     }
     buffers.push(fanoutBuffer.buffer)
+    console.log('FANOUT:')
+    console.log(
+      fanoutBuffer.buffer
+        .toString('hex')
+        .match(/.{8}/g)
+        .join(' ')
+        .match(/.{72}/g)
+        .join('\n')
+    )
     // Write out hashes
+    console.log('HASHES:')
     for (const hash of this.hashes) {
       write(hash, 'hex')
+      console.log(hash)
     }
     // Write out crcs
     const crcsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
@@ -237,17 +248,41 @@ export class GitPackIndex {
       crcsBuffer.writeUInt32BE(this.crcs[hash])
     }
     buffers.push(crcsBuffer.buffer)
+    console.log('CRCS:')
+    console.log(
+      crcsBuffer.buffer
+        .toString('hex')
+        .match(/.{8}/g)
+        .join(' ')
+    )
     // Write out offsets
     const offsetsBuffer = new BufferCursor(Buffer.alloc(this.hashes.length * 4))
     for (const hash of this.hashes) {
       offsetsBuffer.writeUInt32BE(this.offsets.get(hash))
     }
     buffers.push(offsetsBuffer.buffer)
+    console.log('OFFSETS:')
+    console.log(
+      offsetsBuffer.buffer
+        .toString('hex')
+        .match(/.{8}/g)
+        .join(' ')
+    )
     // Write out packfile checksum
     write(this.packfileSha, 'hex')
     // Write out shasum
     const totalBuffer = Buffer.concat(buffers)
+    console.log('TOTAL:')
+    console.log(
+      totalBuffer.slice(8)
+        .toString('hex')
+        .match(/.{8}/g)
+        .join(' ')
+        .match(/.{0,72}/g)
+        .join('\n')
+    )
     const sha = await shasum(totalBuffer)
+    console.log('SHA: ' + sha)
     const shaBuffer = Buffer.alloc(20)
     shaBuffer.write(sha, 'hex')
     return Buffer.concat([totalBuffer, shaBuffer])
