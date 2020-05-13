@@ -19,6 +19,12 @@ export async function _findMergeBase({ fs, gitdir, oids }) {
   // through ancestors, eventually we'll discover a commit where each one of these N walkers
   // has passed through. So we just need to keep track of which walkers have visited each commit
   // until we find a commit that N distinct walkers has visited.
+
+  // Early return if oids contains the root commit '0000000000000000000000000000000000000000'
+  if (oids.find((oid) => oid === '0000000000000000000000000000000000000000') != null) {
+    return []
+  }
+
   const visits = {}
   const passes = oids.length
   let heads = oids.map((oid, index) => ({ index, oid }))

@@ -5,7 +5,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // These have been checked with
 // GIT_DIR=__tests__/__fixtures__/test-findMergeBase.git git merge-base -a --octopus COMMITS
-describe('findMergeBase', () => {
+describe.only('findMergeBase', () => {
   it('silly edge cases', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-findMergeBase')
@@ -38,6 +38,20 @@ describe('findMergeBase', () => {
       oids: [
         '9ec6646dd454e8f530c478c26f8b06e57f880bd6', // A
         '99cfd5bb4e412234162ac1eb46350ec6ccffb50d', // Z
+      ],
+    })
+    expect(base).toEqual([])
+  })
+  it('empty remote repo', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
+    // Test
+    const base = await findMergeBase({
+      fs,
+      gitdir,
+      oids: [
+        '9ec6646dd454e8f530c478c26f8b06e57f880bd6', // A
+        '0000000000000000000000000000000000000000', // Z
       ],
     })
     expect(base).toEqual([])
