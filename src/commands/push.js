@@ -153,6 +153,12 @@ export async function _push({
     // @ts-ignore
     objects = await listObjects({ fs, gitdir, oids: commits })
 
+    // List objects from merge base commits so we can filter them out from the list of objects to pack+send to remote
+    // It already has those objects
+    const mergeBaseCommits = finish.filter((o) => o !== '0000000000000000000000000000000000000000');
+    const objectsOnMergeBaseCommits = await listObjects({ fs, gitdir, oids: mergeBaseCommits });
+    objects = new Set(Array.from(objects).filter((o) => !objectsOnMergeBaseCommits.has(o)));
+
     if (!force) {
       // Is it a tag that already exists?
       if (
