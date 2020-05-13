@@ -144,14 +144,16 @@ export async function _push({
     })
     for (const oid of mergebase) finish.push(oid)
     // @ts-ignore
-    const commits = await listCommitsAndTags({
-      fs,
-      gitdir,
-      start: [oid],
-      finish,
-    })
-    // @ts-ignore
-    objects = await listObjects({ fs, gitdir, oids: commits })
+    if (!mergebase.includes(oid)) {
+      const commits = await listCommitsAndTags({
+        fs,
+        gitdir,
+        start: [oid],
+        finish,
+      })
+      // @ts-ignore
+      objects = await listObjects({fs, gitdir, oids: commits})
+    }
 
     if (!force) {
       // Is it a tag that already exists?
