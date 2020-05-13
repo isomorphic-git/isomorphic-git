@@ -28,7 +28,7 @@
 		"git-apply-delta": "../packages/git-apply-delta-master/index",
 		"pako": "../node_modules/pako/dist/pako.min",
 		"pify": "../packages/stub/pify",
-		"utils/sha1": "./utils/sha1",
+		"utils/sha1": "../packages/stub/sha1",
 		"utils/toHex": "../packages/stub/toHex",
 
 		"typedefs": "./typedefs",
