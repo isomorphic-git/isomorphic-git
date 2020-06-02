@@ -239,6 +239,7 @@ Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions
 - [Next Editor](https://next-editor.app/)
 - [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git)
 - [Stoplight Studio](https://stoplight.io/studio/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git) - a modern editor for API design and technical writing
+- [Git Repo Migrator](https://secanis.github.io/git-migration/) - Migrate a Git repository in secondy directly in your browser
 
 ## Similar projects
 
