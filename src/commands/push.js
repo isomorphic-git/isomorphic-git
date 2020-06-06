@@ -135,14 +135,16 @@ export async function _push({
   let objects = []
   if (!_delete) {
     const finish = [...httpRemote.refs.values()]
-    // hack to speed up common force push scenarios
-    // @ts-ignore
-    const mergebase = await _findMergeBase({
-      fs,
-      gitdir,
-      oids: [oid, oldoid],
-    })
-    for (const oid of mergebase) finish.push(oid)
+    // If remote is empty, do not run findMergeBase
+    if (oldoid !== '0000000000000000000000000000000000000000') {
+      // trick to speed up common force push scenarios
+      const mergebase = await _findMergeBase({
+        fs,
+        gitdir,
+        oids: [oid, oldoid],
+      })
+      for (const oid of mergebase) finish.push(oid)
+    }
     // @ts-ignore
     const commits = await listCommitsAndTags({
       fs,

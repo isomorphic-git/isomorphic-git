@@ -36,7 +36,7 @@ export async function _findMergeBase({ fs, gitdir, oids }) {
       return [...result]
     }
     // We haven't found a common ancestor yet
-    const newheads = []
+    const newheads = new Map()
     for (const { oid, index } of heads) {
       try {
         const { object } = await readObject({ fs, gitdir, oid })
@@ -44,14 +44,14 @@ export async function _findMergeBase({ fs, gitdir, oids }) {
         const { parent } = commit.parseHeaders()
         for (const oid of parent) {
           if (!visits[oid] || !visits[oid].has(index)) {
-            newheads.push({ oid, index })
+            newheads.set(oid + ':' + index, { oid, index })
           }
         }
       } catch (err) {
         // do nothing
       }
     }
-    heads = newheads
+    heads = Array.from(newheads.values())
   }
   return []
 }
