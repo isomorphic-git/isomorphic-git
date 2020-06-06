@@ -96,6 +96,7 @@ export async function _push({
     ? '0000000000000000000000000000000000000000'
     : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
 
+  /** @type typeof import("../managers/GitRemoteHTTP").GitRemoteHTTP */
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const httpRemote = await GitRemoteHTTP.discover({
     http,
@@ -132,10 +133,12 @@ export async function _push({
   const oldoid =
     httpRemote.refs.get(fullRemoteRef) ||
     '0000000000000000000000000000000000000000'
-  let objects = []
+  let objects = new Set()
   if (!_delete) {
     const finish = [...httpRemote.refs.values()]
-    // If remote is empty, do not run findMergeBase
+    let skipObjects = new Set()
+
+    // If remote branch is present, look for a common merge base.
     if (oldoid !== '0000000000000000000000000000000000000000') {
       // trick to speed up common force push scenarios
       const mergebase = await _findMergeBase({
@@ -144,22 +147,24 @@ export async function _push({
         oids: [oid, oldoid],
       })
       for (const oid of mergebase) finish.push(oid)
+      skipObjects = await listObjects({ fs, gitdir, oids: mergebase })
     }
-    // @ts-ignore
+
     const commits = await listCommitsAndTags({
       fs,
       gitdir,
       start: [oid],
       finish,
     })
-    // @ts-ignore
     objects = await listObjects({ fs, gitdir, oids: commits })
 
-    // List objects from merge base commits so we can filter them out from the list of objects to pack+send to remote
-    // It already has those objects
-    const mergeBaseCommits = finish.filter((o) => o !== '0000000000000000000000000000000000000000');
-    const objectsOnMergeBaseCommits = await listObjects({ fs, gitdir, oids: mergeBaseCommits });
-    objects = new Set(Array.from(objects).filter((o) => !objectsOnMergeBaseCommits.has(o)));
+    // Remotes can always accept thin-packs UNLESS they specify the 'no-thin' capability
+    if (!httpRemote.capabilities.has('no-thin')) {
+      // Remove objects that we know the remote already has
+      for (const oid of skipObjects) {
+        objects.delete(oid)
+      }
+    }
 
     if (!force) {
       // Is it a tag that already exists?

@@ -4,6 +4,14 @@ import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 
+/**
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} [args.dir]
+ * @param {string} args.gitdir
+ * @param {Iterable<string>} args.oids
+ * @returns {Promise<Set<string>>}
+ */
 export async function listObjects({
   fs,
   dir,
