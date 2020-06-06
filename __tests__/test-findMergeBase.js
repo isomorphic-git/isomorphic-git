@@ -42,20 +42,6 @@ describe('findMergeBase', () => {
     })
     expect(base).toEqual([])
   })
-  it('empty remote repo', async () => {
-    // Setup
-    const { fs, gitdir } = await makeFixture('test-findMergeBase')
-    // Test
-    const base = await findMergeBase({
-      fs,
-      gitdir,
-      oids: [
-        '9ec6646dd454e8f530c478c26f8b06e57f880bd6', // A
-        '0000000000000000000000000000000000000000', // Z
-      ],
-    })
-    expect(base).toEqual([])
-  })
   it('fast-forward scenarios', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-findMergeBase')
