@@ -13,6 +13,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.gitdir
  * @param {Iterable<string>} args.start
  * @param {Iterable<string>} args.finish
+ * @param {number} args.depth
  * @returns {Promise<Set<string>>}
  */
 export async function listCommitsAndTags({
@@ -21,6 +22,7 @@ export async function listCommitsAndTags({
   gitdir = join(dir, '.git'),
   start,
   finish,
+  depth = -1,
 }) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   const startingSet = new Set()
@@ -39,14 +41,16 @@ export async function listCommitsAndTags({
   // Because git commits are named by their hash, there is no
   // way to construct a cycle. Therefore we won't worry about
   // setting a default recursion limit.
-  async function walk(oid) {
+  async function walk(oid, depth) {
+    if (depth === 0 || finishingSet.has(oid) || visited.has(oid)) return
+
     visited.add(oid)
     const { type, object } = await readObject({ fs, gitdir, oid })
     // Recursively resolve annotated tags
     if (type === 'tag') {
       const tag = GitAnnotatedTag.from(object)
       const commit = tag.headers().object
-      return walk(commit)
+      return walk(commit, depth - 1)
     }
     if (type !== 'commit') {
       throw new ObjectTypeError(oid, type, 'commit')
@@ -56,14 +60,14 @@ export async function listCommitsAndTags({
       const parents = commit.headers().parent
       for (oid of parents) {
         if (!finishingSet.has(oid) && !visited.has(oid)) {
-          await walk(oid)
+          await walk(oid, depth - 1)
         }
       }
     }
   }
   // Let's go walking!
   for (const oid of startingSet) {
-    await walk(oid)
+    await walk(oid, depth)
   }
   return visited
 }

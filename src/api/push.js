@@ -33,6 +33,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.remoteRef] - The name of the receiving branch on the remote. By default this is the configured remote tracking branch.
  * @param {boolean} [args.force = false] - If true, behaves the same as `git push --force`
  * @param {boolean} [args.delete = false] - If true, delete the remote ref
+ * @param {boolean} [args.thinPack = false] - Experimental opt-in optimization. If true, tries to send a [thin pack](https://git-scm.com/docs/protocol-capabilities#_thin_pack).
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  *
@@ -68,6 +69,7 @@ export async function push({
   url,
   force = false,
   delete: _delete = false,
+  thinPack = false,
   corsProxy,
   headers = {},
 }) {
@@ -91,6 +93,7 @@ export async function push({
       url,
       force,
       delete: _delete,
+      thinPack,
       corsProxy,
       headers,
     })

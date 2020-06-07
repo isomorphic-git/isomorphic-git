@@ -13,7 +13,18 @@ const http = require('./http/node')
 minimisted(async function({ _: [command, ...args], ...opts }) {
   try {
     const result = await git[command](
-      Object.assign({ fs, http, dir: '.' }, opts)
+      Object.assign(
+        {
+          fs,
+          http,
+          dir: '.',
+          onAuth: () => {
+            const foo = { username: opts.username, password: opts.password }
+            return foo
+          },
+        },
+        opts
+      )
     )
     if (result === undefined) return
     // detect streams

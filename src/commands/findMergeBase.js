@@ -7,9 +7,10 @@ import { _readObject as readObject } from '../storage/readObject.js'
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {string} args.gitdir
  * @param {string[]} args.oids
- *
+ * @param {number} [args.depth]
+ * @returns {Promise<string[]>}
  */
-export async function _findMergeBase({ fs, gitdir, oids }) {
+export async function _findMergeBase({ fs, gitdir, oids, depth = -1 }) {
   // Note: right now, the tests are geared so that the output should match that of
   // `git merge-base --all --octopus`
   // because without the --octopus flag, git's output seems to depend on the ORDER of the oids,
@@ -22,7 +23,7 @@ export async function _findMergeBase({ fs, gitdir, oids }) {
   const visits = {}
   const passes = oids.length
   let heads = oids.map((oid, index) => ({ index, oid }))
-  while (heads.length) {
+  while (heads.length && depth--) {
     // Count how many times we've passed each commit
     const result = new Set()
     for (const { oid, index } of heads) {
