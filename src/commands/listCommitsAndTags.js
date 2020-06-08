@@ -6,6 +6,15 @@ import { GitCommit } from '../models/GitCommit.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
 
+/**
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} [args.dir]
+ * @param {string} args.gitdir
+ * @param {Iterable<string>} args.start
+ * @param {Iterable<string>} args.finish
+ * @returns {Promise<Set<string>>}
+ */
 export async function listCommitsAndTags({
   fs,
   dir,
