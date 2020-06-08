@@ -133,6 +133,10 @@ export async function _push({
   const oldoid =
     httpRemote.refs.get(fullRemoteRef) ||
     '0000000000000000000000000000000000000000'
+
+  // Remotes can always accept thin-packs UNLESS they specify the 'no-thin' capability
+  const thinPack = !httpRemote.capabilities.has('no-thin')
+
   let objects = new Set()
   if (!_delete) {
     const finish = [...httpRemote.refs.values()]
@@ -147,7 +151,9 @@ export async function _push({
         oids: [oid, oldoid],
       })
       for (const oid of mergebase) finish.push(oid)
-      skipObjects = await listObjects({ fs, gitdir, oids: mergebase })
+      if (thinPack) {
+        skipObjects = await listObjects({ fs, gitdir, oids: mergebase })
+      }
     }
 
     const commits = await listCommitsAndTags({
@@ -158,8 +164,30 @@ export async function _push({
     })
     objects = await listObjects({ fs, gitdir, oids: commits })
 
-    // Remotes can always accept thin-packs UNLESS they specify the 'no-thin' capability
-    if (!httpRemote.capabilities.has('no-thin')) {
+    if (thinPack) {
+      // If there's a default branch for the remote lets skip those objects too.
+      // Since this is an optional optimization, we just catch and continue if there is
+      // an error (because we can't find a default branch, or can't find a commit, etc)
+      try {
+        // Sadly, the discovery phase with 'forPush' doesn't return symrefs, so we have to
+        // rely on existing ones.
+        const ref = await GitRefManager.resolve({
+          fs,
+          gitdir,
+          ref: `refs/remotes/${remote}/HEAD`,
+          depth: 2,
+        })
+        const { oid } = await GitRefManager.resolveAgainstMap({
+          ref: ref.replace(`refs/remotes/${remote}/`, ''),
+          fullref: ref,
+          map: httpRemote.refs,
+        })
+        const oids = [oid]
+        for (const oid of await listObjects({ fs, gitdir, oids })) {
+          skipObjects.add(oid)
+        }
+      } catch (e) {}
+
       // Remove objects that we know the remote already has
       for (const oid of skipObjects) {
         objects.delete(oid)
