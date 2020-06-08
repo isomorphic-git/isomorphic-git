@@ -168,6 +168,14 @@ export class GitRefManager {
     }
   }
 
+  /**
+   * @param {object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs
+   * @param {string} args.gitdir
+   * @param {string} args.ref
+   * @param {number} [args.depth]
+   * @returns {Promise<string>}
+   */
   static async resolve({ fs, gitdir, ref, depth = undefined }) {
     if (depth !== undefined) {
       depth--
