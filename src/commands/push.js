@@ -156,13 +156,16 @@ export async function _push({
       }
     }
 
-    const commits = await listCommitsAndTags({
-      fs,
-      gitdir,
-      start: [oid],
-      finish,
-    })
-    objects = await listObjects({ fs, gitdir, oids: commits })
+    // If remote does not have the commit, figure out the objects to send
+    if (!finish.includes(oid)) {
+      const commits = await listCommitsAndTags({
+        fs,
+        gitdir,
+        start: [oid],
+        finish,
+      })
+      objects = await listObjects({ fs, gitdir, oids: commits })
+    }
 
     if (thinPack) {
       // If there's a default branch for the remote lets skip those objects too.
