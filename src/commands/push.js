@@ -96,6 +96,7 @@ export async function _push({
     ? '0000000000000000000000000000000000000000'
     : await GitRefManager.resolve({ fs, gitdir, ref: fullRef })
 
+  /** @type typeof import("../managers/GitRemoteHTTP").GitRemoteHTTP */
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const httpRemote = await GitRemoteHTTP.discover({
     http,
@@ -132,27 +133,68 @@ export async function _push({
   const oldoid =
     httpRemote.refs.get(fullRemoteRef) ||
     '0000000000000000000000000000000000000000'
-  let objects = []
+
+  // Remotes can always accept thin-packs UNLESS they specify the 'no-thin' capability
+  const thinPack = !httpRemote.capabilities.has('no-thin')
+
+  let objects = new Set()
   if (!_delete) {
     const finish = [...httpRemote.refs.values()]
-    // hack to speed up common force push scenarios
-    // @ts-ignore
-    const mergebase = await _findMergeBase({
-      fs,
-      gitdir,
-      oids: [oid, oldoid],
-    })
-    for (const oid of mergebase) finish.push(oid)
-    // @ts-ignore
-    if (!mergebase.includes(oid)) {
+    let skipObjects = new Set()
+
+    // If remote branch is present, look for a common merge base.
+    if (oldoid !== '0000000000000000000000000000000000000000') {
+      // trick to speed up common force push scenarios
+      const mergebase = await _findMergeBase({
+        fs,
+        gitdir,
+        oids: [oid, oldoid],
+      })
+      for (const oid of mergebase) finish.push(oid)
+      if (thinPack) {
+        skipObjects = await listObjects({ fs, gitdir, oids: mergebase })
+      }
+    }
+
+    // If remote does not have the commit, figure out the objects to send
+    if (!finish.includes(oid)) {
       const commits = await listCommitsAndTags({
         fs,
         gitdir,
         start: [oid],
         finish,
       })
-      // @ts-ignore
-      objects = await listObjects({fs, gitdir, oids: commits})
+      objects = await listObjects({ fs, gitdir, oids: commits })
+    }
+
+    if (thinPack) {
+      // If there's a default branch for the remote lets skip those objects too.
+      // Since this is an optional optimization, we just catch and continue if there is
+      // an error (because we can't find a default branch, or can't find a commit, etc)
+      try {
+        // Sadly, the discovery phase with 'forPush' doesn't return symrefs, so we have to
+        // rely on existing ones.
+        const ref = await GitRefManager.resolve({
+          fs,
+          gitdir,
+          ref: `refs/remotes/${remote}/HEAD`,
+          depth: 2,
+        })
+        const { oid } = await GitRefManager.resolveAgainstMap({
+          ref: ref.replace(`refs/remotes/${remote}/`, ''),
+          fullref: ref,
+          map: httpRemote.refs,
+        })
+        const oids = [oid]
+        for (const oid of await listObjects({ fs, gitdir, oids })) {
+          skipObjects.add(oid)
+        }
+      } catch (e) {}
+
+      // Remove objects that we know the remote already has
+      for (const oid of skipObjects) {
+        objects.delete(oid)
+      }
     }
 
     if (!force) {
