@@ -9,7 +9,7 @@ import { join } from '../utils/join.js'
 /**
  *
  * @typedef {object} FetchResult - The object returned has the following schema:
- * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
+ * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified
  * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
  * @property {string | null} fetchHeadDescription - a textual description of the branch that was fetched
  * @property {Object<string, string>} [headers] - The HTTP response headers returned by the git server
@@ -55,7 +55,7 @@ import { join } from '../utils/join.js'
  *   dir: '/tutorial',
  *   corsProxy: 'https://cors.isomorphic-git.org',
  *   url: 'https://github.com/isomorphic-git/isomorphic-git',
- *   ref: 'master',
+ *   ref: 'main',
  *   depth: 1,
  *   singleBranch: true,
  *   tags: false

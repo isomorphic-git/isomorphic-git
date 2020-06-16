@@ -14,6 +14,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {boolean} [args.bare = false] - Initialize a bare repository
+ * @param {string} [args.defaultBranch = 'master'] - The name of the default branch (might be changed to a required argument in 2.0.0)
  * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
  *
  * @example
@@ -26,6 +27,7 @@ export async function init({
   bare = false,
   dir,
   gitdir = bare ? dir : join(dir, '.git'),
+  defaultBranch = 'master',
 }) {
   try {
     assertParameter('fs', fs)
@@ -39,6 +41,7 @@ export async function init({
       bare,
       dir,
       gitdir,
+      defaultBranch,
     })
   } catch (err) {
     err.caller = 'git.init'

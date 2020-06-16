@@ -28,8 +28,8 @@ import { join } from '../utils/join.js'
  * @see ReadBlobResult
  *
  * @example
- * // Get the contents of 'README.md' in the master branch.
- * let commitOid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'master' })
+ * // Get the contents of 'README.md' in the main branch.
+ * let commitOid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'main' })
  * console.log(commitOid)
  * let { blob } = await git.readBlob({
  *   fs,

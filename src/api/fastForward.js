@@ -34,7 +34,7 @@ import { join } from '../utils/join.js'
  *   fs,
  *   http,
  *   dir: '/tutorial',
- *   ref: 'master',
+ *   ref: 'main',
  *   singleBranch: true
  * })
  * console.log('done')

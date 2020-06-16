@@ -18,7 +18,7 @@ import { join } from '../utils/join.js'
  * @returns {Promise<string>} Resolves successfully with a full ref name ("refs/tags/v1.0.0")
  *
  * @example
- * let fullRef = await git.expandRef({ fs, dir: '/tutorial', ref: 'master'})
+ * let fullRef = await git.expandRef({ fs, dir: '/tutorial', ref: 'main'})
  * console.log(fullRef)
  *
  */
