@@ -60,7 +60,7 @@ let pushResult = await git.push({
   http,
   dir: '/tutorial',
   remote: 'origin',
-  ref: 'master',
+  ref: 'main',
   onAuth: () => ({ username: process.env.GITHUB_TOKEN }),
 })
 console.log(pushResult)
@@ -83,7 +83,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/push.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/push.js';
   }
 })();
 </script>

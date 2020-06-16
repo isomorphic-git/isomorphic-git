@@ -59,8 +59,8 @@ Example Code:
 let m = await git.merge({
   fs,
   dir: '/tutorial',
-  ours: 'master',
-  theirs: 'remotes/origin/master'
+  ours: 'main',
+  theirs: 'remotes/origin/main'
 })
 console.log(m)
 ```
@@ -82,7 +82,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/merge.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/merge.js';
   }
 })();
 </script>

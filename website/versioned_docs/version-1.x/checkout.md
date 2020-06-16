@@ -27,11 +27,11 @@ If the branch already exists it will check out that branch. Otherwise, it will c
 Example Code:
 
 ```js live
-// switch to the master branch
+// switch to the main branch
 await git.checkout({
   fs,
   dir: '/tutorial',
-  ref: 'master'
+  ref: 'main'
 })
 console.log('done')
 ```
@@ -77,7 +77,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/checkout.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/checkout.js';
   }
 })();
 </script>

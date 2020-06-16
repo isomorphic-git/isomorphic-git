@@ -55,7 +55,7 @@ let commits = await git.log({
   fs,
   dir: '/tutorial',
   depth: 5,
-  ref: 'master'
+  ref: 'main'
 })
 console.log(commits)
 ```
@@ -77,7 +77,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/log.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/log.js';
   }
 })();
 </script>

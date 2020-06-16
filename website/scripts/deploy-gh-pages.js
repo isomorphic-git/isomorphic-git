@@ -21,11 +21,11 @@ let dir = path.join(__dirname, '../..')
   await git.fetch({
     dir,
     depth: 1,
-    ref: 'master'
+    ref: 'main'
   })
   await git.checkout({
     dir,
-    ref: 'master',
+    ref: 'main',
     noCheckout: true
   })
   await git.add({

@@ -104,5 +104,5 @@ You don't _have_ to support streaming (and in some cases, like uploads in the br
 If you are not streaming responses, you can simply fake it by returning an array with a single `Uint8Array` inside it.
 This works because the async iteration protocol (`for await ... of`) will fallback to the sync iteration protocol, which is supported by plain Arrays.
 
-To get started, you might want to look at [`src/http/node/index.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/http/node/index.js)
-and [`src/http/web/index.js`](https://github.com/isomorphic-git/isomorphic-git/blob/master/src/http/web/index.js).
+To get started, you might want to look at [`src/http/node/index.js`](https://github.com/isomorphic-git/isomorphic-git/blob/main/src/http/node/index.js)
+and [`src/http/web/index.js`](https://github.com/isomorphic-git/isomorphic-git/blob/main/src/http/web/index.js).

@@ -38,7 +38,7 @@ The object returned has the following schema:
 
 ```ts
 type FetchResult = {
-  defaultBranch: string | null; // The branch that is cloned if no branch is specified (typically "master")
+  defaultBranch: string | null; // The branch that is cloned if no branch is specified
   fetchHead: string | null; // The SHA-1 object id of the fetched head commit
   fetchHeadDescription: string | null; // a textual description of the branch that was fetched
   headers?: Object<string, string>; // The HTTP response headers returned by the git server
@@ -55,7 +55,7 @@ let result = await git.fetch({
   dir: '/tutorial',
   corsProxy: 'https://cors.isomorphic-git.org',
   url: 'https://github.com/isomorphic-git/isomorphic-git',
-  ref: 'master',
+  ref: 'main',
   depth: 1,
   singleBranch: true,
   tags: false
@@ -80,7 +80,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/fetch.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/fetch.js';
   }
 })();
 </script>
