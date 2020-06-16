@@ -34,7 +34,7 @@ await git.fastForward({
   fs,
   http,
   dir: '/tutorial',
-  ref: 'master',
+  ref: 'main',
   singleBranch: true
 })
 console.log('done')
@@ -57,7 +57,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/fastForward.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/fastForward.js';
   }
 })();
 </script>

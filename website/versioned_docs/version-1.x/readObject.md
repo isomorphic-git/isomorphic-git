@@ -253,7 +253,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/readObject.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/readObject.js';
   }
 })();
 </script>

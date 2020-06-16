@@ -28,8 +28,8 @@ type ReadBlobResult = {
 Example Code:
 
 ```js live
-// Get the contents of 'README.md' in the master branch.
-let commitOid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'master' })
+// Get the contents of 'README.md' in the main branch.
+let commitOid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'main' })
 console.log(commitOid)
 let { blob } = await git.readBlob({
   fs,
@@ -57,7 +57,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/readBlob.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/readBlob.js';
   }
 })();
 </script>

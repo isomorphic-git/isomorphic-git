@@ -31,7 +31,7 @@ await git.isDescendent({ dir: '$input((/))', oid, ancestor, depth: $input((-1)) 
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/isDescendent.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/commands/isDescendent.js';
   }
 })();
 </script>

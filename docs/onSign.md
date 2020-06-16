@@ -42,7 +42,7 @@ To verify signed commits and signed annotated tag objects, you use the signature
 // Verify a whole bunch of commits
 import { pgp } from '@isomorphic-git/pgp-plugin'
 
-let commits = await git.log({ fs, dir, ref: 'master' })
+let commits = await git.log({ fs, dir, ref: 'main' })
 for (const { commit, payload } of commits) {
   let { valid, invalid } = await pgp.verify({ payload, publicKey, signature: commit.gpgsig })
   // valid is a string[] of the valid key ids
@@ -54,7 +54,7 @@ for (const { commit, payload } of commits) {
 // Verify a commit object
 import { pgp } from '@isomorphic-git/pgp-plugin'
 
-let oid = await git.resolveRef({ fs, dir, ref: 'master' })
+let oid = await git.resolveRef({ fs, dir, ref: 'main' })
 let { commit, payload } = await git.readCommit({ fs, dir, oid })
 let { valid, invalid } = await pgp.verify({ payload, publicKey, signature: commit.gpgsig })
 // valid is a string[] of the valid key ids

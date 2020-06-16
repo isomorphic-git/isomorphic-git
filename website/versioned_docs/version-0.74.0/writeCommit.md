@@ -41,7 +41,7 @@ type CommitObject = {
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/writeCommit.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/commands/writeCommit.js';
   }
 })();
 </script>

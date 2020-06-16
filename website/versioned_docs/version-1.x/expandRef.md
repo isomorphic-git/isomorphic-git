@@ -18,7 +18,7 @@ Expand an abbreviated ref to its full name
 Example Code:
 
 ```js live
-let fullRef = await git.expandRef({ fs, dir: '/tutorial', ref: 'master'})
+let fullRef = await git.expandRef({ fs, dir: '/tutorial', ref: 'main'})
 console.log(fullRef)
 ```
 
@@ -39,7 +39,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/expandRef.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/expandRef.js';
   }
 })();
 </script>

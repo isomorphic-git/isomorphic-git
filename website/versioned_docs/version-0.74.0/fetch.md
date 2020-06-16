@@ -71,7 +71,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/fetch.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/commands/fetch.js';
   }
 })();
 </script>
