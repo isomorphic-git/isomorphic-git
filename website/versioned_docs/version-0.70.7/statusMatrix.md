@@ -139,7 +139,7 @@ For reference, here are all possible combinations:
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/statusMatrix.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/commands/statusMatrix.js';
   }
 })();
 </script>

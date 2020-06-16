@@ -43,7 +43,7 @@ await git.clone({
   dir,
   corsProxy: 'https://cors.isomorphic-git.org',
   url: 'https://github.com/isomorphic-git/isomorphic-git',
-  ref: 'master',
+  ref: 'main',
   singleBranch: true,
   depth: 10
 });

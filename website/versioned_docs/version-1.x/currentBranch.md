@@ -7,14 +7,14 @@ original_id: currentBranch
 
 Get the name of the branch currently pointed to by .git/HEAD
 
-| param          | type [= default]                | description                                                                                                   |
-| -------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| [**fs**](./fs) | FsClient                        | a file system implementation                                                                                  |
-| dir            | string                          | The [working tree](dir-vs-gitdir.md) directory path                                                           |
-| **gitdir**     | string = join(dir,'.git')       | The [git directory](dir-vs-gitdir.md) path                                                                    |
-| fullname       | boolean = false                 | Return the full path (e.g. "refs/heads/master") instead of the abbreviated form.                              |
-| test           | boolean = false                 | If the current branch doesn't actually exist (such as 'master' right after git init) then return `undefined`. |
-| return         | Promise\<(string &#124; void)\> | The name of the current branch or undefined if the HEAD is detached.                                          |
+| param          | type [= default]                | description                                                                                          |
+| -------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                        | a file system implementation                                                                         |
+| dir            | string                          | The [working tree](dir-vs-gitdir.md) directory path                                                  |
+| **gitdir**     | string = join(dir,'.git')       | The [git directory](dir-vs-gitdir.md) path                                                           |
+| fullname       | boolean = false                 | Return the full path (e.g. "refs/heads/main") instead of the abbreviated form.                       |
+| test           | boolean = false                 | If the current branch doesn't actually exist (such as right after git init) then return `undefined`. |
+| return         | Promise\<(string &#124; void)\> | The name of the current branch or undefined if the HEAD is detached.                                 |
 
 Example Code:
 
@@ -45,7 +45,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/currentBranch.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/currentBranch.js';
   }
 })();
 </script>

@@ -20,7 +20,7 @@ Check whether a git commit is descended from another
 Example Code:
 
 ```js live
-let oid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'master' })
+let oid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'main' })
 let ancestor = await git.resolveRef({ fs, dir: '/tutorial', ref: 'v0.20.0' })
 console.log(oid, ancestor)
 await git.isDescendent({ fs, dir: '/tutorial', oid, ancestor, depth: -1 })
@@ -43,7 +43,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/isDescendent.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/isDescendent.js';
   }
 })();
 </script>

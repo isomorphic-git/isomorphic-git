@@ -7,13 +7,14 @@ original_id: init
 
 Initialize a new repository
 
-| param          | type [= default]          | description                                                   |
-| -------------- | ------------------------- | ------------------------------------------------------------- |
-| [**fs**](./fs) | FsClient                  | a file system client                                          |
-| dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path           |
-| **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                    |
-| bare           | boolean = false           | Initialize a bare repository                                  |
-| return         | Promise\<void\>           | Resolves successfully when filesystem operations are complete |
+| param          | type [= default]          | description                                                                       |
+| -------------- | ------------------------- | --------------------------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                  | a file system client                                                              |
+| dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path                               |
+| **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                                        |
+| bare           | boolean = false           | Initialize a bare repository                                                      |
+| defaultBranch  | string = 'master'         | The name of the default branch (might be changed to a required argument in 2.0.0) |
+| return         | Promise\<void\>           | Resolves successfully when filesystem operations are complete                     |
 
 Example Code:
 
@@ -39,7 +40,7 @@ console.log('done')
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/api/init.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/api/init.js';
   }
 })();
 </script>

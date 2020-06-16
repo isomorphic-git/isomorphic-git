@@ -210,7 +210,7 @@ However you could use a custom function to traverse children serially or use a g
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/walkBeta1.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/commands/walkBeta1.js';
   }
 })();
 </script>

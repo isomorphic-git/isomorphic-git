@@ -32,7 +32,7 @@ console.log('oid', oid) // should be 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391'
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/writeBlob.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/commands/writeBlob.js';
   }
 })();
 </script>

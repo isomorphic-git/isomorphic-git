@@ -43,7 +43,7 @@ type TreeEntry = {
 (function rewriteEditLink() {
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
-    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/master/src/commands/readTree.js';
+    el.href = 'https://github.com/isomorphic-git/isomorphic-git/edit/main/src/commands/readTree.js';
   }
 })();
 </script>

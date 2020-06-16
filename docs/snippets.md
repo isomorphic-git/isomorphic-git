@@ -89,8 +89,8 @@ const buildDir = path.join(sourceDir, 'website/build/isomorphic-git.github.io')
   dir = buildDir
   await git.init({ fs, dir })
   await git.addRemote({ fs, dir, url, remote: 'origin' })
-  await git.fetch({ http, fs, dir, ref: 'master', depth: 1 })
-  await git.checkout({ fs, dir, ref: 'master', noCheckout: true })
+  await git.fetch({ http, fs, dir, ref: 'main', depth: 1 })
+  await git.checkout({ fs, dir, ref: 'main', noCheckout: true })
   await git.add({ fs, dir, filepath: '.' })
   await git.commit({ fs, dir, author: commit.author, message: commit.message })
   await git.push({

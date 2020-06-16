@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/isomorphic-git-logo.svg?sanitize=true" alt="" height="150"/>
+  <img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/main/website/static/img/isomorphic-git-logo.svg?sanitize=true" alt="" height="150"/>
 </p>
 
 # isomorphic-git
@@ -22,7 +22,7 @@ The following environments are tested in CI and will continue to be supported un
 
 <table width="100%">
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/master/website/static/img/browsers/node.webp" alt="" width="64" height="64"><br> Node 10</td>
+<td align="center"><img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/main/website/static/img/browsers/node.webp" alt="" width="64" height="64"><br> Node 10</td>
 <td align="center"><img src="https://raw.githubusercontent.com/alrra/browser-logos/bc47e4601d2c1fd46a7912f9aed5cdda4afdb301/src/chrome/chrome.svg?sanitize=true" alt="" width="64" height="64"><br> Chrome 79</td>
 <td align="center"><img src="https://raw.githubusercontent.com/alrra/browser-logos/bc47e4601d2c1fd46a7912f9aed5cdda4afdb301/src/edge/edge.svg?sanitize=true" alt="" width="64" height="64"><br> Edge 79</td>
 <td align="center"><img src="https://raw.githubusercontent.com/alrra/browser-logos/bc47e4601d2c1fd46a7912f9aed5cdda4afdb301/src/firefox/firefox.svg?sanitize=true" alt="" width="64" height="64"><br> Firefox 72</td>
