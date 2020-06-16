@@ -62,8 +62,8 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * let m = await git.merge({
  *   fs,
  *   dir: '/tutorial',
- *   ours: 'master',
- *   theirs: 'remotes/origin/master'
+ *   ours: 'main',
+ *   theirs: 'remotes/origin/main'
  * })
  * console.log(m)
  *

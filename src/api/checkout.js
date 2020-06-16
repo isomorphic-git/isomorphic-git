@@ -27,11 +27,11 @@ import { join } from '../utils/join.js'
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
  * @example
- * // switch to the master branch
+ * // switch to the main branch
  * await git.checkout({
  *   fs,
  *   dir: '/tutorial',
- *   ref: 'master'
+ *   ref: 'main'
  * })
  * console.log('done')
  *

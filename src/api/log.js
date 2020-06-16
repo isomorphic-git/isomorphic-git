@@ -26,7 +26,7 @@ import { join } from '../utils/join.js'
  *   fs,
  *   dir: '/tutorial',
  *   depth: 5,
- *   ref: 'master'
+ *   ref: 'main'
  * })
  * console.log(commits)
  *

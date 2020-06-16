@@ -16,14 +16,7 @@ import { compareAge } from '../utils/compareAge.js'
  * @param {number|void} args.depth
  * @param {Date|void} args.since
  *
- * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
- * @see ReadCommitResult
- * @see CommitObject
- *
- * @example
- * let commits = await git.log({ dir: '$input((/))', depth: $input((5)), ref: '$input((master))' })
- * console.log(commits)
- *
+ * @returns {Promise<Array<ReadCommitResult>>}
  */
 export async function _log({ fs, gitdir, ref, depth, since }) {
   const sinceTimestamp =

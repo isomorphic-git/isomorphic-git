@@ -8,19 +8,16 @@ import { join } from '../utils/join.js'
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {string} [args.dir]
  * @param {string} [args.gitdir]
- * @param {boolean} [args.bare = false] - Initialize a bare repository
- * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
- *
- * @example
- * await git.init({ dir: '$input((/))' })
- * console.log('done')
- *
+ * @param {boolean} [args.bare = false]
+ * @param {string} [args.defaultBranch = 'master']
+ * @returns {Promise<void>}
  */
 export async function _init({
   fs,
   bare = false,
   dir,
   gitdir = bare ? dir : join(dir, '.git'),
+  defaultBranch = 'master',
 }) {
   // Don't overwrite an existing config
   if (await fs.exists(gitdir + '/config')) return
@@ -48,5 +45,5 @@ export async function _init({
       '\tsymlinks = false\n' +
       '\tignorecase = true\n'
   )
-  await fs.write(gitdir + '/HEAD', 'ref: refs/heads/master\n')
+  await fs.write(gitdir + '/HEAD', `ref: refs/heads/${defaultBranch}\n`)
 }

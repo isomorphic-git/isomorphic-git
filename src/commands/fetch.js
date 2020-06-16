@@ -26,7 +26,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 /**
  *
  * @typedef {object} FetchResult - The object returned has the following schema:
- * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified (typically "master")
+ * @property {string | null} defaultBranch - The branch that is cloned if no branch is specified
  * @property {string | null} fetchHead - The SHA-1 object id of the fetched head commit
  * @property {string | null} fetchHeadDescription - a textual description of the branch that was fetched
  * @property {Object<string, string>} [headers] - The HTTP response headers returned by the git server

@@ -46,7 +46,7 @@ import { join } from '../utils/join.js'
  *   http,
  *   dir: '/tutorial',
  *   remote: 'origin',
- *   ref: 'master',
+ *   ref: 'main',
  *   onAuth: () => ({ username: process.env.GITHUB_TOKEN }),
  * })
  * console.log(pushResult)
