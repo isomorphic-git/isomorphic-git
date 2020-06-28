@@ -59,6 +59,7 @@
     ],
     "Remotes": [
       "getRemoteInfo",
+      "getRemoteInfo2",
       "addRemote",
       "deleteRemote",
       "listRemotes"

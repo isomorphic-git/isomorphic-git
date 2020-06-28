@@ -113,6 +113,10 @@
         "title": "getRemoteInfo",
         "sidebar_label": "getRemoteInfo"
       },
+      "getRemoteInfo2": {
+        "title": "getRemoteInfo2",
+        "sidebar_label": "getRemoteInfo2"
+      },
       "cli": {
         "title": "isogit CLI",
         "sidebar_label": "isogit CLI"
@@ -799,6 +803,10 @@
       "version-1.x/version-1.x-getRemoteInfo": {
         "title": "getRemoteInfo",
         "sidebar_label": "getRemoteInfo"
+      },
+      "version-1.x/version-1.x-getRemoteInfo2": {
+        "title": "getRemoteInfo2",
+        "sidebar_label": "getRemoteInfo2"
       },
       "version-1.x/version-1.x-browser": {
         "title": "Browser Quick Start",

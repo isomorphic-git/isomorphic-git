@@ -61,6 +61,7 @@ export class GitRemoteHTTP {
    * @param {string} args.service
    * @param {string} args.url
    * @param {Object<string, string>} [args.headers]
+   * @param {1 | 2} args.protocolVersion - Git Protocol Version
    */
   static async discover({
     http,
@@ -72,11 +73,15 @@ export class GitRemoteHTTP {
     service,
     url: _origUrl,
     headers,
+    protocolVersion,
   }) {
     let { url, auth } = extractAuthFromUrl(_origUrl)
     const proxifiedURL = corsProxy ? corsProxify(corsProxy, url) : url
     if (auth.username || auth.password) {
       headers.Authorization = calculateBasicAuthHeader(auth)
+    }
+    if (protocolVersion === 2) {
+      headers['Git-Protocol'] = 'version=2'
     }
 
     let res

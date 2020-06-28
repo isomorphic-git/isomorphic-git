@@ -1,6 +1,7 @@
 import { EmptyServerResponseError } from '../errors/EmptyServerResponseError.js'
 import { ParseError } from '../errors/ParseError.js'
 import { GitPktLine } from '../models/GitPktLine.js'
+import { parseCapabilitiesV2 } from '../wire/parseCapabilitiesV2.js'
 
 export async function parseRefsAdResponse(stream, { service }) {
   const capabilities = new Set()
@@ -24,11 +25,12 @@ export async function parseRefsAdResponse(stream, { service }) {
   // In the edge case of a brand new repo, zero refs (and zero capabilities)
   // are returned.
   if (lineTwo === true) return { capabilities, refs, symrefs }
-  const [firstRef, capabilitiesLine] = splitAndAssert(
-    lineTwo.toString('utf8'),
-    '\x00',
-    '\\x00'
-  )
+  lineTwo = lineTwo.toString('utf8')
+  // Handle protocol v2 responses
+  if (lineTwo === 'version 2\n') {
+    return parseCapabilitiesV2(read)
+  }
+  const [firstRef, capabilitiesLine] = splitAndAssert(lineTwo, '\x00', '\\x00')
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
   const [ref, name] = splitAndAssert(firstRef, ' ', ' ')
   refs.set(name, ref)

@@ -163,6 +163,7 @@ unless there is a major version bump.
 - [getConfig](https://isomorphic-git.github.io/docs/getConfig.html)
 - [getConfigAll](https://isomorphic-git.github.io/docs/getConfigAll.html)
 - [getRemoteInfo](https://isomorphic-git.github.io/docs/getRemoteInfo.html)
+- [getRemoteInfo2](https://isomorphic-git.github.io/docs/getRemoteInfo2.html)
 - [hashBlob](https://isomorphic-git.github.io/docs/hashBlob.html)
 - [indexPack](https://isomorphic-git.github.io/docs/indexPack.html)
 - [init](https://isomorphic-git.github.io/docs/init.html)

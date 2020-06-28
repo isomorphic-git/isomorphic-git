@@ -28,6 +28,7 @@ original_id: alphabetic
 - [getConfig](getConfig)
 - [getConfigAll](getConfigAll)
 - [getRemoteInfo](getRemoteInfo)
+- [getRemoteInfo2](getRemoteInfo2)
 - [hashBlob](hashBlob)
 - [indexPack](indexPack)
 - [init](init)
