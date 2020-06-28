@@ -2,7 +2,7 @@
 var whitelist = process.argv.slice(2)
 var { execSync } = require('child_process')
 
-var result = execSync('git diff master --name-only', { encoding: 'utf8' })
+var result = execSync('git diff main --name-only', { encoding: 'utf8' })
 
 var files = result.trim().split('\n')
 
