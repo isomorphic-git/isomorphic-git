@@ -7,7 +7,7 @@ module.exports = function translateBrowser(fullname) {
   } else if (fullname.startsWith('Mobile Safari')) {
     return 'sl_ios_safari'
   } else if (fullname.startsWith('Chrome Mobile')) {
-    return 'sl_android_chrome'
+    return 'bs_android_chrome'
   } else if (fullname.startsWith('Safari')) {
     return 'sl_safari'
   } else if (fullname.startsWith('Chrome')) {
