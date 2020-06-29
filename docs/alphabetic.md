@@ -35,6 +35,7 @@ sidebar_label: Alphabetical Index
 - [listFiles](listFiles)
 - [listNotes](listNotes)
 - [listRemotes](listRemotes)
+- [listServerRefs](listServerRefs)
 - [listTags](listTags)
 - [log](log)
 - [merge](merge)

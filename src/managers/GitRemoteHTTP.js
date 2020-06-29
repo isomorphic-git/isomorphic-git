@@ -156,6 +156,17 @@ export class GitRemoteHTTP {
     }
   }
 
+  /**
+   * @param {Object} args
+   * @param {HttpClient} args.http
+   * @param {ProgressCallback} [args.onProgress]
+   * @param {string} [args.corsProxy]
+   * @param {string} args.service
+   * @param {string} args.url
+   * @param {Object<string, string>} [args.headers]
+   * @param {any} args.body
+   * @param {any} args.auth
+   */
   static async connect({
     http,
     onProgress,

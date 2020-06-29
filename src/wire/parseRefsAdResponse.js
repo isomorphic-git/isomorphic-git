@@ -27,7 +27,7 @@ export async function parseRefsAdResponse(stream, { service }) {
   if (lineTwo === true) return { capabilities, refs, symrefs }
   lineTwo = lineTwo.toString('utf8')
   // Handle protocol v2 responses
-  if (lineTwo === 'version 2\n') {
+  if (lineTwo.includes('version 2')) {
     return parseCapabilitiesV2(read)
   }
   const [firstRef, capabilitiesLine] = splitAndAssert(lineTwo, '\x00', '\\x00')
@@ -51,7 +51,7 @@ export async function parseRefsAdResponse(stream, { service }) {
       }
     }
   }
-  return { capabilities, refs, symrefs }
+  return { protocolVersion: 1, capabilities, refs, symrefs }
 }
 
 function splitAndAssert(line, sep, expected) {

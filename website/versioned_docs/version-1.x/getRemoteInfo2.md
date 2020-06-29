@@ -53,8 +53,8 @@ Example Code:
 ```js live
 let info = await git.getRemoteInfo2({
   http,
-  url:
-    "https://cors.isomorphic-git.org/github.com/isomorphic-git/isomorphic-git.git"
+  corsProxy: "https://cors.isomorphic-git.org",
+  url: "https://github.com/isomorphic-git/isomorphic-git.git"
 });
 console.log(info);
 ```

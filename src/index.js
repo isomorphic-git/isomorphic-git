@@ -34,6 +34,7 @@ import { listBranches } from './api/listBranches.js'
 import { listFiles } from './api/listFiles.js'
 import { listNotes } from './api/listNotes.js'
 import { listRemotes } from './api/listRemotes.js'
+import { listServerRefs } from './api/listServerRefs.js'
 import { listTags } from './api/listTags.js'
 import { log } from './api/log.js'
 import { merge } from './api/merge.js'
@@ -102,6 +103,7 @@ export {
   listFiles,
   listNotes,
   listRemotes,
+  listServerRefs,
   listTags,
   log,
   merge,
@@ -169,6 +171,7 @@ export default {
   listFiles,
   listNotes,
   listRemotes,
+  listServerRefs,
   listTags,
   log,
   merge,
