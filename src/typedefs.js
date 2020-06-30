@@ -60,6 +60,14 @@ import './typedefs-http.js'
  */
 
 /**
+ * @typedef {Object} ServerRef - This object has the following schema:
+ * @property {string} ref - The name of the ref
+ * @property {string} oid - The SHA-1 object id the ref points to
+ * @property {string} [target] - The target ref pointed to by a symbolic ref
+ * @property {string} [peeled] - If the oid is the SHA-1 object id of an annotated tag, this is the SHA-1 object id that the annotated tag points to
+ */
+
+/**
  * @typedef Walker
  * @property {Symbol} Symbol('GitWalkerSymbol')
  */

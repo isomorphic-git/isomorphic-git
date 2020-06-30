@@ -1,9 +1,10 @@
+// @ts-check
+
 /**
- *
- * @param {function} stream
+ * @param {function} read
  */
 export async function parseCapabilitiesV2(read) {
-  /** @type {Object<string, ?string>} */
+  /** @type {Object<string, string | true>} */
   const capabilities2 = {}
 
   let line
@@ -18,7 +19,7 @@ export async function parseCapabilitiesV2(read) {
       const value = line.slice(i + 1)
       capabilities2[key] = value
     } else {
-      capabilities2[line] = null
+      capabilities2[line] = true
     }
   }
   return { protocolVersion: 2, capabilities2 }

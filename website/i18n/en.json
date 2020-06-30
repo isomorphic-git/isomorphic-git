@@ -172,6 +172,10 @@
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
       },
+      "listServerRefs": {
+        "title": "listServerRefs",
+        "sidebar_label": "listServerRefs"
+      },
       "listTags": {
         "title": "listTags",
         "sidebar_label": "listTags"
@@ -863,6 +867,10 @@
       "version-1.x/version-1.x-listRemotes": {
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
+      },
+      "version-1.x/version-1.x-listServerRefs": {
+        "title": "listServerRefs",
+        "sidebar_label": "listServerRefs"
       },
       "version-1.x/version-1.x-listTags": {
         "title": "listTags",
