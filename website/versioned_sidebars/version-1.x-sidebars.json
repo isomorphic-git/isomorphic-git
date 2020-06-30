@@ -59,9 +59,11 @@
     ],
     "Remotes": [
       "version-1.x-getRemoteInfo",
+      "version-1.x-getRemoteInfo2",
       "version-1.x-addRemote",
       "version-1.x-deleteRemote",
-      "version-1.x-listRemotes"
+      "version-1.x-listRemotes",
+      "version-1.x-listServerRefs"
     ],
     "Objects": [
       "version-1.x-readBlob",

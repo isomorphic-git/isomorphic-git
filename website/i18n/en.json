@@ -113,6 +113,10 @@
         "title": "getRemoteInfo",
         "sidebar_label": "getRemoteInfo"
       },
+      "getRemoteInfo2": {
+        "title": "getRemoteInfo2",
+        "sidebar_label": "getRemoteInfo2"
+      },
       "cli": {
         "title": "isogit CLI",
         "sidebar_label": "isogit CLI"
@@ -167,6 +171,10 @@
       "listRemotes": {
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
+      },
+      "listServerRefs": {
+        "title": "listServerRefs",
+        "sidebar_label": "listServerRefs"
       },
       "listTags": {
         "title": "listTags",
@@ -800,6 +808,10 @@
         "title": "getRemoteInfo",
         "sidebar_label": "getRemoteInfo"
       },
+      "version-1.x/version-1.x-getRemoteInfo2": {
+        "title": "getRemoteInfo2",
+        "sidebar_label": "getRemoteInfo2"
+      },
       "version-1.x/version-1.x-browser": {
         "title": "Browser Quick Start",
         "sidebar_label": "Browser Quick Start"
@@ -855,6 +867,10 @@
       "version-1.x/version-1.x-listRemotes": {
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
+      },
+      "version-1.x/version-1.x-listServerRefs": {
+        "title": "listServerRefs",
+        "sidebar_label": "listServerRefs"
       },
       "version-1.x/version-1.x-listTags": {
         "title": "listTags",
