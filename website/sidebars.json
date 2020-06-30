@@ -59,9 +59,11 @@
     ],
     "Remotes": [
       "getRemoteInfo",
+      "getRemoteInfo2",
       "addRemote",
       "deleteRemote",
-      "listRemotes"
+      "listRemotes",
+      "listServerRefs"
     ],
     "Objects": [
       "readBlob",

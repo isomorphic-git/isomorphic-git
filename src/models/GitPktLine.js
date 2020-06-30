@@ -60,6 +60,10 @@ export class GitPktLine {
     return Buffer.from('0000', 'utf8')
   }
 
+  static delim() {
+    return Buffer.from('0001', 'utf8')
+  }
+
   static encode(line) {
     if (typeof line === 'string') {
       line = Buffer.from(line)
@@ -77,6 +81,7 @@ export class GitPktLine {
         if (length == null) return true
         length = parseInt(length.toString('utf8'), 16)
         if (length === 0) return null
+        if (length === 1) return null // delim packets
         const buffer = await reader.read(length - 4)
         if (buffer == null) return true
         return buffer

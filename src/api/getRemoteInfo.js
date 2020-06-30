@@ -66,6 +66,7 @@ export async function getRemoteInfo({
       service: forPush ? 'git-receive-pack' : 'git-upload-pack',
       url,
       headers,
+      protocolVersion: 1,
     })
 
     // Note: remote.capabilities, remote.refs, and remote.symrefs are Set and Map objects,
