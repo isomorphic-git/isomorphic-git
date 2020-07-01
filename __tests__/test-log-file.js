@@ -156,14 +156,19 @@ describe('log', () => {
   })
   it('a deleted file without force should throw error', async () => {
     const { fs, gitdir } = await makeFixture('test-log-file')
-    await expect(
-      log({
+    let err
+    try {
+      await log({
         fs,
         gitdir,
         ref: 'HEAD',
         filepath: 'a/b/rm.md',
       })
-    ).rejects.toThrowError('Could not find')
+    } catch (error) {
+      err = error
+    }
+    expect(err).toBeDefined()
+    expect(err.message).toMatch('Could not find')
   })
   it('a deleted file forced', async () => {
     const { fs, gitdir } = await makeFixture('test-log-file')
