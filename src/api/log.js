@@ -13,9 +13,11 @@ import { join } from '../utils/join.js'
  * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+ * @param {string=} args.filepath optional get the commit for the filepath only
  * @param {string} [args.ref = 'HEAD'] - The commit to begin walking backwards through the history from
  * @param {number} [args.depth] - Limit the number of commits returned. No limit by default.
  * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
+ * @param {boolean=} args.force do not throw error if filepath is not exist (works only for a single file). defaults to false
  *
  * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
  * @see ReadCommitResult
@@ -35,9 +37,11 @@ export async function log({
   fs,
   dir,
   gitdir = join(dir, '.git'),
+  filepath,
   ref = 'HEAD',
   depth,
   since, // Date
+  force,
 }) {
   try {
     assertParameter('fs', fs)
@@ -47,9 +51,11 @@ export async function log({
     return await _log({
       fs: new FileSystem(fs),
       gitdir,
+      filepath,
       ref,
       depth,
       since,
+      force,
     })
   } catch (err) {
     err.caller = 'git.log'
