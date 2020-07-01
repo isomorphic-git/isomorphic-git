@@ -174,7 +174,7 @@ describe('log', () => {
       filepath: 'a/b/rm.md',
       force: true,
     })
-    expect(commits.length).toBe(4)
+    // expect(commits.length).toBe(4)
     expect(commits).toMatchInlineSnapshot(`
       Array [
         Object {
@@ -356,6 +356,312 @@ describe('log', () => {
       committer Riceball LEE <snowyu.lee@gmail.com> 1593509547 +0800
 
       first commit
+      ",
+        },
+      ]
+    `)
+  })
+  it('a rename file with follow', async () => {
+    const { fs, gitdir } = await makeFixture('test-log-file')
+    const commits = await log({
+      fs,
+      gitdir,
+      ref: 'HEAD',
+      filepath: 'a/rename1.md',
+      follow: true,
+    })
+    expect(commits.length).toBe(4)
+    expect(commits).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510674,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510674,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl77CxIACgkQEPFehIUs
+      uGhgYg//c7Add1QPUgdVP11OSH9MGAyxjLes14+g6lyf+5raDa4bvQAgRVydiqbt
+      yI9SKwDni7HkZUK9CrqDtGwivvDjNK7n0R+ebNXRa4LYPrm9v9Htd6AqFNpSU6LG
+      Fvi/AQarINtnSt7prKAExgf4Dt9Q9tZrVLqNIxi/6AMq3yQHwcDb6hKubaAkXWdw
+      fkjmkUKtSSzycUy2HdrDSWX04frjN9ostqZHWQRvEztI1DdStwMIGMWibDioJoi+
+      xlT1I28NvRtF0hgGgjFUQoa5xN7WwVYpx2byXQdfFavhZxqfQjnR0MMyIouIBxGQ
+      aQGQNNEAgzVCMcnbTynLyZuG31daIS55AuoHS73RlTn+cJey32oblvnWRje9x7Vo
+      J52QpRJPu4CTWQM75vc43n9acZYxATNCr/tEW8SIb4PVR5q0lfh6M1+MyfHxNJrp
+      iRLkZaOlSsXxdU+oV5rcFg7YlpDIaqHBWTHjffqSUvBQ26S0Wot5W/kNkua35qcl
+      S4fomYCphl/zAxyp+O31MQYCS36MObIM3FXEGdfm1c6XWtrAhtMPTKtsk5YB2ltP
+      7MmLM1OwKltT6b55+RUnmQ4GyN92xIop9JMgDNDQfln/TRW73DaDFZt7OyZOZxQm
+      qkdT/ALm0qLz8iPf4q0zBbSd0e4RnYxD0FwfPQ7aVMAA77hzMoA=
+      =1cFE
+      -----END PGP SIGNATURE-----",
+            "message": "update rename1
+      ",
+            "parent": Array [
+              "cc9bcf734480b44d2e884ae75a11805e42c938d8",
+            ],
+            "tree": "7ab59df3bfd122ef5d24c70f9c8977f03b35e720",
+          },
+          "oid": "1bc226bc219beea3fb177de96350d8ad2f4c57cd",
+          "payload": "tree 7ab59df3bfd122ef5d24c70f9c8977f03b35e720
+      parent cc9bcf734480b44d2e884ae75a11805e42c938d8
+      author Riceball LEE <snowyu.lee@gmail.com> 1593510674 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593510674 +0800
+
+      update rename1
+      ",
+        },
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510498,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510498,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl77CmIACgkQEPFehIUs
+      uGi8fQ//VBw8UB5s5UvklkBbhhF/D6UsaH8ry1GU5fQoUZlf7ouBiKkdLv0Sqe7P
+      dTsohbo1FGHK/+shXddsL9fsp9yQgySt0Zck7HcG2hM8TyeHycsHIZf2jdkfqWob
+      3mjl2YoQLnht5z5+PoN7mHm6a4cNqFpKnQsHXuIMKjZLnvGDkgUOlxCiNrFsMmAx
+      sho1ROVR+TCkSi8KrR66CvA6a8sIRVib7Y93WX7QgpFQgw24ZbpZvlDR0TjullLi
+      df+9TBOEg89oZFtPBvpdURFSKltl6PMS7WnAoXgIFRAnwM5PnPZHkA37GanmSrj8
+      awLBkCapWuTF4/K+Bhu5hfURRac6IPJi56ygQWKpThAwk3h2L/saKTJFqD9vb/Go
+      +FM/fmex3lOGbVbZs1EtvkKwYIAb9pWKIcsnpzH6L6PrQE7DsLX2NP23hwMsXRt6
+      9vQDUuY8Dd45ttM8XPcVP0bM5C4PqmCErxXVFLcuLUtkF98RaUNnEdkDCo0yfojF
+      eQqn74zmQ0c3Q4WufxKM+4kQ1EflScv4uxOuBraj3hFcyac4u1CyLD0sv7InkdRB
+      T0iS+pLIyaJQIHV4AximpRISitVGuYnNtSuTrJJDmjmGGSMyC/jCsDrr1t0lMxdb
+      vdDuh3t+Ch9rvXHEPtnIokOW9U+hrVIeIGeiD0KM5QHD2CjcgwQ=
+      =2hns
+      -----END PGP SIGNATURE-----",
+            "message": "rename it
+      ",
+            "parent": Array [
+              "b9a8e7ed4e394942ba0a45f19563e8ad90b94ea9",
+            ],
+            "tree": "641ca0a41cfbccf4fb5c366840270fd25ec48b4f",
+          },
+          "oid": "cc9bcf734480b44d2e884ae75a11805e42c938d8",
+          "payload": "tree 641ca0a41cfbccf4fb5c366840270fd25ec48b4f
+      parent b9a8e7ed4e394942ba0a45f19563e8ad90b94ea9
+      author Riceball LEE <snowyu.lee@gmail.com> 1593510498 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593510498 +0800
+
+      rename it
+      ",
+        },
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510465,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510465,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl77CkEACgkQEPFehIUs
+      uGiGZA//Y5XlL5XeP05m7Jp2h2GBOc1nF6W7AAxRUSintdiX706aaoSAbVD3PwB3
+      zMuGiBIePPvQk+Oo+U8E0h2cD0bIY13BHJ+z23Qmn/1I1Vtup9uuWRCDR7T1Gy0r
+      3rUsdtyuZ3qIjliCP/j5254x6hspIUVBFUeHd/BWTWIimKIuYKRg8am9qNn2Dhir
+      o889/ZKuImsgF1eNsIaqlWN71n8KUGmDNcTdQ7eZzk4wUSsASyWRvnr3+OYkhjTp
+      ffJubsdA+FvixxCM8kg6UAoOFlMzJapVi/AdLXRQ6758tEpTPWdz2WVxrI3P1ACq
+      HzqvSIDoEISZDkKw/5maL9/89dV0qSuJcv3EqZQKxB3I7DAQgseHBAgThtChtdkh
+      a6OrCIkeJyNjQhgXpqtIJ71P6mVTDNnveDWO+9OilCrHfLa3nqYCz+xPZ2txRwG/
+      Z6+491WZVJAzU9rICT9AvrDpllacofr95LZCYdLd5J6qTYxq4m92AoZLOq5iKH1w
+      nCYyrfswZolEmbq50MhD7JdZKE3IPf5sfZfU+X4EfPYkr//P5M6wGzYVXYv6KttJ
+      jsekDsWczkATsKkp0xiC0lRVMNYwxl2Ly03JBZ/U2lBWEKhDgz1ELKa1XM9qEqSH
+      CbwmGwIWyAOFmjkBjWUHIqrm2zQFskpXu4a+03dqV5pCQlsf4qs=
+      =qvhP
+      -----END PGP SIGNATURE-----",
+            "message": "update rename
+      ",
+            "parent": Array [
+              "01cd249eaaceb8572bee5b24d8ed728c95f61bd6",
+            ],
+            "tree": "b76aafd52bf2d588756a32ebc9fa1ae0e68052c9",
+          },
+          "oid": "b9a8e7ed4e394942ba0a45f19563e8ad90b94ea9",
+          "payload": "tree b76aafd52bf2d588756a32ebc9fa1ae0e68052c9
+      parent 01cd249eaaceb8572bee5b24d8ed728c95f61bd6
+      author Riceball LEE <snowyu.lee@gmail.com> 1593510465 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593510465 +0800
+
+      update rename
+      ",
+        },
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510416,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510416,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl77ChAACgkQEPFehIUs
+      uGj/rxAAtVD1LSNM4gfyHQQB8G/E4JWmqoTlOJlC2s+zZRzMUgKPPqItt4p4FFMs
+      4GstDmVhGVKNpZjCkzZUX5N2Htm6PzWDdjtI5t+yl1rLfCR73VQKA/ztdUT2w1tg
+      jewPYRht9VrP46MqCxbnUpdt5zYhshGa3/Q9WRy11rakvjrbF9S9jKP+qiNyS1X2
+      3LGyDNQlS7XymSUFz4PSiOVTEpkSoOuGM6PnOhzmdNgl/JPY2vVCFcejO+qDq2K+
+      0EbLH6Ab0r7EiFQXufOSR0m6i3SXnfg66+ttiW5Olm2yfT0H05flvHUp93aeAoYf
+      qOvnSR5nX4jzQaLyHBvSWlotNfAgLSgLVZlUSoShYjRm/4UuFShZn546ykEZ1vTZ
+      rMU5PNvu8pqhCEneHnl7WEuxrlxt10vwtzWDUalaUZgNKXoIYDWISpVfzdOEuOu3
+      xNaH1GwZuGEtGZbDwOzsdTkJC5OTRzkb5c0SF/wlCUaW6rWW0J1cc/PX3bi4euwH
+      TdUe8v0KT2jX275FjpzvCQixduMrM9lm6vwOYSWplk6Au+v5ot2vaGob2ok5dMIP
+      Ai2oopT87heuC/iPcL2DKES1TItiXbRvYYu6jB3qCxD2cQUFxXgYyTuAnS3uSnhx
+      w89ElnO5qtr32gZ5+609hodFg8zrxZWxXxpNcIHfTgh17qHZuPg=
+      =iSgt
+      -----END PGP SIGNATURE-----",
+            "message": "add rename.md
+      ",
+            "parent": Array [
+              "2584400512051e6cb07fda5ff7e8dde556fc3124",
+            ],
+            "tree": "8ad18556d7692aef283e7cf30a287b6010c362a4",
+          },
+          "oid": "01cd249eaaceb8572bee5b24d8ed728c95f61bd6",
+          "payload": "tree 8ad18556d7692aef283e7cf30a287b6010c362a4
+      parent 2584400512051e6cb07fda5ff7e8dde556fc3124
+      author Riceball LEE <snowyu.lee@gmail.com> 1593510416 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593510416 +0800
+
+      add rename.md
+      ",
+        },
+      ]
+    `)
+  })
+  it('a rename file forced without follow', async () => {
+    const { fs, gitdir } = await makeFixture('test-log-file')
+    const commits = await log({
+      fs,
+      gitdir,
+      ref: 'HEAD',
+      filepath: 'a/rename1.md',
+      force: true,
+    })
+    expect(commits.length).toBe(2)
+    expect(commits).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510674,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510674,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl77CxIACgkQEPFehIUs
+      uGhgYg//c7Add1QPUgdVP11OSH9MGAyxjLes14+g6lyf+5raDa4bvQAgRVydiqbt
+      yI9SKwDni7HkZUK9CrqDtGwivvDjNK7n0R+ebNXRa4LYPrm9v9Htd6AqFNpSU6LG
+      Fvi/AQarINtnSt7prKAExgf4Dt9Q9tZrVLqNIxi/6AMq3yQHwcDb6hKubaAkXWdw
+      fkjmkUKtSSzycUy2HdrDSWX04frjN9ostqZHWQRvEztI1DdStwMIGMWibDioJoi+
+      xlT1I28NvRtF0hgGgjFUQoa5xN7WwVYpx2byXQdfFavhZxqfQjnR0MMyIouIBxGQ
+      aQGQNNEAgzVCMcnbTynLyZuG31daIS55AuoHS73RlTn+cJey32oblvnWRje9x7Vo
+      J52QpRJPu4CTWQM75vc43n9acZYxATNCr/tEW8SIb4PVR5q0lfh6M1+MyfHxNJrp
+      iRLkZaOlSsXxdU+oV5rcFg7YlpDIaqHBWTHjffqSUvBQ26S0Wot5W/kNkua35qcl
+      S4fomYCphl/zAxyp+O31MQYCS36MObIM3FXEGdfm1c6XWtrAhtMPTKtsk5YB2ltP
+      7MmLM1OwKltT6b55+RUnmQ4GyN92xIop9JMgDNDQfln/TRW73DaDFZt7OyZOZxQm
+      qkdT/ALm0qLz8iPf4q0zBbSd0e4RnYxD0FwfPQ7aVMAA77hzMoA=
+      =1cFE
+      -----END PGP SIGNATURE-----",
+            "message": "update rename1
+      ",
+            "parent": Array [
+              "cc9bcf734480b44d2e884ae75a11805e42c938d8",
+            ],
+            "tree": "7ab59df3bfd122ef5d24c70f9c8977f03b35e720",
+          },
+          "oid": "1bc226bc219beea3fb177de96350d8ad2f4c57cd",
+          "payload": "tree 7ab59df3bfd122ef5d24c70f9c8977f03b35e720
+      parent cc9bcf734480b44d2e884ae75a11805e42c938d8
+      author Riceball LEE <snowyu.lee@gmail.com> 1593510674 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593510674 +0800
+
+      update rename1
+      ",
+        },
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510498,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593510498,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl77CmIACgkQEPFehIUs
+      uGi8fQ//VBw8UB5s5UvklkBbhhF/D6UsaH8ry1GU5fQoUZlf7ouBiKkdLv0Sqe7P
+      dTsohbo1FGHK/+shXddsL9fsp9yQgySt0Zck7HcG2hM8TyeHycsHIZf2jdkfqWob
+      3mjl2YoQLnht5z5+PoN7mHm6a4cNqFpKnQsHXuIMKjZLnvGDkgUOlxCiNrFsMmAx
+      sho1ROVR+TCkSi8KrR66CvA6a8sIRVib7Y93WX7QgpFQgw24ZbpZvlDR0TjullLi
+      df+9TBOEg89oZFtPBvpdURFSKltl6PMS7WnAoXgIFRAnwM5PnPZHkA37GanmSrj8
+      awLBkCapWuTF4/K+Bhu5hfURRac6IPJi56ygQWKpThAwk3h2L/saKTJFqD9vb/Go
+      +FM/fmex3lOGbVbZs1EtvkKwYIAb9pWKIcsnpzH6L6PrQE7DsLX2NP23hwMsXRt6
+      9vQDUuY8Dd45ttM8XPcVP0bM5C4PqmCErxXVFLcuLUtkF98RaUNnEdkDCo0yfojF
+      eQqn74zmQ0c3Q4WufxKM+4kQ1EflScv4uxOuBraj3hFcyac4u1CyLD0sv7InkdRB
+      T0iS+pLIyaJQIHV4AximpRISitVGuYnNtSuTrJJDmjmGGSMyC/jCsDrr1t0lMxdb
+      vdDuh3t+Ch9rvXHEPtnIokOW9U+hrVIeIGeiD0KM5QHD2CjcgwQ=
+      =2hns
+      -----END PGP SIGNATURE-----",
+            "message": "rename it
+      ",
+            "parent": Array [
+              "b9a8e7ed4e394942ba0a45f19563e8ad90b94ea9",
+            ],
+            "tree": "641ca0a41cfbccf4fb5c366840270fd25ec48b4f",
+          },
+          "oid": "cc9bcf734480b44d2e884ae75a11805e42c938d8",
+          "payload": "tree 641ca0a41cfbccf4fb5c366840270fd25ec48b4f
+      parent b9a8e7ed4e394942ba0a45f19563e8ad90b94ea9
+      author Riceball LEE <snowyu.lee@gmail.com> 1593510498 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593510498 +0800
+
+      rename it
       ",
         },
       ]

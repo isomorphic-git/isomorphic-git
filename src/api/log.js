@@ -18,6 +18,7 @@ import { join } from '../utils/join.js'
  * @param {number} [args.depth] - Limit the number of commits returned. No limit by default.
  * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
  * @param {boolean=} args.force do not throw error if filepath is not exist (works only for a single file). defaults to false
+ * @param {boolean=} args.follow Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  *
  * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
  * @see ReadCommitResult
@@ -42,6 +43,7 @@ export async function log({
   depth,
   since, // Date
   force,
+  follow,
 }) {
   try {
     assertParameter('fs', fs)
@@ -56,6 +58,7 @@ export async function log({
       depth,
       since,
       force,
+      follow,
     })
   } catch (err) {
     err.caller = 'git.log'

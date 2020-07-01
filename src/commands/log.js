@@ -6,6 +6,7 @@ import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { compareAge } from '../utils/compareAge.js'
+import { resolveFileIdInTree } from '../utils/resolveFileIdInTree.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
 /**
@@ -19,6 +20,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {number|void} args.depth
  * @param {Date|void} args.since
  * @param {boolean=} args.force do not throw error if filepath is not exist (works only for a single file). defaults to false
+ * @param {boolean=} args.follow Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  *
  * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
  * @see ReadCommitResult
@@ -29,7 +31,16 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * console.log(commits)
  *
  */
-export async function _log({ fs, gitdir, filepath, ref, depth, since, force }) {
+export async function _log({
+  fs,
+  gitdir,
+  filepath,
+  ref,
+  depth,
+  since,
+  force,
+  follow,
+}) {
   const sinceTimestamp =
     typeof since === 'undefined'
       ? undefined
@@ -51,6 +62,7 @@ export async function _log({ fs, gitdir, filepath, ref, depth, since, force }) {
       sinceTimestamp !== undefined &&
       commit.commit.committer.timestamp <= sinceTimestamp
     ) {
+      endCommit(commit)
       break
     }
 
@@ -63,22 +75,34 @@ export async function _log({ fs, gitdir, filepath, ref, depth, since, force }) {
           oid: commit.commit.tree,
           filepath,
         })
-        console.log('TCL::: function_log -> foid', lastFileOid, vFileOid);
         if (lastCommit && lastFileOid !== vFileOid) {
-          console.log('TCL::: function_log -> coid', filepath, lastCommit.oid, lastCommit.commit.message);
           commits.push(lastCommit)
         }
         lastFileOid = vFileOid
         lastCommit = commit
       } catch (e) {
-        console.log('TCL::: function_log -> e', commit.oid, e);
         if (e instanceof NotFoundError) {
-          if (!force) throw e
-          lastCommit = commit
-          if (lastFileOid) {
-            commits.push(lastCommit)
-            break
+          let found = follow && lastFileOid
+          if (found) {
+            found = await resolveFileIdInTree({
+              fs,
+              gitdir,
+              oid: commit.commit.tree,
+              fileId: lastFileOid,
+            })
+            if (found) {
+              filepath = found
+              if (lastCommit) commits.push(lastCommit)
+            }
           }
+          if (!found) {
+            if (!force && !follow) throw e
+            if (lastFileOid) {
+              commits.push(lastCommit)
+              break
+            }
+          }
+          lastCommit = commit
         } else throw e
       }
     } else {
@@ -87,7 +111,7 @@ export async function _log({ fs, gitdir, filepath, ref, depth, since, force }) {
 
     // Stop the loop if we have enough commits now.
     if (depth !== undefined && commits.length === depth) {
-      endCommit()
+      endCommit(commit)
       break
     }
 
@@ -105,16 +129,16 @@ export async function _log({ fs, gitdir, filepath, ref, depth, since, force }) {
 
     // Stop the loop if there are no more commit parents
     if (tips.length === 0) {
-      endCommit()
+      endCommit(commit)
       break
     }
 
     // Process tips in order by age
     tips.sort((a, b) => compareAge(a.commit, b.commit))
-
-    function endCommit() {
-      if (filepath) commits.push(commit)
-    }
   }
   return commits
+
+  function endCommit(commit) {
+    if (filepath) commits.push(commit)
+  }
 }
