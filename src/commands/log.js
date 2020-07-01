@@ -62,7 +62,6 @@ export async function _log({
       sinceTimestamp !== undefined &&
       commit.commit.committer.timestamp <= sinceTimestamp
     ) {
-      endCommit(commit)
       break
     }
 
