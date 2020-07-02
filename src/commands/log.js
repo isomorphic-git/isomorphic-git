@@ -53,6 +53,7 @@ export async function _log({
   const tips = [await _readCommit({ fs, gitdir, oid })]
   let lastFileOid
   let lastCommit
+  let isOk
 
   while (true) {
     const commit = tips.pop()
@@ -79,6 +80,7 @@ export async function _log({
         }
         lastFileOid = vFileOid
         lastCommit = commit
+        isOk = true
       } catch (e) {
         if (e instanceof NotFoundError) {
           let found = follow && lastFileOid
@@ -96,12 +98,13 @@ export async function _log({
           }
           if (!found) {
             if (!force && !follow) throw e
-            if (lastFileOid) {
+            if (isOk && lastFileOid) {
               commits.push(lastCommit)
-              break
+              // break
             }
           }
           lastCommit = commit
+          isOk = false
         } else throw e
       }
     } else {
@@ -138,6 +141,6 @@ export async function _log({
   return commits
 
   function endCommit(commit) {
-    if (filepath) commits.push(commit)
+    if (isOk && filepath) commits.push(commit)
   }
 }
