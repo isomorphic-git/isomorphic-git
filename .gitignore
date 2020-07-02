@@ -71,6 +71,9 @@ node_modules
 # dotenv environment variables file
 .env
 
+# Webstorm development environment
+.idea/
+
 # AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE
 docs/add.md
 docs/addNote.md
