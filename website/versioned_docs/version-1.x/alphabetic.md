@@ -52,6 +52,7 @@ original_id: alphabetic
 - [readTree](readTree)
 - [remove](remove)
 - [removeNote](removeNote)
+- [renameBranch](renameBranch)
 - [resetIndex](resetIndex)
 - [resolveRef](resolveRef)
 - [setConfig](setConfig)

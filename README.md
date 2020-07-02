@@ -187,6 +187,7 @@ unless there is a major version bump.
 - [readTree](https://isomorphic-git.github.io/docs/readTree.html)
 - [remove](https://isomorphic-git.github.io/docs/remove.html)
 - [removeNote](https://isomorphic-git.github.io/docs/removeNote.html)
+- [renameBranch](https://isomorphic-git.github.io/docs/renameBranch.html)
 - [resetIndex](https://isomorphic-git.github.io/docs/resetIndex.html)
 - [resolveRef](https://isomorphic-git.github.io/docs/resolveRef.html)
 - [setConfig](https://isomorphic-git.github.io/docs/setConfig.html)

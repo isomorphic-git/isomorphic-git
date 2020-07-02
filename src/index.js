@@ -49,6 +49,7 @@ import { readTag } from './api/readTag.js'
 import { readTree } from './api/readTree.js'
 import { remove } from './api/remove.js'
 import { removeNote } from './api/removeNote.js'
+import { renameBranch } from './api/renameBranch.js'
 import { resetIndex } from './api/resetIndex.js'
 import { resolveRef } from './api/resolveRef.js'
 import { setConfig } from './api/setConfig.js'
@@ -118,6 +119,7 @@ export {
   readTree,
   remove,
   removeNote,
+  renameBranch,
   resetIndex,
   resolveRef,
   status,
@@ -186,6 +188,7 @@ export default {
   readTree,
   remove,
   removeNote,
+  renameBranch,
   resetIndex,
   resolveRef,
   status,

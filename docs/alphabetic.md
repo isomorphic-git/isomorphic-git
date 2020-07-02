@@ -50,6 +50,7 @@ sidebar_label: Alphabetical Index
 - [readTree](readTree)
 - [remove](remove)
 - [removeNote](removeNote)
+- [renameBranch](renameBranch)
 - [resetIndex](resetIndex)
 - [resolveRef](resolveRef)
 - [setConfig](setConfig)
