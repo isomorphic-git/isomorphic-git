@@ -1,8 +1,9 @@
 // import LockManager from 'travix-lock-manager'
-import AsyncLock from 'async-lock'
 
 import { GitIndex } from '../models/GitIndex.js'
 import { compareStats } from '../utils/compareStats.js'
+
+import AsyncLock from 'async-lock'
 
 // import Lock from '../utils.js'
 

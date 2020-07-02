@@ -1,10 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 
+const git = require('../..')
+
 const jsdoc = require('jsdoc-api')
 const table = require('markdown-table')
-
-const git = require('../..')
 
 const dir = path.join(__dirname, '..', '..')
 const thisFile = path.relative(dir, __filename).replace(/\\/g, '/')

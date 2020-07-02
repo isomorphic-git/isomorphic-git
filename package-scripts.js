@@ -1,8 +1,8 @@
 // package-scripts.js is a convention used by the 'nps' utility
 // It's like package.json scripts, but more flexible.
-const { concurrent, series, runInNewWindow } = require('nps-utils')
-
 const pkg = require('./package.json')
+
+const { concurrent, series, runInNewWindow } = require('nps-utils')
 
 const builtFiles = pkg.files.filter(f => !['cli.js'].includes(f))
 

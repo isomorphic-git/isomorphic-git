@@ -1,9 +1,9 @@
-import get from 'simple-get'
-
 import '../../typedefs-http.js'
 import { asyncIteratorToStream } from '../../utils/asyncIteratorToStream.js'
 import { collect } from '../../utils/collect.js'
 import { fromNodeStream } from '../../utils/fromNodeStream.js'
+
+import get from 'simple-get'
 
 /**
  * HttpClient

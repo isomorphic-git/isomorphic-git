@@ -1,6 +1,6 @@
-import AsyncLock from 'async-lock'
-
 import { join } from '../utils/join.js'
+
+import AsyncLock from 'async-lock'
 
 let lock = null
 

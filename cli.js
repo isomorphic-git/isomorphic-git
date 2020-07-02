@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 const fs = require('fs')
 
-const minimisted = require('minimisted')
-
 const git = require('.')
 
 const http = require('./http/node')
+
+const minimisted = require('minimisted')
 
 // This really isn't much of a CLI. It's mostly for testing.
 // But it's very versatile and works surprisingly well.
