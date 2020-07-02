@@ -5,7 +5,11 @@ import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from './join.js'
 import { resolveTree } from './resolveTree.js'
 
+// the empty file content object id
+const EMPTY_OID = 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391'
+
 export async function resolveFileIdInTree({ fs, gitdir, oid, fileId }) {
+  if (fileId === EMPTY_OID) return
   const _oid = oid
   let filepath
   const result = await resolveTree({ fs, gitdir, oid })
