@@ -36,6 +36,10 @@ export async function _renameBranch({
     throw new InvalidRefNameError(ref, cleanGitRef.clean(ref))
   }
 
+  if (oldref !== cleanGitRef.clean(oldref)) {
+    throw new InvalidRefNameError(oldref, cleanGitRef.clean(oldref))
+  }
+
   const fulloldref = `refs/heads/${oldref}`
   const fullnewref = `refs/heads/${ref}`
 

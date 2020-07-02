@@ -36,7 +36,7 @@ export async function renameBranch({
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
     assertParameter('ref', ref)
-    assertParameter('ref', oldref)
+    assertParameter('oldref', oldref)
     return await _renameBranch({
       fs: new FileSystem(fs),
       gitdir,
