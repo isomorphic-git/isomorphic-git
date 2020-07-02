@@ -179,9 +179,101 @@ describe('log', () => {
       filepath: 'a/b/rm.md',
       force: true,
     })
-    // expect(commits.length).toBe(4)
+    expect(commits.length).toBe(6)
     expect(commits).toMatchInlineSnapshot(`
       Array [
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593652995,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593652995,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl79NwMACgkQEPFehIUs
+      uGh+EA//f+cNby3i8IhD5LL5elmR6qp+KFNLQMEa7nvcUmYQX2Ffx4QAN0WtPQ+O
+      y6PmrQg5MLfCPzANthY3oKnkvjIYbpnBF2JTeN2HA8mF8/HtGakMfeykkeuaGP6V
+      Kdk4I2jiXC22g/Zy7VAzbYdJTk96yWw71lpufQa1voy8ykCCu/YgeO4EjQME2RYn
+      82W9+X4Qxx5bu0C0lKMwfdhAcR/MDTye0jbu33krwnuXsNyA+6OKBIOfIAWK8PWY
+      iTwvkfQ+61T0dGFAdi8tJCfGZ6JRBf482KHR/gSwmwq59g7quS/snnybB6kGwrqZ
+      tScHZ6Sy08xHYRbibV8HmOAyIBKZr1ZPtEjBx5Aj6Q4qKsTkZ3Q5ZTTi8Ayhm1SM
+      y1mJ20d3B0WM9F48w0a8qbKxNn7zefW88QHq3PB6wdGechkZ/Wq0xN2z/h3Sl5W3
+      ZSmJcvgMFJwc/p7ci2spkR+ibVnFNdvn0xinUvrJGftFuiEqlZfHwo1t6KkmX9st
+      X7+30WwKmotxgeBfV0g1Br4YpaZTKJc5V2JkU+gtjnIlb/7XU6eWm+vCInad5QdL
+      NeiYCPsrT9ejboKghAIteNNfiuauiRnpZ/06H5gi2OVeyChA1urD/pKjJyaNllbh
+      XZTv9Wqzt6oQzR6FV0HH5H9ACqOnCJXsTUoydzt843MFHmPDL0Y=
+      =77Yr
+      -----END PGP SIGNATURE-----",
+            "message": "redel rm.md
+      ",
+            "parent": Array [
+              "91e66ded3cee73f5f181fbd0e7a4703f1c12bb9f",
+            ],
+            "tree": "7ab59df3bfd122ef5d24c70f9c8977f03b35e720",
+          },
+          "oid": "9a4eb099547166c9cf28628a127cfc9e59fa4f29",
+          "payload": "tree 7ab59df3bfd122ef5d24c70f9c8977f03b35e720
+      parent 91e66ded3cee73f5f181fbd0e7a4703f1c12bb9f
+      author Riceball LEE <snowyu.lee@gmail.com> 1593652995 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593652995 +0800
+
+      redel rm.md
+      ",
+        },
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593652652,
+              "timezoneOffset": -480,
+            },
+            "committer": Object {
+              "email": "snowyu.lee@gmail.com",
+              "name": "Riceball LEE",
+              "timestamp": 1593652652,
+              "timezoneOffset": -480,
+            },
+            "gpgsig": "-----BEGIN PGP SIGNATURE-----
+
+      iQIzBAABCgAdFiEEdmCAADTKSYRxNh/nEPFehIUsuGgFAl79NawACgkQEPFehIUs
+      uGj7BRAAjZjpjaP6Kl++qtsHS5GdzMCVyocVOE+UCOWU55ImjJI9g2ajlnWfIUuM
+      oZTFCG123eY0vGtXTCpcrNUPO3QvVtkIlZybMMFcJJMoENWjQ1rWZEVX4UK/skkM
+      kKt1ZFVJHfgLnqsFGcyR5Fmr9omm3faVinyIxQhhdNxIYV44x4Uj5IszZul4yeQr
+      NBdrPpmChT53ST3+WNp1/c7iSeMjUpXO+CVkmmG0kieThJgKBqkBTlholwYrVCgS
+      B5MTgVzLh9NGoJHs+9Qd5pze41tIPNJbCWtWimoOdWJTo91L29qT747tNC14v6zh
+      dkemZgUsO81lq96WiTekDS2E9PDWVWk1mi2XAXrsQ8OqDKYDwkLQa4GvlxjQrNEU
+      1FG0btHD0ddYYEwBN4uK5wsXA60i1qDetggGT+CcYi2yX4MqFCI4GJgf4Oj0htht
+      ltX7fMFZu5sKSOd1vLE8RxS2c4IgNQZ4ZFCAW1mfBAV31RLXG4BH1f/4laKvMrKO
+      5EUufJcPIW4vKAXVVGyPMgenkEUrXL/ImYt1kuSAMx2pffahWQzaF7rTXAWO2YK+
+      bqajFbubxMPbDPW70pnYQJLwuLve2IqBbPsMghx+B30F0PzCajg3XvJv7ZdqodSE
+      wKn2DCea/8Rj7O/GYRPJJtJ8ITwhGMLxRC5s7j6mJAxj5IdB2fw=
+      =z3mu
+      -----END PGP SIGNATURE-----",
+            "message": "feat: readd the rm.md
+      ",
+            "parent": Array [
+              "1bc226bc219beea3fb177de96350d8ad2f4c57cd",
+            ],
+            "tree": "e7bd10ca01b3377fa6fbe633ce104698b5d7dd29",
+          },
+          "oid": "91e66ded3cee73f5f181fbd0e7a4703f1c12bb9f",
+          "payload": "tree e7bd10ca01b3377fa6fbe633ce104698b5d7dd29
+      parent 1bc226bc219beea3fb177de96350d8ad2f4c57cd
+      author Riceball LEE <snowyu.lee@gmail.com> 1593652652 +0800
+      committer Riceball LEE <snowyu.lee@gmail.com> 1593652652 +0800
+
+      feat: readd the rm.md
+      ",
+        },
         Object {
           "commit": Object {
             "author": Object {
