@@ -57,6 +57,7 @@ describe('exports', () => {
         "readTree",
         "remove",
         "removeNote",
+        "renameBranch",
         "resetIndex",
         "resolveRef",
         "setConfig",
