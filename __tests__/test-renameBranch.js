@@ -6,37 +6,6 @@ const { Errors, renameBranch, currentBranch } = require('isomorphic-git')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('renameBranch', () => {
-  it('rename branch', async () => {
-    // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
-    // Test
-    await renameBranch({
-      fs,
-      dir,
-      gitdir,
-      oldref: 'test-branch',
-      ref: 'other-branch',
-    })
-    const files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
-    expect(files).toEqual(['master', 'other-branch'])
-    expect(await currentBranch({ fs, dir, gitdir })).toEqual('master')
-  })
-
-  it('rename branch and checkout', async () => {
-    // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
-    // Test
-    await renameBranch({
-      fs,
-      dir,
-      gitdir,
-      oldref: 'test-branch',
-      ref: 'other-branch',
-      checkout: true,
-    })
-    expect(await currentBranch({ fs, dir, gitdir })).toEqual('other-branch')
-  })
-
   it('branch already exists', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
@@ -125,5 +94,36 @@ describe('renameBranch', () => {
     }
     expect(error).not.toBeNull()
     expect(error instanceof Errors.MissingParameterError).toBe(true)
+  })
+
+  it('rename branch', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
+    // Test
+    await renameBranch({
+      fs,
+      dir,
+      gitdir,
+      oldref: 'test-branch',
+      ref: 'other-branch',
+    })
+    const files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
+    expect(files.includes('test-branch')).toBe(false)
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('master')
+  })
+
+  it('rename branch and checkout', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
+    // Test
+    await renameBranch({
+      fs,
+      dir,
+      gitdir,
+      oldref: 'test-branch-2',
+      ref: 'other-branch-2',
+      checkout: true,
+    })
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('other-branch-2')
   })
 })
