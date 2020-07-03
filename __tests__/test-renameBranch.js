@@ -5,7 +5,7 @@ const { Errors, renameBranch, currentBranch } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
-describe('branch', () => {
+describe('renameBranch', () => {
   it('rename branch', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
@@ -35,6 +35,26 @@ describe('branch', () => {
       checkout: true,
     })
     expect(await currentBranch({ fs, dir, gitdir })).toEqual('other-branch')
+  })
+
+  it('branch already exists', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
+    let error = null
+    // Test
+    try {
+      await renameBranch({
+        fs,
+        dir,
+        gitdir,
+        oldref: 'test-branch',
+        ref: 'master',
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error instanceof Errors.AlreadyExistsError).toBe(true)
   })
 
   it('invalid new branch name', async () => {
