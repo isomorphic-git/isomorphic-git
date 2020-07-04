@@ -176,7 +176,7 @@ export async function _fetch({
   )
   if (relative) capabilities.push('deepen-relative')
   // Start figuring out which oids from the remote we want to request
-  const wants = singleBranch ? [oid] : remoteRefs.values()
+  const wants = singleBranch ? [oid] : [...remoteRefs.values()]
   // Come up with a reasonable list of oids to tell the remote we already have
   // (preferably oids that are close ancestors of the branch heads we're fetching)
   const haveRefs = singleBranch
@@ -197,59 +197,67 @@ export async function _fetch({
     } catch (err) {}
   }
   haves = [...new Set(haves)]
-  const oids = await GitShallowManager.read({ fs, gitdir })
-  const shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
-  const packstream = writeUploadPackRequest({
-    capabilities,
-    wants,
-    haves,
-    shallows,
-    depth,
-    since,
-    exclude,
-  })
-  // CodeCommit will hang up if we don't send a Content-Length header
-  // so we can't stream the body.
-  const packbuffer = Buffer.from(await collect(packstream))
-  const raw = await GitRemoteHTTP.connect({
-    http,
-    onProgress,
-    corsProxy,
-    service: 'git-upload-pack',
-    url,
-    auth,
-    body: [packbuffer],
-    headers,
-  })
-  const response = await parseUploadPackResponse(raw.body)
-  if (raw.headers) {
-    response.headers = raw.headers
-  }
-  // Apply all the 'shallow' and 'unshallow' commands
-  for (const oid of response.shallows) {
-    if (!oids.has(oid)) {
-      // this is in a try/catch mostly because my old test fixtures are missing objects
-      try {
-        // server says it's shallow, but do we have the parents?
-        const { object } = await readObject({ fs, gitdir, oid })
-        const commit = new GitCommit(object)
-        const hasParents = await Promise.all(
-          commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid }))
-        )
-        const haveAllParents =
-          hasParents.length === 0 || hasParents.every(has => has)
-        if (!haveAllParents) {
+
+  // If all the wants are contained in haves, then we can skip this second HTTP request.
+  const fetchedPackfile = wants.some(oid => !haves.includes(oid))
+
+  let response = {}
+  if (fetchedPackfile) {
+    const oids = await GitShallowManager.read({ fs, gitdir })
+    const shallows = remoteHTTP.capabilities.has('shallow') ? [...oids] : []
+    const packstream = writeUploadPackRequest({
+      capabilities,
+      wants,
+      haves,
+      shallows,
+      depth,
+      since,
+      exclude,
+    })
+    // CodeCommit will hang up if we don't send a Content-Length header
+    // so we can't stream the body.
+    const packbuffer = Buffer.from(await collect(packstream))
+    const raw = await GitRemoteHTTP.connect({
+      http,
+      onProgress,
+      corsProxy,
+      service: 'git-upload-pack',
+      url,
+      auth,
+      body: [packbuffer],
+      headers,
+    })
+    response = await parseUploadPackResponse(raw.body)
+    if (raw.headers) {
+      response.headers = raw.headers
+    }
+    // Apply all the 'shallow' and 'unshallow' commands
+    for (const oid of response.shallows) {
+      if (!oids.has(oid)) {
+        // this is in a try/catch mostly because my old test fixtures are missing objects
+        try {
+          // server says it's shallow, but do we have the parents?
+          const { object } = await readObject({ fs, gitdir, oid })
+          const commit = new GitCommit(object)
+          const hasParents = await Promise.all(
+            commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid }))
+          )
+          const haveAllParents =
+            hasParents.length === 0 || hasParents.every(has => has)
+          if (!haveAllParents) {
+            oids.add(oid)
+          }
+        } catch (err) {
           oids.add(oid)
         }
-      } catch (err) {
-        oids.add(oid)
       }
     }
+    for (const oid of response.unshallows) {
+      oids.delete(oid)
+    }
+    await GitShallowManager.write({ fs, gitdir, oids })
   }
-  for (const oid of response.unshallows) {
-    oids.delete(oid)
-  }
-  await GitShallowManager.write({ fs, gitdir, oids })
+
   // Update local remote refs
   if (singleBranch) {
     const refs = new Map([[fullref, oid]])
@@ -317,24 +325,6 @@ export async function _fetch({
     description: `${noun} '${abbreviateRef(fullref)}' of ${url}`,
   }
 
-  if (onProgress || onMessage) {
-    const lines = splitLines(response.progress)
-    forAwait(lines, async line => {
-      if (onMessage) await onMessage(line)
-      if (onProgress) {
-        const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
-        if (matches) {
-          await onProgress({
-            phase: matches[1].trim(),
-            loaded: parseInt(matches[2], 10),
-            total: parseInt(matches[3], 10),
-          })
-        }
-      }
-    })
-  }
-  const packfile = Buffer.from(await collect(response.packfile))
-  const packfileSha = packfile.slice(-20).toString('hex')
   const res = {
     defaultBranch: response.HEAD,
     fetchHead: response.FETCH_HEAD.oid,
@@ -346,23 +336,45 @@ export async function _fetch({
   if (prune) {
     res.pruned = response.pruned
   }
-  // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
-  // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
-  // TODO: Longer term, we should actually:
-  // a) NOT concatenate the entire packfile into memory (line 78),
-  // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
-  // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
-  if (packfileSha !== '' && !emptyPackfile(packfile)) {
-    res.packfile = `objects/pack/pack-${packfileSha}.pack`
-    const fullpath = join(gitdir, res.packfile)
-    await fs.write(fullpath, packfile)
-    const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
-    const idx = await GitPackIndex.fromPack({
-      pack: packfile,
-      getExternalRefDelta,
-      onProgress,
-    })
-    await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
+
+  if (fetchedPackfile) {
+    if (onProgress || onMessage) {
+      const lines = splitLines(response.progress)
+      forAwait(lines, async line => {
+        if (onMessage) await onMessage(line)
+        if (onProgress) {
+          const matches = line.match(/([^:]*).*\((\d+?)\/(\d+?)\)/)
+          if (matches) {
+            await onProgress({
+              phase: matches[1].trim(),
+              loaded: parseInt(matches[2], 10),
+              total: parseInt(matches[3], 10),
+            })
+          }
+        }
+      })
+    }
+    const packfile = Buffer.from(await collect(response.packfile))
+    const packfileSha = packfile.slice(-20).toString('hex')
+    // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
+    // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
+    // TODO: Longer term, we should actually:
+    // a) NOT concatenate the entire packfile into memory (line 78),
+    // b) compute the SHA of the stream except for the last 20 bytes, using the same library used in push.js, and
+    // c) compare the computed SHA with the last 20 bytes of the stream before saving to disk, and throwing a "packfile got corrupted during download" error if the SHA doesn't match.
+    if (packfileSha !== '' && !emptyPackfile(packfile)) {
+      res.packfile = `objects/pack/pack-${packfileSha}.pack`
+      const fullpath = join(gitdir, res.packfile)
+      await fs.write(fullpath, packfile)
+      const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
+      const idx = await GitPackIndex.fromPack({
+        pack: packfile,
+        getExternalRefDelta,
+        onProgress,
+      })
+      await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
+    }
   }
+
   return res
 }
