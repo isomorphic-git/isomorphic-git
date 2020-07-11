@@ -33,6 +33,9 @@ module.exports = {
       default: `eslint .`,
       fix: optional(`eslint --fix .`),
     },
+    format: {
+      default: series.nps('lint.fix'),
+    },
     watch: {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),
