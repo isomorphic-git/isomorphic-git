@@ -323,6 +323,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://crutchcorn.dev/"><img src="https://avatars0.githubusercontent.com/u/9100169?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Corbin Crutchley</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=crutchcorn" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=crutchcorn" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=crutchcorn" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://onetwo.ren/"><img src="https://avatars1.githubusercontent.com/u/3746270?v=4?s=60" width="60px;" alt=""/><br /><sub><b>lin onetwo</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=linonetwo" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/linfaxin"><img src="https://avatars2.githubusercontent.com/u/3705017?v=4?s=60" width="60px;" alt=""/><br /><sub><b>林法鑫</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Alinfaxin" title="Bug reports">🐛</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-enable -->

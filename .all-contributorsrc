@@ -425,6 +425,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "linfaxin",
+      "name": "林法鑫",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/3705017?v=4",
+      "profile": "https://github.com/linfaxin",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
