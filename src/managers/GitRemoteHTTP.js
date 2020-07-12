@@ -45,10 +45,10 @@ const stringifyBody = async res => {
   }
 }
 
-export class GitRemoteHTTP {
-  static async capabilities() {
+export const GitRemoteHTTP = {
+  async capabilities() {
     return ['discover', 'connect']
-  }
+  },
 
   /**
    * @param {Object} args
@@ -63,7 +63,7 @@ export class GitRemoteHTTP {
    * @param {Object<string, string>} [args.headers]
    * @param {1 | 2} args.protocolVersion - Git Protocol Version
    */
-  static async discover({
+  async discover({
     http,
     onProgress,
     onAuth,
@@ -154,7 +154,7 @@ export class GitRemoteHTTP {
         throw new SmartHttpError(preview, response)
       }
     }
-  }
+  },
 
   /**
    * @param {Object} args
@@ -167,7 +167,7 @@ export class GitRemoteHTTP {
    * @param {any} args.body
    * @param {any} args.auth
    */
-  static async connect({
+  async connect({
     http,
     onProgress,
     corsProxy,
