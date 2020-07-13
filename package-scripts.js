@@ -73,6 +73,7 @@ module.exports = {
               `CI_REPO_NAME='isomorphic-git' ` +
               `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
               `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
+              `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}' ` +
               `bundlewatch`
           )
         : optional(`cross-env bundlewatch`),
