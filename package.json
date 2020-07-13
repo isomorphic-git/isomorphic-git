@@ -80,7 +80,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.6",
     "browserfs": "2.0.0",
-    "bundlewatch": "0.2.5",
+    "bundlewatch": "0.2.7",
     "cross-env": "6.0.0",
     "decompress": "^4.2.0",
     "diff-lines": "1.1.1",
@@ -141,7 +141,12 @@
         "path": "./index.umd.min.js",
         "maxSize": "100kb"
       }
-    ]
+    ],
+    "ci": {
+      "trackBranches": [
+        "main"
+      ]
+    }
   },
   "collective": {
     "type": "opencollective",
