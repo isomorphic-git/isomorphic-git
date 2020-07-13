@@ -92,8 +92,31 @@ export async function _log({
               fileId: lastFileOid,
             })
             if (found) {
-              filepath = found
-              if (lastCommit) commits.push(lastCommit)
+              if (Array.isArray(found)) {
+                if (lastCommit) {
+                  const lastFound = await resolveFileIdInTree({
+                    fs,
+                    gitdir,
+                    oid: lastCommit.commit.tree,
+                    fileId: lastFileOid,
+                  })
+                  if (Array.isArray(lastFound)) {
+                    found = found.filter(p => lastFound.indexOf(p) === -1)
+                    if (found.length === 1) {
+                      found = found[0]
+                      filepath = found
+                      if (lastCommit) commits.push(lastCommit)
+                    } else {
+                      found = false
+                      if (lastCommit) commits.push(lastCommit)
+                      break
+                    }
+                  }
+                }
+              } else {
+                filepath = found
+                if (lastCommit) commits.push(lastCommit)
+              }
             }
           }
           if (!found) {
