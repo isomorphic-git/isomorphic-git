@@ -24,6 +24,10 @@ export async function resolveFileIdInTree({ fs, gitdir, oid, fileId }) {
       fileId,
       oid: _oid,
     })
+    if (Array.isArray(filepath)) {
+      if (filepath.length === 0) filepath = undefined
+      else if (filepath.length === 1) filepath = filepath[0]
+    }
   }
   return filepath
 }
@@ -34,27 +38,34 @@ async function _resolveFileId({
   tree,
   fileId,
   oid,
-  filepath = '',
+  filepaths = [],
+  parentPath = '',
 }) {
-  for (const entry of tree) {
+  const walks = tree.entries().map(function(entry) {
+    let result
     if (entry.oid === fileId) {
-      return join(filepath, entry.path)
+      result = join(parentPath, entry.path)
+      filepaths.push(result)
     } else if (entry.type === 'tree') {
-      const { object } = await readObject({
+      result = readObject({
         fs,
         gitdir,
         oid: entry.oid,
+      }).then(function({ object }) {
+        return _resolveFileId({
+          fs,
+          gitdir,
+          tree: GitTree.from(object),
+          fileId,
+          oid,
+          filepaths,
+          parentPath: join(parentPath, entry.path),
+        })
       })
-      const result = await _resolveFileId({
-        fs,
-        gitdir,
-        tree: GitTree.from(object),
-        fileId,
-        oid,
-        filepath: join(filepath, entry.path),
-      })
-      if (result) return result
     }
-  }
-  // throw new NotFoundError(`file or directory found at "${oid}:${filepath}"`)
+    return result
+  })
+
+  await Promise.all(walks)
+  return filepaths
 }
