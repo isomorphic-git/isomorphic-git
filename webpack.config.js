@@ -30,12 +30,6 @@ module.exports = [
         strict: true,
       }),
     ],
-    resolve: {
-      alias: {
-        // 'bops' depends on 0.0.2 but 1.x (used by node-libs-browser) is compatible
-        'base64-js': require.resolve('base64-js'),
-      },
-    },
     module: {
       rules: [
         {
