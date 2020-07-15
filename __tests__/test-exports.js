@@ -34,6 +34,7 @@ describe('exports', () => {
         "getConfigAll",
         "getRemoteInfo",
         "getRemoteInfo2",
+        "getRemoteTrackingBranch",
         "hashBlob",
         "indexPack",
         "init",
