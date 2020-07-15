@@ -27,6 +27,7 @@ sidebar_label: Alphabetical Index
 - [getConfigAll](getConfigAll)
 - [getRemoteInfo](getRemoteInfo)
 - [getRemoteInfo2](getRemoteInfo2)
+- [getRemoteTrackingBranch](getRemoteTrackingBranch)
 - [hashBlob](hashBlob)
 - [indexPack](indexPack)
 - [init](init)
