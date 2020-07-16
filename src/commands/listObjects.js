@@ -37,8 +37,9 @@ export async function listObjects({
     } else if (type === 'tree') {
       const tree = GitTree.from(object)
       for (const entry of tree) {
-        // add blobs and submodules to the visited set
-        if (entry.type === 'blob' || entry.type === 'commit') {
+        // add blobs to the set
+        // skip over submodules whose type is 'commit'
+        if (entry.type === 'blob') {
           visited.add(entry.oid)
         }
         // recurse for trees
