@@ -1,5 +1,6 @@
 import { InternalError } from '../errors/InternalError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
+import { readVarIntLE } from '../utils/varIntLE.js'
 
 /**
  * @param {Buffer} delta
@@ -8,14 +9,15 @@ import { BufferCursor } from '../utils/BufferCursor.js'
  */
 export function applyDelta(delta, source) {
   const reader = new BufferCursor(delta)
-  const sourceSize = readVarIntLE(reader)
+  const readUInt8 = reader.readUInt8.bind(reader)
+  const sourceSize = readVarIntLE(readUInt8)
 
   if (sourceSize !== source.byteLength) {
     throw new InternalError(
       `applyDelta expected source buffer to be ${sourceSize} bytes but the provided buffer was ${source.length} bytes`
     )
   }
-  const targetSize = readVarIntLE(reader)
+  const targetSize = readVarIntLE(readUInt8)
   let target
 
   const firstOp = readOp(reader, source)
@@ -26,10 +28,13 @@ export function applyDelta(delta, source) {
     // Otherwise, allocate a fresh buffer and slices
     target = Buffer.alloc(targetSize)
     const writer = new BufferCursor(target)
+    console.log('firstOp', firstOp)
     writer.copy(firstOp)
 
     while (!reader.eof()) {
-      writer.copy(readOp(reader, source))
+      const op = readOp(reader, source)
+      console.log('op', op)
+      writer.copy(op)
     }
 
     const tell = writer.tell()
@@ -40,18 +45,6 @@ export function applyDelta(delta, source) {
     }
   }
   return target
-}
-
-function readVarIntLE(reader) {
-  let result = 0
-  let shift = 0
-  let byte = null
-  do {
-    byte = reader.readUInt8()
-    result |= (byte & 0b01111111) << shift
-    shift += 7
-  } while (byte & 0b10000000)
-  return result
 }
 
 function readCompactLE(reader, flags, size) {
@@ -79,9 +72,12 @@ function readOp(reader, source) {
     let size = readCompactLE(reader, (byte & SIZE) >> 4, 3)
     // Yup. They really did this optimization.
     if (size === 0) size = 0x10000
+    console.log('offset', offset, 'size', size)
     return source.slice(offset, offset + size)
   } else {
     // insert
-    return reader.slice(byte)
+    const insert = reader.slice(byte)
+    console.log('insert', insert)
+    return insert
   }
 }

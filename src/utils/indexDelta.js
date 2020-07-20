@@ -1,10 +1,10 @@
 import { BufferCursor } from '../utils/BufferCursor.js'
 
-const INDEX_CHUNK_SIZE = 16
+export const INDEX_CHUNK_SIZE = 16
 
 /**
  * @param {Buffer} source
- * @returns {Buffer}
+ * @returns {string, number[]}
  */
 export function indexDelta(source) {
   const reader = new BufferCursor(source)
@@ -57,9 +57,6 @@ export function findLongestMatch(source, index, haystack) {
   let insertBuffer = ''
   const ops = []
   while (!reader.eof()) {
-    console.log(
-      `${reader.tell()} needle = "${needle}" insertBuffer = "${Buffer.from(insertBuffer, 'hex').toString('utf8')}"`
-    )
     const locations = index.get(needle)
     if (locations) {
       let bestLength = -1
@@ -70,10 +67,6 @@ export function findLongestMatch(source, index, haystack) {
         let i = sourceStart
         let j = (location + 1) * INDEX_CHUNK_SIZE
         const targetStart = j
-        console.log(`i = ${i} / ${source.length}, j = ${j} / ${haystack.length}`)
-        console.log('cond', i < source.length &&
-            j < haystack.length &&
-            source[i] === haystack[j])
         while (
           i < source.length &&
           j < haystack.length &&
@@ -82,7 +75,6 @@ export function findLongestMatch(source, index, haystack) {
           i++
           j++
         }
-        console.log(`i = ${i} / ${source.length}, j = ${j} / ${haystack.length}`)
         if (i - sourceStart > bestLength) {
           bestLength = i - sourceStart
           bestStart = targetStart
