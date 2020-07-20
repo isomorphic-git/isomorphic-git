@@ -4,47 +4,46 @@ import { readVarIntLE } from '../utils/varIntLE.js'
 
 /**
  * @param {Buffer} delta
- * @param {Buffer} source
+ * @param {Buffer} base
  * @returns {Buffer}
  */
-export function applyDelta(delta, source) {
+export function applyDelta(delta, base) {
+  console.log(`DELTA SIZE: ${delta.byteLength}`)
   const reader = new BufferCursor(delta)
   const readUInt8 = reader.readUInt8.bind(reader)
-  const sourceSize = readVarIntLE(readUInt8)
+  const baseSize = readVarIntLE(readUInt8)
 
-  if (sourceSize !== source.byteLength) {
+  if (baseSize !== base.byteLength) {
     throw new InternalError(
-      `applyDelta expected source buffer to be ${sourceSize} bytes but the provided buffer was ${source.length} bytes`
+      `applyDelta expected base buffer to be ${baseSize} bytes but the provided buffer was ${base.length} bytes`
     )
   }
-  const targetSize = readVarIntLE(readUInt8)
-  let target
+  const objectSize = readVarIntLE(readUInt8)
+  let object
 
-  const firstOp = readOp(reader, source)
+  const firstOp = readOp(reader, base)
   // Speed optimization - return raw buffer if it's just single simple copy
-  if (firstOp.byteLength === targetSize) {
-    target = firstOp
+  if (firstOp.byteLength === objectSize) {
+    object = firstOp
   } else {
     // Otherwise, allocate a fresh buffer and slices
-    target = Buffer.alloc(targetSize)
-    const writer = new BufferCursor(target)
-    console.log('firstOp', firstOp)
+    object = Buffer.alloc(objectSize)
+    const writer = new BufferCursor(object)
     writer.copy(firstOp)
 
     while (!reader.eof()) {
-      const op = readOp(reader, source)
-      console.log('op', op)
+      const op = readOp(reader, base)
       writer.copy(op)
     }
 
     const tell = writer.tell()
-    if (targetSize !== tell) {
+    if (objectSize !== tell) {
       throw new InternalError(
-        `applyDelta expected target buffer to be ${targetSize} bytes but the resulting buffer was ${tell} bytes`
+        `applyDelta expected object buffer to be ${objectSize} bytes but the resulting buffer was ${tell} bytes`
       )
     }
   }
-  return target
+  return object
 }
 
 function readCompactLE(reader, flags, size) {
@@ -60,7 +59,7 @@ function readCompactLE(reader, flags, size) {
   return result
 }
 
-function readOp(reader, source) {
+function readOp(reader, base) {
   /** @type {number} */
   const byte = reader.readUInt8()
   const COPY = 0b10000000
@@ -73,11 +72,13 @@ function readOp(reader, source) {
     // Yup. They really did this optimization.
     if (size === 0) size = 0x10000
     console.log('offset', offset, 'size', size)
-    return source.slice(offset, offset + size)
+    const slice = base.slice(offset, offset + size)
+    console.log('copy', slice.toString('utf8'))
+    return slice
   } else {
     // insert
     const insert = reader.slice(byte)
-    console.log('insert', insert)
+    console.log('insert', insert.toString('utf8'))
     return insert
   }
 }
