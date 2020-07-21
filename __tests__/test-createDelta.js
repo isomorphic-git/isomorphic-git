@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 const { readBlob } = require('isomorphic-git')
-
 const { applyDelta, createDelta } = require('isomorphic-git/internal-apis')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 /*
 0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
