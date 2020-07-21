@@ -1,7 +1,10 @@
 import { BufferCursor } from '../utils/BufferCursor.js'
-import { INDEX_CHUNK_SIZE, indexDelta } from '../utils/indexDelta.js'
+import { crc32 } from '../utils/crc32.js'
+import { indexDelta } from '../utils/indexDelta.js'
 import { writeVarIntLE } from '../utils/varIntLE.js'
 
+// ATTENTION: If you make `createDelta` asynchronous, be sure to update
+// it to not use the shared `_insertBuffer`.
 /**
  * @param {Buffer} object
  * @param {Buffer} base
@@ -9,16 +12,11 @@ import { writeVarIntLE } from '../utils/varIntLE.js'
  */
 export function createDelta(object, base) {
   const reader = new BufferCursor(object)
-  const index = indexDelta(base)
+  const { index, chunkSize } = indexDelta(base)
 
-  // We can switch to chunks of 6 bytes stored in 64bit floats (using 53 bits for integer)
-  // instead of chunks of 16 bytes stored as 32 byte strings
-  // - 32 byte key + 8 byte index = 48 bytes per 16 bytes
-  // vs
-  // - 3 * 8 byte keys + 8 byte index = 32 bytes per 18 bytes
-  let needle = reader.slice(INDEX_CHUNK_SIZE).toString('hex')
+  const needle = new Uint8Array(chunkSize)
+  needle.set(reader.slice(chunkSize))
   let bestStart
-  let insertBuffer = ''
   const ops = []
 
   // Write object size and base size
@@ -30,69 +28,96 @@ export function createDelta(object, base) {
 
   // Compute and write copy & insert operations
   while (!reader.eof()) {
-    const locations = index.get(needle)
-    // If there's a match in base for the last INDEX_CHUNK_SIZE bytes in object we've scanned...
+    const locations = index.get(crc32(needle))
+    // If there's possible matches in base...
+    let bestLength = 0
+    const objectStart = reader.tell() - 16
     if (locations) {
-      let bestLength = -1
-      console.log('locations', locations)
       // Scan forwards
-      const objectStart = reader.tell()
       for (const location of locations) {
         let i = objectStart
-        let j = (location + 1) * INDEX_CHUNK_SIZE
+        let j = location * chunkSize
         const baseStart = j
         // TODO: Use .getUint32 to compare 4 bytes at a time?
         while (i < object.length && j < base.length && object[i] === base[j]) {
           i++
           j++
         }
-        if (bestLength === -1 || i - objectStart > bestLength) {
+        if (i - objectStart > bestLength) {
           bestLength = i - objectStart
           bestStart = baseStart
         }
       }
       // TODO: Scan backwards
+    }
+    if (bestLength > 15) {
       // Push insert operation
-      writeInsertOp(ops, insertBuffer)
-      insertBuffer = ''
+      writeInsertOp(ops)
       // Push copy operation
-      console.log('bestLength', bestLength)
-      writeCopyOp(
-        ops,
-        bestStart - INDEX_CHUNK_SIZE,
-        bestLength + INDEX_CHUNK_SIZE
-      )
-      console.log(`bestLength = ${bestLength}`)
+      ops.push(writeCopyOp(bestStart, bestLength))
       reader.seek(objectStart + bestLength)
-      needle = reader.slice(INDEX_CHUNK_SIZE).toString('hex')
+      const chunk = reader.slice(chunkSize)
+      if (chunk.length === chunkSize) {
+        needle.set(chunk)
+      } else {
+        // we must have reached the end
+        for (const val of chunk) {
+          appendToInsertionBuffer(ops, val)
+        }
+      }
     } else {
       // Accumulate byte to the insertion buffer
-      insertBuffer += needle.slice(0, 2)
-      needle = needle.slice(2) + reader.slice(1).toString('hex')
-      if (insertBuffer.length === 127 * 2) {
-        // Push insert operation
-        writeInsertOp(ops, insertBuffer)
-        insertBuffer = ''
+      appendToInsertionBuffer(ops, needle[0])
+      shiftNeedle(needle, reader.readUInt8())
+      if (reader.eof()) {
+        for (const val of needle) {
+          appendToInsertionBuffer(ops, val)
+        }
       }
     }
   }
-  if (needle || insertBuffer) {
-    insertBuffer += needle
-    writeInsertOp(ops, insertBuffer)
-  }
-  console.log('ops', ops.map(op => op.toString('utf8')))
+  writeInsertOp(ops)
   return Buffer.concat(ops)
 }
 
-function writeInsertOp(ops, hex) {
-  ops.push(Buffer.from([hex.length / 2]))
-  ops.push(Buffer.from(hex, 'hex'))
+/**
+ * @param {Uint8Array} needle
+ * @param {number} byte
+ */
+function shiftNeedle(needle, byte) {
+  for (let i = 1; i < needle.length; i++) {
+    needle[i - 1] = needle[i]
+  }
+  needle[needle.length - 1] = byte
 }
 
-// Re-using this should be safe because JS is single-threaded.
-const _buffer = new DataView(new ArrayBuffer(4))
-function writeCopyOp(ops, offset, size) {
-  console.log('size', size)
+// Re-using this buffer should be safe because JS is single-threaded,
+// and `createDelta` is synchronous.
+const _insertBuffer = new Uint8Array(127)
+let _insertBufferLen = 0
+function appendToInsertionBuffer(ops, byte) {
+  _insertBuffer[_insertBufferLen++] = byte
+  // If we've reached tha maximum limit for an insertion op,
+  // go ahead and insert it.
+  if (_insertBufferLen === 127) {
+    writeInsertOp(ops)
+  }
+}
+
+function writeInsertOp(ops) {
+  if (_insertBufferLen > 0) {
+    ops.push(Buffer.from([_insertBufferLen]))
+    ops.push(Buffer.from(_insertBuffer.slice(0, _insertBufferLen)))
+    _insertBufferLen = 0
+  }
+}
+
+/** @type {Buffer} Re-using this should be safe because JS is single-threaded. */
+let _buffer
+
+function writeCopyOp(offset, size) {
+  // lazy-instantiate _buffer to preserve tree-shakability
+  if (!_buffer) _buffer = new DataView(new ArrayBuffer(4))
   let flags = 0b10000000
   const bytes = [0]
   _buffer.setUint32(0, offset, true)
@@ -113,5 +138,5 @@ function writeCopyOp(ops, offset, size) {
     }
   }
   bytes[0] = flags
-  ops.push(Buffer.from(bytes))
+  return Buffer.from(bytes)
 }

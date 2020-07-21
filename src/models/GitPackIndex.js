@@ -1,9 +1,8 @@
-import crc32 from 'crc-32'
-
 import { InternalError } from '../errors/InternalError.js'
 import { GitObject } from '../models/GitObject'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { applyDelta } from '../utils/applyDelta.js'
+import { crc32 } from '../utils/crc32.js'
 import { listpack } from '../utils/git-list-pack.js'
 import { inflate } from '../utils/inflate.js'
 import { shasum } from '../utils/shasum.js'
@@ -155,7 +154,7 @@ export class GitPackIndex {
       const end =
         i + 1 === offsetArray.length ? pack.byteLength - 20 : offsetArray[i + 1]
       const o = offsetToObject[start]
-      const crc = crc32.buf(pack.slice(start, end)) >>> 0
+      const crc = crc32(pack.slice(start, end))
       o.end = end
       o.crc = crc
     }

@@ -5,6 +5,12 @@ const { readBlob } = require('isomorphic-git')
 
 const { applyDelta, createDelta } = require('isomorphic-git/internal-apis')
 
+/*
+0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
+the quick brown fox jumps over the slow lazy dog
+over the slow lazy dog the quick brown fox jumps
+*/
+
 describe('createDelta', () => {
   it('the quick brown fox', () => {
     // Test

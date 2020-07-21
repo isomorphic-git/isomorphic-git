@@ -1,10 +1,20 @@
 import { BufferCursor } from '../utils/BufferCursor.js'
+import { crc32 } from '../utils/crc32.js'
 
 export const INDEX_CHUNK_SIZE = 16
+export const MAX_HASH_CONFLICTS = 64
+
+/**
+ * An index for quickly identifying string matches in a blob
+ *
+ * @typedef {Object} DeltaIndex
+ * @property {Map<number, number>} index
+ * @property {number} chunkSize
+ */
 
 /**
  * @param {Buffer} source
- * @returns {string, number[]}
+ * @returns {DeltaIndex}
  */
 export function indexDelta(source) {
   const reader = new BufferCursor(source)
@@ -12,90 +22,15 @@ export function indexDelta(source) {
   const index = new Map()
   let i = 0
   while (!reader.eof()) {
-    const key = reader.slice(INDEX_CHUNK_SIZE).toString('hex')
-    if (key.length === INDEX_CHUNK_SIZE * 2) {
-      const val = index.get(key) || []
-      val.push(i)
-      index.set(key, val)
-      i++
-    }
+    const key = crc32(reader.slice(INDEX_CHUNK_SIZE))
+    const val = index.get(key) || []
+    if (val.length < MAX_HASH_CONFLICTS) val.push(i)
+    index.set(key, val)
+    i++
   }
 
-  return index
-}
-
-/**
- * @param {Buffer} source
- * @param {Map<string, number[]} index
- * @returns {number[] | void}
- */
-export function findAMatch(source, index) {
-  const reader = new BufferCursor(source)
-
-  let needle = reader.slice(INDEX_CHUNK_SIZE).toString('hex')
-  while (!reader.eof()) {
-    const locations = index.get(needle)
-    if (locations) {
-      return locations.map(i => i * INDEX_CHUNK_SIZE)
-    } else {
-      needle = needle.slice(2) + reader.slice(1).toString('hex')
-    }
+  return {
+    chunkSize: INDEX_CHUNK_SIZE,
+    index,
   }
-}
-
-/**
- * @param {Buffer} source
- * @param {Map<string, number[]} index
- * @param {Buffer} haystack
- * @returns {Array<string | number[]> | void}
- */
-export function findLongestMatch(source, index, haystack) {
-  const reader = new BufferCursor(source)
-
-  let needle = reader.slice(INDEX_CHUNK_SIZE).toString('hex')
-  let bestStart
-  let insertBuffer = ''
-  const ops = []
-  while (!reader.eof()) {
-    const locations = index.get(needle)
-    if (locations) {
-      let bestLength = -1
-      console.log('locations', locations)
-      // Scan forwards
-      const sourceStart = reader.tell()
-      for (const location of locations) {
-        let i = sourceStart
-        let j = (location + 1) * INDEX_CHUNK_SIZE
-        const targetStart = j
-        while (
-          i < source.length &&
-          j < haystack.length &&
-          source[i] === haystack[j]
-        ) {
-          i++
-          j++
-        }
-        if (i - sourceStart > bestLength) {
-          bestLength = i - sourceStart
-          bestStart = targetStart
-        }
-      }
-      // Push insert operation
-      ops.push(insertBuffer)
-      insertBuffer = ''
-      // Push copy operation
-      ops.push([bestStart - INDEX_CHUNK_SIZE, bestLength + INDEX_CHUNK_SIZE])
-      console.log(`bestLength = ${bestLength}`)
-      reader.seek(sourceStart + bestLength)
-      needle = reader.slice(INDEX_CHUNK_SIZE).toString('hex')
-    } else {
-      insertBuffer += needle.slice(0, 2)
-      needle = needle.slice(2) + reader.slice(1).toString('hex')
-    }
-  }
-  if (needle || insertBuffer) {
-    insertBuffer += needle
-    ops.push(insertBuffer)
-  }
-  return ops
 }
