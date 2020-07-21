@@ -31,7 +31,7 @@ export function createDelta(object, base) {
     const locations = index.get(crc32(needle))
     // If there's possible matches in base...
     let bestLength = 0
-    const objectStart = reader.tell() - 16
+    let objectStart = reader.tell() - chunkSize
     if (locations) {
       // Scan forwards
       for (const location of locations) {
@@ -48,9 +48,20 @@ export function createDelta(object, base) {
           bestStart = baseStart
         }
       }
-      // TODO: Scan backwards
     }
-    if (bestLength > 15) {
+    if (bestLength > chunkSize - 1) {
+      // Scan backwards (expands match up to chunkSize - 1)
+      while (
+        objectStart >= 0 &&
+        bestStart >= 0 &&
+        object[objectStart - 1] === base[bestStart - 1] &&
+        _insertBufferLen > 0
+      ) {
+        objectStart--
+        bestStart--
+        _insertBufferLen--
+        bestLength++
+      }
       // Push insert operation
       writeInsertOp(ops)
       // Push copy operation

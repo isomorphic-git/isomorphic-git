@@ -23,19 +23,9 @@ describe('createDelta', () => {
       Array [
         48,
         48,
-        9,
-        116,
-        104,
-        101,
-        32,
-        113,
-        117,
-        105,
-        99,
-        107,
         145,
-        32,
-        16,
+        23,
+        25,
         1,
         32,
         144,
@@ -55,21 +45,21 @@ describe('createDelta', () => {
     const { blob: _object } = await readBlob({
       fs,
       gitdir,
-      oid: 'c60bbbe99e96578105c57c4b3f2b6ebdf863edbc',
+      oid: 'e05547ea87ea55eff079de295ff56f483e5b4439',
       filepath: 'src/managers/GitRemoteHTTP.js',
     })
     const object = Buffer.from(_object)
     const { blob: _base } = await readBlob({
       fs,
       gitdir,
-      oid: 'e05547ea87ea55eff079de295ff56f483e5b4439',
+      oid: 'c60bbbe99e96578105c57c4b3f2b6ebdf863edbc',
       filepath: 'src/managers/GitRemoteHTTP.js',
     })
     const base = Buffer.from(_base)
     // Test
     const delta = createDelta(object, base)
     // The two objects are very similar so it should have a very small delta.
-    expect(delta.byteLength).toMatchInlineSnapshot(`175`)
+    expect(delta.byteLength).toMatchInlineSnapshot(`57`)
     // The reconstructed object should match the original
     const reconstructed = applyDelta(delta, base)
     expect(reconstructed.toString('utf8')).toEqual(object.toString('utf8'))

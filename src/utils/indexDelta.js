@@ -21,11 +21,16 @@ export function indexDelta(source) {
 
   const index = new Map()
   let i = 0
+  let prev
   while (!reader.eof()) {
     const key = crc32(reader.slice(INDEX_CHUNK_SIZE))
-    const val = index.get(key) || []
-    if (val.length < MAX_HASH_CONFLICTS) val.push(i)
-    index.set(key, val)
+    // For consecutive identical blocks, store only the first index
+    if (key !== prev) {
+      const val = index.get(key) || []
+      if (val.length < MAX_HASH_CONFLICTS) val.push(i)
+      index.set(key, val)
+    }
+    prev = key
     i++
   }
 
