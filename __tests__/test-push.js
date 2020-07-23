@@ -176,6 +176,31 @@ describe('push', () => {
       'foobar'
     )
   })
+  it('throws UnknownTransportError if using shorter scp-like syntax', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-push')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.ssh.url',
+      value: `git@${localhost}:8888/test-push-server.git`,
+    })
+    // Test
+    let err
+    try {
+      await push({
+        fs,
+        http,
+        gitdir,
+        remote: 'ssh',
+        ref: 'master',
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err).toBeDefined()
+    expect(err.code).toEqual(Errors.UnknownTransportError.code)
+  })
 
   it('push with Basic Auth', async () => {
     // Setup

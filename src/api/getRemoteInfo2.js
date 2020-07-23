@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { GitRemoteHTTP } from '../managers/GitRemoteHTTP.js'
+import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { formatInfoRefs } from '../utils/formatInfoRefs.js'
 
@@ -66,6 +66,7 @@ export async function getRemoteInfo2({
     assertParameter('http', http)
     assertParameter('url', url)
 
+    const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
     const remote = await GitRemoteHTTP.discover({
       http,
       onAuth,
