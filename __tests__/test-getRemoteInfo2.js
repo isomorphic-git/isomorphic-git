@@ -71,4 +71,19 @@ describe('getRemoteInfo2', () => {
       expect(error instanceof Errors.SmartHttpError).toBe(true)
     }
   )
+
+  it('throws UnknownTransportError if using shorter scp-like syntax', async () => {
+    // Test
+    let err
+    try {
+      await getRemoteInfo2({
+        http,
+        url: `git@github.com:isomorphic-git/isomorphic-git.git`,
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err).toBeDefined()
+    expect(err.code).toEqual(Errors.UnknownTransportError.code)
+  })
 })
