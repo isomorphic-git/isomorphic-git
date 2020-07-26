@@ -1,5 +1,29 @@
 /* eslint-env node, browser, jasmine */
 
+const { performance } = require('perf_hooks')
+
+class Timer {
+  constructor(name) {
+    this.total = 0
+    this.lap = 0
+    this.name = name
+  }
+
+  start() {
+    this.startTime = performance.now()
+  }
+
+  stop() {
+    this.stopTime = performance.now()
+    this.lap = this.stopTime - this.startTime
+    this.total += this.lap
+  }
+
+  log() {
+    console.log(`${this.name}: ${this.total}`)
+  }
+}
+
 /*
 Misc:
 7.4 seconds to "readObject" all the objects
@@ -35,6 +59,8 @@ const { applyDelta, createDelta, indexDelta, listPackIndex } = require('./intern
 const dir = './benchmark/test-benchmark-createDelta'
 const gitdir = './benchmark/test-benchmark-createDelta.git'
 
+const indexTime = new Timer('indexing')
+
 ;(async () => {
   console.time('listPackIndex')
   const { oids } = await listPackIndex({
@@ -62,8 +88,11 @@ const gitdir = './benchmark/test-benchmark-createDelta.git'
       format: 'deflated',
     })
     size += object.length
+    indexTime.start()
     await indexDelta(object)
+    indexTime.stop()
   }
+  indexTime.log()
   console.timeEnd('indexAll')
   console.log(`size = ${size}`)
   console.time('packObjects')
