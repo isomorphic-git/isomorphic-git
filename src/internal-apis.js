@@ -3,6 +3,7 @@ export { Errors }
 
 export * from './commands/listCommitsAndTags'
 export * from './commands/listObjects'
+export * from './commands/listPackIndex'
 export * from './commands/pack'
 export * from './commands/uploadPack'
 

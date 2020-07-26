@@ -2,6 +2,10 @@ import { GitPackIndex } from '../models/GitPackIndex.js'
 
 const PackfileCache = new Map()
 
+/**
+ * @param {any} args
+ * @returns { GitPackIndex}
+ */
 async function loadPackIndex({
   fs,
   filename,

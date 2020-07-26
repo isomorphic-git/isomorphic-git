@@ -8,7 +8,7 @@ import { readVarIntLE } from '../utils/varIntLE.js'
  * @returns {Buffer}
  */
 export function applyDelta(delta, base) {
-  console.log(`DELTA SIZE: ${delta.byteLength}`)
+  // console.log(`DELTA SIZE: ${delta.byteLength}`)
   const reader = new BufferCursor(delta)
   const readUInt8 = reader.readUInt8.bind(reader)
   const baseSize = readVarIntLE(readUInt8)
@@ -71,14 +71,14 @@ function readOp(reader, base) {
     let size = readCompactLE(reader, (byte & SIZE) >> 4, 3)
     // Yup. They really did this optimization.
     if (size === 0) size = 0x10000
-    console.log('offset', offset, 'size', size)
+    // console.log('offset', offset, 'size', size)
     const slice = base.slice(offset, offset + size)
-    console.log('copy', slice.toString('utf8'))
+    // console.log('copy', slice.toString('utf8'))
     return slice
   } else {
     // insert
     const insert = reader.slice(byte)
-    console.log('insert', insert.toString('utf8'))
+    // console.log('insert', insert.toString('utf8'))
     return insert
   }
 }

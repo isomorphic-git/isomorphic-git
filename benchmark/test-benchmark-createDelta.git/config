@@ -1,0 +1,104 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[submodule]
+	active = .
+[remote "origin"]
+	url = https://github.com/isomorphic-git/isomorphic-git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[branch "fix/caching"]
+	remote = origin
+	merge = refs/heads/fix/caching
+[remote "phoddie"]
+	url = https://github.com/phoddie/isomorphic-git
+	fetch = +refs/heads/*:refs/remotes/phoddie/*
+[branch "chore/no-shajs-dep"]
+	remote = origin
+	merge = refs/heads/chore/no-shajs-dep
+[branch "moddable"]
+	remote = phoddie
+	merge = refs/heads/master
+	pushRemote = origin
+	
+[remote "hsablonniere"]
+	url = https://github.com/hsablonniere/isomorphic-git/
+	fetch = +refs/heads/*:refs/remotes/hsablonniere/*
+[branch "improve-findMergeBase-speed"]
+	remote = hsablonniere
+	merge = refs/heads/improve-findMergeBase-speed
+[branch "improve-push-list-objects"]
+	remote = hsablonniere
+	merge = refs/heads/improve-push-list-objects
+[remote "ttt"]
+	url = https://github.com/wmhilton/ttt.git
+	fetch = +refs/heads/*:refs/remotes/ttt/*
+[branch "feat/push-thin-pack"]
+	remote = origin
+	merge = refs/heads/feat/push-thin-pack
+[branch "test-234"]
+	remote = ttt
+	merge = refs/heads/test-234
+[branch "improve-force-push-known-commit"]
+	remote = hsablonniere
+	merge = refs/heads/improve-force-push-known-commit
+[branch "perf/listObjects-short-circuit-recursion"]
+	remote = origin
+	merge = refs/heads/perf/listObjects-short-circuit-recursion
+[branch "black-lives-matter"]
+	remote = origin
+	merge = refs/heads/black-lives-matter
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+[branch "feat/defaultBranch"]
+	remote = origin
+	merge = refs/heads/feat/defaultBranch
+[branch "feat/protocol-2"]
+	remote = origin
+	merge = refs/heads/feat/protocol-2
+[branch "fix/generate-docs-main"]
+	remote = origin
+	merge = refs/heads/fix/generate-docs-main
+[remote "crutchcorn"]
+	url = https://github.com/crutchcorn/isomorphic-git.git
+	fetch = +refs/heads/*:refs/remotes/crutchcorn/*
+[branch "renameBranch"]
+	remote = crutchcorn
+	merge = refs/heads/renameBranch
+[branch "perf/no-second-http-request-v1"]
+	remote = origin
+	merge = refs/heads/perf/no-second-http-request-v1
+[remote "linonetwo"]
+	url = https://github.com/linonetwo/isomorphic-git
+	fetch = +refs/heads/*:refs/remotes/linonetwo/*
+[branch "patch-1"]
+	remote = linonetwo
+	merge = refs/heads/patch-1
+[branch "nps-format"]
+	remote = crutchcorn
+	merge = refs/heads/nps-format
+[branch "feat/v2-fetch"]
+	remote = origin
+	merge = refs/heads/feat/v2-fetch
+[branch "chore/my-git-apply-delta"]
+	remote = origin
+	merge = refs/heads/chore/my-git-apply-delta
+[branch "chore/bundlewatch-main"]
+	remote = origin
+	merge = refs/heads/chore/bundlewatch-main
+[branch "fix/submodule-regression"]
+	remote = origin
+	merge = refs/heads/fix/submodule-regression
+[branch "feat/delta-compression"]
+	remote = origin
+	merge = refs/heads/feat/delta-compression
+[branch "fix/throw-nice-error-for-getRemoteInfo-too"]
+	remote = origin
+	merge = refs/heads/fix/throw-nice-error-for-getRemoteInfo-too

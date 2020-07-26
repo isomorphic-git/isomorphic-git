@@ -5,3 +5,5 @@ __tests__/__snapshots__/test-exports.js.snap text eol=lf
 **/*.png binary eol=unset
 **/*.webp binary eol=unset
 **/*.zip binary eol=unset
+**/*.pack binary eol=unset
+**/*.idx binary eol=unset
