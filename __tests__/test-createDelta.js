@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 
 const { readBlob } = require('isomorphic-git')
-const { applyDelta, createDelta } = require('isomorphic-git/internal-apis')
+const { applyDelta, createDelta, indexDelta } = require('isomorphic-git/internal-apis')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -18,7 +18,7 @@ describe('createDelta', () => {
       `the quick brown fox jumps over the slow lazy dog`
     )
     const base = Buffer.from(`over the slow lazy dog the quick brown fox jumps`)
-    const delta = createDelta(object, base)
+    const delta = createDelta(object, base, indexDelta(base))
     expect([...delta]).toMatchInlineSnapshot(`
       Array [
         48,
@@ -57,7 +57,7 @@ describe('createDelta', () => {
     })
     const base = Buffer.from(_base)
     // Test
-    const delta = createDelta(object, base)
+    const delta = createDelta(object, base, indexDelta(base))
     // The two objects are very similar so it should have a very small delta.
     expect(delta.byteLength).toMatchInlineSnapshot(`57`)
     // The reconstructed object should match the original

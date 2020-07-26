@@ -53,8 +53,16 @@ funny how that happens.
 */
 const fs = require('fs')
 
-const { readBlob, readObject, packObjects } = require('./index.cjs')
-const { applyDelta, createDelta, indexDelta, listPackIndex } = require('./internal-apis.cjs')
+const { readObject, packObjects } = require('./index.cjs')
+const {
+  FileSystem,
+  createDelta,
+  indexDelta,
+  listPackIndex,
+  listObjects,
+} = require('./internal-apis.cjs')
+
+const _fs = new FileSystem(fs)
 
 const dir = './benchmark/test-benchmark-createDelta'
 const gitdir = './benchmark/test-benchmark-createDelta.git'
@@ -62,19 +70,35 @@ const gitdir = './benchmark/test-benchmark-createDelta.git'
 const indexTime = new Timer('indexing')
 
 ;(async () => {
-  console.time('listPackIndex')
-  const { oids } = await listPackIndex({
-    fs,
-    dir,
-    filepath: 'pack-993dc0e5e915d97e3d5b07e5148e6e4a9044a157.idx',
-  })
-  console.timeEnd('listPackIndex')
+  // console.time('listPackIndex')
+  // const { oids } = await listPackIndex({
+  //   fs,
+  //   dir,
+  //   filepath: 'pack-993dc0e5e915d97e3d5b07e5148e6e4a9044a157.idx',
+  // })
+  // console.timeEnd('listPackIndex')
+  // const total = oids.length
+  // console.log(`total = ${total}`)
+
+  console.time('listObjects')
+  const oids = [
+    ...(await listObjects({
+      fs: _fs,
+      gitdir,
+      oids: ['55f2ade6fb738e512a404fe05e437295016d2a24'],
+    })),
+  ]
+  console.timeEnd('listObjects')
   const total = oids.length
   console.log(`total = ${total}`)
   console.time('indexAll')
   let size = 0
   let oldp = 0
   let i = 0
+  let prev = null
+  let wins = 0
+  let loss = 0
+  let saved = 0
   for (const oid of oids) {
     i++
     const newp = Math.floor((i * 100) / total)
@@ -88,13 +112,25 @@ const indexTime = new Timer('indexing')
       format: 'deflated',
     })
     size += object.length
-    indexTime.start()
-    await indexDelta(object)
-    indexTime.stop()
+    if (prev && object) {
+      indexTime.start()
+      const index = indexDelta(prev)
+      const delta = createDelta(object, prev, index)
+      indexTime.stop()
+      if (delta.length < object.length) {
+        wins++
+        saved += object.length - delta.length
+      } else {
+        loss++
+      }
+    }
+    prev = object
   }
   indexTime.log()
   console.timeEnd('indexAll')
   console.log(`size = ${size}`)
+  console.log(`wins = ${wins} loss = ${loss}`)
+  console.log(`saved = ${saved}`)
   console.time('packObjects')
   const { packfile } = await packObjects({
     fs,

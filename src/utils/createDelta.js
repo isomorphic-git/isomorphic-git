@@ -1,6 +1,5 @@
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { crc32 } from '../utils/crc32.js'
-import { indexDelta } from '../utils/indexDelta.js'
 import { writeVarIntLE } from '../utils/varIntLE.js'
 
 // ATTENTION: If you make `createDelta` asynchronous, be sure to update
@@ -8,11 +7,11 @@ import { writeVarIntLE } from '../utils/varIntLE.js'
 /**
  * @param {Buffer} object
  * @param {Buffer} base
+ * @param {import('./indexDelta.js').DeltaIndex} deltaIndex
  * @returns {Buffer}
  */
-export function createDelta(object, base) {
+export function createDelta(object, base, { index, chunkSize }) {
   const reader = new BufferCursor(object)
-  const { index, chunkSize } = indexDelta(base)
 
   const needle = new Uint8Array(chunkSize)
   needle.set(reader.slice(chunkSize))
