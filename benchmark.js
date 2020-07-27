@@ -82,7 +82,7 @@ const {
   FileSystem,
   createDelta,
   indexDelta,
-  listPackIndex,
+  listCommitsAndTags,
   listObjects,
 } = require('./internal-apis.cjs')
 
@@ -104,13 +104,24 @@ const searchTimer = new Timer('searching')
   // console.timeEnd('listPackIndex')
   // const total = oids.length
   // console.log(`total = ${total}`)
-
+  console.time('listCommitsAndTags')
+  const commits = [
+    ...(await listCommitsAndTags({
+      fs: _fs,
+      dir,
+      gitdir,
+      start: ['55f2ade6fb738e512a404fe05e437295016d2a24'],
+      finish: [],
+    })),
+  ]
+  console.log(commits.length)
+  console.timeEnd('listCommitsAndTags')
   console.time('listObjects')
   const oids = [
     ...(await listObjects({
       fs: _fs,
       gitdir,
-      oids: ['55f2ade6fb738e512a404fe05e437295016d2a24'],
+      oids: commits,
     })),
   ]
   console.timeEnd('listObjects')
@@ -124,7 +135,7 @@ const searchTimer = new Timer('searching')
   let wins = 0
   let loss = 0
   let saved = 0
-  const window = new FixedSizeWindow(8819095)
+  const window = new FixedSizeWindow(5000000)
   for (const oid of oids) {
     i++
     const newp = Math.floor((i * 100) / total)
@@ -138,35 +149,40 @@ const searchTimer = new Timer('searching')
       format: 'deflated',
     })
     size += object.length
-    searchTimer.start()
-    let best = object
-    console.log(object.length)
-    for (const { prev, index } of window) {
-      const delta = createDelta(object, prev, index)
-      if (delta.length < best.length) {
-        best = delta
+
+    if (object.length < 10000) {
+      searchTimer.start()
+      let best = object
+      process.stdout.write(`${object.length}\t`)
+      for (const { prev, index } of window) {
+        const delta = createDelta(object, prev, index)
+        if (delta.length < best.length) {
+          best = delta
+        }
       }
+      if (best.length < object.length) {
+        wins++
+        saved += object.length - best.length
+      } else {
+        loss++
+      }
+      searchTimer.stop()
     }
-    if (best.length < object.length) {
-      wins++
-      saved += object.length - best.length
-    } else {
-      loss++
-    }
-    searchTimer.stop()
+
     prev = object
-    indexTimer.start()
-    const index = indexDelta(prev)
-    window.push({ index, prev }, prev.length)
-    console.log(`window.items.length = ${window.items.length}`)
-    indexTimer.stop()
+
+    if (object.length < 10000) {
+      indexTimer.start()
+      const index = indexDelta(prev)
+      window.push({ index, prev }, prev.length)
+      process.stdout.write(`(${window.items.length}) `)
+      indexTimer.stop()
+    }
   }
+  console.log('')
   searchTimer.log()
   indexTimer.log()
   console.timeEnd('indexAll')
-  console.log(`size = ${size}`)
-  console.log(`wins = ${wins} loss = ${loss}`)
-  console.log(`saved = ${saved}`)
   console.time('packObjects')
   const { packfile } = await packObjects({
     fs,
@@ -174,5 +190,8 @@ const searchTimer = new Timer('searching')
     oids,
   })
   console.timeEnd('packObjects')
+  console.log(`size = ${size}`)
+  console.log(`wins = ${wins} loss = ${loss}`)
+  console.log(`saved = ${saved}`)
   console.log(`packfile.length = ${packfile.length}`)
 })()
