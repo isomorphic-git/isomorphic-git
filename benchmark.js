@@ -24,6 +24,30 @@ class Timer {
   }
 }
 
+class FixedSizeWindow {
+  constructor(limit) {
+    this.items = []
+    this.sizes = []
+    this.size = 0
+    this.limit = limit
+  }
+
+  push(item, size) {
+    while (this.items.length > 0 && this.size + size > this.limit) {
+      this.items.shift()
+      this.size -= this.sizes.shift()
+    }
+
+    this.items.push(item)
+    this.sizes.push(size)
+    this.size += size
+  }
+
+  [Symbol.iterator]() {
+    return this.items[Symbol.iterator]()
+  }
+}
+
 /*
 Misc:
 7.4 seconds to "readObject" all the objects
@@ -67,7 +91,8 @@ const _fs = new FileSystem(fs)
 const dir = './benchmark/test-benchmark-createDelta'
 const gitdir = './benchmark/test-benchmark-createDelta.git'
 
-const indexTime = new Timer('indexing')
+const indexTimer = new Timer('indexing')
+const searchTimer = new Timer('searching')
 
 ;(async () => {
   // console.time('listPackIndex')
@@ -99,6 +124,7 @@ const indexTime = new Timer('indexing')
   let wins = 0
   let loss = 0
   let saved = 0
+  const window = new FixedSizeWindow(8819095)
   for (const oid of oids) {
     i++
     const newp = Math.floor((i * 100) / total)
@@ -112,21 +138,31 @@ const indexTime = new Timer('indexing')
       format: 'deflated',
     })
     size += object.length
-    if (prev && object) {
-      indexTime.start()
-      const index = indexDelta(prev)
+    searchTimer.start()
+    let best = object
+    console.log(object.length)
+    for (const { prev, index } of window) {
       const delta = createDelta(object, prev, index)
-      indexTime.stop()
-      if (delta.length < object.length) {
-        wins++
-        saved += object.length - delta.length
-      } else {
-        loss++
+      if (delta.length < best.length) {
+        best = delta
       }
     }
+    if (best.length < object.length) {
+      wins++
+      saved += object.length - best.length
+    } else {
+      loss++
+    }
+    searchTimer.stop()
     prev = object
+    indexTimer.start()
+    const index = indexDelta(prev)
+    window.push({ index, prev }, prev.length)
+    console.log(`window.items.length = ${window.items.length}`)
+    indexTimer.stop()
   }
-  indexTime.log()
+  searchTimer.log()
+  indexTimer.log()
   console.timeEnd('indexAll')
   console.log(`size = ${size}`)
   console.log(`wins = ${wins} loss = ${loss}`)
