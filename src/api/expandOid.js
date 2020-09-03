@@ -29,6 +29,7 @@ export async function expandOid({ fs, dir, gitdir = join(dir, '.git'), oid }) {
     assertParameter('oid', oid)
     return await _expandOid({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oid,
     })

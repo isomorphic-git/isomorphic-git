@@ -43,6 +43,7 @@ export async function readTree({
 
     return await _readTree({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oid,
       filepath,

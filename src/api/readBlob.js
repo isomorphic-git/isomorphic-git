@@ -54,6 +54,7 @@ export async function readBlob({
 
     return await _readBlob({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oid,
       filepath,

@@ -17,7 +17,14 @@ export async function _listFiles({ fs, gitdir, ref, cache }) {
   if (ref) {
     const oid = await GitRefManager.resolve({ gitdir, fs, ref })
     const filenames = []
-    await accumulateFilesFromOid({ fs, gitdir, oid, filenames, prefix: '' })
+    await accumulateFilesFromOid({
+      fs,
+      cache,
+      gitdir,
+      oid,
+      filenames,
+      prefix: '',
+    })
     return filenames
   } else {
     return GitIndexManager.acquire({ fs, gitdir, cache }, async function(
@@ -28,13 +35,21 @@ export async function _listFiles({ fs, gitdir, ref, cache }) {
   }
 }
 
-async function accumulateFilesFromOid({ fs, gitdir, oid, filenames, prefix }) {
-  const { tree } = await _readTree({ fs, gitdir, oid })
+async function accumulateFilesFromOid({
+  fs,
+  cache,
+  gitdir,
+  oid,
+  filenames,
+  prefix,
+}) {
+  const { tree } = await _readTree({ fs, cache, gitdir, oid })
   // TODO: Use `walk` to do this. Should be faster.
   for (const entry of tree) {
     if (entry.type === 'tree') {
       await accumulateFilesFromOid({
         fs,
+        cache,
         gitdir,
         oid: entry.oid,
         filenames,

@@ -48,6 +48,7 @@ export async function resetIndex({
       // Resolve blob
       oid = await resolveFilepath({
         fs,
+        cache,
         gitdir,
         oid,
         filepath,

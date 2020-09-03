@@ -95,6 +95,7 @@ export async function fetch({
 
     return await _fetch({
       fs: new FileSystem(fs),
+      cache: {},
       http,
       onProgress,
       onMessage,

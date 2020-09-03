@@ -46,6 +46,7 @@ export async function log({
 
     return await _log({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       ref,
       depth,

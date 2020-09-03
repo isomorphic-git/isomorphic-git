@@ -78,6 +78,7 @@ export async function push({
 
     return await _push({
       fs: new FileSystem(fs),
+      cache: {},
       http,
       onProgress,
       onMessage,

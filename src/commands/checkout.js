@@ -213,7 +213,7 @@ export async function _checkout({
             const filepath = `${dir}/${fullpath}`
             try {
               if (method !== 'create-index' && method !== 'mkdir-index') {
-                const { object } = await readObject({ fs, gitdir, oid })
+                const { object } = await readObject({ fs, cache, gitdir, oid })
                 if (chmod) {
                   // Note: the mode option of fs.write only works when creating files,
                   // not updating them. Since the `fs` plugin doesn't expose `chmod` this

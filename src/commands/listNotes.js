@@ -8,13 +8,14 @@ import { GitRefManager } from '../managers/GitRefManager.js'
  *
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string} args.ref
  *
  * @returns {Promise<Array<{target: string, note: string}>>}
  */
 
-export async function _listNotes({ fs, gitdir, ref }) {
+export async function _listNotes({ fs, cache, gitdir, ref }) {
   // Get the current note commit
   let parent
   try {
@@ -28,6 +29,7 @@ export async function _listNotes({ fs, gitdir, ref }) {
   // Create the current note tree
   const result = await _readTree({
     fs,
+    cache,
     gitdir,
     oid: parent,
   })

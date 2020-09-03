@@ -49,6 +49,7 @@ export async function indexPack({
 
     return await _indexPack({
       fs: new FileSystem(fs),
+      cache: {},
       onProgress,
       dir,
       gitdir,

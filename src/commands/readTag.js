@@ -16,14 +16,16 @@ import { _readObject as readObject } from '../storage/readObject.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string} args.oid
  *
  * @returns {Promise<ReadTagResult>}
  */
-export async function _readTag({ fs, gitdir, oid }) {
+export async function _readTag({ fs, cache, gitdir, oid }) {
   const { type, object } = await readObject({
     fs,
+    cache,
     gitdir,
     oid,
     format: 'content',

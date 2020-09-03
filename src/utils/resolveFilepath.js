@@ -6,7 +6,7 @@ import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
-export async function resolveFilepath({ fs, gitdir, oid, filepath }) {
+export async function resolveFilepath({ fs, cache, gitdir, oid, filepath }) {
   // Ensure there are no leading or trailing directory separators.
   // I was going to do this automatically, but then found that the Git Terminal for Windows
   // auto-expands --filepath=/src/utils to --filepath=C:/Users/Will/AppData/Local/Programs/Git/src/utils
@@ -17,7 +17,7 @@ export async function resolveFilepath({ fs, gitdir, oid, filepath }) {
     throw new InvalidFilepathError('trailing-slash')
   }
   const _oid = oid
-  const result = await resolveTree({ fs, gitdir, oid })
+  const result = await resolveTree({ fs, cache, gitdir, oid })
   const tree = result.tree
   if (filepath === '') {
     oid = result.oid
@@ -25,6 +25,7 @@ export async function resolveFilepath({ fs, gitdir, oid, filepath }) {
     const pathArray = filepath.split('/')
     oid = await _resolveFilepath({
       fs,
+      cache,
       gitdir,
       tree,
       pathArray,
@@ -37,6 +38,7 @@ export async function resolveFilepath({ fs, gitdir, oid, filepath }) {
 
 async function _resolveFilepath({
   fs,
+  cache,
   gitdir,
   tree,
   pathArray,
@@ -51,6 +53,7 @@ async function _resolveFilepath({
       } else {
         const { type, object } = await readObject({
           fs,
+          cache,
           gitdir,
           oid: entry.oid,
         })
@@ -58,7 +61,15 @@ async function _resolveFilepath({
           throw new ObjectTypeError(oid, type, 'blob', filepath)
         }
         tree = GitTree.from(object)
-        return _resolveFilepath({ fs, gitdir, tree, pathArray, oid, filepath })
+        return _resolveFilepath({
+          fs,
+          cache,
+          gitdir,
+          tree,
+          pathArray,
+          oid,
+          filepath,
+        })
       }
     }
   }

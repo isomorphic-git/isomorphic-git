@@ -31,6 +31,7 @@ export async function listNotes({
 
     return await _listNotes({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       ref,
     })
