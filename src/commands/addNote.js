@@ -60,6 +60,7 @@ export async function _addNote({
   // I'm using the "empty tree" magic number here for brevity
   const result = await _readTree({
     fs,
+    cache,
     gitdir,
     oid: parent || '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
   })

@@ -8,6 +8,7 @@ import { _readBlob } from './readBlob'
  *
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string} [args.ref] - The notes ref to look under
  * @param {string} args.oid
@@ -17,6 +18,7 @@ import { _readBlob } from './readBlob'
 
 export async function _readNote({
   fs,
+  cache,
   gitdir,
   ref = 'refs/notes/commits',
   oid,
@@ -24,6 +26,7 @@ export async function _readNote({
   const parent = await GitRefManager.resolve({ gitdir, fs, ref })
   const { blob } = await _readBlob({
     fs,
+    cache,
     gitdir,
     oid: parent,
     filepath: oid,

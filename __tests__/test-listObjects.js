@@ -10,6 +10,7 @@ describe('listObjects', () => {
     // Test
     const objects = await listObjects({
       fs,
+      cache: {},
       gitdir,
       oids: [
         'c60bbbe99e96578105c57c4b3f2b6ebdf863edbc',

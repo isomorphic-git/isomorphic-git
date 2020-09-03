@@ -6,10 +6,24 @@ import { readObjectPacked } from '../storage/readObjectPacked.js'
 import { inflate } from '../utils/inflate.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function _readObject({ fs, gitdir, oid, format = 'content' }) {
+/**
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
+ * @param {string} args.gitdir
+ * @param {string} args.oid
+ * @param {string} [args.format]
+ */
+export async function _readObject({
+  fs,
+  cache,
+  gitdir,
+  oid,
+  format = 'content',
+}) {
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
-  const getExternalRefDelta = oid => _readObject({ fs, gitdir, oid })
+  const getExternalRefDelta = oid => _readObject({ fs, cache, gitdir, oid })
 
   let result
   // Empty tree - hard-coded so we can use it as a shorthand.
@@ -24,7 +38,13 @@ export async function _readObject({ fs, gitdir, oid, format = 'content' }) {
   }
   // Check to see if it's in a packfile.
   if (!result) {
-    result = await readObjectPacked({ fs, gitdir, oid, getExternalRefDelta })
+    result = await readObjectPacked({
+      fs,
+      cache,
+      gitdir,
+      oid,
+      getExternalRefDelta,
+    })
   }
   // Finally
   if (!result) {

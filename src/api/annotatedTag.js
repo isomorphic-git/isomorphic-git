@@ -72,6 +72,7 @@ export async function annotatedTag({
 
     return await _annotatedTag({
       fs,
+      cache: {},
       onSign,
       gitdir,
       ref,

@@ -4,6 +4,7 @@ import { join } from '../utils/join.js'
 
 export async function hasObjectPacked({
   fs,
+  cache,
   gitdir,
   oid,
   getExternalRefDelta,
@@ -16,6 +17,7 @@ export async function hasObjectPacked({
     const indexFile = `${gitdir}/objects/pack/${filename}`
     const p = await readPackIndex({
       fs,
+      cache,
       filename: indexFile,
       getExternalRefDelta,
     })

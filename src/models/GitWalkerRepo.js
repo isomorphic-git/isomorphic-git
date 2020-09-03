@@ -10,6 +10,7 @@ import { resolveTree } from '../utils/resolveTree.js'
 export class GitWalkerRepo {
   constructor({ fs, gitdir, ref }) {
     this.fs = fs
+    this.cache = {}
     this.gitdir = gitdir
     this.mapPromise = (async () => {
       const map = new Map()
@@ -22,7 +23,7 @@ export class GitWalkerRepo {
           oid = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
         }
       }
-      const tree = await resolveTree({ fs, gitdir, oid })
+      const tree = await resolveTree({ fs, cache: this.cache, gitdir, oid })
       tree.type = 'tree'
       tree.mode = '40000'
       map.set('.', tree)
@@ -63,7 +64,7 @@ export class GitWalkerRepo {
 
   async readdir(entry) {
     const filepath = entry._fullpath
-    const { fs, gitdir } = this
+    const { fs, cache, gitdir } = this
     const map = await this.mapPromise
     const obj = map.get(filepath)
     if (!obj) throw new Error(`No obj for ${filepath}`)
@@ -73,7 +74,7 @@ export class GitWalkerRepo {
       // TODO: support submodules (type === 'commit')
       return null
     }
-    const { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, cache, gitdir, oid })
     if (type !== obj.type) {
       throw new ObjectTypeError(oid, type, obj.type)
     }
@@ -108,10 +109,10 @@ export class GitWalkerRepo {
   async content(entry) {
     if (entry._content === false) {
       const map = await this.mapPromise
-      const { fs, gitdir } = this
+      const { fs, cache, gitdir } = this
       const obj = map.get(entry._fullpath)
       const oid = obj.oid
-      const { type, object } = await readObject({ fs, gitdir, oid })
+      const { type, object } = await readObject({ fs, cache, gitdir, oid })
       if (type !== 'blob') {
         entry._content = undefined
       } else {

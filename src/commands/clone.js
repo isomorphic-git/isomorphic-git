@@ -68,6 +68,7 @@ export async function _clone({
   }
   const { defaultBranch, fetchHead } = await _fetch({
     fs,
+    cache,
     http,
     onProgress,
     onMessage,

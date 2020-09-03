@@ -35,6 +35,7 @@ export async function readTag({ fs, dir, gitdir = join(dir, '.git'), oid }) {
 
     return await _readTag({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oid,
     })

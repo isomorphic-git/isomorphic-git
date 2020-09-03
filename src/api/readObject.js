@@ -212,10 +212,12 @@ export async function readObject({
     assertParameter('gitdir', gitdir)
     assertParameter('oid', oid)
 
+    const cache = {}
     const fs = new FileSystem(_fs)
     if (filepath !== undefined) {
       oid = await resolveFilepath({
         fs,
+        cache,
         gitdir,
         oid,
         filepath,
@@ -225,6 +227,7 @@ export async function readObject({
     const _format = format === 'parsed' ? 'content' : format
     const result = await _readObject({
       fs,
+      cache,
       gitdir,
       oid,
       format: _format,
