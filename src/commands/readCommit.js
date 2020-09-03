@@ -6,6 +6,7 @@ import { resolveCommit } from '../utils/resolveCommit.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string} args.oid
  *
@@ -14,9 +15,10 @@ import { resolveCommit } from '../utils/resolveCommit.js'
  * @see CommitObject
  *
  */
-export async function _readCommit({ fs, gitdir, oid }) {
+export async function _readCommit({ fs, cache, gitdir, oid }) {
   const { commit, oid: commitOid } = await resolveCommit({
     fs,
+    cache,
     gitdir,
     oid,
   })

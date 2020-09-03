@@ -35,6 +35,7 @@ export async function readCommit({ fs, dir, gitdir = join(dir, '.git'), oid }) {
 
     return await _readCommit({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oid,
     })

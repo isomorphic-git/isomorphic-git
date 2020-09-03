@@ -1,7 +1,5 @@
 import { GitPackIndex } from '../models/GitPackIndex.js'
 
-const PackfileCache = new Map()
-
 async function loadPackIndex({
   fs,
   filename,
@@ -15,13 +13,15 @@ async function loadPackIndex({
 
 export function readPackIndex({
   fs,
+  cache,
   filename,
   getExternalRefDelta,
   emitter,
   emitterPrefix,
 }) {
   // Try to get the packfile index from the in-memory cache
-  let p = PackfileCache.get(filename)
+  if (!cache.packfiles) cache.packfiles = new Map()
+  let p = cache.packfiles.get(filename)
   if (!p) {
     p = loadPackIndex({
       fs,
@@ -30,7 +30,7 @@ export function readPackIndex({
       emitter,
       emitterPrefix,
     })
-    PackfileCache.set(filename, p)
+    cache.packfiles.set(filename, p)
   }
   return p
 }

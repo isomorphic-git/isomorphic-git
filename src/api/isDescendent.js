@@ -42,6 +42,7 @@ export async function isDescendent({
 
     return await _isDescendent({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oid,
       ancestor,

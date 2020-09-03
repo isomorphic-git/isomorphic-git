@@ -29,6 +29,7 @@ export async function findMergeBase({
 
     return await _findMergeBase({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oids,
     })

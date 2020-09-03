@@ -9,11 +9,18 @@ import { padHex } from '../utils/padHex.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids
  */
-export async function _pack({ fs, dir, gitdir = join(dir, '.git'), oids }) {
+export async function _pack({
+  fs,
+  cache,
+  dir,
+  gitdir = join(dir, '.git'),
+  oids,
+}) {
   const hash = new Hash()
   const outputStream = []
   function write(chunk, enc) {
@@ -52,7 +59,7 @@ export async function _pack({ fs, dir, gitdir = join(dir, '.git'), oids }) {
   // Write a 4 byte (32-bit) int
   write(padHex(8, oids.length), 'hex')
   for (const oid of oids) {
-    const { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, cache, gitdir, oid })
     await writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum

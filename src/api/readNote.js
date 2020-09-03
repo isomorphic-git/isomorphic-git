@@ -34,6 +34,7 @@ export async function readNote({
 
     return await _readNote({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       ref,
       oid,

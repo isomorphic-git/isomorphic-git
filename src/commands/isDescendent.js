@@ -9,6 +9,7 @@ import { _readObject } from '../storage/readObject.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string} args.oid
  * @param {string} args.ancestor
@@ -16,7 +17,14 @@ import { _readObject } from '../storage/readObject.js'
  *
  * @returns {Promise<boolean>}
  */
-export async function _isDescendent({ fs, gitdir, oid, ancestor, depth }) {
+export async function _isDescendent({
+  fs,
+  cache,
+  gitdir,
+  oid,
+  ancestor,
+  depth,
+}) {
   const shallows = await GitShallowManager.read({ fs, gitdir })
   if (!oid) {
     throw new MissingParameterError('oid')
@@ -39,6 +47,7 @@ export async function _isDescendent({ fs, gitdir, oid, ancestor, depth }) {
     const oid = queue.shift()
     const { type, object } = await _readObject({
       fs,
+      cache,
       gitdir,
       oid,
     })

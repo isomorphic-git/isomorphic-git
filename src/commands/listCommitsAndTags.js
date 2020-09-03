@@ -9,6 +9,7 @@ import { join } from '../utils/join.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} [args.dir]
  * @param {string} args.gitdir
  * @param {Iterable<string>} args.start
@@ -17,6 +18,7 @@ import { join } from '../utils/join.js'
  */
 export async function listCommitsAndTags({
   fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
   start,
@@ -41,7 +43,7 @@ export async function listCommitsAndTags({
   // setting a default recursion limit.
   async function walk(oid) {
     visited.add(oid)
-    const { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, cache, gitdir, oid })
     // Recursively resolve annotated tags
     if (type === 'tag') {
       const tag = GitAnnotatedTag.from(object)
