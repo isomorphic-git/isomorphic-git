@@ -37,6 +37,7 @@
       "version-1.x-currentBranch",
       "version-1.x-branch",
       "version-1.x-deleteBranch",
+      "version-1.x-renameBranch",
       "version-1.x-listBranches"
     ],
     "Tags": [
