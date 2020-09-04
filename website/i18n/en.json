@@ -256,6 +256,10 @@
         "title": "removeNote",
         "sidebar_label": "removeNote"
       },
+      "renameBranch": {
+        "title": "renameBranch",
+        "sidebar_label": "renameBranch"
+      },
       "resetIndex": {
         "title": "resetIndex",
         "sidebar_label": "resetIndex"
@@ -966,6 +970,10 @@
       "version-1.x/version-1.x-removeNote": {
         "title": "removeNote",
         "sidebar_label": "removeNote"
+      },
+      "version-1.x/version-1.x-renameBranch": {
+        "title": "renameBranch",
+        "sidebar_label": "renameBranch"
       },
       "version-1.x/version-1.x-resetIndex": {
         "title": "resetIndex",
