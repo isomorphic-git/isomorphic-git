@@ -37,6 +37,7 @@
       "currentBranch",
       "branch",
       "deleteBranch",
+      "renameBranch",
       "listBranches"
     ],
     "Tags": [
