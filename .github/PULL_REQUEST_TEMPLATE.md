@@ -19,7 +19,7 @@
 
 - [ ] add as a new file in `src/api` (and `src/commands` if necessary)
 - [ ] add command to `src/index.js`
-- [ ] update `__tests__/__snapshots__/test-exports.js.snap`
+- [ ] update `__tests__/test-exports.js`
 - [ ] create a test in `src/__tests__`
 - [ ] document the command with a JSDoc comment
 - [ ] add page to the Docs Sidebar `website/sidebars.json`
