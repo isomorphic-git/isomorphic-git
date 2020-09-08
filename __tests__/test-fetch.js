@@ -138,6 +138,29 @@ describe('fetch', () => {
     )
   })
 
+  it('shallow fetch single commit by hash (from Github)', async () => {
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`,
+    })
+    // Test
+    await fetch({
+      fs,
+      http,
+      gitdir,
+      singleBranch: true,
+      remote: 'origin',
+      depth: 1,
+      ref: '36d201c8fea9d87128e7fccd32c21643f355540d',
+    })
+    expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
+    const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
+    expect(shallow).toEqual('36d201c8fea9d87128e7fccd32c21643f355540d\n')
+  })
+
   it('shallow fetch since (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
     await setConfig({

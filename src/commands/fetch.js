@@ -269,7 +269,11 @@ export async function _fetch({
       key = value
     }
     // final value must not be a symref but a real ref
-    refs.set(key, remoteRefs.get(key))
+    const realRef = remoteRefs.get(key)
+    // There may be no ref at all if we've fetched a specific commit hash
+    if (realRef) {
+      refs.set(key, realRef)
+    }
     const { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,

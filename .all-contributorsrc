@@ -434,6 +434,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "willstott101",
+      "name": "Will Stott",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/335152?v=4",
+      "profile": "https://github.com/willstott101",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
