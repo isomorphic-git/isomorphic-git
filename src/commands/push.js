@@ -109,6 +109,7 @@ export async function _push({
     service: 'git-receive-pack',
     url,
     headers,
+    protocolVersion: 1,
   })
   const auth = httpRemote.auth // hack to get new credentials from CredentialManager API
   let fullRemoteRef
@@ -240,6 +241,7 @@ export async function _push({
     ? []
     : await _pack({
         fs,
+        cache,
         gitdir,
         oids: [...objects],
       })

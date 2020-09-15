@@ -119,6 +119,7 @@ export async function _fetch({
     service: 'git-upload-pack',
     url,
     headers,
+    protocolVersion: 1,
   })
   const auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
