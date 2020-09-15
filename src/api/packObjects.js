@@ -50,6 +50,7 @@ export async function packObjects({
 
     return await _packObjects({
       fs: new FileSystem(fs),
+      cache: {},
       gitdir,
       oids,
       write,
