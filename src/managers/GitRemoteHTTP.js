@@ -60,7 +60,7 @@ export class GitRemoteHTTP {
    * @param {string} [args.corsProxy]
    * @param {string} args.service
    * @param {string} args.url
-   * @param {Object<string, string>} [args.headers]
+   * @param {Object<string, string>} args.headers
    * @param {1 | 2} args.protocolVersion - Git Protocol Version
    */
   static async discover({

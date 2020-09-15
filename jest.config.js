@@ -1,4 +1,5 @@
 module.exports = {
+  modulePathIgnorePatterns: ['<rootDir>/website'],
   testRegex: '/__tests__/(server-only\\.)?test-[^\\/]+\\.js',
   moduleNameMapper: {
     '^isomorphic-git$': '<rootDir>/src',
