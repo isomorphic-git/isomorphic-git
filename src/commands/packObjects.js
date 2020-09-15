@@ -14,6 +14,7 @@ import { _pack } from './pack'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string[]} args.oids
  * @param {boolean} args.write
@@ -21,8 +22,8 @@ import { _pack } from './pack'
  * @returns {Promise<PackObjectsResult>}
  * @see PackObjectsResult
  */
-export async function _packObjects({ fs, gitdir, oids, write }) {
-  const buffers = await _pack({ fs, gitdir, oids })
+export async function _packObjects({ fs, cache, gitdir, oids, write }) {
+  const buffers = await _pack({ fs, cache, gitdir, oids })
   const packfile = Buffer.from(await collect(buffers))
   const packfileSha = packfile.slice(-20).toString('hex')
   const filename = `pack-${packfileSha}.pack`
