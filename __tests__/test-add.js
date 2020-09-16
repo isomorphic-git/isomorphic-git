@@ -25,6 +25,14 @@ describe('add', () => {
     await add({ fs, dir, filepath: 'b.txt' })
     expect((await listFiles({ fs, dir })).length).toEqual(3)
   })
+  it('multiple files', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    // Test
+    await init({ fs, dir })
+    await add({ fs, dir, filepaths: ['a.txt', 'a-copy.txt', 'b.txt'] })
+    expect((await listFiles({ fs, dir })).length).toEqual(3)
+  })
   it('ignored file', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')
