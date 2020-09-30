@@ -117,6 +117,7 @@ export async function merge({
       author,
       committer,
       signingKey,
+      onSign,
     })
   } catch (err) {
     err.caller = 'git.merge'
