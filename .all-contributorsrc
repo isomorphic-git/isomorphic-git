@@ -453,6 +453,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "snowyu",
+      "name": "Riceball LEE",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/327887?v=4",
+      "profile": "https://github.com/snowyu",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
