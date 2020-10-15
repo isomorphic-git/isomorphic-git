@@ -327,6 +327,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/linfaxin"><img src="https://avatars2.githubusercontent.com/u/3705017?v=4" width="60px;" alt="林法鑫"/><br /><sub><b>林法鑫</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Alinfaxin" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/willstott101"><img src="https://avatars2.githubusercontent.com/u/335152?v=4" width="60px;" alt="Will Stott"/><br /><sub><b>Will Stott</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=willstott101" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=willstott101" title="Tests">⚠️</a></td>
     <td align="center"><a href="http://mtnspring.org/"><img src="https://avatars2.githubusercontent.com/u/223277?v=4" width="60px;" alt="Seth Nickell"/><br /><sub><b>Seth Nickell</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Asnickell" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/mmkal"><img src="https://avatars2.githubusercontent.com/u/15040698?v=4" width="60px;" alt="Misha Kaletsky"/><br /><sub><b>Misha Kaletsky</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=mmkal" title="Code">💻</a></td>
   </tr>
 </table>
 
