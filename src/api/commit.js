@@ -34,6 +34,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
  * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.
  * @param {string} [args.tree] - The SHA-1 object id of the tree to use. If not specified, a new tree object is created from the current git index.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  *
@@ -64,6 +65,7 @@ export async function commit({
   ref,
   parent,
   tree,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -72,7 +74,6 @@ export async function commit({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
-    const cache = {}
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author) throw new MissingNameError('author')

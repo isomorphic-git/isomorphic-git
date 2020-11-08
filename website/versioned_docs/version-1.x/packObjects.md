@@ -14,6 +14,7 @@ Create a packfile from an array of SHA-1 object ids
 | **gitdir**     | string = join(dir, '.git')   | The [git directory](dir-vs-gitdir.md) path                                    |
 | **oids**       | Array\<string\>              | An array of SHA-1 object ids to be included in the packfile                   |
 | write          | boolean = false              | Whether to save the packfile to disk or not                                   |
+| cache          | object                       | a [cache](cache.md) object                                                    |
 | return         | Promise\<PackObjectsResult\> | Resolves successfully when the packfile is ready with the filename and buffer |
 
 The packObjects command returns an object with two properties:

@@ -14,6 +14,7 @@ Read a tree object directly
 | **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                                                                               |
 | **oid**        | string                    | The SHA-1 object id to get. Annotated tags and commits are peeled.                                                       |
 | filepath       | string                    | Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the tree object at that filepath. |
+| cache          | object                    | a [cache](cache.md) object                                                                                               |
 | return         | Promise\<ReadTreeResult\> | Resolves successfully with a git tree object                                                                             |
 
 The object returned has the following schema:

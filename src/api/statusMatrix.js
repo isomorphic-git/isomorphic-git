@@ -146,6 +146,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {string} [args.ref = 'HEAD'] - Optionally specify a different commit to compare against the workdir and stage instead of the HEAD
  * @param {string[]} [args.filepaths = ['.']] - Limit the query to the given files and directories
  * @param {function(string): boolean} [args.filter] - Filter the results to only those whose filepath matches a function.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<Array<StatusRow>>} Resolves with a status matrix, described below.
  * @see StatusRow
@@ -157,6 +158,7 @@ export async function statusMatrix({
   ref = 'HEAD',
   filepaths = ['.'],
   filter,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -164,7 +166,6 @@ export async function statusMatrix({
     assertParameter('ref', ref)
 
     const fs = new FileSystem(_fs)
-    const cache = {}
     return await _walk({
       fs,
       cache,

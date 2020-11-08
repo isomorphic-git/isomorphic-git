@@ -16,6 +16,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.oid - The descendent commit
  * @param {string} args.ancestor - The (proposed) ancestor commit
  * @param {number} [args.depth = -1] - Maximum depth to search before giving up. -1 means no maximum depth.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<boolean>} Resolves to true if `oid` is a descendent of `ancestor`
  *
@@ -33,6 +34,7 @@ export async function isDescendent({
   oid,
   ancestor,
   depth = -1,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -42,7 +44,7 @@ export async function isDescendent({
 
     return await _isDescendent({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       gitdir,
       oid,
       ancestor,

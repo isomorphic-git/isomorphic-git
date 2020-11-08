@@ -30,6 +30,7 @@ Create a new commit
 | ref                      | string                               | The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.) |
 | parent                   | Array\<string\>                      | The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.                                                                                     |
 | tree                     | string                               | The SHA-1 object id of the tree to use. If not specified, a new tree object is created from the current git index.                                                                                   |
+| cache                    | object                               | a [cache](cache.md) object                                                                                                                                                                           |
 | return                   | Promise\<string\>                    | Resolves successfully with the SHA-1 object id of the newly created commit.                                                                                                                          |
 
 Example Code:

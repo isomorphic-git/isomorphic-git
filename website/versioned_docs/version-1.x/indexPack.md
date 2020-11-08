@@ -14,6 +14,7 @@ Create the .idx file for a given .pack file
 | **dir**                    | string                             | The [working tree](dir-vs-gitdir.md) directory path                    |
 | **gitdir**                 | string = join(dir,'.git')          | The [git directory](dir-vs-gitdir.md) path                             |
 | **filepath**               | string                             | The path to the .pack file to index                                    |
+| cache                      | object                             | a [cache](cache.md) object                                             |
 | return                     | Promise\<{oids: Array\<string\>}\> | Resolves with a list of the SHA-1 object ids contained in the packfile |
 
 Example Code:

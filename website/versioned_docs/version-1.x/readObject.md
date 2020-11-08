@@ -20,6 +20,7 @@ Read a git object directly by its SHA-1 object id
 | format         | 'deflated'  &#124;  'wrapped'  &#124;  'content'  &#124;  'parsed' = 'parsed' | What format to return the object in. The choices are described in more detail below.                                                                                            |
 | filepath       | string                                                                        | Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the object at that filepath. To return the root directory of a tree set filepath to `''` |
 | encoding       | string                                                                        | A convenience argument that only affects blobs. Instead of returning `object` as a buffer, it returns a string parsed using the given encoding.                                 |
+| cache          | object                                                                        | a [cache](cache.md) object                                                                                                                                                      |
 | return         | Promise\<ReadObjectResult\>                                                   | Resolves successfully with a git object description                                                                                                                             |
 
 ```ts
