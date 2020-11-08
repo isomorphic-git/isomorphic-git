@@ -1,7 +1,8 @@
 ---
-id: cache
 title: The `cache` parameter
 sidebar_label: cache
+id: version-1.x-cache
+original_id: cache
 ---
 
 TL;DR see [Example](#example).
