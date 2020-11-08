@@ -7,13 +7,12 @@ import { GitWalkSymbol } from '../utils/symbols.js'
 /**
  * @param {object} args
  * @param {string} [args.ref='HEAD']
- * @param {object} [args.cache] - a [cache](cache.md) object
  * @returns {Walker}
  */
-export function TREE({ ref = 'HEAD', cache = {} }) {
+export function TREE({ ref = 'HEAD' }) {
   const o = Object.create(null)
   Object.defineProperty(o, GitWalkSymbol, {
-    value: function({ fs, gitdir }) {
+    value: function({ fs, gitdir, cache }) {
       return new GitWalkerRepo({ fs, gitdir, ref, cache })
     },
   })
