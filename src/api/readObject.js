@@ -167,7 +167,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {'deflated' | 'wrapped' | 'content' | 'parsed'} [args.format = 'parsed'] - What format to return the object in. The choices are described in more detail below.
  * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the object at that filepath. To return the root directory of a tree set filepath to `''`
  * @param {string} [args.encoding] - A convenience argument that only affects blobs. Instead of returning `object` as a buffer, it returns a string parsed using the given encoding.
- * @param {object} [args.cache] - a cache object
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<ReadObjectResult>} Resolves successfully with a git object description
  * @see ReadObjectResult

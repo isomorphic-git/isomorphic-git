@@ -22,6 +22,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids - An array of SHA-1 object ids to be included in the packfile
  * @param {boolean} [args.write = false] - Whether to save the packfile to disk or not
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<PackObjectsResult>} Resolves successfully when the packfile is ready with the filename and buffer
  * @see PackObjectsResult
@@ -42,6 +43,7 @@ export async function packObjects({
   gitdir = join(dir, '.git'),
   oids,
   write = false,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -50,7 +52,7 @@ export async function packObjects({
 
     return await _packObjects({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       gitdir,
       oids,
       write,

@@ -15,6 +15,7 @@ Get commit descriptions from the git history
 | ref            | string = 'HEAD'                      | The commit to begin walking backwards through the history from                                      |
 | depth          | number                               | Limit the number of commits returned. No limit by default.                                          |
 | since          | Date                                 | Return history newer than the given date. Can be combined with `depth` to get whichever is shorter. |
+| cache          | object                               | a [cache](cache.md) object                                                                          |
 | return         | Promise\<Array\<ReadCommitResult\>\> | Resolves to an array of ReadCommitResult objects                                                    |
 
 ```ts

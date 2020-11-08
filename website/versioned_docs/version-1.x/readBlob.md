@@ -14,6 +14,7 @@ Read a blob object directly
 | **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                                                                               |
 | **oid**        | string                    | The SHA-1 object id to get. Annotated tags, commits, and trees are peeled.                                               |
 | filepath       | string                    | Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the blob object at that filepath. |
+| cache          | object                    | a [cache](cache.md) object                                                                                               |
 | return         | Promise\<ReadBlobResult\> | Resolves successfully with a blob object description                                                                     |
 
 The object returned has the following schema:

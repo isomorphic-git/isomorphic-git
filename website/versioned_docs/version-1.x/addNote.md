@@ -28,6 +28,7 @@ Add or update an object note
 | committer.timestamp      | number = Math.floor(Date.now()/1000) | Set the committer timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).                                          |
 | committer.timezoneOffset | number                               | Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`. |
 | signingKey               | string                               | Sign the note commit using this private PGP key.                                                                                                              |
+| cache                    | object                               | a [cache](cache.md) object                                                                                                                                    |
 | return                   | Promise\<string\>                    | Resolves successfully with the SHA-1 object id of the commit object for the added note.                                                                       |
 
 

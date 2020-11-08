@@ -41,6 +41,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {number} [args.committer.timestamp=Math.floor(Date.now()/1000)] - Set the committer timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).
  * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully when pull operation completes
  *
@@ -76,6 +77,7 @@ export async function pull({
   author: _author,
   committer: _committer,
   signingKey,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -96,7 +98,7 @@ export async function pull({
 
     return await _pull({
       fs,
-      cache: {},
+      cache,
       http,
       onProgress,
       onMessage,

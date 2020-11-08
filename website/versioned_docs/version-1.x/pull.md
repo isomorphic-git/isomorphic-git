@@ -37,6 +37,7 @@ Fetch and merge commits from a remote repository
 | committer.timestamp              | number = Math.floor(Date.now()/1000) | Set the committer timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).                                          |
 | committer.timezoneOffset         | number                               | Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`. |
 | signingKey                       | string                               | passed to [commit](commit.md) when creating a merge commit                                                                                                    |
+| cache                            | object                               | a [cache](cache.md) object                                                                                                                                    |
 | return                           | Promise\<void\>                      | Resolves successfully when pull operation completes                                                                                                           |
 
 Example Code:

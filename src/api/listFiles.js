@@ -17,6 +17,7 @@ import { join } from '../utils/join'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Return a list of all the files in the commit at `ref` instead of the files currently in the git index (aka staging area)
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<Array<string>>} Resolves successfully with an array of filepaths
  *
@@ -29,14 +30,20 @@ import { join } from '../utils/join'
  * console.log(files)
  *
  */
-export async function listFiles({ fs, dir, gitdir = join(dir, '.git'), ref }) {
+export async function listFiles({
+  fs,
+  dir,
+  gitdir = join(dir, '.git'),
+  ref,
+  cache = {},
+}) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
 
     return await _listFiles({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       gitdir,
       ref,
     })

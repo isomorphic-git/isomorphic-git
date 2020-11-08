@@ -32,6 +32,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {number} [args.committer.timestamp=Math.floor(Date.now()/1000)] - Set the committer timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).
  * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - Sign the note commit using this private PGP key.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the commit object for the added note.
  */
@@ -48,6 +49,7 @@ export async function addNote({
   author: _author,
   committer: _committer,
   signingKey,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -58,7 +60,6 @@ export async function addNote({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
-    const cache = {}
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
     if (!author) throw new MissingNameError('author')

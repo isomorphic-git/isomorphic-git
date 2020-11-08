@@ -25,6 +25,7 @@ Like `pull`, but hard-coded with `fastForward: true` so there is no need for an 
 | corsProxy                        | string                    | Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.                |
 | singleBranch                     | boolean = false           | Instead of the default behavior of fetching all the branches, only fetch a single branch.                                 |
 | [headers](./headers)             | Object\<string, string\>  | Additional headers to include in HTTP requests, similar to git's `extraHeader` config                                     |
+| cache                            | object                    | a [cache](cache.md) object                                                                                                |
 | return                           | Promise\<void\>           | Resolves successfully when pull operation completes                                                                       |
 
 Example Code:
