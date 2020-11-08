@@ -31,6 +31,7 @@ import { join } from '../utils/join.js'
  * @param {string[]} [args.exclude = []] - A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.
  * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
  * @param {Object<string, string>} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -69,6 +70,7 @@ export async function clone({
   noCheckout = false,
   noTags = false,
   headers = {},
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -81,7 +83,7 @@ export async function clone({
 
     return await _clone({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       http,
       onProgress,
       onMessage,

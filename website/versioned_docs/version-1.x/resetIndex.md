@@ -14,6 +14,7 @@ Reset a file in the git index (aka staging area)
 | **gitdir**     | string = join(dir, '.git') | The [git directory](dir-vs-gitdir.md) path                |
 | **filepath**   | string                     | The path to the file to reset in the index                |
 | ref            | string = 'HEAD'            | A ref to the commit to use                                |
+| cache          | object                     | a [cache](cache.md) object                                |
 | return         | Promise\<void\>            | Resolves successfully once the git index has been updated |
 
 Note that this does NOT modify the file in the working directory.

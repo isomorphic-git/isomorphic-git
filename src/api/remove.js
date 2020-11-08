@@ -16,6 +16,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to remove from the index
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
@@ -29,13 +30,13 @@ export async function remove({
   dir,
   gitdir = join(dir, '.git'),
   filepath,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
     assertParameter('gitdir', gitdir)
     assertParameter('filepath', filepath)
 
-    const cache = {}
     await GitIndexManager.acquire(
       { fs: new FileSystem(_fs), gitdir, cache },
       async function(index) {

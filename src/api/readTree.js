@@ -22,6 +22,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get. Annotated tags and commits are peeled.
  * @param {string} [args.filepath] - Don't return the object with `oid` itself, but resolve `oid` to a tree and then return the tree object at that filepath.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<ReadTreeResult>} Resolves successfully with a git tree object
  * @see ReadTreeResult
@@ -35,6 +36,7 @@ export async function readTree({
   gitdir = join(dir, '.git'),
   oid,
   filepath = undefined,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -43,7 +45,7 @@ export async function readTree({
 
     return await _readTree({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       gitdir,
       oid,
       filepath,

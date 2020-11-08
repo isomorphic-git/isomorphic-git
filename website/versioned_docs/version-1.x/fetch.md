@@ -32,6 +32,7 @@ Fetch commits from a remote repository
 | pruneTags                        | boolean                   | Prune local tags that don’t exist on the remote, and force-update those tags that differ                                           |
 | corsProxy                        | string                    | Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.                         |
 | [headers](./headers)             | Object\<string, string\>  | Additional headers to include in HTTP requests, similar to git's `extraHeader` config                                              |
+| cache                            | object                    | a [cache](cache.md) object                                                                                                         |
 | return                           | Promise\<FetchResult\>    | Resolves successfully when fetch completes                                                                                         |
 
 The object returned has the following schema:

@@ -13,6 +13,7 @@ Read an annotated tag object directly
 | dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path |
 | **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path          |
 | **oid**        | string                    | The SHA-1 object id to get                          |
+| cache          | object                    | a [cache](cache.md) object                          |
 | return         | Promise\<ReadTagResult\>  | Resolves successfully with a git object description |
 
 The object returned has the following schema:

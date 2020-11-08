@@ -13,6 +13,7 @@ List all the object notes
 | dir            | string                                             | The [working tree](dir-vs-gitdir.md) directory path                                                                    |
 | **gitdir**     | string = join(dir,'.git')                          | The [git directory](dir-vs-gitdir.md) path                                                                             |
 | ref            | string                                             | The notes ref to look under                                                                                            |
+| cache          | object                                             | a [cache](cache.md) object                                                                                             |
 | return         | Promise\<Array\<{target: string, note: string}\>\> | Resolves successfully with an array of entries containing SHA-1 object ids of the note and the object the note targets |
 
 

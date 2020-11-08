@@ -35,6 +35,7 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.delete = false] - If true, delete the remote ref
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<PushResult>} Resolves successfully when push completes with a detailed description of the operation from the server.
  * @see PushResult
@@ -70,6 +71,7 @@ export async function push({
   delete: _delete = false,
   corsProxy,
   headers = {},
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -78,7 +80,7 @@ export async function push({
 
     return await _push({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       http,
       onProgress,
       onMessage,

@@ -13,6 +13,7 @@ Expand and resolve a short oid into a full oid
 | dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path                                       |
 | **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                                                |
 | **oid**        | string                    | The shortened oid prefix to expand (like "0414d2a")                                       |
+| cache          | object                    | a [cache](cache.md) object                                                                |
 | return         | Promise\<string\>         | Resolves successfully with the full oid (like "0414d2a286d7bbc7a4a326a61c1f9f888a8ab87f") |
 
 Example Code:
