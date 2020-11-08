@@ -33,6 +33,10 @@
         "title": "branch",
         "sidebar_label": "branch"
       },
+      "cache": {
+        "title": "Cache",
+        "sidebar_label": "Cache"
+      },
       "checkout": {
         "title": "checkout",
         "sidebar_label": "checkout"
