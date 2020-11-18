@@ -40,8 +40,10 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to query
  * @param {object} [args.cache] - a [cache](cache.md) object
+ * @param {boolean} args.simple - simple style of satus
  *
  * @returns {Promise<'ignored'|'unmodified'|'*modified'|'*deleted'|'*added'|'absent'|'modified'|'deleted'|'added'|'*unmodified'|'*absent'|'*undeleted'|'*undeletemodified'>} Resolves successfully with the file's git status
+ * @returns {Promise<any> Resolves successfully with the simplest file's git status object with oids for Head, Index and Work dir {H, I, W}
  *
  * @example
  * let status = await git.status({ fs, dir: '/tutorial', filepath: 'README.md' })
@@ -54,6 +56,7 @@ export async function status({
   gitdir = join(dir, '.git'),
   filepath,
   cache = {},
+  simple = false,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -68,7 +71,7 @@ export async function status({
       filepath,
     })
     if (ignored) {
-      return 'ignored'
+      return simple && { } || 'ignored'
     }
     const headTree = await getHeadTree({ fs, cache, gitdir })
     const treeOid = await getOidAtPath({
@@ -120,7 +123,9 @@ export async function status({
         return workdirOid
       }
     }
-
+    if (simple) {
+      return {H: H && treeOid, I: I && indexEntry.oid, W: W && await getWorkdirOid() }
+    }
     if (!H && !W && !I) return 'absent' // ---
     if (!H && !W && I) return '*absent' // -A-
     if (!H && W && !I) return '*added' // --A
