@@ -59,54 +59,54 @@ export async function _commit({
     })
   }
 
-  return GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-    const inodes = flatFileListToDirectoryStructure(index.entries)
-    const inode = inodes.get('.')
-    if (!tree) {
-      tree = await constructTree({ fs, gitdir, inode, dryRun })
+  if (!tree) {
+    tree = await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
+      const inodes = flatFileListToDirectoryStructure(index.entries);
+      const inode = inodes.get(".");
+      return await constructTree({ fs, gitdir, inode, dryRun });
+    });
+  }
+  if (!parent) {
+    try {
+      parent = [
+        await GitRefManager.resolve({
+          fs,
+          gitdir,
+          ref,
+        }),
+      ];
+    } catch (err) {
+      // Probably an initial commit
+      parent = [];
     }
-    if (!parent) {
-      try {
-        parent = [
-          await GitRefManager.resolve({
-            fs,
-            gitdir,
-            ref,
-          }),
-        ]
-      } catch (err) {
-        // Probably an initial commit
-        parent = []
-      }
-    }
-    let comm = GitCommit.from({
-      tree,
-      parent,
-      author,
-      committer,
-      message,
-    })
-    if (signingKey) {
-      comm = await GitCommit.sign(comm, onSign, signingKey)
-    }
-    const oid = await writeObject({
+  }
+  let comm = GitCommit.from({
+    tree,
+    parent,
+    author,
+    committer,
+    message,
+  });
+  if (signingKey) {
+    comm = await GitCommit.sign(comm, onSign, signingKey);
+  }
+  const oid = await writeObject({
+    fs,
+    gitdir,
+    type: "commit",
+    object: comm.toObject(),
+    dryRun,
+  });
+  if (!noUpdateBranch && !dryRun) {
+    // Update branch pointer
+    await GitRefManager.writeRef({
       fs,
       gitdir,
-      type: 'commit',
-      object: comm.toObject(),
-      dryRun,
-    })
-    if (!noUpdateBranch && !dryRun) {
-      // Update branch pointer
-      await GitRefManager.writeRef({
-        fs,
-        gitdir,
-        ref,
-        value: oid,
-      })
-    }
-    return oid
-  })
+      ref,
+      value: oid,
+    });
+  }
+  return oid;
 }
 
 async function constructTree({ fs, gitdir, inode, dryRun }) {
