@@ -59,45 +59,56 @@ export async function _clone({
   noTags,
   headers,
 }) {
-  await _init({ fs, gitdir })
-  await _addRemote({ fs, gitdir, remote, url, force: false })
-  if (corsProxy) {
-    const config = await GitConfigManager.get({ fs, gitdir })
-    await config.set(`http.corsProxy`, corsProxy)
-    await GitConfigManager.save({ fs, gitdir, config })
+  try {
+    await _init({ fs, gitdir })
+    await _addRemote({ fs, gitdir, remote, url, force: false })
+    if (corsProxy) {
+      const config = await GitConfigManager.get({ fs, gitdir })
+      await config.set(`http.corsProxy`, corsProxy)
+      await GitConfigManager.save({ fs, gitdir, config })
+    }
+    const { defaultBranch, fetchHead } = await _fetch({
+      fs,
+      cache,
+      http,
+      onProgress,
+      onMessage,
+      onAuth,
+      onAuthSuccess,
+      onAuthFailure,
+      gitdir,
+      ref,
+      remote,
+      depth,
+      since,
+      exclude,
+      relative,
+      singleBranch,
+      headers,
+      tags: !noTags,
+    })
+    if (fetchHead === null) return
+    ref = ref || defaultBranch
+    ref = ref.replace('refs/heads/', '')
+    // Checkout that branch
+    await _checkout({
+      fs,
+      cache,
+      onProgress,
+      dir,
+      gitdir,
+      ref,
+      remote,
+      noCheckout,
+    })
+  } catch (err) {
+    // Remove partial local repository, see #1283
+    try {
+      await fs.rmdir(gitdir)
+    } catch (err) {
+      // ignore this error, we are already failing
+    }
+    // re-throw
+    throw err
   }
-  const { defaultBranch, fetchHead } = await _fetch({
-    fs,
-    cache,
-    http,
-    onProgress,
-    onMessage,
-    onAuth,
-    onAuthSuccess,
-    onAuthFailure,
-    gitdir,
-    ref,
-    remote,
-    depth,
-    since,
-    exclude,
-    relative,
-    singleBranch,
-    headers,
-    tags: !noTags,
-  })
-  if (fetchHead === null) return
-  ref = ref || defaultBranch
-  ref = ref.replace('refs/heads/', '')
-  // Checkout that branch
-  await _checkout({
-    fs,
-    cache,
-    onProgress,
-    dir,
-    gitdir,
-    ref,
-    remote,
-    noCheckout,
-  })
 }
