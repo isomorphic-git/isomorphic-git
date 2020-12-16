@@ -453,6 +453,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "alex-titarenko",
+      "name": "Alex Titarenko",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/3290313?v=4",
+      "profile": "https://www.alextitarenko.me/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
