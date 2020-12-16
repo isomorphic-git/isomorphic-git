@@ -31,6 +31,7 @@ import { mergeFile } from './mergeFile.js'
  */
 export async function mergeTree({
   fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
   ourOid,
@@ -47,6 +48,7 @@ export async function mergeTree({
 
   const results = await _walk({
     fs,
+    cache,
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],
