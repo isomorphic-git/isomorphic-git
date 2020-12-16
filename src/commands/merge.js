@@ -119,6 +119,7 @@ export async function _merge({
     // try a fancier merge
     const tree = await mergeTree({
       fs,
+      cache,
       gitdir,
       ourOid,
       theirOid,
