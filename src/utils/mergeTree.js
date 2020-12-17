@@ -16,6 +16,7 @@ import { mergeFile } from './mergeFile.js'
  *
  * @param {Object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ourOid - The SHA-1 object id of our tree
@@ -31,6 +32,7 @@ import { mergeFile } from './mergeFile.js'
  */
 export async function mergeTree({
   fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
   ourOid,
@@ -47,6 +49,7 @@ export async function mergeTree({
 
   const results = await _walk({
     fs,
+    cache,
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],
