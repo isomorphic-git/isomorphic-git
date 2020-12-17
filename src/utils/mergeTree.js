@@ -16,6 +16,7 @@ import { mergeFile } from './mergeFile.js'
  *
  * @param {Object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ourOid - The SHA-1 object id of our tree
