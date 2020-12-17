@@ -34,7 +34,7 @@
         "sidebar_label": "branch"
       },
       "cache": {
-        "title": "the `cache` parameter",
+        "title": "The `cache` parameter",
         "sidebar_label": "cache"
       },
       "checkout": {
