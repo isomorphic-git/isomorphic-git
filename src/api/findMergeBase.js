@@ -14,6 +14,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids - Which commits
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  */
 export async function findMergeBase({
@@ -21,6 +22,7 @@ export async function findMergeBase({
   dir,
   gitdir = join(dir, '.git'),
   oids,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -29,7 +31,7 @@ export async function findMergeBase({
 
     return await _findMergeBase({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       gitdir,
       oids,
     })

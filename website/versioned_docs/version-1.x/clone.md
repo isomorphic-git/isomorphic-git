@@ -30,6 +30,7 @@ Clone a repository
 | exclude                          | Array\<string\> = []          | A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.                                   |
 | relative                         | boolean = false               | Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.                                   |
 | [headers](./headers)             | Object\<string, string\> = {} | Additional headers to include in HTTP requests, similar to git's `extraHeader` config                                                           |
+| cache                            | object                        | a [cache](cache.md) object                                                                                                                      |
 | return                           | Promise\<void\>               | Resolves successfully when clone completes                                                                                                      |
 
 Example Code:

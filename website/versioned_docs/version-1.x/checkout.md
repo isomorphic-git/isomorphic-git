@@ -20,6 +20,7 @@ Checkout a branch
 | noUpdateHead               | boolean                   | If true, will update the working directory but won't update HEAD. Defaults to `false` when `ref` is provided, and `true` if `ref` is not provided. |
 | dryRun                     | boolean = false           | If true, simulates a checkout so you can test whether it would succeed.                                                                            |
 | force                      | boolean = false           | If true, conflicts will be ignored and files will be overwritten regardless of local changes.                                                      |
+| cache                      | object                    | a [cache](cache.md) object                                                                                                                         |
 | return                     | Promise\<void\>           | Resolves successfully when filesystem operations are complete                                                                                      |
 
 If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.

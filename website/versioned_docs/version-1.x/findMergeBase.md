@@ -13,6 +13,7 @@ Find the merge base for a set of commits
 | dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path |
 | **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path          |
 | **oids**       | Array\<string\>           | Which commits                                       |
+| cache          | object                    | a [cache](cache.md) object                          |
 
 
 ---

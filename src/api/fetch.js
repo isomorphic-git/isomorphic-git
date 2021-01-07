@@ -44,6 +44,7 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.pruneTags] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<FetchResult>} Resolves successfully when fetch completes
  * @see FetchResult
@@ -87,6 +88,7 @@ export async function fetch({
   headers = {},
   prune = false,
   pruneTags = false,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -95,7 +97,7 @@ export async function fetch({
 
     return await _fetch({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       http,
       onProgress,
       onMessage,

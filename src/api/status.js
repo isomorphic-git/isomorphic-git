@@ -39,6 +39,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to query
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<'ignored'|'unmodified'|'*modified'|'*deleted'|'*added'|'absent'|'modified'|'deleted'|'added'|'*unmodified'|'*absent'|'*undeleted'|'*undeletemodified'>} Resolves successfully with the file's git status
  *
@@ -52,6 +53,7 @@ export async function status({
   dir,
   gitdir = join(dir, '.git'),
   filepath,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -59,7 +61,6 @@ export async function status({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
-    const cache = {}
     const ignored = await GitIgnoreManager.isIgnored({
       fs,
       gitdir,

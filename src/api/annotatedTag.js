@@ -27,6 +27,7 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
  * @param {string} [args.gpgsig] - The gpgsig attatched to the tag object. (Mutually exclusive with the `signingKey` option.)
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key. (Mutually exclusive with the `gpgsig` option.)
  * @param {boolean} [args.force = false] - Instead of throwing an error if a tag named `ref` already exists, overwrite the existing tag. Note that this option does not modify the original tag object itself.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -56,6 +57,7 @@ export async function annotatedTag({
   object,
   signingKey,
   force = false,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -72,7 +74,7 @@ export async function annotatedTag({
 
     return await _annotatedTag({
       fs,
-      cache: {},
+      cache,
       onSign,
       gitdir,
       ref,
