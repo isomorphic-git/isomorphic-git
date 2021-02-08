@@ -102,7 +102,7 @@
     "jest-fixtures": "wmhilton-contrib/jest-fixtures#win32",
     "jest-junit": "7.0.0",
     "jsdoc-api": "5.0.3",
-    "karma": "2.0.5",
+    "karma": "6.1.0",
     "karma-browserstack-launcher": "^1.5.1",
     "karma-chrome-launcher": "3.1.0",
     "karma-edge-launcher": "0.4.2",
