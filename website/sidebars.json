@@ -14,7 +14,8 @@
       "pull",
       "fastForward",
       "merge",
-      "walk"
+      "walk",
+      "worktreeAdd"
     ],
     "Callbacks": [
       "onAuth",

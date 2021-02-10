@@ -58,6 +58,7 @@ import { statusMatrix } from './api/statusMatrix.js'
 import { tag } from './api/tag.js'
 import { version } from './api/version.js'
 import { walk } from './api/walk.js'
+import { worktreeAdd } from './api/worktreeAdd.js'
 import { writeBlob } from './api/writeBlob.js'
 import { writeCommit } from './api/writeCommit.js'
 import { writeObject } from './api/writeObject.js'
@@ -127,6 +128,7 @@ export {
   tag,
   version,
   walk,
+  worktreeAdd,
   writeBlob,
   writeCommit,
   writeObject,
@@ -196,6 +198,7 @@ export default {
   tag,
   version,
   walk,
+  worktreeAdd,
   writeBlob,
   writeCommit,
   writeObject,

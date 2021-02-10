@@ -14,7 +14,8 @@
       "version-1.x-pull",
       "version-1.x-fastForward",
       "version-1.x-merge",
-      "version-1.x-walk"
+      "version-1.x-walk",
+      "version-1.x-worktreeAdd"
     ],
     "Callbacks": [
       "version-1.x-onAuth",

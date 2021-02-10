@@ -66,6 +66,7 @@ describe('exports', () => {
         "tag",
         "version",
         "walk",
+        "worktreeAdd",
         "writeBlob",
         "writeCommit",
         "writeObject",
