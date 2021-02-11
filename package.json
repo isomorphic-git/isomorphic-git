@@ -1,7 +1,6 @@
 {
   "name": "@noteshub/isomorphic-git",
   "version": "0.0.0-development",
-  "private": false,
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
   "typings": "./index.d.ts",
@@ -39,6 +38,9 @@
     "url": "https://github.com/NotesHubApp/isomorphic-git/issues"
   },
   "homepage": "https://isomorphic-git.org/",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "cli.cjs",
     "browser-tests.json",
