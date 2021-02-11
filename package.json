@@ -1,5 +1,5 @@
 {
-  "name": "isomorphic-git",
+  "name": "@noteshub/isomorphic-git",
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
