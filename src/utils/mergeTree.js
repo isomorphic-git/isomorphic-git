@@ -10,6 +10,7 @@ import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
+import { isBinary } from './isBinary'
 
 /**
  * Create a merged tree
@@ -90,29 +91,26 @@ export async function mergeTree({
             : undefined
         }
         case 'true-true': {
-          // Modifications
-          if (
-            ours &&
-            base &&
-            theirs &&
-            (await ours.type()) === 'blob' &&
-            (await base.type()) === 'blob' &&
-            (await theirs.type()) === 'blob'
-          ) {
-            return mergeBlobs({
-              fs,
-              gitdir,
-              path,
-              ours,
-              base,
-              theirs,
-              ourName,
-              baseName,
-              theirName,
-            })
+          if ((ours && (await ours.type()) !== 'blob') ||
+              (base && (await base.type()) !== 'blob') ||
+              (theirs && (await theirs.type()) !== 'blob')) {
+            throw new MergeNotSupportedError()  
           }
-          // all other types of conflicts fail
-          throw new MergeNotSupportedError()
+
+          // Modifications
+          return mergeBlobs({
+            fs,
+            gitdir,
+            path,
+            filepath,
+            ours,
+            base,
+            theirs,
+            ourName,
+            baseName,
+            theirName,
+            onBlobMerge
+          })
         }
       }
     },
@@ -173,6 +171,7 @@ async function modified(entry, base) {
  * @param {import('../models/FileSystem').FileSystem} args.fs
  * @param {string} args.gitdir
  * @param {string} args.path
+ * @param {string} args.filepath
  * @param {WalkerEntry} args.ours
  * @param {WalkerEntry} args.base
  * @param {WalkerEntry} args.theirs
@@ -182,67 +181,71 @@ async function modified(entry, base) {
  * @param {string} [args.format]
  * @param {number} [args.markerSize]
  * @param {boolean} [args.dryRun = false]
- *
+ * @param {BlobMergeCallback} [args.onBlobMerge]
  */
 async function mergeBlobs({
   fs,
   gitdir,
   path,
+  filepath,
   ours,
   base,
   theirs,
   ourName,
   theirName,
   baseName,
-  format,
-  markerSize,
   dryRun,
+  onBlobMerge
 }) {
   const type = 'blob'
-  // Compute the new mode.
-  // Since there are ONLY two valid blob modes ('100755' and '100644') it boils down to this
-  const mode =
-    (await base.mode()) === (await ours.mode())
-      ? await theirs.mode()
-      : await ours.mode()
+
+  // if both sides were deleted
+  if (ours === null && theirs === null) {
+    return undefined
+  }
+  
   // The trivial case: nothing to merge except maybe mode
-  if ((await ours.oid()) === (await theirs.oid())) {
-    return { mode, path, oid: await ours.oid(), type }
+  if (ours && theirs && ((await ours.oid()) === (await theirs.oid()))) {
+    return { mode: await ours.mode(), path, oid: await ours.oid(), type }
   }
-  // if only one side made oid changes, return that side's oid
-  if ((await ours.oid()) === (await base.oid())) {
-    return { mode, path, oid: await theirs.oid(), type }
+
+  if (base && ours && theirs) {
+    // Compute the new mode.
+    // Since there are ONLY two valid blob modes ('100755' and '100644') it boils down to this
+    const mode = (await base.mode()) === (await ours.mode()) ? await theirs.mode() : await ours.mode()
+    
+    // if only one side made oid changes, return that side's oid
+    if ((await ours.oid()) === (await base.oid())) {
+      return { mode, path, oid: await theirs.oid(), type }
+    }
+    
+    if ((await theirs.oid()) === (await base.oid())) {
+      return { mode, path, oid: await ours.oid(), type }
+    }
   }
-  if ((await theirs.oid()) === (await base.oid())) {
-    return { mode, path, oid: await ours.oid(), type }
-  }
-  // if both sides made changes do a merge
-  const { mergedText, cleanMerge } = mergeFile({
-    ourContent: Buffer.from(await ours.content()).toString('utf8'),
-    baseContent: Buffer.from(await base.content()).toString('utf8'),
-    theirContent: Buffer.from(await theirs.content()).toString('utf8'),
-    ourName,
-    theirName,
-    baseName,
-    format,
-    markerSize,
-  })
-  if (!cleanMerge) {
-    // all other types of conflicts fail
-    throw new MergeNotSupportedError()
-  }
-  const oid = await writeObject({
-    fs,
-    gitdir,
-    type: 'blob',
-    object: Buffer.from(mergedText, 'utf8'),
-    dryRun,
-  })
+
+  const blobMergeCallback = onBlobMerge || defaultBlobMergeCallback;
+  const blobMergeResult = await blobMergeCallback(filepath, theirs, base, ours, theirName, baseName, ourName);
+  
+  const oid = 'mergedText' in blobMergeResult ?
+    await writeObject({ fs, gitdir, type: 'blob', object: Buffer.from(blobMergeResult.mergedText, 'utf8'), dryRun }) :
+    blobMergeResult.oid
+
   return { mode, path, oid, type }
 }
 
-
+/**
+ * @param {string} filePath
+ * @param {WalkerEntry | null} theirBlob 
+ * @param {WalkerEntry | null} baseBlob 
+ * @param {WalkerEntry | null} ourBlob 
+ * @param {string} theirName 
+ * @param {string} baseName 
+ * @param {string} ourName
+ * @returns {Promise<{ mergedText: string } | { oid: string }>}
+ */
 async function defaultBlobMergeCallback(
+  filePath,
   theirBlob,
   baseBlob,
   ourBlob,
@@ -250,19 +253,34 @@ async function defaultBlobMergeCallback(
   baseName,
   ourName
 ) {
+  if (baseBlob && ourBlob && theirBlob) {
+    const ourContent = await ourBlob.content();
+    const baseContent = await baseBlob.content();
+    const theirContent = await theirBlob.content();
+  
+    if ((!ourContent || isBinary(ourContent)) ||
+        (!baseContent || isBinary(baseContent)) ||
+        (!theirContent || isBinary(theirContent))) {
+      throw new MergeNotSupportedError('Merge of binary data is not supported.')
+    }
 
-  const ourContent = await ourBlob.content();
-  const baseContent = await baseBlob.content();
-  const theirContent = await theirBlob.content();
+    // if both sides made changes do a merge
+    const { mergedText, cleanMerge } = mergeFile({
+      ourContent: Buffer.from(ourContent).toString('utf8'),
+      baseContent: Buffer.from(baseContent).toString('utf8'),
+      theirContent: Buffer.from(theirContent).toString('utf8'),
+      ourName,
+      theirName,
+      baseName
+    })
+  
+    if (!cleanMerge) {
+      // all other types of conflicts fail
+      throw new MergeNotSupportedError('Merge with conflicts is not supported.')
+    }
 
-  const { mergedText, cleanMerge } = mergeFile({
-    ourContent: Buffer.from(ourContent).toString('utf8'),
-    baseContent: Buffer.from(baseContent).toString('utf8'),
-    theirContent: Buffer.from(theirContent).toString('utf8'),
-    ourName,
-    theirName,
-    baseName,
-    format,
-    markerSize,
-  })
+    return { mergedText: mergedText }
+  } else {
+    throw new MergeNotSupportedError()
+  }
 }

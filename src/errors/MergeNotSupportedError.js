@@ -1,8 +1,8 @@
 import { BaseError } from './BaseError.js'
 
 export class MergeNotSupportedError extends BaseError {
-  constructor() {
-    super(`Merges with conflicts are not supported yet.`)
+  constructor(message = `Merges with conflicts are not supported yet.`) {
+    super(message)
     this.code = this.name = MergeNotSupportedError.code
     this.data = {}
   }

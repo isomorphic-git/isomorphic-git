@@ -231,7 +231,7 @@ import './typedefs-http.js'
  * @param {string} theirName
  * @param {string} baseName
  * @param {string} ourName
- * @returns {Promise<void>}
+ * @returns {Promise<{ mergedText: string } | { oid: string }>}
  */
 
 /**
