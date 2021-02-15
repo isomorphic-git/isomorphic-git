@@ -240,3 +240,14 @@ async function mergeBlobs({
   })
   return { mode, path, oid, type }
 }
+
+
+async function defaultBlobMergeCallback(
+  theirBlob,
+  baseBlob,
+  ourBlob,
+  theirName,
+  baseName,
+  ourName
+) {
+}

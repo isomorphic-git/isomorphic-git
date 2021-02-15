@@ -224,9 +224,9 @@ import './typedefs-http.js'
 
 /**
  * @callback BlobMergeCallback
- * @param {WalkerEntry} theirBlob
- * @param {WalkerEntry} baseBlob
- * @param {WalkerEntry} ourBlob
+ * @param {WalkerEntry | null} theirBlob
+ * @param {WalkerEntry | null} baseBlob
+ * @param {WalkerEntry | null} ourBlob
  * @param {string} theirName
  * @param {string} baseName
  * @param {string} ourName
