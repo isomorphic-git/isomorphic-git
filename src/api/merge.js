@@ -30,7 +30,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  *
  * Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
  *
- * Currently it does not support selecting alternative merge strategies.
+ * You can use onBlobMerge callback to define your own merge stragegy.
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
