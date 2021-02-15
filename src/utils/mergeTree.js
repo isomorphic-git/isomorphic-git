@@ -250,4 +250,19 @@ async function defaultBlobMergeCallback(
   baseName,
   ourName
 ) {
+
+  const ourContent = await ourBlob.content();
+  const baseContent = await baseBlob.content();
+  const theirContent = await theirBlob.content();
+
+  const { mergedText, cleanMerge } = mergeFile({
+    ourContent: Buffer.from(ourContent).toString('utf8'),
+    baseContent: Buffer.from(baseContent).toString('utf8'),
+    theirContent: Buffer.from(theirContent).toString('utf8'),
+    ourName,
+    theirName,
+    baseName,
+    format,
+    markerSize,
+  })
 }
