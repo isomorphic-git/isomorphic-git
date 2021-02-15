@@ -1,5 +1,6 @@
 // @ts-check
 
+import { MessageCallback, AuthCallback, AuthFailureCallback, AuthSuccessCallback, BlobMergeCallback } from '../typedefs'
 import { _checkout } from '../commands/checkout.js'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _fetch } from '../commands/fetch.js'
@@ -16,6 +17,7 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
  * @param {AuthCallback} [args.onAuth]
  * @param {AuthFailureCallback} [args.onAuthFailure]
  * @param {AuthSuccessCallback} [args.onAuthSuccess]
+ * @param {BlobMergeCallback} [args.onBlobMerge]
  * @param {string} args.dir
  * @param {string} args.gitdir
  * @param {string} args.ref
@@ -50,6 +52,7 @@ export async function _pull({
   onAuth,
   onAuthSuccess,
   onAuthFailure,
+  onBlobMerge,
   dir,
   gitdir,
   ref,
@@ -107,6 +110,7 @@ export async function _pull({
       signingKey,
       dryRun: false,
       noUpdateBranch: false,
+      onBlobMerge
     })
     await _checkout({
       fs,

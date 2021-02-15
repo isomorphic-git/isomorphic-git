@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import { FsClient, MessageCallback, AuthCallback, AuthFailureCallback, AuthSuccessCallback, BlobMergeCallback } from '../typedefs.js'
 
 import { _pull } from '../commands/pull.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
@@ -20,6 +20,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {AuthCallback} [args.onAuth] - optional auth fill callback
  * @param {AuthFailureCallback} [args.onAuthFailure] - optional auth rejected callback
  * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
+ * @param {BlobMergeCallback} [args.onBlobMerge] - optional blob merge callback
  * @param {string} args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - Which branch to merge into. By default this is the currently checked out branch.
@@ -64,6 +65,7 @@ export async function pull({
   onAuth,
   onAuthSuccess,
   onAuthFailure,
+  onBlobMerge,
   dir,
   gitdir = join(dir, '.git'),
   ref,
@@ -105,6 +107,7 @@ export async function pull({
       onAuth,
       onAuthSuccess,
       onAuthFailure,
+      onBlobMerge,
       dir,
       gitdir,
       ref,

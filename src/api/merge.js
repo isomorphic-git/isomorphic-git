@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import { FsClient, SignCallback, BlobMergeCallback } from '../typedefs.js'
 
 import { _merge } from '../commands/merge.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
@@ -54,6 +54,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {number} [args.committer.timestamp=Math.floor(Date.now()/1000)] - Set the committer timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).
  * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
+ * @param {BlobMergeCallback} [args.onBlobMerge] - Optional blob merge callback
  * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
@@ -83,6 +84,7 @@ export async function merge({
   author: _author,
   committer: _committer,
   signingKey,
+  onBlobMerge,
   cache = {},
 }) {
   try {
@@ -118,6 +120,7 @@ export async function merge({
       author,
       committer,
       signingKey,
+      onBlobMerge
     })
   } catch (err) {
     err.caller = 'git.merge'

@@ -223,6 +223,17 @@ import './typedefs-http.js'
  */
 
 /**
+ * @callback BlobMergeCallback
+ * @param {WalkerEntry} theirBlob
+ * @param {WalkerEntry} baseBlob
+ * @param {WalkerEntry} ourBlob
+ * @param {string} theirName
+ * @param {string} baseName
+ * @param {string} ourName
+ * @returns {Promise<void>}
+ */
+
+/**
  * @typedef {0|1} HeadStatus
  */
 

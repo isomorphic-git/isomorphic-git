@@ -1,5 +1,5 @@
 // @ts-check
-import '../typedefs.js'
+import { TreeEntry, WalkerEntry, BlobMergeCallback } from '../typedefs.js'
 
 import { TREE } from '../commands/TREE.js'
 import { _walk } from '../commands/walk.js'
@@ -26,6 +26,7 @@ import { mergeFile } from './mergeFile.js'
  * @param {string} [args.baseName='base'] - The name to use in conflicted files (in diff3 format) for the base hunks
  * @param {string} [args.theirName='theirs'] - The name to use in conflicted files for their hunks
  * @param {boolean} [args.dryRun=false]
+ * @param {BlobMergeCallback} [args.onBlobMerge]
  *
  * @returns {Promise<string>} - The SHA-1 object id of the merged tree
  *
@@ -42,6 +43,7 @@ export async function mergeTree({
   baseName = 'base',
   theirName = 'theirs',
   dryRun = false,
+  onBlobMerge
 }) {
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
