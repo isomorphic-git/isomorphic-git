@@ -227,36 +227,40 @@ async function mergeBlobs({
   const blobMergeCallback = onBlobMerge || defaultBlobMergeCallback;
   const blobMergeResult = await blobMergeCallback(filepath, theirs, base, ours, theirName, baseName, ourName);
   
-  const oid = 'mergedText' in blobMergeResult ?
-    await writeObject({ fs, gitdir, type: 'blob', object: Buffer.from(blobMergeResult.mergedText, 'utf8'), dryRun }) :
-    blobMergeResult.oid
+  const {oid, mode } = 'mergedText' in blobMergeResult ? {
+    oid: await writeObject({ fs, gitdir, type: 'blob', object: Buffer.from(blobMergeResult.mergedText, 'utf8'), dryRun }),
+    mode: blobMergeResult.mode
+  } : {
+    oid: blobMergeResult.oid,
+    mode: blobMergeResult.mode
+  }
 
   return { mode, path, oid, type }
 }
 
 /**
  * @param {string} filePath
- * @param {WalkerEntry | null} theirBlob 
- * @param {WalkerEntry | null} baseBlob 
- * @param {WalkerEntry | null} ourBlob 
+ * @param {WalkerEntry | null} their 
+ * @param {WalkerEntry | null} base 
+ * @param {WalkerEntry | null} our 
  * @param {string} theirName 
  * @param {string} baseName 
  * @param {string} ourName
- * @returns {Promise<{ mergedText: string } | { oid: string }>}
+ * @returns {Promise<{ mergedText: string, mode: number } | { oid: string, mode: number }>}
  */
 async function defaultBlobMergeCallback(
   filePath,
-  theirBlob,
-  baseBlob,
-  ourBlob,
+  their,
+  base,
+  our,
   theirName,
   baseName,
   ourName
 ) {
-  if (baseBlob && ourBlob && theirBlob) {
-    const ourContent = await ourBlob.content();
-    const baseContent = await baseBlob.content();
-    const theirContent = await theirBlob.content();
+  if (base && our && their) {
+    const ourContent = await our.content();
+    const baseContent = await base.content();
+    const theirContent = await their.content();
   
     if ((!ourContent || isBinary(ourContent)) ||
         (!baseContent || isBinary(baseContent)) ||
@@ -279,7 +283,8 @@ async function defaultBlobMergeCallback(
       throw new MergeNotSupportedError('Merge with conflicts is not supported.')
     }
 
-    return { mergedText: mergedText }
+    const mode = (await base.mode()) === (await our.mode()) ? await their.mode() : await our.mode()
+    return { mergedText: mergedText, mode: mode }
   } else {
     throw new MergeNotSupportedError()
   }
