@@ -224,8 +224,8 @@ async function mergeBlobs({
     }
   }
 
-  const blobMergeCallback = onBlobMerge || defaultBlobMergeCallback;
-  const blobMergeResult = await blobMergeCallback(filepath, theirs, base, ours, theirName, baseName, ourName);
+  const blobMergeCallback = onBlobMerge || defaultBlobMergeCallback
+  const blobMergeResult = await blobMergeCallback(filepath, theirs, base, ours, theirName, baseName, ourName)
   
   const {oid, mode } = 'mergedText' in blobMergeResult ? {
     oid: await writeObject({ fs, gitdir, type: 'blob', object: Buffer.from(blobMergeResult.mergedText, 'utf8'), dryRun }),
