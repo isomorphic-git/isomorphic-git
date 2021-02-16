@@ -172,9 +172,9 @@ async function modified(entry, base) {
  * @param {string} args.gitdir
  * @param {string} args.path
  * @param {string} args.filepath
- * @param {WalkerEntry} args.ours
- * @param {WalkerEntry} args.base
- * @param {WalkerEntry} args.theirs
+ * @param {WalkerEntry | null} args.ours
+ * @param {WalkerEntry | null} args.base
+ * @param {WalkerEntry | null} args.theirs
  * @param {string} [args.ourName]
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]
@@ -227,6 +227,8 @@ async function mergeBlobs({
   const blobMergeCallback = onBlobMerge || defaultBlobMergeCallback
   const blobMergeResult = await blobMergeCallback(filepath, theirs, base, ours, theirName, baseName, ourName)
   
+  if (!blobMergeResult) return undefined
+
   const {oid, mode } = 'mergedText' in blobMergeResult ? {
     oid: await writeObject({ fs, gitdir, type: 'blob', object: Buffer.from(blobMergeResult.mergedText, 'utf8'), dryRun }),
     mode: blobMergeResult.mode
@@ -246,7 +248,7 @@ async function mergeBlobs({
  * @param {string} theirName 
  * @param {string} baseName 
  * @param {string} ourName
- * @returns {Promise<{ mergedText: string, mode: number } | { oid: string, mode: number }>}
+ * @returns {Promise<{ mergedText: string, mode: number } | { oid: string, mode: number } | undefined>}
  */
 async function defaultBlobMergeCallback(
   filePath,
