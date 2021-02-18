@@ -1,5 +1,5 @@
 // @ts-check
-import { FsClient, SignCallback, BlobMergeCallback } from '../typedefs.js'
+import '../typedefs.js'
 
 import { _merge } from '../commands/merge.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
@@ -120,7 +120,7 @@ export async function merge({
       author,
       committer,
       signingKey,
-      onBlobMerge
+      onBlobMerge,
     })
   } catch (err) {
     err.caller = 'git.merge'

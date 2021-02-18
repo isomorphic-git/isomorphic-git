@@ -1,5 +1,5 @@
 // @ts-check
-import { TreeEntry, WalkerEntry, BlobMergeCallback } from '../typedefs.js'
+import '../typedefs.js'
 
 import { TREE } from '../commands/TREE.js'
 import { _walk } from '../commands/walk.js'
@@ -8,9 +8,9 @@ import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 import { basename } from './basename.js'
+import { isBinary } from './isBinary'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
-import { isBinary } from './isBinary'
 
 /**
  * Create a merged tree
@@ -44,7 +44,7 @@ export async function mergeTree({
   baseName = 'base',
   theirName = 'theirs',
   dryRun = false,
-  onBlobMerge
+  onBlobMerge,
 }) {
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
@@ -91,10 +91,12 @@ export async function mergeTree({
             : undefined
         }
         case 'true-true': {
-          if ((ours && (await ours.type()) !== 'blob') ||
-              (base && (await base.type()) !== 'blob') ||
-              (theirs && (await theirs.type()) !== 'blob')) {
-            throw new MergeNotSupportedError()  
+          if (
+            (ours && (await ours.type()) !== 'blob') ||
+            (base && (await base.type()) !== 'blob') ||
+            (theirs && (await theirs.type()) !== 'blob')
+          ) {
+            throw new MergeNotSupportedError()
           }
 
           // Modifications
@@ -109,7 +111,7 @@ export async function mergeTree({
             ourName,
             baseName,
             theirName,
-            onBlobMerge
+            onBlobMerge,
           })
         }
       }
@@ -195,7 +197,7 @@ async function mergeBlobs({
   theirName,
   baseName,
   dryRun,
-  onBlobMerge
+  onBlobMerge,
 }) {
   const type = 'blob'
 
@@ -203,50 +205,70 @@ async function mergeBlobs({
   if (ours === null && theirs === null) {
     return undefined
   }
-  
+
   // The trivial case: nothing to merge except maybe mode
-  if (ours && theirs && ((await ours.oid()) === (await theirs.oid()))) {
+  if (ours && theirs && (await ours.oid()) === (await theirs.oid())) {
     return { mode: await ours.mode(), path, oid: await ours.oid(), type }
   }
 
   if (base && ours && theirs) {
     // Compute the new mode.
     // Since there are ONLY two valid blob modes ('100755' and '100644') it boils down to this
-    const mode = (await base.mode()) === (await ours.mode()) ? await theirs.mode() : await ours.mode()
-    
+    const mode =
+      (await base.mode()) === (await ours.mode())
+        ? await theirs.mode()
+        : await ours.mode()
+
     // if only one side made oid changes, return that side's oid
     if ((await ours.oid()) === (await base.oid())) {
       return { mode, path, oid: await theirs.oid(), type }
     }
-    
+
     if ((await theirs.oid()) === (await base.oid())) {
       return { mode, path, oid: await ours.oid(), type }
     }
   }
 
   const blobMergeCallback = onBlobMerge || defaultBlobMergeCallback
-  const blobMergeResult = await blobMergeCallback(filepath, theirs, base, ours, theirName, baseName, ourName)
-  
+  const blobMergeResult = await blobMergeCallback(
+    filepath,
+    theirs,
+    base,
+    ours,
+    theirName,
+    baseName,
+    ourName
+  )
+
   if (!blobMergeResult) return undefined
 
-  const {oid, mode } = 'mergedText' in blobMergeResult ? {
-    oid: await writeObject({ fs, gitdir, type: 'blob', object: Buffer.from(blobMergeResult.mergedText, 'utf8'), dryRun }),
-    mode: blobMergeResult.mode
-  } : {
-    oid: blobMergeResult.oid,
-    mode: blobMergeResult.mode
-  }
+  const { oid, mode } =
+    'mergedText' in blobMergeResult
+      ? {
+          oid: await writeObject({
+            fs,
+            gitdir,
+            type: 'blob',
+            object: Buffer.from(blobMergeResult.mergedText, 'utf8'),
+            dryRun,
+          }),
+          mode: blobMergeResult.mode,
+        }
+      : {
+          oid: blobMergeResult.oid,
+          mode: blobMergeResult.mode,
+        }
 
   return { mode, path, oid, type }
 }
 
 /**
  * @param {string} filePath
- * @param {WalkerEntry | null} their 
- * @param {WalkerEntry | null} base 
- * @param {WalkerEntry | null} our 
- * @param {string} theirName 
- * @param {string} baseName 
+ * @param {WalkerEntry | null} their
+ * @param {WalkerEntry | null} base
+ * @param {WalkerEntry | null} our
+ * @param {string} theirName
+ * @param {string} baseName
  * @param {string} ourName
  * @returns {Promise<{ mergedText: string, mode: number } | { oid: string, mode: number } | undefined>}
  */
@@ -260,13 +282,18 @@ async function defaultBlobMergeCallback(
   ourName
 ) {
   if (base && our && their) {
-    const ourContent = await our.content();
-    const baseContent = await base.content();
-    const theirContent = await their.content();
-  
-    if ((!ourContent || isBinary(ourContent)) ||
-        (!baseContent || isBinary(baseContent)) ||
-        (!theirContent || isBinary(theirContent))) {
+    const ourContent = await our.content()
+    const baseContent = await base.content()
+    const theirContent = await their.content()
+
+    if (
+      !ourContent ||
+      isBinary(ourContent) ||
+      !baseContent ||
+      isBinary(baseContent) ||
+      !theirContent ||
+      isBinary(theirContent)
+    ) {
       throw new MergeNotSupportedError('Merge of binary data is not supported.')
     }
 
@@ -277,15 +304,18 @@ async function defaultBlobMergeCallback(
       theirContent: Buffer.from(theirContent).toString('utf8'),
       ourName,
       theirName,
-      baseName
+      baseName,
     })
-  
+
     if (!cleanMerge) {
       // all other types of conflicts fail
       throw new MergeNotSupportedError('Merge with conflicts is not supported.')
     }
 
-    const mode = (await base.mode()) === (await our.mode()) ? await their.mode() : await our.mode()
+    const mode =
+      (await base.mode()) === (await our.mode())
+        ? await their.mode()
+        : await our.mode()
     return { mergedText: mergedText, mode: mode }
   } else {
     throw new MergeNotSupportedError()

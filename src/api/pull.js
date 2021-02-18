@@ -1,5 +1,5 @@
 // @ts-check
-import { FsClient, MessageCallback, AuthCallback, AuthFailureCallback, AuthSuccessCallback, BlobMergeCallback } from '../typedefs.js'
+import '../typedefs.js'
 
 import { _pull } from '../commands/pull.js'
 import { MissingNameError } from '../errors/MissingNameError.js'

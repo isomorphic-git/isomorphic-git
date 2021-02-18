@@ -1,5 +1,5 @@
 // @ts-check
-import { BlobMergeCallback } from '../typedefs.js'
+import '../typedefs.js'
 
 import { _commit } from '../commands/commit'
 import { _currentBranch } from '../commands/currentBranch.js'
@@ -62,7 +62,7 @@ export async function _merge({
   author,
   committer,
   signingKey,
-  onBlobMerge
+  onBlobMerge,
 }) {
   if (ours === undefined) {
     ours = await _currentBranch({ fs, gitdir, fullname: true })
@@ -130,7 +130,7 @@ export async function _merge({
       baseName: 'base',
       theirName: theirs,
       dryRun,
-      onBlobMerge
+      onBlobMerge,
     })
     if (!message) {
       message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(

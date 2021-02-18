@@ -1,6 +1,7 @@
 // @ts-check
 
-import { MessageCallback, AuthCallback, AuthFailureCallback, AuthSuccessCallback, BlobMergeCallback } from '../typedefs'
+import '../typedefs'
+
 import { _checkout } from '../commands/checkout.js'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _fetch } from '../commands/fetch.js'
@@ -110,7 +111,7 @@ export async function _pull({
       signingKey,
       dryRun: false,
       noUpdateBranch: false,
-      onBlobMerge
+      onBlobMerge,
     })
     await _checkout({
       fs,
