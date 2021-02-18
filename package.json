@@ -38,9 +38,6 @@
     "url": "https://github.com/isomorphic-git/isomorphic-git/issues"
   },
   "homepage": "https://isomorphic-git.org/",
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "cli.cjs",
     "browser-tests.json",
