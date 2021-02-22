@@ -66,7 +66,7 @@
   "devDependencies": {
     "@babel/core": "7.6.0",
     "@babel/plugin-transform-async-to-generator": "7.5.0",
-    "@babel/preset-env": "7.5.5",
+    "@babel/preset-env": "7.12.17",
     "@babel/runtime": "7.5.5",
     "@isomorphic-git/cors-proxy": "2.7.0",
     "@isomorphic-git/lightning-fs": "^3.3.0",
