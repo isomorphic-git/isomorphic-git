@@ -1,5 +1,5 @@
 {
-  "name": "isomorphic-git",
+  "name": "@noteshub/isomorphic-git",
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/isomorphic-git/isomorphic-git.git"
+    "url": "https://github.com/NotesHubApp/isomorphic-git.git"
   },
   "keywords": [
     "git",
@@ -35,9 +35,12 @@
   "author": "William Hilton <wmhilton@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/isomorphic-git/isomorphic-git/issues"
+    "url": "https://github.com/NotesHubApp/isomorphic-git/issues"
   },
   "homepage": "https://isomorphic-git.org/",
+  "publishConfig": {	
+    "access": "public"	
+  },
   "files": [
     "cli.cjs",
     "browser-tests.json",
