@@ -88,6 +88,21 @@ export class GitRemoteHTTP {
     let tryAgain
     let providedAuthBefore = false
     do {
+      if (onAuth && !providedAuthBefore) {
+        // Acquire credentials
+        // TODO: read `useHttpPath` value from git config and pass along?
+        auth = await onAuth(url, {
+          ...auth,
+          headers: { ...headers },
+        })
+        if (auth && auth.cancel) {
+          throw new UserCanceledError()
+        } else if (auth) {
+          updateHeaders(headers, auth)
+          providedAuthBefore = true
+        }
+      }
+
       res = await http.request({
         onProgress,
         method: 'GET',
@@ -103,11 +118,10 @@ export class GitRemoteHTTP {
       if (res.statusCode === 401 || res.statusCode === 203) {
         // On subsequent 401s, call `onAuthFailure` instead of `onAuth`.
         // This is so that naive `onAuth` callbacks that return a fixed value don't create an infinite loop of retrying.
-        const getAuth = providedAuthBefore ? onAuthFailure : onAuth
-        if (getAuth) {
+        if (onAuthFailure) {
           // Acquire credentials and try again
           // TODO: read `useHttpPath` value from git config and pass along?
-          auth = await getAuth(url, {
+          auth = await onAuthFailure(url, {
             ...auth,
             headers: { ...headers },
           })
