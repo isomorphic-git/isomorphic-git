@@ -75,7 +75,7 @@
     "@types/jest": "24.0.18",
     "@types/node": "12.7.2",
     "agadoo": "2.0.0",
-    "all-contributors-cli": "6.9.1",
+    "all-contributors-cli": "6.20.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.6",
     "browserfs": "2.0.0",

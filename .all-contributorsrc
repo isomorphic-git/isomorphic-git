@@ -462,6 +462,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Ry0taK",
+      "name": "RyotaK",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49341894?v=4",
+      "profile": "https://ryotak.me/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
