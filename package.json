@@ -110,7 +110,7 @@
     "karma-firefox-launcher": "1.2.0",
     "karma-ie-launcher": "1.0.0",
     "karma-jasmine": "2.0.1",
-    "karma-junit-reporter": "1.2.0",
+    "karma-junit-reporter": "2.0.1",
     "karma-safari-launcher": "1.0.0",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.6",
