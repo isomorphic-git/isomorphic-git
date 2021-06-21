@@ -100,7 +100,7 @@
     "inquirer": "^7.0.0",
     "jasmine-core": "3.4.0",
     "jest": "24.9.0",
-    "jest-junit": "7.0.0",
+    "jest-junit": "12.2.0",
     "jsdoc-api": "5.0.3",
     "karma": "2.0.5",
     "karma-browserstack-launcher": "^1.5.1",
