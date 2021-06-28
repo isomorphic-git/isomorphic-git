@@ -12,8 +12,12 @@ export class GitIgnoreManager {
     if (basename(filepath) === '.git') return true
     // '.' is not a valid gitignore entry, so '.' is never ignored
     if (filepath === '.') return false
-    // Load exclusion rules from the project exclude file (.git/info/exclude)
-    const excludes = await fs.read(join(gitdir, 'info', 'exclude'), 'utf8')
+    // Check and load exclusion rules from project exclude file (.git/info/exclude)
+    let excludes = ''
+    const excludesFile = join(gitdir, 'info', 'exclude')
+    if (await fs.exists(excludesFile)) {
+      excludes = await fs.read(excludesFile, 'utf8')
+    }
     // Find all the .gitignore files that could affect this file
     const pairs = [
       {
