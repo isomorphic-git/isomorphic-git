@@ -462,6 +462,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mkizka",
+      "name": "mkizka",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30231179?v=4",
+      "profile": "https://scrapbox.io/mkizka/README",
+      "contributions": [
+        "code"
+      ],
+    },
+    {
+      "login": "Ry0taK",
+      "name": "RyotaK",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49341894?v=4",
+      "profile": "https://ryotak.me/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
