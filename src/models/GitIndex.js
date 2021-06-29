@@ -1,4 +1,5 @@
 import { InternalError } from '../errors/InternalError.js'
+import { UnsafeFilepathError } from '../errors/UnsafeFilepathError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
@@ -92,6 +93,12 @@ export class GitIndex {
       }
       // TODO: handle pathnames larger than 12 bits
       entry.path = reader.toString('utf8', pathlength)
+
+      // Prevent malicious paths like "..\foo"
+      if (entry.path.includes('..\\') || entry.path.includes('../')) {
+        throw new UnsafeFilepathError(entry.path)
+      }
+
       // The next bit is awkward. We expect 1 to 8 null characters
       // such that the total size of the entry is a multiple of 8 bits.
       // (Hence subtract 12 bytes for the header.)

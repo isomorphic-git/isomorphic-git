@@ -39,6 +39,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to query
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<'ignored'|'unmodified'|'*modified'|'*deleted'|'*added'|'absent'|'modified'|'deleted'|'added'|'*unmodified'|'*absent'|'*undeleted'|'*undeletemodified'>} Resolves successfully with the file's git status
  *
@@ -52,6 +53,7 @@ export async function status({
   dir,
   gitdir = join(dir, '.git'),
   filepath,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -59,7 +61,6 @@ export async function status({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
-    const cache = {}
     const ignored = await GitIgnoreManager.isIgnored({
       fs,
       gitdir,
@@ -69,9 +70,10 @@ export async function status({
     if (ignored) {
       return 'ignored'
     }
-    const headTree = await getHeadTree({ fs, gitdir })
+    const headTree = await getHeadTree({ fs, cache, gitdir })
     const treeOid = await getOidAtPath({
       fs,
+      cache,
       gitdir,
       tree: headTree,
       path: filepath,
@@ -168,7 +170,7 @@ export async function status({
   }
 }
 
-async function getOidAtPath({ fs, gitdir, tree, path }) {
+async function getOidAtPath({ fs, cache, gitdir, tree, path }) {
   if (typeof path === 'string') path = path.split('/')
   const dirname = path.shift()
   for (const entry of tree) {
@@ -178,12 +180,13 @@ async function getOidAtPath({ fs, gitdir, tree, path }) {
       }
       const { type, object } = await _readObject({
         fs,
+        cache,
         gitdir,
         oid: entry.oid,
       })
       if (type === 'tree') {
         const tree = GitTree.from(object)
-        return getOidAtPath({ fs, gitdir, tree, path })
+        return getOidAtPath({ fs, cache, gitdir, tree, path })
       }
       if (type === 'blob') {
         throw new ObjectTypeError(entry.oid, type, 'blob', path.join('/'))
@@ -193,7 +196,7 @@ async function getOidAtPath({ fs, gitdir, tree, path }) {
   return null
 }
 
-async function getHeadTree({ fs, gitdir }) {
+async function getHeadTree({ fs, cache, gitdir }) {
   // Get the tree from the HEAD commit.
   let oid
   try {
@@ -204,6 +207,6 @@ async function getHeadTree({ fs, gitdir }) {
       return []
     }
   }
-  const { tree } = await _readTree({ fs, gitdir, oid })
+  const { tree } = await _readTree({ fs, cache, gitdir, oid })
   return tree
 }

@@ -37,6 +37,7 @@
       "version-1.x-currentBranch",
       "version-1.x-branch",
       "version-1.x-deleteBranch",
+      "version-1.x-renameBranch",
       "version-1.x-listBranches"
     ],
     "Tags": [
@@ -97,7 +98,8 @@
     "Getting Started": [
       "version-1.x-quickstart",
       "version-1.x-dir-vs-gitdir",
-      "version-1.x-cli"
+      "version-1.x-cli",
+      "version-1.x-cache"
     ],
     "More": [
       "version-1.x-faq",

@@ -14,6 +14,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get. Annotated tags are peeled.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<ReadCommitResult>} Resolves successfully with a git commit object
  * @see ReadCommitResult
@@ -27,7 +28,13 @@ import { join } from '../utils/join.js'
  * console.log(commit)
  *
  */
-export async function readCommit({ fs, dir, gitdir = join(dir, '.git'), oid }) {
+export async function readCommit({
+  fs,
+  dir,
+  gitdir = join(dir, '.git'),
+  oid,
+  cache = {},
+}) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -35,6 +42,7 @@ export async function readCommit({ fs, dir, gitdir = join(dir, '.git'), oid }) {
 
     return await _readCommit({
       fs: new FileSystem(fs),
+      cache,
       gitdir,
       oid,
     })

@@ -37,6 +37,7 @@
       "currentBranch",
       "branch",
       "deleteBranch",
+      "renameBranch",
       "listBranches"
     ],
     "Tags": [
@@ -97,7 +98,8 @@
     "Getting Started": [
       "quickstart",
       "dir-vs-gitdir",
-      "cli"
+      "cli",
+      "cache"
     ],
     "More": [
       "faq",

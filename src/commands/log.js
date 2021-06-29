@@ -14,6 +14,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  *
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string=} args.filepath optional get the commit for the filepath only
  * @param {string} args.ref
@@ -33,6 +34,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  */
 export async function _log({
   fs,
+  cache,
   gitdir,
   filepath,
   ref,
@@ -50,7 +52,7 @@ export async function _log({
   const commits = []
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
-  const tips = [await _readCommit({ fs, gitdir, oid })]
+  const tips = [await _readCommit({ fs, cache, gitdir, oid })]
   let lastFileOid
   let lastCommit
   let isOk
@@ -71,6 +73,7 @@ export async function _log({
       try {
         vFileOid = await resolveFilepath({
           fs,
+          cache,
           gitdir,
           oid: commit.commit.tree,
           filepath,
@@ -87,6 +90,7 @@ export async function _log({
           if (found) {
             found = await resolveFileIdInTree({
               fs,
+              cache,
               gitdir,
               oid: commit.commit.tree,
               fileId: lastFileOid,
@@ -96,6 +100,7 @@ export async function _log({
                 if (lastCommit) {
                   const lastFound = await resolveFileIdInTree({
                     fs,
+                    cache,
                     gitdir,
                     oid: lastCommit.commit.tree,
                     fileId: lastFileOid,
@@ -145,7 +150,7 @@ export async function _log({
       // Add the parents of this commit to the queue
       // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
       for (const oid of commit.commit.parent) {
-        const commit = await _readCommit({ fs, gitdir, oid })
+        const commit = await _readCommit({ fs, cache, gitdir, oid })
         if (!tips.map(commit => commit.oid).includes(commit.oid)) {
           tips.push(commit)
         }

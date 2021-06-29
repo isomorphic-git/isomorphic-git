@@ -37,6 +37,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {HttpClient} args.http
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
@@ -64,6 +65,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  */
 export async function _fetch({
   fs,
+  cache,
   http,
   onProgress,
   onMessage,
@@ -117,6 +119,7 @@ export async function _fetch({
     service: 'git-upload-pack',
     url,
     headers,
+    protocolVersion: 1,
   })
   const auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
@@ -191,7 +194,7 @@ export async function _fetch({
     try {
       ref = await GitRefManager.expand({ fs, gitdir, ref })
       const oid = await GitRefManager.resolve({ fs, gitdir, ref })
-      if (await hasObject({ fs, gitdir, oid })) {
+      if (await hasObject({ fs, cache, gitdir, oid })) {
         haves.push(oid)
       }
     } catch (err) {}
@@ -231,10 +234,12 @@ export async function _fetch({
       // this is in a try/catch mostly because my old test fixtures are missing objects
       try {
         // server says it's shallow, but do we have the parents?
-        const { object } = await readObject({ fs, gitdir, oid })
+        const { object } = await readObject({ fs, cache, gitdir, oid })
         const commit = new GitCommit(object)
         const hasParents = await Promise.all(
-          commit.headers().parent.map(oid => hasObject({ fs, gitdir, oid }))
+          commit
+            .headers()
+            .parent.map(oid => hasObject({ fs, cache, gitdir, oid }))
         )
         const haveAllParents =
           hasParents.length === 0 || hasParents.every(has => has)
@@ -265,7 +270,11 @@ export async function _fetch({
       key = value
     }
     // final value must not be a symref but a real ref
-    refs.set(key, remoteRefs.get(key))
+    const realRef = remoteRefs.get(key)
+    // There may be no ref at all if we've fetched a specific commit hash
+    if (realRef) {
+      refs.set(key, realRef)
+    }
     const { pruned } = await GitRefManager.updateRemoteRefs({
       fs,
       gitdir,
@@ -356,7 +365,7 @@ export async function _fetch({
     res.packfile = `objects/pack/pack-${packfileSha}.pack`
     const fullpath = join(gitdir, res.packfile)
     await fs.write(fullpath, packfile)
-    const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
+    const getExternalRefDelta = oid => readObject({ fs, cache, gitdir, oid })
     const idx = await GitPackIndex.fromPack({
       pack: packfile,
       getExternalRefDelta,

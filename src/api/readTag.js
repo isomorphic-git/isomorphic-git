@@ -21,13 +21,20 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The SHA-1 object id to get
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<ReadTagResult>} Resolves successfully with a git object description
  * @see ReadTagResult
  * @see TagObject
  *
  */
-export async function readTag({ fs, dir, gitdir = join(dir, '.git'), oid }) {
+export async function readTag({
+  fs,
+  dir,
+  gitdir = join(dir, '.git'),
+  oid,
+  cache = {},
+}) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
@@ -35,6 +42,7 @@ export async function readTag({ fs, dir, gitdir = join(dir, '.git'), oid }) {
 
     return await _readTag({
       fs: new FileSystem(fs),
+      cache,
       gitdir,
       oid,
     })

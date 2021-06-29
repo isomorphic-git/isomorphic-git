@@ -8,17 +8,18 @@ import { resolveTree } from './resolveTree.js'
 // the empty file content object id
 const EMPTY_OID = 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391'
 
-export async function resolveFileIdInTree({ fs, gitdir, oid, fileId }) {
+export async function resolveFileIdInTree({ fs, cache, gitdir, oid, fileId }) {
   if (fileId === EMPTY_OID) return
   const _oid = oid
   let filepath
-  const result = await resolveTree({ fs, gitdir, oid })
+  const result = await resolveTree({ fs, cache, gitdir, oid })
   const tree = result.tree
   if (fileId === result.oid) {
     filepath = result.path
   } else {
     filepath = await _resolveFileId({
       fs,
+      cache,
       gitdir,
       tree,
       fileId,
@@ -34,6 +35,7 @@ export async function resolveFileIdInTree({ fs, gitdir, oid, fileId }) {
 
 async function _resolveFileId({
   fs,
+  cache,
   gitdir,
   tree,
   fileId,
@@ -49,11 +51,13 @@ async function _resolveFileId({
     } else if (entry.type === 'tree') {
       result = readObject({
         fs,
+        cache,
         gitdir,
         oid: entry.oid,
       }).then(function({ object }) {
         return _resolveFileId({
           fs,
+          cache,
           gitdir,
           tree: GitTree.from(object),
           fileId,

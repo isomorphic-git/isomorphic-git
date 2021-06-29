@@ -8,7 +8,7 @@
   "module": "./index.js",
   "unpkg": "./index.umd.min.js",
   "bin": {
-    "isogit": "./cli.js"
+    "isogit": "./cli.cjs"
   },
   "sideEffects": false,
   "engines": {
@@ -39,7 +39,7 @@
   },
   "homepage": "https://isomorphic-git.org/",
   "files": [
-    "cli.js",
+    "cli.cjs",
     "browser-tests.json",
     "http/*",
     "index.cjs",
@@ -55,7 +55,6 @@
     "clean-git-ref": "^2.0.1",
     "crc-32": "^1.2.0",
     "diff3": "0.0.3",
-    "git-apply-delta": "0.0.7",
     "ignore": "^5.1.4",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
@@ -76,11 +75,11 @@
     "@types/jest": "24.0.18",
     "@types/node": "12.7.2",
     "agadoo": "2.0.0",
-    "all-contributors-cli": "6.9.1",
+    "all-contributors-cli": "6.20.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.6",
     "browserfs": "2.0.0",
-    "bundlewatch": "0.2.5",
+    "bundlewatch": "0.2.7",
     "cross-env": "6.0.0",
     "decompress": "^4.2.0",
     "diff-lines": "1.1.1",
@@ -141,7 +140,12 @@
         "path": "./index.umd.min.js",
         "maxSize": "100kb"
       }
-    ]
+    ],
+    "ci": {
+      "trackBranches": [
+        "main"
+      ]
+    }
   },
   "collective": {
     "type": "opencollective",

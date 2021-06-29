@@ -33,6 +33,10 @@
         "title": "branch",
         "sidebar_label": "branch"
       },
+      "cache": {
+        "title": "The `cache` parameter",
+        "sidebar_label": "cache"
+      },
       "checkout": {
         "title": "checkout",
         "sidebar_label": "checkout"
@@ -255,6 +259,10 @@
       "removeNote": {
         "title": "removeNote",
         "sidebar_label": "removeNote"
+      },
+      "renameBranch": {
+        "title": "renameBranch",
+        "sidebar_label": "renameBranch"
       },
       "resetIndex": {
         "title": "resetIndex",
@@ -723,6 +731,10 @@
         "title": "branch",
         "sidebar_label": "branch"
       },
+      "version-1.x/version-1.x-cache": {
+        "title": "The `cache` parameter",
+        "sidebar_label": "cache"
+      },
       "version-1.x/version-1.x-checkout": {
         "title": "checkout",
         "sidebar_label": "checkout"
@@ -966,6 +978,10 @@
       "version-1.x/version-1.x-removeNote": {
         "title": "removeNote",
         "sidebar_label": "removeNote"
+      },
+      "version-1.x/version-1.x-renameBranch": {
+        "title": "renameBranch",
+        "sidebar_label": "renameBranch"
       },
       "version-1.x/version-1.x-resetIndex": {
         "title": "resetIndex",

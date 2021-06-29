@@ -445,6 +445,43 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "willstott101",
+      "name": "Will Stott",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/335152?v=4",
+      "profile": "https://github.com/willstott101",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "snickell",
+      "name": "Seth Nickell",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/223277?v=4",
+      "profile": "http://mtnspring.org/",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "alex-titarenko",
+      "name": "Alex Titarenko",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/3290313?v=4",
+      "profile": "https://www.alextitarenko.me/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Ry0taK",
+      "name": "RyotaK",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49341894?v=4",
+      "profile": "https://ryotak.me/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"

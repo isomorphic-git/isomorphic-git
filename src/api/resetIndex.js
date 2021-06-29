@@ -18,6 +18,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to reset in the index
  * @param {string} [args.ref = 'HEAD'] - A ref to the commit to use
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
@@ -32,6 +33,7 @@ export async function resetIndex({
   gitdir = join(dir, '.git'),
   filepath,
   ref = 'HEAD',
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -40,7 +42,6 @@ export async function resetIndex({
     assertParameter('ref', ref)
 
     const fs = new FileSystem(_fs)
-    const cache = {}
     // Resolve commit
     let oid = await GitRefManager.resolve({ fs, gitdir, ref })
     let workdirOid
@@ -48,6 +49,7 @@ export async function resetIndex({
       // Resolve blob
       oid = await resolveFilepath({
         fs,
+        cache,
         gitdir,
         oid,
         filepath,

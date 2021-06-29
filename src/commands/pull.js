@@ -77,6 +77,7 @@ export async function _pull({
 
     const { fetchHead, fetchHeadDescription } = await _fetch({
       fs,
+      cache,
       http,
       onProgress,
       onMessage,

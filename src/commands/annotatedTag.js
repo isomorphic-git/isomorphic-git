@@ -12,6 +12,7 @@ import { _writeObject as writeObject } from '../storage/writeObject.js'
  *
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {SignCallback} [args.onSign]
  * @param {string} args.gitdir
  * @param {string} args.ref
@@ -43,6 +44,7 @@ import { _writeObject as writeObject } from '../storage/writeObject.js'
  */
 export async function _annotatedTag({
   fs,
+  cache,
   onSign,
   gitdir,
   ref,
@@ -66,7 +68,7 @@ export async function _annotatedTag({
     ref: object || 'HEAD',
   })
 
-  const { type } = await readObject({ fs, gitdir, oid })
+  const { type } = await readObject({ fs, cache, gitdir, oid })
   let tagObject = GitAnnotatedTag.from({
     object: oid,
     type,

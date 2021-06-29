@@ -88,6 +88,7 @@ export async function _merge({
   // find most recent common ancestor of ref a and ref b
   const baseOids = await _findMergeBase({
     fs,
+    cache,
     gitdir,
     oids: [ourOid, theirOid],
   })
@@ -118,6 +119,7 @@ export async function _merge({
     // try a fancier merge
     const tree = await mergeTree({
       fs,
+      cache,
       gitdir,
       ourOid,
       theirOid,

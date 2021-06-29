@@ -15,6 +15,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the .pack file to index
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<{oids: string[]}>} Resolves with a list of the SHA-1 object ids contained in the packfile
  *
@@ -40,6 +41,7 @@ export async function indexPack({
   dir,
   gitdir = join(dir, '.git'),
   filepath,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -49,6 +51,7 @@ export async function indexPack({
 
     return await _indexPack({
       fs: new FileSystem(fs),
+      cache,
       onProgress,
       dir,
       gitdir,

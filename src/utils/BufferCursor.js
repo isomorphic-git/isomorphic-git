@@ -36,6 +36,12 @@ export class BufferCursor {
     return r
   }
 
+  copy(source, start, end) {
+    const r = source.copy(this.buffer, this._start, start, end)
+    this._start += r
+    return r
+  }
+
   readUInt8() {
     const r = this.buffer.readUInt8(this._start)
     this._start += 1

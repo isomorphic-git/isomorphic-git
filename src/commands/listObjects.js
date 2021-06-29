@@ -7,6 +7,7 @@ import { join } from '../utils/join.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} [args.dir]
  * @param {string} args.gitdir
  * @param {Iterable<string>} args.oids
@@ -14,6 +15,7 @@ import { join } from '../utils/join.js'
  */
 export async function listObjects({
   fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
   oids,
@@ -25,7 +27,7 @@ export async function listObjects({
   async function walk(oid) {
     if (visited.has(oid)) return
     visited.add(oid)
-    const { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, cache, gitdir, oid })
     if (type === 'tag') {
       const tag = GitAnnotatedTag.from(object)
       const obj = tag.headers().object
@@ -37,8 +39,9 @@ export async function listObjects({
     } else if (type === 'tree') {
       const tree = GitTree.from(object)
       for (const entry of tree) {
-        // add blobs and submodules to the visited set
-        if (entry.type === 'blob' || entry.type === 'commit') {
+        // add blobs to the set
+        // skip over submodules whose type is 'commit'
+        if (entry.type === 'blob') {
           visited.add(entry.oid)
         }
         // recurse for trees

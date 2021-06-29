@@ -25,6 +25,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {HttpClient} args.http
  * @param {ProgressCallback} [args.onProgress]
  * @param {MessageCallback} [args.onMessage]
@@ -45,6 +46,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  */
 export async function _push({
   fs,
+  cache,
   http,
   onProgress,
   onMessage,
@@ -107,6 +109,7 @@ export async function _push({
     service: 'git-receive-pack',
     url,
     headers,
+    protocolVersion: 1,
   })
   const auth = httpRemote.auth // hack to get new credentials from CredentialManager API
   let fullRemoteRef
@@ -147,12 +150,13 @@ export async function _push({
       // trick to speed up common force push scenarios
       const mergebase = await _findMergeBase({
         fs,
+        cache,
         gitdir,
         oids: [oid, oldoid],
       })
       for (const oid of mergebase) finish.push(oid)
       if (thinPack) {
-        skipObjects = await listObjects({ fs, gitdir, oids: mergebase })
+        skipObjects = await listObjects({ fs, cache, gitdir, oids: mergebase })
       }
     }
 
@@ -160,11 +164,12 @@ export async function _push({
     if (!finish.includes(oid)) {
       const commits = await listCommitsAndTags({
         fs,
+        cache,
         gitdir,
         start: [oid],
         finish,
       })
-      objects = await listObjects({ fs, gitdir, oids: commits })
+      objects = await listObjects({ fs, cache, gitdir, oids: commits })
     }
 
     if (thinPack) {
@@ -186,7 +191,7 @@ export async function _push({
           map: httpRemote.refs,
         })
         const oids = [oid]
-        for (const oid of await listObjects({ fs, gitdir, oids })) {
+        for (const oid of await listObjects({ fs, cache, gitdir, oids })) {
           skipObjects.add(oid)
         }
       } catch (e) {}
@@ -209,7 +214,14 @@ export async function _push({
       if (
         oid !== '0000000000000000000000000000000000000000' &&
         oldoid !== '0000000000000000000000000000000000000000' &&
-        !(await _isDescendent({ fs, gitdir, oid, ancestor: oldoid, depth: -1 }))
+        !(await _isDescendent({
+          fs,
+          cache,
+          gitdir,
+          oid,
+          ancestor: oldoid,
+          depth: -1,
+        }))
       ) {
         throw new PushRejectedError('not-fast-forward')
       }
@@ -229,6 +241,7 @@ export async function _push({
     ? []
     : await _pack({
         fs,
+        cache,
         gitdir,
         oids: [...objects],
       })

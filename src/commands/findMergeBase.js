@@ -5,11 +5,12 @@ import { _readObject as readObject } from '../storage/readObject.js'
 /**
  * @param {object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} args.gitdir
  * @param {string[]} args.oids
  *
  */
-export async function _findMergeBase({ fs, gitdir, oids }) {
+export async function _findMergeBase({ fs, cache, gitdir, oids }) {
   // Note: right now, the tests are geared so that the output should match that of
   // `git merge-base --all --octopus`
   // because without the --octopus flag, git's output seems to depend on the ORDER of the oids,
@@ -39,7 +40,7 @@ export async function _findMergeBase({ fs, gitdir, oids }) {
     const newheads = new Map()
     for (const { oid, index } of heads) {
       try {
-        const { object } = await readObject({ fs, gitdir, oid })
+        const { object } = await readObject({ fs, cache, gitdir, oid })
         const commit = GitCommit.from(object)
         const { parent } = commit.parseHeaders()
         for (const oid of parent) {
