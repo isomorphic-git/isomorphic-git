@@ -121,6 +121,9 @@ export async function mergeTree({
     reduce: async (parent, children) => {
       const entries = children.filter(Boolean) // remove undefineds
 
+      // if the parent was deleted, the children have to go
+      if (!parent) return
+
       // automatically delete directories if they have been emptied
       if (parent && parent.type === 'tree' && entries.length === 0) return
 
