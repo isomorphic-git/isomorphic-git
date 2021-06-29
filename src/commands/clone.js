@@ -106,9 +106,11 @@ export async function _clone({
     try {
       await fs.rmdir(gitdir)
     } catch (err) {
-      // ignore this error, we are already failing
+      // Ignore this error, we are already failing.
+      // This try-catch is necessary so the original error is
+      // not masked by potential errors in `fs.rmdir()`.
     }
-    // re-throw
+
     throw err
   }
 }
