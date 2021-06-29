@@ -6,6 +6,7 @@ import { _checkout } from '../commands/checkout.js'
 import { _fetch } from '../commands/fetch.js'
 import { _init } from '../commands/init.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { deleteRecursively } from '../utils/deleteRecursively.js'
 
 /**
  * @param {object} args
@@ -104,11 +105,11 @@ export async function _clone({
   } catch (err) {
     // Remove partial local repository, see #1283
     try {
-      await fs.rmdir(gitdir)
+      await deleteRecursively({ fs, dirname: gitdir })
     } catch (err) {
       // Ignore this error, we are already failing.
       // This try-catch is necessary so the original error is
-      // not masked by potential errors in `fs.rmdir()`.
+      // not masked by potential errors in deleteRecursively.
     }
 
     throw err
