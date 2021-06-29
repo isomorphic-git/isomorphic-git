@@ -22,6 +22,8 @@ async function browserDeflate(buffer) {
 function testCompressionStream() {
   try {
     const cs = new CompressionStream('deflate')
+    // Test if `Blob.stream` is present. React Native does not have the `stream` method
+    new Blob([]).stream()
     if (cs) return true
   } catch (_) {
     // no bother

@@ -237,7 +237,7 @@ Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions
 ## Who is using isomorphic-git?
 
 - [nde](https://nde.now.sh) - a futuristic next-generation web IDE
-- [git-app-manager](https://git-app-manager-tcibxepsta.now.sh) - install "unhosted" websites locally by git cloning them
+- [git-app-manager](https://git-app-manager.now.sh/) - install "unhosted" websites locally by git cloning them
 - [GIT Web Terminal](https://jcubic.github.io/git/)
 - [Next Editor](https://next-editor.app/)
 - [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git)
