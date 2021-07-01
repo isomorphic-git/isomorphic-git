@@ -9,7 +9,7 @@ import { join } from '../utils/join.js'
 /**
  * @callback WalkerMap
  * @param {string} filename
- * @param {(?WalkerEntry)[]} entries
+ * @param {Array<WalkerEntry | null>} entries
  * @returns {Promise<any>}
  */
 
