@@ -17,8 +17,8 @@ import { join } from '../utils/join.js'
  * @param {string} [args.ref = 'HEAD'] - The commit to begin walking backwards through the history from
  * @param {number} [args.depth] - Limit the number of commits returned. No limit by default.
  * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
- * @param {boolean=} args.force do not throw error if filepath is not exist (works only for a single file). defaults to false
- * @param {boolean=} args.follow Continue listing the history of a file beyond renames (works only for a single file). defaults to false
+ * @param {boolean} [args.force=false] do not throw error if filepath is not exist (works only for a single file). defaults to false
+ * @param {boolean} [args.follow=false] Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
