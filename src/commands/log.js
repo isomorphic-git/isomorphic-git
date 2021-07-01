@@ -57,7 +57,7 @@ export async function _log({
   let lastCommit
   let isOk
 
-  while (true) {
+  while (tips.length > 0) {
     const commit = tips.pop()
 
     // Stop the log if we've hit the age limit
@@ -160,7 +160,6 @@ export async function _log({
     // Stop the loop if there are no more commit parents
     if (tips.length === 0) {
       endCommit(commit)
-      break
     }
 
     // Process tips in order by age
