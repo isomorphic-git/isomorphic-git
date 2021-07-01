@@ -480,7 +480,7 @@
       "profile": "https://scrapbox.io/mkizka/README",
       "contributions": [
         "code"
-      ],
+      ]
     },
     {
       "login": "Ry0taK",
@@ -489,6 +489,16 @@
       "profile": "https://ryotak.me/",
       "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "strangedev",
+      "name": "Noah Hummel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3045979?v=4",
+      "profile": "https://github.com/strangedev",
+      "contributions": [
+        "code",
+        "test"
       ]
     }
   ],
