@@ -19,8 +19,8 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {string=} args.filepath optional get the commit for the filepath only
  * @param {string} args.ref
  * @param {number|void} args.depth
- * @param {Date|void} args.since
- * @param {boolean=} args.force do not throw error if filepath is not exist (works only for a single file). defaults to false
+ * @param {boolean=} [args.force=false] do not throw error if filepath is not exist (works only for a single file). defaults to false
+ * @param {boolean=} [args.follow=false] Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  * @param {boolean=} args.follow Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  *
  * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
