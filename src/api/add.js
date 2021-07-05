@@ -8,6 +8,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
+import { posixifyPathBuffer } from '../utils/posixifyPathBuffer.js'
 
 /**
  * Add a file to the git index (aka staging area)
@@ -17,6 +18,7 @@ import { join } from '../utils/join.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to add to the index
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
@@ -31,6 +33,7 @@ export async function add({
   dir,
   gitdir = join(dir, '.git'),
   filepath,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -39,7 +42,6 @@ export async function add({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
-    const cache = {}
     await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
       await addToIndex({ dir, gitdir, fs, filepath, index })
     })
@@ -68,7 +70,7 @@ async function addToIndex({ dir, gitdir, fs, filepath, index }) {
     await Promise.all(promises)
   } else {
     const object = stats.isSymbolicLink()
-      ? await fs.readlink(join(dir, filepath))
+      ? await fs.readlink(join(dir, filepath)).then(posixifyPathBuffer)
       : await fs.read(join(dir, filepath))
     if (object === null) throw new NotFoundError(filepath)
     const oid = await _writeObject({ fs, gitdir, type: 'blob', object })

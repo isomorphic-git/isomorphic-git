@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function listener () {
   let $button = document.getElementById('giturl_button')
   const change = async function change (event) {
     let value = $input.value
-    value = value.replace(/^https?:\/\//, '')
     if (!value.endsWith('.git')) value += '.git'
     let info = await git.getRemoteInfo({
       http,

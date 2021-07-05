@@ -13,6 +13,7 @@ List all the files in the git index or a commit
 | dir            | string                     | The [working tree](dir-vs-gitdir.md) directory path                                                                      |
 | **gitdir**     | string = join(dir,'.git')  | The [git directory](dir-vs-gitdir.md) path                                                                               |
 | ref            | string                     | Return a list of all the files in the commit at `ref` instead of the files currently in the git index (aka staging area) |
+| cache          | object                     | a [cache](cache.md) object                                                                                               |
 | return         | Promise\<Array\<string\>\> | Resolves successfully with an array of filepaths                                                                         |
 
 > Note: This function is efficient for listing the files in the staging area, but listing all the files in a commit requires recursively walking through the git object store.

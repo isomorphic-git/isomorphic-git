@@ -16,6 +16,7 @@ A powerful recursive tree-walking utility.
 | map            | WalkerMap                 | Transform `WalkerEntry`s into a result form                      |
 | reduce         | WalkerReduce              | Control how mapped entries are combined with their parent result |
 | iterate        | WalkerIterate             | Fine-tune how entries within a tree are iterated over            |
+| cache          | object                    | a [cache](cache.md) object                                       |
 | return         | Promise\<any\>            | The finished tree-walking result                                 |
 
 The `walk` API simplifies gathering detailed information about a tree or comparing all the filepaths in two or more trees.

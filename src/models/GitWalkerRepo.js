@@ -8,9 +8,9 @@ import { normalizeMode } from '../utils/normalizeMode.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
 export class GitWalkerRepo {
-  constructor({ fs, gitdir, ref }) {
+  constructor({ fs, gitdir, ref, cache }) {
     this.fs = fs
-    this.cache = {}
+    this.cache = cache
     this.gitdir = gitdir
     this.mapPromise = (async () => {
       const map = new Map()

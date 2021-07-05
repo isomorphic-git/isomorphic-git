@@ -15,6 +15,7 @@ Check whether a git commit is descended from another
 | **oid**        | string                    | The descendent commit                                                |
 | **ancestor**   | string                    | The (proposed) ancestor commit                                       |
 | depth          | number = -1               | Maximum depth to search before giving up. -1 means no maximum depth. |
+| cache          | object                    | a [cache](cache.md) object                                           |
 | return         | Promise\<boolean\>        | Resolves to true if `oid` is a descendent of `ancestor`              |
 
 Example Code:

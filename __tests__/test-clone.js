@@ -172,4 +172,24 @@ describe('clone', () => {
       `'gitdir/refs/heads/master' does not exist`
     )
   })
+
+  it('removes the gitdir when clone fails', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    const url = `foobar://github.com/isomorphic-git/isomorphic-git`
+    try {
+      await clone({
+        fs,
+        http,
+        dir,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        ref: 'test-tag',
+        url,
+      })
+    } catch (err) {
+      // Intentionally left blank.
+    }
+    expect(await fs.exists(gitdir)).toBe(false, `'gitdir' does not exist`)
+  })
 })

@@ -13,6 +13,7 @@ Remove a file from the git index (aka staging area)
 | dir            | string                     | The [working tree](dir-vs-gitdir.md) directory path       |
 | **gitdir**     | string = join(dir, '.git') | The [git directory](dir-vs-gitdir.md) path                |
 | **filepath**   | string                     | The path to the file to remove from the index             |
+| cache          | object                     | a [cache](cache.md) object                                |
 | return         | Promise\<void\>            | Resolves successfully once the git index has been updated |
 
 Note that this does NOT delete the file in the working directory.

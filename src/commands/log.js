@@ -2,9 +2,12 @@
 import '../typedefs.js'
 
 import { _readCommit } from '../commands/readCommit.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { compareAge } from '../utils/compareAge.js'
+import { resolveFileIdInTree } from '../utils/resolveFileIdInTree.js'
+import { resolveFilepath } from '../utils/resolveFilepath.js'
 
 /**
  * Get commit descriptions from the git history
@@ -13,13 +16,33 @@ import { compareAge } from '../utils/compareAge.js'
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {any} args.cache
  * @param {string} args.gitdir
+ * @param {string=} args.filepath optional get the commit for the filepath only
  * @param {string} args.ref
  * @param {number|void} args.depth
- * @param {Date|void} args.since
+ * @param {boolean=} [args.force=false] do not throw error if filepath is not exist (works only for a single file). defaults to false
+ * @param {boolean=} [args.follow=false] Continue listing the history of a file beyond renames (works only for a single file). defaults to false
+ * @param {boolean=} args.follow Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  *
- * @returns {Promise<Array<ReadCommitResult>>}
+ * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
+ * @see ReadCommitResult
+ * @see CommitObject
+ *
+ * @example
+ * let commits = await git.log({ dir: '$input((/))', depth: $input((5)), ref: '$input((master))' })
+ * console.log(commits)
+ *
  */
-export async function _log({ fs, cache, gitdir, ref, depth, since }) {
+export async function _log({
+  fs,
+  cache,
+  gitdir,
+  filepath,
+  ref,
+  depth,
+  since,
+  force,
+  follow,
+}) {
   const sinceTimestamp =
     typeof since === 'undefined'
       ? undefined
@@ -30,8 +53,11 @@ export async function _log({ fs, cache, gitdir, ref, depth, since }) {
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const tips = [await _readCommit({ fs, cache, gitdir, oid })]
+  let lastFileOid
+  let lastCommit
+  let isOk
 
-  while (true) {
+  while (tips.length > 0) {
     const commit = tips.pop()
 
     // Stop the log if we've hit the age limit
@@ -42,10 +68,82 @@ export async function _log({ fs, cache, gitdir, ref, depth, since }) {
       break
     }
 
-    commits.push(commit)
+    if (filepath) {
+      let vFileOid
+      try {
+        vFileOid = await resolveFilepath({
+          fs,
+          cache,
+          gitdir,
+          oid: commit.commit.tree,
+          filepath,
+        })
+        if (lastCommit && lastFileOid !== vFileOid) {
+          commits.push(lastCommit)
+        }
+        lastFileOid = vFileOid
+        lastCommit = commit
+        isOk = true
+      } catch (e) {
+        if (e instanceof NotFoundError) {
+          let found = follow && lastFileOid
+          if (found) {
+            found = await resolveFileIdInTree({
+              fs,
+              cache,
+              gitdir,
+              oid: commit.commit.tree,
+              fileId: lastFileOid,
+            })
+            if (found) {
+              if (Array.isArray(found)) {
+                if (lastCommit) {
+                  const lastFound = await resolveFileIdInTree({
+                    fs,
+                    cache,
+                    gitdir,
+                    oid: lastCommit.commit.tree,
+                    fileId: lastFileOid,
+                  })
+                  if (Array.isArray(lastFound)) {
+                    found = found.filter(p => lastFound.indexOf(p) === -1)
+                    if (found.length === 1) {
+                      found = found[0]
+                      filepath = found
+                      if (lastCommit) commits.push(lastCommit)
+                    } else {
+                      found = false
+                      if (lastCommit) commits.push(lastCommit)
+                      break
+                    }
+                  }
+                }
+              } else {
+                filepath = found
+                if (lastCommit) commits.push(lastCommit)
+              }
+            }
+          }
+          if (!found) {
+            if (!force && !follow) throw e
+            if (isOk && lastFileOid) {
+              commits.push(lastCommit)
+              // break
+            }
+          }
+          lastCommit = commit
+          isOk = false
+        } else throw e
+      }
+    } else {
+      commits.push(commit)
+    }
 
     // Stop the loop if we have enough commits now.
-    if (depth !== undefined && commits.length === depth) break
+    if (depth !== undefined && commits.length === depth) {
+      endCommit(commit)
+      break
+    }
 
     // If this is not a shallow commit...
     if (!shallowCommits.has(commit.oid)) {
@@ -60,10 +158,16 @@ export async function _log({ fs, cache, gitdir, ref, depth, since }) {
     }
 
     // Stop the loop if there are no more commit parents
-    if (tips.length === 0) break
+    if (tips.length === 0) {
+      endCommit(commit)
+    }
 
     // Process tips in order by age
     tips.sort((a, b) => compareAge(a.commit, b.commit))
   }
   return commits
+
+  function endCommit(commit) {
+    if (isOk && filepath) commits.push(commit)
+  }
 }

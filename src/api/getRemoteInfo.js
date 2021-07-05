@@ -9,6 +9,7 @@ import { assertParameter } from '../utils/assertParameter.js'
  * @typedef {Object} GetRemoteInfoResult - The object returned has the following schema:
  * @property {string[]} capabilities - The list of capabilities returned by the server (part of the Git protocol)
  * @property {Object} [refs]
+ * @property {string} [HEAD] - The default branch of the remote
  * @property {Object<string, string>} [refs.heads] - The branches on the remote
  * @property {Object<string, string>} [refs.pull] - The special branches representing pull requests (non-standard)
  * @property {Object<string, string>} [refs.tags] - The tags on the remote

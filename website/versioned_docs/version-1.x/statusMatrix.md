@@ -15,6 +15,7 @@ Efficiently get the status of multiple files at once.
 | ref            | string = 'HEAD'               | Optionally specify a different commit to compare against the workdir and stage instead of the HEAD |
 | filepaths      | Array\<string\> = ['.']       | Limit the query to the given files and directories                                                 |
 | filter         | function(string): boolean     | Filter the results to only those whose filepath matches a function.                                |
+| cache          | object                        | a [cache](cache.md) object                                                                         |
 | return         | Promise\<Array\<StatusRow\>\> | Resolves with a status matrix, described below.                                                    |
 
 ```ts

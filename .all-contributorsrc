@@ -418,6 +418,17 @@
       ]
     },
     {
+      "login": "snowyu",
+      "name": "Riceball LEE",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/327887?v=4",
+      "profile": "https://github.com/snowyu",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
       "login": "linonetwo",
       "name": "lin onetwo",
       "avatar_url": "https://avatars1.githubusercontent.com/u/3746270?v=4",
@@ -455,12 +466,59 @@
       ]
     },
     {
-      "login": "snowyu",
-      "name": "Riceball LEE",
-      "avatar_url": "https://avatars1.githubusercontent.com/u/327887?v=4",
-      "profile": "https://github.com/snowyu",
+      "login": "alex-titarenko",
+      "name": "Alex Titarenko",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/3290313?v=4",
+      "profile": "https://www.alextitarenko.me/",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "mmkal",
+      "name": "Misha Kaletsky",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/15040698?v=4",
+      "profile": "https://github.com/mmkal",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rczulch",
+      "name": "Richard C. Zulch",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/54646976?v=4",
+      "profile": "https://github.com/rczulch",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "mkizka",
+      "name": "mkizka",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30231179?v=4",
+      "profile": "https://scrapbox.io/mkizka/README",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Ry0taK",
+      "name": "RyotaK",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49341894?v=4",
+      "profile": "https://ryotak.me/",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "strangedev",
+      "name": "Noah Hummel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3045979?v=4",
+      "profile": "https://github.com/strangedev",
+      "contributions": [
+        "code",
+        "test"
       ]
     }
   ],
