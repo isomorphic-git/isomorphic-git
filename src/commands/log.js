@@ -57,6 +57,10 @@ export async function _log({
   let lastCommit
   let isOk
 
+  function endCommit(commit) {
+    if (isOk && filepath) commits.push(commit)
+  }
+
   while (tips.length > 0) {
     const commit = tips.pop()
 
@@ -166,8 +170,4 @@ export async function _log({
     tips.sort((a, b) => compareAge(a.commit, b.commit))
   }
   return commits
-
-  function endCommit(commit) {
-    if (isOk && filepath) commits.push(commit)
-  }
 }
