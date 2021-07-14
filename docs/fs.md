@@ -87,6 +87,7 @@ A "callback" `fs` object must implement the following subset of node's `fs` modu
   - [fs.readlink(path[, options], callback)](https://nodejs.org/api/fs.html#fs_fs_readlink_path_options_callback) (optional [¹](#footnote-1))
   - [fs.symlink(target, path[, type], callback)](https://nodejs.org/api/fs.html#fs_fs_symlink_target_path_type_callback) (optional [¹](#footnote-1))
   - [fs.chmod(path, mode, callback)](https://nodejs.org/api/fs.html#fs_fs_chmod_path_mode_callback) (optional [²](#footnote-2))
+  - [fs.rm(path[, options], callback)](https://nodejs.org/api/fs.html#fs_fs_rm_path_options_callback) (optional [³](#footnote-3))
 
 Internally, `isomorphic-git` wraps the provided "callback" API functions using [`pify`](https://www.npmjs.com/package/pify).
 
@@ -110,9 +111,12 @@ A "promise" `fs` object must implement the same set functions as a "callback" im
   - [fs.promises.readlink(path[, options])](https://nodejs.org/api/fs.html#fs_fspromises_readlink_path_options) (optional [¹](#footnote-1))
   - [fs.promises.symlink(target, path[, type])](https://nodejs.org/api/fs.html#fs_fspromises_symlink_target_path_type) (optional [¹](#footnote-1))
   - [fs.promises.chmod(path, mode)](https://nodejs.org/api/fs.html#fs_fspromises_chmod_path_mode) (optional [²](#footnote-2))
+  - [fs.promises.rm(path[, options])](https://nodejs.org/api/fs.html#fs_fspromises_rm_path_options) (optional [³](#footnote-3))
 
 ---
 
 <a id="footnote-1">¹</a> `readlink` and `symlink` are only needed to work with git repos that contain symlinks.
 
 <a id="footnote-2">²</a> Right now, isomorphic-git rewrites the file if it needs to change its mode. In the future, if `chmod` is available it will use that.
+
+<a id="footnote-3">³</a> Only called with `recursive: true` option. A fallback implementation is provided if not implemented.
