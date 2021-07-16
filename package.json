@@ -71,7 +71,7 @@
     "@isomorphic-git/cors-proxy": "2.7.0",
     "@isomorphic-git/lightning-fs": "^3.3.0",
     "@isomorphic-git/pgp-plugin": "0.0.7",
-    "@semantic-release/exec": "3.3.6",
+    "@semantic-release/exec": "5.0.0",
     "@types/jest": "24.0.18",
     "@types/node": "12.7.2",
     "@wmhilton/jest-fixtures": "0.6.1",
