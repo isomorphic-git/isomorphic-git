@@ -31,7 +31,7 @@ export async function listpack(stream, onData) {
     const inflator = new pako.Inflate()
     while (!inflator.result) {
       const chunk = await reader.chunk()
-      if (reader.ended) break
+      if (!chunk) break
       inflator.push(chunk, false)
       if (inflator.err) {
         throw new InternalError(`Pako error: ${inflator.msg}`)
