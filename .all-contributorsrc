@@ -520,6 +520,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "mtlewis",
+      "name": "Mike Lewis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/542836?v=4",
+      "profile": "https://github.com/mtlewis",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "commitConvention": "angular"
