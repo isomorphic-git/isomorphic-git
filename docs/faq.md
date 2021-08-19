@@ -126,24 +126,36 @@ I'll reconsider the matter once Node.js figures out how it is dealing with mixed
 But for now I think having a `default` export causes more harm than good - since the only good it does is save typing "`* as `" as far as I can tell.
 But that is a VERY good question and one I spent a long time trying to figure out when I was researching how to design the module, and I remember being very disappointed at first when I discovered that `default` exports destroy tree-shaking.
 
-## How to add all untracked files with git.add? 
+## How to add all files based on a glob pattern with git.add?
 
-> I'm looking for a way init a git repo, add all existing files, and commit them, while if I understand correctly, the git.add function needs me to give all of the files explicitly.
-> 
-> Is there a way that I can add all of the files in one or two command?
+> I want to add multiple files based on a pattern. How can I do this?
 
 _Answer by Will Hilton (@wmhilton):_
 
 TLDR:
 ```js
 const globby = require('globby');
-const paths = await globby(['./**', './**/.*'], { gitignore: true });
+// Add all .js files using the pattern "**/*.js" - adjust the
+// pattern to suit your needs!
+const paths = await globby(['**/*.js'], { gitignore: true });
 for (const filepath of paths) {
     await git.add({ fs, dir, filepath });
 }
 ```
 
 Long answer including a browser solution by @jcubic: [#187](https://github.com/isomorphic-git/isomorphic-git/issues/187)
+
+## How to add all untracked files with git.add?
+
+> I want to add all the files in a repository. How can I do this?
+
+_Answer by @mtlewis:_
+
+If you want to add all the files in a repo, you can use the code below. The `dir` parameter should be set to the repository directory. Patterns in .gitignore will be respected, so ignored files should not be added by this command.
+
+```js
+await git.add({ fs, dir, filepath: '.' });
+```
 
 ## How to make a shallow repository unshallow?
 
