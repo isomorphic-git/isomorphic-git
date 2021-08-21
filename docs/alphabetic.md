@@ -31,6 +31,7 @@ sidebar_label: Alphabetical Index
 - [indexPack](indexPack)
 - [init](init)
 - [isDescendent](isDescendent)
+- [isIgnored](isIgnored)
 - [listBranches](listBranches)
 - [listFiles](listFiles)
 - [listNotes](listNotes)

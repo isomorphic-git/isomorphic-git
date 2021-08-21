@@ -33,6 +33,7 @@ original_id: alphabetic
 - [indexPack](indexPack)
 - [init](init)
 - [isDescendent](isDescendent)
+- [isIgnored](isIgnored)
 - [listBranches](listBranches)
 - [listFiles](listFiles)
 - [listNotes](listNotes)

@@ -50,7 +50,8 @@
       "add",
       "remove",
       "listFiles",
-      "status"
+      "status",
+      "isIgnored"
     ],
     "Notes": [
       "addNote",
