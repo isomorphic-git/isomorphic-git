@@ -38,6 +38,7 @@ describe('exports', () => {
         "indexPack",
         "init",
         "isDescendent",
+        "isIgnored",
         "listBranches",
         "listFiles",
         "listNotes",

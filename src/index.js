@@ -30,6 +30,7 @@ import { hashBlob } from './api/hashBlob.js'
 import { indexPack } from './api/indexPack.js'
 import { init } from './api/init.js'
 import { isDescendent } from './api/isDescendent.js'
+import { isIgnored } from './api/isIgnored.js'
 import { listBranches } from './api/listBranches.js'
 import { listFiles } from './api/listFiles.js'
 import { listNotes } from './api/listNotes.js'
@@ -100,6 +101,7 @@ export {
   indexPack,
   init,
   isDescendent,
+  isIgnored,
   listBranches,
   listFiles,
   listNotes,
@@ -169,6 +171,7 @@ export default {
   indexPack,
   init,
   isDescendent,
+  isIgnored,
   listBranches,
   listFiles,
   listNotes,

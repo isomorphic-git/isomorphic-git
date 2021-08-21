@@ -50,7 +50,8 @@
       "version-1.x-add",
       "version-1.x-remove",
       "version-1.x-listFiles",
-      "version-1.x-status"
+      "version-1.x-status",
+      "version-1.x-isIgnored"
     ],
     "Notes": [
       "version-1.x-addNote",
