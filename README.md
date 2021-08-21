@@ -168,6 +168,7 @@ unless there is a major version bump.
 - [indexPack](https://isomorphic-git.github.io/docs/indexPack.html)
 - [init](https://isomorphic-git.github.io/docs/init.html)
 - [isDescendent](https://isomorphic-git.github.io/docs/isDescendent.html)
+- [isIgnored](https://isomorphic-git.github.io/docs/isIgnored.html)
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
 - [listNotes](https://isomorphic-git.github.io/docs/listNotes.html)
