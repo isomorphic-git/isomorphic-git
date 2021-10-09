@@ -124,7 +124,7 @@ export class GitConfig {
   constructor(text) {
     let section = null
     let subsection = null
-    this.parsedConfig = text.split('\n').map(line => {
+    this.parsedConfig = (text || '').split('\n').map(line => {
       let name = null
       let value = null
 
