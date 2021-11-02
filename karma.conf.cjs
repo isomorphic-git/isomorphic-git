@@ -10,7 +10,7 @@ const ISSUE =
   process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
 const COMMIT = process.env.BUILD_SOURCEVERSION
 
-module.exports = function(config) {
+module.exports = function (config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher

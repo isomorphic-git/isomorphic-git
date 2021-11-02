@@ -8,7 +8,7 @@ var symLinks = {}
 
 function rdSync(dpath, tree, name) {
   var files = fs.readdirSync(dpath)
-  files.forEach(function(file) {
+  files.forEach(function (file) {
     var fpath = dpath + '/' + file
     try {
       // Avoid infinite loops.
