@@ -1,4 +1,5 @@
 const { FileSystem } = require('isomorphic-git/internal-apis')
+
 const pify = require('pify')
 
 let browserFS = null

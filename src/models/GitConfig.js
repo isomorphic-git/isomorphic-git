@@ -203,11 +203,7 @@ export class GitConfig {
           this.parsedConfig[configIndex] = modifiedConfig
         }
       } else {
-        const sectionPath = path
-          .split('.')
-          .slice(0, -1)
-          .join('.')
-          .toLowerCase()
+        const sectionPath = path.split('.').slice(0, -1).join('.').toLowerCase()
         const sectionIndex = this.parsedConfig.findIndex(
           config => config.path === sectionPath
         )

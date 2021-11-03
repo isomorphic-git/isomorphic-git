@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const { pgp } = require('@isomorphic-git/pgp-plugin')
 const { log } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+
+const { pgp } = require('@isomorphic-git/pgp-plugin')
 
 describe('log', () => {
   it('HEAD', async () => {

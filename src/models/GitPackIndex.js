@@ -1,5 +1,3 @@
-import crc32 from 'crc-32'
-
 import { InternalError } from '../errors/InternalError.js'
 import { GitObject } from '../models/GitObject'
 import { BufferCursor } from '../utils/BufferCursor.js'
@@ -7,6 +5,8 @@ import { applyDelta } from '../utils/applyDelta.js'
 import { listpack } from '../utils/git-list-pack.js'
 import { inflate } from '../utils/inflate.js'
 import { shasum } from '../utils/shasum.js'
+
+import crc32 from 'crc-32'
 
 function decodeVarInt(reader) {
   const bytes = []

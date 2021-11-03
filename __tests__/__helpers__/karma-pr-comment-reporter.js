@@ -8,7 +8,7 @@ let commit =
   process.env.BUILD_SOURCEVERSION
 commit = commit ? ` for ${commit}` : ''
 
-const CommentReporter = function(
+const CommentReporter = function (
   baseReporterDecorator,
   config,
   logger,
@@ -22,11 +22,11 @@ const CommentReporter = function(
   this.startTimesByBrowser = {}
   this.longestTests = []
 
-  this.onBrowserStart = function(browser) {
+  this.onBrowserStart = function (browser) {
     this.errorsByBrowser[browser.name] = []
     this.startTimesByBrowser[browser.name] = Date.now()
   }
-  this.specSuccess = function(browser, result) {
+  this.specSuccess = function (browser, result) {
     const maxShow = 10
     if (
       this.longestTests.length === 0 ||
@@ -39,10 +39,10 @@ const CommentReporter = function(
       this.longestTests.sort((a, b) => b.result.time - a.result.time)
     }
   }
-  this.specFailure = function(browser, result) {
+  this.specFailure = function (browser, result) {
     this.errorsByBrowser[browser.name].push(testNameFormatter(result))
   }
-  this.onBrowserComplete = function(browser) {
+  this.onBrowserComplete = function (browser) {
     const results = browser.lastResult
     this.rows.push([
       browser.name,
@@ -53,7 +53,7 @@ const CommentReporter = function(
       results.disconnected,
     ])
   }
-  this.onRunComplete = function() {
+  this.onRunComplete = function () {
     // Sort browsers alphabetically
     this.rows.sort((a, b) => (a[0] === b[0] ? 0 : a[0] > b[0] ? 1 : -1))
     postComment(

@@ -42,7 +42,9 @@ export async function add({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function (
+      index
+    ) {
       await addToIndex({ dir, gitdir, fs, filepath, index })
     })
   } catch (err) {

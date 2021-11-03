@@ -130,13 +130,15 @@ export async function _checkout({
 
     let count = 0
     const total = ops.length
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function (
+      index
+    ) {
       await Promise.all(
         ops
           .filter(
             ([method]) => method === 'delete' || method === 'delete-index'
           )
-          .map(async function([method, fullpath]) {
+          .map(async function ([method, fullpath]) {
             const filepath = `${dir}/${fullpath}`
             if (method === 'delete') {
               await fs.rm(filepath)
@@ -154,7 +156,9 @@ export async function _checkout({
     })
 
     // Note: this is cannot be done naively in parallel
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function (
+      index
+    ) {
       for (const [method, fullpath] of ops) {
         if (method === 'rmdir' || method === 'rmdir-index') {
           const filepath = `${dir}/${fullpath}`
@@ -186,7 +190,7 @@ export async function _checkout({
     await Promise.all(
       ops
         .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
-        .map(async function([_, fullpath]) {
+        .map(async function ([_, fullpath]) {
           const filepath = `${dir}/${fullpath}`
           await fs.mkdir(filepath)
           if (onProgress) {
@@ -199,7 +203,9 @@ export async function _checkout({
         })
     )
 
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function (
+      index
+    ) {
       await Promise.all(
         ops
           .filter(
@@ -209,7 +215,7 @@ export async function _checkout({
               method === 'update' ||
               method === 'mkdir-index'
           )
-          .map(async function([method, fullpath, oid, mode, chmod]) {
+          .map(async function ([method, fullpath, oid, mode, chmod]) {
             const filepath = `${dir}/${fullpath}`
             try {
               if (method !== 'create-index' && method !== 'mkdir-index') {
@@ -301,7 +307,7 @@ async function analyze({
     dir,
     gitdir,
     trees: [TREE({ ref }), WORKDIR(), STAGE()],
-    map: async function(fullpath, [commit, workdir, stage]) {
+    map: async function (fullpath, [commit, workdir, stage]) {
       if (fullpath === '.') return
       // match against base paths
       if (filepaths && !filepaths.some(base => worthWalking(fullpath, base))) {
@@ -559,7 +565,7 @@ async function analyze({
       }
     },
     // Modify the default flat mapping
-    reduce: async function(parent, children) {
+    reduce: async function (parent, children) {
       children = flat(children)
       if (!parent) {
         return children

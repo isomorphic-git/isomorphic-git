@@ -115,7 +115,7 @@ export class GitWalkerFs {
       const { fs, gitdir, cache } = this
       let oid
       // See if we can use the SHA1 hash in the index.
-      await GitIndexManager.acquire({ fs, gitdir, cache }, async function(
+      await GitIndexManager.acquire({ fs, gitdir, cache }, async function (
         index
       ) {
         const stage = index.entriesMap.get(entry._fullpath)

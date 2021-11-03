@@ -53,7 +53,7 @@ export async function mergeTree({
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],
-    map: async function(filepath, [ours, base, theirs]) {
+    map: async function (filepath, [ours, base, theirs]) {
       const path = basename(filepath)
       // What we did, what they did
       const ourChange = await modified(ours, base)

@@ -1,8 +1,8 @@
-import pify from 'pify'
-
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
+
+import pify from 'pify'
 
 /**
  * This is just a collection of helper functions really. At least that's how it started.

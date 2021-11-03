@@ -59,7 +59,7 @@ export async function _commit({
     })
   }
 
-  return GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
+  return GitIndexManager.acquire({ fs, gitdir, cache }, async function (index) {
     const inodes = flatFileListToDirectoryStructure(index.entries)
     const inode = inodes.get('.')
     if (!tree) {
