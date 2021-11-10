@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const translateBrowser = require('./karma-translate-browser.js')
+const translateBrowser = require('./karma-translate-browser.cjs')
 
 module.exports = {
   load() {

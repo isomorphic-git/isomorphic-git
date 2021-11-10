@@ -178,18 +178,17 @@ module.exports = function (config) {
       {
         'reporter:browsers': [
           'type',
-          require('./__tests__/__helpers__/karma-successful-browsers-reporter'),
+          require('./__tests__/__helpers__/karma-successful-browsers-reporter.cjs'),
         ],
       },
       {
         'reporter:pr-comment': [
           'type',
-          require('./__tests__/__helpers__/karma-pr-comment-reporter'),
+          require('./__tests__/__helpers__/karma-pr-comment-reporter.cjs'),
         ],
-      },
+      }, 
     ],
   }
-
   // Speed things up, at the cost of not saving the test results (except in the stdout log).
   if (process.env.FAILFAST && process.env.FAILFAST === 'true') {
     options.reporters.push('fail-fast')
@@ -218,9 +217,10 @@ module.exports = function (config) {
 
   if (!process.env.TEST_NO_BROWSERS) {
     // Only re-run browsers that failed in the previous run.
-    options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
-      options.browsers
-    )
+    options.browsers =
+      require('./__tests__/__helpers__/karma-load-successful-browsers.cjs').filter(
+        options.browsers
+      )
     console.log('running with browsers:', options.browsers)
   }
 
