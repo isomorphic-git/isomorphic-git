@@ -30,8 +30,8 @@ module.exports = {
       default: `rm -rf ${builtFiles.join(' ')} internal-apis.*`,
     },
     lint: {
-      default: `eslint .`,
-      fix: optional(`eslint --fix .`),
+      default: `eslint -c .eslintrc.json .`,
+      fix: optional(`eslint -c .eslintrc.json --fix .`),
     },
     format: {
       default: series.nps('lint.fix'),
