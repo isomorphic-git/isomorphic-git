@@ -2,7 +2,6 @@
   "extends": [
     "prettier-standard/prettier-file"
   ],
-  "ignorePatterns": ["/dist/", "*.mjs"],
   "rules": {
     "import/order": ["error", {
       "alphabetize": {
