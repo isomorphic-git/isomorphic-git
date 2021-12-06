@@ -529,6 +529,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "SamVerschueren",
+      "name": "Sam Verschueren",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1913805?v=4",
+      "profile": "https://twitter.com/SamVerschueren",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
