@@ -90,6 +90,18 @@ describe('clone', () => {
     expect(await fs.exists(`${gitdir}/refs/tags/test-tag`)).toBe(true)
     expect(await fs.exists(`${dir}/package.json`)).toBe(true)
   })
+  it('clone should not peel tag', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      url: `http://${localhost}:8888/test-git-http-mock-server.git`,
+    })
+    const oid = await fs._readFile(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
+    expect(oid.trim()).toBe('db34227a52a6490fc80a13da3916ea91d183fc3f')
+  })
   it('clone with an unregistered protocol', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     const url = `foobar://github.com/isomorphic-git/isomorphic-git`
