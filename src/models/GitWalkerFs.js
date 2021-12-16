@@ -128,7 +128,15 @@ export class GitWalkerFs {
             oid = await shasum(
               GitObject.wrap({ type: 'blob', object: await entry.content() })
             )
-            if (stage && oid === stage.oid) {
+            // Update the stats in the index so we will get a "cache hit" next time
+            // 1) if we can (because the oid and mode are the same)
+            // 2) and only if we need to (because other stats differ)
+            if (
+              stage &&
+              oid === stage.oid &&
+              stats.mode === stage.mode &&
+              compareStats(stats, stage)
+            ) {
               index.insert({
                 filepath: entry._fullpath,
                 stats,
