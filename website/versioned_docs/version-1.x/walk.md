@@ -166,7 +166,7 @@ type Stat = {
 
 
 ```ts
-type WalkerMap = (filename: string, entries: Array<WalkerEntry>) => Promise<any>;
+type WalkerMap = (filename: string, entries: Array<(WalkerEntry|null)>) => Promise<any>;
 ```
 
 
