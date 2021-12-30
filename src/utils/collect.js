@@ -5,9 +5,19 @@ export async function collect(iterable) {
   const buffers = []
   // This will be easier once `for await ... of` loops are available.
   await forAwait(iterable, value => {
-    buffers.push(value)
-    size += value.byteLength
-  })
+
+    //  catch some unexpected buffer in array of uint8arrays
+    if(!value.byteLength){
+      let ui8 = new Uint8Array(value.length);
+      for (var i = 0; i < value.length; i++) {
+        ui8[i] = value[i];
+      }
+      value = ui8;
+    }
+
+    buffers.push(value);
+    size += value.byteLength;
+  });
   const result = new Uint8Array(size)
   let nextIndex = 0
   for (const buffer of buffers) {
