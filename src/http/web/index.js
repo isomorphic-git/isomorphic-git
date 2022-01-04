@@ -22,7 +22,7 @@ export async function request({
     let _body = [];
     await forAwait(body, value => {
       //  catch some unexpected buffer in array of uint8arrays
-      if(value instanceof Blob){
+      if(!(value instanceof Uint8Array)){
         let ui8 = new Uint8Array(value.length);
         for (var i = 0; i < value.length; i++) {
           ui8[i] = value[i];
