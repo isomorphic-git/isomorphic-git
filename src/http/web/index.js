@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import '../../typedefs-http.js'
 import { collect } from '../../utils/collect.js'
+import { forAwait } from '../../utils/forAwait.js';
 import { fromStream } from '../../utils/fromStream'
 
 /**
