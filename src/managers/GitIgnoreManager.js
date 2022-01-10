@@ -29,10 +29,12 @@ export class GitIgnoreManager {
     for (let i = 1; i < pieces.length; i++) {
       const folder = pieces.slice(0, i).join('/')
       const file = pieces.slice(i).join('/')
-      pairs.push({
-        gitignore: join(dir, folder, '.gitignore'),
-        filepath: file,
-      })
+      if (file.length > 0) {
+        pairs.push({
+          gitignore: join(dir, folder, '.gitignore'),
+          filepath: file,
+        })
+      }
     }
     let ignoredStatus = false
     for (const p of pairs) {
