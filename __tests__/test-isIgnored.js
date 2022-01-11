@@ -11,26 +11,24 @@ describe('isIgnored', () => {
   it('should check .gitignore', async () => {
     // Setup
     const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
-    await writeGitIgnore(fs, dir, ['a.txt', 'c/*', '!c/d.txt'])
+    await writeGitIgnore(fs, dir, ['a.txt', 'c/*', '!c/d.txt', 'd/'])
     // Test
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'a.txt' })).toBe(true)
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'b.txt' })).toBe(false)
-    expect(await isIgnored({ fs, gitdir, dir, filepath: 'c' })).toBe(true)
-    expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/' })).toBe(true)
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/d.txt' })).toBe(
       false
     )
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/e.txt' })).toBe(true)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'd/' })).toBe(true)
   })
   it('should check .gitignore in sub directory', async () => {
     // Setup
     const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
-    await writeGitIgnore(fs, dir + 'c/.gitignore', ['d.txt'])
+    await writeGitIgnore(fs, dir, ['a.txt'])
+    await writeGitIgnore(fs, dir + '/c', ['d.txt'])
     // Test
-    expect(await isIgnored({ fs, gitdir, dir, filepath: 'a.txt' })).toBe(false)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'a.txt' })).toBe(true)
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'b.txt' })).toBe(false)
-    expect(await isIgnored({ fs, gitdir, dir, filepath: 'c' })).toBe(false)
-    expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/' })).toBe(false)
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/d.txt' })).toBe(true)
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/e.txt' })).toBe(
       false
