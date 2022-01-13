@@ -1,10 +1,9 @@
-import Hash from 'sha.js/sha1.js'
-
 import { types } from '../commands/types.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
+import Hash from '../utils/sha1.js'
 
 /**
  * @param {object} args
@@ -64,6 +63,6 @@ export async function _pack({
   }
   // Write SHA1 checksum
   const digest = hash.digest()
-  outputStream.push(digest)
+  outputStream.push(Buffer.from(digest))
   return outputStream
 }
