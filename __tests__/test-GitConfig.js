@@ -276,6 +276,14 @@ describe('GitConfig', () => {
       url = https://foo.com/project.git`)
     })
 
+    it('existing subsection with dots in key', async () => {
+      const config = GitConfig.from(`[remote "foo.bar"]
+      url = https://foo.com/project.git`)
+      await config.set('remote.foo.bar.url', 'https://bar.com/project.git')
+      expect(config.toString()).toEqual(`[remote "foo.bar"]
+\turl = https://bar.com/project.git`)
+    })
+
     it('new section', async () => {
       const config = GitConfig.from(`[foo]
       keyaaa = valaaa`)
@@ -293,6 +301,16 @@ describe('GitConfig', () => {
       expect(config.toString()).toEqual(`[remote "foo"]
       url = https://foo.com/project.git
 [remote "bar"]
+\turl = https://bar.com/project.git`)
+    })
+
+    it('new subsection with dots in key', async () => {
+      const config = GitConfig.from(`[remote "foo"]
+      url = https://foo.com/project.git`)
+      await config.set('remote.bar.baz.url', 'https://bar.com/project.git')
+      expect(config.toString()).toEqual(`[remote "foo"]
+      url = https://foo.com/project.git
+[remote "bar.baz"]
 \turl = https://bar.com/project.git`)
     })
   })

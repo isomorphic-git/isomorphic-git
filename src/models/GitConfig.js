@@ -203,16 +203,16 @@ export class GitConfig {
           this.parsedConfig[configIndex] = modifiedConfig
         }
       } else {
-        const sectionPath = path
-          .split('.')
-          .slice(0, -1)
-          .join('.')
-          .toLowerCase()
+        const pathSegments = path.split('.')
+        const section = pathSegments.shift().toLowerCase()
+        const name = pathSegments.pop()
+        const subsection = pathSegments.length
+          ? pathSegments.join('.').toLowerCase()
+          : undefined
+        const sectionPath = subsection ? section + '.' + subsection : section
         const sectionIndex = this.parsedConfig.findIndex(
           config => config.path === sectionPath
         )
-        const [section, subsection] = sectionPath.split('.')
-        const name = path.split('.').pop()
         const newConfig = {
           section,
           subsection,
