@@ -30,7 +30,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {boolean} [args.noUpdateHead]
  * @param {boolean} [args.dryRun]
  * @param {boolean} [args.force]
- * @param {boolean} [args.noTrack]
+ * @param {boolean} [args.track]
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -48,7 +48,7 @@ export async function _checkout({
   noUpdateHead,
   dryRun,
   force,
-  noTrack,
+  track,
 }) {
   // Get tree oid
   let oid
@@ -66,7 +66,7 @@ export async function _checkout({
       gitdir,
       ref: remoteRef,
     })
-    if (!noTrack) {
+    if (track) {
       // Set up remote tracking branch
       const config = await GitConfigManager.get({ fs, gitdir })
       await config.set(`branch.${ref}.remote`, remote)
