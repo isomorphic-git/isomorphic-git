@@ -1,7 +1,13 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { Errors, currentBranch, clone, resolveRef } = require('isomorphic-git')
+const {
+  Errors,
+  checkout,
+  clone,
+  currentBranch,
+  resolveRef,
+} = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -161,6 +167,22 @@ describe('clone', () => {
       url: `http://${localhost}:8888/test-clone-no-master.git`,
     })
     expect(await currentBranch({ fs, dir, gitdir })).toBe('i-am-not-master')
+  })
+
+  it('create tracking for remote branch', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-clone-branch-with-dot')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      url: `http://${localhost}:8888/test-branch-with-dot.git`,
+    })
+    await checkout({ fs, dir, gitdir, ref: 'v1.0.x' })
+    const config = await fs.read(gitdir + '/config', 'utf8')
+    expect(config).toContain(
+      '\n[branch "v1.0.x"]\n\tmerge = refs/heads/v1.0.x\n\tremote = origin'
+    )
   })
 
   it('clone empty repository from git-http-mock-server', async () => {
