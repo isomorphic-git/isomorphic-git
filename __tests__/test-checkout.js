@@ -6,6 +6,7 @@ const {
   add,
   commit,
   branch,
+  getConfig,
 } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -449,5 +450,64 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files).toContain('README.md')
+  })
+
+  it('should setup the remote tracking branch', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+    })
+
+    const contents =fs.readFileSync('.git/config', 'utf-8');
+    console.log(contents);
+
+    const [merge, remote] = await Promise.all([
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.merge',
+      }),
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.main.remote',
+      }),
+    ])
+    expect(merge).toContain('refs/head/main')
+    expect(remote).toContain('origin')
+  })
+
+  // Setup
+  it('should not setup the remote tracking branch with `noTrack`', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      noTrack: true,
+    })
+    const [merge, remote] = await Promise.all([
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.merge',
+      }),
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.remote',
+      }),
+    ])
+    expect(merge).toBeUndefined()
+    expect(remote).toBeUndefined()
   })
 })
