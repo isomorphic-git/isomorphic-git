@@ -22,6 +22,7 @@ Checkout a branch
 | force                      | boolean = false           | If true, conflicts will be ignored and files will be overwritten regardless of local changes.                                                      |
 | cache                      | object                    | a [cache](cache.md) object                                                                                                                         |
 | return                     | Promise\<void\>           | Resolves successfully when filesystem operations are complete                                                                                      |
+| track                      | boolean = true           | If false, will not setup the remote tracking branch                                                                                      |
 
 If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
 
