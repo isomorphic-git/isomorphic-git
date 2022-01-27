@@ -23,8 +23,8 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.noUpdateHead] - If true, will update the working directory but won't update HEAD. Defaults to `false` when `ref` is provided, and `true` if `ref` is not provided.
  * @param {boolean} [args.dryRun = false] - If true, simulates a checkout so you can test whether it would succeed.
  * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
+ * @param {boolean} [args.track = true] - If false, will not set the remote branch tracking information. Defaults to true.
  * @param {object} [args.cache] - a [cache](cache.md) object
- * @param {object} [args.track] - If true, will not set the remote branch tracking information. Defaults to false.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -71,8 +71,8 @@ export async function checkout({
   noUpdateHead = _ref === undefined,
   dryRun = false,
   force = false,
-  cache = {},
   track = true,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
