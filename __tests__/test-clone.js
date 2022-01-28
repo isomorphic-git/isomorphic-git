@@ -7,6 +7,7 @@ const {
   clone,
   currentBranch,
   resolveRef,
+  getConfig,
 } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -225,5 +226,28 @@ describe('clone', () => {
       // Intentionally left blank.
     }
     expect(await fs.exists(gitdir)).toBe(false, `'gitdir' does not exist`)
+  })
+
+  it('should set up the remote tracking branch by default', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      remote: 'foo',
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+    })
+
+    const [merge, remote] = await Promise.all([
+      await getConfig({ fs, dir, gitdir, path: 'branch.main.merge' }),
+      await getConfig({ fs, dir, gitdir, path: 'branch.main.remote' }),
+    ])
+
+    expect(merge).toBe('refs/heads/main')
+    expect(remote).toBe('foo')
   })
 })
