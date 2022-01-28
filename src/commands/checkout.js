@@ -48,7 +48,7 @@ export async function _checkout({
   noUpdateHead,
   dryRun,
   force,
-  track,
+  track = true,
 }) {
   // Get tree oid
   let oid
