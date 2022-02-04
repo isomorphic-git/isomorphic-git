@@ -339,6 +339,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/strangedev"><img src="https://avatars.githubusercontent.com/u/3045979?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Noah Hummel</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=strangedev" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=strangedev" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/mtlewis"><img src="https://avatars.githubusercontent.com/u/542836?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Mike Lewis</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=mtlewis" title="Documentation">📖</a></td>
     <td align="center"><a href="https://twitter.com/SamVerschueren"><img src="https://avatars.githubusercontent.com/u/1913805?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Sam Verschueren</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=SamVerschueren" title="Code">💻</a></td>
+    <td align="center"><a href="http://vitorluizc.github.io/"><img src="https://avatars.githubusercontent.com/u/9027363?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Vitor Luiz Cavalcanti</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=VitorLuizC" title="Documentation">📖</a></td>
   </tr>
 </table>
 
