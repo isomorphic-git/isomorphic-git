@@ -24,7 +24,7 @@ import { join } from '../utils/join.js'
  * let oid = await git.resolveRef({ fs, dir: '/tutorial', ref: 'main' })
  * let ancestor = await git.resolveRef({ fs, dir: '/tutorial', ref: 'v0.20.0' })
  * console.log(oid, ancestor)
- * await git.isDescendent({ fs, dir: '/tutorial', oid, ancestor, depth: -1 })
+ * await git.isDescendent({ fs, dir: '/tutorial', oid: oid, ancestor: ancestor, depth: -1 })
  *
  */
 export async function isDescendent({
