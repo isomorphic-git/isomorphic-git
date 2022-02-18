@@ -17,6 +17,7 @@ So this FAQ is kind of small
 - [How to add all untracked files with git.add?](#how-to-add-all-untracked-files-with-gitadd)
 - [How to make a shallow repository unshallow?](#how-to-make-a-shallow-repository-unshallow)
 - [Does it support wire protocol version 2?](#does-it-support-wire-protocol-version-2)
+- [How do I use it with an HTTP proxy?](#how-do-i-use-it-with-an-http-proxy)
 
 ## Is this based on `js-git`?
 
@@ -178,3 +179,74 @@ A slightly more efficient way of telling if you have the full history, would be 
 Not yet, but you can go [upvote the issue](https://github.com/isomorphic-git/isomorphic-git/issues/585)
 As soon as GitHub supports the [fetch filter feature](https://git-scm.com/docs/protocol-v2#_fetch) I'll have a reason to work on it, because that would be extremely useful in browser environments!
 But until then, there's no advantage to using the new protocol.
+
+## How do I use it with an HTTP proxy?
+
+> I want to route HTTP requests through a proxy. How can I do this?
+
+_Answer by Dan Allen (@mojavelinux):_
+
+isomorphic-git only supports a CORS proxy out of the box. However, all HTTP requests are handled by the http plugin. Therefore, you can swap out the http plugin with an alternative that sets up an HTTP or HTTPS agent that routes requests through the proxy.
+
+First, add the following dependencies to your project (or any HTTP agent that supports proxies that you prefer):
+
+* hpagent
+
+Next, create a file named http-plugin.js and populate it with the following code:
+
+```js
+'use strict'
+
+const get = require('simple-get')
+const { HttpProxyAgent, HttpsProxyAgent } = require('hpagent')
+
+async function request ({ url, method, headers, body }) {
+  body = await mergeBuffers(body)
+  const proxy = url.startsWith('https:')
+    ? { Agent: HttpsProxyAgent, url: process.env.https_proxy }
+    : { Agent: HttpProxyAgent, url: process.env.http_proxy }
+  const agent = proxy.url ? new proxy.Agent({ proxy: proxy.url }) : undefined
+  return new Promise((resolve, reject) =>
+    get({ url, method, agent, headers, body }, (err, res) => (err ? reject(err) : resolve(transformResponse(res))))
+  )
+}
+
+async function mergeBuffers (data) {
+  if (!Array.isArray(data)) return data
+  if (data.length === 1 && data[0] instanceof Buffer) return data[0]
+  const buffers = []
+  let offset = 0
+  let size = 0
+  for await (const chunk of data) {
+    buffers.push(chunk)
+    size += chunk.byteLength
+  }
+  data = new Uint8Array(size)
+  for (const buffer of buffers) {
+    data.set(buffer, offset)
+    offset += buffer.byteLength
+  }
+  return Buffer.from(data.buffer)
+}
+
+function transformResponse (res) {
+  const { url, method, statusCode, statusMessage, headers } = res
+  return { url, method, statusCode, statusMessage, headers, body: res }
+}
+
+module.exports = { request }
+```
+
+Next, map this plugin to the http variable instead of isomorphic-git/http/node:
+
+```js
+const http = require('./http-plugin.js')
+```
+
+Finally, pass this http variable to any command that requires the http keyword, such as clone:
+
+```
+await git.clone({ ...repo, url, http })
+```
+
+With this code in place, isomorphic-git will honor the `http_proxy` and `https_proxy` environment variables.
