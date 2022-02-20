@@ -16,6 +16,7 @@ export async function request({
   url,
   method = 'GET',
   headers = {},
+  agent,
   body,
 }) {
   // If we can, we should send it as a single buffer so it sets a Content-Length header.
@@ -30,6 +31,7 @@ export async function request({
         url,
         method,
         headers,
+        agent,
         body,
       },
       (err, res) => {
