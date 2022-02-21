@@ -63,6 +63,8 @@ export async function resetIndex({
       }
     }
 
+    // Not having an oid at this point means `resetIndex()` was called without explicit `ref` on a new git
+    // repository. If that happens, we can skip resolving the file path.
     if (oid) {
       try {
         // Resolve blob
