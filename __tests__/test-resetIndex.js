@@ -95,7 +95,7 @@ describe('resetIndex', () => {
       dir,
       gitdir,
       filepath: 'b.txt',
-      oid: '572d5ec8ea719ed6780ef0e6a115a75999cb3091',
+      ref: '572d5ec8ea719ed6780ef0e6a115a75999cb3091',
     })
     const after = await statusMatrix({ fs, dir, gitdir })
     expect(after).toMatchInlineSnapshot(`

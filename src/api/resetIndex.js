@@ -10,8 +10,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
 /**
  * Reset a file in the git index (aka staging area)
  *
- * Note that this does NOT modify the file in the working directory. If a SHA-1 object id is provided, that commit will
- * be used instead of the commit the provided ref points to.
+ * Note that this does NOT modify the file in the working directory.
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
@@ -19,17 +18,12 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to reset in the index
  * @param {string} [args.ref = 'HEAD'] - A ref to the commit to use
- * @param {string} [args.oid] - A SHA-1 object id to the commit to use
  * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
  * @example
  * await git.resetIndex({ fs, dir: '/tutorial', filepath: 'README.md' })
- * console.log('done')
- *
- * @example
- * await git.resetIndex({ fs, dir: '/tutorial', filepath: 'README.md', oid: '11a57ba27f571e9e2bfa344fdbbccad1d0e34463' })
  * console.log('done')
  *
  */
@@ -39,7 +33,6 @@ export async function resetIndex({
   gitdir = join(dir, '.git'),
   filepath,
   ref,
-  oid,
   cache = {},
 }) {
   try {
@@ -49,17 +42,16 @@ export async function resetIndex({
 
     const fs = new FileSystem(_fs)
 
+    let oid
     let workdirOid
 
-    if (!oid) {
-      try {
-        // Resolve ref if no oid is provided
-        oid = await GitRefManager.resolve({ fs, gitdir, ref: ref || 'HEAD' })
-      } catch (e) {
-        if (ref) {
-          // Only throw the error if a ref is explicitly provided
-          throw e
-        }
+    try {
+      // Resolve commit
+      oid = await GitRefManager.resolve({ fs, gitdir, ref: ref || 'HEAD' })
+    } catch (e) {
+      if (ref) {
+        // Only throw the error if a ref is explicitly provided
+        throw e
       }
     }
 
