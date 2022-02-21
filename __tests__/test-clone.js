@@ -250,4 +250,40 @@ describe('clone', () => {
     expect(merge).toBe('refs/heads/main')
     expect(remote).toBe('foo')
   })
+
+  if (typeof process === 'object' && (process.versions || {}).node) {
+    it('should allow agent to be used with built-in http plugin for Node.js', async () => {
+      const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+      const connectionLog = []
+      const { Agent } = require('https')
+      const httpWithAgent = {
+        async request({ url, method, headers, body }) {
+          const agent = new Agent()
+          // @ts-ignore
+          agent.createConnection = new Proxy(agent.createConnection, {
+            apply(target, self, args) {
+              const { hostname, port, method: method_ } = args[0]
+              connectionLog.push(`${method_} ${hostname}:${port}`)
+              return target.apply(self, args)
+            },
+          })
+          return http.request({ url, method, headers, agent, body })
+        },
+      }
+      await clone({
+        fs,
+        http: httpWithAgent,
+        dir,
+        gitdir,
+        depth: 1,
+        ref: 'test-branch',
+        singleBranch: true,
+        noCheckout: true,
+        url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      })
+      expect(connectionLog.length).not.toBe(0)
+      expect(connectionLog[0]).toEqual('GET github.com:443')
+      expect(connectionLog[1]).toEqual('POST github.com:443')
+    })
+  }
 })

@@ -186,7 +186,8 @@ But until then, there's no advantage to using the new protocol.
 
 _Answer by Dan Allen (@mojavelinux):_
 
-isomorphic-git only supports a CORS proxy out of the box. However, all HTTP requests are handled by the http plugin. Therefore, you can swap out the http plugin with an alternative that sets up an HTTP or HTTPS agent that routes requests through the proxy.
+isomorphic-git only supports a CORS proxy out of the box. However, all HTTP requests are handled by the http plugin. Therefore, you can swap out the http plugin with a wrapper to inject an HTTP or HTTPS agent that routes requests through the proxy.
+This technique only works when using isomorphic-git on Node.js.
 
 First, add the following dependencies to your project (or any HTTP agent that supports proxies that you prefer):
 
@@ -197,47 +198,21 @@ Next, create a file named http-plugin.js and populate it with the following code
 ```js
 'use strict'
 
-const get = require('simple-get')
+const { request: delegate } = require('isomorphic-git/http/node')
 const { HttpProxyAgent, HttpsProxyAgent } = require('hpagent')
 
 async function request ({ url, method, headers, body }) {
-  body = await mergeBuffers(body)
   const proxy = url.startsWith('https:')
     ? { Agent: HttpsProxyAgent, url: process.env.https_proxy }
     : { Agent: HttpProxyAgent, url: process.env.http_proxy }
   const agent = proxy.url ? new proxy.Agent({ proxy: proxy.url }) : undefined
-  return new Promise((resolve, reject) =>
-    get({ url, method, agent, headers, body }, (err, res) => (err ? reject(err) : resolve(transformResponse(res))))
-  )
-}
-
-async function mergeBuffers (data) {
-  if (!Array.isArray(data)) return data
-  if (data.length === 1 && data[0] instanceof Buffer) return data[0]
-  const buffers = []
-  let offset = 0
-  let size = 0
-  for await (const chunk of data) {
-    buffers.push(chunk)
-    size += chunk.byteLength
-  }
-  data = new Uint8Array(size)
-  for (const buffer of buffers) {
-    data.set(buffer, offset)
-    offset += buffer.byteLength
-  }
-  return Buffer.from(data.buffer)
-}
-
-function transformResponse (res) {
-  const { url, method, statusCode, statusMessage, headers } = res
-  return { url, method, statusCode, statusMessage, headers, body: res }
+  return delegate({ url, method, agent, headers, body })
 }
 
 module.exports = { request }
 ```
 
-Next, map this plugin to the http variable instead of isomorphic-git/http/node:
+Next, assign this plugin to the http variable instead of isomorphic-git/http/node:
 
 ```js
 const http = require('./http-plugin.js')
@@ -250,3 +225,5 @@ await git.clone({ ...repo, url, http })
 ```
 
 With this code in place, isomorphic-git will honor the `http_proxy` and `https_proxy` environment variables.
+Those environment variables specify a URL through which to route HTTP and HTTPS connections, respectively.
+The URL may contain a username and password if the proxy requires authentication.
