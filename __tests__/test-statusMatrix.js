@@ -144,7 +144,7 @@ describe('statusMatrix', () => {
   it('statusMatrix with removed folder and created file with same name', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture(
-      'test-statusMatrix-type-collision'
+      'test-statusMatrix-tree-blob-collision'
     )
     // Test
     await fs.rmdir(path.join(dir, 'a'), { recursive: true })
@@ -176,12 +176,12 @@ describe('statusMatrix', () => {
   it('statusMatrix with removed file and created folder with same name', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture(
-      'test-statusMatrix-type-collision'
+      'test-statusMatrix-blob-tree-collision'
     )
     // Test
     await fs.rm(path.join(dir, 'b'))
     await fs.mkdir(path.join(dir, 'b'))
-    await fs.write(path.join(dir, 'b/b.txt'))
+    await fs.write(path.join(dir, 'b/b.txt'), 'Hi')
     let matrix = await statusMatrix({
       fs,
       dir,
