@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "main": "index.cjs",
+  "module": "index.js",
+  "typings": "index.d.ts",
+  "unpkg": "index.umd.js"
+}

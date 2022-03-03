@@ -8,6 +8,7 @@ export async function collect(iterable) {
     buffers.push(value)
     size += value.byteLength
   })
+  
   const result = new Uint8Array(size)
   let nextIndex = 0
   for (const buffer of buffers) {

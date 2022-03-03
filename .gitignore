@@ -3,18 +3,18 @@
 /__tests__/__fixtures__/index.json
 
 # Dist
-/http
-/index.cjs
-/index.d.ts
-/index.js
-/index.umd.min.js
-/index.umd.min.d.ts
-/index.umd.min.js.map
-/internal-apis.js
-/internal-apis.d.ts
-/internal-apis.cjs
-/internal-apis.umd.min.js
-/internal-apis.umd.min.js.map
+# /http
+# /index.cjs
+# /index.d.ts
+# /index.js
+# /index.umd.min.js
+# /index.umd.min.d.ts
+# /index.umd.min.js.map
+# /internal-apis.js
+# /internal-apis.d.ts
+# /internal-apis.cjs
+# /internal-apis.umd.min.js
+# /internal-apis.umd.min.js.map
 
 # Test run artifacts
 /coverage

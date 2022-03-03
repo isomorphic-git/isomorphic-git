@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import '../../typedefs-http.js'
 import { collect } from '../../utils/collect.js'
+import { forAwait } from '../../utils/forAwait.js';
 import { fromStream } from '../../utils/fromStream'
 
 /**
@@ -18,7 +19,21 @@ export async function request({
 }) {
   // streaming uploads aren't possible yet in the browser
   if (body) {
-    body = await collect(body)
+    let _body = [];
+    await forAwait(body, value => {
+      //  catch some unexpected buffer in array of uint8arrays
+      if(!(value instanceof Uint8Array)){
+        let ui8 = new Uint8Array(value.length);
+        for (var i = 0; i < value.length; i++) {
+          ui8[i] = value[i];
+        }
+        value = ui8;
+      }
+  
+      _body.push(value);
+    });
+
+    body = await collect(_body)
   }
   const res = await fetch(url, { method, headers, body })
   const iter =
