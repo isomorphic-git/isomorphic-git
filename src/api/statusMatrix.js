@@ -194,27 +194,37 @@ export async function statusMatrix({
           if (!filter(filepath)) return
         }
 
-        // For now, just bail on directories
-        const headType = head && (await head.type())
-        if (headType === 'tree' || headType === 'special') return
+        const [headType, workdirType, stageType] = await Promise.all([
+          head && head.type(),
+          workdir && workdir.type(),
+          stage && stage.type(),
+        ])
+
+        const isBlob = [headType, workdirType, stageType].includes('blob')
+
+        // For now, bail on directories unless the file is also a blob in another tree
+        if ((headType === 'tree' || headType === 'special') && !isBlob) return
         if (headType === 'commit') return null
 
-        const workdirType = workdir && (await workdir.type())
-        if (workdirType === 'tree' || workdirType === 'special') return
+        if ((workdirType === 'tree' || workdirType === 'special') && !isBlob)
+          return
 
-        const stageType = stage && (await stage.type())
         if (stageType === 'commit') return null
-        if (stageType === 'tree' || stageType === 'special') return
+        if ((stageType === 'tree' || stageType === 'special') && !isBlob) return
 
-        // Figure out the oids, using the staged oid for the working dir oid if the stats match.
-        const headOid = head ? await head.oid() : undefined
-        const stageOid = stage ? await stage.oid() : undefined
+        // Figure out the oids for files, using the staged oid for the working dir oid if the stats match.
+        const headOid = headType === 'blob' ? await head.oid() : undefined
+        const stageOid = stageType === 'blob' ? await stage.oid() : undefined
         let workdirOid
-        if (!head && workdir && !stage) {
+        if (
+          headType !== 'blob' &&
+          workdirType === 'blob' &&
+          stageType !== 'blob'
+        ) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
           workdirOid = '42'
-        } else if (workdir) {
+        } else if (workdirType === 'blob') {
           workdirOid = await workdir.oid()
         }
         const entry = [undefined, headOid, workdirOid, stageOid]

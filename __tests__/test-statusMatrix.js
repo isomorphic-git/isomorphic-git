@@ -140,4 +140,69 @@ describe('statusMatrix', () => {
     })
     expect(matrix).toEqual([['i/i.txt', 0, 2, 0]])
   })
+
+  it('statusMatrix with removed folder and created file with same name', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture(
+      'test-statusMatrix-tree-blob-collision'
+    )
+    // Test
+    await fs.rmdir(path.join(dir, 'a'), { recursive: true })
+    await fs.write(path.join(dir, 'a'), 'Hi')
+    let matrix = await statusMatrix({
+      fs,
+      dir,
+      gitdir,
+    })
+    expect(matrix).toEqual([
+      ['a', 0, 2, 0],
+      ['a/a.txt', 1, 0, 1],
+      ['b', 1, 1, 1],
+    ])
+    await remove({ fs, dir, gitdir, filepath: 'a/a.txt' })
+    await add({ fs, dir, gitdir, filepath: 'a' })
+    matrix = await statusMatrix({
+      fs,
+      dir,
+      gitdir,
+    })
+    expect(matrix).toEqual([
+      ['a', 0, 2, 2],
+      ['a/a.txt', 1, 0, 0],
+      ['b', 1, 1, 1],
+    ])
+  })
+
+  it('statusMatrix with removed file and created folder with same name', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture(
+      'test-statusMatrix-blob-tree-collision'
+    )
+    // Test
+    await fs.rm(path.join(dir, 'b'))
+    await fs.mkdir(path.join(dir, 'b'))
+    await fs.write(path.join(dir, 'b/b.txt'), 'Hi')
+    let matrix = await statusMatrix({
+      fs,
+      dir,
+      gitdir,
+    })
+    expect(matrix).toEqual([
+      ['a/a.txt', 1, 1, 1],
+      ['b', 1, 0, 1],
+      ['b/b.txt', 0, 2, 0],
+    ])
+    await remove({ fs, dir, gitdir, filepath: 'b' })
+    await add({ fs, dir, gitdir, filepath: 'b/b.txt' })
+    matrix = await statusMatrix({
+      fs,
+      dir,
+      gitdir,
+    })
+    expect(matrix).toEqual([
+      ['a/a.txt', 1, 1, 1],
+      ['b', 1, 0, 0],
+      ['b/b.txt', 0, 2, 2],
+    ])
+  })
 })
