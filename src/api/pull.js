@@ -28,6 +28,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {string} [args.remoteRef] - (Added in 1.1.0) The name of the branch on the remote to fetch. By default this is the configured remote tracking branch.
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
+ * @param {boolean} [args.fastForward = true] -  If false, only create merge commits.
  * @param {boolean} [args.fastForwardOnly = false] - Only perform simple fast-forward merges. (Don't create merge commits.)
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {Object} [args.author] - The details about the author.
@@ -70,6 +71,7 @@ export async function pull({
   url,
   remote,
   remoteRef,
+  fastForward = true,
   fastForwardOnly = false,
   corsProxy,
   singleBranch,
@@ -111,6 +113,7 @@ export async function pull({
       url,
       remote,
       remoteRef,
+      fastForward,
       fastForwardOnly,
       corsProxy,
       singleBranch,

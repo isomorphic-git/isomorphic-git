@@ -29,6 +29,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * @param {string} args.gitdir
  * @param {string} [args.ours]
  * @param {string} args.theirs
+ * @param {boolean} args.fastForward
  * @param {boolean} args.fastForwardOnly
  * @param {boolean} args.dryRun
  * @param {boolean} args.noUpdateBranch
@@ -55,6 +56,7 @@ export async function _merge({
   gitdir,
   ours,
   theirs,
+  fastForward = true,
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
@@ -105,7 +107,7 @@ export async function _merge({
       alreadyMerged: true,
     }
   }
-  if (baseOid === ourOid) {
+  if (fastForward && baseOid === ourOid) {
     if (!dryRun && !noUpdateBranch) {
       await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
     }

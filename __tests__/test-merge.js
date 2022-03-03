@@ -112,6 +112,30 @@ describe('merge', () => {
     expect(oid).toEqual(desiredOid)
   })
 
+  it('merge no fast-forward', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge-no-ff')
+    // Test
+    const m = await merge({
+      fs,
+      gitdir,
+      ours: 'main',
+      theirs: 'add-files',
+      fastForward: false,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    expect(m.oid).toBeTruthy()
+    expect(m.tree).toBeTruthy()
+    expect(m.alreadyMerged).toBeFalsy()
+    expect(m.fastForward).toBeFalsy()
+    expect(m.mergeCommit).toBeTruthy()
+  })
+
   it('merge newest into master --dryRun (no author needed since fastForward)', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
