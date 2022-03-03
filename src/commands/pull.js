@@ -95,6 +95,7 @@ export async function _pull({
       singleBranch,
       headers,
     })
+
     // Merge the remote tracking branch into the local one.
     await _merge({
       fs,
