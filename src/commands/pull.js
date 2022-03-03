@@ -24,6 +24,7 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
  * @param {string} [args.remoteRef]
  * @param {string} [args.corsProxy]
  * @param {boolean} args.singleBranch
+ * @param {boolean} args.fastForward
  * @param {boolean} args.fastForwardOnly
  * @param {Object<string, string>} [args.headers]
  * @param {Object} args.author
@@ -56,6 +57,7 @@ export async function _pull({
   url,
   remote,
   remoteRef,
+  fastForward,
   fastForwardOnly,
   corsProxy,
   singleBranch,
@@ -100,6 +102,7 @@ export async function _pull({
       gitdir,
       ours: ref,
       theirs: fetchHead,
+      fastForward,
       fastForwardOnly,
       message: `Merge ${fetchHeadDescription}`,
       author,
