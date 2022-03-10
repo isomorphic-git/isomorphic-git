@@ -50,7 +50,8 @@
       "version-1.x-add",
       "version-1.x-remove",
       "version-1.x-listFiles",
-      "version-1.x-status"
+      "version-1.x-status",
+      "version-1.x-isIgnored"
     ],
     "Notes": [
       "version-1.x-addNote",
@@ -98,7 +99,8 @@
     "Getting Started": [
       "version-1.x-quickstart",
       "version-1.x-dir-vs-gitdir",
-      "version-1.x-cli"
+      "version-1.x-cli",
+      "version-1.x-cache"
     ],
     "More": [
       "version-1.x-faq",

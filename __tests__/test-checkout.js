@@ -1,3 +1,5 @@
+import http from 'isomorphic-git/http'
+
 /* eslint-env node, browser, jasmine */
 const {
   Errors,
@@ -6,9 +8,18 @@ const {
   add,
   commit,
   branch,
+  getConfig,
+  fetch: gitFetch,
+  setConfig,
 } = require('isomorphic-git')
 
+/* eslint-env node, browser, jasmine */
+
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
+
+// this is so it works with either Node local tests or Browser WAN tests
+const localhost =
+  typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 describe('checkout', () => {
   it('checkout', async () => {
@@ -449,5 +460,150 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files).toContain('README.md')
+  })
+
+  it('should setup the remote tracking branch by default', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`,
+    })
+
+    // fetch `test-branch` so `refs/remotes/test-branch` exists but `refs/heads/test-branch` does not
+    await gitFetch({
+      fs,
+      dir,
+      gitdir,
+      http,
+      singleBranch: true,
+      remote: 'origin',
+      ref: 'test-branch',
+    })
+
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+    })
+
+    const [merge, remote] = await Promise.all([
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.merge',
+      }),
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.remote',
+      }),
+    ])
+
+    expect(merge).toContain('refs/heads/test-branch')
+    expect(remote).toContain('origin')
+  })
+
+  it('should setup the remote tracking branch with `track: true`', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`,
+    })
+
+    // fetch `test-branch` so `refs/remotes/test-branch` exists but `refs/heads/test-branch` does not
+    await gitFetch({
+      fs,
+      dir,
+      gitdir,
+      http,
+      singleBranch: true,
+      remote: 'origin',
+      ref: 'test-branch',
+    })
+
+    // checking the test-branch with `track: true` should setup the remote tracking branch
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      track: true,
+    })
+
+    const [merge, remote] = await Promise.all([
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.merge',
+      }),
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.remote',
+      }),
+    ])
+
+    expect(merge).toContain('refs/heads/test-branch')
+    expect(remote).toContain('origin')
+  })
+
+  it('should not setup the remote tracking branch with `track: false`', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-cors')
+
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`,
+    })
+
+    // fetch `test-branch` so `refs/remotes/test-branch` exists but `refs/heads/test-branch` does not
+    await gitFetch({
+      fs,
+      dir,
+      gitdir,
+      http,
+      singleBranch: true,
+      remote: 'origin',
+      ref: 'test-branch',
+    })
+
+    // checking the test-branch with `track: false` should not setup the remote tracking branch
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      track: false,
+    })
+
+    const [merge, remote] = await Promise.all([
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.test-branch.merge',
+      }),
+      getConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'branch.main.remote',
+      }),
+    ])
+
+    expect(merge).toBeUndefined()
+    expect(remote).toBeUndefined()
   })
 })

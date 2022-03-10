@@ -146,7 +146,7 @@ module.exports = function(config) {
       mode: 'development',
       devtool: 'inline-source-map',
       plugins: [
-        new webpack.IgnorePlugin(/^(fs|jest-fixtures)$/),
+        new webpack.IgnorePlugin(/^(fs|@wmhilton\/jest-fixtures)$/),
         new webpack.DefinePlugin({
           'process.env.TEST_PUSH_GITHUB_TOKEN': `'${process.env.TEST_PUSH_GITHUB_TOKEN}'`,
         }),

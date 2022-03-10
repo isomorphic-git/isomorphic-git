@@ -70,8 +70,8 @@ export class GitRefManager {
         if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
           // Git's behavior is to only fetch tags that do not conflict with tags already present.
           if (!(await GitRefManager.exists({ fs, gitdir, ref: serverRef }))) {
-            // If there is a dereferenced an annotated tag value available, prefer that.
-            const oid = refs.get(serverRef + '^{}') || refs.get(serverRef)
+            // Always use the object id of the tag itself, and not the peeled object id.
+            const oid = refs.get(serverRef)
             actualRefsToWrite.set(serverRef, oid)
           }
         }

@@ -1,0 +1,7 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+    url = https://github.com/isomorphic-git/test-branch-with-dot

@@ -50,7 +50,8 @@
       "add",
       "remove",
       "listFiles",
-      "status"
+      "status",
+      "isIgnored"
     ],
     "Notes": [
       "addNote",
@@ -98,7 +99,8 @@
     "Getting Started": [
       "quickstart",
       "dir-vs-gitdir",
-      "cli"
+      "cli",
+      "cache"
     ],
     "More": [
       "faq",

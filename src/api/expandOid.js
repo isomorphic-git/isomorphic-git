@@ -14,6 +14,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.oid - The shortened oid prefix to expand (like "0414d2a")
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<string>} Resolves successfully with the full oid (like "0414d2a286d7bbc7a4a326a61c1f9f888a8ab87f")
  *
@@ -22,14 +23,20 @@ import { join } from '../utils/join.js'
  * console.log(oid)
  *
  */
-export async function expandOid({ fs, dir, gitdir = join(dir, '.git'), oid }) {
+export async function expandOid({
+  fs,
+  dir,
+  gitdir = join(dir, '.git'),
+  oid,
+  cache = {},
+}) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
     assertParameter('oid', oid)
     return await _expandOid({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       gitdir,
       oid,
     })

@@ -1,7 +1,14 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { Errors, currentBranch, clone, resolveRef } = require('isomorphic-git')
+const {
+  Errors,
+  checkout,
+  clone,
+  currentBranch,
+  resolveRef,
+  getConfig,
+} = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -90,6 +97,18 @@ describe('clone', () => {
     expect(await fs.exists(`${gitdir}/refs/tags/test-tag`)).toBe(true)
     expect(await fs.exists(`${dir}/package.json`)).toBe(true)
   })
+  it('clone should not peel tag', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      url: `http://${localhost}:8888/test-git-http-mock-server.git`,
+    })
+    const oid = await fs._readFile(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
+    expect(oid.trim()).toBe('db34227a52a6490fc80a13da3916ea91d183fc3f')
+  })
   it('clone with an unregistered protocol', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     const url = `foobar://github.com/isomorphic-git/isomorphic-git`
@@ -151,6 +170,22 @@ describe('clone', () => {
     expect(await currentBranch({ fs, dir, gitdir })).toBe('i-am-not-master')
   })
 
+  it('create tracking for remote branch', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-clone-branch-with-dot')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      url: `http://${localhost}:8888/test-branch-with-dot.git`,
+    })
+    await checkout({ fs, dir, gitdir, ref: 'v1.0.x' })
+    const config = await fs.read(gitdir + '/config', 'utf8')
+    expect(config).toContain(
+      '\n[branch "v1.0.x"]\n\tmerge = refs/heads/v1.0.x\n\tremote = origin'
+    )
+  })
+
   it('clone empty repository from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-empty')
     await clone({
@@ -172,4 +207,83 @@ describe('clone', () => {
       `'gitdir/refs/heads/master' does not exist`
     )
   })
+
+  it('removes the gitdir when clone fails', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    const url = `foobar://github.com/isomorphic-git/isomorphic-git`
+    try {
+      await clone({
+        fs,
+        http,
+        dir,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        ref: 'test-tag',
+        url,
+      })
+    } catch (err) {
+      // Intentionally left blank.
+    }
+    expect(await fs.exists(gitdir)).toBe(false, `'gitdir' does not exist`)
+  })
+
+  it('should set up the remote tracking branch by default', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      remote: 'foo',
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+    })
+
+    const [merge, remote] = await Promise.all([
+      await getConfig({ fs, dir, gitdir, path: 'branch.main.merge' }),
+      await getConfig({ fs, dir, gitdir, path: 'branch.main.remote' }),
+    ])
+
+    expect(merge).toBe('refs/heads/main')
+    expect(remote).toBe('foo')
+  })
+
+  if (typeof process === 'object' && (process.versions || {}).node) {
+    it('should allow agent to be used with built-in http plugin for Node.js', async () => {
+      const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+      const connectionLog = []
+      const { Agent } = require('https')
+      const httpWithAgent = {
+        async request({ url, method, headers, body }) {
+          const agent = new Agent()
+          // @ts-ignore
+          agent.createConnection = new Proxy(agent.createConnection, {
+            apply(target, self, args) {
+              const { hostname, port, method: method_ } = args[0]
+              connectionLog.push(`${method_} ${hostname}:${port}`)
+              return target.apply(self, args)
+            },
+          })
+          return http.request({ url, method, headers, agent, body })
+        },
+      }
+      await clone({
+        fs,
+        http: httpWithAgent,
+        dir,
+        gitdir,
+        depth: 1,
+        ref: 'test-branch',
+        singleBranch: true,
+        noCheckout: true,
+        url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      })
+      expect(connectionLog.length).not.toBe(0)
+      expect(connectionLog[0]).toEqual('GET github.com:443')
+      expect(connectionLog[1]).toEqual('POST github.com:443')
+    })
+  }
 })

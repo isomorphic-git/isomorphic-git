@@ -26,6 +26,7 @@ Push a branch or tag
 | delete                           | boolean = false           | If true, delete the remote ref                                                                             |
 | corsProxy                        | string                    | Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config. |
 | [headers](./headers)             | Object\<string, string\>  | Additional headers to include in HTTP requests, similar to git's `extraHeader` config                      |
+| cache                            | object                    | a [cache](cache.md) object                                                                                 |
 | return                           | Promise\<PushResult\>     | Resolves successfully when push completes with a detailed description of the operation from the server.    |
 
 ```ts

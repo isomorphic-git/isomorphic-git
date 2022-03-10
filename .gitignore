@@ -102,6 +102,7 @@ docs/hashBlob.md
 docs/indexPack.md
 docs/init.md
 docs/isDescendent.md
+docs/isIgnored.md
 docs/listBranches.md
 docs/listFiles.md
 docs/listNotes.md

@@ -17,6 +17,7 @@ So this FAQ is kind of small
 - [How to add all untracked files with git.add?](#how-to-add-all-untracked-files-with-gitadd)
 - [How to make a shallow repository unshallow?](#how-to-make-a-shallow-repository-unshallow)
 - [Does it support wire protocol version 2?](#does-it-support-wire-protocol-version-2)
+- [How do I use it with an HTTP proxy?](#how-do-i-use-it-with-an-http-proxy)
 
 ## Is this based on `js-git`?
 
@@ -126,24 +127,36 @@ I'll reconsider the matter once Node.js figures out how it is dealing with mixed
 But for now I think having a `default` export causes more harm than good - since the only good it does is save typing "`* as `" as far as I can tell.
 But that is a VERY good question and one I spent a long time trying to figure out when I was researching how to design the module, and I remember being very disappointed at first when I discovered that `default` exports destroy tree-shaking.
 
-## How to add all untracked files with git.add? 
+## How to add all files based on a glob pattern with git.add?
 
-> I'm looking for a way init a git repo, add all existing files, and commit them, while if I understand correctly, the git.add function needs me to give all of the files explicitly.
-> 
-> Is there a way that I can add all of the files in one or two command?
+> I want to add multiple files based on a pattern. How can I do this?
 
 _Answer by Will Hilton (@wmhilton):_
 
 TLDR:
 ```js
 const globby = require('globby');
-const paths = await globby(['./**', './**/.*'], { gitignore: true });
+// Add all .js files using the pattern "**/*.js" - adjust the
+// pattern to suit your needs!
+const paths = await globby(['**/*.js'], { gitignore: true });
 for (const filepath of paths) {
     await git.add({ fs, dir, filepath });
 }
 ```
 
 Long answer including a browser solution by @jcubic: [#187](https://github.com/isomorphic-git/isomorphic-git/issues/187)
+
+## How to add all untracked files with git.add?
+
+> I want to add all the files in a repository. How can I do this?
+
+_Answer by @mtlewis:_
+
+If you want to add all the files in a repo, you can use the code below. The `dir` parameter should be set to the repository directory. Patterns in .gitignore will be respected, so ignored files should not be added by this command.
+
+```js
+await git.add({ fs, dir, filepath: '.' });
+```
 
 ## How to make a shallow repository unshallow?
 
@@ -166,3 +179,51 @@ A slightly more efficient way of telling if you have the full history, would be 
 Not yet, but you can go [upvote the issue](https://github.com/isomorphic-git/isomorphic-git/issues/585)
 As soon as GitHub supports the [fetch filter feature](https://git-scm.com/docs/protocol-v2#_fetch) I'll have a reason to work on it, because that would be extremely useful in browser environments!
 But until then, there's no advantage to using the new protocol.
+
+## How do I use it with an HTTP proxy?
+
+> I want to route HTTP requests through a proxy. How can I do this?
+
+_Answer by Dan Allen (@mojavelinux):_
+
+isomorphic-git only supports a CORS proxy out of the box. However, all HTTP requests are handled by the http plugin. Therefore, you can swap out the http plugin with a wrapper to inject an HTTP or HTTPS agent that routes requests through the proxy.
+This technique only works when using isomorphic-git on Node.js.
+
+First, add the following dependencies to your project (or any HTTP agent that supports proxies that you prefer):
+
+* hpagent
+
+Next, create a file named http-plugin.js and populate it with the following code:
+
+```js
+'use strict'
+
+const { request: delegate } = require('isomorphic-git/http/node')
+const { HttpProxyAgent, HttpsProxyAgent } = require('hpagent')
+
+async function request ({ url, method, headers, body }) {
+  const proxy = url.startsWith('https:')
+    ? { Agent: HttpsProxyAgent, url: process.env.https_proxy }
+    : { Agent: HttpProxyAgent, url: process.env.http_proxy }
+  const agent = proxy.url ? new proxy.Agent({ proxy: proxy.url }) : undefined
+  return delegate({ url, method, agent, headers, body })
+}
+
+module.exports = { request }
+```
+
+Next, assign this plugin to the http variable instead of isomorphic-git/http/node:
+
+```js
+const http = require('./http-plugin.js')
+```
+
+Finally, pass this http variable to any command that requires the http keyword, such as clone:
+
+```
+await git.clone({ ...repo, url, http })
+```
+
+With this code in place, isomorphic-git will honor the `http_proxy` and `https_proxy` environment variables.
+Those environment variables specify a URL through which to route HTTP and HTTPS connections, respectively.
+The URL may contain a username and password if the proxy requires authentication.

@@ -24,6 +24,7 @@ Create an annotated tag.
 | gpgsig                | string                               | The gpgsig attatched to the tag object. (Mutually exclusive with the `signingKey` option.)                                                                                   |
 | signingKey            | string                               | Sign the tag object using this private PGP key. (Mutually exclusive with the `gpgsig` option.)                                                                               |
 | force                 | boolean = false                      | Instead of throwing an error if a tag named `ref` already exists, overwrite the existing tag. Note that this option does not modify the original tag object itself.          |
+| cache                 | object                               | a [cache](cache.md) object                                                                                                                                                   |
 | return                | Promise\<void\>                      | Resolves successfully when filesystem operations are complete                                                                                                                |
 
 Example Code:

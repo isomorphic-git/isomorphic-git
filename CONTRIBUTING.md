@@ -81,3 +81,10 @@ parse[*]Response: (input: stream) -> Object
 Server:
 parse[*]Request: (input: stream) -> Object
 write[*]Response: (input: Object) -> stream
+
+### How git works
+If you want to contribute it may be usefull if you understand how git works under the hood.
+This is great article that shows the details:<br/>
+[A Hacker's Guide to Git](https://wildlyinaccurate.com/a-hackers-guide-to-git/).<br/>
+But as first the introduction you can watch this video:<br/>
+[![Link to Video: Inside the Hidden Git Folder - Computerphile](https://img.youtube.com/vi/bSA91XTzeuA/0.jpg)](http://www.youtube.com/watch?v=bSA91XTzeuA)

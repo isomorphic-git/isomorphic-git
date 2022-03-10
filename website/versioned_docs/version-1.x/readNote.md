@@ -14,6 +14,7 @@ Read the contents of a note
 | **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path             |
 | ref            | string                    | The notes ref to look under                            |
 | **oid**        | string                    | The SHA-1 object id of the object to get the note for. |
+| cache          | object                    | a [cache](cache.md) object                             |
 | return         | Promise\<Uint8Array\>     | Resolves successfully with note contents as a Buffer.  |
 
 

@@ -58,6 +58,7 @@ const http = {
   async request ({
     url,
     method,
+    agent,
     headers,
     body,
     onProgress
@@ -83,6 +84,7 @@ const http = {
 | ----------- | ----------------------------------- | ----------------------------------------------------------------------- |
 | **url**     | string                              | The URL to request                                                      |
 | **method**  | string = 'GET'                      | The HTTP method to use                                                  |
+| **agent**   | object (optional)                   | An HTTP/HTTPS agent that manages HTTP client connections (Node.js only) |
 | **headers** | object = {}                         | Headers to include in the HTTP request                                  |
 | **body**    | AsyncIterableIterator\<Uint8Array\> | An async iterator of Uint8Arrays that make up the body of POST requests |
 | onProgress  | function (optional)                 | Reserved for future use (emitting `GitProgressEvent`s)                  |

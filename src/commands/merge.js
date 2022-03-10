@@ -29,6 +29,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * @param {string} args.gitdir
  * @param {string} [args.ours]
  * @param {string} args.theirs
+ * @param {boolean} args.fastForward
  * @param {boolean} args.fastForwardOnly
  * @param {boolean} args.dryRun
  * @param {boolean} args.noUpdateBranch
@@ -44,6 +45,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * @param {number} args.committer.timestamp
  * @param {number} args.committer.timezoneOffset
  * @param {string} [args.signingKey]
+ * @param {SignCallback} [args.onSign] - a PGP signing implementation
  *
  * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
  *
@@ -54,6 +56,7 @@ export async function _merge({
   gitdir,
   ours,
   theirs,
+  fastForward = true,
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
@@ -61,6 +64,7 @@ export async function _merge({
   author,
   committer,
   signingKey,
+  onSign,
 }) {
   if (ours === undefined) {
     ours = await _currentBranch({ fs, gitdir, fullname: true })
@@ -103,7 +107,7 @@ export async function _merge({
       alreadyMerged: true,
     }
   }
-  if (baseOid === ourOid) {
+  if (fastForward && baseOid === ourOid) {
     if (!dryRun && !noUpdateBranch) {
       await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
     }
@@ -119,6 +123,7 @@ export async function _merge({
     // try a fancier merge
     const tree = await mergeTree({
       fs,
+      cache,
       gitdir,
       ourOid,
       theirOid,
@@ -144,6 +149,7 @@ export async function _merge({
       author,
       committer,
       signingKey,
+      onSign,
       dryRun,
       noUpdateBranch,
     })

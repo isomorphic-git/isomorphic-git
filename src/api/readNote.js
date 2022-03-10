@@ -15,6 +15,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref] - The notes ref to look under
  * @param {string} args.oid - The SHA-1 object id of the object to get the note for.
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<Uint8Array>} Resolves successfully with note contents as a Buffer.
  */
@@ -25,6 +26,7 @@ export async function readNote({
   gitdir = join(dir, '.git'),
   ref = 'refs/notes/commits',
   oid,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -34,7 +36,7 @@ export async function readNote({
 
     return await _readNote({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       gitdir,
       ref,
       oid,

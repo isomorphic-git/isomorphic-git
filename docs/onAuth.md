@@ -80,12 +80,12 @@ In this situation, you want to return an object with `{ username, password }` wh
 
 Unfortunately, all the major git hosting companies have chosen different conventions for converting OAuth2 tokens into Basic Authentication headers!
 
-|            | `username`     | `password`       |
-| ---------- | -------------- | ---------------- |
-| GitHub     | `token`        | 'x-oauth-basic'  |
-| GitHub App | `token`        | 'x-access-token' |
-| BitBucket  | 'x-token-auth' | `token`          |
-| GitLab     | 'oauth2'       | `token`          |
+|            | `username`       | `password`      |
+| ---------- | ---------------- | --------------- |
+| GitHub     | `token`          | 'x-oauth-basic' |
+| GitHub App | 'x-access-token' | `token`         |
+| BitBucket  | 'x-token-auth'   | `token`         |
+| GitLab     | 'oauth2'         | `token`         |
 
 I will gladly accept pull requests to document more companies' conventions.
 

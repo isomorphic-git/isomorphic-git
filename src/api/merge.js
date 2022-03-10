@@ -39,6 +39,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
  * @param {string} args.theirs - The branch to be merged
+ * @param {boolean} [args.fastForward = true] - If false, create a merge commit in all cases.
  * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
  * @param {boolean} [args.dryRun = false] - If true, simulates a merge so you can test whether it would succeed.
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
@@ -54,6 +55,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {number} [args.committer.timestamp=Math.floor(Date.now()/1000)] - Set the committer timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).
  * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
  * @see MergeResult
@@ -75,6 +77,7 @@ export async function merge({
   gitdir = join(dir, '.git'),
   ours,
   theirs,
+  fastForward = true,
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
@@ -82,6 +85,7 @@ export async function merge({
   author: _author,
   committer: _committer,
   signingKey,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -89,10 +93,11 @@ export async function merge({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
-    const cache = {}
 
     const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
-    if (!author && !fastForwardOnly) throw new MissingNameError('author')
+    if (!author && (!fastForwardOnly || !fastForward)) {
+      throw new MissingNameError('author')
+    }
 
     const committer = await normalizeCommitterObject({
       fs,
@@ -100,7 +105,7 @@ export async function merge({
       author,
       committer: _committer,
     })
-    if (!committer && !fastForwardOnly) {
+    if (!committer && (!fastForwardOnly || !fastForward)) {
       throw new MissingNameError('committer')
     }
 
@@ -110,6 +115,7 @@ export async function merge({
       gitdir,
       ours,
       theirs,
+      fastForward,
       fastForwardOnly,
       dryRun,
       noUpdateBranch,
@@ -117,6 +123,7 @@ export async function merge({
       author,
       committer,
       signingKey,
+      onSign,
     })
   } catch (err) {
     err.caller = 'git.merge'

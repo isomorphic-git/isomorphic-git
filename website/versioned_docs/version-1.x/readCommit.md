@@ -13,6 +13,7 @@ Read a commit object directly
 | dir            | string                      | The [working tree](dir-vs-gitdir.md) directory path    |
 | **gitdir**     | string = join(dir,'.git')   | The [git directory](dir-vs-gitdir.md) path             |
 | **oid**        | string                      | The SHA-1 object id to get. Annotated tags are peeled. |
+| cache          | object                      | a [cache](cache.md) object                             |
 | return         | Promise\<ReadCommitResult\> | Resolves successfully with a git commit object         |
 
 ```ts

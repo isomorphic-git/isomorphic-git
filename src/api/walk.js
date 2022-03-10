@@ -9,7 +9,7 @@ import { join } from '../utils/join.js'
 /**
  * @callback WalkerMap
  * @param {string} filename
- * @param {?WalkerEntry[]} entries
+ * @param {Array<WalkerEntry | null>} entries
  * @returns {Promise<any>}
  */
 
@@ -245,6 +245,7 @@ import { join } from '../utils/join.js'
  * @param {WalkerMap} [args.map] - Transform `WalkerEntry`s into a result form
  * @param {WalkerReduce} [args.reduce] - Control how mapped entries are combined with their parent result
  * @param {WalkerIterate} [args.iterate] - Fine-tune how entries within a tree are iterated over
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<any>} The finished tree-walking result
  */
@@ -256,6 +257,7 @@ export async function walk({
   map,
   reduce,
   iterate,
+  cache = {},
 }) {
   try {
     assertParameter('fs', fs)
@@ -264,7 +266,7 @@ export async function walk({
 
     return await _walk({
       fs: new FileSystem(fs),
-      cache: {},
+      cache,
       dir,
       gitdir,
       trees,

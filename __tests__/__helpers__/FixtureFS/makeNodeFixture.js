@@ -11,7 +11,7 @@ async function makeNodeFixture(fixture) {
     getFixturePath,
     createTempDir,
     copyFixtureIntoTempDir,
-  } = require('jest-fixtures')
+  } = require('@wmhilton/jest-fixtures')
 
   const testsDir = path.resolve(__dirname, '..')
 

@@ -2,6 +2,7 @@ import pify from 'pify'
 
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
+import { rmRecursive } from '../utils/rmRecursive.js'
 
 /**
  * This is just a collection of helper functions really. At least that's how it started.
@@ -15,6 +16,13 @@ export class FileSystem {
       this._readFile = fs.promises.readFile.bind(fs.promises)
       this._writeFile = fs.promises.writeFile.bind(fs.promises)
       this._mkdir = fs.promises.mkdir.bind(fs.promises)
+      if (fs.promises.rm) {
+        this._rm = fs.promises.rm.bind(fs.promises)
+      } else if (fs.promises.rmdir.length > 1) {
+        this._rm = fs.promises.rmdir.bind(fs.promises)
+      } else {
+        this._rm = rmRecursive.bind(null, this)
+      }
       this._rmdir = fs.promises.rmdir.bind(fs.promises)
       this._unlink = fs.promises.unlink.bind(fs.promises)
       this._stat = fs.promises.stat.bind(fs.promises)
@@ -26,6 +34,13 @@ export class FileSystem {
       this._readFile = pify(fs.readFile.bind(fs))
       this._writeFile = pify(fs.writeFile.bind(fs))
       this._mkdir = pify(fs.mkdir.bind(fs))
+      if (fs.rm) {
+        this._rm = pify(fs.rm.bind(fs))
+      } else if (fs.rmdir.length > 2) {
+        this._rm = pify(fs.rmdir.bind(fs))
+      } else {
+        this._rm = rmRecursive.bind(null, this)
+      }
       this._rmdir = pify(fs.rmdir.bind(fs))
       this._unlink = pify(fs.unlink.bind(fs))
       this._stat = pify(fs.stat.bind(fs))
@@ -134,9 +149,13 @@ export class FileSystem {
   /**
    * Delete a directory without throwing an error if it is already deleted.
    */
-  async rmdir(filepath) {
+  async rmdir(filepath, opts) {
     try {
-      await this._rmdir(filepath)
+      if (opts && opts.recursive) {
+        await this._rm(filepath, opts)
+      } else {
+        await this._rmdir(filepath)
+      }
     } catch (err) {
       if (err.code !== 'ENOENT') throw err
     }
@@ -201,7 +220,8 @@ export class FileSystem {
     // Note: FileSystem.readlink returns a buffer by default
     // so we can dump it into GitObject.write just like any other file.
     try {
-      return this._readlink(filename, opts)
+      const link = await this._readlink(filename, opts)
+      return Buffer.isBuffer(link) ? link : Buffer.from(link)
     } catch (err) {
       if (err.code === 'ENOENT') {
         return null

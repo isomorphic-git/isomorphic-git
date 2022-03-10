@@ -33,6 +33,10 @@
         "title": "branch",
         "sidebar_label": "branch"
       },
+      "cache": {
+        "title": "The `cache` parameter",
+        "sidebar_label": "cache"
+      },
       "checkout": {
         "title": "checkout",
         "sidebar_label": "checkout"
@@ -726,6 +730,10 @@
       "version-1.x/version-1.x-branch": {
         "title": "branch",
         "sidebar_label": "branch"
+      },
+      "version-1.x/version-1.x-cache": {
+        "title": "The `cache` parameter",
+        "sidebar_label": "cache"
       },
       "version-1.x/version-1.x-checkout": {
         "title": "checkout",

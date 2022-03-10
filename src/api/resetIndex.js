@@ -18,6 +18,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to reset in the index
  * @param {string} [args.ref = 'HEAD'] - A ref to the commit to use
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
@@ -31,32 +32,47 @@ export async function resetIndex({
   dir,
   gitdir = join(dir, '.git'),
   filepath,
-  ref = 'HEAD',
+  ref,
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
     assertParameter('gitdir', gitdir)
     assertParameter('filepath', filepath)
-    assertParameter('ref', ref)
 
     const fs = new FileSystem(_fs)
-    const cache = {}
-    // Resolve commit
-    let oid = await GitRefManager.resolve({ fs, gitdir, ref })
+
+    let oid
     let workdirOid
+
     try {
-      // Resolve blob
-      oid = await resolveFilepath({
-        fs,
-        cache,
-        gitdir,
-        oid,
-        filepath,
-      })
+      // Resolve commit
+      oid = await GitRefManager.resolve({ fs, gitdir, ref: ref || 'HEAD' })
     } catch (e) {
-      // This means we're resetting the file to a "deleted" state
-      oid = null
+      if (ref) {
+        // Only throw the error if a ref is explicitly provided
+        throw e
+      }
     }
+
+    // Not having an oid at this point means `resetIndex()` was called without explicit `ref` on a new git
+    // repository. If that happens, we can skip resolving the file path.
+    if (oid) {
+      try {
+        // Resolve blob
+        oid = await resolveFilepath({
+          fs,
+          cache,
+          gitdir,
+          oid,
+          filepath,
+        })
+      } catch (e) {
+        // This means we're resetting the file to a "deleted" state
+        oid = null
+      }
+    }
+
     // For files that aren't in the workdir use zeros
     let stats = {
       ctime: new Date(0),

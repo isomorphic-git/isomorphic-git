@@ -1,6 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
+import { MultipleGitError } from '../errors/MultipleGitError'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
@@ -8,7 +9,6 @@ import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
-import {MultipleGitError} from "../errors/MultipleGitError";
 
 /**
  * Add a file to the git index (aka staging area)
@@ -19,6 +19,7 @@ import {MultipleGitError} from "../errors/MultipleGitError";
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to add to the index
  * @param {string[]} args.filepaths - The paths to the files to add to the index
+ * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
@@ -34,6 +35,7 @@ export async function add({
   gitdir = join(dir, '.git'),
   filepath,
   filepaths = [filepath],
+  cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
@@ -42,8 +44,7 @@ export async function add({
     assertParameter('filepaths', filepaths[0])
 
     const fs = new FileSystem(_fs)
-    const cache = {}
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function (index) {
       await addToIndex({ dir, gitdir, fs, filepaths, index })
     })
   } catch (err) {
@@ -67,7 +68,13 @@ async function addToIndex({ dir, gitdir, fs, filepaths, index }) {
     if (stats.isDirectory()) {
       const children = await fs.readdir(join(dir, filepath))
       const promises = children.map(child =>
-        addToIndex({ dir, gitdir, fs, filepaths: [join(filepath, child)], index })
+        addToIndex({
+          dir,
+          gitdir,
+          fs,
+          filepaths: [join(filepath, child)],
+          index,
+        })
       )
       await Promise.all(promises)
     } else {
@@ -85,9 +92,7 @@ async function addToIndex({ dir, gitdir, fs, filepaths, index }) {
     .filter(settle => settle.status === 'rejected')
     .map(settle => settle.reason)
   if (rejectedPromises.length) {
-    throw new MultipleGitError(
-      rejectedPromises
-    )
+    throw new MultipleGitError(rejectedPromises)
   }
 
   const fufilledPromises = settledPromises
