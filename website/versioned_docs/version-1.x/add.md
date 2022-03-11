@@ -13,6 +13,7 @@ Add a file to the git index (aka staging area)
 | **dir**        | string                     | The [working tree](dir-vs-gitdir.md) directory path       |
 | **gitdir**     | string = join(dir, '.git') | The [git directory](dir-vs-gitdir.md) path                |
 | **filepath**   | string                     | The path to the file to add to the index                  |
+| **filepaths**  | Array\<string\>            | The paths to the files to add to the index                |
 | cache          | object                     | a [cache](cache.md) object                                |
 | return         | Promise\<void\>            | Resolves successfully once the git index has been updated |
 
