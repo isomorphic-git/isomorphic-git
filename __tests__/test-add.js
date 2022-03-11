@@ -41,7 +41,7 @@ describe('add', () => {
     const { fs, dir } = await makeFixture('test-add')
     // Test
     await init({ fs, dir })
-    await add({ fs, dir, filepaths: ['a.txt', 'a-copy.txt', 'b.txt'] })
+    await add({ fs, dir, filepath: ['a.txt', 'a-copy.txt', 'b.txt'] })
     expect((await listFiles({ fs, dir })).length).toEqual(3)
   })
   it('symlink', async () => {
