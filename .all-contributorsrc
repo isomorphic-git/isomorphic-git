@@ -547,6 +547,17 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "mshanemc",
+      "name": "Shane McLaughlin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4261788?v=4",
+      "profile": "https://www.platformdemos.com/",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
