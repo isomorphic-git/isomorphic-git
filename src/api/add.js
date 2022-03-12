@@ -1,6 +1,8 @@
 // @ts-check
 import '../typedefs.js'
 
+import * as allSettled from 'promise.allsettled'
+
 import { MultipleGitError } from '../errors/MultipleGitError'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
@@ -52,6 +54,8 @@ export async function add({
 }
 
 async function addToIndex({ dir, gitdir, fs, filepath, index }) {
+  // TODO: remove once available in the lowest supported ES version
+  allSettled.shim()
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
   const promises = filepath.map(async filePathIterator => {

@@ -59,6 +59,7 @@
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
     "pify": "^4.0.1",
+    "promise.allsettled": "^1.0.5",
     "readable-stream": "^3.4.0",
     "sha.js": "^2.4.9",
     "simple-get": "^4.0.1"
