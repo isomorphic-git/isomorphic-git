@@ -4,7 +4,7 @@ const { concurrent, series, runInNewWindow } = require('nps-utils')
 
 const pkg = require('./package.json')
 
-const builtFiles = pkg.files.filter(f => !['cli.js'].includes(f))
+const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.cjs')
@@ -55,10 +55,10 @@ module.exports = {
         'build.size',
         'build.pack'
       ),
-      rollup: 'rollup -c --no-treeshake',
+      rollup: 'rollup -c rollup.config.cjs --no-treeshake',
       typings:
         'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
-      webpack: 'webpack',
+      webpack: 'webpack --config webpack.config.cjs',
       indexjson: `node __tests__/__helpers__/make_http_index.cjs`,
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
