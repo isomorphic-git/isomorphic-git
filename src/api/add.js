@@ -12,6 +12,9 @@ import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
+// TODO: remove once available in the lowest supported ES version
+allSettled.shim()
+
 /**
  * Add a file to the git index (aka staging area)
  *
@@ -54,8 +57,6 @@ export async function add({
 }
 
 async function addToIndex({ dir, gitdir, fs, filepath, index }) {
-  // TODO: remove once available in the lowest supported ES version
-  allSettled.shim()
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
   const promises = filepath.map(async filePathIterator => {
