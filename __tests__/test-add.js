@@ -44,6 +44,42 @@ describe('add', () => {
     await add({ fs, dir, filepath: ['a.txt', 'a-copy.txt', 'b.txt'] })
     expect((await listFiles({ fs, dir })).length).toEqual(3)
   })
+  it('multiple files with one failure (normal error)', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    // Test
+    await init({ fs, dir })
+    let err = null
+    try {
+      await add({ fs, dir, filepath: ['a.txt', 'a-copy.txt', 'non-existent'] })
+    } catch (e) {
+      err = e
+    }
+    expect(err.caller).toEqual('git.add')
+    expect(err.name).toEqual('NotFoundError')
+  })
+  it('multiple files with 2 failures (MultipleGitError)', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    // Test
+    await init({ fs, dir })
+    let err = null
+    try {
+      await add({
+        fs,
+        dir,
+        filepath: ['a.txt', 'non-existent', 'also-non-existent'],
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err.caller).toEqual('git.add')
+    expect(err.name).toEqual('MultipleGitError')
+    expect(err.errors.length).toEqual(2)
+    err.errors.forEach(e => {
+      expect(e.name).toEqual('NotFoundError')
+    })
+  })
   it('symlink', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')
