@@ -1,5 +1,5 @@
 // polyfill toMatchInlineSnapshot
-require('./__helpers__/jasmine-inline-snapshots.js')
+require('./__helpers__/jasmine-inline-snapshots.cjs')
 
 // require all modules in the current directory, but not subdirectories, matching with "/test-"
 // @ts-ignore
