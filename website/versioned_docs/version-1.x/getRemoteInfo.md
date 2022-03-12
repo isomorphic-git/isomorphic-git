@@ -25,10 +25,11 @@ The object returned has the following schema:
 type GetRemoteInfoResult = {
   capabilities: Array<string>; // The list of capabilities returned by the server (part of the Git protocol)
   refs: {
-    heads: Object<string, string>; // The branches on the remote
-    pull: Object<string, string>; // The special branches representing pull requests (non-standard)
-    tags: Object<string, string>; // The tags on the remote
   };
+  HEAD?: string; // The default branch of the remote
+  refs.heads?: Object<string, string>; // The branches on the remote
+  refs.pull?: Object<string, string>; // The special branches representing pull requests (non-standard)
+  refs.tags?: Object<string, string>; // The tags on the remote
 }
 ```
 
