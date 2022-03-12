@@ -1,8 +1,6 @@
 // @ts-check
 import '../typedefs.js'
 
-import * as allSettled from 'promise.allsettled'
-
 import { MultipleGitError } from '../errors/MultipleGitError'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
@@ -11,9 +9,6 @@ import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
-
-// TODO: remove once available in the lowest supported ES version
-allSettled.shim()
 
 /**
  * Add a file to the git index (aka staging area)
