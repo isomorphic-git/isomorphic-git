@@ -10,7 +10,7 @@ const ISSUE =
   process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
 const COMMIT = process.env.BUILD_SOURCEVERSION
 
-module.exports = function(config) {
+module.exports = function (config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
@@ -178,13 +178,13 @@ module.exports = function(config) {
       {
         'reporter:browsers': [
           'type',
-          require('./__tests__/__helpers__/karma-successful-browsers-reporter'),
+          require('./__tests__/__helpers__/karma-successful-browsers-reporter.cjs'),
         ],
       },
       {
         'reporter:pr-comment': [
           'type',
-          require('./__tests__/__helpers__/karma-pr-comment-reporter'),
+          require('./__tests__/__helpers__/karma-pr-comment-reporter.cjs'),
         ],
       },
     ],
@@ -218,9 +218,10 @@ module.exports = function(config) {
 
   if (!process.env.TEST_NO_BROWSERS) {
     // Only re-run browsers that failed in the previous run.
-    options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.js').filter(
-      options.browsers
-    )
+    options.browsers =
+      require('./__tests__/__helpers__/karma-load-successful-browsers.cjs').filter(
+        options.browsers
+      )
     console.log('running with browsers:', options.browsers)
   }
 
