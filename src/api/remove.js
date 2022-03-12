@@ -39,7 +39,7 @@ export async function remove({
 
     await GitIndexManager.acquire(
       { fs: new FileSystem(_fs), gitdir, cache },
-      async function(index) {
+      async function (index) {
         index.delete({ filepath })
       }
     )

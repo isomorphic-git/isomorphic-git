@@ -7,7 +7,7 @@ var options = {
   from: /0\.0\.0-development/g,
   to: pkg.version,
 }
-;(async function() {
+;(async function () {
   // @ts-ignore
   await replace(options)
 })()

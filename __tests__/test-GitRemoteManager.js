@@ -57,8 +57,7 @@ describe('GitRemoteManager', () => {
     let error = null
     try {
       helper = await GitRemoteManager.getRemoteHelperFor({
-        url:
-          'hypergit://5701a1c08ae15dba17e181b1a9a28bdfb8b95200d77a25be6051bb018e25439a',
+        url: 'hypergit://5701a1c08ae15dba17e181b1a9a28bdfb8b95200d77a25be6051bb018e25439a',
       })
     } catch (err) {
       error = err
