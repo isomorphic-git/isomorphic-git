@@ -15,6 +15,7 @@
 /internal-apis.cjs
 /internal-apis.umd.min.js
 /internal-apis.umd.min.js.map
+/dist
 
 # Test run artifacts
 /coverage

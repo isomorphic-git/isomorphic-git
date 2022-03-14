@@ -1,4 +1,4 @@
-const loadSuccessfulBrowsers = require('./karma-load-successful-browsers.js')
+const loadSuccessfulBrowsers = require('./karma-load-successful-browsers.cjs')
 
 const BrowsersReporter = function(
   baseReporterDecorator,
