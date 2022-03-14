@@ -9,7 +9,10 @@ const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.cjs')
 
-const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
+const retry = n => cmd =>
+  Array(n)
+    .fill(`(${cmd})`)
+    .join(` || `)
 const retry3 = retry(3)
 
 const quote = cmd =>
@@ -92,10 +95,10 @@ module.exports = {
       codemirrorify:
         '(cd website/packages/codemirrorify && npm install && npm run build)',
       cpstatic:
-        'cp website/packages/codemirrorify/dist/main.js website/static/js/codemirrorify.js && node __tests__/__helpers__/copy-to-website.js',
+        'cp website/packages/codemirrorify/dist/main.js website/static/js/codemirrorify.js && node __tests__/__helpers__/copy-to-website.cjs',
       build: '(cd website && npm install && npm run build)',
       dev: '(cd website && npm start)',
-      publish: '(cd website && node ./scripts/deploy-gh-pages.js)',
+      publish: '(cd website && node ./scripts/deploy-gh-pages.cjs)',
     },
     // ATTENTION:
     // LIST OF SAFE PORTS FOR SAUCE LABS (Edge and Safari) https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy+FAQS#SauceConnectProxyFAQS-CanIAccessApplicationsonlocalhost?
@@ -143,7 +146,7 @@ module.exports = {
     },
     prepublish: {
       default: series.nps('prepublish.version', 'build'),
-      version: `node __tests__/__helpers__/fix-version-number.js`,
+      version: `node __tests__/__helpers__/fix-version-number.cjs`,
     },
   },
 }
