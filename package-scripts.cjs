@@ -6,7 +6,6 @@ const pkg = require('./package.json')
 
 const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 
-// Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.cjs')
 
 const retry = n => cmd =>
