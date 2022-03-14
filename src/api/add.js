@@ -54,36 +54,36 @@ export async function add({
 async function addToIndex({ dir, gitdir, fs, filepath, index }) {
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
-  const promises = filepath.map(async filePathIterator => {
+  const promises = filepath.map(async currentFilepath => {
     const ignored = await GitIgnoreManager.isIgnored({
       fs,
       dir,
       gitdir,
-      filepath: filePathIterator,
+      filepath: currentFilepath,
     })
     if (ignored) return
-    const stats = await fs.lstat(join(dir, filePathIterator))
-    if (!stats) throw new NotFoundError(filePathIterator)
+    const stats = await fs.lstat(join(dir, currentFilepath))
+    if (!stats) throw new NotFoundError(currentFilepath)
 
     if (stats.isDirectory()) {
-      const children = await fs.readdir(join(dir, filePathIterator))
+      const children = await fs.readdir(join(dir, currentFilepath))
       const promises = children.map(child =>
         addToIndex({
           dir,
           gitdir,
           fs,
-          filepath: [join(filePathIterator, child)],
+          filepath: [join(currentFilepath, child)],
           index,
         })
       )
       await Promise.all(promises)
     } else {
       const object = stats.isSymbolicLink()
-        ? await fs.readlink(join(dir, filePathIterator))
-        : await fs.read(join(dir, filePathIterator))
-      if (object === null) throw new NotFoundError(filePathIterator)
+        ? await fs.readlink(join(dir, currentFilepath))
+        : await fs.read(join(dir, currentFilepath))
+      if (object === null) throw new NotFoundError(currentFilepath)
       const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
-      index.insert({ filepath: filePathIterator, stats, oid })
+      index.insert({ filepath: currentFilepath, stats, oid })
     }
   })
 
@@ -99,7 +99,7 @@ async function addToIndex({ dir, gitdir, fs, filepath, index }) {
   }
 
   const fulfilledPromises = settledPromises
-    .filter(settle => settle.status === 'fulfilled')
+    .filter(settle => settle.status === 'fulfilled' && settle.value)
     .map(settle => settle.value)
 
   return fulfilledPromises
