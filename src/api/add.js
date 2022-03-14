@@ -1,6 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
+import { MultipleGitError } from '../errors/MultipleGitError'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
@@ -8,7 +9,6 @@ import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
-import { posixifyPathBuffer } from '../utils/posixifyPathBuffer.js'
 
 /**
  * Add a file to the git index (aka staging area)
@@ -18,6 +18,7 @@ import { posixifyPathBuffer } from '../utils/posixifyPathBuffer.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to add to the index
+ * @param {string[]} args.filepaths - The paths to the files to add to the index
  * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
@@ -33,17 +34,18 @@ export async function add({
   dir,
   gitdir = join(dir, '.git'),
   filepath,
+  filepaths = [filepath],
   cache = {},
 }) {
   try {
     assertParameter('fs', _fs)
     assertParameter('dir', dir)
     assertParameter('gitdir', gitdir)
-    assertParameter('filepath', filepath)
+    assertParameter('filepaths', filepaths[0])
 
     const fs = new FileSystem(_fs)
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-      await addToIndex({ dir, gitdir, fs, filepath, index })
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async function (index) {
+      await addToIndex({ dir, gitdir, fs, filepaths, index })
     })
   } catch (err) {
     err.caller = 'git.add'
@@ -51,29 +53,51 @@ export async function add({
   }
 }
 
-async function addToIndex({ dir, gitdir, fs, filepath, index }) {
+async function addToIndex({ dir, gitdir, fs, filepaths, index }) {
   // TODO: Should ignore UNLESS it's already in the index.
-  const ignored = await GitIgnoreManager.isIgnored({
-    fs,
-    dir,
-    gitdir,
-    filepath,
+  const promises = filepaths.map(async filepath => {
+    const ignored = await GitIgnoreManager.isIgnored({
+      fs,
+      dir,
+      gitdir,
+      filepath,
+    })
+    if (ignored) return
+    const stats = await fs.lstat(join(dir, filepath))
+    if (!stats) throw new NotFoundError(filepath)
+    if (stats.isDirectory()) {
+      const children = await fs.readdir(join(dir, filepath))
+      const promises = children.map(child =>
+        addToIndex({
+          dir,
+          gitdir,
+          fs,
+          filepaths: [join(filepath, child)],
+          index,
+        })
+      )
+      await Promise.all(promises)
+    } else {
+      const object = stats.isSymbolicLink()
+        ? await fs.readlink(join(dir, filepath))
+        : await fs.read(join(dir, filepath))
+      if (object === null) throw new NotFoundError(filepath)
+      const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
+      index.insert({ filepath, stats, oid })
+    }
   })
-  if (ignored) return
-  const stats = await fs.lstat(join(dir, filepath))
-  if (!stats) throw new NotFoundError(filepath)
-  if (stats.isDirectory()) {
-    const children = await fs.readdir(join(dir, filepath))
-    const promises = children.map(child =>
-      addToIndex({ dir, gitdir, fs, filepath: join(filepath, child), index })
-    )
-    await Promise.all(promises)
-  } else {
-    const object = stats.isSymbolicLink()
-      ? await fs.readlink(join(dir, filepath)).then(posixifyPathBuffer)
-      : await fs.read(join(dir, filepath))
-    if (object === null) throw new NotFoundError(filepath)
-    const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
-    index.insert({ filepath, stats, oid })
+
+  const settledPromises = await Promise.allSettled(promises)
+  const rejectedPromises = settledPromises
+    .filter(settle => settle.status === 'rejected')
+    .map(settle => settle.reason)
+  if (rejectedPromises.length) {
+    throw new MultipleGitError(rejectedPromises)
   }
+
+  const fufilledPromises = settledPromises
+    .filter(settle => settle.status === 'fulfilled')
+    .map(settle => settle.value)
+
+  return fufilledPromises
 }
