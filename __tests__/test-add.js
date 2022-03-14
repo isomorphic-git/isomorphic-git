@@ -58,9 +58,11 @@ describe('add', () => {
     expect(err.caller).toEqual('git.add')
     expect(err.name).toEqual('NotFoundError')
   })
-  it('multiple files with 2 failures (MultipleGitError)', async () => {
+  it('multiple files with 2 failures (MultipleGitError) and an ignored file', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')
+    await writeGitIgnore(fs, dir)
+
     // Test
     await init({ fs, dir })
     let err = null
@@ -68,7 +70,7 @@ describe('add', () => {
       await add({
         fs,
         dir,
-        filepath: ['a.txt', 'non-existent', 'also-non-existent'],
+        filepath: ['a.txt', 'i.txt', 'non-existent', 'also-non-existent'],
       })
     } catch (e) {
       err = e
@@ -79,6 +81,21 @@ describe('add', () => {
     err.errors.forEach(e => {
       expect(e.name).toEqual('NotFoundError')
     })
+  })
+  it('multiple files with 1 ignored', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await writeGitIgnore(fs, dir)
+
+    // Test
+    await init({ fs, dir })
+    await add({
+      fs,
+      dir,
+      filepath: ['a.txt', 'i.txt'],
+    })
+    expect((await listFiles({ fs, dir })).length).toEqual(1)
+    expect(await listFiles({ fs, dir })).toEqual(['a.txt'])
   })
   it('symlink', async () => {
     // Setup
