@@ -36,6 +36,67 @@ describe('add', () => {
     await add({ fs, dir, filepath: 'b.txt' })
     expect((await listFiles({ fs, dir })).length).toEqual(3)
   })
+  it('multiple files', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    // Test
+    await init({ fs, dir })
+    await add({ fs, dir, filepath: ['a.txt', 'a-copy.txt', 'b.txt'] })
+    expect((await listFiles({ fs, dir })).length).toEqual(3)
+  })
+  it('multiple files with one failure (normal error)', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    // Test
+    await init({ fs, dir })
+    let err = null
+    try {
+      await add({ fs, dir, filepath: ['a.txt', 'a-copy.txt', 'non-existent'] })
+    } catch (e) {
+      err = e
+    }
+    expect(err.caller).toEqual('git.add')
+    expect(err.name).toEqual('NotFoundError')
+  })
+  it('multiple files with 2 failures (MultipleGitError) and an ignored file', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await writeGitIgnore(fs, dir)
+
+    // Test
+    await init({ fs, dir })
+    let err = null
+    try {
+      await add({
+        fs,
+        dir,
+        filepath: ['a.txt', 'i.txt', 'non-existent', 'also-non-existent'],
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err.caller).toEqual('git.add')
+    expect(err.name).toEqual('MultipleGitError')
+    expect(err.errors.length).toEqual(2)
+    err.errors.forEach(e => {
+      expect(e.name).toEqual('NotFoundError')
+    })
+  })
+  it('multiple files with 1 ignored', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await writeGitIgnore(fs, dir)
+
+    // Test
+    await init({ fs, dir })
+    await add({
+      fs,
+      dir,
+      filepath: ['a.txt', 'i.txt'],
+    })
+    expect((await listFiles({ fs, dir })).length).toEqual(1)
+    expect(await listFiles({ fs, dir })).toEqual(['a.txt'])
+  })
   it('symlink', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')
