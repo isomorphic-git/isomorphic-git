@@ -4,15 +4,12 @@ const { concurrent, series, runInNewWindow } = require('nps-utils')
 
 const pkg = require('./package.json')
 
-const builtFiles = pkg.files.filter(f => !['cli.js'].includes(f))
+const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
-require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.js')
+require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.cjs')
 
-const retry = n => cmd =>
-  Array(n)
-    .fill(`(${cmd})`)
-    .join(` || `)
+const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
 const retry3 = retry(3)
 
 const quote = cmd =>
@@ -61,37 +58,37 @@ module.exports = {
       rollup: 'rollup -c --no-treeshake',
       typings:
         'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
-      webpack: 'webpack',
-      indexjson: `node __tests__/__helpers__/make_http_index.js`,
+      webpack: 'webpack --config webpack.config.cjs',
+      indexjson: `node __tests__/__helpers__/make_http_index.cjs`,
       treeshake: 'agadoo',
-      docs: 'node ./__tests__/__helpers__/generate-docs.js',
+      docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
       size: process.env.CI
         ? optional(
-            `cross-env ` +
-              `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}' ` +
-              `CI_REPO_OWNER='isomorphic-git' ` +
-              `CI_REPO_NAME='isomorphic-git' ` +
-              `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
-              `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
-              `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}' ` +
-              `bundlewatch`
-          )
+          `cross-env ` +
+          `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}' ` +
+          `CI_REPO_OWNER='isomorphic-git' ` +
+          `CI_REPO_NAME='isomorphic-git' ` +
+          `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
+          `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
+          `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}' ` +
+          `bundlewatch`
+        )
         : optional(`cross-env bundlewatch`),
       pack: 'npm pack',
     },
     website: {
       default: process.env.CI
         ? series.nps(
-            'website.codemirrorify',
-            'website.cpstatic',
-            'website.build',
-            'website.publish'
-          )
+          'website.codemirrorify',
+          'website.cpstatic',
+          'website.build',
+          'website.publish'
+        )
         : series.nps(
-            'website.codemirrorify',
-            'website.cpstatic',
-            'website.dev'
-          ),
+          'website.codemirrorify',
+          'website.cpstatic',
+          'website.dev'
+        ),
       codemirrorify:
         '(cd website/packages/codemirrorify && npm install && npm run build)',
       cpstatic:
@@ -116,23 +113,23 @@ module.exports = {
     test: {
       default: process.env.CI
         ? series.nps(
-            'lint',
-            'build',
-            'test.typecheck',
-            'test.setup',
-            'test.jest',
-            'test.karma',
-            'test.teardown'
-          )
+          'lint',
+          'build',
+          'test.typecheck',
+          'test.setup',
+          'test.jest',
+          'test.karma',
+          'test.teardown'
+        )
         : series.nps(
-            'lint',
-            'build',
-            'test.typecheck',
-            'test.setup',
-            'test.jest',
-            'test.karma',
-            'test.teardown'
-          ),
+          'lint',
+          'build',
+          'test.typecheck',
+          'test.setup',
+          'test.jest',
+          'test.karma',
+          'test.teardown'
+        ),
       typecheck: 'tsc -p tsconfig.json',
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
@@ -140,8 +137,8 @@ module.exports = {
         ? retry3(`${timeout5('jest --ci --coverage')}`)
         : `jest --ci --coverage`,
       karma: process.env.CI
-        ? retry3('karma start --single-run')
-        : 'cross-env karma start --single-run',
+        ? retry3('karma start ./karma.conf.cjs --single-run')
+        : 'cross-env karma start ./karma.conf.cjs --single-run -log-level debug',
       karmore: 'cross-env TEST_NO_BROWSERS=1 karma start --no-single-run',
     },
     prepublish: {
