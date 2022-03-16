@@ -183,6 +183,10 @@ export class GitIndex {
     this._dirty = true
   }
 
+  has({ filepath }) {
+    return this._entries.has(filepath)
+  }
+
   render() {
     return this.entries
       .map(entry => `${entry.mode.toString(8)} ${entry.oid}    ${entry.path}`)
