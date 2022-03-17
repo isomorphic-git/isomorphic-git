@@ -60,6 +60,7 @@ original_id: alphabetic
 - [status](status)
 - [statusMatrix](statusMatrix)
 - [tag](tag)
+- [updateIndex](updateIndex)
 - [version](version)
 - [walk](walk)
 - [writeBlob](writeBlob)
