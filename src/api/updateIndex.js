@@ -60,7 +60,6 @@ export async function updateIndex({
   remove,
   force,
 }) {
-  // TODO what if no remove, no add and only a filepath???
   try {
     assertParameter('fs', _fs)
     assertParameter('gitdir', gitdir)
@@ -135,7 +134,9 @@ export async function updateIndex({
         stats = fileStats
 
         // Write the file to the object database
-        const object = await fs.read(join(dir, filepath))
+        const object = stats.isSymbolicLink()
+          ? await fs.readlink(join(dir, filepath))
+          : await fs.read(join(dir, filepath))
 
         oid = await _writeObject({
           fs,
