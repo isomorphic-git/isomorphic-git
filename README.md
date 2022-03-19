@@ -195,6 +195,7 @@ unless there is a major version bump.
 - [status](https://isomorphic-git.github.io/docs/status.html)
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [tag](https://isomorphic-git.github.io/docs/tag.html)
+- [updateIndex](https://isomorphic-git.github.io/docs/updateIndex.html)
 - [version](https://isomorphic-git.github.io/docs/version.html)
 - [walk](https://isomorphic-git.github.io/docs/walk.html)
 - [writeBlob](https://isomorphic-git.github.io/docs/writeBlob.html)

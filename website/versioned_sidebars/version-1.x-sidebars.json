@@ -84,6 +84,7 @@
       "version-1.x-expandRef",
       "version-1.x-expandOid",
       "version-1.x-resetIndex",
+      "version-1.x-updateIndex",
       "version-1.x-resolveRef",
       "version-1.x-writeRef",
       "version-1.x-deleteRef",

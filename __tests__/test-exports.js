@@ -65,6 +65,7 @@ describe('exports', () => {
         "status",
         "statusMatrix",
         "tag",
+        "updateIndex",
         "version",
         "walk",
         "writeBlob",
