@@ -73,6 +73,53 @@ describe('statusMatrix', () => {
     expect(a).toEqual([['.gitignore', 0, 2, 2]])
   })
 
+  it('does not returned ignored files already in the index', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, '.gitignore'), 'ignoreme.txt\n')
+    await add({ fs, dir, gitdir, filepath: '.' })
+    await fs.write(path.join(dir, 'ignoreme.txt'), 'ignored')
+
+    // Test
+    const a = await statusMatrix({ fs, dir, gitdir })
+    expect(a).toEqual([['.gitignore', 0, 2, 2]])
+  })
+
+  it('returns ignored files already in the index if ignored:true', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, '.gitignore'), 'ignoreme.txt\n')
+    await add({ fs, dir, gitdir, filepath: '.' })
+    await fs.write(path.join(dir, 'ignoreme.txt'), 'ignored')
+
+    // Test
+    const a = await statusMatrix({ fs, dir, gitdir, ignored: true })
+    expect(a).toEqual([
+      ['.gitignore', 0, 2, 2],
+      ['ignoreme.txt', 0, 2, 0],
+    ])
+  })
+
+  it('ignored: true has no impact when file is already in index', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, '.gitignore'), 'ignoreme.txt\n')
+    await fs.write(path.join(dir, 'ignoreme.txt'), 'ignored')
+    await add({ fs, dir, gitdir, filepath: '.', force: true })
+    // Test
+    const a = await statusMatrix({ fs, dir, gitdir, ignored: true })
+    expect(a).toEqual([
+      ['.gitignore', 0, 2, 2],
+      ['ignoreme.txt', 0, 2, 2],
+    ])
+    // Test
+    const b = await statusMatrix({ fs, dir, gitdir, ignored: false })
+    expect(b).toEqual([
+      ['.gitignore', 0, 2, 2],
+      ['ignoreme.txt', 0, 2, 2],
+    ])
+  })
+
   it('statusMatrix with filepaths', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')

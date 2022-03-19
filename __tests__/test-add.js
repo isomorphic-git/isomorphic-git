@@ -94,8 +94,22 @@ describe('add', () => {
       dir,
       filepath: ['a.txt', 'i.txt'],
     })
-    expect((await listFiles({ fs, dir })).length).toEqual(1)
-    expect(await listFiles({ fs, dir })).toEqual(['a.txt'])
+  })
+  it('multiple files with 1 ignored and force:true', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await writeGitIgnore(fs, dir)
+
+    // Test
+    await init({ fs, dir })
+    await add({
+      fs,
+      dir,
+      filepath: ['a.txt', 'i.txt'],
+      force: true,
+    })
+    expect((await listFiles({ fs, dir })).length).toEqual(2)
+    expect(await listFiles({ fs, dir })).toEqual(['a.txt', 'i.txt'])
   })
   it('symlink', async () => {
     // Setup
@@ -136,6 +150,15 @@ describe('add', () => {
     await add({ fs, dir, filepath: 'i.txt' })
     expect((await listFiles({ fs, dir })).length).toEqual(0)
   })
+  it('ignored file but with force=true', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await writeGitIgnore(fs, dir)
+    // Test
+    await init({ fs, dir })
+    await add({ fs, dir, filepath: 'i.txt', force: true })
+    expect((await listFiles({ fs, dir })).length).toEqual(1)
+  })
   it('non-existant file', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')
@@ -167,6 +190,16 @@ describe('add', () => {
     expect((await listFiles({ fs, dir })).length).toEqual(0)
     await add({ fs, dir, filepath: 'c' })
     expect((await listFiles({ fs, dir })).length).toEqual(3)
+  })
+  it('folder with .gitignore and force', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await writeGitIgnore(fs, dir)
+    // Test
+    await init({ fs, dir })
+    expect((await listFiles({ fs, dir })).length).toEqual(0)
+    await add({ fs, dir, filepath: 'c', force: true })
+    expect((await listFiles({ fs, dir })).length).toEqual(4)
   })
   it('git add .', async () => {
     // Setup

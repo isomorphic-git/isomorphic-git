@@ -19,6 +19,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string|string[]} args.filepath - The path to the file to add to the index
  * @param {object} [args.cache] - a [cache](cache.md) object
+ * @param {boolean} args.force - add to index even if matches gitignore. Think `git add --force`
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
@@ -34,6 +35,7 @@ export async function add({
   gitdir = join(dir, '.git'),
   filepath,
   cache = {},
+  force = false,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -43,7 +45,7 @@ export async function add({
 
     const fs = new FileSystem(_fs)
     await GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
-      return addToIndex({ dir, gitdir, fs, filepath, index })
+      return addToIndex({ dir, gitdir, fs, filepath, index, force })
     })
   } catch (err) {
     err.caller = 'git.add'
@@ -51,16 +53,18 @@ export async function add({
   }
 }
 
-async function addToIndex({ dir, gitdir, fs, filepath, index }) {
+async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
   const promises = filepath.map(async currentFilepath => {
-    const ignored = await GitIgnoreManager.isIgnored({
-      fs,
-      dir,
-      gitdir,
-      filepath: currentFilepath,
-    })
+    const ignored = force
+      ? false
+      : await GitIgnoreManager.isIgnored({
+        fs,
+        dir,
+        gitdir,
+        filepath: currentFilepath,
+      })
     if (ignored) return
     const stats = await fs.lstat(join(dir, currentFilepath))
     if (!stats) throw new NotFoundError(currentFilepath)
@@ -74,6 +78,7 @@ async function addToIndex({ dir, gitdir, fs, filepath, index }) {
           fs,
           filepath: [join(currentFilepath, child)],
           index,
+          force,
         })
       )
       await Promise.all(promises)
