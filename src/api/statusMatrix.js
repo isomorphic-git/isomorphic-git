@@ -147,6 +147,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {string[]} [args.filepaths = ['.']] - Limit the query to the given files and directories
  * @param {function(string): boolean} [args.filter] - Filter the results to only those whose filepath matches a function.
  * @param {object} [args.cache] - a [cache](cache.md) object
+ * @param {boolean} [args.ignored = false] - include ignored files in the result
  *
  * @returns {Promise<Array<StatusRow>>} Resolves with a status matrix, described below.
  * @see StatusRow
@@ -159,6 +160,7 @@ export async function statusMatrix({
   filepaths = ['.'],
   filter,
   cache = {},
+  ignored: shouldIgnore = false,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -175,14 +177,15 @@ export async function statusMatrix({
       map: async function(filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
         if (!head && !stage && workdir) {
-          if (
-            await GitIgnoreManager.isIgnored({
+          if (!shouldIgnore) {
+            const isIgnored = await GitIgnoreManager.isIgnored({
               fs,
               dir,
               filepath,
             })
-          ) {
-            return null
+            if (isIgnored) {
+              return null
+            }
           }
         }
         // match against base paths

@@ -16,6 +16,7 @@ Efficiently get the status of multiple files at once.
 | filepaths      | Array\<string\> = ['.']       | Limit the query to the given files and directories                                                 |
 | filter         | function(string): boolean     | Filter the results to only those whose filepath matches a function.                                |
 | cache          | object                        | a [cache](cache.md) object                                                                         |
+| ignored        | boolean                       | include ignored files in the result                                                                |
 | return         | Promise\<Array\<StatusRow\>\> | Resolves with a status matrix, described below.                                                    |
 
 ```ts
