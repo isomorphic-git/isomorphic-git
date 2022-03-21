@@ -78,15 +78,22 @@ export async function updateIndex({
             fileStats = await fs.lstat(join(dir, filepath))
 
             if (fileStats) {
+              if (fileStats.isDirectory()) {
+                // Removing directories should not work
+                throw new InvalidFilepathError('directory')
+              }
+
               // Do nothing if we don't force and the file still exists in the workdir
               return
             }
           }
 
-          // Remove the file from the index if it's forced or the file does not exist
-          index.delete({
-            filepath,
-          })
+          // Directories are not allowed, so we make sure the provided filepath exists in the index
+          if (index.has({ filepath })) {
+            index.delete({
+              filepath,
+            })
+          }
         }
       )
     }
