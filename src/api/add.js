@@ -19,7 +19,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string|string[]} args.filepath - The path to the file to add to the index
  * @param {object} [args.cache] - a [cache](cache.md) object
- * @param {boolean} args.force - add to index even if matches gitignore. Think `git add --force`
+ * @param {boolean} [args.force=false] - add to index even if matches gitignore. Think `git add --force`
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *

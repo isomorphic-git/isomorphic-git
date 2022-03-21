@@ -147,7 +147,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {string[]} [args.filepaths = ['.']] - Limit the query to the given files and directories
  * @param {function(string): boolean} [args.filter] - Filter the results to only those whose filepath matches a function.
  * @param {object} [args.cache] - a [cache](cache.md) object
- * @param {boolean} [args.ignored] - include ignored files in the result
+ * @param {boolean} [args.ignored = false] - include ignored files in the result
  *
  * @returns {Promise<Array<StatusRow>>} Resolves with a status matrix, described below.
  * @see StatusRow
