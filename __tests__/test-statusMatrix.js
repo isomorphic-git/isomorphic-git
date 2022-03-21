@@ -73,7 +73,7 @@ describe('statusMatrix', () => {
     expect(a).toEqual([['.gitignore', 0, 2, 2]])
   })
 
-  it('does not returned ignored files already in the index', async () => {
+  it('does not return ignored files already in the index', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-empty')
     await fs.write(path.join(dir, '.gitignore'), 'ignoreme.txt\n')
@@ -100,6 +100,148 @@ describe('statusMatrix', () => {
     ])
   })
 
+  it('ignored:true works with multiple added files ', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(
+      path.join(dir, '.gitignore'),
+      'ignoreme.txt\nignoreme2.txt\n'
+    )
+    await add({ fs, dir, gitdir, filepath: '.' })
+    await fs.write(path.join(dir, 'ignoreme.txt'), 'ignored')
+    await fs.write(path.join(dir, 'ignoreme2.txt'), 'ignored')
+
+    // Test
+    const a = await statusMatrix({ fs, dir, gitdir, ignored: true })
+    expect(a).toEqual([
+      ['.gitignore', 0, 2, 2],
+      ['ignoreme.txt', 0, 2, 0],
+      ['ignoreme2.txt', 0, 2, 0],
+    ])
+  })
+
+  describe('ignored:true works supports multiple filepaths', () => {
+    let fs, dir, gitdir
+    const ignoredFolder = 'ignoreThisFolder'
+    const nonIgnoredFolder = 'nonIgnoredFolder'
+
+    beforeAll(async () => {
+      // Setup
+      const output = await makeFixture('test-empty')
+      fs = output.fs
+      dir = output.dir
+      gitdir = output.gitdir
+
+      await fs.write(path.join(dir, '.gitignore'), `${ignoredFolder}/*\n`)
+      await add({ fs, dir, gitdir, filepath: '.' })
+      await fs.mkdir(path.join(dir, ignoredFolder))
+      await fs.mkdir(path.join(dir, nonIgnoredFolder))
+      await fs.write(
+        path.join(dir, nonIgnoredFolder, 'notIgnored.txt'),
+        'notIgnored'
+      )
+      await fs.write(path.join(dir, ignoredFolder, 'ignoreme.txt'), 'ignored')
+      await fs.write(path.join(dir, 'notIgnored.txt'), 'notIgnored')
+    })
+
+    it('base case: no filepaths', async () => {
+      const result = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        ignored: true,
+      })
+      expect(result).toEqual([
+        ['.gitignore', 0, 2, 2],
+        [`${ignoredFolder}/ignoreme.txt`, 0, 2, 0],
+        [`${nonIgnoredFolder}/notIgnored.txt`, 0, 2, 0],
+        ['notIgnored.txt', 0, 2, 0],
+      ])
+    })
+
+    it('filepaths on ignored folder should return empty', async () => {
+      const result = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        filepaths: [ignoredFolder],
+      })
+      expect(result).toEqual([])
+    })
+
+    it('shows nonignored file and folder', async () => {
+      const result = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        filepaths: [ignoredFolder, 'notIgnored.txt', nonIgnoredFolder],
+      })
+      expect(result).toEqual([
+        [`${nonIgnoredFolder}/notIgnored.txt`, 0, 2, 0],
+        ['notIgnored.txt', 0, 2, 0],
+      ])
+    })
+
+    it('filepaths on ignored folder and non-ignored file should show all files with ignored:true ', async () => {
+      const result = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        filepaths: [ignoredFolder, 'notIgnored.txt', nonIgnoredFolder],
+        ignored: true,
+      })
+      expect(result).toEqual([
+        [`${ignoredFolder}/ignoreme.txt`, 0, 2, 0],
+        [`${nonIgnoredFolder}/notIgnored.txt`, 0, 2, 0],
+        ['notIgnored.txt', 0, 2, 0],
+      ])
+    })
+
+    describe('all files, ignored:true, test order permutation', () => {
+      it('file, ignored, notignored', async () => {
+        const result = await statusMatrix({
+          fs,
+          dir,
+          gitdir,
+          filepaths: ['notIgnored.txt', ignoredFolder, nonIgnoredFolder],
+          ignored: true,
+        })
+        expect(result).toEqual([
+          [`${ignoredFolder}/ignoreme.txt`, 0, 2, 0],
+          [`${nonIgnoredFolder}/notIgnored.txt`, 0, 2, 0],
+          ['notIgnored.txt', 0, 2, 0],
+        ])
+      })
+      it('ignored, notignored, file', async () => {
+        const result = await statusMatrix({
+          fs,
+          dir,
+          gitdir,
+          filepaths: [ignoredFolder, nonIgnoredFolder, 'notIgnored.txt'],
+          ignored: true,
+        })
+        expect(result).toEqual([
+          [`${ignoredFolder}/ignoreme.txt`, 0, 2, 0],
+          [`${nonIgnoredFolder}/notIgnored.txt`, 0, 2, 0],
+          ['notIgnored.txt', 0, 2, 0],
+        ])
+      })
+      it('notignored, ignored, file', async () => {
+        const result = await statusMatrix({
+          fs,
+          dir,
+          gitdir,
+          filepaths: [nonIgnoredFolder, ignoredFolder, 'notIgnored.txt'],
+          ignored: true,
+        })
+        expect(result).toEqual([
+          [`${ignoredFolder}/ignoreme.txt`, 0, 2, 0],
+          [`${nonIgnoredFolder}/notIgnored.txt`, 0, 2, 0],
+          ['notIgnored.txt', 0, 2, 0],
+        ])
+      })
+    })
+  })
   it('ignored: true has no impact when file is already in index', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-empty')

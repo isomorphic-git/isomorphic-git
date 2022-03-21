@@ -57,15 +57,15 @@ async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
   const promises = filepath.map(async currentFilepath => {
-    const ignored = force
-      ? false
-      : await GitIgnoreManager.isIgnored({
-          fs,
-          dir,
-          gitdir,
-          filepath: currentFilepath,
-        })
-    if (ignored) return
+    if (!force) {
+      const ignored = await GitIgnoreManager.isIgnored({
+        fs,
+        dir,
+        gitdir,
+        filepath: currentFilepath,
+      })
+      if (ignored) return
+    }
     const stats = await fs.lstat(join(dir, currentFilepath))
     if (!stats) throw new NotFoundError(currentFilepath)
 

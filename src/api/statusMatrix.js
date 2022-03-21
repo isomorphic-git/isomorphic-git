@@ -160,7 +160,7 @@ export async function statusMatrix({
   filepaths = ['.'],
   filter,
   cache = {},
-  ignored = false,
+  ignored: shouldIgnore = false,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -177,16 +177,15 @@ export async function statusMatrix({
       map: async function(filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
         if (!head && !stage && workdir) {
-          if (
-            ignored
-              ? false
-              : await GitIgnoreManager.isIgnored({
-                  fs,
-                  dir,
-                  filepath,
-                })
-          ) {
-            return null
+          if (!shouldIgnore) {
+            const isIgnored = await GitIgnoreManager.isIgnored({
+              fs,
+              dir,
+              filepath,
+            })
+            if (isIgnored) {
+              return null
+            }
           }
         }
         // match against base paths
