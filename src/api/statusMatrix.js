@@ -174,17 +174,17 @@ export async function statusMatrix({
       dir,
       gitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],
-      map: async function (filepath, [head, workdir, stage]) {
+      map: async function(filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.
         if (!head && !stage && workdir) {
           if (
             ignored
               ? false
               : await GitIgnoreManager.isIgnored({
-                fs,
-                dir,
-                filepath,
-              })
+                  fs,
+                  dir,
+                  filepath,
+                })
           ) {
             return null
           }

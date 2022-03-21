@@ -60,11 +60,11 @@ async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
     const ignored = force
       ? false
       : await GitIgnoreManager.isIgnored({
-        fs,
-        dir,
-        gitdir,
-        filepath: currentFilepath,
-      })
+          fs,
+          dir,
+          gitdir,
+          filepath: currentFilepath,
+        })
     if (ignored) return
     const stats = await fs.lstat(join(dir, currentFilepath))
     if (!stats) throw new NotFoundError(currentFilepath)
