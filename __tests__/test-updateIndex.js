@@ -265,4 +265,74 @@ describe('updateIndex', () => {
       }
     `)
   })
+
+  it('should throw if we try to remove a directory', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.mkdir(path.join(dir, 'hello-world'))
+    await fs.write(path.join(dir, 'hello-world/a'), 'a')
+    await add({
+      fs,
+      dir,
+      filepath: 'hello-world/a',
+    })
+    // Test
+    let error = null
+    try {
+      await updateIndex({
+        fs,
+        dir,
+        remove: true,
+        filepath: 'hello-world',
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.updateIndex')
+    error = error.toJSON()
+    delete error.stack
+    expect(error).toMatchInlineSnapshot(`
+      Object {
+        "caller": "git.updateIndex",
+        "code": "InvalidFilepathError",
+        "data": Object {
+          "reason": "directory",
+        },
+        "message": "\\"filepath\\" should not be a directory.",
+      }
+    `)
+  })
+
+  it('should not throw if we force remove a directory', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.mkdir(path.join(dir, 'hello-world'))
+    await fs.write(path.join(dir, 'hello-world/a'), 'a')
+    await add({
+      fs,
+      dir,
+      filepath: 'hello-world/a',
+    })
+    // Test
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello-world/a',
+    })
+    expect(fileStatus).toBe('added')
+    await updateIndex({
+      fs,
+      dir,
+      remove: true,
+      force: true,
+      filepath: 'hello-world',
+    })
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello-world/a',
+    })
+    expect(fileStatus).toBe('added')
+  })
 })
