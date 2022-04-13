@@ -93,7 +93,7 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^3.1.2",
-    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-standard": "^4.0.1",
     "git-http-mock-server": "2.0.0",
     "github-comment": "1.0.1",
