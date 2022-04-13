@@ -109,7 +109,7 @@
     "karma-fail-fast-reporter": "1.0.5",
     "karma-firefox-launcher": "1.2.0",
     "karma-ie-launcher": "1.0.0",
-    "karma-jasmine": "2.0.1",
+    "karma-jasmine": "4.0.2",
     "karma-junit-reporter": "1.2.0",
     "karma-safari-launcher": "1.0.0",
     "karma-sauce-launcher": "1.2.0",
