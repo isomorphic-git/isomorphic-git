@@ -558,6 +558,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "seanpoulter",
+      "name": "Sean Poulter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2585460?v=4",
+      "profile": "https://github.com/seanpoulter",
+      "contributions": [
+        "maintenance"
+      ]
     }
   ],
   "commitConvention": "angular"
