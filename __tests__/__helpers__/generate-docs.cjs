@@ -1,4 +1,5 @@
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 
 const jsdoc = require('jsdoc-api')
@@ -135,6 +136,47 @@ ${text}`
   fs.writeFileSync(exampleFilepath, text, 'utf8')
 }
 
+/**
+ * @private
+ *
+ * Conditionally write a JSDoc configuration file and return the file path.
+ *
+ * JSDoc excludes directories that start with an underscore. This is a problem
+ * when we call jsdoc.explain and provide source code. The contents are saved to
+ * a temporary file in os.tmpdir(). If any parts of the path start with an
+ * underscore the file is excluded and the JSDoc command fails:
+ *
+ * JSDOC_ERROR: There are no input files to process.
+ *
+ * To bypass this issue we must create and use a JSDoc config.
+ * This is a known issue tracked by https://github.com/jsdoc2md/jsdoc-api/issues/19.
+ */
+const jsdocConfig = () => {
+  if (!/[\\\/]_/.test(os.tmpdir())) {
+    return;
+  }
+
+  try {
+    // Read an example/default JSDoc config
+    const inputFilepath = require.resolve('jsdoc/conf.json.EXAMPLE')
+    const config = JSON.parse(fs.readFileSync(inputFilepath).toString())
+
+    // Clear the pattern that excludes the contents of the temporary directory
+    config.source.excludePattern = ''
+
+    // Write the config to a temporary directory inside node_modules.
+    const outputDir = path.resolve(path.dirname(require.resolve('jsdoc-api')), '../.cache/isomorphic-git/tmp')
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    const filepath = path.join(outputDir, 'jsdoc.config.json')
+    fs.writeFileSync(filepath, JSON.stringify(config))
+    return filepath;
+  }
+  catch {
+    return;
+  }
+}
+
 async function gendoc(file, filepath) {
   // Fix some TypeScript-isms that jsdoc doesn't like
   file = file.replace(/\{import\('events'\)\.EventEmitter\}/g, '{EventEmitter}')
@@ -146,7 +188,7 @@ async function gendoc(file, filepath) {
     /\{\[string, HeadStatus, WorkdirStatus, StageStatus\]\}/g,
     '{Array<string|number>}'
   )
-  const ast = await jsdoc.explain({ source: file })
+  const ast = await jsdoc.explain({ source: file, configure: jsdocConfig() });
   let text = ''
   for (const obj of ast) {
     if (!obj.undocumented) {
