@@ -132,7 +132,7 @@
     "typescript": "3.9.0-dev.20200223",
     "webpack": "4.41.5",
     "webpack-bundle-analyzer": "3.4.1",
-    "webpack-cli": "3.3.7"
+    "webpack-cli": "4.9.2"
   },
   "prettier": "./.prettierrc.cjs",
   "bundlewatch": {
