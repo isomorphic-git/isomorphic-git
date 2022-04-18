@@ -14,7 +14,7 @@ Add a file to the git index (aka staging area)
 | **gitdir**     | string = join(dir, '.git')      | The [git directory](dir-vs-gitdir.md) path                      |
 | **filepath**   | string  &#124;  Array\<string\> | The path to the file to add to the index                        |
 | cache          | object                          | a [cache](cache.md) object                                      |
-| **force**      | boolean                         | add to index even if matches gitignore. Think `git add --force` |
+| force          | boolean = false                 | add to index even if matches gitignore. Think `git add --force` |
 | return         | Promise\<void\>                 | Resolves successfully once the git index has been updated       |
 
 Example Code:
