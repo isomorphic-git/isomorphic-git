@@ -104,7 +104,7 @@
     "jsdoc-api": "5.0.3",
     "karma": "^6.3.18",
     "karma-browserstack-launcher": "^1.6.0",
-    "karma-chrome-launcher": "3.1.0",
+    "karma-chrome-launcher": "^3.1.1",
     "karma-edge-launcher": "0.4.2",
     "karma-fail-fast-reporter": "1.0.5",
     "karma-firefox-launcher": "1.2.0",
