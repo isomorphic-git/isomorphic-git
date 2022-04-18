@@ -16,9 +16,7 @@ describe('GitIndex', () => {
       '"100644 323fae03f4606ea9991df8befbb2fca795e648fa    world.txt"'
     )
     const buffer2 = await index.toObject()
-    expect(buffer.slice(0, buffer2.length - 20).buffer).toEqual(
-      buffer2.slice(0, -20).buffer
-    )
+    expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
   })
 
   it('GitIndex.from(buffer)', async () => {
@@ -61,9 +59,7 @@ describe('GitIndex', () => {
       100644 80708a513b7808becff0acfd70dbd3b66a4fb537    test/test-resolveRef.js"
     `)
     const buffer2 = await index.toObject()
-    expect(buffer.slice(0, buffer2.length - 20).buffer).toEqual(
-      buffer2.slice(0, -20).buffer
-    )
+    expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
   })
 
   it('GitIndex round trip', async () => {
