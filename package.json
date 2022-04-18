@@ -103,7 +103,7 @@
     "jest-junit": "7.0.0",
     "jsdoc-api": "5.0.3",
     "karma": "^6.3.18",
-    "karma-browserstack-launcher": "^1.5.1",
+    "karma-browserstack-launcher": "^1.6.0",
     "karma-chrome-launcher": "3.1.0",
     "karma-edge-launcher": "0.4.2",
     "karma-fail-fast-reporter": "1.0.5",
