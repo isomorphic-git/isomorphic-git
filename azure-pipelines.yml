@@ -4,6 +4,7 @@
 # https://docs.microsoft.com/vsts/pipelines/languages/javascript
 jobs:
   - job: Linux
+    timeoutInMinutes: 20
 
     pool:
       vmImage: 'Ubuntu 18.04'
