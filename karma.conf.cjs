@@ -10,7 +10,11 @@ const ISSUE =
   process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
 const COMMIT = process.env.BUILD_SOURCEVERSION
 
+/**
+ * @param {import('karma').Config} config
+ */
 module.exports = function (config) {
+  /** @type {Partial<import('karma').ConfigOptions>} */
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
@@ -53,12 +57,15 @@ module.exports = function (config) {
     port: 9876,
     // enable / disable colors in the output (reporters and logs)
     colors: true,
+
     // Increase timeouts since some actions take quite a while.
-    browserNoActivityTimeout: 4 * 60 * 1000, // default 10000
     // https://support.saucelabs.com/hc/en-us/articles/225104707-Karma-Tests-Disconnect-Particularly-When-Running-Tests-on-Safari
     browserDisconnectTimeout: 10000, // default 2000
-    browserDisconnectTolerance: 0, // default 0
+    browserDisconnectTolerance: 1, // default 0
+    browserNoActivityTimeout: 4 * 60 * 1000, // default 10000
     captureTimeout: 4 * 60 * 1000, // default 60000
+    pingTimeout: 20000, // default to 5000
+
     // SauceLabs browsers
     customLaunchers: {
       XXXsl_chrome: {
