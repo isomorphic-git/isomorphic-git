@@ -11,6 +11,12 @@ describe('GitConfig', () => {
       const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valfoo')
     })
+    it('section with mixed case name', async () => {
+      const config = GitConfig.from(`[branch "feature/SOMETHING-123"]
+      merge = valaaa`)
+      const a = await config.get('branch.feature/SOMETHING-123.merge')
+      expect(a).toEqual('valaaa')
+    })
 
     it('simple (bar)', async () => {
       const config = GitConfig.from(`[foo]

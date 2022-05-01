@@ -152,7 +152,7 @@ export class GitConfig {
 
   async get(path, getall = false) {
     const allValues = this.parsedConfig
-      .filter(config => config.path === path.toLowerCase())
+      .filter(config => config.path.toLowerCase() === path.toLowerCase())
       .map(({ section, name, value }) => {
         const fn = schema[section] && schema[section][name]
         return fn ? fn(value) : value
