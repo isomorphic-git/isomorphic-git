@@ -56,7 +56,7 @@ module.exports = function (config) {
     // Increase timeouts since some actions take quite a while.
     browserNoActivityTimeout: 4 * 60 * 1000, // default 10000
     // https://support.saucelabs.com/hc/en-us/articles/225104707-Karma-Tests-Disconnect-Particularly-When-Running-Tests-on-Safari
-    browserDisconnectTimeout: 10000, // default 2000
+    browserDisconnectTimeout: 20000, // default 2000
     browserDisconnectTolerance: 0, // default 0
     captureTimeout: 4 * 60 * 1000, // default 60000
     // SauceLabs browsers
