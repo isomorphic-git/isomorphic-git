@@ -119,7 +119,7 @@
     "nps": "^5.10.0",
     "nps-utils": "1.7.0",
     "prettier": "1.19.1",
-    "prettier-config-standard": "^1.0.1",
+    "prettier-config-standard": "^4.0.0",
     "pretty-format": "24.9.0",
     "puppeteer": "2.0.0",
     "replace-in-file": "4.1.3",
