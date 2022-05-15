@@ -35,3 +35,6 @@ updates:
   - dependency-name: handlebars
     versions:
     - 4.7.6
+  - dependency-name: puppeteer
+    versions:
+    - "> 2.0.0"
