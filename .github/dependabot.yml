@@ -26,9 +26,6 @@ updates:
     - 6.0.3
     - 6.1.0
     - 6.1.1
-  - dependency-name: lodash
-    versions:
-    - 4.17.20
   - dependency-name: jasmine-core
     versions:
     - 3.6.0
