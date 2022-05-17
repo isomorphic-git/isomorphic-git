@@ -5,6 +5,7 @@ namespace NodeJS {
 }
 namespace jasmine {
   function getEnv(): any;
+  function addMatchers(matchers: CustomMatcherFactories): void;
 }
 namespace jest {
   interface Matchers<R> {
