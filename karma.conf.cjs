@@ -188,6 +188,11 @@ module.exports = function (config) {
         ],
       },
     ],
+    client: {
+      jasmine: {
+        timeoutInterval: 60000, // Defaults to 5000 ms
+      },
+    },
   }
 
   // Speed things up, at the cost of not saving the test results (except in the stdout log).
