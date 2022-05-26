@@ -105,6 +105,8 @@ module.exports = function (config) {
         browser: 'android',
         device: 'Google Pixel 4',
         real_mobile: true,
+        captureTimeout: 5 * 60 * 1000, // defaults to 120 ms
+        timeout: 1000,                 // defaults to 300 ms
       },
       FirefoxHeadless: {
         base: 'Firefox',
