@@ -53,12 +53,16 @@ module.exports = function (config) {
     port: 9876,
     // enable / disable colors in the output (reporters and logs)
     colors: true,
+
     // Increase timeouts since some actions take quite a while.
-    browserNoActivityTimeout: 4 * 60 * 1000, // default 10000
-    // https://support.saucelabs.com/hc/en-us/articles/225104707-Karma-Tests-Disconnect-Particularly-When-Running-Tests-on-Safari
-    browserDisconnectTimeout: 20000, // default 2000
-    browserDisconnectTolerance: 0, // default 0
-    captureTimeout: 4 * 60 * 1000, // default 60000
+    // Refer to:
+    // - https://support.saucelabs.com/hc/en-us/articles/225104707-Karma-Tests-Disconnect-Particularly-When-Running-Tests-on-Safari
+    // - https://github.com/karma-runner/karma-browserstack-launcher/issues/61
+    browserDisconnectTimeout: 5 * 60 * 1000,  // default 2000
+    browserDisconnectTolerance: 3,            // default 0
+    browserNoActivityTimeout: 5 * 60 * 1000,  // default 10000
+    captureTimeout: 5 * 60 * 1000,            // default 60000
+
     // SauceLabs browsers
     customLaunchers: {
       XXXsl_chrome: {
