@@ -182,6 +182,23 @@ import './typedefs-http.js'
  */
 
 /**
+ * @typedef {Object} MergeConflictParams
+ * @property {string} ourContent
+ * @property {string} baseContent
+ * @property {string} theirContent
+ * @property {string} ourName
+ * @property {string} baseName
+ * @property {string} theirName
+ * @property {any} options
+ */
+
+/**
+ * @callback MergeConflictCallback
+ * @param {MergeConflictParams} args
+ * @return {{cleanMerge: bool, mergedText: string}}
+ */
+
+/**
  * @callback WalkerMap
  * @param {string} filename
  * @param {WalkerEntry[]} entries

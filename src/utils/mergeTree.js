@@ -26,6 +26,7 @@ import { mergeFile } from './mergeFile.js'
  * @param {string} [args.baseName='base'] - The name to use in conflicted files (in diff3 format) for the base hunks
  * @param {string} [args.theirName='theirs'] - The name to use in conflicted files for their hunks
  * @param {boolean} [args.dryRun=false]
+ * @param {MergeConflictCallback} [args.onMergeConflict]
  *
  * @returns {Promise<string>} - The SHA-1 object id of the merged tree
  *
@@ -42,10 +43,13 @@ export async function mergeTree({
   baseName = 'base',
   theirName = 'theirs',
   dryRun = false,
+  onMergeConflict,
 }) {
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
   const theirTree = TREE({ ref: theirOid })
+
+  let cleanMerge = true
 
   const results = await _walk({
     fs,
@@ -107,6 +111,10 @@ export async function mergeTree({
               ourName,
               baseName,
               theirName,
+              onMergeConflict,
+            }).then(r => {
+              cleanMerge = r.cleanMerge
+              return r.mergeResult
             })
           }
           // all other types of conflicts fail
@@ -142,6 +150,29 @@ export async function mergeTree({
       return parent
     },
   })
+
+  if (!cleanMerge) {
+    if (dir) {
+      await _walk({
+        fs,
+        cache,
+        dir,
+        gitdir,
+        trees: [TREE({ ref: results.oid })],
+        map: async function(filepath, [entry]) {
+          const path = `${dir}/${filepath}`
+          if ((await entry.type()) === 'blob') {
+            const mode = await entry.mode()
+            const content = new TextDecoder().decode(await entry.content())
+            await fs.write(path, content, { mode })
+          }
+          return true
+        },
+      })
+    }
+    throw new MergeNotSupportedError()
+  }
+
   return results.oid
 }
 
@@ -180,9 +211,8 @@ async function modified(entry, base) {
  * @param {string} [args.ourName]
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]
- * @param {string} [args.format]
- * @param {number} [args.markerSize]
  * @param {boolean} [args.dryRun = false]
+ * @param {MergeConflictCallback} [args.onMergeConflict]
  *
  */
 async function mergeBlobs({
@@ -195,9 +225,8 @@ async function mergeBlobs({
   ourName,
   theirName,
   baseName,
-  format,
-  markerSize,
   dryRun,
+  onMergeConflict = mergeFile,
 }) {
   const type = 'blob'
   // Compute the new mode.
@@ -208,30 +237,33 @@ async function mergeBlobs({
       : await ours.mode()
   // The trivial case: nothing to merge except maybe mode
   if ((await ours.oid()) === (await theirs.oid())) {
-    return { mode, path, oid: await ours.oid(), type }
+    return {
+      cleanMerge: true,
+      mergeResult: { mode, path, oid: await ours.oid(), type },
+    }
   }
   // if only one side made oid changes, return that side's oid
   if ((await ours.oid()) === (await base.oid())) {
-    return { mode, path, oid: await theirs.oid(), type }
+    return {
+      cleanMerge: true,
+      mergeResult: { mode, path, oid: await theirs.oid(), type },
+    }
   }
   if ((await theirs.oid()) === (await base.oid())) {
-    return { mode, path, oid: await ours.oid(), type }
+    return {
+      cleanMerge: true,
+      mergeResult: { mode, path, oid: await ours.oid(), type },
+    }
   }
   // if both sides made changes do a merge
-  const { mergedText, cleanMerge } = mergeFile({
+  const { mergedText, cleanMerge } = onMergeConflict({
     ourContent: Buffer.from(await ours.content()).toString('utf8'),
     baseContent: Buffer.from(await base.content()).toString('utf8'),
     theirContent: Buffer.from(await theirs.content()).toString('utf8'),
     ourName,
     theirName,
     baseName,
-    format,
-    markerSize,
   })
-  if (!cleanMerge) {
-    // all other types of conflicts fail
-    throw new MergeNotSupportedError()
-  }
   const oid = await writeObject({
     fs,
     gitdir,
@@ -239,5 +271,6 @@ async function mergeBlobs({
     object: Buffer.from(mergedText, 'utf8'),
     dryRun,
   })
-  return { mode, path, oid, type }
+
+  return { cleanMerge, mergeResult: { mode, path, oid, type } }
 }
