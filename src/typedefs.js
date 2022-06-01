@@ -182,15 +182,15 @@ import './typedefs-http.js'
  */
 
 /**
- * @typedef {Object} MergeConflictParams
+ * @typedef {Object} MergeDriverParams
  * @property {Array<string>} branches
  * @property {Array<string>} contents
  * @property {string} path
  */
 
 /**
- * @callback MergeConflictCallback
- * @param {MergeConflictParams} args
+ * @callback MergeDriverCallback
+ * @param {MergeDriverParams} args
  * @return {{cleanMerge: bool, mergedText: string}}
  */
 

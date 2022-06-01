@@ -56,7 +56,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
  * @param {object} [args.cache] - a [cache](cache.md) object
- * @param {MergeConflictCallback} [args.onMergeConflict] - A merge conflict callback
+ * @param {MergeDriverCallback} [args.mergeDriver] - A merge conflict callback
  *
  * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
  * @see MergeResult
@@ -87,7 +87,7 @@ export async function merge({
   committer: _committer,
   signingKey,
   cache = {},
-  onMergeConflict,
+  mergeDriver,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -127,7 +127,7 @@ export async function merge({
       committer,
       signingKey,
       onSign,
-      onMergeConflict,
+      mergeDriver,
     })
   } catch (err) {
     err.caller = 'git.merge'

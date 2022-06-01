@@ -600,7 +600,7 @@ describe('merge', () => {
         timestamp: 1262356920,
         timezoneOffset: -0,
       },
-      onMergeConflict: ({ branches, contents }) => {
+      mergeDriver: ({ branches, contents }) => {
         const baseContent = contents[0]
         const ourContent = contents[1]
         const theirContent = contents[2]
@@ -659,7 +659,7 @@ describe('merge', () => {
         timestamp: 1262356920,
         timezoneOffset: -0,
       },
-      onMergeConflict: ({ branches, contents }) => {
+      mergeDriver: ({ branches, contents }) => {
         const baseContent = contents[0]
         const ourContent = contents[1]
         const theirContent = contents[2]
@@ -718,7 +718,7 @@ describe('merge', () => {
         timestamp: 1262356920,
         timezoneOffset: -0,
       },
-      onMergeConflict: ({ branches, contents }) => {
+      mergeDriver: ({ branches, contents }) => {
         const baseContent = contents[0]
         const ourContent = contents[1]
         const theirContent = contents[2]
@@ -763,7 +763,7 @@ describe('merge', () => {
         timestamp: 1262356920,
         timezoneOffset: -0,
       },
-      onMergeConflict: ({ branches, contents }) => {
+      mergeDriver: ({ branches, contents }) => {
         const baseContent = contents[0]
         const ourContent = contents[1]
         const theirContent = contents[2]
@@ -808,7 +808,7 @@ describe('merge', () => {
         timestamp: 1262356920,
         timezoneOffset: -0,
       },
-      onMergeConflict: ({ branches, contents }) => {
+      mergeDriver: ({ branches, contents }) => {
         const baseContent = contents[0]
         const ourContent = contents[1]
         const theirContent = contents[2]

@@ -27,7 +27,7 @@ import { mergeFile } from './mergeFile.js'
  * @param {string} [args.baseName='base'] - The name to use in conflicted files (in diff3 format) for the base hunks
  * @param {string} [args.theirName='theirs'] - The name to use in conflicted files for their hunks
  * @param {boolean} [args.dryRun=false]
- * @param {MergeConflictCallback} [args.onMergeConflict]
+ * @param {MergeDriverCallback} [args.mergeDriver]
  *
  * @returns {Promise<string>} - The SHA-1 object id of the merged tree
  *
@@ -44,7 +44,7 @@ export async function mergeTree({
   baseName = 'base',
   theirName = 'theirs',
   dryRun = false,
-  onMergeConflict,
+  mergeDriver,
 }) {
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
@@ -114,7 +114,7 @@ export async function mergeTree({
               ourName,
               baseName,
               theirName,
-              onMergeConflict,
+              mergeDriver,
             }).then(r => {
               cleanMerge = r.cleanMerge
               unmergedFiles.push(filepath)
@@ -216,7 +216,7 @@ async function modified(entry, base) {
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]
  * @param {boolean} [args.dryRun = false]
- * @param {MergeConflictCallback} [args.onMergeConflict] - A merge conflict callback
+ * @param {MergeDriverCallback} [args.mergeDriver] - A merge conflict callback
  *
  */
 async function mergeBlobs({
@@ -230,7 +230,7 @@ async function mergeBlobs({
   theirName,
   baseName,
   dryRun,
-  onMergeConflict = mergeFile,
+  mergeDriver = mergeFile,
 }) {
   const type = 'blob'
   // Compute the new mode.
@@ -263,7 +263,7 @@ async function mergeBlobs({
   const ourContent = Buffer.from(await ours.content()).toString('utf8')
   const baseContent = Buffer.from(await base.content()).toString('utf8')
   const theirContent = Buffer.from(await theirs.content()).toString('utf8')
-  const { mergedText, cleanMerge } = onMergeConflict({
+  const { mergedText, cleanMerge } = mergeDriver({
     branches: [baseName, ourName, theirName],
     contents: [baseContent, ourContent, theirContent],
     path,
