@@ -5,6 +5,80 @@ const { log } = require('isomorphic-git')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('log', () => {
+  it('a newly added file', async () => {
+    const { fs, gitdir } = await makeFixture('test-log-file')
+    const commits = await log({
+      fs,
+      gitdir,
+      ref: 'HEAD',
+      filepath: 'newfile.md',
+    })
+    expect(commits.length).toBe(2)
+    expect(commits).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "araknast@protonmail.com",
+              "name": "araknast",
+              "timestamp": 1653969605,
+              "timezoneOffset": 420,
+            },
+            "committer": Object {
+              "email": "araknast@protonmail.com",
+              "name": "araknast",
+              "timestamp": 1653969605,
+              "timezoneOffset": 420,
+            },
+            "message": "update newfile
+      ",
+            "parent": Array [
+              "dcb1c5fe6cc28e7757c4bc4d7dbf5b061c38ec48",
+            ],
+            "tree": "331f342f6e9b38c45e17189691134cb4a72189d2",
+          },
+          "oid": "04833cdb10e0f8fa81800cafa98e1381a1c6c58e",
+          "payload": "tree 331f342f6e9b38c45e17189691134cb4a72189d2
+      parent dcb1c5fe6cc28e7757c4bc4d7dbf5b061c38ec48
+      author araknast <araknast@protonmail.com> 1653969605 -0700
+      committer araknast <araknast@protonmail.com> 1653969605 -0700
+      
+      update newfile
+      ",
+        },
+        Object {
+          "commit": Object {
+            "author": Object {
+              "email": "araknast@protonmail.com",
+              "name": "araknast",
+              "timestamp": 1653969041,
+              "timezoneOffset": 420,
+            },
+            "committer": Object {
+              "email": "araknast@protonmail.com",
+              "name": "araknast",
+              "timestamp": 1653969041,
+              "timezoneOffset": 420,
+            },
+            "message": "add newfile
+      ",
+            "parent": Array [
+              "18f202dfed5cb66a295dc57f1f4ba1b7f6b74f36",
+            ],
+            "tree": "59c1caba006bb27077d11f1c0ff7ad3ff4b2b422",
+          },
+          "oid": "dcb1c5fe6cc28e7757c4bc4d7dbf5b061c38ec48",
+          "payload": "tree 59c1caba006bb27077d11f1c0ff7ad3ff4b2b422
+      parent 18f202dfed5cb66a295dc57f1f4ba1b7f6b74f36
+      author araknast <araknast@protonmail.com> 1653969041 -0700
+      committer araknast <araknast@protonmail.com> 1653969041 -0700
+      
+      add newfile
+      ",
+        },
+      ]
+    `)
+  })
   it('a file only', async () => {
     const { fs, gitdir } = await makeFixture('test-log-file')
     const commits = await log({
