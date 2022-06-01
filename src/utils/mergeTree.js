@@ -216,7 +216,7 @@ async function modified(entry, base) {
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]
  * @param {boolean} [args.dryRun = false]
- * @param {MergeDriverCallback} [args.mergeDriver] - A merge conflict callback
+ * @param {MergeDriverCallback} [args.mergeDriver]
  *
  */
 async function mergeBlobs({
