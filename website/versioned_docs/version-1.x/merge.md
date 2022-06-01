@@ -32,6 +32,7 @@ Merge two branches
 | committer.timezoneOffset | number                               | Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`. |
 | signingKey               | string                               | passed to [commit](commit.md) when creating a merge commit                                                                                                    |
 | cache                    | object                               | a [cache](cache.md) object                                                                                                                                    |
+| mergeDriver              | MergeDriverCallback                  | A merge conflict callback                                                                                                                                     |
 | return                   | Promise\<MergeResult\>               | Resolves to a description of the merge operation                                                                                                              |
 
 Returns an object with a schema like this:
