@@ -3,6 +3,7 @@ import '../typedefs.js'
 
 import { TREE } from '../commands/TREE.js'
 import { _walk } from '../commands/walk.js'
+import { MergeConflictError } from '../errors/MergeConflictError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
@@ -170,7 +171,7 @@ export async function mergeTree({
         },
       })
     }
-    throw new MergeNotSupportedError()
+    throw new MergeConflictError(unmergedFiles)
   }
 
   return results.oid
