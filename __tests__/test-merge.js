@@ -573,10 +573,10 @@ describe('merge', () => {
       await fs.read(testFile, 'utf-8')
     )
     expect(error).not.toBeNull()
-    expect(error.code).toBe(Errors.MergeNotSupportedError.code)
+    expect(error.code).toBe(Errors.MergeConflictError.code)
   })
 
-  it("merge two branches that modified the same file, custom conflict resolver (prefers ours)'", async () => {
+  it("merge two branches that modified the same file, custom conflict resolver (prefer our changes)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
 
@@ -600,14 +600,11 @@ describe('merge', () => {
         timestamp: 1262356920,
         timezoneOffset: -0,
       },
-      onMergeConflict: ({
-        ourContent,
-        baseContent,
-        theirContent,
-        ourname = 'ours',
-        baseName = 'base',
-        theirName = 'theirs',
-      }) => {
+      onMergeConflict: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+
         const LINEBREAKS = /^.*(\r?\n|$)/gm
         const ours = ourContent.match(LINEBREAKS)
         const base = baseContent.match(LINEBREAKS)
@@ -638,7 +635,7 @@ describe('merge', () => {
     expect(mergeCommit.message).toEqual(commit.message)
     expect(mergeCommit.parent).toEqual(commit.parent)
   })
-  it("merge two branches that modified the same file, custom conflict resolver (prefers theirs)'", async () => {
+  it("merge two branches that modified the same file, custom conflict resolver (prefer their changes)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
 
@@ -662,14 +659,11 @@ describe('merge', () => {
         timestamp: 1262356920,
         timezoneOffset: -0,
       },
-      onMergeConflict: ({
-        ourContent,
-        baseContent,
-        theirContent,
-        ourname = 'ours',
-        baseName = 'base',
-        theirName = 'theirs',
-      }) => {
+      onMergeConflict: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+
         const LINEBREAKS = /^.*(\r?\n|$)/gm
         const ours = ourContent.match(LINEBREAKS)
         const base = baseContent.match(LINEBREAKS)
@@ -684,6 +678,141 @@ describe('merge', () => {
             mergedText += item.conflict.b.join('')
           }
         }
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, custom conflict resolver (prefer our file)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-use-ours',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      onMergeConflict: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+        const mergedText = ourContent || theirContent || baseContent
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, custom conflict resolver (prefer their file)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-use-theirs',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      onMergeConflict: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+        const mergedText = theirContent || ourContent || baseContent
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, custom conflict resolver (prefer base file)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-use-base',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      onMergeConflict: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+        const mergedText = baseContent || ourContent || theirContent
         return { cleanMerge: true, mergedText }
       },
     })
