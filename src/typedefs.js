@@ -183,13 +183,9 @@ import './typedefs-http.js'
 
 /**
  * @typedef {Object} MergeConflictParams
- * @property {string} ourContent
- * @property {string} baseContent
- * @property {string} theirContent
- * @property {string} ourName
- * @property {string} baseName
- * @property {string} theirName
- * @property {any} options
+ * @property {Array<string>} branches
+ * @property {Array<string>} contents
+ * @property {string} path
  */
 
 /**

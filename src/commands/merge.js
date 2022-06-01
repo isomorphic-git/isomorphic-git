@@ -46,7 +46,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * @param {number} args.committer.timezoneOffset
  * @param {string} [args.signingKey]
  * @param {SignCallback} [args.onSign] - a PGP signing implementation
- * @param {MergeConflictCallBack} [args.onMergeConflict]
+ * @param {MergeConflictCallback} [args.onMergeConflict]
  *
  * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
  *

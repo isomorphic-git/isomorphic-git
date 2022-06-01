@@ -8,10 +8,12 @@ describe('mergeFile', () => {
     // Setup
     const { fs, dir } = await makeFixture('test-mergeFile')
     // Test
+    const ourContent = await fs.read(`${dir}/a.txt`, 'utf8')
+    const baseContent = await fs.read(`${dir}/o.txt`, 'utf8')
+    const theirContent = await fs.read(`${dir}/b.txt`, 'utf8')
+
     const { cleanMerge, mergedText } = mergeFile({
-      ourContent: await fs.read(`${dir}/a.txt`, 'utf8'),
-      baseContent: await fs.read(`${dir}/o.txt`, 'utf8'),
-      theirContent: await fs.read(`${dir}/b.txt`, 'utf8'),
+      contents: [baseContent, ourContent, theirContent],
     })
     expect(cleanMerge).toBe(true)
     expect(mergedText).toEqual(await fs.read(`${dir}/aob.txt`, 'utf8'))
@@ -21,10 +23,12 @@ describe('mergeFile', () => {
     // Setup
     const { fs, dir } = await makeFixture('test-mergeFile')
     // Test
+    const ourContent = await fs.read(`${dir}/a.txt`, 'utf8')
+    const baseContent = await fs.read(`${dir}/o.txt`, 'utf8')
+    const theirContent = await fs.read(`${dir}/b.txt`, 'utf8')
+
     const { cleanMerge, mergedText } = mergeFile({
-      ourContent: await fs.read(`${dir}/a.txt`, 'utf8'),
-      baseContent: await fs.read(`${dir}/o.txt`, 'utf8'),
-      theirContent: await fs.read(`${dir}/c.txt`, 'utf8'),
+      contents: [baseContent, ourContent, theirContent],
     })
     expect(cleanMerge).toBe(false)
     expect(mergedText).toEqual(await fs.read(`${dir}/aoc.txt`, 'utf8'))

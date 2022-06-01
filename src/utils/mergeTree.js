@@ -50,6 +50,8 @@ export async function mergeTree({
   const baseTree = TREE({ ref: baseOid })
   const theirTree = TREE({ ref: theirOid })
 
+  const unmergedFiles = []
+
   let cleanMerge = true
 
   const results = await _walk({
@@ -115,6 +117,7 @@ export async function mergeTree({
               onMergeConflict,
             }).then(r => {
               cleanMerge = r.cleanMerge
+              unmergedFiles.push(filepath)
               return r.mergeResult
             })
           }
@@ -213,7 +216,7 @@ async function modified(entry, base) {
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]
  * @param {boolean} [args.dryRun = false]
- * @param {MergeConflictCallback} [args.onMergeConflict]
+ * @param {MergeConflictCallback} [args.onMergeConflict] - A merge conflict callback
  *
  */
 async function mergeBlobs({
@@ -257,13 +260,13 @@ async function mergeBlobs({
     }
   }
   // if both sides made changes do a merge
+  const ourContent = Buffer.from(await ours.content()).toString('utf8')
+  const baseContent = Buffer.from(await base.content()).toString('utf8')
+  const theirContent = Buffer.from(await theirs.content()).toString('utf8')
   const { mergedText, cleanMerge } = onMergeConflict({
-    ourContent: Buffer.from(await ours.content()).toString('utf8'),
-    baseContent: Buffer.from(await base.content()).toString('utf8'),
-    theirContent: Buffer.from(await theirs.content()).toString('utf8'),
-    ourName,
-    theirName,
-    baseName,
+    branches: [baseName, ourName, theirName],
+    contents: [baseContent, ourContent, theirContent],
+    path,
   })
   const oid = await writeObject({
     fs,

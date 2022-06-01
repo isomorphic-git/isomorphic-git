@@ -2,14 +2,14 @@ import diff3Merge from 'diff3'
 
 const LINEBREAKS = /^.*(\r?\n|$)/gm
 
-export function mergeFile({
-  ourContent,
-  baseContent,
-  theirContent,
-  ourName = 'ours',
-  baseName = 'base',
-  theirName = 'theirs',
-}) {
+export function mergeFile({ branches, contents }) {
+  const ourName = branches[1]
+  const theirName = branches[2]
+
+  const baseContent = contents[0]
+  const ourContent = contents[1]
+  const theirContent = contents[2]
+
   const ours = ourContent.match(LINEBREAKS)
   const base = baseContent.match(LINEBREAKS)
   const theirs = theirContent.match(LINEBREAKS)
