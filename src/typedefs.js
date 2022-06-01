@@ -191,7 +191,7 @@ import './typedefs-http.js'
 /**
  * @callback MergeDriverCallback
  * @param {MergeDriverParams} args
- * @return {{cleanMerge: bool, mergedText: string}}
+ * @return {{cleanMerge: boolean, mergedText: string}}
  */
 
 /**
