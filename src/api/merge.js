@@ -43,7 +43,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
  * @param {boolean} [args.dryRun = false] - If true, simulates a merge so you can test whether it would succeed.
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
- * @param {boolean} [args.clean = false] - If true, merges with conflicts will not update the worktree or index.
+ * @param {boolean} [args.abortOnConflict = false] - If true, merges with conflicts will not update the worktree or index.
  * @param {string} [args.message] - Overrides the default auto-generated merge commit message
  * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
  * @param {string} [args.author.name] - Default is `user.name` config.
@@ -83,7 +83,7 @@ export async function merge({
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
-  clean = false,
+  abortOnConflict = false,
   message,
   author: _author,
   committer: _committer,
@@ -124,7 +124,7 @@ export async function merge({
       fastForwardOnly,
       dryRun,
       noUpdateBranch,
-      clean,
+      abortOnConflict,
       message,
       author,
       committer,

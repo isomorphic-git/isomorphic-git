@@ -27,7 +27,7 @@ import { mergeFile } from './mergeFile.js'
  * @param {string} [args.baseName='base'] - The name to use in conflicted files (in diff3 format) for the base hunks
  * @param {string} [args.theirName='theirs'] - The name to use in conflicted files for their hunks
  * @param {boolean} [args.dryRun=false]
- * @param {boolean} [args.clean=false]
+ * @param {boolean} [args.abortOnConflict=false]
  * @param {MergeDriverCallback} [args.mergeDriver]
  *
  * @returns {Promise<string>} - The SHA-1 object id of the merged tree
@@ -45,7 +45,7 @@ export async function mergeTree({
   baseName = 'base',
   theirName = 'theirs',
   dryRun = false,
-  clean = false,
+  abortOnConflict = false,
   mergeDriver,
 }) {
   const ourTree = TREE({ ref: ourOid })
@@ -158,7 +158,7 @@ export async function mergeTree({
   })
 
   if (!cleanMerge) {
-    if (dir && !clean) {
+    if (dir && !abortOnConflict) {
       await _walk({
         fs,
         cache,

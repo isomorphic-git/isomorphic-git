@@ -33,7 +33,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * @param {boolean} args.fastForwardOnly
  * @param {boolean} args.dryRun
  * @param {boolean} args.noUpdateBranch
- * @param {boolean} args.clean
+ * @param {boolean} args.abortOnConflict
  * @param {string} [args.message]
  * @param {Object} args.author
  * @param {string} args.author.name
@@ -63,7 +63,7 @@ export async function _merge({
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
-  clean,
+  abortOnConflict = false,
   message,
   author,
   committer,
@@ -138,7 +138,7 @@ export async function _merge({
       baseName: 'base',
       theirName: theirs,
       dryRun,
-      clean,
+      abortOnConflict,
       mergeDriver,
     })
     if (!message) {
