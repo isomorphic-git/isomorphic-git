@@ -590,7 +590,7 @@ describe('merge', () => {
         gitdir,
         ours: 'a',
         theirs: 'c',
-        clean: true,
+        abortOnConflict: true,
         author: {
           name: 'Mr. Test',
           email: 'mrtest@example.com',
