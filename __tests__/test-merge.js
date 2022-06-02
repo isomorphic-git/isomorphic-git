@@ -576,6 +576,37 @@ describe('merge', () => {
     expect(error.code).toBe(Errors.MergeConflictError.code)
   })
 
+  it("merge two branches that modified the same file, no conflict resolver, don't update worktree'", async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-merge')
+    // Test
+    const outFile = `${dir}/o.txt`
+
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'a',
+        theirs: 'c',
+        clean: true,
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(await fs.read(outFile, 'utf-8')).toBeNull()
+    expect(await fs.readdir(dir)).toEqual([])
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+  })
+
   it("merge two branches that modified the same file, custom conflict resolver (prefer our changes)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
