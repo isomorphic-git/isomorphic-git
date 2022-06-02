@@ -265,7 +265,7 @@ async function mergeBlobs({
   const ourContent = Buffer.from(await ours.content()).toString('utf8')
   const baseContent = Buffer.from(await base.content()).toString('utf8')
   const theirContent = Buffer.from(await theirs.content()).toString('utf8')
-  const { mergedText, cleanMerge } = mergeDriver({
+  const { mergedText, cleanMerge } = await mergeDriver({
     branches: [baseName, ourName, theirName],
     contents: [baseContent, ourContent, theirContent],
     path,
