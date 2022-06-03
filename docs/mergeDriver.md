@@ -14,7 +14,7 @@ A merge driver implements the following API:
 | branches      | Array\<string\>                                   | an array of human readable branch names                   |
 | contents      | Array\<string\>                                   | an array of the file's contents on each respective branch |
 | path          | string                                            | the file's path relative to the git repository            |
-| return        | Promise\<{cleanMerge: bool, mergedText: string}\> | Wether is merge was successful, and the merged text       |
+| return        | Promise\<{cleanMerge: bool, mergedText: string}\> | Whether is merge was successful, and the merged text      |
 
 
 If `cleanMerge` is true, then the `mergedText` string will be written to the file. If `cleanMerge` is false, a `MergeConflictError` will be thrown, and if `merge` was called with `abortOnConflict: true`, nothing will be written to the worktree or index.
