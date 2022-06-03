@@ -33,7 +33,7 @@ Merge two branches
 | committer.timezoneOffset | number                               | Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`. |
 | signingKey               | string                               | passed to [commit](commit.md) when creating a merge commit                                                                                                    |
 | cache                    | object                               | a [cache](cache.md) object                                                                                                                                    |
-| mergeDriver              | MergeDriverCallback                  | A merge conflict callback                                                                                                                                     |
+| mergeDriver              | MergeDriverCallback                  | a merge driver implementation                                                                                                                                 |
 | return                   | Promise\<MergeResult\>               | Resolves to a description of the merge operation                                                                                                              |
 
 Returns an object with a schema like this:
@@ -47,11 +47,6 @@ type MergeResult = {
   tree?: string; // The SHA-1 object id of the tree resulting from a merge commit
 }
 ```
-
-## Limitations
-
-Currently it does not support incomplete merges. That is, if there are merge conflicts it cannot solve
-with the built in diff3 algorithm it will not modify the working dir, and will throw a [`MergeNotSupportedError`](./errors.md#mergenotsupportedError) error.
 
 Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
 
