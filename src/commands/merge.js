@@ -63,7 +63,7 @@ export async function _merge({
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
-  abortOnConflict = false,
+  abortOnConflict = true,
   message,
   author,
   committer,

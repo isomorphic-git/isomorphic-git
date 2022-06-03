@@ -45,7 +45,7 @@ export async function mergeTree({
   baseName = 'base',
   theirName = 'theirs',
   dryRun = false,
-  abortOnConflict = false,
+  abortOnConflict = true,
   mergeDriver,
 }) {
   const ourTree = TREE({ ref: ourOid })

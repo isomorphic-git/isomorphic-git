@@ -83,7 +83,7 @@ export async function merge({
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
-  abortOnConflict = false,
+  abortOnConflict = true,
   message,
   author: _author,
   committer: _committer,
