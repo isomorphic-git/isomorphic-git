@@ -751,10 +751,7 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
       mergeDriver: ({ branches, contents }) => {
-        const baseContent = contents[0]
-        const ourContent = contents[1]
-        const theirContent = contents[2]
-        const mergedText = ourContent || theirContent || baseContent
+        const mergedText = contents[1]
         return { cleanMerge: true, mergedText }
       },
     })
@@ -796,10 +793,7 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
       mergeDriver: ({ branches, contents }) => {
-        const baseContent = contents[0]
-        const ourContent = contents[1]
-        const theirContent = contents[2]
-        const mergedText = theirContent || ourContent || baseContent
+        const mergedText = contents[2]
         return { cleanMerge: true, mergedText }
       },
     })

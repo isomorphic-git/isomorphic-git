@@ -81,16 +81,12 @@ In this case, when our merge driver is called on `text.txt`, the `contents` arra
 ```
 
 ## Examples
-Below is a simple example of a merge driver which simply chooses the other branch's version of the file whenever it was modified by both branches.
+Below is an example of a very simple merge driver which always chooses the other branch's version of the file whenever it was modified by both branches.
 ```
 const mergeDriver = ({ contents }) => {
-  const baseContent = contents[0]
-  const ourContent = contents[1]
-  const theirContent = contents[2]
-  const mergedText = theirContent || ourContent || baseContent
+  const mergedText = contents[2]
   return { cleanMerge: true, mergedText }
 }
-
 ```
 
 If we applied this algorithm to the file in the previous example, the resolved file would simply read:
@@ -98,6 +94,22 @@ If we applied this algorithm to the file in the previous example, the resolved f
 modified
 text
 file
+```
+
+and if instead we wanted to chose *our* branch's version of the file, whenever it was modified by both branches,we simply change the line:
+```
+const mergedText = contents[2]
+```
+to read:
+```
+const mergedText = contents[1]
+```
+which results in the resolved file reading:
+```
+text
+file
+was
+modified
 ```
 
 As a more complex example, we use the default diff3 algorithm, but choose the other branch's changes whenever lines of the file conflict.
@@ -125,10 +137,25 @@ const mergeDriver = ({ contents }) => {
   return { cleanMerge: true, mergedText }
 }
 ```
-If we applied this algorithm to the file in the previous example, the resolved file would read:
 
+If we apply this algorithm to the file in the previous example, the resolved file reads:
 ```
 modified
+text
+file
+was
+modified
+```
+and if we wanted to choose *our* branch's changes when lines of the file conflict, we simply change the above line:
+```
+mergedText += item.conflict.b.join('')
+```
+to read:
+```
+mergedText += item.conflict.a.join('')
+```
+which results in a resolved file that reads:
+```
 text
 file
 was
