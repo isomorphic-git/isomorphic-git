@@ -8,19 +8,37 @@ By default the [merge](./merge.md) command uses the diff3 algorithm to try to so
 
 A merge driver implements the following API:
 
-#### async ({ branches, contents, path }) => { cleanMerge, mergedText }
+#### async ({ branches, contents, path, markerSize }) => { cleanMerge, mergedText }
 | param         | type [= default]                                  | description                                               |
 | ------------- | ------------------------------------------------- | --------------------------------------------------------- |
 | branches      | Array\<string\>                                   | an array of human readable branch names                   |
 | contents      | Array\<string\>                                   | an array of the file's contents on each respective branch |
 | path          | string                                            | the file's path relative to the git repository            |
-| return        | Promise\<{cleanMerge: bool, mergedText: string}\> | Whether merge was successful, and the merged text         |
+| markerSize    | number                                            | how many characters wide conflict markers should be       |
+| return        | Promise\<{cleanMerge: bool, mergedText: string}\> | whether merge was successful, and the merged text         |
 
 
 If `cleanMerge` is true, then the `mergedText` string will be written to the file. If `cleanMerge` is false, a `MergeConflictError` will be thrown, and if `merge` was called with `abortOnConflict: true`, nothing will be written to the worktree or index.
 
 ### MergeDriverParams#path
 The `path` parameter refers to the path of the conflicted file, relative to the the git repository.
+### MergeDriverParams#markerSize
+The `markerSize` parameter allows the user to configure the size of the markers used to display unresolved merge conflicts to the user. For example, a merge conflict with size 7 conflict markers might look like this:
+```
+<<<<<<< HEAD
+our text
+======= main
+their text
+>>>>>>>
+```
+While a merge conflict with size 18 markers might look like this:
+```
+<<<<<<<<<<<<<<<<<< HEAD
+our text
+================== main
+their text
+>>>>>>>>>>>>>>>>>>
+```
 ### MergeDriverParams#branches
 The `branches` array contains the human-readable names of the branches we are merging. The first index refers to the merge base, the second refers to the branch being merged into, and any subsequent indexes refer to the branches we are merging. For example, say we have a git history that looks like this:
 ```

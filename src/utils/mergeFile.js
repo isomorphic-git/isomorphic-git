@@ -2,7 +2,7 @@ import diff3Merge from 'diff3'
 
 const LINEBREAKS = /^.*(\r?\n|$)/gm
 
-export function mergeFile({ branches, contents }) {
+export function mergeFile({ branches, contents, markerSize = 7 }) {
   const ourName = branches[1]
   const theirName = branches[2]
 
@@ -16,8 +16,6 @@ export function mergeFile({ branches, contents }) {
 
   // Here we let the diff3 library do the heavy lifting.
   const result = diff3Merge(ours, base, theirs)
-
-  const markerSize = 7
 
   // Here we note whether there are conflicts and format the results
   let mergedText = ''

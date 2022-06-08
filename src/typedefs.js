@@ -186,6 +186,7 @@ import './typedefs-http.js'
  * @property {Array<string>} branches
  * @property {Array<string>} contents
  * @property {string} path
+ * @property {number} markerSize
  */
 
 /**
