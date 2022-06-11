@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const diff3Merge = require('diff3')
-const { Errors, merge, resolveRef, log } = require('isomorphic-git')
+const { Errors, merge, add, resolveRef, log } = require('isomorphic-git')
+const gitCommit = require('isomorphic-git').commit
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -851,6 +852,67 @@ describe('merge', () => {
       })
     )[0].commit
     expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, manual conflict resolution'", async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-manual-resolve',
+      })
+    )[0].commit
+    // Test
+    await merge({
+      fs,
+      dir,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      abortOnConflict: false,
+    }).catch(e => {
+      if (!(e instanceof Errors.MergeConflictError)) throw e
+    })
+    await add({
+      fs,
+      dir,
+      gitdir,
+      filepath: '.',
+    })
+    await gitCommit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      ref: 'a',
+      message: "Merge branch 'c' into a",
+      parent: ['a', 'c'],
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
     expect(mergeCommit.parent).toEqual(commit.parent)
