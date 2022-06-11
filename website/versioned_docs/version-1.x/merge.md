@@ -33,7 +33,7 @@ Merge two branches
 | committer.timezoneOffset | number                               | Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`. |
 | signingKey               | string                               | passed to [commit](commit.md) when creating a merge commit                                                                                                    |
 | cache                    | object                               | a [cache](cache.md) object                                                                                                                                    |
-| mergeDriver              | MergeDriverCallback                  | a merge driver implementation                                                                                                                                 |
+| mergeDriver              | MergeDriverCallback                  | a [merge driver](mergeDriver.md) implementation                                                                                                               |
 | return                   | Promise\<MergeResult\>               | Resolves to a description of the merge operation                                                                                                              |
 
 Returns an object with a schema like this:
@@ -51,6 +51,59 @@ type MergeResult = {
 Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
 
 Currently it does not support selecting alternative merge strategies.
+
+Currently it is not possible to abort an incomplete merge. To restore the worktree to a clean state, you will need to checkout an earlier commit.
+
+Currently it does not directly support the behavior of `git merge --continue`. To complete a merge after manual conflict resolution, you will need to add and commit the files manually, and specify the appropriate parent commits.
+
+## Manually resolving merge conflicts
+By default, if isomorphic-git encounters a merge conflict it cannot resolve using the builtin diff3 algorithm or provided merge driver, it will abort and throw a `MergeNotSupportedError`.
+This leaves the index and working tree untouched.
+
+When `abortOnConflict` is set to `false`, and a merge conflict cannot be automatically resolved, a `MergeConflictError` is thrown and the results of the incomplete merge will be written to the working directory.
+This includes conflict markers in files with unresolved merge conflicts.
+
+To complete the merge, edit the conflicting files as you see fit, and then add and commit the resolved merge.
+
+For a proper merge commit, be sure to specify the branches or commits you are merging in the `parent` argument to `git.commit`.
+For example, say we are merging the branch `feature` into the branch `main` and there is a conflict we want to resolve manually.
+The flow would look like this:
+
+```
+await git.merge({
+  fs,
+  dir,
+  ours: 'main',
+  theirs: 'feature',
+  abortOnConflict: false,
+}).catch(e => {
+  if (e instanceof Errors.MergeConflictError) {
+    console.log(
+      'Automatic merge failed for the following files: '
+      + `${e.data}. `
+      + 'Resolve these conflicts and then commit your changes.'
+    )
+  } else throw e
+})
+
+// This is the where we manually edit the files that have been written to the working directory
+// ...
+// Files have been edited and we are ready to commit
+
+await git.add({
+  fs,
+  dir,
+  filepath: '.',
+})
+
+await git.commit({
+  fs,
+  dir,
+  ref: 'main',
+  message: "Merge branch 'feature' into main",
+  parent: ['main', 'feature'], // Be sure to specify the parents when creating a merge commit
+})
+```
 
 Example Code:
 
