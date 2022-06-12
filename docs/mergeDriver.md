@@ -17,7 +17,7 @@ A merge driver implements the following API:
 | return        | Promise\<{cleanMerge: bool, mergedText: string}\> | Whether merge was successful, and the merged text         |
 
 
-If `cleanMerge` is true, then the `mergedText` string will be written to the file. If `cleanMerge` is false, a `MergeConflictError` will be thrown, and if `merge` was called with `abortOnConflict: true`, nothing will be written to the worktree or index.
+If `cleanMerge` is true, then the `mergedText` string will be written to the file. If `cleanMerge` is false, a `MergeConflictError` will be thrown, and if `merge` was called with `abortOnConflict: false`, the mergedText string will be written to the file in the worktree.
 
 ### MergeDriverParams#path
 The `path` parameter refers to the path of the conflicted file, relative to the the git repository.
@@ -31,7 +31,7 @@ The `branches` array contains the human-readable names of the branches we are me
 If we were to merge `topic` into `main`, the `branches` array would look like: `['base', 'main', 'topic']`. In this case, the name `base` refers to commit `D` which is the common ancestor of our two branches. `base` will always be the name at the first index.
 
 ### MergeDriverParams#contents
-The `contents` array contains the file contents respective of each branch. Like the `branches` array, the first index refers to the merge base, the second, to the branch being merged into, and subsequent indexes refer to the branches we are merging. For example, say we have a file `text.txt` which contains:
+The `contents` array contains the file contents respective of each branch. Like the `branches` array, the first index refers to the merge base, the second refers to the branch being merged into, and subsequent indexes refer to the branches we are merging. For example, say we have a file `text.txt` which contains:
 ```
 original
 text
@@ -138,6 +138,67 @@ mergedText += item.conflict.a.join('')
 ```
 which results in a resolved file that reads:
 ```
+text
+file
+was
+modified
+```
+Finally, what if we wanted to make a slight modification to the behavior of the default merge driver, like changing the size of conflict markers? The code for the default merge driver is located in `src/utils/mergeFile.js`. We can copy the code into our merge driver like so:
+```
+const diff3Merge = require('diff3')
+const mergeDriver = ({ contents, branches }) => {
+  const ourName = branches[1]
+  const theirName = branches[2]
+
+  const baseContent = contents[0]
+  const ourContent = contents[1]
+  const theirContent = contents[2]
+
+  const ours = ourContent.match(LINEBREAKS)
+  const base = baseContent.match(LINEBREAKS)
+  const theirs = theirContent.match(LINEBREAKS)
+
+  const result = diff3Merge(ours, base, theirs)
+
+  const markerSize = 7
+
+  let mergedText = ''
+  let cleanMerge = true
+
+  for (const item of result) {
+    if (item.ok) {
+      mergedText += item.ok.join('')
+    }
+    if (item.conflict) {
+      cleanMerge = false
+      mergedText += `${'<'.repeat(markerSize)} ${ourName}\n`
+      mergedText += item.conflict.a.join('')
+
+      mergedText += `${'='.repeat(markerSize)}\n`
+      mergedText += item.conflict.b.join('')
+      mergedText += `${'>'.repeat(markerSize)} ${theirName}\n`
+    }
+  }
+  return { cleanMerge, mergedText }
+}
+```
+
+If we want larger conflict markers, we can simply change the line
+```
+const markerSize = 7
+```
+to
+```
+const markerSize = 14
+```
+Which will give us conflict markers that are 14 characters wide instead of the default 7.
+
+Now if we use this merge driver when merging the branch 'topic' into 'main', and if we have `abortOnConflict` set to `false`, the worktree will be updated with a `text.txt` file that looks like this:
+```
+<<<<<<<<<<<<<< main
+modified
+==============
+>>>>>>>>>>>>>> topic
 text
 file
 was
