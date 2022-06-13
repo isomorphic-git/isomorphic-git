@@ -78,7 +78,15 @@ export async function _commit({
         // Probably an initial commit
         parent = []
       }
+    } else {
+      // ensure that the parents are oids, not refs
+      parent = await Promise.all(
+        parent.map(p => {
+          return GitRefManager.resolve({ fs, gitdir, ref: p })
+        })
+      )
     }
+
     let comm = GitCommit.from({
       tree,
       parent,
