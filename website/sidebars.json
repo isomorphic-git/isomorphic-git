@@ -22,7 +22,8 @@
       "onAuthFailure",
       "onMessage",
       "onProgress",
-      "onSign"
+      "onSign",
+      "mergeDriver"
     ],
     "Clients": [
       "fs",

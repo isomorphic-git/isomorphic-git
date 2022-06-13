@@ -182,6 +182,19 @@ import './typedefs-http.js'
  */
 
 /**
+ * @typedef {Object} MergeDriverParams
+ * @property {Array<string>} branches
+ * @property {Array<string>} contents
+ * @property {string} path
+ */
+
+/**
+ * @callback MergeDriverCallback
+ * @param {MergeDriverParams} args
+ * @return {{cleanMerge: boolean, mergedText: string} | Promise<{cleanMerge: boolean, mergedText: string}>}
+ */
+
+/**
  * @callback WalkerMap
  * @param {string} filename
  * @param {WalkerEntry[]} entries

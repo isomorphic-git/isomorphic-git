@@ -1,5 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, merge, resolveRef, log } = require('isomorphic-git')
+const diff3Merge = require('diff3')
+const { Errors, merge, add, resolveRef, log } = require('isomorphic-git')
+const gitCommit = require('isomorphic-git').commit
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -543,17 +545,22 @@ describe('merge', () => {
     expect(mergeCommit.parent).toEqual(commit.parent)
   })
 
-  it("merge two branches that modified the same file (should conflict)'", async () => {
+  it("merge two branches that modified the same file, no conflict resolver (should conflict)'", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir, dir } = await makeFixture('test-merge')
     // Test
+    const testFile = `${gitdir}/o.conflict.example`
+    const outFile = `${dir}/o.txt`
+
     let error = null
     try {
       await merge({
         fs,
+        dir,
         gitdir,
         ours: 'a',
         theirs: 'c',
+        abortOnConflict: false,
         author: {
           name: 'Mr. Test',
           email: 'mrtest@example.com',
@@ -564,7 +571,350 @@ describe('merge', () => {
     } catch (e) {
       error = e
     }
+    expect(await fs.read(outFile, 'utf-8')).toBe(
+      await fs.read(testFile, 'utf-8')
+    )
     expect(error).not.toBeNull()
-    expect(error.code).toBe(Errors.MergeNotSupportedError.code)
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+  })
+
+  it("merge two branches that modified the same file, no conflict resolver, don't update worktree'", async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-merge')
+    // Test
+    const outFile = `${dir}/o.txt`
+
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'a',
+        theirs: 'c',
+        abortOnConflict: true,
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(await fs.read(outFile, 'utf-8')).toBeNull()
+    expect(await fs.readdir(dir)).toEqual([])
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+  })
+
+  it("merge two branches that modified the same file, custom conflict resolver (prefer our changes)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-recursive-ours',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      mergeDriver: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+
+        const LINEBREAKS = /^.*(\r?\n|$)/gm
+        const ours = ourContent.match(LINEBREAKS)
+        const base = baseContent.match(LINEBREAKS)
+        const theirs = theirContent.match(LINEBREAKS)
+        const result = diff3Merge(ours, base, theirs)
+        let mergedText = ''
+        for (const item of result) {
+          if (item.ok) {
+            mergedText += item.ok.join('')
+          }
+          if (item.conflict) {
+            mergedText += item.conflict.a.join('')
+          }
+        }
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, custom conflict resolver (prefer their changes)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-recursive-theirs',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      mergeDriver: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+
+        const LINEBREAKS = /^.*(\r?\n|$)/gm
+        const ours = ourContent.match(LINEBREAKS)
+        const base = baseContent.match(LINEBREAKS)
+        const theirs = theirContent.match(LINEBREAKS)
+        const result = diff3Merge(ours, base, theirs)
+        let mergedText = ''
+        for (const item of result) {
+          if (item.ok) {
+            mergedText += item.ok.join('')
+          }
+          if (item.conflict) {
+            mergedText += item.conflict.b.join('')
+          }
+        }
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, custom conflict resolver (prefer our file)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-use-ours',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      mergeDriver: ({ branches, contents }) => {
+        const mergedText = contents[1]
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, custom conflict resolver (prefer their file)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-use-theirs',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      mergeDriver: ({ branches, contents }) => {
+        const mergedText = contents[2]
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, custom conflict resolver (prefer base file)'", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-use-base',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      mergeDriver: ({ branches, contents }) => {
+        const baseContent = contents[0]
+        const ourContent = contents[1]
+        const theirContent = contents[2]
+        const mergedText = baseContent || ourContent || theirContent
+        return { cleanMerge: true, mergedText }
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it("merge two branches that modified the same file, manual conflict resolution'", async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-merge')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-c-manual-resolve',
+      })
+    )[0].commit
+    // Test
+    await merge({
+      fs,
+      dir,
+      gitdir,
+      ours: 'a',
+      theirs: 'c',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      abortOnConflict: false,
+    }).catch(e => {
+      if (!(e instanceof Errors.MergeConflictError)) throw e
+    })
+    await add({
+      fs,
+      dir,
+      gitdir,
+      filepath: '.',
+    })
+    await gitCommit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      ref: 'a',
+      message: "Merge branch 'c' into a",
+      parent: ['a', 'c'],
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
   })
 })
