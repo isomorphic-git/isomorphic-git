@@ -22,7 +22,8 @@
       "version-1.x-onAuthFailure",
       "version-1.x-onMessage",
       "version-1.x-onProgress",
-      "version-1.x-onSign"
+      "version-1.x-onSign",
+      "version-1.x-mergeDriver"
     ],
     "Clients": [
       "version-1.x-fs",
