@@ -2,9 +2,9 @@
 title: mergeDriver
 sidebar_label: mergeDriver
 ---
-The merge driver is a callback which is called for each conflicting file. It takes the file contents on each branch as an array and returns the merged result.
+The merge driver is a callback which is called for each conflicting file during a merge. It takes the file contents on each branch as an array and returns the merged result.
 
-By default the [merge](./merge.md) command uses the diff3 algorithm to try to solve merge conflicts, and throw an error is the conflict cannot be resolved. This is not always ideal, so isomorphic-git implements merge drivers so that users may implement their own merging algorithm.
+By default the [merge](./merge.md) command uses the diff3 algorithm to try to solve merge conflicts, and throws an error if the conflict cannot be resolved. This is not always ideal, so isomorphic-git implements merge drivers so that users may implement their own merging algorithm.
 
 A merge driver implements the following API:
 
@@ -17,10 +17,12 @@ A merge driver implements the following API:
 | return        | Promise\<{cleanMerge: bool, mergedText: string}\> | Whether merge was successful, and the merged text         |
 
 
-If `cleanMerge` is true, then the `mergedText` string will be written to the file. If `cleanMerge` is false, a `MergeConflictError` will be thrown, and if `merge` was called with `abortOnConflict: false`, the mergedText string will be written to the file in the worktree.
+If `cleanMerge` is true, then the `mergedText` string will be written to the file. If `cleanMerge` is false, a `MergeConflictError` will be thrown and no merge commit will be created.
+
+If `merge` was called with `abortOnConflict: false`, the mergedText string will be written to the file even if there is a merge conflict. Otherwise, in the event of a merge conflict, no changes will be written to the worktree or index.
 
 ### MergeDriverParams#path
-The `path` parameter refers to the path of the conflicted file, relative to the the git repository.
+The `path` parameter refers to the path of the conflicted file, relative to the root of the git repository.
 ### MergeDriverParams#branches
 The `branches` array contains the human-readable names of the branches we are merging. The first index refers to the merge base, the second refers to the branch being merged into, and any subsequent indexes refer to the branches we are merging. For example, say we have a git history that looks like this:
 ```
@@ -31,7 +33,9 @@ The `branches` array contains the human-readable names of the branches we are me
 If we were to merge `topic` into `main`, the `branches` array would look like: `['base', 'main', 'topic']`. In this case, the name `base` refers to commit `D` which is the common ancestor of our two branches. `base` will always be the name at the first index.
 
 ### MergeDriverParams#contents
-The `contents` array contains the file contents respective of each branch. Like the `branches` array, the first index refers to the merge base, the second refers to the branch being merged into, and subsequent indexes refer to the branches we are merging. For example, say we have a file `text.txt` which contains:
+The `contents` array contains the file contents respective of each branch. Like the `branches` array, the first index always refers to the merge base. The second index always refers to the branch we are merging into, i.e. 'ours'. Subsequent indexes refer to the branches we are merging, i.e. 'theirs'.
+
+For example, say we have a file `text.txt` which contains:
 ```
 original
 text
@@ -71,7 +75,7 @@ const mergeDriver = ({ contents }) => {
 }
 ```
 
-If we applied this algorithm to the file in the previous example, the resolved file would simply read:
+If we applied this algorithm to the conflict in the previous example, the resolved file would simply read:
 ```
 modified
 text
@@ -94,7 +98,7 @@ was
 modified
 ```
 
-As a more complex example, we use the default diff3 algorithm, but choose the other branch's changes whenever lines of the file conflict.
+As a more complex example, we use the default diff3 algorithm, but choose the other branch's changes whenever specific lines of the file conflict.
 ```
 const diff3Merge = require('diff3')
 const mergeDriver = ({ contents }) => {
@@ -120,7 +124,7 @@ const mergeDriver = ({ contents }) => {
 }
 ```
 
-If we apply this algorithm to the file in the previous example, the resolved file reads:
+If we apply this algorithm to the conflict in the previous example, the resolved file reads:
 ```
 modified
 text
@@ -128,7 +132,7 @@ file
 was
 modified
 ```
-and if we wanted to choose *our* branch's changes when lines of the file conflict, we simply change the above line:
+and if we wanted to choose *our* branch's changes whenever specific lines of the file conflict, we simply change the above line:
 ```
 mergedText += item.conflict.b.join('')
 ```
@@ -143,6 +147,7 @@ file
 was
 modified
 ```
+
 Finally, what if we wanted to make a slight modification to the behavior of the default merge driver, like changing the size of conflict markers? The code for the default merge driver is located in `src/utils/mergeFile.js`. We can copy the code into our merge driver like so:
 ```
 const diff3Merge = require('diff3')
