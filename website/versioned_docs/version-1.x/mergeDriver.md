@@ -1,6 +1,8 @@
 ---
 title: mergeDriver
 sidebar_label: mergeDriver
+id: version-1.x-mergeDriver
+original_id: mergeDriver
 ---
 The merge driver is a callback which is called for each conflicting file. It takes the file contents on each branch as an array and returns the merged result.
 
