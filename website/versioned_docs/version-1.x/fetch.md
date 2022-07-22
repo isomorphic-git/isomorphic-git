@@ -28,8 +28,8 @@ Fetch commits from a remote repository
 | relative                         | boolean = false           | Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.                      |
 | since                            | Date                      | Only fetch commits created after the given date. Mutually exclusive with `depth`.                                                  |
 | exclude                          | Array\<string\> = []      | A list of branches or tags. Instructs the remote server not to send us any commits reachable from these refs.                      |
-| prune                            | boolean                   | Delete local remote-tracking branches that are not present on the remote                                                           |
-| pruneTags                        | boolean                   | Prune local tags that don’t exist on the remote, and force-update those tags that differ                                           |
+| prune                            | boolean = false           | Delete local remote-tracking branches that are not present on the remote                                                           |
+| pruneTags                        | boolean = false           | Prune local tags that don’t exist on the remote, and force-update those tags that differ                                           |
 | corsProxy                        | string                    | Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.                         |
 | [headers](./headers)             | Object\<string, string\>  | Additional headers to include in HTTP requests, similar to git's `extraHeader` config                                              |
 | cache                            | object                    | a [cache](cache.md) object                                                                                                         |

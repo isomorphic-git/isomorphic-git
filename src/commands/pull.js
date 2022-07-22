@@ -22,6 +22,8 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
  * @param {string} [args.url]
  * @param {string} [args.remote]
  * @param {string} [args.remoteRef]
+ * @param {boolean} [args.prune]
+ * @param {boolean} [args.pruneTags]
  * @param {string} [args.corsProxy]
  * @param {boolean} args.singleBranch
  * @param {boolean} args.fastForward
@@ -57,6 +59,8 @@ export async function _pull({
   url,
   remote,
   remoteRef,
+  prune,
+  pruneTags,
   fastForward,
   fastForwardOnly,
   corsProxy,
@@ -94,6 +98,8 @@ export async function _pull({
       remoteRef,
       singleBranch,
       headers,
+      prune,
+      pruneTags,
     })
     // Merge the remote tracking branch into the local one.
     await _merge({

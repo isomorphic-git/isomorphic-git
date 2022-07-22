@@ -26,6 +26,8 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {string} [args.url] - (Added in 1.1.0) The URL of the remote repository. The default is the value set in the git config for that remote.
  * @param {string} [args.remote] - (Added in 1.1.0) If URL is not specified, determines which remote to use.
  * @param {string} [args.remoteRef] - (Added in 1.1.0) The name of the branch on the remote to fetch. By default this is the configured remote tracking branch.
+ * @param {boolean} [args.prune = false] - Delete local remote-tracking branches that are not present on the remote
+ * @param {boolean} [args.pruneTags = false] - Prune local tags that don’t exist on the remote, and force-update those tags that differ
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.fastForward = true] -  If false, only create merge commits.
@@ -71,6 +73,8 @@ export async function pull({
   url,
   remote,
   remoteRef,
+  prune = false,
+  pruneTags = false,
   fastForward = true,
   fastForwardOnly = false,
   corsProxy,
@@ -121,6 +125,8 @@ export async function pull({
       author,
       committer,
       signingKey,
+      prune,
+      pruneTags,
     })
   } catch (err) {
     err.caller = 'git.pull'
