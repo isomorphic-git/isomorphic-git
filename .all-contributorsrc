@@ -578,6 +578,16 @@
         "test",
         "doc"
       ]
+    },
+    {
+      "login": "rraab-dev",
+      "name": "Rafael Raab",
+      "avatar_url": "https://avatars.githubusercontent.com/u/53948988?v=4",
+      "profile": "https://github.com/rraab-dev",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ],
   "commitConvention": "angular"
