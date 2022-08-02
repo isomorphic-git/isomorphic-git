@@ -9,6 +9,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
+import { posixifyPathBuffer } from '../utils/posixifyPathBuffer.js'
 
 /**
  * Add a file to the git index (aka staging area)
@@ -84,7 +85,7 @@ async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
       await Promise.all(promises)
     } else {
       const object = stats.isSymbolicLink()
-        ? await fs.readlink(join(dir, currentFilepath))
+        ? await fs.readlink(join(dir, currentFilepath)).then(posixifyPathBuffer)
         : await fs.read(join(dir, currentFilepath))
       if (object === null) throw new NotFoundError(currentFilepath)
       const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
