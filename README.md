@@ -59,7 +59,7 @@ If you're using `isomorphic-git` in node, you use the native `fs` module and the
 // node.js example
 const path = require('path')
 const git = require('isomorphic-git')
-const http = require('isomorphic-git/http/node')
+const http = require('isomorphic-git/http/node') // ESM: import http from 'isomorphic-git/http/node/index.js'
 const fs = require('fs')
 
 const dir = path.join(process.cwd(), 'test-clone')
