@@ -13,7 +13,7 @@ describe('walk', () => {
       fs,
       dir,
       gitdir,
-      trees: [WORKDIR(), TREE({ ref: 'HEAD' }), STAGE()],
+      trees: [WORKDIR(), TREE(), STAGE()],
       map: (filepath, [workdir, tree, stage]) => [
         filepath,
         !!workdir,
