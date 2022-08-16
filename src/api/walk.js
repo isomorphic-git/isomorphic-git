@@ -177,7 +177,6 @@ import { join } from '../utils/join.js'
  *
  * Example 2: Return the difference between the working directory and the HEAD commit
  * ```js
- * import diff from 'diff-lines'
  * const map = async (filepath, [head, workdir]) => {
  *   return {
  *     filepath,
