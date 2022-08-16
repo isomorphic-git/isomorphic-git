@@ -1,7 +1,13 @@
 /* eslint-env node, browser, jasmine */
 import http from 'isomorphic-git/http'
 
-const { Errors, setConfig, push, listBranches } = require('isomorphic-git')
+const {
+  Errors,
+  clone,
+  setConfig,
+  push,
+  listBranches,
+} = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -52,6 +58,26 @@ describe('push', () => {
       ",
       ]
     `)
+  })
+  it('push empty', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-server')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      url: `http://${localhost}:8888/test-fetch-server.git`,
+    })
+    // Test
+    const res = await push({
+      fs,
+      http,
+      gitdir,
+    })
+    expect(res).toBeTruthy()
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/master'].ok).toBe(true)
   })
   it('push without ref', async () => {
     // Setup
