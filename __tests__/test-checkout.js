@@ -19,7 +19,7 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
-  typeof window === 'undefined' ? 'localhost' : window.location.hostname
+  typeof window === 'undefined' ? '127.0.0.1' : window.location.hostname
 
 describe('checkout', () => {
   it('checkout', async () => {
