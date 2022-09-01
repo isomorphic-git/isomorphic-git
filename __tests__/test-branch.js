@@ -1,7 +1,13 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
 
-const { Errors, branch, init, currentBranch } = require('isomorphic-git')
+const {
+  Errors,
+  branch,
+  init,
+  currentBranch,
+  listFiles,
+} = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -14,6 +20,33 @@ describe('branch', () => {
     const files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
     expect(files).toEqual(['master', 'test-branch'])
     expect(await currentBranch({ fs, dir, gitdir })).toEqual('master')
+  })
+
+  it('branch with start point', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-branch-start-point')
+    // Test
+    let files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
+    expect(files).toEqual(['main', 'start-point'])
+    await branch({ fs, dir, gitdir, ref: 'test-branch', object: 'start-point' })
+    files = await fs.readdir(path.resolve(gitdir, 'refs', 'heads'))
+    expect(files).toEqual(['main', 'start-point', 'test-branch'])
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('main')
+    expect(
+      await fs.read(
+        path.resolve(gitdir, 'refs', 'heads', 'test-branch'),
+        'utf8'
+      )
+    ).toEqual(
+      await fs.read(
+        path.resolve(gitdir, 'refs', 'heads', 'start-point'),
+        'utf8'
+      )
+    )
+    expect(await listFiles({ fs, dir, gitdir, ref: 'HEAD' })).toEqual([
+      'new-file.txt',
+    ])
+    expect(await listFiles({ fs, dir, gitdir, ref: 'test-branch' })).toEqual([])
   })
 
   it('branch --checkout', async () => {
