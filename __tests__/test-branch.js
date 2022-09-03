@@ -49,6 +49,45 @@ describe('branch', () => {
     expect(await listFiles({ fs, dir, gitdir, ref: 'test-branch' })).toEqual([])
   })
 
+  it('branch force', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-branch')
+    let error = null
+    // Test
+    await branch({ fs, dir, gitdir, ref: 'test-branch' })
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('master')
+    expect(
+      await fs.exists(path.resolve(gitdir, 'refs/heads/test-branch'))
+    ).toBeTruthy()
+    try {
+      await branch({ fs, dir, gitdir, ref: 'test-branch', force: true })
+    } catch (err) {
+      error = err
+    }
+    expect(error).toBeNull()
+  })
+
+  it('branch with start point force', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-branch-start-point')
+    let error = null
+    // Test
+    await branch({ fs, dir, gitdir, ref: 'test-branch', object: 'start-point' })
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('main')
+    expect(
+      await fs.exists(path.resolve(gitdir, 'refs/heads/test-branch'))
+    ).toBeTruthy()
+    try {
+      await branch({ fs, dir, gitdir, ref: 'test-branch', force: true })
+    } catch (err) {
+      error = err
+    }
+    expect(error).toBeNull()
+    expect(await listFiles({ fs, dir, gitdir, ref: 'test-branch' })).toEqual([
+      'new-file.txt',
+    ])
+  })
+
   it('branch --checkout', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-branch')
