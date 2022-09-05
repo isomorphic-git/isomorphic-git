@@ -88,4 +88,7 @@ This is great article that shows the details:<br/>
 [A Hacker's Guide to Git](https://wildlyinaccurate.com/a-hackers-guide-to-git/).<br/>
 But as first the introduction you can watch this video:<br/>
 [![Link to Video: Inside the Hidden Git Folder - Computerphile](https://img.youtube.com/vi/bSA91XTzeuA/0.jpg)](http://www.youtube.com/watch?v=bSA91XTzeuA)
-Another resource is GitHub blog: [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
+
+Another resource is GitHub blog:
+* [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
+* [Git’s database internals II: commit history queries](https://github.blog/2022-08-30-gits-database-internals-ii-commit-history-queries/)
