@@ -307,10 +307,19 @@ export async function _fetch({
   // AWS CodeCommit doesn't list HEAD as a symref, but we can reverse engineer it
   // Find the SHA of the branch called HEAD
   if (response.HEAD === undefined) {
-    const { oid } = GitRefManager.resolveAgainstMap({
-      ref: 'HEAD',
-      map: remoteRefs,
-    })
+    let oid
+    try {
+      oid = GitRefManager.resolveAgainstMap({
+        ref: 'HEAD',
+        map: remoteRefs,
+      }).oid
+    } catch (e) {
+      const [firstRef, firstOid] = [...remoteRefs.entries()][0] // still assumes remote has at least 1 ref
+      oid = firstOid
+      if (onProgress) {
+        onProgress({ phase: 'warning: HEAD not found, using ' + firstRef })
+      }
+    }
     // Use the name of the first branch that's not called HEAD that has
     // the same SHA as the branch called HEAD.
     for (const [key, value] of remoteRefs.entries()) {

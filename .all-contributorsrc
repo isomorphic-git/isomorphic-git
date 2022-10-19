@@ -597,6 +597,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "wizzard0",
+      "name": "Oleksandr Nikitin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/424619?v=4",
+      "profile": "https://tvori.info/",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
