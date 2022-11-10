@@ -3,6 +3,7 @@ import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject } from '../storage/readObject.js'
+import { resolveBlob } from '../utils/resolveBlob.js'
 
 export async function resolveTree({ fs, cache, gitdir, oid }) {
   // Empty tree - bypass `readObject`
@@ -19,6 +20,9 @@ export async function resolveTree({ fs, cache, gitdir, oid }) {
   if (type === 'commit') {
     oid = GitCommit.from(object).parse().tree
     return resolveTree({ fs, cache, gitdir, oid })
+  }
+  if (type === 'blob') {
+    return resolveBlob({ fs, cache, gitdir, oid })
   }
   if (type !== 'tree') {
     throw new ObjectTypeError(oid, type, 'tree')
