@@ -58,7 +58,7 @@ async function _resolveFilepath({
           oid: entry.oid,
         })
         if (type !== 'tree') {
-          throw new ObjectTypeError(oid, type, 'blob', filepath)
+          throw new ObjectTypeError(oid, type, 'tree', filepath)
         }
         tree = GitTree.from(object)
         return _resolveFilepath({
