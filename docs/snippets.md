@@ -13,6 +13,7 @@ All snippets are published under the MIT License.
 - [GitHub Pages deploy script](#github-pages-deploy-script)
 - [git log -- path/to/file](#git-log----pathtofile)
 - [git diff --name-status \<commitHash1\> \<commitHash2\>](#git-diff---name-status-commithash1-commithash2)
+- [Remove untracked files](#remove-untracked-files)
 
 ## git add --no-all .
 
@@ -181,5 +182,24 @@ async function getFileStateChanges(commitHash1, commitHash2, dir) {
       }
     },
   })
+}
+```
+
+## Remove untracked files
+
+This snippet walks the index (tree: STAGE) and worktree (tree: WORKDIR), identifies untracked files and directories in the worktree, and removes them.
+
+```js
+const { promises: fsp } = require('fs')
+
+function removeUntrackedFiles (repo) {
+  const trees = [git.STAGE({}), git.WORKDIR()]
+  const map = (relpath, [sEntry]) => {
+    if (relpath === '.') return
+    if (relpath === '.git') return null
+    if (sEntry == null) return fsp.rm(ospath.join(repo.dir, relpath), { recursive: true }).then(() => null)
+    return sEntry.mode().then((mode) => (mode === 0o120000 ? null : undefined))
+  }
+  return git.walk({ ...repo, trees, map })
 }
 ```
