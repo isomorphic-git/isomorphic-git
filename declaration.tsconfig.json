@@ -1,5 +1,5 @@
 {
-  "include": ["index.js", "http/web/index.js", "http/node/index.js"],
+  "include": ["index.js", "http/web/index.js", "http/node/index.js", "internal-apis.js"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "types": [],
