@@ -48,6 +48,8 @@
     "index.umd.min.js",
     "index.umd.min.d.ts",
     "index.umd.min.js.map",
+    "internal-apis.js",
+    "internal-apis.cjs",
     "size_report.html"
   ],
   "dependencies": {
