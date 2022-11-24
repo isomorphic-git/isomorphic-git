@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "alex": "^7.1.0",
+    "caniuse-lite": "^1.0.30001434",
     "docusaurus": "1.14.0",
     "isomorphic-git": "0.51.0",
     "react-icons": "2.2.7"
