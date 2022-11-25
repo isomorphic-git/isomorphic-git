@@ -8,6 +8,10 @@ jobs:
     pool:
       vmImage: 'ubuntu-20.04'
 
+    # Most pipelines finish in under 15 minutes. 30 minutes should be more than enough.
+    # See https://dev.azure.com/isomorphic-git/isomorphic-git/_pipeline/analytics/duration.
+    timeoutInMinutes: 30
+
     steps:
       - task: NodeTool@0
         inputs:
