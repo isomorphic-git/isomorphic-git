@@ -86,12 +86,19 @@ git.clone({ fs, http, dir, url: 'https://github.com/isomorphic-git/lightning-fs'
 If you're using ES module syntax, you can use either the default import for convenience, or named imports to benefit from tree-shaking if you are using a bundler:
 
 ```js
+// npm install buffer
+// explicit polyfill of the nodejs Buffer module, needed for the vite bundler
+import { Buffer } from 'buffer'
+globalThis.Buffer = Buffer
+
 import git from 'isomorphic-git'
 // or
 import * as git from 'isomorphic-git'
 // or
 import {plugins, clone, commit, push} from 'isomorphic-git'
 ```
+
+<!-- TODO Eliminate Buffer dependency https://github.com/isomorphic-git/isomorphic-git/pull/925 -->
 
 View the full [Getting Started guide](https://isomorphic-git.github.io/docs/quickstart.html) on the docs website.
 
