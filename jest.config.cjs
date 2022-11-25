@@ -13,9 +13,8 @@ module.exports = {
     [
       'jest-junit',
       {
-        output: `./junit/TESTS-node-${process.version}-${
-          process.platform
-        }-${require('os').release()}.xml`,
+        outputDirectory: 'junit',
+        outputName: `TESTS-node-${process.version}-${process.platform}-${require('os').release()}.xml`,
       },
     ],
   ],
