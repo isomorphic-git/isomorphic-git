@@ -58,10 +58,10 @@ module.exports = function (config) {
     // Refer to:
     // - https://support.saucelabs.com/hc/en-us/articles/225104707-Karma-Tests-Disconnect-Particularly-When-Running-Tests-on-Safari
     // - https://github.com/karma-runner/karma-browserstack-launcher/issues/61
-    browserDisconnectTimeout: 5 * 60 * 1000,  // default 2000
-    browserDisconnectTolerance: 3,            // default 0
-    browserNoActivityTimeout: 5 * 60 * 1000,  // default 10000
-    captureTimeout: 5 * 60 * 1000,            // default 60000
+    captureTimeout: 3e5,
+    browserNoActivityTimeout: 3e5,
+    browserDisconnectTimeout: 3e5,
+    browserDisconnectTolerance: 3,
 
     // SauceLabs browsers
     customLaunchers: {
