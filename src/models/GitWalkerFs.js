@@ -70,7 +70,7 @@ export class GitWalkerFs {
   async stat(entry) {
     if (entry._stat === false) {
       const { fs, dir } = this
-      let stat = await fs.stat(`${dir}/${entry._fullpath}`)
+      let stat = await fs.lstat(`${dir}/${entry._fullpath}`)
       if (!stat) {
         throw new Error(
           `ENOENT: no such file or directory, lstat '${entry._fullpath}'`
@@ -79,6 +79,13 @@ export class GitWalkerFs {
       let type = stat.isDirectory() ? 'tree' : 'blob'
       if (type === 'blob' && !stat.isFile() && !stat.isSymbolicLink()) {
         type = 'special'
+      }
+      if (type === 'blob' && stat.isSymbolicLink()) {
+        // get the "type" of the symlink's target
+        const fstat = await fs.stat(`${dir}/${entry._fullpath}`)
+        if (fstat.isDirectory()) {
+          type = 'tree'
+        }
       }
       entry._type = type
       stat = normalizeStats(stat)
