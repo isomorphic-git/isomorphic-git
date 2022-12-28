@@ -70,7 +70,7 @@ export class GitWalkerFs {
   async stat(entry) {
     if (entry._stat === false) {
       const { fs, dir } = this
-      let stat = await fs.lstat(`${dir}/${entry._fullpath}`)
+      let stat = await fs.stat(`${dir}/${entry._fullpath}`)
       if (!stat) {
         throw new Error(
           `ENOENT: no such file or directory, lstat '${entry._fullpath}'`

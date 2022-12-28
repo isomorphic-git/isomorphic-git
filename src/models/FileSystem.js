@@ -213,6 +213,27 @@ export class FileSystem {
   }
 
   /**
+   * Return the Stats of a file (following symlinks) if it exists, otherwise returns existsnull.
+   * Rethrows errors that aren't related to file existance.
+   */
+  async stat(filename) {
+    try {
+      const stats = await this._stat(filename)
+      return stats
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null
+      }
+      throw err
+    }
+  }
+
+  // alias for fstat.  nodejs fs module uses bot
+  async fstat(filename) {
+    return this.stat(filename)
+  }
+
+  /**
    * Reads the contents of a symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
    */
