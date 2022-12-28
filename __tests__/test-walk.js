@@ -31,6 +31,10 @@ describe('walk', () => {
       ['folder/1.txt', true, true, true],
       ['folder/2.txt', true, false, false],
       ['folder/3.txt', true, false, true],
+      ['folder-as-link', true, false, false],
+      ['folder-as-link/1.txt', true, false, false],
+      ['folder-as-link/2.txt', true, false, false],
+      ['folder-as-link/3.txt', true, false, false],
     ])
   })
 
@@ -259,6 +263,54 @@ describe('walk', () => {
           oid: '7999426c516ffbbae9136d93dc44e89091d35a13',
           hasStat: true,
         },
+      ],
+      [
+        'folder-as-link',
+        {
+          content: undefined,
+          hasStat: true,
+          mode: 40960,
+          oid: undefined,
+          type: 'tree',
+        },
+        null,
+        null,
+      ],
+      [
+        'folder-as-link/1.txt',
+        {
+          content: '',
+          hasStat: true,
+          mode: 33188,
+          oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+          type: 'blob',
+        },
+        null,
+        null,
+      ],
+      [
+        'folder-as-link/2.txt',
+        {
+          content: '',
+          hasStat: true,
+          mode: 33188,
+          oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+          type: 'blob',
+        },
+        null,
+        null,
+      ],
+      [
+        'folder-as-link/3.txt',
+        {
+          content: '',
+          hasStat: true,
+          mode: 40960,
+          oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+          type: 'blob',
+        },
+        null,
+        null,
       ],
     ])
   })
