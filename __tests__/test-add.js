@@ -181,6 +181,41 @@ describe('add', () => {
     await add({ fs, dir, filepath: 'c' })
     expect((await listFiles({ fs, dir })).length).toEqual(4)
   })
+  it('symlink to a folder', async () => {
+    // Setup
+    const realFolder = 'realFolder'
+    const { fs, dir } = await makeFixture('test-add')
+    await fs.mkdir(`${dir}/${realFolder}`)
+    await fs.write(`${dir}/${realFolder}/a.txt`, 'a')
+    const symlinkCreated = await fs
+      ._symlink(`${dir}/${realFolder}`, `${dir}/linkToFolder`)
+      .then(() => true)
+      .catch(() => false)
+    // Test
+    await init({ fs, dir })
+    expect((await listFiles({ fs, dir })).length).toEqual(0)
+    if (!symlinkCreated) return
+
+    await add({ fs, dir, filepath: 'linkToFolder' })
+    console.log(await listFiles({ fs, dir }))
+    expect((await listFiles({ fs, dir })).length).toEqual(1)
+
+    const walkResult = await walk({
+      fs,
+      dir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        filepath === 'linkToFolder' && stage ? stage.oid() : undefined,
+    })
+    expect(walkResult.length).toEqual(1)
+    const oid = walkResult[0]
+    const { blob: symlinkTarget } = await readBlob({ fs, dir, oid })
+    let symlinkTargetStr = Buffer.from(symlinkTarget).toString('utf8')
+    if (symlinkTargetStr.startsWith('./')) {
+      symlinkTargetStr = symlinkTargetStr.substr(2)
+    }
+    expect(symlinkTargetStr).toMatch(/.*\/realFolder/)
+  })
   it('folder with .gitignore', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')

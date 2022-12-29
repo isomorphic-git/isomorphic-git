@@ -86,6 +86,7 @@ import { join } from '../utils/join.js'
  * - `'blob'` file
  * - `'special'` used by `WORKDIR` to represent irregular files like sockets and FIFOs
  * - `'commit'` used by `TREE` to represent submodules
+ * - `'linkTree'` used by `WORKDIR` to represent a symlink to a directory.  This prevents unnecessary recursion into the directory.
  *
  * ```js
  * await entry.type()

@@ -203,7 +203,9 @@ export async function statusMatrix({
           stage && stage.type(),
         ])
 
-        const isBlob = [headType, workdirType, stageType].includes('blob')
+        const isBlob = [headType, workdirType, stageType].some(
+          t => t === 'blob' || t === 'linkTree'
+        )
 
         // For now, bail on directories unless the file is also a blob in another tree
         if ((headType === 'tree' || headType === 'special') && !isBlob) return
@@ -221,13 +223,14 @@ export async function statusMatrix({
         let workdirOid
         if (
           headType !== 'blob' &&
-          workdirType === 'blob' &&
+          ['blob', 'linkTree'].includes(workdirType) &&
           stageType !== 'blob'
         ) {
           // We don't actually NEED the sha. Any sha will do
           // TODO: update this logic to handle N trees instead of just 3.
           workdirOid = '42'
-        } else if (workdirType === 'blob') {
+          // a symlink to a dir should be treated like a file by git
+        } else if (['blob', 'linkTree'].includes(workdirType)) {
           workdirOid = await workdir.oid()
         }
         const entry = [undefined, headOid, workdirOid, stageOid]

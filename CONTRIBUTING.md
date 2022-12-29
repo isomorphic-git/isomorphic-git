@@ -8,7 +8,17 @@ You are very welcome here and any contribution is appreciated. :+1:
 
 The code is written in "plain" JavaScript and as a rule of thumb shouldn't require transpilation. (The glaring exception being browser's lack of support for bare imports.)
 
+## Dev-time scripts
+
+`yarn test` will do all build, then run all jest and karma tests. It can take a while.
+
+For faster iteration
+
+- rollup on every change `yarn rollup -c --no-treeshake --watch`
+- jest tests for a single file, in watch mode `yarn jest __tests__/test-statusMatrix.js --watch`
+
 ## New feature checklists :sparkles:️
+
 I'm honestly documenting these steps just so I don't forget them myself.
 
 To add a parameter to an existing command `X`:
@@ -83,6 +93,7 @@ parse[*]Request: (input: stream) -> Object
 write[*]Response: (input: Object) -> stream
 
 ### How git works
+
 If you want to contribute it may be usefull if you understand how git works under the hood.
 This is great article that shows the details:<br/>
 [A Hacker's Guide to Git](https://wildlyinaccurate.com/a-hackers-guide-to-git/).<br/>
@@ -90,5 +101,6 @@ But as first the introduction you can watch this video:<br/>
 [![Link to Video: Inside the Hidden Git Folder - Computerphile](https://img.youtube.com/vi/bSA91XTzeuA/0.jpg)](http://www.youtube.com/watch?v=bSA91XTzeuA)
 
 Another resource is GitHub blog:
-* [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
-* [Git’s database internals II: commit history queries](https://github.blog/2022-08-30-gits-database-internals-ii-commit-history-queries/)
+
+- [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
+- [Git’s database internals II: commit history queries](https://github.blog/2022-08-30-gits-database-internals-ii-commit-history-queries/)

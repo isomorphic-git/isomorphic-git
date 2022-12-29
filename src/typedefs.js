@@ -92,7 +92,7 @@ import './typedefs-http.js'
  * The `WalkerEntry` is an interface that abstracts computing many common tree / blob stats.
  *
  * @typedef {Object} WalkerEntry
- * @property {function(): Promise<'tree'|'blob'|'special'|'commit'>} type
+ * @property {function(): Promise<'tree'|'blob'|'special'|'commit'|'linkTree'>} type
  * @property {function(): Promise<number>} mode
  * @property {function(): Promise<string>} oid
  * @property {function(): Promise<Uint8Array|void>} content
