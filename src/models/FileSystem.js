@@ -228,11 +228,6 @@ export class FileSystem {
     }
   }
 
-  // alias for fstat.  nodejs fs module uses bot
-  async fstat(filename) {
-    return this.stat(filename)
-  }
-
   /**
    * Reads the contents of a symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
