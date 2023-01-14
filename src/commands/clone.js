@@ -6,6 +6,7 @@ import { _checkout } from '../commands/checkout.js'
 import { _fetch } from '../commands/fetch.js'
 import { _init } from '../commands/init.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { join } from '../utils/join.js'
 
 /**
  * @param {object} args
@@ -31,8 +32,9 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @param {string[]} args.exclude
  * @param {boolean} args.relative
  * @param {Object<string, string>} args.headers
+ * @param {boolean} args.createDir
  *
- * @returns {Promise<void>} Resolves successfully when clone completes
+ * @returns {Promise<{basename: string}>} Resolves successfully when clone completes
  *
  */
 export async function _clone({
@@ -58,8 +60,16 @@ export async function _clone({
   noCheckout,
   noTags,
   headers,
+  createDir,
 }) {
   try {
+    let dirname = ''
+    if (createDir) {
+      dirname = url.replace(/\.git$/, '').replace(/.*\//, '')
+      dir = join(dir, dirname)
+      gitdir = join(dir, '.git')
+      await fs.mkdir(dir)
+    }
     await _init({ fs, gitdir })
     await _addRemote({ fs, gitdir, remote, url, force: false })
     if (corsProxy) {
@@ -102,6 +112,7 @@ export async function _clone({
       remote,
       noCheckout,
     })
+    return { basename: dirname }
   } catch (err) {
     // Remove partial local repository, see #1283
     // Ignore any error as we are already failing.
@@ -109,6 +120,11 @@ export async function _clone({
     await fs
       .rmdir(gitdir, { recursive: true, maxRetries: 10 })
       .catch(() => undefined)
+    if (createDir) {
+      await fs
+        .rmdir(dir, { recursive: true, maxRetries: 10 })
+        .catch(() => undefined)
+    }
     throw err
   }
 }

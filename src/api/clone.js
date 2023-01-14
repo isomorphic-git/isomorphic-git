@@ -32,8 +32,9 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.relative = false] - Changes the meaning of `depth` to be measured from the current shallow depth rather than from the branch tip.
  * @param {Object<string, string>} [args.headers = {}] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {object} [args.cache] - a [cache](cache.md) object
+ * @param {boolean} [args.createDir] - If true, create the directory with the repository name if it doesn't exist.
  *
- * @returns {Promise<void>} Resolves successfully when clone completes
+ * @returns {Promise<{basename: string}>} Resolves successfully when clone completes
  *
  * @example
  * await git.clone({
@@ -71,6 +72,7 @@ export async function clone({
   noTags = false,
   headers = {},
   cache = {},
+  createDir = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -104,6 +106,7 @@ export async function clone({
       noCheckout,
       noTags,
       headers,
+      createDir,
     })
   } catch (err) {
     err.caller = 'git.clone'

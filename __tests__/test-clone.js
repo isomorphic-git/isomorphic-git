@@ -251,6 +251,24 @@ describe('clone', () => {
     expect(remote).toBe('foo')
   })
 
+  it('clone with createDir', async () => {
+    const { fs, dir } = await makeFixture('isomorphic-git')
+    const { basename } = await clone({
+      fs,
+      http,
+      dir,
+      depth: 1,
+      ref: 'test-branch',
+      singleBranch: true,
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+      createDir: true,
+    })
+    expect(await fs.exists(`${dir}`)).toBe(true)
+    expect(await fs.exists(`${dir}/${basename}`)).toBe(true)
+    expect(await fs.exists(`${dir}/${basename}/.git`)).toBe(true)
+  })
+
   if (typeof process === 'object' && (process.versions || {}).node) {
     it('should allow agent to be used with built-in http plugin for Node.js', async () => {
       const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
