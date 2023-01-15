@@ -57,6 +57,7 @@ export async function add({
 async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
+  filepath = await expandGlobs({ fs, filepath })
   const promises = filepath.map(async currentFilepath => {
     if (!force) {
       const ignored = await GitIgnoreManager.isIgnored({
@@ -109,4 +110,29 @@ async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
     .map(settle => settle.value)
 
   return fulfilledPromises
+}
+
+async function expandGlobs({ fs, filepath }) {
+  return filepath
+    .map(async currentFilePath => {
+      if (currentFilePath.includes('*')) {
+        const glob = currentFilePath
+        const globDirectory = glob
+          .split('/')
+          .slice(0, -1)
+          .join('/')
+        const globFile = glob
+          .split('/')
+          .slice(-1)
+          .join('/')
+        const globRegex = new RegExp(
+          '^' + globFile.replace(/\*/g, '.*').replace(/\?/g, '.') + '$'
+        )
+        let globFiles = await fs.readdir(globDirectory)
+        globFiles = globFiles.filter(file => globRegex.test(file))
+        return globFiles.map(file => join(globDirectory, file))
+      }
+      return [currentFilePath]
+    })
+    .reduce((a, b) => a.concat(b), [])
 }
