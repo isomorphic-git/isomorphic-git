@@ -11,6 +11,7 @@ import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
+import { modified } from './modified.js'
 
 /**
  * Create a merged tree
@@ -38,6 +39,7 @@ export async function mergeTree({
   cache,
   dir,
   gitdir = join(dir, '.git'),
+  index,
   ourOid,
   baseOid,
   theirOid,
@@ -53,8 +55,6 @@ export async function mergeTree({
   const theirTree = TREE({ ref: theirOid })
 
   const unmergedFiles = []
-
-  let cleanMerge = true
 
   const results = await _walk({
     fs,
@@ -117,13 +117,28 @@ export async function mergeTree({
               baseName,
               theirName,
               mergeDriver,
-            }).then(r => {
-              cleanMerge = cleanMerge && r.cleanMerge
-              unmergedFiles.push(filepath)
+            }).then(async r => {
+              if (!r.cleanMerge) {
+                unmergedFiles.push(filepath)
+                if (!abortOnConflict) {
+                  const baseOid = await base.oid()
+                  const ourOid = await ours.oid()
+                  const theirOid = await theirs.oid()
+
+                  index.delete({ filepath })
+
+                  index.insert({ filepath, oid: baseOid, stage: 1 })
+                  index.insert({ filepath, oid: ourOid, stage: 2 })
+                  index.insert({ filepath, oid: theirOid, stage: 3 })
+                }
+              } else if (!abortOnConflict) {
+                index.insert({ filepath, oid: r.mergeResult.oid, stage: 0 })
+              }
               return r.mergeResult
             })
           }
           // all other types of conflicts fail
+          // TODO: Merge conflicts involving deletions/additions
           throw new MergeNotSupportedError()
         }
       }
@@ -132,32 +147,35 @@ export async function mergeTree({
      * @param {TreeEntry} [parent]
      * @param {Array<TreeEntry>} children
      */
-    reduce: async (parent, children) => {
-      const entries = children.filter(Boolean) // remove undefineds
+    reduce:
+      unmergedFiles.length !== 0 && (!dir || abortOnConflict)
+        ? undefined
+        : async (parent, children) => {
+            const entries = children.filter(Boolean) // remove undefineds
 
-      // if the parent was deleted, the children have to go
-      if (!parent) return
+            // if the parent was deleted, the children have to go
+            if (!parent) return
 
-      // automatically delete directories if they have been emptied
-      if (parent && parent.type === 'tree' && entries.length === 0) return
+            // automatically delete directories if they have been emptied
+            if (parent && parent.type === 'tree' && entries.length === 0) return
 
-      if (entries.length > 0) {
-        const tree = new GitTree(entries)
-        const object = tree.toObject()
-        const oid = await writeObject({
-          fs,
-          gitdir,
-          type: 'tree',
-          object,
-          dryRun,
-        })
-        parent.oid = oid
-      }
-      return parent
-    },
+            if (entries.length > 0) {
+              const tree = new GitTree(entries)
+              const object = tree.toObject()
+              const oid = await writeObject({
+                fs,
+                gitdir,
+                type: 'tree',
+                object,
+                dryRun,
+              })
+              parent.oid = oid
+            }
+            return parent
+          },
   })
 
-  if (!cleanMerge) {
+  if (unmergedFiles.length !== 0) {
     if (dir && !abortOnConflict) {
       await _walk({
         fs,
@@ -176,33 +194,10 @@ export async function mergeTree({
         },
       })
     }
-    throw new MergeConflictError(unmergedFiles)
+    return new MergeConflictError(unmergedFiles)
   }
 
   return results.oid
-}
-
-/**
- *
- * @param {WalkerEntry} entry
- * @param {WalkerEntry} base
- *
- */
-async function modified(entry, base) {
-  if (!entry && !base) return false
-  if (entry && !base) return true
-  if (!entry && base) return true
-  if ((await entry.type()) === 'tree' && (await base.type()) === 'tree') {
-    return false
-  }
-  if (
-    (await entry.type()) === (await base.type()) &&
-    (await entry.mode()) === (await base.mode()) &&
-    (await entry.oid()) === (await base.oid())
-  ) {
-    return false
-  }
-  return true
 }
 
 /**

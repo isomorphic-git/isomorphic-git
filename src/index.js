@@ -3,6 +3,7 @@ import './typedefs.js'
 import { STAGE } from './api/STAGE.js'
 import { TREE } from './api/TREE.js'
 import { WORKDIR } from './api/WORKDIR.js'
+import { abortMerge } from './api/abortMerge.js'
 import { add } from './api/add.js'
 import { addNote } from './api/addNote.js'
 import { addRemote } from './api/addRemote.js'
@@ -74,6 +75,7 @@ export {
   STAGE,
   TREE,
   WORKDIR,
+  abortMerge,
   add,
   addNote,
   addRemote,
@@ -146,6 +148,7 @@ export default {
   TREE,
   WORKDIR,
   add,
+  abortMerge,
   addNote,
   addRemote,
   annotatedTag,

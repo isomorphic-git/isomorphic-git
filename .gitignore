@@ -80,6 +80,7 @@ node_modules
 *.swo
 
 # AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE
+docs/abortMerge.md
 docs/add.md
 docs/addNote.md
 docs/addRemote.md
