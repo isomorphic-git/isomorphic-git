@@ -75,6 +75,10 @@ node_modules
 # Webstorm development environment
 .idea/
 
+# Vim swap files
+*.swp
+*.swo
+
 # AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE
 docs/add.md
 docs/addNote.md
