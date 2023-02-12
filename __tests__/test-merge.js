@@ -6,6 +6,33 @@ const gitCommit = require('isomorphic-git').commit
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('merge', () => {
+  it('prevent merge if index has unmerged paths', async () => {
+    // Setup
+    const { gitdir, dir, fs } = await makeFixture('test-GitIndex-unmerged')
+
+    // Test
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'a',
+        theirs: 'b',
+        abortOnConflict: false,
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.UnmergedPathsError.code)
+  })
   it('merge master into master', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
@@ -551,6 +578,7 @@ describe('merge', () => {
     // Test
     const testFile = `${gitdir}/o.conflict.example`
     const outFile = `${dir}/o.txt`
+    const cache = {}
 
     let error = null
     try {
@@ -567,10 +595,12 @@ describe('merge', () => {
           timestamp: 1262356920,
           timezoneOffset: -0,
         },
+        cache,
       })
     } catch (e) {
       error = e
     }
+
     expect(await fs.read(outFile, 'utf-8')).toBe(
       await fs.read(testFile, 'utf-8')
     )
