@@ -17,7 +17,7 @@ import { modified } from '../utils/modified.js'
  *
  * Based on the behavior of git reset --merge, i.e.  "Resets the index and updates the files in the working tree that are different between <commit> and HEAD, but keeps those which are different between the index and working tree (i.e. which have changes which have not been added). If a file that is different between <commit> and the index has unstaged changes, reset is aborted."
  *
- * Essentially, abortMerge will reset any file affected by merge conflicts to their last known good version at HEAD.
+ * Essentially, abortMerge will reset any files affected by merge conflicts to their last known good version at HEAD.
  * Any unstaged changes are saved and any staged changes are reset as well.
  *
  * NOTE: The behavior of this command differs slightly from canonical git in that an error will be thrown if a file exists in the index and nowhere else.
