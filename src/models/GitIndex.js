@@ -244,42 +244,43 @@ export class GitIndex {
       .join('\n')
   }
 
+  static async _entryToBuffer(entry) {
+    const bpath = Buffer.from(entry.path)
+    // the fixed length + the filename + at least one null char => align by 8
+    const length = Math.ceil((62 + bpath.length + 1) / 8) * 8
+    const written = Buffer.alloc(length)
+    const writer = new BufferCursor(written)
+    const stat = normalizeStats(entry)
+    writer.writeUInt32BE(stat.ctimeSeconds)
+    writer.writeUInt32BE(stat.ctimeNanoseconds)
+    writer.writeUInt32BE(stat.mtimeSeconds)
+    writer.writeUInt32BE(stat.mtimeNanoseconds)
+    writer.writeUInt32BE(stat.dev)
+    writer.writeUInt32BE(stat.ino)
+    writer.writeUInt32BE(stat.mode)
+    writer.writeUInt32BE(stat.uid)
+    writer.writeUInt32BE(stat.gid)
+    writer.writeUInt32BE(stat.size)
+    writer.write(entry.oid, 20, 'hex')
+    writer.writeUInt16BE(renderCacheEntryFlags(entry))
+    writer.write(entry.path, bpath.length, 'utf8')
+    return written
+  }
+
   async toObject() {
     const header = Buffer.alloc(12)
     const writer = new BufferCursor(header)
     writer.write('DIRC', 4, 'utf8')
     writer.writeUInt32BE(2)
     writer.writeUInt32BE(this.entriesFlat.length)
-    const entryToBuffer = async entry => {
-      const bpath = Buffer.from(entry.path)
-      // the fixed length + the filename + at least one null char => align by 8
-      const length = Math.ceil((62 + bpath.length + 1) / 8) * 8
-      const written = Buffer.alloc(length)
-      const writer = new BufferCursor(written)
-      const stat = normalizeStats(entry)
-      writer.writeUInt32BE(stat.ctimeSeconds)
-      writer.writeUInt32BE(stat.ctimeNanoseconds)
-      writer.writeUInt32BE(stat.mtimeSeconds)
-      writer.writeUInt32BE(stat.mtimeNanoseconds)
-      writer.writeUInt32BE(stat.dev)
-      writer.writeUInt32BE(stat.ino)
-      writer.writeUInt32BE(stat.mode)
-      writer.writeUInt32BE(stat.uid)
-      writer.writeUInt32BE(stat.gid)
-      writer.writeUInt32BE(stat.size)
-      writer.write(entry.oid, 20, 'hex')
-      writer.writeUInt16BE(renderCacheEntryFlags(entry))
-      writer.write(entry.path, bpath.length, 'utf8')
-      return written
-    }
 
     let entryBuffers = []
     for (const entry of this.entries) {
-      entryBuffers.push(entryToBuffer(entry))
+      entryBuffers.push(GitIndex._entryToBuffer(entry))
       if (entry.stages.length > 1) {
         for (const stage of entry.stages) {
           if (stage && stage !== entry) {
-            entryBuffers.push(entryToBuffer(stage))
+            entryBuffers.push(GitIndex._entryToBuffer(stage))
           }
         }
       }
