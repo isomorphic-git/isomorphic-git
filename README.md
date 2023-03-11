@@ -22,7 +22,9 @@ The original author of the project ([Billie Hilton](https://github.com/wmhilton)
 * [@jcubic](https://github.com/jcubic) (most active)
 * [@mojavelinux](https://github.com/mojavelinux)
 
-But they don't write much code, mainly do code review and try to answer to issues and on Gitter. So you can say that this project is community driven (as jcubic always reply to issues). Which means that if you want a feature to be implemented you need to do this yourself or find someone that is willing to write the code for you. The project have some money on [OpenCollective](https://opencollective.com/isomorphic-git) and we can spend it on some development, if you find somoene that is willing to code in exchange to some bucks (it may be you), but we don't have a lot so don't expect to have full sallary.
+But they don't write much code, mainly do code review and try to answer to issues and on Gitter, they just don't want the project to die. So you can say that this project is community driven (as jcubic always reply to issues). Which means that if you want a feature to be implemented you need to do this yourself or find someone that is willing to write the code for you. The project have some money on [OpenCollective](https://opencollective.com/isomorphic-git) and we can spend it on some development, if you find somoene that is willing to code in exchange to some bucks (it may be you), but we don't have a lot so don't expect to have full sallary.
+
+If you want to help this project you're more than welcome to do so.
 
 ## Supported Environments
 
