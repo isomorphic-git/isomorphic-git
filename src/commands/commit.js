@@ -59,62 +59,65 @@ export async function _commit({
     })
   }
 
-  return GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-    const inodes = flatFileListToDirectoryStructure(index.entries)
-    const inode = inodes.get('.')
-    if (!tree) {
-      tree = await constructTree({ fs, gitdir, inode, dryRun })
-    }
-    if (!parent) {
-      try {
-        parent = [
-          await GitRefManager.resolve({
-            fs,
-            gitdir,
-            ref,
-          }),
-        ]
-      } catch (err) {
-        // Probably an initial commit
-        parent = []
+  return GitIndexManager.acquire(
+    { fs, gitdir, cache, allowUnmerged: false },
+    async function(index) {
+      const inodes = flatFileListToDirectoryStructure(index.entries)
+      const inode = inodes.get('.')
+      if (!tree) {
+        tree = await constructTree({ fs, gitdir, inode, dryRun })
       }
-    } else {
-      // ensure that the parents are oids, not refs
-      parent = await Promise.all(
-        parent.map(p => {
-          return GitRefManager.resolve({ fs, gitdir, ref: p })
-        })
-      )
-    }
+      if (!parent) {
+        try {
+          parent = [
+            await GitRefManager.resolve({
+              fs,
+              gitdir,
+              ref,
+            }),
+          ]
+        } catch (err) {
+          // Probably an initial commit
+          parent = []
+        }
+      } else {
+        // ensure that the parents are oids, not refs
+        parent = await Promise.all(
+          parent.map(p => {
+            return GitRefManager.resolve({ fs, gitdir, ref: p })
+          })
+        )
+      }
 
-    let comm = GitCommit.from({
-      tree,
-      parent,
-      author,
-      committer,
-      message,
-    })
-    if (signingKey) {
-      comm = await GitCommit.sign(comm, onSign, signingKey)
-    }
-    const oid = await writeObject({
-      fs,
-      gitdir,
-      type: 'commit',
-      object: comm.toObject(),
-      dryRun,
-    })
-    if (!noUpdateBranch && !dryRun) {
-      // Update branch pointer
-      await GitRefManager.writeRef({
+      let comm = GitCommit.from({
+        tree,
+        parent,
+        author,
+        committer,
+        message,
+      })
+      if (signingKey) {
+        comm = await GitCommit.sign(comm, onSign, signingKey)
+      }
+      const oid = await writeObject({
         fs,
         gitdir,
-        ref,
-        value: oid,
+        type: 'commit',
+        object: comm.toObject(),
+        dryRun,
       })
+      if (!noUpdateBranch && !dryRun) {
+        // Update branch pointer
+        await GitRefManager.writeRef({
+          fs,
+          gitdir,
+          ref,
+          value: oid,
+        })
+      }
+      return oid
     }
-    return oid
-  })
+  )
 }
 
 async function constructTree({ fs, gitdir, inode, dryRun }) {

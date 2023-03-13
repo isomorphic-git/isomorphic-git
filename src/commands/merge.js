@@ -5,7 +5,9 @@ import { _commit } from '../commands/commit'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _findMergeBase } from '../commands/findMergeBase.js'
 import { FastForwardError } from '../errors/FastForwardError.js'
+import { MergeConflictError } from '../errors/MergeConflictError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
+import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { mergeTree } from '../utils/mergeTree.js'
@@ -102,6 +104,7 @@ export async function _merge({
     oids: [ourOid, theirOid],
   })
   if (baseOids.length !== 1) {
+    // TODO: Recursive Merge strategy
     throw new MergeNotSupportedError()
   }
   const baseOid = baseOids[0]
@@ -126,21 +129,32 @@ export async function _merge({
       throw new FastForwardError()
     }
     // try a fancier merge
-    const tree = await mergeTree({
-      fs,
-      cache,
-      dir,
-      gitdir,
-      ourOid,
-      theirOid,
-      baseOid,
-      ourName: abbreviateRef(ours),
-      baseName: 'base',
-      theirName: abbreviateRef(theirs),
-      dryRun,
-      abortOnConflict,
-      mergeDriver,
-    })
+    const tree = await GitIndexManager.acquire(
+      { fs, gitdir, cache, allowUnmerged: false },
+      async index => {
+        return mergeTree({
+          fs,
+          cache,
+          dir,
+          gitdir,
+          index,
+          ourOid,
+          theirOid,
+          baseOid,
+          ourName: abbreviateRef(ours),
+          baseName: 'base',
+          theirName: abbreviateRef(theirs),
+          dryRun,
+          abortOnConflict,
+          mergeDriver,
+        })
+      }
+    )
+
+    // Defer throwing error until the index lock is relinquished and index is
+    // written to filsesystem
+    if (tree instanceof MergeConflictError) throw tree
+
     if (!message) {
       message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(
         ours
