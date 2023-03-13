@@ -35,9 +35,26 @@ export class GitIndex {
    _entries: Map<string, CacheEntry>
    _dirty: boolean // Used to determine if index needs to be saved to filesystem
    */
-  constructor(entries) {
+  constructor(entries, unmergedPaths) {
     this._dirty = false
+    this._unmergedPaths = unmergedPaths || new Set()
     this._entries = entries || new Map()
+  }
+
+  _addEntry(entry) {
+    if (entry.flags.stage === 0) {
+      entry.stages = [entry]
+      this._entries.set(entry.path, entry)
+      this._unmergedPaths.delete(entry.path)
+    } else {
+      let existingEntry = this._entries.get(entry.path)
+      if (!existingEntry) {
+        this._entries.set(entry.path, entry)
+        existingEntry = entry
+      }
+      existingEntry.stages[entry.flags.stage] = entry
+      this._unmergedPaths.add(entry.path)
+    }
   }
 
   static async from(buffer) {
@@ -59,8 +76,8 @@ export class GitIndex {
         `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
       )
     }
+    const index = new GitIndex()
     const reader = new BufferCursor(buffer)
-    const _entries = new Map()
     const magic = reader.toString('utf8', 4)
     if (magic !== 'DIRC') {
       throw new InternalError(`Inavlid dircache magic file number: ${magic}`)
@@ -115,10 +132,17 @@ export class GitIndex {
         }
       }
       // end of awkward part
-      _entries.set(entry.path, entry)
+      entry.stages = []
+
+      index._addEntry(entry)
+
       i++
     }
-    return new GitIndex(_entries)
+    return index
+  }
+
+  get unmergedPaths() {
+    return [...this._unmergedPaths]
   }
 
   get entries() {
@@ -129,13 +153,33 @@ export class GitIndex {
     return this._entries
   }
 
+  get entriesFlat() {
+    return [...this.entries].flatMap(entry => {
+      return entry.stages.length > 1 ? entry.stages.filter(x => x) : entry
+    })
+  }
+
   *[Symbol.iterator]() {
     for (const entry of this.entries) {
       yield entry
     }
   }
 
-  insert({ filepath, stats, oid }) {
+  insert({ filepath, stats, oid, stage = 0 }) {
+    if (!stats) {
+      stats = {
+        ctimeSeconds: 0,
+        ctimeNanoseconds: 0,
+        mtimeSeconds: 0,
+        mtimeNanoseconds: 0,
+        dev: 0,
+        ino: 0,
+        mode: 0,
+        uid: 0,
+        gid: 0,
+        size: 0,
+      }
+    }
     stats = normalizeStats(stats)
     const bfilepath = Buffer.from(filepath)
     const entry = {
@@ -157,11 +201,14 @@ export class GitIndex {
       flags: {
         assumeValid: false,
         extended: false,
-        stage: 0,
+        stage,
         nameLength: bfilepath.length < 0xfff ? bfilepath.length : 0xfff,
       },
+      stages: [],
     }
-    this._entries.set(entry.path, entry)
+
+    this._addEntry(entry)
+
     this._dirty = true
   }
 
@@ -174,6 +221,10 @@ export class GitIndex {
           this._entries.delete(key)
         }
       }
+    }
+
+    if (this._unmergedPaths.has(filepath)) {
+      this._unmergedPaths.delete(filepath)
     }
     this._dirty = true
   }
@@ -193,36 +244,50 @@ export class GitIndex {
       .join('\n')
   }
 
+  static async _entryToBuffer(entry) {
+    const bpath = Buffer.from(entry.path)
+    // the fixed length + the filename + at least one null char => align by 8
+    const length = Math.ceil((62 + bpath.length + 1) / 8) * 8
+    const written = Buffer.alloc(length)
+    const writer = new BufferCursor(written)
+    const stat = normalizeStats(entry)
+    writer.writeUInt32BE(stat.ctimeSeconds)
+    writer.writeUInt32BE(stat.ctimeNanoseconds)
+    writer.writeUInt32BE(stat.mtimeSeconds)
+    writer.writeUInt32BE(stat.mtimeNanoseconds)
+    writer.writeUInt32BE(stat.dev)
+    writer.writeUInt32BE(stat.ino)
+    writer.writeUInt32BE(stat.mode)
+    writer.writeUInt32BE(stat.uid)
+    writer.writeUInt32BE(stat.gid)
+    writer.writeUInt32BE(stat.size)
+    writer.write(entry.oid, 20, 'hex')
+    writer.writeUInt16BE(renderCacheEntryFlags(entry))
+    writer.write(entry.path, bpath.length, 'utf8')
+    return written
+  }
+
   async toObject() {
     const header = Buffer.alloc(12)
     const writer = new BufferCursor(header)
     writer.write('DIRC', 4, 'utf8')
     writer.writeUInt32BE(2)
-    writer.writeUInt32BE(this.entries.length)
-    const body = Buffer.concat(
-      this.entries.map(entry => {
-        const bpath = Buffer.from(entry.path)
-        // the fixed length + the filename + at least one null char => align by 8
-        const length = Math.ceil((62 + bpath.length + 1) / 8) * 8
-        const written = Buffer.alloc(length)
-        const writer = new BufferCursor(written)
-        const stat = normalizeStats(entry)
-        writer.writeUInt32BE(stat.ctimeSeconds)
-        writer.writeUInt32BE(stat.ctimeNanoseconds)
-        writer.writeUInt32BE(stat.mtimeSeconds)
-        writer.writeUInt32BE(stat.mtimeNanoseconds)
-        writer.writeUInt32BE(stat.dev)
-        writer.writeUInt32BE(stat.ino)
-        writer.writeUInt32BE(stat.mode)
-        writer.writeUInt32BE(stat.uid)
-        writer.writeUInt32BE(stat.gid)
-        writer.writeUInt32BE(stat.size)
-        writer.write(entry.oid, 20, 'hex')
-        writer.writeUInt16BE(renderCacheEntryFlags(entry))
-        writer.write(entry.path, bpath.length, 'utf8')
-        return written
-      })
-    )
+    writer.writeUInt32BE(this.entriesFlat.length)
+
+    let entryBuffers = []
+    for (const entry of this.entries) {
+      entryBuffers.push(GitIndex._entryToBuffer(entry))
+      if (entry.stages.length > 1) {
+        for (const stage of entry.stages) {
+          if (stage && stage !== entry) {
+            entryBuffers.push(GitIndex._entryToBuffer(stage))
+          }
+        }
+      }
+    }
+    entryBuffers = await Promise.all(entryBuffers)
+
+    const body = Buffer.concat(entryBuffers)
     const main = Buffer.concat([header, body])
     const sum = await shasum(main)
     return Buffer.concat([main, Buffer.from(sum, 'hex')])

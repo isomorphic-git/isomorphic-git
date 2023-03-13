@@ -4,6 +4,29 @@ const { Errors, readCommit, commit, log } = require('isomorphic-git')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('commit', () => {
+  it('prevent commit if index has unmerged paths', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-GitIndex-unmerged')
+    // Test
+    let error = null
+    try {
+      await commit({
+        fs,
+        gitdir,
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+        message: 'Initial commit',
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.UnmergedPathsError.code)
+  })
   it('commit', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-commit')
