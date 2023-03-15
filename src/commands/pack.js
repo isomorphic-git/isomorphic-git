@@ -24,7 +24,7 @@ export async function _pack({
 }) {
   const hash = new Hash()
   const outputStream = []
-  function write (chunk, enc) {
+  function write(chunk, enc) {
     const buff = TinyBuffer.from(chunk, enc)
     outputStream.push(buff)
     hash.update(buff)

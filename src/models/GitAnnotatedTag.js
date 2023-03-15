@@ -1,11 +1,10 @@
 import { TinyBuffer } from '../utils/TinyBuffer.js'
-import { InternalError } from '../errors/InternalError.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
 
 export class GitAnnotatedTag {
-  constructor (tag) {
+  constructor(tag) {
     if (typeof tag === 'string') {
       this._tag = tag
     } else if (typeof tag.object === 'string') {
