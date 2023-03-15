@@ -52,7 +52,6 @@
   ],
   "dependencies": {
     "array-buffer-to-hex": "^1.0.0",
-    "arraybuffer-equal": "^1.0.4",
     "async-lock": "^1.1.0",
     "base64-js": "^1.3.1",
     "clean-git-ref": "^2.0.1",
