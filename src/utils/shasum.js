@@ -16,7 +16,9 @@ export async function shasum(buffer) {
 // but without the 'json-stable-stringify' dependency and
 // extra type-casting features.
 function shasumSync(buffer) {
-  return createHash().update(buffer).digest('hex')
+  return createHash()
+    .update(buffer)
+    .digest('hex')
 }
 
 async function subtleSHA1(buffer) {

@@ -1,6 +1,4 @@
-import toHex from 'array-buffer-to-hex'
 import { fromByteArray as toBase64, toByteArray as fromBase64 } from 'base64-js'
-import fromHex from 'hex-to-array-buffer'
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
@@ -9,6 +7,7 @@ const decoder = new TextDecoder()
 export class TinyBuffer extends Uint8Array {
   constructor(src) {
     super(src)
+
     this.view = new DataView(this.buffer)
   }
 
@@ -18,26 +17,33 @@ export class TinyBuffer extends Uint8Array {
     } else if (src.buffer || Array.isArray(src)) {
       return new TinyBuffer(src)
     }
-    console.log('from src', src)
+
     throw new Error('Unanticipated object type passed to TinyBuffer.from!!')
   }
 
   static concat(buffers) {
     let newLength = 0
+
     for (const buffer of buffers) {
       newLength += buffer.byteLength
     }
+
     const newBuffer = TinyBuffer.alloc(newLength)
+
     let i = 0
+
     for (const buffer of buffers) {
       newBuffer.set(buffer, i)
+
       i += buffer.byteLength
     }
+
     return newBuffer
   }
 
   static alloc(length) {
     const buffer = new Uint8Array(length)
+
     return new TinyBuffer(buffer)
   }
 
@@ -47,16 +53,26 @@ export class TinyBuffer extends Uint8Array {
 
   toString(encoding, start, end) {
     const slice = this.slice(start, end)
+
     switch (encoding) {
       case 'utf8': {
         return decoder.decode(slice)
       }
+
       case 'hex': {
-        return toHex(slice.buffer)
+        let hex = ''
+
+        for (let i = 0; i < slice.length; i++) {
+          hex += slice[i].toString(16).padStart(2, '0')
+        }
+
+        return hex
       }
+
       case 'base64': {
         return toBase64(slice)
       }
+
       default: {
         throw new Error(`Unsupported decoding ${encoding}`)
       }
@@ -77,10 +93,12 @@ export class TinyBuffer extends Uint8Array {
     // Node's Buffer won't throw if the source is bigger than the dest, so we mustn't either
     sourceEnd = Math.min(sourceEnd, this.length)
     sourceEnd = Math.min(sourceEnd, sourceStart + target.length - targetStart)
+
     const src =
       sourceStart === 0 && sourceEnd === this.length
         ? this
         : this.slice(sourceStart, sourceEnd)
+
     target.set(src, targetStart)
   }
 
@@ -93,10 +111,13 @@ export class TinyBuffer extends Uint8Array {
       encoding = length
       length = undefined
     }
+
     let buf = fromString(value, encoding)
+
     if (length !== undefined) {
       buf = buf.slice(0, length)
     }
+
     this.set(buf, start)
   }
 
@@ -130,12 +151,15 @@ export class TinyBuffer extends Uint8Array {
 
   equals(another) {
     if (this === another) return true
+
     if (this.length !== another.length) return false
+
     for (let i = 0; i < this.length; i++) {
       if (this[i] !== another[i]) {
         return false
       }
     }
+
     return true
   }
 }
@@ -151,12 +175,21 @@ function fromString(src, encoding = 'utf8') {
     case 'utf8': {
       return encoder.encode(src)
     }
+
     case 'hex': {
-      return new Uint8Array(fromHex(src))
+      const view = new Uint8Array(src.length / 2)
+
+      for (let i = 0; i < src.length; i += 2) {
+        view[i / 2] = parseInt(src.substring(i, i + 2), 16)
+      }
+
+      return view
     }
+
     case 'base64': {
       return fromBase64(src)
     }
+
     default: {
       throw new Error(`Unsupported encoding ${encoding}`)
     }
