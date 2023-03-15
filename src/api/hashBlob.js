@@ -1,6 +1,6 @@
 // @ts-check
-import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { hashObject } from '../storage/hashObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { assertParameter } from '../utils/assertParameter.js'
 
 /**

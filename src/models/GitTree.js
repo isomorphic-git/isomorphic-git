@@ -1,6 +1,6 @@
 import { InternalError } from '../errors/InternalError.js'
-import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { UnsafeFilepathError } from '../errors/UnsafeFilepathError.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { comparePath } from '../utils/comparePath.js'
 import { compareTreeEntryPath } from '../utils/compareTreeEntryPath.js'
 

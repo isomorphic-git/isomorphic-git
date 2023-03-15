@@ -5,12 +5,12 @@ import { decode as toUTF8, encode as fromUTF8 } from 'isomorphic-textencoder'
 
 // A minimal (and portable!) alternative to the large 'buffer' polyfill provided by Webpack.
 export class TinyBuffer extends Uint8Array {
-  constructor (src) {
+  constructor(src) {
     super(src)
     this.view = new DataView(this.buffer)
   }
 
-  static from (src, encoding) {
+  static from(src, encoding) {
     if (typeof src === 'string') {
       return new TinyBuffer(fromString(src, encoding))
     } else if (src.buffer || Array.isArray(src)) {
@@ -20,7 +20,7 @@ export class TinyBuffer extends Uint8Array {
     throw new Error('Unanticipated object type passed to TinyBuffer.from!!')
   }
 
-  static concat (buffers) {
+  static concat(buffers) {
     let newLength = 0
     for (const buffer of buffers) {
       newLength += buffer.byteLength
@@ -34,16 +34,16 @@ export class TinyBuffer extends Uint8Array {
     return newBuffer
   }
 
-  static alloc (length) {
+  static alloc(length) {
     const buffer = new Uint8Array(length)
     return new TinyBuffer(buffer)
   }
 
-  static isBuffer (thing) {
+  static isBuffer(thing) {
     return !!thing.buffer
   }
 
-  toString (encoding, start, end) {
+  toString(encoding, start, end) {
     const slice = this.slice(start, end)
     switch (encoding) {
       case 'utf8': {
@@ -61,7 +61,7 @@ export class TinyBuffer extends Uint8Array {
     }
   }
 
-  get length () {
+  get length() {
     return this.byteLength
   }
 
@@ -71,7 +71,7 @@ export class TinyBuffer extends Uint8Array {
    * @param {number} sourceStart
    * @param {number} sourceEnd
    */
-  copy (target, targetStart = 0, sourceStart = 0, sourceEnd = this.length) {
+  copy(target, targetStart = 0, sourceStart = 0, sourceEnd = this.length) {
     // Node's Buffer won't throw if the source is bigger than the dest, so we mustn't either
     sourceEnd = Math.min(sourceEnd, this.length)
     sourceEnd = Math.min(sourceEnd, sourceStart + target.length - targetStart)
@@ -82,51 +82,51 @@ export class TinyBuffer extends Uint8Array {
     target.set(src, targetStart)
   }
 
-  write (value, start, length, encoding) {
+  write(value, start, length, encoding) {
     if (typeof start === 'string') {
       encoding = start
-      start = void 0
-      length = void 0
+      start = undefined
+      length = undefined
     } else if (typeof length === 'string') {
       encoding = length
-      length = void 0
+      length = undefined
     }
     let buf = fromString(value, encoding)
-    if (length !== void 0) {
+    if (length !== undefined) {
       buf = buf.slice(0, length)
     }
     this.set(buf, start)
   }
 
-  readUInt8 (offset) {
+  readUInt8(offset) {
     return this[offset]
   }
 
-  readUInt16BE (offset) {
+  readUInt16BE(offset) {
     return this.view.getUint16(offset, false)
   }
 
-  readUInt32BE (offset) {
+  readUInt32BE(offset) {
     return this.view.getUint32(offset, false)
   }
 
-  writeUInt8 (value, offset) {
+  writeUInt8(value, offset) {
     this.view.setUint8(offset, value, false)
   }
 
-  writeUInt16BE (value, offset) {
+  writeUInt16BE(value, offset) {
     this.view.setUint16(offset, value, false)
   }
 
-  writeUInt32BE (value, offset) {
+  writeUInt32BE(value, offset) {
     this.view.setUint32(offset, value, false)
   }
 
-  writeUInt32LE (value, offset) {
+  writeUInt32LE(value, offset) {
     this.view.setUint32(offset, value, true)
   }
 
-  equals (another) {
+  equals(another) {
     if (this === another) return true
     if (this.length !== another.length) return false
     for (let i = 0; i < this.length; i++) {
@@ -144,7 +144,7 @@ export class TinyBuffer extends Uint8Array {
  * @param {string} encoding
  * @returns {Uint8Array}
  */
-function fromString (src, encoding = 'utf8') {
+function fromString(src, encoding = 'utf8') {
   switch (encoding) {
     case 'utf8': {
       return fromUTF8(src)

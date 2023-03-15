@@ -1,9 +1,9 @@
 import { InternalError } from '../errors/InternalError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitObject } from '../models/GitObject.js'
-import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { readObjectPacked } from '../storage/readObjectPacked.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { inflate } from '../utils/inflate.js'
 import { shasum } from '../utils/shasum.js'
 

@@ -5,7 +5,7 @@
 // assumes Buffers in Node and Uint8Array in browser when really it's always Uint8Arrays.
 import { TinyBuffer } from '../utils/TinyBuffer.js'
 
-export function applyDelta (delta, target) {
+export function applyDelta(delta, target) {
   const vi = new Decoder()
   const OFFSET_BUFFER = new TinyBuffer(4)
   const LENGTH_BUFFER = new TinyBuffer(4)
@@ -34,7 +34,7 @@ export function applyDelta (delta, target) {
 
   return outputBuffer
 
-  function copy () {
+  function copy() {
     OFFSET_BUFFER.writeUInt32LE(0, 0)
     LENGTH_BUFFER.writeUInt32LE(0, 0)
 
@@ -62,19 +62,19 @@ export function applyDelta (delta, target) {
     outIdx += length
   }
 
-  function insert () {
+  function insert() {
     binaryCopy(delta, outputBuffer, outIdx, idx, command + idx)
     idx += command
     outIdx += command
   }
 
-  function deltaHeader (buf, output) {
+  function deltaHeader(buf, output) {
     let idx = 0
     let size = 0
 
     do {
       size = vi.write(buf[idx++])
-    } while (size === void 0)
+    } while (size === undefined)
 
     output.size = size
     output.buffer = buf.subarray(idx)
@@ -84,11 +84,11 @@ export function applyDelta (delta, target) {
 // Chris Dickinson <chris@neversaw.us>
 // MIT License in package.json but no LICENSE file, again.
 class Decoder {
-  constructor () {
+  constructor() {
     this.accum = []
   }
 
-  write (byte) {
+  write(byte) {
     const MSB = 0x80
     const REST = 0x7f
 
@@ -107,7 +107,7 @@ class Decoder {
 
 // Chris Dickinson <chris@neversaw.us>
 // MIT License in package.json but no LICENSE file, again. Yes, three modules.
-function binaryCopy (source, target, targetStart, sourceStart, sourceEnd) {
+function binaryCopy(source, target, targetStart, sourceStart, sourceEnd) {
   targetStart = arguments.length < 3 ? 0 : targetStart
   sourceStart = arguments.length < 4 ? 0 : sourceStart
   sourceEnd = arguments.length < 5 ? source.length : sourceEnd

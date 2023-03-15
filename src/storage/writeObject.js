@@ -1,6 +1,6 @@
 import { GitObject } from '../models/GitObject.js'
-import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { writeObjectLoose } from '../storage/writeObjectLoose.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { deflate } from '../utils/deflate.js'
 import { shasum } from '../utils/shasum.js'
 
