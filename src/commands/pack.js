@@ -1,6 +1,7 @@
+import { createHash } from 'sha1-uint8array'
+
 import { types } from '../commands/types.js'
 import { _readObject as readObject } from '../storage/readObject.js'
-import Hash from '../utils/Hash.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
@@ -21,7 +22,7 @@ export async function _pack({
   gitdir = join(dir, '.git'),
   oids,
 }) {
-  const hash = new Hash()
+  const hash = createHash()
   const outputStream = []
   function write(chunk, enc) {
     const buff = TinyBuffer.from(chunk, enc)
