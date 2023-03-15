@@ -1,7 +1,9 @@
 import toHex from 'array-buffer-to-hex'
 import { fromByteArray as toBase64, toByteArray as fromBase64 } from 'base64-js'
 import fromHex from 'hex-to-array-buffer'
-import { decode as toUTF8, encode as fromUTF8 } from 'isomorphic-textencoder'
+
+const encoder = new TextEncoder()
+const decoder = new TextDecoder()
 
 // A minimal (and portable!) alternative to the large 'buffer' polyfill provided by Webpack.
 export class TinyBuffer extends Uint8Array {
@@ -47,7 +49,7 @@ export class TinyBuffer extends Uint8Array {
     const slice = this.slice(start, end)
     switch (encoding) {
       case 'utf8': {
-        return toUTF8(slice)
+        return decoder.decode(slice)
       }
       case 'hex': {
         return toHex(slice.buffer)
@@ -147,7 +149,7 @@ export class TinyBuffer extends Uint8Array {
 function fromString(src, encoding = 'utf8') {
   switch (encoding) {
     case 'utf8': {
-      return fromUTF8(src)
+      return encoder.encode(src)
     }
     case 'hex': {
       return new Uint8Array(fromHex(src))

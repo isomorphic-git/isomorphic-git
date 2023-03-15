@@ -59,7 +59,6 @@
     "diff3": "0.0.3",
     "hex-to-array-buffer": "^2.0.0",
     "ignore": "^5.1.4",
-    "isomorphic-textencoder": "^1.0.1",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
     "pify": "^4.0.1",
