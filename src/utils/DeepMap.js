@@ -7,23 +7,23 @@ const deepget = (keys, map) => {
 }
 
 export class DeepMap {
-  constructor () {
+  constructor() {
     this._root = new Map()
   }
 
-  set (keys, value) {
+  set(keys, value) {
     const lastKey = keys.pop()
     const lastMap = deepget(keys, this._root)
     lastMap.set(lastKey, value)
   }
 
-  get (keys) {
+  get(keys) {
     const lastKey = keys.pop()
     const lastMap = deepget(keys, this._root)
     return lastMap.get(lastKey)
   }
 
-  has (keys) {
+  has(keys) {
     const lastKey = keys.pop()
     const lastMap = deepget(keys, this._root)
     return lastMap.has(lastKey)

@@ -1,16 +1,80 @@
 /* eslint-env node, browser, jasmine */
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-exports.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-
 const git = require('isomorphic-git')
 
 describe('exports', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('exposes only the intended API functions', async () => {
     const names = Object.keys(git)
-    expect(names.sort()).toMatchSnapshot()
+    expect(names.sort()).toMatchInlineSnapshot(`
+      Array [
+        "Errors",
+        "STAGE",
+        "TREE",
+        "WORKDIR",
+        "add",
+        "addNote",
+        "addRemote",
+        "annotatedTag",
+        "branch",
+        "checkout",
+        "clone",
+        "commit",
+        "currentBranch",
+        "default",
+        "deleteBranch",
+        "deleteRef",
+        "deleteRemote",
+        "deleteTag",
+        "expandOid",
+        "expandRef",
+        "fastForward",
+        "fetch",
+        "findMergeBase",
+        "findRoot",
+        "getConfig",
+        "getConfigAll",
+        "getRemoteInfo",
+        "getRemoteInfo2",
+        "hashBlob",
+        "indexPack",
+        "init",
+        "isDescendent",
+        "isIgnored",
+        "listBranches",
+        "listFiles",
+        "listNotes",
+        "listRemotes",
+        "listServerRefs",
+        "listTags",
+        "log",
+        "merge",
+        "packObjects",
+        "pull",
+        "push",
+        "readBlob",
+        "readCommit",
+        "readNote",
+        "readObject",
+        "readTag",
+        "readTree",
+        "remove",
+        "removeNote",
+        "renameBranch",
+        "resetIndex",
+        "resolveRef",
+        "setConfig",
+        "status",
+        "statusMatrix",
+        "tag",
+        "updateIndex",
+        "version",
+        "walk",
+        "writeBlob",
+        "writeCommit",
+        "writeObject",
+        "writeRef",
+        "writeTag",
+        "writeTree",
+      ]
+    `)
   })
 })

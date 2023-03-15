@@ -1,21 +1,21 @@
-import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
+import { AmbiguousError } from '../errors/AmbiguousError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { expandOidLoose } from '../storage/expandOidLoose.js'
 import { expandOidPacked } from '../storage/expandOidPacked.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 
-export async function expandOid ({ fs: _fs, gitdir, oid: short }) {
-  const fs = new FileSystem(_fs)
+export async function _expandOid({ fs, cache, gitdir, oid: short }) {
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
-  const getExternalRefDelta = oid => readObject({ fs: _fs, gitdir, oid })
+  const getExternalRefDelta = oid => readObject({ fs, cache, gitdir, oid })
 
   const results1 = await expandOidLoose({ fs, gitdir, oid: short })
   const results2 = await expandOidPacked({
     fs,
+    cache,
     gitdir,
     oid: short,
-    getExternalRefDelta
+    getExternalRefDelta,
   })
   const results = results1.concat(results2)
 
@@ -23,10 +23,7 @@ export async function expandOid ({ fs: _fs, gitdir, oid: short }) {
     return results[0]
   }
   if (results.length > 1) {
-    throw new GitError(E.AmbiguousShortOid, {
-      short,
-      matches: results.join(', ')
-    })
+    throw new AmbiguousError('oids', short, results)
   }
-  throw new GitError(E.ShortOidNotFound, { short })
+  throw new NotFoundError(`an object matching "${short}"`)
 }

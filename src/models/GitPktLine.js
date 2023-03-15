@@ -57,11 +57,15 @@ import { padHex } from '../utils/padHex.js'
 // There's not a lot of "state" in a pkt-line
 
 export class GitPktLine {
-  static flush () {
+  static flush() {
     return TinyBuffer.from('0000', 'utf8')
   }
 
-  static encode (line) {
+  static delim() {
+    return Buffer.from('0001', 'utf8')
+  }
+
+  static encode(line) {
     if (typeof line === 'string') {
       line = TinyBuffer.from(line)
     }
@@ -70,14 +74,15 @@ export class GitPktLine {
     return TinyBuffer.concat([TinyBuffer.from(hexlength, 'utf8'), line])
   }
 
-  static streamReader (stream) {
+  static streamReader(stream) {
     const reader = new StreamReader(stream)
-    return async function read () {
+    return async function read() {
       try {
         let length = await reader.read(4)
         if (length == null) return true
         length = parseInt(length.toString('utf8'), 16)
         if (length === 0) return null
+        if (length === 1) return null // delim packets
         const buffer = await reader.read(length - 4)
         if (buffer == null) return true
         return buffer

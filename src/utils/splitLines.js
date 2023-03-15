@@ -5,7 +5,7 @@ import { forAwait } from './forAwait.js'
 // so they are often sent with just a carriage return to overwrite the last line of output.
 // But there are also messages delimited with newlines.
 // I also include CRLF just in case.
-function findSplit (str) {
+function findSplit(str) {
   const r = str.indexOf('\r')
   const n = str.indexOf('\n')
   if (r === -1 && n === -1) return -1
@@ -15,7 +15,7 @@ function findSplit (str) {
   return Math.min(r, n) + 1 // \r or \n
 }
 
-export function splitLines (input) {
+export function splitLines(input) {
   const output = new FIFO()
   let tmp = ''
   ;(async () => {

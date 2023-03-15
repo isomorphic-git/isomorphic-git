@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const pkg = require('../package.json')
 const { version } = require('isomorphic-git')
+
+const pkg = require('../package.json')
 
 describe('version', () => {
   it('version', () => {

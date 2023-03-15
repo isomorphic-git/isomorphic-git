@@ -1,11 +1,11 @@
 import { GitRefSpec } from './GitRefSpec'
 
 export class GitRefSpecSet {
-  constructor (rules = []) {
+  constructor(rules = []) {
     this.rules = rules
   }
 
-  static from (refspecs) {
+  static from(refspecs) {
     const rules = []
     for (const refspec of refspecs) {
       rules.push(GitRefSpec.from(refspec)) // might throw
@@ -13,12 +13,12 @@ export class GitRefSpecSet {
     return new GitRefSpecSet(rules)
   }
 
-  add (refspec) {
+  add(refspec) {
     const rule = GitRefSpec.from(refspec) // might throw
     this.rules.push(rule)
   }
 
-  translate (remoteRefs) {
+  translate(remoteRefs) {
     const result = []
     for (const rule of this.rules) {
       for (const remoteRef of remoteRefs) {
@@ -31,7 +31,7 @@ export class GitRefSpecSet {
     return result
   }
 
-  translateOne (remoteRef) {
+  translateOne(remoteRef) {
     let result = null
     for (const rule of this.rules) {
       const localRef = rule.translate(remoteRef)
@@ -42,7 +42,7 @@ export class GitRefSpecSet {
     return result
   }
 
-  localNamespaces () {
+  localNamespaces() {
     return this.rules
       .filter(rule => rule.matchPrefix)
       .map(rule => rule.localPath.replace(/\/$/, ''))

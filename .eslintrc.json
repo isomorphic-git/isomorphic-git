@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "prettier-standard/prettier-file"
+  ],
+  "ignorePatterns": ["/dist/", "*.mjs"],
+  "rules": {
+    "import/order": ["error", {
+      "alphabetize": {
+        "order": "asc",
+        "caseInsensitive": false
+      },
+      "groups": [
+        "builtin",
+        "external",
+        "parent",
+        "index",
+        "sibling"
+      ],
+      "newlines-between": "always"
+    }]
+  }
+}

@@ -1,4 +1,4 @@
-export function indent (str) {
+export function indent(str) {
   return (
     str
       .trim()

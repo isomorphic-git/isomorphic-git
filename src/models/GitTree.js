@@ -1,17 +1,19 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { UnsafeFilepathError } from '../errors/UnsafeFilepathError.js'
 import { comparePath } from '../utils/comparePath.js'
+import { compareTreeEntryPath } from '../utils/compareTreeEntryPath.js'
 
-/*::
-type TreeEntry = {
-  mode: string,
-  path: string,
-  oid: string,
-  type?: string
-}
-*/
+/**
+ *
+ * @typedef {Object} TreeEntry
+ * @property {string} mode - the 6 digit hexadecimal mode
+ * @property {string} path - the name of the file or directory
+ * @property {string} oid - the SHA-1 object id of the blob or tree
+ * @property {'commit'|'blob'|'tree'} type - the type of object
+ */
 
-function mode2type (mode) {
+function mode2type(mode) {
   // prettier-ignore
   switch (mode) {
     case '040000': return 'tree'
@@ -20,31 +22,35 @@ function mode2type (mode) {
     case '120000': return 'blob'
     case '160000': return 'commit'
   }
-  throw new GitError(E.InternalFail, {
-    message: `Unexpected GitTree entry mode: ${mode}`
-  })
+  throw new InternalError(`Unexpected GitTree entry mode: ${mode}`)
 }
 
-function parseBuffer (buffer) {
+function parseBuffer(buffer) {
   const _entries = []
   let cursor = 0
   while (cursor < buffer.length) {
     const space = buffer.indexOf(32, cursor)
     if (space === -1) {
-      throw new GitError(E.InternalFail, {
-        message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
-      })
+      throw new InternalError(
+        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next space character.`
+      )
     }
     const nullchar = buffer.indexOf(0, cursor)
     if (nullchar === -1) {
-      throw new GitError(E.InternalFail, {
-        message: `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
-      })
+      throw new InternalError(
+        `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
+      )
     }
     let mode = buffer.slice(cursor, space).toString('utf8')
     if (mode === '40000') mode = '040000' // makes it line up neater in printed output
     const type = mode2type(mode)
     const path = buffer.slice(space + 1, nullchar).toString('utf8')
+
+    // Prevent malicious git repos from writing to "..\foo" on clone etc
+    if (path.includes('\\') || path.includes('/')) {
+      throw new UnsafeFilepathError(path)
+    }
+
     const oid = buffer.slice(nullchar + 1, nullchar + 21).toString('hex')
     cursor = nullchar + 21
     _entries.push({ mode, path, oid, type })
@@ -52,7 +58,7 @@ function parseBuffer (buffer) {
   return _entries
 }
 
-function limitModeToAllowed (mode) {
+function limitModeToAllowed(mode) {
   if (typeof mode === 'number') {
     mode = mode.toString(8)
   }
@@ -62,50 +68,50 @@ function limitModeToAllowed (mode) {
   if (mode.match(/^1007.*/)) return '100755' // Regular executable file
   if (mode.match(/^120.*/)) return '120000' // Symbolic link
   if (mode.match(/^160.*/)) return '160000' // Commit (git submodule reference)
-  throw new GitError(E.InternalFail, {
-    message: `Could not understand file mode: ${mode}`
-  })
+  throw new InternalError(`Could not understand file mode: ${mode}`)
 }
 
-function nudgeIntoShape (entry) {
+function nudgeIntoShape(entry) {
   if (!entry.oid && entry.sha) {
     entry.oid = entry.sha // Github
   }
   entry.mode = limitModeToAllowed(entry.mode) // index
   if (!entry.type) {
-    entry.type = 'blob' // index
+    entry.type = mode2type(entry.mode) // index
   }
   return entry
 }
 
 export class GitTree {
-  /*::
-  _entries: Array<TreeEntry>
-  */
-  constructor (entries) {
-    if (Array.isArray(entries)) {
+  constructor(entries) {
+    if (TinyBuffer.isBuffer(entries)) {
+      this._entries = parseBuffer(entries)
+    } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
     } else {
-      this._entries = parseBuffer(entries)
+      throw new InternalError('invalid type passed to GitTree constructor')
     }
-    // There appears to be an edge case (in this repo no less) where
-    // the tree is NOT sorted as expected if some directories end with ".git"
+    // Tree entries are not sorted alphabetically in the usual sense (see `compareTreeEntryPath`)
+    // but it is important later on that these be sorted in the same order as they would be returned from readdir.
     this._entries.sort(comparePath)
   }
 
-  static from (tree) {
+  static from(tree) {
     return new GitTree(tree)
   }
 
-  render () {
+  render() {
     return this._entries
       .map(entry => `${entry.mode} ${entry.type} ${entry.oid}    ${entry.path}`)
       .join('\n')
   }
 
-  toObject () {
+  toObject() {
+    // Adjust the sort order to match git's
+    const entries = [...this._entries]
+    entries.sort(compareTreeEntryPath)
     return TinyBuffer.concat(
-      this._entries.map(entry => {
+      entries.map(entry => {
         const mode = TinyBuffer.from(entry.mode.replace(/^0/, ''))
         const space = TinyBuffer.from(' ')
         const path = TinyBuffer.from(entry.path, 'utf8')
@@ -116,11 +122,14 @@ export class GitTree {
     )
   }
 
-  entries () {
+  /**
+   * @returns {TreeEntry[]}
+   */
+  entries() {
     return this._entries
   }
 
-  * [Symbol.iterator] () {
+  *[Symbol.iterator]() {
     for (const entry of this._entries) {
       yield entry
     }

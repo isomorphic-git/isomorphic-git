@@ -1,23 +1,17 @@
 const path = require('path')
 
-const { cores, plugins } = require('isomorphic-git')
 const { FileSystem } = require('isomorphic-git/internal-apis')
 
-let i = 0
-
-async function makeNodeFixture (fixture) {
+async function makeNodeFixture(fixture) {
   const _fs = Object.assign({}, require('fs'))
-  const core = `core-node-${i++}`
-  cores.create(core).set('fs', _fs)
-  plugins.set('fs', _fs) // deprecated
 
   const fs = new FileSystem(_fs)
 
   const {
     getFixturePath,
     createTempDir,
-    copyFixtureIntoTempDir
-  } = require('jest-fixtures')
+    copyFixtureIntoTempDir,
+  } = require('@wmhilton/jest-fixtures')
 
   const testsDir = path.resolve(__dirname, '..')
 
@@ -29,7 +23,7 @@ async function makeNodeFixture (fixture) {
     ? await copyFixtureIntoTempDir(testsDir, `${fixture}.git`)
     : await createTempDir()
 
-  return { _fs, fs, dir, gitdir, core }
+  return { _fs, fs, dir, gitdir }
 }
 
 module.exports.makeNodeFixture = makeNodeFixture

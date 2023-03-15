@@ -1,31 +1,27 @@
-import pako from 'pako'
-import Hash from 'sha.js/sha1'
+import Hash from 'sha.js/sha1.js'
 
-import { FileSystem } from '../models/FileSystem.js'
-import { readObject } from '../storage/readObject.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { types } from '../commands/types.js'
+import { _readObject as readObject } from '../storage/readObject.js'
+import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
-import { cores } from '../utils/plugins.js'
-
-import { types } from './types'
 
 /**
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string[]} args.oids
  */
-export async function pack ({
-  core = 'default',
+export async function _pack({
+  fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
-  oids
+  oids,
 }) {
-  const fs = new FileSystem(_fs)
   const hash = new Hash()
   const outputStream = []
   function write (chunk, enc) {
@@ -33,7 +29,7 @@ export async function pack ({
     outputStream.push(buff)
     hash.update(buff)
   }
-  function writeObject ({ stype, object }) {
+  async function writeObject({ stype, object }) {
     // Object type is encoded in bits 654
     const type = types[stype]
     // The length encoding gets complicated.
@@ -57,15 +53,15 @@ export async function pack ({
       length = length >>> 7
     }
     // Lastly, we can compress and write the object.
-    write(TinyBuffer.from(pako.deflate(object)))
+    write(TinyBuffer.from(await deflate(object)))
   }
   write('PACK')
   write('00000002', 'hex')
   // Write a 4 byte (32-bit) int
   write(padHex(8, oids.length), 'hex')
   for (const oid of oids) {
-    const { type, object } = await readObject({ fs, gitdir, oid })
-    writeObject({ write, object, stype: type })
+    const { type, object } = await readObject({ fs, cache, gitdir, oid })
+    await writeObject({ write, object, stype: type })
   }
   // Write SHA1 checksum
   const digest = hash.digest()

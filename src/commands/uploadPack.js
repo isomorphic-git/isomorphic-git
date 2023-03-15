@@ -1,17 +1,13 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 import { writeRefsAdResponse } from '../wire/writeRefsAdResponse.js'
 
-export async function uploadPack ({
-  core = 'default',
+export async function uploadPack({
+  fs,
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
-  advertiseRefs = false
+  advertiseRefs = false,
 }) {
-  const fs = new FileSystem(_fs)
   try {
     if (advertiseRefs) {
       // Send a refs advertisement
@@ -23,12 +19,12 @@ export async function uploadPack ({
         'deepen-since',
         'deepen-not',
         'allow-tip-sha1-in-want',
-        'allow-reachable-sha1-in-want'
+        'allow-reachable-sha1-in-want',
       ]
       let keys = await GitRefManager.listRefs({
         fs,
         gitdir,
-        filepath: 'refs'
+        filepath: 'refs',
       })
       keys = keys.map(ref => `refs/${ref}`)
       const refs = {}
@@ -37,16 +33,16 @@ export async function uploadPack ({
         refs[key] = await GitRefManager.resolve({ fs, gitdir, ref: key })
       }
       const symrefs = {}
-      symrefs['HEAD'] = await GitRefManager.resolve({
+      symrefs.HEAD = await GitRefManager.resolve({
         fs,
         gitdir,
         ref: 'HEAD',
-        depth: 2
+        depth: 2,
       })
       return writeRefsAdResponse({
         capabilities,
         refs,
-        symrefs
+        symrefs,
       })
     }
   } catch (err) {

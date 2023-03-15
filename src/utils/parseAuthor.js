@@ -1,4 +1,4 @@
-export function parseAuthor (author) {
+export function parseAuthor(author) {
   const [, name, email, timestamp, offset] = author.match(
     /^(.*) <(.*)> (.*) (.*)$/
   )
@@ -6,7 +6,7 @@ export function parseAuthor (author) {
     name: name,
     email: email,
     timestamp: Number(timestamp),
-    timezoneOffset: parseTimezoneOffset(offset)
+    timezoneOffset: parseTimezoneOffset(offset),
   }
 }
 
@@ -14,12 +14,12 @@ export function parseAuthor (author) {
 // -0 (just so we don't lose that information when parsing and reconstructing)
 // but can also default to +0 was extraordinary.
 
-function parseTimezoneOffset (offset) {
+function parseTimezoneOffset(offset) {
   let [, sign, hours, minutes] = offset.match(/(\+|-)(\d\d)(\d\d)/)
   minutes = (sign === '+' ? 1 : -1) * (Number(hours) * 60 + Number(minutes))
   return negateExceptForZero(minutes)
 }
 
-function negateExceptForZero (n) {
+function negateExceptForZero(n) {
   return n === 0 ? n : -n
 }

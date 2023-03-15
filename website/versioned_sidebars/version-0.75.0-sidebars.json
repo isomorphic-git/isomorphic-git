@@ -1,0 +1,114 @@
+{
+  "version-0.75.0-docs": {
+    "All Commands": [
+      "version-0.75.0-alphabetic",
+      "version-0.75.0-errors"
+    ],
+    "Repository": [
+      "version-0.75.0-init",
+      "version-0.75.0-clone",
+      "version-0.75.0-commit",
+      "version-0.75.0-log",
+      "version-0.75.0-config",
+      "version-0.75.0-fetch",
+      "version-0.75.0-checkout",
+      "version-0.75.0-fastCheckout",
+      "version-0.75.0-push",
+      "version-0.75.0-pull",
+      "version-0.75.0-merge",
+      "version-0.75.0-verify"
+    ],
+    "Files": [
+      "version-0.75.0-add",
+      "version-0.75.0-remove",
+      "version-0.75.0-listFiles",
+      "version-0.75.0-status"
+    ],
+    "Branches": [
+      "version-0.75.0-currentBranch",
+      "version-0.75.0-branch",
+      "version-0.75.0-deleteBranch",
+      "version-0.75.0-listBranches"
+    ],
+    "Tags": [
+      "version-0.75.0-tag",
+      "version-0.75.0-annotatedTag",
+      "version-0.75.0-deleteTag",
+      "version-0.75.0-listTags"
+    ],
+    "Remotes": [
+      "version-0.75.0-getRemoteInfo",
+      "version-0.75.0-addRemote",
+      "version-0.75.0-deleteRemote",
+      "version-0.75.0-listRemotes"
+    ],
+    "Notes": [
+      "version-0.75.0-addNote",
+      "version-0.75.0-readNote",
+      "version-0.75.0-removeNote",
+      "version-0.75.0-listNotes"
+    ],
+    "Walking": [
+      "version-0.75.0-walkBeta2",
+      "version-0.75.0-WORKDIR",
+      "version-0.75.0-STAGE",
+      "version-0.75.0-TREE"
+    ],
+    "Plugins": [
+      "version-0.75.0-plugin_credentialManager",
+      "version-0.75.0-plugin_emitter",
+      "version-0.75.0-plugin_fs",
+      "version-0.75.0-plugin_http",
+      "version-0.75.0-plugin_pgp"
+    ],
+    "Raw Objects": [
+      "version-0.75.0-readBlob",
+      "version-0.75.0-readCommit",
+      "version-0.75.0-readTag",
+      "version-0.75.0-readTree",
+      "version-0.75.0-writeBlob",
+      "version-0.75.0-writeCommit",
+      "version-0.75.0-writeTag",
+      "version-0.75.0-writeTree"
+    ],
+    "Plumbing Commands": [
+      "version-0.75.0-findRoot",
+      "version-0.75.0-expandRef",
+      "version-0.75.0-expandOid",
+      "version-0.75.0-resetIndex",
+      "version-0.75.0-resolveRef",
+      "version-0.75.0-writeRef",
+      "version-0.75.0-deleteRef",
+      "version-0.75.0-hashBlob",
+      "version-0.75.0-statusMatrix",
+      "version-0.75.0-isDescendent",
+      "version-0.75.0-indexPack",
+      "version-0.75.0-packObjects"
+    ],
+    "Misc Commands": [
+      "version-0.75.0-version"
+    ],
+    "Deprecated Commands": [
+      "version-0.75.0-utils_auth",
+      "version-0.75.0-utils_oauth2",
+      "version-0.75.0-sign",
+      "version-0.75.0-readObject",
+      "version-0.75.0-writeObject"
+    ]
+  },
+  "version-0.75.0-guide": {
+    "Getting Started": [
+      "version-0.75.0-quickstart",
+      "version-0.75.0-browser",
+      "version-0.75.0-fs",
+      "version-0.75.0-authentication",
+      "version-0.75.0-cli",
+      "version-0.75.0-dir-vs-gitdir"
+    ],
+    "More": [
+      "version-0.75.0-faq",
+      "version-0.75.0-snippets",
+      "version-0.75.0-webworker"
+    ]
+  }
+}

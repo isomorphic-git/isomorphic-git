@@ -1,22 +1,29 @@
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
-import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
-import { E, GitError } from '../models/GitError.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
-export async function listCommitsAndTags ({
-  core = 'default',
+/**
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
+ * @param {string} [args.dir]
+ * @param {string} args.gitdir
+ * @param {Iterable<string>} args.start
+ * @param {Iterable<string>} args.finish
+ * @returns {Promise<Set<string>>}
+ */
+export async function listCommitsAndTags({
+  fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   start,
-  finish
+  finish,
 }) {
-  const fs = new FileSystem(_fs)
   const shallows = await GitShallowManager.read({ fs, gitdir })
   const startingSet = new Set()
   const finishingSet = new Set()
@@ -34,9 +41,9 @@ export async function listCommitsAndTags ({
   // Because git commits are named by their hash, there is no
   // way to construct a cycle. Therefore we won't worry about
   // setting a default recursion limit.
-  async function walk (oid) {
+  async function walk(oid) {
     visited.add(oid)
-    const { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, cache, gitdir, oid })
     // Recursively resolve annotated tags
     if (type === 'tag') {
       const tag = GitAnnotatedTag.from(object)
@@ -44,11 +51,7 @@ export async function listCommitsAndTags ({
       return walk(commit)
     }
     if (type !== 'commit') {
-      throw new GitError(E.ObjectTypeAssertionFail, {
-        oid,
-        type,
-        expected: 'commit'
-      })
+      throw new ObjectTypeError(oid, type, 'commit')
     }
     if (!shallows.has(oid)) {
       const commit = GitCommit.from(object)

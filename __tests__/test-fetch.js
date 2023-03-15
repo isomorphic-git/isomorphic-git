@@ -1,28 +1,32 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import http from 'isomorphic-git/http'
 
-const EventEmitter = require('events')
+const { Errors, setConfig, fetch } = require('isomorphic-git')
 const { sleep } = require('isomorphic-git/internal-apis')
-const { E, plugins, config, fetch } = require('isomorphic-git')
+
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
-  typeof window === 'undefined' ? 'localhost' : window.location.hostname
+  typeof window === 'undefined' ? '127.0.0.1' : window.location.hostname
 
 describe('fetch', () => {
   it('fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Smoke Test
     await fetch({
+      fs,
+      http,
       gitdir,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(
       await fs.exists(`${gitdir}/refs/remotes/origin/test-branch-shallow-clone`)
@@ -32,27 +36,29 @@ describe('fetch', () => {
 
   it('shallow fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     const output = []
     const progress = []
-    plugins.set(
-      'emitter',
-      new EventEmitter()
-        .on('fetch.message', output.push.bind(output))
-        .on('fetch.progress', progress.push.bind(progress))
-    )
     // Test
     await fetch({
+      fs,
+      http,
       gitdir,
-      emitterPrefix: 'fetch.',
+      onMessage: async x => {
+        output.push(x)
+      },
+      onProgress: async y => {
+        progress.push(y)
+      },
       depth: 1,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     await sleep(1000) // seems to be a problem spot
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
@@ -62,31 +68,116 @@ describe('fetch', () => {
     expect(shallow === '92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n').toBe(true)
     // Now test deepen
     await fetch({
+      fs,
+      http,
       gitdir,
       depth: 2,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     await sleep(1000) // seems to be a problem spot
     shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
     expect(shallow === '86ec153c7b48e02f92930d07542680f60d104d31\n').toBe(true)
   })
 
-  it('shallow fetch since (from Github)', async () => {
+  it('throws UnknownTransportError if using shorter scp-like syntax', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
+    })
+    // Test
+    let err
+    try {
+      await fetch({
+        fs,
+        http,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        remote: 'ssh',
+        ref: 'test-branch-shallow-clone',
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err).toBeDefined()
+    expect(err.code).toEqual(Errors.UnknownTransportError.code)
+  })
+
+  it('the SSH -> HTTPS UnknownTransportError suggestion feature', async () => {
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`,
+    })
+    // Test
+    let err
+    try {
+      await fetch({
+        fs,
+        http,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        remote: 'ssh',
+        ref: 'test-branch-shallow-clone',
+      })
+    } catch (e) {
+      err = e
+    }
+    expect(err).toBeDefined()
+    expect(err.code).toBe(Errors.UnknownTransportError.code)
+    expect(err.data.suggestion).toBe(
+      'https://github.com/isomorphic-git/isomorphic-git.git'
+    )
+  })
+
+  it('shallow fetch single commit by hash (from Github)', async () => {
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`,
     })
     // Test
     await fetch({
+      fs,
+      http,
+      gitdir,
+      singleBranch: true,
+      remote: 'origin',
+      depth: 1,
+      ref: '36d201c8fea9d87128e7fccd32c21643f355540d',
+    })
+    expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
+    const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
+    expect(shallow).toEqual('36d201c8fea9d87128e7fccd32c21643f355540d\n')
+  })
+
+  it('shallow fetch since (from Github)', async () => {
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'http.corsProxy',
+      value: `http://${localhost}:9999`,
+    })
+    // Test
+    await fetch({
+      fs,
+      http,
       gitdir,
       since: new Date(1506571200000),
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
     const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -95,18 +186,21 @@ describe('fetch', () => {
 
   it('shallow fetch exclude (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     await fetch({
+      fs,
+      http,
       gitdir,
       exclude: ['v0.0.5'],
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
     const shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -115,30 +209,35 @@ describe('fetch', () => {
 
   it('shallow fetch relative (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     await fetch({
+      fs,
+      http,
       gitdir,
       depth: 1,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     expect(await fs.exists(`${gitdir}/shallow`)).toBe(true)
     let shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
     expect(shallow).toEqual('92e7b4123fbf135f5ffa9b6fe2ec78d07bbc353e\n')
     // Now test deepen
     await fetch({
+      fs,
+      http,
       gitdir,
       relative: true,
       depth: 1,
       singleBranch: true,
       remote: 'origin',
-      ref: 'test-branch-shallow-clone'
+      ref: 'test-branch-shallow-clone',
     })
     await sleep(1000) // seems to be a problem spot
     shallow = (await fs.read(`${gitdir}/shallow`)).toString('utf8')
@@ -146,36 +245,41 @@ describe('fetch', () => {
   })
 
   it('errors if missing refspec', async () => {
-    const { gitdir } = await makeFixture('test-issue-84')
-    await config({
+    const { fs, gitdir } = await makeFixture('test-issue-84')
+    await setConfig({
+      fs,
       gitdir,
       path: 'http.corsProxy',
-      value: `http://${localhost}:9999`
+      value: `http://${localhost}:9999`,
     })
     // Test
     let err = null
     try {
       await fetch({
+        fs,
+        http,
         gitdir,
         since: new Date(1506571200000),
         singleBranch: true,
         remote: 'origin',
-        ref: 'test-branch-shallow-clone'
+        ref: 'test-branch-shallow-clone',
       })
     } catch (e) {
       err = e
     }
     expect(err).toBeDefined()
-    expect(err.code).toEqual(E.NoRefspecConfiguredError)
+    expect(err instanceof Errors.NoRefspecError).toBe(true)
   })
 
   it('fetch empty repository from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-empty')
     await fetch({
+      fs,
+      http,
       dir,
       gitdir,
       depth: 1,
-      url: `http://${localhost}:8888/test-empty.git`
+      url: `http://${localhost}:8888/test-empty.git`,
     })
     expect(await fs.exists(`${dir}`)).toBe(true)
     expect(await fs.exists(`${gitdir}/HEAD`)).toBe(true)
@@ -187,19 +291,22 @@ describe('fetch', () => {
 
   it('fetch --prune from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-fetch-server.git`
+      value: `http://${localhost}:8888/test-fetch-server.git`,
     })
     expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
       true
     )
     const { pruned } = await fetch({
+      fs,
+      http,
       dir,
       gitdir,
       depth: 1,
-      prune: true
+      prune: true,
     })
     expect(pruned).toEqual(['refs/remotes/origin/test-prune'])
     expect(await fs.exists(`${gitdir}/refs/remotes/origin/test-prune`)).toBe(
@@ -207,28 +314,25 @@ describe('fetch', () => {
     )
   })
 
-  // XXX: After a PROLONGED and tiring battle... I don't know why the eff the pruneTags
-  // parameter is causing Mobile Safari 11 tests to crash / disconnect.
-  // So... I'm just gonna consider it a fluke.
-  // TODO: Remove this check when we drop support for Safari 11.
-  ;(typeof navigator !== 'undefined' && navigator.userAgent.match(/iPhone/)
-    ? xit
-    : it)('fetch --prune-tags from git-http-mock-server', async () => {
+  it('fetch --prune-tags from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-fetch-client')
-    await config({
+    await setConfig({
+      fs,
       gitdir,
       path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-fetch-server.git`
+      value: `http://${localhost}:8888/test-fetch-server.git`,
     })
     expect(await fs.exists(`${gitdir}/refs/tags/v1.0.0-beta1`)).toBe(true)
     const oldValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
     try {
       await fetch({
+        fs,
+        http,
         dir,
         gitdir,
         depth: 1,
         tags: true,
-        pruneTags: true
+        pruneTags: true,
       })
     } catch (err) {
       // shrug

@@ -3,26 +3,22 @@
 // (I tried to make it API identical, but that ended up being 2x slower than this version.)
 import pako from 'pako'
 
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { StreamReader } from '../utils/StreamReader.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
 
-export async function listpack (stream, onData) {
+export async function listpack(stream, onData) {
   const reader = new StreamReader(stream)
   let PACK = await reader.read(4)
   PACK = PACK.toString('utf8')
   if (PACK !== 'PACK') {
-    throw new GitError(E.InternalFail, {
-      message: `Invalid PACK header '${PACK}'`
-    })
+    throw new InternalError(`Invalid PACK header '${PACK}'`)
   }
 
   let version = await reader.read(4)
   version = version.readUInt32BE(0)
   if (version !== 2) {
-    throw new GitError(E.InternalFail, {
-      message: `Invalid packfile version: ${version}`
-    })
+    throw new InternalError(`Invalid packfile version: ${version}`)
   }
 
   let numObjects = await reader.read(4)
@@ -36,39 +32,37 @@ export async function listpack (stream, onData) {
     const inflator = new pako.Inflate()
     while (!inflator.result) {
       const chunk = await reader.chunk()
-      if (reader.ended) break
-      inflator.push(new Uint8Array(chunk), false)
+      if (!chunk) break
+      inflator.push(chunk, false)
       if (inflator.err) {
-        throw new GitError(E.InternalFail, {
-          message: `Pako error: ${inflator.msg}`
-        })
+        throw new InternalError(`Pako error: ${inflator.msg}`)
       }
       if (inflator.result) {
         if (inflator.result.length !== length) {
-          throw new GitError(E.InternalFail, {
-            message: `Inflated object size is different from that stated in packfile.`
-          })
+          throw new InternalError(
+            `Inflated object size is different from that stated in packfile.`
+          )
         }
 
         // Backtrack parser to where deflated data ends
         await reader.undo()
         await reader.read(chunk.length - inflator.strm.avail_in)
         const end = reader.tell()
-        onData({
+        await onData({
           data: inflator.result,
           type,
           num: numObjects,
           offset,
           end,
           reference,
-          ofs
+          ofs,
         })
       }
     }
   }
 }
 
-async function parseHeader (reader) {
+async function parseHeader(reader) {
   // Object type is encoded in bits 654
   let byte = await reader.byte()
   const type = (byte >> 4) & 0b111

@@ -1,3 +1,7 @@
 * eol=lf
 __tests__/__fixtures__/** binary eol=unset linguist-vendored
 __tests__/__snapshots__/** binary eol=unset
+__tests__/__snapshots__/test-exports.js.snap text eol=lf
+**/*.png binary eol=unset
+**/*.webp binary eol=unset
+**/*.zip binary eol=unset

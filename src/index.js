@@ -1,58 +1,211 @@
-import { auth } from './utils/auth.js'
-import { oauth2 } from './utils/oauth2.js'
+import './typedefs.js'
 
-export * from './commands/add.js'
-export * from './commands/addRemote.js'
-export * from './commands/annotatedTag.js'
-export * from './commands/branch.js'
-export * from './commands/checkout.js'
-export * from './commands/fastCheckout.js'
-export * from './commands/clone.js'
-export * from './commands/commit.js'
-export * from './commands/config.js'
-export * from './commands/currentBranch.js'
-export * from './commands/deleteBranch.js'
-export * from './commands/deleteRef.js'
-export * from './commands/deleteRemote.js'
-export * from './commands/deleteTag.js'
-export * from './commands/expandOid.js'
-export * from './commands/expandRef.js'
-export * from './commands/fetch.js'
-export * from './commands/findMergeBase.js'
-export * from './commands/findRoot.js'
-export * from './commands/getRemoteInfo.js'
-export * from './commands/hashBlob.js'
-export * from './commands/indexPack.js'
-export * from './commands/init.js'
-export * from './commands/isDescendent.js'
-export * from './commands/listBranches.js'
-export * from './commands/listFiles.js'
-export * from './commands/listRemotes.js'
-export * from './commands/listTags.js'
-export * from './commands/log.js'
-export * from './commands/merge.js'
-export * from './commands/packObjects.js'
-export * from './commands/pull.js'
-export * from './commands/push.js'
-export * from './commands/readObject.js'
-export * from './commands/remove.js'
-export * from './commands/resetIndex.js'
-export * from './commands/resolveRef.js'
-export * from './commands/sign.js'
-export * from './commands/status.js'
-export * from './commands/statusMatrix.js'
-export * from './commands/tag.js'
-export * from './commands/verify.js'
-export * from './commands/version.js'
-export * from './commands/walkBeta1.js'
-export * from './commands/walkBeta2.js'
-export * from './commands/writeObject.js'
-export * from './commands/writeRef.js'
-export * from './commands/WORKDIR.js'
-export * from './commands/STAGE.js'
-export * from './commands/TREE.js'
+import { STAGE } from './api/STAGE.js'
+import { TREE } from './api/TREE.js'
+import { WORKDIR } from './api/WORKDIR.js'
+import { add } from './api/add.js'
+import { addNote } from './api/addNote.js'
+import { addRemote } from './api/addRemote.js'
+import { annotatedTag } from './api/annotatedTag.js'
+import { branch } from './api/branch.js'
+import { checkout } from './api/checkout.js'
+import { clone } from './api/clone.js'
+import { commit } from './api/commit.js'
+import { currentBranch } from './api/currentBranch.js'
+import { deleteBranch } from './api/deleteBranch.js'
+import { deleteRef } from './api/deleteRef.js'
+import { deleteRemote } from './api/deleteRemote.js'
+import { deleteTag } from './api/deleteTag.js'
+import { expandOid } from './api/expandOid.js'
+import { expandRef } from './api/expandRef.js'
+import { fastForward } from './api/fastForward.js'
+import { fetch } from './api/fetch.js'
+import { findMergeBase } from './api/findMergeBase.js'
+import { findRoot } from './api/findRoot.js'
+import { getConfig } from './api/getConfig.js'
+import { getConfigAll } from './api/getConfigAll.js'
+import { getRemoteInfo } from './api/getRemoteInfo.js'
+import { getRemoteInfo2 } from './api/getRemoteInfo2.js'
+import { hashBlob } from './api/hashBlob.js'
+import { indexPack } from './api/indexPack.js'
+import { init } from './api/init.js'
+import { isDescendent } from './api/isDescendent.js'
+import { isIgnored } from './api/isIgnored.js'
+import { listBranches } from './api/listBranches.js'
+import { listFiles } from './api/listFiles.js'
+import { listNotes } from './api/listNotes.js'
+import { listRemotes } from './api/listRemotes.js'
+import { listServerRefs } from './api/listServerRefs.js'
+import { listTags } from './api/listTags.js'
+import { log } from './api/log.js'
+import { merge } from './api/merge.js'
+import { packObjects } from './api/packObjects.js'
+import { pull } from './api/pull.js'
+import { push } from './api/push.js'
+import { readBlob } from './api/readBlob.js'
+import { readCommit } from './api/readCommit.js'
+import { readNote } from './api/readNote.js'
+import { readObject } from './api/readObject.js'
+import { readTag } from './api/readTag.js'
+import { readTree } from './api/readTree.js'
+import { remove } from './api/remove.js'
+import { removeNote } from './api/removeNote.js'
+import { renameBranch } from './api/renameBranch.js'
+import { resetIndex } from './api/resetIndex.js'
+import { resolveRef } from './api/resolveRef.js'
+import { setConfig } from './api/setConfig.js'
+import { status } from './api/status.js'
+import { statusMatrix } from './api/statusMatrix.js'
+import { tag } from './api/tag.js'
+import { updateIndex } from './api/updateIndex.js'
+import { version } from './api/version.js'
+import { walk } from './api/walk.js'
+import { writeBlob } from './api/writeBlob.js'
+import { writeCommit } from './api/writeCommit.js'
+import { writeObject } from './api/writeObject.js'
+import { writeRef } from './api/writeRef.js'
+import { writeTag } from './api/writeTag.js'
+import { writeTree } from './api/writeTree.js'
+import * as Errors from './errors/index.js'
 
-export const utils = { auth, oauth2 }
-export { E } from './models/GitError'
+// named exports
+export {
+  Errors,
+  STAGE,
+  TREE,
+  WORKDIR,
+  add,
+  addNote,
+  addRemote,
+  annotatedTag,
+  branch,
+  checkout,
+  clone,
+  commit,
+  getConfig,
+  getConfigAll,
+  setConfig,
+  currentBranch,
+  deleteBranch,
+  deleteRef,
+  deleteRemote,
+  deleteTag,
+  expandOid,
+  expandRef,
+  fastForward,
+  fetch,
+  findMergeBase,
+  findRoot,
+  getRemoteInfo,
+  getRemoteInfo2,
+  hashBlob,
+  indexPack,
+  init,
+  isDescendent,
+  isIgnored,
+  listBranches,
+  listFiles,
+  listNotes,
+  listRemotes,
+  listServerRefs,
+  listTags,
+  log,
+  merge,
+  packObjects,
+  pull,
+  push,
+  readBlob,
+  readCommit,
+  readNote,
+  readObject,
+  readTag,
+  readTree,
+  remove,
+  removeNote,
+  renameBranch,
+  resetIndex,
+  updateIndex,
+  resolveRef,
+  status,
+  statusMatrix,
+  tag,
+  version,
+  walk,
+  writeBlob,
+  writeCommit,
+  writeObject,
+  writeRef,
+  writeTag,
+  writeTree,
+}
 
-export * from './utils/plugins.js'
+// default export
+export default {
+  Errors,
+  STAGE,
+  TREE,
+  WORKDIR,
+  add,
+  addNote,
+  addRemote,
+  annotatedTag,
+  branch,
+  checkout,
+  clone,
+  commit,
+  getConfig,
+  getConfigAll,
+  setConfig,
+  currentBranch,
+  deleteBranch,
+  deleteRef,
+  deleteRemote,
+  deleteTag,
+  expandOid,
+  expandRef,
+  fastForward,
+  fetch,
+  findMergeBase,
+  findRoot,
+  getRemoteInfo,
+  getRemoteInfo2,
+  hashBlob,
+  indexPack,
+  init,
+  isDescendent,
+  isIgnored,
+  listBranches,
+  listFiles,
+  listNotes,
+  listRemotes,
+  listServerRefs,
+  listTags,
+  log,
+  merge,
+  packObjects,
+  pull,
+  push,
+  readBlob,
+  readCommit,
+  readNote,
+  readObject,
+  readTag,
+  readTree,
+  remove,
+  removeNote,
+  renameBranch,
+  resetIndex,
+  updateIndex,
+  resolveRef,
+  status,
+  statusMatrix,
+  tag,
+  version,
+  walk,
+  writeBlob,
+  writeCommit,
+  writeObject,
+  writeRef,
+  writeTag,
+  writeTree,
+}

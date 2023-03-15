@@ -1,4 +1,4 @@
-export function normalizeNewlines (str) {
+export function normalizeNewlines(str) {
   // remove all <CR>
   str = str.replace(/\r/g, '')
   // no extra newlines up front

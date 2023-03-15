@@ -2,6 +2,6 @@
 // Also, this is just much smaller
 import { normalizePath } from './normalizePath.js'
 
-export function join (...parts) {
+export function join(...parts) {
   return normalizePath(parts.map(normalizePath).join('/'))
 }

@@ -1,4 +1,4 @@
-export function compareRefNames (a, b) {
+export function compareRefNames(a, b) {
   // https://stackoverflow.com/a/40355107/2168416
   const _a = a.replace(/\^\{\}$/, '')
   const _b = b.replace(/\^\{\}$/, '')

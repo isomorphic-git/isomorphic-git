@@ -1,40 +1,28 @@
 import pify from 'pify'
 
-import { E, GitError } from '../models/GitError.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
-import { sleep } from '../utils/sleep.js'
+import { rmRecursive } from '../utils/rmRecursive.js'
 
-const delayedReleases = new Map()
-const fsmap = new WeakMap()
 /**
  * This is just a collection of helper functions really. At least that's how it started.
  */
 export class FileSystem {
-  constructor (fs) {
-    // This is not actually the most logical place to put this, but in practice
-    // putting the check here should work great.
-    if (fs === undefined) {
-      throw new GitError(E.PluginUndefined, { plugin: 'fs' })
-    }
-    // This is sad... but preserving reference equality is now necessary
-    // to deal with cache invalidation in GitIndexManager.
-    if (fsmap.has(fs)) {
-      return fsmap.get(fs)
-    }
-    if (fsmap.has(fs._original_unwrapped_fs)) {
-      return fsmap.get(fs._original_unwrapped_fs)
-    }
-
+  constructor(fs) {
     if (typeof fs._original_unwrapped_fs !== 'undefined') return fs
 
-    if (
-      Object.getOwnPropertyDescriptor(fs, 'promises') &&
-      Object.getOwnPropertyDescriptor(fs, 'promises').enumerable
-    ) {
+    const promises = Object.getOwnPropertyDescriptor(fs, 'promises')
+    if (promises && promises.enumerable) {
       this._readFile = fs.promises.readFile.bind(fs.promises)
       this._writeFile = fs.promises.writeFile.bind(fs.promises)
       this._mkdir = fs.promises.mkdir.bind(fs.promises)
+      if (fs.promises.rm) {
+        this._rm = fs.promises.rm.bind(fs.promises)
+      } else if (fs.promises.rmdir.length > 1) {
+        this._rm = fs.promises.rmdir.bind(fs.promises)
+      } else {
+        this._rm = rmRecursive.bind(null, this)
+      }
       this._rmdir = fs.promises.rmdir.bind(fs.promises)
       this._unlink = fs.promises.unlink.bind(fs.promises)
       this._stat = fs.promises.stat.bind(fs.promises)
@@ -46,6 +34,13 @@ export class FileSystem {
       this._readFile = pify(fs.readFile.bind(fs))
       this._writeFile = pify(fs.writeFile.bind(fs))
       this._mkdir = pify(fs.mkdir.bind(fs))
+      if (fs.rm) {
+        this._rm = pify(fs.rm.bind(fs))
+      } else if (fs.rmdir.length > 2) {
+        this._rm = pify(fs.rmdir.bind(fs))
+      } else {
+        this._rm = rmRecursive.bind(null, this)
+      }
       this._rmdir = pify(fs.rmdir.bind(fs))
       this._unlink = pify(fs.unlink.bind(fs))
       this._stat = pify(fs.stat.bind(fs))
@@ -55,14 +50,13 @@ export class FileSystem {
       this._symlink = pify(fs.symlink.bind(fs))
     }
     this._original_unwrapped_fs = fs
-    fsmap.set(fs, this)
   }
 
   /**
    * Return true if a file exists, false if it doesn't exist.
    * Rethrows errors that aren't related to file existance.
    */
-  async exists (filepath, options = {}) {
+  async exists(filepath, options = {}) {
     try {
       await this._stat(filepath)
       return true
@@ -82,9 +76,9 @@ export class FileSystem {
    * @param {string} filepath
    * @param {object} [options]
    *
-   * @returns {Buffer|null}
+   * @returns {Promise<Buffer|string|null>}
    */
-  async read (filepath, options = {}) {
+  async read(filepath, options = {}) {
     try {
       let buffer = await this._readFile(filepath, options)
       // Convert plain ArrayBuffers to Buffers
@@ -104,7 +98,7 @@ export class FileSystem {
    * @param {Buffer|Uint8Array|string} contents
    * @param {object|string} [options]
    */
-  async write (filepath, contents, options = {}) {
+  async write(filepath, contents, options = {}) {
     try {
       await this._writeFile(filepath, contents, options)
       return
@@ -118,7 +112,7 @@ export class FileSystem {
   /**
    * Make a directory (or series of nested directories) without throwing an error if it already exists.
    */
-  async mkdir (filepath, _selfCall = false) {
+  async mkdir(filepath, _selfCall = false) {
     try {
       await this._mkdir(filepath)
       return
@@ -144,7 +138,7 @@ export class FileSystem {
   /**
    * Delete a file without throwing an error if it is already deleted.
    */
-  async rm (filepath) {
+  async rm(filepath) {
     try {
       await this._unlink(filepath)
     } catch (err) {
@@ -155,9 +149,13 @@ export class FileSystem {
   /**
    * Delete a directory without throwing an error if it is already deleted.
    */
-  async rmdir (filepath) {
+  async rmdir(filepath, opts) {
     try {
-      await this._rmdir(filepath)
+      if (opts && opts.recursive) {
+        await this._rm(filepath, opts)
+      } else {
+        await this._rmdir(filepath)
+      }
     } catch (err) {
       if (err.code !== 'ENOENT') throw err
     }
@@ -166,7 +164,7 @@ export class FileSystem {
   /**
    * Read a directory without throwing an error is the directory doesn't exist
    */
-  async readdir (filepath) {
+  async readdir(filepath) {
     try {
       const names = await this._readdir(filepath)
       // Ordering is not guaranteed, and system specific (Windows vs Unix)
@@ -185,7 +183,7 @@ export class FileSystem {
    * Based on an elegant concurrent recursive solution from SO
    * https://stackoverflow.com/a/45130990/2168416
    */
-  async readdirDeep (dir) {
+  async readdirDeep(dir) {
     const subdirs = await this._readdir(dir)
     const files = await Promise.all(
       subdirs.map(async subdir => {
@@ -202,7 +200,7 @@ export class FileSystem {
    * Return the Stats of a file/symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
    */
-  async lstat (filename) {
+  async lstat(filename) {
     try {
       const stats = await this._lstat(filename)
       return stats
@@ -218,11 +216,12 @@ export class FileSystem {
    * Reads the contents of a symlink if it exists, otherwise returns null.
    * Rethrows errors that aren't related to file existance.
    */
-  async readlink (filename, opts = { encoding: 'buffer' }) {
+  async readlink(filename, opts = { encoding: 'buffer' }) {
     // Note: FileSystem.readlink returns a buffer by default
     // so we can dump it into GitObject.write just like any other file.
     try {
-      return this._readlink(filename, opts)
+      const link = await this._readlink(filename, opts)
+      return Buffer.isBuffer(link) ? link : Buffer.from(link)
     } catch (err) {
       if (err.code === 'ENOENT') {
         return null
@@ -234,42 +233,7 @@ export class FileSystem {
   /**
    * Write the contents of buffer to a symlink.
    */
-  async writelink (filename, buffer) {
+  async writelink(filename, buffer) {
     return this._symlink(buffer.toString('utf8'), filename)
-  }
-
-  async lock (filename, triesLeft = 3) {
-    // check to see if we still have it
-    if (delayedReleases.has(filename)) {
-      clearTimeout(delayedReleases.get(filename))
-      delayedReleases.delete(filename)
-      return
-    }
-    if (triesLeft === 0) {
-      throw new GitError(E.AcquireLockFileFail, { filename })
-    }
-    try {
-      await this._mkdir(`${filename}.lock`)
-    } catch (err) {
-      if (err.code === 'EEXIST') {
-        await sleep(100)
-        await this.lock(filename, triesLeft - 1)
-      }
-    }
-  }
-
-  async unlock (filename, delayRelease = 50) {
-    if (delayedReleases.has(filename)) {
-      throw new GitError(E.DoubleReleaseLockFileFail, { filename })
-    }
-    // Basically, we lie and say it was deleted ASAP.
-    // But really we wait a bit to see if you want to acquire it again.
-    delayedReleases.set(
-      filename,
-      setTimeout(async () => {
-        delayedReleases.delete(filename)
-        await this._rmdir(`${filename}.lock`)
-      }, delayRelease)
-    )
   }
 }

@@ -1,28 +1,24 @@
 // @ts-check
+import '../typedefs.js'
+
 import { TREE } from '../commands/TREE.js'
-import { walkBeta2 } from '../commands/walkBeta2.js'
-import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
+import { _walk } from '../commands/walk.js'
+import { MergeConflictError } from '../errors/MergeConflictError.js'
+import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitTree } from '../models/GitTree.js'
-import { writeObject } from '../storage/writeObject.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { _writeObject as writeObject } from '../storage/writeObject.js'
 
 import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
-import { cores } from './plugins.js'
-
-/**
- *
- * @typedef {import('../commands/readObject').TreeEntry} TreeEntry
- */
 
 /**
  * Create a merged tree
  *
  * @param {Object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.ourOid - The SHA-1 object id of our tree
@@ -32,35 +28,42 @@ import { cores } from './plugins.js'
  * @param {string} [args.baseName='base'] - The name to use in conflicted files (in diff3 format) for the base hunks
  * @param {string} [args.theirName='theirs'] - The name to use in conflicted files for their hunks
  * @param {boolean} [args.dryRun=false]
+ * @param {boolean} [args.abortOnConflict=false]
+ * @param {MergeDriverCallback} [args.mergeDriver]
  *
  * @returns {Promise<string>} - The SHA-1 object id of the merged tree
  *
  */
-export async function mergeTree ({
-  core = 'default',
+export async function mergeTree({
+  fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
   ourOid,
   baseOid,
   theirOid,
   ourName = 'ours',
   baseName = 'base',
   theirName = 'theirs',
-  dryRun = false
+  dryRun = false,
+  abortOnConflict = true,
+  mergeDriver,
 }) {
-  const fs = new FileSystem(_fs)
   const ourTree = TREE({ ref: ourOid })
   const baseTree = TREE({ ref: baseOid })
   const theirTree = TREE({ ref: theirOid })
 
-  const results = await walkBeta2({
-    core,
+  const unmergedFiles = []
+
+  let cleanMerge = true
+
+  const results = await _walk({
     fs,
+    cache,
     dir,
     gitdir,
     trees: [ourTree, baseTree, theirTree],
-    map: async function (filepath, [ours, base, theirs]) {
+    map: async function(filepath, [ours, base, theirs]) {
       const path = basename(filepath)
       // What we did, what they did
       const ourChange = await modified(ours, base)
@@ -71,28 +74,28 @@ export async function mergeTree ({
             mode: await base.mode(),
             path,
             oid: await base.oid(),
-            type: await base.type()
+            type: await base.type(),
           }
         }
         case 'false-true': {
           return theirs
             ? {
-              mode: await theirs.mode(),
-              path,
-              oid: await theirs.oid(),
-              type: await theirs.type()
-            }
-            : void 0
+                mode: await theirs.mode(),
+                path,
+                oid: await theirs.oid(),
+                type: await theirs.type(),
+              }
+            : undefined
         }
         case 'true-false': {
           return ours
             ? {
-              mode: await ours.mode(),
-              path,
-              oid: await ours.oid(),
-              type: await ours.type()
-            }
-            : void 0
+                mode: await ours.mode(),
+                path,
+                oid: await ours.oid(),
+                type: await ours.type(),
+              }
+            : undefined
         }
         case 'true-true': {
           // Modifications
@@ -113,11 +116,16 @@ export async function mergeTree ({
               theirs,
               ourName,
               baseName,
-              theirName
+              theirName,
+              mergeDriver,
+            }).then(r => {
+              cleanMerge = cleanMerge && r.cleanMerge
+              unmergedFiles.push(filepath)
+              return r.mergeResult
             })
           }
           // all other types of conflicts fail
-          throw new GitError(E.MergeNotSupportedFail)
+          throw new MergeNotSupportedError()
         }
       }
     },
@@ -127,6 +135,9 @@ export async function mergeTree ({
      */
     reduce: async (parent, children) => {
       const entries = children.filter(Boolean) // remove undefineds
+
+      // if the parent was deleted, the children have to go
+      if (!parent) return
 
       // automatically delete directories if they have been emptied
       if (parent && parent.type === 'tree' && entries.length === 0) return
@@ -139,23 +150,46 @@ export async function mergeTree ({
           gitdir,
           type: 'tree',
           object,
-          dryRun
+          dryRun,
         })
         parent.oid = oid
       }
       return parent
-    }
+    },
   })
+
+  if (!cleanMerge) {
+    if (dir && !abortOnConflict) {
+      await _walk({
+        fs,
+        cache,
+        dir,
+        gitdir,
+        trees: [TREE({ ref: results.oid })],
+        map: async function(filepath, [entry]) {
+          const path = `${dir}/${filepath}`
+          if ((await entry.type()) === 'blob') {
+            const mode = await entry.mode()
+            const content = new TextDecoder().decode(await entry.content())
+            await fs.write(path, content, { mode })
+          }
+          return true
+        },
+      })
+    }
+    throw new MergeConflictError(unmergedFiles)
+  }
+
   return results.oid
 }
 
 /**
  *
- * @param {import('../commands/walkBeta2.js').WalkerEntry} entry
- * @param {import('../commands/walkBeta2.js').WalkerEntry} base
+ * @param {WalkerEntry} entry
+ * @param {WalkerEntry} base
  *
  */
-async function modified (entry, base) {
+async function modified(entry, base) {
   if (!entry && !base) return false
   if (entry && !base) return true
   if (!entry && base) return true
@@ -175,21 +209,20 @@ async function modified (entry, base) {
 /**
  *
  * @param {Object} args
- * @param {FileSystem} args.fs
+ * @param {import('../models/FileSystem').FileSystem} args.fs
  * @param {string} args.gitdir
  * @param {string} args.path
- * @param {import('../commands/walkBeta2.js').WalkerEntry} args.ours
- * @param {import('../commands/walkBeta2.js').WalkerEntry} args.base
- * @param {import('../commands/walkBeta2.js').WalkerEntry} args.theirs
+ * @param {WalkerEntry} args.ours
+ * @param {WalkerEntry} args.base
+ * @param {WalkerEntry} args.theirs
  * @param {string} [args.ourName]
  * @param {string} [args.baseName]
  * @param {string} [args.theirName]
- * @param {string} [args.format]
- * @param {number} [args.markerSize]
  * @param {boolean} [args.dryRun = false]
+ * @param {MergeDriverCallback} [args.mergeDriver]
  *
  */
-async function mergeBlobs ({
+async function mergeBlobs({
   fs,
   gitdir,
   path,
@@ -199,9 +232,8 @@ async function mergeBlobs ({
   ourName,
   theirName,
   baseName,
-  format,
-  markerSize,
-  dryRun
+  dryRun,
+  mergeDriver = mergeFile,
 }) {
   const type = 'blob'
   // Compute the new mode.
@@ -212,36 +244,40 @@ async function mergeBlobs ({
       : await ours.mode()
   // The trivial case: nothing to merge except maybe mode
   if ((await ours.oid()) === (await theirs.oid())) {
-    return { mode, path, oid: await ours.oid(), type }
+    return {
+      cleanMerge: true,
+      mergeResult: { mode, path, oid: await ours.oid(), type },
+    }
   }
   // if only one side made oid changes, return that side's oid
   if ((await ours.oid()) === (await base.oid())) {
-    return { mode, path, oid: await theirs.oid(), type }
+    return {
+      cleanMerge: true,
+      mergeResult: { mode, path, oid: await theirs.oid(), type },
+    }
   }
   if ((await theirs.oid()) === (await base.oid())) {
-    return { mode, path, oid: await ours.oid(), type }
+    return {
+      cleanMerge: true,
+      mergeResult: { mode, path, oid: await ours.oid(), type },
+    }
   }
   // if both sides made changes do a merge
-  const { mergedText, cleanMerge } = mergeFile({
-    ourContent: (await ours.content()).toString('utf8'),
-    baseContent: (await base.content()).toString('utf8'),
-    theirContent: (await theirs.content()).toString('utf8'),
-    ourName,
-    theirName,
-    baseName,
-    format,
-    markerSize
+  const ourContent = Buffer.from(await ours.content()).toString('utf8')
+  const baseContent = Buffer.from(await base.content()).toString('utf8')
+  const theirContent = Buffer.from(await theirs.content()).toString('utf8')
+  const { mergedText, cleanMerge } = await mergeDriver({
+    branches: [baseName, ourName, theirName],
+    contents: [baseContent, ourContent, theirContent],
+    path,
   })
-  if (!cleanMerge) {
-    // all other types of conflicts fail
-    throw new GitError(E.MergeNotSupportedFail)
-  }
   const oid = await writeObject({
     fs,
     gitdir,
     type: 'blob',
     object: TinyBuffer.from(mergedText, 'utf8'),
-    dryRun
+    dryRun,
   })
-  return { mode, path, oid, type }
+
+  return { cleanMerge, mergeResult: { mode, path, oid, type } }
 }

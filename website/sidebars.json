@@ -1,0 +1,113 @@
+{
+  "docs": {
+    "All Commands": [
+      "alphabetic"
+    ],
+    "Repository": [
+      "init",
+      "clone",
+      "commit",
+      "log",
+      "fetch",
+      "checkout",
+      "push",
+      "pull",
+      "fastForward",
+      "merge",
+      "walk"
+    ],
+    "Callbacks": [
+      "onAuth",
+      "onAuthSuccess",
+      "onAuthFailure",
+      "onMessage",
+      "onProgress",
+      "onSign",
+      "mergeDriver"
+    ],
+    "Clients": [
+      "fs",
+      "http"
+    ],
+    "Config": [
+      "setConfig",
+      "getConfig",
+      "getConfigAll"
+    ],
+    "Branches": [
+      "currentBranch",
+      "branch",
+      "deleteBranch",
+      "renameBranch",
+      "listBranches"
+    ],
+    "Tags": [
+      "tag",
+      "annotatedTag",
+      "deleteTag",
+      "listTags"
+    ],
+    "Files": [
+      "add",
+      "remove",
+      "listFiles",
+      "status",
+      "isIgnored"
+    ],
+    "Notes": [
+      "addNote",
+      "readNote",
+      "removeNote",
+      "listNotes"
+    ],
+    "Remotes": [
+      "getRemoteInfo",
+      "getRemoteInfo2",
+      "addRemote",
+      "deleteRemote",
+      "listRemotes",
+      "listServerRefs"
+    ],
+    "Objects": [
+      "readBlob",
+      "readCommit",
+      "readTag",
+      "readTree",
+      "writeBlob",
+      "writeCommit",
+      "writeTag",
+      "writeTree",
+      "readObject",
+      "writeObject"
+    ],
+    "Plumbing Commands": [
+      "findRoot",
+      "expandRef",
+      "expandOid",
+      "resetIndex",
+      "updateIndex",
+      "resolveRef",
+      "writeRef",
+      "deleteRef",
+      "hashBlob",
+      "statusMatrix",
+      "isDescendent",
+      "indexPack",
+      "packObjects",
+      "version"
+    ]
+  },
+  "guide": {
+    "Getting Started": [
+      "quickstart",
+      "dir-vs-gitdir",
+      "cli",
+      "cache"
+    ],
+    "More": [
+      "faq",
+      "snippets",
+      "webworker"
+    ]
+  }
+}

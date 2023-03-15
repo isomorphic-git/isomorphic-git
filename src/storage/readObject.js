@@ -1,18 +1,30 @@
-import pako from 'pako'
-
-import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitObject } from '../models/GitObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { readObjectPacked } from '../storage/readObjectPacked.js'
-import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { inflate } from '../utils/inflate.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) {
-  const fs = new FileSystem(_fs)
+/**
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
+ * @param {string} args.gitdir
+ * @param {string} args.oid
+ * @param {string} [args.format]
+ */
+export async function _readObject({
+  fs,
+  cache,
+  gitdir,
+  oid,
+  format = 'content',
+}) {
   // Curry the current read method so that the packfile un-deltification
   // process can acquire external ref-deltas.
-  const getExternalRefDelta = oid => readObject({ fs, gitdir, oid })
+  const getExternalRefDelta = oid => _readObject({ fs, cache, gitdir, oid })
 
   let result
   // Empty tree - hard-coded so we can use it as a shorthand.
@@ -27,45 +39,48 @@ export async function readObject ({ fs: _fs, gitdir, oid, format = 'content' }) 
   }
   // Check to see if it's in a packfile.
   if (!result) {
-    result = await readObjectPacked({ fs, gitdir, oid, getExternalRefDelta })
+    result = await readObjectPacked({
+      fs,
+      cache,
+      gitdir,
+      oid,
+      getExternalRefDelta,
+    })
   }
   // Finally
   if (!result) {
-    throw new GitError(E.ReadObjectFail, { oid })
+    throw new NotFoundError(oid)
   }
 
   if (format === 'deflated') {
     return result
   }
 
-  // BEHOLD! THE ONLY TIME I'VE EVER WANTED TO USE A CASE STATEMENT WITH FOLLOWTHROUGH!
-  // eslint-ignore
-  /* eslint-disable no-fallthrough */
-  switch (result.format) {
-    case 'deflated':
-      result.object = TinyBuffer.from(pako.inflate(result.object))
-      result.format = 'wrapped'
-    case 'wrapped':
-      if (format === 'wrapped' && result.format === 'wrapped') {
-        return result
-      }
-      const sha = await shasum(result.object)
-      if (sha !== oid) {
-        throw new GitError(E.InternalFail, {
-          message: `SHA check failed! Expected ${oid}, computed ${sha}`
-        })
-      }
-      const { object, type } = GitObject.unwrap(result.object)
-      result.type = type
-      result.object = object
-      result.format = 'content'
-    case 'content':
-      if (format === 'content') return result
-      break
-    default:
-      throw new GitError(E.InternalFail, {
-        message: `invalid format "${result.format}"`
-      })
+  if (result.format === 'deflated') {
+    result.object = TinyBuffer.from(await inflate(result.object))
+    result.format = 'wrapped'
   }
-  /* eslint-enable no-fallthrough */
+
+  if (result.format === 'wrapped') {
+    if (format === 'wrapped' && result.format === 'wrapped') {
+      return result
+    }
+    const sha = await shasum(result.object)
+    if (sha !== oid) {
+      throw new InternalError(
+        `SHA check failed! Expected ${oid}, computed ${sha}`
+      )
+    }
+    const { object, type } = GitObject.unwrap(result.object)
+    result.type = type
+    result.object = object
+    result.format = 'content'
+  }
+
+  if (result.format === 'content') {
+    if (format === 'content') return result
+    return
+  }
+
+  throw new InternalError(`invalid format "${result.format}"`)
 }

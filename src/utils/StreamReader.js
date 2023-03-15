@@ -3,7 +3,7 @@ import { getIterator } from './getIterator.js'
 
 // inspired by 'gartal' but lighter-weight and more battle-tested.
 export class StreamReader {
-  constructor (stream) {
+  constructor(stream) {
     this.stream = getIterator(stream)
     this.buffer = null
     this.cursor = 0
@@ -13,15 +13,15 @@ export class StreamReader {
     this._discardedBytes = 0
   }
 
-  eof () {
+  eof() {
     return this._ended && this.cursor === this.buffer.length
   }
 
-  tell () {
+  tell() {
     return this._discardedBytes + this.cursor
   }
 
-  async byte () {
+  async byte() {
     if (this.eof()) return
     if (!this.started) await this._init()
     if (this.cursor === this.buffer.length) {
@@ -32,7 +32,7 @@ export class StreamReader {
     return this.buffer[this.undoCursor]
   }
 
-  async chunk () {
+  async chunk() {
     if (this.eof()) return
     if (!this.started) await this._init()
     if (this.cursor === this.buffer.length) {
@@ -43,7 +43,7 @@ export class StreamReader {
     return this.buffer.slice(this.undoCursor, this.cursor)
   }
 
-  async read (n) {
+  async read(n) {
     if (this.eof()) return
     if (!this.started) await this._init()
     if (this.cursor + n > this.buffer.length) {
@@ -54,7 +54,7 @@ export class StreamReader {
     return this.buffer.slice(this.undoCursor, this.cursor)
   }
 
-  async skip (n) {
+  async skip(n) {
     if (this.eof()) return
     if (!this.started) await this._init()
     if (this.cursor + n > this.buffer.length) {
@@ -64,11 +64,11 @@ export class StreamReader {
     this._moveCursor(n)
   }
 
-  async undo () {
+  async undo() {
     this.cursor = this.undoCursor
   }
 
-  async _next () {
+  async _next() {
     this.started = true
     let { done, value } = await this.stream.next()
     if (done) {
@@ -80,7 +80,7 @@ export class StreamReader {
     return value
   }
 
-  _trim () {
+  _trim() {
     // Throw away parts of the buffer we don't need anymore
     // assert(this.cursor <= this.buffer.length)
     this.buffer = this.buffer.slice(this.undoCursor)
@@ -89,7 +89,7 @@ export class StreamReader {
     this.undoCursor = 0
   }
 
-  _moveCursor (n) {
+  _moveCursor(n) {
     this.undoCursor = this.cursor
     this.cursor += n
     if (this.cursor > this.buffer.length) {
@@ -97,7 +97,7 @@ export class StreamReader {
     }
   }
 
-  async _accumulate (n) {
+  async _accumulate(n) {
     if (this._ended) return
     // Expand the buffer until we have N bytes of data
     // or we've reached the end of the stream
@@ -110,20 +110,20 @@ export class StreamReader {
     this.buffer = TinyBuffer.concat(buffers)
   }
 
-  async _loadnext () {
+  async _loadnext() {
     this._discardedBytes += this.buffer.length
     this.undoCursor = 0
     this.cursor = 0
     this.buffer = await this._next()
   }
 
-  async _init () {
+  async _init() {
     this.buffer = await this._next()
   }
 }
 
 // This helper function helps us postpone concatenating buffers, which
 // would create intermediate buffer objects,
-function lengthBuffers (buffers) {
+function lengthBuffers(buffers) {
   return buffers.reduce((acc, buffer) => acc + buffer.length, 0)
 }

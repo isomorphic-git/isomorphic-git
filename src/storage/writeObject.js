@@ -1,29 +1,26 @@
-import pako from 'pako'
-
-import { FileSystem } from '../models/FileSystem.js'
 import { GitObject } from '../models/GitObject.js'
-import { writeObjectLoose } from '../storage/writeObjectLoose.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { writeObjectLoose } from '../storage/writeObjectLoose.js'
+import { deflate } from '../utils/deflate.js'
 import { shasum } from '../utils/shasum.js'
 
-export async function writeObject ({
-  fs: _fs,
+export async function _writeObject({
+  fs,
   gitdir,
   type,
   object,
   format = 'content',
   oid = undefined,
-  dryRun = false
+  dryRun = false,
 }) {
   if (format !== 'deflated') {
     if (format !== 'wrapped') {
       object = GitObject.wrap({ type, object })
     }
     oid = await shasum(object)
-    object = TinyBuffer.from(pako.deflate(object))
+    object = TinyBuffer.from(await deflate(object))
   }
   if (!dryRun) {
-    const fs = new FileSystem(_fs)
     await writeObjectLoose({ fs, gitdir, object, format: 'deflated', oid })
   }
   return oid

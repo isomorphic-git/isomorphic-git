@@ -1,5 +1,5 @@
 export class GitPackedRefs {
-  constructor (text) {
+  constructor(text) {
     this.refs = new Map()
     this.parsedConfig = []
     if (text) {
@@ -31,16 +31,16 @@ export class GitPackedRefs {
     return this
   }
 
-  static from (text) {
+  static from(text) {
     return new GitPackedRefs(text)
   }
 
-  delete (ref) {
+  delete(ref) {
     this.parsedConfig = this.parsedConfig.filter(entry => entry.ref !== ref)
     this.refs.delete(ref)
   }
 
-  toString () {
+  toString() {
     return this.parsedConfig.map(({ line }) => line).join('\n') + '\n'
   }
 }

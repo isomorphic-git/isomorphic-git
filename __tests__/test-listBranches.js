@@ -1,29 +1,37 @@
 /* eslint-env node, browser, jasmine */
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-listBranches.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
 const { listBranches } = require('isomorphic-git')
 
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+
 describe('listBranches', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('listBranches', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listBranches')
+    const { fs, gitdir } = await makeFixture('test-listBranches')
     // Test
-    const commits = await listBranches({ gitdir })
-    expect(commits).toMatchSnapshot()
+    const commits = await listBranches({ fs, gitdir })
+    expect(commits).toMatchInlineSnapshot(`
+      Array [
+        "feature/supercool",
+        "greenkeeper/initial",
+        "master",
+        "test-branch",
+      ]
+    `)
   })
   it('remote', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-listBranches')
+    const { fs, gitdir } = await makeFixture('test-listBranches')
     // Test
     const commits = await listBranches({
+      fs,
       gitdir,
-      remote: 'origin'
+      remote: 'origin',
     })
-    expect(commits).toMatchSnapshot()
+    expect(commits).toMatchInlineSnapshot(`
+      Array [
+        "HEAD",
+        "master",
+      ]
+    `)
   })
 })

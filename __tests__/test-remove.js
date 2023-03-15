@@ -1,35 +1,131 @@
 /* eslint-env node, browser, jasmine */
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
-// @ts-ignore
-const snapshots = require('./__snapshots__/test-remove.js.snap')
-const registerSnapshots = require('./__helpers__/jasmine-snapshots')
-
 const { remove, listFiles } = require('isomorphic-git')
 
+const { makeFixture } = require('./__helpers__/FixtureFS.js')
+
 describe('remove', () => {
-  beforeAll(() => {
-    registerSnapshots(snapshots)
-  })
   it('file', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-remove')
+    const { fs, gitdir } = await makeFixture('test-remove')
     // Test
-    const before = await listFiles({ gitdir })
-    expect(before).toMatchSnapshot()
-    await remove({ gitdir, filepath: 'LICENSE.md' })
-    const after = await listFiles({ gitdir })
-    expect(after).toMatchSnapshot()
+    const before = await listFiles({ fs, gitdir })
+    expect(before).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        ".travis.yml",
+        "LICENSE.md",
+        "package-lock.json",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src/commands/checkout.js",
+        "src/commands/config.js",
+        "src/commands/fetch.js",
+        "src/commands/init.js",
+        "src/index.js",
+        "src/models/GitBlob.js",
+        "src/models/GitCommit.js",
+        "src/models/GitConfig.js",
+        "src/models/GitObject.js",
+        "src/models/GitTree.js",
+        "src/utils/exists.js",
+        "src/utils/mkdirs.js",
+        "src/utils/read.js",
+        "src/utils/resolveRef.js",
+        "src/utils/write.js",
+      ]
+    `)
+    await remove({ fs, gitdir, filepath: 'LICENSE.md' })
+    const after = await listFiles({ fs, gitdir })
+    expect(after).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        ".travis.yml",
+        "package-lock.json",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src/commands/checkout.js",
+        "src/commands/config.js",
+        "src/commands/fetch.js",
+        "src/commands/init.js",
+        "src/index.js",
+        "src/models/GitBlob.js",
+        "src/models/GitCommit.js",
+        "src/models/GitConfig.js",
+        "src/models/GitObject.js",
+        "src/models/GitTree.js",
+        "src/utils/exists.js",
+        "src/utils/mkdirs.js",
+        "src/utils/read.js",
+        "src/utils/resolveRef.js",
+        "src/utils/write.js",
+      ]
+    `)
     expect(before.length === after.length + 1).toBe(true)
   })
   it('dir', async () => {
     // Setup
-    const { gitdir } = await makeFixture('test-remove')
+    const { fs, gitdir } = await makeFixture('test-remove')
     // Test
-    const before = await listFiles({ gitdir })
-    expect(before).toMatchSnapshot()
-    await remove({ gitdir, filepath: 'src/models' })
-    const after = await listFiles({ gitdir })
-    expect(after).toMatchSnapshot()
+    const before = await listFiles({ fs, gitdir })
+    expect(before).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        ".travis.yml",
+        "LICENSE.md",
+        "package-lock.json",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src/commands/checkout.js",
+        "src/commands/config.js",
+        "src/commands/fetch.js",
+        "src/commands/init.js",
+        "src/index.js",
+        "src/models/GitBlob.js",
+        "src/models/GitCommit.js",
+        "src/models/GitConfig.js",
+        "src/models/GitObject.js",
+        "src/models/GitTree.js",
+        "src/utils/exists.js",
+        "src/utils/mkdirs.js",
+        "src/utils/read.js",
+        "src/utils/resolveRef.js",
+        "src/utils/write.js",
+      ]
+    `)
+    await remove({ fs, gitdir, filepath: 'src/models' })
+    const after = await listFiles({ fs, gitdir })
+    expect(after).toMatchInlineSnapshot(`
+      Array [
+        ".babelrc",
+        ".editorconfig",
+        ".flowconfig",
+        ".gitignore",
+        ".travis.yml",
+        "LICENSE.md",
+        "package-lock.json",
+        "package.json",
+        "shrinkwrap.yaml",
+        "src/commands/checkout.js",
+        "src/commands/config.js",
+        "src/commands/fetch.js",
+        "src/commands/init.js",
+        "src/index.js",
+        "src/utils/exists.js",
+        "src/utils/mkdirs.js",
+        "src/utils/read.js",
+        "src/utils/resolveRef.js",
+        "src/utils/write.js",
+      ]
+    `)
     expect(before.length === after.length + 5).toBe(true)
   })
 })

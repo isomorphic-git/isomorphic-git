@@ -1,0 +1,12 @@
+{
+  "include": ["index.js", "http/web/index.js", "http/node/index.js"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "types": [],
+    "strictNullChecks": true,
+    "allowJs": true,
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true
+  }
+}

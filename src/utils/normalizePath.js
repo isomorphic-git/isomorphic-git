@@ -1,4 +1,4 @@
-export function normalizePath (path) {
+export function normalizePath(path) {
   return path
     .replace(/\/\.\//g, '/') // Replace '/./' with '/'
     .replace(/\/{2,}/g, '/') // Replace consecutive '/'

@@ -1,8 +1,17 @@
-import { E, GitError } from '../models/GitError.js'
+import { UnknownTransportError } from '../errors/UnknownTransportError.js'
+import { UrlParseError } from '../errors/UrlParseError.js'
+import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
-function parseRemoteUrl ({ url }) {
+function parseRemoteUrl({ url }) {
+  // the stupid "shorter scp-like syntax"
+  if (url.startsWith('git@')) {
+    return {
+      transport: 'ssh',
+      address: url,
+    }
+  }
   const matches = url.match(/(\w+)(:\/\/|::)(.*)/)
   if (matches === null) return
   /*
@@ -15,7 +24,7 @@ function parseRemoteUrl ({ url }) {
   if (matches[2] === '://') {
     return {
       transport: matches[1],
-      address: matches[0]
+      address: matches[0],
     }
   }
   /*
@@ -27,13 +36,13 @@ function parseRemoteUrl ({ url }) {
   if (matches[2] === '::') {
     return {
       transport: matches[1],
-      address: matches[3]
+      address: matches[3],
     }
   }
 }
 
 export class GitRemoteManager {
-  static getRemoteHelperFor ({ url }) {
+  static getRemoteHelperFor({ url }) {
     // TODO: clean up the remoteHelper API and move into PluginCore
     const remoteHelpers = new Map()
     remoteHelpers.set('http', GitRemoteHTTP)
@@ -41,14 +50,15 @@ export class GitRemoteManager {
 
     const parts = parseRemoteUrl({ url })
     if (!parts) {
-      throw new GitError(E.RemoteUrlParseError, { url })
+      throw new UrlParseError(url)
     }
     if (remoteHelpers.has(parts.transport)) {
       return remoteHelpers.get(parts.transport)
     }
-    throw new GitError(E.UnknownTransportError, {
+    throw new UnknownTransportError(
       url,
-      transport: parts.transport
-    })
+      parts.transport,
+      parts.transport === 'ssh' ? translateSSHtoHTTP(url) : undefined
+    )
   }
 }

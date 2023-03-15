@@ -1,4 +1,4 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { indent } from '../utils/indent.js'
@@ -7,17 +7,17 @@ import { outdent } from '../utils/outdent.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
 
 export class GitCommit {
-  constructor (commit) {
+  constructor(commit) {
     if (typeof commit === 'string') {
       this._commit = commit
     } else if (typeof commit.author === 'object') {
       this._commit = GitCommit.render(commit)
     } else {
-      this._commit = commit.toString('utf8')
+      throw new InternalError('invalid type passed to GitCommit constructor')
     }
   }
 
-  static fromPayloadSignature ({ payload, signature }) {
+  static fromPayloadSignature({ payload, signature }) {
     const headers = GitCommit.justHeaders(payload)
     const message = GitCommit.justMessage(payload)
     const commit = normalizeNewlines(
@@ -26,37 +26,37 @@ export class GitCommit {
     return new GitCommit(commit)
   }
 
-  static from (commit) {
+  static from(commit) {
     return new GitCommit(commit)
   }
 
-  toObject () {
+  toObject() {
     return TinyBuffer.from(this._commit, 'utf8')
   }
 
   // Todo: allow setting the headers and message
-  headers () {
+  headers() {
     return this.parseHeaders()
   }
 
   // Todo: allow setting the headers and message
-  message () {
+  message() {
     return GitCommit.justMessage(this._commit)
   }
 
-  parse () {
+  parse() {
     return Object.assign({ message: this.message() }, this.headers())
   }
 
-  static justMessage (commit) {
+  static justMessage(commit) {
     return normalizeNewlines(commit.slice(commit.indexOf('\n\n') + 2))
   }
 
-  static justHeaders (commit) {
+  static justHeaders(commit) {
     return commit.slice(0, commit.indexOf('\n\n'))
   }
 
-  parseHeaders () {
+  parseHeaders() {
     const headers = GitCommit.justHeaders(this._commit).split('\n')
     const hs = []
     for (const h of headers) {
@@ -68,7 +68,7 @@ export class GitCommit {
       }
     }
     const obj = {
-      parent: []
+      parent: [],
     }
     for (const h of hs) {
       const key = h.slice(0, h.indexOf(' '))
@@ -88,7 +88,7 @@ export class GitCommit {
     return obj
   }
 
-  static renderHeaders (obj) {
+  static renderHeaders(obj) {
     let headers = ''
     if (obj.tree) {
       headers += `tree ${obj.tree}\n`
@@ -97,9 +97,7 @@ export class GitCommit {
     }
     if (obj.parent) {
       if (obj.parent.length === undefined) {
-        throw new GitError(E.InternalFail, {
-          message: `commit 'parent' property should be an array`
-        })
+        throw new InternalError(`commit 'parent' property should be an array`)
       }
       for (const p of obj.parent) {
         headers += `parent ${p}\n`
@@ -115,15 +113,15 @@ export class GitCommit {
     return headers
   }
 
-  static render (obj) {
+  static render(obj) {
     return GitCommit.renderHeaders(obj) + '\n' + normalizeNewlines(obj.message)
   }
 
-  render () {
+  render() {
     return this._commit
   }
 
-  withoutSignature () {
+  withoutSignature() {
     const commit = normalizeNewlines(this._commit)
     if (commit.indexOf('\ngpgsig') === -1) return commit
     const headers = commit.slice(0, commit.indexOf('\ngpgsig'))
@@ -134,7 +132,7 @@ export class GitCommit {
     return normalizeNewlines(headers + '\n' + message)
   }
 
-  isolateSignature () {
+  isolateSignature() {
     const signature = this._commit.slice(
       this._commit.indexOf('-----BEGIN PGP SIGNATURE-----'),
       this._commit.indexOf('-----END PGP SIGNATURE-----') +
@@ -143,10 +141,10 @@ export class GitCommit {
     return outdent(signature)
   }
 
-  static async sign (commit, pgp, secretKey) {
+  static async sign(commit, sign, secretKey) {
     const payload = commit.withoutSignature()
     const message = GitCommit.justMessage(commit._commit)
-    let { signature } = await pgp.sign({ payload, secretKey })
+    let { signature } = await sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
     const headers = GitCommit.justHeaders(commit._commit)
@@ -154,11 +152,5 @@ export class GitCommit {
       headers + '\n' + 'gpgsig' + indent(signature) + '\n' + message
     // return a new commit object
     return GitCommit.from(signedCommit)
-  }
-
-  static async verify (commit, pgp, publicKey) {
-    const payload = commit.withoutSignature()
-    const signature = commit.isolateSignature()
-    return pgp.verify({ payload, publicKey, signature })
   }
 }

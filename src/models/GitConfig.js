@@ -25,28 +25,28 @@ const schema = {
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
-    bigFileThreshold: num
-  }
+    bigFileThreshold: num,
+  },
 }
 
-// https://git-scm.com/docs/git-config
+// https://git-scm.com/docs/git-config#_syntax
 
 // section starts with [ and ends with ]
-// section is alphanumeric (ASCII) with _ and .
+// section is alphanumeric (ASCII) with - and .
 // section is case insensitive
 // subsection is optionnal
 // subsection is specified after section and one or more spaces
 // subsection is specified between double quotes
-const SECTION_LINE_REGEX = /^\[([A-Za-z0-9_.]+)(?: "(.*)")?\]$/
-const SECTION_REGEX = /^[A-Za-z0-9_.]+$/
+const SECTION_LINE_REGEX = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/
+const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 
 // variable lines contain a name, and equal sign and then a value
 // variable lines can also only contain a name (the implicit value is a boolean true)
-// variable name is alphanumeric (ASCII) with _
+// variable name is alphanumeric (ASCII) with -
 // variable name starts with an alphabetic character
 // variable name is case insensitive
-const VARIABLE_LINE_REGEX = /^([A-Za-z]\w*)(?: *= *(.*))?$/
-const VARIABLE_NAME_REGEX = /^[A-Za-z]\w*$/
+const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/
+const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z-]*$/
 
 const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
 
@@ -112,6 +112,21 @@ const getPath = (section, subsection, name) => {
     .join('.')
 }
 
+const normalizePath = path => {
+  const pathSegments = path.split('.')
+  const section = pathSegments.shift()
+  const name = pathSegments.pop()
+  const subsection = pathSegments.length ? pathSegments.join('.') : undefined
+
+  return {
+    section,
+    subsection,
+    name,
+    path: getPath(section, subsection, name),
+    sectionPath: getPath(section, subsection, null),
+  }
+}
+
 const findLastIndex = (array, callback) => {
   return array.reduce((lastIndex, item, index) => {
     return callback(item) ? index : lastIndex
@@ -121,7 +136,7 @@ const findLastIndex = (array, callback) => {
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
 export class GitConfig {
-  constructor (text) {
+  constructor(text) {
     let section = null
     let subsection = null
     this.parsedConfig = text.split('\n').map(line => {
@@ -146,13 +161,14 @@ export class GitConfig {
     })
   }
 
-  static from (text) {
+  static from(text) {
     return new GitConfig(text)
   }
 
-  async get (path, getall = false) {
+  async get(path, getall = false) {
+    const normalizedPath = normalizePath(path).path
     const allValues = this.parsedConfig
-      .filter(config => config.path === path.toLowerCase())
+      .filter(config => config.path === normalizedPath)
       .map(({ section, name, value }) => {
         const fn = schema[section] && schema[section][name]
         return fn ? fn(value) : value
@@ -160,31 +176,38 @@ export class GitConfig {
     return getall ? allValues : allValues.pop()
   }
 
-  async getall (path) {
+  async getall(path) {
     return this.get(path, true)
   }
 
-  async getSubsections (section) {
+  async getSubsections(section) {
     return this.parsedConfig
       .filter(config => config.section === section && config.isSection)
       .map(config => config.subsection)
   }
 
-  async deleteSection (section, subsection) {
+  async deleteSection(section, subsection) {
     this.parsedConfig = this.parsedConfig.filter(
       config =>
         !(config.section === section && config.subsection === subsection)
     )
   }
 
-  async append (path, value) {
+  async append(path, value) {
     return this.set(path, value, true)
   }
 
-  async set (path, value, append = false) {
+  async set(path, value, append = false) {
+    const {
+      section,
+      subsection,
+      name,
+      path: normalizedPath,
+      sectionPath,
+    } = normalizePath(path)
     const configIndex = findLastIndex(
       this.parsedConfig,
-      config => config.path === path.toLowerCase()
+      config => config.path === normalizedPath
     )
     if (value == null) {
       if (configIndex !== -1) {
@@ -193,9 +216,11 @@ export class GitConfig {
     } else {
       if (configIndex !== -1) {
         const config = this.parsedConfig[configIndex]
+        // Name should be overwritten in case the casing changed
         const modifiedConfig = Object.assign({}, config, {
+          name,
           value,
-          modified: true
+          modified: true,
         })
         if (append) {
           this.parsedConfig.splice(configIndex + 1, 0, modifiedConfig)
@@ -203,23 +228,16 @@ export class GitConfig {
           this.parsedConfig[configIndex] = modifiedConfig
         }
       } else {
-        const sectionPath = path
-          .split('.')
-          .slice(0, -1)
-          .join('.')
-          .toLowerCase()
         const sectionIndex = this.parsedConfig.findIndex(
           config => config.path === sectionPath
         )
-        const [section, subsection] = sectionPath.split('.')
-        const name = path.split('.').pop()
         const newConfig = {
           section,
           subsection,
           name,
           value,
           modified: true,
-          path: getPath(section, subsection, name)
+          path: normalizedPath,
         }
         if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
           if (sectionIndex >= 0) {
@@ -231,7 +249,7 @@ export class GitConfig {
               section,
               subsection,
               modified: true,
-              path: getPath(section, subsection, null)
+              path: sectionPath,
             }
             this.parsedConfig.push(newSection, newConfig)
           }
@@ -240,13 +258,17 @@ export class GitConfig {
     }
   }
 
-  toString () {
+  toString() {
     return this.parsedConfig
       .map(({ line, section, subsection, name, value, modified = false }) => {
         if (!modified) {
           return line
         }
         if (name != null && value != null) {
+          if (typeof value === 'string' && /[#;]/.test(value)) {
+            // A `#` or `;` symbol denotes a comment, so we have to wrap it in double quotes
+            return `\t${name} = "${value}"`
+          }
           return `\t${name} = ${value}`
         }
         if (subsection != null) {

@@ -1,20 +1,21 @@
 // @ts-check
-// import diff3 from 'node-diff3'
+import '../typedefs.js'
+
+import { _commit } from '../commands/commit'
+import { _currentBranch } from '../commands/currentBranch.js'
+import { _findMergeBase } from '../commands/findMergeBase.js'
+import { FastForwardError } from '../errors/FastForwardError.js'
+import { MergeConflictError } from '../errors/MergeConflictError.js'
+import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
+import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
-import { join } from '../utils/join.js'
 import { mergeTree } from '../utils/mergeTree.js'
-import { cores } from '../utils/plugins.js'
 
-import { commit } from './commit'
-import { currentBranch } from './currentBranch.js'
-import { findMergeBase } from './findMergeBase.js'
-
+// import diff3 from 'node-diff3'
 /**
  *
- * @typedef {Object} MergeReport - Returns an object with a schema like this:
+ * @typedef {Object} MergeResult - Returns an object with a schema like this:
  * @property {string} [oid] - The SHA-1 object id that is now at the head of the branch. Absent only if `dryRun` was specified and `mergeCommit` is true.
  * @property {boolean} [alreadyMerged] - True if the branch was already merged so no changes were made
  * @property {boolean} [fastForward] - True if it was a fast-forward merge
@@ -24,151 +25,160 @@ import { findMergeBase } from './findMergeBase.js'
  */
 
 /**
- * Merge two branches
- *
- * ## Limitations
- *
- * Currently it does not support incomplete merges. That is, if there are merge conflicts it cannot solve
- * with the built in diff3 algorithm it will not modify the working dir, and will throw a [`MergeNotSupportedFail`](./errors.md#mergenotsupportedfail) error.
- *
- * Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
- *
- * Currently it does not support selecting alternative merge strategies.
- *
  * @param {object} args
- * @param {string} [args.core = 'default'] - The plugin core identifier to use for plugin injection
- * @param {FileSystem} [args.fs] - [deprecated] The filesystem containing the git repo. Overrides the fs provided by the [plugin system](./plugin_fs.md).
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.ours] - The branch receiving the merge. If undefined, defaults to the current branch.
- * @param {string} args.theirs - The branch to be merged
- * @param {boolean} [args.fastForwardOnly = false] - If true, then non-fast-forward merges will throw an Error instead of performing a merge.
- * @param {boolean} [args.dryRun = false] - If true, simulates a merge so you can test whether it would succeed.
- * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
- * @param {string} [args.message] - Overrides the default auto-generated merge commit message
- * @param {Object} [args.author] - passed to [commit](commit.md) when creating a merge commit
- * @param {Object} [args.committer] - passed to [commit](commit.md) when creating a merge commit
- * @param {string} [args.signingKey] - passed to [commit](commit.md) when creating a merge commit
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
+ * @param {string} args.gitdir
+ * @param {string} [args.ours]
+ * @param {string} args.theirs
+ * @param {boolean} args.fastForward
+ * @param {boolean} args.fastForwardOnly
+ * @param {boolean} args.dryRun
+ * @param {boolean} args.noUpdateBranch
+ * @param {boolean} args.abortOnConflict
+ * @param {string} [args.message]
+ * @param {Object} args.author
+ * @param {string} args.author.name
+ * @param {string} args.author.email
+ * @param {number} args.author.timestamp
+ * @param {number} args.author.timezoneOffset
+ * @param {Object} args.committer
+ * @param {string} args.committer.name
+ * @param {string} args.committer.email
+ * @param {number} args.committer.timestamp
+ * @param {number} args.committer.timezoneOffset
+ * @param {string} [args.signingKey]
+ * @param {SignCallback} [args.onSign] - a PGP signing implementation
+ * @param {MergeDriverCallback} [args.mergeDriver]
  *
- * @returns {Promise<MergeReport>} Resolves to a description of the merge operation
- * @see MergeReport
- *
- * @example
- * let m = await git.merge({ dir: '$input((/))', ours: '$input((master))', theirs: '$input((remotes/origin/master))' })
- * console.log(m)
+ * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
  *
  */
-export async function merge ({
-  core = 'default',
+export async function _merge({
+  fs,
+  cache,
   dir,
-  gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
+  gitdir,
   ours,
   theirs,
+  fastForward = true,
   fastForwardOnly = false,
   dryRun = false,
   noUpdateBranch = false,
+  abortOnConflict = true,
   message,
   author,
   committer,
-  signingKey
+  signingKey,
+  onSign,
+  mergeDriver,
 }) {
-  try {
-    const fs = new FileSystem(_fs)
-    if (ours === undefined) {
-      ours = await currentBranch({ fs, gitdir, fullname: true })
+  if (ours === undefined) {
+    ours = await _currentBranch({ fs, gitdir, fullname: true })
+  }
+  ours = await GitRefManager.expand({
+    fs,
+    gitdir,
+    ref: ours,
+  })
+  theirs = await GitRefManager.expand({
+    fs,
+    gitdir,
+    ref: theirs,
+  })
+  const ourOid = await GitRefManager.resolve({
+    fs,
+    gitdir,
+    ref: ours,
+  })
+  const theirOid = await GitRefManager.resolve({
+    fs,
+    gitdir,
+    ref: theirs,
+  })
+  // find most recent common ancestor of ref a and ref b
+  const baseOids = await _findMergeBase({
+    fs,
+    cache,
+    gitdir,
+    oids: [ourOid, theirOid],
+  })
+  if (baseOids.length !== 1) {
+    // TODO: Recursive Merge strategy
+    throw new MergeNotSupportedError()
+  }
+  const baseOid = baseOids[0]
+  // handle fast-forward case
+  if (baseOid === theirOid) {
+    return {
+      oid: ourOid,
+      alreadyMerged: true,
     }
-    ours = await GitRefManager.expand({
-      fs,
-      gitdir,
-      ref: ours
-    })
-    theirs = await GitRefManager.expand({
-      fs,
-      gitdir,
-      ref: theirs
-    })
-    const ourOid = await GitRefManager.resolve({
-      fs,
-      gitdir,
-      ref: ours
-    })
-    const theirOid = await GitRefManager.resolve({
-      fs,
-      gitdir,
-      ref: theirs
-    })
-    // find most recent common ancestor of ref a and ref b
-    const baseOids = await findMergeBase({
-      core,
-      dir,
-      gitdir,
-      fs,
-      oids: [ourOid, theirOid]
-    })
-    if (baseOids.length !== 1) {
-      throw new GitError(E.MergeNotSupportedFail)
+  }
+  if (fastForward && baseOid === ourOid) {
+    if (!dryRun && !noUpdateBranch) {
+      await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
     }
-    const baseOid = baseOids[0]
-    // handle fast-forward case
-    if (baseOid === theirOid) {
-      return {
-        oid: ourOid,
-        alreadyMerged: true
-      }
+    return {
+      oid: theirOid,
+      fastForward: true,
     }
-    if (baseOid === ourOid) {
-      if (!dryRun && !noUpdateBranch) {
-        await GitRefManager.writeRef({ fs, gitdir, ref: ours, value: theirOid })
-      }
-      return {
-        oid: theirOid,
-        fastForward: true
-      }
-    } else {
-      // not a simple fast-forward
-      if (fastForwardOnly) {
-        throw new GitError(E.FastForwardFail)
-      }
-      // try a fancier merge
-      const tree = await mergeTree({
-        core,
-        fs,
-        gitdir,
-        ourOid,
-        theirOid,
-        baseOid,
-        ourName: ours,
-        baseName: 'base',
-        theirName: theirs,
-        dryRun
-      })
-      if (!message) {
-        message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(
-          ours
-        )}`
-      }
-      const oid = await commit({
-        fs,
-        gitdir,
-        message,
-        ref: ours,
-        tree,
-        parent: [ourOid, theirOid],
-        author,
-        committer,
-        signingKey,
-        dryRun,
-        noUpdateBranch
-      })
-      return {
-        oid,
-        tree,
-        mergeCommit: true
-      }
+  } else {
+    // not a simple fast-forward
+    if (fastForwardOnly) {
+      throw new FastForwardError()
     }
-  } catch (err) {
-    err.caller = 'git.merge'
-    throw err
+    // try a fancier merge
+    const tree = await GitIndexManager.acquire(
+      { fs, gitdir, cache, allowUnmerged: false },
+      async index => {
+        return mergeTree({
+          fs,
+          cache,
+          dir,
+          gitdir,
+          index,
+          ourOid,
+          theirOid,
+          baseOid,
+          ourName: abbreviateRef(ours),
+          baseName: 'base',
+          theirName: abbreviateRef(theirs),
+          dryRun,
+          abortOnConflict,
+          mergeDriver,
+        })
+      }
+    )
+
+    // Defer throwing error until the index lock is relinquished and index is
+    // written to filsesystem
+    if (tree instanceof MergeConflictError) throw tree
+
+    if (!message) {
+      message = `Merge branch '${abbreviateRef(theirs)}' into ${abbreviateRef(
+        ours
+      )}`
+    }
+    const oid = await _commit({
+      fs,
+      cache,
+      gitdir,
+      message,
+      ref: ours,
+      tree,
+      parent: [ourOid, theirOid],
+      author,
+      committer,
+      signingKey,
+      onSign,
+      dryRun,
+      noUpdateBranch,
+    })
+    return {
+      oid,
+      tree,
+      mergeCommit: true,
+    }
   }
 }

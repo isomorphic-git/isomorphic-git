@@ -34,10 +34,10 @@ const tagObject = {
     name: 'Will Hilton',
     email: 'wmhilton@gmail.com',
     timestamp: 1507071414,
-    timezoneOffset: 240
+    timezoneOffset: 240,
   },
   message: '0.0.9',
-  signature: `-----BEGIN PGP SIGNATURE-----
+  gpgsig: `-----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
 iQIcBAABAgAGBQJZ1BW2AAoJEJYJuKWSi6a5S6EQAJQkK+wIXijDf4ZfVeP1E7Be
@@ -54,7 +54,7 @@ Zp4YxnShDkMTV3rxZc27vehq2g9gKJzQsueLyZPJTzCHqujumiLbdYV4i4X4CZjy
 dBWrLc3kdnemrlhSRzR2
 =PrR1
 -----END PGP SIGNATURE-----
-`
+`,
 }
 
 describe('GitAnnotatedTag', () => {

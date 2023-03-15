@@ -1,6 +1,7 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
+import { InvalidOidError } from '../errors/InvalidOidError.js'
+import { NoRefspecError } from '../errors/NoRefspecError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
@@ -15,15 +16,15 @@ const refpaths = ref => [
   `refs/tags/${ref}`,
   `refs/heads/${ref}`,
   `refs/remotes/${ref}`,
-  `refs/remotes/${ref}/HEAD`
+  `refs/remotes/${ref}/HEAD`,
 ]
 
 // @see https://git-scm.com/docs/gitrepository-layout
 const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
 
 export class GitRefManager {
-  static async updateRemoteRefs ({
-    fs: _fs,
+  static async updateRemoteRefs({
+    fs,
     gitdir,
     remote,
     refs,
@@ -31,20 +32,19 @@ export class GitRefManager {
     tags,
     refspecs = undefined,
     prune = false,
-    pruneTags = false
+    pruneTags = false,
   }) {
-    const fs = new FileSystem(_fs)
     // Validate input
     for (const value of refs.values()) {
       if (!value.match(/[0-9a-f]{40}/)) {
-        throw new GitError(E.NotAnOidFail, { value })
+        throw new InvalidOidError(value)
       }
     }
     const config = await GitConfigManager.get({ fs, gitdir })
     if (!refspecs) {
       refspecs = await config.getall(`remote.${remote}.fetch`)
       if (refspecs.length === 0) {
-        throw new GitError(E.NoRefspecConfiguredError, { remote })
+        throw new NoRefspecError(remote)
       }
       // There's some interesting behavior with HEAD that doesn't follow the refspec.
       refspecs.unshift(`+HEAD:refs/remotes/${remote}/HEAD`)
@@ -56,12 +56,12 @@ export class GitRefManager {
       const tags = await GitRefManager.listRefs({
         fs,
         gitdir,
-        filepath: 'refs/tags'
+        filepath: 'refs/tags',
       })
       await GitRefManager.deleteRefs({
         fs,
         gitdir,
-        refs: tags.map(tag => `refs/tags/${tag}`)
+        refs: tags.map(tag => `refs/tags/${tag}`),
       })
     }
     // Add all tags if the fetch tags argument is true.
@@ -70,8 +70,8 @@ export class GitRefManager {
         if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
           // Git's behavior is to only fetch tags that do not conflict with tags already present.
           if (!(await GitRefManager.exists({ fs, gitdir, ref: serverRef }))) {
-            // If there is a dereferenced an annotated tag value available, prefer that.
-            const oid = refs.get(serverRef + '^{}') || refs.get(serverRef)
+            // Always use the object id of the tag itself, and not the peeled object id.
+            const oid = refs.get(serverRef)
             actualRefsToWrite.set(serverRef, oid)
           }
         }
@@ -95,11 +95,13 @@ export class GitRefManager {
     const pruned = []
     if (prune) {
       for (const filepath of refspec.localNamespaces()) {
-        const refs = (await GitRefManager.listRefs({
-          fs,
-          gitdir,
-          filepath
-        })).map(file => `${filepath}/${file}`)
+        const refs = (
+          await GitRefManager.listRefs({
+            fs,
+            gitdir,
+            filepath,
+          })
+        ).map(file => `${filepath}/${file}`)
         for (const ref of refs) {
           if (!actualRefsToWrite.has(ref)) {
             pruned.push(ref)
@@ -132,26 +134,23 @@ export class GitRefManager {
   }
 
   // TODO: make this less crude?
-  static async writeRef ({ fs: _fs, gitdir, ref, value }) {
-    const fs = new FileSystem(_fs)
+  static async writeRef({ fs, gitdir, ref, value }) {
     // Validate input
     if (!value.match(/[0-9a-f]{40}/)) {
-      throw new GitError(E.NotAnOidFail, { value })
+      throw new InvalidOidError(value)
     }
     await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
   }
 
-  static async writeSymbolicRef ({ fs: _fs, gitdir, ref, value }) {
-    const fs = new FileSystem(_fs)
+  static async writeSymbolicRef({ fs, gitdir, ref, value }) {
     await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
   }
 
-  static async deleteRef ({ fs, gitdir, ref }) {
+  static async deleteRef({ fs, gitdir, ref }) {
     return GitRefManager.deleteRefs({ fs, gitdir, refs: [ref] })
   }
 
-  static async deleteRefs ({ fs: _fs, gitdir, refs }) {
-    const fs = new FileSystem(_fs)
+  static async deleteRefs({ fs, gitdir, refs }) {
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref
@@ -169,8 +168,15 @@ export class GitRefManager {
     }
   }
 
-  static async resolve ({ fs: _fs, gitdir, ref, depth = undefined }) {
-    const fs = new FileSystem(_fs)
+  /**
+   * @param {object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs
+   * @param {string} args.gitdir
+   * @param {string} args.ref
+   * @param {number} [args.depth]
+   * @returns {Promise<string>}
+   */
+  static async resolve({ fs, gitdir, ref, depth = undefined }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {
@@ -201,10 +207,10 @@ export class GitRefManager {
       }
     }
     // Do we give up?
-    throw new GitError(E.ResolveRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
-  static async exists ({ fs, gitdir, ref }) {
+  static async exists({ fs, gitdir, ref }) {
     try {
       await GitRefManager.expand({ fs, gitdir, ref })
       return true
@@ -213,8 +219,7 @@ export class GitRefManager {
     }
   }
 
-  static async expand ({ fs: _fs, gitdir, ref }) {
-    const fs = new FileSystem(_fs)
+  static async expand({ fs, gitdir, ref }) {
     // Is it a complete and valid SHA?
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
       return ref
@@ -228,20 +233,20 @@ export class GitRefManager {
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
-    throw new GitError(E.ExpandRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
-  static async expandAgainstMap ({ ref, map }) {
+  static async expandAgainstMap({ ref, map }) {
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
     for (const ref of allpaths) {
       if (await map.has(ref)) return ref
     }
     // Do we give up?
-    throw new GitError(E.ExpandRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
-  static resolveAgainstMap ({ ref, fullref = ref, depth = undefined, map }) {
+  static resolveAgainstMap({ ref, fullref = ref, depth = undefined, map }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {
@@ -266,24 +271,22 @@ export class GitRefManager {
           ref: sha.trim(),
           fullref: ref,
           depth,
-          map
+          map,
         })
       }
     }
     // Do we give up?
-    throw new GitError(E.ResolveRefError, { ref })
+    throw new NotFoundError(ref)
   }
 
-  static async packedRefs ({ fs: _fs, gitdir }) {
-    const fs = new FileSystem(_fs)
+  static async packedRefs({ fs, gitdir }) {
     const text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     const packed = GitPackedRefs.from(text)
     return packed.refs
   }
 
   // List all the refs that match the `filepath` prefix
-  static async listRefs ({ fs: _fs, gitdir, filepath }) {
-    const fs = new FileSystem(_fs)
+  static async listRefs({ fs, gitdir, filepath }) {
     const packedMap = GitRefManager.packedRefs({ fs, gitdir })
     let files = null
     try {
@@ -309,25 +312,23 @@ export class GitRefManager {
     return files
   }
 
-  static async listBranches ({ fs: _fs, gitdir, remote }) {
-    const fs = new FileSystem(_fs)
+  static async listBranches({ fs, gitdir, remote }) {
     if (remote) {
       return GitRefManager.listRefs({
         fs,
         gitdir,
-        filepath: `refs/remotes/${remote}`
+        filepath: `refs/remotes/${remote}`,
       })
     } else {
       return GitRefManager.listRefs({ fs, gitdir, filepath: `refs/heads` })
     }
   }
 
-  static async listTags ({ fs: _fs, gitdir }) {
-    const fs = new FileSystem(_fs)
+  static async listTags({ fs, gitdir }) {
     const tags = await GitRefManager.listRefs({
       fs,
       gitdir,
-      filepath: `refs/tags`
+      filepath: `refs/tags`,
     })
     return tags.filter(x => !x.endsWith('^{}'))
   }

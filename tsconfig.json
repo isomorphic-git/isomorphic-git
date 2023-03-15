@@ -7,9 +7,9 @@
     "allowJs": true,
     "checkJs": true,
     "moduleResolution": "node",
-    "target": "es6",
-    "module": "es2015",
-    "lib": ["es2015", "es2016", "es2017", "dom"],
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["es2015", "es2016", "es2017", "es2018", "es2019", "dom"],
     "suppressImplicitAnyIndexErrors": true,
     "resolveJsonModule": true,
     "sourceMap": true,
@@ -17,8 +17,9 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "isomorphic-git": ["./src/index.d.ts"],
-      "isomorphic-git/internal-apis": ["./src/internal-apis.d.ts"]
+      "isomorphic-git": ["./index.d.ts"],
+      "isomorphic-git/internal-apis": ["./src/internal-apis.d.ts"],
+      "isomorphic-git/http": ["./http/node/index.d.ts"]
     }
   }
 }

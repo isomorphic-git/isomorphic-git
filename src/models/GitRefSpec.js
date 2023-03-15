@@ -1,22 +1,22 @@
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 
 export class GitRefSpec {
-  constructor ({ remotePath, localPath, force, matchPrefix }) {
+  constructor({ remotePath, localPath, force, matchPrefix }) {
     Object.assign(this, {
       remotePath,
       localPath,
       force,
-      matchPrefix
+      matchPrefix,
     })
   }
 
-  static from (refspec) {
+  static from(refspec) {
     const [
       forceMatch,
       remotePath,
       remoteGlobMatch,
       localPath,
-      localGlobMatch
+      localGlobMatch,
     ] = refspec.match(/^(\+?)(.*?)(\*?):(.*?)(\*?)$/).slice(1)
     const force = forceMatch === '+'
     const remoteIsGlob = remoteGlobMatch === '*'
@@ -24,18 +24,18 @@ export class GitRefSpec {
     // validate
     // TODO: Make this check more nuanced, and depend on whether this is a fetch refspec or a push refspec
     if (remoteIsGlob !== localIsGlob) {
-      throw new GitError(E.InternalFail, { message: 'Invalid refspec' })
+      throw new InternalError('Invalid refspec')
     }
     return new GitRefSpec({
       remotePath,
       localPath,
       force,
-      matchPrefix: remoteIsGlob
+      matchPrefix: remoteIsGlob,
     })
     // TODO: We need to run resolveRef on both paths to expand them to their full name.
   }
 
-  translate (remoteBranch) {
+  translate(remoteBranch) {
     if (this.matchPrefix) {
       if (remoteBranch.startsWith(this.remotePath)) {
         return this.localPath + remoteBranch.replace(this.remotePath, '')
@@ -46,7 +46,7 @@ export class GitRefSpec {
     return null
   }
 
-  reverseTranslate (localBranch) {
+  reverseTranslate(localBranch) {
     if (this.matchPrefix) {
       if (localBranch.startsWith(this.localPath)) {
         return this.remotePath + localBranch.replace(this.localPath, '')

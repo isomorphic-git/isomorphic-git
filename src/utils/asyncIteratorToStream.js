@@ -1,6 +1,6 @@
 import { forAwait } from './forAwait.js'
 
-export function asyncIteratorToStream (iter) {
+export function asyncIteratorToStream(iter) {
   const { PassThrough } = require('readable-stream')
   const stream = new PassThrough()
   setTimeout(async () => {

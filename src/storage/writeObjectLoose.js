@@ -1,20 +1,10 @@
-import { FileSystem } from '../models/FileSystem.js'
-import { E, GitError } from '../models/GitError.js'
+import { InternalError } from '../errors/InternalError.js'
 
-export async function writeObjectLoose ({
-  fs: _fs,
-  gitdir,
-  type,
-  object,
-  format,
-  oid
-}) {
-  const fs = new FileSystem(_fs)
+export async function writeObjectLoose({ fs, gitdir, object, format, oid }) {
   if (format !== 'deflated') {
-    throw new GitError(E.InternalFail, {
-      message:
-        'GitObjectStoreLoose expects objects to write to be in deflated format'
-    })
+    throw new InternalError(
+      'GitObjectStoreLoose expects objects to write to be in deflated format'
+    )
   }
   const source = `objects/${oid.slice(0, 2)}/${oid.slice(2)}`
   const filepath = `${gitdir}/${source}`

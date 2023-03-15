@@ -1,26 +1,33 @@
-import { FileSystem } from '../models/FileSystem.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
-import { readObject } from '../storage/readObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'
-import { cores } from '../utils/plugins.js'
 
-export async function listObjects ({
-  core = 'default',
+/**
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
+ * @param {string} [args.dir]
+ * @param {string} args.gitdir
+ * @param {Iterable<string>} args.oids
+ * @returns {Promise<Set<string>>}
+ */
+export async function listObjects({
+  fs,
+  cache,
   dir,
   gitdir = join(dir, '.git'),
-  fs: _fs = cores.get(core).get('fs'),
-  oids
+  oids,
 }) {
-  const fs = new FileSystem(_fs)
   const visited = new Set()
   // We don't do the purest simplest recursion, because we can
   // avoid reading Blob objects entirely since the Tree objects
   // tell us which oids are Blobs and which are Trees.
-  async function walk (oid) {
+  async function walk(oid) {
+    if (visited.has(oid)) return
     visited.add(oid)
-    const { type, object } = await readObject({ fs, gitdir, oid })
+    const { type, object } = await readObject({ fs, cache, gitdir, oid })
     if (type === 'tag') {
       const tag = GitAnnotatedTag.from(object)
       const obj = tag.headers().object
@@ -32,12 +39,12 @@ export async function listObjects ({
     } else if (type === 'tree') {
       const tree = GitTree.from(object)
       for (const entry of tree) {
-        // only add blobs and trees to the set,
-        // skipping over submodules whose type is 'commit'
-        if (entry.type === 'blob' || entry.type === 'tree') {
+        // add blobs to the set
+        // skip over submodules whose type is 'commit'
+        if (entry.type === 'blob') {
           visited.add(entry.oid)
         }
-        // only recurse for trees
+        // recurse for trees
         if (entry.type === 'tree') {
           await walk(entry.oid)
         }

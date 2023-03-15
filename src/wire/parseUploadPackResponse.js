@@ -1,8 +1,8 @@
-import { E, GitError } from '../models/GitError.js'
+import { InvalidOidError } from '../errors/InvalidOidError.js'
 import { GitSideBand } from '../models/GitSideBand.js'
 import { forAwait } from '../utils/forAwait.js'
 
-export async function parseUploadPackResponse (stream) {
+export async function parseUploadPackResponse(stream) {
   const { packetlines, packfile, progress } = GitSideBand.demux(stream)
   const shallows = []
   const unshallows = []
@@ -16,13 +16,13 @@ export async function parseUploadPackResponse (stream) {
       if (line.startsWith('shallow')) {
         const oid = line.slice(-41).trim()
         if (oid.length !== 40) {
-          reject(new GitError(E.CorruptShallowOidFail, { oid }))
+          reject(new InvalidOidError(oid))
         }
         shallows.push(oid)
       } else if (line.startsWith('unshallow')) {
         const oid = line.slice(-41).trim()
         if (oid.length !== 40) {
-          reject(new GitError(E.CorruptShallowOidFail, { oid }))
+          reject(new InvalidOidError(oid))
         }
         unshallows.push(oid)
       } else if (line.startsWith('ACK')) {

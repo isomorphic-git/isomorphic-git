@@ -2,7 +2,7 @@ import { normalizeMode } from './normalizeMode'
 
 const MAX_UINT32 = 2 ** 32
 
-function SecondsNanoseconds (
+function SecondsNanoseconds(
   givenSeconds,
   givenNanoseconds,
   milliseconds,
@@ -19,7 +19,7 @@ function SecondsNanoseconds (
   return [seconds, nanoseconds]
 }
 
-export function normalizeStats (e) {
+export function normalizeStats(e) {
   const [ctimeSeconds, ctimeNanoseconds] = SecondsNanoseconds(
     e.ctimeSeconds,
     e.ctimeNanoseconds,
@@ -45,6 +45,6 @@ export function normalizeStats (e) {
     gid: e.gid % MAX_UINT32,
     // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
     // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
-    size: e.size > -1 ? e.size % MAX_UINT32 : 0
+    size: e.size > -1 ? e.size % MAX_UINT32 : 0,
   }
 }

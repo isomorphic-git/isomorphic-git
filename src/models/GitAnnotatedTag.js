@@ -1,4 +1,5 @@
 import { TinyBuffer } from '../utils/TinyBuffer.js'
+import { InternalError } from '../errors/InternalError.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
@@ -14,41 +15,41 @@ export class GitAnnotatedTag {
     }
   }
 
-  static from (tag) {
+  static from(tag) {
     return new GitAnnotatedTag(tag)
   }
 
-  static render (obj) {
+  static render(obj) {
     return `object ${obj.object}
 type ${obj.type}
 tag ${obj.tag}
 tagger ${formatAuthor(obj.tagger)}
 
 ${obj.message}
-${obj.signature ? obj.signature : ''}`
+${obj.gpgsig ? obj.gpgsig : ''}`
   }
 
-  justHeaders () {
+  justHeaders() {
     return this._tag.slice(0, this._tag.indexOf('\n\n'))
   }
 
-  message () {
+  message() {
     const tag = this.withoutSignature()
     return tag.slice(tag.indexOf('\n\n') + 2)
   }
 
-  parse () {
+  parse() {
     return Object.assign(this.headers(), {
       message: this.message(),
-      signature: this.signature()
+      gpgsig: this.gpgsig(),
     })
   }
 
-  render () {
+  render() {
     return this._tag
   }
 
-  headers () {
+  headers() {
     const headers = this.justHeaders().split('\n')
     const hs = []
     for (const h of headers) {
@@ -78,13 +79,14 @@ ${obj.signature ? obj.signature : ''}`
     return obj
   }
 
-  withoutSignature () {
+  withoutSignature() {
     const tag = normalizeNewlines(this._tag)
     if (tag.indexOf('\n-----BEGIN PGP SIGNATURE-----') === -1) return tag
     return tag.slice(0, tag.lastIndexOf('\n-----BEGIN PGP SIGNATURE-----'))
   }
 
-  signature () {
+  gpgsig() {
+    if (this._tag.indexOf('\n-----BEGIN PGP SIGNATURE-----') === -1) return
     const signature = this._tag.slice(
       this._tag.indexOf('-----BEGIN PGP SIGNATURE-----'),
       this._tag.indexOf('-----END PGP SIGNATURE-----') +
@@ -93,23 +95,21 @@ ${obj.signature ? obj.signature : ''}`
     return normalizeNewlines(signature)
   }
 
-  toObject () {
+  payload() {
+    return this.withoutSignature() + '\n'
+  }
+
+  toObject() {
     return TinyBuffer.from(this._tag, 'utf8')
   }
 
-  static async sign (tag, pgp, secretKey) {
-    const payload = tag.withoutSignature() + '\n'
-    let { signature } = await pgp.sign({ payload, secretKey })
+  static async sign(tag, sign, secretKey) {
+    const payload = tag.payload()
+    let { signature } = await sign({ payload, secretKey })
     // renormalize the line endings to the one true line-ending
     signature = normalizeNewlines(signature)
     const signedTag = payload + signature
     // return a new tag object
     return GitAnnotatedTag.from(signedTag)
-  }
-
-  static async verify (tag, pgp, publicKey) {
-    const payload = tag.withoutSignature() + '\n'
-    const signature = tag.signature()
-    return pgp.verify({ payload, publicKey, signature })
   }
 }

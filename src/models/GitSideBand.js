@@ -24,14 +24,14 @@ import { FIFO } from '../utils/FIFO.js'
 import { GitPktLine } from './GitPktLine.js'
 
 export class GitSideBand {
-  static demux (input) {
+  static demux(input) {
     const read = GitPktLine.streamReader(input)
     // And now for the ridiculous side-band or side-band-64k protocol
     const packetlines = new FIFO()
     const packfile = new FIFO()
     const progress = new FIFO()
     // TODO: Use a proper through stream?
-    const nextBit = async function () {
+    const nextBit = async function() {
       const line = await read()
       // Skip over flush packets
       if (line === null) return nextBit()
@@ -44,20 +44,27 @@ export class GitSideBand {
       }
       // Examine first byte to determine which output "stream" to use
       switch (line[0]) {
-        case 1: // pack data
+        case 1: {
+          // pack data
           packfile.write(line.slice(1))
           break
-        case 2: // progress message
+        }
+        case 2: {
+          // progress message
           progress.write(line.slice(1))
           break
-        case 3: // fatal error message just before stream aborts
+        }
+        case 3: {
+          // fatal error message just before stream aborts
           const error = line.slice(1)
           progress.write(error)
           packfile.destroy(new Error(error.toString('utf8')))
           return
-        default:
+        }
+        default: {
           // Not part of the side-band-64k protocol
           packetlines.write(line.slice(0))
+        }
       }
       // Careful not to blow up the stack.
       // I think Promises in a tail-call position should be OK.
@@ -67,7 +74,7 @@ export class GitSideBand {
     return {
       packetlines,
       packfile,
-      progress
+      progress,
     }
   }
   // static mux ({

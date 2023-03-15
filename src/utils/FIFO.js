@@ -1,9 +1,9 @@
 export class FIFO {
-  constructor () {
+  constructor() {
     this._queue = []
   }
 
-  write (chunk) {
+  write(chunk) {
     if (this._ended) {
       throw Error('You cannot write to a FIFO that has already been ended!')
     }
@@ -16,7 +16,7 @@ export class FIFO {
     }
   }
 
-  end () {
+  end() {
     this._ended = true
     if (this._waiting) {
       const resolve = this._waiting
@@ -25,12 +25,12 @@ export class FIFO {
     }
   }
 
-  destroy (err) {
+  destroy(err) {
     this._ended = true
     this.error = err
   }
 
-  async next () {
+  async next() {
     if (this._queue.length > 0) {
       return { value: this._queue.shift() }
     }
