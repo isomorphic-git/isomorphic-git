@@ -1,4 +1,4 @@
-import Hash from 'sha.js/sha1.js'
+import Hash from '../utils/Hash.js'
 
 import { types } from '../commands/types.js'
 import { _readObject as readObject } from '../storage/readObject.js'

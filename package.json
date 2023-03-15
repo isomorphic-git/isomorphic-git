@@ -57,14 +57,14 @@
     "clean-git-ref": "^2.0.1",
     "crc-32": "^1.2.0",
     "diff3": "0.0.3",
-    "hex-to-array-buffer": "^1.1.0",
+    "hex-to-array-buffer": "^2.0.0",
     "ignore": "^5.1.4",
     "isomorphic-textencoder": "^1.0.1",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
     "pify": "^4.0.1",
     "readable-stream": "^3.4.0",
-    "sha.js": "^2.4.9",
+    "sha1-uint8array": "^0.10.5",
     "simple-get": "^4.0.1"
   },
   "devDependencies": {
