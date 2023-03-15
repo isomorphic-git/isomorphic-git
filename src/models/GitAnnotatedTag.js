@@ -1,3 +1,4 @@
+import { InternalError } from '../errors/InternalError.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
@@ -7,10 +8,14 @@ export class GitAnnotatedTag {
   constructor(tag) {
     if (typeof tag === 'string') {
       this._tag = tag
-    } else if (typeof tag.object === 'string') {
+    } else if (TinyBuffer.isBuffer(tag)) {
+      this._tag = tag.toString('utf8')
+    } else if (typeof tag === 'object') {
       this._tag = GitAnnotatedTag.render(tag)
     } else {
-      this._tag = tag.toString('utf8')
+      throw new InternalError(
+        'invalid type passed to GitAnnotatedTag constructor'
+      )
     }
   }
 
