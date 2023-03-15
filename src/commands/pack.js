@@ -1,7 +1,6 @@
-import Hash from '../utils/Hash.js'
-
 import { types } from '../commands/types.js'
 import { _readObject as readObject } from '../storage/readObject.js'
+import Hash from '../utils/Hash.js'
 import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
