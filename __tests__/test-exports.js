@@ -10,6 +10,7 @@ describe('exports', () => {
         "STAGE",
         "TREE",
         "WORKDIR",
+        "abortMerge",
         "add",
         "addNote",
         "addRemote",

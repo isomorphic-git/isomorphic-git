@@ -1,15 +1,15 @@
 namespace NodeJS {
   interface Process {
-    browser: boolean;
+    browser: boolean
   }
 }
 namespace jasmine {
-  function getEnv(): any;
-  function addMatchers(matchers: CustomMatcherFactories): void;
+  function getEnv(): any
+  function addMatchers(matchers: CustomMatcherFactories): void
 }
 namespace jest {
   interface Matchers<R> {
-    toBe(expected: any, message?: string): R;
-    toEqual(expected: any, message?: string): R;
+    toBe(expected: any, message?: string): R
+    toEqual(expected: any, message?: string): R
   }
 }

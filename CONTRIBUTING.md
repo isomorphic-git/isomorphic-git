@@ -22,7 +22,7 @@ To add a parameter to an existing command `X`:
 To create a new command:
 
 - [ ] add as a new file in `src/api` (and `src/commands` if necessary)
-- [ ] add command to `src/index.js`
+- [ ] add command to `src/index.js` (named and/or default export)
 - [ ] update `__tests__/__snapshots__/test-exports.js.snap`
 - [ ] create a test in `src/__tests__`
 - [ ] document the command with a JSDoc comment

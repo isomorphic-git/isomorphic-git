@@ -1,1 +1,1 @@
-declare module "isomorphic-git/internal-apis";
+declare module 'isomorphic-git/internal-apis'
