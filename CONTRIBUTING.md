@@ -89,6 +89,9 @@ This is great article that shows the details:<br/>
 But as first the introduction you can watch this video:<br/>
 [![Link to Video: Inside the Hidden Git Folder - Computerphile](https://img.youtube.com/vi/bSA91XTzeuA/0.jpg)](http://www.youtube.com/watch?v=bSA91XTzeuA)
 
+And here is another advanced video:<br/>
+[![Advanced Git: Graphs, Hashes, and Compression, Oh My!](https://img.youtube.com/vi/ig5E8CcdM9g/0.jpg)](https://www.youtube.com/watch?v=ig5E8CcdM9g)
+
 Another resource is GitHub blog:
 * [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
 * [Git’s database internals II: commit history queries](https://github.blog/2022-08-30-gits-database-internals-ii-commit-history-queries/)
