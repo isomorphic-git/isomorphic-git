@@ -63,7 +63,7 @@ And node and browsers have different APIs for making HTTP requests!
 So rather than relying on the `fs` and `http` modules, `isomorphic-git` lets you bring your own file system
 and HTTP client.
 
-If you're using `isomorphic-git` in node, you use the native `fs` module and the provided node HTTP client.
+If you're using `isomorphic-git` in node, you use the native `fs` module and the provided node HTTP client. Note: `fs/promises` won't work out of the box, you'll have to pass in the raw `fs` module.
 
 ```js
 // node.js example
