@@ -597,6 +597,17 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "PouyaEsmaili",
+      "name": "Pouya Esmaili",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20491456?v=4",
+      "profile": "https://github.com/PouyaEsmaili",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
