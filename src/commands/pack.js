@@ -1,7 +1,8 @@
-import Hash from 'sha.js/sha1.js'
+import { createHash } from 'sha1-uint8array'
 
 import { types } from '../commands/types.js'
 import { _readObject as readObject } from '../storage/readObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
@@ -21,10 +22,10 @@ export async function _pack({
   gitdir = join(dir, '.git'),
   oids,
 }) {
-  const hash = new Hash()
+  const hash = createHash()
   const outputStream = []
   function write(chunk, enc) {
-    const buff = Buffer.from(chunk, enc)
+    const buff = TinyBuffer.from(chunk, enc)
     outputStream.push(buff)
     hash.update(buff)
   }
@@ -52,7 +53,7 @@ export async function _pack({
       length = length >>> 7
     }
     // Lastly, we can compress and write the object.
-    write(Buffer.from(await deflate(object)))
+    write(TinyBuffer.from(await deflate(object)))
   }
   write('PACK')
   write('00000002', 'hex')

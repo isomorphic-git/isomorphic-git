@@ -1,4 +1,5 @@
 import { InternalError } from '../errors/InternalError.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
 import { parseAuthor } from '../utils/parseAuthor.js'
@@ -7,7 +8,7 @@ export class GitAnnotatedTag {
   constructor(tag) {
     if (typeof tag === 'string') {
       this._tag = tag
-    } else if (Buffer.isBuffer(tag)) {
+    } else if (TinyBuffer.isBuffer(tag)) {
       this._tag = tag.toString('utf8')
     } else if (typeof tag === 'object') {
       this._tag = GitAnnotatedTag.render(tag)
@@ -103,7 +104,7 @@ ${obj.gpgsig ? obj.gpgsig : ''}`
   }
 
   toObject() {
-    return Buffer.from(this._tag, 'utf8')
+    return TinyBuffer.from(this._tag, 'utf8')
   }
 
   static async sign(tag, sign, secretKey) {

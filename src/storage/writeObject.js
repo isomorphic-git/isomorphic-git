@@ -1,5 +1,6 @@
 import { GitObject } from '../models/GitObject.js'
 import { writeObjectLoose } from '../storage/writeObjectLoose.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { deflate } from '../utils/deflate.js'
 import { shasum } from '../utils/shasum.js'
 
@@ -17,7 +18,7 @@ export async function _writeObject({
       object = GitObject.wrap({ type, object })
     }
     oid = await shasum(object)
-    object = Buffer.from(await deflate(object))
+    object = TinyBuffer.from(await deflate(object))
   }
   if (!dryRun) {
     await writeObjectLoose({ fs, gitdir, object, format: 'deflated', oid })

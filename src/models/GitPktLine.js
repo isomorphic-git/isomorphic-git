@@ -50,6 +50,7 @@ Examples (as C-style strings):
 ----
 */
 import { StreamReader } from '../utils/StreamReader.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { padHex } from '../utils/padHex.js'
 
 // I'm really using this more as a namespace.
@@ -57,7 +58,7 @@ import { padHex } from '../utils/padHex.js'
 
 export class GitPktLine {
   static flush() {
-    return Buffer.from('0000', 'utf8')
+    return TinyBuffer.from('0000', 'utf8')
   }
 
   static delim() {
@@ -66,11 +67,11 @@ export class GitPktLine {
 
   static encode(line) {
     if (typeof line === 'string') {
-      line = Buffer.from(line)
+      line = TinyBuffer.from(line)
     }
     const length = line.length + 4
     const hexlength = padHex(4, length)
-    return Buffer.concat([Buffer.from(hexlength, 'utf8'), line])
+    return TinyBuffer.concat([TinyBuffer.from(hexlength, 'utf8'), line])
   }
 
   static streamReader(stream) {

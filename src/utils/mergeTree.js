@@ -7,6 +7,7 @@ import { MergeConflictError } from '../errors/MergeConflictError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 
 import { basename } from './basename.js'
 import { join } from './join.js'
@@ -269,7 +270,7 @@ async function mergeBlobs({
     fs,
     gitdir,
     type: 'blob',
-    object: Buffer.from(mergedText, 'utf8'),
+    object: TinyBuffer.from(mergedText, 'utf8'),
     dryRun,
   })
 

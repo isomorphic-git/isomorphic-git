@@ -597,6 +597,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "jonathantneal",
+      "name": "Jonathan Neal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/188426?v=4",
+      "profile": "https://jonneal.dev/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"

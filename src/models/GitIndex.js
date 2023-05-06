@@ -1,6 +1,7 @@
 import { InternalError } from '../errors/InternalError.js'
 import { UnsafeFilepathError } from '../errors/UnsafeFilepathError.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { comparePath } from '../utils/comparePath.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
@@ -21,7 +22,7 @@ function renderCacheEntryFlags(entry) {
   flags.extended = false
   // 12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
   // is stored in this field.
-  flags.nameLength = Math.min(Buffer.from(entry.path).length, 0xfff)
+  flags.nameLength = Math.min(TinyBuffer.from(entry.path).length, 0xfff)
   return (
     (flags.assumeValid ? 0b1000000000000000 : 0) +
     (flags.extended ? 0b0100000000000000 : 0) +
@@ -58,7 +59,7 @@ export class GitIndex {
   }
 
   static async from(buffer) {
-    if (Buffer.isBuffer(buffer)) {
+    if (TinyBuffer.isBuffer(buffer)) {
       return GitIndex.fromBuffer(buffer)
     } else if (buffer === null) {
       return new GitIndex(null)
@@ -181,7 +182,7 @@ export class GitIndex {
       }
     }
     stats = normalizeStats(stats)
-    const bfilepath = Buffer.from(filepath)
+    const bfilepath = TinyBuffer.from(filepath)
     const entry = {
       ctimeSeconds: stats.ctimeSeconds,
       ctimeNanoseconds: stats.ctimeNanoseconds,
@@ -245,10 +246,10 @@ export class GitIndex {
   }
 
   static async _entryToBuffer(entry) {
-    const bpath = Buffer.from(entry.path)
+    const bpath = TinyBuffer.from(entry.path)
     // the fixed length + the filename + at least one null char => align by 8
     const length = Math.ceil((62 + bpath.length + 1) / 8) * 8
-    const written = Buffer.alloc(length)
+    const written = TinyBuffer.alloc(length)
     const writer = new BufferCursor(written)
     const stat = normalizeStats(entry)
     writer.writeUInt32BE(stat.ctimeSeconds)
@@ -268,7 +269,7 @@ export class GitIndex {
   }
 
   async toObject() {
-    const header = Buffer.alloc(12)
+    const header = TinyBuffer.alloc(12)
     const writer = new BufferCursor(header)
     writer.write('DIRC', 4, 'utf8')
     writer.writeUInt32BE(2)
@@ -287,9 +288,9 @@ export class GitIndex {
     }
     entryBuffers = await Promise.all(entryBuffers)
 
-    const body = Buffer.concat(entryBuffers)
-    const main = Buffer.concat([header, body])
+    const body = TinyBuffer.concat(entryBuffers)
+    const main = TinyBuffer.concat([header, body])
     const sum = await shasum(main)
-    return Buffer.concat([main, Buffer.from(sum, 'hex')])
+    return TinyBuffer.concat([main, TinyBuffer.from(sum, 'hex')])
   }
 }

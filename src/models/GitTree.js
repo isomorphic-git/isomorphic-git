@@ -1,5 +1,6 @@
 import { InternalError } from '../errors/InternalError.js'
 import { UnsafeFilepathError } from '../errors/UnsafeFilepathError.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { comparePath } from '../utils/comparePath.js'
 import { compareTreeEntryPath } from '../utils/compareTreeEntryPath.js'
 
@@ -83,7 +84,7 @@ function nudgeIntoShape(entry) {
 
 export class GitTree {
   constructor(entries) {
-    if (Buffer.isBuffer(entries)) {
+    if (TinyBuffer.isBuffer(entries)) {
       this._entries = parseBuffer(entries)
     } else if (Array.isArray(entries)) {
       this._entries = entries.map(nudgeIntoShape)
@@ -109,14 +110,14 @@ export class GitTree {
     // Adjust the sort order to match git's
     const entries = [...this._entries]
     entries.sort(compareTreeEntryPath)
-    return Buffer.concat(
+    return TinyBuffer.concat(
       entries.map(entry => {
-        const mode = Buffer.from(entry.mode.replace(/^0/, ''))
-        const space = Buffer.from(' ')
-        const path = Buffer.from(entry.path, 'utf8')
-        const nullchar = Buffer.from([0])
-        const oid = Buffer.from(entry.oid, 'hex')
-        return Buffer.concat([mode, space, path, nullchar, oid])
+        const mode = TinyBuffer.from(entry.mode.replace(/^0/, ''))
+        const space = TinyBuffer.from(' ')
+        const path = TinyBuffer.from(entry.path, 'utf8')
+        const nullchar = TinyBuffer.from([0])
+        const oid = TinyBuffer.from(entry.oid, 'hex')
+        return TinyBuffer.concat([mode, space, path, nullchar, oid])
       })
     )
   }

@@ -1,4 +1,5 @@
 import { InternalError } from '../errors/InternalError.js'
+import { TinyBuffer } from '../utils/TinyBuffer.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { indent } from '../utils/indent.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
@@ -9,9 +10,7 @@ export class GitCommit {
   constructor(commit) {
     if (typeof commit === 'string') {
       this._commit = commit
-    } else if (Buffer.isBuffer(commit)) {
-      this._commit = commit.toString('utf8')
-    } else if (typeof commit === 'object') {
+    } else if (typeof commit.author === 'object') {
       this._commit = GitCommit.render(commit)
     } else {
       throw new InternalError('invalid type passed to GitCommit constructor')
@@ -32,7 +31,7 @@ export class GitCommit {
   }
 
   toObject() {
-    return Buffer.from(this._commit, 'utf8')
+    return TinyBuffer.from(this._commit, 'utf8')
   }
 
   // Todo: allow setting the headers and message

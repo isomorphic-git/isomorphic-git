@@ -68,20 +68,18 @@ describe('GitPktLine', () => {
   it('encode string', async () => {
     const foo = GitPktLine.encode('hello world\n')
     expect(foo).toBeTruthy()
-    expect(Buffer.compare(foo, Buffer.from('0010hello world\n')) === 0).toBe(
-      true
-    )
+    expect(foo.equals(Buffer.from('0010hello world\n'))).toEqual(true)
   })
 
   it('encode empty string', async () => {
     const foo = GitPktLine.encode('')
     expect(foo).toBeTruthy()
-    expect(Buffer.compare(foo, Buffer.from('0004')) === 0).toBe(true)
+    expect(foo.equals(Buffer.from('0004'))).toEqual(true)
   })
 
   it('encode flush', async () => {
     const foo = GitPktLine.flush()
     expect(foo).toBeTruthy()
-    expect(Buffer.compare(foo, Buffer.from('0000')) === 0).toBe(true)
+    expect(foo.equals(Buffer.from('0000'))).toEqual(true)
   })
 })
