@@ -285,5 +285,39 @@ describe('clone', () => {
       expect(connectionLog[0]).toEqual('GET github.com:443')
       expect(connectionLog[1]).toEqual('POST github.com:443')
     })
+
+    it('clone from local repository', async () => {
+      const { fs, dir: dirLocal, gitdir: gitdirLocal } = await makeFixture(
+        'isomorphic-git-local'
+      )
+      await clone({
+        fs,
+        http,
+        dir: dirLocal,
+        gitdir: gitdirLocal,
+        depth: 1,
+        ref: 'test-branch',
+        singleBranch: true,
+        noCheckout: true,
+        url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      })
+      expect(await fs.exists(`${dirLocal}`)).toBe(true)
+
+      const { dir, gitdir } = await makeFixture('isomorphic-git-local')
+      await clone({
+        fs,
+        http,
+        dir,
+        gitdir,
+        depth: 1,
+        ref: 'test-branch',
+        singleBranch: true,
+        noCheckout: true,
+        url: `file://${dirLocal}`,
+      })
+      expect(await fs.exists(`${dir}`)).toBe(true)
+      expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
+      expect(await fs.exists(`${dir}/package.json`)).toBe(false)
+    })
   }
 })

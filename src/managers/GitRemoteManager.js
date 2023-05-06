@@ -2,9 +2,10 @@ import { UnknownTransportError } from '../errors/UnknownTransportError.js'
 import { UrlParseError } from '../errors/UrlParseError.js'
 import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 
+import { GitRemoteFile } from './GitRemoteFile.js'
 import { GitRemoteHTTP } from './GitRemoteHTTP'
 
-function parseRemoteUrl({ url }) {
+export function parseRemoteUrl({ url }) {
   // the stupid "shorter scp-like syntax"
   if (url.startsWith('git@')) {
     return {
@@ -12,6 +13,7 @@ function parseRemoteUrl({ url }) {
       address: url,
     }
   }
+
   const matches = url.match(/(\w+)(:\/\/|::)(.*)/)
   if (matches === null) return
   /*
@@ -47,6 +49,7 @@ export class GitRemoteManager {
     const remoteHelpers = new Map()
     remoteHelpers.set('http', GitRemoteHTTP)
     remoteHelpers.set('https', GitRemoteHTTP)
+    remoteHelpers.set('file', GitRemoteFile)
 
     const parts = parseRemoteUrl({ url })
     if (!parts) {
