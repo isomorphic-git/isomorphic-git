@@ -7,16 +7,14 @@ original_id: branch
 
 Create a branch
 
-| param          | type [= default]          | description                                                                                           |
-| -------------- | ------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [**fs**](./fs) | FsClient                  | a file system implementation                                                                          |
-| dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path                                                   |
-| **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                                                            |
-| **ref**        | string                    | What to name the branch                                                                               |
-| object         | string = 'HEAD'           | What oid to use as the start point. Accepts a symbolic ref.                                           |
-| checkout       | boolean = false           | Update `HEAD` to point at the newly created branch                                                    |
-| force          | boolean = false           | Instead of throwing an error if a branched named `ref` already exists, overwrite the existing branch. |
-| return         | Promise\<void\>           | Resolves successfully when filesystem operations are complete                                         |
+| param          | type [= default]          | description                                                   |
+| -------------- | ------------------------- | ------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                  | a file system implementation                                  |
+| dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path           |
+| **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                    |
+| **ref**        | string                    | What to name the branch                                       |
+| checkout       | boolean = false           | Update `HEAD` to point at the newly created branch            |
+| return         | Promise\<void\>           | Resolves successfully when filesystem operations are complete |
 
 Example Code:
 
