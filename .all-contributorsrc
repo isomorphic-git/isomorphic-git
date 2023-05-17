@@ -597,6 +597,17 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "dead-end",
+      "name": "dead-end",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30635084?v=4",
+      "profile": "https://github.com/dead-end",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
