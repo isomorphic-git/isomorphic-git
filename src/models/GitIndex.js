@@ -68,7 +68,18 @@ export class GitIndex {
   }
 
   static async fromBuffer(buffer) {
-    // Verify shasum
+    if (buffer.length === 0) {
+      throw new InternalError('Index file is empty (.git/index)')
+    }
+
+    const index = new GitIndex()
+    const reader = new BufferCursor(buffer)
+    const magic = reader.toString('utf8', 4)
+    if (magic !== 'DIRC') {
+      throw new InternalError(`Invalid dircache magic file number: ${magic}`)
+    }
+
+    // Verify shasum after we ensured that the file has a magic number
     const shaComputed = await shasum(buffer.slice(0, -20))
     const shaClaimed = buffer.slice(-20).toString('hex')
     if (shaClaimed !== shaComputed) {
@@ -76,12 +87,7 @@ export class GitIndex {
         `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
       )
     }
-    const index = new GitIndex()
-    const reader = new BufferCursor(buffer)
-    const magic = reader.toString('utf8', 4)
-    if (magic !== 'DIRC') {
-      throw new InternalError(`Inavlid dircache magic file number: ${magic}`)
-    }
+
     const version = reader.readUInt32BE()
     if (version !== 2) {
       throw new InternalError(`Unsupported dircache version: ${version}`)
