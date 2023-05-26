@@ -608,6 +608,17 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "barry963",
+      "name": "Barry",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5289896?v=4",
+      "profile": "https://github.com/barry963",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
