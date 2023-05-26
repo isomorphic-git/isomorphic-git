@@ -21,6 +21,7 @@ import { posixifyPathBuffer } from '../utils/posixifyPathBuffer.js'
  * @param {string|string[]} args.filepath - The path to the file to add to the index
  * @param {object} [args.cache] - a [cache](cache.md) object
  * @param {boolean} [args.force=false] - add to index even if matches gitignore. Think `git add --force`
+ * @param {boolean} [args.parallel=false] - process each input file in parallel. Parallel processing will result in more memory consumption but less process time
  *
  * @returns {Promise<void>} Resolves successfully once the git index has been updated
  *
@@ -37,6 +38,7 @@ export async function add({
   filepath,
   cache = {},
   force = false,
+  parallel = true,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -46,7 +48,15 @@ export async function add({
 
     const fs = new FileSystem(_fs)
     await GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
-      return addToIndex({ dir, gitdir, fs, filepath, index, force })
+      return addToIndex({
+        dir,
+        gitdir,
+        fs,
+        filepath,
+        index,
+        force,
+        parallel,
+      })
     })
   } catch (err) {
     err.caller = 'git.add'
@@ -54,7 +64,15 @@ export async function add({
   }
 }
 
-async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
+async function addToIndex({
+  dir,
+  gitdir,
+  fs,
+  filepath,
+  index,
+  force,
+  parallel,
+}) {
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
   const promises = filepath.map(async currentFilepath => {
@@ -72,17 +90,32 @@ async function addToIndex({ dir, gitdir, fs, filepath, index, force }) {
 
     if (stats.isDirectory()) {
       const children = await fs.readdir(join(dir, currentFilepath))
-      const promises = children.map(child =>
-        addToIndex({
-          dir,
-          gitdir,
-          fs,
-          filepath: [join(currentFilepath, child)],
-          index,
-          force,
-        })
-      )
-      await Promise.all(promises)
+      if (parallel) {
+        const promises = children.map(child =>
+          addToIndex({
+            dir,
+            gitdir,
+            fs,
+            filepath: [join(currentFilepath, child)],
+            index,
+            force,
+            parallel,
+          })
+        )
+        await Promise.all(promises)
+      } else {
+        for (const child of children) {
+          await addToIndex({
+            dir,
+            gitdir,
+            fs,
+            filepath: [join(currentFilepath, child)],
+            index,
+            force,
+            parallel,
+          })
+        }
+      }
     } else {
       const object = stats.isSymbolicLink()
         ? await fs.readlink(join(dir, currentFilepath)).then(posixifyPathBuffer)
