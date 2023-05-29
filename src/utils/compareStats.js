@@ -7,8 +7,8 @@ export function compareStats(entry, stats) {
   const s = normalizeStats(stats)
   const staleness =
     e.mode !== s.mode ||
-    e.mtimeNanoseconds !== s.mtimeNanoseconds ||
-    e.ctimeNanoseconds !== s.ctimeNanoseconds ||
+    e.mtimeSeconds !== s.mtimeSeconds ||
+    e.ctimeSeconds !== s.ctimeSeconds ||
     e.uid !== s.uid ||
     e.gid !== s.gid ||
     e.ino !== s.ino ||
