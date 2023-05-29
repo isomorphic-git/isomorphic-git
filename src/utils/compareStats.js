@@ -7,6 +7,21 @@ export function compareStats(entry, stats) {
   const s = normalizeStats(stats)
   const staleness =
     e.mode !== s.mode ||
+    e.mtimeNanoSeconds !== s.mtimeNanoseconds ||
+    e.ctimeNanoSeconds !== s.ctimeNanoseconds ||
+    e.uid !== s.uid ||
+    e.gid !== s.gid ||
+    e.ino !== s.ino ||
+    e.size !== s.size
+  return staleness
+}
+
+// hang of comparing nano seconds
+export function compareStatsFast(entry, stats) {
+  const e = normalizeStats(entry)
+  const s = normalizeStats(stats)
+  const staleness =
+    e.mode !== s.mode ||
     e.mtimeSeconds !== s.mtimeSeconds ||
     e.ctimeSeconds !== s.ctimeSeconds ||
     e.uid !== s.uid ||

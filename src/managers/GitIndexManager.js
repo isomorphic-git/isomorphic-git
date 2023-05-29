@@ -3,7 +3,7 @@ import AsyncLock from 'async-lock'
 
 import { UnmergedPathsError } from '../errors/UnmergedPathsError.js'
 import { GitIndex } from '../models/GitIndex.js'
-import { compareStats } from '../utils/compareStats.js'
+import { compareStatsFast } from '../utils/compareStats.js'
 
 // import Lock from '../utils.js'
 
@@ -36,7 +36,7 @@ async function isIndexStale(fs, filepath, cache) {
   const currStats = await fs.lstat(filepath)
   if (savedStats === null) return false
   if (currStats === null) return false
-  return compareStats(savedStats, currStats)
+  return compareStatsFast(savedStats, currStats)
 }
 
 export class GitIndexManager {

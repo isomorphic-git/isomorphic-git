@@ -1,5 +1,5 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
-import { compareStats } from '../utils/compareStats.js'
+import { compareStats, compareStatsFast } from '../utils/compareStats.js'
 import { join } from '../utils/join'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
@@ -120,7 +120,7 @@ export class GitWalkerFs {
       ) {
         const stage = index.entriesMap.get(entry._fullpath)
         const stats = await entry.stat()
-        if (!stage || compareStats(stats, stage)) {
+        if (!stage || compareStatsFast(stats, stage)) {
           const content = await entry.content()
           if (content === undefined) {
             oid = undefined

@@ -87,12 +87,6 @@ describe('status', () => {
    * Without the fix, the second write is not detected and the status is 'added'
    * instead of '*added'
    */
-   /*
-   Commented since this has problems with real world, some options can be used
-   for only programmatical use.
-   
-   https://github.com/isomorphic-git/isomorphic-git/issues/1768
-   
   it('status of a file changed twice within a second', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-empty')
@@ -107,4 +101,3 @@ describe('status', () => {
     expect(a).toEqual('*added')
   })
 })
-*/
