@@ -16,7 +16,7 @@ export function compareStats(entry, stats) {
   return staleness
 }
 
-// hang of comparing nano seconds
+// hang when comparing nano seconds
 export function compareStatsFast(entry, stats) {
   const e = normalizeStats(entry)
   const s = normalizeStats(stats)
