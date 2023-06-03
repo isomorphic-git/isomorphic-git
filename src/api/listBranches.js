@@ -15,6 +15,9 @@ import { join } from '../utils/join.js'
  * If you want an up-to-date list, first do a `fetch` to that remote.
  * (Which branch you fetch doesn't matter - the list of branches available on the remote is updated during the fetch handshake.)
  *
+ * Also note, that a branch is a reference to a commit. If you initialize a new repository it has no commits, so the
+ * `listBranches` function will return an empty list, until you create the first commit.
+ *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
