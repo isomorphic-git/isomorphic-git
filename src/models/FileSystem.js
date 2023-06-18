@@ -221,7 +221,7 @@ export class FileSystem {
    */
   async lstat(filename) {
     try {
-      const stats = await this._lstat(filename)
+      const stats = await this._lstat(filename, { bigint: true })
       return stats
     } catch (err) {
       if (err.code === 'ENOENT') {
