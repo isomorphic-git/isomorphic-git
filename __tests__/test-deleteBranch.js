@@ -4,6 +4,7 @@ const {
   deleteBranch,
   currentBranch,
   listBranches,
+  listTags,
 } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -16,6 +17,17 @@ describe('deleteBranch', () => {
     await deleteBranch({ fs, gitdir, ref: 'test' })
     const branches = await listBranches({ fs, gitdir })
     expect(branches.includes('test')).toBe(false)
+  })
+
+  it('deletes the branch when an identically named tag exists', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-deleteBranch')
+    // Test
+    await deleteBranch({ fs, gitdir, ref: 'collision' })
+    const branches = await listBranches({ fs, gitdir })
+    expect(branches.includes('collision')).toBe(false)
+    const tags = await listTags({ fs, gitdir })
+    expect(tags.includes('collision')).toBe(true)
   })
 
   it('branch not exist', async () => {
