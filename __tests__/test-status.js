@@ -90,19 +90,19 @@ describe('status', () => {
   ;(process.browser ? xit : it)(
     'status of a file changed twice within a second',
     async () => {
-      // Setup
       const { fs, dir } = await makeFixture('test-empty')
       const file = 'a.txt'
 
-      await Promise.all([
-        await fs.write(path.join(dir, file), 'Hi'),
-        await add({ fs, dir, filepath: file }),
-        await fs.write(path.join(dir, file), 'Ho'),
-      ])
-
-      // Test
+      const start = Date.now()
+      await fs.write(path.join(dir, file), 'Hi')
+      await add({ fs, dir, filepath: file })
       const a = await status({ fs, dir, filepath: file })
-      expect(a).toEqual('*added')
+      expect(a).toEqual('added')
+      await fs.write(path.join(dir, file), 'Ho')
+
+      const b = await status({ fs, dir, filepath: file })
+      expect(b).toEqual('*added')
+      expect(Date.now() - start).toBeLessThan(1000)
     }
   )
 })
