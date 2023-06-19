@@ -87,17 +87,20 @@ describe('status', () => {
    * Without the fix, the second write is not detected and the status is 'added'
    * instead of '*added'
    */
-  it('status of a file changed twice within a second', async () => {
-    // Setup
-    const { fs, dir } = await makeFixture('test-empty')
-    const file = 'a.txt'
+  ;(process.browser ? xit : it)(
+    'status of a file changed twice within a second',
+    async () => {
+      // Setup
+      const { fs, dir } = await makeFixture('test-empty')
+      const file = 'a.txt'
 
-    await fs.write(path.join(dir, file), 'Hi')
-    await add({ fs, dir, filepath: file })
-    await fs.write(path.join(dir, file), 'Ho')
+      await fs.write(path.join(dir, file), 'Hi')
+      await add({ fs, dir, filepath: file })
+      await fs.write(path.join(dir, file), 'Ho')
 
-    // Test
-    const a = await status({ fs, dir, filepath: file })
-    expect(a).toEqual('*added')
-  })
+      // Test
+      const a = await status({ fs, dir, filepath: file })
+      expect(a).toEqual('*added')
+    }
+  )
 })

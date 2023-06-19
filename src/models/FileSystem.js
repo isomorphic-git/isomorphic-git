@@ -221,7 +221,12 @@ export class FileSystem {
    */
   async lstat(filename) {
     try {
-      const stats = await this._lstat(filename, { bigint: true })
+      const stats = await this._lstat(filename)
+      if (!process.browser) {
+        const statsNs = await this._lstat(filename, { bigint: true })
+        stats.mtimeNs = statsNs.mtimeNs
+        stats.ctimeNs = statsNs.ctimeNs
+      }
       return stats
     } catch (err) {
       if (err.code === 'ENOENT') {

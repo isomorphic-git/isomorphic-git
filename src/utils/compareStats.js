@@ -9,8 +9,10 @@ export function compareStats(entry, stats) {
     e.mode !== s.mode ||
     e.mtimeSeconds !== s.mtimeSeconds ||
     e.ctimeSeconds !== s.ctimeSeconds ||
-    e.mtimeNanoseconds !== s.mtimeNanoseconds ||
-    e.ctimeNanoseconds !== s.ctimeNanoseconds ||
+    (e.mtimeNanoseconds &&
+      s.mtimeNanoseconds &&
+      (e.mtimeNanoseconds !== s.mtimeNanoseconds ||
+        e.ctimeNanoseconds !== s.ctimeNanoseconds)) ||
     e.uid !== s.uid ||
     e.gid !== s.gid ||
     e.ino !== s.ino ||
