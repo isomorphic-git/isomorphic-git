@@ -94,9 +94,11 @@ describe('status', () => {
       const { fs, dir } = await makeFixture('test-empty')
       const file = 'a.txt'
 
-      await fs.write(path.join(dir, file), 'Hi')
-      await add({ fs, dir, filepath: file })
-      await fs.write(path.join(dir, file), 'Ho')
+      await Promise.all([
+        await fs.write(path.join(dir, file), 'Hi'),
+        await add({ fs, dir, filepath: file }),
+        await fs.write(path.join(dir, file), 'Ho'),
+      ])
 
       // Test
       const a = await status({ fs, dir, filepath: file })
