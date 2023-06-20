@@ -222,6 +222,7 @@ export class FileSystem {
   async lstat(filename) {
     try {
       const stats = await this._lstat(filename)
+      // For non-browser (local) scenarios regular git 'add' command might be used to write the index. Therefore we need to have the exact nanoseconds (see. normalizeStats.js SecondsNanoseconds ).
       if (!process.browser) {
         const statsNs = await this._lstat(filename, { bigint: true })
         stats.mtimeNs = statsNs.mtimeNs

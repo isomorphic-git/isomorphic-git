@@ -7,10 +7,14 @@ function SecondsNanoseconds(givenSeconds, givenNanoseconds, nanoseconds, date) {
     return [givenSeconds, givenNanoseconds]
   }
   let seconds
+  // For browser scenarios isomorphic-git 'add' will be used to write the index. Reading and writing are handled using normalizeStats ( see FileSystem.js lstat() ).
   if (nanoseconds === undefined) {
     const milliseconds = date.valueOf()
     seconds = Math.trunc(milliseconds / 1000)
-  } else {
+    nanoseconds = (milliseconds - seconds * 1000) * 1000000 // nanoseconds with millisecond precision
+  }
+  // For non-browser (local) scenarios
+  else {
     seconds = Number(nanoseconds / BigInt(1e9))
     nanoseconds = Number(nanoseconds % BigInt(1e9))
   }

@@ -117,4 +117,15 @@ describe('GitIndex', () => {
       expect(index.entriesMap.get('c').stages.length).toBe(1)
     })
   })
+
+  it('ensure nanoseconds are always present', async () => {
+    const { fs, dir } = await makeFixture('test-GitIndex')
+    const buffer = await fs.read(path.join(dir, 'simple-index'))
+    const index = await GitIndex.from(buffer)
+
+    const ctimeSeconds = index.entriesMap.get('world.txt').ctimeSeconds
+    const ctimeNanoseconds = index.entriesMap.get('world.txt').ctimeNanoseconds
+    expect(ctimeSeconds).not.toBeNull()
+    expect(ctimeNanoseconds).not.toBeNull()
+  })
 })
