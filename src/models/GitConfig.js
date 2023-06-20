@@ -256,6 +256,7 @@ export class GitConfig {
               section,
               subsection,
               modified: true,
+              isSection: true,
               path: sectionPath,
             }
             this.parsedConfig.push(newSection, newConfig)
