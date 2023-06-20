@@ -2,14 +2,20 @@ import { normalizeMode } from './normalizeMode'
 
 const MAX_UINT32 = 2 ** 32
 
-function SecondsNanoseconds(givenSeconds, givenNanoseconds, nanoseconds, date) {
+function SecondsNanoseconds(
+  givenSeconds,
+  givenNanoseconds,
+  nanoseconds,
+  milliseconds,
+  date
+) {
   if (givenSeconds !== undefined && givenNanoseconds !== undefined) {
     return [givenSeconds, givenNanoseconds]
   }
   let seconds
   // For browser scenarios isomorphic-git 'add' will be used to write the index. Reading and writing are handled using normalizeStats ( see FileSystem.js lstat() ).
   if (nanoseconds === undefined) {
-    const milliseconds = date.valueOf()
+    milliseconds = milliseconds || date.valueOf()
     seconds = Math.trunc(milliseconds / 1000)
     nanoseconds = (milliseconds - seconds * 1000) * 1000000 // nanoseconds with millisecond precision
   }
@@ -27,12 +33,14 @@ export function normalizeStats(e) {
     e.ctimeSeconds,
     e.ctimeNanoseconds,
     e.ctimeNs,
+    e.ctimeMs,
     e.ctime
   )
   const [mtimeSeconds, mtimeNanoseconds] = SecondsNanoseconds(
     e.mtimeSeconds,
     e.mtimeNanoseconds,
     e.mtimeNs,
+    e.mtimeMs,
     e.mtime
   )
 
