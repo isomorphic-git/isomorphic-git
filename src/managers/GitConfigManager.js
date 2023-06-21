@@ -17,48 +17,51 @@ async function readConfig(fs, path, type) {
 
 export class GitConfigManager {
   static async get({ fs, gitdir }) {
-    const platform = process.platform
+    let globalConfig = new GitConfig()
+    if (!process.browser) {
+      const platform = process.platform
 
-    let systemConfigPath = ''
-    if (platform === 'win32') {
-      systemConfigPath = path.join(
-        'C:',
-        'Program Files',
-        'Git',
-        'etc',
-        'gitconfig'
-      )
-    } else if (platform === 'linux') {
-      systemConfigPath = path.join('/', 'etc', 'gitconfig')
-    } else if (platform === 'darwin') {
-      systemConfigPath = path.join(
-        '/',
-        'Library',
-        'Developer',
-        'CommandLineTools',
-        'usr',
-        'share',
-        'git-core',
-        'gitconfig'
-      )
+      let systemConfigPath = ''
+      if (platform === 'win32') {
+        systemConfigPath = path.join(
+          'C:',
+          'Program Files',
+          'Git',
+          'etc',
+          'gitconfig'
+        )
+      } else if (platform === 'linux') {
+        systemConfigPath = path.join('/', 'etc', 'gitconfig')
+      } else if (platform === 'darwin') {
+        systemConfigPath = path.join(
+          '/',
+          'Library',
+          'Developer',
+          'CommandLineTools',
+          'usr',
+          'share',
+          'git-core',
+          'gitconfig'
+        )
+      }
+      const systemConfig = await readConfig(fs, systemConfigPath, 'system')
+
+      const HOME = process.env.HOME || ''
+      const XDG_CONFIG_HOME =
+        process.env.XDG_CONFIG_HOME || (HOME && path.join(HOME, '.config'))
+
+      const globalXDGConfig = await (
+        await readConfig(
+          fs,
+          path.join(XDG_CONFIG_HOME, 'git', 'config'),
+          'global'
+        )
+      ).appendConfig(systemConfig)
+
+      globalConfig = await (
+        await readConfig(fs, path.join(HOME, '.gitconfig'), 'global')
+      ).appendConfig(globalXDGConfig)
     }
-    const systemConfig = await readConfig(fs, systemConfigPath, 'system')
-
-    const HOME = process.env.HOME || ''
-    const XDG_CONFIG_HOME =
-      process.env.XDG_CONFIG_HOME || (HOME && path.join(HOME, '.config'))
-
-    const globalXDGConfig = await (
-      await readConfig(
-        fs,
-        path.join(XDG_CONFIG_HOME, 'git', 'config'),
-        'global'
-      )
-    ).appendConfig(systemConfig)
-
-    const globalConfig = await (
-      await readConfig(fs, path.join(HOME, '.gitconfig'), 'global')
-    ).appendConfig(globalXDGConfig)
 
     const localConfig = await (
       await readConfig(fs, path.join(gitdir, 'config'))
