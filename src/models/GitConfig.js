@@ -146,8 +146,8 @@ export class GitConfig {
             let name = null
             let value = null
 
-            if (line) {
-              const trimmedLine = line.trim()
+            const trimmedLine = line.trim()
+            if (trimmedLine) {
               const extractedSection = extractSectionLine(trimmedLine)
               const isSection = extractedSection != null
               if (isSection) {
@@ -161,7 +161,7 @@ export class GitConfig {
               }
 
               const path = getPath(section, subsection, name)
-              return { line, isSection, section, subsection, name, value, path }
+              return { isSection, section, subsection, name, value, path }
             }
           })
           .filter(Boolean)
@@ -227,7 +227,6 @@ export class GitConfig {
         const modifiedConfig = Object.assign({}, config, {
           name,
           value,
-          modified: true,
         })
         if (append) {
           this.parsedConfig.splice(configIndex + 1, 0, modifiedConfig)
@@ -243,7 +242,6 @@ export class GitConfig {
           subsection,
           name,
           value,
-          modified: true,
           path: normalizedPath,
         }
         if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
@@ -255,7 +253,6 @@ export class GitConfig {
             const newSection = {
               section,
               subsection,
-              modified: true,
               isSection: true,
               path: sectionPath,
             }
@@ -268,10 +265,7 @@ export class GitConfig {
 
   toString() {
     return this.parsedConfig
-      .map(({ line, section, subsection, name, value, modified = false }) => {
-        if (!modified) {
-          return line
-        }
+      .map(({ section, subsection, name, value }) => {
         if (name != null && value != null) {
           if (typeof value === 'string' && /[#;]/.test(value)) {
             // A `#` or `;` symbol denotes a comment, so we have to wrap it in double quotes
