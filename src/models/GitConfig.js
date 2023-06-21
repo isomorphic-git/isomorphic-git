@@ -210,7 +210,7 @@ export class GitConfig {
 
   async appendConfig(config) {
     for (const c of config.parsedConfig) {
-      if (!(await this.get(c.path)) && c.value) {
+      if ((await this.get(c.path)) === undefined && c.value) {
         await this.append(c.path, c.value, c.type)
       }
     }

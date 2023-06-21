@@ -35,6 +35,9 @@ describe('config', () => {
       const symlinksXDG = await config.get('core.symlinks')
       const ignorecaseUser = await config.get('core.ignorecase')
       const urlLocal = await config.get('remote.origin.url')
+      const bareGlobalLocal = await config.get('core.bare')
+
+      expect(bareGlobalLocal).toBe(false)
       expect(symlinksXDG).toBe(false)
       expect(ignorecaseUser).toBe(true)
       expect(urlLocal).toBe('https://github.com/isomorphic-git/isomorphic-git')
