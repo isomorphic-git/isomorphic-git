@@ -48,19 +48,23 @@ export class GitConfigManager {
     const XDG_CONFIG_HOME =
       process.env.XDG_CONFIG_HOME || (HOME && path.join(HOME, '.config'))
 
-    const XDGConfig = await (
-      await readConfig(fs, path.join(XDG_CONFIG_HOME, 'git', 'config'), 'XDG')
+    const globalXDGConfig = await (
+      await readConfig(
+        fs,
+        path.join(XDG_CONFIG_HOME, 'git', 'config'),
+        'global'
+      )
     ).appendConfig(systemConfig)
 
-    const userConfig = await (
-      await readConfig(fs, path.join(HOME, '.gitconfig'), 'user')
-    ).appendConfig(XDGConfig)
+    const globalConfig = await (
+      await readConfig(fs, path.join(HOME, '.gitconfig'), 'global')
+    ).appendConfig(globalXDGConfig)
 
-    const config = await (
+    const localConfig = await (
       await readConfig(fs, path.join(gitdir, 'config'))
-    ).appendConfig(userConfig)
+    ).appendConfig(globalConfig)
 
-    return config
+    return localConfig
   }
 
   static async save({ fs, gitdir, config }) {
