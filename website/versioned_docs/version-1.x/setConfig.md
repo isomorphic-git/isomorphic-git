@@ -18,7 +18,7 @@ Write an entry to the git config files.
 | return         | Promise\<void\>                                       | Resolves successfully when operation completed                                                |
 
 *Caveats:*
-- Currently only the local `$GIT_DIR/config` file can be read or written. However support for the global `~/.gitconfig` and system `$(prefix)/etc/gitconfig` will be added in the future.
+- Currently only the file `$GIT_DIR/config` can be written. The files `~/.gitconfig` and `$XDG_CONFIG_HOME/git/config` are treated as readonly.
 - The current parser does not support the more exotic features of the git-config file format such as `[include]` and `[includeIf]`.
 
 Example Code:

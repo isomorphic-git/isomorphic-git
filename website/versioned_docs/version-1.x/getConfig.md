@@ -16,7 +16,7 @@ Read an entry from the git config files.
 | return         | Promise\<any\>            | Resolves with the config value                      |
 
 *Caveats:*
-- Currently only the local `$GIT_DIR/config` file can be read or written. However support for the global `~/.gitconfig` and system `$(prefix)/etc/gitconfig` will be added in the future.
+- Currently only the files `$GIT_DIR/config`, `~/.gitconfig` and `$XDG_CONFIG_HOME/git/config` can be read. However support for the system `$(prefix)/etc/gitconfig` file may be added in the future.
 - The current parser does not support the more exotic features of the git-config file format such as `[include]` and `[includeIf]`.
 
 Example Code:
