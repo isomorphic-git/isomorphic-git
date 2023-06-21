@@ -17,7 +17,7 @@ async function readConfig(fs, path, type) {
 
 export class GitConfigManager {
   static async get({ fs, gitdir }) {
-    const HOME = process.env.HOME
+    const HOME = process.env.HOME || ''
     const XDG_CONFIG_HOME =
       process.env.XDG_CONFIG_HOME || (HOME && path.join(HOME, '.config'))
 
