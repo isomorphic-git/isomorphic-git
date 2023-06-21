@@ -10,7 +10,7 @@ import { join } from '../utils/join.js'
  * Write an entry to the git config files.
  *
  * *Caveats:*
- * - Currently only the file `$GIT_DIR/config` can be written. The files `~/.gitconfig` and `$XDG_CONFIG_HOME/git/config` are treated as readonly.
+ * - Currently only the local gitconfig file can be written. The system and global gitconfig files are treated as readonly (see https://git-scm.com/docs/git-config#FILES).
  * - The current parser does not support the more exotic features of the git-config file format such as `[include]` and `[includeIf]`.
  *
  * @param {Object} args
