@@ -17,7 +17,7 @@ describe('renameBranch', () => {
         dir,
         gitdir,
         oldref: 'test-branch',
-        ref: 'master',
+        ref: 'existing-branch',
       })
     } catch (err) {
       error = err
@@ -125,5 +125,28 @@ describe('renameBranch', () => {
       checkout: true,
     })
     expect(await currentBranch({ fs, dir, gitdir })).toEqual('other-branch-2')
+  })
+
+  it('rename current branch', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-renameBranch')
+    // Test
+    await renameBranch({
+      fs,
+      dir,
+      gitdir,
+      oldref: 'master',
+      ref: 'other-branch',
+    })
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('other-branch')
+
+    await renameBranch({
+      fs,
+      dir,
+      gitdir,
+      oldref: 'other-branch',
+      ref: 'master',
+    })
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('master')
   })
 })

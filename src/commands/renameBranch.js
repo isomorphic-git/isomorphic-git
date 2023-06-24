@@ -1,11 +1,11 @@
 // @ts-check
-import '../typedefs.js'
-
 import cleanGitRef from 'clean-git-ref'
 
+import { _currentBranch } from '../commands/currentBranch.js'
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import '../typedefs.js'
 
 /**
  * Rename a branch
@@ -53,7 +53,14 @@ export async function _renameBranch({
   await GitRefManager.writeRef({ fs, gitdir, ref: fullnewref, value })
   await GitRefManager.deleteRef({ fs, gitdir, ref: fulloldref })
 
-  if (checkout) {
+  const fullCurrentBranchRef = await _currentBranch({
+    fs,
+    gitdir,
+    fullname: true,
+  })
+  const isCurrentBranch = fullCurrentBranchRef === fulloldref
+
+  if (checkout || isCurrentBranch) {
     // Update HEAD
     await GitRefManager.writeSymbolicRef({
       fs,
