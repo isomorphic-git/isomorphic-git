@@ -4,15 +4,13 @@ import { GitConfig } from '../models/GitConfig.js'
 
 function getSystemConfigPath() {
   let systemConfigPath
+  // process.env will be ignored by browsers
   if (!(process.env.GIT_CONFIG_NOSYSTEM === '1')) {
     if (process.env.GIT_CONFIG_SYSTEM) {
       systemConfigPath = process.env.GIT_CONFIG_SYSTEM
     } else {
+      // process.platform will be ignored by browsers
       const platform = process.platform
-
-      if (!platform) {
-        throw new Error('no platform')
-      }
 
       if (platform === 'win32') {
         systemConfigPath = path.join(

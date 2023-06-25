@@ -629,4 +629,29 @@ describe('GitConfig', () => {
 \turl = https://bar.com/project.git`)
     })
   })
+
+  describe('append to existing config', () => {
+    it('get git global config values (append)', async () => {
+      const ca = GitConfig.from(`[foo]
+      keyaaa = valaaa
+      [bar]
+      keyxyz = valbar`)
+      const a = await ca.get('foo.keyaaa')
+      expect(a).toEqual('valaaa')
+
+      const cb = GitConfig.from(`[foo]
+      keybbb = valbbb
+      [bar]
+      keyxyz = valbar`)
+      const b = await cb.get('foo.keybbb')
+      expect(b).toEqual('valbbb')
+
+      const cc = await ca.appendConfig(cb)
+      const c1 = await cc.get('foo.keyaaa')
+      const c2 = await cc.get('foo.keybbb')
+
+      expect(c1).toEqual('valaaa')
+      expect(c2).toEqual('valbbb')
+    })
+  })
 })
