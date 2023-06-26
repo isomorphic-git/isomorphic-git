@@ -6,6 +6,9 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 module.exports = [
   {
     target: 'webworker',
+    node: {
+      fs: 'empty',
+    },
     entry: {
       index: './src/index.js',
       'internal-apis': './src/internal-apis.js',
