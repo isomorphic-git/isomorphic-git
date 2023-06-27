@@ -5,25 +5,17 @@ const MAX_UINT32 = 2 ** 32
 function SecondsNanoseconds(
   givenSeconds,
   givenNanoseconds,
-  nanoseconds,
   milliseconds,
   date
 ) {
+  // For non-browser (local) scenarios conversions happens in FileSystem
   if (givenSeconds !== undefined && givenNanoseconds !== undefined) {
     return [givenSeconds, givenNanoseconds]
   }
-  let seconds
   // For browser scenarios isomorphic-git 'add' will be used to write the index. Reading and writing are handled using normalizeStats ( see FileSystem.js lstat() ).
-  if (nanoseconds === undefined) {
-    milliseconds = milliseconds || date.valueOf()
-    seconds = Math.trunc(milliseconds / 1000)
-    nanoseconds = (milliseconds - seconds * 1000) * 1000000 // nanoseconds with millisecond precision
-  }
-  // For non-browser (local) scenarios
-  else {
-    seconds = Number(nanoseconds / BigInt(1e9))
-    nanoseconds = Number(nanoseconds % BigInt(1e9))
-  }
+  milliseconds = milliseconds || date.valueOf()
+  const seconds = Math.trunc(milliseconds / 1000)
+  const nanoseconds = (milliseconds - seconds * 1000) * 1000000 // nanoseconds with millisecond precision
 
   return [seconds, nanoseconds]
 }
@@ -32,14 +24,12 @@ export function normalizeStats(e) {
   const [ctimeSeconds, ctimeNanoseconds] = SecondsNanoseconds(
     e.ctimeSeconds,
     e.ctimeNanoseconds,
-    e.ctimeNs,
     e.ctimeMs,
     e.ctime
   )
   const [mtimeSeconds, mtimeNanoseconds] = SecondsNanoseconds(
     e.mtimeSeconds,
     e.mtimeNanoseconds,
-    e.mtimeNs,
     e.mtimeMs,
     e.mtime
   )
