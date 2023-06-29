@@ -8,14 +8,15 @@ function SecondsNanoseconds(
   milliseconds,
   date
 ) {
+  // For non-browser (local) scenarios conversions happens in FileSystem
   if (givenSeconds !== undefined && givenNanoseconds !== undefined) {
     return [givenSeconds, givenNanoseconds]
   }
-  if (milliseconds === undefined) {
-    milliseconds = date.valueOf()
-  }
-  const seconds = Math.floor(milliseconds / 1000)
-  const nanoseconds = (milliseconds - seconds * 1000) * 1000000
+  // For browser scenarios isomorphic-git 'add' will be used to write the index. Reading and writing are handled using normalizeStats ( see FileSystem.js lstat() ).
+  milliseconds = milliseconds || date.valueOf()
+  const seconds = Math.trunc(milliseconds / 1000)
+  const nanoseconds = (milliseconds - seconds * 1000) * 1000000 // nanoseconds with millisecond precision
+
   return [seconds, nanoseconds]
 }
 

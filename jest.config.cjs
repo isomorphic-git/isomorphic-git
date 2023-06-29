@@ -14,9 +14,12 @@ module.exports = {
       'jest-junit',
       {
         outputDirectory: 'junit',
-        outputName: `TESTS-node-${process.version}-${process.platform}-${require('os').release()}.xml`,
+        outputName: `TESTS-node-${process.version}-${
+          process.platform
+        }-${require('os').release()}.xml`,
       },
     ],
   ],
   coverageReporters: ['lcov', 'cobertura'],
+  setupFilesAfterEnv: ['./jest.setup.js'],
 }

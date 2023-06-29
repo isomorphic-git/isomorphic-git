@@ -78,4 +78,26 @@ describe('status', () => {
     const b = await status({ fs, dir, gitdir, filepath: 'b.txt' })
     expect(b).toEqual('added')
   })
+
+  /**
+   * The unit test checks the fix for:
+   *
+   * https://github.com/isomorphic-git/isomorphic-git/issues/1245
+   *
+   * Without the fix, the second write is not detected and the status is 'added'
+   * instead of '*added'
+   */
+  it('status of a file changed twice within a second', async () => {
+    const { fs, dir } = await makeFixture('test-empty')
+    const file = 'a.txt'
+
+    const start = Date.now()
+    await fs.write(path.join(dir, file), 'Hi')
+    await add({ fs, dir, filepath: file })
+    await fs.write(path.join(dir, file), 'Ho')
+
+    const a = await status({ fs, dir, filepath: file })
+    expect(a).toEqual('*added')
+    expect(Date.now() - start).toBeLessThan(1000)
+  })
 })

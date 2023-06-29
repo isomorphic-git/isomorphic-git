@@ -1,3 +1,5 @@
+import fs from 'fs'
+
 import pify from 'pify'
 
 import { compareStrings } from '../utils/compareStrings.js'
@@ -222,6 +224,16 @@ export class FileSystem {
   async lstat(filename) {
     try {
       const stats = await this._lstat(filename)
+      // For non-browser (local) scenarios regular git 'add' command might be used to write the index. Therefore we need to have the exact nanoseconds (see. normalizeStats.js SecondsNanoseconds ).
+      if (!process.browser) {
+        try {
+          const statsNs = await fs.promises.lstat(filename, { bigint: true })
+          stats.ctimeSeconds = Number(statsNs.ctimeNs / BigInt(1e9))
+          stats.ctimeNanoseconds = Number(statsNs.ctimeNs % BigInt(1e9))
+          stats.mtimeSeconds = Number(statsNs.mtimeNs / BigInt(1e9))
+          stats.mtimeNanoseconds = Number(statsNs.mtimeNs % BigInt(1e9))
+        } catch (error) {}
+      }
       return stats
     } catch (err) {
       if (err.code === 'ENOENT') {

@@ -2,7 +2,13 @@
 
 const path = require('path')
 
-const { GitIndex, GitIndexManager } = require('isomorphic-git/internal-apis')
+const {
+  GitIndex,
+  GitIndexManager,
+  FileSystem,
+} = require('isomorphic-git/internal-apis')
+
+const { normalizeStats } = require('../src/utils/normalizeStats.js')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -117,4 +123,40 @@ describe('GitIndex', () => {
       expect(index.entriesMap.get('c').stages.length).toBe(1)
     })
   })
+
+  it('ensure nanoseconds are always present', async () => {
+    const { fs, dir } = await makeFixture('test-GitIndex')
+    const buffer = await fs.read(path.join(dir, 'simple-index'))
+    const index = await GitIndex.from(buffer)
+
+    const ctimeSeconds = index.entriesMap.get('world.txt').ctimeSeconds
+    const ctimeNanoseconds = index.entriesMap.get('world.txt').ctimeNanoseconds
+    expect(ctimeSeconds).not.toBeNull()
+    expect(ctimeNanoseconds).not.toBeNull()
+  })
+  ;(process.browser ? xit : it)(
+    'ensure nanoseconds of files are equal with index',
+    async () => {
+      const _fs = Object.assign({}, require('fs'))
+      const fs = new FileSystem(_fs)
+
+      const buffer = await fs.read(path.join('.git/index'))
+      const index = await GitIndex.from(buffer)
+      const file = '__tests__/__fixtures__/test-GitIndex-timestamp/nano.txt'
+
+      const stats = normalizeStats(await fs.lstat(file))
+      expect(index.entriesMap.get(file).ctimeSeconds).toEqual(
+        stats.ctimeSeconds
+      )
+      expect(index.entriesMap.get(file).ctimeNanoseconds).toEqual(
+        stats.ctimeNanoseconds
+      )
+      expect(index.entriesMap.get(file).mtimeSeconds).toEqual(
+        stats.mtimeSeconds
+      )
+      expect(index.entriesMap.get(file).mtimeNanoseconds).toEqual(
+        stats.mtimeNanoseconds
+      )
+    }
+  )
 })

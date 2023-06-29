@@ -18,5 +18,8 @@
       ],
       "newlines-between": "always"
     }]
+  },
+  "env": {
+    "es2020": true
   }
 }
