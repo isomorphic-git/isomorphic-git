@@ -619,6 +619,18 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "alirezamirian",
+      "name": "Alireza Mirian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3150694?v=4",
+      "profile": "https://stackoverflow.com/users/1493081/alireza-mirian",
+      "contributions": [
+        "code",
+        "doc",
+        "test",
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
