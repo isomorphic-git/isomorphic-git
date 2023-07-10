@@ -9,15 +9,20 @@ export async function _expandOid({ fs, cache, gitdir, oid: short }) {
   // process can acquire external ref-deltas.
   const getExternalRefDelta = oid => readObject({ fs, cache, gitdir, oid })
 
-  const results1 = await expandOidLoose({ fs, gitdir, oid: short })
-  const results2 = await expandOidPacked({
+  const results = await expandOidLoose({ fs, gitdir, oid: short })
+  const packedOids = await expandOidPacked({
     fs,
     cache,
     gitdir,
     oid: short,
     getExternalRefDelta,
   })
-  const results = results1.concat(results2)
+  // Objects can exist in a pack file as well as loose, make sure we only get a list of unique oids.
+  for (const packedOid of packedOids) {
+    if (results.indexOf(packedOid) === -1) {
+      results.push(packedOid)
+    }
+  }
 
   if (results.length === 1) {
     return results[0]
