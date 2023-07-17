@@ -15,7 +15,7 @@ function isPromiseFs(fs) {
       return e
     }
   }
-  return isPromiseLike(test(fs));
+  return isPromiseLike(test(fs))
 }
 
 // List of commands all filesystems are expected to provide. `rm` is not
