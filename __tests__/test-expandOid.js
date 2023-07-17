@@ -51,4 +51,14 @@ describe('expandOid', () => {
     oid = await expandOid({ fs, gitdir, oid })
     expect(oid).toEqual('5f1f014326b1d7e8079d00b87fa7a9913bd91324')
   })
+
+  it('expand short oid from packfile and loose', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-expandOid')
+    // This object is in the pack file as well as being available loose
+    let oid = '0001c3'
+    // Test
+    oid = await expandOid({ fs, gitdir, oid })
+    expect(oid).toEqual('0001c3e2753b03648b6c43dd74ba7fe2f21123d6')
+  })
 })
