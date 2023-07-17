@@ -3,6 +3,7 @@ import pify from 'pify'
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
+import { isPromiseLike } from '../utils/types.js';
 
 function isPromiseFs(fs) {
   const test = targetFs => {
@@ -14,7 +15,7 @@ function isPromiseFs(fs) {
       return e
     }
   }
-  return test(fs).constructor.name === 'Promise'
+  return isPromiseLike(test(fs));
 }
 
 // List of commands all filesystems are expected to provide. `rm` is not
