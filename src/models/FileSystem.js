@@ -3,7 +3,7 @@ import pify from 'pify'
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
-import { isPromiseLike } from '../utils/types.js';
+import { isPromiseLike } from '../utils/types.js'
 
 function isPromiseFs(fs) {
   const test = targetFs => {
