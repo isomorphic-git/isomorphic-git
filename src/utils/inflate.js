@@ -2,7 +2,7 @@
 /* global DecompressionStream */
 import pako from 'pako'
 
-let supportsDecompressionStream = false
+let supportsDecompressionStream = null
 
 export async function inflate(buffer) {
   if (supportsDecompressionStream === null) {
