@@ -22,6 +22,8 @@
       "onAuthSuccess",
       "onAuthFailure",
       "onMessage",
+      "onPostCheckout",
+      "onPrePush",
       "onProgress",
       "onSign",
       "mergeDriver"

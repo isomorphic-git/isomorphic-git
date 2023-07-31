@@ -595,6 +595,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/49895741?v=4",
       "profile": "https://gitlab.com/CoalZombik/",
       "contributions": [
+        "code",
+        "doc",
+        "test",
         "bug"
       ]
     },
