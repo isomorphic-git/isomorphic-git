@@ -11,8 +11,7 @@ describe('merge', () => {
     const { gitdir, dir, fs } = await makeFixture('test-GitIndex-unmerged')
 
     // Test
-    let error = null
-    try {
+    await expect(async () => {
       await merge({
         fs,
         dir,
@@ -27,11 +26,7 @@ describe('merge', () => {
           timezoneOffset: -0,
         },
       })
-    } catch (e) {
-      error = e
-    }
-    expect(error).not.toBeNull()
-    expect(error.code).toBe(Errors.UnmergedPathsError.code)
+    }).rejects.toThrowError(Errors.UnmergedPathsError)
   })
   it('merge master into master', async () => {
     // Setup
@@ -311,8 +306,7 @@ describe('merge', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
     // Test
-    let error = null
-    try {
+    await expect(async () => {
       await merge({
         fs,
         gitdir,
@@ -320,11 +314,7 @@ describe('merge', () => {
         theirs: 'delete-second-half',
         dryRun: true,
       })
-    } catch (e) {
-      error = e
-    }
-    expect(error).not.toBe(null)
-    expect(error.code).toBe(Errors.MissingNameError.code)
+    }).rejects.toThrowError(Errors.MissingNameError)
   })
 
   it("merge 'delete-first-half' and 'delete-second-half' (dryRun)", async () => {
@@ -475,8 +465,7 @@ describe('merge', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
     // Test
-    let error = null
-    try {
+    await expect(async () => {
       await merge({
         fs,
         gitdir,
@@ -489,11 +478,7 @@ describe('merge', () => {
           timezoneOffset: -0,
         },
       })
-    } catch (e) {
-      error = e
-    }
-    expect(error).not.toBeNull()
-    expect(error.code).toBe(Errors.MergeNotSupportedError.code)
+    }).rejects.toThrowError(Errors.MergeNotSupportedError)
   })
 
   it("merge 'g' and 'g-delete-file' (delete by theirs)", async () => {
@@ -620,8 +605,7 @@ describe('merge', () => {
     const outFile = `${dir}/o.txt`
     const cache = {}
 
-    let error = null
-    try {
+    await expect(async () => {
       await merge({
         fs,
         dir,
@@ -637,15 +621,11 @@ describe('merge', () => {
         },
         cache,
       })
-    } catch (e) {
-      error = e
-    }
+    }).rejects.toThrowError(Errors.MergeConflictError)
 
     expect(await fs.read(outFile, 'utf-8')).toBe(
       await fs.read(testFile, 'utf-8')
     )
-    expect(error).not.toBeNull()
-    expect(error.code).toBe(Errors.MergeConflictError.code)
   })
 
   it("merge two branches that modified the same file, no conflict resolver, don't update worktree'", async () => {
@@ -653,9 +633,7 @@ describe('merge', () => {
     const { fs, gitdir, dir } = await makeFixture('test-merge')
     // Test
     const outFile = `${dir}/o.txt`
-
-    let error = null
-    try {
+    await expect(async () => {
       await merge({
         fs,
         dir,
@@ -670,13 +648,10 @@ describe('merge', () => {
           timezoneOffset: -0,
         },
       })
-    } catch (e) {
-      error = e
-    }
+    }).rejects.toThrowError(Errors.MergeConflictError)
+
     expect(await fs.read(outFile, 'utf-8')).toBeNull()
     expect(await fs.readdir(dir)).toEqual([])
-    expect(error).not.toBeNull()
-    expect(error.code).toBe(Errors.MergeConflictError.code)
   })
 
   it("merge two branches that modified the same file, custom conflict resolver (prefer our changes)'", async () => {
