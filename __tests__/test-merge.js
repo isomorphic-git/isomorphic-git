@@ -496,6 +496,46 @@ describe('merge', () => {
     expect(error.code).toBe(Errors.MergeNotSupportedError.code)
   })
 
+  it("merge 'g' and 'g-delete-file' (delete by theirs)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    // Test
+    await expect(async () => {
+      await merge({
+        fs,
+        gitdir,
+        ours: 'g',
+        theirs: 'g-delete-file',
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+      })
+    }).rejects.toThrowError(Errors.MergeConflictError)
+  })
+
+  it("merge 'g-delete-file' adn 'g' (delete by us)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    // Test
+    await expect(async () => {
+      await merge({
+        fs,
+        gitdir,
+        ours: 'g-delete-file',
+        theirs: 'g',
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+      })
+    }).rejects.toThrowError(Errors.MergeConflictError)
+  })
+
   it("merge two branches that modified the same file (no conflict)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
