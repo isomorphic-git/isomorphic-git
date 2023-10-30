@@ -138,59 +138,65 @@ export async function mergeTree({
             })
           }
 
-            // deleted by theirs
-            if (
-              base &&
-              ours &&
-              !theirs &&
-              (await base.type()) === 'blob' &&
-              (await ours.type()) === 'blob'
-            ) {
-              unmergedFiles.push(filepath)
-              if (!abortOnConflict) {
-                const baseOid = await base.oid()
-                const ourOid = await ours.oid()
-  
-                index.delete({ filepath })
-  
-                index.insert({ filepath, oid: baseOid, stage: 1 })
-                index.insert({ filepath, oid: ourOid, stage: 2 })
-              }
-  
-              return {
-                mode: await ours.mode(),
-                oid: await ours.oid(),
-                type: 'blob',
-                path,
-              }
+          // deleted by theirs
+          if (
+            base &&
+            ours &&
+            !theirs &&
+            (await base.type()) === 'blob' &&
+            (await ours.type()) === 'blob'
+          ) {
+            unmergedFiles.push(filepath)
+            if (!abortOnConflict) {
+              const baseOid = await base.oid()
+              const ourOid = await ours.oid()
+
+              index.delete({ filepath })
+
+              index.insert({ filepath, oid: baseOid, stage: 1 })
+              index.insert({ filepath, oid: ourOid, stage: 2 })
             }
-  
-            // deleted by us 
-            if (
-              base &&
-              !ours &&
-              theirs &&
-              (await base.type()) === 'blob' &&
-              (await theirs.type()) === 'blob'
-            ) {
-              unmergedFiles.push(filepath)
-              if (!abortOnConflict) {
-                const baseOid = await base.oid()
-                const theirOid = await theirs.oid()
-  
-                index.delete({ filepath })
-  
-                index.insert({ filepath, oid: baseOid, stage: 1 })
-                index.insert({ filepath, oid: theirOid, stage: 3 })
-              }
-  
-              return {
-                mode: await theirs.mode(),
-                oid: await theirs.oid(),
-                type: 'blob',
-                path,
-              }
+
+            return {
+              mode: await ours.mode(),
+              oid: await ours.oid(),
+              type: 'blob',
+              path,
             }
+          }
+
+          // deleted by us
+          if (
+            base &&
+            !ours &&
+            theirs &&
+            (await base.type()) === 'blob' &&
+            (await theirs.type()) === 'blob'
+          ) {
+            unmergedFiles.push(filepath)
+            if (!abortOnConflict) {
+              const baseOid = await base.oid()
+              const theirOid = await theirs.oid()
+
+              index.delete({ filepath })
+
+              index.insert({ filepath, oid: baseOid, stage: 1 })
+              index.insert({ filepath, oid: theirOid, stage: 3 })
+            }
+
+            return {
+              mode: await theirs.mode(),
+              oid: await theirs.oid(),
+              type: 'blob',
+              path,
+            }
+          }
+
+          //deleted by both
+          if (base && !ours && !theirs && (await base.type()) === 'blob') {
+            return undefined
+          }
+
           // all other types of conflicts fail
           // TODO: Merge conflicts involving deletions/additions
           throw new MergeNotSupportedError()

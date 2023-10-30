@@ -521,6 +521,29 @@ describe('merge', () => {
     }).rejects.toThrowError(Errors.MergeConflictError)
   })
 
+  it("merge 'i' and 'i-delete-both' (delete by both)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    // Test
+    const mergeReuslt = await merge({
+      fs,
+      gitdir,
+      ours: 'i',
+      theirs: 'i-delete-both',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    expect(mergeReuslt).toEqual({
+      oid: '268d68f711861bb413d4f370cd2ea35d10558226',
+      tree: '8171c8d2486c77cd9c23e111982e35e87f3da438',
+      mergeCommit: true,
+    })
+  })
+
   it("merge two branches that modified the same file (no conflict)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
