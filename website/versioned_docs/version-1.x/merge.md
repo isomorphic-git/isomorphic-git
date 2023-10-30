@@ -80,7 +80,7 @@ await git.merge({
   if (e instanceof Errors.MergeConflictError) {
     console.log(
       'Automatic merge failed for the following files: '
-      + `${e.data.filepaths}. `
+      + `${e.data}. `
       + 'Resolve these conflicts and then commit your changes.'
     )
   } else throw e
