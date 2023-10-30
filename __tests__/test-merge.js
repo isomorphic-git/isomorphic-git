@@ -501,7 +501,7 @@ describe('merge', () => {
     }).rejects.toThrowError(Errors.MergeConflictError)
   })
 
-  it("merge 'g-delete-file' adn 'g' (delete by us)", async () => {
+  it("merge 'g-delete-file' and 'g' (delete by us)", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
     // Test
