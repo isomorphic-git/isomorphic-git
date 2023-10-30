@@ -363,6 +363,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/barry963"><img src="https://avatars.githubusercontent.com/u/5289896?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Barry</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=barry963" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=barry963" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=barry963" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://stackoverflow.com/users/1493081/alireza-mirian"><img src="https://avatars.githubusercontent.com/u/3150694?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Alireza Mirian</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=alirezamirian" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=alirezamirian" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=alirezamirian" title="Tests">⚠️</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Aalirezamirian" title="Bug reports">🐛</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/DanilKazanov"><img src="https://avatars.githubusercontent.com/u/139755256?v=4?s=60" width="60px;" alt=""/><br /><sub><b>DanilKazanov</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=DanilKazanov" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=DanilKazanov" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=DanilKazanov" title="Tests">⚠️</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->

@@ -631,6 +631,17 @@
         "test",
         "bug"
       ]
+    },
+    {
+      "login": "DanilKazanov",
+      "name": "DanilKazanov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/139755256?v=4",
+      "profile": "https://github.com/DanilKazanov",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
