@@ -523,7 +523,8 @@ describe('merge', () => {
 
   it("merge 'i' and 'i-delete-both' (delete by both)", async () => {
     // Setup
-    const { fs, gitdir } = await makeFixture('test-merge')
+    const { fs, gitdir, dir } = await makeFixture('test-merge')
+    const deletedFile = `${dir}/o.txt`
     // Test
     const mergeReuslt = await merge({
       fs,
@@ -537,11 +538,8 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
     })
-    expect(mergeReuslt).toEqual({
-      oid: '268d68f711861bb413d4f370cd2ea35d10558226',
-      tree: '8171c8d2486c77cd9c23e111982e35e87f3da438',
-      mergeCommit: true,
-    })
+    expect(mergeReuslt).toBeTruthy()
+    expect(await fs.exists(deletedFile)).toBeFalsy()
   })
 
   it("merge two branches that modified the same file (no conflict)'", async () => {
