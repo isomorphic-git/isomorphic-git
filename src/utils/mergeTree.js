@@ -198,7 +198,7 @@ export async function mergeTree({
             }
           }
 
-          //deleted by both
+          // deleted by both
           if (base && !ours && !theirs && (await base.type()) === 'blob') {
             return undefined
           }
@@ -260,7 +260,12 @@ export async function mergeTree({
         },
       })
     }
-    return new MergeConflictError(unmergedFiles, bothModified, deleteByUs, deleteByTheirs)
+    return new MergeConflictError(
+      unmergedFiles,
+      bothModified,
+      deleteByUs,
+      deleteByTheirs
+    )
   }
 
   return results.oid
