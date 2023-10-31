@@ -496,6 +496,77 @@ describe('merge', () => {
     expect(error.code).toBe(Errors.MergeNotSupportedError.code)
   })
 
+  it("merge 'g' and 'g-delete-file' (delete by theirs)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    // Test
+    let error = null
+    try {
+      await merge({
+        fs,
+        gitdir,
+        ours: 'g',
+        theirs: 'g-delete-file',
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+  })
+
+  it("merge 'g-delete-file' and 'g' (delete by us)", async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge')
+    // Test
+    let error = null
+    try {
+      await merge({
+        fs,
+        gitdir,
+        ours: 'g-delete-file',
+        theirs: 'g',
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+  })
+
+  it("merge 'i' and 'i-delete-both' (delete by both)", async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-merge')
+    const deletedFile = `${dir}/o.txt`
+    // Test
+    const mergeReuslt = await merge({
+      fs,
+      gitdir,
+      ours: 'i',
+      theirs: 'i-delete-both',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    expect(mergeReuslt).toBeTruthy()
+    expect(await fs.exists(deletedFile)).toBeFalsy()
+  })
+
   it("merge two branches that modified the same file (no conflict)'", async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge')
