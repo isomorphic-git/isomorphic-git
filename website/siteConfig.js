@@ -14,7 +14,7 @@ const siteConfig = {
   url: 'https://isomorphic-git.org' /* your website url */,
   cname: 'isomorphic-git.org' /* gets overwritten each time */,
   baseUrl: '/' /* base url for your project */,
-  editUrl: 'https://github.com/isomorphic-git/isomorphic-git.github.io/edit/source/docs/',
+  editUrl: 'https://github.com/isomorphic-git/isomorphic-git/edit/main/docs/',
   headerLinks: [
     {
       doc: 'alphabetic',
