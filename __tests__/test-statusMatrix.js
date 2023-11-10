@@ -394,4 +394,109 @@ describe('statusMatrix', () => {
       ['b/b.txt', 0, 2, 2],
     ])
   })
+
+  describe('statusMatrix with a symlinked directory', () => {
+    const realFolder = 'realFolder'
+    let storedProps = {}
+    const symlinkCreated = false
+    beforeAll(async () => {
+      const { fs, dir, gitdir } = await makeFixture('test-empty')
+      await fs.mkdir(path.join(dir, realFolder))
+      await fs.write(path.join(dir, realFolder, 'a.txt'), 'a')
+      // symlinks can't be created in browser, according to
+      // https://github.com/isomorphic-git/isomorphic-git/blob/main/__tests__/test-add.js#L117      symlinkCreated = await fs
+      const symlinkCreated = await fs
+        ._symlink(path.join(dir, realFolder), `${dir}/linkToFolder`)
+        .then(() => true)
+        .catch(() => false)
+      if (!symlinkCreated) {
+        return
+      }
+      expect(await fs.exists(`${dir}/linkToFolder`)).toBe(true)
+      expect(await fs.exists(`${dir}/linkToFolder/a.txt`)).toBe(true)
+      storedProps = {
+        fs,
+        dir,
+        gitdir,
+      }
+    })
+
+    it('shows expected initial status', async () => {
+      if (!symlinkCreated) {
+        return
+      }
+      const { fs, dir, gitdir } = storedProps
+      // Test
+      const a = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+      })
+      expect(a).toEqual([
+        ['linkToFolder', 0, 2, 0],
+        ['realFolder/a.txt', 0, 2, 0],
+      ])
+    })
+
+    it('adds the link to staged', async () => {
+      if (!symlinkCreated) {
+        return
+      }
+      const { fs, dir, gitdir } = storedProps
+
+      await add({
+        fs,
+        dir,
+        gitdir,
+        filepath: 'linkToFolder',
+      })
+      // Test without specifying filepaths
+      const a = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+      })
+      expect(a).toEqual([
+        ['linkToFolder', 0, 2, 2],
+        ['realFolder/a.txt', 0, 2, 0],
+      ])
+      // Test with specifying filepaths
+
+      const b = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        filepaths: ['linkToFolder'],
+      })
+      expect(b).toEqual([['linkToFolder', 0, 2, 2]])
+    })
+
+    it('sees no change when stuff in the target folder changes (staged, no workdir changes)', async () => {
+      if (!symlinkCreated) {
+        return
+      }
+      const { fs, dir, gitdir } = storedProps
+      await fs.write(path.join(dir, realFolder, 'a.txt'), 'a')
+
+      // Test without specifying filepaths
+      const a = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+      })
+      expect(a).toEqual([
+        ['linkToFolder', 0, 2, 2],
+        ['realFolder/a.txt', 0, 2, 0],
+      ])
+      // Test with specifying filepaths
+
+      const b = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        filepaths: ['linkToFolder'],
+      })
+      expect(b).toEqual([['linkToFolder', 0, 2, 2]])
+    })
+  })
 })

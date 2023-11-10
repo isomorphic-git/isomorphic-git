@@ -46,6 +46,7 @@ export class GitWalkerFs {
   }
 
   async readdir(entry) {
+    if ((await entry.type()) === 'linkTree') return []
     const filepath = entry._fullpath
     const { fs, dir } = this
     const names = await fs.readdir(join(dir, filepath))
@@ -80,6 +81,14 @@ export class GitWalkerFs {
       if (type === 'blob' && !stat.isFile() && !stat.isSymbolicLink()) {
         type = 'special'
       }
+      // linktree means a symlink to a directory
+      // this can be used by consumers like StatusMatrix to avoid following links (which git doesn't do)
+      if (type === 'blob' && stat.isSymbolicLink()) {
+        const targetStat = await fs._stat(`${dir}/${entry._fullpath}`)
+        if (targetStat.isDirectory()) {
+          type = 'linkTree'
+        }
+      }
       entry._type = type
       stat = normalizeStats(stat)
       entry._mode = stat.mode
@@ -95,7 +104,7 @@ export class GitWalkerFs {
   async content(entry) {
     if (entry._content === false) {
       const { fs, dir } = this
-      if ((await entry.type()) === 'tree') {
+      if (['tree', 'linkTree'].includes(await entry.type(entry))) {
         entry._content = undefined
       } else {
         const content = await fs.read(`${dir}/${entry._fullpath}`)
