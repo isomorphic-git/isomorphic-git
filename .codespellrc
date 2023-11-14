@@ -1,5 +1,5 @@
 [codespell]
-skip = .git,*.pdf,*.svg,package-lock.json,*.css,*.min.*,.codespellrc
+skip = .git,*.pdf,*.svg,package-lock.json,*.css,*.min.*,.codespellrc,__fixtures__
 check-hidden = true
 # ignore-regex = 
-# ignore-words-list =
+ignore-words-list = ot,fo
