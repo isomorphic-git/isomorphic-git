@@ -642,6 +642,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "hisco",
+      "name": "Eyal Hisco",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39222286?v=4",
+      "profile": "https://api.github.com/users/hisco",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
