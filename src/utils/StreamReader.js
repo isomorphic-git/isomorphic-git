@@ -13,9 +13,7 @@ export class StreamReader {
   }
 
   eof() {
-    return (
-      this._ended && this.buffer != null && this.cursor === this.buffer.length
-    )
+    return this._ended && this.cursor === this.buffer.length
   }
 
   tell() {
@@ -23,8 +21,8 @@ export class StreamReader {
   }
 
   async byte() {
-    if (this.eof()) return
     if (!this.started) await this._init()
+    if (this.eof()) return
     if (this.cursor === this.buffer.length) {
       await this._loadnext()
       if (this._ended) return
@@ -34,8 +32,8 @@ export class StreamReader {
   }
 
   async chunk() {
-    if (this.eof()) return
     if (!this.started) await this._init()
+    if (this.eof()) return
     if (this.cursor === this.buffer.length) {
       await this._loadnext()
       if (this._ended) return
@@ -45,8 +43,8 @@ export class StreamReader {
   }
 
   async read(n) {
-    if (this.eof()) return
     if (!this.started) await this._init()
+    if (this.eof()) return
     if (this.cursor + n > this.buffer.length) {
       this._trim()
       await this._accumulate(n)
@@ -56,8 +54,8 @@ export class StreamReader {
   }
 
   async skip(n) {
-    if (this.eof()) return
     if (!this.started) await this._init()
+    if (this.eof()) return
     if (this.cursor + n > this.buffer.length) {
       this._trim()
       await this._accumulate(n)
@@ -71,14 +69,11 @@ export class StreamReader {
 
   async _next() {
     this.started = true
-    let { done, value } = await this.stream.next()
+    const { done, value } = await this.stream.next()
     if (done) {
       this._ended = true
     }
-    if (value) {
-      value = Buffer.from(value)
-    }
-    return value
+    return value == null ? Buffer.alloc(0) : Buffer.from(value)
   }
 
   _trim() {
