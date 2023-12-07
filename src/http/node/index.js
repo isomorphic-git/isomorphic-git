@@ -36,15 +36,19 @@ export async function request({
       },
       (err, res) => {
         if (err) return reject(err)
-        const iter = fromNodeStream(res)
-        resolve({
-          url: res.url,
-          method: res.method,
-          statusCode: res.statusCode,
-          statusMessage: res.statusMessage,
-          body: iter,
-          headers: res.headers,
-        })
+        try {
+          const iter = fromNodeStream(res)
+          resolve({
+            url: res.url,
+            method: res.method,
+            statusCode: res.statusCode,
+            statusMessage: res.statusMessage,
+            body: iter,
+            headers: res.headers,
+          })
+        } catch (e) {
+          reject(e)
+        }
       }
     )
   })
