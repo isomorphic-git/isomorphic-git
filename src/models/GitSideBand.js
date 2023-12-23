@@ -65,7 +65,7 @@ export class GitSideBand {
         }
         default: {
           // Not part of the side-band-64k protocol
-          packetlines.write(line.slice(0))
+          packetlines.write(line)
         }
       }
       // Careful not to blow up the stack.
