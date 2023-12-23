@@ -58,6 +58,8 @@ export class GitSideBand {
           // fatal error message just before stream aborts
           const error = line.slice(1)
           progress.write(error)
+          packetlines.end()
+          progress.end()
           packfile.destroy(new Error(error.toString('utf8')))
           return
         }
