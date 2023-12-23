@@ -86,7 +86,7 @@ export class GitPktLine {
         if (buffer == null) return true
         return buffer
       } catch (err) {
-        console.log('error', err)
+        stream.error = err
         return true
       }
     }

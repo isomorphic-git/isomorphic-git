@@ -73,6 +73,37 @@ describe('GitPktLine', () => {
     )
   })
 
+  it('read stream - with error', async () => {
+    const hookStream = (subject, fn) => {
+      const unhook = function(write) {
+        this.write = write
+      }.bind(subject, subject.write)
+      subject.write = fn
+      return unhook
+    }
+    let unhook
+    try {
+      const output = []
+      if (!process.browser) {
+        const onLog = chunk => output.push(chunk) && undefined
+        unhook = hookStream(process.stdout, onLog)
+      }
+      let err
+      const stream = {
+        next() {
+          throw (err = new Error('something went wrong'))
+        },
+      }
+      const read = GitPktLine.streamReader(stream)
+      const line = await read()
+      expect(output.length === 0).toBe(true)
+      expect(line).toBe(true)
+      expect(stream.error === err).toBe(true)
+    } finally {
+      if (unhook) unhook()
+    }
+  })
+
   it('encode empty string', async () => {
     const foo = GitPktLine.encode('')
     expect(foo).toBeTruthy()
