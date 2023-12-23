@@ -387,6 +387,11 @@ access it.
     const result = await parseUploadPackResponse(res)
     expect(result.nak).toBe(true)
   })
+  it('parseUploadPackResponse - no packetlines', async () => {
+    const res = [Buffer.from(`0000`)]
+    const result = await parseUploadPackResponse(res)
+    expect(result.nak).toBe(false)
+  })
   it('parseUploadPackResponse - incremental update (fetch)', async () => {
     const res = [
       Buffer.from(`003aACK 7e47fe2bd8d01d481f44d7af0531bd93d3b21c01 continue

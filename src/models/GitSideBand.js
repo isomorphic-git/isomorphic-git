@@ -39,7 +39,7 @@ export class GitSideBand {
       if (line === true) {
         packetlines.end()
         progress.end()
-        packfile.end()
+        input.error ? packfile.destroy(input.error) : packfile.end()
         return
       }
       // Examine first byte to determine which output "stream" to use
