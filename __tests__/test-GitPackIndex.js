@@ -70,6 +70,17 @@ describe('GitPackIndex', () => {
       20855
     )
   })
+  it('from .pack when pack is truncated', async () => {
+    const { fs, gitdir } = await makeFixture('test-GitPackIndex')
+    const pack = await fs.read(
+      path.join(
+        gitdir,
+        'objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888.pack'
+      )
+    )
+    const p = await GitPackIndex.fromPack({ pack: pack.slice(0, 12) })
+    expect(p.offsets.size).toBe(0)
+  })
   it('to .idx file from .pack', async () => {
     const { fs, gitdir } = await makeFixture('test-GitPackIndex')
     const idx = await fs.read(
