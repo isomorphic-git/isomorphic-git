@@ -156,6 +156,231 @@ describe('clone', () => {
     expect(await fs.exists(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
   })
 
+  it('should throw error if server resets connection before reading packetlines', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture(
+      'test-clone-error-before-packetlines'
+    )
+    const instrumentedHttp = {
+      request() {
+        return http.request.apply(null, arguments).then(response => {
+          const contentType = response.headers['content-type']
+          if (contentType === 'application/x-git-upload-pack-result') {
+            const body = `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
+0023\x02Enumerating objects: 5, done.
+0022\x02Counting objects:  20% (1/5)
+0022\x02Counting objects:  40% (2/5)
+0022\x02Counting objects:  60% (3/5)
+0022\x02Counting objects:  80% (4/5)
+0029\x02Counting objects: 100% (5/5), done.
+002c\x02Compressing objects: 100% (2/2), done.
+0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
+0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
+              .split('\n')
+              .map(it => Buffer.from(it + '\n'))
+              .values()
+            body.next = new Proxy(body.next, {
+              apply(target, self, args) {
+                const result = target.apply(self, args)
+                if (~result.value.indexOf('shallow')) {
+                  throw Object.assign(new Error('aborted'), {
+                    code: 'ECONNRESET',
+                  })
+                }
+                return result
+              },
+            })
+            response.body = body
+          }
+          return response
+        })
+      },
+    }
+    // Test
+    let error
+    try {
+      await clone({
+        fs,
+        http: instrumentedHttp,
+        dir,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        url: `http://${localhost}:8888/test-clone.git`,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.message).toEqual('aborted')
+    expect(error.caller).toEqual('git.clone')
+    expect(error.code).toEqual('ECONNRESET')
+  })
+
+  it('should throw error if server resets connection while reading packetlines', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture(
+      'test-clone-error-during-packetlines'
+    )
+    const instrumentedHttp = {
+      request() {
+        return http.request.apply(null, arguments).then(response => {
+          const contentType = response.headers['content-type']
+          if (contentType === 'application/x-git-upload-pack-result') {
+            const body = `0037unshallow 1f6d22958fa079fc2205bb5ae1224d9677f1eaf9
+0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
+0023\x02Enumerating objects: 5, done.
+0022\x02Counting objects:  20% (1/5)
+0022\x02Counting objects:  40% (2/5)
+0022\x02Counting objects:  60% (3/5)
+0022\x02Counting objects:  80% (4/5)
+0029\x02Counting objects: 100% (5/5), done.
+002c\x02Compressing objects: 100% (2/2), done.
+0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
+0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
+              .split('\n')
+              .map(it => Buffer.from(it + '\n'))
+              .values()
+            body.next = new Proxy(body.next, {
+              apply(target, self, args) {
+                const result = target.apply(self, args)
+                if (~result.value.indexOf('shallow')) {
+                  throw Object.assign(new Error('aborted'), {
+                    code: 'ECONNRESET',
+                  })
+                }
+                return result
+              },
+            })
+            response.body = body
+          }
+          return response
+        })
+      },
+    }
+    // Test
+    let error
+    try {
+      await clone({
+        fs,
+        http: instrumentedHttp,
+        dir,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        url: `http://${localhost}:8888/test-clone.git`,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.message).toEqual('aborted')
+    expect(error.caller).toEqual('git.clone')
+    expect(error.code).toEqual('ECONNRESET')
+  })
+
+  it('should throw error if server resets connection before reading packfile', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture(
+      'test-clone-error-before-packfile'
+    )
+    const instrumentedHttp = {
+      request() {
+        return http.request.apply(null, arguments).then(response => {
+          const contentType = response.headers['content-type']
+          if (contentType === 'application/x-git-upload-pack-result') {
+            const body = `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
+0023\x02Enumerating objects: 5, done.
+0022\x02Counting objects:  20% (1/5)
+0022\x02Counting objects:  40% (2/5)
+0022\x02Counting objects:  60% (3/5)
+0022\x02Counting objects:  80% (4/5)
+0029\x02Counting objects: 100% (5/5), done.
+002c\x02Compressing objects: 100% (2/2), done.
+0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
+0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
+              .split('\n')
+              .map(it => Buffer.from(it + '\n'))
+              .values()
+            body.next = new Proxy(body.next, {
+              apply(target, self, args) {
+                const result = target.apply(self, args)
+                if (~result.value.indexOf('PACK')) {
+                  throw Object.assign(new Error('aborted'), {
+                    code: 'ECONNRESET',
+                  })
+                }
+                return result
+              },
+            })
+            response.body = body
+          }
+          return response
+        })
+      },
+    }
+    // Test
+    let error
+    try {
+      await clone({
+        fs,
+        http: instrumentedHttp,
+        dir,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        url: `http://${localhost}:8888/test-clone.git`,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.message).toEqual('aborted')
+    expect(error.caller).toEqual('git.clone')
+    expect(error.code).toEqual('ECONNRESET')
+  })
+
+  it('should not throw TypeError error if packfile is empty', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture(
+      'test-clone-error-empty-packfile'
+    )
+    const instrumentedHttp = {
+      request() {
+        return http.request.apply(null, arguments).then(response => {
+          const contentType = response.headers['content-type']
+          if (contentType === 'application/x-git-upload-pack-result') {
+            response.body = `0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
+0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
+              .split('\n')
+              .map(it => Buffer.from(it + '\n'))
+              .values()
+          }
+          return response
+        })
+      },
+    }
+    // Test
+    let error
+    try {
+      await clone({
+        fs,
+        http: instrumentedHttp,
+        dir,
+        gitdir,
+        depth: 1,
+        singleBranch: true,
+        url: `http://${localhost}:8888/test-clone.git`,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.name).not.toEqual('TypeError')
+    expect(error.name).toEqual('CommitNotFetchedError')
+    expect(error.caller).toEqual('git.clone')
+  })
+
   it('clone default branch with --singleBranch', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
     await clone({

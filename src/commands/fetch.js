@@ -343,6 +343,7 @@ export async function _fetch({
     })
   }
   const packfile = Buffer.from(await collect(response.packfile))
+  if (raw.body.error) throw raw.body.error
   const packfileSha = packfile.slice(-20).toString('hex')
   const res = {
     defaultBranch: response.HEAD,

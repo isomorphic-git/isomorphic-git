@@ -26,8 +26,8 @@ export class FIFO {
   }
 
   destroy(err) {
-    this._ended = true
     this.error = err
+    this.end()
   }
 
   async next() {
