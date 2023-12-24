@@ -39,7 +39,7 @@ export class GitSideBand {
       if (line === true) {
         packetlines.end()
         progress.end()
-        packfile.end()
+        input.error ? packfile.destroy(input.error) : packfile.end()
         return
       }
       // Examine first byte to determine which output "stream" to use
@@ -58,12 +58,14 @@ export class GitSideBand {
           // fatal error message just before stream aborts
           const error = line.slice(1)
           progress.write(error)
+          packetlines.end()
+          progress.end()
           packfile.destroy(new Error(error.toString('utf8')))
           return
         }
         default: {
           // Not part of the side-band-64k protocol
-          packetlines.write(line.slice(0))
+          packetlines.write(line)
         }
       }
       // Careful not to blow up the stack.

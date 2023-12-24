@@ -72,6 +72,7 @@ export class StreamReader {
     let { done, value } = await this.stream.next()
     if (done) {
       this._ended = true
+      if (!value) return Buffer.alloc(0)
     }
     if (value) {
       value = Buffer.from(value)

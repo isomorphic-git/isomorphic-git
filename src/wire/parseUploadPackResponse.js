@@ -37,7 +37,15 @@ export async function parseUploadPackResponse(stream) {
         nak = true
       }
       if (done) {
-        resolve({ shallows, unshallows, acks, nak, packfile, progress })
+        stream.error
+          ? reject(stream.error)
+          : resolve({ shallows, unshallows, acks, nak, packfile, progress })
+      }
+    }).finally(() => {
+      if (!done) {
+        stream.error
+          ? reject(stream.error)
+          : resolve({ shallows, unshallows, acks, nak, packfile, progress })
       }
     })
   })
