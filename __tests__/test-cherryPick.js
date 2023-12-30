@@ -6,13 +6,13 @@ const { makeFixture } = require('./__helpers__/FixtureFS.js')
 describe('cherry-pick', () => {
   it("cherry-pick commit from b into a (no conflict)'", async () => {
     // Setup
-    const { fs, dir } = await makeFixture('test-cherryPick')
+    const { fs, gitdir } = await makeFixture('test-cherryPick')
 
     // Test
     const cpCommitExpected = (
       await log({
         fs,
-        dir,
+        gitdir,
         depth: 1,
         ref: 'v',
       })
@@ -20,7 +20,7 @@ describe('cherry-pick', () => {
 
     const report = await cherryPick({
       fs,
-      dir,
+      gitdir,
       ours: 'a',
       theirs: 'd7676dfe102cd28ec794b25f9a6231af0cdfd16d',
       author: {
@@ -33,7 +33,7 @@ describe('cherry-pick', () => {
     const cpCommitActual = (
       await log({
         fs,
-        dir,
+        gitdir,
         ref: 'a',
         depth: 1,
       })
