@@ -17,6 +17,7 @@ describe('exports', () => {
         "annotatedTag",
         "branch",
         "checkout",
+        "cherryPick",
         "clone",
         "commit",
         "currentBranch",

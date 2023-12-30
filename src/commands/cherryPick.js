@@ -4,15 +4,13 @@ import '../typedefs.js'
 import { _commit } from '../commands/commit'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _findMergeBase } from '../commands/findMergeBase.js'
-import { FastForwardError } from '../errors/FastForwardError.js'
 import { MergeConflictError } from '../errors/MergeConflictError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { mergeTree } from '../utils/mergeTree.js'
-import { expandOid } from '../api/expandOid.js'
-import { _readObject } from '../storage/readObject.js'
+
 import { _readCommit } from './readCommit.js'
 
 // import diff3 from 'node-diff3'
@@ -92,7 +90,7 @@ export async function _cherryPick({
 
   const theirOid = theirs
 
-  // TODO: 
+  // TODO:
   // - check if passed string is an oid
   // - support picking multiple commits
 
@@ -144,7 +142,7 @@ export async function _cherryPick({
   if (tree instanceof MergeConflictError) throw tree
 
   // get the commit message of the commit being cherry-picked
-  const commitObj = await _readCommit({fs, gitdir, oid: theirOid, cache})
+  const commitObj = await _readCommit({ fs, gitdir, oid: theirOid, cache })
   message = commitObj.commit.message
 
   const oid = await _commit({
