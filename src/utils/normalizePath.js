@@ -1,4 +1,14 @@
 export function normalizePath(path) {
+  let normalizedPath = normalizePathCache.get(path)
+  if (!normalizedPath) {
+    normalizedPath = normalizePathInternal(path)
+    normalizePathCache.set(path, normalizedPath)
+  }
+  return normalizedPath
+}
+
+const normalizePathCache = new Map()
+function normalizePathInternal(path) {
   path = path
     .split('/./')
     .join('/') // Replace '/./' with '/'
