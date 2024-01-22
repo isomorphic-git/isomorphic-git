@@ -660,6 +660,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mdekstrand",
+      "name": "Michael Ekstrand",
+      "avatar_url": "https://avatars.githubusercontent.com/u/186612?v=4",
+      "profile": "https://md.ekstrandom.net/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
