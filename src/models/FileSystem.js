@@ -10,7 +10,7 @@ function isPromiseFs(fs) {
     try {
       // If readFile returns a promise then we can probably assume the other
       // commands do as well
-      return targetFs.readFile().catch(e => e)
+      return targetFs.readFile(undefined).catch(e => e)
     } catch (e) {
       return e
     }
