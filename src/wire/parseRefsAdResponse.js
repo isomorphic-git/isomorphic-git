@@ -41,14 +41,17 @@ export async function parseRefsAdResponse(stream, { service }) {
 
   const [firstRef, capabilitiesLine] = splitAndAssert(lineTwo, '\x00', '\\x00')
   capabilitiesLine.split(' ').map(x => capabilities.add(x))
-  const [ref, name] = splitAndAssert(firstRef, ' ', ' ')
-  refs.set(name, ref)
-  while (true) {
-    const line = await read()
-    if (line === true) break
-    if (line !== null) {
-      const [ref, name] = splitAndAssert(line.toString('utf8'), ' ', ' ')
-      refs.set(name, ref)
+  // see no-refs in https://git-scm.com/docs/pack-protocol#_reference_discovery (since git 2.41.0)
+  if (firstRef !== '0000000000000000000000000000000000000000 capabilities^{}') {
+    const [ref, name] = splitAndAssert(firstRef, ' ', ' ')
+    refs.set(name, ref)
+    while (true) {
+      const line = await read()
+      if (line === true) break
+      if (line !== null) {
+        const [ref, name] = splitAndAssert(line.toString('utf8'), ' ', ' ')
+        refs.set(name, ref)
+      }
     }
   }
   // Symrefs are thrown into the "capabilities" unfortunately.
