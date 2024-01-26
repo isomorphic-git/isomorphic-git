@@ -1,7 +1,7 @@
-import { normalize } from './path.js'
+import { path } from './path.js'
 
 export function join(...parts) {
-  let normalizedPath = normalize(parts.map(normalize).join('/'))
+  let normalizedPath = path.join(...parts.map(path.normalize))
 
   if (normalizedPath === './') {
     normalizedPath = '.'

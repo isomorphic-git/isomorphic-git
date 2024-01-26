@@ -3,4 +3,3 @@
 import _path from 'path'
 
 export const path = _path.posix === undefined ? _path : _path.posix
-export const normalize = path.normalize
