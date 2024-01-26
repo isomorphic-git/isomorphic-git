@@ -1,4 +1,4 @@
-const { normalize } = require('path').posix || require('path')
+import { normalize } from './path.js'
 
 export function join(...parts) {
   let normalizedPath = normalize(parts.map(normalize).join('/'))
