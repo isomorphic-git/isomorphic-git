@@ -660,6 +660,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "DenSpirit",
+      "name": "Denis Borisevich",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3977019?v=4",
+      "profile": "https://github.com/DenSpirit",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
