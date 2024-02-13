@@ -1,8 +1,9 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
-
+const node_fs = require('fs')
 const { packObjects } = require('isomorphic-git')
 
+const { deflate } = require('../src/utils/deflate.js')
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('packObjects', () => {
@@ -13,7 +14,7 @@ describe('packObjects', () => {
     const fixture = await fs.read(
       path.join(dir, 'foobar-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     )
-    const { filename, packfile } = await packObjects({
+    let { filename, packfile } = await packObjects({
       fs,
       gitdir,
       oids: [
@@ -31,6 +32,7 @@ describe('packObjects', () => {
         '5477471ab5a6a8f2c217023532475044117a8f2c',
       ],
     })
+    packfile = await deflate(packfile)
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     if (!packfile) throw new Error('type error')
     expect(fixture.buffer).toEqual(packfile.buffer)
@@ -70,7 +72,7 @@ describe('packObjects', () => {
     expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     const filepath = path.join(gitdir, `objects/pack/${filename}`)
     expect(await fs.exists(filepath)).toBe(true)
-    const packfile = await fs.read(filepath)
+    const packfile = await deflate(await fs.read(filepath))
     expect(fixture.buffer).toEqual(packfile.buffer)
     expect(
       Buffer.compare(Buffer.from(fixture), Buffer.from(packfile)) === 0
