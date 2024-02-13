@@ -1,9 +1,10 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
-const node_fs = require('fs')
+
 const { packObjects } = require('isomorphic-git')
 
 const { deflate } = require('../src/utils/deflate.js')
+
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('packObjects', () => {
