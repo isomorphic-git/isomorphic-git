@@ -3,15 +3,14 @@ const path = require('path')
 
 const { packObjects, indexPack } = require('isomorphic-git')
 
-const { deflate } = require('../src/utils/deflate.js')
-const { readObjectPacked } = require('../src/storage/readObjectPacked.js');
+const { readObjectPacked } = require('../src/storage/readObjectPacked.js')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
 describe('packObjects', () => {
   it('makes a packfile', async () => {
     // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-packObjects')
+    const { fs, gitdir } = await makeFixture('test-packObjects')
     const { filename, packfile } = await packObjects({
       fs,
       gitdir,
@@ -52,7 +51,7 @@ describe('packObjects', () => {
       'a59efbcd7640e659ec81887a2599711f8d9ef801',
       'e5abf40a5b37382c700f51ac5c2aeefdadb8e184',
       '5477471ab5a6a8f2c217023532475044117a8f2c',
-    ];
+    ]
     const { filename } = await packObjects({
       fs,
       gitdir,
@@ -67,10 +66,17 @@ describe('packObjects', () => {
     const fullpath = path.join(gitdir, filepath)
     expect(await fs.exists(fullpath)).toBe(true)
     await indexPack({ fs, dir: gitdir, filepath, gitdir, cache })
-    await Promise.all(oids.map(async oid => {
-      const object = await readObjectPacked({ fs, gitdir, oid, cache })
-      const fixture = await readObjectPacked({ fs, gitdir: fixdir, oid, cache: fixcache })
-      expect(object).toEqual(fixture)
-    }))
+    await Promise.all(
+      oids.map(async oid => {
+        const object = await readObjectPacked({ fs, gitdir, oid, cache })
+        const fixture = await readObjectPacked({
+          fs,
+          gitdir: fixdir,
+          oid,
+          cache: fixcache,
+        })
+        expect(object).toEqual(fixture)
+      })
+    )
   })
 })
