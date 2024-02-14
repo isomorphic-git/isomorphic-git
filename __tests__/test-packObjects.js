@@ -2,9 +2,7 @@
 const path = require('path')
 
 const { packObjects, indexPack } = require('isomorphic-git')
-
-const { _readObject: readObject } = require('../src/storage/readObject.js')
-const { readObjectPacked } = require('../src/storage/readObjectPacked.js')
+const { readObject, readObjectPacked } = require('isomorphic-git/internal-apis')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 

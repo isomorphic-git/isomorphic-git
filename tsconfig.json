@@ -1,5 +1,5 @@
 {
-  "include": ["**/*.d.ts"],
+  "include": ["__tests__"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "strictNullChecks": true,

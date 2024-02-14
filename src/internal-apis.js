@@ -29,6 +29,7 @@ export * from './models/GitTree'
 
 export * from './storage/readObject'
 export * from './storage/writeObject'
+export * from './storage/readObjectPacked'
 
 export * from './utils/calculateBasicAuthHeader'
 export * from './utils/collect'
