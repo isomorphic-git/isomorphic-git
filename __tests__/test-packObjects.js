@@ -3,6 +3,7 @@ const path = require('path')
 
 const { packObjects, indexPack } = require('isomorphic-git')
 
+const { _readObject: readObject } = require('../src/storage/readObject.js')
 const { readObjectPacked } = require('../src/storage/readObjectPacked.js')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -65,14 +66,22 @@ describe('packObjects', () => {
     const fixdir = path.join(dir, 'git')
     const fullpath = path.join(gitdir, filepath)
     expect(await fs.exists(fullpath)).toBe(true)
+    const getExternalRefDelta = oid => readObject({ fs, cache, gitdir, oid })
     await indexPack({ fs, dir: gitdir, filepath, gitdir, cache })
     await Promise.all(
       oids.map(async oid => {
-        const object = await readObjectPacked({ fs, gitdir, oid, cache })
+        const object = await readObjectPacked({
+          fs,
+          gitdir,
+          oid,
+          cache,
+          getExternalRefDelta,
+        })
         const fixture = await readObjectPacked({
           fs,
           gitdir: fixdir,
           oid,
+          getExternalRefDelta,
           cache: fixcache,
         })
         expect(object).toEqual(fixture)

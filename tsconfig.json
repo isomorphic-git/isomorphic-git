@@ -1,6 +1,5 @@
 {
-  "include": ["__tests__"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "website"],
   "compilerOptions": {
     "strictNullChecks": true,
     "noEmit": true,
