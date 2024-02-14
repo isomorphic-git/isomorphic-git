@@ -1,5 +1,5 @@
 {
-  "include": [],
+  "include": ["src"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "strictNullChecks": true,
