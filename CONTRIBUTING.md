@@ -95,8 +95,11 @@ And here is another advanced video:<br/>
 Another resource is GitHub blog:
 * [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
 * [Git’s database internals II: commit history queries](https://github.blog/2022-08-30-gits-database-internals-ii-commit-history-queries/)
-* 
+
 And this description of .git directory:
 * [What is in that .git directory?](https://blog.meain.io/2023/what-is-in-dot-git/)
+
+There is also chapter in git Pro book
+* [Git Internals](https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain)
 
 You can also search [git in the blog of Julia Evans](https://duckduckgo.com/?q=site%3Ajvns.ca+git&ia=web).
