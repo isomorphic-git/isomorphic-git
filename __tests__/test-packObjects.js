@@ -28,7 +28,6 @@ describe('packObjects', () => {
         '5477471ab5a6a8f2c217023532475044117a8f2c',
       ],
     })
-    expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     if (!packfile) throw new Error('type error')
     expect(await fs.exists(path.join(gitdir, `objects/pack/${filename}`))).toBe(
       false
@@ -57,7 +56,6 @@ describe('packObjects', () => {
       oids,
       write: true,
     })
-    expect(filename).toBe('pack-76178ca22ef818f971fca371d84bce571d474b1d.pack')
     const filepath = `objects/pack/${filename}`
     const cache = {}
     const fixcache = {}
@@ -82,6 +80,10 @@ describe('packObjects', () => {
           getExternalRefDelta,
           cache: fixcache,
         })
+        // the packfile can have different source when compression changes
+        // There are no guarantee that the compression will always give same result
+        delete object.source
+        delete fixture.source
         expect(object).toEqual(fixture)
       })
     )
