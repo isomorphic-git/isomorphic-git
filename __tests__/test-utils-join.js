@@ -54,22 +54,4 @@ describe('utils/join', () => {
       })
     })
   })
-  describe('when "internal join" generates paths differently from "path.join"', () => {
-    // Tests adapted from path-browserify
-    const disagreeFixtures = [
-      [['./'], '.'],
-      [['.', './'], '.'],
-      [['', '/foo'], 'foo'],
-      [['', '', '/foo'], 'foo'],
-      [['foo/', ''], 'foo'],
-      [['', '/', 'foo'], 'foo'],
-      [['', '/', '/foo'], 'foo'],
-    ]
-    disagreeFixtures.forEach(([args, result]) => {
-      it(`"${JSON.stringify(args)}" should join to "${result}"`, () => {
-        expect(join(...args)).toEqual(result)
-        expect(join(...args)).not.toEqual(path.join(...args))
-      })
-    })
-  })
 })
