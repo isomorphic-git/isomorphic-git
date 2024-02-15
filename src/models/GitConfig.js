@@ -34,7 +34,7 @@ const schema = {
 // section starts with [ and ends with ]
 // section is alphanumeric (ASCII) with - and .
 // section is case insensitive
-// subsection is optionnal
+// subsection is optional
 // subsection is specified after section and one or more spaces
 // subsection is specified between double quotes
 const SECTION_LINE_REGEX = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/

@@ -28,9 +28,9 @@ Because of foresight and planning, most `isomorphic-git` functions are:
 
 The plugins (excepting `fs` plugin) also follow this pattern.
 This greatly simplifies the job of mapping `isomorphic-git` calls to a remote procedure call (RPC) API using `postMessage`.
-If you already have a WebWorker in your project and a prefered way to communicating with it, then mapping `isomorphic-git` calls is easy.
+If you already have a WebWorker in your project and a preferred way to communicating with it, then mapping `isomorphic-git` calls is easy.
 
-If you don't already have a prefered WebWorker RPC solution, then the easiest way is to use the [MagicPortal](https://www.npmjs.com/package/magic-portal) which was designed specifically for `isomorphic-git` so it's a perfect match!
+If you don't already have a preferred WebWorker RPC solution, then the easiest way is to use the [MagicPortal](https://www.npmjs.com/package/magic-portal) which was designed specifically for `isomorphic-git` so it's a perfect match!
 The examples below will use MagicPortal.
 
 ## Implementation

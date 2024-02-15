@@ -268,7 +268,7 @@ Branch issue-107 set up to track remote branch issue-107 from origin.
 ```
 
 (If the linter had found any style problems, it would have fixed them using prettier.
-I have not automated ammending the commit though, so I would have to fix the commit with
+I have not automated amending the commit though, so I would have to fix the commit with
 `git add -u && git commit --amend --no-edit` and try pushing again.)
 
 Since it succeeded, it will show up on the [Github page](https://github.com/isomorphic-git/isomorphic-git)
@@ -279,7 +279,7 @@ However, now I will tack on "(fixes #107)" to the end of the title just so Githu
 the issue and the PR.
 
 ... I lied. Github is not smart enough to use the PR title. :eyeroll:
-I edit the PR description to be "fixes #107" and _then_ Github adds the "wmhilton referened this issue a minute ago" link to the PR to the issue.
+I edit the PR description to be "fixes #107" and _then_ Github adds the "wmhilton referenced this issue a minute ago" link to the PR to the issue.
 
 Now we wait for the Continuous Integration (CI) system to do its thing.
 I didn't actually check if it would work in the browser -
