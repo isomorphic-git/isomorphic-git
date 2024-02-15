@@ -23,8 +23,9 @@ function testCompressionStream() {
   try {
     const cs = new CompressionStream('deflate')
     // Test if `Blob.stream` is present. React Native does not have the `stream` method
-    new Blob([]).stream()
-    if (cs) return true
+    const stream = new Blob([]).stream()
+    stream.cancel()
+    return !!cs
   } catch (_) {
     // no bother
   }
