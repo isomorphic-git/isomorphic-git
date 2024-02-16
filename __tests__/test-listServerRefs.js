@@ -10,7 +10,7 @@ const localhost =
 // NOTE:
 // Protocol Version 1 is incapable of reporting all the symrefs in a repo
 // It reports HEAD but does not report refs/heads/symbol.
-// So that descrepancy between the results for version 1 and version 2 is correct.
+// So that discrepancy between the results for version 1 and version 2 is correct.
 describe('listServerRefs', () => {
   it('protocol 1', async () => {
     const refs = await listServerRefs({

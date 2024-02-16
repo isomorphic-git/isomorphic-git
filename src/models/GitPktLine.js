@@ -9,7 +9,7 @@ of the line, the pkt-len, indicates the total length of the line,
 in hexadecimal.  The pkt-len includes the 4 bytes used to contain
 the length's hexadecimal representation.
 
-A pkt-line MAY contain binary data, so implementors MUST ensure
+A pkt-line MAY contain binary data, so implementers MUST ensure
 pkt-line parsing/formatting routines are 8-bit clean.
 
 A non-binary line SHOULD BE terminated by an LF, which if present

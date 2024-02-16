@@ -5,7 +5,7 @@ import { dirname } from '../utils/dirname.js'
 import { join } from '../utils/join.js'
 
 // I'm putting this in a Manager because I reckon it could benefit
-// from a LOT of cacheing.
+// from a LOT of caching.
 export class GitIgnoreManager {
   static async isIgnored({ fs, dir, gitdir = join(dir, '.git'), filepath }) {
     // ALWAYS ignore ".git" folders.

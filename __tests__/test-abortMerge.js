@@ -154,7 +154,7 @@ describe('abortMerge', () => {
 
         expect(await modified(index, head)).toBe(false)
 
-        // only since we didnt touch anything
+        // only since we didn't touch anything
         expect(await modified(workdir, head)).toBe(false)
 
         expect(await modified(index, workdir)).toBe(false)
