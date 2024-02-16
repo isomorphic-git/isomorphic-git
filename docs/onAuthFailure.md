@@ -8,7 +8,7 @@ This is helpful to know if you were using a saved password in the `onAuth` callb
 It also gives you an opportunity to retry the request with new credentials.
 
 As long as your `onAuthFailure` function returns credentials, it will keep trying.
-This is the main reason we don't re-use the `onAuth` callback for this purpose. If we did, then a naive `onAuth` callback that simply returned saved credentials might loop indefinitely.
+This is the main reason we don't reuse the `onAuth` callback for this purpose. If we did, then a naive `onAuth` callback that simply returned saved credentials might loop indefinitely.
 
 An `onAuthFailure` function is called with a `url` and an `auth` object and can return a GitAuth object:
 

@@ -660,6 +660,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "yarikoptic",
+      "name": "Yaroslav Halchenko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39889?v=4",
+      "profile": "https://github.com/yarikoptic",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "commitConvention": "angular"
