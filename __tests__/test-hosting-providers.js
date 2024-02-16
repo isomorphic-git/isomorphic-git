@@ -20,7 +20,7 @@ describe('Hosting Providers', () => {
     // These HTTPS Git credentials for AWS CodeCommit are for IAM user arn:aws:iam::260687965765:user/tester
     // which only has git access to the test repo:
     // https://git-codecommit.us-west-2.amazonaws.com/v1/repos/test.empty
-    // It is stored reversed because the GitHub one is stored reversed and I like being consistant.
+    // It is stored reversed because the GitHub one is stored reversed and I like being consistent.
     const password = reverse('=cYfZKeyeW3ig0yZrkzkd9ElDKYctLgV2WNOZ1Ctntnt')
     const username = 'tester-at-260687965765'
     it('fetch', async () => {
@@ -62,7 +62,7 @@ describe('Hosting Providers', () => {
 
   describe('Azure DevOps', () => {
     // These git credentials are specific to https://isomorphic-git@dev.azure.com/isomorphic-git/isomorphic-git/_git/test.empty
-    // It is stored reversed because the GitHub one is stored reversed and I like being consistant.
+    // It is stored reversed because the GitHub one is stored reversed and I like being consistent.
     const password = reverse('ez8dMKyRfWpzMkhg3QJb5m')
     const username = 'isomorphicgittestpush'
     it('fetch', async () => {
@@ -106,7 +106,7 @@ describe('Hosting Providers', () => {
     // This App Password is for the test account 'isomorphic-git' user on Bitbucket,
     // with "repositories.read" and "repositories.write" access. However the only repo the account has access to is
     // https://bitbucket.org/isomorphic-git/test.empty
-    // It is stored reversed because the GitHub one is stored reversed and I like being consistant.
+    // It is stored reversed because the GitHub one is stored reversed and I like being consistent.
     const password = reverse('TqSWhF3xLxEEXKQtZTwn')
     const username = 'isomorphic-git'
     it('push', async () => {
@@ -194,7 +194,7 @@ describe('Hosting Providers', () => {
     // This Personal Access Token is for a test account (https://gitlab.com/isomorphic-git-test-push)
     // with "read_repository" and "write_repository" access. However the only repo it has write access to is
     // https://gitlab.com/isomorphic-git/test.empty
-    // It is stored reversed because the GitHub one is stored reversed and I like being consistant.
+    // It is stored reversed because the GitHub one is stored reversed and I like being consistent.
     const password = reverse('vjNzgKP7acS6e6vb2Q6g')
     const username = 'isomorphic-git-test-push'
     it('fetch', async () => {

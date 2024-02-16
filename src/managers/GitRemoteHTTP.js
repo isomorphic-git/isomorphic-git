@@ -8,7 +8,7 @@ import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
-// Try to accomodate known CORS proxy implementations:
+// Try to accommodate known CORS proxy implementations:
 // - https://jcubic.pl/proxy.php?  <-- uses query string
 // - https://cors.isomorphic-git.org  <-- uses path
 const corsProxify = (corsProxy, url) =>
