@@ -669,6 +669,17 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "modesty",
+      "name": "Modesty Zhang",
+      "avatar_url": "https://avatars.githubusercontent.com/u/865809?v=4",
+      "profile": "http://www.codeproject.com/script/Articles/MemberArticles.aspx?amid=62372",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
