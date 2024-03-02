@@ -63,6 +63,7 @@ describe('exports', () => {
         "resetIndex",
         "resolveRef",
         "setConfig",
+        "stash",
         "status",
         "statusMatrix",
         "tag",

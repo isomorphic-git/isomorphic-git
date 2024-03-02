@@ -250,3 +250,11 @@ import './typedefs-http.js'
 /**
  * @typedef {[string, HeadStatus, WorkdirStatus, StageStatus]} StatusRow
  */
+
+/**
+ * @typedef {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} StashOp the type of stash ops
+ */
+
+/**
+ * @typedef {'equal' | 'modify' | 'add' | 'remove' | 'unknown'} StashChangeType - when compare WORDIR to HEAD, 'remove' could mean 'untracked'
+ */
