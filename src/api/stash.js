@@ -49,11 +49,11 @@ export async function stash({
     assertParameter('op', op)
 
     const _fs = new FileSystem(fs)
-    const folders = ['logs', 'logs/refs']
+    const folders = ['refs', 'logs', 'logs/refs']
     folders
       .map(f => join(gitdir, f))
       .forEach(async folder => {
-        if (!(await _fs.exists(gitdir + '/config'))) {
+        if (!(await _fs.exists(folder))) {
           await _fs.mkdir(folder)
         }
       })

@@ -21,6 +21,9 @@ import { _currentBranch } from './currentBranch.js'
 import { _readCommit } from './readCommit.js'
 import { _writeCommit } from './writeCommit.js'
 
+const _getRefStashPath = gitdir => join(gitdir, 'refs/stash')
+const _getRefLogStashPath = gitdir => join(gitdir, 'logs/refs/stash')
+
 function _getTimezoneOffsetForRefLogEntry() {
   const offsetMinutes = new Date().getTimezoneOffset()
   const offsetHours = Math.abs(Math.floor(offsetMinutes / 60))
@@ -63,9 +66,6 @@ async function _readStashReflogs(fs, gitdir) {
 
   return reflogEntries
 }
-
-const _getRefStashPath = gitdir => join(gitdir, 'refs/stash')
-const _getRefLogStashPath = gitdir => join(gitdir, 'logs/refs/stash')
 
 export async function _stashPush({ fs, dir, gitdir }) {
   const branch = await _currentBranch({
