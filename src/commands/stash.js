@@ -1,7 +1,8 @@
 // @ts-check
-/** @typedef {import("../typedefs.js").StashOp} StashOp */
+import '../typedefs.js'
 
 import { checkout } from '../api/checkout.js'
+import { readCommit } from '../api/readCommit.js'
 import { writeRef } from '../api/writeRef.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
@@ -10,15 +11,15 @@ import { appendToFile } from '../utils/appendToFile.js'
 import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import {
-  getTreeObjArrayStage,
-  getTreeObjArrayWorkDir,
+  writeTreeChanges,
+  applyTreeChanges,
 } from '../utils/walkerToTreeEntryMap.js'
 
 import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { _currentBranch } from './currentBranch.js'
+import { _readCommit } from './readCommit.js'
 import { _writeCommit } from './writeCommit.js'
-import { _writeTree } from './writeTree.js'
 
 function _getTimezoneOffsetForRefLogEntry() {
   const offsetMinutes = new Date().getTimezoneOffset()
@@ -80,6 +81,9 @@ export async function _stashPush({ fs, dir, gitdir }) {
     ref: 'HEAD',
   })
 
+  const headCommitObj = await readCommit({ fs, dir, gitdir, oid: headCommit })
+  const headMsg = headCommitObj.commit.message
+
   const stashCommitParents = [headCommit]
   let stashCommitTree = null
   let workDirCompareBase = TREE({ ref: 'HEAD' })
@@ -91,15 +95,12 @@ export async function _stashPush({ fs, dir, gitdir }) {
   })
   if (!author) throw new MissingNameError('author')
 
-  const indexTreeObj = await getTreeObjArrayStage(fs, dir, gitdir)
-  if (indexTreeObj.length > 0) {
+  const indexTree = await writeTreeChanges(fs, dir, gitdir, [
+    TREE({ ref: 'HEAD' }),
+    'stage',
+  ])
+  if (indexTree) {
     // this indexTree will be the tree of the stash commit
-    const indexTree = await _writeTree({
-      fs,
-      gitdir,
-      tree: indexTreeObj,
-    })
-
     // create a commit from the index tree, which has one parent, the current branch HEAD
     const stashCommitOne = await _writeCommit({
       fs,
@@ -117,19 +118,11 @@ export async function _stashPush({ fs, dir, gitdir }) {
     workDirCompareBase = STAGE()
   }
 
-  const workingTreeObject = await getTreeObjArrayWorkDir(
-    fs,
-    dir,
-    gitdir,
-    workDirCompareBase
-  )
-  if (workingTreeObject.length > 0) {
-    const workingTree = await _writeTree({
-      fs,
-      gitdir,
-      tree: workingTreeObject,
-    })
-
+  const workingTree = await writeTreeChanges(fs, dir, gitdir, [
+    workDirCompareBase,
+    'workdir',
+  ])
+  if (workingTree) {
     // create a commit from the working directory tree, which has one parent, either the one we just had, or the headCommit
     const workingHeadCommit = await _writeCommit({
       fs,
@@ -178,7 +171,7 @@ export async function _stashPush({ fs, dir, gitdir }) {
     gitdir,
     author,
     stashCommit,
-    `WIP on ${branch}: ${new Date().toISOString()}`
+    `WIP on ${branch}: ${headCommit.substring(0, 7)} ${headMsg}`
   )
 
   // finally, go back to a clean working directory
@@ -197,31 +190,40 @@ export async function _stashApply({ fs, dir, gitdir }) {
     return
   }
 
-  const branch = await _currentBranch({
-    fs,
-    gitdir,
-    fullname: false,
-  })
-
   const stashSHA = await GitRefManager.resolve({
     fs,
     gitdir,
     ref: 'refs/stash',
   })
 
-  // apply the stash commit to the working directory, it'll detach the HEAD
-  await checkout({
+  // get the stash commit object
+  const stashCommit = await _readCommit({
     fs,
-    dir,
+    cache: {},
     gitdir,
-    ref: stashSHA,
-    track: false,
-    noUpdateHead: true,
-    force: true, // force checkout to overwrite changes
+    oid: stashSHA,
   })
+  const { parent: stashParents } = stashCommit.commit
 
-  // reattach the HEAD to the branch
-  await fs.write(join(gitdir, 'HEAD'), `ref: refs/heads/${branch}`)
+  // compare the stash commit tree with its parent commit
+  for (let i = 0; i < stashParents.length - 1; i++) {
+    const applyingCommit = await _readCommit({
+      fs,
+      cache: {},
+      gitdir,
+      oid: stashParents[i + 1],
+    })
+    const wasStaged = applyingCommit.commit.message.startsWith('stash-Index')
+
+    await applyTreeChanges(
+      fs,
+      dir,
+      gitdir,
+      stashParents[i + 1],
+      stashParents[i],
+      wasStaged
+    )
+  }
 }
 
 export async function _stashDrop({ fs, dir, gitdir }) {
@@ -280,7 +282,7 @@ export async function _stashClear({ fs, dir, gitdir }) {
   await Promise.all(
     stashRefPath.map(async path => {
       if (await fs.exists(path)) {
-        return await fs.rm(path)
+        return fs.rm(path)
       }
     })
   )
