@@ -15,7 +15,8 @@
       "fastForward",
       "merge",
       "abortMerge",
-      "walk"
+      "walk",
+      "stash"
     ],
     "Callbacks": [
       "onAuth",
