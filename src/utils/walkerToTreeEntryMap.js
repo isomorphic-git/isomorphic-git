@@ -1,70 +1,28 @@
 // @ts-check
 
+import { add } from '../api/add.js'
+import { readBlob } from '../api/readBlob.js'
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
+import { _writeTree } from '../commands/writeTree.js'
 import { InternalError } from '../errors/InternalError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { _writeObject } from '../storage/writeObject'
 
 import { join } from './join.js'
 import { posixifyPathBuffer } from './posixifyPathBuffer.js'
 
-async function mapFuncBase(filepath, [A, B], typeCondition, mixinFunc) {
-  // ignore directories
-  if (filepath === '.') {
-    return
-  }
-  const aType = A ? await A.type() : ''
-  const bType = B ? await B.type() : ''
-
-  if (!typeCondition(aType, bType)) {
-    return
-  }
-
-  // generate object ids
-  const aObjId = A ? await A.oid() : undefined
-  const bObjId = B ? await B.oid() : undefined
-
-  // determine modification type
-  let type = 'equal'
-  if (aObjId !== bObjId) {
-    type = 'modify'
-  }
-  if (aObjId === undefined) {
-    type = 'add'
-  }
-  if (bObjId === undefined) {
-    type = 'remove'
-  }
-  if (aObjId === undefined && bObjId === undefined) {
-    type = 'unknown' // this should never happen
-    return
-  }
-
-  if (!(await mixinFunc(type, filepath, aObjId))) {
-    return
-  }
-
-  const mode = await A.mode()
-  return {
-    mode: mode.toString(8),
-    path: filepath,
-    oid: aObjId || '',
-    type: aType,
-  }
+const _TreeMap = {
+  stage: STAGE,
+  workdir: WORKDIR,
 }
 
-function typeConditionDefault(aType, bType) {
-  if (aType === 'special' || bType === 'special') {
-    return false
-  }
-  return !(aType === 'commit' || bType === 'commit')
-}
-
-async function writeBlobByFile(fs, gitdir, dir, filepath, oid = null) {
+// make sure filepath, blob type and blob object (from loose objects) plus oid are in sync and valid
+async function checkAndWriteBlob(fs, gitdir, dir, filepath, oid = null) {
   const currentFilepath = join(dir, filepath)
   const stats = await fs.lstat(currentFilepath)
   if (!stats) throw new NotFoundError(currentFilepath)
@@ -96,67 +54,182 @@ async function writeBlobByFile(fs, gitdir, dir, filepath, oid = null) {
   return retOid
 }
 
-export async function getTreeObjArrayStage(fs, dir, gitdir) {
-  let hasStagedChanges = false
-  const mapFuncStaged = async (filepath, [A, B]) => {
-    const mixinStaged = async (type, _filepath, aObjId) => {
-      if (aObjId === undefined || type === 'remove') {
-        return false
+async function processTreeEntries(fs, dir, gitdir, entries) {
+  // make sure each tree entry has valid oid
+  async function processTreeEntry(entry) {
+    if (entry.type === 'tree') {
+      if (!entry.oid) {
+        // Process children entries if the current entry is a tree
+        const children = await Promise.all(entry.children.map(processTreeEntry))
+        // Write the tree with the processed children
+        entry.oid = await _writeTree({
+          fs,
+          gitdir,
+          tree: children,
+        })
+        entry.mode = 0o40000 // directory
       }
-
-      if (!hasStagedChanges && type !== 'equal') {
-        hasStagedChanges = true // yeah, I know, this is a side effect, leave it for now, only internal to this function
-      }
-      return true
+    } else if (entry.type === 'blob') {
+      entry.oid = await checkAndWriteBlob(
+        fs,
+        gitdir,
+        dir,
+        entry.path,
+        entry.oid
+      )
+      entry.mode = 0o100644 // file
     }
 
-    return mapFuncBase(filepath, [A, B], typeConditionDefault, mixinStaged)
+    // remove path from entry.path
+    entry.path = entry.path.split('/').pop()
+    return entry
   }
 
-  const indexTreeObj = await _walk({
-    fs,
-    cache: {},
-    dir,
-    gitdir,
-    trees: [STAGE(), TREE({ ref: 'HEAD' })],
-    map: mapFuncStaged,
-  })
-
-  return hasStagedChanges ? indexTreeObj : []
+  return Promise.all(entries.map(processTreeEntry))
 }
 
-export async function getTreeObjArrayWorkDir(
+export async function writeTreeChanges(
   fs,
   dir,
   gitdir,
-  workDirCompareBase
+  treePair // [TREE({ ref: 'HEAD' }), 'STAGE'] would be the equivlent of `git write-tree`
 ) {
-  let hasWorkingChanges = false
+  const isStage = treePair[1] === 'stage'
+  const trees = treePair.map(t => (typeof t === 'string' ? _TreeMap[t]() : t))
 
-  const mapFuncWorkDir = async (filepath, [A, B]) => {
-    const mixinWorkDir = async (type, filepath, aObjId) => {
-      if (type === 'remove') {
-        return false
-      }
-
-      if (type !== 'equal') {
-        // needs to make sure the blob object exists
-        await writeBlobByFile(fs, gitdir, dir, filepath, aObjId)
-        hasWorkingChanges = true
-      }
-      return true
+  const changedEntries = []
+  // transform WalkerEntry objects into the desired format
+  const map = async (filepath, [head, stage]) => {
+    if (
+      filepath === '.' ||
+      (await GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath }))
+    ) {
+      return
     }
-    return mapFuncBase(filepath, [A, B], typeConditionDefault, mixinWorkDir)
+
+    if (stage) {
+      if (
+        !head ||
+        ((await head.oid()) !== (await stage.oid()) &&
+          (await stage.oid()) !== undefined)
+      ) {
+        changedEntries.push([head, stage])
+      }
+      return {
+        mode: await stage.mode(),
+        path: filepath,
+        oid: await stage.oid(),
+        type: await stage.type(),
+      }
+    }
   }
 
-  const workTreeObj = await _walk({
+  // combine mapped entries with their parent results
+  const reduce = async (parent, children) => {
+    children = children.filter(Boolean) // Remove undefined entries
+    if (!parent) {
+      return children.length > 0 ? children : undefined
+    } else {
+      parent.children = children
+      return parent
+    }
+  }
+
+  // if parent is skipped, skip the children
+  const iterate = async (walk, children) => {
+    const filtered = []
+    for (const child of children) {
+      const [head, stage] = child
+      if (isStage) {
+        if (stage) {
+          filtered.push(child)
+        }
+      } else {
+        if (head) {
+          filtered.push(child) // workdir, tracked only
+        }
+      }
+    }
+    return filtered.length ? Promise.all(filtered.map(walk)) : []
+  }
+
+  const entries = await _walk({
     fs,
     cache: {},
     dir,
     gitdir,
-    trees: [WORKDIR(), workDirCompareBase],
-    map: mapFuncWorkDir,
+    trees,
+    map,
+    reduce,
+    iterate,
   })
 
-  return hasWorkingChanges ? workTreeObj : []
+  if (changedEntries.length === 0 || entries.length === 0) {
+    return null // no changes found to stash
+  }
+
+  const processedEntries = await processTreeEntries(fs, dir, gitdir, entries)
+
+  const treeEntries = processedEntries.filter(Boolean).map(entry => ({
+    mode: entry.mode,
+    path: entry.path,
+    oid: entry.oid,
+    type: entry.type,
+  }))
+
+  return _writeTree({ fs, gitdir, tree: treeEntries })
+}
+
+export async function applyTreeChanges(
+  fs,
+  dir,
+  gitdir,
+  stashCommit,
+  parentCommit,
+  wasStaged
+) {
+  return _walk({
+    fs,
+    cache: {},
+    dir,
+    gitdir,
+    trees: [TREE({ ref: parentCommit }), TREE({ ref: stashCommit })],
+    map: async (filepath, [parent, stash]) => {
+      if (
+        filepath === '.' ||
+        (await GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath }))
+      ) {
+        return
+      }
+      const type = stash ? await stash.type() : undefined
+      if (type !== 'tree' && type !== 'blob') {
+        return
+      }
+
+      const currentFilepath = join(dir, filepath)
+      const oid = await stash.oid()
+      if (oid === undefined) {
+        await fs.rm(join(dir, currentFilepath))
+      } else if (!parent || (await parent.oid()) !== oid) {
+        // only apply changes if changed from the parent commit or doesn't exist in the parent commit
+        if (type === 'tree') {
+          if (!(await fs.exists(currentFilepath))) {
+            await fs.mkdir(currentFilepath)
+          }
+        } else {
+          const { blob } = await readBlob({ fs, dir, gitdir, oid })
+          await fs.write(currentFilepath, blob)
+          // await fs.chmod(currentFilepath, await stash.mode())
+          if (wasStaged) {
+            await add({ fs, dir, gitdir, filepath })
+          }
+        }
+      }
+      return {
+        path: filepath,
+        oid: await stash.oid(),
+        type: await stash.type(),
+      } // return the applied tree entry
+    },
+  })
 }

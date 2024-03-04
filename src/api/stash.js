@@ -1,7 +1,4 @@
 // @ts-check
-/** @typedef { import("../typedefs.js").StashOp } StashOp */
-/** @typedef { import('../typedefs.js').FsClient } FsClient */
-
 import {
   _stashPush,
   _stashApply,
@@ -15,14 +12,13 @@ import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
 /**
- * stash api entry point, support ops defined in StashOp
+ * stash api entry point, support ops defined in {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'}
  *
  * @param {object} args
  * @param {FsClient} args.fs - a file system client
- * @param {boolean} [args.bare = false] - Initialize a bare repository
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {StashOp} [args.op = 'push'] - The name of stash operation, default to 'push', including both index (staging) and working directory
+ * @param {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} [args.op = 'push'] - The name of stash operation, default to 'push', including both index (staging) and working directory
  * @returns {Promise<string | void>}  Resolves successfully when filesystem operations are complete
  *
  * @example
@@ -42,17 +38,14 @@ const stashMap = {
 
 export async function stash({
   fs,
-  bare = false,
   dir,
-  gitdir = bare ? dir : join(dir, '.git'),
+  gitdir = join(dir, '.git'),
   op = 'push',
 }) {
   try {
     assertParameter('fs', fs)
+    assertParameter('dir', dir)
     assertParameter('gitdir', gitdir)
-    if (!bare) {
-      assertParameter('dir', dir)
-    }
     assertParameter('op', op)
 
     const _fs = new FileSystem(fs)

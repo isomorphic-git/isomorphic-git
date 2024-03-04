@@ -19,8 +19,8 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
   // add user to config
   await addUserConfig(fs, dir, gitdir)
 
-  await fs.write(dir + '/a.txt', 'staged changes - a', 'utf8')
-  await fs.write(dir + '/b.js', 'staged changes - b', 'utf8')
+  await fs.write(`${dir}/a.txt`, 'staged changes - a')
+  await fs.write(`${dir}/b.js`, 'staged changes - b')
 
   await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
   let aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
@@ -32,13 +32,13 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
   let mStatus = await status({ fs, dir, gitdir, filepath: 'm.xml' })
   if (defalt) {
     // include unstaged changes, different file first
-    await fs.write(dir + '/m.xml', '<unstaged>m</unstaged>', 'utf8')
+    await fs.write(`${dir}/m.xml`, '<unstaged>m</unstaged>')
     mStatus = await status({ fs, dir, gitdir, filepath: 'm.xml' })
     expect(mStatus).toBe('*modified')
 
     if (again) {
       // same file changes again after staged
-      await fs.write(dir + '/a.txt', 'unstaged changes - a - again', 'utf8')
+      await fs.write(`${dir}/a.txt`, 'unstaged changes - a - again')
       aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
       expect(aStatus).toBe('*modified')
     }
@@ -159,7 +159,7 @@ describe('stash apply', () => {
     const bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
     expect(bStatus).toBe('modified')
     const mStatus = await status({ fs, dir, gitdir, filepath: 'm.xml' })
-    expect(mStatus).toBe('modified')
+    expect(mStatus).toBe('*modified') // m.xml is not staged
   })
 
   it('stash apply with staged and unstaged changes, include same file', async () => {
@@ -177,15 +177,54 @@ describe('stash apply', () => {
 
     expect(error).toBeNull()
     const aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
-    expect(aStatus).toBe('modified')
+    expect(aStatus).toBe('*modified') // a.txt has both staged and unstaged changes
 
-    const again = await fs.read(dir + '/a.txt', 'utf8')
-    expect(again).toBe('unstaged changes - a - again')
+    const againContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
+    expect(againContent).toEqual('unstaged changes - a - again') // make sure the unstaged changes are applied
 
     const bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
     expect(bStatus).toBe('modified')
     const mStatus = await status({ fs, dir, gitdir, filepath: 'm.xml' })
-    expect(mStatus).toBe('modified')
+    expect(mStatus).toBe('*modified') // m.xml is not staged
+  })
+
+  it('stash apply with staged changes under two folders', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    await addUserConfig(fs, dir, gitdir)
+
+    await fs.write(`${dir}/folder/c.txt`, 'staged changes - c')
+    await fs.write(`${dir}/folder/d.js`, 'staged changes - d')
+
+    await add({ fs, dir, gitdir, filepath: ['folder/c.txt', 'folder/d.js'] })
+    let aStatus = await status({ fs, dir, gitdir, filepath: 'folder/c.txt' })
+    expect(aStatus).toBe('added')
+    let bStatus = await status({ fs, dir, gitdir, filepath: 'folder/d.js' })
+    expect(bStatus).toBe('added')
+
+    let error = null
+    try {
+      await stash({ fs, bare: true, dir, gitdir, op: 'push' })
+      aStatus = await status({
+        fs,
+        dir,
+        gitdir,
+        filepath: 'folder/c.txt',
+      })
+      expect(aStatus).toBe('absent')
+      bStatus = await status({ fs, dir, gitdir, filepath: 'folder/d.js' })
+      expect(bStatus).toBe('absent')
+
+      await stash({ fs, bare: true, dir, gitdir, op: 'apply' })
+    } catch (e) {
+      error = e
+      console.log(e.stack)
+    }
+
+    expect(error).toBeNull()
+    aStatus = await status({ fs, dir, gitdir, filepath: 'folder/c.txt' })
+    expect(aStatus).toBe('added')
+    bStatus = await status({ fs, dir, gitdir, filepath: 'folder/d.js' })
+    expect(bStatus).toBe('added')
   })
 })
 
