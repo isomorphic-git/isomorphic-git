@@ -142,11 +142,21 @@ export async function writeTreeChanges(
       const [head, stage] = child
       if (isStage) {
         if (stage) {
-          filtered.push(child)
+          // for deleted file in work dir, it also needs to be added on stage
+          if (await fs.exists(`${dir}/${stage.toString()}`)) {
+            filtered.push(child)
+          } else {
+            changedEntries.push([null, stage]) // record the change (deletion) while stop the iteration
+          }
         }
       } else {
         if (head) {
-          filtered.push(child) // workdir, tracked only
+          // for deleted file in workdir, "stage" (workdir in our case) will be undefined
+          if (!stage) {
+            changedEntries.push([head, null]) // record the change (deletion) while stop the iteration
+          } else {
+            filtered.push(child) // workdir, tracked only
+          }
         }
       }
     }
@@ -201,28 +211,35 @@ export async function applyTreeChanges(
       ) {
         return
       }
-      const type = stash ? await stash.type() : undefined
+      const type = stash ? await stash.type() : await parent.type()
       if (type !== 'tree' && type !== 'blob') {
         return
       }
 
       const currentFilepath = join(dir, filepath)
+
+      // deleted tree or blob
+      if (!stash && parent) {
+        if (type === 'tree') {
+          await fs.rmdir(currentFilepath)
+        } else if (type === 'blob') {
+          await fs.rm(currentFilepath)
+        }
+        return
+      }
+
       const oid = await stash.oid()
-      if (oid === undefined) {
-        await fs.rm(join(dir, currentFilepath))
-      } else if (!parent || (await parent.oid()) !== oid) {
+      if (!parent || (await parent.oid()) !== oid) {
         // only apply changes if changed from the parent commit or doesn't exist in the parent commit
         if (type === 'tree') {
-          if (!(await fs.exists(currentFilepath))) {
-            await fs.mkdir(currentFilepath)
-          }
+          await fs.mkdir(currentFilepath)
         } else {
           const { blob } = await readBlob({ fs, dir, gitdir, oid })
           await fs.write(currentFilepath, blob)
           // await fs.chmod(currentFilepath, await stash.mode())
-          if (wasStaged) {
-            await add({ fs, dir, gitdir, filepath })
-          }
+        }
+        if (wasStaged) {
+          await add({ fs, dir, gitdir, filepath })
         }
       }
       return {
