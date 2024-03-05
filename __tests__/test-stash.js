@@ -1,6 +1,13 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
-const { stash, Errors, setConfig, add, status } = require('isomorphic-git')
+const {
+  stash,
+  Errors,
+  setConfig,
+  add,
+  status,
+  commit,
+} = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -46,7 +53,7 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
 
   let error = null
   try {
-    await stash({ fs, bare: true, dir, gitdir })
+    await stash({ fs, dir, gitdir })
   } catch (e) {
     error = e
     console.log(e.stack)
@@ -226,13 +233,125 @@ describe('stash apply', () => {
     bStatus = await status({ fs, dir, gitdir, filepath: 'folder/d.js' })
     expect(bStatus).toBe('added')
   })
+
+  it('stash apply with deleted files', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    await addUserConfig(fs, dir, gitdir)
+
+    await fs.rm(`${dir}/a.txt`)
+    await fs.rm(`${dir}/b.js`)
+
+    let aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+    expect(aStatus).toBe('*deleted')
+    let bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
+    expect(bStatus).toBe('*deleted')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'push' })
+
+      aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+      expect(aStatus).toBe('unmodified')
+      bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
+      expect(bStatus).toBe('unmodified')
+
+      await stash({ fs, dir, gitdir, op: 'apply' })
+    } catch (e) {
+      error = e
+      console.log(e.stack)
+    }
+
+    expect(error).toBeNull()
+    aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+    expect(aStatus).toBe('*deleted')
+    bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
+    expect(bStatus).toBe('*deleted')
+  })
+
+  it('stash apply with deleted files and staged changes', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    await addUserConfig(fs, dir, gitdir)
+
+    await fs.rm(`${dir}/a.txt`)
+    await fs.write(`${dir}/b.js`, 'staged changes - b')
+
+    let aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+    expect(aStatus).toBe('*deleted')
+    let bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
+    expect(bStatus).toBe('*modified')
+
+    await add({ fs, dir, gitdir, filepath: ['b.js'] })
+
+    bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
+    expect(bStatus).toBe('modified')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'push' })
+
+      aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+      expect(aStatus).toBe('unmodified')
+      bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
+      expect(bStatus).toBe('unmodified')
+
+      await stash({ fs, dir, gitdir, op: 'apply' })
+    } catch (e) {
+      error = e
+      console.log(e.stack)
+    }
+
+    expect(error).toBeNull()
+    aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+    expect(aStatus).toBe('*deleted')
+    bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
+    expect(bStatus).toBe('modified')
+  })
+
+  it('stash apply with delete folder', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    await addUserConfig(fs, dir, gitdir)
+
+    await fs.mkdir(`${dir}/folder`)
+    await fs.write(`${dir}/folder/e.js`, 'commited change - e')
+    await add({ fs, dir, gitdir, filepath: ['folder', 'folder/e.js'] })
+    await commit({
+      fs,
+      dir,
+      gitdir,
+      author: { name: 'author', email: 'author@test' },
+      message: 'add folder',
+    })
+
+    // await fs.rmdir(`${dir}/folder`)
+    await fs.rm(`${dir}/folder/e.js`)
+
+    let aStatus = await status({ fs, dir, gitdir, filepath: 'folder/e.js' })
+    expect(aStatus).toBe('*deleted')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'push' })
+
+      aStatus = await status({ fs, dir, gitdir, filepath: 'folder/e.js' })
+      expect(aStatus).toBe('unmodified')
+
+      await stash({ fs, dir, gitdir, op: 'apply' })
+    } catch (e) {
+      error = e
+      console.log(e.stack)
+    }
+
+    expect(error).toBeNull()
+    aStatus = await status({ fs, dir, gitdir, filepath: 'folder/e.js' })
+    expect(aStatus).toBe('*deleted')
+  })
 })
 
 describe('stash list', () => {
   it('stash list with no stash', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-stash')
 
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList).toEqual([])
   })
 
@@ -241,7 +360,7 @@ describe('stash list', () => {
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(1)
   })
 
@@ -251,7 +370,7 @@ describe('stash list', () => {
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(2)
   })
 })
@@ -262,7 +381,7 @@ describe('stash drop', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'drop' })
+      await stash({ fs, dir, gitdir, op: 'drop' })
     } catch (e) {
       error = e
     }
@@ -277,13 +396,13 @@ describe('stash drop', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'drop' })
+      await stash({ fs, dir, gitdir, op: 'drop' })
     } catch (e) {
       error = e
     }
 
     expect(error).toBeNull()
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(0)
   })
 })
@@ -294,7 +413,7 @@ describe('stash clear', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'clear' })
+      await stash({ fs, dir, gitdir, op: 'clear' })
     } catch (e) {
       error = e
     }
@@ -309,13 +428,13 @@ describe('stash clear', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'clear' })
+      await stash({ fs, dir, gitdir, op: 'clear' })
     } catch (e) {
       error = e
     }
 
     expect(error).toBeNull()
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(0)
   })
 
@@ -327,13 +446,13 @@ describe('stash clear', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'clear' })
+      await stash({ fs, dir, gitdir, op: 'clear' })
     } catch (e) {
       error = e
     }
 
     expect(error).toBeNull()
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(0)
   })
 })
@@ -344,7 +463,7 @@ describe('stash pop', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'pop' })
+      await stash({ fs, dir, gitdir, op: 'pop' })
     } catch (e) {
       error = e
     }
@@ -359,13 +478,13 @@ describe('stash pop', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'pop' })
+      await stash({ fs, dir, gitdir, op: 'pop' })
     } catch (e) {
       error = e
     }
 
     expect(error).toBeNull()
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(0)
   })
 
@@ -377,13 +496,13 @@ describe('stash pop', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'pop' })
+      await stash({ fs, dir, gitdir, op: 'pop' })
     } catch (e) {
       error = e
     }
 
     expect(error).toBeNull()
-    const stashList = await stash({ fs, bare: true, dir, gitdir, op: 'list' })
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(1)
   })
 })
