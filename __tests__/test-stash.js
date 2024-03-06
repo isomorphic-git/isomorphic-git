@@ -26,6 +26,8 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
   // add user to config
   await addUserConfig(fs, dir, gitdir)
 
+  const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
+  const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
   await fs.write(`${dir}/a.txt`, 'staged changes - a')
   await fs.write(`${dir}/b.js`, 'staged changes - b')
 
@@ -54,6 +56,14 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
   let error = null
   try {
     await stash({ fs, dir, gitdir })
+    const aContentAfterStash = new TextDecoder().decode(
+      await fs.read(`${dir}/a.txt`)
+    )
+    expect(aContentAfterStash).toEqual(aContent)
+    const bContentAfterStash = new TextDecoder().decode(
+      await fs.read(`${dir}/b.js`)
+    )
+    expect(bContentAfterStash).toEqual(bContent)
   } catch (e) {
     error = e
     console.log(e.stack)
@@ -140,6 +150,11 @@ describe('stash apply', () => {
       console.log(e.stack)
     }
 
+    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
+    expect(aContent).toEqual('staged changes - a') // make sure the staged changes are applied
+    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
+    expect(bContent).toEqual('staged changes - b') // make sure the staged changes are applied
+
     expect(error).toBeNull()
     const aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
     expect(aStatus).toBe('modified')
@@ -159,6 +174,13 @@ describe('stash apply', () => {
       error = e
       console.log(e.stack)
     }
+
+    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
+    expect(aContent).toEqual('staged changes - a') // make sure the staged changes are applied
+    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
+    expect(bContent).toEqual('staged changes - b') // make sure the staged changes are applied
+    const mContent = new TextDecoder().decode(await fs.read(`${dir}/m.xml`))
+    expect(mContent).toEqual('<unstaged>m</unstaged>') // make sure the unstaged changes are applied
 
     expect(error).toBeNull()
     const aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
@@ -358,7 +380,7 @@ describe('stash list', () => {
   it('stash list with 1 stash', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-stash')
 
-    await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
+    await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged 3 file changes
 
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(1)

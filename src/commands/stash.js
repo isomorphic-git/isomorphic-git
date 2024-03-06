@@ -3,13 +3,9 @@ import '../typedefs.js'
 
 import { checkout } from '../api/checkout.js'
 import { readCommit } from '../api/readCommit.js'
-import { writeRef } from '../api/writeRef.js'
-import { MissingNameError } from '../errors/MissingNameError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { appendToFile } from '../utils/appendToFile.js'
-import { join } from '../utils/join.js'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
+import { GitStashManager } from '../managers/GitStashManager.js'
 import {
   writeTreeChanges,
   applyTreeChanges,
@@ -19,55 +15,11 @@ import { STAGE } from './STAGE.js'
 import { TREE } from './TREE.js'
 import { _currentBranch } from './currentBranch.js'
 import { _readCommit } from './readCommit.js'
-import { _writeCommit } from './writeCommit.js'
 
-const _getRefStashPath = gitdir => join(gitdir, 'refs/stash')
-const _getRefLogStashPath = gitdir => join(gitdir, 'logs/refs/stash')
+export async function _stashPush({ fs, dir, gitdir, message = '' }) {
+  const stashMgr = new GitStashManager({ fs, dir, gitdir })
 
-function _getTimezoneOffsetForRefLogEntry() {
-  const offsetMinutes = new Date().getTimezoneOffset()
-  const offsetHours = Math.abs(Math.floor(offsetMinutes / 60))
-  const offsetMinutesFormatted = Math.abs(offsetMinutes % 60)
-    .toString()
-    .padStart(2, '0')
-  const sign = offsetMinutes > 0 ? '-' : '+'
-  return `${sign}${offsetHours
-    .toString()
-    .padStart(2, '0')}${offsetMinutesFormatted}`
-}
-
-async function _writeStashReflog(fs, gitdir, author, stashCommit, message) {
-  const reflogPath = _getRefLogStashPath(gitdir)
-  const nameNoSpace = author.name.replace(/\s/g, '')
-
-  const z40 = '0000000000000000000000000000000000000000' // hard code for now, works with `git stash list`
-  const timestamp = Math.floor(Date.now() / 1000)
-  const timezoneOffset = _getTimezoneOffsetForRefLogEntry()
-  const reflogEntry = `${z40} ${stashCommit} ${nameNoSpace} ${author.email} ${timestamp} ${timezoneOffset}\t${message}\n`
-
-  await appendToFile(fs, reflogPath, reflogEntry)
-}
-
-async function _readStashReflogs(fs, gitdir) {
-  const reflogEntries = []
-  const reflogPath = _getRefLogStashPath(gitdir)
-  if (!(await fs.exists(reflogPath))) {
-    return reflogEntries
-  }
-
-  const reflogBuffer = await fs.read(reflogPath)
-  const reflogString = reflogBuffer.toString()
-  const reflogLines = reflogString.split('\n')
-  reflogLines.forEach(line => {
-    if (line) {
-      reflogEntries.push(line)
-    }
-  })
-
-  return reflogEntries
-}
-
-export async function _stashPush({ fs, dir, gitdir }) {
+  await stashMgr.getAuthor() // ensure there is an author
   const branch = await _currentBranch({
     fs,
     gitdir,
@@ -88,13 +40,6 @@ export async function _stashPush({ fs, dir, gitdir }) {
   let stashCommitTree = null
   let workDirCompareBase = TREE({ ref: 'HEAD' })
 
-  const author = await normalizeAuthorObject({
-    fs,
-    gitdir,
-    author: {},
-  })
-  if (!author) throw new MissingNameError('author')
-
   const indexTree = await writeTreeChanges(fs, dir, gitdir, [
     TREE({ ref: 'HEAD' }),
     'stage',
@@ -102,16 +47,10 @@ export async function _stashPush({ fs, dir, gitdir }) {
   if (indexTree) {
     // this indexTree will be the tree of the stash commit
     // create a commit from the index tree, which has one parent, the current branch HEAD
-    const stashCommitOne = await _writeCommit({
-      fs,
-      gitdir,
-      commit: {
-        message: `stash-Index: WIP on ${branch} - ${new Date().toISOString()}`,
-        tree: indexTree, // stashCommitTree
-        parent: stashCommitParents,
-        author,
-        committer: author,
-      },
+    const stashCommitOne = await stashMgr.writeStashCommit({
+      message: `stash-Index: WIP on ${branch} - ${new Date().toISOString()}`,
+      tree: indexTree, // stashCommitTree
+      parent: stashCommitParents,
     })
     stashCommitParents.push(stashCommitOne)
     stashCommitTree = indexTree
@@ -124,17 +63,12 @@ export async function _stashPush({ fs, dir, gitdir }) {
   ])
   if (workingTree) {
     // create a commit from the working directory tree, which has one parent, either the one we just had, or the headCommit
-    const workingHeadCommit = await _writeCommit({
-      fs,
-      gitdir,
-      commit: {
-        message: `stash-WorkDir: WIP on ${branch} - ${new Date().toISOString()}`,
-        tree: workingTree,
-        parent: [stashCommitParents[stashCommitParents.length - 1]],
-        author,
-        committer: author,
-      },
+    const workingHeadCommit = await stashMgr.writeStashCommit({
+      message: `stash-WorkDir: WIP on ${branch} - ${new Date().toISOString()}`,
+      tree: workingTree,
+      parent: [stashCommitParents[stashCommitParents.length - 1]],
     })
+
     stashCommitParents.push(workingHeadCommit)
     stashCommitTree = workingTree
   }
@@ -144,35 +78,21 @@ export async function _stashPush({ fs, dir, gitdir }) {
   }
 
   // create another commit from the tree, which has three parents: HEAD and the commit we just made:
-  const stashCommit = await _writeCommit({
-    fs,
-    gitdir,
-    commit: {
-      message: `stash: WIP on ${branch} - ${new Date().toISOString()}`,
-      tree: stashCommitTree,
-      parent: stashCommitParents,
-      author,
-      committer: author,
-    },
+  const stashCommit = await stashMgr.writeStashCommit({
+    message:
+      message.trim() || `stash: WIP on ${branch} - ${new Date().toISOString()}`,
+    tree: stashCommitTree,
+    parent: stashCommitParents,
   })
 
   // next, write this commit into .git/refs/stash:
-  await writeRef({
-    fs,
-    gitdir,
-    ref: 'refs/stash',
-    value: stashCommit,
-    force: true,
-  })
+  await stashMgr.writeStashRef(stashCommit)
 
   // write the stash commit to the logs
-  await _writeStashReflog(
-    fs,
-    gitdir,
-    author,
+  await stashMgr.writeStashReflogEntry({
     stashCommit,
-    `WIP on ${branch}: ${headCommit.substring(0, 7)} ${headMsg}`
-  )
+    message: `WIP on ${branch}: ${headCommit.substring(0, 7)} ${headMsg}`,
+  })
 
   // finally, go back to a clean working directory
   await checkout({
@@ -186,24 +106,16 @@ export async function _stashPush({ fs, dir, gitdir }) {
 }
 
 export async function _stashApply({ fs, dir, gitdir }) {
-  if (!(await fs.exists(_getRefStashPath(gitdir)))) {
-    return
-  }
-
-  const stashSHA = await GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref: 'refs/stash',
-  })
+  const stashMgr = new GitStashManager({ fs, dir, gitdir })
 
   // get the stash commit object
-  const stashCommit = await _readCommit({
-    fs,
-    cache: {},
-    gitdir,
-    oid: stashSHA,
-  })
-  const { parent: stashParents } = stashCommit.commit
+  const stashCommit = await stashMgr.readStashCommit()
+  const { parent: stashParents = null } = stashCommit.commit
+    ? stashCommit.commit
+    : {}
+  if (!stashParents || !Array.isArray(stashParents)) {
+    return // no stash found
+  }
 
   // compare the stash commit tree with its parent commit
   for (let i = 0; i < stashParents.length - 1; i++) {
@@ -227,14 +139,15 @@ export async function _stashApply({ fs, dir, gitdir }) {
 }
 
 export async function _stashDrop({ fs, dir, gitdir }) {
+  const stashMgr = new GitStashManager({ fs, dir, gitdir })
   // remove stash ref first
-  const stashRefPath = _getRefStashPath(gitdir)
+  const stashRefPath = stashMgr.refStashPath
   if (await fs.exists(stashRefPath)) {
     await fs.rm(stashRefPath)
   }
 
   // read from stash reflog and list the stash commits
-  const reflogEntries = await _readStashReflogs(fs, gitdir)
+  const reflogEntries = await stashMgr.readStashReflogs({ parsed: false })
   if (!reflogEntries.length) {
     return // no stash reflog entry
   }
@@ -242,20 +155,14 @@ export async function _stashDrop({ fs, dir, gitdir }) {
   // remove the last stash reflog entry from reflogEntries, then update the stash reflog
   reflogEntries.pop()
 
-  const stashReflogPath = _getRefLogStashPath(gitdir)
+  const stashReflogPath = stashMgr.refLogsStashPath
   if (reflogEntries.length) {
     await fs.write(stashReflogPath, reflogEntries.join('\n'), 'utf8')
 
     const lastStashCommit = reflogEntries[reflogEntries.length - 1].split(
       ' '
     )[1]
-    await writeRef({
-      fs,
-      gitdir,
-      ref: 'refs/stash',
-      value: lastStashCommit,
-      force: true,
-    })
+    await stashMgr.writeStashRef(lastStashCommit)
   } else {
     // remove the stash reflog file if no entry left
     await fs.rm(stashReflogPath)
@@ -263,21 +170,13 @@ export async function _stashDrop({ fs, dir, gitdir }) {
 }
 
 export async function _stashList({ fs, dir, gitdir }) {
-  const stashReader = []
-  const reflogEntries = await _readStashReflogs(fs, gitdir)
-  if (reflogEntries.length > 0) {
-    for (let i = reflogEntries.length - 1; i >= 0; i--) {
-      const entryParts = reflogEntries[i].split('\t')
-      stashReader.push(
-        `stash@{${reflogEntries.length - 1 - i}}: ${entryParts[1]}`
-      )
-    }
-  }
-  return stashReader
+  const stashMgr = new GitStashManager({ fs, dir, gitdir })
+  return stashMgr.readStashReflogs({ parsed: true })
 }
 
 export async function _stashClear({ fs, dir, gitdir }) {
-  const stashRefPath = [_getRefStashPath(gitdir), _getRefLogStashPath(gitdir)]
+  const stashMgr = new GitStashManager({ fs, dir, gitdir })
+  const stashRefPath = [stashMgr.refStashPath, stashMgr.refLogsStashPath]
 
   await Promise.all(
     stashRefPath.map(async path => {

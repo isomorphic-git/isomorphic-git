@@ -56,6 +56,7 @@ sidebar_label: Alphabetical Index
 - [resetIndex](resetIndex)
 - [resolveRef](resolveRef)
 - [setConfig](setConfig)
+- [stash](stash)
 - [status](status)
 - [statusMatrix](statusMatrix)
 - [tag](tag)

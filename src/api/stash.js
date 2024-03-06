@@ -12,42 +12,76 @@ import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
 /**
- * stash api entry point, support ops defined in {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'}
+ * stash api, support ops defined in  {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} StashOp
+ * _note_,
+ * - when op === 'push', both working directory and index (staged) changes will be stashed, tracked files only
+ * - when op === 'apply | pop', the stashed changes will overwrite the working directory, no abort when conflicts
  *
  * @param {object} args
- * @param {FsClient} args.fs - a file system client
- * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
- * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} [args.op = 'push'] - The name of stash operation, default to 'push', including both index (staging) and working directory
- * @returns {Promise<string | void>}  Resolves successfully when filesystem operations are complete
+ * @param {FsClient} args.fs - [required] a file system client
+ * @param {string} [args.dir] - [required] The [working tree](dir-vs-gitdir.md) directory path
+ * @param {string} [args.gitdir=join(dir,'.git')] - [optional] The [git directory](dir-vs-gitdir.md) path
+ * @param {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} [args.op = 'push'] - [optional] name of stash operation, default to 'push'
+ * @param {string} [args.message = ''] - [optional] message to be used for the stash entry, only applicale when op === 'push'
+ * @returns {Promise<string | void>}  Resolves successfully when stash operations are complete
  *
  * @example
- * await git.stash({ fs, dir: '/tutorial' })
- * console.log('done')
+ * // stash changes in the working directory and index
+ * let dir = '/tutorial'
+ * await fs.promises.writeFile(`${dir}/a.txt`, 'original content - a')
+ * await fs.promises.writeFile(`${dir}/b.js`, 'original content - b')
+ * await git.add({ fs, dir, gitdir, filepath: [`a.txt`,`b.txt`] })
+ * let sha = await git.commit({
+ *   fs,
+ *   dir,
+ *   author: {
+ *     name: 'Mr. Stash',
+ *     email: 'mstasher@stash.com',
+ *   },
+ *   message: 'add a.txt and b.txt to test stash'
+ * })
+ * console.log(sha)
  *
+ * await fs.promises.writeFile(`${dir}/a.txt`, 'stashed chang- a')
+ * await git.add({ fs, dir, gitdir, filepath: `${dir}/a.txt` })
+ * await fs.promises.writeFile(`${dir}/b.js`, 'work dir change. not stashed - b')
+ *
+ * await git.stash({ fs, dir }) // default gitdir and op
+ *
+ * console.log(await git.status({ fs, dir, gitdir, filepath: 'a.txt' })) // 'unmodified'
+ * console.log(await git.status({ fs, dir, gitdir, filepath: 'b.txt' })) // 'unmodified'
+ *
+ * const refLog = await git.stash({ fs, dir, op: 'list' })
+ * console.log(refLog) // [{stash{#} message}]
+ *
+ * await git.stash({ fs, dir, op: 'apply' }) // apply the stash
+ *
+ * console.log(await git.status({ fs, dir, gitdir, filepath: 'a.txt' })) // 'modified'
+ * console.log(await git.status({ fs, dir, gitdir, filepath: 'b.txt' })) // '*modified'
  */
-
-const stashMap = {
-  push: _stashPush,
-  apply: _stashApply,
-  drop: _stashDrop,
-  list: _stashList,
-  clear: _stashClear,
-  pop: _stashPop,
-}
 
 export async function stash({
   fs,
   dir,
   gitdir = join(dir, '.git'),
   op = 'push',
+  message = '',
 }) {
-  try {
-    assertParameter('fs', fs)
-    assertParameter('dir', dir)
-    assertParameter('gitdir', gitdir)
-    assertParameter('op', op)
+  assertParameter('fs', fs)
+  assertParameter('dir', dir)
+  assertParameter('gitdir', gitdir)
+  assertParameter('op', op)
 
+  const stashMap = {
+    push: _stashPush,
+    apply: _stashApply,
+    drop: _stashDrop,
+    list: _stashList,
+    clear: _stashClear,
+    pop: _stashPop,
+  }
+
+  try {
     const _fs = new FileSystem(fs)
     const folders = ['refs', 'logs', 'logs/refs']
     folders
