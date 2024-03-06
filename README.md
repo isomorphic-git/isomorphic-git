@@ -203,6 +203,7 @@ unless there is a major version bump.
 - [resetIndex](https://isomorphic-git.github.io/docs/resetIndex.html)
 - [resolveRef](https://isomorphic-git.github.io/docs/resolveRef.html)
 - [setConfig](https://isomorphic-git.github.io/docs/setConfig.html)
+- [stash](https://isomorphic-git.github.io/docs/stash.html)
 - [status](https://isomorphic-git.github.io/docs/status.html)
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [tag](https://isomorphic-git.github.io/docs/tag.html)

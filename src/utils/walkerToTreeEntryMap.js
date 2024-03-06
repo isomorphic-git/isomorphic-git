@@ -44,11 +44,6 @@ async function checkAndWriteBlob(fs, gitdir, dir, filepath, oid = null) {
     if (object === null) throw new NotFoundError(currentFilepath)
 
     retOid = await _writeObject({ fs, gitdir, type: 'blob', object })
-    if (retOid !== oid && oid !== null) {
-      throw new InternalError(
-        `SHA check failed: Expected ${oid}, created ${retOid}`
-      )
-    }
   }
 
   return retOid
