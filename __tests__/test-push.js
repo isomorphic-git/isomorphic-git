@@ -228,6 +228,38 @@ describe('push', () => {
     expect(err.code).toEqual(Errors.UnknownTransportError.code)
   })
 
+  it('push with cancel', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-push')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.auth.url',
+      value: `http://${localhost}:8888/test-push-cancel.git`,
+    })
+
+    const abortController = new AbortController()
+
+    setTimeout(() => {
+      abortController.abort()
+    }, 0)
+
+    let error = null
+    try {
+      await push({
+        fs,
+        http,
+        gitdir,
+        remote: 'auth',
+        ref: 'master',
+        signal: abortController.signal,
+      })
+    } catch (err) {
+      error = err.message
+    }
+    expect(error).toContain('The operation was aborted')
+  })
+
   it('push with Basic Auth', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-push')

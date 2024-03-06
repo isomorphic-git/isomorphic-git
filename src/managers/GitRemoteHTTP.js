@@ -60,6 +60,7 @@ export class GitRemoteHTTP {
    * @param {string} [args.corsProxy]
    * @param {string} args.service
    * @param {string} args.url
+   * @param {AbortSignal} args.signal
    * @param {Object<string, string>} args.headers
    * @param {1 | 2} args.protocolVersion - Git Protocol Version
    */
@@ -73,6 +74,7 @@ export class GitRemoteHTTP {
     service,
     url: _origUrl,
     headers,
+    signal,
     protocolVersion,
   }) {
     let { url, auth } = extractAuthFromUrl(_origUrl)
@@ -93,6 +95,7 @@ export class GitRemoteHTTP {
         method: 'GET',
         url: `${proxifiedURL}/info/refs?service=${service}`,
         headers,
+        signal,
       })
 
       // the default loop behavior
@@ -166,6 +169,7 @@ export class GitRemoteHTTP {
    * @param {Object<string, string>} [args.headers]
    * @param {any} args.body
    * @param {any} args.auth
+   * @param {AbortSignal} args.signal
    */
   static async connect({
     http,
@@ -176,6 +180,7 @@ export class GitRemoteHTTP {
     auth,
     body,
     headers,
+    signal,
   }) {
     // We already have the "correct" auth value at this point, but
     // we need to strip out the username/password from the URL yet again.
@@ -194,6 +199,7 @@ export class GitRemoteHTTP {
       url: `${url}/${service}`,
       body,
       headers,
+      signal,
     })
     if (res.statusCode !== 200) {
       const { response } = stringifyBody(res)
