@@ -12,9 +12,11 @@ import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
 
 /**
- * stash api, support ops defined in  {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} StashOp
+ * stash api, supports  {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} StashOp
  * _note_,
+ * - all stash operations are done on tracked files only with loose objects, no packed objects
  * - when op === 'push', both working directory and index (staged) changes will be stashed, tracked files only
+ * - when op === 'push', message is optional, and only applicable when op === 'push'
  * - when op === 'apply | pop', the stashed changes will overwrite the working directory, no abort when conflicts
  *
  * @param {object} args
