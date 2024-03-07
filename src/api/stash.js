@@ -30,7 +30,7 @@ import { join } from '../utils/join.js'
  * let dir = '/tutorial'
  * await fs.promises.writeFile(`${dir}/a.txt`, 'original content - a')
  * await fs.promises.writeFile(`${dir}/b.js`, 'original content - b')
- * await git.add({ fs, dir, gitdir, filepath: [`a.txt`,`b.txt`] })
+ * await git.add({ fs, dir, filepath: [`a.txt`,`b.txt`] })
  * let sha = await git.commit({
  *   fs,
  *   dir,
@@ -43,21 +43,21 @@ import { join } from '../utils/join.js'
  * console.log(sha)
  *
  * await fs.promises.writeFile(`${dir}/a.txt`, 'stashed chang- a')
- * await git.add({ fs, dir, gitdir, filepath: `${dir}/a.txt` })
+ * await git.add({ fs, dir, filepath: `${dir}/a.txt` })
  * await fs.promises.writeFile(`${dir}/b.js`, 'work dir change. not stashed - b')
  *
  * await git.stash({ fs, dir }) // default gitdir and op
  *
- * console.log(await git.status({ fs, dir, gitdir, filepath: 'a.txt' })) // 'unmodified'
- * console.log(await git.status({ fs, dir, gitdir, filepath: 'b.txt' })) // 'unmodified'
+ * console.log(await git.status({ fs, dir, filepath: 'a.txt' })) // 'unmodified'
+ * console.log(await git.status({ fs, dir, filepath: 'b.txt' })) // 'unmodified'
  *
  * const refLog = await git.stash({ fs, dir, op: 'list' })
  * console.log(refLog) // [{stash{#} message}]
  *
  * await git.stash({ fs, dir, op: 'apply' }) // apply the stash
  *
- * console.log(await git.status({ fs, dir, gitdir, filepath: 'a.txt' })) // 'modified'
- * console.log(await git.status({ fs, dir, gitdir, filepath: 'b.txt' })) // '*modified'
+ * console.log(await git.status({ fs, dir, filepath: 'a.txt' })) // 'modified'
+ * console.log(await git.status({ fs, dir, filepath: 'b.txt' })) // '*modified'
  */
 
 export async function stash({
