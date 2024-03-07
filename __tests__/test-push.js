@@ -234,30 +234,45 @@ describe('push', () => {
     await setConfig({
       fs,
       gitdir,
-      path: 'remote.auth.url',
-      value: `http://${localhost}:8888/test-push-cancel.git`,
+      path: 'remote.signal.url',
+      value: `http://${localhost}:8888/test-push-server.git`,
     })
 
-    const abortController = new AbortController()
+    // Test
+    let abortController
+    let signal
 
-    setTimeout(() => {
-      abortController.abort()
-    }, 0)
+    if (typeof AbortController !== 'undefined') {
+      abortController = new AbortController()
+      signal = abortController.signal
+
+      setTimeout(() => {
+        abortController.abort()
+      }, 0)
+    }
 
     let error = null
+    let res
     try {
-      await push({
+      res = await push({
         fs,
         http,
         gitdir,
-        remote: 'auth',
+        remote: 'signal',
         ref: 'master',
-        signal: abortController.signal,
+        signal,
       })
     } catch (err) {
       error = err.message
     }
-    expect(error).toContain('The operation was aborted')
+
+    if (abortController) {
+      expect(error).toContain('The operation was aborted')
+    } else {
+      expect(error).toBeNull()
+      expect(res).toBeTruthy()
+      expect(res && res.ok).toBe(true)
+    }
   })
 
   it('push with Basic Auth', async () => {
