@@ -1,21 +1,25 @@
-const { E } = require('../..')
-const replace = require('replace-in-file')
+const { replaceInFile } = require('replace-in-file')
+
+const E = require('../..')
 
 const errors = Object.keys(E).map(name => `E.${name}`)
 const bal = []
 
 ;(async () => {
   for (const error of errors) {
-    let files = await replace({
+    const files = await replaceInFile({
       files: ['src/**/*.js'],
       from: error,
       to: 'foo',
       dry: true,
       countMatches: true,
     })
-    files = files.filter(file => file.numMatches > 0).map(file => file.file)
+    const filteredFiles = files
+      .filter(file => file.numMatches !== undefined && file.numMatches > 0)
+      .map(file => file.file)
+
     // console.log(`${error}: ${files.length}`)
-    if (files.length > 0) {
+    if (filteredFiles.length > 0) {
       bal.push(`${files.length} ${error}`)
     }
   }

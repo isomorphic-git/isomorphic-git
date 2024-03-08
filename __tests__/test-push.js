@@ -239,22 +239,16 @@ describe('push', () => {
     })
 
     // Test
-    let abortController
-    let signal
+    const abortController = new AbortController()
+    const signal = abortController.signal
 
-    if (typeof AbortController !== 'undefined') {
-      abortController = new AbortController()
-      signal = abortController.signal
-
-      setTimeout(() => {
-        abortController.abort()
-      }, 0)
-    }
+    setTimeout(() => {
+      abortController.abort()
+    }, 0)
 
     let error = null
-    let res
     try {
-      res = await push({
+      await push({
         fs,
         http,
         gitdir,
@@ -266,13 +260,7 @@ describe('push', () => {
       error = err.message
     }
 
-    if (abortController) {
-      expect(error).toContain('The operation was aborted')
-    } else {
-      expect(error).toBeNull()
-      expect(res).toBeTruthy()
-      expect(res && res.ok).toBe(true)
-    }
+    expect(error).toContain('The operation was aborted')
   })
 
   it('push with Basic Auth', async () => {
