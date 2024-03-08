@@ -121,7 +121,6 @@ export class FileSystem {
   async write(filepath, contents, options = {}) {
     try {
       await this._writeFile(filepath, contents, options)
-      return
     } catch (err) {
       // Hmm. Let's try mkdirp and try again.
       await this.mkdir(dirname(filepath))
@@ -135,7 +134,6 @@ export class FileSystem {
   async mkdir(filepath, _selfCall = false) {
     try {
       await this._mkdir(filepath)
-      return
     } catch (err) {
       // If err is null then operation succeeded!
       if (err === null) return

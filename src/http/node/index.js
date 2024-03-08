@@ -18,6 +18,7 @@ export async function request({
   headers = {},
   agent,
   body,
+  signal,
 }) {
   // If we can, we should send it as a single buffer so it sets a Content-Length header.
   if (body && Array.isArray(body)) {
@@ -33,6 +34,7 @@ export async function request({
         headers,
         agent,
         body,
+        signal,
       },
       (err, res) => {
         if (err) return reject(err)

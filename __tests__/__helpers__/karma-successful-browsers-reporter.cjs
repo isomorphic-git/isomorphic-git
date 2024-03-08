@@ -20,7 +20,7 @@ const BrowsersReporter = function(
     this.successfulBrowsersFullNames = tmp[0]
     this.successfulBrowsers = tmp[1]
   }
-  this.onBrowserComplete = function(browser) {
+  this.onBrowserComplete = browser => {
     var results = browser.lastResult
     if (results.disconnected || results.error || results.failed) {
       this.buildOk = false

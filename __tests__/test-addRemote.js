@@ -26,6 +26,7 @@ describe('addRemote', () => {
     // Test
     let error = null
     try {
+      // @ts-ignore
       await addRemote({ fs, dir, gitdir, remote, url })
     } catch (err) {
       error = err
