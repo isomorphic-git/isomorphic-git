@@ -1,0 +1,85 @@
+---
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - beta
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      node-version:
+        description: Comma-separated list of Node.js versions
+        required: true
+        default: '16, 18, 20'
+      test-browsers:
+        description: 'Comma-separated list of browsers'
+        required: true
+        default: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome'
+
+jobs:
+  build:
+    name: Node.js v${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+
+    # Most pipelines finish in under 15 minutes.
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Use the input, or fallback to the array.
+        node-version: ${{ fromJSON(format('[{0}]', inputs.node-version || '16, 18, 20')) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: |
+          # Use X Virtual Frame Buffer (xvfb) to run headless in CI
+          xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npm test
+        env:
+          BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+          BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          TEST_BROWSERS: ${{ inputs.test-browsers || 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome' }}
+
+      - name: Save npm-tarball.tgz
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'node-v${{ matrix.node-version }}-npm-tarball.tgz'
+          path: 'isomorphic-git-0.0.0-development.tgz'
+
+      - name: 'Save index.umd.min.js'
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'node-v${{ matrix.node-version }}-index.umd.min.js'
+          path: 'index.umd.min.js'
+
+      - name: 'Publish to npm'
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/beta' }}
+        run: npm run semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: 'Update website'
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: npm run publish-website
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
