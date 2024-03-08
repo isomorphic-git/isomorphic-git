@@ -21,6 +21,16 @@ const optional = cmd =>
 const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
 const timeout5 = timeout(5)
 
+// Node.js v17 restricted the use of certain OpenSSL algorithms and key sizes.
+// See https://github.com/nodejs/node/blob/main/doc/changelogs/CHANGELOG_V17.md#2021-10-19-version-1700-current-bethgriggs.
+//
+// To use Webpack v4 with Node >= 17 we must use set NODE_OPTIONS=--openssl-legacy-provider.
+const NODE_MAJOR_VERSION = Number(process.versions.node.split('.')[0])
+let NODE_OPTIONS = process.env.NODE_OPTIONS || '';
+if (NODE_MAJOR_VERSION >= 17) {
+  NODE_OPTIONS += `${process.env.NODE_OPTIONS ? ' ' : ''}--openssl-legacy-provider`;
+}
+
 module.exports = {
   scripts: {
     clean: {
@@ -58,7 +68,7 @@ module.exports = {
       rollup: 'rollup -c --no-treeshake',
       typings:
         'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
-      webpack: 'webpack --config webpack.config.cjs',
+      webpack: `cross-env NODE_OPTIONS=${NODE_OPTIONS} webpack --config webpack.config.cjs`,
       indexjson: `node __tests__/__helpers__/make_http_index.cjs`,
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
@@ -133,9 +143,7 @@ module.exports = {
       typecheck: 'tsc -p tsconfig.json',
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
-      jest: process.env.CI
-        ? retry3(`${timeout5('jest --ci --coverage')}`)
-        : `jest --ci --coverage`,
+      jest: `jest --ci --coverage`,
       karma: process.env.CI
         ? retry3('karma start ./karma.conf.cjs --single-run')
         : 'cross-env karma start ./karma.conf.cjs --single-run -log-level debug',
