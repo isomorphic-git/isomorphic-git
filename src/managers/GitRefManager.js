@@ -267,7 +267,7 @@ export class GitRefManager {
         return ref
       }
     }
-    let sha
+
     // Is it a ref pointer?
     if (ref.startsWith('ref: ')) {
       ref = ref.slice('ref: '.length)
