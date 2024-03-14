@@ -56,7 +56,7 @@ class RefLock {
     try {
       return await callback()
     } finally {
-      lock.release()
+      lock._release()
     }
   }
 
@@ -86,9 +86,9 @@ class RefLock {
   }
 
   /**
-   * Releases the lock. This should only be called by the code that created this lock through RefLock.acquire().
+   * Releases the lock. This should only be called by the code that created this lock through RefLock._acquire().
    */
-  release() {
+  _release() {
     refLocks.delete(this.ref)
     if (this._resolver !== undefined) {
       this._resolver()
