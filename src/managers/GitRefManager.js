@@ -35,7 +35,7 @@ async function acquireRefLock(ref) {
     await refLock[0]
     refLock = refLocks.get(ref)
   }
-  let resolver = () => { }
+  let resolver = () => {}
   refLock = [
     new Promise(resolve => {
       resolver = resolve
