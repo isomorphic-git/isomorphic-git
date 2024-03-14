@@ -22,6 +22,35 @@ const refpaths = ref => [
 // @see https://git-scm.com/docs/gitrepository-layout
 const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
 
+// Keeps track of in-flight locks for reads/writes to refs.
+// The keys are refs in canonical format (40-alphanumeric-chars strings) and each value is an
+// array with two elements: a Promise that resolves when the lock becomes available (code trying
+// to acquire a lock should await this Promise), and a resolver function that should be called
+// by code currently holding a lock when it wants to release it.
+const refLocks = new Map()
+
+async function acquireRefLock(ref) {
+  let refLock = refLocks.get(ref)
+  while (refLock !== undefined) {
+    await refLock[0]
+    refLock = refLocks.get(ref)
+  }
+  let resolver = () => { }
+  refLock = [
+    new Promise(resolve => {
+      resolver = resolve
+    }),
+    resolver,
+  ]
+  refLocks.set(ref, refLock)
+}
+
+function releaseRefLock(ref) {
+  const refLock = refLocks.get(ref)
+  refLocks.delete(ref)
+  refLock[1]() // Release the lock
+}
+
 export class GitRefManager {
   static async updateRemoteRefs({
     fs,
@@ -128,7 +157,12 @@ export class GitRefManager {
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
     for (const [key, value] of actualRefsToWrite) {
-      await fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
+      await acquireRefLock(key)
+      try {
+        await fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
+      } finally {
+        releaseRefLock(key)
+      }
     }
     return { pruned }
   }
@@ -139,11 +173,21 @@ export class GitRefManager {
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new InvalidOidError(value)
     }
-    await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
+    await acquireRefLock(ref)
+    try {
+      await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
+    } finally {
+      releaseRefLock(ref)
+    }
   }
 
   static async writeSymbolicRef({ fs, gitdir, ref, value }) {
-    await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
+    await acquireRefLock(ref)
+    try {
+      await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
+    } finally {
+      releaseRefLock(ref)
+    }
   }
 
   static async deleteRef({ fs, gitdir, ref }) {
@@ -154,7 +198,13 @@ export class GitRefManager {
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref
-    let text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    let text
+    await acquireRefLock('packed-refs')
+    try {
+      text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    } finally {
+      releaseRefLock('packed-refs')
+    }
     const packed = GitPackedRefs.from(text)
     const beforeSize = packed.refs.size
     for (const ref of refs) {
@@ -164,7 +214,12 @@ export class GitRefManager {
     }
     if (packed.refs.size < beforeSize) {
       text = packed.toString()
-      await fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
+      await acquireRefLock('packed-refs')
+      try {
+        await fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
+      } finally {
+        releaseRefLock('packed-refs')
+      }
     }
   }
 
@@ -199,9 +254,14 @@ export class GitRefManager {
     const allpaths = refpaths(ref).filter(p => !GIT_FILES.includes(p)) // exclude git system files (#709)
 
     for (const ref of allpaths) {
-      sha =
-        (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
-        packedMap.get(ref)
+      await acquireRefLock(ref)
+      try {
+        sha =
+          (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
+          packedMap.get(ref)
+      } finally {
+        releaseRefLock(ref)
+      }
       if (sha) {
         return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
       }
@@ -229,7 +289,12 @@ export class GitRefManager {
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
     for (const ref of allpaths) {
-      if (await fs.exists(`${gitdir}/${ref}`)) return ref
+      await acquireRefLock(ref)
+      try {
+        if (await fs.exists(`${gitdir}/${ref}`)) return ref
+      } finally {
+        releaseRefLock(ref)
+      }
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
@@ -280,7 +345,13 @@ export class GitRefManager {
   }
 
   static async packedRefs({ fs, gitdir }) {
-    const text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    let text
+    await acquireRefLock('packed-refs')
+    try {
+      text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    } finally {
+      releaseRefLock('packed-refs')
+    }
     const packed = GitPackedRefs.from(text)
     return packed.refs
   }
