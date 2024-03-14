@@ -47,6 +47,7 @@ class RefLock {
 
   /**
    * Acquires a lock on a ref, executes a specified function while holding it, and releases the lock afterwards.
+   * It _must_ be awaited.
    * @param {string} ref - The ref to lock
    * @param {() => Promise<>} callback - An async function to call while the lock is held.
    * @returns The return value of `callback`, if any.
@@ -202,7 +203,7 @@ export class GitRefManager {
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
     for (const [key, value] of actualRefsToWrite) {
-      RefLock.withLock(key, async () =>
+      await RefLock.withLock(key, async () =>
         fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
       )
     }
@@ -215,13 +216,13 @@ export class GitRefManager {
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new InvalidOidError(value)
     }
-    RefLock.withLock(ref, async () =>
+    await RefLock.withLock(ref, async () =>
       fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
     )
   }
 
   static async writeSymbolicRef({ fs, gitdir, ref, value }) {
-    RefLock.withLock(ref, async () =>
+    await RefLock.withLock(ref, async () =>
       fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
     )
   }
@@ -246,7 +247,7 @@ export class GitRefManager {
     }
     if (packed.refs.size < beforeSize) {
       text = packed.toString()
-      RefLock.withLock('packed-refs', async () =>
+      await RefLock.withLock('packed-refs', async () =>
         fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
       )
     }
