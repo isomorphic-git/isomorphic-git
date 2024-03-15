@@ -1,4 +1,6 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
+import AsyncLock from 'async-lock'
+
 import { InvalidOidError } from '../errors/InvalidOidError.js'
 import { NoRefspecError } from '../errors/NoRefspecError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
@@ -22,80 +24,7 @@ const refpaths = ref => [
 // @see https://git-scm.com/docs/gitrepository-layout
 const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
 
-/**
- * @type {Map<string, RefLock>}
- * Keeps track of in-flight locks for reads/writes to refs.
- */
-const refLocks = new Map()
-
-/**
- * Represents a lock on a ref to enable concurrent operations to coordinate.
- * Use `await RefLock.withLock(<your-ref>, <your-code>)`, and release it by calling `.release()`
- * on the returned object.
- */
-class RefLock {
-  static async _acquire(ref) {
-    let refLock = refLocks.get(ref)
-    while (refLock !== undefined) {
-      await refLock.promise
-      refLock = refLocks.get(ref)
-    }
-    refLock = new RefLock(ref)
-    refLocks.set(ref, refLock)
-    return refLock
-  }
-
-  /**
-   * Acquires a lock on a ref, executes a specified function while holding it, and releases the lock afterwards.
-   * It _must_ be awaited.
-   * @param {string} ref - The ref to lock
-   * @param {() => Promise<>} callback - An async function to call while the lock is held.
-   * @returns The return value of `callback`, if any.
-   */
-  static async withLock(ref, callback) {
-    const lock = await RefLock._acquire(ref)
-    try {
-      return await callback()
-    } finally {
-      lock._release()
-    }
-  }
-
-  /**
-   * Do not use this constructor directly to acquire a lock. Use `await RefLock.withLock()`.
-   * @param {string} ref - The ref to lock
-   */
-  constructor(ref) {
-    this.ref = ref
-  }
-
-  /**
-   * A promise that resolves when this lock is released.
-   *
-   * @remarks
-   * Using a getter so we can delay the creation of the internal promise until the first time someone needs to
-   * await it. If there are no concurrent operations for the same ref, no one will ever access the promise so
-   * we don't even spend time and memory on it.
-   */
-  get promise() {
-    if (this._promise === undefined) {
-      this._promise = new Promise(resolve => {
-        this._resolver = resolve
-      })
-    }
-    return this._promise
-  }
-
-  /**
-   * Releases the lock. This should only be called by the code that created this lock through RefLock._acquire().
-   */
-  _release() {
-    refLocks.delete(this.ref)
-    if (this._resolver !== undefined) {
-      this._resolver()
-    }
-  }
-}
+const lock = new AsyncLock()
 
 export class GitRefManager {
   static async updateRemoteRefs({
@@ -203,7 +132,7 @@ export class GitRefManager {
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
     for (const [key, value] of actualRefsToWrite) {
-      await RefLock.withLock(key, async () =>
+      await lock.acquire(key, async () =>
         fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
       )
     }
@@ -216,13 +145,13 @@ export class GitRefManager {
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new InvalidOidError(value)
     }
-    await RefLock.withLock(ref, async () =>
+    await lock.acquire(ref, async () =>
       fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
     )
   }
 
   static async writeSymbolicRef({ fs, gitdir, ref, value }) {
-    await RefLock.withLock(ref, async () =>
+    await lock.acquire(ref, async () =>
       fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
     )
   }
@@ -235,7 +164,7 @@ export class GitRefManager {
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref
-    let text = await RefLock.withLock('packed-refs', async () =>
+    let text = await lock.acquire('packed-refs', async () =>
       fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     )
     const packed = GitPackedRefs.from(text)
@@ -247,7 +176,7 @@ export class GitRefManager {
     }
     if (packed.refs.size < beforeSize) {
       text = packed.toString()
-      await RefLock.withLock('packed-refs', async () =>
+      await lock.acquire('packed-refs', async () =>
         fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
       )
     }
@@ -284,7 +213,7 @@ export class GitRefManager {
     const allpaths = refpaths(ref).filter(p => !GIT_FILES.includes(p)) // exclude git system files (#709)
 
     for (const ref of allpaths) {
-      const sha = await RefLock.withLock(
+      const sha = await lock.acquire(
         ref,
         async () =>
           (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
@@ -317,7 +246,7 @@ export class GitRefManager {
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
     for (const ref of allpaths) {
-      const refExists = await RefLock.withLock(ref, async () =>
+      const refExists = await lock.acquire(ref, async () =>
         fs.exists(`${gitdir}/${ref}`)
       )
       if (refExists) return ref
@@ -371,7 +300,7 @@ export class GitRefManager {
   }
 
   static async packedRefs({ fs, gitdir }) {
-    const text = await RefLock.withLock('packed-refs', async () =>
+    const text = await lock.acquire('packed-refs', async () =>
       fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     )
     const packed = GitPackedRefs.from(text)
