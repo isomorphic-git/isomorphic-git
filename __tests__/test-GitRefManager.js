@@ -245,4 +245,41 @@ describe('GitRefManager', () => {
       ]
     `)
   })
+  it('concurrently reading/writing a ref should not cause a NotFoundError resolving it', async () => {
+    // There are some expect() calls below, but as of 2023-03-15, if this test fails it will do so by logging instances
+    // of 'NotFoundError: Could not find myRef', which should not happen.
+    const { fs, gitdir } = await makeFixture('test-GitRefManager')
+    const ref = 'myRef'
+    const value = '1234567890123456789012345678901234567890'
+    await GitRefManager.writeRef({ fs, gitdir, ref, value }) // Guarantee that the file for the ref exists on disk
+
+    const writePromises = []
+    const resolvePromises = []
+    // Some arbitrary number of iterations that seems to guarantee that the error (pre-fix) is hit.
+    // With 100 the test *mostly* failed but still passed every now and then.
+    const iterations = 500
+
+    for (let i = 0; i < iterations; i++) {
+      // I was only able to cause the error to reproduce consistently by mixing awaited and non-awaited versions of the
+      // calls to writeRef() and resolve(). I tried several variations of the combination but none of them caused the
+      // error to happen as consistently.
+      if (Math.random() < 0.5) {
+        await GitRefManager.writeRef({ fs, gitdir, ref, value })
+      } else {
+        writePromises.push(GitRefManager.writeRef({ fs, gitdir, ref, value }))
+      }
+      if (Math.random() < 0.5) {
+        const resolvedRef = await GitRefManager.resolve({ fs, gitdir, ref })
+        expect(resolvedRef).toMatch(value)
+      } else {
+        resolvePromises.push(GitRefManager.resolve({ fs, gitdir, ref }))
+      }
+    }
+
+    const resolvedRefs = await Promise.all(resolvePromises)
+    for (const resolvedRef of resolvedRefs) {
+      expect(resolvedRef).toMatch(value)
+    }
+    await Promise.all(writePromises)
+  })
 })
