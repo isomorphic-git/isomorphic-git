@@ -65,6 +65,7 @@ describe('Hosting Providers', () => {
     // It is stored reversed because the GitHub one is stored reversed and I like being consistent.
     const password = reverse('ez8dMKyRfWpzMkhg3QJb5m')
     const username = 'isomorphicgittestpush'
+
     it('fetch', async () => {
       // Setup
       const { fs, gitdir } = await makeFixture('test-hosting-providers')
@@ -82,7 +83,9 @@ describe('Hosting Providers', () => {
       expect(res.defaultBranch).toBe('refs/heads/master')
       expect(res.fetchHead).toBe('c03e131196f43a78888415924bcdcbf3090f3316')
     })
-    it('push', async () => {
+
+    // Disabled as part of https://github.com/isomorphic-git/isomorphic-git/issues/1876.
+    xit('push', async () => {
       // Setup
       const { fs, gitdir } = await makeFixture('test-hosting-providers')
       // Test
