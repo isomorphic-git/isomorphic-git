@@ -368,6 +368,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://api.github.com/users/hisco"><img src="https://avatars.githubusercontent.com/u/39222286?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Eyal Hisco</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Ahisco" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/scolladon"><img src="https://avatars.githubusercontent.com/u/522422?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Sebastien</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=scolladon" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/yarikoptic"><img src="https://avatars.githubusercontent.com/u/39889?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Yaroslav Halchenko</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=yarikoptic" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://alex-v.blog/"><img src="https://avatars.githubusercontent.com/u/716334?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Alex Villarreal</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=alexvy86" title="Code">💻</a></td>
   </tr>
 </table>
 
