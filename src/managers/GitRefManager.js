@@ -24,7 +24,12 @@ const refpaths = ref => [
 // @see https://git-scm.com/docs/gitrepository-layout
 const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
 
-const lock = new AsyncLock()
+let lock
+
+async function acquireLock(ref, callback) {
+  if (lock === undefined) lock = new AsyncLock()
+  return lock.acquire(ref, callback)
+}
 
 export class GitRefManager {
   static async updateRemoteRefs({
@@ -132,7 +137,7 @@ export class GitRefManager {
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
     for (const [key, value] of actualRefsToWrite) {
-      await lock.acquire(key, async () =>
+      await acquireLock(key, async () =>
         fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
       )
     }
@@ -145,13 +150,13 @@ export class GitRefManager {
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new InvalidOidError(value)
     }
-    await lock.acquire(ref, async () =>
+    await acquireLock(ref, async () =>
       fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
     )
   }
 
   static async writeSymbolicRef({ fs, gitdir, ref, value }) {
-    await lock.acquire(ref, async () =>
+    await acquireLock(ref, async () =>
       fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
     )
   }
@@ -164,7 +169,7 @@ export class GitRefManager {
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref
-    let text = await lock.acquire('packed-refs', async () =>
+    let text = await acquireLock('packed-refs', async () =>
       fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     )
     const packed = GitPackedRefs.from(text)
@@ -176,7 +181,7 @@ export class GitRefManager {
     }
     if (packed.refs.size < beforeSize) {
       text = packed.toString()
-      await lock.acquire('packed-refs', async () =>
+      await acquireLock('packed-refs', async () =>
         fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
       )
     }
@@ -213,7 +218,7 @@ export class GitRefManager {
     const allpaths = refpaths(ref).filter(p => !GIT_FILES.includes(p)) // exclude git system files (#709)
 
     for (const ref of allpaths) {
-      const sha = await lock.acquire(
+      const sha = await acquireLock(
         ref,
         async () =>
           (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
@@ -246,7 +251,7 @@ export class GitRefManager {
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
     for (const ref of allpaths) {
-      const refExists = await lock.acquire(ref, async () =>
+      const refExists = await acquireLock(ref, async () =>
         fs.exists(`${gitdir}/${ref}`)
       )
       if (refExists) return ref
@@ -300,7 +305,7 @@ export class GitRefManager {
   }
 
   static async packedRefs({ fs, gitdir }) {
-    const text = await lock.acquire('packed-refs', async () =>
+    const text = await acquireLock('packed-refs', async () =>
       fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
     )
     const packed = GitPackedRefs.from(text)
