@@ -1,4 +1,6 @@
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
+import AsyncLock from 'async-lock'
+
 import { InvalidOidError } from '../errors/InvalidOidError.js'
 import { NoRefspecError } from '../errors/NoRefspecError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
@@ -21,6 +23,13 @@ const refpaths = ref => [
 
 // @see https://git-scm.com/docs/gitrepository-layout
 const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
+
+let lock
+
+async function acquireLock(ref, callback) {
+  if (lock === undefined) lock = new AsyncLock()
+  return lock.acquire(ref, callback)
+}
 
 export class GitRefManager {
   static async updateRemoteRefs({
@@ -128,7 +137,9 @@ export class GitRefManager {
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
     for (const [key, value] of actualRefsToWrite) {
-      await fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
+      await acquireLock(key, async () =>
+        fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
+      )
     }
     return { pruned }
   }
@@ -139,11 +150,15 @@ export class GitRefManager {
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new InvalidOidError(value)
     }
-    await fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
+    await acquireLock(ref, async () =>
+      fs.write(join(gitdir, ref), `${value.trim()}\n`, 'utf8')
+    )
   }
 
   static async writeSymbolicRef({ fs, gitdir, ref, value }) {
-    await fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
+    await acquireLock(ref, async () =>
+      fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
+    )
   }
 
   static async deleteRef({ fs, gitdir, ref }) {
@@ -154,7 +169,9 @@ export class GitRefManager {
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref
-    let text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    let text = await acquireLock('packed-refs', async () =>
+      fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    )
     const packed = GitPackedRefs.from(text)
     const beforeSize = packed.refs.size
     for (const ref of refs) {
@@ -164,7 +181,9 @@ export class GitRefManager {
     }
     if (packed.refs.size < beforeSize) {
       text = packed.toString()
-      await fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
+      await acquireLock('packed-refs', async () =>
+        fs.write(`${gitdir}/packed-refs`, text, { encoding: 'utf8' })
+      )
     }
   }
 
@@ -183,7 +202,7 @@ export class GitRefManager {
         return ref
       }
     }
-    let sha
+
     // Is it a ref pointer?
     if (ref.startsWith('ref: ')) {
       ref = ref.slice('ref: '.length)
@@ -199,9 +218,12 @@ export class GitRefManager {
     const allpaths = refpaths(ref).filter(p => !GIT_FILES.includes(p)) // exclude git system files (#709)
 
     for (const ref of allpaths) {
-      sha =
-        (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
-        packedMap.get(ref)
+      const sha = await acquireLock(
+        ref,
+        async () =>
+          (await fs.read(`${gitdir}/${ref}`, { encoding: 'utf8' })) ||
+          packedMap.get(ref)
+      )
       if (sha) {
         return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
       }
@@ -229,7 +251,10 @@ export class GitRefManager {
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
     for (const ref of allpaths) {
-      if (await fs.exists(`${gitdir}/${ref}`)) return ref
+      const refExists = await acquireLock(ref, async () =>
+        fs.exists(`${gitdir}/${ref}`)
+      )
+      if (refExists) return ref
       if (packedMap.has(ref)) return ref
     }
     // Do we give up?
@@ -280,7 +305,9 @@ export class GitRefManager {
   }
 
   static async packedRefs({ fs, gitdir }) {
-    const text = await fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    const text = await acquireLock('packed-refs', async () =>
+      fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
+    )
     const packed = GitPackedRefs.from(text)
     return packed.refs
   }
