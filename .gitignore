@@ -87,6 +87,7 @@ docs/addRemote.md
 docs/annotatedTag.md
 docs/branch.md
 docs/checkout.md
+docs/cherryPick.md
 docs/clone.md
 docs/commit.md
 docs/currentBranch.md

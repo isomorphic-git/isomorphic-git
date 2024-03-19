@@ -158,6 +158,7 @@ unless there is a major version bump.
 - [annotatedTag](https://isomorphic-git.github.io/docs/annotatedTag.html)
 - [branch](https://isomorphic-git.github.io/docs/branch.html)
 - [checkout](https://isomorphic-git.github.io/docs/checkout.html)
+- [cherryPick](https://isomorphic-git.github.io/docs/cherryPick.html)
 - [clone](https://isomorphic-git.github.io/docs/clone.html)
 - [commit](https://isomorphic-git.github.io/docs/commit.html)
 - [currentBranch](https://isomorphic-git.github.io/docs/currentBranch.html)
