@@ -208,6 +208,14 @@
         "title": "onMessage",
         "sidebar_label": "onMessage"
       },
+      "onPostCheckout": {
+        "title": "onPostCheckout",
+        "sidebar_label": "onPostCheckout"
+      },
+      "onPrePush": {
+        "title": "onPrePush",
+        "sidebar_label": "onPrePush"
+      },
       "onProgress": {
         "title": "onProgress",
         "sidebar_label": "onProgress"

@@ -21,6 +21,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
  * @param {any} args.cache
  * @param {ProgressCallback} [args.onProgress]
+ * @param {PostCheckoutCallback} [args.onPostCheckout]
  * @param {string} args.dir
  * @param {string} args.gitdir
  * @param {string} args.ref
@@ -39,6 +40,7 @@ export async function _checkout({
   fs,
   cache,
   onProgress,
+  onPostCheckout,
   dir,
   gitdir,
   remote,
@@ -50,6 +52,16 @@ export async function _checkout({
   force,
   track = true,
 }) {
+  // oldOid is defined only if onPostCheckout hook is attached
+  let oldOid
+  if (onPostCheckout) {
+    try {
+      oldOid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+    } catch (err) {
+      oldOid = '0000000000000000000000000000000000000000'
+    }
+  }
+
   // Get tree oid
   let oid
   try {
@@ -125,6 +137,14 @@ export async function _checkout({
     if (dryRun) {
       // Since the format of 'ops' is in flux, I really would rather folk besides myself not start relying on it
       // return ops
+
+      if (onPostCheckout) {
+        await onPostCheckout({
+          previousHead: oldOid,
+          newHead: oid,
+          type: filepaths != null && filepaths.length > 0 ? 'file' : 'branch',
+        })
+      }
       return
     }
 
@@ -269,6 +289,14 @@ export async function _checkout({
           })
       )
     })
+
+    if (onPostCheckout) {
+      await onPostCheckout({
+        previousHead: oldOid,
+        newHead: oid,
+        type: filepaths != null && filepaths.length > 0 ? 'file' : 'branch',
+      })
+    }
   }
 
   // Update HEAD

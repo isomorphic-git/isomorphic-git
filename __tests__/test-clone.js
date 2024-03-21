@@ -476,6 +476,31 @@ describe('clone', () => {
     expect(remote).toBe('foo')
   })
 
+  it('clone with post-checkout hook', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
+    const onPostCheckout = []
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      url: `http://${localhost}:8888/test-clone.git`,
+      onPostCheckout: args => {
+        onPostCheckout.push(args)
+      },
+    })
+
+    expect(onPostCheckout).toEqual([
+      {
+        newHead: '97c024f73eaab2781bf3691597bc7c833cb0e22f',
+        previousHead: '0000000000000000000000000000000000000000',
+        type: 'branch',
+      },
+    ])
+  })
+
   if (typeof process === 'object' && (process.versions || {}).node) {
     it('should allow agent to be used with built-in http plugin for Node.js', async () => {
       const { fs, dir, gitdir } = await makeFixture('isomorphic-git')

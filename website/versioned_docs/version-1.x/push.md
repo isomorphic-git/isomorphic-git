@@ -16,6 +16,7 @@ Push a branch or tag
 | [onAuth](./onAuth)               | AuthCallback              | optional auth fill callback                                                                                |
 | [onAuthFailure](./onAuthFailure) | AuthFailureCallback       | optional auth rejected callback                                                                            |
 | [onAuthSuccess](./onAuthSuccess) | AuthSuccessCallback       | optional auth approved callback                                                                            |
+| [onPrePush](./onPrePush)         | PrePushCallback           | optional pre-push hook callback                                                                            |
 | dir                              | string                    | The [working tree](dir-vs-gitdir.md) directory path                                                        |
 | **gitdir**                       | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                                                                 |
 | ref                              | string                    | Which branch to push. By default this is the currently checked out branch.                                 |
