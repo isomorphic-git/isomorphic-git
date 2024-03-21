@@ -203,6 +203,7 @@ unless there is a major version bump.
 - [resetIndex](https://isomorphic-git.github.io/docs/resetIndex.html)
 - [resolveRef](https://isomorphic-git.github.io/docs/resolveRef.html)
 - [setConfig](https://isomorphic-git.github.io/docs/setConfig.html)
+- [stash](https://isomorphic-git.github.io/docs/stash.html)
 - [status](https://isomorphic-git.github.io/docs/status.html)
 - [statusMatrix](https://isomorphic-git.github.io/docs/statusMatrix.html)
 - [tag](https://isomorphic-git.github.io/docs/tag.html)
@@ -369,6 +370,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/scolladon"><img src="https://avatars.githubusercontent.com/u/522422?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Sebastien</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=scolladon" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/yarikoptic"><img src="https://avatars.githubusercontent.com/u/39889?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Yaroslav Halchenko</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=yarikoptic" title="Documentation">📖</a></td>
     <td align="center"><a href="https://alex-v.blog/"><img src="https://avatars.githubusercontent.com/u/716334?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Alex Villarreal</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=alexvy86" title="Code">💻</a></td>
+    <td align="center"><a href="http://www.codeproject.com/script/Articles/MemberArticles.aspx?amid=62372"><img src="https://avatars.githubusercontent.com/u/865809?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Modesty Zhang</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Tests">⚠️</a></td>
   </tr>
 </table>
 

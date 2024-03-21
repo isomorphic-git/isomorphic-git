@@ -55,6 +55,7 @@ import { renameBranch } from './api/renameBranch.js'
 import { resetIndex } from './api/resetIndex.js'
 import { resolveRef } from './api/resolveRef.js'
 import { setConfig } from './api/setConfig.js'
+import { stash } from './api/stash.js'
 import { status } from './api/status.js'
 import { statusMatrix } from './api/statusMatrix.js'
 import { tag } from './api/tag.js'
@@ -139,6 +140,7 @@ export {
   writeRef,
   writeTag,
   writeTree,
+  stash,
 }
 
 // default export
@@ -211,4 +213,5 @@ export default {
   writeRef,
   writeTag,
   writeTree,
+  stash,
 }

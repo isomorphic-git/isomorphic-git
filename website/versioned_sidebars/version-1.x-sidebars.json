@@ -15,7 +15,8 @@
       "version-1.x-fastForward",
       "version-1.x-merge",
       "version-1.x-abortMerge",
-      "version-1.x-walk"
+      "version-1.x-walk",
+      "version-1.x-stash"
     ],
     "Callbacks": [
       "version-1.x-onAuth",
