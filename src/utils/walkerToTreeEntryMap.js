@@ -87,7 +87,7 @@ export async function writeTreeChanges(
   fs,
   dir,
   gitdir,
-  treePair // [TREE({ ref: 'HEAD' }), 'STAGE'] would be the equivlent of `git write-tree`
+  treePair // [TREE({ ref: 'HEAD' }), 'STAGE'] would be the equivalent of `git write-tree`
 ) {
   const isStage = treePair[1] === 'stage'
   const trees = treePair.map(t => (typeof t === 'string' ? _TreeMap[t]() : t))
