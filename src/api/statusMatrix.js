@@ -57,6 +57,8 @@ import { worthWalking } from '../utils/worthWalking.js'
  *   ["g.txt", 1, 2, 3], // modified, staged, with unstaged changes
  *   ["h.txt", 1, 0, 1], // deleted, unstaged
  *   ["i.txt", 1, 0, 0], // deleted, staged
+ *   ["j.txt", 1, 2, 0], // deleted, staged, with unstaged-modified changes (new file of the same name)
+ *   ["k.txt", 1, 1, 0], // deleted, staged, with unstaged changes (new file of the same name)
  * ]
  * ```
  *
