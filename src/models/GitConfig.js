@@ -136,33 +136,48 @@ const findLastIndex = (array, callback) => {
 // Note: there are a LOT of edge cases that aren't covered (e.g. keys in sections that also
 // have subsections, [include] directives, etc.
 export class GitConfig {
-  constructor(text) {
+  constructor(text, type = 'local') {
     let section = null
     let subsection = null
-    this.parsedConfig = text.split('\n').map(line => {
-      let name = null
-      let value = null
+    this.parsedConfig = text
+      ? text
+          .split('\n')
+          .map(line => {
+            let name = null
+            let value = null
 
-      const trimmedLine = line.trim()
-      const extractedSection = extractSectionLine(trimmedLine)
-      const isSection = extractedSection != null
-      if (isSection) {
-        ;[section, subsection] = extractedSection
-      } else {
-        const extractedVariable = extractVariableLine(trimmedLine)
-        const isVariable = extractedVariable != null
-        if (isVariable) {
-          ;[name, value] = extractedVariable
-        }
-      }
+            const trimmedLine = line.trim()
+            if (trimmedLine) {
+              const extractedSection = extractSectionLine(trimmedLine)
+              const isSection = extractedSection != null
+              if (isSection) {
+                ;[section, subsection] = extractedSection
+              } else {
+                const extractedVariable = extractVariableLine(trimmedLine)
+                const isVariable = extractedVariable != null
+                if (isVariable) {
+                  ;[name, value] = extractedVariable
+                }
+              }
 
-      const path = getPath(section, subsection, name)
-      return { line, isSection, section, subsection, name, value, path }
-    })
+              const path = getPath(section, subsection, name)
+              return {
+                type,
+                isSection,
+                section,
+                subsection,
+                name,
+                value,
+                path,
+              }
+            }
+          })
+          .filter(Boolean)
+      : []
   }
 
-  static from(text) {
-    return new GitConfig(text)
+  static from(text, type) {
+    return new GitConfig(text, type)
   }
 
   async get(path, getall = false) {
@@ -193,11 +208,20 @@ export class GitConfig {
     )
   }
 
-  async append(path, value) {
-    return this.set(path, value, true)
+  async appendConfig(config) {
+    for (const c of config.parsedConfig) {
+      if ((await this.get(c.path)) === undefined && c.value) {
+        await this.append(c.path, c.value, c.type)
+      }
+    }
+    return this
   }
 
-  async set(path, value, append = false) {
+  async append(path, value, type) {
+    return this.set(path, value, true, type)
+  }
+
+  async set(path, value, append = false, type = 'local') {
     const {
       section,
       subsection,
@@ -218,9 +242,9 @@ export class GitConfig {
         const config = this.parsedConfig[configIndex]
         // Name should be overwritten in case the casing changed
         const modifiedConfig = Object.assign({}, config, {
+          type,
           name,
           value,
-          modified: true,
         })
         if (append) {
           this.parsedConfig.splice(configIndex + 1, 0, modifiedConfig)
@@ -232,11 +256,11 @@ export class GitConfig {
           config => config.path === sectionPath
         )
         const newConfig = {
+          type,
           section,
           subsection,
           name,
           value,
-          modified: true,
           path: normalizedPath,
         }
         if (SECTION_REGEX.test(section) && VARIABLE_NAME_REGEX.test(name)) {
@@ -246,9 +270,10 @@ export class GitConfig {
           } else {
             // Add a new section
             const newSection = {
+              type,
               section,
               subsection,
-              modified: true,
+              isSection: true,
               path: sectionPath,
             }
             this.parsedConfig.push(newSection, newConfig)
@@ -260,10 +285,7 @@ export class GitConfig {
 
   toString() {
     return this.parsedConfig
-      .map(({ line, section, subsection, name, value, modified = false }) => {
-        if (!modified) {
-          return line
-        }
+      .map(({ section, subsection, name, value }) => {
         if (name != null && value != null) {
           if (typeof value === 'string' && /[#;]/.test(value)) {
             // A `#` or `;` symbol denotes a comment, so we have to wrap it in double quotes

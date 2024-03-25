@@ -8,7 +8,7 @@ describe('config', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-config')
     // Test
-    const sym = await getConfig({ fs, gitdir, path: 'core.symlinks' })
+    const bare = await getConfig({ fs, gitdir, path: 'core.bare' })
     const rfv = await getConfig({
       fs,
       gitdir,
@@ -21,7 +21,7 @@ describe('config', () => {
       gitdir,
       path: 'remote.upstream.fetch',
     })
-    expect(sym).toBe(false)
+    expect(bare).toBe(false)
     expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')
     expect(rfv).toBe('0')
     expect(fetch).toBe('refs/heads/qa/*:refs/remotes/upstream/qa/*')
