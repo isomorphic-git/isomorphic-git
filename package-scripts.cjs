@@ -47,12 +47,12 @@ module.exports = {
     build: {
       default: series.nps(
         'build.rollup',
-        'build.typings',
+        //'build.typings',
         'build.webpack',
         'build.indexjson',
         'build.treeshake',
-        'build.docs',
-        'build.size',
+        //'build.docs',
+        //'build.size',
         'build.pack'
       ),
       rollup: 'rollup -c --no-treeshake',

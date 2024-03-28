@@ -1,6 +1,6 @@
 {
-  "name": "isomorphic-git",
-  "version": "0.0.0-development",
+  "name": "@amrc-factoryplus/git-client",
+  "version": "0.0.1",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
   "typings": "./index.d.ts",
