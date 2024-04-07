@@ -1,7 +1,7 @@
 // @ts-check
 
 import { add } from '../api/add.js'
-import { readBlob } from '../api/readBlob.js'
+import { resetIndex } from '../api/resetIndex.js'
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
@@ -193,7 +193,12 @@ export async function applyTreeChanges(
   parentCommit,
   wasStaged
 ) {
-  return _walk({
+  const dirRemoved = []
+  const stageUpdated = []
+  const stageResetted = []
+
+  // analyze the changes
+  const ops = await _walk({
     fs,
     cache: {},
     dir,
@@ -211,37 +216,66 @@ export async function applyTreeChanges(
         return
       }
 
-      const currentFilepath = join(dir, filepath)
-
       // deleted tree or blob
       if (!stash && parent) {
-        if (type === 'tree') {
-          await fs.rmdir(currentFilepath)
-        } else if (type === 'blob') {
-          await fs.rm(currentFilepath)
-        }
-        return
+        const method = type === 'tree' ? 'rmdir' : 'rm'
+        if (type === 'tree') dirRemoved.push(filepath)
+        if (type === 'blob' && wasStaged) stageResetted.push(filepath)
+        return { method, filepath }
       }
 
       const oid = await stash.oid()
       if (!parent || (await parent.oid()) !== oid) {
         // only apply changes if changed from the parent commit or doesn't exist in the parent commit
         if (type === 'tree') {
-          await fs.mkdir(currentFilepath)
+          return { method: 'mkdir', filepath }
         } else {
-          const { blob } = await readBlob({ fs, dir, gitdir, oid })
-          await fs.write(currentFilepath, blob)
-          // await fs.chmod(currentFilepath, await stash.mode())
-        }
-        if (wasStaged) {
-          await add({ fs, dir, gitdir, filepath })
+          const mode = await stash.mode()
+          if (wasStaged) stageUpdated.push(filepath)
+          return {
+            method: 'write',
+            filepath,
+            oid,
+            mode,
+            content: await stash.content(),
+          }
         }
       }
-      return {
-        path: filepath,
-        oid: await stash.oid(),
-        type: await stash.type(),
-      } // return the applied tree entry
     },
+  })
+
+  // apply the changes
+  for (const op of ops) {
+    const currentFilepath = join(dir, op.filepath)
+    switch (op.method) {
+      case 'rmdir':
+        await fs.rmdir(currentFilepath)
+        break
+      case 'mkdir':
+        await fs.mkdir(currentFilepath)
+        break
+      case 'rm':
+        await fs.rm(currentFilepath)
+        break
+      case 'write':
+        // just like checkout, since mode only applicable to create, not update, delete first
+        if (await fs.exists(currentFilepath)) {
+          await fs.rm(currentFilepath)
+        }
+        // only writes if file is not in the removedDirs
+        if (
+          !dirRemoved.some(removedDir => currentFilepath.startsWith(removedDir))
+        ) {
+          await fs.write(currentFilepath, op.content, { mode: op.mode })
+        }
+        break
+    }
+  }
+
+  if (stageUpdated.length > 0) {
+    await add({ fs, dir, gitdir, filepath: stageUpdated })
+  }
+  stageResetted.forEach(async filepath => {
+    await resetIndex({ fs, dir, gitdir, filepath })
   })
 }
