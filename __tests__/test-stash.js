@@ -1,5 +1,6 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
+
 const {
   stash,
   Errors,
@@ -11,14 +12,41 @@ const {
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
+const makeFixtureStash = async testDir => {
+  const fixtureDir = 'test-stash'
+  let { fs, dir, gitdir } = await makeFixture(fixtureDir)
+  if (process.browser && testDir) {
+    const targetDir = dir.replace(fixtureDir, `${fixtureDir}-${testDir}`)
+    // copy all files from dirName to targetDir
+    const files = await fs.readdirDeep(dir)
+    for (const file of files) {
+      const content = await fs.read(file)
+      const fileName = file.replace(`${dir}/`, '')
+      await fs.write(`${targetDir}/${fileName}`, content)
+    }
+
+    const targetGitDir = gitdir.replace(fixtureDir, `${fixtureDir}-${testDir}`)
+    const gitFiles = await fs.readdirDeep(gitdir)
+    for (const file of gitFiles) {
+      const content = await fs.read(file)
+      const fileName = file.replace(`${gitdir}/`, '')
+      await fs.write(`${targetGitDir}/${fileName}`, content)
+    }
+
+    dir = targetDir
+    gitdir = targetGitDir
+  }
+  return { fs, dir, gitdir }
+}
+
 const addUserConfig = async (fs, dir, gitdir) => {
-  await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'user name' })
+  await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'stash tester' })
   await setConfig({
     fs,
     dir,
     gitdir,
     path: 'user.email',
-    value: 'u@test',
+    value: 'test@stash.com',
   })
 }
 
@@ -66,7 +94,6 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
     expect(bContentAfterStash).toEqual(bContent)
   } catch (e) {
     error = e
-    console.log(e.stack)
   }
 
   expect(error).toBeNull()
@@ -80,13 +107,11 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
 
 describe('abort stash', () => {
   it('stash without user', async () => {
-    // Setup
     const { fs, dir, gitdir } = await makeFixture('test-stash')
-    // Test
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir })
+      await stash({ fs, dir, gitdir })
     } catch (e) {
       error = e
     }
@@ -98,16 +123,14 @@ describe('abort stash', () => {
   })
 
   it('stash with no changes', async () => {
-    // Setup
     const { fs, dir, gitdir } = await makeFixture('test-stash')
-    // Test
 
     // add user to config
     await addUserConfig(fs, dir, gitdir)
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir })
+      await stash({ fs, dir, gitdir })
     } catch (e) {
       error = e
     }
@@ -121,33 +144,32 @@ describe('abort stash', () => {
 
 describe('stash push', () => {
   it('stash with staged changes', async () => {
-    // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
-    // Test
-
+    const { fs, dir, gitdir } = await makeFixtureStash('pushOne')
     await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
   })
 
   it('stash with staged and unstaged changes', async () => {
-    // Setup
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
-    // Test
+    const { fs, dir, gitdir } = await makeFixtureStash('pushTwo')
     await stashChanges(fs, dir, gitdir, true, false) // with unstaged changes
+  })
+
+  it('stash with staged and unstaged changes plus same file changes', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('pushThree')
+    await stashChanges(fs, dir, gitdir, true, true) // with unstaged changes
   })
 })
 
 describe('stash apply', () => {
   it('stash apply with staged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('applyOne')
 
-    await stashChanges(fs, dir, gitdir, false) // no unstaged changes
+    await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'apply' })
+      await stash({ fs, dir, gitdir, op: 'apply' })
     } catch (e) {
       error = e
-      console.log(e.stack)
     }
 
     const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
@@ -163,16 +185,15 @@ describe('stash apply', () => {
   })
 
   it('stash apply with staged and unstaged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('applyTwo')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'apply' })
+      await stash({ fs, dir, gitdir, op: 'apply' })
     } catch (e) {
       error = e
-      console.log(e.stack)
     }
 
     const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
@@ -192,16 +213,15 @@ describe('stash apply', () => {
   })
 
   it('stash apply with staged and unstaged changes, include same file', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('applyThree')
 
     await stashChanges(fs, dir, gitdir, true, true) // staged and non-unstaged changes
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'apply' })
+      await stash({ fs, dir, gitdir, op: 'apply' })
     } catch (e) {
       error = e
-      console.log(e.stack)
     }
 
     expect(error).toBeNull()
@@ -218,7 +238,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with staged changes under two folders', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('applyFour')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.write(`${dir}/folder/c.txt`, 'staged changes - c')
@@ -232,7 +252,7 @@ describe('stash apply', () => {
 
     let error = null
     try {
-      await stash({ fs, bare: true, dir, gitdir, op: 'push' })
+      await stash({ fs, dir, gitdir, op: 'push' })
       aStatus = await status({
         fs,
         dir,
@@ -243,10 +263,9 @@ describe('stash apply', () => {
       bStatus = await status({ fs, dir, gitdir, filepath: 'folder/d.js' })
       expect(bStatus).toBe('absent')
 
-      await stash({ fs, bare: true, dir, gitdir, op: 'apply' })
+      await stash({ fs, dir, gitdir, op: 'apply' })
     } catch (e) {
       error = e
-      console.log(e.stack)
     }
 
     expect(error).toBeNull()
@@ -257,7 +276,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with deleted files', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('applyFive')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.rm(`${dir}/a.txt`)
@@ -280,7 +299,6 @@ describe('stash apply', () => {
       await stash({ fs, dir, gitdir, op: 'apply' })
     } catch (e) {
       error = e
-      console.log(e.stack)
     }
 
     expect(error).toBeNull()
@@ -291,7 +309,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with deleted files and staged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('applySix')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.rm(`${dir}/a.txt`)
@@ -319,7 +337,6 @@ describe('stash apply', () => {
       await stash({ fs, dir, gitdir, op: 'apply' })
     } catch (e) {
       error = e
-      console.log(e.stack)
     }
 
     expect(error).toBeNull()
@@ -330,7 +347,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with delete folder', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('applySeven')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.mkdir(`${dir}/folder`)
@@ -360,7 +377,6 @@ describe('stash apply', () => {
       await stash({ fs, dir, gitdir, op: 'apply' })
     } catch (e) {
       error = e
-      console.log(e.stack)
     }
 
     expect(error).toBeNull()
@@ -481,7 +497,7 @@ describe('stash clear', () => {
 
 describe('stash pop', () => {
   it('stash pop with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('popOne')
 
     let error = null
     try {
@@ -494,7 +510,7 @@ describe('stash pop', () => {
   })
 
   it('stash pop with 1 stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('popTwo')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -511,7 +527,7 @@ describe('stash pop', () => {
   })
 
   it('stash pop with 2 stashes', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('popThree')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes

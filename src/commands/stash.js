@@ -9,6 +9,7 @@ import { GitStashManager } from '../managers/GitStashManager.js'
 import {
   writeTreeChanges,
   applyTreeChanges,
+  acquireLock,
 } from '../utils/walkerToTreeEntryMap.js'
 
 import { STAGE } from './STAGE.js'
@@ -73,7 +74,7 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
     stashCommitTree = workingTree
   }
 
-  if (stashCommitTree === null) {
+  if (!stashCommitTree || (!indexTree && !workingTree)) {
     throw new NotFoundError('changes, nothing to stash')
   }
 
@@ -103,6 +104,8 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
     track: false,
     force: true, // force checkout to discard changes
   })
+
+  return stashCommit
 }
 
 export async function _stashApply({ fs, dir, gitdir }) {
@@ -142,9 +145,11 @@ export async function _stashDrop({ fs, dir, gitdir }) {
   const stashMgr = new GitStashManager({ fs, dir, gitdir })
   // remove stash ref first
   const stashRefPath = stashMgr.refStashPath
-  if (await fs.exists(stashRefPath)) {
-    await fs.rm(stashRefPath)
-  }
+  await acquireLock(stashRefPath, async () => {
+    if (await fs.exists(stashRefPath)) {
+      await fs.rm(stashRefPath)
+    }
+  })
 
   // read from stash reflog and list the stash commits
   const reflogEntries = await stashMgr.readStashReflogs({ parsed: false })
@@ -156,17 +161,18 @@ export async function _stashDrop({ fs, dir, gitdir }) {
   reflogEntries.pop()
 
   const stashReflogPath = stashMgr.refLogsStashPath
-  if (reflogEntries.length) {
-    await fs.write(stashReflogPath, reflogEntries.join('\n'), 'utf8')
-
-    const lastStashCommit = reflogEntries[reflogEntries.length - 1].split(
-      ' '
-    )[1]
-    await stashMgr.writeStashRef(lastStashCommit)
-  } else {
-    // remove the stash reflog file if no entry left
-    await fs.rm(stashReflogPath)
-  }
+  await acquireLock({ reflogEntries, stashReflogPath, stashMgr }, async () => {
+    if (reflogEntries.length) {
+      await fs.write(stashReflogPath, reflogEntries.join('\n'), 'utf8')
+      const lastStashCommit = reflogEntries[reflogEntries.length - 1].split(
+        ' '
+      )[1]
+      await stashMgr.writeStashRef(lastStashCommit)
+    } else {
+      // remove the stash reflog file if no entry left
+      await fs.rm(stashReflogPath)
+    }
+  })
 }
 
 export async function _stashList({ fs, dir, gitdir }) {
@@ -178,13 +184,15 @@ export async function _stashClear({ fs, dir, gitdir }) {
   const stashMgr = new GitStashManager({ fs, dir, gitdir })
   const stashRefPath = [stashMgr.refStashPath, stashMgr.refLogsStashPath]
 
-  await Promise.all(
-    stashRefPath.map(async path => {
-      if (await fs.exists(path)) {
-        return fs.rm(path)
-      }
-    })
-  )
+  await acquireLock(stashRefPath, async () => {
+    await Promise.all(
+      stashRefPath.map(async path => {
+        if (await fs.exists(path)) {
+          return fs.rm(path)
+        }
+      })
+    )
+  })
 }
 
 export async function _stashPop({ fs, dir, gitdir }) {

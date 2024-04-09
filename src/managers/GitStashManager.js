@@ -4,6 +4,7 @@ import { MissingNameError } from '../errors/MissingNameError'
 import { GitRefStash } from '../models/GitRefStash'
 import { join } from '../utils/join'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject'
+import { acquireLock } from '../utils/walkerToTreeEntryMap'
 
 import { GitRefManager } from './GitRefManager'
 
@@ -103,10 +104,13 @@ export class GitStashManager {
       message
     )
     const filepath = this.refLogsStashPath
-    const appendTo = (await this.fs.exists(filepath))
-      ? await this.fs.read(filepath, 'utf8')
-      : ''
-    await this.fs.write(filepath, appendTo + entry, 'utf8')
+
+    await acquireLock({ filepath, entry }, async () => {
+      const appendTo = (await this.fs.exists(filepath))
+        ? await this.fs.read(filepath, 'utf8')
+        : ''
+      await this.fs.write(filepath, appendTo + entry, 'utf8')
+    })
   }
 
   async readStashReflogs({ parsed = false }) {
