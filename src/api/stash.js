@@ -96,7 +96,7 @@ export async function stash({
 
     const opFunc = stashMap[op]
     if (opFunc) {
-      return await opFunc({ fs: _fs, dir, gitdir })
+      return await opFunc({ fs: _fs, dir, gitdir, message })
     }
     throw new Error(`To be implemented: ${op}`)
   } catch (err) {

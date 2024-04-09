@@ -17,7 +17,7 @@ export class GitRefStash {
     const nameNoSpace = author.name.replace(/\s/g, '')
     const z40 = '0000000000000000000000000000000000000000' // hard code for now, works with `git stash list`
     const timestamp = Math.floor(Date.now() / 1000)
-    const timezoneOffset = this.timezoneOffsetForRefLogEntry
+    const timezoneOffset = GitRefStash.timezoneOffsetForRefLogEntry
     return `${z40} ${stashCommit} ${nameNoSpace} ${author.email} ${timestamp} ${timezoneOffset}\t${message}\n`
   }
 

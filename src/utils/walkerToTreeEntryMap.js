@@ -1,7 +1,5 @@
-// @ts-check
+import AsyncLock from 'async-lock'
 
-import { add } from '../api/add.js'
-import { resetIndex } from '../api/resetIndex.js'
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
@@ -10,6 +8,8 @@ import { _writeTree } from '../commands/writeTree.js'
 import { InternalError } from '../errors/InternalError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
+import { GitIndexManager } from '../managers/GitIndexManager.js'
+import { _readObject } from '../storage/readObject.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { _writeObject } from '../storage/writeObject'
 
@@ -19,6 +19,12 @@ import { posixifyPathBuffer } from './posixifyPathBuffer.js'
 const _TreeMap = {
   stage: STAGE,
   workdir: WORKDIR,
+}
+
+let lock
+export async function acquireLock(ref, callback) {
+  if (lock === undefined) lock = new AsyncLock()
+  return lock.acquire(ref, callback)
 }
 
 // make sure filepath, blob type and blob object (from loose objects) plus oid are in sync and valid
@@ -37,13 +43,15 @@ async function checkAndWriteBlob(fs, gitdir, dir, filepath, oid = null) {
     : undefined
   let retOid = objContent ? oid : undefined
   if (!objContent) {
-    const object = stats.isSymbolicLink()
-      ? await fs.readlink(currentFilepath).then(posixifyPathBuffer)
-      : await fs.read(currentFilepath)
+    await acquireLock({ fs, gitdir, currentFilepath }, async () => {
+      const object = stats.isSymbolicLink()
+        ? await fs.readlink(currentFilepath).then(posixifyPathBuffer)
+        : await fs.read(currentFilepath)
 
-    if (object === null) throw new NotFoundError(currentFilepath)
+      if (object === null) throw new NotFoundError(currentFilepath)
 
-    retOid = await _writeObject({ fs, gitdir, type: 'blob', object })
+      retOid = await _writeObject({ fs, gitdir, type: 'blob', object })
+    })
   }
 
   return retOid
@@ -195,7 +203,6 @@ export async function applyTreeChanges(
 ) {
   const dirRemoved = []
   const stageUpdated = []
-  const stageResetted = []
 
   // analyze the changes
   const ops = await _walk({
@@ -220,7 +227,8 @@ export async function applyTreeChanges(
       if (!stash && parent) {
         const method = type === 'tree' ? 'rmdir' : 'rm'
         if (type === 'tree') dirRemoved.push(filepath)
-        if (type === 'blob' && wasStaged) stageResetted.push(filepath)
+        if (type === 'blob' && wasStaged)
+          stageUpdated.push({ filepath, oid: await parent.oid() }) // stats is undefined, will stage the deletion with index.insert
         return { method, filepath }
       }
 
@@ -230,52 +238,64 @@ export async function applyTreeChanges(
         if (type === 'tree') {
           return { method: 'mkdir', filepath }
         } else {
-          const mode = await stash.mode()
-          if (wasStaged) stageUpdated.push(filepath)
+          if (wasStaged)
+            stageUpdated.push({
+              filepath,
+              oid,
+              stats: await fs.lstat(join(dir, filepath)),
+            })
           return {
             method: 'write',
             filepath,
             oid,
-            mode,
-            content: await stash.content(),
           }
         }
       }
     },
   })
 
-  // apply the changes
-  for (const op of ops) {
-    const currentFilepath = join(dir, op.filepath)
-    switch (op.method) {
-      case 'rmdir':
-        await fs.rmdir(currentFilepath)
-        break
-      case 'mkdir':
-        await fs.mkdir(currentFilepath)
-        break
-      case 'rm':
-        await fs.rm(currentFilepath)
-        break
-      case 'write':
-        // just like checkout, since mode only applicable to create, not update, delete first
-        if (await fs.exists(currentFilepath)) {
+  // apply the changes to work dir
+  await acquireLock({ fs, gitdir, dirRemoved, ops }, async () => {
+    for (const op of ops) {
+      const currentFilepath = join(dir, op.filepath)
+      switch (op.method) {
+        case 'rmdir':
+          await fs.rmdir(currentFilepath)
+          break
+        case 'mkdir':
+          await fs.mkdir(currentFilepath)
+          break
+        case 'rm':
           await fs.rm(currentFilepath)
-        }
-        // only writes if file is not in the removedDirs
-        if (
-          !dirRemoved.some(removedDir => currentFilepath.startsWith(removedDir))
-        ) {
-          await fs.write(currentFilepath, op.content, { mode: op.mode })
-        }
-        break
+          break
+        case 'write':
+          // only writes if file is not in the removedDirs
+          if (
+            !dirRemoved.some(removedDir =>
+              currentFilepath.startsWith(removedDir)
+            )
+          ) {
+            const { object } = await _readObject({
+              fs,
+              cache: {},
+              gitdir,
+              oid: op.oid,
+            })
+            // just like checkout, since mode only applicable to create, not update, delete first
+            if (await fs.exists(currentFilepath)) {
+              await fs.rm(currentFilepath)
+            }
+            await fs.write(currentFilepath, object) // only handles regualr files for now
+          }
+          break
+      }
     }
-  }
+  })
 
-  if (stageUpdated.length > 0) {
-    await add({ fs, dir, gitdir, filepath: stageUpdated })
-  }
-  stageResetted.forEach(async filepath => {
-    await resetIndex({ fs, dir, gitdir, filepath })
+  // update the stage
+  await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {
+    stageUpdated.forEach(({ filepath, stats, oid }) => {
+      index.insert({ filepath, stats, oid })
+    })
   })
 }
