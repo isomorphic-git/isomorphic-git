@@ -91,14 +91,11 @@ const stashChanges = async (
   let error = null
   try {
     await stash({ fs, dir, gitdir, message })
-    const aContentAfterStash = new TextDecoder().decode(
-      await fs.read(`${dir}/a.txt`)
-    )
-    expect(aContentAfterStash).toEqual(aContent)
-    const bContentAfterStash = new TextDecoder().decode(
-      await fs.read(`${dir}/b.js`)
-    )
-    expect(bContentAfterStash).toEqual(bContent)
+    const aContentAfterStash = await fs.read(`${dir}/a.txt`)
+    expect(aContentAfterStash.toString()).toEqual(aContent)
+
+    const bContentAfterStash = await fs.read(`${dir}/b.js`)
+    expect(bContentAfterStash.toString()).toEqual(bContent)
   } catch (e) {
     error = e
   }
@@ -204,11 +201,11 @@ describe('stash push', () => {
     await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
 
     const cContentBeforeStash = 'untracked file - c'
-    const dContentBeforeStash = 'untracked file - d'
+    const dContentBeforeStash = 'console.log("untracked file - d")'
 
     // Create untracked files
-    await fs.write(`${dir}/c.txt`, 'untracked file - c')
-    await fs.write(`${dir}/d.js`, 'untracked file - d')
+    await fs.write(`${dir}/c.txt`, cContentBeforeStash)
+    await fs.write(`${dir}/d.js`, dContentBeforeStash)
 
     let error = null
     try {
@@ -218,15 +215,11 @@ describe('stash push', () => {
     }
 
     expect(error).toBeNull()
-    const cContentAfterStash = new TextDecoder().decode(
-      await fs.read(`${dir}/c.txt`)
-    )
-    const dContentAfterStash = new TextDecoder().decode(
-      await fs.read(`${dir}/d.js`)
-    )
+    const cContentAfterStash = await fs.read(`${dir}/c.txt`)
+    const dContentAfterStash = await fs.read(`${dir}/d.js`)
 
-    expect(cContentAfterStash).toEqual(cContentBeforeStash)
-    expect(dContentAfterStash).toEqual(dContentBeforeStash)
+    expect(cContentAfterStash.toString()).toEqual(cContentBeforeStash)
+    expect(dContentAfterStash.toString()).toEqual(dContentBeforeStash)
   })
 })
 
@@ -243,10 +236,10 @@ describe('stash apply', () => {
       error = e
     }
 
-    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
-    expect(aContent).toEqual('staged changes - a') // make sure the staged changes are applied
-    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
-    expect(bContent).toEqual('staged changes - b') // make sure the staged changes are applied
+    const aContent = await fs.read(`${dir}/a.txt`)
+    expect(aContent.toString()).toEqual('staged changes - a') // make sure the staged changes are applied
+    const bContent = await fs.read(`${dir}/b.js`)
+    expect(bContent.toString()).toEqual('staged changes - b') // make sure the staged changes are applied
 
     expect(error).toBeNull()
     const aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
@@ -267,12 +260,12 @@ describe('stash apply', () => {
       error = e
     }
 
-    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
-    expect(aContent).toEqual('staged changes - a') // make sure the staged changes are applied
-    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
-    expect(bContent).toEqual('staged changes - b') // make sure the staged changes are applied
-    const mContent = new TextDecoder().decode(await fs.read(`${dir}/m.xml`))
-    expect(mContent).toEqual('<unstaged>m</unstaged>') // make sure the unstaged changes are applied
+    const aContent = await fs.read(`${dir}/a.txt`)
+    expect(aContent.toString()).toEqual('staged changes - a') // make sure the staged changes are applied
+    const bContent = await fs.read(`${dir}/b.js`)
+    expect(bContent.toString()).toEqual('staged changes - b') // make sure the staged changes are applied
+    const mContent = await fs.read(`${dir}/m.xml`)
+    expect(mContent.toString()).toEqual('<unstaged>m</unstaged>') // make sure the unstaged changes are applied
 
     expect(error).toBeNull()
     const aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
@@ -299,8 +292,8 @@ describe('stash apply', () => {
     const aStatus = await status({ fs, dir, gitdir, filepath: 'a.txt' })
     expect(aStatus).toBe('*modified') // a.txt has both staged and unstaged changes
 
-    const againContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
-    expect(againContent).toEqual('unstaged changes - a - again') // make sure the unstaged changes are applied
+    const againContent = await fs.read(`${dir}/a.txt`)
+    expect(againContent.toString()).toEqual('unstaged changes - a - again') // make sure the unstaged changes are applied
 
     const bStatus = await status({ fs, dir, gitdir, filepath: 'b.js' })
     expect(bStatus).toBe('modified')
@@ -471,24 +464,20 @@ describe('stash apply', () => {
     let error = null
     try {
       await stash({ fs, dir, gitdir, op: 'push' })
-      const cContentBeforeApply = new TextDecoder().decode(
-        await fs.read(`${dir}/c.txt`)
-      )
-      const dContentBeforeStash = new TextDecoder().decode(
-        await fs.read(`${dir}/d.js`)
-      )
+      const cContentBeforeApply = await fs.read(`${dir}/c.txt`)
+      const dContentBeforeStash = await fs.read(`${dir}/d.js`)
 
       await stash({ fs, dir, gitdir, op: 'apply' })
 
-      const cContentAfterApply = new TextDecoder().decode(
-        await fs.read(`${dir}/c.txt`)
-      )
-      const dContentAfterStash = new TextDecoder().decode(
-        await fs.read(`${dir}/d.js`)
-      )
+      const cContentAfterApply = await fs.read(`${dir}/c.txt`)
+      const dContentAfterStash = await fs.read(`${dir}/d.js`)
 
-      expect(cContentAfterApply).toEqual(cContentBeforeApply)
-      expect(dContentAfterStash).toEqual(dContentBeforeStash)
+      expect(cContentAfterApply.toString()).toEqual(
+        cContentBeforeApply.toString()
+      )
+      expect(dContentAfterStash.toString()).toEqual(
+        dContentBeforeStash.toString()
+      )
     } catch (e) {
       error = e
     }
@@ -517,8 +506,11 @@ describe('stash apply', () => {
     const { fs, dir, gitdir } = await makeFixtureStash('applyInvalidRefIdx')
 
     await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
-    await fs.write(`${dir}/a.txt`, 'stash two staged changes - aa')
-    await fs.write(`${dir}/b.js`, 'stash two staged changes - bb')
+
+    const aOriginalContent = 'stash two staged changes - aa'
+    const bOriginalContent = 'console.log("stash two staged changes - bb")'
+    await fs.write(`${dir}/a.txt`, aOriginalContent)
+    await fs.write(`${dir}/b.js`, bOriginalContent)
 
     await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
     await stash({ fs, dir, gitdir, op: 'push', message: 'stash two' })
@@ -533,10 +525,10 @@ describe('stash apply', () => {
     }
 
     expect(error).toBeNull()
-    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
-    expect(aContent).toEqual('stash two staged changes - aa') // make sure the 2nd staged changes are applied
-    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
-    expect(bContent).toEqual('stash two staged changes - bb') // make sure the 2nd staged changes are applied
+    const aContent = await fs.read(`${dir}/a.txt`)
+    expect(aContent.toString()).toEqual(aOriginalContent) // make sure the 2nd staged changes are applied
+    const bContent = await fs.read(`${dir}/b.js`)
+    expect(bContent.toString()).toEqual(bOriginalContent) // make sure the 2nd staged changes are applied
   })
 })
 
@@ -794,8 +786,11 @@ describe('stash pop', () => {
 
     await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
 
-    await fs.write(`${dir}/a.txt`, 'stash two staged changes - aaa')
-    await fs.write(`${dir}/b.js`, 'stash two staged changes - bbb')
+    const aNewContent = 'stash two staged changes - aaa'
+    const bNewContent = 'console.log("stash two staged changes - bbb")'
+
+    await fs.write(`${dir}/a.txt`, aNewContent)
+    await fs.write(`${dir}/b.js`, bNewContent)
 
     await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
     await stash({ fs, dir, gitdir, op: 'push', message: 'stash two' })
@@ -816,9 +811,9 @@ describe('stash pop', () => {
       'stash@{0}: stash one: 3ca31f1 initial commit',
       'stash@{1}: stash three: 3ca31f1 initial commit',
     ])
-    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
-    expect(aContent).toEqual('stash two staged changes - aaa') // make sure the 2nd staged changes are applied
-    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
-    expect(bContent).toEqual('stash two staged changes - bbb') // make sure the 2nd staged changes are applied
+    const aContent = await fs.read(`${dir}/a.txt`)
+    expect(aContent.toString()).toEqual(aNewContent) // make sure the 2nd staged changes are applied
+    const bContent = await fs.read(`${dir}/b.js`)
+    expect(bContent.toString()).toEqual(bNewContent) // make sure the 2nd staged changes are applied
   })
 })
