@@ -41,10 +41,12 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
   let stashCommitTree = null
   let workDirCompareBase = TREE({ ref: 'HEAD' })
 
-  const indexTree = await writeTreeChanges(fs, dir, gitdir, [
-    TREE({ ref: 'HEAD' }),
-    'stage',
-  ])
+  const indexTree = await writeTreeChanges({
+    fs,
+    dir,
+    gitdir,
+    treePair: [TREE({ ref: 'HEAD' }), 'stage'],
+  })
   if (indexTree) {
     // this indexTree will be the tree of the stash commit
     // create a commit from the index tree, which has one parent, the current branch HEAD
@@ -58,10 +60,12 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
     workDirCompareBase = STAGE()
   }
 
-  const workingTree = await writeTreeChanges(fs, dir, gitdir, [
-    workDirCompareBase,
-    'workdir',
-  ])
+  const workingTree = await writeTreeChanges({
+    fs,
+    dir,
+    gitdir,
+    treePair: [workDirCompareBase, 'workdir'],
+  })
   if (workingTree) {
     // create a commit from the working directory tree, which has one parent, either the one we just had, or the headCommit
     const workingHeadCommit = await stashMgr.writeStashCommit({
@@ -79,9 +83,12 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
   }
 
   // create another commit from the tree, which has three parents: HEAD and the commit we just made:
+  const stashMsg =
+    (message.trim() || `WIP on ${branch}`) +
+    `: ${headCommit.substring(0, 7)} ${headMsg}`
+
   const stashCommit = await stashMgr.writeStashCommit({
-    message:
-      message.trim() || `stash: WIP on ${branch} - ${new Date().toISOString()}`,
+    message: stashMsg,
     tree: stashCommitTree,
     parent: stashCommitParents,
   })
@@ -92,7 +99,7 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
   // write the stash commit to the logs
   await stashMgr.writeStashReflogEntry({
     stashCommit,
-    message: `WIP on ${branch}: ${headCommit.substring(0, 7)} ${headMsg}`,
+    message: stashMsg,
   })
 
   // finally, go back to a clean working directory
@@ -108,11 +115,11 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
   return stashCommit
 }
 
-export async function _stashApply({ fs, dir, gitdir }) {
+export async function _stashApply({ fs, dir, gitdir, refIdx = 0 }) {
   const stashMgr = new GitStashManager({ fs, dir, gitdir })
 
   // get the stash commit object
-  const stashCommit = await stashMgr.readStashCommit()
+  const stashCommit = await stashMgr.readStashCommit(refIdx)
   const { parent: stashParents = null } = stashCommit.commit
     ? stashCommit.commit
     : {}
@@ -130,19 +137,23 @@ export async function _stashApply({ fs, dir, gitdir }) {
     })
     const wasStaged = applyingCommit.commit.message.startsWith('stash-Index')
 
-    await applyTreeChanges(
+    await applyTreeChanges({
       fs,
       dir,
       gitdir,
-      stashParents[i + 1],
-      stashParents[i],
-      wasStaged
-    )
+      stashCommit: stashParents[i + 1],
+      parentCommit: stashParents[i],
+      wasStaged,
+    })
   }
 }
 
-export async function _stashDrop({ fs, dir, gitdir }) {
+export async function _stashDrop({ fs, dir, gitdir, refIdx = 0 }) {
   const stashMgr = new GitStashManager({ fs, dir, gitdir })
+  const stashCommit = await stashMgr.readStashCommit(refIdx)
+  if (!stashCommit.commit) {
+    return // no stash found
+  }
   // remove stash ref first
   const stashRefPath = stashMgr.refStashPath
   await acquireLock(stashRefPath, async () => {
@@ -157,8 +168,8 @@ export async function _stashDrop({ fs, dir, gitdir }) {
     return // no stash reflog entry
   }
 
-  // remove the last stash reflog entry from reflogEntries, then update the stash reflog
-  reflogEntries.pop()
+  // remove the specified stash reflog entry from reflogEntries, then update the stash reflog
+  reflogEntries.splice(refIdx, 1)
 
   const stashReflogPath = stashMgr.refLogsStashPath
   await acquireLock({ reflogEntries, stashReflogPath, stashMgr }, async () => {
@@ -195,7 +206,7 @@ export async function _stashClear({ fs, dir, gitdir }) {
   })
 }
 
-export async function _stashPop({ fs, dir, gitdir }) {
-  await _stashApply({ fs, dir, gitdir })
-  await _stashDrop({ fs, dir, gitdir })
+export async function _stashPop({ fs, dir, gitdir, refIdx = 0 }) {
+  await _stashApply({ fs, dir, gitdir, refIdx })
+  await _stashDrop({ fs, dir, gitdir, refIdx })
 }

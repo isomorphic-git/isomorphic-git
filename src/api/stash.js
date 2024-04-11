@@ -7,6 +7,7 @@ import {
   _stashClear,
   _stashPop,
 } from '../commands/stash.js'
+import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
@@ -24,7 +25,8 @@ import { join } from '../utils/join.js'
  * @param {string} [args.dir] - [required] The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [optional] The [git directory](dir-vs-gitdir.md) path
  * @param {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} [args.op = 'push'] - [optional] name of stash operation, default to 'push'
- * @param {string} [args.message = ''] - [optional] message to be used for the stash entry, only applicale when op === 'push'
+ * @param {string} [args.message = ''] - [optional] message to be used for the stash entry, only applicable when op === 'push'
+ * @param {number} [args.refIdx = 0] - [optional - Number] stash ref index of entry, only applicable when op === ['apply' | 'drop' | 'pop'], refIdx >= 0 and < num of stash pushed
  * @returns {Promise<string | void>}  Resolves successfully when stash operations are complete
  *
  * @example
@@ -68,6 +70,7 @@ export async function stash({
   gitdir = join(dir, '.git'),
   op = 'push',
   message = '',
+  refIdx = 0,
 }) {
   assertParameter('fs', fs)
   assertParameter('dir', dir)
@@ -83,6 +86,8 @@ export async function stash({
     pop: _stashPop,
   }
 
+  const opsNeedRefIdx = ['apply', 'drop', 'pop']
+
   try {
     const _fs = new FileSystem(fs)
     const folders = ['refs', 'logs', 'logs/refs']
@@ -96,7 +101,13 @@ export async function stash({
 
     const opFunc = stashMap[op]
     if (opFunc) {
-      return await opFunc({ fs: _fs, dir, gitdir, message })
+      if (opsNeedRefIdx.includes(op) && refIdx < 0) {
+        throw new InvalidRefNameError(
+          `stash@${refIdx}`,
+          'number that is in range of [0, num of stash pushed]'
+        )
+      }
+      return await opFunc({ fs: _fs, dir, gitdir, message, refIdx })
     }
     throw new Error(`To be implemented: ${op}`)
   } catch (err) {

@@ -1,5 +1,6 @@
 import { _readCommit } from '../commands/readCommit'
 import { _writeCommit } from '../commands/writeCommit'
+import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { MissingNameError } from '../errors/MissingNameError'
 import { GitRefStash } from '../models/GitRefStash'
 import { join } from '../utils/join'
@@ -46,16 +47,14 @@ export class GitStashManager {
     return this._author
   }
 
-  async getStashSHA() {
+  async getStashSHA(refIdx, stashEntries) {
     if (!(await this.fs.exists(this.refStashPath))) {
       return null
     }
 
-    return GitRefManager.resolve({
-      fs: this.fs,
-      gitdir: this.gitdir,
-      ref: GitStashManager.refStash,
-    })
+    const entries =
+      stashEntries || (await this.readStashReflogs({ parsed: false }))
+    return entries[refIdx].split(' ')[1]
   }
 
   async writeStashCommit({ message, tree, parent }) {
@@ -72,8 +71,19 @@ export class GitStashManager {
     })
   }
 
-  async readStashCommit() {
-    const stashSHA = await this.getStashSHA()
+  async readStashCommit(refIdx) {
+    const stashEntries = await this.readStashReflogs({ parsed: false })
+    if (refIdx !== 0) {
+      // non-default case, throw exceptions if not valid
+      if (refIdx < 0 || refIdx > stashEntries.length - 1) {
+        throw new InvalidRefNameError(
+          `stash@${refIdx}`,
+          'number that is in range of [0, num of stash pushed]'
+        )
+      }
+    }
+
+    const stashSHA = await this.getStashSHA(refIdx, stashEntries)
     if (!stashSHA) {
       return {} // no stash found
     }

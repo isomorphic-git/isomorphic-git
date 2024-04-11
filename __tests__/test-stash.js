@@ -50,7 +50,14 @@ const addUserConfig = async (fs, dir, gitdir) => {
   })
 }
 
-const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
+const stashChanges = async (
+  fs,
+  dir,
+  gitdir,
+  defalt = true,
+  again = true,
+  message = ''
+) => {
   // add user to config
   await addUserConfig(fs, dir, gitdir)
 
@@ -83,7 +90,7 @@ const stashChanges = async (fs, dir, gitdir, defalt = true, again = true) => {
 
   let error = null
   try {
-    await stash({ fs, dir, gitdir })
+    await stash({ fs, dir, gitdir, message })
     const aContentAfterStash = new TextDecoder().decode(
       await fs.read(`${dir}/a.txt`)
     )
@@ -140,6 +147,35 @@ describe('abort stash', () => {
     expect(error.code).toEqual(Errors.NotFoundError.code)
     expect(error.data.what).toEqual('changes, nothing to stash')
   })
+
+  it('stash with untracked files - no other changes', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('pushUntracked')
+
+    const cContentBeforeStash = 'untracked file - c'
+    const dContentBeforeStash = 'untracked file - d'
+
+    // Create untracked files
+    await fs.write(`${dir}/c.txt`, 'untracked file - c')
+    await fs.write(`${dir}/d.js`, 'untracked file - d')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'push' })
+    } catch (e) {
+      error = e // should come here since no changes to stash
+    }
+
+    expect(error).not.toBeNull()
+    const cContentAfterStash = new TextDecoder().decode(
+      await fs.read(`${dir}/c.txt`)
+    )
+    const dContentAfterStash = new TextDecoder().decode(
+      await fs.read(`${dir}/d.js`)
+    )
+
+    expect(cContentAfterStash).toEqual(cContentBeforeStash)
+    expect(dContentAfterStash).toEqual(dContentBeforeStash)
+  })
 })
 
 describe('stash push', () => {
@@ -156,6 +192,41 @@ describe('stash push', () => {
   it('stash with staged and unstaged changes plus same file changes', async () => {
     const { fs, dir, gitdir } = await makeFixtureStash('pushThree')
     await stashChanges(fs, dir, gitdir, true, true) // with unstaged changes
+  })
+
+  it('stash with untracked files - with other changes', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('pushUntracked')
+
+    await addUserConfig(fs, dir, gitdir)
+    await fs.write(`${dir}/a.txt`, 'staged changes - a')
+    await fs.write(`${dir}/b.js`, 'staged changes - b')
+
+    await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
+
+    const cContentBeforeStash = 'untracked file - c'
+    const dContentBeforeStash = 'untracked file - d'
+
+    // Create untracked files
+    await fs.write(`${dir}/c.txt`, 'untracked file - c')
+    await fs.write(`${dir}/d.js`, 'untracked file - d')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'push' })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).toBeNull()
+    const cContentAfterStash = new TextDecoder().decode(
+      await fs.read(`${dir}/c.txt`)
+    )
+    const dContentAfterStash = new TextDecoder().decode(
+      await fs.read(`${dir}/d.js`)
+    )
+
+    expect(cContentAfterStash).toEqual(cContentBeforeStash)
+    expect(dContentAfterStash).toEqual(dContentBeforeStash)
   })
 })
 
@@ -383,6 +454,90 @@ describe('stash apply', () => {
     aStatus = await status({ fs, dir, gitdir, filepath: 'folder/e.js' })
     expect(aStatus).toBe('*deleted')
   })
+
+  it('stash apply with untracked files - with other staged and unstaged changes', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('applyUntracked')
+
+    await addUserConfig(fs, dir, gitdir)
+    await fs.write(`${dir}/a.txt`, 'staged changes - a')
+    await fs.write(`${dir}/b.js`, 'unstaged changes - b')
+
+    await add({ fs, dir, gitdir, filepath: ['a.txt'] }) // only staged a.txt
+
+    // Create untracked files
+    await fs.write(`${dir}/c.txt`, 'untracked file - c')
+    await fs.write(`${dir}/d.js`, 'untracked file - d')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'push' })
+      const cContentBeforeApply = new TextDecoder().decode(
+        await fs.read(`${dir}/c.txt`)
+      )
+      const dContentBeforeStash = new TextDecoder().decode(
+        await fs.read(`${dir}/d.js`)
+      )
+
+      await stash({ fs, dir, gitdir, op: 'apply' })
+
+      const cContentAfterApply = new TextDecoder().decode(
+        await fs.read(`${dir}/c.txt`)
+      )
+      const dContentAfterStash = new TextDecoder().decode(
+        await fs.read(`${dir}/d.js`)
+      )
+
+      expect(cContentAfterApply).toEqual(cContentBeforeApply)
+      expect(dContentAfterStash).toEqual(dContentBeforeStash)
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).toBeNull()
+  })
+
+  it('stash apply with invalid ref idx', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('applyInvalidRefIdx')
+
+    await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'apply', refIdx: 1 })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.stash')
+    expect(error.code).toEqual(Errors.InvalidRefNameError.code)
+  })
+
+  it('stash apply with non-default ref idx', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('applyInvalidRefIdx')
+
+    await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
+    await fs.write(`${dir}/a.txt`, 'stash two staged changes - aa')
+    await fs.write(`${dir}/b.js`, 'stash two staged changes - bb')
+
+    await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
+    await stash({ fs, dir, gitdir, op: 'push', message: 'stash two' })
+
+    await stashChanges(fs, dir, gitdir, true, true, 'stash three')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'apply', refIdx: 1 })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).toBeNull()
+    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
+    expect(aContent).toEqual('stash two staged changes - aa') // make sure the 2nd staged changes are applied
+    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
+    expect(bContent).toEqual('stash two staged changes - bb') // make sure the 2nd staged changes are applied
+  })
 })
 
 describe('stash list', () => {
@@ -411,11 +566,37 @@ describe('stash list', () => {
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(2)
   })
+
+  it('stash list with default message', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
+    const defaultMsg = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(defaultMsg).toEqual([
+      'stash@{0}: WIP on master: 3ca31f1 initial commit',
+    ])
+  })
+
+  it('stash list with custom message', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-stash')
+
+    await addUserConfig(fs, dir, gitdir)
+
+    await fs.write(`${dir}/a.txt`, 'staged changes - a')
+    await fs.write(`${dir}/b.js`, 'staged changes - b')
+
+    await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
+
+    await stash({ fs, dir, gitdir, op: 'push', message: 'test custom message' })
+    const customMsg = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(customMsg).toEqual([
+      'stash@{0}: test custom message: 3ca31f1 initial commit',
+    ])
+  })
 })
 
 describe('stash drop', () => {
   it('stash drop with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('dropWithNoStash')
 
     let error = null
     try {
@@ -442,6 +623,52 @@ describe('stash drop', () => {
     expect(error).toBeNull()
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(0)
+  })
+
+  it('stash drop with invalid ref idx', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('dropInvalidRefIdx')
+
+    await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'drop', refIdx: 1 })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.stash')
+    expect(error.code).toEqual(Errors.InvalidRefNameError.code)
+  })
+
+  it('stash drop with non-default ref idx', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('dropValidRefIdx')
+
+    await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
+
+    await fs.write(`${dir}/a.txt`, 'stash two staged changes - a')
+    await fs.write(`${dir}/b.js`, 'stash two staged changes - b')
+
+    await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
+    await stash({ fs, dir, gitdir, op: 'push', message: 'stash two' })
+
+    await stashChanges(fs, dir, gitdir, true, true, 'stash three')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'drop', refIdx: 1 })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).toBeNull()
+
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashList).toEqual([
+      'stash@{0}: stash one: 3ca31f1 initial commit',
+      'stash@{1}: stash three: 3ca31f1 initial commit',
+    ])
   })
 })
 
@@ -542,5 +769,56 @@ describe('stash pop', () => {
     expect(error).toBeNull()
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList.length).toBe(1)
+  })
+
+  it('stash pop with invalid ref idx', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('popInvalidRefIdx')
+
+    await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
+    await stashChanges(fs, dir, gitdir, true, false) // plus unstaged changes
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'pop', refIdx: 2 })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.stash')
+    expect(error.code).toEqual(Errors.InvalidRefNameError.code)
+  })
+
+  it('stash pop with non-default ref idx', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('dropValidRefIdx')
+
+    await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
+
+    await fs.write(`${dir}/a.txt`, 'stash two staged changes - aaa')
+    await fs.write(`${dir}/b.js`, 'stash two staged changes - bbb')
+
+    await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
+    await stash({ fs, dir, gitdir, op: 'push', message: 'stash two' })
+
+    await stashChanges(fs, dir, gitdir, true, true, 'stash three')
+
+    let error = null
+    try {
+      await stash({ fs, dir, gitdir, op: 'pop', refIdx: 1 })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).toBeNull()
+
+    const stashList = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashList).toEqual([
+      'stash@{0}: stash one: 3ca31f1 initial commit',
+      'stash@{1}: stash three: 3ca31f1 initial commit',
+    ])
+    const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
+    expect(aContent).toEqual('stash two staged changes - aaa') // make sure the 2nd staged changes are applied
+    const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
+    expect(bContent).toEqual('stash two staged changes - bbb') // make sure the 2nd staged changes are applied
   })
 })

@@ -57,7 +57,7 @@ async function checkAndWriteBlob(fs, gitdir, dir, filepath, oid = null) {
   return retOid
 }
 
-async function processTreeEntries(fs, dir, gitdir, entries) {
+async function processTreeEntries({ fs, dir, gitdir, entries }) {
   // make sure each tree entry has valid oid
   async function processTreeEntry(entry) {
     if (entry.type === 'tree') {
@@ -91,12 +91,12 @@ async function processTreeEntries(fs, dir, gitdir, entries) {
   return Promise.all(entries.map(processTreeEntry))
 }
 
-export async function writeTreeChanges(
+export async function writeTreeChanges({
   fs,
   dir,
   gitdir,
-  treePair // [TREE({ ref: 'HEAD' }), 'STAGE'] would be the equivalent of `git write-tree`
-) {
+  treePair, // [TREE({ ref: 'HEAD' }), 'STAGE'] would be the equivalent of `git write-tree`
+}) {
   const isStage = treePair[1] === 'stage'
   const trees = treePair.map(t => (typeof t === 'string' ? _TreeMap[t]() : t))
 
@@ -152,14 +152,12 @@ export async function writeTreeChanges(
             changedEntries.push([null, stage]) // record the change (deletion) while stop the iteration
           }
         }
-      } else {
-        if (head) {
-          // for deleted file in workdir, "stage" (workdir in our case) will be undefined
-          if (!stage) {
-            changedEntries.push([head, null]) // record the change (deletion) while stop the iteration
-          } else {
-            filtered.push(child) // workdir, tracked only
-          }
+      } else if (head) {
+        // for deleted file in workdir, "stage" (workdir in our case) will be undefined
+        if (!stage) {
+          changedEntries.push([head, null]) // record the change (deletion) while stop the iteration
+        } else {
+          filtered.push(child) // workdir, tracked only
         }
       }
     }
@@ -181,7 +179,12 @@ export async function writeTreeChanges(
     return null // no changes found to stash
   }
 
-  const processedEntries = await processTreeEntries(fs, dir, gitdir, entries)
+  const processedEntries = await processTreeEntries({
+    fs,
+    dir,
+    gitdir,
+    entries,
+  })
 
   const treeEntries = processedEntries.filter(Boolean).map(entry => ({
     mode: entry.mode,
@@ -193,14 +196,14 @@ export async function writeTreeChanges(
   return _writeTree({ fs, gitdir, tree: treeEntries })
 }
 
-export async function applyTreeChanges(
+export async function applyTreeChanges({
   fs,
   dir,
   gitdir,
   stashCommit,
   parentCommit,
-  wasStaged
-) {
+  wasStaged,
+}) {
   const dirRemoved = []
   const stageUpdated = []
 
@@ -285,7 +288,7 @@ export async function applyTreeChanges(
             if (await fs.exists(currentFilepath)) {
               await fs.rm(currentFilepath)
             }
-            await fs.write(currentFilepath, object) // only handles regualr files for now
+            await fs.write(currentFilepath, object) // only handles regular files for now
           }
           break
       }
