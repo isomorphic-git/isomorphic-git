@@ -678,6 +678,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "amrc-benmorrow",
+      "name": "Ben Morrow",
+      "avatar_url": "https://avatars.githubusercontent.com/u/120477944?v=4",
+      "profile": "https://github.com/amrc-benmorrow",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
