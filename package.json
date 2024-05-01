@@ -131,7 +131,7 @@
     "tweet-tweet": "1.0.4",
     "typescript": "3.9.0-dev.20200223",
     "webpack": "4.41.5",
-    "webpack-bundle-analyzer": "3.4.1",
+    "webpack-bundle-analyzer": "4.10.2",
     "webpack-cli": "3.3.7"
   },
   "prettier": "./.prettierrc.cjs",
