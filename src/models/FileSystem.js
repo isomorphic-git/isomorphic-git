@@ -101,6 +101,9 @@ export class FileSystem {
   async read(filepath, options = {}) {
     try {
       let buffer = await this._readFile(filepath, options)
+      if (typeof buffer === 'string' && options.autocrlf) {
+        buffer = buffer.replace(/\r\n/g, '\n')
+      }
       // Convert plain ArrayBuffers to Buffers
       if (typeof buffer !== 'string') {
         buffer = Buffer.from(buffer)
