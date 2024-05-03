@@ -139,26 +139,28 @@ export class GitConfig {
   constructor(text) {
     let section = null
     let subsection = null
-    this.parsedConfig = text.split('\n').map(line => {
-      let name = null
-      let value = null
+    this.parsedConfig = text
+      ? text.split('\n').map(line => {
+          let name = null
+          let value = null
 
-      const trimmedLine = line.trim()
-      const extractedSection = extractSectionLine(trimmedLine)
-      const isSection = extractedSection != null
-      if (isSection) {
-        ;[section, subsection] = extractedSection
-      } else {
-        const extractedVariable = extractVariableLine(trimmedLine)
-        const isVariable = extractedVariable != null
-        if (isVariable) {
-          ;[name, value] = extractedVariable
-        }
-      }
+          const trimmedLine = line.trim()
+          const extractedSection = extractSectionLine(trimmedLine)
+          const isSection = extractedSection != null
+          if (isSection) {
+            ;[section, subsection] = extractedSection
+          } else {
+            const extractedVariable = extractVariableLine(trimmedLine)
+            const isVariable = extractedVariable != null
+            if (isVariable) {
+              ;[name, value] = extractedVariable
+            }
+          }
 
-      const path = getPath(section, subsection, name)
-      return { line, isSection, section, subsection, name, value, path }
-    })
+          const path = getPath(section, subsection, name)
+          return { line, isSection, section, subsection, name, value, path }
+        })
+      : []
   }
 
   static from(text) {
