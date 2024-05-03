@@ -131,7 +131,7 @@ async function addToIndex({
         fs,
         gitdir,
         type: 'blob',
-        object: Buffer.from(object),
+        object: new TextEncoder().encode(object),
       })
       index.insert({ filepath: currentFilepath, stats, oid })
     }
