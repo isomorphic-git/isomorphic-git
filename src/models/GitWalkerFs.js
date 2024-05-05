@@ -1,7 +1,7 @@
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
-import { join } from '../utils/join'
+import { join } from '../utils/join.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
 
@@ -100,17 +100,14 @@ export class GitWalkerFs {
         entry._content = undefined
       } else {
         const config = await GitConfigManager.get({ fs, gitdir })
-        const autocrlf = (await config.get('core.autocrlf')) || false
-        const content = await fs.read(`${dir}/${entry._fullpath}`, {
-          encoding: 'utf8',
-          autocrlf,
-        })
+        const autocrlf = await config.get('core.autocrlf')
+        const content = await fs.read(`${dir}/${entry._fullpath}`, { autocrlf })
         // workaround for a BrowserFS edge case
         entry._actualSize = content.length
         if (entry._stat && entry._stat.size === -1) {
           entry._stat.size = entry._actualSize
         }
-        entry._content = new TextEncoder().encode(content)
+        entry._content = new Uint8Array(content)
       }
     }
     return entry._content
