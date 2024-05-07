@@ -371,6 +371,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/yarikoptic"><img src="https://avatars.githubusercontent.com/u/39889?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Yaroslav Halchenko</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=yarikoptic" title="Documentation">📖</a></td>
     <td align="center"><a href="https://alex-v.blog/"><img src="https://avatars.githubusercontent.com/u/716334?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Alex Villarreal</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=alexvy86" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/amrc-benmorrow"><img src="https://avatars.githubusercontent.com/u/120477944?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Ben Morrow</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=amrc-benmorrow" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/jayree"><img src="https://avatars.githubusercontent.com/u/14836154?v=4?s=60" width="60px;" alt=""/><br /><sub><b>jayree</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Tests">⚠️</a></td>
   </tr>
 </table>
 

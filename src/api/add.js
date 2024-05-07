@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { MultipleGitError } from '../errors/MultipleGitError'
+import { MultipleGitError } from '../errors/MultipleGitError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
@@ -119,20 +119,12 @@ async function addToIndex({
       }
     } else {
       const config = await GitConfigManager.get({ fs, gitdir })
-      const autocrlf = (await config.get('core.autocrlf')) || false
+      const autocrlf = await config.get('core.autocrlf')
       const object = stats.isSymbolicLink()
         ? await fs.readlink(join(dir, currentFilepath)).then(posixifyPathBuffer)
-        : await fs.read(join(dir, currentFilepath), {
-            encoding: 'utf8',
-            autocrlf,
-          })
+        : await fs.read(join(dir, currentFilepath), { autocrlf })
       if (object === null) throw new NotFoundError(currentFilepath)
-      const oid = await _writeObject({
-        fs,
-        gitdir,
-        type: 'blob',
-        object: new TextEncoder().encode(object),
-      })
+      const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
       index.insert({ filepath: currentFilepath, stats, oid })
     }
   })
