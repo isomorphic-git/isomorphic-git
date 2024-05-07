@@ -5,4 +5,4 @@
 	logallrefupdates = true
 	ignorecase = true
 	precomposeunicode = true
-    autocrlf = true
+	autocrlf = true
