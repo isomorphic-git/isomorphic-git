@@ -101,6 +101,7 @@
   "version-1.x-guide": {
     "Getting Started": [
       "version-1.x-quickstart",
+      "version-1.x-quickstart-with-bundlers",
       "version-1.x-dir-vs-gitdir",
       "version-1.x-cli",
       "version-1.x-cache"
