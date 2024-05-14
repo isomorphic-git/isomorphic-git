@@ -101,6 +101,7 @@
   "guide": {
     "Getting Started": [
       "quickstart",
+      "quickstart-with-bundlers",
       "dir-vs-gitdir",
       "cli",
       "cache"

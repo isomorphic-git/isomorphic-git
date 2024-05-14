@@ -697,6 +697,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "lsegurado",
+      "name": "Lucas Martin Segurado",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27731047?v=4",
+      "profile": "https://github.com/lsegurado",
+      "contributions": [
+        "doc",
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"

@@ -5,6 +5,10 @@
     "previous": "Previous",
     "tagline": "A pure JavaScript implementation of git for node and browsers!",
     "docs": {
+      "abortMerge": {
+        "title": "abortMerge",
+        "sidebar_label": "abortMerge"
+      },
       "add": {
         "title": "add",
         "sidebar_label": "add"
@@ -125,6 +129,10 @@
         "title": "isogit CLI",
         "sidebar_label": "isogit CLI"
       },
+      "quickstart-with-bundlers": {
+        "title": "Quick Start (With bundlers)",
+        "sidebar_label": "Quick Start (With bundlers)"
+      },
       "quickstart": {
         "title": "Quick Start",
         "sidebar_label": "Quick Start"
@@ -160,6 +168,10 @@
         "title": "isDescendent",
         "sidebar_label": "isDescendent"
       },
+      "isIgnored": {
+        "title": "isIgnored",
+        "sidebar_label": "isIgnored"
+      },
       "listBranches": {
         "title": "listBranches",
         "sidebar_label": "listBranches"
@@ -192,6 +204,10 @@
         "title": "merge",
         "sidebar_label": "merge"
       },
+      "mergeDriver": {
+        "title": "mergeDriver",
+        "sidebar_label": "mergeDriver"
+      },
       "onAuth": {
         "title": "onAuth",
         "sidebar_label": "onAuth"
@@ -215,10 +231,6 @@
       "onSign": {
         "title": "onSign",
         "sidebar_label": "onSign"
-      },
-      "mergeDriver": {
-        "title": "mergeDriver",
-        "sidebar_label": "mergeDriver"
       },
       "packObjects": {
         "title": "packObjects",
@@ -295,6 +307,10 @@
       "tag": {
         "title": "tag",
         "sidebar_label": "tag"
+      },
+      "updateIndex": {
+        "title": "updateIndex",
+        "sidebar_label": "updateIndex"
       },
       "version": {
         "title": "version",
@@ -711,6 +727,10 @@
         "title": "pull",
         "sidebar_label": "pull"
       },
+      "version-1.x/version-1.x-abortMerge": {
+        "title": "abortMerge",
+        "sidebar_label": "abortMerge"
+      },
       "version-1.x/version-1.x-add": {
         "title": "add",
         "sidebar_label": "add"
@@ -836,6 +856,10 @@
         "title": "isogit CLI",
         "sidebar_label": "isogit CLI"
       },
+      "version-1.x/version-1.x-quickstart-with-bundlers": {
+        "title": "Quick Start (With bundlers)",
+        "sidebar_label": "Quick Start (With bundlers)"
+      },
       "version-1.x/version-1.x-quickstart": {
         "title": "Quick Start",
         "sidebar_label": "Quick Start"
@@ -868,6 +892,10 @@
         "title": "isDescendent",
         "sidebar_label": "isDescendent"
       },
+      "version-1.x/version-1.x-isIgnored": {
+        "title": "isIgnored",
+        "sidebar_label": "isIgnored"
+      },
       "version-1.x/version-1.x-listBranches": {
         "title": "listBranches",
         "sidebar_label": "listBranches"
@@ -899,6 +927,10 @@
       "version-1.x/version-1.x-merge": {
         "title": "merge",
         "sidebar_label": "merge"
+      },
+      "version-1.x/version-1.x-mergeDriver": {
+        "title": "mergeDriver",
+        "sidebar_label": "mergeDriver"
       },
       "version-1.x/version-1.x-onAuth": {
         "title": "onAuth",
@@ -1023,6 +1055,10 @@
       },
       "version-1.x/version-1.x-TREE": {
         "title": "version-1.x/version-1.x-TREE"
+      },
+      "version-1.x/version-1.x-updateIndex": {
+        "title": "updateIndex",
+        "sidebar_label": "updateIndex"
       },
       "version-1.x/version-1.x-verify": {
         "title": "version-1.x/version-1.x-verify"

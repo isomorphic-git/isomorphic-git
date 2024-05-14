@@ -372,6 +372,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/amrc-benmorrow"><img src="https://avatars.githubusercontent.com/u/120477944?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Ben Morrow</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=amrc-benmorrow" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/jayree"><img src="https://avatars.githubusercontent.com/u/14836154?v=4?s=60" width="60px;" alt=""/><br /><sub><b>jayree</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Tests">⚠️</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/lsegurado"><img src="https://avatars.githubusercontent.com/u/27731047?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Lucas Martin Segurado</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=lsegurado" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Alsegurado" title="Bug reports">🐛</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
