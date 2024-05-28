@@ -25,7 +25,16 @@ describe('checkout', () => {
   it('checkout', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
-    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
+    const onPostCheckout = []
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      onPostCheckout: args => {
+        onPostCheckout.push(args)
+      },
+    })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
       Array [
@@ -78,6 +87,13 @@ describe('checkout', () => {
     `)
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('ref: refs/heads/test-branch\n')
+    expect(onPostCheckout).toEqual([
+      {
+        newHead: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
+        previousHead: '0f55956cbd50de80c2f86e6e565f00c92ce86631',
+        type: 'branch',
+      },
+    ])
   })
 
   it('checkout by tag', async () => {
@@ -605,5 +621,59 @@ describe('checkout', () => {
 
     expect(merge).toBeUndefined()
     expect(remote).toBeUndefined()
+  })
+
+  it('onPostCheckout dry run', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const onPostCheckout = []
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      dryRun: true,
+      onPostCheckout: args => {
+        onPostCheckout.push(args)
+      },
+    })
+
+    expect(onPostCheckout).toEqual([
+      {
+        newHead: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
+        previousHead: '0f55956cbd50de80c2f86e6e565f00c92ce86631',
+        type: 'branch',
+      },
+    ])
+  })
+
+  it('onPostCheckout with specified filepaths', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+    })
+    // Test
+    const onPostCheckout = []
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/utils', 'test'],
+      onPostCheckout: args => {
+        onPostCheckout.push(args)
+      },
+    })
+
+    expect(onPostCheckout).toEqual([
+      {
+        newHead: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
+        previousHead: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
+        type: 'file',
+      },
+    ])
   })
 })
