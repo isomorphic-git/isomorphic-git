@@ -11,14 +11,15 @@ Write an entry to the git config files.
 | -------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [**fs**](./fs) | FsClient                                              | a file system implementation                                                                  |
 | dir            | string                                                | The [working tree](dir-vs-gitdir.md) directory path                                           |
-| **gitdir**     | string = join(dir,'.git')                             | The [git directory](dir-vs-gitdir.md) path                                                    |
+| gitdir         | string = join(dir,'.git')                             | The [git directory](dir-vs-gitdir.md) path, required if global is not true and dir is missing |
+| global         | boolean = false                                       | Use global git directory                                                                      |
 | **path**       | string                                                | The key of the git config entry                                                               |
 | **value**      | string  &#124;  boolean  &#124;  number  &#124;  void | A value to store at that path. (Use `undefined` as the value to delete a config entry.)       |
 | append         | boolean = false                                       | If true, will append rather than replace when setting (use with multi-valued config options). |
 | return         | Promise\<void\>                                       | Resolves successfully when operation completed                                                |
 
 *Caveats:*
-- Currently only the local `$GIT_DIR/config` file can be read or written. However support for the global `~/.gitconfig` and system `$(prefix)/etc/gitconfig` will be added in the future.
+- Currently only the local `$GIT_DIR/config` file and global `~/.gitconfig` can be read or written. However support for system `$(prefix)/etc/gitconfig` will be added in the future.
 - The current parser does not support the more exotic features of the git-config file format such as `[include]` and `[includeIf]`.
 
 Example Code:

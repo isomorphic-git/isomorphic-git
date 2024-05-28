@@ -7,16 +7,17 @@ original_id: getConfigAll
 
 Read a multi-valued entry from the git config files.
 
-| param          | type [= default]          | description                                         |
-| -------------- | ------------------------- | --------------------------------------------------- |
-| [**fs**](./fs) | FsClient                  | a file system implementation                        |
-| dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path |
-| **gitdir**     | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path          |
-| **path**       | string                    | The key of the git config entry                     |
-| return         | Promise\<Array\<any\>\>   | Resolves with the config value                      |
+| param          | type [= default]          | description                                                                                   |
+| -------------- | ------------------------- | --------------------------------------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                  | a file system implementation                                                                  |
+| dir            | string                    | The [working tree](dir-vs-gitdir.md) directory path                                           |
+| gitdir         | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path, required if global is not true and dir is missing |
+| global         | boolean = false           | Use global git directory                                                                      |
+| **path**       | string                    | The key of the git config entry                                                               |
+| return         | Promise\<Array\<any\>\>   | Resolves with the config value                                                                |
 
 *Caveats:*
-- Currently only the local `$GIT_DIR/config` file can be read or written. However support for the global `~/.gitconfig` and system `$(prefix)/etc/gitconfig` will be added in the future.
+- Currently only the local `$GIT_DIR/config` file and global `~/.gitconfig` can be read or written. However support for system `$(prefix)/etc/gitconfig` will be added in the future.
 - The current parser does not support the more exotic features of the git-config file format such as `[include]` and `[includeIf]`.
 
 
