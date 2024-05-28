@@ -374,6 +374,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/lsegurado"><img src="https://avatars.githubusercontent.com/u/27731047?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Lucas Martin Segurado</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=lsegurado" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Alsegurado" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/vigan-abd"><img src="https://avatars.githubusercontent.com/u/20401969?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Vigan Abdurrahmani</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=vigan-abd" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=vigan-abd" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=vigan-abd" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
