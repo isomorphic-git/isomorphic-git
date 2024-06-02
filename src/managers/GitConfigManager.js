@@ -1,17 +1,26 @@
+import { homedir } from 'os'
+import { join } from 'path'
+
 import { GitConfig } from '../models/GitConfig.js'
 
 export class GitConfigManager {
-  static async get({ fs, gitdir }) {
+  static async get({ fs, gitdir, global = false }) {
     // We can improve efficiency later if needed.
     // TODO: read from full list of git config files
-    const text = await fs.read(`${gitdir}/config`, { encoding: 'utf8' })
+    const configPath = global
+      ? join(homedir(), '.gitconfig')
+      : join(gitdir, 'config')
+    const text = await fs.read(configPath, { encoding: 'utf8' })
     return GitConfig.from(text)
   }
 
-  static async save({ fs, gitdir, config }) {
+  static async save({ fs, gitdir, config, global = false }) {
     // We can improve efficiency later if needed.
     // TODO: handle saving to the correct global/user/repo location
-    await fs.write(`${gitdir}/config`, config.toString(), {
+    const configPath = global
+      ? join(homedir(), '.gitconfig')
+      : join(gitdir, 'config')
+    await fs.write(configPath, config.toString(), {
       encoding: 'utf8',
     })
   }

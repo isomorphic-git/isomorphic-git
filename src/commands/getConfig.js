@@ -6,7 +6,8 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
 /**
  * @param {Object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
- * @param {string} args.gitdir
+ * @param {string} [args.gitdir]
+ * @param {boolean} [args.global]
  * @param {string} args.path
  *
  * @returns {Promise<any>} Resolves with the config value
@@ -20,7 +21,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * console.log(value)
  *
  */
-export async function _getConfig({ fs, gitdir, path }) {
-  const config = await GitConfigManager.get({ fs, gitdir })
+export async function _getConfig({ fs, gitdir, path, global }) {
+  const config = await GitConfigManager.get({ fs, gitdir, global })
   return config.get(path)
 }
