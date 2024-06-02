@@ -194,12 +194,12 @@ describe('Hosting Providers', () => {
   })
 
   describe('GitLab', () => {
-    // This Personal Access Token is for a test account (https://gitlab.com/isomorphic-git-test-push)
+    // This Personal Access Token is for a test account (https://gitlab.com/vigan.isomorphic-git)
     // with "read_repository" and "write_repository" access. However the only repo it has write access to is
-    // https://gitlab.com/isomorphic-git/test.empty
+    // https://gitlab.com/isomorphic-git1/isomorphic-git-test-push
     // It is stored reversed because the GitHub one is stored reversed and I like being consistent.
-    const password = reverse('vjNzgKP7acS6e6vb2Q6g')
-    const username = 'isomorphic-git-test-push'
+    const password = reverse('8LNhvf8fVnBiL9nw_Cxh-taplg')
+    const username = 'vigan.isomorphic-git'
     it('fetch', async () => {
       // Setup
       const { fs, gitdir } = await makeFixture('test-hosting-providers')
