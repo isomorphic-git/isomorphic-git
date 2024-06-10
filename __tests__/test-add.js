@@ -8,6 +8,7 @@ const {
   STAGE,
   status,
   getConfig,
+  setConfig,
 } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -241,6 +242,41 @@ describe('add', () => {
     expect(await getConfig({ fs, dir, gitdir, path: 'core.autocrlf' })).toEqual(
       'true'
     )
+    const files = await fs.readdir(dir)
+    expect(files.sort()).toMatchInlineSnapshot(`
+      Array [
+        "20thcenturyfoodcourt.png",
+        "Test.md",
+      ]
+    `)
+    const index = await listFiles({ fs, dir, gitdir })
+    expect(index).toMatchInlineSnapshot(`
+      Array [
+        "20thcenturyfoodcourt.png",
+        "Test.md",
+      ]
+    `)
+    expect(new TextDecoder().decode(await fs.read(`${dir}/Test.md`))).toContain(
+      `\r\n`
+    )
+    await fs.write(`${dir}/README.md`, '# test')
+
+    await add({ fs, dir, gitdir, filepath: '.' })
+
+    expect(
+      await status({ fs, dir, gitdir, filepath: '20thcenturyfoodcourt.png' })
+    ).toEqual('unmodified')
+    expect(await status({ fs, dir, gitdir, filepath: 'Test.md' })).toEqual(
+      'unmodified'
+    )
+    expect(await status({ fs, dir, gitdir, filepath: 'README.md' })).toEqual(
+      'added'
+    )
+  })
+
+  it('git add . with core.autocrlf=input does not break binary files', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-add-autocrlf')
+    await setConfig({ fs, dir, gitdir, path: 'core.autocrlf', value: 'input' })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
       Array [

@@ -101,7 +101,7 @@ export class FileSystem {
   async read(filepath, options = {}) {
     try {
       let buffer = await this._readFile(filepath, options)
-      if (options.autocrlf === 'true') {
+      if (['true', 'input'].includes(options.autocrlf)) {
         try {
           buffer = new TextDecoder('utf8', { fatal: true }).decode(buffer)
           buffer = buffer.replace(/\r\n/g, '\n')
