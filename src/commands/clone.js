@@ -17,6 +17,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @param {AuthCallback} [args.onAuth]
  * @param {AuthFailureCallback} [args.onAuthFailure]
  * @param {AuthSuccessCallback} [args.onAuthSuccess]
+ * @param {PostCheckoutCallback} [args.onPostCheckout]
  * @param {string} [args.dir]
  * @param {string} args.gitdir
  * @param {string} args.url
@@ -44,6 +45,7 @@ export async function _clone({
   onAuth,
   onAuthSuccess,
   onAuthFailure,
+  onPostCheckout,
   dir,
   gitdir,
   url,
@@ -96,6 +98,7 @@ export async function _clone({
       fs,
       cache,
       onProgress,
+      onPostCheckout,
       dir,
       gitdir,
       ref,

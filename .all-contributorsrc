@@ -595,6 +595,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/49895741?v=4",
       "profile": "https://gitlab.com/CoalZombik/",
       "contributions": [
+        "code",
+        "doc",
+        "test",
         "bug"
       ]
     },
@@ -688,6 +691,35 @@
         "code",
         "doc",
         "test"
+      ]
+    },
+    {
+      "login": "amrc-benmorrow",
+      "name": "Ben Morrow",
+      "avatar_url": "https://avatars.githubusercontent.com/u/120477944?v=4",
+      "profile": "https://github.com/amrc-benmorrow",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jayree",
+      "name": "jayree",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14836154?v=4",
+      "profile": "https://github.com/jayree",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "lsegurado",
+      "name": "Lucas Martin Segurado",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27731047?v=4",
+      "profile": "https://github.com/lsegurado",
+      "contributions": [
+        "doc",
+        "bug"
       ]
     }
   ],

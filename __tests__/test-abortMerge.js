@@ -173,8 +173,8 @@ describe('abortMerge', () => {
         fs,
         dir,
         gitdir,
-        ours: 'A',
-        theirs: 'B',
+        ours: 'c',
+        theirs: 'd',
         abortOnConflict: false,
         author: {
           name: 'Mr. Test',
@@ -195,9 +195,9 @@ describe('abortMerge', () => {
     await fs.write(`${dir}/b/b`, 'new text for file b')
     await fs.write(`${dir}/c/c`, 'new text for file c')
 
-    await abortMerge({ fs, dir, gitdir, commit: 'A' })
+    await abortMerge({ fs, dir, gitdir, commit: 'c' })
 
-    const trees = [TREE({ ref: 'A' }), WORKDIR(), STAGE()]
+    const trees = [TREE({ ref: 'c' }), WORKDIR(), STAGE()]
     await walk({
       fs,
       dir,

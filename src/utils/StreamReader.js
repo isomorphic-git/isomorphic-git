@@ -3,6 +3,10 @@ import { getIterator } from './getIterator.js'
 // inspired by 'gartal' but lighter-weight and more battle-tested.
 export class StreamReader {
   constructor(stream) {
+    // TODO: fix usage in bundlers before Buffer dependency is removed #1855
+    if (typeof Buffer === 'undefined') {
+      throw new Error('Missing Buffer dependency')
+    }
     this.stream = getIterator(stream)
     this.buffer = null
     this.cursor = 0

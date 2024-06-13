@@ -23,6 +23,8 @@
       "version-1.x-onAuthSuccess",
       "version-1.x-onAuthFailure",
       "version-1.x-onMessage",
+      "version-1.x-onPostCheckout",
+      "version-1.x-onPrePush",
       "version-1.x-onProgress",
       "version-1.x-onSign",
       "version-1.x-mergeDriver"
@@ -102,6 +104,7 @@
   "version-1.x-guide": {
     "Getting Started": [
       "version-1.x-quickstart",
+      "version-1.x-quickstart-with-bundlers",
       "version-1.x-dir-vs-gitdir",
       "version-1.x-cli",
       "version-1.x-cache"

@@ -1,6 +1,7 @@
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
-import { join } from '../utils/join'
+import { join } from '../utils/join.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
 
@@ -94,11 +95,13 @@ export class GitWalkerFs {
 
   async content(entry) {
     if (entry._content === false) {
-      const { fs, dir } = this
+      const { fs, dir, gitdir } = this
       if ((await entry.type()) === 'tree') {
         entry._content = undefined
       } else {
-        const content = await fs.read(`${dir}/${entry._fullpath}`)
+        const config = await GitConfigManager.get({ fs, gitdir })
+        const autocrlf = await config.get('core.autocrlf')
+        const content = await fs.read(`${dir}/${entry._fullpath}`, { autocrlf })
         // workaround for a BrowserFS edge case
         entry._actualSize = content.length
         if (entry._stat && entry._stat.size === -1) {
@@ -120,7 +123,10 @@ export class GitWalkerFs {
       ) {
         const stage = index.entriesMap.get(entry._fullpath)
         const stats = await entry.stat()
-        if (!stage || compareStats(stats, stage)) {
+        const config = await GitConfigManager.get({ fs, gitdir })
+        const filemode = await config.get('core.filemode')
+        const trustino = !(process.platform === 'win32')
+        if (!stage || compareStats(stats, stage, filemode, trustino)) {
           const content = await entry.content()
           if (content === undefined) {
             oid = undefined
@@ -134,8 +140,8 @@ export class GitWalkerFs {
             if (
               stage &&
               oid === stage.oid &&
-              stats.mode === stage.mode &&
-              compareStats(stats, stage)
+              (!filemode || stats.mode === stage.mode) &&
+              compareStats(stats, stage, filemode, trustino)
             ) {
               index.insert({
                 filepath: entry._fullpath,

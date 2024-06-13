@@ -26,6 +26,7 @@ describe('push', () => {
       value: `http://${localhost}:8888/test-push-server.git`,
     })
     const output = []
+    const onPrePush = []
     // Test
     const res = await push({
       fs,
@@ -36,6 +37,10 @@ describe('push', () => {
       },
       remote: 'karma',
       ref: 'refs/heads/master',
+      onPrePush: args => {
+        onPrePush.push(args)
+        return true
+      },
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -58,6 +63,20 @@ describe('push', () => {
       ",
       ]
     `)
+    expect(onPrePush).toEqual([
+      {
+        localRef: {
+          oid: 'c03e131196f43a78888415924bcdcbf3090f3316',
+          ref: 'refs/heads/master',
+        },
+        remote: 'karma',
+        remoteRef: {
+          oid: '5a8905a02e181fe1821068b8c0f48cb6633d5b81',
+          ref: 'refs/heads/master',
+        },
+        url: `http://${localhost}:8888/test-push-server.git`,
+      },
+    ])
   })
   it('push empty', async () => {
     // Setup
@@ -109,6 +128,7 @@ describe('push', () => {
       value: `http://${localhost}:8888/test-push-server.git`,
     })
     // Test
+    const onPrePush = []
     const res = await push({
       fs,
       http,
@@ -116,6 +136,10 @@ describe('push', () => {
       remote: 'karma',
       ref: 'master',
       remoteRef: 'foobar',
+      onPrePush: args => {
+        onPrePush.push(args)
+        return true
+      },
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -123,6 +147,20 @@ describe('push', () => {
     expect(await listBranches({ fs, gitdir, remote: 'karma' })).toContain(
       'foobar'
     )
+    expect(onPrePush).toEqual([
+      {
+        localRef: {
+          oid: 'c03e131196f43a78888415924bcdcbf3090f3316',
+          ref: 'refs/heads/master',
+        },
+        remote: 'karma',
+        remoteRef: {
+          oid: '0000000000000000000000000000000000000000',
+          ref: 'refs/heads/foobar',
+        },
+        url: `http://${localhost}:8888/test-push-server.git`,
+      },
+    ])
   })
   it('push with lightweight tag', async () => {
     // Setup
@@ -134,16 +172,35 @@ describe('push', () => {
       value: `http://${localhost}:8888/test-push-server.git`,
     })
     // Test
+    const onPrePush = []
     const res = await push({
       fs,
       http,
       gitdir,
       remote: 'karma',
       ref: 'lightweight-tag',
+      onPrePush: args => {
+        onPrePush.push(args)
+        return true
+      },
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
     expect(res.refs['refs/tags/lightweight-tag'].ok).toBe(true)
+    expect(onPrePush).toEqual([
+      {
+        localRef: {
+          oid: 'c03e131196f43a78888415924bcdcbf3090f3316',
+          ref: 'refs/tags/lightweight-tag',
+        },
+        remote: 'karma',
+        remoteRef: {
+          oid: '0000000000000000000000000000000000000000',
+          ref: 'refs/tags/lightweight-tag',
+        },
+        url: `http://${localhost}:8888/test-push-server.git`,
+      },
+    ])
   })
   it('push with annotated tag', async () => {
     // Setup
@@ -187,6 +244,7 @@ describe('push', () => {
       'foobar'
     )
     // Test
+    const onPrePush = []
     const res = await push({
       fs,
       http,
@@ -194,6 +252,10 @@ describe('push', () => {
       remote: 'karma',
       remoteRef: 'foobar',
       delete: true,
+      onPrePush: args => {
+        onPrePush.push(args)
+        return true
+      },
     })
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
@@ -201,6 +263,20 @@ describe('push', () => {
     expect(await listBranches({ fs, gitdir, remote: 'karma' })).not.toContain(
       'foobar'
     )
+    expect(onPrePush).toEqual([
+      {
+        localRef: {
+          oid: '0000000000000000000000000000000000000000',
+          ref: '(delete)',
+        },
+        remote: 'karma',
+        remoteRef: {
+          oid: '0000000000000000000000000000000000000000', // This is OK: mock server threw away information about newly created branch
+          ref: 'refs/heads/foobar',
+        },
+        url: `http://${localhost}:8888/test-push-server.git`,
+      },
+    ])
   })
   it('throws UnknownTransportError if using shorter scp-like syntax', async () => {
     // Setup
@@ -607,5 +683,35 @@ describe('push', () => {
     ])
     expect(onAuthSuccessArgs).toEqual([])
     expect(onAuthFailureArgs).toEqual([])
+  })
+
+  it('onPrePush abort', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-server')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      url: `http://${localhost}:8888/test-fetch-server.git`,
+    })
+    // Test
+    let err
+    try {
+      await push({
+        fs,
+        http,
+        gitdir,
+        onPrePush: args => {
+          return false
+        },
+      })
+    } catch (e) {
+      err = e
+    }
+
+    expect(err).toBeDefined()
+    expect(err instanceof Errors.UserCanceledError).toBe(true)
+    expect(err.code).toBe('UserCanceledError')
   })
 })

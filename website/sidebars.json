@@ -23,6 +23,8 @@
       "onAuthSuccess",
       "onAuthFailure",
       "onMessage",
+      "onPostCheckout",
+      "onPrePush",
       "onProgress",
       "onSign",
       "mergeDriver"
@@ -102,6 +104,7 @@
   "guide": {
     "Getting Started": [
       "quickstart",
+      "quickstart-with-bundlers",
       "dir-vs-gitdir",
       "cli",
       "cache"
