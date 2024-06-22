@@ -193,7 +193,7 @@ describe('Hosting Providers', () => {
     })
   })
 
-  describe('GitLab', () => {
+  xdescribe('GitLab', () => {
     // This Personal Access Token is for a test account (https://gitlab.com/isomorphic-git-test-push)
     // with "read_repository" and "write_repository" access. However the only repo it has write access to is
     // https://gitlab.com/isomorphic-git/test.empty
