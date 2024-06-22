@@ -45,10 +45,13 @@ export async function _readObject({
       oid,
       getExternalRefDelta,
     })
-  }
-  // Finally
-  if (!result) {
-    throw new NotFoundError(oid)
+
+    if (!result) {
+      throw new NotFoundError(oid)
+    }
+
+    // Directly return packed result, as specified: packed objects always return the 'content' format.
+    return result
   }
 
   if (format === 'deflated') {
