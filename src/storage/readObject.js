@@ -45,41 +45,44 @@ export async function _readObject({
       oid,
       getExternalRefDelta,
     })
-  }
-  // Finally
-  if (!result) {
-    throw new NotFoundError(oid)
+
+    if (!result) {
+      throw new NotFoundError(oid)
+    }
+
+    // Directly return packed result, as specified: packed objects always return the 'content' format.
+    return result
   }
 
+  // Loose objects are always deflated, return early
   if (format === 'deflated') {
     return result
   }
 
+  // All loose objects are deflated but the hard-coded empty tree is `wrapped` so we have to check if we need to inflate the object.
   if (result.format === 'deflated') {
     result.object = Buffer.from(await inflate(result.object))
     result.format = 'wrapped'
   }
 
-  if (result.format === 'wrapped') {
-    if (format === 'wrapped' && result.format === 'wrapped') {
-      return result
-    }
-    const sha = await shasum(result.object)
-    if (sha !== oid) {
-      throw new InternalError(
-        `SHA check failed! Expected ${oid}, computed ${sha}`
-      )
-    }
-    const { object, type } = GitObject.unwrap(result.object)
-    result.type = type
-    result.object = object
-    result.format = 'content'
+  if (format === 'wrapped') {
+    return result
   }
 
-  if (result.format === 'content') {
-    if (format === 'content') return result
-    return
+  const sha = await shasum(result.object)
+  if (sha !== oid) {
+    throw new InternalError(
+      `SHA check failed! Expected ${oid}, computed ${sha}`
+    )
+  }
+  const { object, type } = GitObject.unwrap(result.object)
+  result.type = type
+  result.object = object
+  result.format = 'content'
+
+  if (format === 'content') {
+    return result
   }
 
-  throw new InternalError(`invalid format "${result.format}"`)
+  throw new InternalError(`invalid requested format "${format}"`)
 }
