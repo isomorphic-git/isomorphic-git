@@ -710,6 +710,16 @@
         "doc",
         "bug"
       ]
+    },
+    {
+      "login": "limond",
+      "name": "Leon Kaucher",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1025682?v=4",
+      "profile": "https://github.com/limond",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
