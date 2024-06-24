@@ -720,6 +720,17 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "gilisho",
+      "name": "Gili Shohat",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40733156?v=4",
+      "profile": "https://github.com/gilisho",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"

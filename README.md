@@ -375,6 +375,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
   <tr>
     <td align="center"><a href="https://github.com/lsegurado"><img src="https://avatars.githubusercontent.com/u/27731047?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Lucas Martin Segurado</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=lsegurado" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Alsegurado" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/limond"><img src="https://avatars.githubusercontent.com/u/1025682?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Leon Kaucher</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=limond" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=limond" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/gilisho"><img src="https://avatars.githubusercontent.com/u/40733156?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Gili Shohat</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gilisho" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gilisho" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gilisho" title="Tests">⚠️</a></td>
   </tr>
 </table>
 

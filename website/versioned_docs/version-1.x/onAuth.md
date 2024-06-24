@@ -84,10 +84,10 @@ Unfortunately, all the major git hosting companies have chosen different convent
 
 |            | `username`     | `password`       |
 | ---------- | -------------- | ---------------- |
-| GitHub     | `token`        | 'x-oauth-basic'  |
-| GitHub App | `token`        | 'x-access-token' |
-| BitBucket  | 'x-token-auth' | `token`          |
-| GitLab     | 'oauth2'       | `token`          |
+| GitHub     | `token`          | 'x-oauth-basic'  |
+| GitHub App | 'x-access-token' | `token`          |
+| BitBucket  | 'x-token-auth'   | `token`          |
+| GitLab     | 'oauth2'         | `token`          |
 
 I will gladly accept pull requests to document more companies' conventions.
 
