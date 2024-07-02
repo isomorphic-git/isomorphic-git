@@ -1,7 +1,9 @@
 // @ts-check
 import { _currentBranch } from '../commands/currentBranch'
 import { NotFoundError } from '../errors/NotFoundError.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { abbreviateRef } from '../utils/abbreviateRef.js'
 
 /**
  * @param {Object} args
@@ -28,4 +30,10 @@ export async function _deleteBranch({ fs, gitdir, ref }) {
 
   // Delete a specified branch
   await GitRefManager.deleteRef({ fs, gitdir, ref: fullRef })
+
+  // Delete branch config entries
+  const abbrevRef = abbreviateRef(ref)
+  const config = await GitConfigManager.get({ fs, gitdir })
+  await config.deleteSection('branch', abbrevRef)
+  await GitConfigManager.save({ fs, gitdir, config })
 }
