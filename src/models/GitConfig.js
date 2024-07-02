@@ -48,6 +48,7 @@ const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/
 const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z-]*$/
 
+// Comments start with either # or ; and extend to the end of line
 const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
 
 const extractSectionLine = line => {
