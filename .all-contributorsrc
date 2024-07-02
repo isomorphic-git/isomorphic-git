@@ -731,6 +731,17 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "hhourani27",
+      "name": "Habib",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61935766?v=4",
+      "profile": "https://github.com/hhourani27",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
