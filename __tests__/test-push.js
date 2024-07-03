@@ -7,6 +7,7 @@ const {
   setConfig,
   push,
   listBranches,
+  resolveRef,
 } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -77,6 +78,14 @@ describe('push', () => {
         url: `http://${localhost}:8888/test-push-server.git`,
       },
     ])
+
+    // Test that remote ref is updated
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/karma/master' })
+    ).toEqual(await resolveRef({ fs, gitdir, ref: 'refs/heads/master' }))
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/karma/master' })
+    ).toEqual('c03e131196f43a78888415924bcdcbf3090f3316')
   })
   it('push empty', async () => {
     // Setup
@@ -201,6 +210,10 @@ describe('push', () => {
         url: `http://${localhost}:8888/test-push-server.git`,
       },
     ])
+    // See #1900: make sure that a remote tag ref is not created
+    expect(await fs.exists(`${gitdir}/refs/remotes/karma/refs/tags`)).toBe(
+      false
+    )
   })
   it('push with annotated tag', async () => {
     // Setup
@@ -222,6 +235,10 @@ describe('push', () => {
     expect(res).toBeTruthy()
     expect(res.ok).toBe(true)
     expect(res.refs['refs/tags/annotated-tag'].ok).toBe(true)
+    // See #1900: make sure that a remote tag ref is not created
+    expect(await fs.exists(`${gitdir}/refs/remotes/karma/refs/tags`)).toBe(
+      false
+    )
   })
   it('push delete', async () => {
     // Setup
