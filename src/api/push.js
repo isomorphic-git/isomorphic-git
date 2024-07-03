@@ -28,7 +28,7 @@ import { join } from '../utils/join.js'
  * @param {PrePushCallback} [args.onPrePush] - optional pre-push hook callback
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.ref] - Which branch to push. By default this is the currently checked out branch.
+ * @param {string} [args.ref] - Which branch or tag to push. By default this is the currently checked out branch.
  * @param {string} [args.url] - The URL of the remote repository. The default is the value set in the git config for that remote.
  * @param {string} [args.remote] - If URL is not specified, determines which remote to use.
  * @param {string} [args.remoteRef] - The name of the receiving branch on the remote. By default this is the configured remote tracking branch.
