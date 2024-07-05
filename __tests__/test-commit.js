@@ -1,5 +1,11 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, readCommit, commit, log } = require('isomorphic-git')
+const {
+  Errors,
+  readCommit,
+  commit,
+  log,
+  resolveRef,
+} = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -52,6 +58,7 @@ describe('commit', () => {
     expect(currentCommit.parent).toEqual([originalOid])
     expect(currentCommit.author).toEqual(author)
     expect(currentCommit.committer).toEqual(author)
+    expect(currentCommit.message).toEqual('Initial commit\n')
     expect(currentOid).not.toEqual(originalOid)
     expect(currentOid).toEqual(sha)
   })
@@ -306,5 +313,44 @@ describe('commit', () => {
     expect(
       Object.is(commits[0].commit.author.timezoneOffset, -240)
     ).toBeTruthy()
+  })
+
+  it('commit with amend', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-commit')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+    await commit({
+      fs,
+      gitdir,
+      author,
+      message: 'Initial commit',
+    })
+
+    // Test
+    const { oid: originalOid, commit: originalCommit } = (
+      await log({ fs, gitdir, depth: 1 })
+    )[0]
+    await commit({
+      fs,
+      gitdir,
+      author,
+      message: 'Amended commit',
+      amend: true,
+    })
+    const { oid: amendedOid, commit: amendedCommit } = (
+      await log({ fs, gitdir, depth: 1 })
+    )[0]
+
+    expect(amendedOid).not.toEqual(originalOid)
+    expect(amendedCommit.author).toEqual(originalCommit.author)
+    expect(amendedCommit.committer).toEqual(originalCommit.committer)
+    expect(amendedCommit.message).toEqual('Amended commit\n')
+    expect(amendedCommit.parent).toEqual(originalCommit.parent)
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toEqual(amendedOid)
   })
 })

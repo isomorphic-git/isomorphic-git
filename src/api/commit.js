@@ -25,6 +25,7 @@ import { join } from '../utils/join.js'
  * @param {number} [args.committer.timestamp=Math.floor(Date.now()/1000)] - Set the committer timestamp field. This is the integer number of seconds since the Unix epoch (1970-01-01 00:00:00).
  * @param {number} [args.committer.timezoneOffset] - Set the committer timezone offset field. This is the difference, in minutes, from the current timezone to UTC. Default is `(new Date()).getTimezoneOffset()`.
  * @param {string} [args.signingKey] - Sign the tag object using this private PGP key.
+ * @param {boolean} [args.amend = false] - If true, replaces the last commit with a new commit.
  * @param {boolean} [args.dryRun = false] - If true, simulates making a commit so you can test whether it would succeed. Implies `noUpdateBranch`.
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
  * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
@@ -56,6 +57,7 @@ export async function commit({
   author,
   committer,
   signingKey,
+  amend = false,
   dryRun = false,
   noUpdateBranch = false,
   ref,
@@ -80,6 +82,7 @@ export async function commit({
       author,
       committer,
       signingKey,
+      amend,
       dryRun,
       noUpdateBranch,
       ref,

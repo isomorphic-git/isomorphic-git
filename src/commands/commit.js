@@ -11,6 +11,8 @@ import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirecto
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
+import { _readCommit as readCommit } from './readCommit.js'
+
 /**
  *
  * @param {Object} args
@@ -30,6 +32,7 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * @param {number} args.committer.timestamp
  * @param {number} args.committer.timezoneOffset
  * @param {string} [args.signingKey]
+ * @param {boolean} [args.amend = false]
  * @param {boolean} [args.dryRun = false]
  * @param {boolean} [args.noUpdateBranch = false]
  * @param {string} [args.ref]
@@ -47,6 +50,7 @@ export async function _commit({
   author: _author,
   committer: _committer,
   signingKey,
+  amend = false,
   dryRun = false,
   noUpdateBranch = false,
   ref,
@@ -82,6 +86,7 @@ export async function _commit({
         tree = await constructTree({ fs, gitdir, inode, dryRun })
       }
       if (!parent) {
+        // If parents are not provided, then parent is the commit pointed to by ref (standard case wih 'git commit')
         try {
           parent = [
             await GitRefManager.resolve({
@@ -90,6 +95,13 @@ export async function _commit({
               ref,
             }),
           ]
+
+          if (amend) {
+            // We're "replacing" the commit pointed to by ref. Thus the new commit will get its parent
+            parent = (
+              await readCommit({ fs, gitdir, oid: parent[0], cache: {} })
+            ).commit.parent
+          }
         } catch (err) {
           // Probably an initial commit
           parent = []
