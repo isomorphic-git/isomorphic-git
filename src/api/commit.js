@@ -2,13 +2,9 @@
 import '../typedefs.js'
 
 import { _commit } from '../commands/commit.js'
-import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { join } from '../utils/join.js'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
-import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
-
 /**
  * Create a new commit
  *
@@ -57,8 +53,8 @@ export async function commit({
   dir,
   gitdir = join(dir, '.git'),
   message,
-  author: _author,
-  committer: _committer,
+  author,
+  committer,
   signingKey,
   dryRun = false,
   noUpdateBranch = false,
@@ -74,17 +70,6 @@ export async function commit({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
-
-    const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
-    if (!author) throw new MissingNameError('author')
-
-    const committer = await normalizeCommitterObject({
-      fs,
-      gitdir,
-      author,
-      committer: _committer,
-    })
-    if (!committer) throw new MissingNameError('committer')
 
     return await _commit({
       fs,

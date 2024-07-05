@@ -1,12 +1,15 @@
 // @ts-check
 import '../typedefs.js'
 
+import { MissingNameError } from '../errors/MissingNameError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
+import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
 /**
  *
@@ -41,8 +44,8 @@ export async function _commit({
   onSign,
   gitdir,
   message,
-  author,
-  committer,
+  author: _author,
+  committer: _committer,
   signingKey,
   dryRun = false,
   noUpdateBranch = false,
@@ -50,6 +53,17 @@ export async function _commit({
   parent,
   tree,
 }) {
+  const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
+  if (!author) throw new MissingNameError('author')
+
+  const committer = await normalizeCommitterObject({
+    fs,
+    gitdir,
+    author,
+    committer: _committer,
+  })
+  if (!committer) throw new MissingNameError('committer')
+
   if (!ref) {
     ref = await GitRefManager.resolve({
       fs,
