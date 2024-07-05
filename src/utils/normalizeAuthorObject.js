@@ -1,10 +1,13 @@
 import '../typedefs.js'
-
 import { _getConfig } from '../commands/getConfig'
 
+import { assignDefined } from './assignDefined.js'
+
 /**
- * Returns an author object by populating properties from the provided author object,
- * and falling back first to the author of commit object, then to the Config and current date/time for missing properties.
+ * Return author object by using properties following this priority:
+ * (1) provided author object
+ * -> (2) author of provided commit object
+ * -> (3) Config and current date/time
  *
  * @param {Object} args
  * @param {FsClient} args.fs - a file system implementation
@@ -17,37 +20,32 @@ import { _getConfig } from '../commands/getConfig'
 export async function normalizeAuthorObject({
   fs,
   gitdir,
-  author = {},
+  author,
   commit = {},
 }) {
-  const commitAuthor = commit.author ? commit.author : {}
+  const timestamp = Math.floor(Date.now() / 1000)
 
-  const name =
-    author.name ||
-    commitAuthor.name ||
-    (await _getConfig({ fs, gitdir, path: 'user.name' }))
-  const email =
-    author.email ||
-    commitAuthor.email ||
-    (await _getConfig({ fs, gitdir, path: 'user.email' })) ||
-    ''
+  const defaultAuthor = {
+    name: await _getConfig({ fs, gitdir, path: 'user.name' }),
+    email: (await _getConfig({ fs, gitdir, path: 'user.email' })) || '', // author.email is allowed to be empty string
+    timestamp,
+    timezoneOffset: new Date(timestamp * 1000).getTimezoneOffset(),
+  }
 
-  if (name === undefined) {
+  // Populate author object by using properties with this priority:
+  // (1) provided author object
+  // -> (2) author of provided commit object
+  // -> (3) default author
+  const normalizedAuthor = assignDefined(
+    {},
+    defaultAuthor,
+    commit.author,
+    author
+  )
+
+  if (normalizedAuthor.name === undefined) {
     return undefined
   }
 
-  const timestamp =
-    author.timestamp != null
-      ? author.timestamp
-      : commitAuthor.timestamp != null
-      ? commitAuthor.timestamp
-      : Math.floor(Date.now() / 1000)
-  const timezoneOffset =
-    author.timezoneOffset != null
-      ? author.timezoneOffset
-      : commitAuthor.timezoneOffset != null
-      ? commitAuthor.timezoneOffset
-      : new Date(timestamp * 1000).getTimezoneOffset()
-
-  return { name, email, timestamp, timezoneOffset }
+  return normalizedAuthor
 }

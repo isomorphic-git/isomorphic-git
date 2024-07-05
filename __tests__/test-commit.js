@@ -32,24 +32,26 @@ describe('commit', () => {
     const { fs, gitdir } = await makeFixture('test-commit')
     const { oid: originalOid } = (await log({ fs, gitdir, depth: 1 }))[0]
     // Test
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
     const sha = await commit({
       fs,
       gitdir,
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1262356920,
-        timezoneOffset: -0,
-      },
+      author,
       message: 'Initial commit',
     })
     expect(sha).toBe('7a51c0b1181d738198ff21c4679d3aa32eb52fe0')
     // updates branch pointer
-    const {
-      oid: currentOid,
-      commit: { parent },
-    } = (await log({ fs, gitdir, depth: 1 }))[0]
-    expect(parent).toEqual([originalOid])
+    const { oid: currentOid, commit: currentCommit } = (
+      await log({ fs, gitdir, depth: 1 })
+    )[0]
+    expect(currentCommit.parent).toEqual([originalOid])
+    expect(currentCommit.author).toEqual(author)
+    expect(currentCommit.committer).toEqual(author)
     expect(currentOid).not.toEqual(originalOid)
     expect(currentOid).toEqual(sha)
   })
