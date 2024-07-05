@@ -2,6 +2,8 @@
 import '../typedefs.js'
 
 import { MissingNameError } from '../errors/MissingNameError.js'
+import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { NoCommitError } from '../errors/NoCommitError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -20,17 +22,17 @@ import { _readCommit as readCommit } from './readCommit.js'
  * @param {object} args.cache
  * @param {SignCallback} [args.onSign]
  * @param {string} args.gitdir
- * @param {string} args.message
- * @param {Object} args.author
- * @param {string} args.author.name
- * @param {string} args.author.email
- * @param {number} args.author.timestamp
- * @param {number} args.author.timezoneOffset
- * @param {Object} args.committer
- * @param {string} args.committer.name
- * @param {string} args.committer.email
- * @param {number} args.committer.timestamp
- * @param {number} args.committer.timezoneOffset
+ * @param {string} [args.message]
+ * @param {Object} [args.author]
+ * @param {string} [args.author.name]
+ * @param {string} [args.author.email]
+ * @param {number} [args.author.timestamp]
+ * @param {number} [args.author.timezoneOffset]
+ * @param {Object} [args.committer]
+ * @param {string} [args.committer.name]
+ * @param {string} [args.committer.email]
+ * @param {number} [args.committer.timestamp]
+ * @param {number} [args.committer.timezoneOffset]
  * @param {string} [args.signingKey]
  * @param {boolean} [args.amend = false]
  * @param {boolean} [args.dryRun = false]
@@ -57,17 +59,8 @@ export async function _commit({
   parent,
   tree,
 }) {
-  const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
-  if (!author) throw new MissingNameError('author')
-
-  const committer = await normalizeCommitterObject({
-    fs,
-    gitdir,
-    author,
-    committer: _committer,
-  })
-  if (!committer) throw new MissingNameError('committer')
-
+  // Determine ref and the commit pointed to by ref, and if it is the initial commit
+  let initialCommit = false
   if (!ref) {
     ref = await GitRefManager.resolve({
       fs,
@@ -77,6 +70,50 @@ export async function _commit({
     })
   }
 
+  let refOid, refCommit
+  try {
+    refOid = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref,
+    })
+    refCommit = await readCommit({ fs, gitdir, oid: refOid, cache: {} })
+  } catch {
+    // We assume that there's no commit and this is the initial commit
+    initialCommit = true
+  }
+
+  if (amend && initialCommit) {
+    throw new NoCommitError(ref)
+  }
+
+  // Determine author and committer information
+  const author = !amend
+    ? await normalizeAuthorObject({ fs, gitdir, author: _author })
+    : await normalizeAuthorObject({
+        fs,
+        gitdir,
+        author: _author,
+        commit: refCommit.commit,
+      })
+  if (!author) throw new MissingNameError('author')
+
+  const committer = !amend
+    ? await normalizeCommitterObject({
+        fs,
+        gitdir,
+        author,
+        committer: _committer,
+      })
+    : await normalizeCommitterObject({
+        fs,
+        gitdir,
+        author,
+        committer: _committer,
+        commit: refCommit.commit,
+      })
+  if (!committer) throw new MissingNameError('committer')
+
   return GitIndexManager.acquire(
     { fs, gitdir, cache, allowUnmerged: false },
     async function(index) {
@@ -85,26 +122,13 @@ export async function _commit({
       if (!tree) {
         tree = await constructTree({ fs, gitdir, inode, dryRun })
       }
-      if (!parent) {
-        // If parents are not provided, then parent is the commit pointed to by ref (standard case wih 'git commit')
-        try {
-          parent = [
-            await GitRefManager.resolve({
-              fs,
-              gitdir,
-              ref,
-            }),
-          ]
 
-          if (amend) {
-            // We're "replacing" the commit pointed to by ref. Thus the new commit will get its parent
-            parent = (
-              await readCommit({ fs, gitdir, oid: parent[0], cache: {} })
-            ).commit.parent
-          }
-        } catch (err) {
-          // Probably an initial commit
-          parent = []
+      // Determine parents of this commit
+      if (!parent) {
+        if (!amend) {
+          parent = refOid ? [refOid] : []
+        } else {
+          parent = refCommit.commit.parent
         }
       } else {
         // ensure that the parents are oids, not refs
@@ -115,6 +139,16 @@ export async function _commit({
         )
       }
 
+      // Determine message of this commit
+      if (!message) {
+        if (!amend) {
+          throw new MissingParameterError('message')
+        } else {
+          message = refCommit.commit.message
+        }
+      }
+
+      // Create and write new Commit object
       let comm = GitCommit.from({
         tree,
         parent,

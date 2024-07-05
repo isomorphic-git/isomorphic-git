@@ -11,9 +11,9 @@ import { assignDefined } from './assignDefined.js'
  * @param {Object} args
  * @param {FsClient} args.fs - a file system implementation
  * @param {string} [args.gitdir] - The [git directory](dir-vs-gitdir.md) path
- * @param {Object} [args.author={}] - The author object.
- * @param {Object} [args.committer={}] - The committer object.
- * @param {CommitObject} [args.commit={}] - A commit object.
+ * @param {Object} [args.author] - The author object.
+ * @param {Object} [args.committer] - The committer object.
+ * @param {CommitObject} [args.commit] - A commit object.
  *
  * @returns {Promise<void | {name: string, email: string, timestamp: number, timezoneOffset: number }>}
  */
@@ -22,7 +22,7 @@ export async function normalizeCommitterObject({
   gitdir,
   author,
   committer,
-  commit = {},
+  commit,
 }) {
   const timestamp = Math.floor(Date.now() / 1000)
 
@@ -36,7 +36,7 @@ export async function normalizeCommitterObject({
   const normalizedCommitter = assignDefined(
     {},
     defaultCommitter,
-    commit.committer,
+    commit ? commit.committer : undefined,
     author,
     committer
   )

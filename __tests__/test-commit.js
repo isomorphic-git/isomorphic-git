@@ -1,10 +1,14 @@
 /* eslint-env node, browser, jasmine */
+const path = require('path')
+
 const {
   Errors,
   readCommit,
   commit,
   log,
   resolveRef,
+  init,
+  add,
 } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -61,6 +65,61 @@ describe('commit', () => {
     expect(currentCommit.message).toEqual('Initial commit\n')
     expect(currentOid).not.toEqual(originalOid)
     expect(currentOid).toEqual(sha)
+  })
+
+  it('Initial commit', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await add({ fs, dir, filepath: 'hello.md' })
+
+    // Test
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    await commit({
+      fs,
+      dir,
+      author,
+      message: 'Initial commit',
+    })
+
+    const commits = await log({ fs, dir })
+    expect(commits.length).toBe(1)
+    expect(commits[0].commit.parent).toEqual([])
+    expect(await resolveRef({ fs, dir, ref: 'HEAD' })).toEqual(commits[0].oid)
+  })
+
+  it('Cannot commit without message', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-commit')
+    // Test
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    let error = null
+
+    try {
+      await commit({
+        fs,
+        gitdir,
+        author,
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).not.toBeNull()
+    expect(error instanceof Errors.MissingParameterError).toBe(true)
   })
 
   it('without updating branch', async () => {
@@ -315,7 +374,7 @@ describe('commit', () => {
     ).toBeTruthy()
   })
 
-  it('commit with amend', async () => {
+  it('commit amend (new message)', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-commit')
     const author = {
@@ -338,7 +397,6 @@ describe('commit', () => {
     await commit({
       fs,
       gitdir,
-      author,
       message: 'Amended commit',
       amend: true,
     })
@@ -352,5 +410,81 @@ describe('commit', () => {
     expect(amendedCommit.message).toEqual('Amended commit\n')
     expect(amendedCommit.parent).toEqual(originalCommit.parent)
     expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toEqual(amendedOid)
+  })
+
+  it('commit amend (change author, keep message)', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-commit')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+    await commit({
+      fs,
+      gitdir,
+      author,
+      message: 'Initial commit',
+    })
+
+    // Test
+    const { oid: originalOid, commit: originalCommit } = (
+      await log({ fs, gitdir, depth: 1 })
+    )[0]
+
+    const newAuthor = {
+      name: 'Mr. Test 2',
+      email: 'mrtest2@example.com',
+      timestamp: 1262356921,
+      timezoneOffset: -0,
+    }
+    await commit({
+      fs,
+      gitdir,
+      author: newAuthor,
+      amend: true,
+    })
+    const { oid: amendedOid, commit: amendedCommit } = (
+      await log({ fs, gitdir, depth: 1 })
+    )[0]
+
+    expect(amendedOid).not.toEqual(originalOid)
+    expect(amendedCommit.author).toEqual(newAuthor)
+    expect(amendedCommit.committer).toEqual(newAuthor)
+    expect(amendedCommit.message).toEqual(originalCommit.message)
+    expect(amendedCommit.parent).toEqual(originalCommit.parent)
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toEqual(amendedOid)
+  })
+
+  it('Cannot amend without an initial commit', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await add({ fs, dir, filepath: 'hello.md' })
+
+    // Test
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    let error = null
+    try {
+      await commit({
+        fs,
+        dir,
+        author,
+        message: 'Initial commit',
+        amend: true,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error instanceof Errors.NoCommitError).toBe(true)
   })
 })
