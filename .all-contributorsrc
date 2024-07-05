@@ -742,6 +742,17 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "arunhari82",
+      "name": "Arunkumar Nattamai Hariharan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73549783?v=4",
+      "profile": "https://github.com/arunhari82",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"

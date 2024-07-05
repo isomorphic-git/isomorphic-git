@@ -18,7 +18,8 @@ const corsProxify = (corsProxy, url) =>
 
 const updateHeaders = (headers, auth) => {
   // Update the basic auth header
-  if (auth.username || auth.password) {
+  // Override headers auth only when both username and password are available
+  if (auth.username && auth.password) {
     headers.Authorization = calculateBasicAuthHeader(auth)
   }
   // but any manually provided headers take precedence
@@ -77,7 +78,8 @@ export class GitRemoteHTTP {
   }) {
     let { url, auth } = extractAuthFromUrl(_origUrl)
     const proxifiedURL = corsProxy ? corsProxify(corsProxy, url) : url
-    if (auth.username || auth.password) {
+    // Override headers auth only when both username and password are available
+    if (auth.username && auth.password) {
       headers.Authorization = calculateBasicAuthHeader(auth)
     }
     if (protocolVersion === 2) {
