@@ -125,7 +125,10 @@ export class GitWalkerFs {
         const stats = await entry.stat()
         const config = await GitConfigManager.get({ fs, gitdir })
         const filemode = await config.get('core.filemode')
-        const trustino = !(process.platform === 'win32')
+        const trustino =
+          typeof process !== 'undefined'
+            ? !(process.platform === 'win32')
+            : true
         if (!stage || compareStats(stats, stage, filemode, trustino)) {
           const content = await entry.content()
           if (content === undefined) {
