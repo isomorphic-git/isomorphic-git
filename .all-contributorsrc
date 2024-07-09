@@ -742,6 +742,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "Vinzent03",
+      "name": "Vinzent",
+      "avatar_url": "https://avatars.githubusercontent.com/u/63981639?v=4",
+      "profile": "https://github.com/Vinzent03",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
