@@ -8,6 +8,12 @@ module.exports = {
   },
   collectCoverageFrom: ['src/*.js', 'src/**/*.js'],
   testEnvironment: 'node',
+  globals: {
+    Blob: global.Blob,
+    CompressionStream: global.CompressionStream,
+    DecompressionStream: global.DecompressionStream,
+    Response: global.Response,
+  },
   reporters: [
     'default',
     [
