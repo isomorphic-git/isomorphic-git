@@ -114,7 +114,7 @@
     "karma-safari-launcher": "1.0.0",
     "karma-sauce-launcher": "1.2.0",
     "karma-verbose-reporter": "0.0.8",
-    "karma-webpack": "4.0.2",
+    "karma-webpack": "5.0.1",
     "markdown-table": "^2.0.0",
     "nps": "^5.10.0",
     "nps-utils": "1.7.0",
@@ -130,9 +130,9 @@
     "timeout-cli": "0.3.2",
     "tweet-tweet": "1.0.4",
     "typescript": "3.9.0-dev.20200223",
-    "webpack": "4.41.5",
+    "webpack": "5.91.0",
     "webpack-bundle-analyzer": "3.4.1",
-    "webpack-cli": "3.3.7"
+    "webpack-cli": "5.1.4"
   },
   "prettier": "./.prettierrc.cjs",
   "bundlewatch": {
