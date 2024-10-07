@@ -74,7 +74,7 @@ export class FileSystem {
 
   /**
    * Return true if a file exists, false if it doesn't exist.
-   * Rethrows errors that aren't related to file existance.
+   * Rethrows errors that aren't related to file existence.
    */
   async exists(filepath, options = {}) {
     try {
@@ -101,6 +101,15 @@ export class FileSystem {
   async read(filepath, options = {}) {
     try {
       let buffer = await this._readFile(filepath, options)
+      if (options.autocrlf === 'true') {
+        try {
+          buffer = new TextDecoder('utf8', { fatal: true }).decode(buffer)
+          buffer = buffer.replace(/\r\n/g, '\n')
+          buffer = new TextEncoder().encode(buffer)
+        } catch (error) {
+          // non utf8 file
+        }
+      }
       // Convert plain ArrayBuffers to Buffers
       if (typeof buffer !== 'string') {
         buffer = Buffer.from(buffer)
@@ -218,7 +227,7 @@ export class FileSystem {
 
   /**
    * Return the Stats of a file/symlink if it exists, otherwise returns null.
-   * Rethrows errors that aren't related to file existance.
+   * Rethrows errors that aren't related to file existence.
    */
   async lstat(filename) {
     try {
@@ -234,7 +243,7 @@ export class FileSystem {
 
   /**
    * Reads the contents of a symlink if it exists, otherwise returns null.
-   * Rethrows errors that aren't related to file existance.
+   * Rethrows errors that aren't related to file existence.
    */
   async readlink(filename, opts = { encoding: 'buffer' }) {
     // Note: FileSystem.readlink returns a buffer by default

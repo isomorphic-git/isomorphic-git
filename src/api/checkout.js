@@ -14,6 +14,7 @@ import { join } from '../utils/join.js'
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
+ * @param {PostCheckoutCallback} [args.onPostCheckout] - optional post-checkout hook callback
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} [args.ref = 'HEAD'] - Source to checkout files from
@@ -62,6 +63,7 @@ import { join } from '../utils/join.js'
 export async function checkout({
   fs,
   onProgress,
+  onPostCheckout,
   dir,
   gitdir = join(dir, '.git'),
   remote = 'origin',
@@ -84,6 +86,7 @@ export async function checkout({
       fs: new FileSystem(fs),
       cache,
       onProgress,
+      onPostCheckout,
       dir,
       gitdir,
       remote,

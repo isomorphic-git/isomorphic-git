@@ -13,7 +13,6 @@
 - [ ] document the parameter in the JSDoc comment above the function
 - [ ] add a test case in `__tests__/test-X.js` if possible
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
-- [ ] squash merge the PR with commit message "feat(X): Added 'bar' parameter"
 
 ## I'm adding a new command:
 

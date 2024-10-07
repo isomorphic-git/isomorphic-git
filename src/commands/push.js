@@ -11,6 +11,7 @@ import { GitPushError } from '../errors/GitPushError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { PushRejectedError } from '../errors/PushRejectedError.js'
+import { UserCanceledError } from '../errors/UserCanceledError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
@@ -32,6 +33,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {AuthCallback} [args.onAuth]
  * @param {AuthFailureCallback} [args.onAuthFailure]
  * @param {AuthSuccessCallback} [args.onAuthSuccess]
+ * @param {PrePushCallback} [args.onPrePush]
  * @param {string} args.gitdir
  * @param {string} [args.ref]
  * @param {string} [args.remoteRef]
@@ -53,6 +55,7 @@ export async function _push({
   onAuth,
   onAuthSuccess,
   onAuthFailure,
+  onPrePush,
   gitdir,
   ref: _ref,
   remoteRef: _remoteRef,
@@ -136,6 +139,16 @@ export async function _push({
   const oldoid =
     httpRemote.refs.get(fullRemoteRef) ||
     '0000000000000000000000000000000000000000'
+
+  if (onPrePush) {
+    const hookCancel = await onPrePush({
+      remote,
+      url,
+      localRef: { ref: _delete ? '(delete)' : fullRef, oid: oid },
+      remoteRef: { ref: fullRemoteRef, oid: oldoid },
+    })
+    if (!hookCancel) throw new UserCanceledError()
+  }
 
   // Remotes can always accept thin-packs UNLESS they specify the 'no-thin' capability
   const thinPack = !httpRemote.capabilities.has('no-thin')
@@ -270,7 +283,12 @@ export async function _push({
   }
 
   // Update the local copy of the remote ref
-  if (remote && result.ok && result.refs[fullRemoteRef].ok) {
+  if (
+    remote &&
+    result.ok &&
+    result.refs[fullRemoteRef].ok &&
+    !fullRef.startsWith('refs/tags')
+  ) {
     // TODO: I think this should actually be using a refspec transform rather than assuming 'refs/remotes/{remote}'
     const ref = `refs/remotes/${remote}/${fullRemoteRef.replace(
       'refs/heads',

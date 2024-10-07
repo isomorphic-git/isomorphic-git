@@ -20,6 +20,7 @@ window.pfs = window.fs.promises
 </script>
 ```
 
+## Picking a directory
 Now let's pick a directory to work in.
 
 ```js live

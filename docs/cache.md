@@ -29,7 +29,7 @@ test().catch(err => console.log(err))
 
 Running this code on the `isomorphic-git` repo on my 2018 Macbook Pro takes over 2 minutes!
 
-It is slow because every time you call `git.status` it has to re-read and re-parse one or more packfiles in `.git/objecs/pack`.
+It is slow because every time you call `git.status` it has to re-read and re-parse one or more packfiles in `.git/objects/pack`.
 Each individual status may take relatively little time (10ms to 100ms) but if you have thousands of files that quickly adds up.
 
 Naively doing it in parallel will not help!
@@ -76,7 +76,7 @@ This runs in 843ms on my machine.
 As you can see, you can easily write yourself into a performance trap using `isomorphic-git` commands in isolation.
 
 Unlike canonical `git` commands however, there is a way for `isomorphic-git` commands to cache intermediate results
-and re-use them between commands.
+and reuse them between commands.
 It used to do this by default, but that results in a memory leak if you never clear the cache.
 
 There is no single best caching strategy:
