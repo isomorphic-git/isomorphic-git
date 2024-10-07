@@ -1,1 +1,1 @@
-export { join } from 'path/posix'
+export { join } from 'path-browserify'
