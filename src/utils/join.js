@@ -1,1 +1,1 @@
-export { join } from 'path'
+export { join } from 'path/posix'
