@@ -128,7 +128,6 @@
     "semantic-release": "17.4.7",
     "standard": "13.1.0",
     "timeout-cli": "0.3.2",
-    "tweet-tweet": "1.0.4",
     "typescript": "3.9.0-dev.20200223",
     "webpack": "4.41.5",
     "webpack-bundle-analyzer": "3.4.1",
