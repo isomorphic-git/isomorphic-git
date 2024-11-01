@@ -721,6 +721,47 @@
         "doc",
         "bug"
       ]
+    },
+    {
+      "login": "limond",
+      "name": "Leon Kaucher",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1025682?v=4",
+      "profile": "https://github.com/limond",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "gilisho",
+      "name": "Gili Shohat",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40733156?v=4",
+      "profile": "https://github.com/gilisho",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "hhourani27",
+      "name": "Habib",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61935766?v=4",
+      "profile": "https://github.com/hhourani27",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "Vinzent03",
+      "name": "Vinzent",
+      "avatar_url": "https://avatars.githubusercontent.com/u/63981639?v=4",
+      "profile": "https://github.com/Vinzent03",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
