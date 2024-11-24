@@ -1,4 +1,12 @@
----
+---<script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
+<script src="https://unpkg.com/isomorphic-git"></script>
+<script type="module">
+import http from 'https://unpkg.com/isomorphic-git/http/web/index.js'
+// Initialize isomorphic-git with a file system
+window.fs = new LightningFS('fs')
+// I prefer using the Promisified version honestly
+window.pfs = window.fs.promises
+</script>
 title: Useful Code Snippets
 sidebar_label: Useful Snippets
 ---
