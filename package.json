@@ -101,7 +101,7 @@
     "jasmine-core": "^3.99.1",
     "jest": "^27.5.1",
     "jest-junit": "^15.0.0",
-    "jsdoc-api": "5.0.3",
+    "jsdoc-api": "9.3.4",
     "karma": "^6.3.18",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chrome-launcher": "^3.1.1",
