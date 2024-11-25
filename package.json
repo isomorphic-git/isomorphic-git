@@ -76,7 +76,7 @@
     "@types/node": "12.7.2",
     "@wmhilton/jest-fixtures": "0.6.1",
     "agadoo": "2.0.0",
-    "all-contributors-cli": "6.20.0",
+    "all-contributors-cli": "6.26.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.3.0",
     "browserfs": "2.0.0",
