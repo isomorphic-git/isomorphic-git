@@ -35,6 +35,7 @@ import { isIgnored } from './api/isIgnored.js'
 import { listBranches } from './api/listBranches.js'
 import { listFiles } from './api/listFiles.js'
 import { listNotes } from './api/listNotes.js'
+import { listRefs } from './api/listRefs.js'
 import { listRemotes } from './api/listRemotes.js'
 import { listServerRefs } from './api/listServerRefs.js'
 import { listTags } from './api/listTags.js'
@@ -108,6 +109,7 @@ export {
   listBranches,
   listFiles,
   listNotes,
+  listRefs,
   listRemotes,
   listServerRefs,
   listTags,
@@ -180,6 +182,7 @@ export default {
   listBranches,
   listFiles,
   listNotes,
+  listRefs,
   listRemotes,
   listServerRefs,
   listTags,
