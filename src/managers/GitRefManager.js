@@ -360,12 +360,4 @@ export class GitRefManager {
     return tags.filter(x => !x.endsWith('^{}'))
   }
 
-  static async listRefs({ fs, gitdir, filepath }) {
-    const refs = await GitRefManager.listRefs({
-      fs,
-      gitdir,
-      filepath,
-    })
-    return refs
-  }
 }
