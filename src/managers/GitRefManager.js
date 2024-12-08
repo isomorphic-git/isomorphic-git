@@ -359,5 +359,4 @@ export class GitRefManager {
     })
     return tags.filter(x => !x.endsWith('^{}'))
   }
-
 }
