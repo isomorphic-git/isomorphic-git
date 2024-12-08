@@ -89,6 +89,7 @@
       "expandOid",
       "resetIndex",
       "updateIndex",
+      "listRefs",
       "resolveRef",
       "writeRef",
       "deleteRef",
