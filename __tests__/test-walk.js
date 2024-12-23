@@ -37,11 +37,9 @@ describe('walk', () => {
   it('can populate type, mode, oid, and content', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-walk')
-    // BrowserFS has a design quirk where HTTPRequestFS has a default mode of 555 for everything,
-    // meaning that files have the executable bit set by default!
-    const isBrowserFS = !!fs._original_unwrapped_fs.getRootFS
-    const FILEMODE = isBrowserFS ? 0o100755 : 0o100644
-    const SYMLINKMODE = isBrowserFS ? 0o100755 : 0o120000
+
+    const FILEMODE = 0o100644
+    const SYMLINKMODE = 0o120000
     // Test
     const matrix = await walk({
       fs,
