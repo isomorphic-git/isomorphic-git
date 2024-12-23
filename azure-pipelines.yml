@@ -15,7 +15,7 @@ jobs:
     steps:
       - task: NodeTool@0
         inputs:
-          versionSpec: '18.x'
+          versionSpec: '22.5'
         displayName: 'Install Node.js'
 
       - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
