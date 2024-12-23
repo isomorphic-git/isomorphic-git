@@ -751,6 +751,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "james-pre",
+      "name": "James Prevett",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75621402?v=4",
+      "profile": "https://jamespre.dev/",
+      "contributions": [
+        "code",
+        "test",
+        "maintenance"
+      ]
     }
   ],
   "commitConvention": "angular"

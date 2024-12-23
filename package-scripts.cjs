@@ -59,7 +59,7 @@ module.exports = {
       typings:
         'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
       webpack: 'webpack --config webpack.config.cjs',
-      indexjson: `node __tests__/__helpers__/make_http_index.cjs`,
+      indexjson: 'npx make-index -o __tests__/__fixtures__/index.json && node __tests__/__helpers__/make_superblock.cjs',
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
       size: process.env.CI

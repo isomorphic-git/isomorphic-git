@@ -19,7 +19,7 @@ Push a branch or tag
 | [onPrePush](./onPrePush)         | PrePushCallback           | optional pre-push hook callback                                                                            |
 | dir                              | string                    | The [working tree](dir-vs-gitdir.md) directory path                                                        |
 | **gitdir**                       | string = join(dir,'.git') | The [git directory](dir-vs-gitdir.md) path                                                                 |
-| ref                              | string                    | Which branch to push. By default this is the currently checked out branch.                                 |
+| ref                              | string                    | Which branch or tag to push. By default this is the currently checked out branch.                          |
 | url                              | string                    | The URL of the remote repository. The default is the value set in the git config for that remote.          |
 | remote                           | string                    | If URL is not specified, determines which remote to use.                                                   |
 | remoteRef                        | string                    | The name of the receiving branch on the remote. By default this is the configured remote tracking branch.  |

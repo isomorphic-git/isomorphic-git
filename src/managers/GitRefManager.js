@@ -9,7 +9,7 @@ import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
 import { join } from '../utils/join.js'
 
-import { GitConfigManager } from './GitConfigManager'
+import { GitConfigManager } from './GitConfigManager.js'
 
 // @see https://git-scm.com/docs/git-rev-parse.html#_specifying_revisions
 const refpaths = ref => [
