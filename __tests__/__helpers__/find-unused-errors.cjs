@@ -1,7 +1,8 @@
-const { E } = require('../..')
 const replace = require('replace-in-file')
 
-const errors = Object.keys(E).map(name => `E.${name}`)
+const { Errors } = require('../..')
+
+const errors = Object.keys(Errors).map(name => `E.${name}`)
 const bal = []
 
 ;(async () => {

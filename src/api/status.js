@@ -1,7 +1,7 @@
 // @ts-check
 import { _readTree } from '../commands/readTree.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
-import { ObjectTypeError } from '../errors/ObjectTypeError'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -106,11 +106,16 @@ export async function status({
         // If the oid in the index === working dir oid but stats differed update cache
         if (I && indexEntry.oid === workdirOid) {
           // and as long as our fs.stats aren't bad.
-
-          // We don't await this so we can return faster for one-off cases.
-          GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-            index.insert({ filepath, stats, oid: workdirOid })
-          })
+          // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
+          // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
+          if (stats.size !== -1) {
+            // We don't await this so we can return faster for one-off cases.
+            GitIndexManager.acquire({ fs, gitdir, cache }, async function(
+              index
+            ) {
+              index.insert({ filepath, stats, oid: workdirOid })
+            })
+          }
         }
         return workdirOid
       }

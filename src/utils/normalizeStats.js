@@ -1,4 +1,4 @@
-import { normalizeMode } from './normalizeMode'
+import { normalizeMode } from './normalizeMode.js'
 
 const MAX_UINT32 = 2 ** 32
 
@@ -43,6 +43,8 @@ export function normalizeStats(e) {
     mode: normalizeMode(e.mode % MAX_UINT32),
     uid: e.uid % MAX_UINT32,
     gid: e.gid % MAX_UINT32,
-    size: e.size % MAX_UINT32,
+    // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
+    // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
+    size: e.size > -1 ? e.size % MAX_UINT32 : 0,
   }
 }

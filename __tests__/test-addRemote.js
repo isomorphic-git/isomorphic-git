@@ -26,6 +26,7 @@ describe('addRemote', () => {
     // Test
     let error = null
     try {
+      // @ts-expect-error 2322 - This argument is missing on purpose
       await addRemote({ fs, dir, gitdir, remote, url })
     } catch (err) {
       error = err
