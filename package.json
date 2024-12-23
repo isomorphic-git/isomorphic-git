@@ -76,7 +76,7 @@
     "@types/jest": "^27.5.1",
     "@types/node": "12.7.2",
     "@wmhilton/jest-fixtures": "0.6.1",
-    "@zenfs/core": "^1.6.12",
+    "@zenfs/core": "^1.6.13",
     "agadoo": "2.0.0",
     "all-contributors-cli": "6.20.0",
     "babel-core": "7.0.0-bridge.0",
