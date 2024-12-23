@@ -63,7 +63,7 @@ import git from "isomorphic-git";
 
 await configureSingle({ backend: IndexedDB });
 
-const files = git.listFiles({ fs dir: '/' });
+const files = git.listFiles({ fs, dir: '/' });
 console.log(files);
 
 </script>
