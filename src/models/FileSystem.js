@@ -81,7 +81,11 @@ export class FileSystem {
       await this._stat(filepath)
       return true
     } catch (err) {
-      if (err.code === 'ENOENT' || err.code === 'ENOTDIR' || (err?.code || '').includes('ENS')) {
+      if (
+        err.code === 'ENOENT' ||
+        err.code === 'ENOTDIR' ||
+        (err?.code || '').includes('ENS')
+      ) {
         return false
       } else {
         console.log('Unhandled error in "FileSystem.exists()" function', err)
