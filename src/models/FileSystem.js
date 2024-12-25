@@ -84,7 +84,7 @@ export class FileSystem {
       if (
         err.code === 'ENOENT' ||
         err.code === 'ENOTDIR' ||
-        (err?.code || '').includes('ENS')
+        (err.code || '').includes('ENS')
       ) {
         return false
       } else {
@@ -238,7 +238,7 @@ export class FileSystem {
       const stats = await this._lstat(filename)
       return stats
     } catch (err) {
-      if (err.code === 'ENOENT' || (err?.code || '').includes('ENS')) {
+      if (err.code === 'ENOENT' || (err.code || '').includes('ENS')) {
         return null
       }
       throw err
@@ -256,7 +256,7 @@ export class FileSystem {
       const link = await this._readlink(filename, opts)
       return Buffer.isBuffer(link) ? link : Buffer.from(link)
     } catch (err) {
-      if (err.code === 'ENOENT' || (err?.code || '').includes('ENS')) {
+      if (err.code === 'ENOENT' || (err.code || '').includes('ENS')) {
         return null
       }
       throw err
