@@ -61,8 +61,12 @@ const stashChanges = async (
   // add user to config
   await addUserConfig(fs, dir, gitdir)
 
-  const aContent = new TextDecoder().decode(await fs.read(`${dir}/a.txt`))
-  const bContent = new TextDecoder().decode(await fs.read(`${dir}/b.js`))
+  const aContent = new TextDecoder().decode(
+    new TextEncoder().encode(await fs.read(`${dir}/a.txt`))
+  )
+  const bContent = new TextDecoder().decode(
+    new TextEncoder().encode(await fs.read(`${dir}/b.js`))
+  )
   await fs.write(`${dir}/a.txt`, 'staged changes - a')
   await fs.write(`${dir}/b.js`, 'staged changes - b')
 
