@@ -164,10 +164,10 @@ describe('abort stash', () => {
 
     expect(error).not.toBeNull()
     const cContentAfterStash = new TextDecoder().decode(
-      await fs.read(`${dir}/c.txt`)
+      new TextEncoder().encode(await fs.read(`${dir}/c.txt`))
     )
     const dContentAfterStash = new TextDecoder().decode(
-      await fs.read(`${dir}/d.js`)
+      new TextEncoder().encode(await fs.read(`${dir}/d.js`))
     )
 
     expect(cContentAfterStash).toEqual(cContentBeforeStash)
