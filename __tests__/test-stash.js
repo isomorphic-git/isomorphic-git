@@ -111,7 +111,7 @@ const stashChanges = async (
 
 describe('abort stash', () => {
   it('stash without user', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     let error = null
     try {
@@ -127,7 +127,7 @@ describe('abort stash', () => {
   })
 
   it('stash with no changes', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     // add user to config
     await addUserConfig(fs, dir, gitdir)
@@ -530,14 +530,14 @@ describe('stash apply', () => {
 
 describe('stash list', () => {
   it('stash list with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList).toEqual([])
   })
 
   it('stash list with 1 stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged 3 file changes
 
@@ -546,7 +546,7 @@ describe('stash list', () => {
   })
 
   it('stash list with 2 stashes', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
@@ -556,7 +556,7 @@ describe('stash list', () => {
   })
 
   it('stash list with default message', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     const defaultMsg = await stash({ fs, dir, gitdir, op: 'list' })
     expect(defaultMsg).toEqual([
@@ -565,7 +565,7 @@ describe('stash list', () => {
   })
 
   it('stash list with custom message', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     await addUserConfig(fs, dir, gitdir)
 
@@ -597,7 +597,7 @@ describe('stash drop', () => {
   })
 
   it('stash drop with stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -662,7 +662,7 @@ describe('stash drop', () => {
 
 describe('stash clear', () => {
   it('stash clear with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     let error = null
     try {
@@ -675,7 +675,7 @@ describe('stash clear', () => {
   })
 
   it('stash clear with stash', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -692,7 +692,7 @@ describe('stash clear', () => {
   })
 
   it('stash clear with 2 stashes', async () => {
-    const { fs, dir, gitdir } = await makeFixture('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
