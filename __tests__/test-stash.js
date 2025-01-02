@@ -61,12 +61,8 @@ const stashChanges = async (
   // add user to config
   await addUserConfig(fs, dir, gitdir)
 
-  const aContent = new TextDecoder().decode(
-    new TextEncoder().encode(await fs.read(`${dir}/a.txt`))
-  )
-  const bContent = new TextDecoder().decode(
-    new TextEncoder().encode(await fs.read(`${dir}/b.js`))
-  )
+  const aContent = await fs.read(`${dir}/a.txt`)
+  const bContent = await fs.read(`${dir}/b.js`)
   await fs.write(`${dir}/a.txt`, 'staged changes - a')
   await fs.write(`${dir}/b.js`, 'staged changes - b')
 
@@ -96,10 +92,10 @@ const stashChanges = async (
   try {
     await stash({ fs, dir, gitdir, message })
     const aContentAfterStash = await fs.read(`${dir}/a.txt`)
-    expect(aContentAfterStash.toString()).toEqual(aContent)
+    expect(aContentAfterStash).toEqual(aContent)
 
     const bContentAfterStash = await fs.read(`${dir}/b.js`)
-    expect(bContentAfterStash.toString()).toEqual(bContent)
+    expect(bContentAfterStash).toEqual(bContent)
   } catch (e) {
     error = e
   }
@@ -156,8 +152,8 @@ describe('abort stash', () => {
     const dContentBeforeStash = 'untracked file - d'
 
     // Create untracked files
-    await fs.write(`${dir}/c.txt`, 'untracked file - c')
-    await fs.write(`${dir}/d.js`, 'untracked file - d')
+    await fs.write(`${dir}/c.txt`, cContentBeforeStash)
+    await fs.write(`${dir}/d.js`, dContentBeforeStash)
 
     let error = null
     try {
@@ -167,15 +163,11 @@ describe('abort stash', () => {
     }
 
     expect(error).not.toBeNull()
-    const cContentAfterStash = new TextDecoder().decode(
-      new TextEncoder().encode(await fs.read(`${dir}/c.txt`))
-    )
-    const dContentAfterStash = new TextDecoder().decode(
-      new TextEncoder().encode(await fs.read(`${dir}/d.js`))
-    )
+    const cContentAfterStash = await fs.read(`${dir}/c.txt`)
+    const dContentAfterStash = await fs.read(`${dir}/d.js`)
 
-    expect(cContentAfterStash).toEqual(cContentBeforeStash)
-    expect(dContentAfterStash).toEqual(dContentBeforeStash)
+    expect(cContentAfterStash.toString()).toEqual(cContentBeforeStash)
+    expect(dContentAfterStash.toString()).toEqual(dContentBeforeStash)
   })
 })
 
