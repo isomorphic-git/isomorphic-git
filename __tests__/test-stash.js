@@ -92,10 +92,10 @@ const stashChanges = async (
   try {
     await stash({ fs, dir, gitdir, message })
     const aContentAfterStash = await fs.read(`${dir}/a.txt`)
-    expect(aContentAfterStash).toEqual(aContent)
+    expect(aContentAfterStash.toString()).toEqual(aContent.toString())
 
     const bContentAfterStash = await fs.read(`${dir}/b.js`)
-    expect(bContentAfterStash).toEqual(bContent)
+    expect(bContentAfterStash.toString()).toEqual(bContent.toString())
   } catch (e) {
     error = e
   }
