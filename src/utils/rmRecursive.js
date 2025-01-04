@@ -1,4 +1,4 @@
-import { join } from './join'
+import { join } from './join.js'
 
 /**
  * Removes the directory at the specified filepath recursively. Used internally to replicate the behavior of

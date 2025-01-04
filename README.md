@@ -78,7 +78,7 @@ git.clone({ fs, http, dir, url: 'https://github.com/isomorphic-git/lightning-fs'
 
 If you're using `isomorphic-git` in the browser, you'll need something that emulates the `fs` API.
 The easiest to setup and most performant library is [LightningFS](https://github.com/isomorphic-git/lightning-fs) which is written and maintained by the same author and is part of the `isomorphic-git` suite.
-If LightningFS doesn't meet your requirements, isomorphic-git should also work with [BrowserFS](https://github.com/jvilk/BrowserFS) and [Filer](https://github.com/filerjs/filer).
+If LightningFS doesn't meet your requirements, isomorphic-git should also work with [ZenFS](https://github.com/zen-fs/core) and [Filer](https://github.com/filerjs/filer).
 Instead of `isomorphic-git/http/node` this time import `isomorphic-git/http/web`:
 
 ```html
@@ -380,6 +380,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/gilisho"><img src="https://avatars.githubusercontent.com/u/40733156?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Gili Shohat</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gilisho" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gilisho" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gilisho" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/hhourani27"><img src="https://avatars.githubusercontent.com/u/61935766?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Habib</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/Vinzent03"><img src="https://avatars.githubusercontent.com/u/63981639?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Vinzent</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=Vinzent03" title="Code">💻</a></td>
+    <td align="center"><a href="https://jamespre.dev/"><img src="https://avatars.githubusercontent.com/u/75621402?v=4?s=60" width="60px;" alt=""/><br /><sub><b>James Prevett</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=james-pre" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=james-pre" title="Tests">⚠️</a> <a href="#maintenance-james-pre" title="Maintenance">🚧</a></td>
   </tr>
 </table>
 
