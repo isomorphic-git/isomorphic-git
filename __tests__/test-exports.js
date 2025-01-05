@@ -43,6 +43,7 @@ describe('exports', () => {
         "listBranches",
         "listFiles",
         "listNotes",
+        "listRefs",
         "listRemotes",
         "listServerRefs",
         "listTags",
