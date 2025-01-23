@@ -125,6 +125,7 @@ const normalizePath = path => {
     name,
     path: getPath(section, subsection, name),
     sectionPath: getPath(section, subsection, null),
+    isSection: !!section,
   }
 }
 
@@ -185,7 +186,7 @@ export class GitConfig {
 
   async getSubsections(section) {
     return this.parsedConfig
-      .filter(config => config.section === section && config.isSection)
+      .filter(config => config.isSection && config.section === section)
       .map(config => config.subsection)
   }
 
@@ -207,7 +208,9 @@ export class GitConfig {
       name,
       path: normalizedPath,
       sectionPath,
+      isSection,
     } = normalizePath(path)
+
     const configIndex = findLastIndex(
       this.parsedConfig,
       config => config.path === normalizedPath
@@ -249,6 +252,7 @@ export class GitConfig {
           } else {
             // Add a new section
             const newSection = {
+              isSection,
               section,
               subsection,
               modified: true,
