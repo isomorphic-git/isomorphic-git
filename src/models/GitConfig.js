@@ -1,5 +1,9 @@
 // This is straight from parse_unit_factor in config.c of canonical git
 const num = val => {
+  if (typeof val === 'number') {
+    return val
+  }
+
   val = val.toLowerCase()
   let n = parseInt(val)
   if (val.endsWith('k')) n *= 1024
@@ -10,6 +14,10 @@ const num = val => {
 
 // This is straight from git_parse_maybe_bool_text in config.c of canonical git
 const bool = val => {
+  if (typeof val === 'boolean') {
+    return val
+  }
+
   val = val.trim().toLowerCase()
   if (val === 'true' || val === 'yes' || val === 'on') return true
   if (val === 'false' || val === 'no' || val === 'off') return false
