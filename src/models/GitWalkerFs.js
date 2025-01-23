@@ -13,6 +13,8 @@ export class GitWalkerFs {
     this.cache = cache
     this.dir = dir
     this.gitdir = gitdir
+
+    this.config = null
     const walker = this
     this.ConstructEntry = class WorkdirEntry {
       constructor(fullpath) {
@@ -99,7 +101,7 @@ export class GitWalkerFs {
       if ((await entry.type()) === 'tree') {
         entry._content = undefined
       } else {
-        const config = await GitConfigManager.get({ fs, gitdir })
+        const config = await this._getGitConfig(fs, gitdir)
         const autocrlf = await config.get('core.autocrlf')
         const content = await fs.read(`${dir}/${entry._fullpath}`, { autocrlf })
         // workaround for a BrowserFS edge case
@@ -115,6 +117,7 @@ export class GitWalkerFs {
 
   async oid(entry) {
     if (entry._oid === false) {
+      const me = this
       const { fs, gitdir, cache } = this
       let oid
       // See if we can use the SHA1 hash in the index.
@@ -123,7 +126,7 @@ export class GitWalkerFs {
       ) {
         const stage = index.entriesMap.get(entry._fullpath)
         const stats = await entry.stat()
-        const config = await GitConfigManager.get({ fs, gitdir })
+        const config = await me._getGitConfig(fs, gitdir)
         const filemode = await config.get('core.filemode')
         const trustino =
           typeof process !== 'undefined'
@@ -161,5 +164,13 @@ export class GitWalkerFs {
       entry._oid = oid
     }
     return entry._oid
+  }
+
+  async _getGitConfig(fs, gitdir) {
+    if (this.config) {
+      return this.config
+    }
+    this.config = await GitConfigManager.get({ fs, gitdir })
+    return this.config
   }
 }
