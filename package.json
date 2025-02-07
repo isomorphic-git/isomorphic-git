@@ -51,7 +51,7 @@
     "size_report.html"
   ],
   "dependencies": {
-    "@isomorphic-git/path-browserify": "github:isomorphic-git/path-browserify",
+    "@isomorphic-git/path-browserify": "https://github.com/isomorphic-git/path-browserify.git",
     "async-lock": "^1.4.1",
     "clean-git-ref": "^2.0.1",
     "crc-32": "^1.2.0",
