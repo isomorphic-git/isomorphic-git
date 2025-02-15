@@ -49,6 +49,8 @@ export async function add({
 
     const fs = new FileSystem(_fs)
     await GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
+      const config = await GitConfigManager.get({ fs, gitdir })
+      const autocrlf = await config.get('core.autocrlf')
       return addToIndex({
         dir,
         gitdir,
@@ -57,6 +59,7 @@ export async function add({
         index,
         force,
         parallel,
+        autocrlf,
       })
     })
   } catch (err) {
@@ -73,6 +76,7 @@ async function addToIndex({
   index,
   force,
   parallel,
+  autocrlf,
 }) {
   // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
@@ -101,6 +105,7 @@ async function addToIndex({
             index,
             force,
             parallel,
+            autocrlf,
           })
         )
         await Promise.all(promises)
@@ -114,12 +119,11 @@ async function addToIndex({
             index,
             force,
             parallel,
+            autocrlf,
           })
         }
       }
     } else {
-      const config = await GitConfigManager.get({ fs, gitdir })
-      const autocrlf = await config.get('core.autocrlf')
       const object = stats.isSymbolicLink()
         ? await fs.readlink(join(dir, currentFilepath)).then(posixifyPathBuffer)
         : await fs.read(join(dir, currentFilepath), { autocrlf })

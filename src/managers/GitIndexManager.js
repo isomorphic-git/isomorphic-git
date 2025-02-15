@@ -20,8 +20,11 @@ function createCache() {
 }
 
 async function updateCachedIndexFile(fs, filepath, cache) {
-  const stat = await fs.lstat(filepath)
-  const rawIndexFile = await fs.read(filepath)
+  const [stat, rawIndexFile] = await Promise.all([
+    fs.lstat(filepath),
+    fs.read(filepath),
+  ])
+
   const index = await GitIndex.from(rawIndexFile)
   // cache the GitIndex object so we don't need to re-read it every time.
   cache.map.set(filepath, index)
@@ -33,8 +36,9 @@ async function updateCachedIndexFile(fs, filepath, cache) {
 async function isIndexStale(fs, filepath, cache) {
   const savedStats = cache.stats.get(filepath)
   if (savedStats === undefined) return true
-  const currStats = await fs.lstat(filepath)
   if (savedStats === null) return false
+
+  const currStats = await fs.lstat(filepath)
   if (currStats === null) return false
   return compareStats(savedStats, currStats)
 }
@@ -50,7 +54,9 @@ export class GitIndexManager {
    * @param {function(GitIndex): any} closure
    */
   static async acquire({ fs, gitdir, cache, allowUnmerged = true }, closure) {
-    if (!cache[IndexCache]) cache[IndexCache] = createCache()
+    if (!cache[IndexCache]) {
+      cache[IndexCache] = createCache()
+    }
 
     const filepath = `${gitdir}/index`
     if (lock === null) lock = new AsyncLock({ maxPending: Infinity })
@@ -61,10 +67,11 @@ export class GitIndexManager {
       // to make sure other processes aren't writing to it
       // simultaneously, which could result in a corrupted index.
       // const fileLock = await Lock(filepath)
-      if (await isIndexStale(fs, filepath, cache[IndexCache])) {
-        await updateCachedIndexFile(fs, filepath, cache[IndexCache])
+      const theIndexCache = cache[IndexCache]
+      if (await isIndexStale(fs, filepath, theIndexCache)) {
+        await updateCachedIndexFile(fs, filepath, theIndexCache)
       }
-      const index = cache[IndexCache].map.get(filepath)
+      const index = theIndexCache.map.get(filepath)
       unmergedPaths = index.unmergedPaths
 
       if (unmergedPaths.length && !allowUnmerged)
@@ -77,7 +84,7 @@ export class GitIndexManager {
         const buffer = await index.toObject()
         await fs.write(filepath, buffer)
         // Update cached stat value
-        cache[IndexCache].stats.set(filepath, await fs.lstat(filepath))
+        theIndexCache.stats.set(filepath, await fs.lstat(filepath))
         index._dirty = false
       }
     })
