@@ -74,7 +74,7 @@
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "5.0.0",
     "@types/jest": "^27.5.1",
-    "@types/node": "12.7.2",
+    "@types/node": "22.13.4",
     "@wmhilton/jest-fixtures": "0.6.1",
     "agadoo": "2.0.0",
     "all-contributors-cli": "6.20.0",
