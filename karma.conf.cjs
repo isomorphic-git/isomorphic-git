@@ -82,14 +82,14 @@ module.exports = function (config) {
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
-        platform: 'macOS 10.15',
-        version: '13.1',
+        platform: 'macOS 11',
+        version: '16',
       },
       sl_ios_safari: {
         base: 'SauceLabs',
         deviceName: 'iPhone 11 Pro Max Simulator',
         platformName: 'iOS',
-        platformVersion: '13.0',
+        platformVersion: '15.7',
         browserName: 'Safari',
         appiumVersion: '1.15.0',
       },
