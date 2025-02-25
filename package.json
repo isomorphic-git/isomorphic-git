@@ -12,7 +12,7 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=12"
+    "node": ">=14.17"
   },
   "scripts": {
     "start": "nps",
