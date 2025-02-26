@@ -773,6 +773,17 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "eliot-akira",
+      "name": "3λiȯ+",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5352434?v=4",
+      "profile": "https://eliotakira.com/",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
