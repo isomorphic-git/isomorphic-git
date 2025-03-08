@@ -17,7 +17,7 @@ By providing functionality as individual functions, code bundlers can produce sm
 The project includes type definitions so you can enjoy static type-checking and intelligent code completion in editors like VS Code and [CodeSandbox](https://codesandbox.io).
 
 ## Project status
-The original author of the project ([Billie Hilton](https://github.com/wmhilton)) left the project, but the project is still maintained by two volunteers:
+The original author of the project ([Billie Hilton](https://github.com/billiegoose)) left the project, but the project is still maintained by two volunteers:
 
 * [@jcubic](https://github.com/jcubic) (most active)
 * [@mojavelinux](https://github.com/mojavelinux)
@@ -114,14 +114,14 @@ Unfortunately, due to the same-origin policy by default `isomorphic-git` can onl
 For this purpose [@isomorphic-git/cors-proxy](https://github.com/isomorphic-git/cors-proxy) exists which you can clone or [`npm install`](https://www.npmjs.com/package/@isomorphic-git/cors-proxy).
 For testing or small projects, you can also use [https://cors.isomorphic-git.org](https://cors.isomorphic-git.org) - a free proxy sponsored by [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git).
 
-I'm hoping to get CORS headers added to all the major Git hosting platforms eventually, and will list my progress here:
+We hope to get CORS headers added to all the major Git hosting platforms eventually, and will list the progress made here:
 
 | Service             | Supports CORS requests                                                                                                                                                       |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Gogs (self-hosted)  | [✔](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)                                                                         |
 | Gitea (self-hosted) | [✔](https://github.com/go-gitea/gitea/pull/5719)                                                                                                                             |
 | Azure DevOps        | [✔](https://github.com/isomorphic-git/isomorphic-git/issues/678#issuecomment-452402740) (Usage Note: requires authentication)                        |
-| Gitlab              | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open! |
+| Gitlab              | ❌ Our [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open! |
 | Bitbucket           | ❌                                                                                                                                                                            |
 | Github              | ❌                                                                                                                                                                            |
 
@@ -140,7 +140,7 @@ The CLI is more of a lark for quickly testing `isomorphic-git` and isn't really 
 
 ## Supported Git commands
 
-This project follows semantic versioning, so I may continue to make changes to the API but they will always be backwards compatible
+This project follows semantic versioning, so we may continue to make changes to the API but they will always be backwards compatible
 unless there is a major version bump.
 
 ### commands
@@ -266,7 +266,7 @@ Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions
 
 Isomorphic-git would not have been possible without the pioneering work by
 @creationix and @chrisdickinson. Git is a tricky binary mess, and without
-their examples (and their modules!) I would not have been able to come even
+their examples (and their modules!) we would not have been able to come even
 close to finishing this. They are geniuses ahead of their time.
 
 Cross-browser device testing is provided by:
