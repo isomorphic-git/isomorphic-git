@@ -2,7 +2,6 @@
 const diff3Merge = require('diff3')
 const { Errors, merge, add, resolveRef, log } = require('isomorphic-git')
 const gitCommit = require('isomorphic-git').commit
-const git = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
