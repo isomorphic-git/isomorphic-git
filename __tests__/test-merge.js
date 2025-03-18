@@ -1107,4 +1107,48 @@ describe('merge', () => {
     expect(mergeCommit.message).toEqual(commit.message)
     expect(mergeCommit.parent).toEqual(commit.parent)
   })
+  it('merge preserves nested directory structure when combining unrelated changes', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
+
+    // Get the reference commit that contains the expected merge result
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'e-merge-f-reference', // This should be a pre-created reference merge
+      })
+    )[0].commit
+
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'e',
+      theirs: 'f',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+
+    // Get the actual merge commit
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'e',
+        depth: 1,
+      })
+    )[0].commit
+
+    // Compare with the expected commit
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
 })
