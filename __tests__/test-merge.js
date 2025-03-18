@@ -1023,16 +1023,14 @@ describe('merge', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
 
-    // Get the reference commit that contains the expected merge result
     const commit = (
       await log({
         fs,
         gitdir,
         depth: 1,
-        ref: 'a-merge-b-reference', // This should be a pre-created reference merge
+        ref: 'a-merge-b-reference',
       })
     )[0].commit
-
     // Test
     const report = await merge({
       fs,
@@ -1046,8 +1044,6 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
     })
-
-    // Get the actual merge commit
     const mergeCommit = (
       await log({
         fs,
@@ -1057,7 +1053,6 @@ describe('merge', () => {
       })
     )[0].commit
 
-    // Compare with the expected commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -1067,16 +1062,14 @@ describe('merge', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
 
-    // Get the reference commit that contains the expected merge result
     const commit = (
       await log({
         fs,
         gitdir,
         depth: 1,
-        ref: 'c-merge-d-reference', // This should be a pre-created reference merge
+        ref: 'c-merge-d-reference',
       })
     )[0].commit
-
     // Test
     const report = await merge({
       fs,
@@ -1090,8 +1083,6 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
     })
-
-    // Get the actual merge commit
     const mergeCommit = (
       await log({
         fs,
@@ -1101,7 +1092,6 @@ describe('merge', () => {
       })
     )[0].commit
 
-    // Compare with the expected commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
@@ -1111,16 +1101,14 @@ describe('merge', () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
 
-    // Get the reference commit that contains the expected merge result
     const commit = (
       await log({
         fs,
         gitdir,
         depth: 1,
-        ref: 'e-merge-f-reference', // This should be a pre-created reference merge
+        ref: 'e-merge-f-reference',
       })
     )[0].commit
-
     // Test
     const report = await merge({
       fs,
@@ -1134,8 +1122,6 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
     })
-
-    // Get the actual merge commit
     const mergeCommit = (
       await log({
         fs,
@@ -1145,7 +1131,6 @@ describe('merge', () => {
       })
     )[0].commit
 
-    // Compare with the expected commit
     expect(report.tree).toBe(commit.tree)
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
