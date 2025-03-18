@@ -183,6 +183,7 @@ unless there is a major version bump.
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
 - [listNotes](https://isomorphic-git.github.io/docs/listNotes.html)
+- [listRefs](https://isomorphic-git.github.io/docs/listRefs.html)
 - [listRemotes](https://isomorphic-git.github.io/docs/listRemotes.html)
 - [listServerRefs](https://isomorphic-git.github.io/docs/listServerRefs.html)
 - [listTags](https://isomorphic-git.github.io/docs/listTags.html)
@@ -373,7 +374,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="http://www.codeproject.com/script/Articles/MemberArticles.aspx?amid=62372"><img src="https://avatars.githubusercontent.com/u/865809?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Modesty Zhang</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/amrc-benmorrow"><img src="https://avatars.githubusercontent.com/u/120477944?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Ben Morrow</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=amrc-benmorrow" title="Code">💻</a></td>
   </tr>
-  <tr>    
+  <tr>
     <td align="center"><a href="https://github.com/jayree"><img src="https://avatars.githubusercontent.com/u/14836154?v=4?s=60" width="60px;" alt=""/><br /><sub><b>jayree</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/lsegurado"><img src="https://avatars.githubusercontent.com/u/27731047?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Lucas Martin Segurado</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=lsegurado" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Alsegurado" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/limond"><img src="https://avatars.githubusercontent.com/u/1025682?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Leon Kaucher</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=limond" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=limond" title="Tests">⚠️</a></td>
@@ -381,6 +382,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/hhourani27"><img src="https://avatars.githubusercontent.com/u/61935766?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Habib</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/Vinzent03"><img src="https://avatars.githubusercontent.com/u/63981639?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Vinzent</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=Vinzent03" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/LokiMidgard"><img src="https://avatars.githubusercontent.com/u/389101?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Patrick Kranz</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Tests">⚠️</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/kofta999"><img src="https://avatars.githubusercontent.com/u/99273340?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Mostafa Mahmoud</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=kofta999" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=kofta999" title="Tests">⚠️</a> <a href="#question-kofta999" title="Answering Questions">💬</a></td>
   </tr>
 </table>
 
