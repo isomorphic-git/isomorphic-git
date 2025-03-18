@@ -26,7 +26,14 @@ describe('addRemote', () => {
     // Test
     let error = null
     try {
-      await addRemote({ fs, dir, gitdir, remote, url })
+      await addRemote({
+        fs,
+        dir,
+        gitdir,
+        remote,
+        // @ts-ignore
+        url,
+      })
     } catch (err) {
       error = err
     }
