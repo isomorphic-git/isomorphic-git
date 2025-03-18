@@ -2,6 +2,7 @@
 const diff3Merge = require('diff3')
 const { Errors, merge, add, resolveRef, log } = require('isomorphic-git')
 const gitCommit = require('isomorphic-git').commit
+const git = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -1017,5 +1018,157 @@ describe('merge', () => {
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
     expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it('merge two branches where theirs deletes a file and ours adds a new file', async () => {
+    // Setup
+    const { Volume } = require('memfs')
+    const fs = Volume.fromJSON({})
+    const dir = '/'
+
+    await git.init({ fs, dir, defaultBranch: 'main' })
+
+    // Create initial content and commit
+    fs.mkdirSync('/src')
+    fs.writeFileSync('/src/foo.txt', 'hello')
+    await git.add({ fs, dir, filepath: 'src/foo.txt' })
+    await git.commit({
+      fs: fs,
+      dir,
+      message: 'initial',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Create incoming branch
+    await git.branch({ fs, dir, ref: 'incoming' })
+
+    // On main branch, add a new file
+    fs.writeFileSync('/src/another.txt', 'hello world')
+    await git.add({ fs, dir, filepath: 'src/another.txt' })
+    const mainCommit = await git.commit({
+      fs,
+      dir,
+      message: 'add another.txt on main',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Switch to incoming branch and delete the original file
+    await git.checkout({ fs, dir, ref: 'incoming' })
+    fs.unlinkSync('/src/foo.txt')
+    await git.remove({ fs, dir, filepath: 'src/foo.txt' })
+    const incomingCommit = await git.commit({
+      fs,
+      dir,
+      message: 'delete foo.txt on incoming',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Switch back to main branch and merge
+    await git.checkout({ fs, dir, ref: 'main' })
+    const mergeResult = await git.merge({
+      fs,
+      dir,
+      ours: 'main',
+      theirs: 'incoming',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Verify merge was successful
+    expect(mergeResult.oid).toBeTruthy()
+    expect(mergeResult.alreadyMerged).toBeFalsy()
+    expect(mergeResult.fastForward).toBeFalsy()
+
+    // Read the merge commit
+    const mergeCommitObj = await git.readCommit({
+      fs,
+      dir,
+      oid: mergeResult.oid,
+    })
+    const mergeCommit = mergeCommitObj.commit
+
+    // Verify commit parentage (should have two parents)
+    expect(mergeCommit.parent).toHaveLength(2)
+    expect(mergeCommit.parent).toContain(mainCommit)
+    expect(mergeCommit.parent).toContain(incomingCommit)
+
+    // Verify tree contains expected files
+    const tree = await git.listFiles({ fs, dir })
+    expect(tree).toContain('src/another.txt')
+    expect(tree).not.toContain('src/foo.txt')
+  })
+  it('merge two branches where ours deletes a file and theirs adds a new file', async () => {
+    // Setup
+    const { Volume } = require('memfs')
+    const fs = Volume.fromJSON({})
+    const dir = '/'
+
+    await git.init({ fs, dir, defaultBranch: 'main' })
+
+    // Create initial content and commit
+    fs.mkdirSync('/src')
+    fs.writeFileSync('/src/foo.txt', 'hello')
+    await git.add({ fs, dir, filepath: 'src/foo.txt' })
+    await git.commit({
+      fs: fs,
+      dir,
+      message: 'initial',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Create incoming branch
+    await git.branch({ fs, dir, ref: 'incoming' })
+
+    // On main branch, delete the original file
+    fs.unlinkSync('/src/foo.txt')
+    await git.remove({ fs, dir, filepath: 'src/foo.txt' })
+    const incomingCommit = await git.commit({
+      fs,
+      dir,
+      message: 'delete foo.txt on main',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Switch to incoming branch and add a new file
+    await git.checkout({ fs, dir, ref: 'incoming' })
+    fs.writeFileSync('/src/another.txt', 'hello world')
+    await git.add({ fs, dir, filepath: 'src/another.txt' })
+    const mainCommit = await git.commit({
+      fs,
+      dir,
+      message: 'add another.txt on incoming',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Switch back to main branch and merge
+    await git.checkout({ fs, dir, ref: 'main' })
+    const mergeResult = await git.merge({
+      fs,
+      dir,
+      ours: 'main',
+      theirs: 'incoming',
+      author: { name: 'Test User', email: 'test@example.com' },
+    })
+
+    // Verify merge was successful
+    expect(mergeResult.oid).toBeTruthy()
+    expect(mergeResult.alreadyMerged).toBeFalsy()
+    expect(mergeResult.fastForward).toBeFalsy()
+
+    // Read the merge commit
+    const mergeCommitObj = await git.readCommit({
+      fs,
+      dir,
+      oid: mergeResult.oid,
+    })
+    const mergeCommit = mergeCommitObj.commit
+
+    // Verify commit parentage (should have two parents)
+    expect(mergeCommit.parent).toHaveLength(2)
+    expect(mergeCommit.parent).toContain(mainCommit)
+    expect(mergeCommit.parent).toContain(incomingCommit)
+
+    // Verify tree contains expected files
+    const tree = await git.listFiles({ fs, dir })
+    expect(tree).toContain('src/another.txt')
+    expect(tree).not.toContain('src/foo.txt')
   })
 })
