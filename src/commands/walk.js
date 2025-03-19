@@ -47,20 +47,15 @@ export async function _walk({
   const range = arrayRange(0, walkers.length)
   const unionWalkerFromReaddir = async entries => {
     range.map(i => {
-      const entry = entries[i]
-      entries[i] = entry && new walkers[i].ConstructEntry(entry)
+      entries[i] = entries[i] && new walkers[i].ConstructEntry(entries[i])
     })
     const subdirs = await Promise.all(
-      range.map(i => {
-        const entry = entries[i]
-        return entry ? walkers[i].readdir(entry) : []
-      })
+      range.map(i => (entries[i] ? walkers[i].readdir(entries[i]) : []))
     )
     // Now process child directories
-    const iterators = subdirs.map(array => {
-      return (array === null ? [] : array)[Symbol.iterator]()
-    })
-
+    const iterators = subdirs
+      .map(array => (array === null ? [] : array))
+      .map(array => array[Symbol.iterator]())
     return {
       entries,
       children: unionOfIterators(iterators),
