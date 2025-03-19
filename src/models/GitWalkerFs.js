@@ -138,7 +138,7 @@ export class GitWalkerFs {
             oid = undefined
           } else {
             oid = await shasum(
-              GitObject.wrap({ type: 'blob', object: await entry.content() })
+              GitObject.wrap({ type: 'blob', object: content })
             )
             // Update the stats in the index so we will get a "cache hit" next time
             // 1) if we can (because the oid and mode are the same)
