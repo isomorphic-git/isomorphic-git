@@ -71,9 +71,11 @@ export async function updateIndex({
       return await GitIndexManager.acquire(
         { fs, gitdir, cache },
         async function(index) {
+          let fileStats
+
           if (!force) {
             // Check if the file is still present in the working directory
-            const fileStats = await fs.lstat(join(dir, filepath))
+            fileStats = await fs.lstat(join(dir, filepath))
 
             if (fileStats) {
               if (fileStats.isDirectory()) {
@@ -123,7 +125,18 @@ export async function updateIndex({
         )
       }
 
-      let stats
+      // By default we use 0 for the stats of the index file
+      let stats = {
+        ctime: new Date(0),
+        mtime: new Date(0),
+        dev: 0,
+        ino: 0,
+        mode,
+        uid: 0,
+        gid: 0,
+        size: 0,
+      }
+
       if (!oid) {
         stats = fileStats
 
@@ -139,18 +152,6 @@ export async function updateIndex({
           format: 'content',
           object,
         })
-      } else {
-        // By default we use 0 for the stats of the index file
-        stats = {
-          ctime: new Date(0),
-          mtime: new Date(0),
-          dev: 0,
-          ino: 0,
-          mode,
-          uid: 0,
-          gid: 0,
-          size: 0,
-        }
       }
 
       index.insert({
