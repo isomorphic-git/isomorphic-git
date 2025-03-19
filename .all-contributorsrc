@@ -773,6 +773,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "lukecotter",
+      "name": "Luke Cotter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4013877?v=4",
+      "profile": "https://github.com/lukecotter",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
