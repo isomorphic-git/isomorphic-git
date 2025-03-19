@@ -117,7 +117,7 @@ export class GitWalkerFs {
 
   async oid(entry) {
     if (entry._oid === false) {
-      const me = this
+      const self = this
       const { fs, gitdir, cache } = this
       let oid
       // See if we can use the SHA1 hash in the index.
@@ -126,7 +126,7 @@ export class GitWalkerFs {
       ) {
         const stage = index.entriesMap.get(entry._fullpath)
         const stats = await entry.stat()
-        const config = await me._getGitConfig(fs, gitdir)
+        const config = await self._getGitConfig(fs, gitdir)
         const filemode = await config.get('core.filemode')
         const trustino =
           typeof process !== 'undefined'
