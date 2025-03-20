@@ -36,6 +36,7 @@ sidebar_label: Alphabetical Index
 - [listBranches](listBranches)
 - [listFiles](listFiles)
 - [listNotes](listNotes)
+- [listRefs](listRefs)
 - [listRemotes](listRemotes)
 - [listServerRefs](listServerRefs)
 - [listTags](listTags)
