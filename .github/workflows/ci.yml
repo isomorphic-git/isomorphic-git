@@ -140,11 +140,11 @@ jobs:
           name: test-results-${{ matrix.karma-launcher }}
           path: junit/*.xml
 
-# TODO:
   publish:
     name: Publish
     needs: test-in-browser
     runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
 
     steps:
       - name: Download test results
