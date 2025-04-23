@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      node-version:
+        description: Comma-separated list of Node.js versions
+        required: true
+        default: '14' # Changes to this value must also be made to the defaults in jobs.build.strategy.matrix.node-version
+
+jobs:
+  build:
+    name: Node.js v${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+
+    # Most pipelines finish in under 15 minutes. 30 minutes should be more than enough.
+    # See https://dev.azure.com/isomorphic-git/isomorphic-git/_pipeline/analytics/duration.
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: true
+      matrix:
+        # Use the Node.js versions from workflow_dispatch input or fallback to default values
+        node-version: ${{ fromJSON(format('[{0}]', inputs.node-version || '14')) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+  
+      - name: Run tests
+        run: |
+          # Use X Virtual Frame Buffer (xvfb) to run headless in CI
+          xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npm test
+        env:
+          BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+          BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome'
+
+      # TODO:
+      #
+      # - name: 'Save test results'
+      # - name: 'Save code coverage'
+      # - name: 'Save npm-tarball.tgz'
+      # - name: 'Save index.umd.min.js'
+      # - name: 'Publish to npm'
+      # - name: 'Update website'
