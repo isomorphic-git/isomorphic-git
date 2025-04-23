@@ -55,7 +55,9 @@ jobs:
           name: test-results-jest
           path: junit/*.xml
 
-      # TODO: Switch from "Save" to "Publish"
+      # Problem: GitHub does not support Code Coverage reports like Azure Pipelines.
+      # TODO:    Update the workflow to "Publish code coverage" somewhere.
+
       - name: Save code coverage
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         uses: actions/upload-artifact@v4
@@ -151,20 +153,23 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/download-artifact@v4
 
+
+      # Problem: GitHub does not support Test Results reports like Azure Pipelines.
+      # TODO:    Update the workflow to combine and "Publish test results" somewhere.
+
       - name: Publish test results
         if: ${{ !cancelled() }}
         run: |
-          # Display all artifacts
-          ls -R
+          # List the test results
+          echo test-results-*/*.xml
 
-          # The Azure Pipeline test results combines all test results.
-          echo TODO
+          # TODO: Combine and publish the test results
 
   publish-artifacts:
     name: Publish
     needs: test-in-browser
     runs-on: ubuntu-latest
-    if: ${{ success() }}
+    if: ${{ success() && ( github.ref == 'main' || github.ref_name == 'beta')  }}
 
     steps:
       - uses: actions/checkout@v4
@@ -179,8 +184,6 @@ jobs:
         run: npm ci
 
       - name: Publish to npm
-        # TODO: Add support for main and beta: `github.ref == 'main' || github.ref_name == 'beta'` and remove --dry-run
-        if: ${{ success() }}
         run: |
           npm run semantic-release -- --dry-run
         env:
@@ -188,7 +191,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Update website
-        if: ${{ success() && github.ref == 'main' }}
+        if: ${{ github.ref == 'main' }}
         run: |
           npm run publish-website
         env:
