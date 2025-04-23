@@ -71,7 +71,7 @@ jobs:
       fail-fast: true
       matrix:
         # This is a comma-separated list of Karma launchers
-        karma-launcher: ${{ fromJSON(format('[{0}]', 'ChromeHeadlessNoSandbox,FirefoxHeadless')) }}
+        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless"')) }}
 
     steps:
       - uses: actions/checkout@v4
