@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # Most pipelines finish in under 15 minutes.
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     strategy:
       fail-fast: false
