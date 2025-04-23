@@ -169,7 +169,7 @@ jobs:
     name: Publish
     needs: test-in-browser
     runs-on: ubuntu-latest
-    if: ${{ success() && ( github.ref == 'main' || github.ref_name == 'beta')  }}
+    if: ${{ github.ref == 'main' || github.ref_name == 'beta' }}
 
     steps:
       - uses: actions/checkout@v4
