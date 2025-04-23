@@ -1,6 +1,6 @@
-// const comment = require('github-comment')
-const table = require('markdown-table')
-const fetch = require('simple-get')
+// import comment from 'github-comment'
+import table from 'markdown-table'
+import fetch from 'simple-get'
 
 let commit =
   process.env.TRAVIS_PULL_REQUEST_SHA ||
@@ -143,4 +143,4 @@ function postComment(message) {
   }
 }
 
-module.exports = CommentReporter
+export default CommentReporter

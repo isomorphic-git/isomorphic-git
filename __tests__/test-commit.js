@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const {
+import {
   Errors,
   readCommit,
   commit,
@@ -9,9 +9,9 @@ const {
   resolveRef,
   init,
   add,
-} = require('isomorphic-git')
+} from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('commit', () => {
   it('prevent commit if index has unmerged paths', async () => {
@@ -279,10 +279,10 @@ describe('commit', () => {
 
   it('create signed commit', async () => {
     // Setup
-    const { pgp } = require('@isomorphic-git/pgp-plugin')
+    const { pgp } = await import('@isomorphic-git/pgp-plugin')
     const { fs, gitdir } = await makeFixture('test-commit')
     // Test
-    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
+    const { privateKey, publicKey } = await import('./__fixtures__/pgp-keys.js')
     const oid = await commit({
       fs,
       gitdir,

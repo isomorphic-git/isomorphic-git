@@ -1,7 +1,7 @@
-const join = require('path').join
+import { join } from 'path'
 
-const decompress = require('decompress')
-const rmrf = require('rimraf')
+import decompress from 'decompress'
+import rmrf from 'rimraf'
 
 const dest = 'website/static/js/isomorphic-git'
 

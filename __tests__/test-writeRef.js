@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { writeRef, resolveRef, currentBranch } = require('isomorphic-git')
+import { writeRef, resolveRef, currentBranch } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('writeRef', () => {
   it('writes a tag ref to HEAD', async () => {

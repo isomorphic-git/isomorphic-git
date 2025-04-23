@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const git = require('isomorphic-git')
+import git from 'isomorphic-git'
 
 describe('exports', () => {
   it('exposes only the intended API functions', async () => {
@@ -20,7 +20,6 @@ describe('exports', () => {
         "clone",
         "commit",
         "currentBranch",
-        "default",
         "deleteBranch",
         "deleteRef",
         "deleteRemote",

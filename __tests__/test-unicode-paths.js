@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const {
+import {
   init,
   add,
   remove,
@@ -10,9 +10,9 @@ const {
   listFiles,
   readCommit,
   readTree,
-} = require('isomorphic-git')
+} from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('unicode filepath support', () => {
   it('write/read index 日本語', async () => {

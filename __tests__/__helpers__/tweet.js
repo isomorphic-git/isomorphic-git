@@ -1,6 +1,6 @@
 #!/usr/bin/env node
+import TweetTweet from 'tweet-tweet'
 var message = process.argv.slice(2).join(' ')
-var TweetTweet = require('tweet-tweet')
 
 console.log('Tweeting:', '"' + message + '"')
 

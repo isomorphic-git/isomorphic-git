@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const {
+import {
   collect,
   parseRefsAdResponse,
   parseUploadPackResponse,
@@ -7,8 +7,8 @@ const {
   writeRefsAdResponse,
   writeUploadPackRequest,
   Errors,
-} = require('isomorphic-git/internal-apis')
-// const stream = require('stream')
+} from 'isomorphic-git/internal-apis'
+// import stream from 'stream'
 
 /*
 A diagram might be helpful.

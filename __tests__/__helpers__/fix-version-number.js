@@ -1,7 +1,7 @@
 #! /usr/bin/env node
-var replace = require('replace-in-file')
+import replace from 'replace-in-file'
 
-var pkg = require('../../package.json')
+import * as pkg from '../../package.json'
 var options = {
   files: ['src/**/*.js'],
   from: /0\.0\.0-development/g,

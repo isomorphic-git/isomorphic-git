@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { uploadPack, collect } = require('isomorphic-git/internal-apis')
+import { uploadPack, collect } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('uploadPack', () => {
   it('advertiseRefs: true', async () => {
