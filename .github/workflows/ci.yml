@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-  
+
       - name: Run lint
         run: |
           npx nps lint
@@ -140,8 +140,8 @@ jobs:
           name: test-results-${{ matrix.karma-launcher }}
           path: junit/*.xml
 
-  publish:
-    name: Publish
+  publish-test-results:
+    name: Publish Test Results
     needs: test-in-browser
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
@@ -159,6 +159,24 @@ jobs:
 
           # The Azure Pipeline test results combines all test results.
           echo TODO
+
+  publish-artifacts:
+    name: Publish
+    needs: test-in-browser
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Publish to npm
         # TODO: Add support for main and beta: `github.ref == 'main' || github.ref_name == 'beta'` and remove --dry-run
@@ -178,4 +196,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  
