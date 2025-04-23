@@ -137,7 +137,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ inputs.karma-launcher }}
+          name: test-results-${{ matrix.karma-launcher }}
           path: junit/*.xml
 
 # TODO:
