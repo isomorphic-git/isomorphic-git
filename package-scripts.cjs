@@ -146,7 +146,7 @@ module.exports = {
       jest: `jest --ci --coverage`,
       karma: process.env.CI
         ? retry3(`cross-env NODE_OPTIONS=${NODE_OPTIONS} karma start ./karma.conf.cjs --single-run`)
-        : 'cross-env NODE_OPTIONS=${NODE_OPTIONS} karma start ./karma.conf.cjs --single-run -log-level debug',
+        : `cross-env NODE_OPTIONS=${NODE_OPTIONS} karma start ./karma.conf.cjs --single-run -log-level debug`,
       karmore: 'cross-env TEST_NO_BROWSERS=1 karma start --no-single-run',
     },
     prepublish: {
