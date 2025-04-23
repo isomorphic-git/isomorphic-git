@@ -27,7 +27,6 @@ jobs:
         run: |
           # Run eslint and tsc before the build.
           npx nps \
-            build.typings \
             test.typecheck \
             lint
 
@@ -36,6 +35,7 @@ jobs:
           # Run the subset of the `build` necessary to run the tests.
           npx nps \
             build.rollup \
+            build.typings \
             build.webpack \
             build.indexjson \
             build.treeshake \
