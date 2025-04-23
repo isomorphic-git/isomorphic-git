@@ -25,10 +25,7 @@ jobs:
   
       - name: Run lint
         run: |
-          # Run eslint and tsc before the build.
-          npx nps \
-            test.typecheck \
-            lint
+          npx nps lint
 
       - name: Run build
         run: |
@@ -43,7 +40,9 @@ jobs:
 
       - name: Run tests (CLI)
         run: |
+          # `test.typecheck` must be run after `build.rollup` and `build.typings`
           npx nps \
+            test.typecheck \
             test.setup \
             test.jest
 
