@@ -37,6 +37,8 @@ jobs:
             build.indexjson \
             build.treeshake \
             build.size
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
 
       - name: Run tests (CLI)
         run: |
@@ -46,19 +48,42 @@ jobs:
             test.setup \
             test.jest
 
-# TODO:
-#       - name: Save test results
-#       - name: Save code coverage
+      - name: Save test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-jest
+          path: junit/*.xml
+
+      # TODO: Switch from "Save" to "Publish"
+      - name: Save code coverage
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-results
+          path: coverage/
 
       - name: Build artifacts
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         run: |
           # Run the subset of the `test` necessary to test from the CLI.
           npx nps \
             build.docs \
             build.pack
 
-#       - name: Save npm-tarball.tgz
-#       - name: Save index.umd.min.js
+      - name: Save npm-tarball.tgz
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-tarball.tgz
+          path: isomorphic-git-0.0.0-development.tgz
+
+      - name: Save index.umd.min.js
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: index.umd.min.js
+          path: index.umd.min.js
 
   test-in-browser:
     name: Test (${{ matrix.karma-launcher }})
@@ -108,9 +133,12 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           TEST_BROWSERS: ${{ matrix.karma-launcher }}
 
-# TODO:
-#       - name: 'Save test results'
-#       - name: 'Save code coverage'
+      - name: Save test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ inputs.karma-launcher }}
+          path: junit/*.xml
 
 # TODO:
   publish:
@@ -119,10 +147,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download test results
+        if: ${{ !cancelled() }}
+        uses: actions/download-artifact@v4
+
+      - name: Publish test results
+        if: ${{ !cancelled() }}
+        run: |
+          # Display all artifacts
+          ls -R
+
+          # The Azure Pipeline test results combines all test results.
+          echo TODO
+
       - name: Publish to npm
+        # TODO: Add support for main and beta: `github.ref == 'main' || github.ref_name == 'beta'` and remove --dry-run
+        if: ${{ success() }}
         run: |
-          echo TODO
-  
+          npm run semantic-release -- --dry-run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+
       - name: Update website
+        if: ${{ success() && github.ref == 'main' }}
         run: |
-          echo TODO
+          npm run publish-website
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  
