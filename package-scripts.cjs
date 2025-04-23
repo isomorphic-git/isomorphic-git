@@ -111,25 +111,15 @@ module.exports = {
       stop: `cross-env GIT_HTTP_MOCK_SERVER_PORT=8888 GIT_HTTP_MOCK_SERVER_ROOT=__tests__/__fixtures__ git-http-mock-server stop`,
     },
     test: {
-      default: process.env.CI
-        ? series.nps(
-          'lint',
-          'build',
-          'test.typecheck',
-          'test.setup',
-          'test.jest',
-          'test.karma',
-          'test.teardown'
-        )
-        : series.nps(
-          'lint',
-          'build',
-          'test.typecheck',
-          'test.setup',
-          'test.jest',
-          'test.karma',
-          'test.teardown'
-        ),
+      default: series.nps(
+        'lint',
+        'build',
+        'test.typecheck',
+        'test.setup',
+        'test.jest',
+        'test.karma',
+        'test.teardown'
+      ),
       typecheck: 'tsc -p tsconfig.json',
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
