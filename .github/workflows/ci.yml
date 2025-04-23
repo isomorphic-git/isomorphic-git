@@ -3,26 +3,13 @@ name: Build
 on:
   pull_request:
   workflow_dispatch:
-    inputs:
-      node-version:
-        description: Comma-separated list of Node.js versions
-        required: true
-        default: '14' # Changes to this value must also be made to the defaults in jobs.build.strategy.matrix.node-version
 
 jobs:
   build:
-    name: Node.js v${{ matrix.node-version }}
+    name: Build (Node.js v14)
     runs-on: ubuntu-latest
 
-    # Most pipelines finish in under 15 minutes. 30 minutes should be more than enough.
-    # See https://dev.azure.com/isomorphic-git/isomorphic-git/_pipeline/analytics/duration.
-    timeout-minutes: 60
-
-    strategy:
-      fail-fast: true
-      matrix:
-        # Use the Node.js versions from workflow_dispatch input or fallback to default values
-        node-version: ${{ fromJSON(format('[{0}]', inputs.node-version || '14')) }}
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -30,29 +17,113 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 14
           cache: npm
 
       - name: Install dependencies
         run: npm ci
   
-      - name: Run tests
+      - name: Run lint
         run: |
-          # Use X Virtual Frame Buffer (xvfb) to run headless in CI
-          xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npm test
+          # Run eslint and tsc before the build.
+          npx nps \
+            build.typings \
+            test.typecheck \
+            lint
+
+      - name: Run build
+        run: |
+          # Run the subset of the `build` necessary to run the tests.
+          npx nps \
+            build.rollup \
+            build.webpack \
+            build.indexjson \
+            build.treeshake \
+            build.size
+
+      - name: Run tests (CLI)
+        run: |
+          npx nps \
+            test.setup \
+            test.jest
+
+# TODO:
+#       - name: Save test results
+#       - name: Save code coverage
+
+      - name: Build artifacts
+        run: |
+          # Run the subset of the `test` necessary to test from the CLI.
+          npx nps \
+            build.docs \
+            build.pack
+
+#       - name: Save npm-tarball.tgz
+#       - name: Save index.umd.min.js
+
+  test-in-browser:
+    name: Test (Karma ${{ matrix.karma-launcher }})
+    needs: build
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: true
+      matrix:
+        # This is a comma-separated list of Karma launchers
+        karma-launcher: ${{ fromJSON(format('[{0}]', 'ChromeHeadlessNoSandbox,FirefoxHeadless')) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build
+        run: |
+          # Run the subset of the `build` necessary to run the tests.
+          npx nps \
+            build.rollup \
+            build.webpack \
+            build.indexjson \
+            build.treeshake
+
+      - name: Run tests (${{ matrix.karma-launcher }})
+        run: |
+          # Run the subset of the `test` necessary to test from the browser.
+          # Use X Virtual Frame Buffer (xvfb) to run the browser with no display (headless).
+          xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npx nps \
+            test.setup \
+            test.karma
         env:
           BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
           BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
-          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome'
+          TEST_BROWSERS: ${{ matrix.karma-launcher }}
 
-      # TODO:
-      #
-      # - name: 'Save test results'
-      # - name: 'Save code coverage'
-      # - name: 'Save npm-tarball.tgz'
-      # - name: 'Save index.umd.min.js'
-      # - name: 'Publish to npm'
-      # - name: 'Update website'
+# TODO:
+#       - name: 'Save test results'
+#       - name: 'Save code coverage'
+
+# TODO:
+  publish:
+    name: Publish
+    needs: test-in-browser
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish to npm
+        run: |
+          echo TODO
+  
+      - name: Update website
+        run: |
+          echo TODO
