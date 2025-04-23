@@ -27,8 +27,8 @@ const timeout5 = timeout(5)
 // To use Webpack v4 with Node >= 17 we must use set NODE_OPTIONS=--openssl-legacy-provider.
 const NODE_MAJOR_VERSION = Number(process.versions.node.split('.')[0])
 let NODE_OPTIONS = process.env.NODE_OPTIONS || '';
-if (NODE_MAJOR_VERSION >= 17) {
-  NODE_OPTIONS += `${process.env.NODE_OPTIONS ? ' ' : ''}--openssl-legacy-provider`;
+if (NODE_MAJOR_VERSION >= 17 && !NODE_OPTIONS.includes('--openssl-legacy-provider')) {
+  NODE_OPTIONS += `${NODE_OPTIONS ? ' ' : ''}--openssl-legacy-provider`;
 }
 
 module.exports = {
