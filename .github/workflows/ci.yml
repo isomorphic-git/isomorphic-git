@@ -61,7 +61,7 @@ jobs:
 #       - name: Save index.umd.min.js
 
   test-in-browser:
-    name: Test (Karma ${{ matrix.karma-launcher }})
+    name: Test (${{ matrix.karma-launcher }})
     needs: build
     runs-on: ubuntu-latest
 
@@ -71,7 +71,7 @@ jobs:
       fail-fast: true
       matrix:
         # This is a comma-separated list of Karma launchers
-        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless"')) }}
+        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","sl_edge","sl_safari","sl_ios_safari","bs_android_chrome"')) }}
 
     steps:
       - uses: actions/checkout@v4
