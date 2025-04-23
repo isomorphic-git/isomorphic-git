@@ -73,8 +73,6 @@ jobs:
         env:
           GH_TOKEN: $(GITHUB_TOKEN)
           NPM_TOKEN: $(Npm.Token)
-          TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
-          TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
 
       - script: npm run publish-website
         displayName: 'Update website'
