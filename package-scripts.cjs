@@ -21,6 +21,9 @@ const optional = cmd =>
 const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
 const timeout5 = timeout(5)
 
+// Detect when running in the Azure Pipeline environment
+const onAzurePipelines = process.env.SYSTEM_COLLECTIONURI !== undefined
+
 module.exports = {
   scripts: {
     clean: {
@@ -68,9 +71,11 @@ module.exports = {
           `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}' ` +
           `CI_REPO_OWNER='isomorphic-git' ` +
           `CI_REPO_NAME='isomorphic-git' ` +
-          `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
-          `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
-          `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}' ` +
+          (onAzurePipelines
+          ? `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
+            `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
+            `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}' `
+          : '') +
           `bundlewatch`
         )
         : optional(`cross-env bundlewatch`),
