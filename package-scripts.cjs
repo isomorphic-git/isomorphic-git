@@ -69,10 +69,10 @@ module.exports = {
         ? optional(
           `cross-env ` +
           `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}' ` +
-          `CI_REPO_OWNER='isomorphic-git' ` +
-          `CI_REPO_NAME='isomorphic-git' ` +
           (onAzurePipelines
-          ? `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
+          ? `CI_REPO_OWNER='isomorphic-git' ` +
+            `CI_REPO_NAME='isomorphic-git' ` +
+            `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
             `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
             `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}' `
           : '') +
