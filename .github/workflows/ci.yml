@@ -185,7 +185,7 @@ jobs:
 
       - name: Publish to npm
         run: |
-          npm run semantic-release -- --dry-run
+          npm run semantic-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
