@@ -1,4 +1,5 @@
 import * as path from 'path'
+import * as nodeFs from 'fs'
 import { fileURLToPath } from 'url'
 
 import { FileSystem } from 'isomorphic-git/internal-apis'
@@ -6,7 +7,7 @@ import { FileSystem } from 'isomorphic-git/internal-apis'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export async function makeNodeFixture(fixture) {
-  const _fs = Object.assign({}, await import('fs'))
+  const _fs = Object.assign({}, nodeFs)
 
   const fs = new FileSystem(_fs)
 
