@@ -1,5 +1,5 @@
-import * as path from 'path'
 import * as nodeFs from 'fs'
+import * as path from 'path'
 import { fileURLToPath } from 'url'
 
 import { FileSystem } from 'isomorphic-git/internal-apis'
