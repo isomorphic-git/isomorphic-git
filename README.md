@@ -183,6 +183,7 @@ unless there is a major version bump.
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
 - [listNotes](https://isomorphic-git.github.io/docs/listNotes.html)
+- [listRefs](https://isomorphic-git.github.io/docs/listRefs.html)
 - [listRemotes](https://isomorphic-git.github.io/docs/listRemotes.html)
 - [listServerRefs](https://isomorphic-git.github.io/docs/listServerRefs.html)
 - [listTags](https://isomorphic-git.github.io/docs/listTags.html)
