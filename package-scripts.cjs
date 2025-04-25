@@ -21,8 +21,47 @@ const optional = cmd =>
 const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
 const timeout5 = timeout(5)
 
-// Detect when running in the Azure Pipeline environment
-const onAzurePipelines = process.env.SYSTEM_COLLECTIONURI !== undefined
+/**
+ * Returns the environment variables to configure bundlewatch for the current CI provider.
+ * @returns {string}
+ */
+const bundlewatchEnvironmentVariables = () => {
+  const options = [
+    `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}'`,
+    `CI_REPO_OWNER='isomorphic-git'`,
+    `CI_REPO_NAME='isomorphic-git'`,
+  ]
+
+  // Azure DevOps Pipeline is not detected by bundlewatch (which uses ci-env).
+  if (process.env.SYSTEM_COLLECTIONURI !== undefined) {
+    options.push(
+      `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}'`,
+      `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}'`,
+      `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}'`
+    )
+  }
+
+  // GitHub is not detected well using bundlewatch@0.2.5.
+  else if (process.env.GITHUB_SHA) {
+    options.push(`CI_COMMIT_SHA='${process.env.GITHUB_SHA}'`)
+
+    // Get the current and base branch for pull requests
+    if (process.env.GITHUB_EVENT_NAME === 'pull_request') {
+      options.push(
+        `CI_BRANCH='${process.env.GITHUB_HEAD_REF}'`,
+        `CI_BRANCH_BASE='${process.env.GITHUB_BASE_REF}'`
+      )
+    }
+    // Otherwise, get the current branch. This handles push and workflow_dispatch events.
+    // This does not handle tags (refs/tags/<tag_name>).
+    else if (process.env.GITHUB_REF.startsWith('refs/heads/')) {
+      const branch = process.env.GITHUB_REF.replace('refs/heads/')
+      options.push(`CI_BRANCH='${branch}'`)
+    }
+  }
+
+  return options.join(' ')
+}
 
 module.exports = {
   scripts: {
@@ -66,18 +105,7 @@ module.exports = {
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
       size: process.env.CI
-        ? optional(
-          `cross-env ` +
-          `BUNDLEWATCH_GITHUB_TOKEN='${process.env.BUNDLEWATCH_GITHUB_TOKEN}' ` +
-          (onAzurePipelines
-          ? `CI_REPO_OWNER='isomorphic-git' ` +
-            `CI_REPO_NAME='isomorphic-git' ` +
-            `CI_COMMIT_SHA='${process.env.TRAVIS_PULL_REQUEST_SHA}' ` +
-            `CI_BRANCH='${process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH}' ` +
-            `CI_BRANCH_BASE='${process.env.SYSTEM_PULLREQUEST_TARGETBRANCH}' `
-          : '') +
-          `bundlewatch`
-        )
+        ? optional(`cross-env ${bundlewatchEnvironmentVariables()} bundlewatch`)
         : optional(`cross-env bundlewatch`),
       pack: 'npm pack',
     },
