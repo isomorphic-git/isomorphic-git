@@ -1,0 +1,199 @@
+name: Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (Node.js v14)
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: |
+          npx nps lint
+
+      - name: Run build
+        run: |
+          # Run the subset of the `build` necessary to run the tests.
+          npx nps \
+            build.rollup \
+            build.typings \
+            build.webpack \
+            build.indexjson \
+            build.treeshake \
+            build.size
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+
+      - name: Run tests (CLI)
+        run: |
+          # `test.typecheck` must be run after `build.rollup` and `build.typings`
+          npx nps \
+            test.typecheck \
+            test.setup \
+            test.jest
+
+      - name: Save test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-jest
+          path: junit/*.xml
+
+      # Problem: GitHub does not support Code Coverage reports like Azure Pipelines.
+      # TODO:    Update the workflow to "Publish code coverage" somewhere.
+
+      - name: Save code coverage
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-results
+          path: coverage/
+
+      - name: Build artifacts
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        run: |
+          # Run the subset of the `test` necessary to test from the CLI.
+          npx nps \
+            build.docs \
+            build.pack
+
+      - name: Save npm-tarball.tgz
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-tarball.tgz
+          path: isomorphic-git-0.0.0-development.tgz
+
+      - name: Save index.umd.min.js
+        if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: index.umd.min.js
+          path: index.umd.min.js
+
+  test-in-browser:
+    name: Test (${{ matrix.karma-launcher }})
+    needs: build
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # This is a comma-separated list of Karma launchers
+        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","sl_edge","sl_safari","sl_ios_safari","bs_android_chrome"')) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build
+        run: |
+          # Run the subset of the `build` necessary to run the tests.
+          npx nps \
+            build.rollup \
+            build.webpack \
+            build.indexjson \
+            build.treeshake
+
+      - name: Run tests (${{ matrix.karma-launcher }})
+        run: |
+          # Run the subset of the `test` necessary to test from the browser.
+          # Use X Virtual Frame Buffer (xvfb) to run the browser with no display (headless).
+          xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npx nps \
+            test.setup \
+            test.karma
+        env:
+          BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+          BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          TEST_BROWSERS: ${{ matrix.karma-launcher }}
+
+      - name: Save test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.karma-launcher }}
+          path: junit/*.xml
+
+  publish-test-results:
+    name: Publish Test Results
+    needs: test-in-browser
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+
+    steps:
+      - name: Download test results
+        if: ${{ !cancelled() }}
+        uses: actions/download-artifact@v4
+
+
+      # Problem: GitHub does not support Test Results reports like Azure Pipelines.
+      # TODO:    Update the workflow to combine and "Publish test results" somewhere.
+
+      - name: Publish test results
+        if: ${{ !cancelled() }}
+        run: |
+          # List the test results
+          echo test-results-*/*.xml
+
+          # TODO: Combine and publish the test results
+
+  publish-artifacts:
+    name: Publish
+    needs: test-in-browser
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'main' || github.ref_name == 'beta' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to npm
+        run: |
+          npm run semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Update website
+        if: ${{ github.ref == 'main' }}
+        run: |
+          npm run publish-website
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
