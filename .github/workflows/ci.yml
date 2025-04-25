@@ -22,6 +22,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+          PUPPETEER_SKIP_DOWNLOAD: true
 
       - name: Run lint
         run: |
@@ -73,6 +76,11 @@ jobs:
             build.docs \
             build.pack
 
+          # Warn when there are uncommitted changes to documentation
+          if ! git diff --quiet --exit-code; then
+            echo "::warning::There are uncommitted changes to the documentation. Please run `nps build.docs` and commit the changes."
+          fi
+
       - name: Save npm-tarball.tgz
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         uses: actions/upload-artifact@v4
@@ -111,6 +119,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          # Puppeteer is only used to install Chromium and get the executable path from CHROME_BIN.
+          # This is only required when running the karma-chrome-launcher.
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: ${{ (matrix.karma-launcher == 'ChromeHeadlessNoSandbox') && 'true' || 'false' }}
+          PUPPETEER_SKIP_DOWNLOAD: ${{ (matrix.karma-launcher == 'ChromeHeadlessNoSandbox') && 'true' || 'false' }}  
 
       - name: Run build
         run: |
@@ -148,11 +161,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
 
+    timeout-minutes: 5
+
     steps:
       - name: Download test results
         if: ${{ !cancelled() }}
         uses: actions/download-artifact@v4
-
 
       # Problem: GitHub does not support Test Results reports like Azure Pipelines.
       # TODO:    Update the workflow to combine and "Publish test results" somewhere.
@@ -171,6 +185,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'main' || github.ref_name == 'beta' }}
 
+    timeout-minutes: 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -182,6 +198,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+          PUPPETEER_SKIP_DOWNLOAD: true  
 
       - name: Publish to npm
         run: |
