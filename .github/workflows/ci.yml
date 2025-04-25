@@ -83,7 +83,7 @@ jobs:
 
           # Warn when there are uncommitted changes to documentation
           if ! git diff --quiet --exit-code; then
-            echo "::warning::There are uncommitted changes to the documentation. Please run `nps build.docs` and commit the changes."
+            echo "::warning title=Uncommitted Changes to Documentation::There are uncommitted changes to the documentation. Please run \`nps build.docs\` and commit the changes."
           fi
 
       - name: Save npm-tarball.tgz
