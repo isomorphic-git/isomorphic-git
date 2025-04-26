@@ -128,8 +128,8 @@ jobs:
         env:
           # Puppeteer is only used to install Chromium and get the executable path from CHROME_BIN.
           # This is only required when running the karma-chrome-launcher.
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: ${{ (matrix.karma-launcher != 'ChromeHeadlessNoSandbox') && 'true' || 'false' }}
-          PUPPETEER_SKIP_DOWNLOAD: ${{ (matrix.karma-launcher != 'ChromeHeadlessNoSandbox') && 'true' || 'false' }}
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: ${{ (matrix.karma-launcher == 'ChromeHeadlessNoSandbox') && '' || 'true' }}
+          PUPPETEER_SKIP_DOWNLOAD: ${{ (matrix.karma-launcher == 'ChromeHeadlessNoSandbox') && '' || 'true' }}
 
       - name: Run build
         run: |
