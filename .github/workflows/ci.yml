@@ -105,7 +105,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    timeout-minutes: 15
+    # The BrowserStack test running Android 10 on a Pixel 4 timed out after 15 minutes.
+    timeout-minutes: 20
 
     strategy:
       fail-fast: false
