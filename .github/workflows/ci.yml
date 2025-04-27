@@ -4,6 +4,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Cancel in-progress runs for the current workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build (Node.js v14)
@@ -22,6 +27,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+          PUPPETEER_SKIP_DOWNLOAD: true
 
       - name: Run lint
         run: |
@@ -73,6 +81,11 @@ jobs:
             build.docs \
             build.pack
 
+          # Warn when there are uncommitted changes to documentation
+          if ! git diff --quiet --exit-code; then
+            echo "::warning title=Uncommitted Changes to Documentation::There are uncommitted changes to the documentation. Please run \`nps build.docs\` and commit the changes."
+          fi
+
       - name: Save npm-tarball.tgz
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         uses: actions/upload-artifact@v4
@@ -92,7 +105,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    timeout-minutes: 15
+    # The BrowserStack test running Android 10 on a Pixel 4 timed out after 15 minutes.
+    timeout-minutes: 20
 
     strategy:
       fail-fast: false
@@ -111,6 +125,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          # Puppeteer is only used to install Chromium and get the executable path from CHROME_BIN.
+          # This is only required when running the karma-chrome-launcher.
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: ${{ (matrix.karma-launcher == 'ChromeHeadlessNoSandbox') && '' || 'true' }}
+          PUPPETEER_SKIP_DOWNLOAD: ${{ (matrix.karma-launcher == 'ChromeHeadlessNoSandbox') && '' || 'true' }}
 
       - name: Run build
         run: |
@@ -148,11 +167,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
 
+    timeout-minutes: 5
+
     steps:
       - name: Download test results
         if: ${{ !cancelled() }}
         uses: actions/download-artifact@v4
-
 
       # Problem: GitHub does not support Test Results reports like Azure Pipelines.
       # TODO:    Update the workflow to combine and "Publish test results" somewhere.
@@ -171,6 +191,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'main' || github.ref_name == 'beta' }}
 
+    timeout-minutes: 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -182,6 +204,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+          PUPPETEER_SKIP_DOWNLOAD: true
 
       - name: Publish to npm
         run: |
