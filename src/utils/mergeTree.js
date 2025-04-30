@@ -80,6 +80,16 @@ export async function mergeTree({
           }
         }
         case 'false-true': {
+          // if directory is deleted in theirs but not in ours we return our directory
+          if (!theirs && (await ours.type()) === 'tree') {
+            return {
+              mode: await ours.mode(),
+              path,
+              oid: await ours.oid(),
+              type: await ours.type(),
+            }
+          }
+
           return theirs
             ? {
                 mode: await theirs.mode(),
@@ -90,6 +100,16 @@ export async function mergeTree({
             : undefined
         }
         case 'true-false': {
+          // if directory is deleted in ours but not in theirs we return their directory
+          if (!ours && (await theirs.type()) === 'tree') {
+            return {
+              mode: await theirs.mode(),
+              path,
+              oid: await theirs.oid(),
+              type: await theirs.type(),
+            }
+          }
+
           return ours
             ? {
                 mode: await ours.mode(),
