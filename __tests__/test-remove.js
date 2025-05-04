@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { remove, listFiles } = require('isomorphic-git')
+import { remove, listFiles } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('remove', () => {
   it('file', async () => {

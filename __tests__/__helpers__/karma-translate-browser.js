@@ -1,4 +1,4 @@
-module.exports = function translateBrowser(fullname) {
+export default function translateBrowser(fullname) {
   if (fullname.startsWith('X ')) {
   } else if (fullname.startsWith('HeadlessChrome')) {
     return 'ChromeHeadlessNoSandbox'

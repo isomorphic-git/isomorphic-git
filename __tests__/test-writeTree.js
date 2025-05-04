@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { writeTree } = require('isomorphic-git')
+import { writeTree } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 // NOTE: These are mostly the `readObject` tests but in reverse
 describe('writeTree', () => {

@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, deleteTag, listTags } = require('isomorphic-git')
+import { Errors, deleteTag, listTags } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('deleteTag', () => {
   it('deletes the latest tag to HEAD', async () => {

@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { readTag } = require('isomorphic-git')
+import { readTag } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('readTag', () => {
   it('annotated tag', async () => {
