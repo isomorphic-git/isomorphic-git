@@ -51,7 +51,7 @@ module.exports = {
         'build.webpack',
         'build.indexjson',
         'build.treeshake',
-        'build.docs',
+//        'build.docs',
         'build.size',
         'build.pack'
       ),
