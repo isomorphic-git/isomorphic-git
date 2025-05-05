@@ -1,11 +1,12 @@
-const { E } = require('../..')
+const { Errors } = require('../..')
 const replace = require('replace-in-file')
 
-const errors = Object.keys(E).map(name => `E.${name}`)
+const errors = Object.keys(Errors).map(name => `E.${name}`)
 const bal = []
 
 ;(async () => {
   for (const error of errors) {
+    // @ts-ignore
     let files = await replace({
       files: ['src/**/*.js'],
       from: error,

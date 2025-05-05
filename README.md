@@ -17,7 +17,7 @@ By providing functionality as individual functions, code bundlers can produce sm
 The project includes type definitions so you can enjoy static type-checking and intelligent code completion in editors like VS Code and [CodeSandbox](https://codesandbox.io).
 
 ## Project status
-The original author of the project ([Billie Hilton](https://github.com/wmhilton)) left the project, but the project is still maintained by two volunteers:
+The original author of the project ([Billie Hilton](https://github.com/billiegoose)) left the project, but the project is still maintained by two volunteers:
 
 * [@jcubic](https://github.com/jcubic) (most active)
 * [@mojavelinux](https://github.com/mojavelinux)
@@ -114,14 +114,14 @@ Unfortunately, due to the same-origin policy by default `isomorphic-git` can onl
 For this purpose [@isomorphic-git/cors-proxy](https://github.com/isomorphic-git/cors-proxy) exists which you can clone or [`npm install`](https://www.npmjs.com/package/@isomorphic-git/cors-proxy).
 For testing or small projects, you can also use [https://cors.isomorphic-git.org](https://cors.isomorphic-git.org) - a free proxy sponsored by [Clever Cloud](https://www.clever-cloud.com/?utm_source=ref&utm_medium=link&utm_campaign=isomorphic-git).
 
-I'm hoping to get CORS headers added to all the major Git hosting platforms eventually, and will list my progress here:
+We hope to get CORS headers added to all the major Git hosting platforms eventually, and will list the progress made here:
 
 | Service             | Supports CORS requests                                                                                                                                                       |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Gogs (self-hosted)  | [✔](https://isomorphic-git.github.io/blog/2018/04/07/gogs-adds-cors-headers-for-isomorphic-git.html)                                                                         |
 | Gitea (self-hosted) | [✔](https://github.com/go-gitea/gitea/pull/5719)                                                                                                                             |
 | Azure DevOps        | [✔](https://github.com/isomorphic-git/isomorphic-git/issues/678#issuecomment-452402740) (Usage Note: requires authentication)                        |
-| Gitlab              | ❌ My [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open! |
+| Gitlab              | ❌ Our [PR](https://gitlab.com/gitlab-org/gitlab-workhorse/merge_requests/219) was rejected, but the [issue](https://gitlab.com/gitlab-org/gitlab/issues/20590) is still open! |
 | Bitbucket           | ❌                                                                                                                                                                            |
 | Github              | ❌                                                                                                                                                                            |
 
@@ -140,7 +140,7 @@ The CLI is more of a lark for quickly testing `isomorphic-git` and isn't really 
 
 ## Supported Git commands
 
-This project follows semantic versioning, so I may continue to make changes to the API but they will always be backwards compatible
+This project follows semantic versioning, so we may continue to make changes to the API but they will always be backwards compatible
 unless there is a major version bump.
 
 ### commands
@@ -183,6 +183,7 @@ unless there is a major version bump.
 - [listBranches](https://isomorphic-git.github.io/docs/listBranches.html)
 - [listFiles](https://isomorphic-git.github.io/docs/listFiles.html)
 - [listNotes](https://isomorphic-git.github.io/docs/listNotes.html)
+- [listRefs](https://isomorphic-git.github.io/docs/listRefs.html)
 - [listRemotes](https://isomorphic-git.github.io/docs/listRemotes.html)
 - [listServerRefs](https://isomorphic-git.github.io/docs/listServerRefs.html)
 - [listTags](https://isomorphic-git.github.io/docs/listTags.html)
@@ -266,7 +267,7 @@ Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions
 
 Isomorphic-git would not have been possible without the pioneering work by
 @creationix and @chrisdickinson. Git is a tricky binary mess, and without
-their examples (and their modules!) I would not have been able to come even
+their examples (and their modules!) we would not have been able to come even
 close to finishing this. They are geniuses ahead of their time.
 
 Cross-browser device testing is provided by:
@@ -356,7 +357,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://www.platformdemos.com/"><img src="https://avatars.githubusercontent.com/u/4261788?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Shane McLaughlin</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=mshanemc" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=mshanemc" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=mshanemc" title="Tests">⚠️</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/seanpoulter"><img src="https://avatars.githubusercontent.com/u/2585460?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Sean Poulter</b></sub></a><br /><a href="#maintenance-seanpoulter" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/seanpoulter"><img src="https://avatars.githubusercontent.com/u/2585460?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Sean Poulter</b></sub></a><br /><a href="#maintenance-seanpoulter" title="Maintenance">🚧</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=seanpoulter" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=seanpoulter" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=seanpoulter" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/araknast"><img src="https://avatars.githubusercontent.com/u/84164531?v=4?s=60" width="60px;" alt=""/><br /><sub><b>araknast</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=araknast" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=araknast" title="Tests">⚠️</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=araknast" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/rraab-dev"><img src="https://avatars.githubusercontent.com/u/53948988?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Rafael Raab</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=rraab-dev" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=rraab-dev" title="Documentation">📖</a></td>
     <td align="center"><a href="https://gitlab.com/CoalZombik/"><img src="https://avatars.githubusercontent.com/u/49895741?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Lukáš Cezner</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=CoalZombik" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=CoalZombik" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=CoalZombik" title="Tests">⚠️</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3ACoalZombik" title="Bug reports">🐛</a></td>
@@ -373,7 +374,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="http://www.codeproject.com/script/Articles/MemberArticles.aspx?amid=62372"><img src="https://avatars.githubusercontent.com/u/865809?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Modesty Zhang</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=modesty" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/amrc-benmorrow"><img src="https://avatars.githubusercontent.com/u/120477944?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Ben Morrow</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=amrc-benmorrow" title="Code">💻</a></td>
   </tr>
-  <tr>    
+  <tr>
     <td align="center"><a href="https://github.com/jayree"><img src="https://avatars.githubusercontent.com/u/14836154?v=4?s=60" width="60px;" alt=""/><br /><sub><b>jayree</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jayree" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/lsegurado"><img src="https://avatars.githubusercontent.com/u/27731047?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Lucas Martin Segurado</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=lsegurado" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Alsegurado" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/limond"><img src="https://avatars.githubusercontent.com/u/1025682?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Leon Kaucher</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=limond" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=limond" title="Tests">⚠️</a></td>
@@ -381,6 +382,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/hhourani27"><img src="https://avatars.githubusercontent.com/u/61935766?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Habib</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hhourani27" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/Vinzent03"><img src="https://avatars.githubusercontent.com/u/63981639?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Vinzent</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=Vinzent03" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/LokiMidgard"><img src="https://avatars.githubusercontent.com/u/389101?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Patrick Kranz</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Tests">⚠️</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/lukecotter"><img src="https://avatars.githubusercontent.com/u/4013877?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Luke Cotter</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=lukecotter" title="Code">💻</a></td>
   </tr>
 </table>
 

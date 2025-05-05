@@ -12,7 +12,7 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=12"
+    "node": ">=14.17"
   },
   "scripts": {
     "start": "nps",
@@ -85,7 +85,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.3.0",
     "browserfs": "2.0.0",
-    "bundlewatch": "^0.3.2",
+    "bundlewatch": "^0.4.1",
     "cross-env": "6.0.0",
     "decompress": "^4.2.0",
     "diff-lines": "1.1.1",
@@ -133,8 +133,7 @@
     "semantic-release": "17.4.7",
     "standard": "13.1.0",
     "timeout-cli": "0.3.2",
-    "tweet-tweet": "1.0.4",
-    "typescript": "3.9.0-dev.20200223",
+    "typescript": "5.7.3",
     "webpack": "4.41.5",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "3.3.7"
