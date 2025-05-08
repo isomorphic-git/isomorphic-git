@@ -1,3 +1,9 @@
+https://golang.org/
+https://en.wikipedia.org/wiki/Go_(programming_language)
+https://github.com/golang/go
+https://resources.github.com/events/
+The Go Programming Language
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/main/website/static/img/isomorphic-git-logo.svg?sanitize=true" alt="" height="150"/>
 </p>
