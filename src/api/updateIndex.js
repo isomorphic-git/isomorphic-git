@@ -5,6 +5,7 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -66,10 +67,11 @@ export async function updateIndex({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
 
     if (remove) {
       return await GitIndexManager.acquire(
-        { fs, gitdir, cache },
+        { fs, gitdir: updatedGitdir, cache },
         async function(index) {
           if (!force) {
             // Check if the file is still present in the working directory
@@ -113,54 +115,55 @@ export async function updateIndex({
       }
     }
 
-    return await GitIndexManager.acquire({ fs, gitdir, cache }, async function(
-      index
-    ) {
-      if (!add && !index.has({ filepath })) {
-        // If the index does not contain the filepath yet and `add` is not set, we should throw
-        throw new NotFoundError(
-          `file at "${filepath}" in index and "add" not set`
-        )
-      }
-
-      let stats
-      if (!oid) {
-        stats = fileStats
-
-        // Write the file to the object database
-        const object = stats.isSymbolicLink()
-          ? await fs.readlink(join(dir, filepath))
-          : await fs.read(join(dir, filepath))
-
-        oid = await _writeObject({
-          fs,
-          gitdir,
-          type: 'blob',
-          format: 'content',
-          object,
-        })
-      } else {
-        // By default we use 0 for the stats of the index file
-        stats = {
-          ctime: new Date(0),
-          mtime: new Date(0),
-          dev: 0,
-          ino: 0,
-          mode,
-          uid: 0,
-          gid: 0,
-          size: 0,
+    return await GitIndexManager.acquire(
+      { fs, gitdir: updatedGitdir, cache },
+      async function(index) {
+        if (!add && !index.has({ filepath })) {
+          // If the index does not contain the filepath yet and `add` is not set, we should throw
+          throw new NotFoundError(
+            `file at "${filepath}" in index and "add" not set`
+          )
         }
+
+        let stats
+        if (!oid) {
+          stats = fileStats
+
+          // Write the file to the object database
+          const object = stats.isSymbolicLink()
+            ? await fs.readlink(join(dir, filepath))
+            : await fs.read(join(dir, filepath))
+
+          oid = await _writeObject({
+            fs,
+            gitdir: updatedGitdir,
+            type: 'blob',
+            format: 'content',
+            object,
+          })
+        } else {
+          // By default we use 0 for the stats of the index file
+          stats = {
+            ctime: new Date(0),
+            mtime: new Date(0),
+            dev: 0,
+            ino: 0,
+            mode,
+            uid: 0,
+            gid: 0,
+            size: 0,
+          }
+        }
+
+        index.insert({
+          filepath,
+          oid: oid,
+          stats,
+        })
+
+        return oid
       }
-
-      index.insert({
-        filepath,
-        oid: oid,
-        stats,
-      })
-
-      return oid
-    })
+    )
   } catch (err) {
     err.caller = 'git.updateIndex'
     throw err

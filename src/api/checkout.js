@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _checkout } from '../commands/checkout.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -86,13 +87,15 @@ export async function checkout({
     assertParameter('gitdir', gitdir)
 
     const ref = _ref || 'HEAD'
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _checkout({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
       onProgress,
       onPostCheckout,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       remote,
       ref,
       filepaths,
