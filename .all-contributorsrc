@@ -785,6 +785,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "gnillev",
+      "name": "Mathias Nisted Velling",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8965094?v=4",
+      "profile": "https://github.com/gnillev",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
