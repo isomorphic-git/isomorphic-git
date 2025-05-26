@@ -1018,4 +1018,121 @@ describe('merge', () => {
     expect(mergeCommit.message).toEqual(commit.message)
     expect(mergeCommit.parent).toEqual(commit.parent)
   })
+  it('merge two branches where ours adds a new file and theirs deletes a file', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'a-merge-b-reference',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'a',
+      theirs: 'b',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'a',
+        depth: 1,
+      })
+    )[0].commit
+
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it('merge two branches where ours deletes a file and theirs adds a new file', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'c-merge-d-reference',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'c',
+      theirs: 'd',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'c',
+        depth: 1,
+      })
+    )[0].commit
+
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it('merge preserves nested directory structure when combining unrelated changes', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'e-merge-f-reference',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'e',
+      theirs: 'f',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'e',
+        depth: 1,
+      })
+    )[0].commit
+
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
 })
