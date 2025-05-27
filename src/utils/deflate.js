@@ -16,7 +16,10 @@ export async function deflate(buffer) {
 async function browserDeflate(buffer) {
   const cs = new CompressionStream('deflate')
   const c = new Blob([buffer]).stream().pipeThrough(cs)
-  return new Uint8Array(await new Response(c).arrayBuffer())
+  return new Response(c)
+    .blob()
+    .then(b => new Response(b).arrayBuffer())
+    .then(ab => new Uint8Array(ab))
 }
 
 function testCompressionStream() {
