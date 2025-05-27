@@ -1,6 +1,6 @@
 #!/usr/bin/env node
+import { execSync } from 'child_process'
 var whitelist = process.argv.slice(2)
-var { execSync } = require('child_process')
 
 var result = execSync('git diff main --name-only', { encoding: 'utf8' })
 

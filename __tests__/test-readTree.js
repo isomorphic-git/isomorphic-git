@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, readTree } = require('isomorphic-git')
+import { Errors, readTree } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('readTree', () => {
   it('read a tree directly', async () => {

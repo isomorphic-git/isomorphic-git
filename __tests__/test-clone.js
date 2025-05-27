@@ -1,16 +1,15 @@
 /* eslint-env node, browser, jasmine */
-import http from 'isomorphic-git/http'
-
-const {
+import {
   Errors,
   checkout,
   clone,
   currentBranch,
   resolveRef,
   getConfig,
-} = require('isomorphic-git')
+} from 'isomorphic-git'
+import http from 'isomorphic-git/http'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -505,7 +504,7 @@ describe('clone', () => {
     it('should allow agent to be used with built-in http plugin for Node.js', async () => {
       const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
       const connectionLog = []
-      const { Agent } = require('https')
+      const { Agent } = await import('https')
       const httpWithAgent = {
         async request({ url, method, headers, body }) {
           const agent = new Agent()

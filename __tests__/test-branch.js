@@ -1,15 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const {
-  Errors,
-  branch,
-  init,
-  currentBranch,
-  listFiles,
-} = require('isomorphic-git')
+import { Errors, branch, init, currentBranch, listFiles } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('branch', () => {
   it('branch', async () => {
