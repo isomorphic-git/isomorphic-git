@@ -32,6 +32,8 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @param {string[]} args.exclude
  * @param {boolean} args.relative
  * @param {Object<string, string>} args.headers
+ * @param {boolean} [args.nonBlocking]
+ * @param {number} [args.batchSize]
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -60,6 +62,8 @@ export async function _clone({
   noCheckout,
   noTags,
   headers,
+  nonBlocking,
+  batchSize = 100,
 }) {
   try {
     await _init({ fs, gitdir })
@@ -104,6 +108,8 @@ export async function _clone({
       ref,
       remote,
       noCheckout,
+      nonBlocking,
+      batchSize,
     })
   } catch (err) {
     // Remove partial local repository, see #1283
