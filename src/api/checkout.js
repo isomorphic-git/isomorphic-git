@@ -26,6 +26,8 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.force = false] - If true, conflicts will be ignored and files will be overwritten regardless of local changes.
  * @param {boolean} [args.track = true] - If false, will not set the remote branch tracking information. Defaults to true.
  * @param {object} [args.cache] - a [cache](cache.md) object
+ * @param {boolean} [args.nonBlocking = false] - If true, will use non-blocking file system operations to allow for better performance in certain environments (For example, in Browsers)
+ * @param {number} [args.batchSize = 100] - If args.nonBlocking is true, batchSize is the number of files to process at a time avoid blocking the executing thread. The default value of 100 is a good starting point.
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -75,6 +77,8 @@ export async function checkout({
   force = false,
   track = true,
   cache = {},
+  nonBlocking = false,
+  batchSize = 100,
 }) {
   try {
     assertParameter('fs', fs)
@@ -97,6 +101,8 @@ export async function checkout({
       dryRun,
       force,
       track,
+      nonBlocking,
+      batchSize,
     })
   } catch (err) {
     err.caller = 'git.checkout'
