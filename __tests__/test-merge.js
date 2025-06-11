@@ -551,7 +551,7 @@ describe('merge', () => {
     const { fs, gitdir, dir } = await makeFixture('test-merge')
     const deletedFile = `${dir}/o.txt`
     // Test
-    const mergeReuslt = await merge({
+    const mergeResult = await merge({
       fs,
       gitdir,
       ours: 'i',
@@ -563,7 +563,7 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
     })
-    expect(mergeReuslt).toBeTruthy()
+    expect(mergeResult).toBeTruthy()
     expect(await fs.exists(deletedFile)).toBeFalsy()
   })
 
