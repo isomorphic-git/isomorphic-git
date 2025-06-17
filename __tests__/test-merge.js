@@ -551,7 +551,7 @@ describe('merge', () => {
     const { fs, gitdir, dir } = await makeFixture('test-merge')
     const deletedFile = `${dir}/o.txt`
     // Test
-    const mergeReuslt = await merge({
+    const mergeResult = await merge({
       fs,
       gitdir,
       ours: 'i',
@@ -563,7 +563,7 @@ describe('merge', () => {
         timezoneOffset: -0,
       },
     })
-    expect(mergeReuslt).toBeTruthy()
+    expect(mergeResult).toBeTruthy()
     expect(await fs.exists(deletedFile)).toBeFalsy()
   })
 
@@ -1126,6 +1126,45 @@ describe('merge', () => {
         fs,
         gitdir,
         ref: 'e',
+        depth: 1,
+      })
+    )[0].commit
+
+    expect(report.tree).toBe(commit.tree)
+    expect(mergeCommit.tree).toEqual(commit.tree)
+    expect(mergeCommit.message).toEqual(commit.message)
+    expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it('merge two branches where both ours and theirs delete the same file', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-merge-file-deletion')
+
+    const commit = (
+      await log({
+        fs,
+        gitdir,
+        depth: 1,
+        ref: 'g-merge-h-reference',
+      })
+    )[0].commit
+    // Test
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'g',
+      theirs: 'h',
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const mergeCommit = (
+      await log({
+        fs,
+        gitdir,
+        ref: 'g',
         depth: 1,
       })
     )[0].commit
