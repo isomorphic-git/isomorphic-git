@@ -23,7 +23,7 @@ describe('huge repo clone and checkout', () => {
       depth: 10,
       ref: branchName,
       singleBranch: true,
-      url: `https://github.com/ARBhosale/dummy-huge-repo.git`,
+      url: `https://github.com/isomorphic-git/dummy-huge-repo.git`,
       corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
       nonBlocking: true,
     })
