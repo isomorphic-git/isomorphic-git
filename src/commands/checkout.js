@@ -187,10 +187,10 @@ export async function _checkout({
         if (method === 'rmdir' || method === 'rmdir-index') {
           const filepath = `${dir}/${fullpath}`
           try {
-            if (method === 'rmdir-index') {
-              index.delete({ filepath: fullpath })
+            if (method === 'rmdir') {
+              await fs.rmdir(filepath)
             }
-            await fs.rmdir(filepath)
+            index.delete({ filepath: fullpath })
             if (onProgress) {
               await onProgress({
                 phase: 'Updating workdir',
@@ -521,7 +521,7 @@ async function analyze({
         case '101': {
           switch (await stage.type()) {
             case 'tree': {
-              return ['rmdir', fullpath]
+              return ['rmdir-index', fullpath]
             }
             case 'blob': {
               // Git checks that the workdir.oid === stage.oid before deleting file
