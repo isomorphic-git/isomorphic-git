@@ -1,9 +1,15 @@
 /* eslint-env node, browser, jasmine */
-const diff3Merge = require('diff3')
-const { Errors, merge, add, resolveRef, log } = require('isomorphic-git')
-const gitCommit = require('isomorphic-git').commit
+import diff3Merge from 'diff3'
+import {
+  Errors,
+  merge,
+  add,
+  resolveRef,
+  log,
+  commit as gitCommit,
+} from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('merge', () => {
   it('prevent merge if index has unmerged paths', async () => {

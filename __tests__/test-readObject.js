@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, readObject } = require('isomorphic-git')
+import { Errors, readObject } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('readObject', () => {
   it('test missing', async () => {

@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, tag, resolveRef } = require('isomorphic-git')
+import { Errors, tag, resolveRef } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('tag', () => {
   it('creates a lightweight tag to HEAD', async () => {

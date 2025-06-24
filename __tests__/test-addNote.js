@@ -1,13 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const {
-  Errors,
-  addNote,
-  readBlob,
-  resolveRef,
-  readTree,
-} = require('isomorphic-git')
+import { Errors, addNote, readBlob, resolveRef, readTree } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('addNote', () => {
   it('to a commit', async () => {

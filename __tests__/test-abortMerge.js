@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const {
+import {
   Errors,
   merge,
   readBlob,
@@ -10,10 +10,10 @@ const {
   TREE,
   WORKDIR,
   walk,
-} = require('isomorphic-git')
-const { GitIndexManager, modified } = require('isomorphic-git/internal-apis')
+} from 'isomorphic-git'
+import { GitIndexManager, modified } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('abortMerge', () => {
   it('write conflicted files to index at different stages', async () => {
