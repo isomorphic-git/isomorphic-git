@@ -123,10 +123,8 @@ export async function mergeTree({
           // Modifications
           if (
             ours &&
-            base &&
             theirs &&
             (await ours.type()) === 'blob' &&
-            (await base.type()) === 'blob' &&
             (await theirs.type()) === 'blob'
           ) {
             return mergeBlobs({
@@ -145,13 +143,18 @@ export async function mergeTree({
                 unmergedFiles.push(filepath)
                 bothModified.push(filepath)
                 if (!abortOnConflict) {
-                  const baseOid = await base.oid()
+                  let baseOid = ''
+                  if (base && (await base.type()) === 'blob') {
+                    baseOid = await base.oid()
+                  }
                   const ourOid = await ours.oid()
                   const theirOid = await theirs.oid()
 
                   index.delete({ filepath })
 
-                  index.insert({ filepath, oid: baseOid, stage: 1 })
+                  if (baseOid) {
+                    index.insert({ filepath, oid: baseOid, stage: 1 })
+                  }
                   index.insert({ filepath, oid: ourOid, stage: 2 })
                   index.insert({ filepath, oid: theirOid, stage: 3 })
                 }
@@ -338,10 +341,16 @@ async function mergeBlobs({
   const type = 'blob'
   // Compute the new mode.
   // Since there are ONLY two valid blob modes ('100755' and '100644') it boils down to this
+  let baseMode = '100755'
+  let baseOid = ''
+  let baseContent = ''
+  if (base && (await base.type()) === 'blob') {
+    baseMode = await base.mode()
+    baseOid = await base.oid()
+    baseContent = Buffer.from(await base.content()).toString('utf8')
+  }
   const mode =
-    (await base.mode()) === (await ours.mode())
-      ? await theirs.mode()
-      : await ours.mode()
+    baseMode === (await ours.mode()) ? await theirs.mode() : await ours.mode()
   // The trivial case: nothing to merge except maybe mode
   if ((await ours.oid()) === (await theirs.oid())) {
     return {
@@ -350,13 +359,13 @@ async function mergeBlobs({
     }
   }
   // if only one side made oid changes, return that side's oid
-  if ((await ours.oid()) === (await base.oid())) {
+  if ((await ours.oid()) === baseOid) {
     return {
       cleanMerge: true,
       mergeResult: { mode, path, oid: await theirs.oid(), type },
     }
   }
-  if ((await theirs.oid()) === (await base.oid())) {
+  if ((await theirs.oid()) === baseOid) {
     return {
       cleanMerge: true,
       mergeResult: { mode, path, oid: await ours.oid(), type },
@@ -364,7 +373,6 @@ async function mergeBlobs({
   }
   // if both sides made changes do a merge
   const ourContent = Buffer.from(await ours.content()).toString('utf8')
-  const baseContent = Buffer.from(await base.content()).toString('utf8')
   const theirContent = Buffer.from(await theirs.content()).toString('utf8')
   const { mergedText, cleanMerge } = await mergeDriver({
     branches: [baseName, ourName, theirName],
