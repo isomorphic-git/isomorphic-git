@@ -1174,4 +1174,109 @@ describe('merge', () => {
     expect(mergeCommit.message).toEqual(commit.message)
     expect(mergeCommit.parent).toEqual(commit.parent)
   })
+  it('merge two branches with unrelated histories where they add 2 files having different name', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // First root commit on 'master'
+    await fs.write(`${dir}/a.txt`, 'hello a')
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Add a.txt',
+      author,
+    })
+
+    // Second root commit on unrelated branch 'other'
+    await fs.write(`${dir}/b.txt`, 'hello b')
+    await add({ fs, dir, gitdir, filepath: 'b.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'other',
+      message: 'Add b.txt',
+      author,
+    })
+
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'master',
+      theirs: 'other',
+      abortOnConflict: false,
+      allowUnrelatedHistories: true,
+      author,
+    })
+
+    expect(report).toBeTruthy()
+    expect(report.mergeCommit).toBeTruthy()
+    const mergeHead = (await log({ fs, gitdir, ref: 'master', depth: 1 }))[0]
+      .commit
+    expect(mergeHead.parent.length).toBe(2)
+  })
+
+  it('merge two branches with unrelated histories where they add 2 files having same name', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // First root commit on master adding same.txt
+    await fs.write(`${dir}/same.txt`, 'content from master')
+    await add({ fs, dir, gitdir, filepath: 'same.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Add same.txt on master',
+      author,
+    })
+
+    // Second unrelated root commit on branch 'other' adding same.txt with different content
+    await fs.write(`${dir}/same.txt`, 'content from other')
+    await add({ fs, dir, gitdir, filepath: 'same.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'other',
+      parent: [],
+      message: 'Add same.txt on other',
+      author,
+    })
+
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'master',
+        theirs: 'other',
+        abortOnConflict: false,
+        allowUnrelatedHistories: true,
+        author,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+    const resultText = await fs.read(`${dir}/same.txt`, 'utf8')
+    expect(resultText).toContain('<<<<<<<')
+  })
 })
