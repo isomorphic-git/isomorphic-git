@@ -120,7 +120,22 @@ export async function mergeTree({
             : undefined
         }
         case 'true-true': {
-          // Modifications
+          // Handle tree-tree merges (directories)
+          if (
+            ours &&
+            theirs &&
+            (await ours.type()) === 'tree' &&
+            (await theirs.type()) === 'tree'
+          ) {
+            return {
+              mode: await ours.mode(),
+              path,
+              oid: await ours.oid(),
+              type: 'tree',
+            }
+          }
+
+          // Modifications - both are blobs
           if (
             ours &&
             theirs &&
