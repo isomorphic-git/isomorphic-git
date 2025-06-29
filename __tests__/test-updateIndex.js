@@ -336,3 +336,441 @@ describe('updateIndex', () => {
     expect(fileStatus).toBe('added')
   })
 })
+
+describe('updateIndex with array', () => {
+  it('should be possible to add files on disk to the index', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await fs.write(path.join(dir, 'changelog.md'), 'Changes')
+    // Test
+    const oids = await updateIndex({
+      fs,
+      dir,
+      add: true,
+      filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog.md' }],
+    })
+    expect(oids).toEqual([
+      'b45ef6fec89518d314f546fd6c3025367b721684',
+      'c38de3d1dcc9d65cfe6ff7c66fdebdefc9a91435',
+    ])
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('added')
+
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('added')
+  })
+
+  it('should be possible to remove files from the index which are not present in the workdir', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await fs.write(path.join(dir, 'changelog.md'), 'Changes')
+    await add({
+      fs,
+      dir,
+      filepath: ['hello.md', 'changelog.md'],
+    })
+    await fs.rm(path.join(dir, 'hello.md'))
+    await fs.rm(path.join(dir, 'changelog.md'))
+    // Test
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('*absent')
+
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('*absent')
+    await updateIndex({
+      fs,
+      dir,
+      remove: true,
+      filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog.md' }],
+    })
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('absent')
+
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('absent')
+  })
+
+  it('should not remove files from index by default if files still exists in workdir', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await fs.write(path.join(dir, 'changelog.md'), 'Changes')
+    await add({
+      fs,
+      dir,
+      filepath: ['hello.md', 'changelog.md'],
+    })
+    // Test
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('added')
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('added')
+
+    await updateIndex({
+      fs,
+      dir,
+      remove: true,
+      filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog.md' }],
+    })
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('added')
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('added')
+  })
+
+  it('should remove files from index which exist on disk if force is used', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await fs.write(path.join(dir, 'changelog.md'), 'Changes')
+    await add({
+      fs,
+      dir,
+      filepath: ['hello.md', 'changelog.md'],
+    })
+    // Test
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('added')
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('added')
+    await updateIndex({
+      fs,
+      dir,
+      remove: true,
+      force: true,
+      filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog.md' }],
+    })
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('*added')
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('*added')
+  })
+
+  it('should be possible to add files from the object database to the index', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    const oid = await writeBlob({
+      fs,
+      dir,
+      blob: Buffer.from('Hello, World!'),
+    })
+
+    const oid2 = await writeBlob({
+      fs,
+      dir,
+      blob: Buffer.from('Changes'),
+    })
+    // Test
+    const updatedOids = await updateIndex({
+      fs,
+      dir,
+      add: true,
+      filepath: [
+        { filepath: 'hello.md', oid },
+        { filepath: 'changelog.md', oid: oid2 },
+      ],
+    })
+    expect(updatedOids).toEqual([oid, oid2])
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('*absent')
+
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('*absent')
+  })
+
+  it('should be possible to update files', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await fs.write(path.join(dir, 'changelog.md'), 'Changes')
+    await add({
+      fs,
+      dir,
+      filepath: ['hello.md', 'changelog.md'],
+    })
+    await fs.write(path.join(dir, 'hello.md'), 'Hello World')
+    await fs.write(path.join(dir, 'changelog.md'), 'Changes.')
+    // Test
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('*added')
+
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('*added')
+    const oids = await updateIndex({
+      fs,
+      dir,
+      filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog.md' }],
+    })
+    expect(oids).toEqual([
+      '5e1c309dae7f45e0f39b1bf3ac3cd9db12e7d689',
+      '8bfdf71f3aac961ebf193a9ac33a92cd315a2f6b',
+    ])
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello.md',
+    })
+    expect(fileStatus).toBe('added')
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('added')
+  })
+
+  it('should throw if we try to update a file without providing `add`', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await fs.write(path.join(dir, 'changelog.md'), 'Changes')
+    // Test
+    let error = null
+    try {
+      await updateIndex({
+        fs,
+        dir,
+        filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog.md' }],
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.updateIndex')
+    error = error.toJSON()
+    delete error.stack
+    expect(error).toMatchInlineSnapshot(`
+      Object {
+        "caller": "git.updateIndex",
+        "code": "NotFoundError",
+        "data": Object {
+          "what": "file at \\"hello.md\\" in index and \\"add\\" not set",
+        },
+        "message": "Could not find file at \\"hello.md\\" in index and \\"add\\" not set.",
+      }
+    `)
+  })
+
+  it('should throw if we try to update a file which does not exist on disk', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    // Test
+    let error = null
+    try {
+      await updateIndex({
+        fs,
+        dir,
+        filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog.md' }],
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.updateIndex')
+    error = error.toJSON()
+    delete error.stack
+    expect(error).toMatchInlineSnapshot(`
+      Object {
+        "caller": "git.updateIndex",
+        "code": "NotFoundError",
+        "data": Object {
+          "what": "file at \\"changelog.md\\" on disk and \\"remove\\" not set",
+        },
+        "message": "Could not find file at \\"changelog.md\\" on disk and \\"remove\\" not set.",
+      }
+    `)
+  })
+
+  it('should throw if we try to add a directory', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'hello.md'), 'Hello, World!')
+    await fs.mkdir(path.join(dir, 'changelog'))
+    // Test
+    let error = null
+    try {
+      await updateIndex({
+        fs,
+        dir,
+        filepath: [{ filepath: 'hello.md' }, { filepath: 'changelog' }],
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.updateIndex')
+    error = error.toJSON()
+    delete error.stack
+    expect(error).toMatchInlineSnapshot(`
+      Object {
+        "caller": "git.updateIndex",
+        "code": "InvalidFilepathError",
+        "data": Object {
+          "reason": "directory",
+        },
+        "message": "\\"filepath\\" should not be a directory.",
+      }
+    `)
+  })
+
+  it('should throw if we try to remove a directory', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'changelog.md'), 'changes')
+    await fs.mkdir(path.join(dir, 'hello-world'))
+    await fs.write(path.join(dir, 'hello-world/a'), 'a')
+    await add({
+      fs,
+      dir,
+      filepath: ['hello-world/a', 'changelog.md'],
+    })
+    // Test
+    let error = null
+    try {
+      await updateIndex({
+        fs,
+        dir,
+        remove: true,
+        filepath: [{ filepath: 'changelog.md' }, { filepath: 'hello-world' }],
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.caller).toEqual('git.updateIndex')
+    error = error.toJSON()
+    delete error.stack
+    expect(error).toMatchInlineSnapshot(`
+      Object {
+        "caller": "git.updateIndex",
+        "code": "InvalidFilepathError",
+        "data": Object {
+          "reason": "directory",
+        },
+        "message": "\\"filepath\\" should not be a directory.",
+      }
+    `)
+  })
+
+  it('should not throw if we force remove directories', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, 'changelog.md'), 'changes')
+    await fs.write(path.join(dir, 'hello-world/a'), 'a')
+    await fs.mkdir(path.join(dir, 'changelogs'))
+    await fs.mkdir(path.join(dir, 'hello-world'))
+    await add({
+      fs,
+      dir,
+      filepath: ['hello-world/a', 'changelog.md'],
+    })
+    // Test
+    let fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello-world/a',
+    })
+    expect(fileStatus).toBe('added')
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('added')
+    await updateIndex({
+      fs,
+      dir,
+      remove: true,
+      force: true,
+      filepath: [{ filepath: 'hello-world' }, { filepath: 'changelogs' }],
+    })
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'hello-world/a',
+    })
+    expect(fileStatus).toBe('added')
+
+    fileStatus = await status({
+      fs,
+      dir,
+      filepath: 'changelog.md',
+    })
+    expect(fileStatus).toBe('added')
+  })
+})
