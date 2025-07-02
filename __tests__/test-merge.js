@@ -1,6 +1,13 @@
 /* eslint-env node, browser, jasmine */
 const diff3Merge = require('diff3')
-const { Errors, merge, add, resolveRef, log } = require('isomorphic-git')
+const {
+  Errors,
+  merge,
+  add,
+  resolveRef,
+  log,
+  statusMatrix,
+} = require('isomorphic-git')
 const gitCommit = require('isomorphic-git').commit
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
@@ -1173,5 +1180,274 @@ describe('merge', () => {
     expect(mergeCommit.tree).toEqual(commit.tree)
     expect(mergeCommit.message).toEqual(commit.message)
     expect(mergeCommit.parent).toEqual(commit.parent)
+  })
+  it('merge two branches with unrelated histories where they add 2 files having different name', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // First root commit on 'master'
+    await fs.write(`${dir}/a.txt`, 'hello a')
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Add a.txt',
+      author,
+    })
+
+    // Second root commit on unrelated branch 'other'
+    await fs.write(`${dir}/b.txt`, 'hello b')
+    await add({ fs, dir, gitdir, filepath: 'b.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'other',
+      message: 'Add b.txt',
+      author,
+    })
+
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'master',
+      theirs: 'other',
+      abortOnConflict: false,
+      allowUnrelatedHistories: true,
+      author,
+    })
+
+    expect(report).toBeTruthy()
+    expect(report.mergeCommit).toBeTruthy()
+    const mergeHead = (await log({ fs, gitdir, ref: 'master', depth: 1 }))[0]
+      .commit
+    expect(mergeHead.parent.length).toBe(2)
+
+    const matrix = await statusMatrix({ fs, dir, gitdir })
+    const trackedFiles = matrix.map(row => row[0])
+    expect(trackedFiles.join()).toEqual(['a.txt', 'b.txt'].join())
+
+    const history = await log({ fs, gitdir, ref: 'master', depth: 3 })
+    const messages = history.map(entry =>
+      entry.commit.message.replace('\n', '')
+    )
+    expect(messages.join()).toEqual(
+      [`Merge branch 'other' into master`, 'Add b.txt', 'Add a.txt'].join()
+    )
+  })
+
+  it('merge two branches with unrelated histories where they add 2 files having same name', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // First root commit on master adding same.txt
+    await fs.write(`${dir}/same.txt`, 'content from master')
+    await add({ fs, dir, gitdir, filepath: 'same.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Add same.txt on master',
+      author,
+    })
+
+    // Second unrelated root commit on branch 'other' adding same.txt with different content
+    await fs.write(`${dir}/same.txt`, 'content from other')
+    await add({ fs, dir, gitdir, filepath: 'same.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'other',
+      parent: [],
+      message: 'Add same.txt on other',
+      author,
+    })
+
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'master',
+        theirs: 'other',
+        abortOnConflict: false,
+        allowUnrelatedHistories: true,
+        author,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+    const resultText = await fs.read(`${dir}/same.txt`, 'utf8')
+    expect(resultText).toContain('<<<<<<<')
+
+    const matrix = await statusMatrix({ fs, dir, gitdir })
+    const trackedFiles = matrix.map(row => row[0])
+    expect(trackedFiles.join()).toEqual(['same.txt'].join())
+
+    const history = await log({ fs, gitdir, ref: 'master', depth: 3 })
+    const messages = history.map(entry =>
+      entry.commit.message.replace('\n', '')
+    )
+    expect(messages.join()).toEqual(['Add same.txt on master'].join())
+  })
+
+  it('merge two branches with unrelated histories where they add files in nested directories', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // First root commit on 'master' with nested directory
+    await fs.mkdir(`${dir}/dir1`)
+    await fs.mkdir(`${dir}/dir1/subdir1`)
+    await fs.write(`${dir}/dir1/subdir1/file1.txt`, 'content from master')
+    await add({ fs, dir, gitdir, filepath: 'dir1/subdir1/file1.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Add file in nested directory on master',
+      author,
+    })
+
+    // Second root commit on unrelated branch 'other' with different nested directory
+    await fs.mkdir(`${dir}/dir2`)
+    await fs.mkdir(`${dir}/dir2/subdir2`)
+    await fs.write(`${dir}/dir2/subdir2/file2.txt`, 'content from other')
+    await add({ fs, dir, gitdir, filepath: 'dir2/subdir2/file2.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'other',
+      message: 'Add file in different nested directory on other',
+      author,
+    })
+
+    const report = await merge({
+      fs,
+      gitdir,
+      ours: 'master',
+      theirs: 'other',
+      abortOnConflict: false,
+      allowUnrelatedHistories: true,
+      author,
+    })
+
+    expect(report).toBeTruthy()
+    expect(report.mergeCommit).toBeTruthy()
+    const mergeHead = (await log({ fs, gitdir, ref: 'master', depth: 1 }))[0]
+      .commit
+    expect(mergeHead.parent.length).toBe(2)
+
+    const matrix = await statusMatrix({ fs, dir, gitdir })
+    const trackedFiles = matrix.map(row => row[0])
+    expect(trackedFiles.join()).toEqual(
+      ['dir1/subdir1/file1.txt', 'dir2/subdir2/file2.txt'].join()
+    )
+
+    const history = await log({ fs, gitdir, ref: 'master', depth: 3 })
+    const messages = history.map(entry =>
+      entry.commit.message.replace('\n', '')
+    )
+    expect(messages.join()).toEqual(
+      [
+        `Merge branch 'other' into master`,
+        'Add file in different nested directory on other',
+        'Add file in nested directory on master',
+      ].join()
+    )
+  })
+
+  it('merge two branches with unrelated histories where they add files with same path in nested directories', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // First root commit on master adding nested file
+    await fs.mkdir(`${dir}/shared`)
+    await fs.mkdir(`${dir}/shared/path`)
+    await fs.write(`${dir}/shared/path/conflict.txt`, 'content from master')
+    await add({ fs, dir, gitdir, filepath: 'shared/path/conflict.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Add nested file on master',
+      author,
+    })
+
+    // Second unrelated root commit on branch 'other' adding same nested file with different content
+    await fs.mkdir(`${dir}/shared`)
+    await fs.mkdir(`${dir}/shared/path`)
+    await fs.write(`${dir}/shared/path/conflict.txt`, 'content from other')
+    await add({ fs, dir, gitdir, filepath: 'shared/path/conflict.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'other',
+      parent: [],
+      message: 'Add nested file on other',
+      author,
+    })
+
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'master',
+        theirs: 'other',
+        abortOnConflict: false,
+        allowUnrelatedHistories: true,
+        author,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+    const resultText = await fs.read(`${dir}/shared/path/conflict.txt`, 'utf8')
+    expect(resultText).toContain('<<<<<<<')
+
+    const matrix = await statusMatrix({ fs, dir, gitdir })
+    const trackedFiles = matrix.map(row => row[0])
+    expect(trackedFiles.join()).toEqual(['shared/path/conflict.txt'].join())
+
+    const history = await log({ fs, gitdir, ref: 'master', depth: 3 })
+    const messages = history.map(entry =>
+      entry.commit.message.replace('\n', '')
+    )
+    expect(messages.join()).toEqual(['Add nested file on master'].join())
   })
 })
