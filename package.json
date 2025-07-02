@@ -3,9 +3,35 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
-  "typings": "./index.d.ts",
+  "typings": "./index.d.cts",
   "main": "./index.cjs",
   "module": "./index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.cts",
+      "default": "./index.cjs"
+    },
+    "./http/node": {
+      "import": {
+        "types": "./http/node/index.d.ts",
+        "default": "./http/node/index.js"
+      },
+      "require": {
+        "types": "./http/node/index.d.cts",
+        "default": "./http/node/index.cjs"
+      }
+    },
+    "./http/web": {
+      "import": {
+        "types": "./http/web/index.d.ts",
+        "default": "./http/web/index.js"
+      },
+      "require": {
+        "types": "./http/web/index.d.cts",
+        "default": "./http/web/index.cjs"
+      }
+    }
+  },
   "unpkg": "./index.umd.min.js",
   "bin": {
     "isogit": "./cli.cjs"
@@ -43,8 +69,9 @@
     "browser-tests.json",
     "http/*",
     "index.cjs",
-    "index.d.ts",
+    "index.d.cts",
     "index.js",
+    "index.d.ts",
     "index.umd.min.js",
     "index.umd.min.d.ts",
     "index.umd.min.js.map",
