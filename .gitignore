@@ -5,8 +5,9 @@
 # Dist
 /http
 /index.cjs
-/index.d.ts
+/index.d.cts
 /index.js
+/index.d.ts
 /index.umd.min.js
 /index.umd.min.d.ts
 /index.umd.min.js.map
