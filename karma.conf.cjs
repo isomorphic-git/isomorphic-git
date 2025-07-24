@@ -105,9 +105,9 @@ module.exports = function (config) {
       bs_android_chrome: {
         base: 'BrowserStack',
         os: 'android',
-        os_version: '10.0',
+        os_version: '11.0',
         browser: 'android',
-        device: 'Google Pixel 4',
+        device: 'Google Pixel 5',
         real_mobile: true,
         captureTimeout: 5 * 60 * 1000, // defaults to 120 ms
         timeout: 1000,                 // defaults to 300 ms
