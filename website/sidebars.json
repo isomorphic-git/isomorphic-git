@@ -1,8 +1,6 @@
 {
   "docs": {
-    "All Commands": [
-      "alphabetic"
-    ],
+    "All Commands": ["alphabetic"],
     "Repository": [
       "init",
       "clone",
@@ -29,15 +27,8 @@
       "onSign",
       "mergeDriver"
     ],
-    "Clients": [
-      "fs",
-      "http"
-    ],
-    "Config": [
-      "setConfig",
-      "getConfig",
-      "getConfigAll"
-    ],
+    "Clients": ["fs", "http"],
+    "Config": ["setConfig", "getConfig", "getConfigAll"],
     "Branches": [
       "currentBranch",
       "branch",
@@ -45,25 +36,9 @@
       "renameBranch",
       "listBranches"
     ],
-    "Tags": [
-      "tag",
-      "annotatedTag",
-      "deleteTag",
-      "listTags"
-    ],
-    "Files": [
-      "add",
-      "remove",
-      "listFiles",
-      "status",
-      "isIgnored"
-    ],
-    "Notes": [
-      "addNote",
-      "readNote",
-      "removeNote",
-      "listNotes"
-    ],
+    "Tags": ["tag", "annotatedTag", "deleteTag", "listTags"],
+    "Files": ["add", "remove", "listFiles", "status", "isIgnored"],
+    "Notes": ["addNote", "readNote", "removeNote", "listNotes"],
     "Remotes": [
       "getRemoteInfo",
       "getRemoteInfo2",
@@ -100,6 +75,16 @@
       "indexPack",
       "packObjects",
       "version"
+    ],
+    "Managers": [
+      "gitConfigManager",
+      "gitIgnoreManager",
+      "gitIndexManager",
+      "gitRefManager",
+      "gitRemoteHTTP",
+      "gitRemoteManager",
+      "gitShallowManager",
+      "gitStashManager"
     ]
   },
   "guide": {
@@ -110,10 +95,6 @@
       "cli",
       "cache"
     ],
-    "More": [
-      "faq",
-      "snippets",
-      "webworker"
-    ]
+    "More": ["faq", "snippets", "webworker"]
   }
 }

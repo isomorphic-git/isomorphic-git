@@ -352,6 +352,38 @@
         "title": "writeTree",
         "sidebar_label": "writeTree"
       },
+      "gitConfigManager": {
+        "title": "gitConfigManager",
+        "sidebar_label": "gitConfigManager"
+      },
+      "gitIgnoreManager": {
+        "title": "gitIgnoreManager",
+        "sidebar_label": "gitIgnoreManager"
+      },
+      "gitIndexManager": {
+        "title": "gitIndexManager",
+        "sidebar_label": "gitIndexManager"
+      },
+      "gitRefManager": {
+        "title": "gitRefManager",
+        "sidebar_label": "gitRefManager"
+      },
+      "gitRemoteHTTP": {
+        "title": "gitRemoteHTTP",
+        "sidebar_label": "gitRemoteHTTP"
+      },
+      "gitRemoteManager": {
+        "title": "gitRemoteManager",
+        "sidebar_label": "gitRemoteManager"
+      },
+      "gitShallowManager": {
+        "title": "gitShallowManager",
+        "sidebar_label": "gitShallowManager"
+      },
+      "gitStashManager": {
+        "title": "gitStashManager",
+        "sidebar_label": "gitStashManager"
+      },
       "version-0.70.7/version-0.70.7-add": {
         "title": "add",
         "sidebar_label": "add"
@@ -1111,6 +1143,38 @@
       "version-1.x/version-1.x-writeTree": {
         "title": "writeTree",
         "sidebar_label": "writeTree"
+      },
+      "version-1.x/version-1.x-gitConfigManager": {
+        "title": "version-1.x/version-1.x-gitConfigManager",
+        "sidebar_label": "gitConfigManager"
+      },
+      "version-1.x/version-1.x-gitIgnoreManager": {
+        "title": "version-1.x/version-1.x-gitIgnoreManager",
+        "sidebar_label": "gitIgnoreManager"
+      },
+      "version-1.x/version-1.x-gitIndexManager": {
+        "title": "version-1.x/version-1.x-gitIndexManager",
+        "sidebar_label": "gitIndexManager"
+      },
+      "version-1.x/version-1.x-gitRefManager": {
+        "title": "version-1.x/version-1.x-gitRefManager",
+        "sidebar_label": "gitRefManager"
+      },
+      "version-1.x/version-1.x-gitRemoteHTTP": {
+        "title": "version-1.x/version-1.x-gitRemoteHTTP",
+        "sidebar_label": "gitRemoteHTTP"
+      },
+      "version-1.x/version-1.x-gitRemoteManager": {
+        "title": "version-1.x/version-1.x-gitRemoteManager",
+        "sidebar_label": "gitRemoteManager"
+      },
+      "version-1.x/version-1.x-gitShallowManager": {
+        "title": "version-1.x/version-1.x-gitShallowManager",
+        "sidebar_label": "gitShallowManager"
+      },
+      "version-1.x/version-1.x-gitStashManager": {
+        "title": "version-1.x/version-1.x-gitStashManager",
+        "sidebar_label": "gitStashManager"
       }
     },
     "links": {
