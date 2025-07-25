@@ -10,6 +10,14 @@ import { acquireLock } from '../utils/walkerToTreeEntryMap'
 import { GitRefManager } from './GitRefManager'
 
 export class GitStashManager {
+  /**
+   * Creates an instance of GitStashManager.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.dir - The working directory.
+   * @param {string} [args.gitdir] - The path to the `.git` directory (defaults to `join(dir, '.git')`).
+   */
   constructor({ fs, dir, gitdir = join(dir, '.git') }) {
     Object.assign(this, {
       fs,
@@ -19,22 +27,48 @@ export class GitStashManager {
     })
   }
 
+  /**
+   * Gets the reference name for the stash.
+   *
+   * @returns {string} - The stash reference name.
+   */
   static get refStash() {
     return 'refs/stash'
   }
 
+  /**
+   * Gets the reference name for the stash reflogs.
+   *
+   * @returns {string} - The stash reflogs reference name.
+   */
   static get refLogsStash() {
     return 'logs/refs/stash'
   }
 
+  /**
+   * Gets the file path for the stash reference.
+   *
+   * @returns {string} - The file path for the stash reference.
+   */
   get refStashPath() {
     return join(this.gitdir, GitStashManager.refStash)
   }
 
+  /**
+   * Gets the file path for the stash reflogs.
+   *
+   * @returns {string} - The file path for the stash reflogs.
+   */
   get refLogsStashPath() {
     return join(this.gitdir, GitStashManager.refLogsStash)
   }
 
+  /**
+   * Retrieves the author information for the stash.
+   *
+   * @returns {Promise<Object>} - The author object.
+   * @throws {MissingNameError} - If the author name is missing.
+   */
   async getAuthor() {
     if (!this._author) {
       this._author = await normalizeAuthorObject({
@@ -47,6 +81,13 @@ export class GitStashManager {
     return this._author
   }
 
+  /**
+   * Gets the SHA of a stash entry by its index.
+   *
+   * @param {number} refIdx - The index of the stash entry.
+   * @param {string[]} [stashEntries] - Optional preloaded stash entries.
+   * @returns {Promise<string|null>} - The SHA of the stash entry or `null` if not found.
+   */
   async getStashSHA(refIdx, stashEntries) {
     if (!(await this.fs.exists(this.refStashPath))) {
       return null
@@ -57,6 +98,15 @@ export class GitStashManager {
     return entries[refIdx].split(' ')[1]
   }
 
+  /**
+   * Writes a stash commit to the repository.
+   *
+   * @param {Object} args
+   * @param {string} args.message - The commit message.
+   * @param {string} args.tree - The tree object ID.
+   * @param {string[]} args.parent - The parent commit object IDs.
+   * @returns {Promise<string>} - The object ID of the written commit.
+   */
   async writeStashCommit({ message, tree, parent }) {
     return _writeCommit({
       fs: this.fs,
@@ -71,6 +121,13 @@ export class GitStashManager {
     })
   }
 
+  /**
+   * Reads a stash commit by its index.
+   *
+   * @param {number} refIdx - The index of the stash entry.
+   * @returns {Promise<Object>} - The stash commit object.
+   * @throws {InvalidRefNameError} - If the index is invalid.
+   */
   async readStashCommit(refIdx) {
     const stashEntries = await this.readStashReflogs({ parsed: false })
     if (refIdx !== 0) {
@@ -97,6 +154,12 @@ export class GitStashManager {
     })
   }
 
+  /**
+   * Writes a stash reference to the repository.
+   *
+   * @param {string} stashCommit - The object ID of the stash commit.
+   * @returns {Promise<void>}
+   */
   async writeStashRef(stashCommit) {
     return GitRefManager.writeRef({
       fs: this.fs,
@@ -106,6 +169,14 @@ export class GitStashManager {
     })
   }
 
+  /**
+   * Writes a reflog entry for a stash commit.
+   *
+   * @param {Object} args
+   * @param {string} args.stashCommit - The object ID of the stash commit.
+   * @param {string} args.message - The reflog message.
+   * @returns {Promise<void>}
+   */
   async writeStashReflogEntry({ stashCommit, message }) {
     const author = await this.getAuthor()
     const entry = GitRefStash.createStashReflogEntry(
@@ -123,6 +194,13 @@ export class GitStashManager {
     })
   }
 
+  /**
+   * Reads the stash reflogs.
+   *
+   * @param {Object} args
+   * @param {boolean} [args.parsed=false] - Whether to parse the reflog entries.
+   * @returns {Promise<string[]|Object[]>} - The reflog entries as strings or parsed objects.
+   */
   async readStashReflogs({ parsed = false }) {
     if (!(await this.fs.exists(this.refLogsStashPath))) {
       return []

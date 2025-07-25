@@ -7,6 +7,16 @@ import { join } from '../utils/join.js'
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of caching.
 export class GitIgnoreManager {
+  /**
+   * Determines whether a given file is ignored based on `.gitignore` rules and exclusion files.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.dir - The working directory.
+   * @param {string} [args.gitdir] - The path to the `.git` directory (defaults to `join(dir, '.git')`).
+   * @param {string} args.filepath - The path of the file to check.
+   * @returns {Promise<boolean>} - `true` if the file is ignored, `false` otherwise.
+   */
   static async isIgnored({ fs, dir, gitdir = join(dir, '.git'), filepath }) {
     // ALWAYS ignore ".git" folders.
     if (basename(filepath) === '.git') return true

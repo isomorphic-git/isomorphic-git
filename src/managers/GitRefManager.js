@@ -31,7 +31,25 @@ async function acquireLock(ref, callback) {
   return lock.acquire(ref, callback)
 }
 
+/**
+ * A class for managing Git references, including reading, writing, deleting, and resolving refs.
+ */
 export class GitRefManager {
+  /**
+   * Updates remote refs based on the provided refspecs and options.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.remote - The name of the remote.
+   * @param {Map<string, string>} args.refs - A map of refs to their object IDs.
+   * @param {Map<string, string>} args.symrefs - A map of symbolic refs.
+   * @param {boolean} args.tags - Whether to fetch tags.
+   * @param {string[]} [args.refspecs] - The refspecs to use.
+   * @param {boolean} [args.prune] - Whether to prune stale refs.
+   * @param {boolean} [args.pruneTags] - Whether to prune tags.
+   * @returns {Promise<Object>} - An object containing pruned refs.
+   */
   static async updateRemoteRefs({
     fs,
     gitdir,
@@ -144,6 +162,16 @@ export class GitRefManager {
     return { pruned }
   }
 
+  /**
+   * Writes a ref to the file system.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.ref - The ref to write.
+   * @param {string} args.value - The object ID to write.
+   * @returns {Promise<void>}
+   */
   // TODO: make this less crude?
   static async writeRef({ fs, gitdir, ref, value }) {
     // Validate input
@@ -155,16 +183,44 @@ export class GitRefManager {
     )
   }
 
+  /**
+   * Writes a symbolic ref to the file system.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.ref - The ref to write.
+   * @param {string} args.value - The target ref.
+   * @returns {Promise<void>}
+   */
   static async writeSymbolicRef({ fs, gitdir, ref, value }) {
     await acquireLock(ref, async () =>
       fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
     )
   }
 
+  /**
+   * Deletes a single ref.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.ref - The ref to delete.
+   * @returns {Promise<void>}
+   */
   static async deleteRef({ fs, gitdir, ref }) {
     return GitRefManager.deleteRefs({ fs, gitdir, refs: [ref] })
   }
 
+  /**
+   * Deletes multiple refs.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string[]} args.refs - The refs to delete.
+   * @returns {Promise<void>}
+   */
   static async deleteRefs({ fs, gitdir, refs }) {
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
@@ -188,12 +244,14 @@ export class GitRefManager {
   }
 
   /**
-   * @param {object} args
-   * @param {import('../models/FileSystem.js').FileSystem} args.fs
-   * @param {string} args.gitdir
-   * @param {string} args.ref
-   * @param {number} [args.depth]
-   * @returns {Promise<string>}
+   * Resolves a ref to its object ID.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.ref - The ref to resolve.
+   * @param {number} [args.depth] - The maximum depth to resolve symbolic refs.
+   * @returns {Promise<string>} - The resolved object ID.
    */
   static async resolve({ fs, gitdir, ref, depth = undefined }) {
     if (depth !== undefined) {
@@ -232,6 +290,15 @@ export class GitRefManager {
     throw new NotFoundError(ref)
   }
 
+  /**
+   * Checks if a ref exists.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.ref - The ref to check.
+   * @returns {Promise<boolean>} - True if the ref exists, false otherwise.
+   */
   static async exists({ fs, gitdir, ref }) {
     try {
       await GitRefManager.expand({ fs, gitdir, ref })
@@ -241,6 +308,15 @@ export class GitRefManager {
     }
   }
 
+  /**
+   * Expands a ref to its full name.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.ref - The ref to expand.
+   * @returns {Promise<string>} - The full ref name.
+   */
   static async expand({ fs, gitdir, ref }) {
     // Is it a complete and valid SHA?
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
@@ -261,6 +337,14 @@ export class GitRefManager {
     throw new NotFoundError(ref)
   }
 
+  /**
+   * Expands a ref against a provided map.
+   *
+   * @param {Object} args
+   * @param {string} args.ref - The ref to expand.
+   * @param {Map<string, string>} args.map - The map of refs.
+   * @returns {Promise<string>} - The expanded ref.
+   */
   static async expandAgainstMap({ ref, map }) {
     // Look in all the proper paths, in this order
     const allpaths = refpaths(ref)
@@ -271,6 +355,16 @@ export class GitRefManager {
     throw new NotFoundError(ref)
   }
 
+  /**
+   * Resolves a ref against a provided map.
+   *
+   * @param {Object} args
+   * @param {string} args.ref - The ref to resolve.
+   * @param {string} [args.fullref] - The full ref name.
+   * @param {number} [args.depth] - The maximum depth to resolve symbolic refs.
+   * @param {Map<string, string>} args.map - The map of refs.
+   * @returns {Object} - An object containing the full ref and its object ID.
+   */
   static resolveAgainstMap({ ref, fullref = ref, depth = undefined, map }) {
     if (depth !== undefined) {
       depth--
@@ -304,6 +398,14 @@ export class GitRefManager {
     throw new NotFoundError(ref)
   }
 
+  /**
+   * Reads the packed refs file and returns a map of refs.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @returns {Promise<Map<string, string>>} - A map of packed refs.
+   */
   static async packedRefs({ fs, gitdir }) {
     const text = await acquireLock('packed-refs', async () =>
       fs.read(`${gitdir}/packed-refs`, { encoding: 'utf8' })
@@ -312,7 +414,15 @@ export class GitRefManager {
     return packed.refs
   }
 
-  // List all the refs that match the `filepath` prefix
+  /**
+   * Lists all refs matching a given filepath prefix.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} args.filepath - The filepath prefix to match.
+   * @returns {Promise<string[]>} - A sorted list of refs.
+   */
   static async listRefs({ fs, gitdir, filepath }) {
     const packedMap = GitRefManager.packedRefs({ fs, gitdir })
     let files = null
@@ -339,6 +449,15 @@ export class GitRefManager {
     return files
   }
 
+  /**
+   * Lists all branches, optionally filtered by remote.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.remote] - The remote to filter branches by.
+   * @returns {Promise<string[]>} - A list of branch names.
+   */
   static async listBranches({ fs, gitdir, remote }) {
     if (remote) {
       return GitRefManager.listRefs({
@@ -351,6 +470,14 @@ export class GitRefManager {
     }
   }
 
+  /**
+   * Lists all tags.
+   *
+   * @param {Object} args
+   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @returns {Promise<string[]>} - A list of tag names.
+   */
   static async listTags({ fs, gitdir }) {
     const tags = await GitRefManager.listRefs({
       fs,
