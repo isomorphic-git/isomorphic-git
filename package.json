@@ -7,6 +7,20 @@
   "main": "./index.cjs",
   "module": "./index.js",
   "unpkg": "./index.umd.min.js",
+  "exports": {
+    ".": {
+      "require": "./index.cjs",
+      "import": "./index.js"
+    },
+    "./managers": {
+      "require": "./managers/index.cjs",
+      "import": "./managers/index.js"
+    },
+    "./models": {
+      "require": "./models/index.cjs",
+      "import": "./models/index.js"
+    }
+  },
   "bin": {
     "isogit": "./cli.cjs"
   },
@@ -48,7 +62,9 @@
     "index.umd.min.js",
     "index.umd.min.d.ts",
     "index.umd.min.js.map",
-    "size_report.html"
+    "size_report.html",
+    "managers/*",
+    "models/*"
   ],
   "dependencies": {
     "async-lock": "^1.4.1",

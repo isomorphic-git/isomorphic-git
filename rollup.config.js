@@ -86,6 +86,10 @@ export default [
   nodeConfig('index.js', 'index.cjs'),
   ecmaConfig('internal-apis.js', 'internal-apis.js'),
   nodeConfig('internal-apis.js', 'internal-apis.cjs'),
+  ecmaConfig('managers/index.js', 'managers/index.js'),
+  nodeConfig('managers/index.js', 'managers/index.cjs'),
+  ecmaConfig('models/index.js', 'models/index.js'),
+  nodeConfig('models/index.js', 'models/index.cjs'),
   ...pkgify('http/node', 'http/node'),
   ...pkgify('http/web', 'http/web', 'GitHttp'),
 ]

@@ -1,5 +1,11 @@
 {
-  "include": ["index.js", "http/web/index.js", "http/node/index.js"],
+  "include": [
+    "index.js",
+    "http/web/index.js",
+    "http/node/index.js",
+    "managers/index.js",
+    "models/index.js"
+  ],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "types": [],

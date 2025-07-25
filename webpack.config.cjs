@@ -9,6 +9,8 @@ module.exports = [
     entry: {
       index: './src/index.js',
       'internal-apis': './src/internal-apis.js',
+      managers: './src/managers/index.js',
+      models: './src/models/index.js'
     },
     output: {
       path: path.resolve(__dirname),
