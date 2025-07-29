@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -33,10 +34,12 @@ export async function isIgnored({
     assertParameter('gitdir', gitdir)
     assertParameter('filepath', filepath)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return GitIgnoreManager.isIgnored({
-      fs: new FileSystem(fs),
+      fs: fsp,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       filepath,
     })
   } catch (err) {
