@@ -105,7 +105,8 @@
       "version-1.x-gitRemoteManager",
       "version-1.x-gitShallowManager",
       "version-1.x-gitStashManager"
-    ]
+    ],
+    "Models": ["version-1.x-fileSystem"]
   },
   "version-1.x-guide": {
     "Getting Started": [

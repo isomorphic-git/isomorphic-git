@@ -105,6 +105,10 @@
         "title": "findRoot",
         "sidebar_label": "findRoot"
       },
+      "fileSystem": {
+        "title": "fileSystem",
+        "sidebar_label": "fileSystem"
+      },
       "fs": {
         "title": "fs",
         "sidebar_label": "fs"
@@ -867,6 +871,10 @@
       "version-1.x/version-1.x-findRoot": {
         "title": "findRoot",
         "sidebar_label": "findRoot"
+      },
+      "version-1.x/version-1.x-fileSystem": {
+        "title": "fileSystem",
+        "sidebar_label": "fileSystem"
       },
       "version-1.x/version-1.x-fs": {
         "title": "fs",

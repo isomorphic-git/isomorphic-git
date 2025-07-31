@@ -85,7 +85,8 @@
       "gitRemoteManager",
       "gitShallowManager",
       "gitStashManager"
-    ]
+    ],
+    "Models": ["fileSystem"]
   },
   "guide": {
     "Getting Started": [
