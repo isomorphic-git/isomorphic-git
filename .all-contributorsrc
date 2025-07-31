@@ -826,6 +826,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "acandoo",
+      "name": "acandoo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117209328?v=4",
+      "profile": "https://github.com/acandoo",
+      "contributions": [
+        "platform",
+        "userTesting"
+      ]
     }
   ],
   "commitConvention": "angular"
