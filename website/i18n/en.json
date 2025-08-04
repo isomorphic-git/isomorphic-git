@@ -184,6 +184,10 @@
         "title": "listNotes",
         "sidebar_label": "listNotes"
       },
+      "listRefs": {
+        "title": "listRefs",
+        "sidebar_label": "listRefs"
+      },
       "listRemotes": {
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
@@ -303,6 +307,10 @@
       "snippets": {
         "title": "Useful Code Snippets",
         "sidebar_label": "Useful Snippets"
+      },
+      "stash": {
+        "title": "stash",
+        "sidebar_label": "stash"
       },
       "status": {
         "title": "status",
@@ -952,6 +960,10 @@
         "title": "listNotes",
         "sidebar_label": "listNotes"
       },
+      "version-1.x/version-1.x-listRefs": {
+        "title": "listRefs",
+        "sidebar_label": "listRefs"
+      },
       "version-1.x/version-1.x-listRemotes": {
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
@@ -991,6 +1003,14 @@
       "version-1.x/version-1.x-onMessage": {
         "title": "onMessage",
         "sidebar_label": "onMessage"
+      },
+      "version-1.x/version-1.x-onPostCheckout": {
+        "title": "onPostCheckout",
+        "sidebar_label": "onPostCheckout"
+      },
+      "version-1.x/version-1.x-onPrePush": {
+        "title": "onPrePush",
+        "sidebar_label": "onPrePush"
       },
       "version-1.x/version-1.x-onProgress": {
         "title": "onProgress",
@@ -1084,6 +1104,10 @@
       },
       "version-1.x/version-1.x-STAGE": {
         "title": "version-1.x/version-1.x-STAGE"
+      },
+      "version-1.x/version-1.x-stash": {
+        "title": "stash",
+        "sidebar_label": "stash"
       },
       "version-1.x/version-1.x-status": {
         "title": "status",
