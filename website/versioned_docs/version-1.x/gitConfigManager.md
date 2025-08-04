@@ -1,8 +1,8 @@
 ---
 title: GitConfigManager
 sidebar_label: GitConfigManager
-id: version-1.x-git-config-manager
-original_id: git-config-manager
+id: version-1.x-gitConfigManager
+original_id: gitConfigManager
 ---
 
 The `GitConfigManager` class provides methods to manage access to the Git configuration file, allowing for reading and saving configurations.
@@ -15,10 +15,10 @@ Reads the Git configuration file from the specified `.git` directory.
 
 #### Parameters
 
-| param      | type                              | description                                   |
-| ---------- | --------------------------------- | --------------------------------------------- |
-| **fs**     | FileSystem                        | The file system abstraction.                  |
-| **gitdir** | string                            | The path to the `.git` directory.             |
+| param      | type       | description                       |
+| ---------- | ---------- | --------------------------------- |
+| **fs**     | FileSystem | The file system abstraction.      |
+| **gitdir** | string     | The path to the `.git` directory. |
 
 #### Returns
 
@@ -46,11 +46,11 @@ Saves the provided Git configuration to the specified `.git` directory.
 
 #### Parameters
 
-| param      | type                              | description                                   |
-| ---------- | --------------------------------- | --------------------------------------------- |
-| **fs**     | FileSystem                        | The file system abstraction.                  |
-| **gitdir** | string                            | The path to the `.git` directory.             |
-| **config** | GitConfig                         | The `GitConfig` object to save.               |
+| param      | type       | description                       |
+| ---------- | ---------- | --------------------------------- |
+| **fs**     | FileSystem | The file system abstraction.      |
+| **gitdir** | string     | The path to the `.git` directory. |
+| **config** | GitConfig  | The `GitConfig` object to save.   |
 
 #### Returns
 

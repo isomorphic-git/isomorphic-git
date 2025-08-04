@@ -1,8 +1,8 @@
 ---
 title: GitRemoteManager
 sidebar_label: GitRemoteManager
-id: version-1.x-git-remote-manager
-original_id: git-remote-manager
+id: version-1.x-gitRemoteManager
+original_id: gitRemoteManager
 ---
 
 The `GitRemoteManager` class provides methods for managing Git remotes and determining the appropriate remote helper for a given URL.
@@ -15,9 +15,9 @@ Determines the appropriate remote helper for the given URL.
 
 #### Parameters
 
-| param      | type                              | description                                   |
-| ---------- | --------------------------------- | --------------------------------------------- |
-| **url**    | string                            | The URL of the remote repository.             |
+| param   | type   | description                       |
+| ------- | ------ | --------------------------------- |
+| **url** | string | The URL of the remote repository. |
 
 #### Returns
 

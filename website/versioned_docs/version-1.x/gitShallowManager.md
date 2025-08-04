@@ -1,8 +1,8 @@
 ---
 title: GitShallowManager
 sidebar_label: GitShallowManager
-id: version-1.x-git-shallow-manager
-original_id: git-shallow-manager
+id: version-1.x-gitShallowManager
+original_id: gitShallowManager
 ---
 
 The `GitShallowManager` class provides methods for reading and writing the `shallow` file in a Git repository.
@@ -15,10 +15,10 @@ Reads the `shallow` file in the Git repository and returns a set of object IDs (
 
 #### Parameters
 
-| param      | type                              | description                                   |
-| ---------- | --------------------------------- | --------------------------------------------- |
-| **fs**     | FileSystem                        | The file system abstraction.                  |
-| **gitdir** | string                            | The path to the `.git` directory.             |
+| param      | type       | description                       |
+| ---------- | ---------- | --------------------------------- |
+| **fs**     | FileSystem | The file system abstraction.      |
+| **gitdir** | string     | The path to the `.git` directory. |
 
 #### Returns
 
@@ -33,11 +33,11 @@ Writes a set of object IDs (OIDs) to the `shallow` file in the Git repository. I
 
 #### Parameters
 
-| param      | type                              | description                                   |
-| ---------- | --------------------------------- | --------------------------------------------- |
-| **fs**     | FileSystem                        | The file system abstraction.                  |
-| **gitdir** | string                            | The path to the `.git` directory.             |
-| **oids**   | Set<string>                       | A set of shallow object IDs to write.         |
+| param      | type          | description                           |
+| ---------- | ------------- | ------------------------------------- |
+| **fs**     | FileSystem    | The file system abstraction.          |
+| **gitdir** | string        | The path to the `.git` directory.     |
+| **oids**   | Set\<string\> | A set of shallow object IDs to write. |
 
 #### Returns
 

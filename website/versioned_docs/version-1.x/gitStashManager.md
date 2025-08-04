@@ -1,8 +1,8 @@
 ---
 title: GitStashManager
 sidebar_label: GitStashManager
-id: version-1.x-git-stash-manager
-original_id: git-stash-manager
+id: version-1.x-gitStashManager
+original_id: gitStashManager
 ---
 
 The `GitStashManager` class provides methods for managing Git stash entries, including reading, writing, and retrieving stash commits.
@@ -15,10 +15,10 @@ Gets the SHA of a stash entry by its index.
 
 #### Parameters
 
-| param          | type                              | description                                   |
-| -------------- | --------------------------------- | --------------------------------------------- |
-| **refIdx**     | number                            | The index of the stash entry.                 |
-| **stashEntries** | string[]                        | Optional preloaded stash entries.             |
+| param            | type     | description                       |
+| ---------------- | -------- | --------------------------------- |
+| **refIdx**       | number   | The index of the stash entry.     |
+| **stashEntries** | string[] | Optional preloaded stash entries. |
 
 #### Returns
 
@@ -33,11 +33,11 @@ Writes a stash commit to the repository.
 
 #### Parameters
 
-| param      | type                              | description                                   |
-| ---------- | --------------------------------- | --------------------------------------------- |
-| **message** | string                           | The commit message.                           |
-| **tree**    | string                           | The tree object ID.                           |
-| **parent**  | string[]                         | The parent commit object IDs.                 |
+| param       | type     | description                   |
+| ----------- | -------- | ----------------------------- |
+| **message** | string   | The commit message.           |
+| **tree**    | string   | The tree object ID.           |
+| **parent**  | string[] | The parent commit object IDs. |
 
 #### Returns
 

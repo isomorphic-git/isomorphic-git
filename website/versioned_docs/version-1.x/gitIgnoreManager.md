@@ -1,8 +1,8 @@
 ---
 title: GitIgnoreManager
 sidebar_label: GitIgnoreManager
-id: version-1.x-git-ignore-manager
-original_id: git-ignore-manager
+id: version-1.x-gitIgnoreManager
+original_id: gitIgnoreManager
 ---
 
 The `GitIgnoreManager` class provides methods to determine whether a file is ignored based on `.gitignore` rules and exclusion files.
@@ -15,12 +15,12 @@ Determines whether a given file is ignored based on `.gitignore` rules and exclu
 
 #### Parameters
 
-| param      | type                              | description                                                                 |
-| ---------- | --------------------------------- | --------------------------------------------------------------------------- |
-| **fs**     | FileSystem                        | The file system abstraction.                                                |
-| **dir**    | string                            | The working directory.                                                      |
-| **gitdir** | string = `join(dir, '.git')`      | The path to the `.git` directory (defaults to `join(dir, '.git')`).          |
-| **filepath** | string                          | The path of the file to check.                                              |
+| param        | type                         | description                                                         |
+| ------------ | ---------------------------- | ------------------------------------------------------------------- |
+| **fs**       | FileSystem                   | The file system abstraction.                                        |
+| **dir**      | string                       | The working directory.                                              |
+| **gitdir**   | string = `join(dir, '.git')` | The path to the `.git` directory (defaults to `join(dir, '.git')`). |
+| **filepath** | string                       | The path of the file to check.                                      |
 
 #### Returns
 
@@ -56,3 +56,6 @@ console.log(isIgnored) // true or false
   const el = document.querySelector('a.edit-page-link.button');
   if (el) {
     el.href = 'https://github.com/isomorphic-git/isomorphic-
+  }
+})();
+</script>

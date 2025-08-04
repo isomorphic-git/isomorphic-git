@@ -1,8 +1,8 @@
 ---
 title: GitIndexManager
 sidebar_label: GitIndexManager
-id: version-1.x-git-index-manager
-original_id: git-index-manager
+id: version-1.x-gitIndexManager
+original_id: gitIndexManager
 ---
 
 The `GitIndexManager` class provides thread-safe access to the Git index file, ensuring proper caching and synchronization for operations on the index.

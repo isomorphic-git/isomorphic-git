@@ -1,8 +1,8 @@
 ---
 title: GitRemoteHTTP
 sidebar_label: GitRemoteHTTP
-id: version-1.x-git-remote-http
-original_id: git-remote-http
+id: version-1.x-gitRemoteHTTP
+original_id: gitRemoteHTTP
 ---
 
 The `GitRemoteHTTP` class provides methods for interacting with remote Git repositories over HTTP.
@@ -15,18 +15,18 @@ Discovers references from a remote Git repository.
 
 #### Parameters
 
-| param           | type                              | description                                   |
-| --------------- | --------------------------------- | --------------------------------------------- |
-| **http**        | HttpClient                        | The HTTP client to use for requests.          |
-| **onProgress**  | ProgressCallback                 | Callback for progress updates.                |
-| **onAuth**      | AuthCallback                     | Callback for providing authentication.        |
-| **onAuthFailure** | AuthFailureCallback            | Callback for handling authentication failures.|
-| **onAuthSuccess** | AuthSuccessCallback            | Callback for handling successful authentication.|
-| **corsProxy**   | string                           | Optional CORS proxy URL.                      |
-| **service**     | string                           | The Git service (e.g., "git-upload-pack").    |
-| **url**         | string                           | The URL of the remote repository.             |
-| **headers**     | Object<string, string>           | HTTP headers to include in the request.       |
-| **protocolVersion** | 1 | 2                        | The Git protocol version to use.              |
+| param               | type                     | description                                      |
+| ------------------- | ------------------------ | ------------------------------------------------ |
+| **http**            | HttpClient               | The HTTP client to use for requests.             |
+| **onProgress**      | ProgressCallback         | Callback for progress updates.                   |
+| **onAuth**          | AuthCallback             | Callback for providing authentication.           |
+| **onAuthFailure**   | AuthFailureCallback      | Callback for handling authentication failures.   |
+| **onAuthSuccess**   | AuthSuccessCallback      | Callback for handling successful authentication. |
+| **corsProxy**       | string                   | Optional CORS proxy URL.                         |
+| **service**         | string                   | The Git service (e.g., "git-upload-pack").       |
+| **url**             | string                   | The URL of the remote repository.                |
+| **headers**         | Object\<string, string\> | HTTP headers to include in the request.          |
+| **protocolVersion** | 1 &#124; 2               | The Git protocol version to use.                 |
 
 #### Returns
 
@@ -41,16 +41,16 @@ Connects to a remote Git repository and sends a request.
 
 #### Parameters
 
-| param           | type                              | description                                   |
-| --------------- | --------------------------------- | --------------------------------------------- |
-| **http**        | HttpClient                        | The HTTP client to use for requests.          |
-| **onProgress**  | ProgressCallback                 | Callback for progress updates.                |
-| **corsProxy**   | string                           | Optional CORS proxy URL.                      |
-| **service**     | string                           | The Git service (e.g., "git-upload-pack").    |
-| **url**         | string                           | The URL of the remote repository.             |
-| **auth**        | any                              | Authentication credentials.                   |
-| **body**        | any                              | The request body to send.                     |
-| **headers**     | Object<string, string>           | HTTP headers to include in the request.       |
+| param          | type                     | description                                |
+| -------------- | ------------------------ | ------------------------------------------ |
+| **http**       | HttpClient               | The HTTP client to use for requests.       |
+| **onProgress** | ProgressCallback         | Callback for progress updates.             |
+| **corsProxy**  | string                   | Optional CORS proxy URL.                   |
+| **service**    | string                   | The Git service (e.g., "git-upload-pack"). |
+| **url**        | string                   | The URL of the remote repository.          |
+| **auth**       | any                      | Authentication credentials.                |
+| **body**       | any                      | The request body to send.                  |
+| **headers**    | Object\<string, string\> | HTTP headers to include in the request.    |
 
 #### Returns
 

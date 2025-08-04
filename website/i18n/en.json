@@ -105,10 +105,6 @@
         "title": "findRoot",
         "sidebar_label": "findRoot"
       },
-      "fileSystem": {
-        "title": "fileSystem",
-        "sidebar_label": "fileSystem"
-      },
       "fs": {
         "title": "fs",
         "sidebar_label": "fs"
@@ -355,38 +351,6 @@
       "writeTree": {
         "title": "writeTree",
         "sidebar_label": "writeTree"
-      },
-      "gitConfigManager": {
-        "title": "gitConfigManager",
-        "sidebar_label": "gitConfigManager"
-      },
-      "gitIgnoreManager": {
-        "title": "gitIgnoreManager",
-        "sidebar_label": "gitIgnoreManager"
-      },
-      "gitIndexManager": {
-        "title": "gitIndexManager",
-        "sidebar_label": "gitIndexManager"
-      },
-      "gitRefManager": {
-        "title": "gitRefManager",
-        "sidebar_label": "gitRefManager"
-      },
-      "gitRemoteHTTP": {
-        "title": "gitRemoteHTTP",
-        "sidebar_label": "gitRemoteHTTP"
-      },
-      "gitRemoteManager": {
-        "title": "gitRemoteManager",
-        "sidebar_label": "gitRemoteManager"
-      },
-      "gitShallowManager": {
-        "title": "gitShallowManager",
-        "sidebar_label": "gitShallowManager"
-      },
-      "gitStashManager": {
-        "title": "gitStashManager",
-        "sidebar_label": "gitStashManager"
       },
       "version-0.70.7/version-0.70.7-add": {
         "title": "add",
@@ -864,6 +828,10 @@
         "title": "fetch",
         "sidebar_label": "fetch"
       },
+      "version-1.x/version-1.x-fileSystem": {
+        "title": "FileSystem",
+        "sidebar_label": "FileSystem"
+      },
       "version-1.x/version-1.x-findMergeBase": {
         "title": "findMergeBase",
         "sidebar_label": "findMergeBase"
@@ -871,10 +839,6 @@
       "version-1.x/version-1.x-findRoot": {
         "title": "findRoot",
         "sidebar_label": "findRoot"
-      },
-      "version-1.x/version-1.x-fileSystem": {
-        "title": "fileSystem",
-        "sidebar_label": "fileSystem"
       },
       "version-1.x/version-1.x-fs": {
         "title": "fs",
@@ -895,6 +859,38 @@
       "version-1.x/version-1.x-getRemoteInfo2": {
         "title": "getRemoteInfo2",
         "sidebar_label": "getRemoteInfo2"
+      },
+      "version-1.x/version-1.x-gitConfigManager": {
+        "title": "GitConfigManager",
+        "sidebar_label": "GitConfigManager"
+      },
+      "version-1.x/version-1.x-gitIgnoreManager": {
+        "title": "GitIgnoreManager",
+        "sidebar_label": "GitIgnoreManager"
+      },
+      "version-1.x/version-1.x-gitIndexManager": {
+        "title": "GitIndexManager",
+        "sidebar_label": "GitIndexManager"
+      },
+      "version-1.x/version-1.x-gitRefManager": {
+        "title": "GitRefManager",
+        "sidebar_label": "GitRefManager"
+      },
+      "version-1.x/version-1.x-gitRemoteHTTP": {
+        "title": "GitRemoteHTTP",
+        "sidebar_label": "GitRemoteHTTP"
+      },
+      "version-1.x/version-1.x-gitRemoteManager": {
+        "title": "GitRemoteManager",
+        "sidebar_label": "GitRemoteManager"
+      },
+      "version-1.x/version-1.x-gitShallowManager": {
+        "title": "GitShallowManager",
+        "sidebar_label": "GitShallowManager"
+      },
+      "version-1.x/version-1.x-gitStashManager": {
+        "title": "GitStashManager",
+        "sidebar_label": "GitStashManager"
       },
       "version-1.x/version-1.x-browser": {
         "title": "Browser Quick Start",
@@ -1151,38 +1147,6 @@
       "version-1.x/version-1.x-writeTree": {
         "title": "writeTree",
         "sidebar_label": "writeTree"
-      },
-      "version-1.x/version-1.x-gitConfigManager": {
-        "title": "version-1.x/version-1.x-gitConfigManager",
-        "sidebar_label": "gitConfigManager"
-      },
-      "version-1.x/version-1.x-gitIgnoreManager": {
-        "title": "version-1.x/version-1.x-gitIgnoreManager",
-        "sidebar_label": "gitIgnoreManager"
-      },
-      "version-1.x/version-1.x-gitIndexManager": {
-        "title": "version-1.x/version-1.x-gitIndexManager",
-        "sidebar_label": "gitIndexManager"
-      },
-      "version-1.x/version-1.x-gitRefManager": {
-        "title": "version-1.x/version-1.x-gitRefManager",
-        "sidebar_label": "gitRefManager"
-      },
-      "version-1.x/version-1.x-gitRemoteHTTP": {
-        "title": "version-1.x/version-1.x-gitRemoteHTTP",
-        "sidebar_label": "gitRemoteHTTP"
-      },
-      "version-1.x/version-1.x-gitRemoteManager": {
-        "title": "version-1.x/version-1.x-gitRemoteManager",
-        "sidebar_label": "gitRemoteManager"
-      },
-      "version-1.x/version-1.x-gitShallowManager": {
-        "title": "version-1.x/version-1.x-gitShallowManager",
-        "sidebar_label": "gitShallowManager"
-      },
-      "version-1.x/version-1.x-gitStashManager": {
-        "title": "version-1.x/version-1.x-gitStashManager",
-        "sidebar_label": "gitStashManager"
       }
     },
     "links": {
@@ -1205,6 +1169,8 @@
       "Remotes": "Remotes",
       "Objects": "Objects",
       "Plumbing Commands": "Plumbing Commands",
+      "Managers": "Managers",
+      "Models": "Models",
       "Getting Started": "Getting Started",
       "More": "More",
       "Walking": "Walking",

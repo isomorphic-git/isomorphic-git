@@ -1,8 +1,8 @@
 ---
 title: FileSystem
 sidebar_label: FileSystem
-id: version-1.x-file-system
-original_id: file-system
+id: version-1.x-fileSystem
+original_id: fileSystem
 ---
 
 The `FileSystem` class provides a consistent API for file system operations, supporting both promise-based and callback-based file systems. It includes utility methods for common file system tasks such as reading, writing, and deleting files and directories.
