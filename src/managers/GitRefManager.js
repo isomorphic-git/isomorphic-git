@@ -42,14 +42,14 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.remote - The name of the remote.
    * @param {Map<string, string>} args.refs - A map of refs to their object IDs.
    * @param {Map<string, string>} args.symrefs - A map of symbolic refs.
    * @param {boolean} args.tags - Whether to fetch tags.
-   * @param {string[]} [args.refspecs] - The refspecs to use.
-   * @param {boolean} [args.prune] - Whether to prune stale refs.
-   * @param {boolean} [args.pruneTags] - Whether to prune tags.
+   * @param {string[]} [args.refspecs = undefined] - The refspecs to use.
+   * @param {boolean} [args.prune = false] - Whether to prune stale refs.
+   * @param {boolean} [args.pruneTags = false] - Whether to prune tags.
    * @returns {Promise<Object>} - An object containing pruned refs.
    */
   static async updateRemoteRefs({
@@ -169,7 +169,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.ref - The ref to write.
    * @param {string} args.value - The object ID to write.
    * @returns {Promise<void>}
@@ -190,7 +190,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.ref - The ref to write.
    * @param {string} args.value - The target ref.
    * @returns {Promise<void>}
@@ -206,7 +206,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.ref - The ref to delete.
    * @returns {Promise<void>}
    */
@@ -219,7 +219,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string[]} args.refs - The refs to delete.
    * @returns {Promise<void>}
    */
@@ -250,9 +250,9 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.ref - The ref to resolve.
-   * @param {number} [args.depth] - The maximum depth to resolve symbolic refs.
+   * @param {number} [args.depth = undefined] - The maximum depth to resolve symbolic refs.
    * @returns {Promise<string>} - The resolved object ID.
    */
   static async resolve({ fs, gitdir, ref, depth = undefined }) {
@@ -297,7 +297,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.ref - The ref to check.
    * @returns {Promise<boolean>} - True if the ref exists, false otherwise.
    */
@@ -315,7 +315,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.ref - The ref to expand.
    * @returns {Promise<string>} - The full ref name.
    */
@@ -362,8 +362,8 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {string} args.ref - The ref to resolve.
-   * @param {string} [args.fullref] - The full ref name.
-   * @param {number} [args.depth] - The maximum depth to resolve symbolic refs.
+   * @param {string} [args.fullref = args.ref] - The full ref name.
+   * @param {number} [args.depth = undefined] - The maximum depth to resolve symbolic refs.
    * @param {Map<string, string>} args.map - The map of refs.
    * @returns {Object} - An object containing the full ref and its object ID.
    */
@@ -405,7 +405,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    * @returns {Promise<Map<string, string>>} - A map of packed refs.
    */
   static async packedRefs({ fs, gitdir }) {
@@ -421,7 +421,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} args.filepath - The filepath prefix to match.
    * @returns {Promise<string[]>} - A sorted list of refs.
    */
@@ -456,7 +456,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {string} [args.remote] - The remote to filter branches by.
    * @returns {Promise<string[]>} - A list of branch names.
    */
@@ -477,7 +477,7 @@ export class GitRefManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    * @returns {Promise<string[]>} - A list of tag names.
    */
   static async listTags({ fs, gitdir }) {

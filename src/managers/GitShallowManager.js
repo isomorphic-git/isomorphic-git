@@ -11,7 +11,7 @@ export class GitShallowManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
    * @returns {Promise<Set<string>>} - A set of shallow object IDs.
    */
   static async read({ fs, gitdir }) {
@@ -36,7 +36,7 @@ export class GitShallowManager {
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
-   * @param {string} args.gitdir - The path to the `.git` directory.
+   * @param {string} [args.gitdir] - [required] The [git directory](dir-vs-gitdir.md) path
    * @param {Set<string>} args.oids - A set of shallow object IDs to write.
    * @returns {Promise<void>}
    */
