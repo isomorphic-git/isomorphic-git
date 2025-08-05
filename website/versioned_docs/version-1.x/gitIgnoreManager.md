@@ -15,12 +15,12 @@ Determines whether a given file is ignored based on `.gitignore` rules and exclu
 
 #### Parameters
 
-| param        | type                         | description                                                         |
-| ------------ | ---------------------------- | ------------------------------------------------------------------- |
-| **fs**       | FileSystem                   | The file system abstraction.                                        |
-| **dir**      | string                       | The working directory.                                              |
-| **gitdir**   | string = `join(dir, '.git')` | The path to the `.git` directory (defaults to `join(dir, '.git')`). |
-| **filepath** | string                       | The path of the file to check.                                      |
+| param          | type                         | description                                                         |
+| -------------- | ---------------------------- | ------------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                     | A file system implementation.                                       |
+| **dir**        | string                       | The working directory.                                              |
+| **gitdir**     | string = `join(dir, '.git')` | The path to the `.git` directory (defaults to `join(dir, '.git')`). |
+| **filepath**   | string                       | The path of the file to check.                                      |
 
 #### Returns
 

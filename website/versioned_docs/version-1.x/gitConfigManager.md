@@ -15,10 +15,10 @@ Reads the Git configuration file from the specified `.git` directory.
 
 #### Parameters
 
-| param      | type       | description                       |
-| ---------- | ---------- | --------------------------------- |
-| **fs**     | FileSystem | The file system abstraction.      |
-| **gitdir** | string     | The path to the `.git` directory. |
+| param          | type     | description                       |
+| -------------- | -------- | --------------------------------- |
+| [**fs**](./fs) | FsClient | A file system implementation.     |
+| **gitdir**     | string   | The path to the `.git` directory. |
 
 #### Returns
 
@@ -46,11 +46,11 @@ Saves the provided Git configuration to the specified `.git` directory.
 
 #### Parameters
 
-| param      | type       | description                       |
-| ---------- | ---------- | --------------------------------- |
-| **fs**     | FileSystem | The file system abstraction.      |
-| **gitdir** | string     | The path to the `.git` directory. |
-| **config** | GitConfig  | The `GitConfig` object to save.   |
+| param          | type      | description                       |
+| -------------- | --------- | --------------------------------- |
+| [**fs**](./fs) | FsClient  | A file system implementation.     |
+| **gitdir**     | string    | The path to the `.git` directory. |
+| **config**     | GitConfig | The `GitConfig` object to save.   |
 
 #### Returns
 

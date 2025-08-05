@@ -64,7 +64,7 @@ export class FileSystem {
   /**
    * Creates an instance of FileSystem.
    *
-   * @param {Object} fs - The file system abstraction to wrap.
+   * @param {Object} fs - A file system implementation to wrap.
    */
   constructor(fs) {
     if (typeof fs._original_unwrapped_fs !== 'undefined') return fs

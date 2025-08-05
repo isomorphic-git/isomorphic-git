@@ -1,3 +1,5 @@
+import '../typedefs.js'
+
 import ignore from 'ignore'
 
 import { basename } from '../utils/basename.js'
@@ -11,7 +13,7 @@ export class GitIgnoreManager {
    * Determines whether a given file is ignored based on `.gitignore` rules and exclusion files.
    *
    * @param {Object} args
-   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {FSClient} args.fs - A file system implementation.
    * @param {string} args.dir - The working directory.
    * @param {string} [args.gitdir] - The path to the `.git` directory (defaults to `join(dir, '.git')`).
    * @param {string} args.filepath - The path of the file to check.

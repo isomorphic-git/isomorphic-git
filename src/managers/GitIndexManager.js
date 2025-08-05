@@ -1,3 +1,5 @@
+import '../typedefs.js'
+
 // import LockManager from 'travix-lock-manager'
 import AsyncLock from 'async-lock'
 
@@ -25,7 +27,7 @@ function createCache() {
 
 /**
  * Updates the cached index file by reading the file system and parsing the Git index.
- * @param {import('../models/FileSystem.js').FileSystem} fs - The file system abstraction.
+ * @param {FSClient} fs - A file system implementation.
  * @param {string} filepath - The path to the Git index file.
  * @param {object} cache - The cache object to update.
  * @returns {Promise<void>}
@@ -45,7 +47,7 @@ async function updateCachedIndexFile(fs, filepath, cache) {
 
 /**
  * Determines whether the cached index file is stale by comparing file stats.
- * @param {import('../models/FileSystem.js').FileSystem} fs - The file system abstraction.
+ * @param {FSClient} fs - A file system implementation.
  * @param {string} filepath - The path to the Git index file.
  * @param {object} cache - The cache object containing file stats.
  * @returns {Promise<boolean>} `true` if the index file is stale, otherwise `false`.
@@ -65,7 +67,7 @@ export class GitIndexManager {
    * Manages access to the Git index file, ensuring thread-safe operations and caching.
    *
    * @param {object} opts - Options for acquiring the Git index.
-   * @param {import('../models/FileSystem.js').FileSystem} opts.fs - The file system abstraction.
+   * @param {FSClient} opts.fs - A file system implementation.
    * @param {string} opts.gitdir - The path to the `.git` directory.
    * @param {object} opts.cache - A shared cache object for storing index data.
    * @param {boolean} [opts.allowUnmerged=true] - Whether to allow unmerged paths in the index.

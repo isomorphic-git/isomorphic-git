@@ -15,13 +15,13 @@ Manages access to the Git index file, ensuring thread-safe operations and cachin
 
 #### Parameters
 
-| param         | type [= default]        | description                                   |
-| ------------- | ----------------------- | --------------------------------------------- |
-| **fs**        | FileSystem              | The file system abstraction.                  |
-| **gitdir**    | string                  | The path to the `.git` directory.             |
-| **cache**     | object                  | A shared cache object for storing index data. |
-| allowUnmerged | boolean = true          | Whether to allow unmerged paths in the index. |
-| **closure**   | function(GitIndex): any | A function to execute with the Git index.     |
+| param          | type [= default]        | description                                   |
+| -------------- | ----------------------- | --------------------------------------------- |
+| [**fs**](./fs) | FsClient                | A file system implementation.                 |
+| **gitdir**     | string                  | The path to the `.git` directory.             |
+| **cache**      | object                  | A shared cache object for storing index data. |
+| allowUnmerged  | boolean = true          | Whether to allow unmerged paths in the index. |
+| **closure**    | function(GitIndex): any | A function to execute with the Git index.     |
 
 #### Returns
 

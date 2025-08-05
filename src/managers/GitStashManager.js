@@ -1,3 +1,5 @@
+import '../typedefs.js'
+
 import { _readCommit } from '../commands/readCommit'
 import { _writeCommit } from '../commands/writeCommit'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
@@ -14,7 +16,7 @@ export class GitStashManager {
    * Creates an instance of GitStashManager.
    *
    * @param {Object} args
-   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {FSClient} args.fs - A file system implementation.
    * @param {string} args.dir - The working directory.
    * @param {string} [args.gitdir] - The path to the `.git` directory (defaults to `join(dir, '.git')`).
    */

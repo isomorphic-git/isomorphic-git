@@ -15,17 +15,17 @@ Updates remote refs based on the provided refspecs and options.
 
 #### Parameters
 
-| param         | type                  | description                        |
-| ------------- | --------------------- | ---------------------------------- |
-| **fs**        | FileSystem            | The file system abstraction.       |
-| **gitdir**    | string                | The path to the `.git` directory.  |
-| **remote**    | string                | The name of the remote.            |
-| **refs**      | Map\<string, string\> | A map of refs to their object IDs. |
-| **symrefs**   | Map\<string, string\> | A map of symbolic refs.            |
-| **tags**      | boolean               | Whether to fetch tags.             |
-| **refspecs**  | string[]              | The refspecs to use.               |
-| **prune**     | boolean               | Whether to prune stale refs.       |
-| **pruneTags** | boolean               | Whether to prune tags.             |
+| param          | type                  | description                        |
+| -------------- | --------------------- | ---------------------------------- |
+| [**fs**](./fs) | FsClient              | A file system implementation.      |
+| **gitdir**     | string                | The path to the `.git` directory.  |
+| **remote**     | string                | The name of the remote.            |
+| **refs**       | Map\<string, string\> | A map of refs to their object IDs. |
+| **symrefs**    | Map\<string, string\> | A map of symbolic refs.            |
+| **tags**       | boolean               | Whether to fetch tags.             |
+| **refspecs**   | string[]              | The refspecs to use.               |
+| **prune**      | boolean               | Whether to prune stale refs.       |
+| **pruneTags**  | boolean               | Whether to prune tags.             |
 
 #### Returns
 
@@ -40,12 +40,12 @@ Resolves a ref to its object ID.
 
 #### Parameters
 
-| param      | type       | description                                 |
-| ---------- | ---------- | ------------------------------------------- |
-| **fs**     | FileSystem | The file system abstraction.                |
-| **gitdir** | string     | The path to the `.git` directory.           |
-| **ref**    | string     | The ref to resolve.                         |
-| **depth**  | number     | The maximum depth to resolve symbolic refs. |
+| param          | type     | description                                 |
+| -------------- | -------- | ------------------------------------------- |
+| [**fs**](./fs) | FsClient | A file system implementation.               |
+| **gitdir**     | string   | The path to the `.git` directory.           |
+| **ref**        | string   | The ref to resolve.                         |
+| **depth**      | number   | The maximum depth to resolve symbolic refs. |
 
 #### Returns
 

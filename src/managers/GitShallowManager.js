@@ -1,3 +1,4 @@
+import '../typedefs.js'
 import AsyncLock from 'async-lock'
 
 import { join } from '../utils/join.js'
@@ -9,7 +10,7 @@ export class GitShallowManager {
    * Reads the `shallow` file in the Git repository and returns a set of object IDs (OIDs).
    *
    * @param {Object} args
-   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {FSClient} args.fs - A file system implementation.
    * @param {string} args.gitdir - The path to the `.git` directory.
    * @returns {Promise<Set<string>>} - A set of shallow object IDs.
    */
@@ -34,7 +35,7 @@ export class GitShallowManager {
    * If the set is empty, the `shallow` file is removed.
    *
    * @param {Object} args
-   * @param {import('../models/FileSystem.js').FileSystem} args.fs - The file system abstraction.
+   * @param {FSClient} args.fs - A file system implementation.
    * @param {string} args.gitdir - The path to the `.git` directory.
    * @param {Set<string>} args.oids - A set of shallow object IDs to write.
    * @returns {Promise<void>}
