@@ -49,7 +49,8 @@ export async function hashBlob({ object }) {
       format: 'content',
       object,
     })
-    return { oid, type, object: new Uint8Array(_object), format: 'wrapped' }
+
+    return { oid, type, object: _object, format: 'wrapped' }
   } catch (err) {
     err.caller = 'git.hashBlob'
     throw err
