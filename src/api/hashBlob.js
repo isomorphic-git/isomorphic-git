@@ -38,7 +38,7 @@ export async function hashBlob({ object }) {
 
     // Convert object to buffer
     if (typeof object === 'string') {
-      object = Buffer.from(object)
+      object = Buffer.from(object, 'utf8')
     } else if (!(object instanceof Uint8Array)) {
       object = new Uint8Array(object)
     }
