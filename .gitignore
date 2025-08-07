@@ -4,6 +4,8 @@
 
 # Dist
 /http
+/managers
+/models
 /index.cjs
 /index.d.cts
 /index.js

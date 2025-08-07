@@ -30,6 +30,26 @@
         "types": "./http/web/index.d.cts",
         "default": "./http/web/index.cjs"
       }
+    },
+    "./managers": {
+      "import": {
+        "types": "./managers/index.d.ts",
+        "default": "./managers/index.js"
+      },
+      "require": {
+        "types": "./managers/index.d.cts",
+        "default": "./managers/index.cjs"
+      }
+    },
+    "./models": {
+      "import": {
+        "types": "./models/index.d.ts",
+        "default": "./models/index.js"
+      },
+      "require": {
+        "types": "./models/index.d.cts",
+        "default": "./models/index.cjs"
+      }
     }
   },
   "unpkg": "./index.umd.min.js",
@@ -75,7 +95,9 @@
     "index.umd.min.js",
     "index.umd.min.d.ts",
     "index.umd.min.js.map",
-    "size_report.html"
+    "size_report.html",
+    "managers/*",
+    "models/*"
   ],
   "dependencies": {
     "async-lock": "^1.4.1",
