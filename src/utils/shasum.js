@@ -29,7 +29,7 @@ async function testSubtleSHA1() {
   // some browsers that have crypto.subtle.digest don't actually implement SHA-1.
   try {
     const hash = await subtleSHA1(new Uint8Array([]))
-    if (hash === 'da39a3ee5e6b4b0d3255bfef95601890afd80709') return true
+    return hash === 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
   } catch (_) {
     // no bother
   }
