@@ -3,6 +3,9 @@ name: Build
 on:
   pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - feature/** 
 
 # Cancel in-progress runs for the current workflow
 concurrency:
