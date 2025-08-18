@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import pkg from './package.json'
+import pkg from './package.json' with { type: "json" }
 
 const external = [
   'fs',
@@ -67,9 +67,9 @@ const template = umd =>
   )
 
 const pkgify = (input, output, name) => {
-  fs.mkdirSync(path.join(__dirname, output), { recursive: true })
+  fs.mkdirSync(path.join(import.meta.dirname, output), { recursive: true })
   fs.writeFileSync(
-    path.join(__dirname, output, 'package.json'),
+    path.join(import.meta.dirname, output, 'package.json'),
     template(!!name)
   )
   return [
