@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _removeNote } from '../commands/removeNote.js'
 import { MissingNameError } from '../errors/MissingNameError.js'

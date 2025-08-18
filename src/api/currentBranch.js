@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _currentBranch } from '../commands/currentBranch.js'
 import { FileSystem } from '../models/FileSystem.js'

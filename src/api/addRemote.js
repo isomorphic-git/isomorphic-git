@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _addRemote } from '../commands/addRemote.js'
 import { FileSystem } from '../models/FileSystem.js'

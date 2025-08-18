@@ -1,3 +1,4 @@
+*.tsbuildinfo
 # stuff that gets generated during test setup
 /__tests__/__fixtures__/.superblock.txt
 /__tests__/__fixtures__/index.json

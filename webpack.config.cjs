@@ -10,7 +10,7 @@ module.exports = [
       index: './src/index.js',
       'internal-apis': './src/internal-apis.js',
       'managers/index': './src/managers/index.js',
-      'models/index': './src/models/index.js'
+      'models/index': './src/models/index.js',
     },
     output: {
       path: path.resolve(__dirname),

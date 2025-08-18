@@ -1,6 +1,6 @@
-// @ts-check
-import '../typedefs.js'
 
+import '@isomorphic-git/types'
+import { request } from '../managers/GitRemoteHTTP.js'
 import { _push } from '../commands/push.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
@@ -64,7 +64,7 @@ export async function push({
   onAuthFailure,
   onPrePush,
   dir,
-  gitdir = join(dir, '.git'),
+  gitdir = join(dir||"", '.git'),
   ref,
   remoteRef,
   remote = 'origin',

@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'

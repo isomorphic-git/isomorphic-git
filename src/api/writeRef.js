@@ -1,4 +1,4 @@
-// @ts-check
+
 import cleanGitRef from 'clean-git-ref'
 
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'

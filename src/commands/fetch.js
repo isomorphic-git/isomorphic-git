@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _currentBranch } from '../commands/currentBranch.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
@@ -22,6 +22,7 @@ import { pkg } from '../utils/pkg.js'
 import { splitLines } from '../utils/splitLines.js'
 import { parseUploadPackResponse } from '../wire/parseUploadPackResponse.js'
 import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
+import { request } from '../managers/GitRemoteHTTP.js'
 
 /**
  *
@@ -66,7 +67,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
 export async function _fetch({
   fs,
   cache,
-  http,
+  http = { request },
   onProgress,
   onMessage,
   onAuth,
@@ -78,8 +79,8 @@ export async function _fetch({
   remote: _remote,
   url: _url,
   corsProxy,
-  depth = null,
-  since = null,
+  depth = 0,
+  since = new Date(),
   exclude = [],
   relative = false,
   tags = false,

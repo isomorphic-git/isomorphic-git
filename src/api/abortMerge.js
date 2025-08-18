@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
@@ -101,11 +101,10 @@ export async function abortMerge({
         if (entry.type === 'blob') {
           const content = new TextDecoder().decode(entry.content)
           await fs.write(`${dir}/${entry.path}`, content, { mode: entry.mode })
-          index.insert({
-            filepath: entry.path,
-            oid: entry.oid,
-            stage: 0,
-          })
+          index.insert(// @ts-expect-error There are wrong types
+            {
+              filepath: entry.path,     oid: entry.oid,            stage: 0,
+            })
         }
       }
     })

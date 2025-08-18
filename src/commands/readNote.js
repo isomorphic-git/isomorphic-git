@@ -1,4 +1,4 @@
-// @ts-check
+
 import { GitRefManager } from '../managers/GitRefManager.js'
 
 import { _readBlob } from './readBlob'

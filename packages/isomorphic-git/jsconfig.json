@@ -1,0 +1,26 @@
+{
+  "include": [
+    "./*/*.js",
+    "index.js",
+    "managers.js",
+    "models.js"
+  ],
+  "exclude": ["node_modules","*.d.ts"],
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "composite": true,
+    "moduleResolution": "bundler",
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["ESNext", "dom"],
+    "resolveJsonModule": true,
+    "types": ["@isomorphic-git/types","node"],
+    "strictNullChecks": true,
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declarationDir": "types"
+  }
+}

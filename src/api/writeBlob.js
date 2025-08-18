@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject'

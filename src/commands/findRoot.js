@@ -1,4 +1,4 @@
-// @ts-check
+
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { dirname } from '../utils/dirname.js'
 import { join } from '../utils/join.js'

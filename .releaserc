@@ -3,6 +3,9 @@ branches:
   - 'main'
   - 'next'
   - 'next-major'
+  - 'isomorphic-git-main'
+  - name: 'isomorphic-git-main'
+    prerelease: true
   - name: 'beta'
     prerelease: true
   - name: 'alpha'

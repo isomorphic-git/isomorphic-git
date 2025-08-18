@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'

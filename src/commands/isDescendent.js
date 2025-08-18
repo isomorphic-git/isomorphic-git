@@ -1,4 +1,4 @@
-// @ts-check
+
 import { MaxDepthError } from '../errors/MaxDepthError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { ObjectTypeError } from '../errors/ObjectTypeError.js'

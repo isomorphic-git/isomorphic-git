@@ -1,4 +1,4 @@
-// @ts-check
+
 import { _readTree } from '../commands/readTree'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'

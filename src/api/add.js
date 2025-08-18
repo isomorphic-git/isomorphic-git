@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { MultipleGitError } from '../errors/MultipleGitError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'

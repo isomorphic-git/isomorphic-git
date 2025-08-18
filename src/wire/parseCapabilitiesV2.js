@@ -1,4 +1,4 @@
-// @ts-check
+
 
 /**
  * @param {function} read

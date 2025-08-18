@@ -1,4 +1,4 @@
-// @ts-check
+
 import { InvalidFilepathError } from '../errors/InvalidFilepathError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'

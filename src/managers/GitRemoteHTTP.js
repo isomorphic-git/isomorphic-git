@@ -1,10 +1,49 @@
-import '../typedefs.js'
+// inline http/web
+import { collect } from '../utils/collect.js'
+import { fromStream } from '../utils/fromStream.js'
 
+/**
+ * HttpClient
+ *
+ * @param {GitHttpRequest} request
+ * @returns {Promise<GitHttpResponse>}
+ */
+export async function request({
+  onProgress,
+  url,
+  method = 'GET',
+  headers = {},
+  body,
+}) {
+  // streaming uploads aren't possible yet in the browser
+  if (body) {
+    body = await collect(body)
+  }
+  const res = await fetch(url, { method, headers, body })
+  const iter =
+    res.body && res.body.getReader
+      ? fromStream(res.body)
+      : [new Uint8Array(await res.arrayBuffer())]
+  // convert Header object to ordinary JSON
+  headers = {}
+  for (const [key, value] of res.headers.entries()) {
+    headers[key] = value
+  }
+  return {
+    url: res.url,
+    method: res.method,
+    statusCode: res.status,
+    statusMessage: res.statusText,
+    body: iter,
+    headers: headers,
+  }
+}
+
+// End
 import { HttpError } from '../errors/HttpError.js'
 import { SmartHttpError } from '../errors/SmartHttpError.js'
 import { UserCanceledError } from '../errors/UserCanceledError.js'
 import { calculateBasicAuthHeader } from '../utils/calculateBasicAuthHeader.js'
-import { collect } from '../utils/collect.js'
 import { extractAuthFromUrl } from '../utils/extractAuthFromUrl.js'
 import { parseRefsAdResponse } from '../wire/parseRefsAdResponse.js'
 
@@ -75,7 +114,7 @@ export class GitRemoteHTTP {
    * @throws {UserCanceledError} - If the user cancels the operation.
    */
   static async discover({
-    http,
+    http = { request },
     onProgress,
     onAuth,
     onAuthSuccess,
@@ -183,7 +222,7 @@ export class GitRemoteHTTP {
    * @throws {HttpError} - If the HTTP request fails.
    */
   static async connect({
-    http,
+    http = { request },
     onProgress,
     corsProxy,
     service,

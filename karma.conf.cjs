@@ -10,7 +10,7 @@ const ISSUE =
   process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
 const COMMIT = process.env.BUILD_SOURCEVERSION
 
-module.exports = function (config) {
+module.exports = function(config) {
   const options = {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
@@ -110,7 +110,7 @@ module.exports = function (config) {
         device: 'Google Pixel 5',
         real_mobile: true,
         captureTimeout: 5 * 60 * 1000, // defaults to 120 ms
-        timeout: 1000,                 // defaults to 300 ms
+        timeout: 1000, // defaults to 300 ms
       },
       FirefoxHeadless: {
         base: 'Firefox',
@@ -229,10 +229,9 @@ module.exports = function (config) {
 
   if (!process.env.TEST_NO_BROWSERS) {
     // Only re-run browsers that failed in the previous run.
-    options.browsers =
-      require('./__tests__/__helpers__/karma-load-successful-browsers.cjs').filter(
-        options.browsers
-      )
+    options.browsers = require('./__tests__/__helpers__/karma-load-successful-browsers.cjs').filter(
+      options.browsers
+    )
     console.log('running with browsers:', options.browsers)
   }
 

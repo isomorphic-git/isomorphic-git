@@ -1,4 +1,4 @@
-// @ts-check
+
 import { _currentBranch } from '../commands/currentBranch'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'

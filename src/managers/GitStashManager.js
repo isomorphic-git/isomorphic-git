@@ -1,4 +1,4 @@
-import '../typedefs.js'
+import '@isomorphic-git/types'
 
 import { _readCommit } from '../commands/readCommit'
 import { _writeCommit } from '../commands/writeCommit'
@@ -16,7 +16,7 @@ export class GitStashManager {
    * Creates an instance of GitStashManager.
    *
    * @param {Object} args
-   * @param {FSClient} args.fs - A file system implementation.
+   * @param {FsClient} args.fs - A file system implementation.
    * @param {string} args.dir - The working directory.
    * @param {string}[args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
    */

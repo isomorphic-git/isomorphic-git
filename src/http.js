@@ -1,0 +1,1 @@
+export { request } from "./managers/GitRemoteHTTP";

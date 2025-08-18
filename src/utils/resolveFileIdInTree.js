@@ -1,4 +1,4 @@
-// @ts-check
+
 import { GitTree } from '../models/GitTree.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 

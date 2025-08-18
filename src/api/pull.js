@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _pull } from '../commands/pull.js'
 import { MissingNameError } from '../errors/MissingNameError.js'

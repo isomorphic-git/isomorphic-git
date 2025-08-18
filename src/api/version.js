@@ -1,4 +1,4 @@
-// @ts-check
+
 import { pkg } from '../utils/pkg.js'
 
 /**

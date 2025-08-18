@@ -1,4 +1,4 @@
-// @ts-check
+
 import { hashObject } from '../storage/hashObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 

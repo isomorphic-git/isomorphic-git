@@ -1,4 +1,4 @@
-import '../typedefs.js'
+import '@isomorphic-git/types'
 
 import { _readTag } from '../commands/readTag.js'
 import { FileSystem } from '../models/FileSystem.js'

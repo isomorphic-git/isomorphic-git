@@ -1,0 +1,8 @@
+{
+  "name": "isomorphic-git",
+  "version": "2.0.0-pre.0",
+  "description": "A pure JavaScript reimplementation of git for node and browsers",
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js"
+}

@@ -1,11 +1,12 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _addRemote } from '../commands/addRemote.js'
 import { _checkout } from '../commands/checkout.js'
 import { _fetch } from '../commands/fetch.js'
 import { _init } from '../commands/init.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { request } from '../managers/GitRemoteHTTP.js'
 
 /**
  * @param {object} args
@@ -41,7 +42,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
 export async function _clone({
   fs,
   cache,
-  http,
+  http = { request },
   onProgress,
   onMessage,
   onAuth,

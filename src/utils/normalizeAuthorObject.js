@@ -1,4 +1,4 @@
-import '../typedefs.js'
+import '@isomorphic-git/types'
 import { _getConfig } from '../commands/getConfig'
 
 import { assignDefined } from './assignDefined.js'

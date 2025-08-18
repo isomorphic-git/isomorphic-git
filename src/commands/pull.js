@@ -1,10 +1,11 @@
-// @ts-check
+
 
 import { _checkout } from '../commands/checkout.js'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _fetch } from '../commands/fetch.js'
 import { _merge } from '../commands/merge.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { request } from '../managers/GitRemoteHTTP.js'
 
 /**
  * @param {object} args
@@ -47,7 +48,7 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
 export async function _pull({
   fs,
   cache,
-  http,
+  http = { request },
   onProgress,
   onMessage,
   onAuth,

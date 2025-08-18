@@ -1,0 +1,9 @@
+{
+    "name":"@isomorphic-git/src",
+    "private":true,
+    "description":"A pure JavaScript implementation of git",
+    "type":"module",
+    "main":"./index.js",
+    "bin":{"isogit":"./cli.cjs"},
+    "sideEffects":false
+}

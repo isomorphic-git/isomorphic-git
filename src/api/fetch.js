@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _fetch } from '../commands/fetch.js'
 import { FileSystem } from '../models/FileSystem.js'

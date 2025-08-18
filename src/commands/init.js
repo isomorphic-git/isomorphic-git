@@ -1,4 +1,4 @@
-// @ts-check
+
 import { join } from '../utils/join.js'
 
 /**
