@@ -813,3 +813,31 @@ describe('stash pop', () => {
     expect(bContent.toString()).toEqual(bNewContent) // make sure the 2nd staged changes are applied
   })
 })
+
+describe('stash regression #2138', () => {
+  it('should not lose stashes after stash pop followed by stash push', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('stashRegression')
+    await addUserConfig(fs, dir, gitdir)
+
+    // --- stash 1 ---
+    await fs.write(dir + '/a.txt', 'change 1')
+    await stash({ fs, dir, gitdir, message: 'stash 1', op: 'push' })
+    // --- stash 2 ---
+    await fs.write(dir + '/a.txt', 'change 2')
+    await stash({ fs, dir, gitdir, message: 'stash 2', op: 'push' })
+
+    let stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes.length).toBe(2)
+
+    // Pop stash 2
+    await stash({ fs, dir, gitdir, op: 'pop' })
+
+    stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes.length).toBe(1)
+    // Push stash 2 again
+    await stash({ fs, dir, gitdir, message: 'stash 2', op: 'push' })
+
+    stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes.length).toBe(2)
+  })
+})

@@ -836,6 +836,15 @@
         "platform",
         "userTesting"
       ]
+    },
+    {
+      "login": "bekatan",
+      "name": "Bekatan Satyev",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19550476?v=4",
+      "profile": "https://github.com/bekatan",
+      "contributions": [
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
