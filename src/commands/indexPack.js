@@ -1,4 +1,4 @@
-// @ts-check
+
 import { GitPackIndex } from '../models/GitPackIndex.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { join } from '../utils/join.js'

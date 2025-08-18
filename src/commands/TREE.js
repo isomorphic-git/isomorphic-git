@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { GitWalkerRepo } from '../models/GitWalkerRepo.js'
 import { GitWalkSymbol } from '../utils/symbols.js'

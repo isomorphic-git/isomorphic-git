@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'

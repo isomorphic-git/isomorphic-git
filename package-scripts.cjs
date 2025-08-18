@@ -1,15 +1,18 @@
 // package-scripts.js is a convention used by the 'nps' utility
 // It's like package.json scripts, but more flexible.
-const { concurrent, series, runInNewWindow } = require('nps-utils')
-
 const pkg = require('./package.json')
+
+const { concurrent, series, runInNewWindow } = require('nps-utils')
 
 const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.cjs')
 
-const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
+const retry = n => cmd =>
+  Array(n)
+    .fill(`(${cmd})`)
+    .join(` || `)
 const retry3 = retry(3)
 
 const quote = cmd =>
@@ -88,9 +91,9 @@ module.exports = {
     },
     build: {
       default: series.nps(
-        'build.rollup',
+        'build.rollup', //TODO: Uses no-treeshake while it should be total ok to treeshake as we are ESM maybe hack from before
         'build.typings',
-        'build.webpack',
+        //'build.webpack',
         'build.indexjson',
         'build.treeshake',
         'build.docs',
@@ -101,26 +104,26 @@ module.exports = {
       typings: 'tsc -p declaration.tsconfig.json',
       webpack: 'webpack --config webpack.config.cjs',
       indexjson: `node __tests__/__helpers__/make_http_index.cjs`,
-      treeshake: 'agadoo',
+      treeshake: 'node -e "console.log(`TODO: look if treeshake and no treeshake is the same result it should be`)"',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
       size: process.env.CI
         ? optional(`cross-env ${bundlewatchEnvironmentVariables()} bundlewatch`)
         : optional(`cross-env bundlewatch`),
-      pack: 'npm pack',
+      // pack: 'npm pack',
     },
     website: {
       default: process.env.CI
         ? series.nps(
-          'website.codemirrorify',
-          'website.cpstatic',
-          'website.build',
-          'website.publish'
-        )
+            'website.codemirrorify',
+            'website.cpstatic',
+            'website.build',
+            'website.publish'
+          )
         : series.nps(
-          'website.codemirrorify',
-          'website.cpstatic',
-          'website.dev'
-        ),
+            'website.codemirrorify',
+            'website.cpstatic',
+            'website.dev'
+          ),
       codemirrorify:
         '(cd website/packages/codemirrorify && npm install && npm run build)',
       cpstatic:

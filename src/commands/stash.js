@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { checkout } from '../api/checkout.js'
 import { readCommit } from '../api/readCommit.js'

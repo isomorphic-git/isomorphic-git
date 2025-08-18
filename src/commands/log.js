@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _readCommit } from '../commands/readCommit.js'
 import { NotFoundError } from '../errors/NotFoundError.js'

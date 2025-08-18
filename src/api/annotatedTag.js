@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _annotatedTag } from '../commands/annotatedTag.js'
 import { MissingNameError } from '../errors/MissingNameError.js'

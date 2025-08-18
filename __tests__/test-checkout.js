@@ -1,4 +1,4 @@
-import http from 'isomorphic-git/http'
+import http from 'packages/http/node/index.js'
 
 /* eslint-env node, browser, jasmine */
 const {
@@ -11,7 +11,7 @@ const {
   getConfig,
   fetch: gitFetch,
   setConfig,
-} = require('isomorphic-git')
+} = require('packages/isomorphic-git/index.js')
 
 /* eslint-env node, browser, jasmine */
 

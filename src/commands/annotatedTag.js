@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'

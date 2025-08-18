@@ -1,41 +1,9 @@
-{ "name": "@isomorphic-git/src", "private": true,
-"description": "A pure JavaScript implementation of git",
-  "type": "module",
-  "typings": "./index.d.cts",
-  "main": "./index.js",
-  "exports": {
-    "./*": "./*",
-    ".": {
-      "types": "./index.d.ts",
-      "default": "./index.js"
-    },
-    "./http/node": {
-      "module-sync": {
-        "types": "./http/node/index.d.ts",
-        "default": "./http/node/index.js"
-      }
-    },
-    "./http/web": {
-      "module-sync": {
-        "types": "./http/web/index.d.ts",
-        "default": "./http/web/index.js"
-      }
-    },
-    "./managers": {
-      "module-sync": {
-        "types": "./managers/index.d.ts",
-        "default": "./managers/index.js"
-      }
-    },
-    "./models": {
-      "module-sync": {
-        "types": "./models/index.d.ts",
-        "default": "./models/index.js"
-      }
-    }
-  },
-  "bin": {
-    "isogit": "./cli.cjs"
-  },
-  "sideEffects": false
+{
+    "name":"@isomorphic-git/src",
+    "private":true,
+    "description":"A pure JavaScript implementation of git",
+    "type":"module",
+    "main":"./index.js",
+    "bin":{"isogit":"./cli.cjs"},
+    "sideEffects":false
 }

@@ -1,4 +1,4 @@
-// @ts-check
+
 /**
  *
  * @param {WalkerEntry} entry

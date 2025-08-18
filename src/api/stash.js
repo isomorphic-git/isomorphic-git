@@ -1,4 +1,4 @@
-// @ts-check
+
 import {
   _stashPush,
   _stashApply,

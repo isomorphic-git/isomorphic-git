@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _findMergeBase } from '../commands/findMergeBase.js'
@@ -22,6 +22,7 @@ import { pkg } from '../utils/pkg.js'
 import { splitLines } from '../utils/splitLines.js'
 import { parseReceivePackResponse } from '../wire/parseReceivePackResponse.js'
 import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
+import { request } from '../managers/GitRemoteHTTP'
 
 /**
  * @param {object} args
@@ -49,7 +50,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
 export async function _push({
   fs,
   cache,
-  http,
+  http = { request },
   onProgress,
   onMessage,
   onAuth,
@@ -59,7 +60,7 @@ export async function _push({
   gitdir,
   ref: _ref,
   remoteRef: _remoteRef,
-  remote,
+  remote="",
   url: _url,
   force = false,
   delete: _delete = false,
@@ -249,7 +250,10 @@ export async function _push({
   )
   const packstream1 = await writeReceivePackRequest({
     capabilities,
-    triplets: [{ oldoid, oid, fullRef: fullRemoteRef }],
+    // @ts-expect-error This things are not typed
+    triplets: [{ 
+      oldoid, oid, fullRef: fullRemoteRef 
+    }],
   })
   const packstream2 = _delete
     ? []

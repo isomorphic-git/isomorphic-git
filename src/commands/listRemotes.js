@@ -1,4 +1,4 @@
-// @ts-check
+
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 
 /**

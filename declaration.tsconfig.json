@@ -1,14 +1,17 @@
 {
   "include": [
-    "index.js", "index.cjs",
-    "http/web/index.js", "http/web/index.cjs",
-    "http/node/index.js", "http/node/index.cjs",
-    "managers/index.js", "managers/index.cjs",
-    "models/index.js", "models/index.cjs"
+    "index.js",
+    "managers/index.js",
+    "models/index.js"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "types": [],
+    "moduleResolution": "node",
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["ESNext", "dom"],
+    "resolveJsonModule": true,
+    "types": ["@isomorphic-git/types"],
     "strictNullChecks": true,
     "allowJs": true,
     "declaration": true,

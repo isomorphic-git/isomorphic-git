@@ -1,6 +1,6 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
-const { walk, WORKDIR, TREE, STAGE, setConfig } = require('isomorphic-git')
+const { walk, WORKDIR, TREE, STAGE, setConfig } = require('packages/isomorphic-git/index.js')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 

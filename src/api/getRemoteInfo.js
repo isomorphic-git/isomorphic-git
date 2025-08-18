@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { assertParameter } from '../utils/assertParameter.js'

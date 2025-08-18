@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const git = require('isomorphic-git')
+const git = require('packages/isomorphic-git')
 
 describe('exports', () => {
   it('exposes only the intended API functions', async () => {

@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { arrayRange } from '../utils/arrayRange.js'
 import { flat } from '../utils/flat.js'

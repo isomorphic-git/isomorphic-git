@@ -7,7 +7,7 @@ const {
   init,
   currentBranch,
   listFiles,
-} = require('isomorphic-git')
+} = require('packages/isomorphic-git/index.js')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 

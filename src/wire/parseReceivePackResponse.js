@@ -1,4 +1,4 @@
-import '../typedefs.js'
+import '@isomorphic-git/types'
 
 import { ParseError } from '../errors/ParseError.js'
 import { GitPktLine } from '../models/GitPktLine.js'

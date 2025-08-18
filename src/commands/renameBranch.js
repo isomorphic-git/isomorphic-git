@@ -1,11 +1,11 @@
-// @ts-check
+
 import cleanGitRef from 'clean-git-ref'
 
 import { _currentBranch } from '../commands/currentBranch.js'
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import '../typedefs.js'
+import '@isomorphic-git/types'
 
 /**
  * Rename a branch

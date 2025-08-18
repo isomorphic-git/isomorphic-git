@@ -46,50 +46,33 @@ const umdConfig = (input, output, name) => ({
   output: [
     {
       format: 'umd',
-      file: `${output}`,
+      file: `packages/isomorphic-git/dist/${output}`,
       name,
       exports: 'named',
     },
   ],
 })
 
-const template = umd =>
-  JSON.stringify(
-    {
-      type: 'module',
-      main: 'index.cjs',
-      module: 'index.js',
-      typings: 'index.d.ts',
-      unpkg: umd ? 'index.umd.js' : undefined,
-    },
-    null,
-    2
-  )
-
-const pkgify = (input, output, name) => {
-  fs.mkdirSync(path.join(import.meta.dirname, output), { recursive: true })
-  fs.writeFileSync(
-    path.join(import.meta.dirname, output, 'package.json'),
-    template(!!name)
-  )
-  return [
-    ecmaConfig(`${input}/index.js`, `${output}/index.js`),
-    nodeConfig(`${input}/index.js`, `${output}/index.cjs`),
-    ...(name
-      ? [umdConfig(`${input}/index.js`, `${output}/index.umd.js`, name)]
-      : []),
-  ]
-}
-
 export default [
+  {
+  input: {
+      'index': 'src/index.js',
+      'internal/apis': 'src/internal-apis.js',
+      'managers': 'src/managers/index.js',
+      'models': 'src/models/index.js',
+  },
+  external: [...external],
+  output: [
+    {
+      format: 'es',
+      chunkFileNames: "internal/[name].js",
+      minifyInternalExports: false,
+      dir: `packages/isomorphic-git/dist`,
+    },
+  ],
+},
   ecmaConfig('index.js', 'index.js'),
-  nodeConfig('index.js', 'index.cjs'),
   ecmaConfig('internal-apis.js', 'internal-apis.js'),
-  nodeConfig('internal-apis.js', 'internal-apis.cjs'),
   ecmaConfig('managers/index.js', 'managers/index.js'),
-  nodeConfig('managers/index.js', 'managers/index.cjs'),
-  ecmaConfig('models/index.js', 'models/index.js'),
-  nodeConfig('models/index.js', 'models/index.cjs'),
-  ...pkgify('http/node', 'http/node'),
-  ...pkgify('http/web', 'http/web', 'GitHttp'),
+  ecmaConfig('models/index.js', 'models/index.js')
 ]

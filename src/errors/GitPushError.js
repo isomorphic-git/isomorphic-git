@@ -1,4 +1,4 @@
-import '../typedefs.js'
+import '@isomorphic-git/types'
 import { BaseError } from './BaseError.js'
 
 export class GitPushError extends BaseError {

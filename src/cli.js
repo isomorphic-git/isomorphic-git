@@ -1,22 +1,19 @@
 #!/usr/bin/env node
-const fs = require('fs')
-
-const minimisted = require('minimisted')
-
-const git = require('.')
-
-const http = require('./http/node')
+import fs from 'fs';
+import http from '../packages/isomorphic-git/http/node';
+import git from '.';
+import minimisted from 'minimisted';
 
 // This really isn't much of a CLI. It's mostly for testing.
 // But it's very versatile and works surprisingly well.
 
-minimisted(async function({ _: [command, ...args], ...opts }) {
+minimisted(async ({ _: [command, ...args], ...opts }) => {
   try {
     const result = await git[command](
       Object.assign(
         {
           fs,
-          http,
+          http = { request },
           dir: '.',
           onAuth: () => ({ username: opts.username, password: opts.password }),
           headers: {
@@ -34,7 +31,7 @@ minimisted(async function({ _: [command, ...args], ...opts }) {
       console.log(JSON.stringify(result, null, 2))
     }
   } catch (err) {
-    process.stderr.write(err.message + '\n')
+    process.stderr.write(`${err.message}\n`)
     console.log(err)
     process.exit(1)
   }

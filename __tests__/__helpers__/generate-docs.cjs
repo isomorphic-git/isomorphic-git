@@ -5,7 +5,7 @@ const path = require('path')
 const jsdoc = require('jsdoc-api')
 const table = require('markdown-table')
 
-const git = require('../..')
+const git = require('../../packages/isomorphic-git')
 
 const dir = path.join(__dirname, '..', '..')
 const thisFile = path.relative(dir, __filename).replace(/\\/g, '/')

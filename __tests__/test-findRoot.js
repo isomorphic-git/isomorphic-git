@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 const path = require('path')
 
-const { findRoot } = require('isomorphic-git')
+const { findRoot } = require('packages/isomorphic-git/index.js')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 

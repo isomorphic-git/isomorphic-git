@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'

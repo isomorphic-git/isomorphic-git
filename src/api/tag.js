@@ -1,4 +1,4 @@
-// @ts-check
+
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitRefManager } from '../managers/GitRefManager'

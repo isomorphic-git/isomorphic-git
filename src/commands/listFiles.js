@@ -1,4 +1,4 @@
-// @ts-check
+
 import { _readTree } from '../commands/readTree'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'

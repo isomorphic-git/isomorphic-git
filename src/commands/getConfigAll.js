@@ -1,11 +1,10 @@
-// @ts-check
-import '../typedefs.js'
 
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 
 /**
  * @param {Object} args
  * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * //TODO: Upgrade to native FileSystem API
  * @param {string} args.gitdir
  * @param {string} args.path
  *

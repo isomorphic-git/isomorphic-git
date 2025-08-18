@@ -1,4 +1,4 @@
-// @ts-check
+
 import { resolveBlob } from '../utils/resolveBlob.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 

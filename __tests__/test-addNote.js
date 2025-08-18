@@ -5,7 +5,7 @@ const {
   readBlob,
   resolveRef,
   readTree,
-} = require('isomorphic-git')
+} = require('packages/isomorphic-git/index.js')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 

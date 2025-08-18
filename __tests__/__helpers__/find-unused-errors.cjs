@@ -1,4 +1,4 @@
-const { Errors } = require('../..')
+const { Errors } = require('../../packages/isomorphic-git')
 const replace = require('replace-in-file')
 
 const errors = Object.keys(Errors).map(name => `E.${name}`)

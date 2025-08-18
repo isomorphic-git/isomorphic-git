@@ -1,5 +1,5 @@
-// @ts-check
-import '../typedefs.js'
+
+import '@isomorphic-git/types'
 
 import { TREE } from '../commands/TREE.js'
 import { _walk } from '../commands/walk.js'
