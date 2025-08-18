@@ -46,7 +46,7 @@ const umdConfig = (input, output, name) => ({
   output: [
     {
       format: 'umd',
-      file: `packages/isomorphic-git/dist/${output}`,
+      file: `${output}`,
       name,
       exports: 'named',
     },
@@ -57,22 +57,25 @@ export default [
   {
   input: {
       'index': 'src/index.js',
-      'internal/apis': 'src/internal-apis.js',
-      'managers': 'src/managers/index.js',
-      'models': 'src/models/index.js',
+      // 'internal/apis': 'src/internal-apis.js',
+      // 'managers': 'src/managers/index.js',
+      // 'models': 'src/models/index.js',
+      'models/FileSystem': 'src/models/FileSystem.js',
   },
   external: [...external],
   output: [
     {
       format: 'es',
+      dir: `packages/isomorphic-git`,
       chunkFileNames: "internal/[name].js",
       minifyInternalExports: false,
-      dir: `packages/isomorphic-git/dist`,
+      preserveModules: true,
+			preserveModulesRoot: 'src'
     },
   ],
 },
-  ecmaConfig('index.js', 'index.js'),
-  ecmaConfig('internal-apis.js', 'internal-apis.js'),
-  ecmaConfig('managers/index.js', 'managers/index.js'),
-  ecmaConfig('models/index.js', 'models/index.js')
+  // ecmaConfig('index.js', 'index.js'),
+  // ecmaConfig('internal-apis.js', 'internal-apis.js'),
+  // ecmaConfig('managers/index.js', 'managers/index.js'),
+  // ecmaConfig('models/index.js', 'models/index.js')
 ]

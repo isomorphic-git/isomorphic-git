@@ -10,7 +10,7 @@ const {
   TREE,
   WORKDIR,
   walk,
-} = require('packages/isomorphic-git/index.js')
+} = require('isomorphic-git')
 const { GitIndexManager, modified } = require('isomorphic-git/internal-apis')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')

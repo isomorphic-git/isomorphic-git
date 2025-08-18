@@ -1,12 +1,15 @@
 {
-  "include": ["__tests__"],
+  "include": ["__tests__","packages/isomorphic-git/**/*"],
+  "references": [
+    { "path": "./packages/isomorphic-git/jsconfig.json" },
+  ],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "maxNodeModuleJsDepth": 2,
+    "maxNodeModuleJsDepth": 1,
     "strictNullChecks": true,
     "noEmit": true,
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "moduleResolution": "node",
     "target": "esnext",
     "module": "esnext",

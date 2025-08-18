@@ -101,7 +101,7 @@ module.exports = {
         'build.pack'
       ),
       rollup: 'rollup -c --no-treeshake',
-      typings: 'tsc -p declaration.tsconfig.json',
+      typings: 'tsc --build',
       webpack: 'webpack --config webpack.config.cjs',
       indexjson: `node __tests__/__helpers__/make_http_index.cjs`,
       treeshake: 'node -e "console.log(`TODO: look if treeshake and no treeshake is the same result it should be`)"',
@@ -109,7 +109,7 @@ module.exports = {
       size: process.env.CI
         ? optional(`cross-env ${bundlewatchEnvironmentVariables()} bundlewatch`)
         : optional(`cross-env bundlewatch`),
-      // pack: 'npm pack',
+      pack: 'npm pack',
     },
     website: {
       default: process.env.CI

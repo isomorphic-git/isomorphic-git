@@ -3,7 +3,7 @@ import http from 'packages/http/node/index.js'
 
 const path = require('path')
 
-const { setConfig, pull, log, add, commit, Errors } = require('packages/isomorphic-git/index.js')
+const { setConfig, pull, log, add, commit, Errors } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
