@@ -1,4 +1,4 @@
-import http from 'packages/http/node/index.js'
+import http from 'isomorphic-git/http'
 
 /* eslint-env node, browser, jasmine */
 const {

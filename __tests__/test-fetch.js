@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import http from 'packages/http/node/index.js'
+import http from 'isomorphic-git/http'
 
 const { Errors, setConfig, fetch } = require('isomorphic-git')
 const { sleep } = require('isomorphic-git/internal-apis')

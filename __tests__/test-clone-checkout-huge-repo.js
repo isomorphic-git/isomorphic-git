@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import http from 'packages/http/node/index.js'
+import http from 'isomorphic-git/http'
 
 const { clone } = require('isomorphic-git')
 

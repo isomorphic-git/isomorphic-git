@@ -1,5 +1,5 @@
 {
-  "include": ["__tests__","packages/isomorphic-git/**/*"],
+  "include": ["__tests__"],
   "references": [
     { "path": "./packages/isomorphic-git/jsconfig.json" },
   ],

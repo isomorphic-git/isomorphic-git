@@ -57,9 +57,10 @@ export default [
   {
   input: {
       'index': 'src/index.js',
-      // 'internal/apis': 'src/internal-apis.js',
-      // 'managers': 'src/managers/index.js',
-      // 'models': 'src/models/index.js',
+      'http': 'src/http.js',
+      'internal-apis': 'src/internal-apis.js',
+      'managers/index': 'src/managers/index.js',
+      'models/index': 'src/models/index.js',
       'models/FileSystem': 'src/models/FileSystem.js',
   },
   external: [...external],
@@ -69,7 +70,7 @@ export default [
       dir: `packages/isomorphic-git`,
       chunkFileNames: "internal/[name].js",
       minifyInternalExports: false,
-      preserveModules: true,
+      preserveModules: false,
 			preserveModulesRoot: 'src'
     },
   ],
