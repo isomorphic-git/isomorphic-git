@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/awesome-os/isomorphic-git.git"
+    "url": "https://github.com/isomorphic-git/isomorphic-git.git"
   },
   "keywords": [
     "git",
