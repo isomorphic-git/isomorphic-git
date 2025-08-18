@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { writeObject } = require('isomorphic-git')
+const { readObject, writeObject } = require('isomorphic-git')
 
 const { makeFixture } = require('./__helpers__/FixtureFS.js')
 
@@ -102,11 +102,12 @@ Qixh2bmPgr3h9nxq2Dmn
     // Setup
     const { fs, gitdir } = await makeFixture('test-writeObject')
     // Test
+    let expectedContents
     const oid = await writeObject({
       fs,
       gitdir,
       type: 'blob',
-      object: `#!/usr/bin/env node
+      object: (expectedContents = `#!/usr/bin/env node
 const minimisted = require('minimisted')
 const git = require('.')
 
@@ -133,11 +134,13 @@ minimisted(async function ({ _: [command, ...args], ...opts }) {
   if (result === undefined) return
   console.log(JSON.stringify(result, null, 2))
 })
-`,
+`),
       format: 'parsed',
       encoding: 'utf8',
     })
     expect(oid).toEqual('4551a1856279dde6ae9d65862a1dff59a5f199d8')
+    const result = await readObject({ fs, gitdir, oid })
+    expect(Buffer.from(result.object).toString()).toEqual(expectedContents)
   })
   it('tree', async () => {
     // Setup
