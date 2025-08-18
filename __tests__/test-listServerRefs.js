@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-import http from 'packages/http/node'
+import http from 'isomorphic-git/http'
 
-const { listServerRefs } = require('packages/isomorphic-git/dist')
+const { listServerRefs } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =

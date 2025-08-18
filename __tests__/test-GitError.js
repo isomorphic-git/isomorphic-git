@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 
-const { Errors } = require('packages/isomorphic-git/dist')
+const { Errors } = require('isomorphic-git')
 
 describe('Errors', () => {
   it('have the correct value for their static property code', async () => {

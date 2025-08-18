@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { Errors } = require('packages/isomorphic-git/dist')
+const { Errors } = require('isomorphic-git')
 const {
   GitRemoteManager,
   GitRemoteHTTP,
