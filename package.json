@@ -54,8 +54,14 @@
     "./*.json": "./*.json",
     "./*": "./*.js",
     ".": {
-      "types": "./index.d.cts",
-      "default": "./index.cjs"
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "require": {
+        "types": "./index.d.cts",
+        "default": "./index.cjs"
+      }
     }
   },
   "unpkg": "./index.umd.min.js",
