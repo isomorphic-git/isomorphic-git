@@ -51,6 +51,9 @@ const external = [
 const ecmaConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
+  plugins: [
+    pluginVirtualAssets
+  ],
   output: [
     {
       format: 'es',
