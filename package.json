@@ -7,7 +7,6 @@
   "main": "./index.cjs",
   "module": "./index.js",
   "exports": {
-    "./*": "./*",
     "./http/node": {
       "import": {
         "types": "./http/node/index.d.ts",
@@ -48,6 +47,7 @@
         "default": "./models/index.cjs"
       }
     },
+    "./*": "./*",
     ".": {
       "types": "./index.d.cts",
       "default": "./index.cjs"
