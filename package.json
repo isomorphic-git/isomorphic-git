@@ -7,10 +7,7 @@
   "main": "./index.cjs",
   "module": "./index.js",
   "exports": {
-    ".": {
-      "types": "./index.d.cts",
-      "default": "./index.cjs"
-    },
+    "./*": "./*",
     "./http/node": {
       "import": {
         "types": "./http/node/index.d.ts",
@@ -50,6 +47,10 @@
         "types": "./models/index.d.cts",
         "default": "./models/index.cjs"
       }
+    },
+    ".": {
+      "types": "./index.d.cts",
+      "default": "./index.cjs"
     }
   },
   "unpkg": "./index.umd.min.js",
