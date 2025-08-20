@@ -47,7 +47,12 @@
         "default": "./models/index.cjs"
       }
     },
-    "./*": "./*",
+    "./*.js": "./*.js",
+    "./*.ts": "./*.ts",
+    "./*.cjs": "./*.cjs",
+    "./*.cts": "./*.cts",
+    "./*.json": "./*.json",
+    "./*": "./*.js",
     ".": {
       "types": "./index.d.cts",
       "default": "./index.cjs"
