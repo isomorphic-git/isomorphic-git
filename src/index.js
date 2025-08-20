@@ -69,4 +69,4 @@ export { writeObject } from './api/writeObject.js';
 export { writeRef } from './api/writeRef.js';
 export { writeTag } from './api/writeTag.js';
 export { writeTree } from './api/writeTree.js';
-export * as Errors from './errors/index.js';
+export * from './internal-apis.js'
