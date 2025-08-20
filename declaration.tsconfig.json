@@ -1,6 +1,6 @@
 {
   "include": [
-    "index.js", "index.cjs",
+    "index.js",
     "http/web/index.js", "http/web/index.cjs",
     "http/node/index.js", "http/node/index.cjs",
     "managers/index.js", "managers/index.cjs",
