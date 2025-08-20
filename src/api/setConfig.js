@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -63,13 +64,14 @@ export async function setConfig({
     // assertParameter('value', value) // We actually allow 'undefined' as a value to unset/delete
 
     const fs = new FileSystem(_fs)
-    const config = await GitConfigManager.get({ fs, gitdir })
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
+    const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
     if (append) {
       await config.append(path, value)
     } else {
       await config.set(path, value)
     }
-    await GitConfigManager.save({ fs, gitdir, config })
+    await GitConfigManager.save({ fs, gitdir: updatedGitdir, config })
   } catch (err) {
     err.caller = 'git.setConfig'
     throw err

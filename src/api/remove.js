@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -37,8 +38,10 @@ export async function remove({
     assertParameter('gitdir', gitdir)
     assertParameter('filepath', filepath)
 
+    const fsp = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     await GitIndexManager.acquire(
-      { fs: new FileSystem(_fs), gitdir, cache },
+      { fs: fsp, gitdir: updatedGitdir, cache },
       async function(index) {
         index.delete({ filepath })
       }

@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _writeTree } from '../commands/writeTree.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -26,9 +27,11 @@ export async function writeTree({ fs, dir, gitdir = join(dir, '.git'), tree }) {
     assertParameter('gitdir', gitdir)
     assertParameter('tree', tree)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _writeTree({
-      fs: new FileSystem(fs),
-      gitdir,
+      fs: fsp,
+      gitdir: updatedGitdir,
       tree,
     })
   } catch (err) {
