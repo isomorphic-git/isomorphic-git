@@ -61,95 +61,22 @@ const external = [
   'sha.js/sha1',
   'sha.js/sha1.js',
   ...Object.keys(pkg.dependencies),
-]
-
-// Modern modules
-const ecmaConfig = (input, output) => ({
-  input: `${input}`,
-  external: [...external],
-  output: [
-    {
-      format: 'es',
-      file: `${output}`,
-    },
-  ],
-})
-
-// Legacy CommonJS2 modules
-const nodeConfig = (input, output) => ({
-  input: `${input}`,
-  external: [...external],
-  output: [
-    {
-      format: 'cjs',
-      file: `${output}`,
-      exports: 'named',
-    },
-  ],
-})
-
-// Script tags that "export" a global var for those browser environments that
-// still don't support `import` (Workers and ServiceWorkers)
-const umdConfig = (input, output, name) => ({
-  input: `src/${input}`,
-  output: [
-    {
-      format: 'umd',
-      file: `${output}`,
-      name,
-      exports: 'named',
-    },
-  ],
-})
-
-const template = umd =>
-  JSON.stringify(
-    {
-      type: 'module',
-      main: 'index.cjs',
-      module: 'index.js',
-      typings: 'index.d.ts',
-      unpkg: umd ? 'index.umd.js' : undefined,
-    },
-  )
-
-const pkgify = (input, output, name) => {
-  fs.mkdirSync(path.join(import.meta.dirname, output), { recursive: true })
-  fs.writeFileSync(
-    path.join(import.meta.dirname, output, 'package.json'),
-    template(name)
-  )
-  return [    
-    ecmaConfig(`${input}/index.js`, `${output}/index.js`),
-    // TODO: next step is to deprecate the cjs build at all 
-    // and make it optional as npx rollup can create that with a single command in the consumer dir
-    nodeConfig(`${input}/index.js`, `${output}/index.cjs`),
-    ...(name
-      ? [umdConfig(`${input}/index.js`, `${output}/index.umd.js`, name)]
-      : []),
-  ]
-}
+];
 
 export default [
-  // Build isomorphic-git
-  {
-    input: `src/index.js`,
-    external: [...external],
-    plugins: [ pluginVirtualAssets ],
-    output: { format: 'es', dir: import.meta.dirname, },
+  // Build isomorphic-git ESM
+  { 
+    output: { format: 'es', dir: import.meta.dirname }, input: `src/index.js`, 
+    external: [...external], plugins: [ 
+      // Emits all kind of hotFix files as asset to fix the current package state.    
+      pluginVirtualAssets 
+    ] 
   },
-  { // The index.d.cts got created in the build step before 
-    input: `index.js`, // take the files from the  bundle created before
-    external: [...external],
-    output: { format: 'cjs', file: `index.cjs`, exports: 'named', },
-  },
-  // Build isomorphic-git/http/node
-  {
-    input: `src/http/node/index.js`,
-    external: [...external],
-    plugins: [{
-      name: 'emit-package.json',
-      buildStart() {
+  // Build isomorphic-git/http/node ESM and create package.json 
+  { 
+    output: { format: 'es', dir: import.meta.dirname + '/http/node', }, input: `src/http/node/index.js`, 
+    external: [...external], plugins: [{
+      name: 'emit-http-node-package.json', buildStart() {
          this.emitFile({ 
            type: 'asset', fileName: "package.json", 
            source: JSON.stringify({ 
@@ -158,19 +85,13 @@ export default [
          });  
       }
     }],
-    output: { format: 'es', dir: import.meta.dirname + 'http/node', },
   },
-  { 
-    input: `http/node/index.js`, // take the files from the  bundle created before
-    external: [...external],
-    output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named', },
-  },
-  // Build isomorphic-git/http/web
+  // Build isomorphic-git/http/web ESM and create package.json
   {
     input: `src/http/web/index.js`,
     external: [...external],
     plugins: [{
-      name: 'emit-package.json', buildStart() {
+      name: 'emit-http-web-package.json', buildStart() {
          this.emitFile({ 
            type: 'asset', fileName: "package.json", 
            source: JSON.stringify({ 
@@ -182,15 +103,19 @@ export default [
     }],
     output: { format: 'es', dir: import.meta.dirname + 'http/web', },
   },
+  // Build isomorphic-git CJS The index.d.cts got created in the build step before take the files from the  bundle created before
+  { output: { format: 'cjs', file: `index.cjs`, exports: 'named', }, input: `index.js`, external: [...external] },
+  { output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named' }, input: `http/node/index.js`, external: [...external] },
   { 
     input: `http/web/index.js`, // take the files from the  bundle created before
     external: [...external],
     output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named', },
   },
+  // Create UMD Build of HTTP the UMD Build of isomorphic-git gets done via webpack......
   {
     input: `http/web/index.js`, // take files from the bundle created before
     output: {
       format: 'umd', file: `http/web/index.umd.js`, name: 'GitHttp', exports: 'named',
     },
-  }
-]
+  },
+];
