@@ -3,7 +3,7 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
-  "typings": "./index.d.cts",
+  "types": "./index.d.cts",
   "main": "./index.cjs",
   "module": "./index.js",
   "exports": {
@@ -48,9 +48,9 @@
       }
     },
     "./*.js": "./*.js",
-    "./*.ts": "./*.ts",
     "./*.cjs": "./*.cjs",
-    "./*.cts": "./*.cts",
+    "./*.d.ts": "./*.d.ts",
+    "./*.d.cts": "./*.d.cts",
     "./*.json": "./*.json",
     "./*": "./*.js",
     ".": {
