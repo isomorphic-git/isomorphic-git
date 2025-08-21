@@ -52,22 +52,14 @@ const pluginVirtualAssets = {
 // // import virtual from '@rollup/plugin-virtual';
 // // virtual(virtualModules)
 
-const external = [
-  'fs',
-  'path',
-  'crypto',
-  'stream',
-  'crc/lib/crc32.js',
-  'sha.js/sha1',
-  'sha.js/sha1.js',
-  ...Object.keys(pkg.dependencies),
-];
+// TODO: Replace that with a function that works better when we do v2
+const external = ['fs','path','crypto','stream','crc/lib/crc32.js','sha.js/sha1','sha.js/sha1.js', ...Object.keys(pkg.dependencies)];
 
 export default [
   // Build isomorphic-git ESM
   { 
     output: { format: 'es', dir: import.meta.dirname }, input: `src/index.js`, 
-    external: [...external], plugins: [ 
+    external, plugins: [ 
       // Emits all kind of hotFix files as asset to fix the current package state.    
       pluginVirtualAssets 
     ] 
@@ -75,7 +67,7 @@ export default [
   // Build isomorphic-git/http/node ESM and create package.json 
   { 
     output: { format: 'es', dir: import.meta.dirname + '/http/node', }, input: `src/http/node/index.js`, 
-    external: [...external], plugins: [{
+    external, plugins: [{
       name: 'emit-http-node-package.json', buildStart() {
          this.emitFile({ 
            type: 'asset', fileName: "package.json", 
@@ -88,9 +80,8 @@ export default [
   },
   // Build isomorphic-git/http/web ESM and create package.json
   {
-    input: `src/http/web/index.js`,
-    external: [...external],
-    plugins: [{
+    output: { format: 'es', dir: import.meta.dirname + 'http/web', }, input: `src/http/web/index.js`,
+    external, plugins: [{
       name: 'emit-http-web-package.json', buildStart() {
          this.emitFile({ 
            type: 'asset', fileName: "package.json", 
@@ -101,21 +92,12 @@ export default [
          });  
       }
     }],
-    output: { format: 'es', dir: import.meta.dirname + 'http/web', },
   },
   // Build isomorphic-git CJS The index.d.cts got created in the build step before take the files from the  bundle created before
-  { output: { format: 'cjs', file: `index.cjs`, exports: 'named', }, input: `index.js`, external: [...external] },
-  { output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named' }, input: `http/node/index.js`, external: [...external] },
-  { 
-    input: `http/web/index.js`, // take the files from the  bundle created before
-    external: [...external],
-    output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named', },
-  },
-  // Create UMD Build of HTTP the UMD Build of isomorphic-git gets done via webpack......
-  {
-    input: `http/web/index.js`, // take files from the bundle created before
-    output: {
-      format: 'umd', file: `http/web/index.umd.js`, name: 'GitHttp', exports: 'named',
-    },
-  },
+  { output: { format: 'cjs', file: `index.cjs`, exports: 'named', }, input: `index.js`, external, },
+  { output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named' }, input: `http/node/index.js`, external, },
+  { output: { format: 'cjs', file: `http/web/index.cjs`, exports: 'named', }, input: `http/web/index.js`, external, },
+  // Create UMD Build of HTTP the UMD Build of isomorphic-git gets done via webpack...... take files from the bundle created before
+  // Note this is the only build without external dependency the webpack build also has no external dependencys.
+  { output: { format: 'umd', file: `http/web/index.umd.js`, name: 'GitHttp', exports: 'named' }, input: `http/web/index.js` },
 ];
