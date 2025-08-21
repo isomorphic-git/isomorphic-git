@@ -8,15 +8,27 @@ const virtualModules = {
   // We emit some modules as hotfix for the ESM build
   // this are hotfix wrappers they should get replaced by the real files
   // in v2. and then we should look in v2 also into the declarations.tsconfig.
-  "internal-api": `export * from './index.js';`,
-  "managers": `export * from './index.js';`,
-  "models": `export * from './index.js'`,
+  // ESM Wrappers as hotfix for v1
+  "internal-api.js": `export * from './index.js';`,
+  "managers.js": `export * from './index.js';`,
+  "models.js": `export * from './index.js'`, //TODO: models index does in fact at present only export FileSystem
 }
 
 const hotFixFiles = {
   ...virtualModules,
   // TODO: remove when cjs build gets removed
+  // Note: index does not need a CJS wrapper as we do a
+  // Real CJS Build at present.
+  // CJS Files to fix the build
+  "internal-api.cjs": `module.exports = require('./index.cjs');`,
+  "managers.cjs": `module.exports = require('./index.cjs');`,
+  "models.cjs":  `module.exports = require('./index.cjs');`,
+  // CJS Type Wrappers
   "index.d.cts": `export * from './index';`,
+  "internal-api.d.cts": `export * from './index';`,
+  "managers.d.cts": `export * from './index';`,
+  "models.d.cts": `export * from './index'`,
+  // ESM Type Wrappers 
   "internal-api.d.ts": `export * from './index';`,
   "managers.d.ts": `export * from './index';`,
   "models.d.ts": `export * from './index'`,
@@ -54,9 +66,6 @@ const external = [
 const ecmaConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
-  plugins: [
-    pluginVirtualAssets
-  ],
   output: [
     {
       format: 'es',
@@ -112,6 +121,10 @@ const pkgify = (input, output, name) => {
     template(!!name)
   )
   return [
+
+
+
+    
     ecmaConfig(`${input}/index.js`, `${output}/index.js`),
     // TODO: next step is to deprecate the cjs build at all 
     // and make it optional as npx rollup can create that with a single command in the consumer dir
@@ -123,17 +136,16 @@ const pkgify = (input, output, name) => {
 }
 
 export default [
-  ecmaConfig('index.js', 'index.js'),
   {
-    input: `index.js`, // take the index.js bundle created before
+    input: `src/index.js`,
     external: [...external],
-    output: [
-      {
-        format: 'cjs',
-        file: `index.cjs`,
-        exports: 'named',
-      },
-    ],
+    plugins: [ pluginVirtualAssets ],
+    output: { format: 'es', dir: import.meta.dirname, },
+  },
+  { // The index.d.cts got created in the build step before 
+    input: `index.js`, // take the files from the  bundle created before
+    external: [...external],
+    output: { format: 'cjs', file: `index.cjs`, exports: 'named', },
   },
   // ecmaConfig('internal-apis.js', 'internal-apis.js'),
   // nodeConfig('internal-apis.js', 'internal-apis.cjs'),
