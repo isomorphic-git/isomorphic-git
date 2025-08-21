@@ -90,14 +90,12 @@ module.exports = {
       default: series.nps(
         'build.rollup',
         'build.indexjson',
-        'build.treeshake',
         'build.docs',
         'build.size',
         'build.pack'
       ),
       rollup: 'rollup -c --no-treeshake',
       indexjson: `node __tests__/__helpers__/make_http_index.cjs`,
-      treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
       size: process.env.CI
         ? optional(`cross-env ${bundlewatchEnvironmentVariables()} bundlewatch`)
