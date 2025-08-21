@@ -19,7 +19,10 @@ const virtualModules = {
 };
 
 // TODO: Replace that with a function that works better when we do v2
-const external = ['fs','path','crypto','stream','crc/lib/crc32.js','sha.js/sha1','sha.js/sha1.js', ...Object.keys(pkg.dependencies)];
+const external = [
+  'fs','path','crypto','stream','crc/lib/crc32.js','sha.js/sha1','sha.js/sha1.js', 
+  ...Object.keys(pkg.dependencies),
+];
 
 export default [
   // Build isomorphic-git ESM & CJS as also emit type declarations for ESM
@@ -109,8 +112,7 @@ export default [
       }
     }],
   },
-  // Build isomorphic-git/http/web ESM & CJS and create package.json
-  
+  // Build isomorphic-git/http/web ESM & CJS & UMD and create package.json referencing all including types from ESM
   {
     output: [
       { dir: dir + '/http/web', format: 'es' },
