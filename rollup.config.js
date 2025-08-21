@@ -8,6 +8,7 @@ const virtualModules = {
   // We emit some modules as hotfix for the ESM build
   // this are hotfix wrappers they should get replaced by the real files
   // in v2. and then we should look in v2 also into the declarations.tsconfig.
+  // NOTE: we do not need a virtual index.js we create a Real ESM Build at present.
   // ESM Wrappers as hotfix for v1
   "internal-api.js": `export * from './index.js';`,
   "managers.js": `export * from './index.js';`,
@@ -64,7 +65,7 @@ const external = [
 
 // Modern modules
 const ecmaConfig = (input, output) => ({
-  input: `src/${input}`,
+  input: `${input}`,
   external: [...external],
   output: [
     {
@@ -76,7 +77,7 @@ const ecmaConfig = (input, output) => ({
 
 // Legacy CommonJS2 modules
 const nodeConfig = (input, output) => ({
-  input: `src/${input}`,
+  input: `${input}`,
   external: [...external],
   output: [
     {
@@ -110,21 +111,15 @@ const template = umd =>
       typings: 'index.d.ts',
       unpkg: umd ? 'index.umd.js' : undefined,
     },
-    null,
-    2
   )
 
 const pkgify = (input, output, name) => {
-  fs.mkdirSync(path.join(__dirname, output), { recursive: true })
+  fs.mkdirSync(path.join(import.meta.dirname, output), { recursive: true })
   fs.writeFileSync(
-    path.join(__dirname, output, 'package.json'),
-    template(!!name)
+    path.join(import.meta.dirname, output, 'package.json'),
+    template(name)
   )
-  return [
-
-
-
-    
+  return [    
     ecmaConfig(`${input}/index.js`, `${output}/index.js`),
     // TODO: next step is to deprecate the cjs build at all 
     // and make it optional as npx rollup can create that with a single command in the consumer dir
@@ -136,6 +131,7 @@ const pkgify = (input, output, name) => {
 }
 
 export default [
+  // Build isomorphic-git
   {
     input: `src/index.js`,
     external: [...external],
@@ -147,12 +143,54 @@ export default [
     external: [...external],
     output: { format: 'cjs', file: `index.cjs`, exports: 'named', },
   },
-  // ecmaConfig('internal-apis.js', 'internal-apis.js'),
-  // nodeConfig('internal-apis.js', 'internal-apis.cjs'),
-  // ecmaConfig('managers/index.js', 'managers/index.js'),
-  // nodeConfig('managers/index.js', 'managers/index.cjs'),
-  // ecmaConfig('models/index.js', 'models/index.js'),
-  // nodeConfig('models/index.js', 'models/index.cjs'),
-  ...pkgify('http/node', 'http/node'),
-  ...pkgify('http/web', 'http/web', 'GitHttp'),
+  // Build isomorphic-git/http/node
+  {
+    input: `src/http/node/index.js`,
+    external: [...external],
+    plugins: [{
+      name: 'emit-package.json',
+      buildStart() {
+         this.emitFile({ 
+           type: 'asset', fileName: "package.json", 
+           source: JSON.stringify({ 
+             type: 'module', main: 'index.cjs', module: 'index.js', typings: 'index.d.ts', 
+           }),
+         });  
+      }
+    }],
+    output: { format: 'es', dir: import.meta.dirname + 'http/node', },
+  },
+  { 
+    input: `http/node/index.js`, // take the files from the  bundle created before
+    external: [...external],
+    output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named', },
+  },
+  // Build isomorphic-git/http/web
+  {
+    input: `src/http/web/index.js`,
+    external: [...external],
+    plugins: [{
+      name: 'emit-package.json', buildStart() {
+         this.emitFile({ 
+           type: 'asset', fileName: "package.json", 
+           source: JSON.stringify({ 
+             type: 'module', main: 'index.cjs', module: 'index.js', typings: 'index.d.ts', 
+             unpkg: 'index.umd.js'
+           }),
+         });  
+      }
+    }],
+    output: { format: 'es', dir: import.meta.dirname + 'http/web', },
+  },
+  { 
+    input: `http/web/index.js`, // take the files from the  bundle created before
+    external: [...external],
+    output: { format: 'cjs', file: `http/node/index.cjs`, exports: 'named', },
+  },
+  {
+    input: `http/web/index.js`, // take files from the bundle created before
+    output: {
+      format: 'umd', file: `http/web/index.umd.js`, name: 'GitHttp', exports: 'named',
+    },
+  }
 ]
