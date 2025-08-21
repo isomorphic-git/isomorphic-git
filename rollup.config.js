@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-
+// TODO: Upgrade CI pipeline as this is Node22 syntax but it is needed!
 import pkg from './package.json' with { type: 'json' }
 
 // TODO: starting point for fixing the module exports
