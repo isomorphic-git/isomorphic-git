@@ -1,10 +1,13 @@
 import fs from 'fs'
 import path from 'path'
 
-import pkg from './package.json'
+import pkg from './package.json' with { type: 'json' }
 
 // TODO: starting point for fixing the module exports
 const virtualModules = {
+  // We emit some modules as hotfix for the ESM build
+  // this are hotfix wrappers they should get replaced by the real files
+  // in v2. and then we should look in v2 also into the declarations.tsconfig.
   "internal-api": `export * from './index.js';`,
   "managers": `export * from './index.js';`,
   "models": `export * from './index.js'`,
@@ -15,8 +18,8 @@ const hotFixFiles = {
   // TODO: remove when cjs build gets removed
   "index.d.cts": `export * from './index';`,
   "internal-api.d.ts": `export * from './index';`,
-  "managers.d.ts": `export { GitManager } from './index';`,
-  "models.d.ts": `export { FileSystem } from './index'`,
+  "managers.d.ts": `export * from './index';`,
+  "models.d.ts": `export * from './index'`,
 };
 
 // // TODO: hotfix would be to build a single file ESM Bundle and reexport from that.
@@ -121,7 +124,17 @@ const pkgify = (input, output, name) => {
 
 export default [
   ecmaConfig('index.js', 'index.js'),
-  nodeConfig('index.js', 'index.cjs'),
+  {
+    input: `index.js`, // take the index.js bundle created before
+    external: [...external],
+    output: [
+      {
+        format: 'cjs',
+        file: `index.cjs`,
+        exports: 'named',
+      },
+    ],
+  },
   // ecmaConfig('internal-apis.js', 'internal-apis.js'),
   // nodeConfig('internal-apis.js', 'internal-apis.cjs'),
   // ecmaConfig('managers/index.js', 'managers/index.js'),
