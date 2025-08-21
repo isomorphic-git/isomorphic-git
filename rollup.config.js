@@ -4,13 +4,26 @@ import { execSync } from 'node:child_process';
 // TODO: Upgrade CI pipeline as this is Node22 syntax but it is needed!
 import pkg from './package.json' with { type: 'json' }
 
+const { dependencies } = pkg;
 const dir = import.meta.dirname;
+
+// TODO: Replace that with a function that works better when we do v2
+const external = [
+  'fs','path','crypto','stream','crc/lib/crc32.js','sha.js/sha1','sha.js/sha1.js', 
+  ...Object.keys(dependencies),
+];
+
+const v2DefaultOutputOptions = {
+  minifyInternalExports: false,
+  preserveModules: false, // Else we would not bundle
+  preserveModulesRoot: 'src',  // maybe needed for relative types
+}
 
 // ESM Files to fix the build
 const virtualModules = {
   // We emit some modules as hotfix for the ESM build
   // this are hotfix wrappers they should get replaced by the real files
-  // in v2. and then we should look in v2 also into the declarations.tsconfig.
+
   // NOTE: we do not need a virtual index.js we create a Real ESM Build at present.
   // ESM Wrappers as hotfix for v1
   "internal-api": `export * from './index.js';`,
@@ -18,68 +31,66 @@ const virtualModules = {
   "models": `export * from './index.js'`, //TODO: models index does in fact at present only export FileSystem
 };
 
-// TODO: Replace that with a function that works better when we do v2
-const external = [
-  'fs','path','crypto','stream','crc/lib/crc32.js','sha.js/sha1','sha.js/sha1.js', 
-  ...Object.keys(pkg.dependencies),
-];
-
 // TODO: make type emit compatible to this structure then enable virtual module till all works
 // // This is for dev only at present 
 // // npm install @rollup/plugin-virtual --save-dev
 // // import virtual from '@rollup/plugin-virtual';
 // // virtual(virtualModules)
-// TODO: for v2 we should use packages/*/package.json for publishing
-// TODO: for v1 we should emit a own package.json here without all the dependency bloat.
+
+
+// TODO: Rename that to singleBundleEsmReExport
+const singleBundleTypes = `export * from './index';`
+const singleBundleEsmReExport = `export * from './index';`
+
 // Emits all kind of hotFix files as asset to fix the current package state.
 const outputPluginIsomorphicGitESM = { 
-// TODO: remove v2 - hotfix builds a single file ESM Bundle and reexports from that.
-"name": "emit-types-for-isomorphic-git ESM & webpack build that depends on this build.",
-// options: OutputOptions, bundle:  { [fileName: string]: OutputAsset | OutputChunk }
-writeBundle(options, bundle) {
-    const { format } = options;
-    const fileNames = Object.keys(bundle);
-    if (format.startsWith('es')) {
-      // create the webpack bundle here as it uses this bundle
-      execSync('webpack --config webpack.config.cjs');
-      // Emit the ESM assets and generate types for the esm bundle.
-      // execSync('tsc -p ./declarations.tsconfig.json'); // emits dir + 'index.d.ts'
-      // {"include":["index.js","http/web/index.js","http/web/index.cjs","http/node/index.js",
-      // "http/node/index.cjs"],"exclude":["node_modules"],"compilerOptions": 
-      // {"types":[],"strictNullChecks":true,"allowJs":true,"declaration":true,"noEmit":false,"emitDeclarationOnly":true}}
-
+  // TODO: remove v2 - hotfix builds a single file ESM Bundle and reexports from that.
+  "name": "emit-types-for-isomorphic-git ESM & webpack build that depends on this build.",
+  // options: OutputOptions, bundle:  { [fileName: string]: OutputAsset | OutputChunk }
+  writeBundle(options, bundle) {
+      // TODO: for v2 we should use packages/*/package.json for publishing
+      // TODO: for v1 we should emit a own package.json here without all the dependency bloat.
       
-
-      // Create types for ismorphic-git/*
-      execSync('tsc index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+      const { format } = options;
+      const fileNames = Object.keys(bundle);
+      if (format.startsWith('es')) {
+  
+        // Emit the ESM assets and generate types for the esm bundle.
+       
+        // execSync('tsc -p ./declarations.tsconfig.json'); // emits dir + 'index.d.ts'
+        // {"include":["index.js","http/web/index.js","http/web/index.cjs","http/node/index.js",
+        // "http/node/index.cjs"],"exclude":["node_modules"],"compilerOptions": 
+        // {"types":[],"strictNullChecks":true,"allowJs":true,"declaration":true,"noEmit":false,"emitDeclarationOnly":true}}
+        execSync('tsc index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+        // NOTE: The other Types get emited in other outputConfigs
+        
+        // ReExport the types so that type mappings work even without package.json
+        Object.entries({
+          // this modules are keept indipendent as they are external at present
+          // they will get used as input in v2+ so they get processed
+          // ESM Files to fix the build
+          ...virtualModules,
+          // ESM Type Wrappers for the virtual modules
+          "internal-api.d.ts": singleBundleEsmReExport,
+          "managers.d.ts": singleBundleEsmReExport,
+          "models.d.ts": singleBundleEsmReExport,
+        }).map(([moduleName,source]) =>{
+          return [moduleName + moduleName.includes('.') ? "" : '.js', source];
+        }).forEach(([fileName, source]) => {
+          this.emitFile({ type: 'asset', fileName, source });
+        });
+  
+        // create the webpack bundle here as it uses this bundle
+        execSync('npx webpack --config webpack.config.cjs');
+        this.emitFile({ type: 'asset', fileName: "index.umd.min.d.ts", source: singleBundleEsmReExport });
       
-      // ReExport the types so that type mappings work even without package.json
-      const singleBundleTypes = `export * from './index';`
-      Object.entries({
-        // this modules are keept indipendent as they are external at present
-        // they will get used as input in v2+ so they get processed
-        // ESM Files to fix the build
-        ...virtualModules,
-        // ESM Type Wrappers for the virtual modules
-        "internal-api.d.ts": singleBundleTypes,
-        "managers.d.ts": singleBundleTypes,
-        "models.d.ts": singleBundleTypes,
-        "index.umd.min.d.ts": singleBundleTypes,
-      }).map(([moduleName,source]) =>{
-        return [moduleName + moduleName.includes('.') ? "" : '.js', source];
-      }).forEach(([fileName, source]) => {
-        this.emitFile({ type: 'asset', fileName, source });
-      });
-    } else {
-      console.log(this.name + " got unsupported format i will do nothing got:", { format });
-    }
+      } else {
+        console.log(this.name + " got unsupported format i will do nothing got:", { format });
+      }
   },
 };
 
-// TODO: for v2 we should use packages/*/package.json for publishing
-// TODO: for v1 we should emit a own package.json here without all the dependency bloat.
-
-// Emits all kind of hotFix files as asset to fix the current package state.
+// Emits all kind of hotFix files as asset to fix the current CJS package state.
 const outputPluginIsomorphicGitCJS = { 
   // TODO: remove v2 - hotfix builds a single file ESM Bundle and reexports from that.
   "name": "emit-wrappers-for-code-and-types-isomorphic-git CJS",
@@ -87,23 +98,24 @@ const outputPluginIsomorphicGitCJS = {
   writeBundle(options, bundle) {
     const { format } = options;
     const fileNames = Object.keys(bundle);
-    const singleBundleTypes = `export * from './index';`
     if (format === 'cjs') {
+      
       Object.entries({
         // TODO: remove when cjs build gets removed
         // Note: index does not need a CJS wrapper as we do a
-        // CJS Files to fix the build
+        // CJS Files to fix the build singleBundleCjsExport
         "internal-api.cjs": `module.exports = require('./index.cjs');`,
         "managers.cjs": `module.exports = require('./index.cjs');`,
         "models.cjs":  `module.exports = require('./index.cjs');`,
         // CJS Type Wrappers We use the types from the ESM Build
-        "index.d.cts": singleBundleTypes,
-        "internal-api.d.cts": singleBundleTypes,
-        "managers.d.cts": singleBundleTypes,
-        "models.d.cts": singleBundleTypes,
+        "index.d.cts": singleBundleEsmReExport,
+        "internal-api.d.cts": singleBundleEsmReExports,
+        "managers.d.cts": singleBundleEsmReExport,
+        "models.d.cts": singleBundleEsmReExport,
       }).forEach(([fileName, source]) => {
         this.emitFile({ type: 'asset', fileName, source });
       });
+    
     } else {
       console.log(this.name + " got unsupported format i will do nothing got:", { format });
     }
@@ -117,10 +129,16 @@ export default [
   // so both CJS and ESM will export indentical shaped Objects.
   { 
     output: [
-      { dir, format: 'es', plugins: [outputPluginIsomorphicGitESM] },
+      { 
+        dir, format: 'es', plugins: [
+          outputPluginIsomorphicGitESM
+        ],
+      },
       { 
         dir, format: 'cjs', entryFileNames: "[name].cjs", 
-        exports: 'named', plugins: [outputPluginIsomorphicGitCJS] 
+        exports: 'named', plugins: [
+          outputPluginIsomorphicGitCJS
+        ] 
       },
     ], 
     input: `src/index.js`, 
@@ -132,28 +150,32 @@ export default [
       // // virtual(virtualModules)
     ],
   },
-
-  // TODO: Improve the fixes they are epic :)
-  
+ 
   // Build isomorphic-git/http/node ESM & CJS and create package.json 
   { 
     output: [
-      { dir: dir + '/http/node', format: 'es', plugins: [{ 
-        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
-        writeBundle(options, bundle) {
-            // Create types for ismorphic-git/http/*
-          execSync('tsc http/node/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
-        }
-      }], },
-      { dir: dir + '/http/node', format: 'cjs', entryFileNames: "[name].cjs", exports: 'named', plugins: [{ 
-        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
-        writeBundle(options, bundle) {
-            // emit wrappers here
-        }
-      }], },
+      { 
+        dir: `${dir}/http/node`, format: 'es', 
+        plugins: [{ 
+          "name": "tsc create types-isomorphic-git/http/node ESM",
+          writeBundle(options, bundle) {
+            execSync(`tsc ${dir}/http/node/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly`);
+          }
+        }], 
+      },
+      { 
+        dir: `${dir}/http/node`, format: 'cjs', 
+        entryFileNames: "[name].cjs", exports: 'named', 
+        plugins: [{ 
+          "name": "wrapper create types-isomorphic-git/http/node CJS",
+          writeBundle(options, bundle) {
+              // emit wrappers here
+          }
+        }], 
+      },
     ], 
-    input: `src/http/node/index.js`, 
-    external, plugins: [{
+    input: `${dir}/src/http/node/index.js`, external, 
+    plugins: [{
       name: 'emit-http-node-package.json', buildStart() {
          this.emitFile({ 
            type: 'asset', fileName: "package.json", 
@@ -168,50 +190,58 @@ export default [
   // Build isomorphic-git/http/web ESM & CJS & UMD and create package.json referencing all including types from ESM
   {
     output: [
-      { dir: dir + '/http/web', format: 'es', plugins: [{ 
-        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
-        writeBundle(options, bundle) {
-          execSync('tsc http/web/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
-        }
-      }], },
-      { dir: dir + '/http/web', format: 'cjs', entryFileNames: "[name].cjs", exports: 'named', plugins: [{ 
-        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
-        writeBundle(options, bundle) {
-          // Emit wrappers here
-        }
-      }], },
+      { 
+        dir: dir + '/http/web', format: 'es', 
+        plugins: [
+          { 
+            "name": "tsc create types-isomorphic-git/http/web ESM",
+            writeBundle(options, bundle) {
+              execSync('tsc http/web/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+            }
+          },
+          {
+            name: 'emit-http-web-package.json', 
+            generateBundle() {
+              this.emitFile({ 
+                 type: 'asset', fileName: "package.json", 
+                 source: JSON.stringify({ 
+                   type: 'module', main: 'index.cjs', module: 'index.js', typings: 'index.d.ts', 
+                   unpkg: 'index.umd.js'
+                 }),
+              });
+            }
+          },
+        ], 
+      },
+      { 
+        dir: dir + '/http/web', format: 'cjs', 
+        entryFileNames: "[name].cjs", exports: 'named', 
+        plugins: [{ 
+          "name": "wrapper create types-isomorphic-git/http/web CJS",
+          writeBundle(options, bundle) {
+            this.emitFile({ 
+             type: 'asset', fileName: "index.d.cts", source: singleBundleEsmReExport,
+            });
+          }
+        }], 
+      },
       // Create UMD Build of HTTP the UMD Build of isomorphic-git gets done via webpack...... 
       // Note this is the only build without external dependency the webpack build also has no external dependencys.
-      { dir: dir + '/http/web', format: 'umd', entryFileNames: "[name].umd.js", 
-        exports: 'named', name: 'GitHttp', plugins: [{ 
-          "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
+      { 
+        dir: dir + '/http/web', format: 'umd', 
+        entryFileNames: "[name].umd.js", 
+        exports: 'named', name: 'GitHttp', 
+        plugins: [{ 
+          "name": "wrapper create types-isomorphic-git/http/web UMD",
           writeBundle(options, bundle) {
-            // Emit wrappers here
+            this.emitFile({ 
+             type: 'asset', fileName: "index.umd.d.ts", source: singleBundleEsmReExport,
+            });
           }
         }], 
       },
       // TODO: Imaginated webpack umd build from the webpack.config.js
     ],
-    input: `src/http/web/index.js`,
-    external, plugins: [
-      {
-        name: 'emit-http-web-package.json', 
-        buildStart() {
-          this.emitFile({ 
-             type: 'asset', fileName: "package.json", 
-             source: JSON.stringify({ 
-               type: 'module', main: 'index.cjs', module: 'index.js', typings: 'index.d.ts', 
-               unpkg: 'index.umd.js'
-             }),
-          });  
-            
-          // TODO: remove when you remove the CJS Build
-          const singleBundleTypes = `export * from './index';`
-          this.emitFile({ 
-           type: 'asset', fileName: "index.d.cts", source: singleBundleTypes,
-          });
-        }
-      },
-    ],
+    input: `src/http/web/index.js`, external
   },
 ];
