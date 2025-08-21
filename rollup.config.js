@@ -48,9 +48,7 @@ writeBundle(options, bundle) {
       // "http/node/index.cjs"],"exclude":["node_modules"],"compilerOptions": 
       // {"types":[],"strictNullChecks":true,"allowJs":true,"declaration":true,"noEmit":false,"emitDeclarationOnly":true}}
 
-      // Create types for ismorphic-git/http/*
-      execSync('tsc http/node/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
-      execSync('tsc http/web/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+      
 
       // Create types for ismorphic-git/*
       execSync('tsc index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
@@ -140,8 +138,19 @@ export default [
   // Build isomorphic-git/http/node ESM & CJS and create package.json 
   { 
     output: [
-      { dir: dir + '/http/node', format: 'es' },
-      { dir: dir + '/http/node', format: 'cjs', entryFileNames: "[name].cjs", exports: 'named' }
+      { dir: dir + '/http/node', format: 'es', plugins: [{ 
+        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
+        writeBundle(options, bundle) {
+            // Create types for ismorphic-git/http/*
+          execSync('tsc http/node/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+        }
+      }], },
+      { dir: dir + '/http/node', format: 'cjs', entryFileNames: "[name].cjs", exports: 'named', plugins: [{ 
+        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
+        writeBundle(options, bundle) {
+            // emit wrappers here
+        }
+      }], },
     ], 
     input: `src/http/node/index.js`, 
     external, plugins: [{
@@ -159,13 +168,28 @@ export default [
   // Build isomorphic-git/http/web ESM & CJS & UMD and create package.json referencing all including types from ESM
   {
     output: [
-      { dir: dir + '/http/web', format: 'es', plugins: [
-      
-      ]},
-      { dir: dir + '/http/web', format: 'cjs', entryFileNames: "[name].cjs", exports: 'named' },
+      { dir: dir + '/http/web', format: 'es', plugins: [{ 
+        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
+        writeBundle(options, bundle) {
+          execSync('tsc http/web/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+        }
+      }], },
+      { dir: dir + '/http/web', format: 'cjs', entryFileNames: "[name].cjs", exports: 'named', plugins: [{ 
+        "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
+        writeBundle(options, bundle) {
+          // Emit wrappers here
+        }
+      }], },
       // Create UMD Build of HTTP the UMD Build of isomorphic-git gets done via webpack...... 
       // Note this is the only build without external dependency the webpack build also has no external dependencys.
-      { dir: dir + '/http/web', format: 'umd', entryFileNames: "[name].umd.js", exports: 'named', name: 'GitHttp'  }
+      { dir: dir + '/http/web', format: 'umd', entryFileNames: "[name].umd.js", 
+        exports: 'named', name: 'GitHttp', plugins: [{ 
+          "name": "emit-wrappers-for-code-and-types-isomorphic-git/http/web CJS",
+          writeBundle(options, bundle) {
+            // Emit wrappers here
+          }
+        }], 
+      },
       // TODO: Imaginated webpack umd build from the webpack.config.js
     ],
     input: `src/http/web/index.js`,
