@@ -71,7 +71,11 @@ export default [
             });
           } else if (format.startsWith('es')) {
             // Emit the ESM assets and generate types for the esm bundle.
-            execSync('tsc -p ./declarations.tsconfig.json'); // emits dir + 'index.d.ts'
+            // execSync('tsc -p ./declarations.tsconfig.json'); // emits dir + 'index.d.ts'
+            execSync('tsc index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+            execSync('tsc http/node/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+            execSync('tsc http/web/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
+          
             Object.entries({
               // this modules are keept indipendent as they are external at present
               // they will get used as input in v2+ so they get processed
