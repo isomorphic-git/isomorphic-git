@@ -22,9 +22,11 @@ const v2DefaultOutputOptions = {
 // ESM Files to fix the build
 const virtualModules = {
   // We emit some modules as hotfix for the ESM build
+  //  Managers + models can be import like so
+  // `import {GitConfigManager, GitIndexManager} from "isomorphic-git/managers"`
+  // `import {FileSystem} from "isomorphic-git/models"`
+  // we create the wrapper files and package.json resolves them with extension.js via exports.
   // this are hotfix wrappers they should get replaced by the real files
-
-  // NOTE: we do not need a virtual index.js we create a Real ESM Build at present.
   // ESM Wrappers as hotfix for v1
   "internal-api": `export * from './index.js';`,
   "managers": `export * from './index.js';`,
@@ -130,13 +132,18 @@ export default [
   { 
     output: [
       { 
-        dir, format: 'es', plugins: [
+        dir, format: 'es', 
+        exports: "named", // <-- disables synthetic default export
+        preferConst: true, // optional, makes top-level vars `const`
+        plugins: [
           outputPluginIsomorphicGitESM
         ],
       },
       { 
         dir, format: 'cjs', entryFileNames: "[name].cjs", 
-        exports: 'named', plugins: [
+        exports: 'named', 
+        preferConst: true, // optional, makes top-level vars `const`
+        plugins: [
           outputPluginIsomorphicGitCJS
         ] 
       },
@@ -155,8 +162,24 @@ export default [
   { 
     output: [
       { 
-        dir: `${dir}/http/node`, format: 'es', 
-        plugins: [{ 
+        dir: `${dir}/http/node`, format: 'es', exports: 'named', 
+        preferConst: true, // optional, makes top-level vars `const`
+        plugins: [
+          // {
+          //   // TODO: in node v12 we do not need this package.json files the main files covers the correct resolution
+          //   // there the files should be http/web.js node.js
+          //   name: 'emit-http-node-package.json', 
+          //   generateBundle() {
+          //      this.emitFile({ 
+          //        type: 'asset', fileName: "package.json", 
+          //        source: JSON.stringify({ 
+          //          type: 'module', main: 'index.cjs', 
+          //          module: 'index.js', typings: 'index.d.ts', 
+          //        }),
+          //      });  
+          //   },
+          // },
+          { 
           "name": "tsc create types-isomorphic-git/http/node ESM",
           writeBundle(options, bundle) {
             execSync(`tsc ${dir}/http/node/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly`);
@@ -175,40 +198,33 @@ export default [
       },
     ], 
     input: `${dir}/src/http/node/index.js`, external, 
-    plugins: [{
-      name: 'emit-http-node-package.json', buildStart() {
-         this.emitFile({ 
-           type: 'asset', fileName: "package.json", 
-           source: JSON.stringify({ 
-             type: 'module', main: 'index.cjs', 
-             module: 'index.js', typings: 'index.d.ts', 
-           }),
-         });  
-      }
-    }],
+    plugins: [],
   },
   // Build isomorphic-git/http/web ESM & CJS & UMD and create package.json referencing all including types from ESM
   {
     output: [
       { 
-        dir: dir + '/http/web', format: 'es', 
+        dir: dir + '/http/web', format: 'es', exports: 'named',
+        preferConst: true, // optional, makes top-level vars `const`
         plugins: [
+          //     // TODO: node12 we do not need this package.json files the main files covers the correct resolution
+          //     // there the files should be http/web.js node.js
+          // {
+          //   name: 'emit-http-web-package.json', 
+          //   generateBundle() {
+          //     this.emitFile({ 
+          //        type: 'asset', fileName: "package.json", 
+          //        source: JSON.stringify({ 
+          //          type: 'module', main: 'index.cjs', module: 'index.js', typings: 'index.d.ts', 
+          //          unpkg: 'index.umd.js'
+          //        }),
+          //     });
+          //   },
+          // },
           { 
             "name": "tsc create types-isomorphic-git/http/web ESM",
             writeBundle(options, bundle) {
               execSync('tsc http/web/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
-            }
-          },
-          {
-            name: 'emit-http-web-package.json', 
-            generateBundle() {
-              this.emitFile({ 
-                 type: 'asset', fileName: "package.json", 
-                 source: JSON.stringify({ 
-                   type: 'module', main: 'index.cjs', module: 'index.js', typings: 'index.d.ts', 
-                   unpkg: 'index.umd.js'
-                 }),
-              });
             }
           },
         ], 
