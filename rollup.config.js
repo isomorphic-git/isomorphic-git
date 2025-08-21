@@ -72,6 +72,10 @@ export default [
           } else if (format.startsWith('es')) {
             // Emit the ESM assets and generate types for the esm bundle.
             // execSync('tsc -p ./declarations.tsconfig.json'); // emits dir + 'index.d.ts'
+            // {"include":["index.js","http/web/index.js","http/web/index.cjs","http/node/index.js",
+            // "http/node/index.cjs"],"exclude":["node_modules"],"compilerOptions": 
+            // {"types":[],"strictNullChecks":true,"allowJs":true,"declaration":true,"noEmit":false,"emitDeclarationOnly":true}}
+
             execSync('tsc index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
             execSync('tsc http/node/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
             execSync('tsc http/web/index.js --strictNullChecks --allowJs --declaration --emitDeclarationOnly');
