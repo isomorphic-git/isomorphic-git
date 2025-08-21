@@ -3,9 +3,6 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
-  "typings": "./index.d.cts",
-  "main": "./index.cjs",
-  "module": "./index.js",
   "exports": {
     ".": {
       "types": "./index.d.cts",
