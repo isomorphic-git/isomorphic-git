@@ -7,10 +7,7 @@ module.exports = [
   {
     target: 'webworker',
     entry: {
-      index: './src/index.js',
-      'internal-apis': './src/internal-apis.js',
-      'managers/index': './src/managers/index.js',
-      'models/index': './src/models/index.js'
+      index: './index.js',
     },
     output: {
       path: path.resolve(__dirname),
