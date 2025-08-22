@@ -1,9 +1,3 @@
-Of course. Here is a professional, comprehensive `README.md` for `universal-git`.
-
-This README is designed to be compelling and build immediate trust. It directly addresses the pain points of `isomorphic-git` users and provides clear, actionable steps to get started, making the decision to switch as easy as possible.
-
----
-
 # universal-git
 
 <p align="center">
