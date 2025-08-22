@@ -1,50 +1,39 @@
 {
   "name": "isomorphic-git",
   "version": "0.0.0-development",
-  "description": "A pure JavaScript reimplementation of git for node and browsers",
+  "description": "A pure JavaScript implementation of git",
   "type": "module",
   "types": "./index.d.ts",
   "main": "./index.cjs",
   "module": "./index.js",
   "exports": {
+    "./src/*": "./src/*",
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
     "./http/node": {
-      "import": {
-        "types": "./http/node/index.d.ts",
-        "default": "./http/node/index.js"
+      "module-sync": {
+        "types": "./src/http/node/index.d.ts",
+        "default": "./src/http/node/index.js"
       },
-      "require": {
-        "types": "./http/node/index.d.cts",
-        "default": "./http/node/index.cjs"
-      }
     },
     "./http/web": {
-      "import": {
-        "types": "./http/web/index.d.ts",
-        "default": "./http/web/index.js"
+      "module-sync": {
+        "types": "./src/http/web/index.d.ts",
+        "default": "./src/http/web/index.js"
       },
-      "require": {
-        "types": "./http/web/index.d.cts",
-        "default": "./http/web/index.cjs"
-      }
     },
     "./managers": {
-      "import": {
-        "types": "./managers/index.d.ts",
-        "default": "./managers/index.js"
+      "module-sync": {
+        "types": "./src/managers/index.d.ts",
+        "default": "./src/managers/index.js"
       },
-      "require": {
-        "types": "./managers/index.d.cts",
-        "default": "./managers/index.cjs"
-      }
     },
     "./models": {
-      "import": {
-        "types": "./models/index.d.ts",
-        "default": "./models/index.js"
-      },
-      "require": {
-        "types": "./models/index.d.cts",
-        "default": "./models/index.cjs"
+      "module-sync": {
+        "types": "./src/models/index.d.ts",
+        "default": "./src/models/index.js"
       }
     },
     "./*.js": "./*.js",
@@ -64,14 +53,10 @@
       }
     }
   },
-  "unpkg": "./index.umd.min.js",
   "bin": {
     "isogit": "./cli.cjs"
   },
   "sideEffects": false,
-  "engines": {
-    "node": ">=14.17"
-  },
   "scripts": {
     "start": "nps",
     "format": "nps format",
@@ -84,18 +69,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/isomorphic-git/isomorphic-git.git"
+    "url": "https://github.com/awesome-os/universal-git.git"
   },
   "keywords": [
     "git",
     "isomorphic"
   ],
-  "author": "William Hilton <wmhilton@gmail.com>",
-  "license": "MIT",
+  "author": "frank Lemanschik",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/isomorphic-git/isomorphic-git/issues"
   },
-  "homepage": "https://isomorphic-git.org/",
+  "homepage": "https://github.com/isomorphic-git/isomorphic-git",
   "files": [
     "cli.cjs",
     "browser-tests.json",
@@ -109,7 +94,8 @@
     "index.umd.min.js.map",
     "size_report.html",
     "managers/*",
-    "models/*"
+    "models/*",
+    "src/*"
   ],
   "dependencies": {
     "async-lock": "^1.4.1",
