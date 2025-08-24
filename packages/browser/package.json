@@ -1,0 +1,7 @@
+{ 
+  "name": "universal-git-browser",
+  "dependencies": {
+    "node-stdlib-browser": "https://github.com/niksy/node-stdlib-browser",
+    "rollup-plugin-node-polyfills": "npm:rollup-plugin-node-polyfills@latest",
+  }
+}

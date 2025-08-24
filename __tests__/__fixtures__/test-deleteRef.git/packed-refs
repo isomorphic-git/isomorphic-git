@@ -1,0 +1,3 @@
+# pack-refs with: peeled fully-peeled 
+cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69 refs/tags/packed-tag
+cfc039a0acb68bee8bb4f3b13b6b211dbb8c1a69 refs/tags/packed-and-loose

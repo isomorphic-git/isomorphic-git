@@ -1,0 +1,26 @@
+{
+  "include": ["__tests__"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": true,
+    "moduleResolution": "node",
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["es2015", "es2016", "es2017", "es2018", "es2019", "dom"],
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "isomorphic-git": ["./index.d.ts"],
+      "isomorphic-git/internal-apis": ["./src/internal-apis.d.ts"],
+      "isomorphic-git/http": ["./http/node/index.d.ts"],
+      "isomorphic-git/managers": ["./managers/index.d.ts"],
+      "isomorphic-git/models": ["./models/index.d.ts"]
+    }
+  }
+}

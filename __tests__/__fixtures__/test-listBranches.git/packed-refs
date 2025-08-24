@@ -1,0 +1,4 @@
+# pack-refs with: peeled fully-peeled 
+1a2149e96a9767b281a8f10fd014835322da2d14 refs/tags/v0.0.1
+452556eb554fdbcc49d23605cab0c24952ec0716 refs/heads/greenkeeper/initial
+452556eb554fdbcc49d23605cab0c24952ec0716 refs/remotes/origin/master

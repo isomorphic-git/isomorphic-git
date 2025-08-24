@@ -1,22 +1,26 @@
 {
-  "name": "esgit",
-  "version": "0.0.0",
-  "description": "Node library for interacting with git repositories, circa 2017",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wmhilton/esgit.git"
-  },
-  "keywords": [
-    "git"
+  "name": "universal-git-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/universal-git",
+    "packages/universal-git/**/",
+    "packages/browser",
   ],
-  "author": "William Hilton <wmhilton@gmail.com>",
-  "license": "Unlicense",
-  "bugs": {
-    "url": "https://github.com/wmhilton/esgit/issues"
-  },
-  "homepage": "https://github.com/wmhilton/esgit#readme"
+  "scripts": {
+    "test:comment": "// Run all tests across workspaces",
+    "test": "npm run test --workspaces --if-present",
+
+    "build:comment": "// Build all packages that have a build script",
+    "build": "npm run build --workspaces --if-present",
+
+    "lint:comment": "// Lint all (if using eslint)",
+    "lint": "npm run lint --workspaces --if-present",
+
+    "publish:comment": "// Publish only changed package(s)",
+    "publish": "npm publish --workspaces",
+
+    "version:comment": "// Bump versions for all or single workspace",
+    "version:all": "npm version patch --workspaces",
+    "version:pkg": "npm version patch --workspace"
+  }
 }

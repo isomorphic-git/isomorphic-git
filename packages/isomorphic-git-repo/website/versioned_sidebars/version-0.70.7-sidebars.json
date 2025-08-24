@@ -1,0 +1,98 @@
+{
+  "version-0.70.7-docs": {
+    "All Commands": [
+      "version-0.70.7-alphabetic",
+      "version-0.70.7-errors"
+    ],
+    "Repository": [
+      "version-0.70.7-init",
+      "version-0.70.7-clone",
+      "version-0.70.7-commit",
+      "version-0.70.7-log",
+      "version-0.70.7-config",
+      "version-0.70.7-fetch",
+      "version-0.70.7-checkout",
+      "version-0.70.7-fastCheckout",
+      "version-0.70.7-push",
+      "version-0.70.7-pull",
+      "version-0.70.7-merge",
+      "version-0.70.7-verify"
+    ],
+    "Files": [
+      "version-0.70.7-add",
+      "version-0.70.7-remove",
+      "version-0.70.7-listFiles",
+      "version-0.70.7-status"
+    ],
+    "Branches": [
+      "version-0.70.7-currentBranch",
+      "version-0.70.7-branch",
+      "version-0.70.7-deleteBranch",
+      "version-0.70.7-listBranches"
+    ],
+    "Tags": [
+      "version-0.70.7-tag",
+      "version-0.70.7-annotatedTag",
+      "version-0.70.7-deleteTag",
+      "version-0.70.7-listTags"
+    ],
+    "Remotes": [
+      "version-0.70.7-getRemoteInfo",
+      "version-0.70.7-addRemote",
+      "version-0.70.7-deleteRemote",
+      "version-0.70.7-listRemotes"
+    ],
+    "Walking": [
+      "version-0.70.7-walkBeta2",
+      "version-0.70.7-WORKDIR",
+      "version-0.70.7-STAGE",
+      "version-0.70.7-TREE"
+    ],
+    "Plugins": [
+      "version-0.70.7-plugin_credentialManager",
+      "version-0.70.7-plugin_emitter",
+      "version-0.70.7-plugin_fs",
+      "version-0.70.7-plugin_http",
+      "version-0.70.7-plugin_pgp"
+    ],
+    "Plumbing Commands": [
+      "version-0.70.7-findRoot",
+      "version-0.70.7-expandRef",
+      "version-0.70.7-expandOid",
+      "version-0.70.7-resetIndex",
+      "version-0.70.7-resolveRef",
+      "version-0.70.7-writeRef",
+      "version-0.70.7-deleteRef",
+      "version-0.70.7-readObject",
+      "version-0.70.7-writeObject",
+      "version-0.70.7-hashBlob",
+      "version-0.70.7-statusMatrix",
+      "version-0.70.7-isDescendent",
+      "version-0.70.7-indexPack",
+      "version-0.70.7-packObjects"
+    ],
+    "Misc Commands": [
+      "version-0.70.7-version"
+    ],
+    "Deprecated Commands": [
+      "version-0.70.7-utils_auth",
+      "version-0.70.7-utils_oauth2",
+      "version-0.70.7-sign"
+    ]
+  },
+  "version-0.70.7-guide": {
+    "Getting Started": [
+      "version-0.70.7-quickstart",
+      "version-0.70.7-browser",
+      "version-0.70.7-fs",
+      "version-0.70.7-authentication",
+      "version-0.70.7-cli",
+      "version-0.70.7-dir-vs-gitdir"
+    ],
+    "More": [
+      "version-0.70.7-faq",
+      "version-0.70.7-snippets",
+      "version-0.70.7-webworker"
+    ]
+  }
+}

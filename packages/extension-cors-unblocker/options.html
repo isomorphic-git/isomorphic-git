@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CORS Unblocker Options</title>
+  <style>
+    body { font-family: sans-serif; padding: 1em; width: 400px; }
+    textarea { width: 100%; height: 200px; margin-bottom: 1em; }
+    button { padding: 0.5em 1em; }
+    #status { color: green; }
+  </style>
+</head>
+<body>
+  <h1>CORS Unblocker Whitelist</h1>
+  <p>Enter URL patterns below (one per line). Use * as a wildcard.</p>
+  <p><strong>Example:</strong> <code>https://api.example.com/*</code></p>
+  
+  <textarea id="urls"></textarea>
+  <button id="save">Save</button>
+  <p id="status"></p>
+  
+  <script src="options.js"></script>
+</body>
+</html>

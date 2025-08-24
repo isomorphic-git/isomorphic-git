@@ -1,0 +1,121 @@
+{
+  "version-1.x-docs": {
+    "All Commands": ["version-1.x-alphabetic"],
+    "Repository": [
+      "version-1.x-init",
+      "version-1.x-clone",
+      "version-1.x-commit",
+      "version-1.x-log",
+      "version-1.x-fetch",
+      "version-1.x-checkout",
+      "version-1.x-push",
+      "version-1.x-pull",
+      "version-1.x-fastForward",
+      "version-1.x-merge",
+      "version-1.x-abortMerge",
+      "version-1.x-walk",
+      "version-1.x-stash"
+    ],
+    "Callbacks": [
+      "version-1.x-onAuth",
+      "version-1.x-onAuthSuccess",
+      "version-1.x-onAuthFailure",
+      "version-1.x-onMessage",
+      "version-1.x-onPostCheckout",
+      "version-1.x-onPrePush",
+      "version-1.x-onProgress",
+      "version-1.x-onSign",
+      "version-1.x-mergeDriver"
+    ],
+    "Clients": ["version-1.x-fs", "version-1.x-http"],
+    "Config": [
+      "version-1.x-setConfig",
+      "version-1.x-getConfig",
+      "version-1.x-getConfigAll"
+    ],
+    "Branches": [
+      "version-1.x-currentBranch",
+      "version-1.x-branch",
+      "version-1.x-deleteBranch",
+      "version-1.x-renameBranch",
+      "version-1.x-listBranches"
+    ],
+    "Tags": [
+      "version-1.x-tag",
+      "version-1.x-annotatedTag",
+      "version-1.x-deleteTag",
+      "version-1.x-listTags"
+    ],
+    "Files": [
+      "version-1.x-add",
+      "version-1.x-remove",
+      "version-1.x-listFiles",
+      "version-1.x-status",
+      "version-1.x-isIgnored"
+    ],
+    "Notes": [
+      "version-1.x-addNote",
+      "version-1.x-readNote",
+      "version-1.x-removeNote",
+      "version-1.x-listNotes"
+    ],
+    "Remotes": [
+      "version-1.x-getRemoteInfo",
+      "version-1.x-getRemoteInfo2",
+      "version-1.x-addRemote",
+      "version-1.x-deleteRemote",
+      "version-1.x-listRemotes",
+      "version-1.x-listServerRefs"
+    ],
+    "Objects": [
+      "version-1.x-readBlob",
+      "version-1.x-readCommit",
+      "version-1.x-readTag",
+      "version-1.x-readTree",
+      "version-1.x-writeBlob",
+      "version-1.x-writeCommit",
+      "version-1.x-writeTag",
+      "version-1.x-writeTree",
+      "version-1.x-readObject",
+      "version-1.x-writeObject"
+    ],
+    "Plumbing Commands": [
+      "version-1.x-findRoot",
+      "version-1.x-expandRef",
+      "version-1.x-expandOid",
+      "version-1.x-resetIndex",
+      "version-1.x-updateIndex",
+      "version-1.x-listRefs",
+      "version-1.x-resolveRef",
+      "version-1.x-writeRef",
+      "version-1.x-deleteRef",
+      "version-1.x-hashBlob",
+      "version-1.x-statusMatrix",
+      "version-1.x-isDescendent",
+      "version-1.x-indexPack",
+      "version-1.x-packObjects",
+      "version-1.x-version"
+    ],
+    "Managers": [
+      "version-1.x-gitConfigManager",
+      "version-1.x-gitIgnoreManager",
+      "version-1.x-gitIndexManager",
+      "version-1.x-gitRefManager",
+      "version-1.x-gitRemoteHTTP",
+      "version-1.x-gitRemoteManager",
+      "version-1.x-gitShallowManager",
+      "version-1.x-gitStashManager"
+    ],
+    "Models": ["version-1.x-fileSystem"]
+  },
+  "version-1.x-guide": {
+    "Getting Started": [
+      "version-1.x-quickstart",
+      "version-1.x-quickstart-with-bundlers",
+      "version-1.x-dir-vs-gitdir",
+      "version-1.x-cli",
+      "version-1.x-cache"
+    ],
+    "More": ["version-1.x-faq", "version-1.x-snippets", "version-1.x-webworker"]
+  }
+}

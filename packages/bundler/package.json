@@ -1,0 +1,5 @@
+{ 
+  "name": "@universal-git/bundler" ,
+  "description": "A ECMAScript Typescript aware Bundler that uses universal-git as input and fs source.",
+  "type": "module"
+}

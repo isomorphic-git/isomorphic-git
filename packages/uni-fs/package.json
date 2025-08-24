@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "lightning-fs": "github:isomorphic-git/lightning-fs",
+    
+    
+  }
+  
+}

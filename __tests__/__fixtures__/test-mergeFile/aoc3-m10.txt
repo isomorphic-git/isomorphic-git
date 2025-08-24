@@ -1,0 +1,10 @@
+<<<<<<<<<< ours
+modified
+|||||||||| base
+original
+==========
+>>>>>>>>>> theirs
+text
+file
+was
+modified

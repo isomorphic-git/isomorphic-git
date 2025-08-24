@@ -1,0 +1,7 @@
+{
+  "profanitySureness": 1,
+  "allow": [
+    "illegal",
+    "invalid"
+  ]
+}

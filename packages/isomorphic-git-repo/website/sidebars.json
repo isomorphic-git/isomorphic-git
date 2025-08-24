@@ -1,0 +1,101 @@
+{
+  "docs": {
+    "All Commands": ["alphabetic"],
+    "Repository": [
+      "init",
+      "clone",
+      "commit",
+      "log",
+      "fetch",
+      "checkout",
+      "push",
+      "pull",
+      "fastForward",
+      "merge",
+      "abortMerge",
+      "walk",
+      "stash"
+    ],
+    "Callbacks": [
+      "onAuth",
+      "onAuthSuccess",
+      "onAuthFailure",
+      "onMessage",
+      "onPostCheckout",
+      "onPrePush",
+      "onProgress",
+      "onSign",
+      "mergeDriver"
+    ],
+    "Clients": ["fs", "http"],
+    "Config": ["setConfig", "getConfig", "getConfigAll"],
+    "Branches": [
+      "currentBranch",
+      "branch",
+      "deleteBranch",
+      "renameBranch",
+      "listBranches"
+    ],
+    "Tags": ["tag", "annotatedTag", "deleteTag", "listTags"],
+    "Files": ["add", "remove", "listFiles", "status", "isIgnored"],
+    "Notes": ["addNote", "readNote", "removeNote", "listNotes"],
+    "Remotes": [
+      "getRemoteInfo",
+      "getRemoteInfo2",
+      "addRemote",
+      "deleteRemote",
+      "listRemotes",
+      "listServerRefs"
+    ],
+    "Objects": [
+      "readBlob",
+      "readCommit",
+      "readTag",
+      "readTree",
+      "writeBlob",
+      "writeCommit",
+      "writeTag",
+      "writeTree",
+      "readObject",
+      "writeObject"
+    ],
+    "Plumbing Commands": [
+      "findRoot",
+      "expandRef",
+      "expandOid",
+      "resetIndex",
+      "updateIndex",
+      "listRefs",
+      "resolveRef",
+      "writeRef",
+      "deleteRef",
+      "hashBlob",
+      "statusMatrix",
+      "isDescendent",
+      "indexPack",
+      "packObjects",
+      "version"
+    ],
+    "Managers": [
+      "gitConfigManager",
+      "gitIgnoreManager",
+      "gitIndexManager",
+      "gitRefManager",
+      "gitRemoteHTTP",
+      "gitRemoteManager",
+      "gitShallowManager",
+      "gitStashManager"
+    ],
+    "Models": ["fileSystem"]
+  },
+  "guide": {
+    "Getting Started": [
+      "quickstart",
+      "quickstart-with-bundlers",
+      "dir-vs-gitdir",
+      "cli",
+      "cache"
+    ],
+    "More": ["faq", "snippets", "webworker"]
+  }
+}

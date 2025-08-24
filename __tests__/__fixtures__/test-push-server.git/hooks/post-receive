@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Here is a message from 'post-receive' hook."
+exit 0

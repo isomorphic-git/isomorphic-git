@@ -1,0 +1,33 @@
+{
+  "name": "universal-git",
+  "version": "0.0.0-pre.0",
+  "description": "A Universal Git Client and Server as also SDK based on isomorphic-git but written in ECMAScript esnext and maintained.",
+  "keywords": [
+    "isomorphic-git",
+    "universal-git",
+    "browser",
+    "git",
+    "javascript",
+    "ecmascript",
+    "versioning",
+    "repository"
+  ],
+  "homepage": "https://github.com/awesome-os/universal-git#readme",
+  "bugs": {
+    "url": "https://github.com/awesome-os/universal-git/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awesome-os/universal-git.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Frank Lemanschik",
+  "type": "module",
+  "main": "universal-git.js",
+  "scripts": {
+    "test": "echo \"not implemented\""
+  },
+  "dependencies": {
+    "isomorphic-git": "^1.33.0"
+  }
+}

@@ -1,0 +1,21 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	symlinks = false
+	ignorecase = true
+[remote "github"]
+	url = https://github.com/isomorphic-git/test.empty.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "gitlab"]
+	url = https://gitlab.com/isomorphic-git/test.empty.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "awscc"]
+	url = https://git-codecommit.us-west-2.amazonaws.com/v1/repos/test.empty
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "azure"]
+	url = https://dev.azure.com/isomorphic-git/isomorphic-git/_git/test.empty
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "bitbucket"]
+	url = https://bitbucket.org/isomorphic-git/test.empty
+	fetch = +refs/heads/*:refs/remotes/origin/*

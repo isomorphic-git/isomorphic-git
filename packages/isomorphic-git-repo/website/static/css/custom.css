@@ -1,0 +1,145 @@
+/* your custom css */
+
+.navListItemActive {
+  font-weight: bold;
+}
+.navListItem:hover {
+  font-weight: bold;
+}
+
+table tr th code, table tr td code {
+  display: inline; /* was inline-block, had terrible vertical alignment */
+}
+
+@media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
+}
+
+@media only screen and (min-width: 1024px) {
+}
+
+@media only screen and (max-width: 1023px) {
+}
+
+@media only screen and (min-width: 1400px) {
+}
+
+@media only screen and (min-width: 1500px) {
+}
+
+aside {
+  border-left: 4px solid #3f87a6;
+  padding-left: 0.5em;
+  font-style: italic;
+}
+
+header img[src="/img/isomorphic-git-logo.svg"],
+footer img[src="/img/isomorphic-git-logo.svg"] {
+  filter: invert(100%);
+}
+
+.imageAlignTop .blockImage {
+  max-width: 100%;
+}
+
+.gridBlock .twoByGridBlock img, .gridBlock .threeByGridBlock img, .gridBlock .fourByGridBlock img {
+  max-height: 80px;
+  /* height: 80px; */
+}
+
+.isomorphic-git-feature-list {
+  list-style: none;
+  margin: 40px;
+  display: grid;
+  grid-gap: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  text-align: left;
+}
+.isomorphic-git-feature-list li {
+  width: fit-content;
+}
+.isomorphic-git-feature-list img {
+  margin-left: auto;
+  margin-right: auto;
+}
+.isomorphic-git-feature-list li a {
+  color: black;
+  text-decoration: underline;
+}
+
+.isomorphic-git-browser-list {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 86px;
+  display: flex;
+  justify-content: space-evenly;
+  width: calc(90px * 6);
+  flex-wrap: wrap;
+}
+@media only screen and (max-width: 1024px) {
+  .isomorphic-git-browser-list {
+    width: calc(85px * 3);
+  }
+}
+@media only screen and (max-width: 1024px) {
+  .isomorphic-git-browser-list-header {
+    margin-top: 3em;
+  }
+}
+@media only screen and (max-width: 735px) {
+  .isomorphic-git-browser-list-header-2 {
+    margin-top: 1em;
+  }
+  .isomorphic-git-browser-list-block-2 {
+    margin-top: 4em;
+  }
+}
+@media only screen and (max-width: 1499px) {
+  .projectLogo {
+    display: none !important;
+  }
+}
+
+.input {
+  margin: 4px;
+  border: 1px solid #2E8555;
+  border-radius: 3px;
+  color: #2E8555;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2em;
+  padding: 10px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.try-it-out {
+  line-height: 2em;
+  text-align: center;
+}
+.try-it-out h2 {
+  margin-top: 0;
+}
+#try-it-output {
+  text-align: left;
+  display: none;
+}
+#try-it-output .more {
+  text-align: center;
+}
+#try-it-output.show {
+  display: block;
+}
+
+#giturl_branches,
+#giturl_tags {
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+article em {
+  font-style: italic;
+}

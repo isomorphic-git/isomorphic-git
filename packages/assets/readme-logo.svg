@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="900" height="220" viewBox="0 0 900 220" role="img" aria-labelledby="title desc">
+  <title id="title">universal-git logo</title>
+  <desc id="desc">A circular globe with a git-branch network and a ring of small modules to imply built-in tooling, plus the wordmark “universal-git”.</desc>
+
+  <!-- THEME -->
+  <defs>
+    <style><![CDATA[
+      :root {
+        --bg: #ffffff;
+        --fg: #0f172a;     /* slate-900 */
+        --accent: #ff3e00; /* warm orange-red */
+        --muted: #64748b;  /* slate-500 */
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0f1a;
+          --fg: #e5e7eb;   /* zinc-200 */
+          --accent: #ff7a59;
+          --muted: #94a3b8;
+        }
+      }
+      .bg { fill: var(--bg); }
+      .fg { fill: var(--fg); }
+      .muted { stroke: var(--muted); fill: none; }
+      .accent-fill { fill: var(--accent); }
+      .accent-stroke { stroke: var(--accent); }
+      text { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; }
+      .wordmark { font-weight: 800; letter-spacing: .5px; }
+    ]]></style>
+  </defs>
+
+  <!-- ICON -->
+  <g transform="translate(40,30)">
+    <!-- outer module ring (implies “tools included”) -->
+    <g transform="translate(80,80)">
+      <!-- twelve tiny modules around a circle -->
+      <g id="m">
+        <rect x="-6" y="-92" width="12" height="12" rx="2" class="fg" opacity="0.18"/>
+      </g>
+      <use href="#m" transform="rotate(30)"/>
+      <use href="#m" transform="rotate(60)"/>
+      <use href="#m" transform="rotate(90)"/>
+      <use href="#m" transform="rotate(120)"/>
+      <use href="#m" transform="rotate(150)"/>
+      <use href="#m" transform="rotate(180)"/>
+      <use href="#m" transform="rotate(210)"/>
+      <use href="#m" transform="rotate(240)"/>
+      <use href="#m" transform="rotate(270)"/>
+      <use href="#m" transform="rotate(300)"/>
+      <use href="#m" transform="rotate(330)"/>
+    </g>
+
+    <!-- globe -->
+    <circle cx="80" cy="80" r="72" class="muted" stroke-width="3"/>
+    <ellipse cx="80" cy="80" rx="72" ry="26" class="muted" stroke-width="2"/>
+    <ellipse cx="80" cy="80" rx="26" ry="72" class="muted" stroke-width="2"/>
+    <path d="M8,80 H152 M80,8 V152" class="muted" stroke-width="2"/>
+
+    <!-- git branch network -->
+    <!-- edges -->
+    <path d="M48,108 C48,90 64,84 80,84" class="accent-stroke" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M80,84 C104,84 112,64 120,48" class="accent-stroke" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M80,84 C100,100 108,120 120,132" class="accent-stroke" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- nodes -->
+    <circle cx="48" cy="108" r="10" class="accent-fill"/>
+    <circle cx="80" cy="84" r="10" class="accent-fill"/>
+    <circle cx="120" cy="48" r="10" class="accent-fill"/>
+    <circle cx="120" cy="132" r="10" class="accent-fill"/>
+  </g>
+
+  <!-- WORDMARK -->
+  <g transform="translate(220,110)">
+    <text class="wordmark" x="0" y="0" font-size="72" fill="var(--fg)">
+      universal<tspan fill="var(--accent)">-git</tspan>
+    </text>
+  </g>
+</svg>
