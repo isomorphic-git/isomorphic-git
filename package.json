@@ -3,16 +3,62 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
-  "typings": "./index.d.ts",
+  "typings": "./index.d.cts",
   "main": "./index.cjs",
   "module": "./index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.cts",
+      "default": "./index.cjs"
+    },
+    "./http/node": {
+      "import": {
+        "types": "./http/node/index.d.ts",
+        "default": "./http/node/index.js"
+      },
+      "require": {
+        "types": "./http/node/index.d.cts",
+        "default": "./http/node/index.cjs"
+      }
+    },
+    "./http/web": {
+      "import": {
+        "types": "./http/web/index.d.ts",
+        "default": "./http/web/index.js"
+      },
+      "require": {
+        "types": "./http/web/index.d.cts",
+        "default": "./http/web/index.cjs"
+      }
+    },
+    "./managers": {
+      "import": {
+        "types": "./managers/index.d.ts",
+        "default": "./managers/index.js"
+      },
+      "require": {
+        "types": "./managers/index.d.cts",
+        "default": "./managers/index.cjs"
+      }
+    },
+    "./models": {
+      "import": {
+        "types": "./models/index.d.ts",
+        "default": "./models/index.js"
+      },
+      "require": {
+        "types": "./models/index.d.cts",
+        "default": "./models/index.cjs"
+      }
+    }
+  },
   "unpkg": "./index.umd.min.js",
   "bin": {
     "isogit": "./cli.cjs"
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=12"
+    "node": ">=14.17"
   },
   "scripts": {
     "start": "nps",
@@ -43,12 +89,15 @@
     "browser-tests.json",
     "http/*",
     "index.cjs",
-    "index.d.ts",
+    "index.d.cts",
     "index.js",
+    "index.d.ts",
     "index.umd.min.js",
     "index.umd.min.d.ts",
     "index.umd.min.js.map",
-    "size_report.html"
+    "size_report.html",
+    "managers/*",
+    "models/*"
   ],
   "dependencies": {
     "async-lock": "^1.4.1",
@@ -81,7 +130,7 @@
     "all-contributors-cli": "6.20.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.3.0",
-    "bundlewatch": "^0.3.2",
+    "bundlewatch": "^0.4.1",
     "cross-env": "6.0.0",
     "decompress": "^4.2.0",
     "diff-lines": "1.1.1",
@@ -129,9 +178,7 @@
     "semantic-release": "17.4.7",
     "standard": "13.1.0",
     "timeout-cli": "0.3.2",
-    "tinyglobby": "^0.2.10",
-    "tweet-tweet": "1.0.4",
-    "typescript": "^5.7.2",
+    "typescript": "5.7.3",
     "webpack": "^5.97.1",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1"

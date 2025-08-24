@@ -252,6 +252,11 @@ import './typedefs-http.js'
  */
 
 /**
+ * @typedef {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} StashOp the type of stash ops
+ */
+
+/**
+ * @typedef {'equal' | 'modify' | 'add' | 'remove' | 'unknown'} StashChangeType - when compare WORDIR to HEAD, 'remove' could mean 'untracked'
  * @typedef {Object} ClientRef
  * @property {string} ref The name of the ref
  * @property {string} oid The SHA-1 object id the ref points to

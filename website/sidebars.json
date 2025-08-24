@@ -1,8 +1,6 @@
 {
   "docs": {
-    "All Commands": [
-      "alphabetic"
-    ],
+    "All Commands": ["alphabetic"],
     "Repository": [
       "init",
       "clone",
@@ -15,7 +13,8 @@
       "fastForward",
       "merge",
       "abortMerge",
-      "walk"
+      "walk",
+      "stash"
     ],
     "Callbacks": [
       "onAuth",
@@ -28,15 +27,8 @@
       "onSign",
       "mergeDriver"
     ],
-    "Clients": [
-      "fs",
-      "http"
-    ],
-    "Config": [
-      "setConfig",
-      "getConfig",
-      "getConfigAll"
-    ],
+    "Clients": ["fs", "http"],
+    "Config": ["setConfig", "getConfig", "getConfigAll"],
     "Branches": [
       "currentBranch",
       "branch",
@@ -44,25 +36,9 @@
       "renameBranch",
       "listBranches"
     ],
-    "Tags": [
-      "tag",
-      "annotatedTag",
-      "deleteTag",
-      "listTags"
-    ],
-    "Files": [
-      "add",
-      "remove",
-      "listFiles",
-      "status",
-      "isIgnored"
-    ],
-    "Notes": [
-      "addNote",
-      "readNote",
-      "removeNote",
-      "listNotes"
-    ],
+    "Tags": ["tag", "annotatedTag", "deleteTag", "listTags"],
+    "Files": ["add", "remove", "listFiles", "status", "isIgnored"],
+    "Notes": ["addNote", "readNote", "removeNote", "listNotes"],
     "Remotes": [
       "getRemoteInfo",
       "getRemoteInfo2",
@@ -89,6 +65,7 @@
       "expandOid",
       "resetIndex",
       "updateIndex",
+      "listRefs",
       "resolveRef",
       "writeRef",
       "deleteRef",
@@ -98,7 +75,18 @@
       "indexPack",
       "packObjects",
       "version"
-    ]
+    ],
+    "Managers": [
+      "gitConfigManager",
+      "gitIgnoreManager",
+      "gitIndexManager",
+      "gitRefManager",
+      "gitRemoteHTTP",
+      "gitRemoteManager",
+      "gitShallowManager",
+      "gitStashManager"
+    ],
+    "Models": ["fileSystem"]
   },
   "guide": {
     "Getting Started": [
@@ -108,10 +96,6 @@
       "cli",
       "cache"
     ],
-    "More": [
-      "faq",
-      "snippets",
-      "webworker"
-    ]
+    "More": ["faq", "snippets", "webworker"]
   }
 }

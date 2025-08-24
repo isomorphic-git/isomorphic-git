@@ -565,7 +565,10 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/2585460?v=4",
       "profile": "https://github.com/seanpoulter",
       "contributions": [
-        "maintenance"
+        "maintenance",
+        "code",
+        "doc",
+        "test"
       ]
     },
     {
@@ -683,6 +686,17 @@
       ]
     },
     {
+      "login": "modesty",
+      "name": "Modesty Zhang",
+      "avatar_url": "https://avatars.githubusercontent.com/u/865809?v=4",
+      "profile": "http://www.codeproject.com/script/Articles/MemberArticles.aspx?amid=62372",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
       "login": "amrc-benmorrow",
       "name": "Ben Morrow",
       "avatar_url": "https://avatars.githubusercontent.com/u/120477944?v=4",
@@ -761,6 +775,78 @@
         "code",
         "test",
         "maintenance"
+      ]
+   },
+   {
+      "login": "LokiMidgard",
+      "name": "Patrick Kranz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/389101?v=4",
+      "profile": "https://github.com/LokiMidgard",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "lukecotter",
+      "name": "Luke Cotter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4013877?v=4",
+      "profile": "https://github.com/lukecotter",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tomlarkworthy",
+      "name": "Tom Larkworthy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1848162?v=4",
+      "profile": "https://tomlarkworthy.endpointservices.net/",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "kofta999",
+      "name": "Mostafa Mahmoud",
+      "avatar_url": "https://avatars.githubusercontent.com/u/99273340?v=4",
+      "profile": "https://github.com/kofta999",
+      "contributions": [
+        "code",
+        "test",
+        "question"
+      ]
+    },
+    {
+      "login": "ARBhosale",
+      "name": "Aniket Bhosale",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26981417?v=4",
+      "profile": "https://github.com/ARBhosale",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "gnillev",
+      "name": "Mathias Nisted Velling",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8965094?v=4",
+      "profile": "https://github.com/gnillev",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "acandoo",
+      "name": "acandoo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117209328?v=4",
+      "profile": "https://github.com/acandoo",
+      "contributions": [
+        "platform",
+        "userTesting"
+>>>>>>> main
       ]
     }
   ],

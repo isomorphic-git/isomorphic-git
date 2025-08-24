@@ -1,8 +1,6 @@
 {
   "version-1.x-docs": {
-    "All Commands": [
-      "version-1.x-alphabetic"
-    ],
+    "All Commands": ["version-1.x-alphabetic"],
     "Repository": [
       "version-1.x-init",
       "version-1.x-clone",
@@ -15,7 +13,8 @@
       "version-1.x-fastForward",
       "version-1.x-merge",
       "version-1.x-abortMerge",
-      "version-1.x-walk"
+      "version-1.x-walk",
+      "version-1.x-stash"
     ],
     "Callbacks": [
       "version-1.x-onAuth",
@@ -28,10 +27,7 @@
       "version-1.x-onSign",
       "version-1.x-mergeDriver"
     ],
-    "Clients": [
-      "version-1.x-fs",
-      "version-1.x-http"
-    ],
+    "Clients": ["version-1.x-fs", "version-1.x-http"],
     "Config": [
       "version-1.x-setConfig",
       "version-1.x-getConfig",
@@ -89,6 +85,7 @@
       "version-1.x-expandOid",
       "version-1.x-resetIndex",
       "version-1.x-updateIndex",
+      "version-1.x-listRefs",
       "version-1.x-resolveRef",
       "version-1.x-writeRef",
       "version-1.x-deleteRef",
@@ -98,7 +95,18 @@
       "version-1.x-indexPack",
       "version-1.x-packObjects",
       "version-1.x-version"
-    ]
+    ],
+    "Managers": [
+      "version-1.x-gitConfigManager",
+      "version-1.x-gitIgnoreManager",
+      "version-1.x-gitIndexManager",
+      "version-1.x-gitRefManager",
+      "version-1.x-gitRemoteHTTP",
+      "version-1.x-gitRemoteManager",
+      "version-1.x-gitShallowManager",
+      "version-1.x-gitStashManager"
+    ],
+    "Models": ["version-1.x-fileSystem"]
   },
   "version-1.x-guide": {
     "Getting Started": [
@@ -108,10 +116,6 @@
       "version-1.x-cli",
       "version-1.x-cache"
     ],
-    "More": [
-      "version-1.x-faq",
-      "version-1.x-snippets",
-      "version-1.x-webworker"
-    ]
+    "More": ["version-1.x-faq", "version-1.x-snippets", "version-1.x-webworker"]
   }
 }

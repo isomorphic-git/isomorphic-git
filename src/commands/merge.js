@@ -50,6 +50,7 @@ import { mergeTree } from '../utils/mergeTree.js'
  * @param {string} [args.signingKey]
  * @param {SignCallback} [args.onSign] - a PGP signing implementation
  * @param {MergeDriverCallback} [args.mergeDriver]
+ * @param {boolean} args.allowUnrelatedHistories
  *
  * @returns {Promise<MergeResult>} Resolves to a description of the merge operation
  *
@@ -72,6 +73,7 @@ export async function _merge({
   signingKey,
   onSign,
   mergeDriver,
+  allowUnrelatedHistories = false,
 }) {
   if (ours === undefined) {
     ours = await _currentBranch({ fs, gitdir, fullname: true })
@@ -104,8 +106,13 @@ export async function _merge({
     oids: [ourOid, theirOid],
   })
   if (baseOids.length !== 1) {
-    // TODO: Recursive Merge strategy
-    throw new MergeNotSupportedError()
+    if (baseOids.length === 0 && allowUnrelatedHistories) {
+      // 4b825…  == the empty tree used by git
+      baseOids.push('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
+    } else {
+      // TODO: Recursive Merge strategy
+      throw new MergeNotSupportedError()
+    }
   }
   const baseOid = baseOids[0]
   // handle fast-forward case
@@ -152,7 +159,7 @@ export async function _merge({
     )
 
     // Defer throwing error until the index lock is relinquished and index is
-    // written to filsesystem
+    // written to filesystem
     if (tree instanceof MergeConflictError) throw tree
 
     if (!message) {

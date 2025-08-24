@@ -35,6 +35,7 @@ import { isIgnored } from './api/isIgnored.js'
 import { listBranches } from './api/listBranches.js'
 import { listFiles } from './api/listFiles.js'
 import { listNotes } from './api/listNotes.js'
+import { listRefs } from './api/listRefs.js'
 import { listRemotes } from './api/listRemotes.js'
 import { listServerRefs } from './api/listServerRefs.js'
 import { listTags } from './api/listTags.js'
@@ -55,6 +56,7 @@ import { renameBranch } from './api/renameBranch.js'
 import { resetIndex } from './api/resetIndex.js'
 import { resolveRef } from './api/resolveRef.js'
 import { setConfig } from './api/setConfig.js'
+import { stash } from './api/stash.js'
 import { status } from './api/status.js'
 import { statusMatrix } from './api/statusMatrix.js'
 import { tag } from './api/tag.js'
@@ -108,6 +110,7 @@ export {
   listBranches,
   listFiles,
   listNotes,
+  listRefs,
   listRemotes,
   listServerRefs,
   listTags,
@@ -139,6 +142,7 @@ export {
   writeRef,
   writeTag,
   writeTree,
+  stash,
 }
 
 // default export
@@ -180,6 +184,7 @@ export default {
   listBranches,
   listFiles,
   listNotes,
+  listRefs,
   listRemotes,
   listServerRefs,
   listTags,
@@ -211,4 +216,5 @@ export default {
   writeRef,
   writeTag,
   writeTree,
+  stash,
 }

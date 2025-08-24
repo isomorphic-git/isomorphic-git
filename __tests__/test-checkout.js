@@ -676,4 +676,58 @@ describe('checkout', () => {
       },
     ])
   })
+
+  it('checkout should not delete ignored files', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+
+    // Checkout the test-branch
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+    })
+
+    // Create a branch from test-branch
+    await branch({
+      fs,
+      dir,
+      gitdir,
+      ref: 'branch-w-ignored-dir',
+      checkout: true,
+    })
+    // Add a regular file to the ignored dir
+    await fs.write(`${dir}/ignored/regular-file.txt`, 'regular file', {
+      mode: 0o666,
+    })
+
+    // Add and commit a gitignore, ignoring everything but itself
+    const gitignoreContent = `*
+!.gitignore`
+    await fs.write(`${dir}/ignored/.gitignore`, gitignoreContent, {
+      mode: 0o666,
+    })
+    await add({ fs, dir, gitdir, filepath: 'ignored/.gitignore' })
+
+    await commit({
+      fs,
+      dir,
+      gitdir,
+      author: { name: 'Git', email: 'git@example.org' },
+      message: 'add gitignore',
+    })
+
+    // Checkout the test-branch, which does not contain the ignore/.gitignore
+    // should not delete files from ignore, but leave them as untracked in the working tree
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+    })
+    const files = await fs.readdir(`${dir}/ignored`)
+    expect(files).toContain('regular-file.txt')
+    expect(files).not.toContain('.gitignore')
+  })
 })

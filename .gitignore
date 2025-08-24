@@ -4,9 +4,12 @@
 
 # Dist
 /http
+/managers
+/models
 /index.cjs
-/index.d.ts
+/index.d.cts
 /index.js
+/index.d.ts
 /index.umd.min.js
 /index.umd.min.js.LICENSE.txt
 /index.umd.min.d.ts
@@ -114,6 +117,7 @@ docs/isIgnored.md
 docs/listBranches.md
 docs/listFiles.md
 docs/listNotes.md
+docs/listRefs.md
 docs/listRemotes.md
 docs/listServerRefs.md
 docs/listTags.md
@@ -134,6 +138,7 @@ docs/renameBranch.md
 docs/resetIndex.md
 docs/resolveRef.md
 docs/setConfig.md
+docs/stash.md
 docs/status.md
 docs/statusMatrix.md
 docs/tag.md
