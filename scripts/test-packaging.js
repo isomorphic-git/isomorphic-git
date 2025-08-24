@@ -4,7 +4,7 @@
  */
 import { execSync } from 'node:child_process'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { join, relative } from 'node:path/posix'
+import { join } from 'node:path/posix'
 
 /**
  * Creates a temporary directory with a minimal package.json inside.
