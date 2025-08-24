@@ -184,6 +184,16 @@
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "^4.0.0"
   },
+  "overrides": {
+    "spawn-rx": {
+      "rxjs": "5.5.12"
+    },
+    "timeout-cli": {
+      "spawn-rx": {
+        "rxjs": "5.5.12"
+      }
+    }
+  },
   "prettier": "./.prettierrc.cjs",
   "bundlewatch": {
     "files": [
