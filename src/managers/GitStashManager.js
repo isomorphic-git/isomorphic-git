@@ -9,7 +9,7 @@ import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { acquireLock } from '../utils/walkerToTreeEntryMap.js'
 
-import { GitRefManager } from './GitRefManage.js'
+import { GitRefManager } from './GitRefManager.js'
 
 export class GitStashManager {
   /**
