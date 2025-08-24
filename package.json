@@ -130,6 +130,7 @@
     "all-contributors-cli": "6.20.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.3.0",
+    "browserfs": "2.0.0",
     "bundlewatch": "^0.4.1",
     "cross-env": "6.0.0",
     "decompress": "^4.2.0",
@@ -179,9 +180,9 @@
     "standard": "13.1.0",
     "timeout-cli": "0.3.2",
     "typescript": "5.7.3",
-    "webpack": "^5.97.1",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^6.0.1"
+    "webpack": "^5.0.1",
+    "webpack-bundle-analyzer": "3.4.1",
+    "webpack-cli": "^4.0.0"
   },
   "prettier": "./.prettierrc.cjs",
   "bundlewatch": {
