@@ -9,6 +9,7 @@ import { IndexResetError } from '../errors/IndexResetError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { modified } from '../utils/modified.js'
 
@@ -52,15 +53,19 @@ export async function abortMerge({
     const trees = [TREE({ ref: commit }), WORKDIR(), STAGE()]
     let unmergedPaths = []
 
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-      unmergedPaths = index.unmergedPaths
-    })
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
+    await GitIndexManager.acquire(
+      { fs, gitdir: updatedGitdir, cache },
+      async function(index) {
+        unmergedPaths = index.unmergedPaths
+      }
+    )
 
     const results = await _walk({
       fs,
       cache,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       trees,
       map: async function(path, [head, workdir, index]) {
         const staged = !(await modified(workdir, index))
@@ -84,31 +89,36 @@ export async function abortMerge({
       },
     })
 
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-      // Reset paths in index and worktree, this can't be done in _walk because the
-      // STAGE walker acquires its own index lock.
+    await GitIndexManager.acquire(
+      { fs, gitdir: updatedGitdir, cache },
+      async function(index) {
+        // Reset paths in index and worktree, this can't be done in _walk because the
+        // STAGE walker acquires its own index lock.
 
-      for (const entry of results) {
-        if (entry === false) continue
+        for (const entry of results) {
+          if (entry === false) continue
 
-        // entry is not false, so from here we can assume index = workdir
-        if (!entry) {
-          await fs.rmdir(`${dir}/${entry.path}`, { recursive: true })
-          index.delete({ filepath: entry.path })
-          continue
-        }
+          // entry is not false, so from here we can assume index = workdir
+          if (!entry) {
+            await fs.rmdir(`${dir}/${entry.path}`, { recursive: true })
+            index.delete({ filepath: entry.path })
+            continue
+          }
 
-        if (entry.type === 'blob') {
-          const content = new TextDecoder().decode(entry.content)
-          await fs.write(`${dir}/${entry.path}`, content, { mode: entry.mode })
-          index.insert({
-            filepath: entry.path,
-            oid: entry.oid,
-            stage: 0,
-          })
+          if (entry.type === 'blob') {
+            const content = new TextDecoder().decode(entry.content)
+            await fs.write(`${dir}/${entry.path}`, content, {
+              mode: entry.mode,
+            })
+            index.insert({
+              filepath: entry.path,
+              oid: entry.oid,
+              stage: 0,
+            })
+          }
         }
       }
-    })
+    )
   } catch (err) {
     err.caller = 'git.abortMerge'
     throw err

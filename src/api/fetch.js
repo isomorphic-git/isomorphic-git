@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _fetch } from '../commands/fetch.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -95,8 +96,10 @@ export async function fetch({
     assertParameter('http', http)
     assertParameter('gitdir', gitdir)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _fetch({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
       http,
       onProgress,
@@ -104,7 +107,7 @@ export async function fetch({
       onAuth,
       onAuthSuccess,
       onAuthFailure,
-      gitdir,
+      gitdir: updatedGitdir,
       ref,
       remote,
       remoteRef,

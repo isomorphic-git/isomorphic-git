@@ -10,7 +10,7 @@ jobs:
 
     # Most pipelines finish in under 15 minutes. 30 minutes should be more than enough.
     # See https://dev.azure.com/isomorphic-git/isomorphic-git/_pipeline/analytics/duration.
-    timeoutInMinutes: 60
+    timeoutInMinutes: 120
 
     steps:
       - task: NodeTool@0

@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _push } from '../commands/push.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -80,8 +81,10 @@ export async function push({
     assertParameter('http', http)
     assertParameter('gitdir', gitdir)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _push({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
       http,
       onProgress,
@@ -90,7 +93,7 @@ export async function push({
       onAuthSuccess,
       onAuthFailure,
       onPrePush,
-      gitdir,
+      gitdir: updatedGitdir,
       ref,
       remoteRef,
       remote,

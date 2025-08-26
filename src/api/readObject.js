@@ -8,6 +8,7 @@ import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject } from '../storage/readObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
 
@@ -215,11 +216,12 @@ export async function readObject({
     assertParameter('oid', oid)
 
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     if (filepath !== undefined) {
       oid = await resolveFilepath({
         fs,
         cache,
-        gitdir,
+        gitdir: updatedGitdir,
         oid,
         filepath,
       })
@@ -229,7 +231,7 @@ export async function readObject({
     const result = await _readObject({
       fs,
       cache,
-      gitdir,
+      gitdir: updatedGitdir,
       oid,
       format: _format,
     })
