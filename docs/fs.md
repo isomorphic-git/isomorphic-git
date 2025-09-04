@@ -69,7 +69,7 @@ console.log(files);
 </script>
 ```
 
-Besides IndexedDB, ZenFS supports many different backends with different performance characteristics (some backends support sync operations, some only async), as well as different features such as proxying a static file server as a read-only file system, mounting ZIP files as file systems, or overlaying a writeable in-memory filesystem on top of a read-only filesystem.
+Besides IndexedDB, ZenFS supports many different backends with different performance characteristics (all backends support sync operations), as well as different features such as proxying a static file server as a read-only file system, mounting ZIP files as file systems, or overlaying a writeable in-memory filesystem on top of a read-only filesystem.
 You don't need to know all these features, but familiarizing yourself with the different options may be necessary if you hit a storage limit or performance bottleneck in the IndexedDB backend I suggested above.
 
 An [advanced example usage](https://github.com/isomorphic-git/isomorphic-git/blob/53f2e909030adb1c6ae855b14f3a2474ca93ce71/__tests__/__helpers__/FixtureFS.js#L12) is in the old unit tests for isomorphic-git.
