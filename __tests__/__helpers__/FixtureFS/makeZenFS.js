@@ -1,26 +1,33 @@
+import {
+  configureSingle,
+  CopyOnWrite,
+  Fetch,
+  InMemory,
+  fs as _fs,
+} from '@zenfs/core'
+
 const { FileSystem } = require('isomorphic-git/internal-apis')
 
 async function makeZenFS(dir) {
-  const ZenFS = await import('@zenfs/core')
   const index = require('../../__fixtures__/index.json')
-  await ZenFS.configureSingle({
-    backend: ZenFS.CopyOnWrite,
+  await configureSingle({
+    backend: CopyOnWrite,
     readable: {
-      backend: ZenFS.Fetch,
+      backend: Fetch,
       index,
       baseUrl: '/base/__tests__/__fixtures__/',
     },
-    writable: ZenFS.InMemory,
+    writable: InMemory,
   })
 
-  const fs = new FileSystem(ZenFS.fs)
+  const fs = new FileSystem(_fs)
 
   dir = `/${dir}`
   const gitdir = `/${dir}.git`
   await fs.mkdir(dir)
   await fs.mkdir(gitdir)
   return {
-    _fs: ZenFS.fs,
+    _fs,
     fs,
     dir,
     gitdir,
