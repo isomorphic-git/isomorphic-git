@@ -4,12 +4,13 @@ async function makeZenFS(dir) {
   const ZenFS = await import('@zenfs/core')
   const index = require('../../__fixtures__/index.json')
   await ZenFS.configureSingle({
-    backend: ZenFS.Overlay,
-    readable: ZenFS.Fetch.create({
+    backend: ZenFS.CopyOnWrite,
+    readable: {
+      backend: ZenFS.Fetch,
       index,
       baseUrl: '/base/__tests__/__fixtures__/',
-    }),
-    writable: ZenFS.InMemory.create({}),
+    },
+    writable: ZenFS.InMemory,
   })
 
   const fs = new FileSystem(ZenFS.fs)
