@@ -1,14 +1,13 @@
 import {
+  fs as _fs,
   configureSingle,
   CopyOnWrite,
   Fetch,
   InMemory,
-  fs as _fs,
 } from '@zenfs/core'
+import { FileSystem } from 'isomorphic-git/internal-apis'
 
-const { FileSystem } = require('isomorphic-git/internal-apis')
-
-async function makeZenFS(dir) {
+export async function makeZenFS(dir) {
   const index = require('../../__fixtures__/index.json')
   await configureSingle({
     backend: CopyOnWrite,
@@ -33,5 +32,3 @@ async function makeZenFS(dir) {
     gitdir,
   }
 }
-
-module.exports.makeZenFS = makeZenFS
