@@ -1,5 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import { readFileSync } from 'fs'
+import { join } from 'path'
+import { fileURLToPath } from 'url'
 
 import { version } from 'isomorphic-git'
 
@@ -8,7 +10,10 @@ import { version } from 'isomorphic-git'
  * Note this needs Eslint 9
  */
 const pkg = JSON.parse(
-  readFileSync(import.meta.resolve('../package.json'), 'utf8')
+  readFileSync(
+    join(fileURLToPath(import.meta.url), '../../package.json'),
+    'utf8'
+  )
 )
 
 describe('version', () => {
