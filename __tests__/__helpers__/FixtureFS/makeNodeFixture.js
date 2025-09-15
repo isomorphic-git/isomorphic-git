@@ -1,19 +1,21 @@
-const path = require('path')
+import * as path from 'path'
+import { fileURLToPath } from 'url'
 
-const { FileSystem } = require('isomorphic-git/internal-apis')
+import { FileSystem } from 'isomorphic-git/internal-apis'
 
-async function makeNodeFixture(fixture) {
-  const _fs = Object.assign({}, require('fs'))
-
-  const fs = new FileSystem(_fs)
-
+export async function makeNodeFixture(fixture) {
   const {
     getFixturePath,
     createTempDir,
     copyFixtureIntoTempDir,
-  } = require('@wmhilton/jest-fixtures')
+  } = await import('./_jestUtils.js')
 
-  const testsDir = path.resolve(__dirname, '..')
+  const _fs = await import('fs')
+
+  const fs = new FileSystem(_fs)
+
+  /** @todo Use `import.meta.dirname` and `..` once support for Node 18 is dropped */
+  const testsDir = path.resolve(fileURLToPath(import.meta.url), '../..')
 
   const dir = (await getFixturePath(testsDir, fixture))
     ? await copyFixtureIntoTempDir(testsDir, fixture)
@@ -25,5 +27,3 @@ async function makeNodeFixture(fixture) {
 
   return { _fs, fs, dir, gitdir }
 }
-
-module.exports.makeNodeFixture = makeNodeFixture

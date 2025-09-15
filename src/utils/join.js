@@ -1,1 +1,1 @@
-export { join } from 'path-browserify'
+export { join } from '@zenfs/core/path'

@@ -1,5 +1,6 @@
-const { Errors } = require('../..')
-const replace = require('replace-in-file')
+import replace from 'replace-in-file'
+
+import { Errors } from '../..'
 
 const errors = Object.keys(Errors).map(name => `E.${name}`)
 const bal = []
