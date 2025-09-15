@@ -160,7 +160,7 @@ module.exports = {
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
       jest:
-        'NODE_OPTIONS=--experimental-vm-modules\n' +
+        'cross-env NODE_OPTIONS=--experimental-vm-modules ' +
         (process.env.CI
           ? retry3(`${timeout5('jest --ci --coverage')}`)
           : `jest --ci --coverage`),
