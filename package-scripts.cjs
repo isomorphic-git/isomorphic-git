@@ -71,8 +71,8 @@ module.exports = {
       default: `rm -rf ${builtFiles.join(' ')} internal-apis.*`,
     },
     lint: {
-      default: `eslint .`,
-      fix: optional(`eslint --fix .`),
+      default: 'eslint src __tests__',
+      fix: optional('eslint --fix src __tests__'),
     },
     format: {
       default: series.nps('lint.fix'),
