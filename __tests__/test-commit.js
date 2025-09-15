@@ -279,10 +279,10 @@ describe('commit', () => {
 
   it('create signed commit', async () => {
     // Setup
-    const { pgp } = require('@isomorphic-git/pgp-plugin')
+    const { pgp } = await import('@isomorphic-git/pgp-plugin')
     const { fs, gitdir } = await makeFixture('test-commit')
     // Test
-    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
+    const { privateKey, publicKey } = await import('./__fixtures__/pgp-keys.js')
     const oid = await commit({
       fs,
       gitdir,
