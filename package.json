@@ -122,7 +122,7 @@
     "@isomorphic-git/lightning-fs": "^3.3.0",
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "5.0.0",
-    "@types/jest": "^27.5.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^18.19.68",
     "@wmhilton/jest-fixtures": "0.6.1",
     "@zenfs/core": "^2.0.0",
