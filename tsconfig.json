@@ -11,6 +11,7 @@
     "module": "esnext",
     "lib": ["es2019", "dom"],
     "resolveJsonModule": true,
+    "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
     "skipLibCheck": true,
