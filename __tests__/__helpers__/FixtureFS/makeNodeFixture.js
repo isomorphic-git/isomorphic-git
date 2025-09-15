@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import * as _fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
@@ -19,7 +19,7 @@ export function getFixturePath(cwd, ...fileParts) {
 }
 
 export async function createTempDir() {
-  const tempDir = await fs.promises.mkdtemp(TEMP_PATH)
+  const tempDir = await _fs.promises.mkdtemp(TEMP_PATH)
   TEMP_DIRS_CREATED.push(tempDir)
   return tempDir
 }
@@ -27,7 +27,7 @@ export async function createTempDir() {
 export function cleanupTempDirs() {
   for (const tempDir of TEMP_DIRS_CREATED) {
     try {
-      fs.rmSync(tempDir, { recursive: true, force: true })
+      _fs.rmSync(tempDir, { recursive: true, force: true })
     } catch (err) {}
   }
 
@@ -41,12 +41,11 @@ export function cleanupTempDirs() {
 export async function copyFixtureIntoTempDir(cwd, ...fileParts) {
   const fixturePath = await getFixturePath(cwd, ...fileParts)
   const tempDir = await createTempDir()
-  await fs.promises.cp(fixturePath, tempDir, { recursive: true })
+  await _fs.promises.cp(fixturePath, tempDir, { recursive: true })
   return tempDir
 }
 
 export async function makeNodeFixture(fixture) {
-  const _fs = await import('fs')
   onExit(cleanupTempDirs)
 
   const fs = new FileSystem(_fs)
