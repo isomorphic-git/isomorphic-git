@@ -13,7 +13,7 @@ describe('listTags', () => {
       gitdir,
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "local-tag",
         "test-tag",
         "v0.0.1",

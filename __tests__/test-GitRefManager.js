@@ -90,7 +90,7 @@ describe('GitRefManager', () => {
       filepath: 'refs/remotes/origin',
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "develop",
         "dist",
         "gh-pages",
@@ -107,7 +107,7 @@ describe('GitRefManager', () => {
       filepath: 'refs/tags',
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "local-tag",
         "test-tag",
         "v0.0.1",
@@ -184,7 +184,7 @@ describe('GitRefManager', () => {
       remote: 'origin',
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "develop",
         "dist",
         "gh-pages",
@@ -200,7 +200,7 @@ describe('GitRefManager', () => {
     const { fs, gitdir } = await makeFixture('test-GitRefManager')
     const refs = await GitRefManager.listTags({ fs, gitdir })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "local-tag",
         "test-tag",
         "v0.0.1",

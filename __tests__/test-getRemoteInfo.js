@@ -16,8 +16,8 @@ describe('getRemoteInfo', () => {
     expect(info.capabilities).not.toBeNull()
     expect(info.refs).not.toBeNull()
     expect(info.refs).toMatchInlineSnapshot(`
-      Object {
-        "heads": Object {
+      {
+        "heads": {
           "master": "97c024f73eaab2781bf3691597bc7c833cb0e22f",
           "test": "5a8905a02e181fe1821068b8c0f48cb6633d5b81",
         },

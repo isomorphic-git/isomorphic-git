@@ -10,7 +10,7 @@ describe('listFiles', () => {
     // Test
     const files = await listFiles({ fs, gitdir })
     expect(files).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -52,7 +52,7 @@ describe('listFiles', () => {
     // Test
     const files = await listFiles({ fs, gitdir, ref: 'test-branch' })
     expect(files).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",

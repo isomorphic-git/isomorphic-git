@@ -15,7 +15,7 @@ describe('listCommitsAndTags', () => {
       finish: ['c77052f99c33dbe3d2a120805fcebe9e2194b6f9'],
     })
     expect([...commits]).toMatchInlineSnapshot(`
-      Array [
+      [
         "c60bbbe99e96578105c57c4b3f2b6ebdf863edbc",
         "e05547ea87ea55eff079de295ff56f483e5b4439",
         "ebdedf722a3ec938da3fd53eb74fdea55c48a19d",

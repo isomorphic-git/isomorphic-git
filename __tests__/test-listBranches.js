@@ -10,7 +10,7 @@ describe('listBranches', () => {
     // Test
     const commits = await listBranches({ fs, gitdir })
     expect(commits).toMatchInlineSnapshot(`
-      Array [
+      [
         "feature/supercool",
         "greenkeeper/initial",
         "master",
@@ -28,7 +28,7 @@ describe('listBranches', () => {
       remote: 'origin',
     })
     expect(commits).toMatchInlineSnapshot(`
-      Array [
+      [
         "HEAD",
         "master",
       ]

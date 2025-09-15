@@ -10,7 +10,7 @@ describe('resetIndex', () => {
     // Test
     const before = await listFiles({ fs, gitdir })
     expect(before).toMatchInlineSnapshot(`
-      Array [
+      [
         "a.txt",
         "b.txt",
         "d.txt",
@@ -19,7 +19,7 @@ describe('resetIndex', () => {
     await resetIndex({ fs, dir, gitdir, filepath: 'a.txt' })
     const after = await listFiles({ fs, gitdir })
     expect(after).toMatchInlineSnapshot(`
-      Array [
+      [
         "a.txt",
         "b.txt",
         "d.txt",
@@ -33,7 +33,7 @@ describe('resetIndex', () => {
     // Test
     const before = await listFiles({ fs, gitdir })
     expect(before).toMatchInlineSnapshot(`
-      Array [
+      [
         "a.txt",
         "b.txt",
         "d.txt",
@@ -42,7 +42,7 @@ describe('resetIndex', () => {
     await resetIndex({ fs, dir, gitdir, filepath: 'd.txt' })
     const after = await listFiles({ fs, gitdir })
     expect(after).toMatchInlineSnapshot(`
-      Array [
+      [
         "a.txt",
         "b.txt",
       ]
@@ -55,7 +55,7 @@ describe('resetIndex', () => {
     // Test
     const before = await listFiles({ fs, gitdir })
     expect(before).toMatchInlineSnapshot(`
-      Array [
+      [
         "a.txt",
         "b.txt",
       ]
@@ -63,7 +63,7 @@ describe('resetIndex', () => {
     await resetIndex({ fs, dir, gitdir, filepath: 'b.txt' })
     const after = await listFiles({ fs, gitdir })
     expect(after).toMatchInlineSnapshot(`
-      Array [
+      [
         "a.txt",
       ]
     `)
@@ -75,14 +75,14 @@ describe('resetIndex', () => {
     // Test
     const before = await statusMatrix({ fs, dir, gitdir })
     expect(before).toMatchInlineSnapshot(`
-      Array [
-        Array [
+      [
+        [
           "a.txt",
           1,
           1,
           1,
         ],
-        Array [
+        [
           "b.txt",
           1,
           1,
@@ -99,14 +99,14 @@ describe('resetIndex', () => {
     })
     const after = await statusMatrix({ fs, dir, gitdir })
     expect(after).toMatchInlineSnapshot(`
-      Array [
-        Array [
+      [
+        [
           "a.txt",
           1,
           1,
           1,
         ],
-        Array [
+        [
           "b.txt",
           1,
           1,

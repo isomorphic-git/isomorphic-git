@@ -504,7 +504,7 @@ describe('clone', () => {
     it('should allow agent to be used with built-in http plugin for Node.js', async () => {
       const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
       const connectionLog = []
-      const { Agent } = require('https')
+      const { Agent } = await import('https')
       const httpWithAgent = {
         async request({ url, method, headers, body }) {
           const agent = new Agent()

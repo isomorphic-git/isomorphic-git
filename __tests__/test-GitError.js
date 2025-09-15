@@ -23,10 +23,10 @@ describe('Errors', () => {
     e = e.toJSON()
     delete e.stack
     expect(e).toMatchInlineSnapshot(`
-      Object {
+      {
         "caller": "",
         "code": "NotFoundError",
-        "data": Object {
+        "data": {
           "what": "foobar.txt",
         },
         "message": "Could not find foobar.txt.",

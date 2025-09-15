@@ -10,7 +10,7 @@ describe('remove', () => {
     // Test
     const before = await listFiles({ fs, gitdir })
     expect(before).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -40,7 +40,7 @@ describe('remove', () => {
     await remove({ fs, gitdir, filepath: 'LICENSE.md' })
     const after = await listFiles({ fs, gitdir })
     expect(after).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -74,7 +74,7 @@ describe('remove', () => {
     // Test
     const before = await listFiles({ fs, gitdir })
     expect(before).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -104,7 +104,7 @@ describe('remove', () => {
     await remove({ fs, gitdir, filepath: 'src/models' })
     const after = await listFiles({ fs, gitdir })
     expect(after).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",

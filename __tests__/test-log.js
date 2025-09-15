@@ -10,16 +10,16 @@ describe('log', () => {
     const commits = await log({ fs, gitdir, ref: 'HEAD' })
     expect(commits.length).toBe(5)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501475810,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501475810,
@@ -44,7 +44,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "Update gitignore
       ",
-            "parent": Array [
+            "parent": [
               "ae054080bcfd04c84e0820e0cf74b31f4a422d7c",
             ],
             "tree": "24224c8f5d4cb40dc61f4210e7eb2c964f7e2407",
@@ -58,15 +58,15 @@ describe('log', () => {
       Update gitignore
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501475755,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501475755,
@@ -91,7 +91,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "Finished implementing fetching trees and blobs from Github API, even if we can't push to it.
       ",
-            "parent": Array [
+            "parent": [
               "3e80cede3c2a753a5272ed4d93496b67bb65cb0d",
             ],
             "tree": "6b858a95cc8e87677aff79a645ae178923caa5f5",
@@ -105,15 +105,15 @@ describe('log', () => {
       Finished implementing fetching trees and blobs from Github API, even if we can't push to it.
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501462174,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501462174,
@@ -138,7 +138,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "My oh shit moment
       ",
-            "parent": Array [
+            "parent": [
               "1c04ba2c3b7c61cdfc0ddc3f9515116bc0e06863",
             ],
             "tree": "d1a3e8c5371d481b54e32916da162e08a87ad294",
@@ -152,15 +152,15 @@ describe('log', () => {
       My oh shit moment
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501454660,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501454660,
@@ -185,7 +185,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "Git init, and parts of git fetch
       ",
-            "parent": Array [
+            "parent": [
               "1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9",
             ],
             "tree": "dd92ed7e55ddc0c74f467a8899cc281d909c6bb9",
@@ -199,15 +199,15 @@ describe('log', () => {
       Git init, and parts of git fetch
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501381894,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1501381894,
@@ -232,7 +232,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "Initial commit
       ",
-            "parent": Array [],
+            "parent": [],
             "tree": "421909592ea5e22c6dda69d1cc85118240478444",
           },
           "oid": "1e40fdfba1cf17f3c9f9f3d6b392b1865e5147b9",
@@ -265,16 +265,16 @@ describe('log', () => {
     const { fs, gitdir } = await makeFixture('test-log')
     const commits = await log({ fs, gitdir, ref: 'origin/shallow-branch' })
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1502484200,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "Will Hilton",
               "timestamp": 1502484200,
@@ -299,7 +299,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "Improve resolveRef to handle more kinds of refs. Add tests
       ",
-            "parent": Array [
+            "parent": [
               "b4f8206d9e359416b0f34238cbeb400f7da889a8",
             ],
             "tree": "e0b8f3574060ee24e03e4af3896f65dd208a60cc",
@@ -386,16 +386,16 @@ dGs=
     const { fs, gitdir } = await makeFixture('test-log-complex')
     const commits = await log({ fs, gitdir, ref: 'master' })
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605340,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605340,
@@ -403,7 +403,7 @@ dGs=
             },
             "message": "Merge branches 'foo' and 'baz'
       ",
-            "parent": Array [
+            "parent": [
               "8bb702b66d8def74b2a9642309eb23a5f76779dc",
               "ccc9ef071f1b27210fa0df2f8665f4ad550358e8",
               "1ce759dd468c1ea830e8befbbdcf79e591346153",
@@ -421,15 +421,15 @@ dGs=
       Merge branches 'foo' and 'baz'
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605325,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605325,
@@ -437,7 +437,7 @@ dGs=
             },
             "message": "Other sixth commit
       ",
-            "parent": Array [
+            "parent": [
               "f1eca35203ee2b578f23e0e7c8b8c2c48927d597",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -451,15 +451,15 @@ dGs=
       Other sixth commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605315,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605315,
@@ -467,7 +467,7 @@ dGs=
             },
             "message": "Sixth commit
       ",
-            "parent": Array [
+            "parent": [
               "f1eca35203ee2b578f23e0e7c8b8c2c48927d597",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -481,15 +481,15 @@ dGs=
       Sixth commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605295,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605295,
@@ -497,7 +497,7 @@ dGs=
             },
             "message": "Fifth commit
       ",
-            "parent": Array [
+            "parent": [
               "6cabb8ab77d3fc40858db84416dfd1a41fe1c2fd",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -511,15 +511,15 @@ dGs=
       Fifth commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605245,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605245,
@@ -527,7 +527,7 @@ dGs=
             },
             "message": "Merge branch 'bar' into foo
       ",
-            "parent": Array [
+            "parent": [
               "ad5f1992b8ff758bc9fe457acf905093dd75b7b1",
               "ec2db34cd04249ea6c31ed6d367656b0f2ab25c6",
             ],
@@ -543,15 +543,15 @@ dGs=
       Merge branch 'bar' into foo
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605228,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605228,
@@ -559,7 +559,7 @@ dGs=
             },
             "message": "Other fourth commit
       ",
-            "parent": Array [
+            "parent": [
               "b5129e2726d68c93ed09a3eaec9dda5e76fd4a87",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -573,15 +573,15 @@ dGs=
       Other fourth commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605214,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605214,
@@ -589,7 +589,7 @@ dGs=
             },
             "message": "Fourth commit
       ",
-            "parent": Array [
+            "parent": [
               "c4e447f61fcaf49032265bfe3dea32383339d910",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -603,15 +603,15 @@ dGs=
       Fourth commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605200,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605200,
@@ -619,7 +619,7 @@ dGs=
             },
             "message": "Other third commit
       ",
-            "parent": Array [
+            "parent": [
               "6cabb8ab77d3fc40858db84416dfd1a41fe1c2fd",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -633,15 +633,15 @@ dGs=
       Other third commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605169,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605169,
@@ -649,7 +649,7 @@ dGs=
             },
             "message": "Third commit
       ",
-            "parent": Array [
+            "parent": [
               "6cabb8ab77d3fc40858db84416dfd1a41fe1c2fd",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -663,15 +663,15 @@ dGs=
       Third commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605133,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605133,
@@ -679,7 +679,7 @@ dGs=
             },
             "message": "Second commit
       ",
-            "parent": Array [
+            "parent": [
               "4acc58cd881f48c4662c4554ab268e77bcd34b71",
             ],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -693,15 +693,15 @@ dGs=
       Second commit
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605128,
               "timezoneOffset": 240,
             },
-            "committer": Object {
+            "committer": {
               "email": "wmhilton@gmail.com",
               "name": "William Hilton",
               "timestamp": 1528605128,
@@ -709,7 +709,7 @@ dGs=
             },
             "message": "Initial commit
       ",
-            "parent": Array [],
+            "parent": [],
             "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
           },
           "oid": "4acc58cd881f48c4662c4554ab268e77bcd34b71",

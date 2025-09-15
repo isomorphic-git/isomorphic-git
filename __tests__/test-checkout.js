@@ -37,7 +37,7 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -52,7 +52,7 @@ describe('checkout', () => {
     `)
     const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -107,7 +107,7 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -122,7 +122,7 @@ describe('checkout', () => {
     `)
     const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -170,7 +170,7 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -185,7 +185,7 @@ describe('checkout', () => {
     `)
     const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -237,14 +237,14 @@ describe('checkout', () => {
     error = error.toJSON()
     delete error.stack
     expect(error).toMatchInlineSnapshot(`
-      Object {
+      {
         "caller": "git.checkout",
         "code": "CommitNotFetchedError",
-        "data": Object {
+        "data": {
           "oid": "033417ae18b174f078f2f44232cb7a374f4c60ce",
           "ref": "missing-branch",
         },
-        "message": "Failed to checkout \\"missing-branch\\" because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally.",
+        "message": "Failed to checkout "missing-branch" because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally.",
       }
     `)
   })
@@ -323,14 +323,14 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
-      Array [
+      [
         "src",
         "test",
       ]
     `)
     const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchInlineSnapshot(`
-      Array [
+      [
         "src/models/GitBlob.js",
         "src/models/GitCommit.js",
         "src/models/GitConfig.js",
@@ -355,13 +355,13 @@ describe('checkout', () => {
     })
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
-      Array [
+      [
         "src",
       ]
     `)
     const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchInlineSnapshot(`
-      Array [
+      [
         "src/models/GitBlob.js",
         "src/utils/write.js",
       ]

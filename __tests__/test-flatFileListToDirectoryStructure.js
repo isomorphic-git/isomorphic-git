@@ -59,163 +59,163 @@ describe('flatFileListToDirectoryStructure', () => {
     const files = filelist.map(f => ({ path: f, someMeta: f.length }))
     const inodes = flatFileListToDirectoryStructure(files)
     expect(inodes.get('.')).toMatchInlineSnapshot(`
-      Object {
+      {
         "basename": ".",
-        "children": Array [
-          Object {
+        "children": [
+          {
             "basename": ".babelrc",
-            "children": Array [],
+            "children": [],
             "fullpath": ".babelrc",
-            "metadata": Object {
+            "metadata": {
               "path": ".babelrc",
               "someMeta": 8,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": ".editorconfig",
-            "children": Array [],
+            "children": [],
             "fullpath": ".editorconfig",
-            "metadata": Object {
+            "metadata": {
               "path": ".editorconfig",
               "someMeta": 13,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": ".flowconfig",
-            "children": Array [],
+            "children": [],
             "fullpath": ".flowconfig",
-            "metadata": Object {
+            "metadata": {
               "path": ".flowconfig",
               "someMeta": 11,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": ".gitignore",
-            "children": Array [],
+            "children": [],
             "fullpath": ".gitignore",
-            "metadata": Object {
+            "metadata": {
               "path": ".gitignore",
               "someMeta": 10,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": ".travis.yml",
-            "children": Array [],
+            "children": [],
             "fullpath": ".travis.yml",
-            "metadata": Object {
+            "metadata": {
               "path": ".travis.yml",
               "someMeta": 11,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": "LICENSE.md",
-            "children": Array [],
+            "children": [],
             "fullpath": "LICENSE.md",
-            "metadata": Object {
+            "metadata": {
               "path": "LICENSE.md",
               "someMeta": 10,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": "README.md",
-            "children": Array [],
+            "children": [],
             "fullpath": "README.md",
-            "metadata": Object {
+            "metadata": {
               "path": "README.md",
               "someMeta": 9,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": "package-lock.json",
-            "children": Array [],
+            "children": [],
             "fullpath": "package-lock.json",
-            "metadata": Object {
+            "metadata": {
               "path": "package-lock.json",
               "someMeta": 17,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": "package.json",
-            "children": Array [],
+            "children": [],
             "fullpath": "package.json",
-            "metadata": Object {
+            "metadata": {
               "path": "package.json",
               "someMeta": 12,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": "shrinkwrap.yaml",
-            "children": Array [],
+            "children": [],
             "fullpath": "shrinkwrap.yaml",
-            "metadata": Object {
+            "metadata": {
               "path": "shrinkwrap.yaml",
               "someMeta": 15,
             },
             "parent": [Circular],
             "type": "blob",
           },
-          Object {
+          {
             "basename": "src",
-            "children": Array [
-              Object {
+            "children": [
+              {
                 "basename": "commands",
-                "children": Array [
-                  Object {
+                "children": [
+                  {
                     "basename": "checkout.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/commands/checkout.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/commands/checkout.js",
                       "someMeta": 24,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "config.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/commands/config.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/commands/config.js",
                       "someMeta": 22,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "fetch.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/commands/fetch.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/commands/fetch.js",
                       "someMeta": 21,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "init.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/commands/init.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/commands/init.js",
                       "someMeta": 20,
                     },
@@ -224,73 +224,73 @@ describe('flatFileListToDirectoryStructure', () => {
                   },
                 ],
                 "fullpath": "src/commands",
-                "metadata": Object {},
+                "metadata": {},
                 "parent": [Circular],
                 "type": "tree",
               },
-              Object {
+              {
                 "basename": "index.js",
-                "children": Array [],
+                "children": [],
                 "fullpath": "src/index.js",
-                "metadata": Object {
+                "metadata": {
                   "path": "src/index.js",
                   "someMeta": 12,
                 },
                 "parent": [Circular],
                 "type": "blob",
               },
-              Object {
+              {
                 "basename": "models",
-                "children": Array [
-                  Object {
+                "children": [
+                  {
                     "basename": "GitBlob.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/models/GitBlob.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/models/GitBlob.js",
                       "someMeta": 21,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "GitCommit.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/models/GitCommit.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/models/GitCommit.js",
                       "someMeta": 23,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "GitConfig.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/models/GitConfig.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/models/GitConfig.js",
                       "someMeta": 23,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "GitObject.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/models/GitObject.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/models/GitObject.js",
                       "someMeta": 23,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "GitTree.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/models/GitTree.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/models/GitTree.js",
                       "someMeta": 21,
                     },
@@ -299,62 +299,62 @@ describe('flatFileListToDirectoryStructure', () => {
                   },
                 ],
                 "fullpath": "src/models",
-                "metadata": Object {},
+                "metadata": {},
                 "parent": [Circular],
                 "type": "tree",
               },
-              Object {
+              {
                 "basename": "utils",
-                "children": Array [
-                  Object {
+                "children": [
+                  {
                     "basename": "exists.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/utils/exists.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/utils/exists.js",
                       "someMeta": 19,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "mkdirs.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/utils/mkdirs.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/utils/mkdirs.js",
                       "someMeta": 19,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "read.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/utils/read.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/utils/read.js",
                       "someMeta": 17,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "resolveRef.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/utils/resolveRef.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/utils/resolveRef.js",
                       "someMeta": 23,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "write.js",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "src/utils/write.js",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "src/utils/write.js",
                       "someMeta": 18,
                     },
@@ -363,49 +363,49 @@ describe('flatFileListToDirectoryStructure', () => {
                   },
                 ],
                 "fullpath": "src/utils",
-                "metadata": Object {},
+                "metadata": {},
                 "parent": [Circular],
                 "type": "tree",
               },
             ],
             "fullpath": "src",
-            "metadata": Object {},
+            "metadata": {},
             "parent": [Circular],
             "type": "tree",
           },
-          Object {
+          {
             "basename": "test",
-            "children": Array [
-              Object {
+            "children": [
+              {
                 "basename": "_helpers.js",
-                "children": Array [],
+                "children": [],
                 "fullpath": "test/_helpers.js",
-                "metadata": Object {
+                "metadata": {
                   "path": "test/_helpers.js",
                   "someMeta": 16,
                 },
                 "parent": [Circular],
                 "type": "blob",
               },
-              Object {
+              {
                 "basename": "snapshots",
-                "children": Array [
-                  Object {
+                "children": [
+                  {
                     "basename": "test-resolveRef.js.md",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "test/snapshots/test-resolveRef.js.md",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "test/snapshots/test-resolveRef.js.md",
                       "someMeta": 36,
                     },
                     "parent": [Circular],
                     "type": "blob",
                   },
-                  Object {
+                  {
                     "basename": "test-resolveRef.js.snap",
-                    "children": Array [],
+                    "children": [],
                     "fullpath": "test/snapshots/test-resolveRef.js.snap",
-                    "metadata": Object {
+                    "metadata": {
                       "path": "test/snapshots/test-resolveRef.js.snap",
                       "someMeta": 38,
                     },
@@ -414,48 +414,48 @@ describe('flatFileListToDirectoryStructure', () => {
                   },
                 ],
                 "fullpath": "test/snapshots",
-                "metadata": Object {},
+                "metadata": {},
                 "parent": [Circular],
                 "type": "tree",
               },
-              Object {
+              {
                 "basename": "test-clone.js",
-                "children": Array [],
+                "children": [],
                 "fullpath": "test/test-clone.js",
-                "metadata": Object {
+                "metadata": {
                   "path": "test/test-clone.js",
                   "someMeta": 18,
                 },
                 "parent": [Circular],
                 "type": "blob",
               },
-              Object {
+              {
                 "basename": "test-config.js",
-                "children": Array [],
+                "children": [],
                 "fullpath": "test/test-config.js",
-                "metadata": Object {
+                "metadata": {
                   "path": "test/test-config.js",
                   "someMeta": 19,
                 },
                 "parent": [Circular],
                 "type": "blob",
               },
-              Object {
+              {
                 "basename": "test-init.js",
-                "children": Array [],
+                "children": [],
                 "fullpath": "test/test-init.js",
-                "metadata": Object {
+                "metadata": {
                   "path": "test/test-init.js",
                   "someMeta": 17,
                 },
                 "parent": [Circular],
                 "type": "blob",
               },
-              Object {
+              {
                 "basename": "test-resolveRef.js",
-                "children": Array [],
+                "children": [],
                 "fullpath": "test/test-resolveRef.js",
-                "metadata": Object {
+                "metadata": {
                   "path": "test/test-resolveRef.js",
                   "someMeta": 23,
                 },
@@ -464,13 +464,13 @@ describe('flatFileListToDirectoryStructure', () => {
               },
             ],
             "fullpath": "test",
-            "metadata": Object {},
+            "metadata": {},
             "parent": [Circular],
             "type": "tree",
           },
         ],
         "fullpath": ".",
-        "metadata": Object {},
+        "metadata": {},
         "parent": [Circular],
         "type": "tree",
       }

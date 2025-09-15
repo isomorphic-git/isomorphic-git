@@ -243,14 +243,14 @@ describe('add', () => {
     )
     const files = await fs.readdir(dir)
     expect(files.sort()).toMatchInlineSnapshot(`
-      Array [
+      [
         "20thcenturyfoodcourt.png",
         "Test.md",
       ]
     `)
     const index = await listFiles({ fs, dir, gitdir })
     expect(index).toMatchInlineSnapshot(`
-      Array [
+      [
         "20thcenturyfoodcourt.png",
         "Test.md",
       ]

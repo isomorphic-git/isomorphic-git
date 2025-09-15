@@ -47,10 +47,10 @@ describe('annotatedTag', () => {
   })
   it('creates a signed tag to HEAD', async () => {
     // Setup
-    const { pgp } = require('@isomorphic-git/pgp-plugin')
+    const { pgp } = await import('@isomorphic-git/pgp-plugin')
     const { fs, gitdir } = await makeFixture('test-annotatedTag')
     // Test
-    const { privateKey, publicKey } = require('./__fixtures__/pgp-keys.js')
+    const { privateKey, publicKey } = await import('./__fixtures__/pgp-keys.js')
     await annotatedTag({
       fs,
       gitdir,

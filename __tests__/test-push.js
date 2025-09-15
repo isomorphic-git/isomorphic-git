@@ -46,7 +46,7 @@ describe('push', () => {
     expect(res.ok).toBe(true)
     expect(res.refs['refs/heads/master'].ok).toBe(true)
     expect(output).toMatchInlineSnapshot(`
-      Array [
+      [
         "build started...
       ",
         "build completed...

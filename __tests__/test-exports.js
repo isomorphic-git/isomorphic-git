@@ -5,7 +5,7 @@ describe('exports', () => {
   it('exposes only the intended API functions', async () => {
     const names = Object.keys(git)
     expect(names.sort()).toMatchInlineSnapshot(`
-      Array [
+      [
         "Errors",
         "STAGE",
         "TREE",
