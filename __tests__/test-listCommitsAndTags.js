@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { listCommitsAndTags } = require('isomorphic-git/internal-apis')
+import { listCommitsAndTags } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('listCommitsAndTags', () => {
   it('listCommitsAndTags', async () => {

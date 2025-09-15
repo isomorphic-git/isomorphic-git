@@ -1,13 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const {
-  GitPackIndex,
-  GitObject,
-  shasum,
-} = require('isomorphic-git/internal-apis')
+import { GitPackIndex, GitObject, shasum } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('GitPackIndex', () => {
   it('from .idx', async () => {

@@ -1,9 +1,6 @@
 /* eslint-env node, browser, jasmine */
-const { Errors } = require('isomorphic-git')
-const {
-  GitRemoteManager,
-  GitRemoteHTTP,
-} = require('isomorphic-git/internal-apis')
+import { Errors } from 'isomorphic-git'
+import { GitRemoteManager, GitRemoteHTTP } from 'isomorphic-git/internal-apis'
 
 describe('GitRemoteManager', () => {
   it('getRemoteHelperFor (http)', async () => {

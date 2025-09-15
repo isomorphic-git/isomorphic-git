@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const { writeBlob, updateIndex, status, add } = require('isomorphic-git')
+import { writeBlob, updateIndex, status, add } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('updateIndex', () => {
   it('should be possible to add a file on disk to the index', async () => {

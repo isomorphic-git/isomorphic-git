@@ -1,10 +1,10 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const { packObjects, indexPack } = require('isomorphic-git')
-const { readObject, readObjectPacked } = require('isomorphic-git/internal-apis')
+import { packObjects, indexPack } from 'isomorphic-git'
+import { readObject, readObjectPacked } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('packObjects', () => {
   it('makes a packfile', async () => {

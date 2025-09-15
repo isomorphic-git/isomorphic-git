@@ -1,16 +1,9 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
 
-const {
-  stash,
-  Errors,
-  setConfig,
-  add,
-  status,
-  commit,
-} = require('isomorphic-git')
+import { stash, Errors, setConfig, add, status, commit } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 const makeFixtureStash = async testDir => {
   const fixtureDir = 'test-stash'
