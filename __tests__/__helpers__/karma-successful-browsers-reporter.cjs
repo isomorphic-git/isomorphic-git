@@ -12,7 +12,7 @@ const BrowsersReporter = function(
   this.successfulBrowsersFullNames = []
   this.successfulBrowsers = []
   this.failedBrowsers = []
-  this.onRunStart = (browsers) => {
+  this.onRunStart = browsers => {
     this.browserCount = browsers.length
     this.buildOk = true
     // Append to the existing list of successful browsers
@@ -20,7 +20,7 @@ const BrowsersReporter = function(
     this.successfulBrowsersFullNames = tmp[0]
     this.successfulBrowsers = tmp[1]
   }
-  this.onBrowserComplete = (browser) => {
+  this.onBrowserComplete = browser => {
     var results = browser.lastResult
     if (results.disconnected || results.error || results.failed) {
       this.buildOk = false

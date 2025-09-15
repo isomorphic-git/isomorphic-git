@@ -39,7 +39,7 @@ export function flatFileListToDirectoryStructure(files) {
         type: 'blob',
         fullpath: name,
         basename: basename(name),
-        metadata: metadata,
+        metadata,
         // This recursively generates any missing parent folders.
         parent: mkdir(dirname(name)),
         children: [],

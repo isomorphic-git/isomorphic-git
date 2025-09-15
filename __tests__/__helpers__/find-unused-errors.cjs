@@ -14,6 +14,7 @@ const bal = []
       dry: true,
       countMatches: true,
     })
+    // @ts-ignore
     files = files.filter(file => file.numMatches > 0).map(file => file.file)
     // console.log(`${error}: ${files.length}`)
     if (files.length > 0) {

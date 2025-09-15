@@ -3,8 +3,8 @@ export function parseAuthor(author) {
     /^(.*) <(.*)> (.*) (.*)$/
   )
   return {
-    name: name,
-    email: email,
+    name,
+    email,
     timestamp: Number(timestamp),
     timezoneOffset: parseTimezoneOffset(offset),
   }

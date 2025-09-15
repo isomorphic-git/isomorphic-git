@@ -203,7 +203,7 @@ export class GitIndex {
       gid: stats.gid,
       size: stats.size,
       path: filepath,
-      oid: oid,
+      oid,
       flags: {
         assumeValid: false,
         extended: false,

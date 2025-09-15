@@ -9,11 +9,13 @@ const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.cjs')
 
-const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
+const retry = n => cmd =>
+  Array(n)
+    .fill(`(${cmd})`)
+    .join(` || `)
 const retry3 = retry(3)
 
-const quote = cmd =>
-  cmd.replace(new RegExp("'", 'g'), "\\'").replace(new RegExp('"', 'g'), '\\"')
+const quote = cmd => cmd.replaceAll("'", "\\'").replace('"', '\\"')
 
 const optional = cmd =>
   `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`
@@ -101,7 +103,8 @@ module.exports = {
       typings:
         'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
       webpack: 'webpack --config webpack.config.cjs',
-      indexjson: 'npx make-index -o __tests__/__fixtures__/index.json && node __tests__/__helpers__/make_superblock.cjs',
+      indexjson:
+        'npx make-index -o __tests__/__fixtures__/index.json && node __tests__/__helpers__/make_superblock.cjs',
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
       size: process.env.CI
@@ -112,16 +115,16 @@ module.exports = {
     website: {
       default: process.env.CI
         ? series.nps(
-          'website.codemirrorify',
-          'website.cpstatic',
-          'website.build',
-          'website.publish'
-        )
+            'website.codemirrorify',
+            'website.cpstatic',
+            'website.build',
+            'website.publish'
+          )
         : series.nps(
-          'website.codemirrorify',
-          'website.cpstatic',
-          'website.dev'
-        ),
+            'website.codemirrorify',
+            'website.cpstatic',
+            'website.dev'
+          ),
       codemirrorify:
         '(cd website/packages/codemirrorify && npm install && npm run build)',
       cpstatic:
