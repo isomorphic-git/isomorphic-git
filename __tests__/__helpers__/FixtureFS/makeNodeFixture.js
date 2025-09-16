@@ -1,28 +1,14 @@
 import * as _fs from 'fs'
 import * as os from 'os'
-import * as path from 'path'
+import { join, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
 import findUp from 'find-up'
 import { FileSystem } from 'isomorphic-git/internal-apis'
 import onExit from 'signal-exit'
 
-const TEMP_PATH = path.join(os.tmpdir(), 'jest-fixture-')
-const TEMP_DIRS_CREATED = []
-
-/**
- * @param {string} cwd
- * @param  {...string} fileParts
- */
-export function getFixturePath(cwd, ...fileParts) {
-  return findUp(path.join('__fixtures__', ...fileParts), { cwd })
-}
-
-export async function createTempDir() {
-  const tempDir = await _fs.promises.mkdtemp(TEMP_PATH)
-  TEMP_DIRS_CREATED.push(tempDir)
-  return tempDir
-}
+const TEMP_PATH = join(os.tmpdir(), 'jest-fixture-')
+const TEMP_DIRS_CREATED = new Set()
 
 export function cleanupTempDirs() {
   for (const tempDir of TEMP_DIRS_CREATED) {
@@ -30,18 +16,24 @@ export function cleanupTempDirs() {
       _fs.rmSync(tempDir, { recursive: true, force: true })
     } catch (err) {}
   }
-
-  TEMP_DIRS_CREATED.length = 0
+  TEMP_DIRS_CREATED.clear()
 }
 
-/**
- * @param {string} cwd
- * @param  {...string} fileParts
- */
-export async function copyFixtureIntoTempDir(cwd, ...fileParts) {
-  const fixturePath = await getFixturePath(cwd, ...fileParts)
-  const tempDir = await createTempDir()
-  await _fs.promises.cp(fixturePath, tempDir, { recursive: true })
+/** @todo Use `import.meta.dirname` and `..` once support for Node 18 is dropped */
+const testsDir = resolve(fileURLToPath(import.meta.url), '../..')
+
+export async function useTempDir(fixture) {
+  const fixturePath = await findUp(join('__fixtures__', fixture), {
+    cwd: testsDir,
+  })
+
+  const tempDir = await _fs.promises.mkdtemp(TEMP_PATH)
+  TEMP_DIRS_CREATED.add(tempDir)
+
+  if (fixturePath) {
+    await _fs.promises.cp(fixturePath, tempDir, { recursive: true })
+  }
+
   return tempDir
 }
 
@@ -50,16 +42,8 @@ export async function makeNodeFixture(fixture) {
 
   const fs = new FileSystem(_fs)
 
-  /** @todo Use `import.meta.dirname` and `..` once support for Node 18 is dropped */
-  const testsDir = path.resolve(fileURLToPath(import.meta.url), '../..')
-
-  const dir = (await getFixturePath(testsDir, fixture))
-    ? await copyFixtureIntoTempDir(testsDir, fixture)
-    : await createTempDir()
-
-  const gitdir = (await getFixturePath(testsDir, `${fixture}.git`))
-    ? await copyFixtureIntoTempDir(testsDir, `${fixture}.git`)
-    : await createTempDir()
+  const dir = await useTempDir(fixture)
+  const gitdir = await useTempDir(`${fixture}.git`)
 
   return { _fs, fs, dir, gitdir }
 }
