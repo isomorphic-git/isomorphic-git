@@ -1,8 +1,8 @@
 /* eslint-env node, browser, jasmine */
 import * as path from 'path'
 
-import { packObjects, indexPack } from 'isomorphic-git'
-import { readObject, readObjectPacked } from 'isomorphic-git/internal-apis'
+import { packObjects, indexPack, readObject } from 'isomorphic-git'
+import { readObjectPacked } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
