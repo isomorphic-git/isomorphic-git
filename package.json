@@ -166,6 +166,7 @@
     "karma-verbose-reporter": "0.0.8",
     "karma-webpack": "4.0.2",
     "markdown-table": "^2.0.0",
+    "micro": "^9.3.4",
     "nps": "^5.10.0",
     "nps-utils": "1.7.0",
     "prettier": "1.19.1",
