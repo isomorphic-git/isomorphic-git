@@ -159,11 +159,10 @@ module.exports = {
       typecheck: 'tsc -p tsconfig.json',
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
-      jest:
-        'cross-env-shell NODE_OPTIONS=--experimental-vm-modules ' +
-        (process.env.CI
-          ? retry3(`${timeout5('jest --ci --coverage')}`)
-          : `jest --ci --coverage`),
+      jest: process.env.CI
+        ? 'export NODE_OPTIONS=--experimental-vm-modules\n' +
+          retry3(`${timeout5('jest --ci --coverage')}`)
+        : 'cross-env-shell NODE_OPTIONS=--experimental-vm-modules jest --ci --coverage',
       karma: process.env.CI
         ? retry3('karma start ./karma.conf.cjs --single-run')
         : 'cross-env karma start ./karma.conf.cjs --single-run -log-level debug',
