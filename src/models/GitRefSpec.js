@@ -17,7 +17,7 @@ export class GitRefSpec {
       remoteGlobMatch,
       localPath,
       localGlobMatch,
-    ] = refspec.match(/^(\+?)(.*?)(\*?):(.*?)(\*?)$/).slice(1)
+    ] = refspec.match(/^(\+?)([^:]*?)(\*?):(.*?)(\*?)$/).slice(1)
     const force = forceMatch === '+'
     const remoteIsGlob = remoteGlobMatch === '*'
     const localIsGlob = localGlobMatch === '*'
