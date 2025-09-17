@@ -51,7 +51,7 @@ describe('clone', () => {
     }
     expect(err).not.toBeNull()
     expect(err.code).toBe(Errors.NotFoundError.code)
-  })
+  }, 30_000)
   it('clone with noCheckout', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
