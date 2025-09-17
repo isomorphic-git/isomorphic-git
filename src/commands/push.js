@@ -144,7 +144,7 @@ export async function _push({
     const hookCancel = await onPrePush({
       remote,
       url,
-      localRef: { ref: _delete ? '(delete)' : fullRef, oid: oid },
+      localRef: { ref: _delete ? '(delete)' : fullRef, oid },
       remoteRef: { ref: fullRemoteRef, oid: oldoid },
     })
     if (!hookCancel) throw new UserCanceledError()

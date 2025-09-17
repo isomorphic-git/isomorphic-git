@@ -152,7 +152,7 @@ export class GitWalkerFs {
               index.insert({
                 filepath: entry._fullpath,
                 stats,
-                oid: oid,
+                oid,
               })
             }
           }

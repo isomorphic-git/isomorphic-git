@@ -1,6 +1,6 @@
 /* eslint-env jasmine */
-const diff = require('diff-lines')
-const prettyFormat = require('pretty-format')
+import diff from 'diff-lines'
+import prettyFormat from 'pretty-format'
 
 function assertSnapshot(object, snapshot) {
   let actual = prettyFormat(object)

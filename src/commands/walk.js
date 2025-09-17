@@ -46,7 +46,7 @@ export async function _walk({
   const root = new Array(walkers.length).fill('.')
   const range = arrayRange(0, walkers.length)
   const unionWalkerFromReaddir = async entries => {
-    range.map(i => {
+    range.forEach(i => {
       const entry = entries[i]
       entries[i] = entry && new walkers[i].ConstructEntry(entry)
     })

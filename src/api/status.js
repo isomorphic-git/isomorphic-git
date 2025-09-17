@@ -1,7 +1,7 @@
 // @ts-check
 import { _readTree } from '../commands/readTree.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
-import { ObjectTypeError } from '../errors/ObjectTypeError'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'

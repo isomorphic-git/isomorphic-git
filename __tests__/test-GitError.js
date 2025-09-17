@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 
-const { Errors } = require('isomorphic-git')
+import { Errors } from 'isomorphic-git'
 
 describe('Errors', () => {
   it('have the correct value for their static property code', async () => {
@@ -23,10 +23,10 @@ describe('Errors', () => {
     e = e.toJSON()
     delete e.stack
     expect(e).toMatchInlineSnapshot(`
-      Object {
+      {
         "caller": "",
         "code": "NotFoundError",
-        "data": Object {
+        "data": {
           "what": "foobar.txt",
         },
         "message": "Could not find foobar.txt.",
