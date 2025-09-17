@@ -21,37 +21,41 @@ describe('clone', () => {
   // so I'm enabling it.
   // Update: well, it's now slow enough on Edge that it's failing. Which is odd bc
   // it's the New Edge with is Chromium-based.
-  ;(process.browser ? xit : it)('clone with noTags', async () => {
-    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    await clone({
-      fs,
-      http,
-      dir,
-      gitdir,
-      depth: 1,
-      ref: 'test-branch',
-      noTags: true,
-      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
-      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
-      noCheckout: true,
-    })
-    expect(await fs.exists(`${dir}`)).toBe(true)
-    expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
-    expect(
-      await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/test-branch' })
-    ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
-    expect(
-      await resolveRef({ fs, gitdir, ref: 'refs/heads/test-branch' })
-    ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
-    let err = null
-    try {
-      await resolveRef({ fs, gitdir, ref: 'refs/tags/v0.0.1' })
-    } catch (e) {
-      err = e
-    }
-    expect(err).not.toBeNull()
-    expect(err.code).toBe(Errors.NotFoundError.code)
-  }, 30_000)
+  ;(process.browser ? xit : it)(
+    'clone with noTags',
+    async () => {
+      const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+      await clone({
+        fs,
+        http,
+        dir,
+        gitdir,
+        depth: 1,
+        ref: 'test-branch',
+        noTags: true,
+        url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+        corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+        noCheckout: true,
+      })
+      expect(await fs.exists(`${dir}`)).toBe(true)
+      expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
+      expect(
+        await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/test-branch' })
+      ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
+      expect(
+        await resolveRef({ fs, gitdir, ref: 'refs/heads/test-branch' })
+      ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
+      let err = null
+      try {
+        await resolveRef({ fs, gitdir, ref: 'refs/tags/v0.0.1' })
+      } catch (e) {
+        err = e
+      }
+      expect(err).not.toBeNull()
+      expect(err.code).toBe(Errors.NotFoundError.code)
+    },
+    30_000
+  )
   it('clone with noCheckout', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
