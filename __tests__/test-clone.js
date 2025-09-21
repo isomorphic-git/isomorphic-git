@@ -536,4 +536,53 @@ describe('clone', () => {
       expect(connectionLog[1]).toEqual('POST github.com:443')
     })
   }
+
+  it('clone with immediate abort', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    const controller = new AbortController()
+
+    // Abort immediately
+    controller.abort()
+
+    let error
+    try {
+      await clone({
+        fs,
+        http,
+        dir,
+        gitdir,
+        url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+        corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+        signal: controller.signal,
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeDefined()
+    expect(error instanceof Errors.AbortError).toBe(true)
+    expect(error.code).toBe('AbortError')
+    expect(error.caller).toBe('git.clone')
+  })
+
+  it('clone with non-aborted signal should work normally', async () => {
+    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+    const controller = new AbortController()
+
+    // Don't abort the signal
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+      depth: 1,
+      singleBranch: true,
+      noCheckout: true,
+      signal: controller.signal,
+    })
+
+    expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
+  })
 })

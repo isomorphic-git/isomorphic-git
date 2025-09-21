@@ -13,6 +13,7 @@ import { GitPackIndex } from '../models/GitPackIndex.js'
 import { hasObject } from '../storage/hasObject.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
+import { checkAborted } from '../utils/abortSignal.js'
 import { collect } from '../utils/collect.js'
 import { emptyPackfile } from '../utils/emptyPackfile.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
@@ -59,6 +60,7 @@ import { writeUploadPackRequest } from '../wire/writeUploadPackRequest.js'
  * @param {Object<string, string>} [args.headers]
  * @param {boolean} [args.prune]
  * @param {boolean} [args.pruneTags]
+ * @param {AbortSignal} [args.signal]
  *
  * @returns {Promise<FetchResult>}
  * @see FetchResult
@@ -87,7 +89,10 @@ export async function _fetch({
   headers = {},
   prune = false,
   pruneTags = false,
+  signal,
 }) {
+  // Check if operation was aborted before starting
+  checkAborted(signal)
   const ref = _ref || (await _currentBranch({ fs, gitdir, test: true }))
   const config = await GitConfigManager.get({ fs, gitdir })
   // Figure out what remote to use.
@@ -120,7 +125,11 @@ export async function _fetch({
     url,
     headers,
     protocolVersion: 1,
+    signal,
   })
+
+  // Check if operation was aborted after discovery
+  checkAborted(signal)
   const auth = remoteHTTP.auth // hack to get new credentials from CredentialManager API
   const remoteRefs = remoteHTTP.refs
   // For the special case of an empty repository with no refs, return null.
@@ -223,7 +232,11 @@ export async function _fetch({
     auth,
     body: [packbuffer],
     headers,
+    signal,
   })
+
+  // Check if operation was aborted after connection
+  checkAborted(signal)
   const response = await parseUploadPackResponse(raw.body)
   if (raw.headers) {
     response.headers = raw.headers

@@ -35,6 +35,7 @@ import { join } from '../utils/join.js'
  * @param {object} [args.cache] - a [cache](cache.md) object
  * @param {boolean} [args.nonBlocking = false] - if true, checkout will happen non-blockingly (useful for long-running operations blocking the thread in browser environments)
  * @param {number} [args.batchSize = 100] - If args.nonBlocking is true, batchSize is the number of files to process at a time avoid blocking the executing thread. The default value of 100 is a good starting point.
+ * @param {AbortSignal} [args.signal] - An AbortSignal to cancel the operation
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -49,6 +50,30 @@ import { join } from '../utils/join.js'
  *   depth: 1
  * })
  * console.log('done')
+ *
+ * @example
+ * // Clone with cancellation support
+ * const controller = new AbortController()
+ *
+ * // Cancel after 10 seconds
+ * setTimeout(() => controller.abort(), 10000)
+ *
+ * try {
+ *   await git.clone({
+ *     fs,
+ *     http,
+ *     dir: '/tutorial',
+ *     url: 'https://github.com/isomorphic-git/isomorphic-git',
+ *     signal: controller.signal
+ *   })
+ *   console.log('Clone completed')
+ * } catch (err) {
+ *   if (err instanceof git.Errors.AbortError) {
+ *     console.log('Clone was cancelled')
+ *   } else {
+ *     console.error('Clone failed:', err)
+ *   }
+ * }
  *
  */
 export async function clone({
@@ -77,6 +102,7 @@ export async function clone({
   cache = {},
   nonBlocking = false,
   batchSize = 100,
+  signal,
 }) {
   try {
     assertParameter('fs', fs)
@@ -113,6 +139,7 @@ export async function clone({
       headers,
       nonBlocking,
       batchSize,
+      signal,
     })
   } catch (err) {
     err.caller = 'git.clone'

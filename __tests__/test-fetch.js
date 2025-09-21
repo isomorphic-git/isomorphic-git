@@ -343,4 +343,51 @@ describe('fetch', () => {
     const newValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
     expect(oldValue).not.toEqual(newValue)
   })
+
+  it('fetch with immediate abort', async () => {
+    const { fs, gitdir } = await makeFixture('test-fetch')
+    const controller = new AbortController()
+
+    // Abort immediately
+    controller.abort()
+
+    let error
+    try {
+      await fetch({
+        fs,
+        http,
+        gitdir,
+        url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+        corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+        signal: controller.signal,
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeDefined()
+    expect(error instanceof Errors.AbortError).toBe(true)
+    expect(error.code).toBe('AbortError')
+    expect(error.caller).toBe('git.fetch')
+  })
+
+  it('fetch with non-aborted signal should work normally', async () => {
+    const { fs, gitdir } = await makeFixture('test-fetch')
+    const controller = new AbortController()
+
+    // Don't abort the signal
+    const result = await fetch({
+      fs,
+      http,
+      gitdir,
+      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+      depth: 1,
+      singleBranch: true,
+      signal: controller.signal,
+    })
+
+    expect(result).toBeDefined()
+    expect(result.fetchHead).toBeDefined()
+  })
 })

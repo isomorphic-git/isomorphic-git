@@ -16,6 +16,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitSideBand } from '../models/GitSideBand.js'
+import { checkAborted } from '../utils/abortSignal.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
 import { pkg } from '../utils/pkg.js'
@@ -43,6 +44,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {string} [args.url]
  * @param {string} [args.corsProxy]
  * @param {Object<string, string>} [args.headers]
+ * @param {AbortSignal} [args.signal]
  *
  * @returns {Promise<PushResult>}
  */
@@ -65,7 +67,11 @@ export async function _push({
   delete: _delete = false,
   corsProxy,
   headers = {},
+  signal,
 }) {
+  // Check if operation was aborted before starting
+  checkAborted(signal)
+
   const ref = _ref || (await _currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
     throw new MissingParameterError('ref')
@@ -113,7 +119,11 @@ export async function _push({
     url,
     headers,
     protocolVersion: 1,
+    signal,
   })
+
+  // Check if operation was aborted after discovery
+  checkAborted(signal)
   const auth = httpRemote.auth // hack to get new credentials from CredentialManager API
   let fullRemoteRef
   if (!remoteRef) {
@@ -268,7 +278,11 @@ export async function _push({
     auth,
     headers,
     body: [...packstream1, ...packstream2],
+    signal,
   })
+
+  // Check if operation was aborted after connection
+  checkAborted(signal)
   const { packfile, progress } = await GitSideBand.demux(res.body)
   if (onMessage) {
     const lines = splitLines(progress)

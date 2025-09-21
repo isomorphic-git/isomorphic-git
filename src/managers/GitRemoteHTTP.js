@@ -85,6 +85,7 @@ export class GitRemoteHTTP {
     url: _origUrl,
     headers,
     protocolVersion,
+    signal,
   }) {
     let { url, auth } = extractAuthFromUrl(_origUrl)
     const proxifiedURL = corsProxy ? corsProxify(corsProxy, url) : url
@@ -104,6 +105,7 @@ export class GitRemoteHTTP {
         method: 'GET',
         url: `${proxifiedURL}/info/refs?service=${service}`,
         headers,
+        signal,
       })
 
       // the default loop behavior
@@ -191,6 +193,7 @@ export class GitRemoteHTTP {
     auth,
     body,
     headers,
+    signal,
   }) {
     // We already have the "correct" auth value at this point, but
     // we need to strip out the username/password from the URL yet again.
@@ -209,6 +212,7 @@ export class GitRemoteHTTP {
       url: `${url}/${service}`,
       body,
       headers,
+      signal,
     })
     if (res.statusCode !== 200) {
       const { response } = stringifyBody(res)

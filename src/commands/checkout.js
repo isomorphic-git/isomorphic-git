@@ -13,6 +13,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { _readObject as readObject } from '../storage/readObject.js'
+import { checkAborted } from '../utils/abortSignal.js'
 import { flat } from '../utils/flat.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
@@ -34,6 +35,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {boolean} [args.track]
  * @param {boolean} [args.nonBlocking]
  * @param {number} [args.batchSize]
+ * @param {AbortSignal} [args.signal]
  *
  * @returns {Promise<void>} Resolves successfully when filesystem operations are complete
  *
@@ -55,7 +57,11 @@ export async function _checkout({
   track = true,
   nonBlocking = false,
   batchSize = 100,
+  signal,
 }) {
+  // Check if operation was aborted before starting
+  checkAborted(signal)
+
   // oldOid is defined only if onPostCheckout hook is attached
   let oldOid
   if (onPostCheckout) {
