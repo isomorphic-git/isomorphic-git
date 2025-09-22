@@ -538,6 +538,12 @@ describe('clone', () => {
   }
 
   it('clone with immediate abort', async () => {
+    // Skip test if AbortController is not available
+    if (typeof AbortController === 'undefined') {
+      console.warn('AbortController not available, skipping abort test')
+      return
+    }
+
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     const controller = new AbortController()
 
@@ -566,6 +572,12 @@ describe('clone', () => {
   })
 
   it('clone with non-aborted signal should work normally', async () => {
+    // Skip test if AbortController is not available
+    if (typeof AbortController === 'undefined') {
+      console.warn('AbortController not available, skipping abort test')
+      return
+    }
+
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     const controller = new AbortController()
 

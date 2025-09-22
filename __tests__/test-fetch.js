@@ -345,6 +345,12 @@ describe('fetch', () => {
   })
 
   it('fetch with immediate abort', async () => {
+    // Skip test if AbortController is not available
+    if (typeof AbortController === 'undefined') {
+      console.warn('AbortController not available, skipping abort test')
+      return
+    }
+
     const { fs, gitdir } = await makeFixture('test-fetch')
     const controller = new AbortController()
 
@@ -372,6 +378,12 @@ describe('fetch', () => {
   })
 
   it('fetch with non-aborted signal should work normally', async () => {
+    // Skip test if AbortController is not available
+    if (typeof AbortController === 'undefined') {
+      console.warn('AbortController not available, skipping abort test')
+      return
+    }
+
     const { fs, gitdir } = await makeFixture('test-fetch')
     const controller = new AbortController()
 

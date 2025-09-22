@@ -733,6 +733,12 @@ describe('push', () => {
   })
 
   it('push with immediate abort', async () => {
+    // Skip test if AbortController is not available
+    if (typeof AbortController === 'undefined') {
+      console.warn('AbortController not available, skipping abort test')
+      return
+    }
+
     const { fs, gitdir } = await makeFixture('test-push')
     const controller = new AbortController()
 
