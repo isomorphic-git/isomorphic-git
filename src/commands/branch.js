@@ -2,6 +2,7 @@
 import '../typedefs.js'
 
 import cleanGitRef from 'clean-git-ref'
+import validRef from 'is-git-ref-name-valid'
 
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
@@ -33,7 +34,7 @@ export async function _branch({
   checkout = false,
   force = false,
 }) {
-  if (ref !== cleanGitRef.clean(ref)) {
+  if (!validRef(ref, true)) {
     throw new InvalidRefNameError(ref, cleanGitRef.clean(ref))
   }
 
