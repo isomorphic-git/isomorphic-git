@@ -1,5 +1,6 @@
 // @ts-check
 import cleanGitRef from 'clean-git-ref'
+import validRef from 'is-git-ref-name-valid'
 
 import { _currentBranch } from '../commands/currentBranch.js'
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
@@ -26,11 +27,11 @@ export async function _renameBranch({
   ref,
   checkout = false,
 }) {
-  if (ref !== cleanGitRef.clean(ref)) {
+  if (!validRef(ref, true)) {
     throw new InvalidRefNameError(ref, cleanGitRef.clean(ref))
   }
 
-  if (oldref !== cleanGitRef.clean(oldref)) {
+  if (!validRef(oldref, true)) {
     throw new InvalidRefNameError(oldref, cleanGitRef.clean(oldref))
   }
 
