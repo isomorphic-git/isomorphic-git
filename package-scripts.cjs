@@ -137,8 +137,8 @@ module.exports = {
     // LIST OF SAFE PORTS FOR SAUCE LABS (Edge and Safari) https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy+FAQS#SauceConnectProxyFAQS-CanIAccessApplicationsonlocalhost?
     // 'proxy' needs to run in the background during tests. I'm too lazy to auto start/stop it from within the browser tests.
     proxy: {
-      default: `cors-proxy start -p 9999`,
-      start: `cors-proxy start -p 9999 -d`,
+      default: `cors-proxy run`,
+      start: `cors-proxy start`,
       stop: `cors-proxy stop`,
     },
     gitserver: {
