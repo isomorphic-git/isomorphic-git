@@ -105,7 +105,6 @@
     "crc-32": "^1.2.0",
     "diff3": "0.0.3",
     "ignore": "^5.1.4",
-    "is-git-ref-name-valid": "^1.0.0",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
     "pify": "^4.0.1",
