@@ -392,9 +392,6 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/ARBhosale"><img src="https://avatars.githubusercontent.com/u/26981417?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Aniket Bhosale</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=ARBhosale" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=ARBhosale" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=ARBhosale" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/gnillev"><img src="https://avatars.githubusercontent.com/u/8965094?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Mathias Nisted Velling</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gnillev" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gnillev" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/acandoo"><img src="https://avatars.githubusercontent.com/u/117209328?v=4?s=60" width="60px;" alt=""/><br /><sub><b>acandoo</b></sub></a><br /><a href="#platform-acandoo" title="Packaging/porting to new platform">📦</a> <a href="#userTesting-acandoo" title="User Testing">📓</a></td>
->>>>>>> main
-||||||| 632f67fa
-=======
     <td align="center"><a href="https://github.com/LokiMidgard"><img src="https://avatars.githubusercontent.com/u/389101?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Patrick Kranz</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=LokiMidgard" title="Tests">⚠️</a></td>
   </tr>
   <tr>
@@ -404,7 +401,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/ARBhosale"><img src="https://avatars.githubusercontent.com/u/26981417?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Aniket Bhosale</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=ARBhosale" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=ARBhosale" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=ARBhosale" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/gnillev"><img src="https://avatars.githubusercontent.com/u/8965094?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Mathias Nisted Velling</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gnillev" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=gnillev" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/acandoo"><img src="https://avatars.githubusercontent.com/u/117209328?v=4?s=60" width="60px;" alt=""/><br /><sub><b>acandoo</b></sub></a><br /><a href="#platform-acandoo" title="Packaging/porting to new platform">📦</a> <a href="#userTesting-acandoo" title="User Testing">📓</a></td>
->>>>>>> main
+    <td align="center"><a href="https://github.com/hemanthkini"><img src="https://avatars.githubusercontent.com/u/3934055?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Hemanth Kini</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hemanthkini" title="Code">💻</a></td>
   </tr>
 </table>
 

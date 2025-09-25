@@ -918,6 +918,15 @@
         "platform",
         "userTesting"
       ]
+    },
+    {
+      "login": "hemanthkini",
+      "name": "Hemanth Kini",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3934055?v=4",
+      "profile": "https://github.com/hemanthkini",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
