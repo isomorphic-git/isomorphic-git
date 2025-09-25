@@ -1,6 +1,7 @@
 module.exports = {
   modulePathIgnorePatterns: ['<rootDir>/website'],
   testRegex: '/__tests__/(server-only\\.)?test-[^\\/]+\\.js',
+  setupFilesAfterEnv: ['<rootDir>/__tests__/__helpers__/setup-abort-controller.js'],
   moduleNameMapper: {
     '^isomorphic-git$': '<rootDir>/src',
     '^isomorphic-git/http$': '<rootDir>/http/node',

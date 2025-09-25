@@ -45,6 +45,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Overrides value in repo config.
  * @param {Object<string, string>} [args.headers] - Additional headers to include in HTTP requests, similar to git's `extraHeader` config
  * @param {object} [args.cache] - a [cache](cache.md) object
+ * @param {AbortSignal} [args.signal] - An AbortSignal to cancel the operation
  *
  * @returns {Promise<FetchResult>} Resolves successfully when fetch completes
  * @see FetchResult
@@ -89,6 +90,7 @@ export async function fetch({
   prune = false,
   pruneTags = false,
   cache = {},
+  signal,
 }) {
   try {
     assertParameter('fs', fs)
@@ -119,6 +121,7 @@ export async function fetch({
       headers,
       prune,
       pruneTags,
+      signal,
     })
   } catch (err) {
     err.caller = 'git.fetch'

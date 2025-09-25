@@ -18,6 +18,7 @@ export async function request({
   headers = {},
   agent,
   body,
+  signal,
 }) {
   // If we can, we should send it as a single buffer so it sets a Content-Length header.
   if (body && Array.isArray(body)) {
@@ -25,8 +26,17 @@ export async function request({
   } else if (body) {
     body = asyncIteratorToStream(body)
   }
+
   return new Promise((resolve, reject) => {
-    get(
+    // Check if already aborted
+    if (signal && signal.aborted) {
+      const error = new Error('The operation was aborted.')
+      error.name = 'AbortError'
+      reject(error)
+      return
+    }
+
+    const request = get(
       {
         url,
         method,
@@ -51,6 +61,22 @@ export async function request({
         }
       }
     )
+
+    // Handle abort signal
+    if (signal) {
+      const onAbort = () => {
+        request.abort()
+        const error = new Error('The operation was aborted.')
+        error.name = 'AbortError'
+        reject(error)
+      }
+
+      if (signal.aborted) {
+        onAbort()
+      } else {
+        signal.addEventListener('abort', onAbort, { once: true })
+      }
+    }
   })
 }
 
