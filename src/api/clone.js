@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _clone } from '../commands/clone.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -87,8 +88,10 @@ export async function clone({
     }
     assertParameter('url', url)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _clone({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
       http,
       onProgress,
@@ -98,7 +101,7 @@ export async function clone({
       onAuthFailure,
       onPostCheckout,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       url,
       corsProxy,
       ref,

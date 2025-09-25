@@ -10,6 +10,7 @@ import { GitTree } from '../models/GitTree.js'
 import { _readObject } from '../storage/readObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { compareStats } from '../utils/compareStats.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
 
@@ -61,25 +62,26 @@ export async function status({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     const ignored = await GitIgnoreManager.isIgnored({
       fs,
-      gitdir,
+      gitdir: updatedGitdir,
       dir,
       filepath,
     })
     if (ignored) {
       return 'ignored'
     }
-    const headTree = await getHeadTree({ fs, cache, gitdir })
+    const headTree = await getHeadTree({ fs, cache, gitdir: updatedGitdir })
     const treeOid = await getOidAtPath({
       fs,
       cache,
-      gitdir,
+      gitdir: updatedGitdir,
       tree: headTree,
       path: filepath,
     })
     const indexEntry = await GitIndexManager.acquire(
-      { fs, gitdir, cache },
+      { fs, gitdir: updatedGitdir, cache },
       async function(index) {
         for (const entry of index) {
           if (entry.path === filepath) return entry
@@ -99,7 +101,7 @@ export async function status({
       } else {
         const object = await fs.read(join(dir, filepath))
         const workdirOid = await hashObject({
-          gitdir,
+          gitdir: updatedGitdir,
           type: 'blob',
           object,
         })
@@ -110,11 +112,12 @@ export async function status({
           // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
           if (stats.size !== -1) {
             // We don't await this so we can return faster for one-off cases.
-            GitIndexManager.acquire({ fs, gitdir, cache }, async function(
-              index
-            ) {
-              index.insert({ filepath, stats, oid: workdirOid })
-            })
+            GitIndexManager.acquire(
+              { fs, gitdir: updatedGitdir, cache },
+              async function(index) {
+                index.insert({ filepath, stats, oid: workdirOid })
+              }
+            )
           }
         }
         return workdirOid
@@ -170,7 +173,7 @@ export async function status({
   }
 }
 
-async function getOidAtPath({ fs, cache, gitdir, tree, path }) {
+async function getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path }) {
   if (typeof path === 'string') path = path.split('/')
   const dirname = path.shift()
   for (const entry of tree) {
@@ -181,12 +184,12 @@ async function getOidAtPath({ fs, cache, gitdir, tree, path }) {
       const { type, object } = await _readObject({
         fs,
         cache,
-        gitdir,
+        gitdir: updatedGitdir,
         oid: entry.oid,
       })
       if (type === 'tree') {
         const tree = GitTree.from(object)
-        return getOidAtPath({ fs, cache, gitdir, tree, path })
+        return getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path })
       }
       if (type === 'blob') {
         throw new ObjectTypeError(entry.oid, type, 'blob', path.join('/'))
@@ -196,17 +199,21 @@ async function getOidAtPath({ fs, cache, gitdir, tree, path }) {
   return null
 }
 
-async function getHeadTree({ fs, cache, gitdir }) {
+async function getHeadTree({ fs, cache, gitdir: updatedGitdir }) {
   // Get the tree from the HEAD commit.
   let oid
   try {
-    oid = await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD' })
+    oid = await GitRefManager.resolve({
+      fs,
+      gitdir: updatedGitdir,
+      ref: 'HEAD',
+    })
   } catch (e) {
     // Handle fresh branches with no commits
     if (e instanceof NotFoundError) {
       return []
     }
   }
-  const { tree } = await _readTree({ fs, cache, gitdir, oid })
+  const { tree } = await _readTree({ fs, cache, gitdir: updatedGitdir, oid })
   return tree
 }
