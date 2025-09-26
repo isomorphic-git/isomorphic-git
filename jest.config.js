@@ -1,4 +1,6 @@
-module.exports = {
+import { release } from 'os'
+
+export default {
   modulePathIgnorePatterns: ['<rootDir>/website'],
   testRegex: '/__tests__/(server-only\\.)?test-[^\\/]+\\.js',
   moduleNameMapper: {
@@ -14,7 +16,9 @@ module.exports = {
       'jest-junit',
       {
         outputDirectory: 'junit',
-        outputName: `TESTS-node-${process.version}-${process.platform}-${require('os').release()}.xml`,
+        outputName: `TESTS-node-${process.version}-${
+          process.platform
+        }-${release()}.xml`,
       },
     ],
   ],
