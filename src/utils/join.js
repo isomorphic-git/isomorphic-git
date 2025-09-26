@@ -1,6 +1,8 @@
-//! This code for `path.join` is directly copied from @zenfs/core/path for bundle size improvements.
-//! SPDX-License-Identifier: LGPL-3.0-or-later
-//! Copyright (c) James Prevett and other ZenFS contributors.
+/*!
+ * This code for `path.join` is directly copied from @zenfs/core/path for bundle size improvements.
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ * Copyright (c) James Prevett and other ZenFS contributors.
+ */
 
 function normalizeString(path, aar) {
   let res = ''
