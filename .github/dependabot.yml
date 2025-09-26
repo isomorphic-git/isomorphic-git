@@ -20,15 +20,6 @@ updates:
     - 7.13.10
     - 7.13.8
     - 7.13.9
-  - dependency-name: karma
-    versions:
-    - 6.0.0
-    - 6.0.3
-    - 6.1.0
-    - 6.1.1
-  - dependency-name: jasmine-core
-    versions:
-    - 3.6.0
   - dependency-name: handlebars
     versions:
     - 4.7.6

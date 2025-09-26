@@ -1,26 +1,7 @@
 import { release } from 'os'
+import commonConfig from './.config/jest.js'
 
 export default {
-  modulePathIgnorePatterns: ['<rootDir>/website'],
-  testRegex: '/__tests__/(server-only\\.)?test-[^\\/]+\\.js',
-  moduleNameMapper: {
-    '^isomorphic-git$': '<rootDir>/src',
-    '^isomorphic-git/http$': '<rootDir>/http/node',
-    '^isomorphic-git/(.+)$': '<rootDir>/src/$1',
-  },
-  collectCoverageFrom: ['src/*.js', 'src/**/*.js'],
+  ...commonConfig(`node-${process.version}-${process.platform}-${release()}`),
   testEnvironment: 'node',
-  reporters: [
-    'default',
-    [
-      'jest-junit',
-      {
-        outputDirectory: 'junit',
-        outputName: `TESTS-node-${process.version}-${
-          process.platform
-        }-${release()}.xml`,
-      },
-    ],
-  ],
-  coverageReporters: ['lcov', 'cobertura'],
 }

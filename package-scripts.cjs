@@ -9,10 +9,7 @@ const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 // Polyfill TRAVIS_PULL_REQUEST_SHA environment variable
 require('./__tests__/__helpers__/set-TRAVIS_PULL_REQUEST_SHA.cjs')
 
-const retry = n => cmd =>
-  Array(n)
-    .fill(`(${cmd})`)
-    .join(` || `)
+const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
 const retry3 = retry(3)
 
 const quote = cmd => cmd.replaceAll("'", "\\'").replace('"', '\\"')
@@ -65,6 +62,17 @@ const bundlewatchEnvironmentVariables = () => {
   return options.join(' ')
 }
 
+const jestEnv = 'NODE_OPTIONS=--experimental-vm-modules'
+const jestCommand = 'jest --ci --coverage'
+
+const jestBrowser = browserName => {
+  const cmd = `${jestCommand} --config jest-browser.config.js`
+
+  return process.env.CI
+    ? `export ${jestEnv}\nexport JEST_BROWSER=${browserName}\nexport JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js\n${retry3(`${timeout5(cmd)}`)}`
+    : `cross-env ${jestEnv} JEST_BROWSER=${browserName} JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js ${cmd}`
+}
+
 module.exports = {
   scripts: {
     clean: {
@@ -81,7 +89,6 @@ module.exports = {
       default: concurrent.nps('watch.rollup', 'watch.jest'),
       rollup: runInNewWindow('rollup -cw'),
       jest: runInNewWindow('cross-env DEBUG=* jest --watch'),
-      karma: runInNewWindow('karma start'),
     },
     contributors: {
       add: 'node ./__tests__/__helpers__/add-contributor.cjs',
@@ -152,21 +159,19 @@ module.exports = {
         'build',
         'test.typecheck',
         'test.setup',
-        'test.jest',
-        'test.karma',
+        'test.node',
+        'test.chrome',
         'test.teardown'
       ),
+      browsers: series.nps('test.chrome', 'test.firefox'),
       typecheck: 'tsc -p tsconfig.json',
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
-      jest: process.env.CI
-        ? 'export NODE_OPTIONS=--experimental-vm-modules\n' +
-          retry3(`${timeout5('jest --ci --coverage')}`)
-        : 'cross-env-shell NODE_OPTIONS=--experimental-vm-modules jest --ci --coverage',
-      karma: process.env.CI
-        ? retry3('karma start ./karma.conf.cjs --single-run')
-        : 'cross-env karma start ./karma.conf.cjs --single-run -log-level debug',
-      karmore: 'cross-env TEST_NO_BROWSERS=1 karma start --no-single-run',
+      node: process.env.CI
+        ? `export ${jestEnv}\n${retry3(`${timeout5(jestCommand)}`)}`
+        : `cross-env-shell ${jestEnv} ${jestCommand}`,
+      chrome: jestBrowser('chrome'),
+      firefox: jestBrowser('firefox'),
     },
     prepublish: {
       default: series.nps('prepublish.version', 'build'),
