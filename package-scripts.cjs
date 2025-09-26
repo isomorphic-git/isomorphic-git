@@ -106,6 +106,15 @@ module.exports = {
         'build.size',
         'build.pack'
       ),
+	  nodocs: series.nps(
+		'build.rollup',
+		'build.typings',
+		'build.webpack',
+		'build.indexjson',
+		'build.treeshake',
+		'build.size',
+		'build.pack'
+	  ),
       rollup: 'rollup -c --no-treeshake',
       typings:
         'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
@@ -156,7 +165,7 @@ module.exports = {
     test: {
       default: series.nps(
         'lint',
-        'build',
+        'build.nodocs',
         'test.typecheck',
         'test.setup',
         'test.node',
