@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { listTags } = require('isomorphic-git')
+import { listTags } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('listTags', () => {
   it('listTags', async () => {
@@ -13,7 +13,7 @@ describe('listTags', () => {
       gitdir,
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "local-tag",
         "test-tag",
         "v0.0.1",

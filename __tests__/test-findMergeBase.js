@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { findMergeBase } = require('isomorphic-git')
+import { findMergeBase } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 // These have been checked with
 // GIT_DIR=__tests__/__fixtures__/test-findMergeBase.git git merge-base -a --octopus COMMITS

@@ -1,8 +1,8 @@
 /* eslint-env node, browser, jasmine */
 // const { pgp } = require('@isomorphic-git/pgp-plugin')
-const { log } = require('isomorphic-git')
+import { log } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('log', () => {
   it('a newly added file', async () => {
@@ -15,16 +15,16 @@ describe('log', () => {
     })
     expect(commits.length).toBe(2)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "araknast@protonmail.com",
               "name": "araknast",
               "timestamp": 1653969605,
               "timezoneOffset": 420,
             },
-            "committer": Object {
+            "committer": {
               "email": "araknast@protonmail.com",
               "name": "araknast",
               "timestamp": 1653969605,
@@ -32,7 +32,7 @@ describe('log', () => {
             },
             "message": "update newfile
       ",
-            "parent": Array [
+            "parent": [
               "dcb1c5fe6cc28e7757c4bc4d7dbf5b061c38ec48",
             ],
             "tree": "331f342f6e9b38c45e17189691134cb4a72189d2",
@@ -46,15 +46,15 @@ describe('log', () => {
       update newfile
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "araknast@protonmail.com",
               "name": "araknast",
               "timestamp": 1653969041,
               "timezoneOffset": 420,
             },
-            "committer": Object {
+            "committer": {
               "email": "araknast@protonmail.com",
               "name": "araknast",
               "timestamp": 1653969041,
@@ -62,7 +62,7 @@ describe('log', () => {
             },
             "message": "add newfile
       ",
-            "parent": Array [
+            "parent": [
               "18f202dfed5cb66a295dc57f1f4ba1b7f6b74f36",
             ],
             "tree": "59c1caba006bb27077d11f1c0ff7ad3ff4b2b422",
@@ -89,16 +89,16 @@ describe('log', () => {
     })
     expect(commits.length).toBe(3)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509836,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509836,
@@ -122,7 +122,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "feat: update to readme and hi.md
       ",
-            "parent": Array [
+            "parent": [
               "8e98db35c3e3e01014f78a60786b1b3b96a49960",
             ],
             "tree": "281d4cba64e37323777e7f3ee222d504ed8fa0ea",
@@ -136,15 +136,15 @@ describe('log', () => {
       feat: update to readme and hi.md
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509669,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509669,
@@ -168,7 +168,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "feat: update to README
       ",
-            "parent": Array [
+            "parent": [
               "533131624898bb8ff588b48c77b26d63e7eb180f",
             ],
             "tree": "2ed69fff23ee6e239744c7277ab80bf40a644ece",
@@ -182,15 +182,15 @@ describe('log', () => {
       feat: update to README
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509547,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509547,
@@ -214,7 +214,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "first commit
       ",
-            "parent": Array [],
+            "parent": [],
             "tree": "5640888e247e986136d36b1d52a9881abc7170f6",
           },
           "oid": "8651dcc28c58d96439e99aa2bf239bf2ab238b73",
@@ -255,16 +255,16 @@ describe('log', () => {
     })
     expect(commits.length).toBe(6)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593652995,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593652995,
@@ -288,7 +288,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "redel rm.md
       ",
-            "parent": Array [
+            "parent": [
               "91e66ded3cee73f5f181fbd0e7a4703f1c12bb9f",
             ],
             "tree": "7ab59df3bfd122ef5d24c70f9c8977f03b35e720",
@@ -302,15 +302,15 @@ describe('log', () => {
       redel rm.md
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593652652,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593652652,
@@ -334,7 +334,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "feat: readd the rm.md
       ",
-            "parent": Array [
+            "parent": [
               "1bc226bc219beea3fb177de96350d8ad2f4c57cd",
             ],
             "tree": "e7bd10ca01b3377fa6fbe633ce104698b5d7dd29",
@@ -348,15 +348,15 @@ describe('log', () => {
       feat: readd the rm.md
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509970,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509970,
@@ -380,7 +380,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "fix: remove rm.md
       ",
-            "parent": Array [
+            "parent": [
               "58aa7508ff84bc25552b4576b1b5ab0ddc5e41dd",
             ],
             "tree": "b0904e4ea2e2548d0ebc5c9401b8a0390c0888cd",
@@ -394,15 +394,15 @@ describe('log', () => {
       fix: remove rm.md
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509879,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509879,
@@ -426,7 +426,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "feat: update to rm.md
       ",
-            "parent": Array [
+            "parent": [
               "bba48a582aaa7e572c844cf7f42f3cd03eab81f0",
             ],
             "tree": "996a1c302a71aeeb3ba865c1a8720bbec39657b9",
@@ -440,15 +440,15 @@ describe('log', () => {
       feat: update to rm.md
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509597,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509597,
@@ -472,7 +472,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "feat: add content to rm.md
       ",
-            "parent": Array [
+            "parent": [
               "8651dcc28c58d96439e99aa2bf239bf2ab238b73",
             ],
             "tree": "c8a2583e243cfdd458a6ff40ff6f7a2d57fbaa96",
@@ -486,15 +486,15 @@ describe('log', () => {
       feat: add content to rm.md
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509547,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593509547,
@@ -518,7 +518,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "first commit
       ",
-            "parent": Array [],
+            "parent": [],
             "tree": "5640888e247e986136d36b1d52a9881abc7170f6",
           },
           "oid": "8651dcc28c58d96439e99aa2bf239bf2ab238b73",
@@ -543,16 +543,16 @@ describe('log', () => {
     })
     expect(commits.length).toBe(4)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510674,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510674,
@@ -576,7 +576,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "update rename1
       ",
-            "parent": Array [
+            "parent": [
               "cc9bcf734480b44d2e884ae75a11805e42c938d8",
             ],
             "tree": "7ab59df3bfd122ef5d24c70f9c8977f03b35e720",
@@ -590,15 +590,15 @@ describe('log', () => {
       update rename1
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510498,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510498,
@@ -622,7 +622,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "rename it
       ",
-            "parent": Array [
+            "parent": [
               "b9a8e7ed4e394942ba0a45f19563e8ad90b94ea9",
             ],
             "tree": "641ca0a41cfbccf4fb5c366840270fd25ec48b4f",
@@ -636,15 +636,15 @@ describe('log', () => {
       rename it
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510465,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510465,
@@ -668,7 +668,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "update rename
       ",
-            "parent": Array [
+            "parent": [
               "01cd249eaaceb8572bee5b24d8ed728c95f61bd6",
             ],
             "tree": "b76aafd52bf2d588756a32ebc9fa1ae0e68052c9",
@@ -682,15 +682,15 @@ describe('log', () => {
       update rename
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510416,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510416,
@@ -714,7 +714,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "add rename.md
       ",
-            "parent": Array [
+            "parent": [
               "2584400512051e6cb07fda5ff7e8dde556fc3124",
             ],
             "tree": "8ad18556d7692aef283e7cf30a287b6010c362a4",
@@ -742,16 +742,16 @@ describe('log', () => {
     })
     expect(commits.length).toBe(2)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510674,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510674,
@@ -775,7 +775,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "update rename1
       ",
-            "parent": Array [
+            "parent": [
               "cc9bcf734480b44d2e884ae75a11805e42c938d8",
             ],
             "tree": "7ab59df3bfd122ef5d24c70f9c8977f03b35e720",
@@ -789,15 +789,15 @@ describe('log', () => {
       update rename1
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510498,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1593510498,
@@ -821,7 +821,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "rename it
       ",
-            "parent": Array [
+            "parent": [
               "b9a8e7ed4e394942ba0a45f19563e8ad90b94ea9",
             ],
             "tree": "641ca0a41cfbccf4fb5c366840270fd25ec48b4f",
@@ -849,16 +849,16 @@ describe('log', () => {
     })
     expect(commits.length).toBe(2)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594854,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594854,
@@ -882,7 +882,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "rename rename2 to rename-2
       ",
-            "parent": Array [
+            "parent": [
               "c7a666607cd986eee187b3df2c4adef3b7e56c94",
             ],
             "tree": "2d8cf1942da4577aa3f205108c228e1a95b33940",
@@ -896,15 +896,15 @@ describe('log', () => {
       rename rename2 to rename-2
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594440,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594440,
@@ -928,7 +928,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "add rename2
       ",
-            "parent": Array [
+            "parent": [
               "9a4eb099547166c9cf28628a127cfc9e59fa4f29",
             ],
             "tree": "795c22aa0265ce8c2d1cd3d4bf2d62ac1605b5ca",
@@ -956,16 +956,16 @@ describe('log', () => {
     })
     // expect(commits.length).toBe(2)
     expect(commits).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "commit": Object {
-            "author": Object {
+      [
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594611,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594611,
@@ -989,7 +989,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "update rename22
       ",
-            "parent": Array [
+            "parent": [
               "c87ae5071b9e674a1cfa3d853e33993c162c5def",
             ],
             "tree": "6ae7cfe2d19e1ab121ec7c31fac66f33f1ef9957",
@@ -1003,15 +1003,15 @@ describe('log', () => {
       update rename22
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594590,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594590,
@@ -1035,7 +1035,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "rename rename2-2 to rename22
       ",
-            "parent": Array [
+            "parent": [
               "b3886fec49477755dcc5591c8df04f66535c0d79",
             ],
             "tree": "b5d1f7500bb4d6dd31b70c19c2ddf89955a3e509",
@@ -1049,15 +1049,15 @@ describe('log', () => {
       rename rename2-2 to rename22
       ",
         },
-        Object {
-          "commit": Object {
-            "author": Object {
+        {
+          "commit": {
+            "author": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594501,
               "timezoneOffset": -480,
             },
-            "committer": Object {
+            "committer": {
               "email": "snowyu.lee@gmail.com",
               "name": "Riceball LEE",
               "timestamp": 1594594501,
@@ -1081,7 +1081,7 @@ describe('log', () => {
       -----END PGP SIGNATURE-----",
             "message": "add rename2-2
       ",
-            "parent": Array [
+            "parent": [
               "58ebbeb4ea12bf4b0bdedfdf89e3d8c8f456e094",
             ],
             "tree": "84230a4664bf41b53034b9cab3c823db721055eb",

@@ -3,7 +3,7 @@ import '../typedefs.js'
 
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { GitAnnotatedTag } from '../models/GitAnnotatedTag'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 

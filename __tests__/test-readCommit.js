@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, readCommit } = require('isomorphic-git')
+import { Errors, readCommit } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('readCommit', () => {
   it('test missing', async () => {
@@ -31,15 +31,15 @@ describe('readCommit', () => {
       oid: 'e10ebb90d03eaacca84de1af0a59b444232da99e',
     })
     expect(result).toMatchInlineSnapshot(`
-      Object {
-        "commit": Object {
-          "author": Object {
+      {
+        "commit": {
+          "author": {
             "email": "wmhilton@gmail.com",
             "name": "Will Hilton",
             "timestamp": 1502484200,
             "timezoneOffset": 240,
           },
-          "committer": Object {
+          "committer": {
             "email": "wmhilton@gmail.com",
             "name": "Will Hilton",
             "timestamp": 1502484200,
@@ -64,7 +64,7 @@ describe('readCommit', () => {
       -----END PGP SIGNATURE-----",
           "message": "Improve resolveRef to handle more kinds of refs. Add tests
       ",
-          "parent": Array [
+          "parent": [
             "b4f8206d9e359416b0f34238cbeb400f7da889a8",
           ],
           "tree": "e0b8f3574060ee24e03e4af3896f65dd208a60cc",
@@ -90,15 +90,15 @@ describe('readCommit', () => {
       oid: '0b8faa11b353db846b40eb064dfb299816542a46',
     })
     expect(result).toMatchInlineSnapshot(`
-      Object {
-        "commit": Object {
-          "author": Object {
+      {
+        "commit": {
+          "author": {
             "email": "wmhilton@gmail.com",
             "name": "William Hilton",
             "timestamp": 1508204013,
             "timezoneOffset": 240,
           },
-          "committer": Object {
+          "committer": {
             "email": "wmhilton@gmail.com",
             "name": "William Hilton",
             "timestamp": 1508204013,
@@ -106,7 +106,7 @@ describe('readCommit', () => {
           },
           "message": "index on master: fbd56b4 Add 'unpkg' key to package.json
       ",
-          "parent": Array [
+          "parent": [
             "fbd56b49d400a19ee185ae735417bdb34c084621",
           ],
           "tree": "4d166e26fcf9fe7b21863436137c44a39a21a90f",

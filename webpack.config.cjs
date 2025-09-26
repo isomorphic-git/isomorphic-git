@@ -32,23 +32,5 @@ module.exports = [
         strict: true,
       }),
     ],
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /node_modules/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              babelrc: false,
-              plugins: [
-                '@babel/plugin-proposal-object-rest-spread',
-                '@babel/plugin-transform-async-to-generator',
-              ],
-            },
-          },
-        },
-      ],
-    },
   },
 ]

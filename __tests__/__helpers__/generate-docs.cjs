@@ -152,8 +152,8 @@ ${text}`
  * This is a known issue tracked by https://github.com/jsdoc2md/jsdoc-api/issues/19.
  */
 const jsdocConfig = () => {
-  if (!/[\\\/]_/.test(os.tmpdir())) {
-    return;
+  if (!/[\\/]_/.test(os.tmpdir())) {
+    return
   }
 
   try {
@@ -165,16 +165,16 @@ const jsdocConfig = () => {
     config.source.excludePattern = ''
 
     // Write the config to a temporary directory inside node_modules.
-    const outputDir = path.resolve(path.dirname(require.resolve('jsdoc-api')), '../.cache/isomorphic-git/tmp')
-    fs.mkdirSync(outputDir, { recursive: true });
+    const outputDir = path.resolve(
+      path.dirname(require.resolve('jsdoc-api')),
+      '../.cache/isomorphic-git/tmp'
+    )
+    fs.mkdirSync(outputDir, { recursive: true })
 
     const filepath = path.join(outputDir, 'jsdoc.config.json')
     fs.writeFileSync(filepath, JSON.stringify(config))
-    return filepath;
-  }
-  catch {
-    return;
-  }
+    return filepath
+  } catch {}
 }
 
 async function gendoc(file, filepath) {
@@ -188,7 +188,7 @@ async function gendoc(file, filepath) {
     /\{\[string, HeadStatus, WorkdirStatus, StageStatus\]\}/g,
     '{Array<string|number>}'
   )
-  const ast = await jsdoc.explain({ source: file, configure: jsdocConfig() });
+  const ast = await jsdoc.explain({ source: file, configure: jsdocConfig() })
   let text = ''
   for (const obj of ast) {
     if (!obj.undocumented) {

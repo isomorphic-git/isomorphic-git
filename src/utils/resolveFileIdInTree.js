@@ -43,7 +43,7 @@ async function _resolveFileId({
   filepaths = [],
   parentPath = '',
 }) {
-  const walks = tree.entries().map(function(entry) {
+  const walks = tree.entries().map(function (entry) {
     let result
     if (entry.oid === fileId) {
       result = join(parentPath, entry.path)
@@ -54,7 +54,7 @@ async function _resolveFileId({
         cache,
         gitdir,
         oid: entry.oid,
-      }).then(function({ object }) {
+      }).then(function ({ object }) {
         return _resolveFileId({
           fs,
           cache,

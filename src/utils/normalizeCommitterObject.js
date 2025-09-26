@@ -1,4 +1,4 @@
-import { _getConfig } from '../commands/getConfig'
+import { _getConfig } from '../commands/getConfig.js'
 
 import { assignDefined } from './assignDefined.js'
 /**

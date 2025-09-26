@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { listFiles } = require('isomorphic-git')
+import { listFiles } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('listFiles', () => {
   it('index', async () => {
@@ -10,7 +10,7 @@ describe('listFiles', () => {
     // Test
     const files = await listFiles({ fs, gitdir })
     expect(files).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",
@@ -52,7 +52,7 @@ describe('listFiles', () => {
     // Test
     const files = await listFiles({ fs, gitdir, ref: 'test-branch' })
     expect(files).toMatchInlineSnapshot(`
-      Array [
+      [
         ".babelrc",
         ".editorconfig",
         ".flowconfig",

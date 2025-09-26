@@ -31,7 +31,7 @@ export class GitSideBand {
     const packfile = new FIFO()
     const progress = new FIFO()
     // TODO: Use a proper through stream?
-    const nextBit = async function() {
+    const nextBit = async function () {
       const line = await read()
       // Skip over flush packets
       if (line === null) return nextBit()

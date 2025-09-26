@@ -175,9 +175,8 @@ export async function _stashDrop({ fs, dir, gitdir, refIdx = 0 }) {
   await acquireLock({ reflogEntries, stashReflogPath, stashMgr }, async () => {
     if (reflogEntries.length) {
       await fs.write(stashReflogPath, reflogEntries.join('\n'), 'utf8')
-      const lastStashCommit = reflogEntries[reflogEntries.length - 1].split(
-        ' '
-      )[1]
+      const lastStashCommit =
+        reflogEntries[reflogEntries.length - 1].split(' ')[1]
       await stashMgr.writeStashRef(lastStashCommit)
     } else {
       // remove the stash reflog file if no entry left

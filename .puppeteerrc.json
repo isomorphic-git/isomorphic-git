@@ -1,0 +1,8 @@
+{
+  "chrome": {
+    "skipDownload": false
+  },
+  "firefox": {
+    "skipDownload": false
+  }
+}
