@@ -80,7 +80,7 @@ export async function status({
     })
     const indexEntry = await GitIndexManager.acquire(
       { fs, gitdir, cache },
-      async function(index) {
+      async function (index) {
         for (const entry of index) {
           if (entry.path === filepath) return entry
         }
@@ -110,11 +110,12 @@ export async function status({
           // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
           if (stats.size !== -1) {
             // We don't await this so we can return faster for one-off cases.
-            GitIndexManager.acquire({ fs, gitdir, cache }, async function(
-              index
-            ) {
-              index.insert({ filepath, stats, oid: workdirOid })
-            })
+            GitIndexManager.acquire(
+              { fs, gitdir, cache },
+              async function (index) {
+                index.insert({ filepath, stats, oid: workdirOid })
+              }
+            )
           }
         }
         return workdirOid

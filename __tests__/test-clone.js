@@ -169,7 +169,8 @@ describe('clone', () => {
         return http.request.apply(null, arguments).then(response => {
           const contentType = response.headers['content-type']
           if (contentType === 'application/x-git-upload-pack-result') {
-            const body = `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
+            const body =
+              `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
 0023\x02Enumerating objects: 5, done.
 0022\x02Counting objects:  20% (1/5)
 0022\x02Counting objects:  40% (2/5)
@@ -179,9 +180,9 @@ describe('clone', () => {
 002c\x02Compressing objects: 100% (2/2), done.
 0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
 0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
-              .split('\n')
-              .map(it => Buffer.from(it + '\n'))
-              .values()
+                .split('\n')
+                .map(it => Buffer.from(it + '\n'))
+                .values()
             body.next = new Proxy(body.next, {
               apply(target, self, args) {
                 const result = target.apply(self, args)
@@ -292,7 +293,8 @@ describe('clone', () => {
         return http.request.apply(null, arguments).then(response => {
           const contentType = response.headers['content-type']
           if (contentType === 'application/x-git-upload-pack-result') {
-            const body = `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
+            const body =
+              `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
 0023\x02Enumerating objects: 5, done.
 0022\x02Counting objects:  20% (1/5)
 0022\x02Counting objects:  40% (2/5)
@@ -302,9 +304,9 @@ describe('clone', () => {
 002c\x02Compressing objects: 100% (2/2), done.
 0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
 0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
-              .split('\n')
-              .map(it => Buffer.from(it + '\n'))
-              .values()
+                .split('\n')
+                .map(it => Buffer.from(it + '\n'))
+                .values()
             body.next = new Proxy(body.next, {
               apply(target, self, args) {
                 const result = target.apply(self, args)
