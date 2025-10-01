@@ -1,7 +1,6 @@
 import * as _fs from 'fs'
 import * as os from 'os'
 import { join, resolve } from 'path'
-import { fileURLToPath } from 'url'
 
 import findUp from 'find-up'
 import { FileSystem } from 'isomorphic-git/internal-apis'
@@ -19,8 +18,7 @@ export function cleanupTempDirs() {
   TEMP_DIRS_CREATED.clear()
 }
 
-/** @todo Use `import.meta.dirname` and `..` once support for Node 18 is dropped */
-const testsDir = resolve(fileURLToPath(import.meta.url), '../..')
+const testsDir = resolve(import.meta.dirname, '../..')
 
 export async function useTempDir(fixture) {
   const fixturePath = await findUp(join('__fixtures__', fixture), {
