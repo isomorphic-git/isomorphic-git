@@ -18,7 +18,7 @@ export function cleanupTempDirs() {
   TEMP_DIRS_CREATED.clear()
 }
 
-const testsDir = resolve(import.meta.dirname, '../..')
+const testsDir = resolve(import.meta.dirname, '..')
 
 export async function useTempDir(fixture) {
   const fixturePath = await findUp(join('__fixtures__', fixture), {
