@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -43,9 +44,11 @@ export async function listBranches({
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return GitRefManager.listBranches({
-      fs: new FileSystem(fs),
-      gitdir,
+      fs: fsp,
+      gitdir: updatedGitdir,
       remote,
     })
   } catch (err) {

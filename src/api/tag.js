@@ -4,6 +4,7 @@ import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { GitRefManager } from '../managers/GitRefManager'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -46,17 +47,21 @@ export async function tag({
     ref = ref.startsWith('refs/tags/') ? ref : `refs/tags/${ref}`
 
     // Resolve passed object
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     const value = await GitRefManager.resolve({
       fs,
-      gitdir,
+      gitdir: updatedGitdir,
       ref: object || 'HEAD',
     })
 
-    if (!force && (await GitRefManager.exists({ fs, gitdir, ref }))) {
+    if (
+      !force &&
+      (await GitRefManager.exists({ fs, gitdir: updatedGitdir, ref }))
+    ) {
       throw new AlreadyExistsError('tag', ref)
     }
 
-    await GitRefManager.writeRef({ fs, gitdir, ref, value })
+    await GitRefManager.writeRef({ fs, gitdir: updatedGitdir, ref, value })
   } catch (err) {
     err.caller = 'git.tag'
     throw err
