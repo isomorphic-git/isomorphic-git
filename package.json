@@ -117,7 +117,6 @@
     "@semantic-release/exec": "5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.16",
-    "@wmhilton/jest-fixtures": "0.6.1",
     "@zenfs/core": "^2.0.0",
     "agadoo": "2.0.0",
     "all-contributors-cli": "6.20.0",
