@@ -262,14 +262,14 @@ describe('stash create', () => {
 
     const aOriginalContent = 'staged changes - a'
     const bOriginalContent = 'staged changes - b'
-    
+
     await fs.write(`${dir}/a.txt`, aOriginalContent)
     await fs.write(`${dir}/b.js`, bOriginalContent)
     await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
 
-    let aStatusBefore = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+    const aStatusBefore = await status({ fs, dir, gitdir, filepath: 'a.txt' })
     expect(aStatusBefore).toBe('modified')
-    let bStatusBefore = await status({ fs, dir, gitdir, filepath: 'b.js' })
+    const bStatusBefore = await status({ fs, dir, gitdir, filepath: 'b.js' })
     expect(bStatusBefore).toBe('modified')
 
     let stashCommitHash = null
@@ -292,9 +292,9 @@ describe('stash create', () => {
     expect(bContent.toString()).toEqual(bOriginalContent)
 
     // Verify status is still modified
-    let aStatusAfter = await status({ fs, dir, gitdir, filepath: 'a.txt' })
+    const aStatusAfter = await status({ fs, dir, gitdir, filepath: 'a.txt' })
     expect(aStatusAfter).toBe('modified')
-    let bStatusAfter = await status({ fs, dir, gitdir, filepath: 'b.js' })
+    const bStatusAfter = await status({ fs, dir, gitdir, filepath: 'b.js' })
     expect(bStatusAfter).toBe('modified')
 
     // Verify stash ref is NOT created
@@ -319,7 +319,13 @@ describe('stash create', () => {
     let error = null
     let stashCommitHash = null
     try {
-      stashCommitHash = await stash({ fs, dir, gitdir, op: 'create', message: 'custom message' })
+      stashCommitHash = await stash({
+        fs,
+        dir,
+        gitdir,
+        op: 'create',
+        message: 'custom message',
+      })
     } catch (e) {
       error = e
     }
@@ -414,12 +420,14 @@ describe('stash create', () => {
   })
 
   it('stash create with untracked files - with other changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createUntrackedWithChanges')
+    const { fs, dir, gitdir } = await makeFixtureStash(
+      'createUntrackedWithChanges'
+    )
 
     await addUserConfig(fs, dir, gitdir)
     const aOriginalContent = 'staged changes - a'
     const bOriginalContent = 'staged changes - b'
-    
+
     await fs.write(`${dir}/a.txt`, aOriginalContent)
     await fs.write(`${dir}/b.js`, bOriginalContent)
     await add({ fs, dir, gitdir, filepath: ['a.txt', 'b.js'] })
@@ -537,12 +545,24 @@ describe('stash create', () => {
     await fs.write(`${dir}/a.txt`, 'first change')
     await add({ fs, dir, gitdir, filepath: ['a.txt'] })
 
-    const firstHash = await stash({ fs, dir, gitdir, op: 'create', message: 'first' })
+    const firstHash = await stash({
+      fs,
+      dir,
+      gitdir,
+      op: 'create',
+      message: 'first',
+    })
 
     await fs.write(`${dir}/a.txt`, 'second change')
     await add({ fs, dir, gitdir, filepath: ['a.txt'] })
 
-    const secondHash = await stash({ fs, dir, gitdir, op: 'create', message: 'second' })
+    const secondHash = await stash({
+      fs,
+      dir,
+      gitdir,
+      op: 'create',
+      message: 'second',
+    })
 
     expect(firstHash).not.toBeNull()
     expect(secondHash).not.toBeNull()
@@ -568,7 +588,13 @@ describe('stash create', () => {
     // Now use stash create
     await fs.write(`${dir}/b.js`, 'create change')
     await add({ fs, dir, gitdir, filepath: ['b.js'] })
-    const createHash = await stash({ fs, dir, gitdir, op: 'create', message: 'create stash' })
+    const createHash = await stash({
+      fs,
+      dir,
+      gitdir,
+      op: 'create',
+      message: 'create stash',
+    })
 
     expect(createHash).not.toBeNull()
 
@@ -590,12 +616,12 @@ describe('stash create', () => {
     let error = null
 
     try {
-      stashCommitHash = await stash({ 
-        fs, 
-        dir, 
-        gitdir, 
-        op: 'create', 
-        message: customMessage 
+      stashCommitHash = await stash({
+        fs,
+        dir,
+        gitdir,
+        op: 'create',
+        message: customMessage,
       })
     } catch (e) {
       error = e
@@ -607,7 +633,12 @@ describe('stash create', () => {
     expect(stashCommitHash.length).toBe(40)
 
     // Read the commit to verify message format
-    const commitObj = await readCommit({ fs, dir, gitdir, oid: stashCommitHash })
+    const commitObj = await readCommit({
+      fs,
+      dir,
+      gitdir,
+      oid: stashCommitHash,
+    })
     expect(commitObj.commit.message).toContain(customMessage)
   })
 })
