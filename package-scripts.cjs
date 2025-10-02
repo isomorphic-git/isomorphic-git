@@ -103,14 +103,13 @@ module.exports = {
         'build.size',
         'build.pack'
       ),
-      nodocs: series.nps(
+      test: series.nps(
         'build.rollup',
         'build.typings',
         'build.webpack',
         'build.indexjson',
         'build.treeshake',
-        'build.size',
-        'build.pack'
+        'build.size'
       ),
       rollup: 'rollup -c --no-treeshake',
       typings:
@@ -162,7 +161,7 @@ module.exports = {
     test: {
       default: series.nps(
         'lint',
-        'build.nodocs',
+        'build.test',
         'test.typecheck',
         'test.setup',
         'test.node',

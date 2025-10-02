@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build (Node.js v14)
+    name: Build
     runs-on: ubuntu-latest
 
     timeout-minutes: 10
@@ -27,24 +27,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        env:
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
-          PUPPETEER_SKIP_DOWNLOAD: true
 
       - name: Run lint
-        run: |
-          npx nps lint
+        run: npx nps lint
 
       - name: Run build
-        run: |
-          # Run the subset of the `build` necessary to run the tests.
-          npx nps \
-            build.rollup \
-            build.typings \
-            build.webpack \
-            build.indexjson \
-            build.treeshake \
-            build.size
+        run: npx nps build.test # Run the subset of the `build` necessary to run the tests.
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
 
@@ -78,9 +66,7 @@ jobs:
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         run: |
           # Run the subset of the `test` necessary to test from the CLI.
-          npx nps \
-            build.docs \
-            build.pack
+          npx nps build.docs build.pack
 
           # Warn when there are uncommitted changes to documentation
           if ! git diff --quiet --exit-code; then
