@@ -64,7 +64,7 @@ import { join } from '../utils/join.js'
  *
  * console.log(await git.status({ fs, dir, filepath: 'a.txt' })) // 'modified'
  * console.log(await git.status({ fs, dir, filepath: 'b.txt' })) // '*modified'
- * 
+ *
  * // create a stash commit without modifying working directory
  * const stashCommitHash = await git.stash({ fs, dir, op: 'create', message: 'my stash' })
  * console.log(stashCommitHash) // returns the stash commit hash
