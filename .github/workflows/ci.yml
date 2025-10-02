@@ -103,7 +103,6 @@ jobs:
 
   publish-test-results:
     name: Publish Test Results
-    needs: test-in-browser
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
 
@@ -127,7 +126,6 @@ jobs:
 
   publish-artifacts:
     name: Publish
-    needs: test-in-browser
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'main' || github.ref_name == 'beta' }}
 
@@ -139,7 +137,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
