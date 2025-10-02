@@ -654,8 +654,8 @@ describe('stash drop', () => {
 
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList).toEqual([
-      'stash@{0}: stash one: 3ca31f1 initial commit',
-      'stash@{1}: stash three: 3ca31f1 initial commit',
+      'stash@{0}: stash three: 3ca31f1 initial commit',
+      'stash@{1}: stash one: 3ca31f1 initial commit',
     ])
   })
 })
@@ -804,12 +804,72 @@ describe('stash pop', () => {
 
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList).toEqual([
-      'stash@{0}: stash one: 3ca31f1 initial commit',
-      'stash@{1}: stash three: 3ca31f1 initial commit',
+      'stash@{0}: stash three: 3ca31f1 initial commit',
+      'stash@{1}: stash one: 3ca31f1 initial commit',
     ])
     const aContent = await fs.read(`${dir}/a.txt`)
     expect(aContent.toString()).toEqual(aNewContent) // make sure the 2nd staged changes are applied
     const bContent = await fs.read(`${dir}/b.js`)
     expect(bContent.toString()).toEqual(bNewContent) // make sure the 2nd staged changes are applied
+  })
+})
+
+describe('stash regression #2138', () => {
+  it('should not lose stashes after stash pop followed by stash push', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('stashRegression')
+    await addUserConfig(fs, dir, gitdir)
+
+    // --- stash 1 ---
+    await fs.write(dir + '/a.txt', 'change 1')
+    await stash({ fs, dir, gitdir, message: 'stash 1', op: 'push' })
+    // --- stash 2 ---
+    await fs.write(dir + '/a.txt', 'change 2')
+    await stash({ fs, dir, gitdir, message: 'stash 2', op: 'push' })
+
+    let stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes.length).toBe(2)
+
+    // Pop stash 2
+    await stash({ fs, dir, gitdir, op: 'pop' })
+
+    stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes.length).toBe(1)
+    // Push stash 2 again
+    await stash({ fs, dir, gitdir, message: 'stash 2', op: 'push' })
+
+    stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes.length).toBe(2)
+  })
+
+  it('stash list order before and after stash drop', async () => {
+    const { fs, dir, gitdir } = await makeFixtureStash('stashRegression')
+    await addUserConfig(fs, dir, gitdir)
+
+    // --- stash 1 ---
+    await fs.write(dir + '/a.txt', 'change 1')
+    await stash({ fs, dir, gitdir, message: 'stash 1', op: 'push' })
+    // --- stash 2 ---
+    await fs.write(dir + '/a.txt', 'change 2')
+    await stash({ fs, dir, gitdir, message: 'stash 2', op: 'push' })
+
+    // --- stash 3 ---
+    await fs.write(dir + '/a.txt', 'change 3')
+    await stash({ fs, dir, gitdir, message: 'stash 3', op: 'push' })
+
+    let stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes).toEqual([
+      'stash@{0}: stash 3: 3ca31f1 initial commit',
+      'stash@{1}: stash 2: 3ca31f1 initial commit',
+      'stash@{2}: stash 1: 3ca31f1 initial commit',
+    ])
+
+    // drop stash 3
+    await stash({ fs, dir, gitdir, op: 'drop' })
+
+    stashes = await stash({ fs, dir, gitdir, op: 'list' })
+    expect(stashes).toEqual([
+      'stash@{0}: stash 2: 3ca31f1 initial commit',
+      'stash@{1}: stash 1: 3ca31f1 initial commit',
+    ])
   })
 })
