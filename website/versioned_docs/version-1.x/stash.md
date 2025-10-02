@@ -5,22 +5,24 @@ id: version-1.x-stash
 original_id: stash
 ---
 
-stash api, supports  {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear'} StashOp
+stash api, supports {'push' | 'pop' | 'apply' | 'drop' | 'list' | 'clear' | 'create'} StashOp
 
-| param              | type [= default]                                                                                 | description                                                                                                                                                 |
-| ------------------ | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [****fs****](./fs) | FsClient                                                                                         | a file system client                                                                                                                                        |
-| **dir**            | string                                                                                           | The [working tree](dir-vs-gitdir.md) directory path                                                                                                         |
-| gitdir             | string = join(dir,'.git')                                                                        | [optional] The [git directory](dir-vs-gitdir.md) path                                                                                                       |
-| op                 | 'push'  &#124;  'pop'  &#124;  'apply'  &#124;  'drop'  &#124;  'list'  &#124;  'clear' = 'push' | [optional] name of stash operation, default to 'push'                                                                                                       |
-| message            | string = ''                                                                                      | [optional] message to be used for the stash entry, only applicable when op === 'push'                                                                       |
-| refIdx             | number = 0                                                                                       | [optional - Number] stash ref index of entry, only applicable when op === ['apply'  &#124;  'drop'  &#124;  'pop'], refIdx \>= 0 and \< num of stash pushed |
-| return             | Promise\<(string &#124; void)\>                                                                  | Resolves successfully when stash operations are complete                                                                                                    |
+| param          | type [= default]                                                      | description                                                                                                                         |
+| -------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                                                              | a file system client                                                                                                                |
+| **dir**        | string                                                                | The [working tree](dir-vs-gitdir.md) directory path                                                                                 |
+| gitdir         | string = join(dir,'.git')                                             | [optional] The [git directory](dir-vs-gitdir.md) path                                                                               |
+| op             | 'push' \| 'pop' \| 'apply' \| 'drop' \| 'list' \| 'clear' \| 'create' | [optional] name of stash operation, default to 'push'                                                                               |
+| message        | string = ''                                                           | [optional] message to be used for the stash entry, only applicable when op === 'push' or 'create'                                   |
+| refIdx         | number = 0                                                            | [optional] stash ref index of entry, only applicable when op === ['apply' \| 'drop' \| 'pop'], refIdx ≥ 0 and < num of stash pushed |
+| return         | Promise<(string \| void)>                                             | Resolves successfully when stash operations are complete. For `create`, resolves to the stash commit SHA.                           |
 
 _note_,
+
 - all stash operations are done on tracked files only with loose objects, no packed objects
 - when op === 'push', both working directory and index (staged) changes will be stashed, tracked files only
 - when op === 'push', message is optional, and only applicable when op === 'push'
+- when op === 'create', it works like `push` but does **not** update refs or clean the working directory — it just returns the commit SHA of the stash
 - when op === 'apply | pop', the stashed changes will overwrite the working directory, no abort when conflicts
 
 Example Code:
@@ -30,7 +32,7 @@ Example Code:
 let dir = '/tutorial'
 await fs.promises.writeFile(`${dir}/a.txt`, 'original content - a')
 await fs.promises.writeFile(`${dir}/b.js`, 'original content - b')
-await git.add({ fs, dir, filepath: [`a.txt`,`b.txt`] })
+await git.add({ fs, dir, filepath: [`a.txt`, `b.txt`] })
 let sha = await git.commit({
   fs,
   dir,
@@ -38,7 +40,7 @@ let sha = await git.commit({
     name: 'Mr. Stash',
     email: 'mstasher@stash.com',
   },
-  message: 'add a.txt and b.txt to test stash'
+  message: 'add a.txt and b.txt to test stash',
 })
 console.log(sha)
 
@@ -60,7 +62,6 @@ console.log(await git.status({ fs, dir, filepath: 'a.txt' })) // 'modified'
 console.log(await git.status({ fs, dir, filepath: 'b.txt' })) // '*modified'
 ```
 
-
 ---
 
 <details>
@@ -71,6 +72,7 @@ window.fs = new LightningFS('fs', { wipe: true })
 window.pfs = window.fs.promises
 console.log('done')
 ```
+
 </details>
 
 <script>

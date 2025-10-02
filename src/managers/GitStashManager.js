@@ -208,8 +208,7 @@ export class GitStashManager {
       return []
     }
 
-    const reflogBuffer = await this.fs.read(this.refLogsStashPath)
-    const reflogString = reflogBuffer.toString()
+    const reflogString = await this.fs.read(this.refLogsStashPath, 'utf8')
 
     return GitRefStash.getStashReflogEntry(reflogString, parsed)
   }
