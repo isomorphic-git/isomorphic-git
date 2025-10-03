@@ -6,6 +6,7 @@ import { _checkout } from '../commands/checkout.js'
 import { _fetch } from '../commands/fetch.js'
 import { _init } from '../commands/init.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { checkAborted } from '../utils/abortSignal.js'
 
 /**
  * @param {object} args
@@ -34,6 +35,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @param {Object<string, string>} args.headers
  * @param {boolean} [args.nonBlocking]
  * @param {number} [args.batchSize]
+ * @param {AbortSignal} [args.signal]
  *
  * @returns {Promise<void>} Resolves successfully when clone completes
  *
@@ -64,8 +66,12 @@ export async function _clone({
   headers,
   nonBlocking,
   batchSize = 100,
+  signal,
 }) {
   try {
+    // Check if operation was aborted before starting
+    checkAborted(signal)
+
     await _init({ fs, gitdir })
     await _addRemote({ fs, gitdir, remote, url, force: false })
     if (corsProxy) {
@@ -93,7 +99,11 @@ export async function _clone({
       singleBranch,
       headers,
       tags: !noTags,
+      signal,
     })
+
+    // Check if operation was aborted after fetch
+    checkAborted(signal)
     if (fetchHead === null) return
     ref = ref || defaultBranch
     ref = ref.replace('refs/heads/', '')
@@ -110,6 +120,7 @@ export async function _clone({
       noCheckout,
       nonBlocking,
       batchSize,
+      signal,
     })
   } catch (err) {
     // Remove partial local repository, see #1283

@@ -19,7 +19,7 @@
  * @property {Object} [agent] - An HTTP or HTTPS agent that manages connections for the HTTP client (Node.js only)
  * @property {AsyncIterableIterator<Uint8Array>} [body] - An async iterator of Uint8Arrays that make up the body of POST requests
  * @property {ProgressCallback} [onProgress] - Reserved for future use (emitting `GitProgressEvent`s)
- * @property {object} [signal] - Reserved for future use (canceling a request)
+ * @property {AbortSignal} [signal] - An AbortSignal to cancel the request
  */
 
 /**
