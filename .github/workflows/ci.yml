@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build (Node.js v14)
+    name: Build
     runs-on: ubuntu-latest
 
     timeout-minutes: 10
@@ -22,7 +22,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -123,7 +123,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -205,7 +205,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 22
           cache: npm
 
       - name: Install dependencies

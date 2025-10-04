@@ -14,7 +14,7 @@ type Node = {
 
 export function flatFileListToDirectoryStructure(files) {
   const inodes = new Map()
-  const mkdir = function(name) {
+  const mkdir = function (name) {
     if (!inodes.has(name)) {
       const dir = {
         type: 'tree',
@@ -33,13 +33,13 @@ export function flatFileListToDirectoryStructure(files) {
     return inodes.get(name)
   }
 
-  const mkfile = function(name, metadata) {
+  const mkfile = function (name, metadata) {
     if (!inodes.has(name)) {
       const file = {
         type: 'blob',
         fullpath: name,
         basename: basename(name),
-        metadata: metadata,
+        metadata,
         // This recursively generates any missing parent folders.
         parent: mkdir(dirname(name)),
         children: [],

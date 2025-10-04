@@ -1,14 +1,14 @@
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
-import { mode2type } from '../utils/mode2type'
-import { normalizeStats } from '../utils/normalizeStats'
+import { mode2type } from '../utils/mode2type.js'
+import { normalizeStats } from '../utils/normalizeStats.js'
 
 export class GitWalkerIndex {
   constructor({ fs, gitdir, cache }) {
     this.treePromise = GitIndexManager.acquire(
       { fs, gitdir, cache },
-      async function(index) {
+      async function (index) {
         return flatFileListToDirectoryStructure(index.entries)
       }
     )

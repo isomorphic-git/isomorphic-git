@@ -15,10 +15,7 @@ export async function parseUploadPackRequest(stream) {
     const line = await read()
     if (line === true) break
     if (line === null) continue
-    const [key, value, ...rest] = line
-      .toString('utf8')
-      .trim()
-      .split(' ')
+    const [key, value, ...rest] = line.toString('utf8').trim().split(' ')
     if (!capabilities) capabilities = rest
     switch (key) {
       case 'want':

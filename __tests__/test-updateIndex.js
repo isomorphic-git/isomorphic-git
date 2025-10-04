@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const { writeBlob, updateIndex, status, add } = require('isomorphic-git')
+import { writeBlob, updateIndex, status, add } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('updateIndex', () => {
   it('should be possible to add a file on disk to the index', async () => {
@@ -194,13 +194,13 @@ describe('updateIndex', () => {
     error = error.toJSON()
     delete error.stack
     expect(error).toMatchInlineSnapshot(`
-      Object {
+      {
         "caller": "git.updateIndex",
         "code": "NotFoundError",
-        "data": Object {
-          "what": "file at \\"hello.md\\" in index and \\"add\\" not set",
+        "data": {
+          "what": "file at "hello.md" in index and "add" not set",
         },
-        "message": "Could not find file at \\"hello.md\\" in index and \\"add\\" not set.",
+        "message": "Could not find file at "hello.md" in index and "add" not set.",
       }
     `)
   })
@@ -224,13 +224,13 @@ describe('updateIndex', () => {
     error = error.toJSON()
     delete error.stack
     expect(error).toMatchInlineSnapshot(`
-      Object {
+      {
         "caller": "git.updateIndex",
         "code": "NotFoundError",
-        "data": Object {
-          "what": "file at \\"hello.md\\" on disk and \\"remove\\" not set",
+        "data": {
+          "what": "file at "hello.md" on disk and "remove" not set",
         },
-        "message": "Could not find file at \\"hello.md\\" on disk and \\"remove\\" not set.",
+        "message": "Could not find file at "hello.md" on disk and "remove" not set.",
       }
     `)
   })
@@ -255,13 +255,13 @@ describe('updateIndex', () => {
     error = error.toJSON()
     delete error.stack
     expect(error).toMatchInlineSnapshot(`
-      Object {
+      {
         "caller": "git.updateIndex",
         "code": "InvalidFilepathError",
-        "data": Object {
+        "data": {
           "reason": "directory",
         },
-        "message": "\\"filepath\\" should not be a directory.",
+        "message": ""filepath" should not be a directory.",
       }
     `)
   })
@@ -293,13 +293,13 @@ describe('updateIndex', () => {
     error = error.toJSON()
     delete error.stack
     expect(error).toMatchInlineSnapshot(`
-      Object {
+      {
         "caller": "git.updateIndex",
         "code": "InvalidFilepathError",
-        "data": Object {
+        "data": {
           "reason": "directory",
         },
-        "message": "\\"filepath\\" should not be a directory.",
+        "message": ""filepath" should not be a directory.",
       }
     `)
   })

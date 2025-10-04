@@ -2,11 +2,11 @@
 import '../typedefs.js'
 
 import cleanGitRef from 'clean-git-ref'
-import validRef from 'is-git-ref-name-valid'
 
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import validRef from '../utils/isValidRef.js'
 
 /**
  * @param {object} args

@@ -1,5 +1,6 @@
-const { Errors } = require('../..')
-const replace = require('replace-in-file')
+import replace from 'replace-in-file'
+
+import { Errors } from '../..'
 
 const errors = Object.keys(Errors).map(name => `E.${name}`)
 const bal = []
@@ -14,6 +15,7 @@ const bal = []
       dry: true,
       countMatches: true,
     })
+    // @ts-ignore
     files = files.filter(file => file.numMatches > 0).map(file => file.file)
     // console.log(`${error}: ${files.length}`)
     if (files.length > 0) {

@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { Errors, deleteRemote, listRemotes } = require('isomorphic-git')
+import { Errors, deleteRemote, listRemotes } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('deleteRemote', () => {
   it('deleteRemote', async () => {

@@ -1,8 +1,8 @@
 // @ts-check
-import { _readTree } from '../commands/readTree'
+import { _readTree } from '../commands/readTree.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { join } from '../utils/join'
+import { join } from '../utils/join.js'
 
 /**
  * @param {object} args
@@ -27,11 +27,12 @@ export async function _listFiles({ fs, gitdir, ref, cache }) {
     })
     return filenames
   } else {
-    return GitIndexManager.acquire({ fs, gitdir, cache }, async function(
-      index
-    ) {
-      return index.entries.map(x => x.path)
-    })
+    return GitIndexManager.acquire(
+      { fs, gitdir, cache },
+      async function (index) {
+        return index.entries.map(x => x.path)
+      }
+    )
   }
 }
 

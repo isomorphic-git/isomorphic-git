@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { GitRefManager } = require('isomorphic-git/internal-apis')
+import { GitRefManager } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('GitRefManager', () => {
   it('packedRefs', async () => {
@@ -90,7 +90,7 @@ describe('GitRefManager', () => {
       filepath: 'refs/remotes/origin',
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "develop",
         "dist",
         "gh-pages",
@@ -107,7 +107,7 @@ describe('GitRefManager', () => {
       filepath: 'refs/tags',
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "local-tag",
         "test-tag",
         "v0.0.1",
@@ -184,7 +184,7 @@ describe('GitRefManager', () => {
       remote: 'origin',
     })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "develop",
         "dist",
         "gh-pages",
@@ -200,7 +200,7 @@ describe('GitRefManager', () => {
     const { fs, gitdir } = await makeFixture('test-GitRefManager')
     const refs = await GitRefManager.listTags({ fs, gitdir })
     expect(refs).toMatchInlineSnapshot(`
-      Array [
+      [
         "local-tag",
         "test-tag",
         "v0.0.1",

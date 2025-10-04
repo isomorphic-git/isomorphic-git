@@ -1,16 +1,15 @@
 /* eslint-env node, browser, jasmine */
-import http from 'isomorphic-git/http'
-
-const {
+import {
   Errors,
   checkout,
   clone,
   currentBranch,
   resolveRef,
   getConfig,
-} = require('isomorphic-git')
+} from 'isomorphic-git'
+import http from 'isomorphic-git/http'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -22,37 +21,41 @@ describe('clone', () => {
   // so I'm enabling it.
   // Update: well, it's now slow enough on Edge that it's failing. Which is odd bc
   // it's the New Edge with is Chromium-based.
-  ;(process.browser ? xit : it)('clone with noTags', async () => {
-    const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
-    await clone({
-      fs,
-      http,
-      dir,
-      gitdir,
-      depth: 1,
-      ref: 'test-branch',
-      noTags: true,
-      url: 'https://github.com/isomorphic-git/isomorphic-git.git',
-      corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
-      noCheckout: true,
-    })
-    expect(await fs.exists(`${dir}`)).toBe(true)
-    expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
-    expect(
-      await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/test-branch' })
-    ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
-    expect(
-      await resolveRef({ fs, gitdir, ref: 'refs/heads/test-branch' })
-    ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
-    let err = null
-    try {
-      await resolveRef({ fs, gitdir, ref: 'refs/tags/v0.0.1' })
-    } catch (e) {
-      err = e
-    }
-    expect(err).not.toBeNull()
-    expect(err.code).toBe(Errors.NotFoundError.code)
-  })
+  ;(process.browser ? xit : it)(
+    'clone with noTags',
+    async () => {
+      const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
+      await clone({
+        fs,
+        http,
+        dir,
+        gitdir,
+        depth: 1,
+        ref: 'test-branch',
+        noTags: true,
+        url: 'https://github.com/isomorphic-git/isomorphic-git.git',
+        corsProxy: process.browser ? `http://${localhost}:9999` : undefined,
+        noCheckout: true,
+      })
+      expect(await fs.exists(`${dir}`)).toBe(true)
+      expect(await fs.exists(`${gitdir}/objects`)).toBe(true)
+      expect(
+        await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/test-branch' })
+      ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
+      expect(
+        await resolveRef({ fs, gitdir, ref: 'refs/heads/test-branch' })
+      ).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e')
+      let err = null
+      try {
+        await resolveRef({ fs, gitdir, ref: 'refs/tags/v0.0.1' })
+      } catch (e) {
+        err = e
+      }
+      expect(err).not.toBeNull()
+      expect(err.code).toBe(Errors.NotFoundError.code)
+    },
+    30_000
+  )
   it('clone with noCheckout', async () => {
     const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
     await clone({
@@ -166,7 +169,8 @@ describe('clone', () => {
         return http.request.apply(null, arguments).then(response => {
           const contentType = response.headers['content-type']
           if (contentType === 'application/x-git-upload-pack-result') {
-            const body = `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
+            const body =
+              `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
 0023\x02Enumerating objects: 5, done.
 0022\x02Counting objects:  20% (1/5)
 0022\x02Counting objects:  40% (2/5)
@@ -176,9 +180,9 @@ describe('clone', () => {
 002c\x02Compressing objects: 100% (2/2), done.
 0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
 0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
-              .split('\n')
-              .map(it => Buffer.from(it + '\n'))
-              .values()
+                .split('\n')
+                .map(it => Buffer.from(it + '\n'))
+                .values()
             body.next = new Proxy(body.next, {
               apply(target, self, args) {
                 const result = target.apply(self, args)
@@ -289,7 +293,8 @@ describe('clone', () => {
         return http.request.apply(null, arguments).then(response => {
           const contentType = response.headers['content-type']
           if (contentType === 'application/x-git-upload-pack-result') {
-            const body = `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
+            const body =
+              `0034shallow 97c024f73eaab2781bf3691597bc7c833cb0e22f00000008NAK
 0023\x02Enumerating objects: 5, done.
 0022\x02Counting objects:  20% (1/5)
 0022\x02Counting objects:  40% (2/5)
@@ -299,9 +304,9 @@ describe('clone', () => {
 002c\x02Compressing objects: 100% (2/2), done.
 0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
 0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
-              .split('\n')
-              .map(it => Buffer.from(it + '\n'))
-              .values()
+                .split('\n')
+                .map(it => Buffer.from(it + '\n'))
+                .values()
             body.next = new Proxy(body.next, {
               apply(target, self, args) {
                 const result = target.apply(self, args)
@@ -505,7 +510,7 @@ describe('clone', () => {
     it('should allow agent to be used with built-in http plugin for Node.js', async () => {
       const { fs, dir, gitdir } = await makeFixture('isomorphic-git')
       const connectionLog = []
-      const { Agent } = require('https')
+      const { Agent } = await import('https')
       const httpWithAgent = {
         async request({ url, method, headers, body }) {
           const agent = new Agent()

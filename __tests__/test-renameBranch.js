@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const { Errors, renameBranch, currentBranch } = require('isomorphic-git')
+import { Errors, renameBranch, currentBranch } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('renameBranch', () => {
   it('branch already exists', async () => {

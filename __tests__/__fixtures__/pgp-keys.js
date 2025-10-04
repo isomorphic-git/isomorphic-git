@@ -1,4 +1,4 @@
-module.exports.privateKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
+export const privateKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
 
 lQHYBFvjn6cBBAC3u+yC1fc0S/daBgjnVDq3lSnxfK7ogultM8rbqA0wqKqYqhUc
 Yd611c8LmOv+Ri7jtr31vA81kunJEQ0uQ3jkqXaNzdOULFG3XCLVpz92TSD9E8uv
@@ -31,7 +31,7 @@ HAxKBtRQhi5go6B/bAJevSwZLpHyMUyCPa81ggSEXlx+CfJWNzj81fLC4JIbrSo=
 =DL8M
 -----END PGP PRIVATE KEY BLOCK-----`
 
-module.exports.publicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+export const publicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mI0EW+OfpwEEALe77ILV9zRL91oGCOdUOreVKfF8ruiC6W0zytuoDTCoqpiqFRxh
 3rXVzwuY6/5GLuO2vfW8DzWS6ckRDS5DeOSpdo3N05QsUbdcItWnP3ZNIP0Ty6+x

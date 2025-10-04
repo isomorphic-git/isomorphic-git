@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { listBranches } = require('isomorphic-git')
+import { listBranches } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('listBranches', () => {
   it('listBranches', async () => {
@@ -10,7 +10,7 @@ describe('listBranches', () => {
     // Test
     const commits = await listBranches({ fs, gitdir })
     expect(commits).toMatchInlineSnapshot(`
-      Array [
+      [
         "feature/supercool",
         "greenkeeper/initial",
         "master",
@@ -28,7 +28,7 @@ describe('listBranches', () => {
       remote: 'origin',
     })
     expect(commits).toMatchInlineSnapshot(`
-      Array [
+      [
         "HEAD",
         "master",
       ]
