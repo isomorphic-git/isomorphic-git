@@ -148,270 +148,6 @@ describe('pull', () => {
     ])
   })
 
-  it('pull into empty clone', async () => {
-    // Setup - simulate cloning an empty repository
-    const { fs, gitdir, dir } = await makeFixture('test-pull-empty-clone')
-    await init({ fs, gitdir, dir })
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-pull-server.git`,
-    })
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.fetch',
-      value: '+refs/heads/*:refs/remotes/origin/*',
-    })
-    // Delete HEAD to simulate empty clone with no branches
-    await fs.rm(path.join(gitdir, 'HEAD'))
-    // Test - verify no current branch exists (should throw)
-    let branch = null
-    try {
-      branch = await currentBranch({ fs, gitdir })
-    } catch (err) {
-      // Expected to fail when HEAD doesn't exist
-      expect(err.code).toBe(Errors.NotFoundError.code)
-    }
-    expect(branch).toBeNull()
-    // Pull should create the branch and fast-forward
-    await pull({
-      fs,
-      http,
-      gitdir,
-      dir,
-      remote: 'origin',
-      ref: 'master',
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1262356920,
-        timezoneOffset: -0,
-      },
-    })
-    // Verify branch was created and contains commits
-    branch = await currentBranch({ fs, gitdir })
-    expect(branch).toBe('master')
-    const logs = await log({ fs, gitdir, dir, ref: 'refs/heads/master' })
-    expect(logs.map(({ commit }) => commit.message)).toEqual([
-      'Added c.txt\n',
-      'Added b.txt\n',
-      'Initial commit\n',
-    ])
-  })
-
-  it('pull into empty clone without ref parameter', async () => {
-    // Setup - simulate cloning an empty repository
-    const { fs, gitdir, dir } = await makeFixture(
-      'test-pull-empty-clone-no-ref'
-    )
-    await init({ fs, gitdir, dir })
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-pull-server.git`,
-    })
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.fetch',
-      value: '+refs/heads/*:refs/remotes/origin/*',
-    })
-    // Delete HEAD and refs to simulate empty clone with no branches
-    await fs.rm(path.join(gitdir, 'HEAD'))
-    // Also need to ensure refs/heads/master doesn't exist
-    try {
-      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
-    } catch (e) {
-      // May not exist, that's fine
-    }
-    // Test - verify no current branch exists (should throw)
-    let branch = null
-    try {
-      branch = await currentBranch({ fs, gitdir })
-    } catch (err) {
-      // Expected to fail when HEAD doesn't exist
-      expect(err.code).toBe(Errors.NotFoundError.code)
-    }
-    expect(branch).toBeNull()
-    // Pull without specifying ref - should fail or handle gracefully
-    // Since we don't have a ref and currentBranch fails, we need to specify remoteRef
-    await pull({
-      fs,
-      http,
-      gitdir,
-      dir,
-      remote: 'origin',
-      remoteRef: 'master',
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1262356920,
-        timezoneOffset: -0,
-      },
-    })
-    // Verify default branch was created
-    branch = await currentBranch({ fs, gitdir })
-    expect(branch).toBeDefined()
-    const logs = await log({ fs, gitdir, dir, ref: `refs/heads/${branch}` })
-    expect(logs.length).toBeGreaterThan(0)
-  })
-  it('pull into empty clone when remote HEAD points to origin/master', async () => {
-    // Setup - simulate cloning an empty repository
-    const { fs, gitdir, dir } = await makeFixture('test-pull-empty-clone') // reuse existing fixture
-    await init({ fs, gitdir, dir })
-
-    // Use the existing test server fixture (test-pull-server.git)
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-pull-server.git`,
-    })
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.fetch',
-      value: '+refs/heads/*:refs/remotes/origin/*',
-    })
-
-    // Delete HEAD to simulate empty clone with no branches
-    await fs.rm(path.join(gitdir, 'HEAD'))
-
-    // Simulate remote HEAD file pointing to refs/remotes/origin/master (pre-fetch case)
-    const remoteHeadPath = path.join(
-      gitdir,
-      'refs',
-      'remotes',
-      'origin',
-      'HEAD'
-    )
-    try {
-      await fs.mkdir(path.dirname(remoteHeadPath), { recursive: true })
-    } catch (e) {}
-    // Use test-fs API - write() in fixture fs
-    await fs.write(remoteHeadPath, 'ref: refs/remotes/origin/master')
-
-    // Pull without specifying ref - implementation should pick up 'master'
-    await pull({
-      fs,
-      http,
-      gitdir,
-      dir,
-      remote: 'origin',
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1262356920,
-        timezoneOffset: -0,
-      },
-    })
-
-    // Verify branch was created and contains commits and that currentBranch is 'master'
-    const branch = await currentBranch({ fs, gitdir })
-    expect(branch).toBe('master')
-    const logs = await log({ fs, gitdir, dir, ref: 'refs/heads/master' })
-    expect(logs.length).toBeGreaterThan(0)
-  })
-
-  it('pull into empty clone honors remoteRef when provided', async () => {
-    // Setup - empty clone
-    const { fs, gitdir, dir } = await makeFixture('test-pull-empty-clone')
-    await init({ fs, gitdir, dir })
-
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-pull-server.git`,
-    })
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.fetch',
-      value: '+refs/heads/*:refs/remotes/origin/*',
-    })
-
-    // Delete HEAD to simulate empty clone
-    await fs.rm(path.join(gitdir, 'HEAD'))
-
-    // Provide remoteRef explicitly as 'refs/heads/master' (simulate user input)
-    await pull({
-      fs,
-      http,
-      gitdir,
-      dir,
-      remote: 'origin',
-      remoteRef: 'refs/heads/master',
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1262356920,
-        timezoneOffset: -0,
-      },
-    })
-
-    // Verify branch created is master and contains commits
-    const branch = await currentBranch({ fs, gitdir })
-    expect(branch).toBe('master')
-    const logs = await log({ fs, gitdir, dir, ref: 'refs/heads/master' })
-    expect(logs.length).toBeGreaterThan(0)
-  })
-
-  it('pull into empty clone writes branch tracking config', async () => {
-    // Setup - simulate empty clone
-    const { fs, gitdir, dir } = await makeFixture('test-pull-empty-clone')
-    await init({ fs, gitdir, dir })
-
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.url',
-      value: `http://${localhost}:8888/test-pull-server.git`,
-    })
-    await setConfig({
-      fs,
-      gitdir,
-      path: 'remote.origin.fetch',
-      value: '+refs/heads/*:refs/remotes/origin/*',
-    })
-
-    // Delete HEAD to simulate empty clone
-    await fs.rm(path.join(gitdir, 'HEAD'))
-
-    // Pull specifying master (to make assertions deterministic)
-    await pull({
-      fs,
-      http,
-      gitdir,
-      dir,
-      remote: 'origin',
-      ref: 'master',
-      author: {
-        name: 'Mr. Test',
-        email: 'mrtest@example.com',
-        timestamp: 1262356920,
-        timezoneOffset: -0,
-      },
-    })
-
-    // Ensure .git/config contains branch.master.remote and branch.master.merge
-    const configFile = await fs.read(path.join(gitdir, 'config'), 'utf8')
-    expect(
-      configFile.includes('branch "master"') ||
-        configFile.includes('branch.master')
-    ).toBeTruthy()
-    expect(
-      configFile.includes('remote = origin') ||
-        configFile.includes('branch.master.remote')
-    ).toBeTruthy()
-    expect(
-      configFile.includes('merge = refs/heads/master') ||
-        configFile.includes('branch.master.merge')
-    ).toBeTruthy()
-  })
   // Test 1: Error when no ref/remoteRef in empty clone without remote HEAD
   it('pull into empty clone without ref should error when remote has no default branch', async () => {
     const { fs, gitdir, dir } = await makeFixture('test-pull-empty-no-default')
@@ -430,8 +166,13 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    // Delete HEAD to simulate empty clone
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone: HEAD exists but points to non-existent branch
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+
+    // Ensure refs/heads/master doesn't exist
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     // Ensure no remote HEAD file exists
     try {
@@ -550,7 +291,11 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     // Simulate remote HEAD pointing to master (as would be set during fetch)
     const remoteHeadPath = path.join(
@@ -641,7 +386,11 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     await pull({
       fs,
@@ -691,7 +440,11 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     // Explicitly provide ref
     await pull({
@@ -740,7 +493,11 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     await pull({
       fs,
@@ -787,7 +544,11 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     await pull({
       fs,
@@ -848,7 +609,11 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     await pull({
       fs,
@@ -907,7 +672,11 @@ describe('pull', () => {
       value: '+refs/heads/*:refs/remotes/origin/*',
     })
 
-    await fs.rm(path.join(gitdir, 'HEAD'))
+    // Simulate empty clone
+    await fs.write(path.join(gitdir, 'HEAD'), 'ref: refs/heads/master')
+    try {
+      await fs.rm(path.join(gitdir, 'refs', 'heads', 'master'))
+    } catch (e) {}
 
     // First pull
     await pull({

@@ -129,30 +129,40 @@ export async function _pull({
     let branchToCreate = null
     const originalRef = ref
 
-    // Detect empty clone by checking if current branch exists
-    // This needs to happen regardless of whether ref is provided
+    // Detect empty clone by checking if current branch exists and has commits
+    // In a real empty clone, HEAD exists but points to a branch with no commits
+    let currentBranchName = null
     try {
-      const head = await _currentBranch({ fs, gitdir })
-      if (!head) {
-        // currentBranch returned null/undefined - empty clone
+      currentBranchName = await _currentBranch({ fs, gitdir })
+
+      if (currentBranchName) {
+        // HEAD exists and points to a branch - check if that branch has commits
+        try {
+          await GitRefManager.resolve({
+            fs,
+            gitdir,
+            ref: `refs/heads/${currentBranchName}`,
+          })
+          // Branch exists and has commits - not an empty clone
+        } catch (err) {
+          // Branch doesn't exist or can't be resolved - this is an empty clone
+          isEmptyClone = true
+        }
+      } else {
+        // currentBranch returned null - treat as empty clone
         isEmptyClone = true
       }
     } catch (err) {
-      // currentBranch threw error (NotFoundError) - empty clone
-      isEmptyClone = true
-    }
-
-    // If ref is undefined and not empty clone, try to get current branch for ref
-    if (!ref && !isEmptyClone) {
-      try {
-        const head = await _currentBranch({ fs, gitdir })
-        if (head) {
-          ref = head
-        }
-      } catch (err) {
-        // Shouldn't happen since we checked above, but handle it
+      // currentBranch threw error - could be detached HEAD or other state
+      // For safety, don't treat as empty clone unless we're sure
+      if (err.code === 'NotFoundError') {
         isEmptyClone = true
       }
+    }
+
+    // If ref is undefined and not empty clone, use current branch
+    if (!ref && !isEmptyClone && currentBranchName) {
+      ref = currentBranchName
     }
 
     // For empty clone, determine branch name before fetch if possible
