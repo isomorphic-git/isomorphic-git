@@ -6,7 +6,7 @@ export class InternalError extends BaseError {
    */
   constructor(message) {
     super(
-      `An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: ${message}`
+      `"If you're not a developer, report the bug to the developers of the application you're using. If this is a bug in isomorphic-git they should create a proper bug themselves. The bug should include a minimal reproduction and details about the version and environment.\n\n---\n\An internal error caused this command to fail. Please file a bug report at https://github.com/isomorphic-git/isomorphic-git/issues with this error message: ${message}`
     )
     this.code = this.name = InternalError.code
     this.data = { message }

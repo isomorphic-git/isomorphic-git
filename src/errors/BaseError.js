@@ -5,6 +5,7 @@ export class BaseError extends Error {
     // that its type is string.
     this.caller = ''
   }
+}
 
   toJSON() {
     // Error objects aren't normally serializable. So we do something about that.
@@ -29,4 +30,4 @@ export class BaseError extends Error {
   get isIsomorphicGitError() {
     return true
   }
-}
+
