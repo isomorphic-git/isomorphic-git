@@ -102,7 +102,7 @@ To re-implement the default Basic Auth behavior, do something like this:
 ```js
 let auth = {
   headers: {
-    Authentication: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+    Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
   }
 }
 ```
