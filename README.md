@@ -396,6 +396,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
   <tr>
     <td align="center"><a href="https://github.com/hemanthkini"><img src="https://avatars.githubusercontent.com/u/3934055?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Hemanth Kini</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=hemanthkini" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/anish3333"><img src="https://avatars.githubusercontent.com/u/128889867?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Anish Awasthi</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=anish3333" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=anish3333" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=anish3333" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/fetsorn"><img src="https://avatars.githubusercontent.com/u/12858105?v=4?s=60" width="60px;" alt=""/><br /><sub><b>fetsorn</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=fetsorn" title="Documentation">📖</a></td>
   </tr>
 </table>
 

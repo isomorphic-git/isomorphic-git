@@ -866,6 +866,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "fetsorn",
+      "name": "fetsorn",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12858105?v=4",
+      "profile": "https://github.com/fetsorn",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "commitConvention": "angular"
