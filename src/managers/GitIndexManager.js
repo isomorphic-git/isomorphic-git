@@ -1,3 +1,5 @@
+import '../typedefs.js'
+
 // import LockManager from 'travix-lock-manager'
 import AsyncLock from 'async-lock'
 
@@ -12,6 +14,10 @@ let lock = null
 
 const IndexCache = Symbol('IndexCache')
 
+/**
+ * Creates a cache object to store GitIndex and file stats.
+ * @returns {object} A cache object with `map` and `stats` properties.
+ */
 function createCache() {
   return {
     map: new Map(),
@@ -19,6 +25,13 @@ function createCache() {
   }
 }
 
+/**
+ * Updates the cached index file by reading the file system and parsing the Git index.
+ * @param {FSClient} fs - A file system implementation.
+ * @param {string} filepath - The path to the Git index file.
+ * @param {object} cache - The cache object to update.
+ * @returns {Promise<void>}
+ */
 async function updateCachedIndexFile(fs, filepath, cache) {
   const [stat, rawIndexFile] = await Promise.all([
     fs.lstat(filepath),
@@ -32,7 +45,13 @@ async function updateCachedIndexFile(fs, filepath, cache) {
   cache.stats.set(filepath, stat)
 }
 
-// Determine whether our copy of the index file is stale
+/**
+ * Determines whether the cached index file is stale by comparing file stats.
+ * @param {FSClient} fs - A file system implementation.
+ * @param {string} filepath - The path to the Git index file.
+ * @param {object} cache - The cache object containing file stats.
+ * @returns {Promise<boolean>} `true` if the index file is stale, otherwise `false`.
+ */
 async function isIndexStale(fs, filepath, cache) {
   const savedStats = cache.stats.get(filepath)
   if (savedStats === undefined) return true
@@ -45,13 +64,16 @@ async function isIndexStale(fs, filepath, cache) {
 
 export class GitIndexManager {
   /**
+   * Manages access to the Git index file, ensuring thread-safe operations and caching.
    *
-   * @param {object} opts
-   * @param {import('../models/FileSystem.js').FileSystem} opts.fs
-   * @param {string} opts.gitdir
-   * @param {object} opts.cache
-   * @param {bool} opts.allowUnmerged
-   * @param {function(GitIndex): any} closure
+   * @param {object} opts - Options for acquiring the Git index.
+   * @param {FSClient} opts.fs - A file system implementation.
+   * @param {string} opts.gitdir - The path to the `.git` directory.
+   * @param {object} opts.cache - A shared cache object for storing index data.
+   * @param {boolean} [opts.allowUnmerged=true] - Whether to allow unmerged paths in the index.
+   * @param {function(GitIndex): any} closure - A function to execute with the Git index.
+   * @returns {Promise<any>} The result of the closure function.
+   * @throws {UnmergedPathsError} If unmerged paths exist and `allowUnmerged` is `false`.
    */
   static async acquire({ fs, gitdir, cache, allowUnmerged = true }, closure) {
     if (!cache[IndexCache]) {

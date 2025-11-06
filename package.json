@@ -3,9 +3,55 @@
   "version": "0.0.0-development",
   "description": "A pure JavaScript reimplementation of git for node and browsers",
   "type": "module",
-  "typings": "./index.d.ts",
+  "typings": "./index.d.cts",
   "main": "./index.cjs",
   "module": "./index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.cts",
+      "default": "./index.cjs"
+    },
+    "./http/node": {
+      "import": {
+        "types": "./http/node/index.d.ts",
+        "default": "./http/node/index.js"
+      },
+      "require": {
+        "types": "./http/node/index.d.cts",
+        "default": "./http/node/index.cjs"
+      }
+    },
+    "./http/web": {
+      "import": {
+        "types": "./http/web/index.d.ts",
+        "default": "./http/web/index.js"
+      },
+      "require": {
+        "types": "./http/web/index.d.cts",
+        "default": "./http/web/index.cjs"
+      }
+    },
+    "./managers": {
+      "import": {
+        "types": "./managers/index.d.ts",
+        "default": "./managers/index.js"
+      },
+      "require": {
+        "types": "./managers/index.d.cts",
+        "default": "./managers/index.cjs"
+      }
+    },
+    "./models": {
+      "import": {
+        "types": "./models/index.d.ts",
+        "default": "./models/index.js"
+      },
+      "require": {
+        "types": "./models/index.d.cts",
+        "default": "./models/index.cjs"
+      }
+    }
+  },
   "unpkg": "./index.umd.min.js",
   "bin": {
     "isogit": "./cli.cjs"
@@ -43,12 +89,15 @@
     "browser-tests.json",
     "http/*",
     "index.cjs",
-    "index.d.ts",
+    "index.d.cts",
     "index.js",
+    "index.d.ts",
     "index.umd.min.js",
     "index.umd.min.d.ts",
     "index.umd.min.js.map",
-    "size_report.html"
+    "size_report.html",
+    "managers/*",
+    "models/*"
   ],
   "dependencies": {
     "async-lock": "^1.4.1",
@@ -56,12 +105,13 @@
     "crc-32": "^1.2.0",
     "diff3": "0.0.3",
     "ignore": "^5.1.4",
+    "is-git-ref-name-valid": "^1.0.0",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
     "path-browserify": "^1.0.1",
     "pify": "^4.0.1",
     "readable-stream": "^3.4.0",
-    "sha.js": "^2.4.9",
+    "sha.js": "^2.4.12",
     "simple-get": "^4.0.1"
   },
   "devDependencies": {
@@ -81,7 +131,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.3.0",
     "browserfs": "2.0.0",
-    "bundlewatch": "^0.3.2",
+    "bundlewatch": "^0.4.1",
     "cross-env": "6.0.0",
     "decompress": "^4.2.0",
     "diff-lines": "1.1.1",
@@ -117,6 +167,7 @@
     "karma-verbose-reporter": "0.0.8",
     "karma-webpack": "4.0.2",
     "markdown-table": "^2.0.0",
+    "micro": "^9.3.4",
     "nps": "^5.10.0",
     "nps-utils": "1.7.0",
     "prettier": "1.19.1",
@@ -129,7 +180,6 @@
     "semantic-release": "17.4.7",
     "standard": "13.1.0",
     "timeout-cli": "0.3.2",
-    "tweet-tweet": "1.0.4",
     "typescript": "5.7.3",
     "webpack": "4.41.5",
     "webpack-bundle-analyzer": "3.4.1",
