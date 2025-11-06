@@ -184,6 +184,10 @@
         "title": "listNotes",
         "sidebar_label": "listNotes"
       },
+      "listRefs": {
+        "title": "listRefs",
+        "sidebar_label": "listRefs"
+      },
       "listRemotes": {
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
@@ -303,6 +307,10 @@
       "snippets": {
         "title": "Useful Code Snippets",
         "sidebar_label": "Useful Snippets"
+      },
+      "stash": {
+        "title": "stash",
+        "sidebar_label": "stash"
       },
       "status": {
         "title": "status",
@@ -828,6 +836,10 @@
         "title": "fetch",
         "sidebar_label": "fetch"
       },
+      "version-1.x/version-1.x-fileSystem": {
+        "title": "FileSystem",
+        "sidebar_label": "FileSystem"
+      },
       "version-1.x/version-1.x-findMergeBase": {
         "title": "findMergeBase",
         "sidebar_label": "findMergeBase"
@@ -855,6 +867,38 @@
       "version-1.x/version-1.x-getRemoteInfo2": {
         "title": "getRemoteInfo2",
         "sidebar_label": "getRemoteInfo2"
+      },
+      "version-1.x/version-1.x-gitConfigManager": {
+        "title": "GitConfigManager",
+        "sidebar_label": "GitConfigManager"
+      },
+      "version-1.x/version-1.x-gitIgnoreManager": {
+        "title": "GitIgnoreManager",
+        "sidebar_label": "GitIgnoreManager"
+      },
+      "version-1.x/version-1.x-gitIndexManager": {
+        "title": "GitIndexManager",
+        "sidebar_label": "GitIndexManager"
+      },
+      "version-1.x/version-1.x-gitRefManager": {
+        "title": "GitRefManager",
+        "sidebar_label": "GitRefManager"
+      },
+      "version-1.x/version-1.x-gitRemoteHTTP": {
+        "title": "GitRemoteHTTP",
+        "sidebar_label": "GitRemoteHTTP"
+      },
+      "version-1.x/version-1.x-gitRemoteManager": {
+        "title": "GitRemoteManager",
+        "sidebar_label": "GitRemoteManager"
+      },
+      "version-1.x/version-1.x-gitShallowManager": {
+        "title": "GitShallowManager",
+        "sidebar_label": "GitShallowManager"
+      },
+      "version-1.x/version-1.x-gitStashManager": {
+        "title": "GitStashManager",
+        "sidebar_label": "GitStashManager"
       },
       "version-1.x/version-1.x-browser": {
         "title": "Browser Quick Start",
@@ -916,6 +960,10 @@
         "title": "listNotes",
         "sidebar_label": "listNotes"
       },
+      "version-1.x/version-1.x-listRefs": {
+        "title": "listRefs",
+        "sidebar_label": "listRefs"
+      },
       "version-1.x/version-1.x-listRemotes": {
         "title": "listRemotes",
         "sidebar_label": "listRemotes"
@@ -955,6 +1003,14 @@
       "version-1.x/version-1.x-onMessage": {
         "title": "onMessage",
         "sidebar_label": "onMessage"
+      },
+      "version-1.x/version-1.x-onPostCheckout": {
+        "title": "onPostCheckout",
+        "sidebar_label": "onPostCheckout"
+      },
+      "version-1.x/version-1.x-onPrePush": {
+        "title": "onPrePush",
+        "sidebar_label": "onPrePush"
       },
       "version-1.x/version-1.x-onProgress": {
         "title": "onProgress",
@@ -1049,6 +1105,10 @@
       "version-1.x/version-1.x-STAGE": {
         "title": "version-1.x/version-1.x-STAGE"
       },
+      "version-1.x/version-1.x-stash": {
+        "title": "stash",
+        "sidebar_label": "stash"
+      },
       "version-1.x/version-1.x-status": {
         "title": "status",
         "sidebar_label": "status"
@@ -1133,6 +1193,8 @@
       "Remotes": "Remotes",
       "Objects": "Objects",
       "Plumbing Commands": "Plumbing Commands",
+      "Managers": "Managers",
+      "Models": "Models",
       "Getting Started": "Getting Started",
       "More": "More",
       "Walking": "Walking",

@@ -38,6 +38,7 @@ original_id: alphabetic
 - [listBranches](listBranches)
 - [listFiles](listFiles)
 - [listNotes](listNotes)
+- [listRefs](listRefs)
 - [listRemotes](listRemotes)
 - [listServerRefs](listServerRefs)
 - [listTags](listTags)

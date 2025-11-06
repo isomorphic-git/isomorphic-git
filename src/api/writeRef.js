@@ -1,5 +1,6 @@
 // @ts-check
 import cleanGitRef from 'clean-git-ref'
+import validRef from 'is-git-ref-name-valid'
 
 import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
@@ -57,7 +58,7 @@ export async function writeRef({
 
     const fs = new FileSystem(_fs)
 
-    if (ref !== cleanGitRef.clean(ref)) {
+    if (!validRef(ref, true)) {
       throw new InvalidRefNameError(ref, cleanGitRef.clean(ref))
     }
 

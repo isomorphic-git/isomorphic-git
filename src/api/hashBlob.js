@@ -39,17 +39,18 @@ export async function hashBlob({ object }) {
     // Convert object to buffer
     if (typeof object === 'string') {
       object = Buffer.from(object, 'utf8')
-    } else {
-      object = Buffer.from(object)
+    } else if (!(object instanceof Uint8Array)) {
+      object = new Uint8Array(object)
     }
 
     const type = 'blob'
     const { oid, object: _object } = await hashObject({
-      type: 'blob',
+      type,
       format: 'content',
       object,
     })
-    return { oid, type, object: new Uint8Array(_object), format: 'wrapped' }
+
+    return { oid, type, object: _object, format: 'wrapped' }
   } catch (err) {
     err.caller = 'git.hashBlob'
     throw err

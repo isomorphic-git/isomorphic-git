@@ -6,7 +6,7 @@ jobs:
   - job: Linux
 
     pool:
-      vmImage: 'ubuntu-20.04'
+      vmImage: 'ubuntu-24.04'
 
     # Most pipelines finish in under 15 minutes. 30 minutes should be more than enough.
     # See https://dev.azure.com/isomorphic-git/isomorphic-git/_pipeline/analytics/duration.
@@ -15,7 +15,7 @@ jobs:
     steps:
       - task: NodeTool@0
         inputs:
-          versionSpec: '12.x'
+          versionSpec: '14.x'
         displayName: 'Install Node.js'
 
       - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
@@ -73,8 +73,6 @@ jobs:
         env:
           GH_TOKEN: $(GITHUB_TOKEN)
           NPM_TOKEN: $(Npm.Token)
-          TWITTER_ACCESS_TOKEN_SECRET: $(TWITTER_ACCESS_TOKEN_SECRET)
-          TWITTER_CONSUMER_SECRET: $(TWITTER_CONSUMER_SECRET)
 
       - script: npm run publish-website
         displayName: 'Update website'

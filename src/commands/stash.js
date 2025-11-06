@@ -17,7 +17,11 @@ import { TREE } from './TREE.js'
 import { _currentBranch } from './currentBranch.js'
 import { _readCommit } from './readCommit.js'
 
-export async function _stashPush({ fs, dir, gitdir, message = '' }) {
+/**
+ * Common logic for creating a stash commit
+ * @private
+ */
+async function _createStashCommit({ fs, dir, gitdir, message = '' }) {
   const stashMgr = new GitStashManager({ fs, dir, gitdir })
 
   await stashMgr.getAuthor() // ensure there is an author
@@ -52,7 +56,7 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
     // create a commit from the index tree, which has one parent, the current branch HEAD
     const stashCommitOne = await stashMgr.writeStashCommit({
       message: `stash-Index: WIP on ${branch} - ${new Date().toISOString()}`,
-      tree: indexTree, // stashCommitTree
+      tree: indexTree,
       parent: stashCommitParents,
     })
     stashCommitParents.push(stashCommitOne)
@@ -93,6 +97,17 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
     parent: stashCommitParents,
   })
 
+  return { stashCommit, stashMsg, branch, stashMgr }
+}
+
+export async function _stashPush({ fs, dir, gitdir, message = '' }) {
+  const { stashCommit, stashMsg, branch, stashMgr } = await _createStashCommit({
+    fs,
+    dir,
+    gitdir,
+    message,
+  })
+
   // next, write this commit into .git/refs/stash:
   await stashMgr.writeStashRef(stashCommit)
 
@@ -112,6 +127,18 @@ export async function _stashPush({ fs, dir, gitdir, message = '' }) {
     force: true, // force checkout to discard changes
   })
 
+  return stashCommit
+}
+
+export async function _stashCreate({ fs, dir, gitdir, message = '' }) {
+  const { stashCommit } = await _createStashCommit({
+    fs,
+    dir,
+    gitdir,
+    message,
+  })
+
+  // Return the stash commit hash without modifying refs or working directory
   return stashCommit
 }
 
@@ -174,7 +201,11 @@ export async function _stashDrop({ fs, dir, gitdir, refIdx = 0 }) {
   const stashReflogPath = stashMgr.refLogsStashPath
   await acquireLock({ reflogEntries, stashReflogPath, stashMgr }, async () => {
     if (reflogEntries.length) {
-      await fs.write(stashReflogPath, reflogEntries.join('\n'), 'utf8')
+      await fs.write(
+        stashReflogPath,
+        reflogEntries.reverse().join('\n') + '\n',
+        'utf8'
+      )
       const lastStashCommit = reflogEntries[reflogEntries.length - 1].split(
         ' '
       )[1]
