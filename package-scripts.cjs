@@ -9,7 +9,7 @@ const builtFiles = pkg.files.filter(f => !['cli.js', 'cli.cjs'].includes(f))
 const retry = n => cmd => Array(n).fill(`(${cmd})`).join(` || `)
 const retry3 = retry(3)
 
-const quote = cmd => cmd.replaceAll("'", "\\'").replace('"', '\\"')
+const quote = cmd => cmd.replaceAll("'", "\\'").replaceAll('"', '\\"')
 
 const optional = cmd =>
   `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`
