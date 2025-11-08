@@ -11,7 +11,7 @@ import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { _readObject } from '../storage/readObject.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
-import { _writeObject } from '../storage/writeObject'
+import { _writeObject } from '../storage/writeObject.js'
 
 import { join } from './join.js'
 import { posixifyPathBuffer } from './posixifyPathBuffer.js'

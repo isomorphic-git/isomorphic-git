@@ -1,7 +1,7 @@
 import crc32 from 'crc-32'
 
 import { InternalError } from '../errors/InternalError.js'
-import { GitObject } from '../models/GitObject'
+import { GitObject } from '../models/GitObject.js'
 import { BufferCursor } from '../utils/BufferCursor.js'
 import { applyDelta } from '../utils/applyDelta.js'
 import { listpack } from '../utils/git-list-pack.js'

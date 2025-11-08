@@ -121,46 +121,47 @@ export class GitWalkerFs {
       const { fs, gitdir, cache } = this
       let oid
       // See if we can use the SHA1 hash in the index.
-      await GitIndexManager.acquire({ fs, gitdir, cache }, async function(
-        index
-      ) {
-        const stage = index.entriesMap.get(entry._fullpath)
-        const stats = await entry.stat()
-        const config = await self._getGitConfig(fs, gitdir)
-        const filemode = await config.get('core.filemode')
-        const trustino =
-          typeof process !== 'undefined'
-            ? !(process.platform === 'win32')
-            : true
-        if (!stage || compareStats(stats, stage, filemode, trustino)) {
-          const content = await entry.content()
-          if (content === undefined) {
-            oid = undefined
-          } else {
-            oid = await shasum(
-              GitObject.wrap({ type: 'blob', object: content })
-            )
-            // Update the stats in the index so we will get a "cache hit" next time
-            // 1) if we can (because the oid and mode are the same)
-            // 2) and only if we need to (because other stats differ)
-            if (
-              stage &&
-              oid === stage.oid &&
-              (!filemode || stats.mode === stage.mode) &&
-              compareStats(stats, stage, filemode, trustino)
-            ) {
-              index.insert({
-                filepath: entry._fullpath,
-                stats,
-                oid: oid,
-              })
+      await GitIndexManager.acquire(
+        { fs, gitdir, cache },
+        async function (index) {
+          const stage = index.entriesMap.get(entry._fullpath)
+          const stats = await entry.stat()
+          const config = await self._getGitConfig(fs, gitdir)
+          const filemode = await config.get('core.filemode')
+          const trustino =
+            typeof process !== 'undefined'
+              ? !(process.platform === 'win32')
+              : true
+          if (!stage || compareStats(stats, stage, filemode, trustino)) {
+            const content = await entry.content()
+            if (content === undefined) {
+              oid = undefined
+            } else {
+              oid = await shasum(
+                GitObject.wrap({ type: 'blob', object: content })
+              )
+              // Update the stats in the index so we will get a "cache hit" next time
+              // 1) if we can (because the oid and mode are the same)
+              // 2) and only if we need to (because other stats differ)
+              if (
+                stage &&
+                oid === stage.oid &&
+                (!filemode || stats.mode === stage.mode) &&
+                compareStats(stats, stage, filemode, trustino)
+              ) {
+                index.insert({
+                  filepath: entry._fullpath,
+                  stats,
+                  oid,
+                })
+              }
             }
+          } else {
+            // Use the index SHA1 rather than compute it
+            oid = stage.oid
           }
-        } else {
-          // Use the index SHA1 rather than compute it
-          oid = stage.oid
         }
-      })
+      )
       entry._oid = oid
     }
     return entry._oid

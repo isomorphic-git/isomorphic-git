@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { mergeFile } = require('isomorphic-git/internal-apis')
+import { mergeFile } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('mergeFile', () => {
   it('mergeFile a o b', async () => {

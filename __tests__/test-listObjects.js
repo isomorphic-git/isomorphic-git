@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
-const { listObjects } = require('isomorphic-git/internal-apis')
+import { listObjects } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('listObjects', () => {
   it('listObjects', async () => {
@@ -20,7 +20,7 @@ describe('listObjects', () => {
       ],
     })
     expect([...objects]).toMatchInlineSnapshot(`
-      Array [
+      [
         "c60bbbe99e96578105c57c4b3f2b6ebdf863edbc",
         "a8103169a3cb5fb457e5232a0e36728511e736b4",
         "1db939d41956405f755e69ab570296c7ed3cec99",

@@ -15,14 +15,8 @@ jobs:
     steps:
       - task: NodeTool@0
         inputs:
-          versionSpec: '14.x'
+          versionSpec: '22.x'
         displayName: 'Install Node.js'
-
-      - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
-        inputs:
-          keyfile: 'package-lock.json'
-          targetfolder: 'node_modules'
-          vstsFeed: $(ARTIFACT_FEED)
 
       - script: npm ci
         displayName: 'Install dependencies'

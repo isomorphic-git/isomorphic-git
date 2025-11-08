@@ -2,7 +2,7 @@ import { UnknownTransportError } from '../errors/UnknownTransportError.js'
 import { UrlParseError } from '../errors/UrlParseError.js'
 import { translateSSHtoHTTP } from '../utils/translateSSHtoHTTP.js'
 
-import { GitRemoteHTTP } from './GitRemoteHTTP'
+import { GitRemoteHTTP } from './GitRemoteHTTP.js'
 
 /**
  * A class for managing Git remotes and determining the appropriate remote helper for a given URL.

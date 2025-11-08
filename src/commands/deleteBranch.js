@@ -1,5 +1,5 @@
 // @ts-check
-import { _currentBranch } from '../commands/currentBranch'
+import { _currentBranch } from '../commands/currentBranch.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'

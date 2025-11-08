@@ -1,29 +1,47 @@
-const path = require('path')
+import * as _fs from 'fs'
+import * as os from 'os'
+import { join, resolve } from 'path'
 
-const { FileSystem } = require('isomorphic-git/internal-apis')
+import findUp from 'find-up'
+import { FileSystem } from 'isomorphic-git/internal-apis'
+import onExit from 'signal-exit'
 
-async function makeNodeFixture(fixture) {
-  const _fs = Object.assign({}, require('fs'))
+const TEMP_PATH = join(os.tmpdir(), 'jest-fixture-')
+const TEMP_DIRS_CREATED = new Set()
+
+export function cleanupTempDirs() {
+  for (const tempDir of TEMP_DIRS_CREATED) {
+    try {
+      _fs.rmSync(tempDir, { recursive: true, force: true })
+    } catch (err) {}
+  }
+  TEMP_DIRS_CREATED.clear()
+}
+
+const testsDir = resolve(import.meta.dirname, '..')
+
+export async function useTempDir(fixture) {
+  const fixturePath = await findUp(join('__fixtures__', fixture), {
+    cwd: testsDir,
+  })
+
+  const tempDir = await _fs.promises.mkdtemp(TEMP_PATH)
+  TEMP_DIRS_CREATED.add(tempDir)
+
+  if (fixturePath) {
+    await _fs.promises.cp(fixturePath, tempDir, { recursive: true })
+  }
+
+  return tempDir
+}
+
+export async function makeNodeFixture(fixture) {
+  onExit(cleanupTempDirs)
 
   const fs = new FileSystem(_fs)
 
-  const {
-    getFixturePath,
-    createTempDir,
-    copyFixtureIntoTempDir,
-  } = require('@wmhilton/jest-fixtures')
-
-  const testsDir = path.resolve(__dirname, '..')
-
-  const dir = (await getFixturePath(testsDir, fixture))
-    ? await copyFixtureIntoTempDir(testsDir, fixture)
-    : await createTempDir()
-
-  const gitdir = (await getFixturePath(testsDir, `${fixture}.git`))
-    ? await copyFixtureIntoTempDir(testsDir, `${fixture}.git`)
-    : await createTempDir()
+  const dir = await useTempDir(fixture)
+  const gitdir = await useTempDir(`${fixture}.git`)
 
   return { _fs, fs, dir, gitdir }
 }
-
-module.exports.makeNodeFixture = makeNodeFixture

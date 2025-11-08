@@ -1,10 +1,10 @@
 /* eslint-env node, browser, jasmine */
 
-const path = require('path')
+import * as path from 'path'
 
-const { GitIndex, GitIndexManager } = require('isomorphic-git/internal-apis')
+import { GitIndex, GitIndexManager } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('GitIndex', () => {
   it('GitIndex.from(buffer) - Simple', async () => {
@@ -74,30 +74,32 @@ describe('GitIndex', () => {
 
   it('write unmerged index to disk and read it back', async () => {
     const { gitdir, fs } = await makeFixture('test-GitIndex')
-    await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async function(
-      index
-    ) {
-      expect(index.entries.length).toBe(0)
-      expect(index.entriesFlat.length).toBe(0)
-      index.insert({ filepath: 'a', oid: '01', stage: 1 })
-      index.insert({ filepath: 'a', oid: '10', stage: 2 })
-      index.insert({ filepath: 'a', oid: '11', stage: 3 })
-      expect(index.unmergedPaths).toContain('a')
-    })
-    await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async function(
-      index
-    ) {
-      expect(index.entries.length).toBe(1)
-      expect(index.entriesFlat.length).toBe(3)
-      expect(index.unmergedPaths).toContain('a')
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache: {} },
+      async function (index) {
+        expect(index.entries.length).toBe(0)
+        expect(index.entriesFlat.length).toBe(0)
+        index.insert({ filepath: 'a', oid: '01', stage: 1 })
+        index.insert({ filepath: 'a', oid: '10', stage: 2 })
+        index.insert({ filepath: 'a', oid: '11', stage: 3 })
+        expect(index.unmergedPaths).toContain('a')
+      }
+    )
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache: {} },
+      async function (index) {
+        expect(index.entries.length).toBe(1)
+        expect(index.entriesFlat.length).toBe(3)
+        expect(index.unmergedPaths).toContain('a')
 
-      const entryA = index.entriesMap.get('a')
+        const entryA = index.entriesMap.get('a')
 
-      expect(entryA.stages.length).toBe(4)
-      expect(entryA.stages[1]).toBe(index.entriesFlat[0])
-      expect(entryA.stages[2]).toBe(index.entriesFlat[1])
-      expect(entryA.stages[3]).toBe(index.entriesFlat[2])
-    })
+        expect(entryA.stages.length).toBe(4)
+        expect(entryA.stages[1]).toBe(index.entriesFlat[0])
+        expect(entryA.stages[2]).toBe(index.entriesFlat[1])
+        expect(entryA.stages[3]).toBe(index.entriesFlat[2])
+      }
+    )
   })
 
   it('read existing unmerged index', async () => {
@@ -105,16 +107,17 @@ describe('GitIndex', () => {
     const { gitdir, fs } = await makeFixture('test-GitIndex-unmerged')
 
     // Test
-    await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async function(
-      index
-    ) {
-      expect(index.unmergedPaths.length).toEqual(2)
-      expect(index.entriesFlat.length).toBe(7)
-      expect(index.unmergedPaths).toContain('a')
-      expect(index.unmergedPaths).toContain('b')
-      expect(index.entriesMap.get('a').stages.length).toBe(4)
-      expect(index.entriesMap.get('b').stages.length).toBe(4)
-      expect(index.entriesMap.get('c').stages.length).toBe(1)
-    })
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache: {} },
+      async function (index) {
+        expect(index.unmergedPaths.length).toEqual(2)
+        expect(index.entriesFlat.length).toBe(7)
+        expect(index.unmergedPaths).toContain('a')
+        expect(index.unmergedPaths).toContain('b')
+        expect(index.entriesMap.get('a').stages.length).toBe(4)
+        expect(index.entriesMap.get('b').stages.length).toBe(4)
+        expect(index.entriesMap.get('c').stages.length).toBe(1)
+      }
+    )
   })
 })

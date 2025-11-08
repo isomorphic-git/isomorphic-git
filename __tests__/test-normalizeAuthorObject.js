@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
 
-const { setConfig } = require('isomorphic-git')
-const { normalizeAuthorObject } = require('isomorphic-git/internal-apis')
+import { setConfig } from 'isomorphic-git'
+import { normalizeAuthorObject } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('normalizeAuthorObject', () => {
   it('return author if all properties are populated', async () => {

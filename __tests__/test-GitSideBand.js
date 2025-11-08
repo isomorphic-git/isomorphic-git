@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { collect, GitSideBand } = require('isomorphic-git/internal-apis')
+import { collect, GitSideBand } from 'isomorphic-git/internal-apis'
 
 describe('GitSideBand', () => {
   it('demux - packetlines, packfile, and progress', async () => {

@@ -1,7 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
-import { _commit } from '../commands/commit'
+import { _commit } from '../commands/commit.js'
 import { _currentBranch } from '../commands/currentBranch.js'
 import { _findMergeBase } from '../commands/findMergeBase.js'
 import { FastForwardError } from '../errors/FastForwardError.js'

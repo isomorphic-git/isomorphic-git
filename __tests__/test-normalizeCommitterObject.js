@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
 
-const { setConfig } = require('isomorphic-git')
-const { normalizeCommitterObject } = require('isomorphic-git/internal-apis')
+import { setConfig } from 'isomorphic-git'
+import { normalizeCommitterObject } from 'isomorphic-git/internal-apis'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('normalizeCommitterObject', () => {
   it('return committer if all properties are populated', async () => {

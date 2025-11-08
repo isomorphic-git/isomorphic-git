@@ -1,7 +1,6 @@
 /* eslint-env node, browser, jasmine */
+import { Errors, getRemoteInfo2 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
-
-const { Errors, getRemoteInfo2 } = require('isomorphic-git')
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -37,17 +36,17 @@ describe('getRemoteInfo2', () => {
     if (info.protocolVersion === 1) {
       expect(info.refs).toBeDefined()
       expect(info.refs).toMatchInlineSnapshot(`
-        Array [
-          Object {
+        [
+          {
             "oid": "97c024f73eaab2781bf3691597bc7c833cb0e22f",
             "ref": "HEAD",
             "target": "refs/heads/master",
           },
-          Object {
+          {
             "oid": "97c024f73eaab2781bf3691597bc7c833cb0e22f",
             "ref": "refs/heads/master",
           },
-          Object {
+          {
             "oid": "5a8905a02e181fe1821068b8c0f48cb6633d5b81",
             "ref": "refs/heads/test",
           },

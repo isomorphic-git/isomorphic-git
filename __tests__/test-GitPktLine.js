@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { GitPktLine } = require('isomorphic-git/internal-apis')
+import { GitPktLine } from 'isomorphic-git/internal-apis'
 
 describe('GitPktLine', () => {
   it('read stream - simple', async () => {
@@ -75,7 +75,7 @@ describe('GitPktLine', () => {
 
   it('read stream - with error', async () => {
     const hookStream = (subject, fn) => {
-      const unhook = function(write) {
+      const unhook = function (write) {
         this.write = write
       }.bind(subject, subject.write)
       subject.write = fn

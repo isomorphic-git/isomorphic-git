@@ -1,9 +1,9 @@
 /* eslint-env node, browser, jasmine */
-const path = require('path')
+import * as path from 'path'
 
-const { findRoot } = require('isomorphic-git')
+import { findRoot } from 'isomorphic-git'
 
-const { makeFixture } = require('./__helpers__/FixtureFS.js')
+import { makeFixture } from './__helpers__/FixtureFS.js'
 
 // NOTE: Because ".git" is not allowed as a path name in git,
 // we can't actually store the ".git" folders in our fixture,

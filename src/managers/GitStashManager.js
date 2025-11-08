@@ -1,15 +1,15 @@
 import '../typedefs.js'
 
-import { _readCommit } from '../commands/readCommit'
-import { _writeCommit } from '../commands/writeCommit'
+import { _readCommit } from '../commands/readCommit.js'
+import { _writeCommit } from '../commands/writeCommit.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
-import { MissingNameError } from '../errors/MissingNameError'
-import { GitRefStash } from '../models/GitRefStash'
-import { join } from '../utils/join'
-import { normalizeAuthorObject } from '../utils/normalizeAuthorObject'
-import { acquireLock } from '../utils/walkerToTreeEntryMap'
+import { MissingNameError } from '../errors/MissingNameError.js'
+import { GitRefStash } from '../models/GitRefStash.js'
+import { join } from '../utils/join.js'
+import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
+import { acquireLock } from '../utils/walkerToTreeEntryMap.js'
 
-import { GitRefManager } from './GitRefManager'
+import { GitRefManager } from './GitRefManager.js'
 
 export class GitStashManager {
   /**

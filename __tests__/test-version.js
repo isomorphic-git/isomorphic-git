@@ -1,7 +1,20 @@
 /* eslint-env node, browser, jasmine */
-const { version } = require('isomorphic-git')
+import { readFileSync } from 'fs'
+import { join } from 'path'
+import { fileURLToPath } from 'url'
 
-const pkg = require('../package.json')
+import { version } from 'isomorphic-git'
+
+/**
+ * @todo Use `import ... with { type: 'json' }` when development uses Node.js 20+.
+ * Note this needs Eslint 9
+ */
+const pkg = JSON.parse(
+  readFileSync(
+    join(fileURLToPath(import.meta.url), '../../package.json'),
+    'utf8'
+  )
+)
 
 describe('version', () => {
   it('version', () => {

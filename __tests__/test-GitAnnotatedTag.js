@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-const { GitAnnotatedTag } = require('isomorphic-git/internal-apis')
+import { GitAnnotatedTag } from 'isomorphic-git/internal-apis'
 
 const tagString = `object af4d84a6a9fa7a74acdad07fddf9f17ff3a974ae
 type commit

@@ -1,12 +1,17 @@
-/* eslint-env node, browser, jasmine */
+/* eslint-env node, browser, jasmine, jest */
 
-const { makeBrowserFS } = require('./FixtureFS/makeBrowserFS.js')
-const { makeLightningFS } = require('./FixtureFS/makeLightningFS.js')
-const { makeNodeFixture } = require('./FixtureFS/makeNodeFixture.js')
-const setTestTimeout = require('./set-test-timeout')
-setTestTimeout(60000)
+import { makeLightningFS } from './FixtureFS/makeLightningFS.js'
+import { makeNodeFixture } from './FixtureFS/makeNodeFixture.js'
+import { makeZenFS } from './FixtureFS/makeZenFS.js'
 
-async function makeFixture(dir) {
+if (globalThis.jest) {
+  jest.useFakeTimers()
+  jest.setTimeout(60_000)
+}
+
+if (globalThis.jasmine) jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
+
+export async function makeFixture(dir) {
   return process.browser ? makeBrowserFixture(dir) : makeNodeFixture(dir)
 }
 
@@ -16,7 +21,5 @@ async function makeBrowserFixture(dir) {
   const isSafari = /Safari/.test(navigator && navigator.userAgent)
   return process.env.ENABLE_LIGHTNINGFS && !isSafari
     ? makeLightningFS(dir)
-    : makeBrowserFS(dir)
+    : makeZenFS(dir)
 }
-
-module.exports.makeFixture = makeFixture

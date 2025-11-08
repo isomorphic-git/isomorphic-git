@@ -158,63 +158,69 @@ export async function _checkout({
 
     let count = 0
     const total = ops.length
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-      await Promise.all(
-        ops
-          .filter(
-            ([method]) => method === 'delete' || method === 'delete-index'
-          )
-          .map(async function([method, fullpath]) {
-            const filepath = `${dir}/${fullpath}`
-            if (method === 'delete') {
-              await fs.rm(filepath)
-            }
-            index.delete({ filepath: fullpath })
-            if (onProgress) {
-              await onProgress({
-                phase: 'Updating workdir',
-                loaded: ++count,
-                total,
-              })
-            }
-          })
-      )
-    })
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache },
+      async function (index) {
+        await Promise.all(
+          ops
+            .filter(
+              ([method]) => method === 'delete' || method === 'delete-index'
+            )
+            .map(async function ([method, fullpath]) {
+              const filepath = `${dir}/${fullpath}`
+              if (method === 'delete') {
+                await fs.rm(filepath)
+              }
+              index.delete({ filepath: fullpath })
+              if (onProgress) {
+                await onProgress({
+                  phase: 'Updating workdir',
+                  loaded: ++count,
+                  total,
+                })
+              }
+            })
+        )
+      }
+    )
 
     // Note: this is cannot be done naively in parallel
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async function(index) {
-      for (const [method, fullpath] of ops) {
-        if (method === 'rmdir' || method === 'rmdir-index') {
-          const filepath = `${dir}/${fullpath}`
-          try {
-            if (method === 'rmdir') {
-              await fs.rmdir(filepath)
-            }
-            index.delete({ filepath: fullpath })
-            if (onProgress) {
-              await onProgress({
-                phase: 'Updating workdir',
-                loaded: ++count,
-                total,
-              })
-            }
-          } catch (e) {
-            if (e.code === 'ENOTEMPTY') {
-              console.log(
-                `Did not delete ${fullpath} because directory is not empty`
-              )
-            } else {
-              throw e
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache },
+      async function (index) {
+        for (const [method, fullpath] of ops) {
+          if (method === 'rmdir' || method === 'rmdir-index') {
+            const filepath = `${dir}/${fullpath}`
+            try {
+              if (method === 'rmdir') {
+                await fs.rmdir(filepath)
+              }
+              index.delete({ filepath: fullpath })
+              if (onProgress) {
+                await onProgress({
+                  phase: 'Updating workdir',
+                  loaded: ++count,
+                  total,
+                })
+              }
+            } catch (e) {
+              if (e.code === 'ENOTEMPTY') {
+                console.log(
+                  `Did not delete ${fullpath} because directory is not empty`
+                )
+              } else {
+                throw e
+              }
             }
           }
         }
       }
-    })
+    )
 
     await Promise.all(
       ops
         .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
-        .map(async function([_, fullpath]) {
+        .map(async function ([_, fullpath]) {
           const filepath = `${dir}/${fullpath}`
           await fs.mkdir(filepath)
           if (onProgress) {
@@ -239,14 +245,16 @@ export async function _checkout({
 
       const updateWorkingDirResults = await batchAllSettled(
         'Update Working Dir',
-        eligibleOps.map(([method, fullpath, oid, mode, chmod]) => () =>
-          updateWorkingDir({ fs, cache, gitdir, dir }, [
-            method,
-            fullpath,
-            oid,
-            mode,
-            chmod,
-          ])
+        eligibleOps.map(
+          ([method, fullpath, oid, mode, chmod]) =>
+            () =>
+              updateWorkingDir({ fs, cache, gitdir, dir }, [
+                method,
+                fullpath,
+                oid,
+                mode,
+                chmod,
+              ])
         ),
         onProgress,
         batchSize
@@ -254,11 +262,13 @@ export async function _checkout({
 
       await GitIndexManager.acquire(
         { fs, gitdir, cache, allowUnmerged: true },
-        async function(index) {
+        async function (index) {
           await batchAllSettled(
             'Update Index',
-            updateWorkingDirResults.map(([fullpath, oid, stats]) => () =>
-              updateIndex({ index, fullpath, oid, stats })
+            updateWorkingDirResults.map(
+              ([fullpath, oid, stats]) =>
+                () =>
+                  updateIndex({ index, fullpath, oid, stats })
             ),
             onProgress,
             batchSize
@@ -268,7 +278,7 @@ export async function _checkout({
     } else {
       await GitIndexManager.acquire(
         { fs, gitdir, cache, allowUnmerged: true },
-        async function(index) {
+        async function (index) {
           await Promise.all(
             ops
               .filter(
@@ -278,7 +288,7 @@ export async function _checkout({
                   method === 'update' ||
                   method === 'mkdir-index'
               )
-              .map(async function([method, fullpath, oid, mode, chmod]) {
+              .map(async function ([method, fullpath, oid, mode, chmod]) {
                 const filepath = `${dir}/${fullpath}`
                 try {
                   if (method !== 'create-index' && method !== 'mkdir-index') {
@@ -387,7 +397,7 @@ async function analyze({
     dir,
     gitdir,
     trees: [TREE({ ref }), WORKDIR(), STAGE()],
-    map: async function(fullpath, [commit, workdir, stage]) {
+    map: async function (fullpath, [commit, workdir, stage]) {
       if (fullpath === '.') return
       // match against base paths
       if (filepaths && !filepaths.some(base => worthWalking(fullpath, base))) {
@@ -645,7 +655,7 @@ async function analyze({
       }
     },
     // Modify the default flat mapping
-    reduce: async function(parent, children) {
+    reduce: async function (parent, children) {
       children = flat(children)
       if (!parent) {
         return children
