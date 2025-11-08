@@ -1,3 +1,4 @@
+export * from './AbortError.js'
 export * from './AlreadyExistsError.js'
 export * from './AmbiguousError.js'
 // BaseError.js

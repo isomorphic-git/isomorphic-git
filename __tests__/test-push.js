@@ -731,4 +731,35 @@ describe('push', () => {
     expect(err instanceof Errors.UserCanceledError).toBe(true)
     expect(err.code).toBe('UserCanceledError')
   })
+
+  it('push with immediate abort', async () => {
+    // Skip test if AbortController is not available
+    if (typeof AbortController === 'undefined') {
+      console.warn('AbortController not available, skipping abort test')
+      return
+    }
+
+    const { fs, gitdir } = await makeFixture('test-push')
+    const controller = new AbortController()
+
+    // Abort immediately
+    controller.abort()
+
+    let error
+    try {
+      await push({
+        fs,
+        http,
+        gitdir,
+        signal: controller.signal,
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeDefined()
+    expect(error instanceof Errors.AbortError).toBe(true)
+    expect(error.code).toBe('AbortError')
+    expect(error.caller).toBe('git.push')
+  })
 })

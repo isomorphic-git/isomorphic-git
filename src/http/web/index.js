@@ -15,12 +15,13 @@ export async function request({
   method = 'GET',
   headers = {},
   body,
+  signal,
 }) {
   // streaming uploads aren't possible yet in the browser
   if (body) {
     body = await collect(body)
   }
-  const res = await fetch(url, { method, headers, body })
+  const res = await fetch(url, { method, headers, body, signal })
   const iter =
     res.body && res.body.getReader
       ? fromStream(res.body)
