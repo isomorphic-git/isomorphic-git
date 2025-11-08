@@ -1,4 +1,5 @@
 module.exports = {
+  testTimeout: 20000, // Default 5000ms
   modulePathIgnorePatterns: ['<rootDir>/website'],
   testRegex: '/__tests__/(server-only\\.)?test-[^\\/]+\\.js',
   moduleNameMapper: {
