@@ -157,7 +157,7 @@
     "timeout-cli": "0.3.2",
     "typescript": "^5.8.0",
     "webpack": "^5.0.1",
-    "webpack-bundle-analyzer": "3.4.1",
+    "webpack-bundle-analyzer": "4.10.2",
     "webpack-cli": "^4.0.0"
   },
   "prettier": "./.prettierrc.cjs",
