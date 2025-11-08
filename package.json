@@ -116,7 +116,7 @@
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "5.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.19.16",
+    "@types/node": "^24.10.0",
     "@zenfs/core": "^2.0.0",
     "agadoo": "2.0.0",
     "all-contributors-cli": "6.20.0",
