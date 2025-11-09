@@ -109,7 +109,8 @@ module.exports = {
         'build.webpack',
         'build.indexjson',
         'build.treeshake',
-        'build.size'
+        'build.size',
+        'build.pack'
       ),
       rollup: 'rollup -c --no-treeshake',
       typings:
