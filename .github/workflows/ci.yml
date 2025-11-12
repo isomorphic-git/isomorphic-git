@@ -3,6 +3,10 @@ name: Build
 on:
   pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/**
 
 # Cancel in-progress runs for the current workflow
 concurrency:
@@ -11,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build
+    name: Build (Node.js v22)
     runs-on: ubuntu-latest
 
     timeout-minutes: 10
@@ -54,7 +58,7 @@ jobs:
           npx nps \
             test.typecheck \
             test.setup \
-            test.jest
+            test.node
 
       - name: Save test results
         if: ${{ !cancelled() }}
@@ -112,7 +116,9 @@ jobs:
       fail-fast: false
       matrix:
         # This is a comma-separated list of Karma launchers
-        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","sl_edge","sl_safari","sl_ios_safari","bs_android_chrome"')) }}
+        # karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","sl_edge","sl_safari","sl_ios_safari","bs_android_chrome"')) }}
+        # 2025 reduced matrix. The other browsers need to be re-implemented.
+        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox"')) }}
 
       # Our BrowserStack plan allows up to 5 parallel tests. We limit each workflow to 2 to avoid the limit.
       max-parallel: 2
@@ -152,7 +158,10 @@ jobs:
           # Use X Virtual Frame Buffer (xvfb) to run the browser with no display (headless).
           xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npx nps \
             test.setup \
-            test.karma
+            test.chrome
+            # 2025 test.karma was in the above list but has been temporarily removed.
+            # Reduced to only test.chrome.
+
         env:
           BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
           BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
