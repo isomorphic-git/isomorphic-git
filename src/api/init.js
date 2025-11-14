@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _init } from '../commands/init.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -36,11 +37,13 @@ export async function init({
       assertParameter('dir', dir)
     }
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _init({
-      fs: new FileSystem(fs),
+      fs: fsp,
       bare,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       defaultBranch,
     })
   } catch (err) {

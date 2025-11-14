@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _deleteBranch } from '../commands/deleteBranch.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -33,9 +34,11 @@ export async function deleteBranch({
   try {
     assertParameter('fs', fs)
     assertParameter('ref', ref)
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _deleteBranch({
-      fs: new FileSystem(fs),
-      gitdir,
+      fs: fsp,
+      gitdir: updatedGitdir,
       ref,
     })
   } catch (err) {

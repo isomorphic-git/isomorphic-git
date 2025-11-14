@@ -15,7 +15,8 @@ const optional = cmd =>
   `(${cmd}) || echo "Optional command '${quote(cmd)}' failed".`
 
 const timeout = n => cmd => `timeout -t ${n}m -- ${cmd}`
-const timeout5 = timeout(5)
+// const timeout5 = timeout(5)
+const timeout15 = timeout(15)
 
 /**
  * Returns the environment variables to configure bundlewatch for the current CI provider.
@@ -59,14 +60,17 @@ const bundlewatchEnvironmentVariables = () => {
   return options.join(' ')
 }
 
-const jestEnv = 'NODE_OPTIONS=--experimental-vm-modules'
+const jestEnv =
+  'NODE_OPTIONS="--experimental-vm-modules --max-old-space-size-percentage=80"'
+
 const jestCommand = 'jest --ci --coverage'
+// const jestCommand = 'jest --ci --coverage --runInBand --logHeapUsage'
 
 const jestBrowser = browserName => {
   const cmd = `${jestCommand} --config jest-browser.config.js`
 
   return process.env.CI
-    ? `export ${jestEnv}\nexport JEST_BROWSER=${browserName}\nexport JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js\n${retry3(`${timeout5(cmd)}`)}`
+    ? `export ${jestEnv}\nexport JEST_BROWSER=${browserName}\nexport JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js\n${retry3(timeout15(cmd))}`
     : `cross-env ${jestEnv} JEST_BROWSER=${browserName} JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js ${cmd}`
 }
 
@@ -174,7 +178,7 @@ module.exports = {
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
       node: process.env.CI
-        ? `export ${jestEnv}\n${retry3(`${timeout5(jestCommand)}`)}`
+        ? `export ${jestEnv}\n${retry3(timeout15(jestCommand))}`
         : `cross-env-shell ${jestEnv} ${jestCommand}`,
       chrome: jestBrowser('chrome'),
       firefox: jestBrowser('firefox'),

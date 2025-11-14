@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _pull } from '../commands/pull.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -72,8 +73,10 @@ export async function fastForward({
       timezoneOffset: 0,
     }
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _pull({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
       http,
       onProgress,
@@ -82,7 +85,7 @@ export async function fastForward({
       onAuthSuccess,
       onAuthFailure,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       ref,
       url,
       remote,

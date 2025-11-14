@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _packObjects } from '../commands/packObjects.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -50,10 +51,12 @@ export async function packObjects({
     assertParameter('gitdir', gitdir)
     assertParameter('oids', oids)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _packObjects({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
-      gitdir,
+      gitdir: updatedGitdir,
       oids,
       write,
     })

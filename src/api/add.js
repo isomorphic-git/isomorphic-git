@@ -9,6 +9,7 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { posixifyPathBuffer } from '../utils/posixifyPathBuffer.js'
 
@@ -48,20 +49,24 @@ export async function add({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
-    await GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
-      const config = await GitConfigManager.get({ fs, gitdir })
-      const autocrlf = await config.get('core.autocrlf')
-      return addToIndex({
-        dir,
-        gitdir,
-        fs,
-        filepath,
-        index,
-        force,
-        parallel,
-        autocrlf,
-      })
-    })
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
+    await GitIndexManager.acquire(
+      { fs, gitdir: updatedGitdir, cache },
+      async index => {
+        const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
+        const autocrlf = await config.get('core.autocrlf')
+        return addToIndex({
+          dir,
+          gitdir: updatedGitdir,
+          fs,
+          filepath,
+          index,
+          force,
+          parallel,
+          autocrlf,
+        })
+      }
+    )
   } catch (err) {
     err.caller = 'git.add'
     throw err

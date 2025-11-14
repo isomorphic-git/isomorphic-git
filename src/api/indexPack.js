@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _indexPack } from '../commands/indexPack.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -49,12 +50,14 @@ export async function indexPack({
     assertParameter('gitdir', dir)
     assertParameter('filepath', filepath)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _indexPack({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
       onProgress,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       filepath,
     })
   } catch (err) {

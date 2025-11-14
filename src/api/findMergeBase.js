@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _findMergeBase } from '../commands/findMergeBase.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -29,10 +30,12 @@ export async function findMergeBase({
     assertParameter('gitdir', gitdir)
     assertParameter('oids', oids)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _findMergeBase({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
-      gitdir,
+      gitdir: updatedGitdir,
       oids,
     })
   } catch (err) {

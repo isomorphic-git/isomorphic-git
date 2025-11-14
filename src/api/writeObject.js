@@ -7,6 +7,7 @@ import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject } from '../storage/writeObject.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -86,6 +87,7 @@ export async function writeObject({
 }) {
   try {
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     // Convert object to buffer
     if (format === 'parsed') {
       switch (type) {
@@ -109,7 +111,7 @@ export async function writeObject({
     }
     oid = await _writeObject({
       fs,
-      gitdir,
+      gitdir: updatedGitdir,
       type,
       object,
       oid,

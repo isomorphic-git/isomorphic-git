@@ -3,6 +3,7 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
 import { resolveFilepath } from '../utils/resolveFilepath.js'
@@ -41,13 +42,18 @@ export async function resetIndex({
     assertParameter('filepath', filepath)
 
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
 
     let oid
     let workdirOid
 
     try {
       // Resolve commit
-      oid = await GitRefManager.resolve({ fs, gitdir, ref: ref || 'HEAD' })
+      oid = await GitRefManager.resolve({
+        fs,
+        gitdir: updatedGitdir,
+        ref: ref || 'HEAD',
+      })
     } catch (e) {
       if (ref) {
         // Only throw the error if a ref is explicitly provided
@@ -63,7 +69,7 @@ export async function resetIndex({
         oid = await resolveFilepath({
           fs,
           cache,
-          gitdir,
+          gitdir: updatedGitdir,
           oid,
           filepath,
         })
@@ -89,7 +95,7 @@ export async function resetIndex({
     if (object) {
       // ... and has the same hash as the desired state...
       workdirOid = await hashObject({
-        gitdir,
+        gitdir: updatedGitdir,
         type: 'blob',
         object,
       })
@@ -99,7 +105,7 @@ export async function resetIndex({
       }
     }
     await GitIndexManager.acquire(
-      { fs, gitdir, cache },
+      { fs, gitdir: updatedGitdir, cache },
       async function (index) {
         index.delete({ filepath })
         if (oid) {

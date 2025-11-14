@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _readNote } from '../commands/readNote.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -34,10 +35,12 @@ export async function readNote({
     assertParameter('ref', ref)
     assertParameter('oid', oid)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _readNote({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
-      gitdir,
+      gitdir: updatedGitdir,
       ref,
       oid,
     })
