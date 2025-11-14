@@ -406,3 +406,4 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 This work is released under [The MIT License](https://opensource.org/licenses/MIT)
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fisomorphic-git%2Fisomorphic-git?ref=badge_large)
+
