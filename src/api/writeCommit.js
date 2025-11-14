@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _writeCommit } from '../commands/writeCommit.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -30,9 +31,11 @@ export async function writeCommit({
     assertParameter('gitdir', gitdir)
     assertParameter('commit', commit)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _writeCommit({
-      fs: new FileSystem(fs),
-      gitdir,
+      fs: fsp,
+      gitdir: updatedGitdir,
       commit,
     })
   } catch (err) {

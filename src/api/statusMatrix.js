@@ -8,6 +8,7 @@ import { _walk } from '../commands/walk.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
@@ -170,11 +171,12 @@ export async function statusMatrix({
     assertParameter('ref', ref)
 
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     return await _walk({
       fs,
       cache,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       trees: [TREE({ ref }), WORKDIR(), STAGE()],
       map: async function (filepath, [head, workdir, stage]) {
         // Ignore ignored files, but only if they are not already tracked.

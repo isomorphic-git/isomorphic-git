@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _writeTag } from '../commands/writeTag.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -49,9 +50,11 @@ export async function writeTag({ fs, dir, gitdir = join(dir, '.git'), tag }) {
     assertParameter('gitdir', gitdir)
     assertParameter('tag', tag)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _writeTag({
-      fs: new FileSystem(fs),
-      gitdir,
+      fs: fsp,
+      gitdir: updatedGitdir,
       tag,
     })
   } catch (err) {

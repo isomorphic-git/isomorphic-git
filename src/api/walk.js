@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _walk } from '../commands/walk.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -266,11 +267,13 @@ export async function walk({
     assertParameter('gitdir', gitdir)
     assertParameter('trees', trees)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _walk({
-      fs: new FileSystem(fs),
+      fs: fsp,
       cache,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       trees,
       map,
       reduce,

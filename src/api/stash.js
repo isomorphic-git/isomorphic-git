@@ -11,6 +11,7 @@ import {
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -97,9 +98,10 @@ export async function stash({
 
   try {
     const _fs = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp: _fs, dotgit: gitdir })
     const folders = ['refs', 'logs', 'logs/refs']
     folders
-      .map(f => join(gitdir, f))
+      .map(f => join(updatedGitdir, f))
       .forEach(async folder => {
         if (!(await _fs.exists(folder))) {
           await _fs.mkdir(folder)
@@ -114,7 +116,13 @@ export async function stash({
           'number that is in range of [0, num of stash pushed]'
         )
       }
-      return await opFunc({ fs: _fs, dir, gitdir, message, refIdx })
+      return await opFunc({
+        fs: _fs,
+        dir,
+        gitdir: updatedGitdir,
+        message,
+        refIdx,
+      })
     }
     throw new Error(`To be implemented: ${op}`)
   } catch (err) {
