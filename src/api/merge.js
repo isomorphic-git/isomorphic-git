@@ -5,6 +5,7 @@ import { _merge } from '../commands/merge.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
@@ -147,15 +148,20 @@ export async function merge({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
 
-    const author = await normalizeAuthorObject({ fs, gitdir, author: _author })
+    const author = await normalizeAuthorObject({
+      fs,
+      gitdir: updatedGitdir,
+      author: _author,
+    })
     if (!author && (!fastForwardOnly || !fastForward)) {
       throw new MissingNameError('author')
     }
 
     const committer = await normalizeCommitterObject({
       fs,
-      gitdir,
+      gitdir: updatedGitdir,
       author,
       committer: _committer,
     })
@@ -167,7 +173,7 @@ export async function merge({
       fs,
       cache,
       dir,
-      gitdir,
+      gitdir: updatedGitdir,
       ours,
       theirs,
       fastForward,

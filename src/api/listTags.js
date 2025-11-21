@@ -2,6 +2,7 @@
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -23,7 +24,9 @@ export async function listTags({ fs, dir, gitdir = join(dir, '.git') }) {
   try {
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
-    return GitRefManager.listTags({ fs: new FileSystem(fs), gitdir })
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
+    return GitRefManager.listTags({ fs: fsp, gitdir: updatedGitdir })
   } catch (err) {
     err.caller = 'git.listTags'
     throw err
