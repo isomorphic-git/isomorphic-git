@@ -776,8 +776,8 @@
         "test",
         "maintenance"
       ]
-   },
-   {
+    },
+    {
       "login": "LokiMidgard",
       "name": "Patrick Kranz",
       "avatar_url": "https://avatars.githubusercontent.com/u/389101?v=4",
@@ -956,6 +956,17 @@
       "profile": "https://github.com/fetsorn",
       "contributions": [
         "doc"
+      ]
+    },
+    {
+      "login": "xiaoboost",
+      "name": "xiaoboost",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7752883?v=4",
+      "profile": "http://www.dreamingcat.me/",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
       ]
     }
   ],
