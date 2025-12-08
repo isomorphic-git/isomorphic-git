@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -34,9 +35,11 @@ export async function writeBlob({ fs, dir, gitdir = join(dir, '.git'), blob }) {
     assertParameter('gitdir', gitdir)
     assertParameter('blob', blob)
 
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _writeObject({
-      fs: new FileSystem(fs),
-      gitdir,
+      fs: fsp,
+      gitdir: updatedGitdir,
       type: 'blob',
       object: blob,
       format: 'content',

@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _branch } from '../commands/branch.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 
 /**
@@ -38,9 +39,11 @@ export async function branch({
     assertParameter('fs', fs)
     assertParameter('gitdir', gitdir)
     assertParameter('ref', ref)
+    const fsp = new FileSystem(fs)
+    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
     return await _branch({
-      fs: new FileSystem(fs),
-      gitdir,
+      fs: fsp,
+      gitdir: updatedGitdir,
       ref,
       object,
       checkout,

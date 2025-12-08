@@ -5,6 +5,7 @@ import { _addNote } from '../commands/addNote.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
@@ -72,11 +73,12 @@ export async function addNote({
     })
     if (!committer) throw new MissingNameError('committer')
 
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     return await _addNote({
-      fs: new FileSystem(fs),
+      fs,
       cache,
       onSign,
-      gitdir,
+      gitdir: updatedGitdir,
       ref,
       oid,
       note,

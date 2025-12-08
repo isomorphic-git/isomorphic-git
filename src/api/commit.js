@@ -4,6 +4,7 @@ import '../typedefs.js'
 import { _commit } from '../commands/commit.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 /**
  * Create a new commit
@@ -74,12 +75,13 @@ export async function commit({
       assertParameter('onSign', onSign)
     }
     const fs = new FileSystem(_fs)
+    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
 
     return await _commit({
       fs,
       cache,
       onSign,
-      gitdir,
+      gitdir: updatedGitdir,
       message,
       author,
       committer,
