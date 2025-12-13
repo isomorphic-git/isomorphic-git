@@ -20,8 +20,8 @@ function isPromiseFs(fs) {
 
 // List of commands all filesystems are expected to provide. `rm` is not
 // included since it may not exist and must be handled as a special case
+// Likewise with `cp`.
 const commands = [
-  'cp',
   'readFile',
   'writeFile',
   'mkdir',
@@ -45,12 +45,14 @@ function bindFs(target, fs) {
     }
   }
 
-  // Handle the special case of `rm`
+  // Handle the special cases of `rm` and `cp`
   if (isPromiseFs(fs)) {
+    if (fs.cp) target._cp = fs.cp.bind(fs)
     if (fs.rm) target._rm = fs.rm.bind(fs)
     else if (fs.rmdir.length > 1) target._rm = fs.rmdir.bind(fs)
     else target._rm = rmRecursive.bind(null, target)
   } else {
+    if (fs.cp) target._cp = pify(fs.cp.bind(fs))
     if (fs.rm) target._rm = pify(fs.rm.bind(fs))
     else if (fs.rmdir.length > 2) target._rm = pify(fs.rmdir.bind(fs))
     else target._rm = rmRecursive.bind(null, target)
