@@ -248,6 +248,8 @@ npm install
 npm test
 ```
 
+The new relase happen automatically after every PR merge. We use [sematic release](https://github.com/semantic-release/semantic-release).
+
 Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions.
 
 ## Who is using isomorphic-git?
