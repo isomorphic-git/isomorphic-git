@@ -126,7 +126,7 @@
     "diff-lines": "1.1.1",
     "duplicate-package-checker-webpack-plugin": "3.0.0",
     "envify": "4.1.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^7.2.0",
     "eslint-config-prettier-standard": "^4.0.1",
     "eslint-config-standard": "^17.1.0",
