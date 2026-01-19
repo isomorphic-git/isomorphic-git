@@ -551,4 +551,62 @@ describe('walk', () => {
     }
     expect(matrix).toEqual(expectedMatrix)
   })
+
+  it('symlink content returns target path, not target file content', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
+
+    await fs._symlink('a.txt', `${dir}/link-to-a.txt`)
+
+    const result = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [WORKDIR()],
+      map: async (filepath, [workdir]) => {
+        if (filepath === 'link-to-a.txt' && workdir) {
+          return {
+            type: await workdir.type(),
+            mode: await workdir.mode(),
+            content: Buffer.from(await workdir.content()).toString('utf8'),
+          }
+        }
+      },
+    })
+
+    const entry = result.find(Boolean)
+    expect(entry).toBeDefined()
+    expect(entry.type).toBe('blob')
+    expect(entry.mode).toBe(0o120000)
+    expect(entry.content).toBe('a.txt')
+  })
+
+  it('symlink oid works for non-existent targets', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
+
+    await fs._symlink('non-existent-file.txt', `${dir}/broken-link.txt`)
+
+    const result = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [WORKDIR()],
+      map: async (filepath, [workdir]) => {
+        if (filepath === 'broken-link.txt' && workdir) {
+          return {
+            type: await workdir.type(),
+            mode: await workdir.mode(),
+            content: Buffer.from(await workdir.content()).toString('utf8'),
+            oid: await workdir.oid(),
+          }
+        }
+      },
+    })
+
+    const entry = result.find(Boolean)
+    expect(entry).toBeDefined()
+    expect(entry.type).toBe('blob')
+    expect(entry.mode).toBe(0o120000)
+    expect(entry.content).toBe('non-existent-file.txt')
+    expect(entry.oid).toBeDefined()
+  })
 })

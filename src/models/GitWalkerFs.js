@@ -101,9 +101,14 @@ export class GitWalkerFs {
       if ((await entry.type()) === 'tree') {
         entry._content = undefined
       } else {
-        const config = await this._getGitConfig(fs, gitdir)
-        const autocrlf = await config.get('core.autocrlf')
-        const content = await fs.read(`${dir}/${entry._fullpath}`, { autocrlf })
+        let content
+        if ((await entry.mode()) >> 12 === 0b1010) {
+          content = await fs.readlink(`${dir}/${entry._fullpath}`)
+        } else {
+          const config = await this._getGitConfig(fs, gitdir)
+          const autocrlf = await config.get('core.autocrlf')
+          content = await fs.read(`${dir}/${entry._fullpath}`, { autocrlf })
+        }
         // workaround for a BrowserFS edge case
         entry._actualSize = content.length
         if (entry._stat && entry._stat.size === -1) {
