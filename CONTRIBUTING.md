@@ -18,6 +18,7 @@ To add a parameter to an existing command `X`:
 - [ ] add a test case in `__tests__/test-X.js` if possible
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] squash merge the PR with commit message "feat(X): Added 'bar' parameter"
+- [ ] see Appendix A below, about submodules
 
 To create a new command:
 
@@ -29,6 +30,7 @@ To create a new command:
 - [ ] add page to the Docs Sidebar `website/sidebars.json`
 - [ ] if this is your first time contributing, run `npm run add-contributor` and follow the prompts to add yourself to the README
 - [ ] squash merge the PR with commit message "feat: Added 'X' command"
+- [ ] see Appendix A below, about submodules
 
 # Overview
 
@@ -103,3 +105,27 @@ There is also chapter in git Pro book
 * [Git Internals](https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain)
 
 You can also search [git in the blog of Julia Evans](https://duckduckgo.com/?q=site%3Ajvns.ca+git&ia=web).
+
+## Appendix A, submodules
+
+As of 2026, isomorphic-git supports commands run within submodules and so new contributions should take this into account. 
+
+The quick TLDR summary is this: look in `__tests__` and you'll see there are two test files for every command, a regular one and an -in-submodule.js version. Make sure to include both.
+
+The following discussion covers more details.
+
+1. Modifying or adding `__tests__` to existing apis
+
+Let's say the main file is `test-branch.js` and the corresponding submodule file is `test-branch-in-submodule.js`. After modifying or adding tests in `test-branch.js`, copy and paste identical code to `test-branch-in-submodule.js` since the new submodule tests will be mostly the same. Replace any instances of `makeFixture` with `makeFixtureAsSubmodule` in submodule tests. Prefer the plain variable `gitdir` in test files whenever possible, only swapping it to `gitdirsmfullpath` as a last resort if tests are failing and there is no other choice. `gitdirsmfullpath` is almost like "cheating" because it reveals to the testing code where the `gitdir` really is, but often that answer should be computed automatically, and not passed in.  
+
+2. Creating new `__tests__` for brand new apis
+
+Let's imagine "brancher" is a new API command. Place two new files in `__tests__` which are `test-brancher.js` and `test-brancher-in-submodule.js`. They should be mostly identical. For submodule tests, import and use `makeFixtureAsSubmodule` instead of `makeFixture`. See the notes above about the `gitdir` variable.
+
+3. Creating new `src/api/` commands
+
+In terms of submodule-related features, only modify `src/api/` files and not `src/commands/`. This is an architectural decision to keep logic at one layer of the stack, while other layers may remain unaffected. Review other files, the basic idea is to apply the `discoverGitdir` function, and never assume `gitdir` is right. Send the `gitdir` value through the `discoverGitdir` filter before passing it anywhere else. In a common situation, when submodules aren't used, the `discoverGitdir` filter will just send back the original value. If it turns out a submodule is used it will return the required information.  
+
+4. Modifying existing `src/api/` commands
+
+Depending on the situation, perhaps nothing must change. See the notes above regarding the `discoverGitdir` function.
