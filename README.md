@@ -248,7 +248,7 @@ npm install
 npm test
 ```
 
-The new release happen automatically after every PR merge. We use [semantic release](https://github.com/semantic-release/semantic-release).
+The new release happens automatically after every PR merge. We use [semantic release](https://github.com/semantic-release/semantic-release).
 
 Check out the [`CONTRIBUTING`](./CONTRIBUTING.md) document for more instructions.
 
