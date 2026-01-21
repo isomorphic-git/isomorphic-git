@@ -264,8 +264,8 @@ describe('walk', () => {
         {
           type: 'blob',
           mode: SYMLINKMODE,
-          content: '',
-          oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+          content: '1.txt',
+          oid: '7999426c516ffbbae9136d93dc44e89091d35a13',
           hasStat: true,
         },
         null,
@@ -496,8 +496,8 @@ describe('walk', () => {
         {
           type: 'blob',
           mode: SYMLINKMODE,
-          content: '',
-          oid: 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391',
+          content: '1.txt',
+          oid: '7999426c516ffbbae9136d93dc44e89091d35a13',
           hasStat: true,
         },
         null,
