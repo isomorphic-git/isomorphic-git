@@ -29,7 +29,10 @@ export async function useTempDir(fixture) {
   TEMP_DIRS_CREATED.add(tempDir)
 
   if (fixturePath) {
-    await _fs.promises.cp(fixturePath, tempDir, { recursive: true })
+    await _fs.promises.cp(fixturePath, tempDir, {
+      recursive: true,
+      verbatimSymlinks: true,
+    })
   }
 
   return tempDir

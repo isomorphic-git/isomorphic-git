@@ -968,6 +968,16 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "Andarist",
+      "name": "Mateusz Burzyński",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9800850?v=4",
+      "profile": "https://github.com/Andarist",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"

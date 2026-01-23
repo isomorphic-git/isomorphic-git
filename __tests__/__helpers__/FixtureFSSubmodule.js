@@ -46,11 +46,17 @@ export async function makeFixtureAsSubmodule(fixture) {
   // Move the submodule's gitdir into place
   await fssp._mkdir(join(gitdirsp, 'modules'))
   const gitdirsmfullpath = join(gitdirsp, 'modules', 'mysubmodule')
-  await fssp._cp(gitdirsm, gitdirsmfullpath, { recursive: true })
+  await fssp._cp(gitdirsm, gitdirsmfullpath, {
+    recursive: true,
+    verbatimSymlinks: true,
+  })
 
   // Move the submodule's main dir into place
   const officialSubmoduleDir = join(dirsp, 'mysubmodule')
-  await fssp._cp(dirsm, officialSubmoduleDir, { recursive: true })
+  await fssp._cp(dirsm, officialSubmoduleDir, {
+    recursive: true,
+    verbatimSymlinks: true,
+  })
 
   // Write a ".git" file into the submodule
   const submoduleGitFile = join(officialSubmoduleDir, '.git')
