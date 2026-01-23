@@ -593,6 +593,11 @@ describe('walk', () => {
     const { fs, dir, gitdirsmfullpath } =
       await makeFixtureAsSubmodule('test-walk')
 
+    // BrowserFS has a design quirk where HTTPRequestFS has a default mode of 555 for everything,
+    // meaning that files have the executable bit set by default!
+    const isBrowserFS = !!fs._original_unwrapped_fs.getRootFS
+    const SYMLINKMODE = isBrowserFS ? 0o100755 : 0o120000
+
     await fs._symlink('a.txt', `${dir}/link-to-a.txt`)
 
     const result = await walk({
@@ -614,13 +619,18 @@ describe('walk', () => {
     const entry = result.find(Boolean)
     expect(entry).toBeDefined()
     expect(entry.type).toBe('blob')
-    expect(entry.mode).toBe(0o120000)
+    expect(entry.mode).toBe(SYMLINKMODE)
     expect(entry.content).toBe('a.txt')
   })
 
   it('symlink oid works for non-existent targets', async () => {
     const { fs, dir, gitdirsmfullpath } =
       await makeFixtureAsSubmodule('test-walk')
+
+    // BrowserFS has a design quirk where HTTPRequestFS has a default mode of 555 for everything,
+    // meaning that files have the executable bit set by default!
+    const isBrowserFS = !!fs._original_unwrapped_fs.getRootFS
+    const SYMLINKMODE = isBrowserFS ? 0o100755 : 0o120000
 
     await fs._symlink('non-existent-file.txt', `${dir}/broken-link.txt`)
 
@@ -644,7 +654,7 @@ describe('walk', () => {
     const entry = result.find(Boolean)
     expect(entry).toBeDefined()
     expect(entry.type).toBe('blob')
-    expect(entry.mode).toBe(0o120000)
+    expect(entry.mode).toBe(SYMLINKMODE)
     expect(entry.content).toBe('non-existent-file.txt')
     expect(entry.oid).toBeDefined()
   })
