@@ -1,6 +1,15 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
-import { walk, WORKDIR, TREE, STAGE, setConfig } from 'isomorphic-git'
+import {
+  walk,
+  WORKDIR,
+  TREE,
+  STAGE,
+  setConfig,
+  add,
+  commit,
+  hashBlob,
+} from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -608,5 +617,57 @@ describe('walk', () => {
     expect(entry.mode).toBe(0o120000)
     expect(entry.content).toBe('non-existent-file.txt')
     expect(entry.oid).toBeDefined()
+  })
+
+  it('symlink content matches what git stores (target path, not dereferenced content)', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
+
+    // Create and commit a symlink so it exists in TREE
+    await fs._symlink('a.txt', `${dir}/link-to-a.txt`)
+    await add({ fs, dir, gitdir, filepath: 'link-to-a.txt' })
+    await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'add symlink',
+      author: { name: 'test', email: 'test@test.com' },
+    })
+
+    // Git stores symlinks as blobs containing the target PATH, not the target's content.
+    // This matches `git cat-file blob <symlink-oid>` behavior.
+    const result = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [WORKDIR(), TREE({ ref: 'HEAD' })],
+      map: async (filepath, [workdir, tree]) => {
+        if (filepath === 'link-to-a.txt' && workdir && tree) {
+          return {
+            filepath,
+            workdir: {
+              oid: await workdir.oid(),
+              content: Buffer.from(await workdir.content()).toString('utf8'),
+            },
+            tree: {
+              oid: await tree.oid(),
+              content: Buffer.from(await tree.content()).toString('utf8'),
+            },
+          }
+        }
+      },
+    })
+
+    const entry = result.find(Boolean)
+    expect(entry).toBeDefined()
+    expect(entry.workdir.oid).toBe(entry.tree.oid)
+    expect(entry.workdir.content).toBe(entry.tree.content)
+    expect(entry.tree.content).toBe('a.txt')
+
+    const computedOid = (
+      await hashBlob({
+        object: entry.workdir.content,
+      })
+    ).oid
+    expect(computedOid).toBe(entry.workdir.oid)
   })
 })
