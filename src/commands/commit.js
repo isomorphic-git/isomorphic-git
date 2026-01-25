@@ -61,7 +61,10 @@ export async function _commit({
 }) {
   // Determine ref and the commit pointed to by ref, and if it is the initial commit
   let initialCommit = false
+  let detachedHead = false
   if (!ref) {
+    const headContent = await fs.read(`${gitdir}/HEAD`, { encoding: 'utf8' })
+    detachedHead = !headContent.startsWith('ref:')
     ref = await GitRefManager.resolve({
       fs,
       gitdir,
@@ -167,11 +170,11 @@ export async function _commit({
         dryRun,
       })
       if (!noUpdateBranch && !dryRun) {
-        // Update branch pointer
+        // Update branch pointer (or HEAD directly if detached)
         await GitRefManager.writeRef({
           fs,
           gitdir,
-          ref,
+          ref: detachedHead ? 'HEAD' : ref,
           value: oid,
         })
       }
