@@ -487,4 +487,37 @@ describe('commit', () => {
     expect(error).not.toBeNull()
     expect(error instanceof Errors.NoCommitError).toBe(true)
   })
+
+  it('updates HEAD in detached HEAD state', async () => {
+    const { fs, gitdir } = await makeFixture('test-detachedHead')
+
+    // Verify we're in detached HEAD state
+    const headBefore = await fs.read(`${gitdir}/HEAD`, { encoding: 'utf8' })
+    expect(headBefore.trim()).toBe('d4ddffa3db6f52466e09076e70fbefa0641b4cea')
+
+    const originalOid = await resolveRef({ fs, gitdir, ref: 'HEAD' })
+
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+    const sha = await commit({
+      fs,
+      gitdir,
+      author,
+      message: 'Commit in detached HEAD',
+    })
+
+    // HEAD should be updated to the new commit
+    const newOid = await resolveRef({ fs, gitdir, ref: 'HEAD' })
+    expect(newOid).toBe(sha)
+    expect(newOid).not.toBe(originalOid)
+
+    // Verify via log that we have the right parent
+    const commits = await log({ fs, gitdir, depth: 1 })
+    expect(commits[0].oid).toBe(sha)
+    expect(commits[0].commit.parent).toEqual([originalOid])
+  })
 })
