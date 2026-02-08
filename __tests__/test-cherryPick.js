@@ -4,6 +4,7 @@ import { join } from 'path'
 
 import {
   Errors,
+  merge,
   cherryPick,
   init,
   commit as gitCommit,
@@ -184,7 +185,6 @@ describe('cherryPick', () => {
     // Merge a into b to create a merge commit on b
     await checkout({ fs, dir, gitdir, ref: 'b' })
     // Use merge API to create a merge commit
-    const merge = await import('isomorphic-git').then(m => m.merge)
     await merge({ fs, dir, gitdir, theirs: 'a' })
 
     // Find a merge commit (has 2 parents)
