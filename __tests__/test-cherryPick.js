@@ -15,9 +15,9 @@ import {
   log,
   setConfig,
 } from 'isomorphic-git'
+import { GitIndexManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
-import { GitIndexManager } from 'isomorphic-git/internal-apis'
 
 describe('cherryPick', () => {
   it('simple cherry-pick without conflicts', async () => {
