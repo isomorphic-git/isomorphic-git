@@ -10,6 +10,7 @@ import { addRemote } from './api/addRemote.js'
 import { annotatedTag } from './api/annotatedTag.js'
 import { branch } from './api/branch.js'
 import { checkout } from './api/checkout.js'
+import { cherryPick } from './api/cherryPick.js'
 import { clone } from './api/clone.js'
 import { commit } from './api/commit.js'
 import { currentBranch } from './api/currentBranch.js'
@@ -83,6 +84,7 @@ export {
   addRemote,
   annotatedTag,
   branch,
+  cherryPick,
   checkout,
   clone,
   commit,
@@ -157,6 +159,7 @@ export default {
   addRemote,
   annotatedTag,
   branch,
+  cherryPick,
   checkout,
   clone,
   commit,

@@ -978,6 +978,17 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "IAmSSH",
+      "name": "iamssh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34162350?v=4",
+      "profile": "https://github.com/IAmSSH",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
