@@ -15,6 +15,7 @@ import {
   resolveRef,
   log,
   setConfig,
+  status,
 } from 'isomorphic-git'
 import { GitIndexManager } from 'isomorphic-git/internal-apis'
 
@@ -78,6 +79,19 @@ describe('cherryPick', () => {
     // Verify new commit was created
     expect(newOid).toBeDefined()
     expect(newOid).not.toBe(featureOid)
+
+    // Verify workdir contains the cherry-picked change
+    const featureContent = (await fs.read(join(dir, 'feature.txt'))).toString()
+    expect(featureContent).toEqual('feature change\n')
+
+    // Verify index/workdir are clean for the cherry-picked file
+    const featureStatus = await status({
+      fs,
+      dir,
+      gitdir,
+      filepath: 'feature.txt',
+    })
+    expect(featureStatus).toBe('unmodified')
 
     // Verify it has single parent
     const { commit: newCommit } = await readCommit({ fs, gitdir, oid: newOid })

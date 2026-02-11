@@ -15,6 +15,7 @@ import {
   log,
   setConfig,
   merge as mergeApi,
+  status,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -143,6 +144,17 @@ describe('cherryPick in submodule', () => {
     // Verify
     expect(newOid).toBeDefined()
     expect(newOid).not.toBe(featureOid)
+    const featureContent = (
+      await fssp.read(join(officialSubmoduleDir, 'file.txt'))
+    ).toString()
+    expect(featureContent).toEqual('feature\n')
+    const featureStatus = await status({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      filepath: 'file.txt',
+    })
+    expect(featureStatus).toBe('unmodified')
     const { commit: newCommit } = await readCommit({
       fs: fssp,
       gitdir: submoduleGitFile,
