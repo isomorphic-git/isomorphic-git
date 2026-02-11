@@ -367,6 +367,15 @@ describe('cherryPick', () => {
   it('noUpdateBranch option', async () => {
     const { fs, dir, gitdir } = await makeFixture('tmp-cherry-5')
     await init({ fs, dir, gitdir })
+    // Ensure committer identity exists for cherry-pick
+    await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'Committer' })
+    await setConfig({
+      fs,
+      dir,
+      gitdir,
+      path: 'user.email',
+      value: 'committer@example.com',
+    })
     const author = {
       name: 'Author',
       email: 'author@example.com',
@@ -460,5 +469,85 @@ describe('cherryPick', () => {
       beforeTimestamp
     )
     expect(newCommit.committer.timestamp).toBeLessThanOrEqual(afterTimestamp)
+  })
+
+  it('throws MissingNameError when committer not set and user.name missing', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-cherry-6')
+
+    await init({ fs, dir, gitdir })
+
+    const author = {
+      name: 'Author',
+      email: 'author@example.com',
+      timestamp: 1600000000,
+      timezoneOffset: 0,
+    }
+
+    // Create base commit and a feature commit (provide explicit author so commits succeed without config)
+    await fs._writeFile(join(dir, 'file.txt'), 'base\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    await gitCommit({ fs, dir, gitdir, message: 'base', author })
+
+    await branch({ fs, dir, gitdir, ref: 'feature' })
+    await checkout({ fs, dir, gitdir, ref: 'feature' })
+    await fs._writeFile(join(dir, 'feature.txt'), 'feature change\n')
+    await add({ fs, dir, gitdir, filepath: 'feature.txt' })
+    const featureOid = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      message: 'feature',
+      author,
+    })
+
+    await checkout({ fs, dir, gitdir, ref: 'master' })
+    // Advance master so cherry-pick would create a new commit if it ran
+    await fs._writeFile(join(dir, 'master.txt'), 'master update\n')
+    await add({ fs, dir, gitdir, filepath: 'master.txt' })
+    await gitCommit({ fs, dir, gitdir, message: 'master update', author })
+
+    let error = null
+    try {
+      await cherryPick({ fs, dir, gitdir, oid: featureOid })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MissingNameError.code)
+  })
+
+  it('rejects cherry-picking a root commit', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-cherry-root')
+
+    await init({ fs, dir, gitdir })
+    await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'Tester' })
+    await setConfig({
+      fs,
+      dir,
+      gitdir,
+      path: 'user.email',
+      value: 'test@example.com',
+    })
+
+    await fs._writeFile(join(dir, 'file.txt'), 'root\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    const rootOid = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      message: 'root',
+    })
+
+    let error = null
+    try {
+      await cherryPick({ fs, dir, gitdir, oid: rootOid })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.CherryPickRootCommitError.code)
+    expect(error.data.oid).toBe(rootOid)
   })
 })

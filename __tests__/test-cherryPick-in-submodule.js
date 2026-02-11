@@ -45,6 +45,21 @@ describe('cherryPick in submodule', () => {
       dir: officialSubmoduleDir,
       gitdir: submoduleGitFile,
     })
+    // Ensure committer identity exists for this test
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.name',
+      value: 'Committer',
+    })
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.email',
+      value: 'committer@example.com',
+    })
     const author = {
       name: 'Test User',
       email: 'test@example.com',
@@ -156,6 +171,21 @@ describe('cherryPick in submodule', () => {
       fs: fssp,
       dir: officialSubmoduleDir,
       gitdir: submoduleGitFile,
+    })
+    // Ensure committer identity exists for this test
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.name',
+      value: 'Committer',
+    })
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.email',
+      value: 'committer@example.com',
     })
     const author = {
       name: 'Author',
@@ -533,6 +563,21 @@ describe('cherryPick in submodule', () => {
       gitdir: submoduleGitFile,
       ref: 'HEAD',
     })
+    // Ensure committer identity exists so cherryPick does not throw MissingNameError
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.name',
+      value: 'Committer',
+    })
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.email',
+      value: 'committer@example.com',
+    })
     const newOid = await cherryPick({
       fs: fssp,
       dir: officialSubmoduleDir,
@@ -664,5 +709,184 @@ describe('cherryPick in submodule', () => {
       beforeTimestamp
     )
     expect(newCommit.committer.timestamp).toBeLessThanOrEqual(afterTimestamp)
+  })
+
+  it('rejects cherry-picking a root commit (submodule)', async () => {
+    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
+    const { dir, gitdir } = await makeFixture('tmp-cherry-sub-root')
+    await fssp._mkdir(join(dirsp, '.git'))
+    await fssp._mkdir(join(dirsp, '.git', 'modules'))
+    const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule-root')
+    await fssp._cp(gitdir, gitdirsmfullpath, { recursive: true })
+    const officialSubmoduleDir = join(dirsp, 'mysubmodule-root')
+    await fssp._cp(dir, officialSubmoduleDir, { recursive: true })
+    const submoduleGitFile = join(officialSubmoduleDir, '.git')
+    await fssp._writeFile(
+      submoduleGitFile,
+      'gitdir: ../.git/modules/mysubmodule-root\n'
+    )
+
+    await init({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+    })
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.name',
+      value: 'Tester',
+    })
+    await setConfig({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      path: 'user.email',
+      value: 'test@example.com',
+    })
+
+    await fssp._writeFile(join(officialSubmoduleDir, 'file.txt'), 'root\n')
+    await add({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      filepath: 'file.txt',
+    })
+    const rootOid = await gitCommit({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      message: 'root',
+    })
+
+    let error = null
+    try {
+      await cherryPick({
+        fs: fssp,
+        dir: officialSubmoduleDir,
+        gitdir: submoduleGitFile,
+        oid: rootOid,
+      })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.CherryPickRootCommitError.code)
+    expect(error.data.oid).toBe(rootOid)
+  })
+
+  it('throws MissingNameError when committer not set and user.name missing (submodule)', async () => {
+    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
+    const { dir, gitdir } = await makeFixture('tmp-cherry-sub4')
+    await fssp._mkdir(join(dirsp, '.git'))
+    await fssp._mkdir(join(dirsp, '.git', 'modules'))
+    const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule5')
+    await fssp._cp(gitdir, gitdirsmfullpath, { recursive: true })
+    const officialSubmoduleDir = join(dirsp, 'mysubmodule5')
+    await fssp._cp(dir, officialSubmoduleDir, { recursive: true })
+    const submoduleGitFile = join(officialSubmoduleDir, '.git')
+    await fssp._writeFile(
+      submoduleGitFile,
+      'gitdir: ../.git/modules/mysubmodule5\n'
+    )
+
+    await init({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+    })
+
+    const author = {
+      name: 'Author',
+      email: 'author@example.com',
+      timestamp: 1600000000,
+      timezoneOffset: 0,
+    }
+
+    await fssp._writeFile(join(officialSubmoduleDir, 'file.txt'), 'base\n')
+    await add({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      filepath: 'file.txt',
+    })
+    await gitCommit({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      message: 'base',
+      author,
+    })
+
+    await branch({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      ref: 'feature',
+    })
+    await checkout({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      ref: 'feature',
+    })
+    await fssp._writeFile(
+      join(officialSubmoduleDir, 'feature.txt'),
+      'feature change\n'
+    )
+    await add({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      filepath: 'feature.txt',
+    })
+    const featureOid = await gitCommit({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      message: 'feature',
+      author,
+    })
+
+    await checkout({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      ref: 'master',
+    })
+    await fssp._writeFile(
+      join(officialSubmoduleDir, 'master.txt'),
+      'master update\n'
+    )
+    await add({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      filepath: 'master.txt',
+    })
+    await gitCommit({
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+      message: 'master update',
+      author,
+    })
+
+    let error = null
+    try {
+      await cherryPick({
+        fs: fssp,
+        dir: officialSubmoduleDir,
+        gitdir: submoduleGitFile,
+        oid: featureOid,
+      })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MissingNameError.code)
   })
 })

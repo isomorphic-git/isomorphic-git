@@ -4,8 +4,8 @@ import '../typedefs.js'
 import { _commit } from '../commands/commit.js'
 import { _readCommit } from '../commands/readCommit.js'
 import { CherryPickMergeCommitError } from '../errors/CherryPickMergeCommitError.js'
+import { CherryPickRootCommitError } from '../errors/CherryPickRootCommitError.js'
 import { MergeConflictError } from '../errors/MergeConflictError.js'
-import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { mergeTree } from '../utils/mergeTree.js'
@@ -21,11 +21,11 @@ import { applyTreeChanges } from '../utils/walkerToTreeEntryMap.js'
  * @param {boolean} args.dryRun
  * @param {boolean} args.noUpdateBranch
  * @param {boolean} args.abortOnConflict
- * @param {Object} args.committer
- * @param {string} args.committer.name
- * @param {string} args.committer.email
- * @param {number} args.committer.timestamp
- * @param {number} args.committer.timezoneOffset
+ * @param {Object} [args.committer]
+ * @param {string} [args.committer.name]
+ * @param {string} [args.committer.email]
+ * @param {number} [args.committer.timestamp]
+ * @param {number} [args.committer.timezoneOffset]
  * @param {MergeDriverCallback} [args.mergeDriver]
  *
  * @returns {Promise<string>} - The OID of the newly created commit
@@ -57,9 +57,7 @@ export async function _cherryPick({
 
   // Validate it's not an initial commit (0 parents)
   if (cherryCommit.parent.length === 0) {
-    throw new NotFoundError(
-      `parent commit for ${cherryOid}. Cannot cherry-pick initial commit`
-    )
+    throw new CherryPickRootCommitError(cherryOid)
   }
 
   // Get current HEAD

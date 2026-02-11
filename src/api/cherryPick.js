@@ -2,6 +2,8 @@
 import '../typedefs.js'
 
 import { _cherryPick } from '../commands/cherryPick.js'
+import { _readCommit } from '../commands/readCommit.js'
+import { MissingNameError } from '../errors/MissingNameError.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
@@ -58,12 +60,41 @@ export async function cherryPick({
     const fs = new FileSystem(_fs)
     const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
 
-    // Normalize committer object
+    // Read the commit to be cherry-picked
+    const { commit: cherryCommit } = await _readCommit({
+      fs,
+      cache,
+      gitdir: updatedGitdir,
+      oid,
+    })
+
+    // If the target is a merge commit, let the command layer handle rejecting it
+    // (so tests expecting a CherryPickMergeCommitError still work). Only enforce
+    // a committer when we are actually going to create a commit.
+    if (cherryCommit.parent && cherryCommit.parent.length > 1) {
+      return await _cherryPick({
+        fs,
+        cache,
+        dir,
+        gitdir: updatedGitdir,
+        oid,
+        dryRun,
+        noUpdateBranch,
+        abortOnConflict,
+        committer: undefined,
+        mergeDriver,
+      })
+    }
+
+    // Use provided committer, not the original commit's committer
     const normalizedCommitter = await normalizeCommitterObject({
       fs,
       gitdir: updatedGitdir,
       committer,
     })
+    if (!normalizedCommitter) {
+      throw new MissingNameError('committer')
+    }
 
     return await _cherryPick({
       fs,
