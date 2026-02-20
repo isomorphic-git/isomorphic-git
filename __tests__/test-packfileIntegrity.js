@@ -41,6 +41,9 @@ describe('packfile integrity', () => {
     const packDir = gitdir + '/objects/pack'
     const files = await fs.readdir(packDir)
     const packFile = files.find(f => f.endsWith('.pack'))
+    if (!packFile) {
+      throw new Error('No packfile found in ' + packDir)
+    }
     const packPath = packDir + '/' + packFile
 
     const data = await fs.read(packPath)
@@ -79,6 +82,9 @@ describe('packfile integrity', () => {
     const packDir = gitdir + '/objects/pack'
     const files = await fs.readdir(packDir)
     const packFile = files.find(f => f.endsWith('.pack'))
+    if (!packFile) {
+      throw new Error('No packfile found in ' + packDir)
+    }
     const packPath = packDir + '/' + packFile
 
     const data = await fs.read(packPath)
