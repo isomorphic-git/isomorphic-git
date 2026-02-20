@@ -989,6 +989,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "N0zoM1z0",
+      "name": "N0zoM1z0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/161784452?v=4",
+      "profile": "https://github.com/N0zoM1z0",
+      "contributions": [
+        "security"
+      ]
     }
   ],
   "commitConvention": "angular"

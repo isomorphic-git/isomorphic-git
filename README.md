@@ -413,6 +413,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/Andarist"><img src="https://avatars.githubusercontent.com/u/9800850?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Mateusz Burzyński</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=Andarist" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=Andarist" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/IAmSSH"><img src="https://avatars.githubusercontent.com/u/34162350?v=4?s=60" width="60px;" alt=""/><br /><sub><b>iamssh</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=IAmSSH" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=IAmSSH" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=IAmSSH" title="Tests">⚠️</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/N0zoM1z0"><img src="https://avatars.githubusercontent.com/u/161784452?v=4?s=60" width="60px;" alt=""/><br /><sub><b>N0zoM1z0</b></sub></a><br /><a href="#security-N0zoM1z0" title="Security">🛡️</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
