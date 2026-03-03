@@ -77,7 +77,10 @@ git.clone({ fs, http, dir, url: 'https://github.com/isomorphic-git/lightning-fs'
 ```
 
 If you're using `isomorphic-git` in the browser, you'll need something that emulates the `fs` API.
-The easiest to setup and most performant library is [LightningFS](https://github.com/isomorphic-git/lightning-fs) which is written and maintained by the same author and is part of the `isomorphic-git` suite.
+The easiest to setup and most performant library is [LightningFS](https://github.com/isomorphic-git/lightning-fs) which is written and maintained by the same author and is part of the `isomorphic-git` suite. 
+
+⚠️ LightningFS may apply file operations out of order, which can lead to repository corruption if the process crashes. You can mitigate this by calling `fs.flush()` after Git operations.
+
 If LightningFS doesn't meet your requirements, isomorphic-git should also work with [ZenFS](https://github.com/zen-fs/core) and [Filer](https://github.com/filerjs/filer).
 Instead of `isomorphic-git/http/node` this time import `isomorphic-git/http/web`:
 
