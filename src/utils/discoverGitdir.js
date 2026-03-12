@@ -1,7 +1,7 @@
 /**
  * discoverGitdir
  *
- * When processing git commands on a submodule determine
+ * When processing git commands on a submodule or worktree, determine
  * the actual git directory based on the contents of the .git file.
  *
  * Otherwise (if sent a directory) return that directory as-is.
@@ -24,6 +24,11 @@ import { assertParameter } from './assertParameter.js'
 import { dirname } from './dirname.js'
 import { join } from './join.js'
 
+// Check if a path is absolute (Unix / or Windows drive letter like C:\ or C:/)
+function isAbsolute(filepath) {
+  return filepath.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(filepath)
+}
+
 export async function discoverGitdir({ fsp, dotgit }) {
   assertParameter('fsp', fsp)
   assertParameter('dotgit', dotgit)
@@ -38,6 +43,10 @@ export async function discoverGitdir({ fsp, dotgit }) {
       ._readFile(dotgit, 'utf8')
       .then(contents => contents.trimRight().substr(8))
       .then(submoduleGitdir => {
+        // Worktrees use absolute gitdir paths; submodules use relative ones.
+        if (isAbsolute(submoduleGitdir)) {
+          return submoduleGitdir
+        }
         const gitdir = join(dirname(dotgit), submoduleGitdir)
         return gitdir
       })
