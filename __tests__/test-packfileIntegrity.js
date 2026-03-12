@@ -140,4 +140,41 @@ describe('packfile integrity', () => {
     expect(obj2).not.toBeNull()
     expect(obj2.format).toBe(obj1.format)
   })
+
+  it('should throw descriptive error when packfile cannot be read', async () => {
+    // Setup - use a repo with packfile
+    const { fs, dir } = await makeFixture('test-readObject.git')
+    const cache = {}
+    const gitdir = dir
+
+    // Use a known OID from the packfile
+    const oid = '0001c3e2753b03648b6c43dd74ba7fe2f21123d6'
+
+    // Delete the .pack file but keep the .idx file
+    // This causes fs.read() to return null (file not found)
+    const packDir = gitdir + '/objects/pack'
+    const files = await fs.readdir(packDir)
+    const packFile = files.find(f => f.endsWith('.pack'))
+    if (!packFile) {
+      throw new Error('No packfile found in ' + packDir)
+    }
+    await fs.rm(packDir + '/' + packFile)
+
+    // Test - should throw InternalError with descriptive message
+    let error = null
+    try {
+      await readObjectPacked({
+        fs,
+        cache,
+        gitdir,
+        oid,
+      })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error instanceof Errors.InternalError).toBe(true)
+    expect(error.data.message).toContain('Could not read packfile')
+  })
 })

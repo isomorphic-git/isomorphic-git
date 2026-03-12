@@ -26,12 +26,18 @@ export async function readObjectPacked({
     if (p.error) throw new InternalError(p.error)
     // If the packfile DOES have the oid we're looking for...
     if (p.offsets.has(oid)) {
-      // Get the resolved git object from the packfile
+      // Derive the .pack path from the .idx path
+      const packFile = indexFile.replace(/idx$/, 'pack')
       if (!p.pack) {
-        const packFile = indexFile.replace(/idx$/, 'pack')
         p.pack = fs.read(packFile)
       }
       const pack = await p.pack
+      if (!pack) {
+        p.pack = null
+        throw new InternalError(
+          `Could not read packfile at ${packFile}. The file may be missing, corrupted, or too large to read into memory.`
+        )
+      }
 
       // === Packfile Integrity Verification ===
       // Performance optimization: use _checksumVerified flag to verify only once per packfile
