@@ -54,7 +54,7 @@ jobs:
           npx nps \
             test.typecheck \
             test.setup \
-            test.jest
+            test.node
 
       - name: Save test results
         if: ${{ !cancelled() }}
