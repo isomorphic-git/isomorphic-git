@@ -74,3 +74,9 @@ jobs:
         env:
           GITHUB_TOKEN: $(GITHUB_TOKEN)
           NPM_TOKEN: $(Npm.Token)
+
+      - script: |
+          python -m pip install --upgrade pip
+          pip install codespell
+          codespell .
+        displayName: 'Install and run codespell'
