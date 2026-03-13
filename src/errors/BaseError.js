@@ -1,9 +1,11 @@
 export class BaseError extends Error {
   constructor(message) {
     super(message)
-    // Setting this here allows TS to infer that all git errors have a `caller` property and
-    // that its type is string.
+    // Setting these here allows TS to infer that all git errors have
+    // `caller`, `code`, and `data` properties and their types.
     this.caller = ''
+    this.code = ''
+    this.data = {}
   }
 
   toJSON() {
