@@ -14,6 +14,23 @@ const external = [
   ...Object.keys(pkg.dependencies),
 ]
 
+const nodeAliases = {
+  [path.resolve(__dirname, 'src/utils/shasumRange.js')]: path.resolve(
+    __dirname,
+    'src/utils/shasumRange.node.js'
+  ),
+}
+
+const alias = aliases => ({
+  name: 'alias',
+  resolveId(source, importer) {
+    if (aliases[source]) return aliases[source]
+    if (!importer || !source.startsWith('.')) return null
+    const resolved = path.resolve(path.dirname(importer), source)
+    return aliases[resolved] || null
+  },
+})
+
 // Modern modules
 const ecmaConfig = (input, output) => ({
   input: `src/${input}`,
@@ -30,6 +47,7 @@ const ecmaConfig = (input, output) => ({
 const nodeConfig = (input, output) => ({
   input: `src/${input}`,
   external: [...external],
+  plugins: [alias(nodeAliases)],
   output: [
     {
       format: 'cjs',
