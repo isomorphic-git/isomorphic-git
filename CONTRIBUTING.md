@@ -98,7 +98,7 @@ And here are some other advanced videos:<br/>
 * Git Internals by John Britton of GitHub - CS50 Tech Talk<br/>
   [![Git Internals by John Britton of GitHub - CS50 Tech Talk](https://img.youtube.com/vi/lG90LZotrpo/0.jpg)](https://www.youtube.com/watch?v=lG90LZotrpo)
 
-* Anatomy of ".git/" folder - How Git Really Works Under the Hood by Piotr KowalskiPiotr Kowalski<br/>
+* Anatomy of ".git/" folder - How Git Really Works Under the Hood by Piotr Kowalski<br/>
 [![ Anatomy of ".git/" folder - How Git Really Works Under the Hood](https://img.youtube.com/vi/rzwyDeRlLdE/0.jpg)](https://www.youtube.com/watch?v=rzwyDeRlLdE)
 
 Another resource is GitHub blog:
