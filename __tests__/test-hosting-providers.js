@@ -149,8 +149,10 @@ describe('Hosting Providers', () => {
     // with "public_repo" access. The only repo it has write access to is
     // https://github.com/isomorphic-git/test.empty
     // It is stored reversed to avoid Github's auto-revoking feature.
-    const password = reverse('e8df25b340c98b7eec57a4976bd9074b93a7dc1c')
-    const username = 'isomorphic-git-test-push'
+    // Can be overridden via TEST_PUSH_GITHUB_TOKEN env var (token must have write access to the test repo).
+    const password = process.env.TEST_PUSH_GITHUB_TOKEN
+    const username =
+      process.env.TEST_PUSH_GITHUB_USERNAME || 'isomorphic-git-test-push'
     it('fetch', async () => {
       // Setup
       const { fs, gitdir } = await makeFixture('test-hosting-providers')
