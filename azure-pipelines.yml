@@ -2,6 +2,9 @@
 # Build a general Node.js application with npm.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/vsts/pipelines/languages/javascript
+variables:
+  - group: TEST_PUSH_GITHUB_TOKEN
+
 jobs:
   - job: Linux
 
@@ -29,7 +32,7 @@ jobs:
           BROWSER_STACK_USERNAME: $(BROWSER_STACK_USERNAME)
           BUNDLEWATCH_GITHUB_TOKEN: $(BUNDLEWATCH_GITHUB_TOKEN)
           TEST_PUSH_GITHUB_TOKEN: $(TEST_PUSH_GITHUB_TOKEN)
-          TEST_PUSH_GITHUB_USERNAME: $(TEST_PUSH_GITHUB_USERNAME)
+          GITHUB_TEST_USERNAME: $(GITHUB_TEST_USERNAME)
           SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
           SAUCE_USERNAME: $(SAUCE_USERNAME)
           TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome'

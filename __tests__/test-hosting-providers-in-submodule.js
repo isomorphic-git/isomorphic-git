@@ -164,7 +164,7 @@ describe('Hosting Providers', () => {
     // Can be overridden via TEST_PUSH_GITHUB_TOKEN env var (token must have write access to the test repo).
     const password = process.env.TEST_PUSH_GITHUB_TOKEN
     const username =
-      process.env.TEST_PUSH_GITHUB_USERNAME || 'isomorphic-git-test-push'
+      process.env.GITHUB_TEST_USERNAME || 'isomorphic-git-test-push'
     it('fetch', async () => {
       // Setup
       const { fs, gitdir } = await makeFixtureAsSubmodule(
