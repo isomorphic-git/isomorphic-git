@@ -3,6 +3,10 @@ name: Build
 on:
   pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/**
 
 # Cancel in-progress runs for the current workflow
 concurrency:
@@ -12,9 +16,16 @@ concurrency:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -38,29 +49,20 @@ jobs:
       - name: Run build
         run: |
           # Run the subset of the `build` necessary to run the tests.
-          npx nps \
-            build.rollup \
-            build.typings \
-            build.webpack \
-            build.indexjson \
-            build.treeshake \
-            build.size
+          npx nps build.rollup build.typings build.webpack build.indexjson build.treeshake build.size
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
 
       - name: Run tests (CLI)
         run: |
           # `test.typecheck` must be run after `build.rollup` and `build.typings`
-          npx nps \
-            test.typecheck \
-            test.setup \
-            test.node
+          npx nps test.typecheck test.setup test.node
 
       - name: Save test results
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-jest
+          name: test-results-jest-${{ matrix.os }}
           path: junit/*.xml
 
       # Problem: GitHub does not support Code Coverage reports like Azure Pipelines.
@@ -70,16 +72,14 @@ jobs:
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-results
+          name: code-coverage-results-${{ matrix.os }}
           path: coverage/
 
       - name: Build artifacts
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         run: |
           # Run the subset of the `test` necessary to test from the CLI.
-          npx nps \
-            build.docs \
-            build.pack
+          npx nps build.docs build.pack
 
           # Warn when there are uncommitted changes to documentation
           if ! git diff --quiet --exit-code; then
@@ -90,14 +90,14 @@ jobs:
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         uses: actions/upload-artifact@v4
         with:
-          name: npm-tarball.tgz
+          name: npm-tarball.tgz-${{ matrix.os }}
           path: isomorphic-git-0.0.0-development.tgz
 
       - name: Save index.umd.min.js
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
         uses: actions/upload-artifact@v4
         with:
-          name: index.umd.min.js
+          name: index.umd.min.js-${{ matrix.os }}
           path: index.umd.min.js
 
   test-in-browser:
