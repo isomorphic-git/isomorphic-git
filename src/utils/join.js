@@ -4,6 +4,30 @@
  * Copyright (c) James Prevett and other ZenFS contributors.
  */
 
+// Detect whether we are running in a real Node.js environment (server-side),
+// as opposed to a browser or a browser bundler that polyfills `process`.
+// References: isomorphic-git uses this same pattern elsewhere (e.g. src/utils/pkg-info.js).
+const isServer =
+  typeof process !== 'undefined' && process.versions?.node != null
+
+// Load Node's native path.join when running in Node.js (CJS bundle).
+//
+// In the CJS Rollup output, `require` is always in scope. We guard with
+// `typeof require === 'function'` so that:
+//   - Rollup's static analyser sees a plain require('path') call and can mark
+//     'path' as an external CJS built-in (no bundling, no warning).
+//   - Browser bundles never reach this branch at runtime (isServer is false).
+//   - agadoo / tree-shake checks pass because there is no dynamic code eval.
+//
+// We intentionally use 'path' (not 'node:path') for maximum compatibility
+// with older Rollup versions and bundler configurations.
+let nativeJoin
+// eslint-disable-next-line no-undef
+if (isServer && typeof require === 'function') {
+  // eslint-disable-next-line no-undef
+  nativeJoin = require('path').join
+}
+
 function normalizeString(path, aar) {
   let res = ''
   let lastSegmentLength = 0
@@ -83,6 +107,9 @@ function normalize(path) {
 }
 
 export function join(...args) {
+  if (isServer && nativeJoin) {
+    return nativeJoin(...args)
+  }
   if (args.length === 0) return '.'
   let joined
   for (let i = 0; i < args.length; ++i) {
