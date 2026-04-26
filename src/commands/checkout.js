@@ -731,7 +731,9 @@ async function batchAllSettled(operationName, tasks, onProgress, batchSize) {
           // eslint-disable-next-line no-console
           console.error(
             `[isomorphic-git ${operationName}] task rejected:`,
-            result.reason && result.reason.stack ? result.reason.stack : result.reason
+            result.reason && result.reason.stack
+              ? result.reason.stack
+              : result.reason
           )
         }
       })
