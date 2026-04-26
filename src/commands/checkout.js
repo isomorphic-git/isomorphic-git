@@ -718,12 +718,22 @@ async function updateWorkingDir(
 
 async function batchAllSettled(operationName, tasks, onProgress, batchSize) {
   const results = []
+  const rejections = []
   try {
     for (let i = 0; i < tasks.length; i += batchSize) {
       const batch = tasks.slice(i, i + batchSize).map(task => task())
       const batchResults = await Promise.allSettled(batch)
       batchResults.forEach(result => {
-        if (result.status === 'fulfilled') results.push(result.value)
+        if (result.status === 'fulfilled') {
+          results.push(result.value)
+        } else {
+          rejections.push(result.reason)
+          // eslint-disable-next-line no-console
+          console.error(
+            `[isomorphic-git ${operationName}] task rejected:`,
+            result.reason && result.reason.stack ? result.reason.stack : result.reason
+          )
+        }
       })
       if (onProgress) {
         await onProgress({
@@ -734,10 +744,20 @@ async function batchAllSettled(operationName, tasks, onProgress, batchSize) {
       }
     }
 
+    if (rejections.length > 0) {
+      const summary = rejections
+        .slice(0, 5)
+        .map(r => (r && r.message) || String(r))
+        .join('; ')
+      throw new Error(
+        `[isomorphic-git ${operationName}] ${rejections.length}/${tasks.length} tasks failed. First errors: ${summary}`
+      )
+    }
+
     return results
   } catch (error) {
-    console.error(`Error during ${operationName}: ${error}`)
+    // eslint-disable-next-line no-console
+    console.error(`[isomorphic-git ${operationName}] FATAL:`, error)
+    throw error
   }
-
-  return results
 }
