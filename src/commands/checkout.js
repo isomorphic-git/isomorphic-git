@@ -8,6 +8,7 @@ import { _walk } from '../commands/walk.js'
 import { CheckoutConflictError } from '../errors/CheckoutConflictError.js'
 import { CommitNotFetchedError } from '../errors/CommitNotFetchedError.js'
 import { InternalError } from '../errors/InternalError.js'
+import { MultipleGitError } from '../errors/MultipleGitError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
@@ -279,7 +280,7 @@ export async function _checkout({
       await GitIndexManager.acquire(
         { fs, gitdir, cache, allowUnmerged: true },
         async function (index) {
-          await Promise.all(
+          const settled = await Promise.allSettled(
             ops
               .filter(
                 ([method]) =>
@@ -290,66 +291,76 @@ export async function _checkout({
               )
               .map(async function ([method, fullpath, oid, mode, chmod]) {
                 const filepath = `${dir}/${fullpath}`
-                try {
-                  if (method !== 'create-index' && method !== 'mkdir-index') {
-                    const { object } = await readObject({
-                      fs,
-                      cache,
-                      gitdir,
-                      oid,
-                    })
-                    if (chmod) {
-                      // Note: the mode option of fs.write only works when creating files,
-                      // not updating them. Since the `fs` plugin doesn't expose `chmod` this
-                      // is our only option.
-                      await fs.rm(filepath)
-                    }
-                    if (mode === 0o100644) {
-                      // regular file
-                      await fs.write(filepath, object)
-                    } else if (mode === 0o100755) {
-                      // executable file
-                      await fs.write(filepath, object, { mode: 0o777 })
-                    } else if (mode === 0o120000) {
-                      // symlink
-                      await fs.writelink(filepath, object)
-                    } else {
-                      throw new InternalError(
-                        `Invalid mode 0o${mode.toString(
-                          8
-                        )} detected in blob ${oid}`
-                      )
-                    }
-                  }
-
-                  const stats = await fs.lstat(filepath)
-                  // We can't trust the executable bit returned by lstat on Windows,
-                  // so we need to preserve this value from the TREE.
-                  // TODO: Figure out how git handles this internally.
-                  if (mode === 0o100755) {
-                    stats.mode = 0o755
-                  }
-                  // Submodules are present in the git index but use a unique mode different from trees
-                  if (method === 'mkdir-index') {
-                    stats.mode = 0o160000
-                  }
-                  index.insert({
-                    filepath: fullpath,
-                    stats,
+                if (method !== 'create-index' && method !== 'mkdir-index') {
+                  const { object } = await readObject({
+                    fs,
+                    cache,
+                    gitdir,
                     oid,
                   })
-                  if (onProgress) {
-                    await onProgress({
-                      phase: 'Updating workdir',
-                      loaded: ++count,
-                      total,
-                    })
+                  if (chmod) {
+                    // Note: the mode option of fs.write only works when creating files,
+                    // not updating them. Since the `fs` plugin doesn't expose `chmod` this
+                    // is our only option.
+                    await fs.rm(filepath)
                   }
-                } catch (e) {
-                  console.log(e)
+                  if (mode === 0o100644) {
+                    // regular file
+                    await fs.write(filepath, object)
+                  } else if (mode === 0o100755) {
+                    // executable file
+                    await fs.write(filepath, object, { mode: 0o777 })
+                  } else if (mode === 0o120000) {
+                    // symlink
+                    await fs.writelink(filepath, object)
+                  } else {
+                    throw new InternalError(
+                      `Invalid mode 0o${mode.toString(
+                        8
+                      )} detected in blob ${oid}`
+                    )
+                  }
+                }
+
+                const stats = await fs.lstat(filepath)
+                // We can't trust the executable bit returned by lstat on Windows,
+                // so we need to preserve this value from the TREE.
+                // TODO: Figure out how git handles this internally.
+                if (mode === 0o100755) {
+                  stats.mode = 0o755
+                }
+                // Submodules are present in the git index but use a unique mode different from trees
+                if (method === 'mkdir-index') {
+                  stats.mode = 0o160000
+                }
+                index.insert({
+                  filepath: fullpath,
+                  stats,
+                  oid,
+                })
+                if (onProgress) {
+                  await onProgress({
+                    phase: 'Updating workdir',
+                    loaded: ++count,
+                    total,
+                  })
                 }
               })
           )
+          const rejections = []
+          for (const result of settled) {
+            if (result.status === 'rejected') {
+              rejections.push(result.reason)
+              // eslint-disable-next-line no-console
+              console.error(
+                '[isomorphic-git checkout] task rejected:',
+                result.reason?.stack ?? result.reason
+              )
+            }
+          }
+          if (rejections.length > 0) {
+            throw new MultipleGitError(rejections)
+          }
         }
       )
     }
@@ -719,47 +730,32 @@ async function updateWorkingDir(
 async function batchAllSettled(operationName, tasks, onProgress, batchSize) {
   const results = []
   const rejections = []
-  try {
-    for (let i = 0; i < tasks.length; i += batchSize) {
-      const batch = tasks.slice(i, i + batchSize).map(task => task())
-      const batchResults = await Promise.allSettled(batch)
-      batchResults.forEach(result => {
-        if (result.status === 'fulfilled') {
-          results.push(result.value)
-        } else {
-          rejections.push(result.reason)
-          // eslint-disable-next-line no-console
-          console.error(
-            `[isomorphic-git ${operationName}] task rejected:`,
-            result.reason && result.reason.stack
-              ? result.reason.stack
-              : result.reason
-          )
-        }
-      })
-      if (onProgress) {
-        await onProgress({
-          phase: 'Updating workdir',
-          loaded: i + batch.length,
-          total: tasks.length,
-        })
+  for (let i = 0; i < tasks.length; i += batchSize) {
+    const batch = tasks.slice(i, i + batchSize).map(task => task())
+    const batchResults = await Promise.allSettled(batch)
+    batchResults.forEach(result => {
+      if (result.status === 'fulfilled') {
+        results.push(result.value)
+      } else {
+        rejections.push(result.reason)
+        // eslint-disable-next-line no-console
+        console.error(
+          `[isomorphic-git ${operationName}] task rejected:`,
+          result.reason?.stack ?? result.reason
+        )
       }
+    })
+    if (onProgress) {
+      await onProgress({
+        phase: 'Updating workdir',
+        loaded: i + batch.length,
+        total: tasks.length,
+      })
     }
-
-    if (rejections.length > 0) {
-      const summary = rejections
-        .slice(0, 5)
-        .map(r => (r && r.message) || String(r))
-        .join('; ')
-      throw new Error(
-        `[isomorphic-git ${operationName}] ${rejections.length}/${tasks.length} tasks failed. First errors: ${summary}`
-      )
-    }
-
-    return results
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(`[isomorphic-git ${operationName}] FATAL:`, error)
-    throw error
   }
+
+  if (rejections.length > 0) {
+    throw new MultipleGitError(rejections)
+  }
+  return results
 }
