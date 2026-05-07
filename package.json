@@ -107,8 +107,7 @@
     "pako": "^1.0.10",
     "pify": "^4.0.1",
     "readable-stream": "^4.0.0",
-    "sha.js": "^2.4.12",
-    "simple-get": "^4.0.1"
+    "sha.js": "^2.4.12"
   },
   "devDependencies": {
     "@isomorphic-git/cors-proxy": "^3.0.0",
