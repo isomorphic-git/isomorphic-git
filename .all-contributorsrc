@@ -998,6 +998,16 @@
       "contributions": [
         "security"
       ]
+    },
+    {
+      "login": "amxmln",
+      "name": "Amadeus Maximilian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15271679?v=4",
+      "profile": "https://github.com/amxmln",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
