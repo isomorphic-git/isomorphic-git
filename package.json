@@ -8,8 +8,14 @@
   "module": "./index.js",
   "exports": {
     ".": {
-      "types": "./index.d.cts",
-      "default": "./index.cjs"
+      "node": {
+        "types": "./index.d.cts",
+        "default": "./index.cjs"
+      },
+      "default": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      }
     },
     "./http/node": {
       "import": {
