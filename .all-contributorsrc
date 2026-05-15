@@ -937,6 +937,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "toxik",
+      "name": "Alexandru Georoceanu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/235319?v=4",
+      "profile": "http://toxik.us/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"

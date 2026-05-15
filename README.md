@@ -410,6 +410,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
   <tr>
     <td align="center"><a href="https://github.com/N0zoM1z0"><img src="https://avatars.githubusercontent.com/u/161784452?v=4?s=60" width="60px;" alt=""/><br /><sub><b>N0zoM1z0</b></sub></a><br /><a href="#security-N0zoM1z0" title="Security">🛡️</a></td>
     <td align="center"><a href="https://github.com/amxmln"><img src="https://avatars.githubusercontent.com/u/15271679?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Amadeus Maximilian</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=amxmln" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/issues?q=author%3Aamxmln" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="http://toxik.us/"><img src="https://avatars.githubusercontent.com/u/235319?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Alexandru Georoceanu</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=toxik" title="Code">💻</a></td>
   </tr>
 </table>
 
