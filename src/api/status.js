@@ -41,6 +41,11 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.filepath - The path to the file to query
  * @param {object} [args.cache] - a [cache](cache.md) object
+ * @param {boolean} [args.refresh = true] - when false, do not refresh the
+ *   `.git/index` stat cache when the working-tree file's contents still match
+ *   the staged blob. The call becomes read-only with respect to the index, at
+ *   the cost of recomputing the SHA1 on subsequent calls for files whose
+ *   stat info has drifted.
  *
  * @returns {Promise<'ignored'|'unmodified'|'*modified'|'*deleted'|'*added'|'absent'|'modified'|'deleted'|'added'|'*unmodified'|'*absent'|'*undeleted'|'*undeletemodified'>} Resolves successfully with the file's git status
  *
@@ -55,6 +60,7 @@ export async function status({
   gitdir = join(dir, '.git'),
   filepath,
   cache = {},
+  refresh = true,
 }) {
   try {
     assertParameter('fs', _fs)
@@ -106,7 +112,7 @@ export async function status({
           object,
         })
         // If the oid in the index === working dir oid but stats differed update cache
-        if (I && indexEntry.oid === workdirOid) {
+        if (refresh && I && indexEntry.oid === workdirOid) {
           // and as long as our fs.stats aren't bad.
           // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
           // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat

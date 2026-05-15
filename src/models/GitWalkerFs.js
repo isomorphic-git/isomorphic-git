@@ -8,11 +8,12 @@ import { shasum } from '../utils/shasum.js'
 import { GitObject } from './GitObject.js'
 
 export class GitWalkerFs {
-  constructor({ fs, dir, gitdir, cache }) {
+  constructor({ fs, dir, gitdir, cache, refresh = true }) {
     this.fs = fs
     this.cache = cache
     this.dir = dir
     this.gitdir = gitdir
+    this.refresh = refresh
 
     this.config = null
     const walker = this
@@ -148,7 +149,9 @@ export class GitWalkerFs {
               // Update the stats in the index so we will get a "cache hit" next time
               // 1) if we can (because the oid and mode are the same)
               // 2) and only if we need to (because other stats differ)
+              // 3) and only if the caller opted in to refreshing the index
               if (
+                self.refresh &&
                 stage &&
                 oid === stage.oid &&
                 (!filemode || stats.mode === stage.mode) &&
