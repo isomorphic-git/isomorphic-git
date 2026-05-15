@@ -1,5 +1,11 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/isomorphic-git/isomorphic-git/main/website/static/img/isomorphic-git-logo.svg?sanitize=true" alt="" height="150"/>
+  <a href="https://isomorphic-git.org/" target="_blank" rel="noopener">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/isomorphic-git-dark.svg?raw=true" />
+      <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/isomorphic-git-light.svg?raw=true" />
+      <img alt="Isomorphic Git logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/isomorphic-git-light.svg?raw=true" height="150" />
+    </picture>
+  </a>
 </p>
 
 # isomorphic-git
@@ -280,7 +286,23 @@ Cross-browser device testing is provided by:
 
 [![BrowserStack](https://user-images.githubusercontent.com/587740/39730261-9c65c4d8-522e-11e8-9f12-16b349377a35.png)](http://browserstack.com/)
 
-[![SauceLabs](https://saucelabs.com/content/images/logo.png)](https://saucelabs.com)
+<a href="https://saucelabs.com" target="_blank" rel="noopener">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://saucelabs.com/images/logo-white.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://saucelabs.com/images/logo.svg" />
+    <img alt="Sauce Labs logo" src="https://saucelabs.com/images/logo.svg" height="40" />
+  </picture>
+</a>
+
+Code Review AI provided by:
+
+<a href="https://coderabbit.ai" target="_blank" rel="noopener">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/coderabbit-dark.svg?raw=true" />
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/coderabbit-light.svg?raw=true" />
+    <img alt="CodeRabbit logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/coderabbit-light.svg?raw=true" height="40" />
+  </picture>
+</a>
 
 ## Contributors
 
