@@ -1,9 +1,9 @@
 <p align="center">
   <a href="https://isomorphic-git.org/" target="_blank" rel="noopener">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/master/.github/images/isomorphic-git-dark.svg?raw=true" />
-      <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/master/.github/images/isomorphic-git-light.svg?raw=true" />
-      <img alt="Isomorphic Git logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/master/.github/images/isomorphic-git-light.svg?raw=true" height="150" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/isomorphic-git-dark.svg?raw=true" />
+      <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/isomorphic-git-light.svg?raw=true" />
+      <img alt="Isomorphic Git logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/isomorphic-git-light.svg?raw=true" height="150" />
     </picture>
   </a>
 </p>
@@ -298,9 +298,9 @@ Code Review AI provided by:
 
 <a href="https://coderabbit.ai" target="_blank" rel="noopener">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/master/.github/images/coderabbit-dark.svg?raw=true" />
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/master/.github/images/coderabbit-light.svg?raw=true" />
-    <img alt="CodeRabbit logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/master/.github/images/coderabbit-light.svg?raw=true" height="40" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/coderabbit-dark.svg?raw=true" />
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/coderabbit-light.svg?raw=true" />
+    <img alt="CodeRabbit logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/coderabbit-light.svg?raw=true" height="40" />
   </picture>
 </a>
 
