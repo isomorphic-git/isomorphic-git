@@ -58,6 +58,7 @@
       }
     }
   },
+  "jsdelivr": "./index.umd.min.js",
   "unpkg": "./index.umd.min.js",
   "bin": {
     "isogit": "./cli.cjs"
