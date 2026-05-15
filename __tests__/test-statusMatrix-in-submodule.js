@@ -404,4 +404,27 @@ describe('statusMatrix', () => {
       ['b/b.txt', 0, 2, 2],
     ])
   })
+
+  it('does not modify .git/index when refresh is false', async () => {
+    // Setup
+    const { fs, dir, gitdir } =
+      await makeFixtureAsSubmodule('test-statusMatrix')
+    // Take an unmodified tracked file and bump its workdir mtime without
+    // changing contents, so the racy stat-cache refresh would normally fire.
+    const original = await fs.read(path.join(dir, 'a.txt'))
+    await fs.write(path.join(dir, 'a.txt'), original)
+    // Snapshot the index file
+    const indexBefore = await fs.read(path.join(gitdir, 'index'))
+    // Read-only statusMatrix call
+    const matrix = await statusMatrix({
+      fs,
+      dir,
+      gitdir,
+      filepaths: ['a.txt'],
+      refresh: false,
+    })
+    expect(matrix).toEqual([['a.txt', 1, 1, 1]])
+    const indexAfter = await fs.read(path.join(gitdir, 'index'))
+    expect(indexAfter).toEqual(indexBefore)
+  })
 })

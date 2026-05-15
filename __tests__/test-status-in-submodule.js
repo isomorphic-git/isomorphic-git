@@ -78,4 +78,26 @@ describe('status', () => {
     const b = await status({ fs, dir, gitdir, filepath: 'b.txt' })
     expect(b).toEqual('added')
   })
+
+  it('does not modify .git/index when refresh is false', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-status')
+    // Take an unmodified tracked file and bump its workdir mtime without
+    // changing contents, so the racy stat-cache refresh would normally fire.
+    const original = await fs.read(path.join(dir, 'a.txt'))
+    await fs.write(path.join(dir, 'a.txt'), original)
+    // Snapshot the index file
+    const indexBefore = await fs.read(path.join(gitdir, 'index'))
+    // Read-only status call
+    const a = await status({
+      fs,
+      dir,
+      gitdir,
+      filepath: 'a.txt',
+      refresh: false,
+    })
+    expect(a).toEqual('unmodified')
+    const indexAfter = await fs.read(path.join(gitdir, 'index'))
+    expect(indexAfter).toEqual(indexBefore)
+  })
 })
