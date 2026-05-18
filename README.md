@@ -304,6 +304,16 @@ Code Review AI provided by:
   </picture>
 </a>
 
+DNS provided by:
+
+<a href="https://www.cloudflare.com/" target="_blank" rel="noopener">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/cloudflare-dark.svg?raw=true" />
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/cloudflare-light.svg?raw=true" />
+    <img alt="CloudFlare logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/cloudflare-light.svg?raw=true" height="40" />
+  </picture>
+</a>
+
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
