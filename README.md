@@ -304,7 +304,7 @@ Code Review AI provided by:
   </picture>
 </a>
 
-DNS privided by:
+DNS provided by:
 
 <a href="https://www.cloudflare.com/" target="_blank" rel="noopener">
   <picture>
