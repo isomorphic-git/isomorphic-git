@@ -112,7 +112,7 @@
     "ignore": "^5.1.4",
     "minimisted": "^2.0.0",
     "pako": "^1.0.10",
-    "pify": "^4.0.1",
+    "pify": "^6.1.0",
     "readable-stream": "^4.0.0",
     "sha.js": "^2.4.12",
     "simple-get": "^4.0.1"
