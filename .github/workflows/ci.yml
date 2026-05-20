@@ -27,6 +27,9 @@ jobs:
           - os: ubuntu-latest
           - os: windows-latest
 
+    env:
+      TEST_PUSH_GITHUB_TOKEN: ${{ secrets.TEST_PUSH_GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -102,7 +105,6 @@ jobs:
 
   test-in-browser:
     name: Test (${{ matrix.karma-launcher }})
-    needs: build
     runs-on: ubuntu-latest
 
     # The BrowserStack test running Android 10 on a Pixel 4 timed out after 15 minutes.
@@ -169,7 +171,7 @@ jobs:
 
   publish-test-results:
     name: Publish Test Results
-    needs: test-in-browser
+    needs: [build, test-in-browser]
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
 
