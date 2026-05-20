@@ -214,6 +214,11 @@ jobs:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
           PUPPETEER_SKIP_DOWNLOAD: true
 
+      - name: Configure git identity for release
+        run: |
+          git config user.name "isomorphic-git-bot"
+          git config user.email "wmhilton+isomorphic-git-bot@gmail.com"
+
       - name: Publish to npm
         run: |
           npm run semantic-release
