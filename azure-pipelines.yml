@@ -66,6 +66,12 @@ jobs:
           artifactName: 'index.umd.min.js'
           PathtoPublish: '$(System.DefaultWorkingDirectory)/index.umd.min.js'
 
+      - script: |
+          git config user.name "isomorphic-git-bot"
+          git config user.email "wmhilton+isomorphic-git-bot@gmail.com"
+        displayName: 'Configure git identity for release'
+        condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/beta')))
+
       - script: npm run semantic-release
         displayName: 'Publish to npm'
         condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/beta')))
