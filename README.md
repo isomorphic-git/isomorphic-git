@@ -314,6 +314,16 @@ DNS provided by:
   </picture>
 </a>
 
+Hosting (for CORS) provided by:
+
+<a href="https://www.clever.cloud/" target="_blank" rel="noopener">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/clever-cloud-dark.svg?raw=true" />
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/clever-cloud-light.svg?raw=true" />
+    <img alt="Clever Cloud logo" src="https://github.com/isomorphic-git/isomorphic-git/blob/main/.github/images/clever-cloud-light.svg?raw=true" height="40" />
+  </picture>
+</a>
+
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
