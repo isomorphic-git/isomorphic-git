@@ -33,4 +33,15 @@ describe('Errors', () => {
       }
     `)
   })
+  it('create an InternalError with actionable reporting guidance', async () => {
+    const e = new Errors.InternalError('Something unexpected happened.')
+
+    expect(e.message).toContain(
+      "If you're using an application that depends on isomorphic-git"
+    )
+    expect(e.message).toContain(
+      "If you're a developer and you believe this is a bug in isomorphic-git"
+    )
+    expect(e.message).toContain('Something unexpected happened.')
+  })
 })
