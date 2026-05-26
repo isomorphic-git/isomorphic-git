@@ -10,6 +10,65 @@ const localhost =
   typeof window === 'undefined' ? '127.0.0.1' : window.location.hostname
 
 describe('fetch', () => {
+  it('passes credential config username to onAuth', async () => {
+    const { fs, gitdir } = await makeFixture('test-fetch-cors')
+    const url = 'https://example.com/repo.git'
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.origin.url',
+      value: url,
+    })
+    await setConfig({
+      fs,
+      gitdir,
+      path: `credential.${url}.username`,
+      value: 'alice',
+    })
+    const requests = []
+    const onAuthArgs = []
+    const mockHttp = {
+      request: async request => {
+        requests.push(request)
+        return requests.length === 1
+          ? {
+              statusCode: 401,
+              statusMessage: 'Unauthorized',
+              headers: {},
+              body: [],
+            }
+          : {
+              statusCode: 403,
+              statusMessage: 'Forbidden',
+              headers: {},
+              body: [],
+            }
+      },
+    }
+
+    let err
+    try {
+      await fetch({
+        fs,
+        http: mockHttp,
+        gitdir,
+        remote: 'origin',
+        ref: 'master',
+        singleBranch: true,
+        onAuth: (authUrl, auth) => {
+          onAuthArgs.push([authUrl, auth])
+          return { ...auth, password: 'secret' }
+        },
+      })
+    } catch (e) {
+      err = e
+    }
+
+    expect(err).toBeDefined()
+    expect(err.code).toEqual(Errors.HttpError.code)
+    expect(onAuthArgs).toEqual([[url, { username: 'alice', headers: {} }]])
+  })
+
   it('fetch (from Github)', async () => {
     const { fs, gitdir } = await makeFixture('test-fetch-cors')
     await setConfig({
