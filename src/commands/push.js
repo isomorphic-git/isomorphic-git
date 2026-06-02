@@ -16,6 +16,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitRemoteManager } from '../managers/GitRemoteManager.js'
 import { GitSideBand } from '../models/GitSideBand.js'
+import { addCredentialUsername } from '../utils/addCredentialUsername.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
 import { forAwait } from '../utils/forAwait.js'
 import { pkg } from '../utils/pkg.js'
@@ -105,9 +106,9 @@ export async function _push({
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const httpRemote = await GitRemoteHTTP.discover({
     http,
-    onAuth,
+    onAuth: addCredentialUsername({ config, onAuth }),
     onAuthSuccess,
-    onAuthFailure,
+    onAuthFailure: addCredentialUsername({ config, onAuth: onAuthFailure }),
     corsProxy,
     service: 'git-receive-pack',
     url,

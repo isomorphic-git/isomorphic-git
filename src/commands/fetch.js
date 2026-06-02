@@ -13,6 +13,7 @@ import { GitPackIndex } from '../models/GitPackIndex.js'
 import { hasObject } from '../storage/hasObject.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
+import { addCredentialUsername } from '../utils/addCredentialUsername.js'
 import { collect } from '../utils/collect.js'
 import { emptyPackfile } from '../utils/emptyPackfile.js'
 import { filterCapabilities } from '../utils/filterCapabilities.js'
@@ -112,9 +113,9 @@ export async function _fetch({
   const GitRemoteHTTP = GitRemoteManager.getRemoteHelperFor({ url })
   const remoteHTTP = await GitRemoteHTTP.discover({
     http,
-    onAuth,
+    onAuth: addCredentialUsername({ config, onAuth }),
     onAuthSuccess,
-    onAuthFailure,
+    onAuthFailure: addCredentialUsername({ config, onAuth: onAuthFailure }),
     corsProxy,
     service: 'git-upload-pack',
     url,
