@@ -32,12 +32,14 @@ describe('fetch', () => {
         requests.push(request)
         return requests.length === 1
           ? {
+              url: request.url,
               statusCode: 401,
               statusMessage: 'Unauthorized',
               headers: {},
               body: [],
             }
           : {
+              url: request.url,
               statusCode: 403,
               statusMessage: 'Forbidden',
               headers: {},
