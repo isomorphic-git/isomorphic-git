@@ -27,6 +27,7 @@ describe('fetch', () => {
     })
     const requests = []
     const onAuthArgs = []
+    const emptyBody = async function* () {}
     const mockHttp = {
       request: async request => {
         requests.push(request)
@@ -36,14 +37,14 @@ describe('fetch', () => {
               statusCode: 401,
               statusMessage: 'Unauthorized',
               headers: {},
-              body: [],
+              body: emptyBody(),
             }
           : {
               url: request.url,
               statusCode: 403,
               statusMessage: 'Forbidden',
               headers: {},
-              body: [],
+              body: emptyBody(),
             }
       },
     }
