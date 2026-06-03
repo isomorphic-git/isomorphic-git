@@ -162,7 +162,7 @@
     "semantic-release": "17.4.7",
     "standard": "^17.1.2",
     "timeout-cli": "0.3.2",
-    "typescript": "^5.8.0",
+    "typescript": "^6.0.3",
     "webpack": "^5.0.1",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "^4.0.0"
