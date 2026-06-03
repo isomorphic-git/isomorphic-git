@@ -144,13 +144,20 @@ describe('Hosting Providers', () => {
     })
   })
 
-  describe('GitHub', () => {
+  const githubPassword = process.env.TEST_PUSH_GITHUB_TOKEN
+  if (!githubPassword) {
+    console.warn(
+      "\n\nTEST_PUSH_GITHUB_TOKEN is MISSING. Please set this as a secret in github so that it's available. Skipping the test.\n\n"
+    )
+  }
+  const describeGitHub = githubPassword ? describe : describe.skip
+  describeGitHub('GitHub', () => {
     // This Personal OAuth token is for a test account (https://github.com/isomorphic-git-test-push)
     // with "public_repo" access. The only repo it has write access to is
     // https://github.com/isomorphic-git/test.empty
     // It is stored reversed to avoid Github's auto-revoking feature.
     // Can be overridden via TEST_PUSH_GITHUB_TOKEN env var (token must have write access to the test repo).
-    const password = process.env.TEST_PUSH_GITHUB_TOKEN
+    const password = githubPassword
     const username =
       process.env.GITHUB_TEST_USERNAME || 'isomorphic-git-test-push'
     it('fetch', async () => {
