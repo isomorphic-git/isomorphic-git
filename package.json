@@ -144,7 +144,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "git-http-mock-server": "2.0.0",
     "github-comment": "1.0.1",
-    "inquirer": "^7.0.0",
+    "inquirer": "^14.0.2",
     "jest": "^30.2.0",
     "jest-junit": "^15.0.0",
     "jest-puppeteer": "^11.0.0",
