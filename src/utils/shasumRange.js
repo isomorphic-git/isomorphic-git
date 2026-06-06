@@ -4,5 +4,5 @@ export async function shasumRange(
   buffer,
   { start = 0, end = buffer.length } = {}
 ) {
-  return shasum(buffer.subarray(start, end))
+  return shasum(buffer.slice(start, end))
 }

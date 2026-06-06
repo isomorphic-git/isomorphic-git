@@ -29,7 +29,13 @@ async function testSubtleSHA1() {
   // some browsers that have crypto.subtle.digest don't actually implement SHA-1.
   try {
     const hash = await subtleSHA1(new Uint8Array([]))
-    return hash === 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
+    if (hash !== 'da39a3ee5e6b4b0d3255bfef95601890afd80709') return false
+    // Also test with a subarray view at a non-zero offset
+    // to detect the iOS WebKit bug (Safari < 16.4)
+    const buf = new Uint8Array([0, 104, 101, 108, 108, 111, 0])
+    const hashSlice = await subtleSHA1(buf.slice(1, 6)) // "hello"
+    const hashSubarray = await subtleSHA1(buf.subarray(1, 6)) // "hello"
+    return hashSlice === hashSubarray
   } catch (_) {
     // no bother
   }
