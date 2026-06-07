@@ -946,6 +946,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "kskotetsu",
+      "name": "kskotetsu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3476920?v=4",
+      "profile": "https://github.com/kskotetsu",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
