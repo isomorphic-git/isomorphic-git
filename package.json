@@ -118,7 +118,7 @@
     "simple-get": "^4.0.1"
   },
   "devDependencies": {
-    "@isomorphic-git/cors-proxy": "^3.0.0",
+    "@isomorphic-git/cors-proxy": "^3.0.2",
     "@isomorphic-git/lightning-fs": "^3.3.0",
     "@isomorphic-git/pgp-plugin": "0.0.7",
     "@semantic-release/exec": "5.0.0",

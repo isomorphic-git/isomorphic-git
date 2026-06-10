@@ -188,14 +188,8 @@ module.exports = {
       ),
       browsers: series.nps('test.chrome', 'test.firefox'),
       typecheck: 'tsc -p tsconfig.json',
-      setup:
-        process.platform === 'win32'
-          ? series.nps('gitserver.start')
-          : series.nps('proxy.start', 'gitserver.start'),
-      teardown:
-        process.platform === 'win32'
-          ? series.nps('gitserver.stop')
-          : series.nps('proxy.stop', 'gitserver.stop'),
+      setup: series.nps('proxy.start', 'gitserver.start'),
+      teardown: series.nps('proxy.stop', 'gitserver.stop'),
       node: process.env.CI
         ? (process.platform === 'win32'
             ? `cross-env ${jestEnv} ${retry3(jestCommand)}`

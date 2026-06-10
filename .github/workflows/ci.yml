@@ -80,6 +80,7 @@ jobs:
 
       - name: Build artifacts
         if: ${{ !cancelled() && !github.event.pull_request.head.repo.fork }}
+        shell: bash
         run: |
           # Run the subset of the `test` necessary to test from the CLI.
           npx nps build.docs build.pack
