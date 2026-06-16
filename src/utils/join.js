@@ -2,6 +2,18 @@
  * This code for `path.join` is directly copied from @zenfs/core/path for bundle size improvements.
  * SPDX-License-Identifier: LGPL-3.0-or-later
  * Copyright (c) James Prevett and other ZenFS contributors.
+ *
+ * Windows support added:
+ *   - Backslashes are normalised to forward slashes before processing.
+ *   - Drive-letter prefixes (e.g. "C:") are detected and preserved through
+ *     normalisation, so absolute Windows paths are handled correctly.
+ *   - An absolute argument passed to join() resets the accumulated path,
+ *     matching Node behaviour and handling worktree gitdir paths properly.
+ *
+ * Limitation: UNC paths (e.g. \\server\share) are not supported. The leading
+ *   backslashes are normalised to forward slashes and then collapsed by
+ *   normalizeString, losing the UNC root. Git on Windows works with
+ *   drive-letter paths, so this is not expected to be a practical issue.
  */
 
 function normalizeString(path, aar) {
@@ -65,29 +77,67 @@ function normalizeString(path, aar) {
   return res
 }
 
+// Returns the Windows drive prefix ("C:") if present, otherwise null.
+function getWindowsDrivePrefix(path) {
+  if (path.length >= 2 && /^[a-zA-Z]:/.test(path)) {
+    return path.slice(0, 2) // e.g. "C:"
+  }
+  return null
+}
+
 function normalize(path) {
   if (!path.length) return '.'
 
-  const isAbsolute = path[0] === '/'
+  // Normalise backslashes to forward slashes before any other processing.
+  path = path.replace(/\\/g, '/')
+
+  const drivePrefix = getWindowsDrivePrefix(path)
+  // isAbsolute: Unix root ('/foo') OR Windows drive+slash ('C:/foo').
+  const isAbsolute =
+    path[0] === '/' || (drivePrefix !== null && path[2] === '/')
   const trailingSeparator = path.at(-1) === '/'
 
-  path = normalizeString(path, !isAbsolute)
+  // Strip the drive prefix before feeding into normalizeString so that the
+  // core algorithm only ever sees a plain POSIX-style string.
+  const pathBody = drivePrefix ? path.slice(2) : path
 
-  if (!path.length) {
-    if (isAbsolute) return '/'
-    return trailingSeparator ? './' : '.'
+  let normalized = normalizeString(pathBody, !isAbsolute)
+
+  if (!normalized.length) {
+    const root = drivePrefix
+      ? isAbsolute
+        ? drivePrefix + '/'
+        : drivePrefix
+      : isAbsolute
+        ? '/'
+        : '.'
+    return trailingSeparator && !isAbsolute ? root + '/' : root
   }
-  if (trailingSeparator) path += '/'
+  if (trailingSeparator) normalized += '/'
 
-  return isAbsolute ? `/${path}` : path
+  if (drivePrefix) {
+    return isAbsolute
+      ? `${drivePrefix}/${normalized}`
+      : `${drivePrefix}${normalized}`
+  }
+  return isAbsolute ? `/${normalized}` : normalized
 }
 
 export function join(...args) {
   if (args.length === 0) return '.'
   let joined
   for (let i = 0; i < args.length; ++i) {
-    const arg = args[i]
-    if (arg.length > 0) {
+    // Normalise separators before processing.
+    const arg = args[i].replace(/\\/g, '/')
+    if (arg.length === 0) continue
+
+    // A Windows drive-letter path (e.g. "C:/worktrees/foo") cannot be
+    // meaningfully appended to any base, so it resets the accumulator.
+    // Unix absolute paths (leading '/') are NOT reset here — that would be
+    // path.resolve() semantics; path.join('foo', '/bar') must yield 'foo/bar'.
+    if (/^[a-zA-Z]:\//.test(arg)) {
+      joined = arg
+    } else {
       if (joined === undefined) joined = arg
       else joined += '/' + arg
     }
