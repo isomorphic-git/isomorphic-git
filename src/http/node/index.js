@@ -29,12 +29,12 @@ export async function request({
   return new Promise((resolve, reject) => {
     get(
       {
+        ...fetchOptions,
         url,
         method,
         headers,
         agent,
         body,
-        ...fetchOptions,
       },
       (err, res) => {
         if (err) return reject(err)
