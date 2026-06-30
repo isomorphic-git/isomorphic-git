@@ -1,14 +1,14 @@
 /* eslint-env node, browser, jasmine */
 import { jest } from '@jest/globals'
 
+import { request as nodeRequest } from '../src/http/node/index.js'
 import { request as webRequest } from '../src/http/web/index.js'
 
-const simpleGetMock = jest.fn()
-await jest.unstable_mockModule('simple-get', () => ({
+const mockSimpleGet = jest.fn()
+jest.mock('simple-get', () => ({
   __esModule: true,
-  default: simpleGetMock,
+  default: mockSimpleGet,
 }))
-const { request: nodeRequest } = await import('../src/http/node/index.js')
 
 describe('httpClient', () => {
   describe('web', () => {
@@ -89,7 +89,7 @@ describe('httpClient', () => {
 
   describe('node', () => {
     it('passes fetchOptions through to simple-get', async () => {
-      simpleGetMock.mockImplementation(
+      mockSimpleGet.mockImplementation(
         /**
          * @param {any} opts
          * @param {any} cb
@@ -110,7 +110,7 @@ describe('httpClient', () => {
         headers: {},
         fetchOptions: { timeout: 5000, family: 4 },
       })
-      expect(simpleGetMock).toHaveBeenCalledWith(
+      expect(mockSimpleGet).toHaveBeenCalledWith(
         expect.objectContaining({
           timeout: 5000,
           family: 4,
