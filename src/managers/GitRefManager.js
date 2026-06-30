@@ -3,6 +3,7 @@ import '../typedefs.js'
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import AsyncLock from 'async-lock'
 
+import { InternalError } from '../errors/InternalError.js'
 import { InvalidOidError } from '../errors/InvalidOidError.js'
 import { NoRefspecError } from '../errors/NoRefspecError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
@@ -255,7 +256,13 @@ export class GitRefManager {
    * @param {number} [args.depth = undefined] - The maximum depth to resolve symbolic refs.
    * @returns {Promise<string>} - The resolved object ID.
    */
-  static async resolve({ fs, gitdir, ref, depth = undefined }) {
+  static async resolve({
+    fs,
+    gitdir,
+    ref,
+    depth = undefined,
+    visited = new Set(),
+  }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {
@@ -266,7 +273,7 @@ export class GitRefManager {
     // Is it a ref pointer?
     if (ref.startsWith('ref: ')) {
       ref = ref.slice('ref: '.length)
-      return GitRefManager.resolve({ fs, gitdir, ref, depth })
+      return GitRefManager.resolve({ fs, gitdir, ref, depth, visited })
     }
     // Is it a complete and valid SHA?
     if (ref.length === 40 && /[0-9a-f]{40}/.test(ref)) {
@@ -285,7 +292,21 @@ export class GitRefManager {
           packedMap.get(ref)
       )
       if (sha) {
-        return GitRefManager.resolve({ fs, gitdir, ref: sha.trim(), depth })
+        // Guard against circular symbolic references (e.g. a -> b -> a). Without
+        // tracking visited refs this recursion would not terminate.
+        if (visited.has(ref)) {
+          throw new InternalError(
+            `Circular reference detected while resolving ref "${ref}"`
+          )
+        }
+        visited.add(ref)
+        return GitRefManager.resolve({
+          fs,
+          gitdir,
+          ref: sha.trim(),
+          depth,
+          visited,
+        })
       }
     }
     // Do we give up?

@@ -23,21 +23,26 @@ export function applyDelta(delta, source) {
   if (firstOp.byteLength === targetSize) {
     target = firstOp
   } else {
-    // Otherwise, allocate a fresh buffer and slices
-    target = Buffer.alloc(targetSize)
-    const writer = new BufferCursor(target)
-    writer.copy(firstOp)
+    // Build the result from the delta ops instead of pre-allocating `targetSize`.
+    // `targetSize` comes from the delta header and may not match the actual op output,
+    // so allocating it up front can reserve far more memory than the ops produce.
+    // Building from the ops bounds memory to the real output size; the size check below
+    // still validates the total before concatenating.
+    const chunks = [firstOp]
+    let tell = firstOp.byteLength
 
     while (!reader.eof()) {
-      writer.copy(readOp(reader, source))
+      const op = readOp(reader, source)
+      chunks.push(op)
+      tell += op.byteLength
     }
 
-    const tell = writer.tell()
     if (targetSize !== tell) {
       throw new InternalError(
         `applyDelta expected target buffer to be ${targetSize} bytes but the resulting buffer was ${tell} bytes`
       )
     }
+    target = Buffer.concat(chunks, targetSize)
   }
   return target
 }

@@ -31,6 +31,7 @@ export * from './storage/readObject.js'
 export * from './storage/writeObject.js'
 export * from './storage/readObjectPacked.js'
 
+export * from './utils/applyDelta.js'
 export * from './utils/calculateBasicAuthHeader.js'
 export * from './utils/collect.js'
 export * from './utils/comparePath.js'
