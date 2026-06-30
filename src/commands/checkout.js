@@ -248,6 +248,7 @@ export async function _checkout({
         .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
         .map(async function ([_, fullpath]) {
           const filepath = `${dir}/${fullpath}`
+          await assertNoSymlinkInLeadingPath(fs, dir, fullpath)
           await fs.mkdir(filepath)
           if (onProgress) {
             await onProgress({
@@ -727,6 +728,7 @@ async function updateWorkingDir(
 ) {
   const filepath = `${dir}/${fullpath}`
   if (method !== 'create-index' && method !== 'mkdir-index') {
+    await assertNoSymlinkInLeadingPath(fs, dir, fullpath)
     const { object } = await readObject({ fs, cache, gitdir, oid })
     if (chmod) {
       await fs.rm(filepath)
