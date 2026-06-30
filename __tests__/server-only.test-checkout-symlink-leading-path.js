@@ -14,7 +14,12 @@ describe('checkout symlinked leading path', () => {
     const { fs, dir, gitdir } = await makeFixture(
       'test-checkout-symlink-leading-path'
     )
-    const author = { name: 't', email: 't@t', timestamp: 1000, timezoneOffset: 0 }
+    const author = {
+      name: 't',
+      email: 't@t',
+      timestamp: 1000,
+      timezoneOffset: 0,
+    }
 
     // A directory outside the working tree that the symlink will point at.
     const sink = `${dir}-sink`
@@ -22,7 +27,12 @@ describe('checkout symlinked leading path', () => {
 
     // Build a commit whose tree contains config/inside.
     await git.init({ fs, dir, gitdir })
-    const blob = await git.writeBlob({ fs, dir, gitdir, blob: Buffer.from('payload\n') })
+    const blob = await git.writeBlob({
+      fs,
+      dir,
+      gitdir,
+      blob: Buffer.from('payload\n'),
+    })
     const sub = await git.writeTree({
       fs,
       dir,
@@ -39,10 +49,31 @@ describe('checkout symlinked leading path', () => {
       fs,
       dir,
       gitdir,
-      commit: { message: 'c\n', tree: root, parent: [], author, committer: author },
+      commit: {
+        message: 'c\n',
+        tree: root,
+        parent: [],
+        author,
+        committer: author,
+      },
     })
-    await git.writeRef({ fs, dir, gitdir, ref: 'refs/heads/master', value: commit, force: true })
-    await git.writeRef({ fs, dir, gitdir, ref: 'HEAD', value: 'refs/heads/master', symbolic: true, force: true })
+    await git.writeRef({
+      fs,
+      dir,
+      gitdir,
+      ref: 'refs/heads/master',
+      value: commit,
+      force: true,
+    })
+    await git.writeRef({
+      fs,
+      dir,
+      gitdir,
+      ref: 'HEAD',
+      value: 'refs/heads/master',
+      symbolic: true,
+      force: true,
+    })
 
     // Plant `config` as a directory symlink and track it, so checkout sees a
     // symlink -> directory change and reaches the file-write step.
@@ -61,7 +92,8 @@ describe('checkout symlinked leading path', () => {
       error = e
     }
     expect(error).toBeDefined()
-    const inner = error && error.errors && error.errors[0] ? error.errors[0] : error
+    const inner =
+      error && error.errors && error.errors[0] ? error.errors[0] : error
     expect(`${inner.code || inner.name}`).toMatch(/unsafe/i)
 
     // The file must not have been written through the symlink into the sink.
