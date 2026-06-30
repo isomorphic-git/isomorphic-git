@@ -23,6 +23,36 @@ describe('GitTree entry-name validation', () => {
     rejects('.git ')
   })
 
+  it('rejects NTFS 8.3 short name aliases for .git', () => {
+    rejects('git~1')
+    rejects('GIT~1')
+    rejects('git~2')
+    rejects('git~9')
+    rejects('git~1.')
+    rejects('git~1 ')
+  })
+
+  it('rejects HFS+ ignorable Unicode variants of .git', () => {
+    rejects('.g‌it') // U+200C zero width non-joiner
+    rejects('.‍git') // U+200D zero width joiner
+    rejects('.gi‎t') // U+200E left-to-right mark
+    rejects('.git﻿') // U+FEFF zero width no-break space (BOM)
+  })
+
+  it('rejects HFS+ ignorable Unicode variants of . and ..', () => {
+    rejects('.‌') // "." + zero width non-joiner
+    rejects('.‌.') // ".." with zero width non-joiner between dots
+  })
+
+  it('accepts git~10 and git~0 (not valid 8.3 aliases)', () => {
+    expect(GitTree.from(entry('100644', 'git~10')).entries()[0].path).toBe(
+      'git~10'
+    )
+    expect(GitTree.from(entry('100644', 'git~0')).entries()[0].path).toBe(
+      'git~0'
+    )
+  })
+
   it('accepts ordinary names, including .gitignore', () => {
     expect(GitTree.from(entry('100644', 'normal.txt')).entries()[0].path).toBe(
       'normal.txt'

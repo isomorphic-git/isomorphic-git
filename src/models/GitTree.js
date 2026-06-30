@@ -47,15 +47,22 @@ function parseBuffer(buffer) {
 
     // Reject reserved entry names, matching git's verify_path(): path separators,
     // "." and ".." (which resolve outside the working directory), and ".git" (which git
-    // disallows as a path component). ".git" is matched case-insensitively and with
-    // trailing dots/spaces stripped, since those are ignored on some filesystems.
-    const normalized = path.toLowerCase().replace(/[. ]+$/, '')
+    // disallows as a path component). Checks mirror git's is_ntfs_dotgit() and
+    // is_hfs_dotgit(): case-insensitive, trailing dots/spaces stripped (NTFS),
+    // NTFS 8.3 short name aliases (git~1..git~9), and HFS+ ignorable Unicode
+    // characters stripped (zero-width joiners, directional marks, BOM, etc.).
+    const hfsClean = path.replace(
+      /[\u200C-\u200F\u202A-\u202E\u206A-\u206F\uFEFF]/g,
+      ''
+    )
+    const normalized = hfsClean.toLowerCase().replace(/[. ]+$/, '')
     if (
       path.includes('\\') ||
       path.includes('/') ||
-      path === '.' ||
-      path === '..' ||
-      normalized === '.git'
+      hfsClean === '.' ||
+      hfsClean === '..' ||
+      normalized === '.git' ||
+      /^\.?git~[1-9]$/.test(normalized)
     ) {
       throw new UnsafeFilepathError(path)
     }

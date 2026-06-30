@@ -256,7 +256,13 @@ export class GitRefManager {
    * @param {number} [args.depth = undefined] - The maximum depth to resolve symbolic refs.
    * @returns {Promise<string>} - The resolved object ID.
    */
-  static async resolve({ fs, gitdir, ref, depth = undefined, visited = new Set() }) {
+  static async resolve({
+    fs,
+    gitdir,
+    ref,
+    depth = undefined,
+    visited = new Set(),
+  }) {
     if (depth !== undefined) {
       depth--
       if (depth === -1) {

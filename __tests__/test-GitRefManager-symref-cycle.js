@@ -1,4 +1,4 @@
-/* eslint-env node, browser, jasmine */
+/* eslint-env node, browser, jasmine, jest */
 import { GitRefManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -26,7 +26,9 @@ describe('GitRefManager symref cycle handling', () => {
         value => ({ value }),
         error => ({ error })
       ),
-      new Promise(resolve => setTimeout(() => resolve({ timedOut: true }), 5000)),
+      new Promise(resolve =>
+        setTimeout(() => resolve({ timedOut: true }), 5000)
+      ),
     ])
 
     // Without the fix resolve() never returns and we hit the 5s timeout.
