@@ -45,8 +45,18 @@ function parseBuffer(buffer) {
     const type = mode2type(mode)
     const path = buffer.slice(space + 1, nullchar).toString('utf8')
 
-    // Prevent malicious git repos from writing to "..\foo" on clone etc
-    if (path.includes('\\') || path.includes('/')) {
+    // Reject reserved entry names, matching git's verify_path(): path separators,
+    // "." and ".." (which resolve outside the working directory), and ".git" (which git
+    // disallows as a path component). ".git" is matched case-insensitively and with
+    // trailing dots/spaces stripped, since those are ignored on some filesystems.
+    const normalized = path.toLowerCase().replace(/[. ]+$/, '')
+    if (
+      path.includes('\\') ||
+      path.includes('/') ||
+      path === '.' ||
+      path === '..' ||
+      normalized === '.git'
+    ) {
       throw new UnsafeFilepathError(path)
     }
 
