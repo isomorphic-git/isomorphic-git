@@ -1,14 +1,6 @@
 /* eslint-env node, browser, jasmine */
 import { jest } from '@jest/globals'
-
-import { request as nodeRequest } from '../src/http/node/index.js'
-import { request as webRequest } from '../src/http/web/index.js'
-
-const mockSimpleGet = jest.fn()
-jest.mock('simple-get', () => ({
-  __esModule: true,
-  default: mockSimpleGet,
-}))
+import { PassThrough } from 'stream'
 
 describe('httpClient', () => {
   describe('web', () => {
@@ -35,8 +27,11 @@ describe('httpClient', () => {
         }
       )
       try {
+        const { request: webRequest } = await import(
+          '../src/http/web/index.js'
+        )
         await webRequest({
-          url: 'https://example.com',
+          url: 'http://example.com',
           method: 'GET',
           headers: {},
           fetchOptions: { credentials: 'include', mode: 'cors' },
@@ -72,8 +67,11 @@ describe('httpClient', () => {
         }
       )
       try {
+        const { request: webRequest } = await import(
+          '../src/http/web/index.js'
+        )
         await webRequest({
-          url: 'https://example.com',
+          url: 'http://example.com',
           method: 'GET',
           headers: {},
         })
@@ -89,34 +87,46 @@ describe('httpClient', () => {
 
   describe('node', () => {
     it('passes fetchOptions through to simple-get', async () => {
-      mockSimpleGet.mockImplementation(
+      /** @type {any} */
+      let capturedOpts = null
+      const mockGet = jest.fn(
         /**
          * @param {any} opts
          * @param {any} cb
          */
         (opts, cb) => {
-          cb(null, {
+          capturedOpts = opts
+          const mockResponse = Object.assign(new PassThrough(), {
             url: opts.url,
             method: opts.method,
             statusCode: 200,
             statusMessage: 'OK',
             headers: {},
           })
+          mockResponse.end()
+          cb(null, mockResponse)
         }
       )
+
+      jest.unstable_mockModule('simple-get', () => ({
+        __esModule: true,
+        default: mockGet,
+      }))
+
+      const { request: nodeRequest } = await import(
+        '../src/http/node/index.js'
+      )
+
       await nodeRequest({
         url: 'http://example.com',
         method: 'GET',
         headers: {},
         fetchOptions: { timeout: 5000, family: 4 },
       })
-      expect(mockSimpleGet).toHaveBeenCalledWith(
-        expect.objectContaining({
-          timeout: 5000,
-          family: 4,
-        }),
-        expect.any(Function)
-      )
+      expect(capturedOpts).not.toBeNull()
+      expect(capturedOpts.timeout).toBe(5000)
+      expect(capturedOpts.family).toBe(4)
+      expect(capturedOpts.url).toBe('http://example.com')
     })
   })
 })
