@@ -68,7 +68,10 @@ describe('httpClient', () => {
       try {
         const { request: webRequest } = await import('../src/http/web/index.js')
         await webRequest({
+          url: 'https://example.com',
+          method: 'GET',
           headers: {},
+          fetchOptions: {}, // explicitly empty for backward compatibility
         })
       } finally {
         globalThis.fetch = originalFetch
