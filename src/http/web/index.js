@@ -28,12 +28,12 @@ export async function request({
       : [new Uint8Array(await res.arrayBuffer())]
   // convert Header object to ordinary JSON
   headers = {}
-  for (const [key, value] of res.headers.entries()) {
+  for (const [key, value] of /** @ts-expect-error */ res.headers.entries()) {
     headers[key] = value
   }
   return {
     url: res.url,
-    method: res.method,
+    method: /** @ts-expect-error */ res.method,
     statusCode: res.status,
     statusMessage: res.statusText,
     body: iter,
