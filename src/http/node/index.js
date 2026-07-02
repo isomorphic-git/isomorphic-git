@@ -22,7 +22,8 @@ export async function request({
 }) {
   // If we can, we should send it as a single buffer so it sets a Content-Length header.
   if (body && Array.isArray(body)) {
-    body = /** @ts-expect-error */ Buffer.from(await collect(body))
+    // @ts-expect-error
+    body = Buffer.from(await collect(body))
   } else if (body) {
     body = asyncIteratorToStream(body)
   }
