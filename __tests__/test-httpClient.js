@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
-import { jest } from '@jest/globals'
 import { PassThrough } from 'stream'
+
+import { jest } from '@jest/globals'
 
 describe('httpClient', () => {
   describe('web', () => {
@@ -27,9 +28,7 @@ describe('httpClient', () => {
         }
       )
       try {
-        const { request: webRequest } = await import(
-          '../src/http/web/index.js'
-        )
+        const { request: webRequest } = await import('../src/http/web/index.js')
         await webRequest({
           url: 'http://example.com',
           method: 'GET',
@@ -67,12 +66,8 @@ describe('httpClient', () => {
         }
       )
       try {
-        const { request: webRequest } = await import(
-          '../src/http/web/index.js'
-        )
+        const { request: webRequest } = await import('../src/http/web/index.js')
         await webRequest({
-          url: 'http://example.com',
-          method: 'GET',
           headers: {},
         })
       } finally {
@@ -113,9 +108,7 @@ describe('httpClient', () => {
         default: mockGet,
       }))
 
-      const { request: nodeRequest } = await import(
-        '../src/http/node/index.js'
-      )
+      const { request: nodeRequest } = await import('../src/http/node/index.js')
 
       await nodeRequest({
         url: 'http://example.com',
