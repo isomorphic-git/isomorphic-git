@@ -9,6 +9,7 @@ You are very welcome here and any contribution is appreciated. :+1:
 The code is written in "plain" JavaScript and as a rule of thumb shouldn't require transpilation. (The glaring exception being browser's lack of support for bare imports.)
 
 ## New feature checklists :sparkles:️
+
 I'm honestly documenting these steps just so I don't forget them myself.
 
 To add a parameter to an existing command `X`:
@@ -85,6 +86,7 @@ parse[*]Request: (input: stream) -> Object
 write[*]Response: (input: Object) -> stream
 
 ### How git works
+
 If you want to contribute it may be useful if you understand how git works under the hood.
 This is great article that shows the details:<br/>
 [A Hacker's Guide to Git](https://wildlyinaccurate.com/a-hackers-guide-to-git/).<br/>
@@ -92,30 +94,36 @@ But as first the introduction you can watch this video:<br/>
 [![Link to Video: Inside the Hidden Git Folder - Computerphile](https://img.youtube.com/vi/bSA91XTzeuA/0.jpg)](http://www.youtube.com/watch?v=bSA91XTzeuA)
 
 And here are some other advanced videos:<br/>
-* Advanced Git: Graphs, Hashes, and Compression, Oh My!<br/>
+
+- Advanced Git: Graphs, Hashes, and Compression, Oh My!<br/>
   [![Advanced Git: Graphs, Hashes, and Compression, Oh My!](https://img.youtube.com/vi/ig5E8CcdM9g/0.jpg)](https://www.youtube.com/watch?v=ig5E8CcdM9g)
 
-* Git Internals by John Britton of GitHub - CS50 Tech Talk<br/>
+- Git Internals by John Britton of GitHub - CS50 Tech Talk<br/>
   [![Git Internals by John Britton of GitHub - CS50 Tech Talk](https://img.youtube.com/vi/lG90LZotrpo/0.jpg)](https://www.youtube.com/watch?v=lG90LZotrpo)
 
-* Anatomy of ".git/" folder - How Git Really Works Under the Hood by Piotr Kowalski<br/>
+- Anatomy of ".git/" folder - How Git Really Works Under the Hood by Piotr Kowalski<br/>
   [![Anatomy of ".git/" folder - How Git Really Works Under the Hood](https://img.youtube.com/vi/rzwyDeRlLdE/0.jpg)](https://www.youtube.com/watch?v=rzwyDeRlLdE)
+- Stop Memorizing Git Commands. Learn The Data Model<br/>
+  [![Stop Memorizing Git Commands. Learn The Data Model](https://img.youtube.com/vi/Csd4lMKPC5g/0.jpg)](https://www.youtube.com/watch?v=Csd4lMKPC5g)
 
 Another resource is GitHub blog:
-* [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
-* [Git’s database internals II: commit history queries](https://github.blog/2022-08-30-gits-database-internals-ii-commit-history-queries/)
+
+- [Git’s database internals I: packed object store](https://github.blog/2022-08-29-gits-database-internals-i-packed-object-store/)
+- [Git’s database internals II: commit history queries](https://github.blog/2022-08-30-gits-database-internals-ii-commit-history-queries/)
 
 And this description of .git directory:
-* [What is in that .git directory?](https://blog.meain.io/2023/what-is-in-dot-git/)
+
+- [What is in that .git directory?](https://blog.meain.io/2023/what-is-in-dot-git/)
 
 There is also chapter in git Pro book
-* [Git Internals](https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain)
+
+- [Git Internals](https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain)
 
 You can also search [git in the blog of Julia Evans](https://duckduckgo.com/?q=site%3Ajvns.ca+git&ia=web).
 
 ## Appendix A, submodules
 
-As of 2026, isomorphic-git supports commands run within submodules and so new contributions should take this into account. 
+As of 2026, isomorphic-git supports commands run within submodules and so new contributions should take this into account.
 
 The quick TLDR summary is this: look in `__tests__` and you'll see there are two test files for every command, a regular one and an -in-submodule.js version. Make sure to include both.
 
@@ -123,7 +131,7 @@ The following discussion covers more details.
 
 1. Modifying or adding `__tests__` to existing apis
 
-Let's say the main file is `test-branch.js` and the corresponding submodule file is `test-branch-in-submodule.js`. After modifying or adding tests in `test-branch.js`, copy and paste identical code to `test-branch-in-submodule.js` since the new submodule tests will be mostly the same. Replace any instances of `makeFixture` with `makeFixtureAsSubmodule` in submodule tests. Prefer the plain variable `gitdir` in test files whenever possible, only swapping it to `gitdirsmfullpath` as a last resort if tests are failing and there is no other choice. `gitdirsmfullpath` is almost like "cheating" because it reveals to the testing code where the `gitdir` really is, but often that answer should be computed automatically, and not passed in.  
+Let's say the main file is `test-branch.js` and the corresponding submodule file is `test-branch-in-submodule.js`. After modifying or adding tests in `test-branch.js`, copy and paste identical code to `test-branch-in-submodule.js` since the new submodule tests will be mostly the same. Replace any instances of `makeFixture` with `makeFixtureAsSubmodule` in submodule tests. Prefer the plain variable `gitdir` in test files whenever possible, only swapping it to `gitdirsmfullpath` as a last resort if tests are failing and there is no other choice. `gitdirsmfullpath` is almost like "cheating" because it reveals to the testing code where the `gitdir` really is, but often that answer should be computed automatically, and not passed in.
 
 2. Creating new `__tests__` for brand new apis
 
@@ -131,7 +139,7 @@ Let's imagine "brancher" is a new API command. Place two new files in `__tests__
 
 3. Creating new `src/api/` commands
 
-In terms of submodule-related features, only modify `src/api/` files and not `src/commands/`. This is an architectural decision to keep logic at one layer of the stack, while other layers may remain unaffected. Review other files, the basic idea is to apply the `discoverGitdir` function, and never assume `gitdir` is right. Send the `gitdir` value through the `discoverGitdir` filter before passing it anywhere else. In a common situation, when submodules aren't used, the `discoverGitdir` filter will just send back the original value. If it turns out a submodule is used it will return the required information.  
+In terms of submodule-related features, only modify `src/api/` files and not `src/commands/`. This is an architectural decision to keep logic at one layer of the stack, while other layers may remain unaffected. Review other files, the basic idea is to apply the `discoverGitdir` function, and never assume `gitdir` is right. Send the `gitdir` value through the `discoverGitdir` filter before passing it anywhere else. In a common situation, when submodules aren't used, the `discoverGitdir` filter will just send back the original value. If it turns out a submodule is used it will return the required information.
 
 4. Modifying existing `src/api/` commands
 
