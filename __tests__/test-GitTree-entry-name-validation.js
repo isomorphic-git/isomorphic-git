@@ -32,6 +32,36 @@ describe('GitTree entry-name validation', () => {
     rejects('git~1 ')
   })
 
+  // NTFS Alternate Data Streams are referenced as `<name>:<stream>:<type>`, and a
+  // directory's default stream `::$INDEX_ALLOCATION` lets `.git::$INDEX_ALLOCATION`
+  // resolve to the `.git` directory itself. git rejects *any* ADS of `.git`
+  // (CVE-2019-1352, git commit 7c3745fc), so only the portion before the first
+  // colon names the actual entry.
+  it('rejects NTFS Alternate Data Streams of .git', () => {
+    rejects('.git::$INDEX_ALLOCATION')
+    rejects('.git:$INDEX_ALLOCATION')
+    rejects('.git:foo')
+    rejects('.git...:alternate-stream') // git's own t1014 test case
+    rejects('.GIT:$DATA') // case-insensitive
+    rejects('.git.:stream') // trailing dot before the stream
+    rejects('.git :stream') // trailing space before the stream
+  })
+
+  it('rejects NTFS Alternate Data Streams of the git~1 short name', () => {
+    rejects('git~1::$INDEX_ALLOCATION')
+    rejects('git~1:foo')
+    rejects('GIT~1:$DATA')
+  })
+
+  it('accepts colon names whose leading component is not .git', () => {
+    expect(GitTree.from(entry('100644', 'foo:bar')).entries()[0].path).toBe(
+      'foo:bar'
+    )
+    expect(
+      GitTree.from(entry('100644', '.gitignore:bar')).entries()[0].path
+    ).toBe('.gitignore:bar')
+  })
+
   it('rejects HFS+ ignorable Unicode variants of .git', () => {
     rejects('.g‌it') // U+200C zero width non-joiner
     rejects('.‍git') // U+200D zero width joiner
