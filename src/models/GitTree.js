@@ -49,13 +49,19 @@ function parseBuffer(buffer) {
     // "." and ".." (which resolve outside the working directory), and ".git" (which git
     // disallows as a path component). Checks mirror git's is_ntfs_dotgit() and
     // is_hfs_dotgit(): case-insensitive, trailing dots/spaces stripped (NTFS),
-    // NTFS 8.3 short name aliases (git~1..git~9), and HFS+ ignorable Unicode
-    // characters stripped (zero-width joiners, directional marks, BOM, etc.).
+    // NTFS 8.3 short name aliases (git~1..git~9), NTFS Alternate Data Streams, and
+    // HFS+ ignorable Unicode characters stripped (zero-width joiners, directional
+    // marks, BOM, etc.).
     const hfsClean = path.replace(
       /[\u200C-\u200F\u202A-\u202E\u206A-\u206F\uFEFF]/g,
       ''
     )
-    const normalized = hfsClean.toLowerCase().replace(/[. ]+$/, '')
+    // NTFS Alternate Data Streams are referenced as `<name>:<stream>:<type>`, and a
+    // directory's default stream lets `.git::$INDEX_ALLOCATION` resolve to the `.git`
+    // directory itself. git forbids *any* ADS, so only the portion before the first
+    // colon names the actual entry we normalize and check.
+    const ntfsClean = hfsClean.split(':')[0]
+    const normalized = ntfsClean.toLowerCase().replace(/[. ]+$/, '')
     if (
       path.includes('\\') ||
       path.includes('/') ||
