@@ -13,6 +13,7 @@ import { _readObject } from '../storage/readObject.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { _writeObject } from '../storage/writeObject.js'
 
+import { assertNoSymlinkInLeadingPath } from './assertNoSymlinkInLeadingPath.js'
 import { join } from './join.js'
 import { posixifyPathBuffer } from './posixifyPathBuffer.js'
 
@@ -266,6 +267,11 @@ export async function applyTreeChanges({
           await fs.rmdir(currentFilepath)
           break
         case 'mkdir':
+          // Don't mkdir through a symlinked leading path: a parent component that
+          // is a symlink could otherwise redirect the directory creation outside
+          // the working tree. git applies the same check (it does not follow
+          // symlinks here) — see checkout.
+          await assertNoSymlinkInLeadingPath(fs, dir, op.filepath)
           await fs.mkdir(currentFilepath)
           break
         case 'rm':
@@ -278,6 +284,10 @@ export async function applyTreeChanges({
               currentFilepath.startsWith(removedDir)
             )
           ) {
+            // Don't write through a symlinked leading path (see checkout): a
+            // parent component that is a symlink could redirect the write to a
+            // location outside the working tree.
+            await assertNoSymlinkInLeadingPath(fs, dir, op.filepath)
             const { object } = await _readObject({
               fs,
               cache: {},
