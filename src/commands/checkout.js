@@ -10,37 +10,13 @@ import { CommitNotFetchedError } from '../errors/CommitNotFetchedError.js'
 import { InternalError } from '../errors/InternalError.js'
 import { MultipleGitError } from '../errors/MultipleGitError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
-import { UnsafeFilepathError } from '../errors/UnsafeFilepathError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { _readObject as readObject } from '../storage/readObject.js'
+import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { flat } from '../utils/flat.js'
 import { worthWalking } from '../utils/worthWalking.js'
-
-/**
- * Throw if any leading directory component of `fullpath` (relative to `dir`) is a symbolic
- * link. git does not follow symlinks in the leading path when writing working-tree files;
- * matching that avoids writing through a symlinked parent into a location outside `dir`.
- *
- * @param {import('../models/FileSystem.js').FileSystem} fs
- * @param {string} dir
- * @param {string} fullpath
- */
-async function assertNoSymlinkInLeadingPath(fs, dir, fullpath) {
-  const parts = fullpath.split('/')
-  parts.pop() // the final segment is the entry being written, not a leading dir
-  let current = dir
-  for (const part of parts) {
-    if (part === '' || part === '.') continue
-    current = `${current}/${part}`
-    const stats = await fs.lstat(current)
-    // lstat returns null when the path doesn't exist yet (nothing to traverse).
-    if (stats && stats.isSymbolicLink()) {
-      throw new UnsafeFilepathError(fullpath)
-    }
-  }
-}
 
 /**
  * @param {object} args
