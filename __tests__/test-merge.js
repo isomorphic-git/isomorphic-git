@@ -1451,4 +1451,92 @@ describe('merge', () => {
     )
     expect(messages.join()).toEqual(['Add nested file on master'].join())
   })
+
+  it('merge conflict does not corrupt binary files in the working directory', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // Every possible byte value, so the file is not valid UTF-8 text. It only
+    // survives if working directory contents are written verbatim.
+    const binary = Uint8Array.from({ length: 256 }, (_, i) => i)
+
+    // Multibyte UTF-8, to catch a text file being re-encoded rather than copied.
+    const unicodeText = 'Ünicode: αβγδ 日本語 🎉\n'
+
+    // Base commit: the file that will conflict, plus a text file and a binary
+    // file that neither branch touches.
+    await fs.write(`${dir}/doc.txt`, 'base content\n')
+    await fs.write(`${dir}/notes.md`, unicodeText)
+    await fs.write(`${dir}/image.bin`, binary)
+    await add({ fs, dir, gitdir, filepath: 'doc.txt' })
+    await add({ fs, dir, gitdir, filepath: 'notes.md' })
+    await add({ fs, dir, gitdir, filepath: 'image.bin' })
+    const base = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Add a text file and a binary file',
+      author,
+    })
+
+    // master edits only the text file.
+    await fs.write(`${dir}/doc.txt`, 'master content\n')
+    await add({ fs, dir, gitdir, filepath: 'doc.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'master',
+      message: 'Edit the text file on master',
+      author,
+    })
+
+    // other edits only the text file, from the same base, so the two conflict.
+    await fs.write(`${dir}/doc.txt`, 'other content\n')
+    await add({ fs, dir, gitdir, filepath: 'doc.txt' })
+    await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'other',
+      parent: [base],
+      message: 'Edit the text file on other',
+      author,
+    })
+
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'master',
+        theirs: 'other',
+        abortOnConflict: false,
+        author,
+      })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+
+    // The conflict is in doc.txt. Both image.bin and notes.md are identical on
+    // both branches and are not part of the merge, so they must survive
+    // untouched even though the conflicted merge rewrites the whole tree.
+    const binaryAfterMerge = await fs.read(`${dir}/image.bin`)
+    expect(Array.from(binaryAfterMerge)).toEqual(Array.from(binary))
+
+    expect(await fs.read(`${dir}/notes.md`, 'utf8')).toBe(unicodeText)
+
+    // The text conflict still materialises in the working directory.
+    expect(await fs.read(`${dir}/doc.txt`, 'utf8')).toContain('<<<<<<<')
+  })
 })
