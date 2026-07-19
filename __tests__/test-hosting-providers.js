@@ -100,7 +100,8 @@ describe('Hosting Providers', () => {
     })
   })
 
-  describe('Bitbucket', () => {
+  // TODO: Re-enable once Bitbucket token/access changes are resolved.
+  describe.skip('Bitbucket', () => {
     // This App Password is for the test account 'isomorphic-git' user on Bitbucket,
     // with "repositories.read" and "repositories.write" access. However the only repo the account has access to is
     // https://bitbucket.org/isomorphic-git/test.empty
