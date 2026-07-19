@@ -946,6 +946,18 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "arisgk",
+      "name": "Aris Goudouras",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4354335?v=4",
+      "profile": "https://github.com/arisgk",
+      "contributions": [
+        "code",
+        "doc",
+        "test",
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"

@@ -306,7 +306,7 @@ export async function mergeTree({
           const path = `${dir}/${filepath}`
           if ((await entry.type()) === 'blob') {
             const mode = await entry.mode()
-            const content = new TextDecoder().decode(await entry.content())
+            const content = await entry.content()
             await fs.write(path, content, { mode })
           }
           return true
