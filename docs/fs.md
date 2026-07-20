@@ -78,6 +78,176 @@ In between tests it empties the `InMemory`, restoring the file system to a prist
 The current unit tests use LightningFS instead, which was built with this HTTP-backed overlay behavior by default, because I find it so useful.
 
 
+## Environments without IndexedDB (e.g. Cloudflare Workers, Deno Deploy)
+
+Cloudflare Workers, Deno Deploy, and other **edge runtimes** do not expose `IndexedDB`.
+This means that `LightningFS` will throw a `ReferenceError: indexedDB is not defined` at
+startup, and ZenFS's `IndexedDB` backend won't work either.
+
+The good news is that `isomorphic-git` itself has **no dependency on IndexedDB** — it
+just needs *any* object that implements the `fs.promises` interface described below.
+You have two main options.
+
+### Option 1 — ZenFS with the InMemory backend (zero extra deps)
+
+[ZenFS](https://github.com/zen-fs/core) ships an `InMemory` backend that works in every
+JavaScript environment. It is the quickest path to get `isomorphic-git` running inside
+a Cloudflare Worker:
+
+```js
+// wrangler.toml: compatibility_flags = ["nodejs_compat"]
+import { fs, configureSingle } from '@zenfs/core'
+import { InMemory } from '@zenfs/core'
+import git from 'isomorphic-git'
+import http from 'isomorphic-git/http/web'
+
+await configureSingle({ backend: InMemory })
+
+await git.clone({
+  fs,
+  http,
+  dir: '/',
+  url: 'https://github.com/example/repo',
+  singleBranch: true,
+  depth: 1,
+})
+```
+
+> **Note:** All data is ephemeral — it is lost when the Worker terminates.
+> For persistence across requests see [Option 3](#option-3-persisting-across-requests-cloudflare-durable-objects) below.
+
+### Option 2 — MemoryFS (built-in, zero dependencies)
+
+`isomorphic-git` ships a minimal in-memory filesystem implementation called `MemoryFS`
+that works in *any* JavaScript runtime without any additional packages:
+
+```js
+import { MemoryFS } from 'isomorphic-git/src/utils/MemoryFS.js'
+import git from 'isomorphic-git'
+import http from 'isomorphic-git/http/web'
+
+const fs = new MemoryFS()
+
+await git.init({ fs, dir: '/' })
+await git.clone({
+  fs,
+  http,
+  dir: '/',
+  url: 'https://github.com/example/repo',
+  singleBranch: true,
+  depth: 1,
+})
+
+const files = await fs.promises.readdir('/')
+console.log(files)
+```
+
+`MemoryFS` implements the full `fs.promises` interface expected by `isomorphic-git`:
+`readFile`, `writeFile`, `unlink`, `readdir`, `mkdir`, `rmdir`, `stat`, `lstat`, and `rm`.
+
+> **Note:** Like Option 1, this is ephemeral — the entire filesystem lives in the Worker's
+> JavaScript heap and is discarded when the isolate is destroyed.
+
+### Option 3 — Persisting across requests (Cloudflare Durable Objects)
+
+If you need the Git repository to **survive** between Worker requests, you must use a
+persistent storage primitive. On Cloudflare, the right tool is
+[Durable Objects](https://developers.cloudflare.com/durable-objects/).
+
+The pattern is to build a thin adapter that maps `fs.promises` calls onto Durable Object
+storage. Here is a minimal sketch:
+
+```js
+// do-fs.js — Durable Object filesystem adapter for isomorphic-git
+export class DurableObjectFS {
+  constructor(storage) {
+    // `storage` is a Cloudflare Durable Object Storage instance
+    this._storage = storage
+    this.promises = {
+      readFile:  this.readFile.bind(this),
+      writeFile: this.writeFile.bind(this),
+      unlink:    this.unlink.bind(this),
+      readdir:   this.readdir.bind(this),
+      mkdir:     this.mkdir.bind(this),
+      rmdir:     this.rmdir.bind(this),
+      stat:      this.stat.bind(this),
+      lstat:     this.lstat.bind(this),
+    }
+  }
+
+  async writeFile(path, data) {
+    const bytes = typeof data === 'string'
+      ? new TextEncoder().encode(data)
+      : data
+    await this._storage.put(`f:${path}`, [...bytes])
+  }
+
+  async readFile(path, opts) {
+    const raw = await this._storage.get(`f:${path}`)
+    if (raw == null) { const e = new Error('ENOENT'); e.code = 'ENOENT'; throw e }
+    const bytes = new Uint8Array(raw)
+    return (opts === 'utf8' || opts?.encoding === 'utf8')
+      ? new TextDecoder().decode(bytes)
+      : Buffer.from(bytes)
+  }
+
+  async unlink(path)      { await this._storage.delete(`f:${path}`) }
+  async mkdir(path)       { await this._storage.put(`d:${path}`, 1) }
+  async rmdir(path)       { await this._storage.delete(`d:${path}`) }
+  async lstat(path)       { return this.stat(path) }
+
+  async stat(path) {
+    const isDir  = await this._storage.get(`d:${path}`) != null
+    const isFile = await this._storage.get(`f:${path}`) != null
+    if (!isDir && !isFile) { const e = new Error('ENOENT'); e.code = 'ENOENT'; throw e }
+    return {
+      isFile: ()      => isFile,
+      isDirectory: () => isDir,
+      isSymbolicLink: () => false,
+      size: 0,
+      mode: isDir ? 0o755 : 0o644,
+      mtimeMs: Date.now(),
+      ctimeMs: Date.now(),
+      mtime: new Date(),
+      ctime: new Date(),
+    }
+  }
+
+  async readdir(path) {
+    // List all keys in storage and filter for immediate children
+    const all   = await this._storage.list()
+    const prefix = path === '/' ? '/' : path + '/'
+    const children = new Set()
+    for (const key of all.keys()) {
+      for (const pfx of [`f:${prefix}`, `d:${prefix}`]) {
+        if (key.startsWith(pfx)) {
+          const rest = key.slice(pfx.length)
+          if (!rest.includes('/')) children.add(rest)
+        }
+      }
+    }
+    return [...children].sort()
+  }
+}
+```
+
+> **Tip:** Durable Object storage has a **128 KiB** per-value limit. For repositories
+> with large binary blobs, chunk file writes into smaller pieces or use
+> [R2](https://developers.cloudflare.com/r2/) for blob storage and Durable Objects only
+> for the metadata/directory tree.
+
+### Compatibility notes
+
+| Runtime | LightningFS | ZenFS InMemory | MemoryFS | DO Adapter |
+|---|---|---|---|---|
+| Node.js | ✅ (IndexedDB not needed — use `fs` module instead) | ✅ | ✅ | — |
+| Browser | ✅ | ✅ | ✅ | — |
+| Cloudflare Workers | ❌ (no IndexedDB) | ✅ | ✅ | ✅ (persistent) |
+| Deno Deploy | ❌ (no IndexedDB) | ✅ | ✅ | — |
+| Bun | ✅ (IndexedDB available) | ✅ | ✅ | — |
+
+---
+
 # Implementing your own `fs`
 
 There are actually TWO possible interfaces for an `fs` object: the classic "callback" API and the newer "promise" API. If your `fs` object provides an enumerable `promises` property, `isomorphic-git` will use the "promise" API _exclusively_.
