@@ -1,4 +1,5 @@
 /* eslint-env node, browser, jasmine */
+import { promises as fsp } from 'fs'
 import * as path from 'path'
 
 import { statusMatrix, add, remove } from 'isomorphic-git'
@@ -415,5 +416,19 @@ describe('statusMatrix', () => {
     expect(matrix).toEqual([['a.txt', 1, 1, 1]])
     const indexAfter = await fs.read(path.join(gitdir, 'index'))
     expect(indexAfter).toEqual(indexBefore)
+  })
+
+  it('statusMatrix with symlink targeting ignored directory', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await fs.write(path.join(dir, '.gitignore'), 'ignored-dir\n')
+    await fs.mkdir(path.join(dir, 'ignored-dir'))
+    await fs.write(path.join(dir, 'ignored-dir', 'file.txt'), 'secret')
+    await fsp.symlink('ignored-dir', path.join(dir, 'symlink-to-ignored'))
+
+    const matrix = await statusMatrix({ fs, dir, gitdir })
+    expect(matrix).toEqual([
+      ['.gitignore', 0, 2, 0],
+      ['symlink-to-ignored', 0, 2, 0],
+    ])
   })
 })
