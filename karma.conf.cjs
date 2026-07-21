@@ -78,24 +78,29 @@ module.exports = function (config) {
         base: 'SauceLabs',
         browserName: 'firefox',
       },
+      // Browser versions target a "few years old" buffer: recent enough to run
+      // modern JS (the 2020-era Edge 79 / Safari 14 failed on modern syntax),
+      // but old enough to cover users who have not updated in a couple of years.
+      // NOTE: these Sauce Labs / BrowserStack version+platform strings can only be
+      // validated in CI (they need the SAUCE_*/BROWSER_STACK_* secrets); adjust if
+      // a platform/version combination is reported as unavailable.
       sl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge',
-        version: '79.0',
+        version: '110',
       },
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
-        platform: 'macOS 11.00',
-        version: '14',
+        platform: 'macOS 12',
+        version: '16',
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone 11 Pro Max Simulator',
+        deviceName: 'iPhone 14 Simulator',
         platformName: 'iOS',
-        platformVersion: '14.0',
+        platformVersion: '16.0',
         browserName: 'Safari',
-        appiumVersion: '1.18.3',
       },
       XXXsl_android_chrome: {
         base: 'SauceLabs',
@@ -109,9 +114,9 @@ module.exports = function (config) {
       bs_android_chrome: {
         base: 'BrowserStack',
         os: 'android',
-        os_version: '11.0',
-        browser: 'android',
-        device: 'Google Pixel 5',
+        os_version: '12.0',
+        browser: 'chrome',
+        device: 'Samsung Galaxy S22',
         real_mobile: true,
         captureTimeout: 5 * 60 * 1000, // defaults to 120 ms
         timeout: 1000,                 // defaults to 300 ms

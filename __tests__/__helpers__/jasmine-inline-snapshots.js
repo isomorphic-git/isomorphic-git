@@ -20,10 +20,25 @@ ${diff(actual, snapshot)}`)
   }
 }
 
+// Jasmine lacks the jest-style `.skip`/`.only` sub-functions; alias them to the
+// native x*/f* helpers so test files using `describe.skip` / `it.skip` load.
+if (typeof jest === 'undefined') {
+  if (typeof describe !== 'undefined') {
+    if (typeof xdescribe !== 'undefined') describe.skip = xdescribe
+    if (typeof fdescribe !== 'undefined') describe.only = fdescribe
+  }
+  if (typeof it !== 'undefined') {
+    if (typeof xit !== 'undefined') it.skip = xit
+    if (typeof fit !== 'undefined') it.only = fit
+  }
+}
+
 // Jest has a toMatchInlineSnapshot() matcher built in, so we only
 // need to run this polyfill if jest is undefined.
+// NOTE: custom matchers must be registered in `beforeEach` — Jasmine clears them
+// after every spec, so registering once in `beforeAll` leaves later specs without it.
 if (typeof jest === 'undefined' && typeof jasmine !== 'undefined') {
-  beforeAll(() => {
+  beforeEach(() => {
     jasmine.addMatchers({
       toMatchInlineSnapshot(_util, _customEqualityTesters) {
         return {
