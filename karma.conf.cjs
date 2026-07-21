@@ -39,7 +39,22 @@ module.exports = function (config) {
         watched: false,
         included: false,
       },
+      // 1x1 image served for the browsers (Safari) that request favicons /
+      // apple-touch icons, to avoid a flood of 404 warnings in the logs.
+      {
+        pattern: '__tests__/__helpers__/1px.png',
+        served: true,
+        watched: false,
+        included: false,
+      },
     ],
+    // Serve a 1x1 image for the icon paths Safari requests at the site root, so
+    // they don't spam the log with 404s.
+    proxies: {
+      '/favicon.ico': '/base/__tests__/__helpers__/1px.png',
+      '/apple-touch-icon.png': '/base/__tests__/__helpers__/1px.png',
+      '/apple-touch-icon-precomposed.png': '/base/__tests__/__helpers__/1px.png',
+    },
     // list of files to exclude
     exclude: [],
     // preprocess matching files before serving them to the browser

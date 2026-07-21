@@ -169,7 +169,7 @@
     "path-browserify": "^1.0.1",
     "prettier": "^3.6.2",
     "prettier-config-standard": "^1.0.1",
-    "pretty-format": "24.9.0",
+    "pretty-format": "^30.2.0",
     "process": "^0.11.10",
     "puppeteer": "^24.22.3",
     "replace-in-file": "4.1.3",

@@ -3,7 +3,16 @@ import diff from 'diff-lines'
 import prettyFormat from 'pretty-format'
 
 function assertSnapshot(object, snapshot) {
-  let actual = prettyFormat(object)
+  // Match Jest's inline-snapshot serialization (Jest >= 28 drops the `Object`/
+  // `Array` prototype prefixes) so snapshots written for the Node/Jest run also
+  // match in the browser/Jasmine run. Jest compares against the raw source of the
+  // inline snapshot (with `\"`/`\\` escapes intact); here the snapshot argument
+  // has already been un-escaped by the JS parser, so un-escape pretty-format's
+  // output the same way before comparing.
+  let actual = prettyFormat(object, { printBasicPrototype: false }).replace(
+    /\\(["\\])/g,
+    '$1'
+  )
   if (snapshot.includes('\n')) {
     // we must unindent
     const match = snapshot.match(/^\n( *)/)
