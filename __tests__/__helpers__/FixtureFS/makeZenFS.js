@@ -8,13 +8,21 @@ import {
 import { FileSystem } from 'isomorphic-git/internal-apis'
 
 export async function makeZenFS(dir) {
-  const index = require('../../__fixtures__/index.json')
+  // Use a dynamic import instead of `require` (this is an ES module). Kept inside
+  // the function — and eagerly inlined by webpack — so it is only evaluated in the
+  // browser, where `makeZenFS` is actually called.
+  const { default: index } = await import(
+    /* webpackMode: "eager" */ '../../__fixtures__/index.json'
+  )
   await configureSingle({
     backend: CopyOnWrite,
     readable: {
       backend: Fetch,
       index,
-      baseUrl: '/base/__tests__/__fixtures__/',
+      // ZenFS' Fetch backend builds request URLs with `new URL()`, which requires
+      // an absolute base. Karma serves the fixtures under `/base/…` on its own
+      // origin, so anchor the base URL to it.
+      baseUrl: `${globalThis.location.origin}/base/__tests__/__fixtures__/`,
     },
     writable: InMemory,
   })
