@@ -20,9 +20,15 @@ ${diff(actual, snapshot)}`)
   }
 }
 
-// Jasmine lacks the jest-style `.skip`/`.only` sub-functions; alias them to the
-// native x*/f* helpers so test files using `describe.skip` / `it.skip` load.
-if (typeof jest === 'undefined') {
+// This is called explicitly from index.webpack.js (rather than relying on a
+// side-effect-only import) because isomorphic-git's package.json sets
+// "sideEffects": false, which makes webpack tree-shake side-effect-only imports.
+export function installJasmineSnapshots() {
+  // Jest has a built-in toMatchInlineSnapshot() and .skip/.only helpers.
+  if (typeof jest !== 'undefined') return
+
+  // Jasmine lacks the jest-style `.skip`/`.only` sub-functions; alias them to the
+  // native x*/f* helpers so test files using `describe.skip` / `it.skip` load.
   if (typeof describe !== 'undefined') {
     if (typeof xdescribe !== 'undefined') describe.skip = xdescribe
     if (typeof fdescribe !== 'undefined') describe.only = fdescribe
@@ -31,33 +37,25 @@ if (typeof jest === 'undefined') {
     if (typeof xit !== 'undefined') it.skip = xit
     if (typeof fit !== 'undefined') it.only = fit
   }
-}
 
-// Jest has a toMatchInlineSnapshot() matcher built in, so we only
-// need to run this polyfill if jest is undefined.
-// NOTE: custom matchers must be registered in `beforeEach` — Jasmine clears them
-// after every spec, so registering once in `beforeAll` leaves later specs without it.
-if (typeof jest === 'undefined' && typeof jasmine !== 'undefined') {
-  beforeEach(() => {
-    jasmine.addMatchers({
-      toMatchInlineSnapshot(_util, _customEqualityTesters) {
-        return {
-          compare(actual, expected) {
-            try {
-              assertSnapshot(actual, expected)
-              return {
-                pass: true,
-                message: () => `matched inline snapshot`,
+  // Register the toMatchInlineSnapshot matcher. Jasmine clears custom matchers
+  // after every spec, so this must run in `beforeEach`, not `beforeAll`.
+  if (typeof jasmine !== 'undefined') {
+    beforeEach(() => {
+      jasmine.addMatchers({
+        toMatchInlineSnapshot() {
+          return {
+            compare(actual, expected) {
+              try {
+                assertSnapshot(actual, expected)
+                return { pass: true, message: 'matched inline snapshot' }
+              } catch (err) {
+                return { pass: false, message: err.message }
               }
-            } catch (err) {
-              return {
-                pass: false,
-                message: () => err.message,
-              }
-            }
-          },
-        }
-      },
+            },
+          }
+        },
+      })
     })
-  })
+  }
 }

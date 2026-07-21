@@ -115,7 +115,7 @@ jobs:
       fail-fast: false
       matrix:
         # This is a comma-separated list of Karma launchers
-        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","sl_edge","sl_safari","sl_ios_safari","bs_android_chrome"')) }}
+        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","bs_edge","bs_safari","bs_ios_safari","bs_android_chrome"')) }}
 
       # Our BrowserStack plan allows up to 5 parallel tests. We limit each workflow to 2 to avoid the limit.
       max-parallel: 2

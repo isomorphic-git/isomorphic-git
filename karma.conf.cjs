@@ -4,12 +4,6 @@ const path = require('path')
 
 const webpack = require('webpack')
 
-const REPO = process.env.BUILD_REPOSITORY_NAME
-const ISSUE =
-  process.env.SYSTEM_PULLREQUEST_PULLREQUESTNUMBER ||
-  process.env.SYSTEM_PULLREQUEST_PULLREQUESTID
-const COMMIT = process.env.BUILD_SOURCEVERSION
-
 module.exports = function (config) {
   const options = {
     // start these browsers
@@ -60,63 +54,40 @@ module.exports = function (config) {
 
     // Increase timeouts since some actions take quite a while.
     // Refer to:
-    // - https://support.saucelabs.com/hc/en-us/articles/225104707-Karma-Tests-Disconnect-Particularly-When-Running-Tests-on-Safari
     // - https://github.com/karma-runner/karma-browserstack-launcher/issues/61
     captureTimeout: 3e5,
     browserNoActivityTimeout: 3e5,
     browserDisconnectTimeout: 3e5,
     browserDisconnectTolerance: 3,
 
-    // SauceLabs browsers
     customLaunchers: {
-      XXXsl_chrome: {
-        base: 'SauceLabs',
-        browserName: 'chrome',
-        extendedDebugging: true,
+      // Cross-platform browsers run on BrowserStack. Versions target a
+      // "few years old" buffer: recent enough to run modern JS (the 2020-era
+      // Edge 79 / Safari 14 failed on modern syntax), but old enough to cover
+      // users who have not updated in a couple of years.
+      // NOTE: these BrowserStack browser/os/device strings can only be validated
+      // in CI (they need the BROWSER_STACK_* secrets); adjust if a combination is
+      // reported as unavailable.
+      bs_edge: {
+        base: 'BrowserStack',
+        browser: 'edge',
+        browser_version: '110.0',
+        os: 'Windows',
+        os_version: '11',
       },
-      XXXsl_firefox: {
-        base: 'SauceLabs',
-        browserName: 'firefox',
+      bs_safari: {
+        base: 'BrowserStack',
+        browser: 'safari',
+        browser_version: '16.0',
+        os: 'OS X',
+        os_version: 'Ventura',
       },
-      // Browser versions target a "few years old" buffer: recent enough to run
-      // modern JS (the 2020-era Edge 79 / Safari 14 failed on modern syntax),
-      // but old enough to cover users who have not updated in a couple of years.
-      // NOTE: these Sauce Labs / BrowserStack version+platform strings can only be
-      // validated in CI (they need the SAUCE_*/BROWSER_STACK_* secrets); adjust if
-      // a platform/version combination is reported as unavailable.
-      // W3C capabilities (karma-sauce-launcher >= 4). Sauce's Appium 2 rejects the
-      // legacy JWP style that karma-sauce-launcher@1 emitted.
-      sl_edge: {
-        base: 'SauceLabs',
-        browserName: 'MicrosoftEdge',
-        browserVersion: '110',
-        platformName: 'Windows 11',
-      },
-      sl_safari: {
-        base: 'SauceLabs',
-        browserName: 'safari',
-        browserVersion: '16',
-        platformName: 'macOS 13',
-      },
-      sl_ios_safari: {
-        base: 'SauceLabs',
-        browserName: 'safari',
-        platformName: 'iOS',
-        'appium:deviceName': 'iPhone 14 Simulator',
-        'appium:platformVersion': '16.0',
-        'appium:automationName': 'XCUITest',
-        'sauce:options': {
-          appiumVersion: 'latest',
-        },
-      },
-      XXXsl_android_chrome: {
-        base: 'SauceLabs',
-        deviceOrientation: 'portrait',
-        deviceName: 'Android GoogleAPI Emulator',
-        platformName: 'Android',
-        platformVersion: '7.1',
-        browserName: 'Chrome',
-        appiumVersion: '1.15.0',
+      bs_ios_safari: {
+        base: 'BrowserStack',
+        device: 'iPhone 14',
+        os: 'ios',
+        os_version: '16',
+        real_mobile: true,
       },
       bs_android_chrome: {
         base: 'BrowserStack',
@@ -141,19 +112,6 @@ module.exports = function (config) {
         flags: ['--no-sandbox'],
       },
     },
-    sauceLabs: {
-      // Since tags aren't being sent correctly, I'm going to stick the branch name in here.
-      testName: `${REPO} / ${ISSUE} / ${COMMIT}`,
-      // Note: I added the Date.now() bit so that when I can click "Restart" on a Travis job,
-      // Sauce Labs does not simply append new test results to the old set that failed, which
-      // convinces karma that it failed again and always.
-      build: process.env.BUILD_BUILDID + '-' + Date.now(),
-      // Note: it does not appear that tags are being sent correctly.
-      tags: [ISSUE],
-      recordScreenshots: false,
-      recordVideo: false,
-      public: 'public restricted',
-    },
     concurrency: 6,
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
@@ -167,6 +125,12 @@ module.exports = function (config) {
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',
+      // isomorphic-git's package.json sets "sideEffects": false, which makes
+      // webpack tree-shake side-effect-only imports — including the
+      // `import './jasmine-inline-snapshots.js'` in index.webpack.js that
+      // registers the toMatchInlineSnapshot matcher and describe.skip aliases.
+      // Disable that optimization so the test setup module is always kept.
+      optimization: { sideEffects: false },
       module: {
         rules: [
           {
@@ -235,7 +199,6 @@ module.exports = function (config) {
       'karma-firefox-launcher',
       'karma-jasmine',
       'karma-junit-reporter',
-      'karma-sauce-launcher',
       'karma-verbose-reporter',
       'karma-webpack',
       {
@@ -261,18 +224,6 @@ module.exports = function (config) {
   // Speed things up, at the cost of not saving the test results (except in the stdout log).
   if (process.env.FAILFAST && process.env.FAILFAST === 'true') {
     options.reporters.push('fail-fast')
-  }
-
-  if (!process.env.SAUCE_USERNAME) {
-    console.log(
-      'Skipping SauceLabs tests because SAUCE_USERNAME environment variable is not set.'
-    )
-  } else if (!process.env.SAUCE_ACCESS_KEY) {
-    console.log(
-      'Skipping SauceLabs tests because SAUCE_ACCESS_KEY environment variable is not set.'
-    )
-  } else {
-    options.reporters.push('saucelabs')
   }
 
   if (process.env.TEST_BROWSERS) {

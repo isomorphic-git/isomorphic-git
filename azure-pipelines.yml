@@ -35,7 +35,7 @@ jobs:
           GITHUB_TEST_USERNAME: $(GITHUB_TEST_USERNAME)
           SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
           SAUCE_USERNAME: $(SAUCE_USERNAME)
-          TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome'
+          TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,bs_edge,bs_safari,bs_ios_safari,bs_android_chrome'
 
       - task: PublishTestResults@2
         displayName: 'Save test results'
