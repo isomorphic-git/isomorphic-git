@@ -84,23 +84,30 @@ module.exports = function (config) {
       // NOTE: these Sauce Labs / BrowserStack version+platform strings can only be
       // validated in CI (they need the SAUCE_*/BROWSER_STACK_* secrets); adjust if
       // a platform/version combination is reported as unavailable.
+      // W3C capabilities (karma-sauce-launcher >= 4). Sauce's Appium 2 rejects the
+      // legacy JWP style that karma-sauce-launcher@1 emitted.
       sl_edge: {
         base: 'SauceLabs',
         browserName: 'MicrosoftEdge',
-        version: '110',
+        browserVersion: '110',
+        platformName: 'Windows 11',
       },
       sl_safari: {
         base: 'SauceLabs',
         browserName: 'safari',
-        platform: 'macOS 12',
-        version: '16',
+        browserVersion: '16',
+        platformName: 'macOS 13',
       },
       sl_ios_safari: {
         base: 'SauceLabs',
-        deviceName: 'iPhone 14 Simulator',
+        browserName: 'safari',
         platformName: 'iOS',
-        platformVersion: '16.0',
-        browserName: 'Safari',
+        'appium:deviceName': 'iPhone 14 Simulator',
+        'appium:platformVersion': '16.0',
+        'appium:automationName': 'XCUITest',
+        'sauce:options': {
+          appiumVersion: 'latest',
+        },
       },
       XXXsl_android_chrome: {
         base: 'SauceLabs',
