@@ -11,7 +11,10 @@ describe('statusMatrix with symlink', () => {
     await fs.write(path.join(dir, '.gitignore'), 'ignored-dir\n')
     await fs.mkdir(path.join(dir, 'ignored-dir'))
     await fs.write(path.join(dir, 'ignored-dir', 'file.txt'), 'secret')
-    await _fs.promises.symlink('ignored-dir', path.join(dir, 'symlink-to-ignored'))
+    await _fs.promises.symlink(
+      'ignored-dir',
+      path.join(dir, 'symlink-to-ignored')
+    )
 
     const matrix = await statusMatrix({ fs, dir, gitdir })
     expect(matrix).toEqual([
