@@ -201,7 +201,16 @@ async function getChanges({ fs, cache, gitdir, commit, shallow }) {
         current && current.type(),
         previous && previous.type(),
       ])
-      if (currentType === 'tree' || previousType === 'tree') {
+      if (currentType === 'tree') {
+        if (previousType && previousType !== 'tree') {
+          return [null, await previous.oid(), filepath]
+        }
+        return
+      }
+      if (previousType === 'tree') {
+        if (currentType) {
+          return [await current.oid(), null, filepath]
+        }
         return
       }
       const [newOid, oldOid] = await Promise.all([

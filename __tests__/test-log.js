@@ -66,6 +66,7 @@ describe('log', () => {
     }
     const originalContent = 'original content'
     const nestedContent = 'nested content'
+    const originalOid = (await hashBlob({ object: originalContent })).oid
     const nestedOid = (await hashBlob({ object: nestedContent })).oid
 
     await init({ fs, dir })
@@ -88,6 +89,7 @@ describe('log', () => {
     })
 
     expect(latestCommit.commit.changes).toEqual([
+      [null, originalOid, 'entry'],
       [nestedOid, null, 'entry/nested.txt'],
     ])
   })
