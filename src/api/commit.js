@@ -29,6 +29,7 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.amend = false] - If true, replaces the last commit pointed to by `ref` with a new commit.
  * @param {boolean} [args.dryRun = false] - If true, simulates making a commit so you can test whether it would succeed. Implies `noUpdateBranch`.
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
+ * @param {boolean} [args.disallowEmpty = false] - If true, throws an error instead of creating a commit with no staged changes.
  * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
  * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.
  * @param {string} [args.tree] - The SHA-1 object id of the tree to use. If not specified, a new tree object is created from the current git index.
@@ -61,6 +62,7 @@ export async function commit({
   amend = false,
   dryRun = false,
   noUpdateBranch = false,
+  disallowEmpty = false,
   ref,
   parent,
   tree,
@@ -89,6 +91,7 @@ export async function commit({
       amend,
       dryRun,
       noUpdateBranch,
+      disallowEmpty,
       ref,
       parent,
       tree,

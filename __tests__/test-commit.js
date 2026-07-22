@@ -87,12 +87,67 @@ describe('commit', () => {
       dir,
       author,
       message: 'Initial commit',
+      disallowEmpty: true,
     })
 
     const commits = await log({ fs, dir })
     expect(commits.length).toBe(1)
     expect(commits[0].commit.parent).toEqual([])
     expect(await resolveRef({ fs, dir, ref: 'HEAD' })).toEqual(commits[0].oid)
+  })
+
+  it('disallows an empty initial commit when disallowEmpty is true', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir })
+
+    let error = null
+    try {
+      await commit({
+        fs,
+        dir,
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+        },
+        message: 'Empty initial commit',
+        disallowEmpty: true,
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeInstanceOf(Errors.EmptyCommitError)
+  })
+
+  it('disallows an unchanged commit when disallowEmpty is true', async () => {
+    const { fs, gitdir } = await makeFixture('test-commit')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+    }
+    await commit({
+      fs,
+      gitdir,
+      author,
+      message: 'Baseline commit',
+    })
+    const oid = await resolveRef({ fs, gitdir, ref: 'HEAD' })
+
+    let error = null
+    try {
+      await commit({
+        fs,
+        gitdir,
+        author,
+        message: 'Empty commit',
+        disallowEmpty: true,
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeInstanceOf(Errors.EmptyCommitError)
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(oid)
   })
 
   it('Cannot commit without message', async () => {

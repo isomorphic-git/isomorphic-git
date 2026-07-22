@@ -1,6 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
+import { EmptyCommitError } from '../errors/EmptyCommitError.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NoCommitError } from '../errors/NoCommitError.js'
@@ -37,6 +38,7 @@ import { _readCommit as readCommit } from './readCommit.js'
  * @param {boolean} [args.amend = false]
  * @param {boolean} [args.dryRun = false]
  * @param {boolean} [args.noUpdateBranch = false]
+ * @param {boolean} [args.disallowEmpty = false]
  * @param {string} [args.ref]
  * @param {string[]} [args.parent]
  * @param {string} [args.tree]
@@ -55,6 +57,7 @@ export async function _commit({
   amend = false,
   dryRun = false,
   noUpdateBranch = false,
+  disallowEmpty = false,
   ref,
   parent,
   tree,
@@ -140,6 +143,15 @@ export async function _commit({
             return GitRefManager.resolve({ fs, gitdir, ref: p })
           })
         )
+      }
+
+      if (
+        disallowEmpty &&
+        !amend &&
+        ((initialCommit && index.entries.length === 0) ||
+          (!initialCommit && tree === refCommit.commit.tree))
+      ) {
+        throw new EmptyCommitError()
       }
 
       // Determine message of this commit
