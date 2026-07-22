@@ -92,4 +92,17 @@ describe('GitRemoteManager', () => {
     expect(helper).toBeNull()
     expect(error.code).toBe(Errors.UrlParseError.code)
   })
+  
+  it('ReDos attack', () => {
+    const bad = 'a'.repeat(100000) + '\u0000'
+    const start = Date.now()
+    let err
+    try {
+      GitRemoteManager.getRemoteHelperFor({ url: bad })
+    } catch (e) {
+      err = e
+    }
+    const elapsed = Date.now() - start
+    expect(elapsed).toBeLessThan(1000)
+  })
 })

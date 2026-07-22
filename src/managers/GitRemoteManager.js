@@ -53,7 +53,7 @@ function parseRemoteUrl({ url }) {
       address: url,
     }
   }
-  const matches = url.match(/(\w+)(:\/\/|::)(.*)/)
+  const matches = url.match(/^(\w+)(:\/\/|::)(.*)/)
   if (matches === null) return
   /*
    * When git encounters a URL of the form <transport>://<address>, where <transport> is
