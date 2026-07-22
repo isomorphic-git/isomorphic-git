@@ -1,7 +1,9 @@
 // @ts-check
 import '../typedefs.js'
 
+import { TREE } from '../commands/TREE.js'
 import { _readCommit } from '../commands/readCommit.js'
+import { _walk } from '../commands/walk.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
@@ -21,7 +23,7 @@ import { resolveFilepath } from '../utils/resolveFilepath.js'
  * @param {number|void} args.depth
  * @param {boolean=} [args.force=false] do not throw error if filepath is not exist (works only for a single file). defaults to false
  * @param {boolean=} [args.follow=false] Continue listing the history of a file beyond renames (works only for a single file). defaults to false
- * @param {boolean=} args.follow Continue listing the history of a file beyond renames (works only for a single file). defaults to false
+ * @param {boolean=} [args.includeChanges=false] Include changed file object ids for each commit.
  *
  * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
  * @see ReadCommitResult
@@ -42,6 +44,7 @@ export async function _log({
   since,
   force,
   follow,
+  includeChanges,
 }) {
   const sinceTimestamp =
     typeof since === 'undefined'
@@ -169,5 +172,41 @@ export async function _log({
     // Process tips in order by age
     tips.sort((a, b) => compareAge(a.commit, b.commit))
   }
+  if (includeChanges) {
+    await Promise.all(
+      commits.map(async commit => {
+        commit.commit.changes = await getChanges({ fs, cache, gitdir, commit })
+      })
+    )
+  }
   return commits
+}
+
+async function getChanges({ fs, cache, gitdir, commit }) {
+  const parent =
+    commit.commit.parent[0] || '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+  return _walk({
+    fs,
+    cache,
+    gitdir,
+    trees: [TREE({ ref: commit.oid }), TREE({ ref: parent })],
+    map: async (filepath, [current, previous]) => {
+      const [currentType, previousType] = await Promise.all([
+        current && current.type(),
+        previous && previous.type(),
+      ])
+      if (
+        (currentType === 'tree' || !currentType) &&
+        (previousType === 'tree' || !previousType)
+      ) {
+        return
+      }
+      const [newOid, oldOid] = await Promise.all([
+        current ? current.oid() : null,
+        previous ? previous.oid() : null,
+      ])
+      if (newOid === oldOid) return
+      return [newOid, oldOid, filepath]
+    },
+  })
 }

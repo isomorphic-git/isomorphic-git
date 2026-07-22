@@ -7,6 +7,7 @@ import './typedefs-http.js'
  * @property {string} message Commit message
  * @property {string} tree SHA-1 object id of corresponding file tree
  * @property {string[]} parent an array of zero or more SHA-1 object ids
+ * @property {[string | null, string | null, string][]} [changes] Changed files as `[newOid, oldOid, filepath]`; present when `log` is called with `includeChanges: true`.
  * @property {Object} author
  * @property {string} author.name The author's name
  * @property {string} author.email The author's email

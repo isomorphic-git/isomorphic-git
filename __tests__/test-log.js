@@ -1,10 +1,53 @@
 /* eslint-env node, browser, jasmine */
+import * as path from 'path'
+
 import { pgp } from '@isomorphic-git/pgp-plugin'
-import { log } from 'isomorphic-git'
+import { add, commit, hashBlob, init, log, remove } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('log', () => {
+  it('includes changed file object ids when includeChanges is true', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const oldContent = 'old content'
+    const newContent = 'new content'
+    const addedContent = 'added content'
+    const oldOid = (await hashBlob({ object: oldContent })).oid
+    const newOid = (await hashBlob({ object: newContent })).oid
+    const addedOid = (await hashBlob({ object: addedContent })).oid
+
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'a.txt'), oldContent)
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author, message: 'Add a.txt' })
+
+    await fs.write(path.join(dir, 'a.txt'), newContent)
+    await fs.write(path.join(dir, 'b.txt'), addedContent)
+    await add({ fs, dir, filepath: 'a.txt' })
+    await add({ fs, dir, filepath: 'b.txt' })
+    await commit({ fs, dir, author, message: 'Update a.txt and add b.txt' })
+
+    await remove({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author, message: 'Remove a.txt' })
+
+    const commits = await log({ fs, dir, includeChanges: true })
+
+    expect(commits.map(({ commit }) => commit.changes)).toEqual([
+      [[null, newOid, 'a.txt']],
+      [
+        [newOid, oldOid, 'a.txt'],
+        [addedOid, null, 'b.txt'],
+      ],
+      [[oldOid, null, 'a.txt']],
+    ])
+  })
+
   it('HEAD', async () => {
     const { fs, gitdir } = await makeFixture('test-log')
     const commits = await log({ fs, gitdir, ref: 'HEAD' })
