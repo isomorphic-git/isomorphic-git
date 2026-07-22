@@ -16,6 +16,8 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
 import { _readCommit as readCommit } from './readCommit.js'
 
+const EMPTY_TREE_OID = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+
 /**
  *
  * @param {Object} args
@@ -148,7 +150,7 @@ export async function _commit({
       if (
         disallowEmpty &&
         !amend &&
-        ((initialCommit && index.entries.length === 0) ||
+        ((initialCommit && tree === EMPTY_TREE_OID) ||
           (!initialCommit && tree === refCommit.commit.tree))
       ) {
         throw new EmptyCommitError()

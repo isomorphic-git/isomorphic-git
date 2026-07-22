@@ -9,6 +9,8 @@ import {
   resolveRef,
   init,
   add,
+  writeBlob,
+  writeTree,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -117,6 +119,60 @@ describe('commit', () => {
     }
 
     expect(error).toBeInstanceOf(Errors.EmptyCommitError)
+  })
+
+  it('disallows an explicitly empty initial tree when disallowEmpty is true', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir })
+
+    let error = null
+    try {
+      await commit({
+        fs,
+        dir,
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+        },
+        message: 'Empty initial commit',
+        tree: '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
+        disallowEmpty: true,
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeInstanceOf(Errors.EmptyCommitError)
+  })
+
+  it('allows an explicitly non-empty initial tree when disallowEmpty is true', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-init')
+    await init({ fs, dir })
+    const blob = await writeBlob({
+      fs,
+      gitdir,
+      blob: Buffer.from('hello', 'utf8'),
+    })
+    const tree = await writeTree({
+      fs,
+      gitdir,
+      tree: [{ mode: '100644', path: 'hello.txt', oid: blob, type: 'blob' }],
+    })
+
+    await commit({
+      fs,
+      dir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+      },
+      message: 'Initial commit',
+      tree,
+      disallowEmpty: true,
+    })
+
+    const [commitEntry] = await log({ fs, dir })
+    expect(commitEntry.commit.tree).toBe(tree)
   })
 
   it('disallows an unchanged commit when disallowEmpty is true', async () => {
