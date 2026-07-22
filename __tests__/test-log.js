@@ -2,7 +2,15 @@
 import * as path from 'path'
 
 import { pgp } from '@isomorphic-git/pgp-plugin'
-import { add, commit, hashBlob, init, log, remove } from 'isomorphic-git'
+import {
+  add,
+  commit,
+  hashBlob,
+  init,
+  log,
+  remove,
+  resolveRef,
+} from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -45,6 +53,42 @@ describe('log', () => {
         [addedOid, null, 'b.txt'],
       ],
       [[oldOid, null, 'a.txt']],
+    ])
+  })
+
+  it('includes files within a directory that replaced a file', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const originalContent = 'original content'
+    const nestedContent = 'nested content'
+    const nestedOid = (await hashBlob({ object: nestedContent })).oid
+
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'entry'), originalContent)
+    await add({ fs, dir, filepath: 'entry' })
+    await commit({ fs, dir, author, message: 'Add file' })
+
+    await fs.rm(path.join(dir, 'entry'))
+    await remove({ fs, dir, filepath: 'entry' })
+    await fs.mkdir(path.join(dir, 'entry'))
+    await fs.write(path.join(dir, 'entry', 'nested.txt'), nestedContent)
+    await add({ fs, dir, filepath: 'entry/nested.txt' })
+    await commit({ fs, dir, author, message: 'Replace file with directory' })
+
+    const [latestCommit] = await log({
+      fs,
+      dir,
+      depth: 1,
+      includeChanges: true,
+    })
+
+    expect(latestCommit.commit.changes).toEqual([
+      [nestedOid, null, 'entry/nested.txt'],
     ])
   })
 
@@ -358,6 +402,36 @@ describe('log', () => {
         },
       ]
     `)
+  })
+
+  it('includes changes for a shallow boundary', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const gitdir = path.join(dir, '.git')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const originalContent = 'original content'
+    const updatedContent = 'updated content'
+    const updatedOid = (await hashBlob({ object: updatedContent })).oid
+
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'a.txt'), originalContent)
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author, message: 'Initial commit' })
+    await fs.write(path.join(dir, 'a.txt'), updatedContent)
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author, message: 'Update a.txt' })
+
+    const head = await resolveRef({ fs, dir, ref: 'HEAD' })
+    await fs.write(path.join(gitdir, 'shallow'), `${head}\n`)
+
+    const commits = await log({ fs, dir, includeChanges: true })
+
+    expect(commits).toHaveLength(1)
+    expect(commits[0].commit.changes).toEqual([[updatedOid, null, 'a.txt']])
   })
   it('has correct payloads and gpgsig', async () => {
     // Setup

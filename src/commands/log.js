@@ -173,18 +173,24 @@ export async function _log({
     tips.sort((a, b) => compareAge(a.commit, b.commit))
   }
   if (includeChanges) {
-    await Promise.all(
-      commits.map(async commit => {
-        commit.commit.changes = await getChanges({ fs, cache, gitdir, commit })
+    for (const commit of commits) {
+      commit.commit.changes = await getChanges({
+        fs,
+        cache,
+        gitdir,
+        commit,
+        shallow: shallowCommits.has(commit.oid),
       })
-    )
+    }
   }
   return commits
 }
 
-async function getChanges({ fs, cache, gitdir, commit }) {
+async function getChanges({ fs, cache, gitdir, commit, shallow }) {
   const parent =
-    commit.commit.parent[0] || '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+    shallow || !commit.commit.parent[0]
+      ? '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+      : commit.commit.parent[0]
   return _walk({
     fs,
     cache,
@@ -195,10 +201,7 @@ async function getChanges({ fs, cache, gitdir, commit }) {
         current && current.type(),
         previous && previous.type(),
       ])
-      if (
-        (currentType === 'tree' || !currentType) &&
-        (previousType === 'tree' || !previousType)
-      ) {
+      if (currentType === 'tree' || previousType === 'tree') {
         return
       }
       const [newOid, oldOid] = await Promise.all([
