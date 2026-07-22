@@ -178,8 +178,11 @@ module.exports = {
         : `cross-env-shell ${jestEnv} ${jestCommand}`,
       // Browser tests run under Jasmine via Karma. Browsers are selected with
       // the TEST_BROWSERS env var (see karma.conf.cjs and the CI matrix).
+      // NOTE: no nps-level retry here — karma already retries flaky/disconnected
+      // browsers within a run (browserDisconnectTolerance), and wrapping the whole
+      // matrix in retry3 just re-ran every browser up to 3x on any failure.
       karma: process.env.CI
-        ? retry3('karma start ./karma.conf.cjs --single-run')
+        ? 'karma start ./karma.conf.cjs --single-run'
         : 'cross-env karma start ./karma.conf.cjs --single-run --log-level debug',
       // Run Karma as a watch server without capturing browsers (attach your own).
       karmore: 'cross-env TEST_NO_BROWSERS=1 karma start --no-single-run',

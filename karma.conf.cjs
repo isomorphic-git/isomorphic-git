@@ -67,12 +67,14 @@ module.exports = function (config) {
     // enable / disable colors in the output (reporters and logs)
     colors: true,
 
-    // Increase timeouts since some actions take quite a while.
+    // Timeouts are kept generous enough for slow BrowserStack sessions, but far
+    // below the previous 5-minute values so a dead/hung (e.g. disconnected Safari)
+    // session fails fast instead of stalling the whole run for minutes.
     // Refer to:
     // - https://github.com/karma-runner/karma-browserstack-launcher/issues/61
-    captureTimeout: 3e5,
-    browserNoActivityTimeout: 3e5,
-    browserDisconnectTimeout: 3e5,
+    captureTimeout: 12e4, // 2 min — initial browser capture on BrowserStack
+    browserNoActivityTimeout: 12e4, // 2 min (> the 60s jasmine test timeout)
+    browserDisconnectTimeout: 6e4, // 1 min to reconnect after a disconnect
     browserDisconnectTolerance: 3,
 
     customLaunchers: {
