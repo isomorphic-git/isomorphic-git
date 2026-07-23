@@ -56,13 +56,21 @@ export function installJasmineSnapshots() {
     if (typeof fit !== 'undefined') it.only = fit
   }
 
+  // `any` aliases: the `expect` package's types clash with the ambient
+  // `@types/jest` globals (so `jestExpect` types as `void`), and `expect` isn't a
+  // declared property of `globalThis`.
+  /** @type {any} */
+  const je = jestExpect
+  /** @type {any} */
+  const globalObj = globalThis
+
   // toMatchInlineSnapshot is a Jest snapshot matcher that rewrites the test's
   // *source file* with the received value. A real browser has no source file to
   // write back to, so we can only compare against the snapshot already inlined in
   // the source (auto-update is impossible here by nature — not a Jasmine quirk).
   // Registered on Jest's expect (persistent) rather than via jasmine.addMatchers
   // (which Jasmine clears after every spec).
-  jestExpect.extend({
+  je.extend({
     toMatchInlineSnapshot(received, expected) {
       try {
         assertSnapshot(received, expected)
@@ -76,5 +84,5 @@ export function installJasmineSnapshots() {
   // Replace Jasmine's global `expect` with Jest's. Jest's matchers throw a
   // JestAssertionError on failure, which Jasmine's spec runner catches and reports
   // as a failed spec.
-  globalThis.expect = jestExpect
+  globalObj.expect = jestExpect
 }
