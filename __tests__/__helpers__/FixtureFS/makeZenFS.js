@@ -6,6 +6,9 @@ import {
   InMemory,
 } from '@zenfs/core'
 import { FileSystem } from 'isomorphic-git/internal-apis'
+// @ts-ignore — utilium exposes the `requests` subpath at runtime (used by
+// @zenfs/core's Fetch backend) but ships no type declarations for it.
+import { resourcesCache } from 'utilium/requests'
 
 // The parsed fixtures index (~800 KB of JSON) is loaded once and reused; only the
 // expensive JSON parse is memoized here. The Fetch backend itself is rebuilt per
@@ -67,6 +70,13 @@ async function makeReadable() {
 // Note: makeFixtureAsSubmodule needs two fixtures in ONE fs, so it calls makeZenFS
 // only once and builds the second fixture itself (see FixtureFSSubmodule.js).
 export async function makeZenFS(dir) {
+  // Isolate each fixture from utilium's module-level (shared) per-URL request
+  // cache. The Fetch backend fires off un-awaited background fetches
+  // (FetchFS._async) that write into this cache; combined with remounting the
+  // global fs per fixture, stale/in-flight entries leak across tests and make
+  // packed-object reads flaky (intermittent "NotFoundError: Could not find <oid>").
+  resourcesCache.clear()
+
   const readable = await makeReadable()
   const root = await resolveMountConfig({
     backend: CopyOnWrite,
