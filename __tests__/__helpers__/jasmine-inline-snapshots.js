@@ -1,5 +1,6 @@
 /* eslint-env jasmine */
 import diff from 'diff-lines'
+import { expect as jestExpect } from 'expect'
 import prettyFormat from 'pretty-format'
 
 function assertSnapshot(object, snapshot) {
@@ -29,11 +30,19 @@ ${diff(actual, snapshot)}`)
   }
 }
 
-// This is called explicitly from index.webpack.js (rather than relying on a
-// side-effect-only import) because isomorphic-git's package.json sets
-// "sideEffects": false, which makes webpack tree-shake side-effect-only imports.
+// Called explicitly from index.webpack.js (rather than as a side-effect-only
+// import) because isomorphic-git's package.json sets "sideEffects": false, which
+// makes webpack tree-shake side-effect-only imports.
+//
+// The browser tests run under Karma + Jasmine, but the test files were authored
+// for Jest. Rather than re-implement Jest's matcher semantics on top of Jasmine
+// (which drift subtly — e.g. Jasmine's `toThrow(/re/)` checks the thrown value for
+// equality, not the message), we swap in Jest's own framework-agnostic matcher
+// library (the `expect` package, same 30.x family as our pretty-format). Jasmine
+// still provides the runner — describe/it/beforeAll and its own globals like
+// `fail` — and only the global `expect` is replaced.
 export function installJasmineSnapshots() {
-  // Jest has a built-in toMatchInlineSnapshot() and .skip/.only helpers.
+  // Real Jest run (Node): it already has expect + toMatchInlineSnapshot + .skip.
   if (typeof jest !== 'undefined') return
 
   // Jasmine lacks the jest-style `.skip`/`.only` sub-functions; alias them to the
@@ -47,24 +56,25 @@ export function installJasmineSnapshots() {
     if (typeof fit !== 'undefined') it.only = fit
   }
 
-  // Register the toMatchInlineSnapshot matcher. Jasmine clears custom matchers
-  // after every spec, so this must run in `beforeEach`, not `beforeAll`.
-  if (typeof jasmine !== 'undefined') {
-    beforeEach(() => {
-      jasmine.addMatchers({
-        toMatchInlineSnapshot() {
-          return {
-            compare(actual, expected) {
-              try {
-                assertSnapshot(actual, expected)
-                return { pass: true, message: 'matched inline snapshot' }
-              } catch (err) {
-                return { pass: false, message: err.message }
-              }
-            },
-          }
-        },
-      })
-    })
-  }
+  // toMatchInlineSnapshot is a Jest snapshot matcher that rewrites the test's
+  // *source file* with the received value. A real browser has no source file to
+  // write back to, so we can only compare against the snapshot already inlined in
+  // the source (auto-update is impossible here by nature — not a Jasmine quirk).
+  // Registered on Jest's expect (persistent) rather than via jasmine.addMatchers
+  // (which Jasmine clears after every spec).
+  jestExpect.extend({
+    toMatchInlineSnapshot(received, expected) {
+      try {
+        assertSnapshot(received, expected)
+        return { pass: true, message: () => 'matched inline snapshot' }
+      } catch (err) {
+        return { pass: false, message: () => err.message }
+      }
+    },
+  })
+
+  // Replace Jasmine's global `expect` with Jest's. Jest's matchers throw a
+  // JestAssertionError on failure, which Jasmine's spec runner catches and reports
+  // as a failed spec.
+  globalThis.expect = jestExpect
 }

@@ -129,6 +129,7 @@
     "all-contributors-cli": "6.20.0",
     "buffer": "^6.0.3",
     "bundlewatch": "^0.4.1",
+    "constants-browserify": "^1.0.0",
     "cross-env": "6.0.0",
     "decompress": "^4.2.0",
     "diff-lines": "1.1.1",
@@ -143,6 +144,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-promise": "^6.6.0",
     "eslint-plugin-standard": "^4.0.1",
+    "expect": "^30.2.0",
     "git-http-mock-server": "2.0.0",
     "github-comment": "1.0.1",
     "inquirer": "^7.0.0",
@@ -178,11 +180,16 @@
     "rxjs": "^5.5.12",
     "semantic-release": "17.4.7",
     "standard": "^17.1.2",
+    "stream-browserify": "^3.0.0",
     "timeout-cli": "0.3.2",
     "typescript": "^5.8.0",
+    "util": "^0.12.5",
     "webpack": "^5.0.1",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-cli": "^4.0.0"
+  },
+  "overrides": {
+    "@jest/test-utils": "0.0.0"
   },
   "prettier": "./.prettierrc.cjs",
   "bundlewatch": {

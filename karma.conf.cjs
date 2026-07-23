@@ -16,6 +16,10 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
     // list of files / patterns to load in the browser
     files: [
+      // Plain script (NOT webpack-preprocessed) that defines the `process` global
+      // before the bundle loads — Jest's pre-bundled `jest-util` reads it at
+      // module-load time. Must come before index.webpack.js.
+      '__tests__/__helpers__/setup-node-globals.js',
       '__tests__/index.webpack.js',
       // The fixtures are fetched individually by ZenFS' Fetch backend, so every
       // file must be served — including dotfiles (`.gitignore`, `.gitkeep`,
@@ -53,7 +57,8 @@ module.exports = function (config) {
     proxies: {
       '/favicon.ico': '/base/__tests__/__helpers__/1px.png',
       '/apple-touch-icon.png': '/base/__tests__/__helpers__/1px.png',
-      '/apple-touch-icon-precomposed.png': '/base/__tests__/__helpers__/1px.png',
+      '/apple-touch-icon-precomposed.png':
+        '/base/__tests__/__helpers__/1px.png',
     },
     // list of files to exclude
     exclude: [],
@@ -114,7 +119,7 @@ module.exports = function (config) {
         device: 'Samsung Galaxy S22',
         real_mobile: true,
         captureTimeout: 5 * 60 * 1000, // defaults to 120 ms
-        timeout: 1000,                 // defaults to 300 ms
+        timeout: 1000, // defaults to 300 ms
       },
       FirefoxHeadless: {
         base: 'Firefox',
@@ -200,18 +205,28 @@ module.exports = function (config) {
         // did). The test files and their helpers reference a few Node built-ins:
         //  - `path` / `path/posix` are used in the browser (e.g. utils/join tests),
         //    so they need a real polyfill.
+        //  - `util` / `stream` / `constants` are pulled in transitively by Jest's
+        //    `expect` (via jest-message-util / jest-util / graceful-fs, used to
+        //    format assertion messages); they need real polyfills so the matcher
+        //    library bundles and its failure messages render.
         //  - `os`, `url`, `https`, `assert` are only reached from Node-only code
         //    paths (e.g. makeNodeFixture), so an empty stub is enough.
+        //  - `module` is required only by stack-utils' Node-only code path, so an
+        //    empty stub is enough.
         // `fs` is handled by the IgnorePlugin above.
         fallback: {
           path: require.resolve('path-browserify'),
           os: require.resolve('os-browserify/browser'),
           buffer: require.resolve('buffer/'),
           process: require.resolve('process/browser'),
+          util: require.resolve('util/'),
+          stream: require.resolve('stream-browserify'),
+          constants: require.resolve('constants-browserify'),
           fs: false,
           url: false,
           https: false,
           assert: false,
+          module: false,
         },
       },
     },
