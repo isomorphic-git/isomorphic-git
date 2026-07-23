@@ -129,6 +129,15 @@ module.exports = function (config) {
         flags: ['--no-sandbox'],
       },
     },
+    // BrowserStack tunnel options (credentials come from the BROWSER_STACK_*
+    // env vars). `forceLocal` routes ALL of the browser's traffic through the
+    // BrowserStack Local tunnel — needed so real mobile devices can reach the
+    // secondary local servers (git-http-mock-server on :8888, cors-proxy on
+    // :9999), which otherwise fail with "Failed to fetch" on Android even though
+    // they work on desktop BrowserStack. (Per BrowserStack support.)
+    browserStack: {
+      forceLocal: true,
+    },
     concurrency: 6,
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
