@@ -67,7 +67,7 @@ import { MemoryBackend } from './MemoryBackend.js'
 export default {
   async fetch(request, env) {
     // Each request gets a fresh in-memory filesystem
-    const fs = new LightningFS('mem', { db: new MemoryBackend() })
+    const fs = new LightningFS('mem', { backend: new MemoryBackend() })
 
     await git.clone({
       fs,
@@ -129,6 +129,7 @@ export default {
 
 ---
 
+<a id="option-3"></a>
 ## Option 3 — Persistent storage (Durable Objects backend)
 
 If the repository must **survive across requests**, replace `MemoryBackend` with a backend
@@ -144,9 +145,9 @@ export class DurableBackend {
   }
   async saveSuperblock(superblock) { await this._storage.put('!root', superblock) }
   async loadSuperblock()           { return (await this._storage.get('!root')) || null }
-  async readFile(inode)            { return (await this._storage.get(inode)) || null }
-  async writeFile(inode, data)     { await this._storage.put(inode, data) }
-  async unlink(inode)              { await this._storage.delete(inode) }
+  async readFile(inode)            { return (await this._storage.get(String(inode))) || null }
+  async writeFile(inode, data)     { await this._storage.put(String(inode), data) }
+  async unlink(inode)              { await this._storage.delete(String(inode)) }
   async wipe()                     { await this._storage.deleteAll() }
 }
 ```
@@ -166,7 +167,7 @@ export class GitRepository {
   }
 
   async fetch(request) {
-    const fs = new LightningFS('repo', { db: new DurableBackend(this.ctx.storage) })
+    const fs = new LightningFS('repo', { backend: new DurableBackend(this.ctx.storage) })
     const url = new URL(request.url)
 
     if (url.pathname === '/init') {
@@ -203,20 +204,21 @@ class_name = "GitRepository"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["GitRepository"]
+new_sqlite_classes = ["GitRepository"]
 ```
 
-> **Storage limits:** Durable Object values have a **128 KiB** limit. For repos with
-> large binary blobs, store file data in [R2](https://developers.cloudflare.com/r2/) and
-> keep only the superblock + inode metadata in Durable Object storage.
+> **Storage limits:** For legacy KV-backed Durable Objects, values have a **128 KiB** limit per key.
+> SQLite-backed Durable Objects (recommended for all new namespaces) allow up to **2 MB** per combined key/value pair
+> and 10 GB total per Durable Object. For repositories with large binary blobs exceeding these limits, store file data
+> in [R2](https://developers.cloudflare.com/r2/) and keep only the superblock + inode metadata in Durable Object storage.
 
 ---
 
 ## Troubleshooting
 
 ### `ReferenceError: indexedDB is not defined`
-You are using the default `LightningFS` without a custom `db` backend. Pass
-`{ db: new MemoryBackend() }` as shown above.
+You are using the default `LightningFS` without a custom `backend`. Pass
+`{ backend: new MemoryBackend() }` as shown above.
 
 ### `ReferenceError: Buffer is not defined`
 Add `nodejs_compat` to `wrangler.toml`:

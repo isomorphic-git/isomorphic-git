@@ -91,7 +91,7 @@ The fix lives entirely in the **filesystem layer**.
 ### Option 1 — LightningFS with a MemoryBackend (recommended)
 
 `LightningFS` is designed to be storage-agnostic. Its `DefaultBackend` uses IndexedDB
-under the hood, but you can swap it out via the `db` option with any object that
+under the hood, but you can swap it out via the `backend` option with any object that
 implements five low-level methods: `saveSuperblock`, `loadSuperblock`, `readFile(inode)`,
 `writeFile(inode, data)`, and `unlink(inode)`.
 
@@ -124,7 +124,7 @@ class MemoryBackend {
 }
 ```
 
-Pass it to `LightningFS` via the `db` option:
+Pass it to `LightningFS` via the `backend` option:
 
 ```js
 import LightningFS from '@isomorphic-git/lightning-fs'
@@ -134,7 +134,7 @@ import http from 'isomorphic-git/http/web'
 import { MemoryBackend } from '@isomorphic-git/lightning-fs'  // once the PR is merged
 // or paste the class above locally in the meantime
 
-const fs = new LightningFS('mem', { db: new MemoryBackend() })
+const fs = new LightningFS('mem', { backend: new MemoryBackend() })
 
 await git.clone({
   fs,
@@ -147,7 +147,7 @@ await git.clone({
 ```
 
 > **Note:** Data is ephemeral — it lives in the JS heap and is lost when the runtime
-> terminates. For persistence across Cloudflare Worker requests, replace `MemoryBackend`
+> terminates. For persistence across Cloudflare Worker requests, see [Option 3 in the Cloudflare Workers guide](./guide-cloudflare-workers.md#option-3--persistent-storage-durable-objects-backend) to replace `MemoryBackend`
 > with a backend backed by [Durable Object storage](https://developers.cloudflare.com/durable-objects/) 
 > using the same five-method interface.
 
@@ -178,7 +178,7 @@ await git.clone({
 
 | Runtime | LightningFS (default) | LightningFS + MemoryBackend | ZenFS InMemory |
 |---|---|---|---|
-| Node.js | ✅ (use native `fs` instead) | ✅ | ✅ |
+| Node.js | ❌ (no IndexedDB; use native `fs`) | ✅ | ✅ |
 | Browser | ✅ | ✅ | ✅ |
 | Cloudflare Workers | ❌ (no IndexedDB) | ✅ | ✅ |
 | Deno Deploy | ❌ (no IndexedDB) | ✅ | ✅ |
