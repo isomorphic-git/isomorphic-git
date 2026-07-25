@@ -72,15 +72,20 @@ module.exports = function (config) {
     // enable / disable colors in the output (reporters and logs)
     colors: true,
 
-    // Timeouts are kept generous enough for slow BrowserStack sessions, but far
-    // below the previous 5-minute values so a dead/hung (e.g. disconnected Safari)
-    // session fails fast instead of stalling the whole run for minutes.
+    // Timeouts sized for slow BrowserStack real devices. The heavy CPU-bound
+    // specs (GitPackIndex delta resolution / inflate) run largely synchronously
+    // and block the event loop; on iOS/Android real devices they can take several
+    // minutes, during which no message reaches karma and jasmine's own 60s spec
+    // timer can't fire either — so browserNoActivityTimeout must be well above the
+    // slowest single spec or the session is dropped mid-run ("Disconnected because
+    // no message in N ms"). Kept bounded (with a small disconnect tolerance) so a
+    // genuinely dead session still fails rather than stalling the whole matrix.
     // Refer to:
     // - https://github.com/karma-runner/karma-browserstack-launcher/issues/61
     captureTimeout: 12e4, // 2 min — initial browser capture on BrowserStack
-    browserNoActivityTimeout: 12e4, // 2 min (> the 60s jasmine test timeout)
+    browserNoActivityTimeout: 3e5, // 5 min — headroom for slow real-device specs
     browserDisconnectTimeout: 6e4, // 1 min to reconnect after a disconnect
-    browserDisconnectTolerance: 3,
+    browserDisconnectTolerance: 2,
 
     customLaunchers: {
       // Cross-platform browsers run on BrowserStack. Versions target a
