@@ -95,12 +95,20 @@ module.exports = function (config) {
       // NOTE: these BrowserStack browser/os/device strings can only be validated
       // in CI (they need the BROWSER_STACK_* secrets); adjust if a combination is
       // reported as unavailable.
+      // NOTE on `timeout`: this is the BrowserStack idle-session timeout, in
+      // SECONDS. Its default is 90s — so a spec that blocks the event loop (iso-git
+      // pack delta resolution / inflate can run for minutes on real devices, during
+      // which no message reaches BrowserStack) drops the whole session with
+      // "Disconnected because no message". Raise it on every BrowserStack launcher,
+      // well above the slowest single spec. (No amount of console/verbose output
+      // helps here: a blocked main thread can't emit anything.)
       bs_edge: {
         base: 'BrowserStack',
         browser: 'edge',
         browser_version: '110.0',
         os: 'Windows',
         os_version: '11',
+        timeout: 1000,
       },
       bs_safari: {
         base: 'BrowserStack',
@@ -108,6 +116,7 @@ module.exports = function (config) {
         browser_version: '16.0',
         os: 'OS X',
         os_version: 'Ventura',
+        timeout: 1000,
       },
       bs_ios_safari: {
         base: 'BrowserStack',
@@ -115,6 +124,8 @@ module.exports = function (config) {
         os: 'ios',
         os_version: '16',
         real_mobile: true,
+        captureTimeout: 5 * 60 * 1000,
+        timeout: 1000,
       },
       bs_android_chrome: {
         base: 'BrowserStack',
@@ -123,8 +134,8 @@ module.exports = function (config) {
         browser: 'chrome',
         device: 'Samsung Galaxy S22',
         real_mobile: true,
-        captureTimeout: 5 * 60 * 1000, // defaults to 120 ms
-        timeout: 1000, // defaults to 300 ms
+        captureTimeout: 5 * 60 * 1000,
+        timeout: 1000,
       },
       FirefoxHeadless: {
         base: 'Firefox',
