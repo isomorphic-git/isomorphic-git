@@ -10,7 +10,7 @@
 // SKIPPED (not failed) when it is unavailable. In secure contexts (local
 // ChromeHeadless on localhost, Node, or a browser served over HTTPS) they run
 // normally.
-export function itSecureContext(...args) {
+export function itSecureContext(expectation, assertion, timeout) {
   const runner = typeof crypto !== 'undefined' && crypto.subtle ? it : it.skip
-  return runner(...args)
+  return runner(expectation, assertion, timeout)
 }
