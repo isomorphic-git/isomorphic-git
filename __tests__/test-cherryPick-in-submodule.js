@@ -291,8 +291,9 @@ describe('cherryPick in submodule', () => {
 
   it('reject merge commits', async () => {
     // Setup - programmatic submodule repo and create a merge commit
-    const { fssp, dirsp, dir, gitdir } =
-      await makeSuperprojectAndSubmodule('tmp-cherry-sub-merge')
+    const { fssp, dirsp, dir, gitdir } = await makeSuperprojectAndSubmodule(
+      'tmp-cherry-sub-merge'
+    )
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule-merge')
@@ -740,8 +741,9 @@ describe('cherryPick in submodule', () => {
   })
 
   it('rejects cherry-picking a root commit (submodule)', async () => {
-    const { fssp, dirsp, dir, gitdir } =
-      await makeSuperprojectAndSubmodule('tmp-cherry-sub-root')
+    const { fssp, dirsp, dir, gitdir } = await makeSuperprojectAndSubmodule(
+      'tmp-cherry-sub-root'
+    )
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule-root')
