@@ -75,6 +75,14 @@ export async function makeFixtureAsSubmodule(fixture) {
     verbatimSymlinks: true,
   })
 
+  // Pre-create the reflog directory in the submodule gitdir. Writing a reflog
+  // (stash/branch/checkout) does `fs.write(gitdir/logs/refs/…)`, whose recursive
+  // mkdir can race under the browser fs and surface as an unhandled
+  // `ENOENT: mkdir '…/logs/refs'`. The fixture gitdirs ship without `logs/`, so
+  // create it up front.
+  await ensureDir(join(gitdirsmfullpath, 'logs'))
+  await ensureDir(join(gitdirsmfullpath, 'logs', 'refs'))
+
   // Move the submodule's main dir into place
   const officialSubmoduleDir = join(dirsp, 'mysubmodule')
   await fssp._cp(dirsm, officialSubmoduleDir, {
