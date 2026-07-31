@@ -191,7 +191,14 @@ module.exports = function (config) {
           process: require.resolve('process/browser'),
         }),
         new webpack.DefinePlugin({
-          'process.env.TEST_PUSH_GITHUB_TOKEN': `'${process.env.TEST_PUSH_GITHUB_TOKEN}'`,
+          // Use JSON.stringify so an *unset* token becomes an empty string (falsy)
+          // rather than the literal string 'undefined' (truthy) — otherwise the
+          // GitHub push/fetch suite runs with an invalid token and fails with 401
+          // instead of being skipped. When set (e.g. a CI secret), the real token
+          // is injected.
+          'process.env.TEST_PUSH_GITHUB_TOKEN': JSON.stringify(
+            process.env.TEST_PUSH_GITHUB_TOKEN || ''
+          ),
         }),
       ],
       resolve: {

@@ -68,6 +68,7 @@
     "node": ">=14.17"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "start": "nps",
     "format": "nps format",
     "build": "nps build",
@@ -124,7 +125,7 @@
     "@semantic-release/exec": "5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.16",
-    "@zenfs/core": "^2.5.8",
+    "@zenfs/core": "^2.6.1",
     "agadoo": "2.0.0",
     "all-contributors-cli": "6.20.0",
     "buffer": "^6.0.3",
@@ -168,6 +169,7 @@
     "nps": "^5.10.0",
     "nps-utils": "1.7.0",
     "os-browserify": "^0.3.0",
+    "patch-package": "^8.0.1",
     "path-browserify": "^1.0.1",
     "prettier": "^3.6.2",
     "prettier-config-standard": "^1.0.1",

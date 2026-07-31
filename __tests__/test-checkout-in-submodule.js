@@ -21,6 +21,11 @@ import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 const localhost =
   typeof window === 'undefined' ? '127.0.0.1' : window.location.hostname
 
+// See test-checkout.js: the browser fs (@zenfs/core) has no umask, so a mode
+// captured right after `fs.write({ mode })` doesn't survive a checkout unchanged
+// the way it does under Node's umask. Fully covered in Node; skip in the browser.
+const itUmask = typeof window === 'undefined' ? it : it.skip
+
 describe('checkout', () => {
   it('checkout', async () => {
     // Setup
@@ -255,7 +260,7 @@ describe('checkout', () => {
     `)
   })
 
-  it('checkout file permissions', async () => {
+  itUmask('checkout file permissions', async () => {
     const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-checkout')
     await branch({ fs, dir, gitdir, ref: 'other', checkout: true })
     await checkout({ fs, dir, gitdir, ref: 'test-branch' })
@@ -290,7 +295,7 @@ describe('checkout', () => {
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
 
-  it('checkout changing file permissions', async () => {
+  itUmask('checkout changing file permissions', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-checkout')
 

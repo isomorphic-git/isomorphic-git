@@ -36,9 +36,19 @@ export async function makeFixtureAsSubmodule(fixture) {
   // SAME fs instead (the two fixtures must live together for the _cp calls below).
   let fssp = fs
   let dirsp
+  // mkdir that tolerates the directory already existing (the browser fs and its
+  // async clone can leave a dir in place across the suite; a hard EEXIST here
+  // makes the whole test flaky).
+  const ensureDir = async path => {
+    try {
+      await fssp._mkdir(path)
+    } catch (err) {
+      if (!err || err.code !== 'EEXIST') throw err
+    }
+  }
   if (process.browser) {
     dirsp = `/superproject-${fixture}`
-    await fssp.mkdir(dirsp)
+    await ensureDir(dirsp)
   } else {
     const sp = await makeFixture(`superproject-${fixture}`)
     fssp = sp.fs
@@ -58,7 +68,7 @@ export async function makeFixtureAsSubmodule(fixture) {
   })
 
   // Move the submodule's gitdir into place
-  await fssp._mkdir(join(gitdirsp, 'modules'))
+  await ensureDir(join(gitdirsp, 'modules'))
   const gitdirsmfullpath = join(gitdirsp, 'modules', 'mysubmodule')
   await fssp._cp(gitdirsm, gitdirsmfullpath, {
     recursive: true,

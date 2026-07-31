@@ -20,12 +20,28 @@ import {
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
+// Build a faux-submodule setup that works in BOTH Node and the browser. The
+// superproject and the submodule fixture must share ONE filesystem: in the
+// browser makeFixture() remounts a fresh in-memory fs on every call, so calling
+// it twice would discard the first fixture (see makeFixtureAsSubmodule). So we
+// create the submodule fixture, then place the superproject in the SAME fs.
+async function makeSuperprojectAndSubmodule(submoduleFixture) {
+  const { fs: fssp, dir, gitdir } = await makeFixture(submoduleFixture)
+  let dirsp
+  if (process.browser) {
+    dirsp = '/superproject-test'
+    await fssp.mkdir(dirsp)
+  } else {
+    dirsp = (await makeFixture('superproject-test')).dir
+  }
+  return { fssp, dirsp, dir, gitdir }
+}
+
 describe('cherryPick in submodule', () => {
   it('simple cherry-pick without conflicts', async () => {
     // Setup - create a tiny repository programmatically inside a faux submodule
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    // Create a submodule repo
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub')
 
     // Place submodule into superproject structure similar to makeFixtureAsSubmodule
     await fssp._mkdir(join(dirsp, '.git'))
@@ -165,8 +181,8 @@ describe('cherryPick in submodule', () => {
 
   it('cherry-pick with dryRun', async () => {
     // Setup - programmatic submodule repo
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub-dry')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub-dry')
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule-dry')
@@ -275,8 +291,8 @@ describe('cherryPick in submodule', () => {
 
   it('reject merge commits', async () => {
     // Setup - programmatic submodule repo and create a merge commit
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub-merge')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub-merge')
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule-merge')
@@ -403,8 +419,8 @@ describe('cherryPick in submodule', () => {
 
   it('cherry-pick with custom committer', async () => {
     // Setup - programmatic submodule repo
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub2')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub2')
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule2')
@@ -500,8 +516,8 @@ describe('cherryPick in submodule', () => {
 
   it('noUpdateBranch option', async () => {
     // Setup - programmatic submodule repo
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub3')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub3')
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule3')
@@ -614,8 +630,8 @@ describe('cherryPick in submodule', () => {
 
   it('cherry-pick creates new committer timestamp', async () => {
     // Setup - programmatic submodule repo
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub4')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub4')
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule4')
@@ -724,8 +740,8 @@ describe('cherryPick in submodule', () => {
   })
 
   it('rejects cherry-picking a root commit (submodule)', async () => {
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub-root')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub-root')
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule-root')
@@ -790,8 +806,8 @@ describe('cherryPick in submodule', () => {
   })
 
   it('throws MissingNameError when committer not set and user.name missing (submodule)', async () => {
-    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
-    const { dir, gitdir } = await makeFixture('tmp-cherry-sub4')
+    const { fssp, dirsp, dir, gitdir } =
+      await makeSuperprojectAndSubmodule('tmp-cherry-sub4')
     await fssp._mkdir(join(dirsp, '.git'))
     await fssp._mkdir(join(dirsp, '.git', 'modules'))
     const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule5')

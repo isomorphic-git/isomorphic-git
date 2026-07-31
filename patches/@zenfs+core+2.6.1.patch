@@ -1,0 +1,120 @@
+diff --git a/node_modules/@zenfs/core/dist/backends/cow.d.ts b/node_modules/@zenfs/core/dist/backends/cow.d.ts
+index 301c8cc..1a1d613 100644
+--- a/node_modules/@zenfs/core/dist/backends/cow.d.ts
++++ b/node_modules/@zenfs/core/dist/backends/cow.d.ts
+@@ -45,6 +45,12 @@ export declare class Journal extends EventEmitter<{
+      */
+     fromString(value: string): this;
+     add(op: JournalOperation, path: string): void;
++    /**
++     * Clear any pending deletion of `path`. Called when a new entry is created at a
++     * path that was previously deleted, so the path is no longer treated as deleted
++     * (e.g. no longer filtered out of `readdir`).
++     */
++    undelete(path: string): void;
+     has(op: JournalOperation, path: string): boolean;
+     isDeleted(path: string): boolean;
+ }
+diff --git a/node_modules/@zenfs/core/dist/backends/cow.js b/node_modules/@zenfs/core/dist/backends/cow.js
+index 55a46f1..d14839d 100644
+--- a/node_modules/@zenfs/core/dist/backends/cow.js
++++ b/node_modules/@zenfs/core/dist/backends/cow.js
+@@ -46,6 +46,18 @@ export class Journal extends EventEmitter {
+         this.emit('update', op, path);
+         this.emit(op, path);
+     }
++    /**
++     * Clear any pending deletion of `path`. Called when a new entry is created at a
++     * path that was previously deleted, so the path is no longer treated as deleted
++     * (e.g. no longer filtered out of `readdir`).
++     */
++    undelete(path) {
++        const remaining = this.entries.filter(entry => !(entry.op === 'delete' && entry.path === path));
++        if (remaining.length === this.entries.length)
++            return;
++        this.entries = remaining;
++        this.emit('update', 'delete', path);
++    }
+     has(op, path) {
+         const test = JSON.stringify({ op, path });
+         for (const entry of this.entries)
+@@ -211,11 +223,15 @@ export class CopyOnWriteFS extends FileSystem {
+     }
+     async createFile(path, options) {
+         await this.createParentDirectories(path);
+-        return this.remapIno(path, await this.writable.createFile(path, options));
++        const node = await this.writable.createFile(path, options);
++        this.journal.undelete(path);
++        return this.remapIno(path, node);
+     }
+     createFileSync(path, options) {
+         this.createParentDirectoriesSync(path);
+-        return this.remapIno(path, this.writable.createFileSync(path, options));
++        const node = this.writable.createFileSync(path, options);
++        this.journal.undelete(path);
++        return this.remapIno(path, node);
+     }
+     async link(srcpath, dstpath) {
+         await this.copyForWrite(srcpath);
+@@ -285,18 +301,24 @@ export class CopyOnWriteFS extends FileSystem {
+         if (await this.exists(path))
+             throw withErrno('EEXIST');
+         await this.createParentDirectories(path);
+-        return this.remapIno(path, await this.writable.mkdir(path, options));
++        const node = await this.writable.mkdir(path, options);
++        this.journal.undelete(path);
++        return this.remapIno(path, node);
+     }
+     mkdirSync(path, options) {
+         if (this.existsSync(path))
+             throw withErrno('EEXIST');
+         this.createParentDirectoriesSync(path);
+-        return this.remapIno(path, this.writable.mkdirSync(path, options));
++        const node = this.writable.mkdirSync(path, options);
++        this.journal.undelete(path);
++        return this.remapIno(path, node);
+     }
+     async readdir(path) {
+         if (this.isDeleted(path) || !(await this.exists(path)))
+             throw withErrno('ENOENT');
+-        const entries = (await this.readable.exists(path)) ? await this.readable.readdir(path) : [];
++        // Only merge the read-only layer's entries if it actually holds a directory
++        // here: a writable directory can shadow a read-only file of the same name.
++        const entries = (await this.readable.exists(path)) && isDirectory(await this.readable.stat(path)) ? await this.readable.readdir(path) : [];
+         if (await this.writable.exists(path))
+             for (const entry of await this.writable.readdir(path)) {
+                 if (!entries.includes(entry))
+@@ -307,7 +329,9 @@ export class CopyOnWriteFS extends FileSystem {
+     readdirSync(path) {
+         if (this.isDeleted(path) || !this.existsSync(path))
+             throw withErrno('ENOENT');
+-        const entries = this.readable.existsSync(path) ? this.readable.readdirSync(path) : [];
++        // Only merge the read-only layer's entries if it actually holds a directory
++        // here: a writable directory can shadow a read-only file of the same name.
++        const entries = this.readable.existsSync(path) && isDirectory(this.readable.statSync(path)) ? this.readable.readdirSync(path) : [];
+         if (this.writable.existsSync(path))
+             for (const entry of this.writable.readdirSync(path)) {
+                 if (!entries.includes(entry))
+diff --git a/node_modules/@zenfs/core/dist/node/promises.js b/node_modules/@zenfs/core/dist/node/promises.js
+index 95df3f3..1e17e27 100644
+--- a/node_modules/@zenfs/core/dist/node/promises.js
++++ b/node_modules/@zenfs/core/dist/node/promises.js
+@@ -1081,8 +1081,17 @@ export async function cp(source, destination, opts) {
+             await Promise.all(entries.map(_cp));
+             break;
+         }
+-        case constants.S_IFREG:
+         case constants.S_IFLNK:
++            // Preserve the symlink itself unless dereferencing is requested. Copying
++            // the link's contents (via `copyFile`) would turn it into a regular file.
++            if (opts?.dereference) {
++                await copyFile.call(this, source, destination);
++            }
++            else {
++                await symlink.call(this, await readlink.call(this, source), destination);
++            }
++            break;
++        case constants.S_IFREG:
+             await copyFile.call(this, source, destination);
+             break;
+         case constants.S_IFBLK:
