@@ -83,10 +83,11 @@ async function addToIndex({
   parallel,
   autocrlf,
 }) {
-  // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
   const promises = filepath.map(async currentFilepath => {
-    if (!force) {
+    // .gitignore governs untracked files. Once a file is in the index, adding a
+    // matching rule does not stop canonical git from staging further changes.
+    if (!force && !index.has({ filepath: currentFilepath })) {
       const ignored = await GitIgnoreManager.isIgnored({
         fs,
         dir,
