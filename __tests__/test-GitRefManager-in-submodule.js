@@ -1,4 +1,5 @@
 /* eslint-env node, browser, jasmine */
+import { Errors } from 'isomorphic-git'
 import { GitRefManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
@@ -305,5 +306,23 @@ describe('GitRefManager', () => {
       expect(resolvedRef).toMatch(value)
     }
     await Promise.all(writePromises)
+  })
+
+  it('expand does not return a git system file', async () => {
+    const { fs, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-checkout')
+    // The first refpath candidate is the bare name, so a lookup that does not
+    // filter finds `.git/config`, `.git/index` and `.git/shallow` on disk. Those
+    // are repository files, not refs. `resolve` already excludes them (#709).
+    for (const ref of ['config', 'index', 'shallow']) {
+      let error = null
+      try {
+        await GitRefManager.expand({ fs, gitdir: gitdirsmfullpath, ref })
+      } catch (err) {
+        error = err
+      }
+      expect(error).not.toBeNull()
+      expect(error.code).toBe(Errors.NotFoundError.code)
+    }
   })
 })
