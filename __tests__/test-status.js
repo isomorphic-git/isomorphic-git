@@ -139,8 +139,9 @@ describe('status', () => {
       message: 'initial',
       author: { name: 'Test', email: 'test@example.com' },
     })
-    // What a checkout under core.autocrlf=true leaves on a Windows disk: the
-    // blob is stored with LF and the working copy carries CRLF.
+    // The blob is stored with LF and the working copy carries CRLF. This
+    // library never writes CRLF, so on a real machine the working copy got
+    // that way from canonical git, an editor, or a syncing tool.
     await fs.write(path.join(dir, 'a.txt'), 'one\r\ntwo\r\n')
     // Test
     // status has to come first. statusMatrix refreshes the index stat cache,
