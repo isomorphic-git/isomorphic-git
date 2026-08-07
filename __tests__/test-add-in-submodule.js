@@ -275,4 +275,31 @@ describe('add', () => {
       'added'
     )
   })
+
+  it('ignored file that is already tracked', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-add')
+    await init({ fs, dir, gitdir })
+    // Track the file before it becomes ignored. That is how a file ends up
+    // tracked and ignored at the same time in a real repository.
+    await add({ fs, dir, gitdir, filepath: 'i.txt' })
+    await writeGitIgnore(fs, dir)
+    await fs.write(dir + '/i.txt', 'changed after being ignored')
+    // Test
+    await add({ fs, dir, gitdir, filepath: 'i.txt' })
+    // .gitignore applies to untracked files only, so canonical git stages this
+    // change instead of silently doing nothing.
+    const staged = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        filepath === 'i.txt' && stage ? stage.oid() : undefined,
+    })
+    const { blob } = await readBlob({ fs, dir, gitdir, oid: staged[0] })
+    expect(Buffer.from(blob).toString('utf8')).toEqual(
+      'changed after being ignored'
+    )
+  })
 })
