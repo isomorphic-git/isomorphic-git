@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import { Errors } from 'isomorphic-git'
+import { Errors, branch } from 'isomorphic-git'
 import { GitRefManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -361,5 +361,32 @@ describe('GitRefManager', () => {
       expect(error).not.toBeNull()
       expect(error.code).toBe(Errors.NotFoundError.code)
     }
+  })
+
+  it('expand still resolves a branch named after a git system file', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await branch({ fs, dir, gitdir, ref: 'config', checkout: false })
+    const oid = await GitRefManager.resolve({
+      fs,
+      gitdir,
+      ref: 'refs/heads/config',
+    })
+    // The filter must drop only the *bare* `config` candidate (which would land
+    // on `.git/config`), never the `refs/heads/config` one. A branch legally
+    // named after a git system file therefore stays fully resolvable.
+    expect(await GitRefManager.expand({ fs, gitdir, ref: 'config' })).toEqual(
+      'refs/heads/config'
+    )
+    // A fully-qualified nested ref whose leaf matches a system-file name is
+    // never a candidate for filtering.
+    expect(
+      await GitRefManager.expand({ fs, gitdir, ref: 'refs/heads/config' })
+    ).toEqual('refs/heads/config')
+    // resolve() carries the same filter line, so verify its positive path too:
+    // the short name must resolve to the branch oid, not try to parse
+    // `.git/config` as a ref.
+    expect(await GitRefManager.resolve({ fs, gitdir, ref: 'config' })).toEqual(
+      oid
+    )
   })
 })
