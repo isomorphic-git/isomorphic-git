@@ -1,6 +1,9 @@
+import * as path from 'path'
+
 import {
   Errors,
   checkout,
+  currentBranch,
   listFiles,
   add,
   commit,
@@ -738,5 +741,22 @@ describe('checkout', () => {
     const files = await fs.readdir(`${dir}/ignored`)
     expect(files).toContain('regular-file.txt')
     expect(files).not.toContain('.gitignore')
+  })
+
+  it('checkout a branch named after a git system file keeps HEAD attached', async () => {
+    // Setup
+    const { fs, dir, gitdir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-checkout')
+    await branch({ fs, dir, gitdir, ref: 'index', checkout: false })
+    // Test
+    await checkout({ fs, dir, gitdir, ref: 'index' })
+    // Every repository has a `.git/index`, and checkout asks GitRefManager to
+    // expand the ref before deciding whether it is a branch. When the expansion
+    // returns the index file instead of refs/heads/index, checkout concludes it
+    // is not a branch and detaches HEAD, so later commits belong to no branch.
+    expect(await currentBranch({ fs, dir, gitdir })).toEqual('index')
+    expect(await fs.read(path.join(gitdirsmfullpath, 'HEAD'), 'utf8')).toEqual(
+      'ref: refs/heads/index\n'
+    )
   })
 })
