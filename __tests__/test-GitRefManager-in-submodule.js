@@ -334,6 +334,27 @@ describe('GitRefManager', () => {
     expect(await fs.read(`${gitdirsmfullpath}/index`)).toEqual(before)
   })
 
+  it('deleteRefs refuses to delete a git system file', async () => {
+    const { fs, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-checkout')
+    const before = await fs.read(`${gitdirsmfullpath}/index`)
+    // deleteRefs goes straight to fs.rm, so an unguarded call removes the
+    // staging area outright rather than merely overwriting it.
+    let error = null
+    try {
+      await GitRefManager.deleteRefs({
+        fs,
+        gitdir: gitdirsmfullpath,
+        refs: ['index'],
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(await fs.read(`${gitdirsmfullpath}/index`)).toEqual(before)
+  })
+
   it('expand does not return a git system file', async () => {
     const { fs, gitdirsmfullpath } =
       await makeFixtureAsSubmodule('test-checkout')

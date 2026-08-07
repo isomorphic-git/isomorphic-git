@@ -168,6 +168,11 @@ export class GitRefManager {
     // Examples of refs we need to avoid writing in loose format for efficieny's sake
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
+    // The local side of a refspec is whatever `remote.<name>.fetch` says, so a
+    // config like `+refs/heads/main:index` lands a write on `.git/index`.
+    for (const key of actualRefsToWrite.keys()) {
+      assertWritableRef(key)
+    }
     for (const [key, value] of actualRefsToWrite) {
       await acquireLock(key, async () =>
         fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
@@ -238,6 +243,8 @@ export class GitRefManager {
    * @returns {Promise<void>}
    */
   static async deleteRefs({ fs, gitdir, refs }) {
+    // Validate input
+    refs.forEach(assertWritableRef)
     // Delete regular ref
     await Promise.all(refs.map(ref => fs.rm(join(gitdir, ref))))
     // Delete any packed ref

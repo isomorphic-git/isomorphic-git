@@ -304,6 +304,48 @@ describe('GitRefManager', () => {
     expect(await fs.read(`${gitdir}/index`)).toEqual(before)
   })
 
+  it('deleteRefs refuses to delete a git system file', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const before = await fs.read(`${gitdir}/index`)
+    // deleteRefs goes straight to fs.rm, so an unguarded call removes the
+    // staging area outright rather than merely overwriting it.
+    let error = null
+    try {
+      await GitRefManager.deleteRefs({ fs, gitdir, refs: ['index'] })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(await fs.read(`${gitdir}/index`)).toEqual(before)
+  })
+
+  it('updateRemoteRefs refuses a refspec that targets a git system file', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const before = await fs.read(`${gitdir}/index`)
+    // The local side of a refspec is whatever the config says, so a remote
+    // cannot be trusted to translate only into refs/.
+    let error = null
+    try {
+      await GitRefManager.updateRemoteRefs({
+        fs,
+        gitdir,
+        remote: 'origin',
+        refs: new Map([
+          ['refs/heads/main', 'e10ebb90d03eaacca84de1af0a59b444232da99e'],
+        ]),
+        symrefs: new Map(),
+        tags: false,
+        refspecs: ['+refs/heads/main:index'],
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(await fs.read(`${gitdir}/index`)).toEqual(before)
+  })
+
   it('expand does not return a git system file', async () => {
     const { fs, gitdir } = await makeFixture('test-checkout')
     // The first refpath candidate is the bare name, so a lookup that does not
