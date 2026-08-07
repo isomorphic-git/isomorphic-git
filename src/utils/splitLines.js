@@ -25,6 +25,11 @@ export function splitLines(input) {
       while (true) {
         const i = findSplit(tmp)
         if (i === -1) break
+        // A '\r' at the very end may be the first half of a '\r\n' whose '\n'
+        // arrives in the next chunk. Hold it back until there is a character
+        // after it to look at, otherwise the same bytes split into two lines
+        // or one depending only on where the socket boundary fell.
+        if (i === tmp.length && tmp[i - 1] === '\r') break
         output.write(tmp.slice(0, i))
         tmp = tmp.slice(i)
       }
