@@ -199,6 +199,34 @@ describe('add', () => {
       'changed after being ignored'
     )
   })
+  it('tracked file inside an ignored folder', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await init({ fs, dir })
+    // Track one file inside the folder before the folder becomes ignored.
+    await add({ fs, dir, filepath: 'js_modules/awesome/index.js' })
+    await writeGitIgnore(fs, dir)
+    await fs.write(dir + '/js_modules/awesome/index.js', 'changed')
+    await fs.write(dir + '/js_modules/untracked.js', 'never staged')
+    // Test
+    await add({ fs, dir, filepath: '.' })
+    // Canonical git recurses into an ignored folder for the sake of the paths
+    // it already tracks, and stages those while leaving the rest alone.
+    const staged = await walk({
+      fs,
+      dir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        filepath === 'js_modules/awesome/index.js' && stage
+          ? stage.oid()
+          : undefined,
+    })
+    const { blob } = await readBlob({ fs, dir, oid: staged[0] })
+    expect(Buffer.from(blob).toString('utf8')).toEqual('changed')
+    expect(await listFiles({ fs, dir })).not.toContain(
+      'js_modules/untracked.js'
+    )
+  })
   it('non-existant file', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')
