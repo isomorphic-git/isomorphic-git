@@ -284,6 +284,26 @@ describe('GitRefManager', () => {
     await Promise.all(writePromises)
   })
 
+  it('writeRef refuses to write over a git system file', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const oid = 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    const before = await fs.read(`${gitdir}/index`)
+    // `.git/index` is not a ref, and its bare name is a legal one-level ref
+    // name, so an unguarded write lands on the staging area and destroys it.
+    // Canonical git refuses: "cannot lock ref 'index': reference broken".
+    for (const ref of ['config', 'index', 'shallow']) {
+      let error = null
+      try {
+        await GitRefManager.writeRef({ fs, gitdir, ref, value: oid })
+      } catch (err) {
+        error = err
+      }
+      expect(error).not.toBeNull()
+      expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    }
+    expect(await fs.read(`${gitdir}/index`)).toEqual(before)
+  })
+
   it('expand does not return a git system file', async () => {
     const { fs, gitdir } = await makeFixture('test-checkout')
     // The first refpath candidate is the bare name, so a lookup that does not

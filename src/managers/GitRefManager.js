@@ -5,6 +5,7 @@ import AsyncLock from 'async-lock'
 
 import { InternalError } from '../errors/InternalError.js'
 import { InvalidOidError } from '../errors/InvalidOidError.js'
+import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { NoRefspecError } from '../errors/NoRefspecError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
@@ -26,6 +27,16 @@ const refpaths = ref => [
 
 // @see https://git-scm.com/docs/gitrepository-layout
 const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
+
+// These names are legal one-level ref names, so nothing upstream of here
+// rejects them, and writing to one lands on the repository file itself.
+// Canonical git refuses too: `git update-ref index <oid>` fails with
+// "cannot lock ref 'index': reference broken" and leaves the file alone.
+function assertWritableRef(ref) {
+  if (GIT_FILES.includes(ref)) {
+    throw new InvalidRefNameError(ref, `refs/heads/${ref}`)
+  }
+}
 
 let lock
 
@@ -178,6 +189,7 @@ export class GitRefManager {
   // TODO: make this less crude?
   static async writeRef({ fs, gitdir, ref, value }) {
     // Validate input
+    assertWritableRef(ref)
     if (!value.match(/[0-9a-f]{40}/)) {
       throw new InvalidOidError(value)
     }
@@ -197,6 +209,7 @@ export class GitRefManager {
    * @returns {Promise<void>}
    */
   static async writeSymbolicRef({ fs, gitdir, ref, value }) {
+    assertWritableRef(ref)
     await acquireLock(ref, async () =>
       fs.write(join(gitdir, ref), 'ref: ' + `${value.trim()}\n`, 'utf8')
     )
