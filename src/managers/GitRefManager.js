@@ -348,7 +348,7 @@ export class GitRefManager {
     // We need to alternate between the file system and the packed-refs
     const packedMap = await GitRefManager.packedRefs({ fs, gitdir })
     // Look in all the proper paths, in this order
-    const allpaths = refpaths(ref)
+    const allpaths = refpaths(ref).filter(p => !GIT_FILES.includes(p)) // exclude git system files (#709)
     for (const ref of allpaths) {
       const refExists = await acquireLock(ref, async () =>
         fs.exists(`${gitdir}/${ref}`)
