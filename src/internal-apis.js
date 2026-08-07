@@ -48,6 +48,7 @@ export * from './utils/padHex.js'
 export * from './utils/pkg.js'
 export * from './utils/resolveTree.js'
 export * from './utils/shasum.js'
+export * from './utils/splitLines.js'
 export * from './utils/sleep.js'
 export * from './utils/symbols.js'
 
