@@ -1,7 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import * as path from 'path'
 
-import { status, add, remove } from 'isomorphic-git'
+import { status, add, init, remove } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -99,5 +99,21 @@ describe('status', () => {
     expect(a).toEqual('unmodified')
     const indexAfter = await fs.read(path.join(gitdir, 'index'))
     expect(indexAfter).toEqual(indexBefore)
+  })
+
+  it('tracked file that matches a .gitignore rule', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-add')
+    await init({ fs, dir, gitdir })
+    // Track the file before it becomes ignored, then change it on disk.
+    await add({ fs, dir, gitdir, filepath: 'i.txt' })
+    await fs.write(path.join(dir, '.gitignore'), 'i.txt\n')
+    await fs.write(path.join(dir, 'i.txt'), 'changed after being ignored')
+    // Test
+    // .gitignore applies to untracked files only. canonical git reports this
+    // file as modified, and `git check-ignore` does not match it at all.
+    expect(await status({ fs, dir, gitdir, filepath: 'i.txt' })).toEqual(
+      '*added'
+    )
   })
 })

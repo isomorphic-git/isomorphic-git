@@ -73,6 +73,18 @@ export async function add({
   }
 }
 
+// True for a path the index already holds, and for a folder holding one. The
+// exact lookup is a Map hit; the prefix scan only runs for folders, since a
+// tracked file always answers on the first check.
+function isTracked(index, filepath) {
+  if (index.has({ filepath })) return true
+  const prefix = `${filepath}/`
+  for (const entry of index.entriesMap.keys()) {
+    if (entry.startsWith(prefix)) return true
+  }
+  return false
+}
+
 async function addToIndex({
   dir,
   gitdir,
@@ -83,10 +95,13 @@ async function addToIndex({
   parallel,
   autocrlf,
 }) {
-  // TODO: Should ignore UNLESS it's already in the index.
   filepath = Array.isArray(filepath) ? filepath : [filepath]
   const promises = filepath.map(async currentFilepath => {
-    if (!force) {
+    // .gitignore governs untracked paths. Once a path is in the index, adding a
+    // matching rule does not stop canonical git from staging further changes,
+    // and an ignored folder is still walked for the sake of what it tracks:
+    // the recursion below re-checks every child, so only tracked ones get in.
+    if (!force && !isTracked(index, currentFilepath)) {
       const ignored = await GitIgnoreManager.isIgnored({
         fs,
         dir,

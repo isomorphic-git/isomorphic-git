@@ -69,15 +69,6 @@ export async function status({
 
     const fs = new FileSystem(_fs)
     const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
-    const ignored = await GitIgnoreManager.isIgnored({
-      fs,
-      gitdir: updatedGitdir,
-      dir,
-      filepath,
-    })
-    if (ignored) {
-      return 'ignored'
-    }
     const headTree = await getHeadTree({ fs, cache, gitdir: updatedGitdir })
     const treeOid = await getOidAtPath({
       fs,
@@ -95,6 +86,20 @@ export async function status({
         return null
       }
     )
+    // .gitignore governs untracked files. A file in HEAD or in the index is
+    // tracked, so canonical git keeps reporting its real state, and
+    // `git check-ignore` does not match it. statusMatrix already does this.
+    if (treeOid === null && indexEntry === null) {
+      const ignored = await GitIgnoreManager.isIgnored({
+        fs,
+        gitdir: updatedGitdir,
+        dir,
+        filepath,
+      })
+      if (ignored) {
+        return 'ignored'
+      }
+    }
     const stats = await fs.lstat(join(dir, filepath))
 
     const H = treeOid !== null // head

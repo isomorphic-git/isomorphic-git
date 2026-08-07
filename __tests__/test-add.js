@@ -174,6 +174,59 @@ describe('add', () => {
     await add({ fs, dir, filepath: 'i.txt', force: true })
     expect((await listFiles({ fs, dir })).length).toEqual(1)
   })
+  it('ignored file that is already tracked', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await init({ fs, dir })
+    // Track the file before it becomes ignored. That is how a file ends up
+    // tracked and ignored at the same time in a real repository.
+    await add({ fs, dir, filepath: 'i.txt' })
+    await writeGitIgnore(fs, dir)
+    await fs.write(dir + '/i.txt', 'changed after being ignored')
+    // Test
+    await add({ fs, dir, filepath: 'i.txt' })
+    // .gitignore applies to untracked files only, so canonical git stages this
+    // change instead of silently doing nothing.
+    const staged = await walk({
+      fs,
+      dir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        filepath === 'i.txt' && stage ? stage.oid() : undefined,
+    })
+    const { blob } = await readBlob({ fs, dir, oid: staged[0] })
+    expect(Buffer.from(blob).toString('utf8')).toEqual(
+      'changed after being ignored'
+    )
+  })
+  it('tracked file inside an ignored folder', async () => {
+    // Setup
+    const { fs, dir } = await makeFixture('test-add')
+    await init({ fs, dir })
+    // Track one file inside the folder before the folder becomes ignored.
+    await add({ fs, dir, filepath: 'js_modules/awesome/index.js' })
+    await writeGitIgnore(fs, dir)
+    await fs.write(dir + '/js_modules/awesome/index.js', 'changed')
+    await fs.write(dir + '/js_modules/untracked.js', 'never staged')
+    // Test
+    await add({ fs, dir, filepath: '.' })
+    // Canonical git recurses into an ignored folder for the sake of the paths
+    // it already tracks, and stages those while leaving the rest alone.
+    const staged = await walk({
+      fs,
+      dir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        filepath === 'js_modules/awesome/index.js' && stage
+          ? stage.oid()
+          : undefined,
+    })
+    const { blob } = await readBlob({ fs, dir, oid: staged[0] })
+    expect(Buffer.from(blob).toString('utf8')).toEqual('changed')
+    expect(await listFiles({ fs, dir })).not.toContain(
+      'js_modules/untracked.js'
+    )
+  })
   it('non-existant file', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-add')
