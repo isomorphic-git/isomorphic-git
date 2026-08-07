@@ -2,6 +2,7 @@
 import { _readTree } from '../commands/readTree.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { ObjectTypeError } from '../errors/ObjectTypeError.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -110,7 +111,12 @@ export async function status({
       if (I && !compareStats(indexEntry, stats)) {
         return indexEntry.oid
       } else {
-        const object = await fs.read(join(dir, filepath))
+        // Read through the same core.autocrlf normalisation GitWalkerFs uses,
+        // so the working copy hashes to the blob that was stored. Without it a
+        // CRLF checkout of an LF blob reads as modified.
+        const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
+        const autocrlf = await config.get('core.autocrlf')
+        const object = await fs.read(join(dir, filepath), { autocrlf })
         const workdirOid = await hashObject({
           gitdir: updatedGitdir,
           type: 'blob',
