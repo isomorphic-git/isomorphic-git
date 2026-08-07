@@ -346,6 +346,77 @@ describe('GitRefManager', () => {
     expect(await fs.read(`${gitdir}/index`)).toEqual(before)
   })
 
+  it('updateRemoteRefs rejects a bad refspec before pruneTags deletes anything', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const oid = 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    // pruneTags clears refs/tags before the write loop runs, so a refspec that
+    // is refused later takes the tags down with it. The fetch cannot put them
+    // back: it throws before writing anything.
+    let error = null
+    try {
+      await GitRefManager.updateRemoteRefs({
+        fs,
+        gitdir,
+        remote: 'origin',
+        refs: new Map([
+          ['refs/heads/main', oid],
+          ['refs/tags/v1.0.0', oid],
+        ]),
+        symrefs: new Map(),
+        tags: true,
+        refspecs: ['+refs/heads/main:index'],
+        pruneTags: true,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(
+      await GitRefManager.resolve({ fs, gitdir, ref: 'refs/tags/v1.0.0' })
+    ).toEqual(oid)
+  })
+
+  it('updateRemoteRefs rejects a bad refspec before prune deletes anything', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const oid = 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    await GitRefManager.writeRef({
+      fs,
+      gitdir,
+      ref: 'refs/remotes/origin/stale',
+      value: oid,
+    })
+    // Same hazard on the prune path: a ref the remote no longer advertises is
+    // deleted before the refspec that targets `.git/index` is refused.
+    let error = null
+    try {
+      await GitRefManager.updateRemoteRefs({
+        fs,
+        gitdir,
+        remote: 'origin',
+        refs: new Map([['refs/heads/main', oid]]),
+        symrefs: new Map(),
+        tags: false,
+        refspecs: [
+          '+refs/heads/*:refs/remotes/origin/*',
+          '+refs/heads/main:index',
+        ],
+        prune: true,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(
+      await GitRefManager.resolve({
+        fs,
+        gitdir,
+        ref: 'refs/remotes/origin/stale',
+      })
+    ).toEqual(oid)
+  })
+
   it('expand does not return a git system file', async () => {
     const { fs, gitdir } = await makeFixture('test-checkout')
     // The first refpath candidate is the bare name, so a lookup that does not

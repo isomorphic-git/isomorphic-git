@@ -92,6 +92,31 @@ export class GitRefManager {
     }
     const refspec = GitRefSpecSet.from(refspecs)
     const actualRefsToWrite = new Map()
+    // Work out every destination this call will write, before touching the
+    // repository. Translating is pure, so it can happen up here; the writes
+    // themselves stay at the end of the function.
+    const refTranslations = refspec.translate([...refs.keys()])
+    const symrefTranslations = []
+    for (const [serverRef, translatedRef] of refspec.translate([
+      ...symrefs.keys(),
+    ])) {
+      const symtarget = refspec.translateOne(symrefs.get(serverRef))
+      if (symtarget) {
+        symrefTranslations.push([translatedRef, `ref: ${symtarget}`])
+      }
+    }
+    // The local side of a refspec is whatever `remote.<name>.fetch` says, so a
+    // config like `+refs/heads/main:index` lands a write on `.git/index`.
+    // Refuse it here rather than at the write loop: `pruneTags` and `prune`
+    // delete refs in between, so a later throw leaves the repository pruned
+    // and not updated. The tags added below are always `refs/tags/...`, which
+    // is never a system file, so nothing is missed by checking this early.
+    for (const [, translatedRef] of refTranslations) {
+      assertWritableRef(translatedRef)
+    }
+    for (const [translatedRef] of symrefTranslations) {
+      assertWritableRef(translatedRef)
+    }
     // Delete all current tags if the pruneTags argument is true.
     if (pruneTags) {
       const tags = await GitRefManager.listRefs({
@@ -119,18 +144,12 @@ export class GitRefManager {
       }
     }
     // Combine refs and symrefs giving symrefs priority
-    const refTranslations = refspec.translate([...refs.keys()])
     for (const [serverRef, translatedRef] of refTranslations) {
       const value = refs.get(serverRef)
       actualRefsToWrite.set(translatedRef, value)
     }
-    const symrefTranslations = refspec.translate([...symrefs.keys()])
-    for (const [serverRef, translatedRef] of symrefTranslations) {
-      const value = symrefs.get(serverRef)
-      const symtarget = refspec.translateOne(value)
-      if (symtarget) {
-        actualRefsToWrite.set(translatedRef, `ref: ${symtarget}`)
-      }
+    for (const [translatedRef, value] of symrefTranslations) {
+      actualRefsToWrite.set(translatedRef, value)
     }
     // If `prune` argument is true, clear out the existing local refspec roots
     const pruned = []
@@ -168,11 +187,6 @@ export class GitRefManager {
     // Examples of refs we need to avoid writing in loose format for efficieny's sake
     // are .git/refs/remotes/origin/refs/remotes/remote_mirror_3059
     // and .git/refs/remotes/origin/refs/merge-requests
-    // The local side of a refspec is whatever `remote.<name>.fetch` says, so a
-    // config like `+refs/heads/main:index` lands a write on `.git/index`.
-    for (const key of actualRefsToWrite.keys()) {
-      assertWritableRef(key)
-    }
     for (const [key, value] of actualRefsToWrite) {
       await acquireLock(key, async () =>
         fs.write(join(gitdir, key), `${value.trim()}\n`, 'utf8')
