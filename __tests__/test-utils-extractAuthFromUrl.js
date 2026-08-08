@@ -41,6 +41,48 @@ describe('utils/extractAuthFromUrl', () => {
     expect(auth).toEqual({ username: 'user', password: '' })
   })
 
+  it('reads credentials from an uppercase scheme', () => {
+    const { url, auth } = extractAuthFromUrl(
+      'HTTPS://user:pass@github.com/owner/repo.git'
+    )
+    expect(url).toEqual('HTTPS://github.com/owner/repo.git')
+    expect(auth).toEqual({ username: 'user', password: 'pass' })
+  })
+
+  it('percent-decodes the credentials', () => {
+    const { auth } = extractAuthFromUrl(
+      'https://us%40er:100%25@github.com/owner/repo.git'
+    )
+    expect(auth).toEqual({ username: 'us@er', password: '100%' })
+  })
+
+  it('keeps a lone percent sign that cannot be decoded', () => {
+    const { auth } = extractAuthFromUrl(
+      'https://user:100%@github.com/owner/repo.git'
+    )
+    expect(auth).toEqual({ username: 'user', password: '100%' })
+  })
+
+  it('leaves the rest of the url exactly as written', () => {
+    for (const [given, expected] of [
+      [
+        'https://user:pass@github.com:443/owner/repo.git',
+        'https://github.com:443/owner/repo.git',
+      ],
+      [
+        'https://user:pass@GitHub.com/owner/repo.git',
+        'https://GitHub.com/owner/repo.git',
+      ],
+      ['https://user:pass@github.com', 'https://github.com'],
+      [
+        'https://user:pass@github.com/owner/repo.git?a=b#c',
+        'https://github.com/owner/repo.git?a=b#c',
+      ],
+    ]) {
+      expect(extractAuthFromUrl(given).url).toEqual(expected)
+    }
+  })
+
   it('matches what the WHATWG URL parser reads', () => {
     for (const url of [
       'https://user:pass@github.com/owner/repo.git',
