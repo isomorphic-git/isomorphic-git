@@ -159,7 +159,6 @@ export class FileSystem {
    * Make a directory (or series of nested directories) without throwing an error if it already exists.
    *
    * @param {string} filepath - The path to the directory.
-   * @param {boolean} [_selfCall=false] - Internal flag to prevent infinite recursion.
    * @returns {Promise<void>}
    */
   async mkdir(filepath) {
@@ -170,7 +169,7 @@ export class FileSystem {
     // that eventually-consistent backends throw when a freshly created parent
     // isn't visible yet, which is what made concurrent reflog writes into
     // `.git/logs/refs/*` fail intermittently.
-    await mkdirp(this, filepath)
+    await mkdirp(this._mkdir, filepath)
   }
 
   /**
