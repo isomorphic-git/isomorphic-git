@@ -40,16 +40,27 @@ const CommentReporter = function(
     }
   }
   this.specFailure = function(browser, result) {
+    // A spec can fail before `onBrowserStart` has registered this browser (real
+    // devices that reconnect mid-run, or a failure during capture), so lazily
+    // initialize the bucket instead of crashing the karma-server on a push to
+    // `undefined`.
+    if (!this.errorsByBrowser[browser.name]) {
+      this.errorsByBrowser[browser.name] = []
+    }
     this.errorsByBrowser[browser.name].push(testNameFormatter(result))
   }
   this.onBrowserComplete = function(browser) {
     const results = browser.lastResult
+    // Fall back to 0 if `onBrowserStart` never registered a start time for this
+    // browser (same reconnect/capture race as `specFailure`), so the duration
+    // column shows `0m:0s` rather than `NaNm:NaNs`.
+    const startTime = this.startTimesByBrowser[browser.name]
     this.rows.push([
       browser.name,
       results.success,
       results.skipped,
       results.failed,
-      formatTime(Date.now() - this.startTimesByBrowser[browser.name]),
+      formatTime(startTime ? Date.now() - startTime : 0),
       results.disconnected,
     ])
   }
