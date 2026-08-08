@@ -199,7 +199,7 @@ export async function _stashDrop({ fs, dir, gitdir, refIdx = 0 }) {
   reflogEntries.splice(refIdx, 1)
 
   const stashReflogPath = stashMgr.refLogsStashPath
-  await acquireLock({ reflogEntries, stashReflogPath, stashMgr }, async () => {
+  await acquireLock(stashReflogPath, async () => {
     if (reflogEntries.length) {
       await fs.write(
         stashReflogPath,

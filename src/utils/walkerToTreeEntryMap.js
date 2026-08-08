@@ -44,7 +44,7 @@ async function checkAndWriteBlob(fs, gitdir, dir, filepath, oid = null) {
     : undefined
   let retOid = objContent ? oid : undefined
   if (!objContent) {
-    await acquireLock({ fs, gitdir, currentFilepath }, async () => {
+    await acquireLock(currentFilepath, async () => {
       const object = stats.isSymbolicLink()
         ? await fs.readlink(currentFilepath).then(posixifyPathBuffer)
         : await fs.read(currentFilepath)
@@ -259,7 +259,7 @@ export async function applyTreeChanges({
   })
 
   // apply the changes to work dir
-  await acquireLock({ fs, gitdir, dirRemoved, ops }, async () => {
+  await acquireLock(gitdir, async () => {
     for (const op of ops) {
       const currentFilepath = join(dir, op.filepath)
       switch (op.method) {
