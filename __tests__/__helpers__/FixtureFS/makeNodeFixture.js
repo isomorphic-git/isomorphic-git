@@ -6,7 +6,6 @@ import findUp from 'find-up'
 import { FileSystem } from 'isomorphic-git/internal-apis'
 import onExit from 'signal-exit'
 
-const TEMP_PATH = join(os.tmpdir(), 'jest-fixture-')
 const TEMP_DIRS_CREATED = new Set()
 
 export function cleanupTempDirs() {
@@ -18,9 +17,14 @@ export function cleanupTempDirs() {
   TEMP_DIRS_CREATED.clear()
 }
 
-const testsDir = resolve(import.meta.dirname, '..')
-
 export async function useTempDir(fixture) {
+  // Computed lazily (not at module scope) so this Node-only helper can be part
+  // of the browser test bundle without executing Node APIs — `os.tmpdir()` and
+  // `import.meta.dirname` — when the module is merely imported. `useTempDir` is
+  // only ever called from the Node code path.
+  const testsDir = resolve(import.meta.dirname, '..')
+  const TEMP_PATH = join(os.tmpdir(), 'jest-fixture-')
+
   const fixturePath = await findUp(join('__fixtures__', fixture), {
     cwd: testsDir,
   })

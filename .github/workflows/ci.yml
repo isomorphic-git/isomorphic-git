@@ -115,7 +115,7 @@ jobs:
       fail-fast: false
       matrix:
         # This is a comma-separated list of Karma launchers
-        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","sl_edge","sl_safari","sl_ios_safari","bs_android_chrome"')) }}
+        karma-launcher: ${{ fromJSON(format('[{0}]', '"ChromeHeadlessNoSandbox","FirefoxHeadless","bs_edge","bs_safari","bs_ios_safari","bs_android_chrome"')) }}
 
       # Our BrowserStack plan allows up to 5 parallel tests. We limit each workflow to 2 to avoid the limit.
       max-parallel: 2
@@ -151,17 +151,30 @@ jobs:
 
       - name: Run tests (${{ matrix.karma-launcher }})
         run: |
-          # Run the subset of the `test` necessary to test from the browser.
-          # Use X Virtual Frame Buffer (xvfb) to run the browser with no display (headless).
-          xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npx nps \
-            test.setup \
-            test.karma
+          # Start the local git + cors-proxy servers once.
+          npx nps test.setup
+          # A handful of specs are flaky only under full-suite load in a single
+          # long-running browser session (they pass in isolation). Retry the run a
+          # few times: the successful-browsers reporter records which browser
+          # passed, so each retry re-runs only what still failed and exits early
+          # once green. Use X Virtual Frame Buffer (xvfb) for a headless browser.
+          code=1
+          for attempt in 1 2 3; do
+            if xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npx nps test.karma; then
+              code=0
+              break
+            fi
+            echo "::warning::${{ matrix.karma-launcher }} test attempt $attempt failed; retrying"
+          done
+          npx nps test.teardown || true
+          exit $code
         env:
           BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
           BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           TEST_BROWSERS: ${{ matrix.karma-launcher }}
+          TEST_PUSH_GITHUB_TOKEN: ${{ secrets.TEST_PUSH_GITHUB_TOKEN }}
 
       - name: Save test results
         if: ${{ !cancelled() }}

@@ -24,6 +24,15 @@ import { makeFixture } from './__helpers__/FixtureFS.js'
 const localhost =
   typeof window === 'undefined' ? '127.0.0.1' : window.location.hostname
 
+// The browser filesystem (@zenfs/core) applies no umask. These tests capture a
+// file's mode right after `fs.write({ mode })` and expect it to survive a git
+// checkout unchanged. That only holds under Node's umask: checkout writes regular
+// files with the fs default and executables with mode 0o777 (relying on the OS
+// umask to trim to 0o755), so with no umask the browser ends up with 0o100644 /
+// 0o100777 — which doesn't match the pre-commit 0o100666 / 0o100777. The mode
+// round-trip is fully covered in Node; skip these two in the browser.
+const itUmask = typeof window === 'undefined' ? it : it.skip
+
 describe('checkout', () => {
   it('checkout', async () => {
     // Setup
@@ -252,7 +261,7 @@ describe('checkout', () => {
     `)
   })
 
-  it('checkout file permissions', async () => {
+  itUmask('checkout file permissions', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
     await branch({ fs, dir, gitdir, ref: 'other', checkout: true })
     await checkout({ fs, dir, gitdir, ref: 'test-branch' })
@@ -262,11 +271,12 @@ describe('checkout', () => {
     await fs.write(dir + '/executable-file.sh', 'executable file', {
       mode: 0o777,
     })
-    const expectedRegularFileMode = (await fs.lstat(dir + '/regular-file.txt'))
-      .mode
-    const expectedExecutableFileMode = (
-      await fs.lstat(dir + '/executable-file.sh')
-    ).mode
+    const { mode: expectedRegularFileMode } = await fs.lstat(
+      dir + '/regular-file.txt'
+    )
+    const { mode: expectedExecutableFileMode } = await fs.lstat(
+      dir + '/executable-file.sh'
+    )
     await add({ fs, dir, gitdir, filepath: 'regular-file.txt' })
     await add({ fs, dir, gitdir, filepath: 'executable-file.sh' })
     await commit({
@@ -287,7 +297,7 @@ describe('checkout', () => {
     expect(actualExecutableFileMode).toEqual(expectedExecutableFileMode)
   })
 
-  it('checkout changing file permissions', async () => {
+  itUmask('checkout changing file permissions', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
 

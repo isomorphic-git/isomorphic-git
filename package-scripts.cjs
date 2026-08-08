@@ -75,24 +75,6 @@ const jestCommand = 'node --experimental-vm-modules --max-old-space-size-percent
 // const jestCommand = 'jest --ci --coverage'
 // const jestCommand = 'jest --ci --coverage --runInBand --logHeapUsage'
 
-const jestBrowser = browserName => {
-  const cmd = `${jestCommand} --config jest-browser.config.js`
-
-  if (process.env.CI) {
-    // On CI we need to set environment variables differently depending on the shell
-    if (process.platform === 'win32') {
-      // PowerShell / cmd.exe compatible version using cross-env
-      return `cross-env ${jestEnv} JEST_BROWSER=${browserName} JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js ${retry3(cmd)}`
-    } else {
-      // Unix-like shells (bash, sh, etc.) – keep the original export style
-      return `export ${jestEnv}\nexport JEST_BROWSER=${browserName}\nexport JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js\n${retry3(timeout15(cmd))}`
-    }
-  }
-
-  // Non-CI case (local development) – already cross-platform via cross-env
-  return `cross-env ${jestEnv} JEST_BROWSER=${browserName} JEST_PUPPETEER_CONFIG=.config/jest-puppeteer.js ${cmd}`
-}
-
 module.exports = {
   scripts: {
     clean: {
@@ -140,7 +122,7 @@ module.exports = {
         'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
       webpack: 'webpack --config webpack.config.cjs',
       indexjson:
-        'npx make-index __tests__/__fixtures__ -o __tests__/__fixtures__/index.json -i __tests__/__fixtures__/index.json && node __tests__/__helpers__/make_superblock.cjs',
+        'npx make-index __tests__/__fixtures__ -o __tests__/__fixtures__/index.json -i __tests__/__fixtures__/index.json && node __tests__/__helpers__/make-symlinks-map.cjs && node __tests__/__helpers__/make_superblock.cjs',
       treeshake: 'agadoo',
       docs: 'node ./__tests__/__helpers__/generate-docs.cjs',
       size: process.env.CI
@@ -189,10 +171,9 @@ module.exports = {
         'test.typecheck',
         'test.setup',
         'test.node',
-        'test.chrome',
+        'test.karma',
         'test.teardown'
       ),
-      browsers: series.nps('test.chrome', 'test.firefox'),
       typecheck: 'tsc -p tsconfig.json',
       setup: series.nps('proxy.start', 'gitserver.start'),
       teardown: series.nps('proxy.stop', 'gitserver.stop'),
@@ -201,8 +182,16 @@ module.exports = {
             ? `cross-env ${jestEnv} ${retry3(jestCommand)}`
             : `export ${jestEnv}\n${retry3(timeout15(jestCommand))}`)
         : `cross-env-shell ${jestEnv} ${jestCommand}`,
-      chrome: jestBrowser('chrome'),
-      firefox: jestBrowser('firefox'),
+      // Browser tests run under Jasmine via Karma. Browsers are selected with
+      // the TEST_BROWSERS env var (see karma.conf.cjs and the CI matrix).
+      // NOTE: no nps-level retry here — karma already retries flaky/disconnected
+      // browsers within a run (browserDisconnectTolerance), and wrapping the whole
+      // matrix in retry3 just re-ran every browser up to 3x on any failure.
+      karma: process.env.CI
+        ? 'karma start ./karma.conf.cjs --single-run'
+        : 'cross-env karma start ./karma.conf.cjs --single-run --log-level debug',
+      // Run Karma as a watch server without capturing browsers (attach your own).
+      karmore: 'cross-env TEST_NO_BROWSERS=1 karma start --no-single-run',
     },
     prepublish: {
       default: series.nps('prepublish.version', 'build'),
