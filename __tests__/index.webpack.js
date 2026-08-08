@@ -1,7 +1,13 @@
-// polyfill toMatchInlineSnapshot + jest-style describe.skip/it.skip.
-// Called (not a bare side-effect import) so webpack does not tree-shake it.
-import { installJasmineSnapshots } from './__helpers__/jasmine-inline-snapshots.js'
+// polyfill toMatchInlineSnapshot + jest-style describe.skip/it.skip, and wrap
+// `it` so flaky browser specs retry themselves (per-spec, not per-browser).
+// Called (not bare side-effect imports) so webpack does not tree-shake them.
+import {
+  installJasmineSnapshots,
+  installSpecRetry,
+} from './__helpers__/jasmine-inline-snapshots.js'
 installJasmineSnapshots()
+// Must run before any spec is registered so `it` is wrapped when tests load.
+installSpecRetry()
 
 // Import all "test-*.js" modules in this directory (but not subdirectories).
 // `import.meta.webpackContext` is the webpack 5 ESM-native equivalent of the

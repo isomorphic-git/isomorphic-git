@@ -1,6 +1,7 @@
 import {
   fs as _fs,
   resolveMountConfig,
+  bindContext,
   CopyOnWrite,
   Fetch,
   InMemory,
@@ -23,25 +24,25 @@ function getSymlinks() {
   return symlinksPromise
 }
 
-async function putSymlink(path, target) {
+async function putSymlink(pfs, path, target) {
   try {
-    await _fs.promises.symlink(target, path)
+    await pfs.symlink(target, path)
   } catch (err) {
     // Something already exists at this path (the read-only Fetch entry, or a
     // regular file left by a dereferencing copy). Replace it so the link wins.
     if (err && err.code === 'EEXIST') {
-      await _fs.promises.rm(path, { force: true })
-      await _fs.promises.symlink(target, path)
+      await pfs.rm(path, { force: true })
+      await pfs.symlink(target, path)
     } else {
       throw err
     }
   }
 }
 
-async function materializeSymlinks() {
+async function materializeSymlinks(pfs) {
   const symlinks = await getSymlinks()
   for (const [path, target] of Object.entries(symlinks)) {
-    await putSymlink(path, target)
+    await putSymlink(pfs, path, target)
   }
 }
 
@@ -85,14 +86,23 @@ function getReadable() {
   return readablePromise
 }
 
-// Every makeFixture() call gets a brand-new in-memory filesystem: a fresh
-// writable overlay mounted at '/' on top of the shared, read-only fixtures. This
-// mirrors the Node helper, where each fixture is an independent temp dir — a test
-// that creates a fixture starts clean, and a fixture built in `beforeAll` survives
-// across that suite's specs (they don't create a new fixture, so nothing resets).
+// Every makeFixture() call gets a FULLY ISOLATED filesystem: a fresh InMemory
+// writable overlay on top of the shared, read-only fixtures, mounted at a unique
+// path and exposed through its own bound (chrooted) context. Tests keep using
+// normal absolute paths (e.g. `/test-foo.git`); the context roots them under
+// that unique mount, so nothing — no state, and no leaked or still-pending async
+// op — can ever cross between tests. This mirrors the Node helper, where each
+// fixture is an independent temp dir.
 //
-// Note: makeFixtureAsSubmodule needs two fixtures in ONE fs, so it calls makeZenFS
-// only once and builds the second fixture itself (see FixtureFSSubmodule.js).
+// We intentionally never reuse or umount a fixture's mount: keeping it alive
+// means a stray op that outlives its test resolves harmlessly against its own
+// dead overlay instead of corrupting the next test or throwing an unhandled
+// ENOENT against a torn-down path. The overlays are small in-memory maps.
+//
+// Note: makeFixtureAsSubmodule needs two fixtures in ONE fs, so it calls
+// makeZenFS only once and builds the second fixture as another directory in the
+// same (isolated) context (see FixtureFSSubmodule.js).
+let fixtureCount = 0
 export async function makeZenFS(dir) {
   // NB: we deliberately do NOT clear utilium's shared request cache here. The
   // read-only fixtures layer is pre-fetched once (see getReadable) and never
@@ -106,19 +116,20 @@ export async function makeZenFS(dir) {
     readable,
     writable: { backend: InMemory },
   })
-  try {
-    _fs.umount('/')
-  } catch {}
-  _fs.mount('/', root)
-  await materializeSymlinks()
+  const mountpoint = `/fixture-${fixtureCount++}`
+  _fs.mount(mountpoint, root)
+  // Root a context at this mount so the fixture has its own chrooted `fs`,
+  // isolated from every other fixture's mount in the shared table.
+  const ctx = bindContext({ root: mountpoint })
+  await materializeSymlinks(ctx.fs.promises)
 
-  const fs = new FileSystem(_fs)
+  const fs = new FileSystem(ctx.fs)
   dir = `/${dir}`
   const gitdir = `${dir}.git`
   await fs.mkdir(dir)
   await fs.mkdir(gitdir)
   return {
-    _fs,
+    _fs: ctx.fs,
     fs,
     dir,
     gitdir,

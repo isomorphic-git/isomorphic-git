@@ -86,3 +86,60 @@ export function installJasmineSnapshots() {
   // as a failed spec.
   globalObj.expect = jestExpect
 }
+
+/**
+ * Retry a flaky spec a few times before failing it. Real browsers and devices
+ * occasionally hit transient timing failures in the shared ZenFS/BrowserStack
+ * tunnel stack that have nothing to do with the code under test. Retrying just
+ * the failing spec — each of which builds its own isolated fixture, so a retry
+ * starts from a clean filesystem — is far cheaper and more targeted than
+ * re-running the whole browser suite when a single spec is flaky.
+ *
+ * Only applies under Jasmine (browsers); Jest/Node runs are deterministic. Jest's
+ * `expect` throws on failure, so a failed assertion — like any thrown error — is
+ * caught here and retried.
+ *
+ * @param {number} [attempts=3] - Max attempts per spec.
+ */
+export function installSpecRetry(attempts = 3) {
+  // Node/Jest: no retries (deterministic).
+  if (typeof jest !== 'undefined') return
+  /** @type {any} */
+  const globalObj = globalThis
+  const originalIt = globalObj.it
+  if (typeof originalIt !== 'function' || originalIt.__retryWrapped) return
+
+  const retryingIt = function (description, testFn, timeout) {
+    // Only wrap async/zero-arg specs (all of ours). Pending specs (no fn) and
+    // any done-callback style (fn.length > 0) are registered unchanged.
+    if (typeof testFn !== 'function' || testFn.length > 0) {
+      return originalIt(description, testFn, timeout)
+    }
+    return originalIt(
+      description,
+      async function () {
+        let lastError
+        for (let attempt = 1; attempt <= attempts; attempt++) {
+          try {
+            await testFn.call(this)
+            return
+          } catch (error) {
+            lastError = error
+            if (attempt < attempts) {
+              // eslint-disable-next-line no-console
+              console.warn(
+                `Retrying flaky spec (attempt ${attempt + 1}/${attempts}): ${description}`
+              )
+            }
+          }
+        }
+        throw lastError
+      },
+      timeout
+    )
+  }
+  // Preserve `it.skip` / `it.only` and any other sub-helpers.
+  Object.assign(retryingIt, originalIt)
+  retryingIt.__retryWrapped = true
+  globalObj.it = retryingIt
+}
