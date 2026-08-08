@@ -188,7 +188,7 @@ export class GitStashManager {
     )
     const filepath = this.refLogsStashPath
 
-    await acquireLock({ filepath, entry }, async () => {
+    await acquireLock(filepath, async () => {
       const appendTo = (await this.fs.exists(filepath))
         ? await this.fs.read(filepath, 'utf8')
         : ''
