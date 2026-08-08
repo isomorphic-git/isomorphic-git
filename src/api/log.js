@@ -20,6 +20,7 @@ import { join } from '../utils/join.js'
  * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
  * @param {boolean=} [args.force=false] do not throw error if filepath is not exist (works only for a single file). defaults to false
  * @param {boolean=} [args.follow=false] Continue listing the history of a file beyond renames (works only for a single file). defaults to false
+ * @param {boolean=} [args.includeChanges=false] Include changed file object ids for each commit. Each tuple is `[newOid, oldOid, filepath]`; an added or removed file has a null old or new oid, respectively.
  * @param {object} [args.cache] - a [cache](cache.md) object
  *
  * @returns {Promise<Array<ReadCommitResult>>} Resolves to an array of ReadCommitResult objects
@@ -46,6 +47,7 @@ export async function log({
   since, // Date
   force,
   follow,
+  includeChanges = false,
   cache = {},
 }) {
   try {
@@ -65,6 +67,7 @@ export async function log({
       since,
       force,
       follow,
+      includeChanges,
     })
   } catch (err) {
     err.caller = 'git.log'

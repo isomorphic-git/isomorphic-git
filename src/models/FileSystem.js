@@ -2,6 +2,7 @@ import pify from 'pify'
 
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
+import { mkdirp } from '../utils/mkdirp.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
 import { isPromiseLike } from '../utils/types.js'
 
@@ -158,29 +159,17 @@ export class FileSystem {
    * Make a directory (or series of nested directories) without throwing an error if it already exists.
    *
    * @param {string} filepath - The path to the directory.
-   * @param {boolean} [_selfCall=false] - Internal flag to prevent infinite recursion.
    * @returns {Promise<void>}
    */
-  async mkdir(filepath, _selfCall = false) {
-    try {
-      await this._mkdir(filepath)
-    } catch (err) {
-      // If err is null then operation succeeded!
-      if (err === null) return
-      // If the directory already exists, that's OK!
-      if (err.code === 'EEXIST') return
-      // Avoid infinite loops of failure
-      if (_selfCall) throw err
-      // If we got a "no such file or directory error" backup and try again.
-      if (err.code === 'ENOENT') {
-        const parent = dirname(filepath)
-        // Check to see if we've gone too far
-        if (parent === '.' || parent === '/' || parent === filepath) throw err
-        // Infinite recursion, what could go wrong?
-        await this.mkdir(parent)
-        await this.mkdir(filepath, true)
-      }
-    }
+  async mkdir(filepath) {
+    // Recursively create the directory, using only single-level `_mkdir` so we
+    // don't depend on `{ recursive: true }` (which isn't part of the required
+    // `fs` contract — see docs/fs.md — and is unimplemented by some backends
+    // e.g. lightning-fs). The helper tolerates EEXIST and the transient ENOENT
+    // that eventually-consistent backends throw when a freshly created parent
+    // isn't visible yet, which is what made concurrent reflog writes into
+    // `.git/logs/refs/*` fail intermittently.
+    await mkdirp(this._mkdir, filepath)
   }
 
   /**

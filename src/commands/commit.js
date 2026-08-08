@@ -1,6 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
+import { EmptyCommitError } from '../errors/EmptyCommitError.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NoCommitError } from '../errors/NoCommitError.js'
@@ -14,6 +15,8 @@ import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
 import { _readCommit as readCommit } from './readCommit.js'
+
+const EMPTY_TREE_OID = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 /**
  *
@@ -37,6 +40,7 @@ import { _readCommit as readCommit } from './readCommit.js'
  * @param {boolean} [args.amend = false]
  * @param {boolean} [args.dryRun = false]
  * @param {boolean} [args.noUpdateBranch = false]
+ * @param {boolean} [args.disallowEmpty = false]
  * @param {string} [args.ref]
  * @param {string[]} [args.parent]
  * @param {string} [args.tree]
@@ -55,6 +59,7 @@ export async function _commit({
   amend = false,
   dryRun = false,
   noUpdateBranch = false,
+  disallowEmpty = false,
   ref,
   parent,
   tree,
@@ -140,6 +145,15 @@ export async function _commit({
             return GitRefManager.resolve({ fs, gitdir, ref: p })
           })
         )
+      }
+
+      if (
+        disallowEmpty &&
+        !amend &&
+        ((initialCommit && tree === EMPTY_TREE_OID) ||
+          (!initialCommit && tree === refCommit.commit.tree))
+      ) {
+        throw new EmptyCommitError()
       }
 
       // Determine message of this commit

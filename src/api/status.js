@@ -2,6 +2,7 @@
 import { _readTree } from '../commands/readTree.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { ObjectTypeError } from '../errors/ObjectTypeError.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -69,15 +70,6 @@ export async function status({
 
     const fs = new FileSystem(_fs)
     const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
-    const ignored = await GitIgnoreManager.isIgnored({
-      fs,
-      gitdir: updatedGitdir,
-      dir,
-      filepath,
-    })
-    if (ignored) {
-      return 'ignored'
-    }
     const headTree = await getHeadTree({ fs, cache, gitdir: updatedGitdir })
     const treeOid = await getOidAtPath({
       fs,
@@ -95,6 +87,20 @@ export async function status({
         return null
       }
     )
+    // .gitignore governs untracked files. A file in HEAD or in the index is
+    // tracked, so canonical git keeps reporting its real state, and
+    // `git check-ignore` does not match it. statusMatrix already does this.
+    if (treeOid === null && indexEntry === null) {
+      const ignored = await GitIgnoreManager.isIgnored({
+        fs,
+        gitdir: updatedGitdir,
+        dir,
+        filepath,
+      })
+      if (ignored) {
+        return 'ignored'
+      }
+    }
     const stats = await fs.lstat(join(dir, filepath))
 
     const H = treeOid !== null // head
@@ -105,7 +111,12 @@ export async function status({
       if (I && !compareStats(indexEntry, stats)) {
         return indexEntry.oid
       } else {
-        const object = await fs.read(join(dir, filepath))
+        // Read through the same core.autocrlf normalisation GitWalkerFs uses,
+        // so the working copy hashes to the blob that was stored. Without it a
+        // CRLF checkout of an LF blob reads as modified.
+        const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
+        const autocrlf = await config.get('core.autocrlf')
+        const object = await fs.read(join(dir, filepath), { autocrlf })
         const workdirOid = await hashObject({
           gitdir: updatedGitdir,
           type: 'blob',

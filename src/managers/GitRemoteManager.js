@@ -45,9 +45,15 @@ export class GitRemoteManager {
  * @param {string} args.url - The URL of the remote repository.
  * @returns {Object|undefined} - An object containing the transport and address, or undefined if parsing fails.
  */
+// git-clone(1) calls this the "shorter scp-like syntax": [user@]host:path. The
+// user is part of the syntax, not part of the word `git`, and a self-hosted
+// forge is as likely to hand out `gitolite@`, `forgejo@` or `ubuntu@`. The host
+// and the user cannot hold a slash, an at sign or a colon, so `https://x` and a
+// `scheme:address` override are left to the expression below.
+const scpLike = /^[^/@:]+@[^/@:]+:/
+
 function parseRemoteUrl({ url }) {
-  // the stupid "shorter scp-like syntax"
-  if (url.startsWith('git@')) {
+  if (scpLike.test(url)) {
     return {
       transport: 'ssh',
       address: url,
