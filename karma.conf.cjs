@@ -157,6 +157,17 @@ module.exports = function (config) {
     // :9999), which otherwise fail with "Failed to fetch" on Android even though
     // they work on desktop BrowserStack. (Per BrowserStack support.)
     browserStack: {
+      // Explicit project/build names so each run is identifiable in the
+      // BrowserStack dashboard and resolvable via the BrowserStack API/MCP
+      // (getBuildId → listTestIds → fetchRCA / getFailureLogs). Without these,
+      // karma-browserstack-launcher falls back to project "Karma" and a
+      // timestamp-based build, which are hard to look up after the fact.
+      project: 'isomorphic-git',
+      build:
+        process.env.BROWSERSTACK_BUILD_NAME ||
+        process.env.BUILD_BUILDNUMBER || // Azure Pipelines
+        process.env.GITHUB_RUN_ID || // GitHub Actions
+        'local',
       forceLocal: true,
     },
     concurrency: 6,
