@@ -8,7 +8,14 @@ export function extractAuthFromUrl(url) {
   // No credentials, return the url unmodified and an empty auth object
   if (userpass == null) return { url, auth: {} }
   userpass = userpass[1]
-  const [username, password] = userpass.split(':')
+  // Only the first colon separates the two halves. A colon inside the
+  // password is legal, and `split(':')` would drop everything after it,
+  // so the request would go out with a truncated secret and come back 401.
+  const separatorIndex = userpass.indexOf(':')
+  const username =
+    separatorIndex === -1 ? userpass : userpass.slice(0, separatorIndex)
+  const password =
+    separatorIndex === -1 ? undefined : userpass.slice(separatorIndex + 1)
   // Remove credentials from URL
   url = url.replace(`${userpass}@`, '')
   // Has credentials, return the fetch-safe URL and the parsed credentials
