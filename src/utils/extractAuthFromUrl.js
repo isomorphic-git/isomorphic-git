@@ -1,7 +1,9 @@
-// The `@` that ends the credentials is the last one before the path, and the
+// The `@` that ends the credentials is the last one in the authority, and the
 // scheme is matched case-insensitively: `HTTPS://user:pass@host/x` is a URL
 // like any other, and leaving the credentials in it is what `fetch` rejects.
-const CREDENTIALS = /^(https?:\/\/)([^/]+)@/i
+// The authority ends at the first `/`, `?` or `#`, so an `@` that lives in a
+// query or a fragment is left where it is.
+const CREDENTIALS = /^(https?:\/\/)([^/?#]+)@/i
 
 export function extractAuthFromUrl(url) {
   // For whatever reason, the `fetch` API does not convert credentials embedded in the URL

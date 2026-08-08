@@ -83,6 +83,17 @@ describe('utils/extractAuthFromUrl', () => {
     }
   })
 
+  it('ignores an @ that belongs to the query or the fragment', () => {
+    for (const url of [
+      'https://github.com?account=user@example.com',
+      'https://github.com#user@example.com',
+    ]) {
+      const extracted = extractAuthFromUrl(url)
+      expect(extracted.url).toEqual(url)
+      expect(extracted.auth).toEqual({})
+    }
+  })
+
   it('matches what the WHATWG URL parser reads', () => {
     for (const url of [
       'https://user:pass@github.com/owner/repo.git',
