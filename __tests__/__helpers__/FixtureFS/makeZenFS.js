@@ -94,15 +94,19 @@ function getReadable() {
 // op — can ever cross between tests. This mirrors the Node helper, where each
 // fixture is an independent temp dir.
 //
-// We intentionally never reuse or umount a fixture's mount: keeping it alive
-// means a stray op that outlives its test resolves harmlessly against its own
-// dead overlay instead of corrupting the next test or throwing an unhandled
-// ENOENT against a torn-down path. The overlays are small in-memory maps.
-//
 // Note: makeFixtureAsSubmodule needs two fixtures in ONE fs, so it calls
 // makeZenFS only once and builds the second fixture as another directory in the
 // same (isolated) context (see FixtureFSSubmodule.js).
 let fixtureCount = 0
+// ZenFS resolves paths by re-sorting the ENTIRE global mount table on every
+// operation, so letting per-fixture mounts accumulate makes every fs call
+// progressively slower (a full suite has >1000 fixtures — the table sort alone
+// balloons the run and trips 60s spec timeouts). We keep only the few most-recent
+// fixtures mounted: small enough that resolution stays cheap, but enough of a
+// window that a stray op briefly outliving its test still finds its overlay
+// instead of throwing an unhandled ENOENT against a torn-down path.
+const MAX_LIVE_MOUNTS = 4
+const liveMounts = []
 export async function makeZenFS(dir) {
   // NB: we deliberately do NOT clear utilium's shared request cache here. The
   // read-only fixtures layer is pre-fetched once (see getReadable) and never
@@ -118,6 +122,14 @@ export async function makeZenFS(dir) {
   })
   const mountpoint = `/fixture-${fixtureCount++}`
   _fs.mount(mountpoint, root)
+  liveMounts.push(mountpoint)
+  while (liveMounts.length > MAX_LIVE_MOUNTS) {
+    try {
+      _fs.umount(liveMounts.shift())
+    } catch {
+      // already gone — fine
+    }
+  }
   // Root a context at this mount so the fixture has its own chrooted `fs`,
   // isolated from every other fixture's mount in the shared table.
   const ctx = bindContext({ root: mountpoint })
