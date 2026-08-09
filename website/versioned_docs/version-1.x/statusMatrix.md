@@ -7,17 +7,22 @@ original_id: statusMatrix
 
 Efficiently get the status of multiple files at once.
 
-| param          | type [= default]              | description                                                                                        |
-| -------------- | ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| [**fs**](./fs) | FsClient                      | a file system client                                                                               |
-| **dir**        | string                        | The [working tree](dir-vs-gitdir.md) directory path                                                |
-| **gitdir**     | string = join(dir, '.git')    | The [git directory](dir-vs-gitdir.md) path                                                         |
-| ref            | string = 'HEAD'               | Optionally specify a different commit to compare against the workdir and stage instead of the HEAD |
-| filepaths      | Array\<string\> = ['.']       | Limit the query to the given files and directories                                                 |
-| filter         | function(string): boolean     | Filter the results to only those whose filepath matches a function.                                |
-| cache          | object                        | a [cache](cache.md) object                                                                         |
-| ignored        | boolean = false               | include ignored files in the result                                                                |
-| return         | Promise\<Array\<StatusRow\>\> | Resolves with a status matrix, described below.                                                    |
+| param          | type [= default]              | description                                                                                                                                                                                                                                                               |
+| -------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                      | a file system client                                                                                                                                                                                                                                                      |
+| **dir**        | string                        | The [working tree](dir-vs-gitdir.md) directory path                                                                                                                                                                                                                       |
+| **gitdir**     | string = join(dir, '.git')    | The [git directory](dir-vs-gitdir.md) path                                                                                                                                                                                                                                |
+| ref            | string = 'HEAD'               | Optionally specify a different commit to compare against the workdir and stage instead of the HEAD                                                                                                                                                                        |
+| filepaths      | Array\<string\> = ['.']       | Limit the query to the given files and directories                                                                                                                                                                                                                        |
+| filter         | function(string): boolean     | Filter the results to only those whose filepath matches a function.                                                                                                                                                                                                       |
+| cache          | object                        | a [cache](cache.md) object                                                                                                                                                                                                                                                |
+| ignored        | boolean = false               | include ignored files in the result                                                                                                                                                                                                                                       |
+| refresh        | boolean = true                | when false, do not refresh the
+  `.git/index` stat cache for files whose contents still match the staged
+  blob. The call becomes read-only with respect to the index, at the cost
+  of recomputing the SHA1 on subsequent calls for files whose stat info
+  has drifted. |
+| return         | Promise\<Array\<StatusRow\>\> | Resolves with a status matrix, described below.                                                                                                                                                                                                                           |
 
 ```ts
 type StatusRow = Array<(string|number)>;
