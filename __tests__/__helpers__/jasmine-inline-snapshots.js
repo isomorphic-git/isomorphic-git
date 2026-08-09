@@ -1,6 +1,7 @@
 /* eslint-env jasmine */
 import diff from 'diff-lines'
 import { expect as jestExpect } from 'expect'
+import { _resetLock } from 'isomorphic-git/internal-apis'
 import prettyFormat from 'pretty-format'
 
 function assertSnapshot(object, snapshot) {
@@ -142,4 +143,17 @@ export function installSpecRetry(attempts = 3) {
   Object.assign(retryingIt, originalIt)
   retryingIt.__retryWrapped = true
   globalObj.it = retryingIt
+}
+
+/**
+ * Reset iso-git's shared file lock before every spec. The lock is a module-level
+ * singleton keyed by path; because fixtures reuse the same paths, a filesystem
+ * operation that stalls on a slow real browser leaves its lock held and cascades
+ * 60s timeouts into every later spec that touches the same path. Discarding the
+ * lock before each spec stops that cascade — a genuinely stuck op only fails its
+ * own spec, not the ones after it. Browser-only; Node runs are deterministic.
+ */
+export function installLockReset() {
+  if (typeof jest !== 'undefined') return
+  beforeEach(() => _resetLock())
 }
