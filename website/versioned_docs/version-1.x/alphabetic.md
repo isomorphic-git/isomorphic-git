@@ -13,6 +13,7 @@ original_id: alphabetic
 - [annotatedTag](annotatedTag)
 - [branch](branch)
 - [checkout](checkout)
+- [cherryPick](cherryPick)
 - [clone](clone)
 - [commit](commit)
 - [currentBranch](currentBranch)

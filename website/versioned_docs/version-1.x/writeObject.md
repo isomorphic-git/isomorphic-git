@@ -42,6 +42,7 @@ type CommitObject = {
   message: string; // Commit message
   tree: string; // SHA-1 object id of corresponding file tree
   parent: Array<string>; // an array of zero or more SHA-1 object ids
+  changes?: Array<Array<(string|null)>>; // Changed files as `[newOid, oldOid, filepath]`; present when `log` is called with `includeChanges: true`.
   author: {
     name: string; // The author's name
     email: string; // The author's email

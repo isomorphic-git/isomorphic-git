@@ -7,19 +7,20 @@ original_id: log
 
 Get commit descriptions from the git history
 
-| param          | type [= default]                     | description                                                                                             |
-| -------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| [**fs**](./fs) | FsClient                             | a file system client                                                                                    |
-| dir            | string                               | The [working tree](dir-vs-gitdir.md) directory path                                                     |
-| **gitdir**     | string = join(dir,'.git')            | The [git directory](dir-vs-gitdir.md) path                                                              |
-| filepath       | string                               | optional get the commit for the filepath only                                                           |
-| ref            | string = 'HEAD'                      | The commit to begin walking backwards through the history from                                          |
-| depth          | number                               | Limit the number of commits returned. No limit by default.                                              |
-| since          | Date                                 | Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.     |
-| force          | boolean = false                      | do not throw error if filepath is not exist (works only for a single file). defaults to false           |
-| follow         | boolean = false                      | Continue listing the history of a file beyond renames (works only for a single file). defaults to false |
-| cache          | object                               | a [cache](cache.md) object                                                                              |
-| return         | Promise\<Array\<ReadCommitResult\>\> | Resolves to an array of ReadCommitResult objects                                                        |
+| param          | type [= default]                     | description                                                                                                                                                    |
+| -------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [**fs**](./fs) | FsClient                             | a file system client                                                                                                                                           |
+| dir            | string                               | The [working tree](dir-vs-gitdir.md) directory path                                                                                                            |
+| **gitdir**     | string = join(dir,'.git')            | The [git directory](dir-vs-gitdir.md) path                                                                                                                     |
+| filepath       | string                               | optional get the commit for the filepath only                                                                                                                  |
+| ref            | string = 'HEAD'                      | The commit to begin walking backwards through the history from                                                                                                 |
+| depth          | number                               | Limit the number of commits returned. No limit by default.                                                                                                     |
+| since          | Date                                 | Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.                                                            |
+| force          | boolean = false                      | do not throw error if filepath is not exist (works only for a single file). defaults to false                                                                  |
+| follow         | boolean = false                      | Continue listing the history of a file beyond renames (works only for a single file). defaults to false                                                        |
+| includeChanges | boolean = false                      | Include changed file object ids for each commit. Each tuple is `[newOid, oldOid, filepath]`; an added or removed file has a null old or new oid, respectively. |
+| cache          | object                               | a [cache](cache.md) object                                                                                                                                     |
+| return         | Promise\<Array\<ReadCommitResult\>\> | Resolves to an array of ReadCommitResult objects                                                                                                               |
 
 ```ts
 type ReadCommitResult = {
@@ -36,6 +37,7 @@ type CommitObject = {
   message: string; // Commit message
   tree: string; // SHA-1 object id of corresponding file tree
   parent: Array<string>; // an array of zero or more SHA-1 object ids
+  changes?: Array<Array<(string|null)>>; // Changed files as `[newOid, oldOid, filepath]`; present when `log` is called with `includeChanges: true`.
   author: {
     name: string; // The author's name
     email: string; // The author's email
