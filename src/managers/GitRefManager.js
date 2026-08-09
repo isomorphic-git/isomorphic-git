@@ -1,8 +1,6 @@
 import '../typedefs.js'
 
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
-import AsyncLock from 'async-lock'
-
 import { InternalError } from '../errors/InternalError.js'
 import { InvalidOidError } from '../errors/InvalidOidError.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
@@ -12,6 +10,7 @@ import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
 import { join } from '../utils/join.js'
+import { acquireLock } from '../utils/lock.js'
 
 import { GitConfigManager } from './GitConfigManager.js'
 
@@ -36,13 +35,6 @@ function assertWritableRef(ref) {
   if (GIT_FILES.includes(ref)) {
     throw new InvalidRefNameError(ref, `refs/heads/${ref}`)
   }
-}
-
-let lock
-
-async function acquireLock(ref, callback) {
-  if (lock === undefined) lock = new AsyncLock()
-  return lock.acquire(ref, callback)
 }
 
 /**
