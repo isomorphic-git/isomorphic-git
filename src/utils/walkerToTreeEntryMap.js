@@ -1,5 +1,3 @@
-import AsyncLock from 'async-lock'
-
 import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
@@ -15,17 +13,15 @@ import { _writeObject } from '../storage/writeObject.js'
 
 import { assertNoSymlinkInLeadingPath } from './assertNoSymlinkInLeadingPath.js'
 import { join } from './join.js'
+// Re-exported so existing importers (e.g. commands/stash.js) keep working.
+import { acquireLock } from './lock.js'
 import { posixifyPathBuffer } from './posixifyPathBuffer.js'
+
+export { acquireLock }
 
 const _TreeMap = {
   stage: STAGE,
   workdir: WORKDIR,
-}
-
-let lock
-export async function acquireLock(ref, callback) {
-  if (lock === undefined) lock = new AsyncLock()
-  return lock.acquire(ref, callback)
 }
 
 // make sure filepath, blob type and blob object (from loose objects) plus oid are in sync and valid
