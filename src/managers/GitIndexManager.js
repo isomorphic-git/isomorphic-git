@@ -1,16 +1,9 @@
 import '../typedefs.js'
 
-// import LockManager from 'travix-lock-manager'
-import AsyncLock from 'async-lock'
-
 import { UnmergedPathsError } from '../errors/UnmergedPathsError.js'
 import { GitIndex } from '../models/GitIndex.js'
 import { compareStats } from '../utils/compareStats.js'
-
-// import Lock from '../utils.js'
-
-// const lm = new LockManager()
-let lock = null
+import { acquireLock } from '../utils/lock.js'
 
 const IndexCache = Symbol('IndexCache')
 
@@ -81,10 +74,9 @@ export class GitIndexManager {
     }
 
     const filepath = `${gitdir}/index`
-    if (lock === null) lock = new AsyncLock({ maxPending: Infinity })
     let result
     let unmergedPaths = []
-    await lock.acquire(filepath, async () => {
+    await acquireLock(filepath, async () => {
       // Acquire a file lock while we're reading the index
       // to make sure other processes aren't writing to it
       // simultaneously, which could result in a corrupted index.
