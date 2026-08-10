@@ -51,6 +51,15 @@ module.exports = function (config) {
         watched: false,
         included: false,
       },
+      // Service Worker probe script (see test-sw-probe.js). Served but not
+      // injected as a <script>; the browser fetches it via the `/sw-probe.js`
+      // proxy below so its scope is the origin root.
+      {
+        pattern: '__tests__/__helpers__/sw-probe.js',
+        served: true,
+        watched: false,
+        included: false,
+      },
     ],
     // Serve a 1x1 image for the icon paths Safari requests at the site root, so
     // they don't spam the log with 404s.
@@ -59,6 +68,9 @@ module.exports = function (config) {
       '/apple-touch-icon.png': '/base/__tests__/__helpers__/1px.png',
       '/apple-touch-icon-precomposed.png':
         '/base/__tests__/__helpers__/1px.png',
+      // Expose the SW probe script at the origin root so it registers with
+      // scope '/' (a worker under /base/... could not control the context page).
+      '/sw-probe.js': '/base/__tests__/__helpers__/sw-probe.js',
     },
     // list of files to exclude
     exclude: [],
@@ -328,6 +340,32 @@ module.exports = function (config) {
     options.singleRun = false
     // enable / disable watching file and executing tests whenever any file changes
     options.autoWatch = true
+  }
+
+  // Optional HTTPS (KARMA_HTTPS=1). Service Workers require a secure context.
+  // http://localhost is already secure, so run the SW probe (test-sw-probe.js)
+  // FIRST without this — only flip it on if the probe reports isSecureContext=false
+  // / registration failures on the tunnel browsers. See make-https-cert.cjs for
+  // the mixed-content caveat.
+  if (process.env.KARMA_HTTPS) {
+    const {
+      getHttpsServerOptions,
+    } = require('./__tests__/__helpers__/make-https-cert.cjs')
+    options.protocol = 'https'
+    options.httpsServerOptions = getHttpsServerOptions()
+    // Real BrowserStack / SauceLabs browsers must be told to trust the
+    // self-signed certificate, or the page never loads over TLS.
+    for (const launcher of Object.values(options.customLaunchers)) {
+      if (launcher.base === 'BrowserStack') {
+        launcher.acceptSslCerts = true
+        launcher['browserstack.acceptSslCerts'] = true
+      }
+    }
+    console.log('[SW-PROBE] karma serving over HTTPS (KARMA_HTTPS set)')
+  } else {
+    console.log(
+      '[SW-PROBE] karma serving over HTTP (set KARMA_HTTPS=1 to enable TLS)'
+    )
   }
 
   config.set(options)
