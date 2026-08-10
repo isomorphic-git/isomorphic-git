@@ -102,7 +102,7 @@ export function installJasmineSnapshots() {
  *
  * @param {number} [attempts=3] - Max attempts per spec.
  */
-export function installSpecRetry(attempts = 3) {
+export function installSpecRetry(attempts = 3, perAttemptMs = 75000) {
   // Node/Jest: no retries (deterministic).
   if (typeof jest !== 'undefined') return
   /** @type {any} */
@@ -121,10 +121,39 @@ export function installSpecRetry(attempts = 3) {
       async function () {
         let lastError
         for (let attempt = 1; attempt <= attempts; attempt++) {
+          // Race each attempt against its own timeout so an *async* hang (an fs
+          // op that never resolves on a slow real browser) is caught and retried
+          // rather than eating jasmine's whole budget as an unrecoverable
+          // timeout. `perAttemptMs` is set above the slowest legitimate spec so
+          // it never aborts a merely-slow one. (A *synchronous* block can't be
+          // interrupted by a timer — that path still fails, which is correct.)
+          let timer
+          const spec = testFn.call(this)
           try {
-            await testFn.call(this)
+            await Promise.race([
+              spec,
+              new Promise((_resolve, reject) => {
+                timer = setTimeout(
+                  () =>
+                    reject(
+                      new Error(
+                        `Spec attempt ${attempt} did not complete within ${perAttemptMs}ms`
+                      )
+                    ),
+                  perAttemptMs
+                )
+              }),
+            ])
+            clearTimeout(timer)
             return
           } catch (error) {
+            clearTimeout(timer)
+            // If the timeout won, the spec promise is still pending: swallow its
+            // eventual settlement so an abandoned hung op can't surface as an
+            // unhandled rejection, and drop any lock it may still hold so the
+            // retry starts from a clean slate.
+            spec.catch(() => {})
+            _resetLock()
             lastError = error
             if (attempt < attempts) {
               // eslint-disable-next-line no-console

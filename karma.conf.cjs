@@ -291,7 +291,10 @@ module.exports = function (config) {
     ],
     client: {
       jasmine: {
-        timeoutInterval: 60000, // Defaults to 5000 ms
+        // Ceiling for the whole spec, sized to fit the per-spec retry wrapper
+        // (installSpecRetry: up to 3 attempts × ~75s). The wrapper's per-attempt
+        // timeout is what actually fails a stuck spec; see FixtureFS.js.
+        timeoutInterval: 240000, // Defaults to 5000 ms
       },
     },
   }
