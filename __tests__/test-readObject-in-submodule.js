@@ -28,6 +28,7 @@ describe('readObject', () => {
     const { fs, gitdir } = await makeFixtureAsSubmodule('test-readObject')
     let error = null
     try {
+      // @ts-ignore
       await readObject({ fs, gitdir, oid, format: 'invalid' })
     } catch (err) {
       error = err

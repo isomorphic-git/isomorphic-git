@@ -28,6 +28,7 @@ describe('readObject', () => {
     const { fs, gitdir } = await makeFixture('test-readObject')
     let error = null
     try {
+      // @ts-ignore
       await readObject({ fs, gitdir, oid, format: 'invalid' })
     } catch (err) {
       error = err
