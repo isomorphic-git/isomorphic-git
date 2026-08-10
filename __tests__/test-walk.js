@@ -1,6 +1,7 @@
 // @ts-nocheck
 /* eslint-env node, browser, jasmine */
 import {
+  Errors,
   walk,
   WORKDIR,
   TREE,
@@ -9,6 +10,7 @@ import {
   add,
   commit,
   hashBlob,
+  init,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -679,5 +681,60 @@ describe('walk', () => {
       })
     ).oid
     expect(computedOid).toBe(entry.workdir.oid)
+  })
+
+  it('throws when TREE is given a ref that does not exist', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
+    // Test
+    let error = null
+    try {
+      await walk({
+        fs,
+        dir,
+        gitdir,
+        trees: [TREE({ ref: 'refs/heads/does-not-exist' })],
+        map: async filepath => filepath,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error instanceof Errors.NotFoundError).toBe(true)
+  })
+
+  it('throws when TREE is given a ref with a trailing newline', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
+    // Test
+    let error = null
+    try {
+      await walk({
+        fs,
+        dir,
+        gitdir,
+        trees: [TREE({ ref: 'master\n' })],
+        map: async filepath => filepath,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error instanceof Errors.NotFoundError).toBe(true)
+  })
+
+  it('walks an empty tree on a branch that has no commits yet', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await init({ fs, dir, gitdir, defaultBranch: 'main' })
+    // Test
+    const result = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [TREE({ ref: 'HEAD' })],
+      map: async filepath => (filepath === '.' ? undefined : filepath),
+    })
+    expect(result).toEqual([])
   })
 })
