@@ -192,6 +192,13 @@ module.exports = {
         : 'cross-env karma start ./karma.conf.cjs --single-run --log-level debug',
       // Run Karma as a watch server without capturing browsers (attach your own).
       karmore: 'cross-env TEST_NO_BROWSERS=1 karma start --no-single-run',
+      // One-off diagnostic: does iOS Safari expose Service Workers when karma is
+      // served over HTTPS? BrowserStack routes the iPhone to http://bs-local.com
+      // (not localhost), which is NOT a secure context, so the SW API is hidden;
+      // over HTTPS bs-local.com becomes secure. Loads only test-sw-probe.js and
+      // reuses an existing build. Grep the output for [SW-PROBE].
+      swprobe:
+        'cross-env KARMA_HTTPS=1 SW_PROBE_ONLY=1 TEST_BROWSERS=bs_ios_safari karma start ./karma.conf.cjs --single-run',
     },
     prepublish: {
       default: series.nps('prepublish.version', 'build'),

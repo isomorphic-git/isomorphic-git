@@ -22,6 +22,10 @@ const testsContext = import.meta.webpackContext('.', {
   regExp: /\/test-.*$/,
 })
 
+// SW_PROBE_ONLY (see karma.conf.cjs) loads just the Service Worker probe spec,
+// so the iOS-over-HTTPS diagnostic run is fast and free of mixed-content noise.
+const onlyProbe = process.env.SW_PROBE_ONLY
 for (const key of testsContext.keys()) {
+  if (onlyProbe && !/test-sw-probe/.test(key)) continue
   testsContext(key)
 }

@@ -233,6 +233,12 @@ module.exports = function (config) {
           'process.env.TEST_PUSH_GITHUB_TOKEN': JSON.stringify(
             process.env.TEST_PUSH_GITHUB_TOKEN || ''
           ),
+          // When set, index.webpack.js loads ONLY the Service Worker probe spec
+          // (test-sw-probe.js) so an iOS-over-HTTPS diagnostic run stays fast and
+          // avoids the mixed-content failures a full HTTPS suite would hit.
+          'process.env.SW_PROBE_ONLY': JSON.stringify(
+            process.env.SW_PROBE_ONLY || ''
+          ),
         }),
       ],
       resolve: {
@@ -325,7 +331,10 @@ module.exports = function (config) {
     // options.browsers.push('ChromeCanaryHeadlessNoSandbox')
   }
 
-  if (!process.env.TEST_NO_BROWSERS) {
+  // SW_PROBE_ONLY runs are a one-off diagnostic (a single browser over HTTPS);
+  // skip the "only re-run failed browsers" filter, which would otherwise drop the
+  // target browser if a previous run had already marked it successful.
+  if (!process.env.TEST_NO_BROWSERS && !process.env.SW_PROBE_ONLY) {
     // Only re-run browsers that failed in the previous run.
     options.browsers =
       require('./__tests__/__helpers__/karma-load-successful-browsers.cjs').filter(
