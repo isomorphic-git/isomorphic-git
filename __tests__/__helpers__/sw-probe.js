@@ -1,4 +1,7 @@
 /* eslint-env serviceworker */
+// @ts-nocheck — this runs in a ServiceWorkerGlobalScope, but tsconfig's `lib` is
+// `dom` (not `webworker`), so `self`, the fetch `event`, `clients`, etc. would be
+// mis-typed as Window/Event. Skip type-checking this raw worker script.
 // Minimal service worker used by test-sw-probe.js to verify — on every browser
 // and CI tunnel — that (1) a Service Worker can be *registered* (i.e. the page is
 // a secure context) and (2) it can actually *intercept* the page's requests.
