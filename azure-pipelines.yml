@@ -46,14 +46,14 @@ jobs:
 
       # TEMPORARY diagnostic (remove once the Service-Worker fixtures decision is
       # made): does iOS Safari expose Service Workers when karma is served over
-      # HTTPS? BrowserStack routes the iPhone to http://bs-local.com (not
-      # localhost), a non-secure context where the SW API is hidden; over HTTPS it
-      # becomes a secure context. This runs ONLY the [SW-PROBE] spec on the iPhone
-      # real device and reuses the build from 'Run tests'. Grep the log for
-      # [SW-PROBE]; look for `isSecureContext=true` / `register OK` on Mobile Safari.
+      # HTTPS with `acceptInsecureCerts` (per BrowserStack support)? Runs ONLY the
+      # [SW-PROBE] spec on the iPhone real device and reuses the build from 'Run
+      # tests'. `continueOnError` so a capture failure doesn't fail the build —
+      # grep the log for [SW-PROBE] (want isSecureContext=true / register OK).
       - script: npx nps test.swprobe
         displayName: 'Probe iOS Service Worker over HTTPS (temporary)'
         condition: succeededOrFailed()
+        continueOnError: true
         env:
           BROWSER_STACK_ACCESS_KEY: $(BROWSER_STACK_ACCESS_KEY)
           BROWSER_STACK_USERNAME: $(BROWSER_STACK_USERNAME)

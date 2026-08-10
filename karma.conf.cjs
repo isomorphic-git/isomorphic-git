@@ -363,9 +363,13 @@ module.exports = function (config) {
     options.protocol = 'https'
     options.httpsServerOptions = getHttpsServerOptions()
     // Real BrowserStack / SauceLabs browsers must be told to trust the
-    // self-signed certificate, or the page never loads over TLS.
+    // self-signed certificate, or the page never loads over TLS. The W3C
+    // `acceptInsecureCerts` (root-level) is the one BrowserStack support says
+    // works on real iOS devices; `acceptSslCerts` is the legacy JSONWP name kept
+    // as a fallback for older desktop launchers.
     for (const launcher of Object.values(options.customLaunchers)) {
       if (launcher.base === 'BrowserStack') {
+        launcher.acceptInsecureCerts = true
         launcher.acceptSslCerts = true
         launcher['browserstack.acceptSslCerts'] = true
       }
