@@ -21,6 +21,20 @@ describe('readObject', () => {
     expect(error).not.toBeNull()
     expect(error instanceof Errors.NotFoundError).toBe(true)
   })
+  it.each([
+    ['loose', 'e10ebb90d03eaacca84de1af0a59b444232da99e'],
+    ['packed', '0b8faa11b353db846b40eb064dfb299816542a46'],
+  ])('rejects an invalid format for a %s object', async (_, oid) => {
+    const { fs, gitdir } = await makeFixtureAsSubmodule('test-readObject')
+    let error = null
+    try {
+      await readObject({ fs, gitdir, oid, format: 'invalid' })
+    } catch (err) {
+      error = err
+    }
+    expect(error instanceof Errors.InternalError).toBe(true)
+    expect(error.data.message).toBe('invalid requested format "invalid"')
+  })
   it('parsed', async () => {
     // Setup
     const { fs, gitdir } = await makeFixtureAsSubmodule('test-readObject')
