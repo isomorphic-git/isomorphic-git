@@ -367,7 +367,7 @@ export class GitRefManager {
     } catch (_) {
       return false
     }
-    if (!target.startsWith('refs/')) return false
+    if (!target.startsWith('refs/heads/')) return false
     return ref === 'HEAD' || refpaths(ref).includes(target)
   }
 

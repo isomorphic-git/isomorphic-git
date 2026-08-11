@@ -11,6 +11,7 @@ import {
   commit,
   hashBlob,
   init,
+  writeRef,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -736,5 +737,35 @@ describe('walk', () => {
       map: async filepath => (filepath === '.' ? undefined : filepath),
     })
     expect(result).toEqual([])
+  })
+
+  it('throws when HEAD points to a missing non-branch ref', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await init({ fs, dir, gitdir, defaultBranch: 'main' })
+    await writeRef({
+      fs,
+      dir,
+      gitdir,
+      ref: 'HEAD',
+      value: 'refs/tags/missing',
+      force: true,
+      symbolic: true,
+    })
+    // Test
+    let error = null
+    try {
+      await walk({
+        fs,
+        dir,
+        gitdir,
+        trees: [TREE({ ref: 'HEAD' })],
+        map: async filepath => filepath,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error instanceof Errors.NotFoundError).toBe(true)
   })
 })
