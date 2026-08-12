@@ -34,6 +34,7 @@ import { worthWalking } from '../utils/worthWalking.js'
  * @param {boolean} [args.dryRun]
  * @param {boolean} [args.force]
  * @param {boolean} [args.track]
+ * @param {boolean} [args.restoreFromIndex]
  * @param {boolean} [args.nonBlocking]
  * @param {number} [args.batchSize]
  *
@@ -55,6 +56,7 @@ export async function _checkout({
   dryRun,
   force,
   track = true,
+  restoreFromIndex = false,
   nonBlocking = false,
   batchSize = 100,
 }) {
@@ -114,6 +116,7 @@ export async function _checkout({
         ref,
         force,
         filepaths,
+        restoreFromIndex,
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
@@ -406,6 +409,7 @@ async function analyze({
   ref,
   force,
   filepaths,
+  restoreFromIndex,
 }) {
   let count = 0
   return _walk({
@@ -413,7 +417,7 @@ async function analyze({
     cache,
     dir,
     gitdir,
-    trees: [TREE({ ref }), WORKDIR(), STAGE()],
+    trees: [restoreFromIndex ? STAGE() : TREE({ ref }), WORKDIR(), STAGE()],
     map: async function (fullpath, [commit, workdir, stage]) {
       if (fullpath === '.') return
       // match against base paths
