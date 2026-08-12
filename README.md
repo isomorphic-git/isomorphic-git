@@ -109,7 +109,7 @@ import git from 'isomorphic-git'
 // or
 import * as git from 'isomorphic-git'
 // or
-import {plugins, clone, commit, push} from 'isomorphic-git'
+import {add, clone, commit, push} from 'isomorphic-git'
 ```
 
 View the full [Getting Started guide](https://isomorphic-git.github.io/docs/quickstart.html) on the docs website.
