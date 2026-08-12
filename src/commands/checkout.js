@@ -442,7 +442,12 @@ async function analyze({
         // Ignore workdir files that are not tracked and not part of the new commit.
         case '001':
           // OK, make an exception for explicitly named files.
-          if (force && filepaths && filepaths.includes(fullpath)) {
+          if (
+            !restoreFromIndex &&
+            force &&
+            filepaths &&
+            filepaths.includes(fullpath)
+          ) {
             return ['delete', fullpath]
           }
           return

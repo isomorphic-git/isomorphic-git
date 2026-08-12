@@ -10,6 +10,7 @@ import {
   branch,
   getConfig,
   fetch as gitFetch,
+  remove,
   setConfig,
   statusMatrix,
 } from 'isomorphic-git'
@@ -481,6 +482,19 @@ describe('checkout', () => {
     expect(
       await statusMatrix({ fs, dir, gitdir, filepaths: ['README.md'] })
     ).toEqual([['README.md', 1, 2, 2]])
+  })
+
+  it('does not delete a staged-deleted filepath when restoring from the index', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const filepath = 'src/utils/exists.js'
+    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
+    const contents = await fs.read(`${dir}/${filepath}`)
+    await remove({ fs, dir, gitdir, filepath })
+
+    await checkout({ fs, dir, gitdir, force: true, filepaths: [filepath] })
+
+    expect(await fs.read(`${dir}/${filepath}`)).toEqual(contents)
+    expect(await listFiles({ fs, dir, gitdir })).not.toContain(filepath)
   })
 
   it('checkout files should not delete other files', async () => {
