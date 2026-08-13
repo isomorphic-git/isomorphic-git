@@ -9,7 +9,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { compareAge } from '../utils/compareAge.js'
 import { resolveFileIdInTree } from '../utils/resolveFileIdInTree.js'
-import { resolveFilepath } from '../utils/resolveFilepath.js'
+import { resolveFilepathEntry } from '../utils/resolveFilepath.js'
 
 /**
  * Get commit descriptions from the git history
@@ -57,6 +57,7 @@ export async function _log({
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const tips = [await _readCommit({ fs, cache, gitdir, oid })]
   let lastFileOid
+  let lastFileMode
   let lastCommit
   let isOk
 
@@ -76,19 +77,23 @@ export async function _log({
     }
 
     if (filepath) {
-      let vFileOid
+      let vFileEntry
       try {
-        vFileOid = await resolveFilepath({
+        vFileEntry = await resolveFilepathEntry({
           fs,
           cache,
           gitdir,
           oid: commit.commit.tree,
           filepath,
         })
-        if (lastCommit && lastFileOid !== vFileOid) {
+        if (
+          lastCommit &&
+          (lastFileOid !== vFileEntry.oid || lastFileMode !== vFileEntry.mode)
+        ) {
           commits.push(lastCommit)
         }
-        lastFileOid = vFileOid
+        lastFileOid = vFileEntry.oid
+        lastFileMode = vFileEntry.mode
         lastCommit = commit
         isOk = true
       } catch (e) {

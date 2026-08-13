@@ -10,11 +10,76 @@ import {
   log,
   remove,
   resolveRef,
+  writeBlob,
+  writeCommit,
+  writeRef,
+  writeTree,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('log', () => {
+  it('includes commits that only change a file mode', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const oid = await writeBlob({
+      fs,
+      dir,
+      blob: Buffer.from('#!/bin/sh\n'),
+    })
+    const regularTree = await writeTree({
+      fs,
+      dir,
+      tree: [{ mode: '100644', path: 'script.sh', oid, type: 'blob' }],
+    })
+    const regularCommit = await writeCommit({
+      fs,
+      dir,
+      commit: {
+        message: 'Add script\n',
+        tree: regularTree,
+        parent: [],
+        author,
+        committer: author,
+      },
+    })
+    const executableTree = await writeTree({
+      fs,
+      dir,
+      tree: [{ mode: '100755', path: 'script.sh', oid, type: 'blob' }],
+    })
+    const executableCommit = await writeCommit({
+      fs,
+      dir,
+      commit: {
+        message: 'Make script executable\n',
+        tree: executableTree,
+        parent: [regularCommit],
+        author,
+        committer: author,
+      },
+    })
+    await writeRef({
+      fs,
+      dir,
+      ref: 'refs/heads/main',
+      value: executableCommit,
+      force: true,
+    })
+
+    const commits = await log({ fs, dir, ref: 'main', filepath: 'script.sh' })
+
+    expect(commits.map(({ commit }) => commit.message.trim())).toEqual([
+      'Make script executable',
+      'Add script',
+    ])
+  })
+
   it('includes changed file object ids when includeChanges is true', async () => {
     const { fs, dir } = await makeFixture('test-init')
     const author = {
