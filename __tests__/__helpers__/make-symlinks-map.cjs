@@ -49,22 +49,17 @@ function makeSymlinksMap(root) {
 
   // With core.symlinks=false, Git writes a symlink's target to a regular file.
   // Read the index to preserve those links in the browser fixture map.
-  const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-    cwd: root,
-    encoding: 'utf8',
-  }).trim()
-  const fixturePath = path.relative(repoRoot, root)
   const entries = execFileSync(
     'git',
-    ['ls-files', '--stage', '-z', '--', fixturePath],
-    { cwd: repoRoot, encoding: 'utf8' }
+    ['ls-files', '--stage', '-z', '--', '.'],
+    { cwd: root, encoding: 'utf8' }
   ).split('\0')
 
   for (const entry of entries) {
     const match = /^120000 [0-9a-f]+ \d+\t(.+)$/.exec(entry)
     if (!match) continue
 
-    const abs = path.join(repoRoot, match[1])
+    const abs = path.join(root, match[1])
     const rel = '/' + path.relative(root, abs).split(path.sep).join('/')
     if (!(rel in map)) {
       map[rel] = fs.readFileSync(abs, 'utf8').split(path.sep).join('/')
