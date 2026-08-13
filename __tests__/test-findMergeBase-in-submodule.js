@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import { findMergeBase } from 'isomorphic-git'
+import { findMergeBase, writeCommit, writeTree } from 'isomorphic-git'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 
@@ -87,6 +87,33 @@ describe('findMergeBase', () => {
       ],
     })
     expect(base).toEqual(['f79577b91d302d87e310c8b5af8c274bbf45502f'])
+  })
+  it('does not prefer a closer but older common ancestor', async () => {
+    const { fs, gitdir } = await makeFixtureAsSubmodule('test-findMergeBase')
+    const tree = await writeTree({ fs, gitdir, tree: [] })
+    const author = {
+      name: 'Test Author',
+      email: 'test@example.com',
+      timestamp: 1502484200,
+      timezoneOffset: 0,
+    }
+    const commit = (message, parent) =>
+      writeCommit({
+        fs,
+        gitdir,
+        commit: { author, committer: author, message, parent, tree },
+      })
+
+    const e = await commit('E', [])
+    const f = await commit('F', [e])
+    const d = await commit('D', [e])
+    const c = await commit('C', [d])
+    const b = await commit('B', [c])
+    const a = await commit('A', [b])
+    const head = await commit('HEAD', [a, f])
+
+    const base = await findMergeBase({ fs, gitdir, oids: [head, c] })
+    expect(base).toEqual([c])
   })
   it('diverging scenarios', async () => {
     // Setup
