@@ -42,6 +42,18 @@ describe('findMergeBase', () => {
     })
     expect(base).toEqual([])
   })
+  it('rejects an oid that cannot be read', async () => {
+    const { fs, gitdir } = await makeFixture('test-findMergeBase')
+    const oid = '0000000000000000000000000000000000000000'
+    const tree = await writeTree({ fs, gitdir, tree: [] })
+
+    await expect(
+      findMergeBase({ fs, gitdir, oids: [oid, oid] })
+    ).rejects.toThrow()
+    await expect(
+      findMergeBase({ fs, gitdir, oids: [tree, tree] })
+    ).rejects.toThrow()
+  })
   it('fast-forward scenarios', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-findMergeBase')

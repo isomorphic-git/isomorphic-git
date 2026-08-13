@@ -1,4 +1,6 @@
 // @ts-check
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
+import { GitShallowManager } from '../managers/GitShallowManager.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 
@@ -24,23 +26,24 @@ export async function _findMergeBase({ fs, cache, gitdir, oids }) {
   const passes = oids.length
   const common = new Set()
   const parents = new Map()
+  const shallows = await GitShallowManager.read({ fs, gitdir })
   const readParents = async oid => {
     if (parents.has(oid)) return parents.get(oid)
-    try {
-      const { object } = await readObject({ fs, cache, gitdir, oid })
-      const commit = GitCommit.from(object)
-      const result = commit.parseHeaders().parent
-      parents.set(oid, result)
-      return result
-    } catch (err) {
-      parents.set(oid, [])
-      return []
+    const { object, type } = await readObject({ fs, cache, gitdir, oid })
+    if (type !== 'commit') {
+      throw new ObjectTypeError(oid, type, 'commit')
     }
+    const commit = GitCommit.from(object)
+    const { parent } = commit.parseHeaders()
+    const result = shallows.has(oid) ? [] : parent
+    parents.set(oid, result)
+    return result
   }
   let heads = oids.map((oid, index) => ({ index, oid }))
   while (heads.length) {
     // Count how many times we've passed each commit
     for (const { oid, index } of heads) {
+      await readParents(oid)
       if (!visits[oid]) visits[oid] = new Set()
       visits[oid].add(index)
       if (visits[oid].size === passes) {
