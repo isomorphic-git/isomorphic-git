@@ -19,46 +19,86 @@
 //   - make-index recorded symlinks as regular files (fixed there with lstat), and
 //   - the Fetch backend has no way to carry a symlink's target inline.
 
+const { execFileSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
-const root = path.join(__dirname, '..', '__fixtures__')
+/**
+ * @param {string} root
+ * @returns {Record<string, string>}
+ */
+function makeSymlinksMap(root) {
+  /** @type {Record<string, string>} posix path (rooted at '/') -> link target */
+  const map = {}
 
-/** @type {Record<string, string>} posix path (rooted at '/') -> link target */
-const map = {}
-
-/** @param {string} dir */
-function walk(dir) {
-  for (const name of fs.readdirSync(dir)) {
-    const abs = path.join(dir, name)
-    const stat = fs.lstatSync(abs)
-    if (stat.isSymbolicLink()) {
-      const rel = '/' + path.relative(root, abs).split(path.sep).join('/')
-      map[rel] = fs.readlinkSync(abs).split(path.sep).join('/')
-    } else if (stat.isDirectory()) {
-      walk(abs)
+  /** @param {string} dir */
+  function walk(dir) {
+    for (const name of fs.readdirSync(dir)) {
+      const abs = path.join(dir, name)
+      const stat = fs.lstatSync(abs)
+      if (stat.isSymbolicLink()) {
+        const rel = '/' + path.relative(root, abs).split(path.sep).join('/')
+        map[rel] = fs.readlinkSync(abs).split(path.sep).join('/')
+      } else if (stat.isDirectory()) {
+        walk(abs)
+      }
     }
   }
-}
 
-walk(root)
+  walk(root)
 
-fs.writeFileSync(path.join(root, 'symlinks.json'), JSON.stringify(map))
+  // With core.symlinks=false, Git writes a symlink's target to a regular file.
+  // Read the index to preserve those links in the browser fixture map.
+  const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).trim()
+  const fixturePath = path.relative(repoRoot, root)
+  const entries = execFileSync(
+    'git',
+    ['ls-files', '--stage', '-z', '--', fixturePath],
+    { cwd: repoRoot, encoding: 'utf8' }
+  ).split('\0')
 
-// Strip the symlink entries from index.json so the Fetch backend never tries to
-// serve (and readlink) them — they are materialized in the overlay instead.
-const indexPath = path.join(root, 'index.json')
-const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'))
-let removed = 0
-for (const linkPath of Object.keys(map)) {
-  if (linkPath in index.entries) {
-    delete index.entries[linkPath]
-    removed++
+  for (const entry of entries) {
+    const match = /^120000 [0-9a-f]+ \d+\t(.+)$/.exec(entry)
+    if (!match) continue
+
+    const abs = path.join(repoRoot, match[1])
+    const rel = '/' + path.relative(root, abs).split(path.sep).join('/')
+    if (!(rel in map)) {
+      map[rel] = fs.readFileSync(abs, 'utf8').split(path.sep).join('/')
+    }
   }
-}
-fs.writeFileSync(indexPath, JSON.stringify(index))
 
-console.log(
-  `Wrote ${Object.keys(map).length} symlink(s) to symlinks.json; ` +
-    `removed ${removed} from index.json`
-)
+  return map
+}
+
+function main() {
+  const root = path.join(__dirname, '..', '__fixtures__')
+  const map = makeSymlinksMap(root)
+
+  fs.writeFileSync(path.join(root, 'symlinks.json'), JSON.stringify(map))
+
+  // Strip the symlink entries from index.json so the Fetch backend never tries to
+  // serve (and readlink) them — they are materialized in the overlay instead.
+  const indexPath = path.join(root, 'index.json')
+  const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'))
+  let removed = 0
+  for (const linkPath of Object.keys(map)) {
+    if (linkPath in index.entries) {
+      delete index.entries[linkPath]
+      removed++
+    }
+  }
+  fs.writeFileSync(indexPath, JSON.stringify(index))
+
+  console.log(
+    `Wrote ${Object.keys(map).length} symlink(s) to symlinks.json; ` +
+      `removed ${removed} from index.json`
+  )
+}
+
+if (require.main === module) main()
+
+module.exports = { makeSymlinksMap }
