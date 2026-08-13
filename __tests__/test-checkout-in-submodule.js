@@ -10,7 +10,9 @@ import {
   branch,
   getConfig,
   fetch as gitFetch,
+  remove,
   setConfig,
+  statusMatrix,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
@@ -467,6 +469,40 @@ describe('checkout', () => {
     }
     expect(error).toBeNull()
     expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('Hello world')
+  })
+
+  it('restores filepaths from the index when no ref is provided', async () => {
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-checkout')
+    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
+    await fs.write(`${dir}/README.md`, 'staged content', 'utf8')
+    await add({ fs, dir, gitdir, filepath: 'README.md' })
+    await fs.write(`${dir}/README.md`, 'workdir content', 'utf8')
+
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      force: true,
+      filepaths: ['README.md'],
+    })
+
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).toBe('staged content')
+    expect(
+      await statusMatrix({ fs, dir, gitdir, filepaths: ['README.md'] })
+    ).toEqual([['README.md', 1, 2, 2]])
+  })
+
+  it('does not delete a staged-deleted filepath when restoring from the index', async () => {
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-checkout')
+    const filepath = 'src/utils/exists.js'
+    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
+    const contents = await fs.read(`${dir}/${filepath}`)
+    await remove({ fs, dir, gitdir, filepath })
+
+    await checkout({ fs, dir, gitdir, force: true, filepaths: [filepath] })
+
+    expect(await fs.read(`${dir}/${filepath}`)).toEqual(contents)
+    expect(await listFiles({ fs, dir, gitdir })).not.toContain(filepath)
   })
 
   it('checkout files should not delete other files', async () => {
