@@ -7,6 +7,23 @@ import { _readObject as readObject } from '../storage/readObject.js'
 import { resolveTree } from '../utils/resolveTree.js'
 
 export async function resolveFilepath({ fs, cache, gitdir, oid, filepath }) {
+  const entry = await resolveFilepathEntry({
+    fs,
+    cache,
+    gitdir,
+    oid,
+    filepath,
+  })
+  return entry.oid
+}
+
+export async function resolveFilepathEntry({
+  fs,
+  cache,
+  gitdir,
+  oid,
+  filepath,
+}) {
   // Ensure there are no leading or trailing directory separators.
   // I was going to do this automatically, but then found that the Git Terminal for Windows
   // auto-expands --filepath=/src/utils to --filepath=C:/Users/Will/AppData/Local/Programs/Git/src/utils
@@ -20,10 +37,10 @@ export async function resolveFilepath({ fs, cache, gitdir, oid, filepath }) {
   const result = await resolveTree({ fs, cache, gitdir, oid })
   const tree = result.tree
   if (filepath === '') {
-    oid = result.oid
+    return { mode: '040000', oid: result.oid, path: '', type: 'tree' }
   } else {
     const pathArray = filepath.split('/')
-    oid = await _resolveFilepath({
+    return _resolveFilepath({
       fs,
       cache,
       gitdir,
@@ -33,7 +50,6 @@ export async function resolveFilepath({ fs, cache, gitdir, oid, filepath }) {
       filepath,
     })
   }
-  return oid
 }
 
 async function _resolveFilepath({
@@ -49,7 +65,7 @@ async function _resolveFilepath({
   for (const entry of tree) {
     if (entry.path === name) {
       if (pathArray.length === 0) {
-        return entry.oid
+        return entry
       } else {
         const { type, object } = await readObject({
           fs,
