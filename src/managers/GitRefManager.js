@@ -340,6 +340,38 @@ export class GitRefManager {
   }
 
   /**
+   * Checks whether a ref names the branch HEAD points at in a repository where
+   * that branch has no commits yet.
+   *
+   * A repository created by `git init` has a HEAD pointing at a branch that
+   * does not exist on disk. Resolving that branch fails the same way resolving
+   * a misspelled ref does, so callers that want to treat the two differently
+   * need this to tell them apart.
+   *
+   * @param {Object} args
+   * @param {FSClient} args.fs - A file system implementation.
+   * @param {string} [args.gitdir=join(dir, '.git')] - [required] The [git directory](dir-vs-gitdir.md) path
+   * @param {string} args.ref - The ref to check.
+   * @returns {Promise<boolean>} - True if the ref names an unborn branch.
+   */
+  static async isUnbornBranch({ fs, gitdir, ref }) {
+    let target
+    try {
+      // depth 2 stops at the symbolic target instead of following it to an oid.
+      target = await GitRefManager.resolve({
+        fs,
+        gitdir,
+        ref: 'HEAD',
+        depth: 2,
+      })
+    } catch (_) {
+      return false
+    }
+    if (!target.startsWith('refs/heads/')) return false
+    return ref === 'HEAD' || refpaths(ref).includes(target)
+  }
+
+  /**
    * Checks if a ref exists.
    *
    * @param {Object} args
