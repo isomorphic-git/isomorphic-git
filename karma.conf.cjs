@@ -1,0 +1,385 @@
+// Karma configuration
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+const path = require('path')
+
+const webpack = require('webpack')
+
+module.exports = function (config) {
+  const options = {
+    // start these browsers
+    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+    browsers: [],
+    // base path that will be used to resolve all patterns (eg. files, exclude)
+    basePath: '',
+    // frameworks to use
+    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+    frameworks: ['jasmine'],
+    // list of files / patterns to load in the browser
+    files: [
+      // Plain script (NOT webpack-preprocessed) that defines the `process` global
+      // before the bundle loads — Jest's pre-bundled `jest-util` reads it at
+      // module-load time. Must come before index.webpack.js.
+      '__tests__/__helpers__/setup-node-globals.js',
+      '__tests__/index.webpack.js',
+      // The fixtures are fetched individually by ZenFS' Fetch backend, so every
+      // file must be served — including dotfiles (`.gitignore`, `.gitkeep`,
+      // `.superblock.txt`, …) and the contents of dot-directories, which the
+      // `**/*` glob skips by default.
+      {
+        pattern: '__tests__/__fixtures__/**/*',
+        served: true,
+        watched: false,
+        included: false,
+      },
+      {
+        pattern: '__tests__/__fixtures__/**/.*',
+        served: true,
+        watched: false,
+        included: false,
+      },
+      {
+        pattern: '__tests__/__fixtures__/**/.*/**',
+        served: true,
+        watched: false,
+        included: false,
+      },
+      // 1x1 image served for the browsers (Safari) that request favicons /
+      // apple-touch icons, to avoid a flood of 404 warnings in the logs.
+      {
+        pattern: '__tests__/__helpers__/1px.png',
+        served: true,
+        watched: false,
+        included: false,
+      },
+      // Service Worker probe script (see test-sw-probe.js). Served but not
+      // injected as a <script>; the browser fetches it via the `/sw-probe.js`
+      // proxy below so its scope is the origin root.
+      {
+        pattern: '__tests__/__helpers__/sw-probe.js',
+        served: true,
+        watched: false,
+        included: false,
+      },
+    ],
+    // Serve a 1x1 image for the icon paths Safari requests at the site root, so
+    // they don't spam the log with 404s.
+    proxies: {
+      '/favicon.ico': '/base/__tests__/__helpers__/1px.png',
+      '/apple-touch-icon.png': '/base/__tests__/__helpers__/1px.png',
+      '/apple-touch-icon-precomposed.png':
+        '/base/__tests__/__helpers__/1px.png',
+      // Expose the SW probe script at the origin root so it registers with
+      // scope '/' (a worker under /base/... could not control the context page).
+      '/sw-probe.js': '/base/__tests__/__helpers__/sw-probe.js',
+    },
+    // list of files to exclude
+    exclude: [],
+    // preprocess matching files before serving them to the browser
+    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+    preprocessors: {
+      '__tests__/index.webpack.js': ['webpack'],
+    },
+    // web server port
+    port: 9876,
+    // enable / disable colors in the output (reporters and logs)
+    colors: true,
+
+    // Timeouts sized for slow BrowserStack real devices. The heavy CPU-bound
+    // specs (GitPackIndex delta resolution / inflate) run largely synchronously
+    // and block the event loop; on iOS/Android real devices they can take several
+    // minutes, during which no message reaches karma and jasmine's own 60s spec
+    // timer can't fire either — so browserNoActivityTimeout must be well above the
+    // slowest single spec or the session is dropped mid-run ("Disconnected because
+    // no message in N ms"). Kept bounded (with a small disconnect tolerance) so a
+    // genuinely dead session still fails rather than stalling the whole matrix.
+    // Refer to:
+    // - https://github.com/karma-runner/karma-browserstack-launcher/issues/61
+    captureTimeout: 12e4, // 2 min — initial browser capture on BrowserStack
+    browserNoActivityTimeout: 3e5, // 5 min — headroom for slow real-device specs
+    browserDisconnectTimeout: 6e4, // 1 min to reconnect after a disconnect
+    browserDisconnectTolerance: 2,
+
+    customLaunchers: {
+      // Cross-platform browsers run on BrowserStack. Versions target a
+      // "few years old" buffer: recent enough to run modern JS (the 2020-era
+      // Edge 79 / Safari 14 failed on modern syntax), but old enough to cover
+      // users who have not updated in a couple of years.
+      // NOTE: these BrowserStack browser/os/device strings can only be validated
+      // in CI (they need the BROWSER_STACK_* secrets); adjust if a combination is
+      // reported as unavailable.
+      // NOTE on `timeout`: this is the BrowserStack idle-session timeout, in
+      // SECONDS. Its default is 90s — so a spec that blocks the event loop (iso-git
+      // pack delta resolution / inflate can run for minutes on real devices, during
+      // which no message reaches BrowserStack) drops the whole session with
+      // "Disconnected because no message". Raise it on every BrowserStack launcher,
+      // well above the slowest single spec. (No amount of console/verbose output
+      // helps here: a blocked main thread can't emit anything.)
+      bs_edge: {
+        base: 'BrowserStack',
+        browser: 'edge',
+        browser_version: '110.0',
+        os: 'Windows',
+        os_version: '11',
+        timeout: 1000,
+      },
+      bs_safari: {
+        base: 'BrowserStack',
+        browser: 'safari',
+        browser_version: '16.0',
+        os: 'OS X',
+        os_version: 'Ventura',
+        timeout: 1000,
+      },
+      bs_ios_safari: {
+        base: 'BrowserStack',
+        device: 'iPhone 14',
+        os: 'ios',
+        os_version: '16',
+        real_mobile: true,
+        captureTimeout: 5 * 60 * 1000,
+        timeout: 1000,
+      },
+      bs_android_chrome: {
+        base: 'BrowserStack',
+        os: 'android',
+        os_version: '12.0',
+        browser: 'chrome',
+        device: 'Samsung Galaxy S22',
+        real_mobile: true,
+        captureTimeout: 5 * 60 * 1000,
+        timeout: 1000,
+      },
+      FirefoxHeadless: {
+        base: 'Firefox',
+        flags: ['-headless'],
+      },
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+      ChromeCanaryHeadlessNoSandbox: {
+        base: 'ChromeCanaryHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
+    // BrowserStack tunnel options (credentials come from the BROWSER_STACK_*
+    // env vars). `forceLocal` routes ALL of the browser's traffic through the
+    // BrowserStack Local tunnel — needed so real mobile devices can reach the
+    // secondary local servers (git-http-mock-server on :8888, cors-proxy on
+    // :9999), which otherwise fail with "Failed to fetch" on Android even though
+    // they work on desktop BrowserStack. (Per BrowserStack support.)
+    browserStack: {
+      // Explicit project/build names so each run is identifiable in the
+      // BrowserStack dashboard and resolvable via the BrowserStack API/MCP
+      // (getBuildId → listTestIds → fetchRCA / getFailureLogs). Without these,
+      // karma-browserstack-launcher falls back to project "Karma" and a
+      // timestamp-based build, which are hard to look up after the fact.
+      project: 'isomorphic-git',
+      build:
+        process.env.BROWSERSTACK_BUILD_NAME ||
+        process.env.BUILD_BUILDNUMBER || // Azure Pipelines
+        process.env.GITHUB_RUN_ID || // GitHub Actions
+        'local',
+      forceLocal: true,
+    },
+    concurrency: 6,
+    // Continuous Integration mode
+    // if true, Karma captures browsers, runs the tests and exits
+    singleRun: true,
+    // test results reporter to use
+    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+    reporters: ['browsers', 'verbose', 'pr-comment', 'junit'],
+    junitReporter: {
+      outputDir: './junit',
+    },
+    webpack: {
+      mode: 'development',
+      devtool: 'inline-source-map',
+      // isomorphic-git's package.json sets "sideEffects": false, which makes
+      // webpack tree-shake side-effect-only imports — including the
+      // `import './jasmine-inline-snapshots.js'` in index.webpack.js that
+      // registers the toMatchInlineSnapshot matcher and describe.skip aliases.
+      // Disable that optimization so the test setup module is always kept.
+      optimization: { sideEffects: false },
+      module: {
+        rules: [
+          {
+            // The aliased browser bundles below are UMD. Because package.json sets
+            // "type": "module", webpack would otherwise treat these `.js` files as
+            // ES modules (which expose no named exports), breaking imports like
+            // `import { FileSystem } from 'isomorphic-git/internal-apis'`. Forcing
+            // `javascript/auto` lets webpack use CommonJS interop for them.
+            test: /\.umd\.min\.js$/,
+            type: 'javascript/auto',
+          },
+        ],
+      },
+      plugins: [
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^@wmhilton\/jest-fixtures$/,
+        }),
+        // Webpack 5 no longer injects the `Buffer` and `process` globals that the
+        // browser tests rely on (webpack 4 did automatically).
+        new webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+          process: require.resolve('process/browser'),
+        }),
+        new webpack.DefinePlugin({
+          // Use JSON.stringify so an *unset* token becomes an empty string (falsy)
+          // rather than the literal string 'undefined' (truthy) — otherwise the
+          // GitHub push/fetch suite runs with an invalid token and fails with 401
+          // instead of being skipped. When set (e.g. a CI secret), the real token
+          // is injected.
+          'process.env.TEST_PUSH_GITHUB_TOKEN': JSON.stringify(
+            process.env.TEST_PUSH_GITHUB_TOKEN || ''
+          ),
+          // When set, index.webpack.js loads ONLY the Service Worker probe spec
+          // (test-sw-probe.js) so an iOS-over-HTTPS diagnostic run stays fast and
+          // avoids the mixed-content failures a full HTTPS suite would hit.
+          'process.env.SW_PROBE_ONLY': JSON.stringify(
+            process.env.SW_PROBE_ONLY || ''
+          ),
+        }),
+      ],
+      resolve: {
+        alias: {
+          'isomorphic-git/internal-apis': path.resolve(
+            __dirname,
+            'internal-apis.umd.min.js'
+          ),
+          'isomorphic-git/http': path.resolve(__dirname, 'http/web/index.js'),
+          'isomorphic-git': path.resolve(__dirname, 'index.umd.min.js'),
+          // `resolve.fallback` only applies to bare core-module names, not the
+          // `path/posix` subpath used by the utils/join tests, so alias it.
+          'path/posix': require.resolve('path-browserify'),
+        },
+        // Webpack 5 no longer polyfills Node core modules automatically (webpack 4
+        // did). The test files and their helpers reference a few Node built-ins:
+        //  - `path` / `path/posix` are used in the browser (e.g. utils/join tests),
+        //    so they need a real polyfill.
+        //  - `util` / `stream` / `constants` are pulled in transitively by Jest's
+        //    `expect` (via jest-message-util / jest-util / graceful-fs, used to
+        //    format assertion messages); they need real polyfills so the matcher
+        //    library bundles and its failure messages render.
+        //  - `os`, `url`, `https`, `assert` are only reached from Node-only code
+        //    paths (e.g. makeNodeFixture), so an empty stub is enough.
+        //  - `module` is required only by stack-utils' Node-only code path, so an
+        //    empty stub is enough.
+        // `fs` is handled by the IgnorePlugin above.
+        fallback: {
+          path: require.resolve('path-browserify'),
+          os: require.resolve('os-browserify/browser'),
+          buffer: require.resolve('buffer/'),
+          process: require.resolve('process/browser'),
+          util: require.resolve('util/'),
+          stream: require.resolve('stream-browserify'),
+          constants: require.resolve('constants-browserify'),
+          fs: false,
+          url: false,
+          https: false,
+          assert: false,
+          module: false,
+        },
+      },
+    },
+    plugins: [
+      'karma-browserstack-launcher',
+      'karma-chrome-launcher',
+      'karma-edge-launcher',
+      'karma-ie-launcher',
+      'karma-safari-launcher',
+      'karma-fail-fast-reporter',
+      'karma-firefox-launcher',
+      'karma-jasmine',
+      'karma-junit-reporter',
+      'karma-verbose-reporter',
+      'karma-webpack',
+      {
+        'reporter:browsers': [
+          'type',
+          require('./__tests__/__helpers__/karma-successful-browsers-reporter.cjs'),
+        ],
+      },
+      {
+        'reporter:pr-comment': [
+          'type',
+          require('./__tests__/__helpers__/karma-pr-comment-reporter.cjs'),
+        ],
+      },
+    ],
+    client: {
+      jasmine: {
+        // Ceiling for the whole spec, sized to fit the per-spec retry wrapper
+        // (installSpecRetry: up to 3 attempts × ~75s). The wrapper's per-attempt
+        // timeout is what actually fails a stuck spec; see FixtureFS.js.
+        timeoutInterval: 240000, // Defaults to 5000 ms
+      },
+    },
+  }
+
+  // Speed things up, at the cost of not saving the test results (except in the stdout log).
+  if (process.env.FAILFAST && process.env.FAILFAST === 'true') {
+    options.reporters.push('fail-fast')
+  }
+
+  if (process.env.TEST_BROWSERS) {
+    options.browsers = process.env.TEST_BROWSERS.split(',')
+  } else if (!process.env.TEST_NO_BROWSERS) {
+    options.browsers.push('ChromeHeadlessNoSandbox')
+    options.browsers.push('FirefoxHeadless')
+    // options.browsers.push('Edge')
+    // options.browsers.push('ChromeCanaryHeadlessNoSandbox')
+  }
+
+  // SW_PROBE_ONLY runs are a one-off diagnostic (a single browser over HTTPS);
+  // skip the "only re-run failed browsers" filter, which would otherwise drop the
+  // target browser if a previous run had already marked it successful.
+  if (!process.env.TEST_NO_BROWSERS && !process.env.SW_PROBE_ONLY) {
+    // Only re-run browsers that failed in the previous run.
+    options.browsers =
+      require('./__tests__/__helpers__/karma-load-successful-browsers.cjs').filter(
+        options.browsers
+      )
+    console.log('running with browsers:', options.browsers)
+  }
+
+  if (!process.env.CI) {
+    // Continuous Integration mode
+    // if true, Karma captures browsers, runs the tests and exits
+    options.singleRun = false
+    // enable / disable watching file and executing tests whenever any file changes
+    options.autoWatch = true
+  }
+
+  // Optional HTTPS (KARMA_HTTPS=1). Service Workers require a secure context.
+  // http://localhost is already secure, so run the SW probe (test-sw-probe.js)
+  // FIRST without this — only flip it on if the probe reports isSecureContext=false
+  // / registration failures on the tunnel browsers. See make-https-cert.cjs for
+  // the mixed-content caveat.
+  if (process.env.KARMA_HTTPS) {
+    const {
+      getHttpsServerOptions,
+    } = require('./__tests__/__helpers__/make-https-cert.cjs')
+    options.protocol = 'https'
+    options.httpsServerOptions = getHttpsServerOptions()
+    // Real BrowserStack / SauceLabs browsers must be told to trust the
+    // self-signed certificate, or the page never loads over TLS. The W3C
+    // `acceptInsecureCerts` (root-level) is the one BrowserStack support says
+    // works on real iOS devices; `acceptSslCerts` is the legacy JSONWP name kept
+    // as a fallback for older desktop launchers.
+    for (const launcher of Object.values(options.customLaunchers)) {
+      if (launcher.base === 'BrowserStack') {
+        launcher.acceptInsecureCerts = true
+        launcher.acceptSslCerts = true
+        launcher['browserstack.acceptSslCerts'] = true
+      }
+    }
+    console.log('[SW-PROBE] karma serving over HTTPS (KARMA_HTTPS set)')
+  } else {
+    console.log(
+      '[SW-PROBE] karma serving over HTTP (set KARMA_HTTPS=1 to enable TLS)'
+    )
+  }
+
+  config.set(options)
+}

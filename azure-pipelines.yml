@@ -35,7 +35,7 @@ jobs:
           GITHUB_TEST_USERNAME: $(GITHUB_TEST_USERNAME)
           SAUCE_ACCESS_KEY: $(SAUCE_ACCESS_KEY)
           SAUCE_USERNAME: $(SAUCE_USERNAME)
-          TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,sl_edge,sl_safari,sl_ios_safari,bs_android_chrome'
+          TEST_BROWSERS: 'ChromeHeadlessNoSandbox,FirefoxHeadless,bs_edge,bs_safari,bs_ios_safari,bs_android_chrome'
 
       - task: PublishTestResults@2
         displayName: 'Save test results'
@@ -43,6 +43,20 @@ jobs:
         inputs:
           testResultsFormat: JUnit
           testResultsFiles: '$(System.DefaultWorkingDirectory)/junit/*.xml'
+
+      # TEMPORARY diagnostic (remove once the Service-Worker fixtures decision is
+      # made): does iOS Safari expose Service Workers when karma is served over
+      # HTTPS with `acceptInsecureCerts` (per BrowserStack support)? Runs ONLY the
+      # [SW-PROBE] spec on the iPhone real device and reuses the build from 'Run
+      # tests'. `continueOnError` so a capture failure doesn't fail the build —
+      # grep the log for [SW-PROBE] (want isSecureContext=true / register OK).
+      - script: npx nps test.swprobe
+        displayName: 'Probe iOS Service Worker over HTTPS (temporary)'
+        condition: succeededOrFailed()
+        continueOnError: true
+        env:
+          BROWSER_STACK_ACCESS_KEY: $(BROWSER_STACK_ACCESS_KEY)
+          BROWSER_STACK_USERNAME: $(BROWSER_STACK_USERNAME)
 
       - task: PublishCodeCoverageResults@1
         displayName: 'Save code coverage'

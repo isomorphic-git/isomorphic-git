@@ -2,6 +2,7 @@
 import { annotatedTag, resolveRef, readTag } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
+import { itSecureContext } from './__helpers__/itSecureContext.js'
 
 describe('annotatedTag', () => {
   it('creates an annotated tag to HEAD', async () => {
@@ -45,7 +46,7 @@ describe('annotatedTag', () => {
     const { tag } = await readTag({ fs, gitdir, oid: tagRef })
     expect(tag.object).toEqual('d670460b4b4aece5915caf5c68d12f560a9fe3e4')
   })
-  it('creates a signed tag to HEAD', async () => {
+  itSecureContext('creates a signed tag to HEAD', async () => {
     // Setup
     const { pgp } = await import('@isomorphic-git/pgp-plugin')
     const { fs, gitdir } = await makeFixture('test-annotatedTag')

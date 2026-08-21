@@ -128,7 +128,10 @@ describe('pull', () => {
       ({ commit }) => `${commit.message} (${commit.parent.join(' ')})`
     )
     expect(formattedLogs).toEqual([
-      "Merge branch 'master' of http://localhost:8888/test-pull-server.git\n (5a8905a02e181fe1821068b8c0f48cb6633d5b81 97c024f73eaab2781bf3691597bc7c833cb0e22f)",
+      // The remote URL uses the dynamic `localhost` (window.location.hostname),
+      // which is e.g. `bs-local.com` on BrowserStack — so the merge message must
+      // interpolate the same host rather than hardcode "localhost".
+      `Merge branch 'master' of http://${localhost}:8888/test-pull-server.git\n (5a8905a02e181fe1821068b8c0f48cb6633d5b81 97c024f73eaab2781bf3691597bc7c833cb0e22f)`,
       'Added c.txt\n (c82587c97be8f9a10088590e06c9d0f767ed5c4a)',
       'Added b.txt\n (5a8905a02e181fe1821068b8c0f48cb6633d5b81)',
       'Initial commit\n ()',

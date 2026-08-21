@@ -2,6 +2,7 @@
 import { promises as fsp } from 'fs'
 import { join } from 'path'
 
+import { jest } from '@jest/globals'
 import * as git from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -10,6 +11,18 @@ import { makeFixture } from './__helpers__/FixtureFS.js'
 // follow symlinks in the leading path when writing working-tree files; this checks the
 // same. (node-only: needs real symlinks.)
 describe('checkout symlinked leading path', () => {
+  // When checkout hits the unsafe-symlink guard it rejects the offending task and
+  // logs it via `console.error('[isomorphic-git …] task rejected:', …)`. That is
+  // expected in these tests, so mock `console.error` to keep the output clean —
+  // and assert it actually fired (below), turning the noise into a check.
+  let consoleErrorSpy
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+  afterEach(() => {
+    consoleErrorSpy.mockRestore()
+  })
+
   it('does not write through a planted directory symlink', async () => {
     const { fs, dir, gitdir } = await makeFixture(
       'test-checkout-symlink-leading-path'
@@ -145,6 +158,12 @@ describe('checkout symlinked leading path', () => {
     await expect(
       fsp.readFile(join(sink, 'inside'), 'utf8')
     ).rejects.toBeDefined()
+
+    // The rejected task was logged via console.error (mocked above).
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('task rejected:'),
+      expect.anything()
+    )
   })
 
   it('does not mkdir through a symlinked leading path', async () => {
@@ -284,6 +303,9 @@ describe('checkout symlinked leading path', () => {
 
     // The directory must not have been created inside the sink.
     await expect(fsp.stat(join(sink, 'sub'))).rejects.toBeDefined()
+    // (This path throws directly rather than via the task-rejection logging, so
+    // no console.error is expected here — the describe-level mock still keeps the
+    // output clean if that ever changes.)
   })
 
   it('does not write through a planted directory symlink (nonBlocking)', async () => {
@@ -418,5 +440,11 @@ describe('checkout symlinked leading path', () => {
     await expect(
       fsp.readFile(join(sink, 'inside'), 'utf8')
     ).rejects.toBeDefined()
+
+    // The rejected task was logged via console.error (mocked above).
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('task rejected:'),
+      expect.anything()
+    )
   })
 })
