@@ -17,6 +17,33 @@ import { assertParameter } from '../utils/assertParameter.js'
  */
 
 /**
+ * Assign `value` at the `/`-separated `path` inside `root`, creating the
+ * intermediate objects as we go.
+ *
+ * Ref names come straight off the wire, so a path segment must never be allowed
+ * to walk out of `root` and into the prototype chain. The `hasOwnProperty`
+ * check takes care of inherited keys such as `constructor` by shadowing them
+ * with a fresh object; `__proto__` gets no such treatment because assigning it
+ * invokes the setter instead of creating an own property, so refs containing it
+ * are dropped.
+ *
+ * @param {Object} root
+ * @param {string} path
+ * @param {string} value
+ */
+function assignRefPath(root, path, value) {
+  const parts = path.split('/')
+  const last = parts.pop()
+  if (last === '__proto__' || parts.includes('__proto__')) return
+  let o = root
+  for (const part of parts) {
+    if (!Object.prototype.hasOwnProperty.call(o, part)) o[part] = {}
+    o = o[part]
+  }
+  o[last] = value
+}
+
+/**
  * List a remote servers branches, tags, and capabilities.
  *
  * This is a rare command that doesn't require an `fs`, `dir`, or even `gitdir` argument.
@@ -80,25 +107,11 @@ export async function getRemoteInfo({
     // Convert the flat list into an object tree, because I figure 99% of the time
     // that will be easier to use.
     for (const [ref, oid] of remote.refs) {
-      const parts = ref.split('/')
-      const last = parts.pop()
-      let o = result
-      for (const part of parts) {
-        o[part] = o[part] || {}
-        o = o[part]
-      }
-      o[last] = oid
+      assignRefPath(result, ref, oid)
     }
     // Merge symrefs on top of refs to more closely match actual git repo layouts
     for (const [symref, ref] of remote.symrefs) {
-      const parts = symref.split('/')
-      const last = parts.pop()
-      let o = result
-      for (const part of parts) {
-        o[part] = o[part] || {}
-        o = o[part]
-      }
-      o[last] = ref
+      assignRefPath(result, symref, ref)
     }
     return result
   } catch (err) {
