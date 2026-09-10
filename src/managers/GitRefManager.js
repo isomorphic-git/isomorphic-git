@@ -1,5 +1,7 @@
 import '../typedefs.js'
 
+import cleanGitRef from 'clean-git-ref'
+
 // This is a convenience wrapper for reading and writing files in the 'refs' directory.
 import { InternalError } from '../errors/InternalError.js'
 import { InvalidOidError } from '../errors/InvalidOidError.js'
@@ -9,6 +11,7 @@ import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitPackedRefs } from '../models/GitPackedRefs.js'
 import { GitRefSpecSet } from '../models/GitRefSpecSet.js'
 import { compareRefNames } from '../utils/compareRefNames.js'
+import validRef from '../utils/isValidRef.js'
 import { join } from '../utils/join.js'
 import { acquireLock } from '../utils/lock.js'
 
@@ -34,6 +37,13 @@ const GIT_FILES = ['config', 'description', 'index', 'shallow', 'commondir']
 function assertWritableRef(ref) {
   if (GIT_FILES.includes(ref)) {
     throw new InvalidRefNameError(ref, `refs/heads/${ref}`)
+  }
+  // A ref name is joined onto gitdir with `join()`, which collapses `..`
+  // exactly like `path.join`. A server-supplied ref/tag name or the wildcard
+  // capture of a refspec can therefore climb out of gitdir, or anywhere
+  // beneath it, entirely unvalidated up to this point. See GHSA-h3c3-jh3g-8hcc.
+  if (!validRef(ref, true)) {
+    throw new InvalidRefNameError(ref, cleanGitRef.clean(ref))
   }
 }
 
@@ -97,18 +107,28 @@ export class GitRefManager {
         symrefTranslations.push([translatedRef, `ref: ${symtarget}`])
       }
     }
+    // Tags aren't translated by a refspec, but they are still a server-supplied
+    // name written straight to gitdir below, so they need the same check.
+    // Computed here (pure, no I/O) so it can be validated up front and then
+    // reused unchanged in the write step further down.
+    const tagRefsToWrite = tags
+      ? [...refs.keys()].filter(
+          serverRef =>
+            serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')
+        )
+      : []
     // The local side of a refspec is whatever `remote.<name>.fetch` says, so a
     // config like `+refs/heads/main:index` lands a write on `.git/index`.
     // Refuse it here rather than at the write loop: `pruneTags` and `prune`
     // delete refs in between, so a later throw leaves the repository pruned
-    // and not updated. The tags added below are always `refs/tags/...`, which
-    // is never a system file, so nothing is missed by checking this early.
+    // and not updated.
     for (const [, translatedRef] of refTranslations) {
       assertWritableRef(translatedRef)
     }
     for (const [translatedRef] of symrefTranslations) {
       assertWritableRef(translatedRef)
     }
+    tagRefsToWrite.forEach(assertWritableRef)
     // Delete all current tags if the pruneTags argument is true.
     if (pruneTags) {
       const tags = await GitRefManager.listRefs({
@@ -123,16 +143,12 @@ export class GitRefManager {
       })
     }
     // Add all tags if the fetch tags argument is true.
-    if (tags) {
-      for (const serverRef of refs.keys()) {
-        if (serverRef.startsWith('refs/tags') && !serverRef.endsWith('^{}')) {
-          // Git's behavior is to only fetch tags that do not conflict with tags already present.
-          if (!(await GitRefManager.exists({ fs, gitdir, ref: serverRef }))) {
-            // Always use the object id of the tag itself, and not the peeled object id.
-            const oid = refs.get(serverRef)
-            actualRefsToWrite.set(serverRef, oid)
-          }
-        }
+    for (const serverRef of tagRefsToWrite) {
+      // Git's behavior is to only fetch tags that do not conflict with tags already present.
+      if (!(await GitRefManager.exists({ fs, gitdir, ref: serverRef }))) {
+        // Always use the object id of the tag itself, and not the peeled object id.
+        const oid = refs.get(serverRef)
+        actualRefsToWrite.set(serverRef, oid)
       }
     }
     // Combine refs and symrefs giving symrefs priority

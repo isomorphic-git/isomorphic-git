@@ -1,6 +1,6 @@
 /* eslint-env node, browser, jasmine */
 import { Errors, branch } from 'isomorphic-git'
-import { GitRefManager } from 'isomorphic-git/internal-apis'
+import { GitRefManager, join } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -415,6 +415,92 @@ describe('GitRefManager', () => {
         ref: 'refs/remotes/origin/stale',
       })
     ).toEqual(oid)
+  })
+
+  it('updateRemoteRefs refuses a tag name containing `..` (GHSA-h3c3-jh3g-8hcc)', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const oid = 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    // Tags are fetched unconditionally by default and are never passed through
+    // a refspec, so a malicious remote can advertise a tag name containing
+    // `..` to have `join()` collapse it into a path outside gitdir entirely.
+    const marker = 'GHSA-h3c3-jh3g-8hcc-poc-tag'
+    const escapePath = join(gitdir, '..', marker)
+    let error = null
+    try {
+      await GitRefManager.updateRemoteRefs({
+        fs,
+        gitdir,
+        remote: 'origin',
+        refs: new Map([[`refs/tags/../../../${marker}`, oid]]),
+        symrefs: new Map(),
+        tags: true,
+        refspecs: ['+refs/heads/*:refs/remotes/origin/*'],
+      })
+    } catch (err) {
+      error = err
+    } finally {
+      await fs.rm(escapePath).catch(() => {})
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(await fs.exists(escapePath)).toBe(false)
+  })
+
+  it('updateRemoteRefs refuses a refspec-translated ref containing `..` that escapes gitdir (GHSA-h3c3-jh3g-8hcc)', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const oid = 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    // The wildcard capture of a refspec is server-controlled, so a branch name
+    // containing `..` survives translation and still escapes gitdir once
+    // `join()` collapses it.
+    const marker = 'GHSA-h3c3-jh3g-8hcc-poc-branch'
+    const escapePath = join(gitdir, '..', marker)
+    let error = null
+    try {
+      await GitRefManager.updateRemoteRefs({
+        fs,
+        gitdir,
+        remote: 'origin',
+        refs: new Map([[`refs/heads/../../../../${marker}`, oid]]),
+        symrefs: new Map(),
+        tags: false,
+        refspecs: ['+refs/heads/*:refs/remotes/origin/*'],
+      })
+    } catch (err) {
+      error = err
+    } finally {
+      await fs.rm(escapePath).catch(() => {})
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(await fs.exists(escapePath)).toBe(false)
+  })
+
+  it('updateRemoteRefs refuses a refspec-translated ref containing `..` that overwrites .git/config (GHSA-h3c3-jh3g-8hcc)', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    const oid = 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+    const before = await fs.read(`${gitdir}/config`, { encoding: 'utf8' })
+    // With the default refspec, `refs/heads/../../../config` translates to
+    // `refs/remotes/origin/../../../config`, which collapses right back onto
+    // `.git/config` and would overwrite it with a bare oid.
+    let error = null
+    try {
+      await GitRefManager.updateRemoteRefs({
+        fs,
+        gitdir,
+        remote: 'origin',
+        refs: new Map([['refs/heads/../../../config', oid]]),
+        symrefs: new Map(),
+        tags: false,
+        refspecs: ['+refs/heads/*:refs/remotes/origin/*'],
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(await fs.read(`${gitdir}/config`, { encoding: 'utf8' })).toEqual(
+      before
+    )
   })
 
   it('expand does not return a git system file', async () => {
