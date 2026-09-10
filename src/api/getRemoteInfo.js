@@ -16,21 +16,18 @@ import { assertParameter } from '../utils/assertParameter.js'
  *
  */
 
-/**
- * Assign `value` at the `/`-separated `path` inside `root`, creating the
- * intermediate objects as we go.
- *
- * Ref names come straight off the wire, so a path segment must never be allowed
- * to walk out of `root` and into the prototype chain. The `hasOwnProperty`
- * check takes care of inherited keys such as `constructor` by shadowing them
- * with a fresh object; `__proto__` gets no such treatment because assigning it
- * invokes the setter instead of creating an own property, so refs containing it
- * are dropped.
- *
- * @param {Object} root
- * @param {string} path
- * @param {string} value
- */
+// Assign `value` at the `/`-separated `path` inside `root`, creating the
+// intermediate objects as we go.
+//
+// Ref names come straight off the wire, so a path segment must never be allowed
+// to walk out of `root` and into the prototype chain. The `hasOwnProperty` check
+// takes care of inherited keys such as `constructor` by shadowing them with a
+// fresh object; `__proto__` gets no such treatment because assigning it invokes
+// the setter instead of creating an own property, so refs containing it are
+// dropped.
+//
+// NB: deliberately not a JSDoc comment. `__tests__/__helpers__/generate-docs.cjs`
+// turns every documented function in `src/api` into a public doc page.
 function assignRefPath(root, path, value) {
   const parts = path.split('/')
   const last = parts.pop()
