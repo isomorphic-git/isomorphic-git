@@ -16,13 +16,20 @@ export async function request({
   headers = {},
   fetchOptions = {},
   body,
+  signal,
 }) {
   // streaming uploads aren't possible yet in the browser
   if (body) {
     // @ts-expect-error
     body = await collect(body)
   }
-  const res = await fetch(url, { ...fetchOptions, method, headers, body })
+  const res = await fetch(url, {
+    ...fetchOptions,
+    method,
+    headers,
+    body,
+    signal,
+  })
   const iter =
     // @ts-expect-error
     res.body && res.body.getReader

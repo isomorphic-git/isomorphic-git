@@ -43,6 +43,7 @@ import { writeReceivePackRequest } from '../wire/writeReceivePackRequest.js'
  * @param {boolean} [args.delete = false]
  * @param {string} [args.url]
  * @param {string} [args.corsProxy]
+ * @param {AbortSignal} [args.signal]
  * @param {Object<string, string>} [args.headers]
  *
  * @returns {Promise<PushResult>}
@@ -66,6 +67,7 @@ export async function _push({
   delete: _delete = false,
   corsProxy,
   headers = {},
+  signal,
 }) {
   const ref = _ref || (await _currentBranch({ fs, gitdir }))
   if (typeof ref === 'undefined') {
@@ -114,6 +116,7 @@ export async function _push({
     url,
     headers,
     protocolVersion: 1,
+    signal,
   })
   const auth = httpRemote.auth // hack to get new credentials from CredentialManager API
   let fullRemoteRef
@@ -269,6 +272,7 @@ export async function _push({
     auth,
     headers,
     body: [...packstream1, ...packstream2],
+    signal,
   })
   const { packfile, progress } = await GitSideBand.demux(res.body)
   if (onMessage) {

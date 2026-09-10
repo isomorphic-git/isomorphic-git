@@ -68,6 +68,7 @@ export class GitRemoteHTTP {
    * @param {string} args.service - The Git service (e.g., "git-upload-pack").
    * @param {string} args.url - The URL of the remote repository.
    * @param {Object<string, string>} args.headers - HTTP headers to include in the request.
+   * @param {AbortSignal} [args.signal] - Signal to abort the operation.
    * @param {1 | 2} args.protocolVersion - The Git protocol version to use.
    * @returns {Promise<Object>} - The parsed response from the remote repository.
    * @throws {HttpError} - If the HTTP request fails.
@@ -84,6 +85,7 @@ export class GitRemoteHTTP {
     service,
     url: _origUrl,
     headers,
+    signal,
     protocolVersion,
   }) {
     let { url, auth } = extractAuthFromUrl(_origUrl)
@@ -104,6 +106,7 @@ export class GitRemoteHTTP {
         method: 'GET',
         url: `${proxifiedURL}/info/refs?service=${service}`,
         headers,
+        signal,
       })
 
       // the default loop behavior
@@ -179,6 +182,7 @@ export class GitRemoteHTTP {
    * @param {Object<string, string>} [args.headers] - HTTP headers to include in the request.
    * @param {any} args.body - The request body to send.
    * @param {any} args.auth - Authentication credentials.
+   * @param {AbortSignal} [args.signal] - Signal to abort the operation.
    * @returns {Promise<GitHttpResponse>} - The HTTP response from the remote repository.
    * @throws {HttpError} - If the HTTP request fails.
    */
@@ -191,6 +195,7 @@ export class GitRemoteHTTP {
     auth,
     body,
     headers,
+    signal,
   }) {
     // We already have the "correct" auth value at this point, but
     // we need to strip out the username/password from the URL yet again.
@@ -209,6 +214,7 @@ export class GitRemoteHTTP {
       url: `${url}/${service}`,
       body,
       headers,
+      signal,
     })
     if (res.statusCode !== 200) {
       const { response } = stringifyBody(res)
