@@ -28,7 +28,7 @@ export async function request({
     method,
     headers,
     body,
-    signal,
+    signal: signal ?? fetchOptions.signal,
   })
   const iter =
     // @ts-expect-error

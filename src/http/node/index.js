@@ -37,7 +37,7 @@ export async function request({
         headers,
         agent,
         body,
-        signal,
+        signal: signal ?? fetchOptions.signal,
       },
       (err, res) => {
         if (err) return reject(err)
