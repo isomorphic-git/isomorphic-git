@@ -171,6 +171,78 @@ describe('push', () => {
       },
     ])
   })
+  it('push with ref !== remoteRef does not corrupt the local remote-tracking ref name', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-push')
+    const oid = 'c03e131196f43a78888415924bcdcbf3090f3316' // local master's oid, per the sibling test above
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.karma.url',
+      value: 'http://fake-server.invalid/test-push-server.git',
+    })
+    // A fake http client standing in for the real mock git server, so this
+    // regression doesn't depend on network access. It only needs to get far
+    // enough for push() to reach "Update the local copy of the remote ref".
+    const pkt = line => (line.length + 4).toString(16).padStart(4, '0') + line
+    const capabilities = 'report-status side-band-64k'
+    const discoverBody =
+      pkt('# service=git-receive-pack\n') +
+      '0000' +
+      pkt(
+        `0000000000000000000000000000000000000000 capabilities^{}\x00${capabilities}\n`
+      ) +
+      '0000'
+    const innerReport =
+      pkt('unpack ok\n') + pkt('ok refs/heads/foobar\n') + '0000'
+    const connectBody = pkt('\x01' + innerReport) + '0000'
+    const fakeHttp = /** @type {any} */ ({
+      async request({ method, url }) {
+        if (method === 'GET') {
+          return {
+            url,
+            method,
+            statusCode: 200,
+            statusMessage: 'OK',
+            headers: {
+              'content-type': 'application/x-git-receive-pack-advertisement',
+            },
+            body: [Buffer.from(discoverBody)],
+          }
+        }
+        return {
+          url,
+          method,
+          statusCode: 200,
+          statusMessage: 'OK',
+          headers: {},
+          body: [Buffer.from(connectBody)],
+        }
+      },
+    })
+    // Test
+    // Regression: the local-ref-update path used to build
+    // `refs/remotes/${remote}/${fullRemoteRef.replace('refs/heads', '')}`,
+    // which drops "refs/heads" but keeps its trailing slash, producing
+    // "refs/remotes/karma//foobar". `join()` used to silently collapse that
+    // double slash when writing to disk, but the ref-name validator added for
+    // GHSA-h3c3-jh3g-8hcc checks the raw string first and correctly rejects
+    // consecutive slashes as invalid, surfacing the pre-existing construction
+    // bug as a hard failure. See src/commands/push.js.
+    const res = await push({
+      fs,
+      http: fakeHttp,
+      gitdir,
+      remote: 'karma',
+      ref: 'master',
+      remoteRef: 'foobar',
+    })
+    expect(res.ok).toBe(true)
+    expect(res.refs['refs/heads/foobar'].ok).toBe(true)
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/karma/foobar' })
+    ).toEqual(oid)
+  })
   it('push with lightweight tag', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-push')

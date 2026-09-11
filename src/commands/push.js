@@ -303,7 +303,7 @@ export async function _push({
   ) {
     // TODO: I think this should actually be using a refspec transform rather than assuming 'refs/remotes/{remote}'
     const ref = `refs/remotes/${remote}/${fullRemoteRef.replace(
-      'refs/heads',
+      'refs/heads/',
       ''
     )}`
     if (_delete) {
