@@ -8,6 +8,7 @@ import {
   resolveRef,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
+import { GitPktLine } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -776,5 +777,69 @@ describe('push', () => {
     expect(err).toBeDefined()
     expect(err instanceof Errors.UserCanceledError).toBe(true)
     expect(err.code).toBe('UserCanceledError')
+  })
+
+  // Regression: #2421 — push against an advanced remote must throw
+  // PushRejectedError (not-fast-forward), not NotFoundError from merge-base.
+  // git-http-mock-server uses copy-on-write for pushes, so advertise a remote
+  // tip oid that is intentionally absent from the local object store.
+  it('push against advanced remote throws PushRejectedError', async () => {
+    const { fs, gitdir } = await makeFixture('test-push')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.karma.url',
+      value: `http://${localhost}:8888/test-push-server.git`,
+    })
+    // Valid-looking oid that is not present in the test-push fixture
+    const missingRemoteOid = 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
+    const mockHttp = {
+      request: async ({ url, method }) => {
+        if (method === 'GET' && /info\/refs/.test(url)) {
+          const caps =
+            'report-status delete-refs side-band-64k quiet ofs-delta agent=git/mock'
+          const advertisement = Buffer.concat([
+            GitPktLine.encode('# service=git-receive-pack\n'),
+            GitPktLine.flush(),
+            GitPktLine.encode(
+              `${missingRemoteOid} refs/heads/master\0${caps}\n`
+            ),
+            GitPktLine.flush(),
+          ])
+          return {
+            url,
+            method,
+            statusCode: 200,
+            statusMessage: 'OK',
+            headers: {
+              'content-type': 'application/x-git-receive-pack-advertisement',
+            },
+            body: (async function* () {
+              yield advertisement
+            })(),
+          }
+        }
+        throw new Error(`unexpected request ${method} ${url}`)
+      },
+    }
+
+    let err
+    try {
+      await push({
+        fs,
+        http: mockHttp,
+        gitdir,
+        remote: 'karma',
+        ref: 'refs/heads/master',
+      })
+    } catch (e) {
+      err = e
+    }
+
+    expect(err).toBeDefined()
+    expect(err instanceof Errors.NotFoundError).toBe(false)
+    expect(err instanceof Errors.PushRejectedError).toBe(true)
+    expect(err.code).toBe(Errors.PushRejectedError.code)
+    expect(err.data.reason).toBe('not-fast-forward')
   })
 })

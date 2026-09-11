@@ -164,13 +164,20 @@ export async function _push({
 
     // If remote branch is present, look for a common merge base.
     if (oldoid !== '0000000000000000000000000000000000000000') {
-      // trick to speed up common force push scenarios
-      const mergebase = await _findMergeBase({
-        fs,
-        cache,
-        gitdir,
-        oids: [oid, oldoid],
-      })
+      // Speeds up common force-push / thin-pack scenarios. The advertised
+      // remote tip may be absent locally (e.g. remote advanced since clone);
+      // that is normal and must not surface as NotFoundError from merge-base.
+      let mergebase = []
+      try {
+        mergebase = await _findMergeBase({
+          fs,
+          cache,
+          gitdir,
+          oids: [oid, oldoid],
+        })
+      } catch (e) {
+        mergebase = []
+      }
       for (const oid of mergebase) finish.push(oid)
       if (thinPack) {
         skipObjects = await listObjects({ fs, cache, gitdir, oids: mergebase })
