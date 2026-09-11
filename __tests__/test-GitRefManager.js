@@ -503,6 +503,39 @@ describe('GitRefManager', () => {
     )
   })
 
+  it('updateRemoteRefs refuses a HEAD symbolic ref whose target contains `..` (GHSA-h3c3-jh3g-8hcc)', async () => {
+    const { fs, gitdir } = await makeFixture('test-checkout')
+    // The destination of a symref translation is validated, but the target it
+    // points at is only ever run through the refspec's plain string
+    // substitution (GitRefSpec#translate), never checked for `..`. The wire
+    // parser also puts it there unrestricted (`symref=HEAD:(.*)`), so a
+    // malicious remote's HEAD symref target survives untouched into the
+    // written `ref: <target>` file content, ready to escape gitdir the next
+    // time something resolves it.
+    let error = null
+    try {
+      await GitRefManager.updateRemoteRefs({
+        fs,
+        gitdir,
+        remote: 'origin',
+        refs: new Map(),
+        symrefs: new Map([
+          ['HEAD', 'refs/heads/../../../../GHSA-h3c3-jh3g-8hcc-poc-symref'],
+        ]),
+        tags: false,
+        refspecs: [
+          '+HEAD:refs/remotes/origin/HEAD',
+          '+refs/heads/*:refs/remotes/origin/*',
+        ],
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.InvalidRefNameError.code)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/HEAD`)).toBe(false)
+  })
+
   it('expand does not return a git system file', async () => {
     const { fs, gitdir } = await makeFixture('test-checkout')
     // The first refpath candidate is the bare name, so a lookup that does not

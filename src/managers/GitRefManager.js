@@ -104,6 +104,14 @@ export class GitRefManager {
     ])) {
       const symtarget = refspec.translateOne(symrefs.get(serverRef))
       if (symtarget) {
+        // The destination (translatedRef) is validated below, but the target
+        // a symref points at is server-supplied too (the wire parser accepts
+        // `symref=HEAD:(.*)` unrestricted) and only ever passed through the
+        // refspec's plain string substitution, never checked. Left alone, a
+        // `..`-laden target is written into the file content as-is and later
+        // drives an out-of-gitdir read the next time something resolves it.
+        // See GHSA-h3c3-jh3g-8hcc.
+        assertWritableRef(symtarget)
         symrefTranslations.push([translatedRef, `ref: ${symtarget}`])
       }
     }
