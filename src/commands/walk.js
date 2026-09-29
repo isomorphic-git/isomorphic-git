@@ -77,5 +77,22 @@ export async function _walk({
       return reduce(parent, walkedChildren)
     }
   }
-  return walk(root)
+  // Some walkers keep changes while they walk. This lets them save the
+  // changes with one write, and not one write for each entry.
+  const finish = () =>
+    Promise.all(
+      walkers.map(walker =>
+        typeof walker.finish === 'function' ? walker.finish() : undefined
+      )
+    )
+  let result
+  try {
+    result = await walk(root)
+  } catch (err) {
+    // Save the work done so far, but report the first error.
+    await finish().catch(() => {})
+    throw err
+  }
+  await finish()
+  return result
 }

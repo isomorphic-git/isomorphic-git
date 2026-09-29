@@ -16,6 +16,9 @@ export class GitWalkerFs {
     this.refresh = refresh
 
     this.config = null
+    // Index entries with new stats. `oid()` collects them during a walk and
+    // `finish()` writes them to the index in one step.
+    this._refreshedStats = new Map()
     const walker = this
     this.ConstructEntry = class WorkdirEntry {
       constructor(fullpath) {
@@ -135,10 +138,7 @@ export class GitWalkerFs {
           const stats = await entry.stat()
           const config = await self._getGitConfig(fs, gitdir)
           const filemode = await config.get('core.filemode')
-          const trustino =
-            typeof process !== 'undefined'
-              ? !(process.platform === 'win32')
-              : true
+          const trustino = self._trustIno()
           if (!stage || compareStats(stats, stage, filemode, trustino)) {
             const content = await entry.content()
             if (content === undefined) {
@@ -151,6 +151,9 @@ export class GitWalkerFs {
               // 1) if we can (because the oid and mode are the same)
               // 2) and only if we need to (because other stats differ)
               // 3) and only if the caller opted in to refreshing the index
+              // Writing the index for each file would make a walk slow when
+              // many files are stale. So we save the new stats here and
+              // write them all at once in `finish()`.
               if (
                 self.refresh &&
                 stage &&
@@ -158,11 +161,7 @@ export class GitWalkerFs {
                 (!filemode || stats.mode === stage.mode) &&
                 compareStats(stats, stage, filemode, trustino)
               ) {
-                index.insert({
-                  filepath: entry._fullpath,
-                  stats,
-                  oid,
-                })
+                self._refreshedStats.set(entry._fullpath, { stats, oid })
               }
             }
           } else {
@@ -174,6 +173,45 @@ export class GitWalkerFs {
       entry._oid = oid
     }
     return entry._oid
+  }
+
+  /**
+   * Write the stats that `oid()` refreshed to the index, with one write.
+   * The walk calls this once, after the last entry.
+   * A path is skipped if the index changed after `oid()` read it.
+   *
+   * @returns {Promise<void>}
+   */
+  async finish() {
+    if (this._refreshedStats.size === 0) return
+    const refreshed = this._refreshedStats
+    this._refreshedStats = new Map()
+    const { fs, gitdir, cache } = this
+    const config = await this._getGitConfig(fs, gitdir)
+    const filemode = await config.get('core.filemode')
+    const trustino = this._trustIno()
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache },
+      async function (index) {
+        for (const [filepath, { stats, oid }] of refreshed) {
+          const stage = index.entriesMap.get(filepath)
+          if (
+            stage &&
+            oid === stage.oid &&
+            (!filemode || stats.mode === stage.mode) &&
+            compareStats(stats, stage, filemode, trustino)
+          ) {
+            index.insert({ filepath, stats, oid })
+          }
+        }
+      }
+    )
+  }
+
+  _trustIno() {
+    return typeof process !== 'undefined'
+      ? !(process.platform === 'win32')
+      : true
   }
 
   async _getGitConfig(fs, gitdir) {
