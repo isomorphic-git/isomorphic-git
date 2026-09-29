@@ -1,9 +1,11 @@
 /* eslint-env node, browser, jasmine */
 import * as path from 'path'
 
-import { statusMatrix, add, remove } from 'isomorphic-git'
+import { statusMatrix, add, commit, remove } from 'isomorphic-git'
+import { GitIndexManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
+import { countIndexWrites } from './__helpers__/countIndexWrites.js'
 
 describe('statusMatrix', () => {
   it('statusMatrix', async () => {
@@ -426,5 +428,211 @@ describe('statusMatrix', () => {
     expect(matrix).toEqual([['a.txt', 1, 1, 1]])
     const indexAfter = await fs.read(path.join(gitdir, 'index'))
     expect(indexAfter).toEqual(indexBefore)
+  })
+
+  describe('stale index stats', () => {
+    const author = { name: 'Test', email: 'test@example.com' }
+    const STALE_SECONDS = 1000
+
+    // Create a repo where every file is committed and staged.
+    async function makeCommittedRepo(count) {
+      const { fs, dir, gitdir, gitdirsmfullpath } =
+        await makeFixtureAsSubmodule('test-empty')
+      // Internal APIs need the real git directory, not the `.git` file.
+      const indexGitdir = gitdirsmfullpath
+      const filepaths = []
+      for (let i = 0; i < count; i++) {
+        const filepath = `d/sub${i % 10}/file${i}.txt`
+        await fs.write(path.join(dir, filepath), `content ${i}\n`)
+        filepaths.push(filepath)
+      }
+      await add({ fs, dir, gitdir, filepath: 'd' })
+      await commit({ fs, dir, gitdir, message: 'initial', author })
+      return { fs, dir, gitdir, indexGitdir, filepaths }
+    }
+
+    // Change the recorded stats of index entries, but not their oid.
+    // This has the same effect as `touch` on the files.
+    /**
+     * @param {any} fs
+     * @param {string} gitdir
+     * @param {(filepath: string) => boolean} [shouldChange]
+     */
+    async function makeStale(fs, gitdir, shouldChange = () => true) {
+      const cache = {}
+      await GitIndexManager.acquire(
+        { fs, gitdir, cache },
+        async function (index) {
+          for (const entry of [...index]) {
+            if (!shouldChange(entry.path)) continue
+            index.insert({
+              filepath: entry.path,
+              stats: {
+                ...entry,
+                mtimeSeconds: entry.mtimeSeconds - STALE_SECONDS,
+                ctimeSeconds: entry.ctimeSeconds - STALE_SECONDS,
+              },
+              oid: entry.oid,
+            })
+          }
+        }
+      )
+    }
+
+    async function readIndexEntries(fs, gitdir) {
+      const entries = new Map()
+      await GitIndexManager.acquire(
+        { fs, gitdir, cache: {} },
+        async function (index) {
+          for (const entry of index) entries.set(entry.path, { ...entry })
+        }
+      )
+      return entries
+    }
+
+    it('writes the index a constant number of times for many stale files', async () => {
+      // Setup
+      const { fs, dir, gitdir, indexGitdir } = await makeCommittedRepo(300)
+      await makeStale(fs, indexGitdir)
+      const { fs: countedFs, counter } = countIndexWrites(fs)
+      // Test
+      const matrix = await statusMatrix({
+        fs: countedFs,
+        dir,
+        gitdir,
+        filepaths: ['d'],
+      })
+      expect(matrix).toHaveLength(300)
+      expect(
+        matrix.every(row => row[1] === 1 && row[2] === 1 && row[3] === 1)
+      ).toBe(true)
+      expect(counter.count).toBeGreaterThan(0)
+      expect(counter.count).toBeLessThanOrEqual(2)
+    })
+
+    it('refreshes the stats so a second run does not write the index', async () => {
+      // Setup
+      const { fs, dir, gitdir, indexGitdir, filepaths } =
+        await makeCommittedRepo(50)
+      await makeStale(fs, indexGitdir)
+      const { fs: countedFs, counter } = countIndexWrites(fs)
+      // Test
+      const first = await statusMatrix({ fs: countedFs, dir, gitdir })
+      expect(counter.count).toBeGreaterThan(0)
+      const entries = await readIndexEntries(fs, indexGitdir)
+      for (const filepath of filepaths) {
+        const stats = await fs.lstat(path.join(dir, filepath))
+        expect(entries.get(filepath).mtimeSeconds).toBe(
+          Math.floor(stats.mtimeMs / 1000)
+        )
+      }
+      counter.reset()
+      // A new cache object forces a read of the index file from disk.
+      const second = await statusMatrix({ fs: countedFs, dir, gitdir })
+      expect(second).toEqual(first)
+      expect(counter.count).toBe(0)
+    })
+
+    it('returns the same result for each kind of change', async () => {
+      // Setup
+      const { fs, dir, gitdir, indexGitdir } = await makeCommittedRepo(10)
+      const same = 'd/sub1/file1.txt' // stale stats, same content
+      const changed = 'd/sub2/file2.txt' // stale stats, changed content
+      const deleted = 'd/sub3/file3.txt' // removed from the working tree
+      const mode = 'd/sub4/file4.txt' // recorded as executable in the index
+      const fresh = 'd/sub5/file5.txt' // stats not stale
+      await fs.write(path.join(dir, changed), 'changed\n')
+      await fs.rm(path.join(dir, deleted))
+      await fs.write(path.join(dir, 'd/new.txt'), 'new file\n')
+      await makeStale(fs, indexGitdir, filepath => filepath !== fresh)
+      await GitIndexManager.acquire(
+        { fs, gitdir: indexGitdir, cache: {} },
+        async function (index) {
+          const entry = [...index].find(entry => entry.path === mode)
+          index.insert({
+            filepath: mode,
+            stats: { ...entry, mode: 0o100755 },
+            oid: entry.oid,
+          })
+        }
+      )
+      const before = await readIndexEntries(fs, indexGitdir)
+      // Test
+      const expected = [
+        ['d/new.txt', 0, 2, 0],
+        ['d/sub0/file0.txt', 1, 1, 1],
+        [same, 1, 1, 1],
+        [changed, 1, 2, 1],
+        [deleted, 1, 0, 1],
+        [mode, 1, 1, 1],
+        [fresh, 1, 1, 1],
+      ]
+      const matrix = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        filepaths: ['d'],
+        filter: f => f === 'd/new.txt' || /file[0-5]\.txt$/.test(f),
+      })
+      expect(matrix).toEqual(expected.sort((a, b) => (a[0] < b[0] ? -1 : 1)))
+      // Only entries with the same content and the same mode get new stats.
+      const after = await readIndexEntries(fs, indexGitdir)
+      const stats = await fs.lstat(path.join(dir, same))
+      expect(after.get(same).mtimeSeconds).toBe(
+        Math.floor(stats.mtimeMs / 1000)
+      )
+      expect(after.get(changed)).toEqual(before.get(changed))
+      expect(after.get(deleted)).toEqual(before.get(deleted))
+      expect(after.get(mode)).toEqual(before.get(mode))
+      expect(after.has('d/new.txt')).toBe(false)
+      // The result is the same when the run happens again.
+      const again = await statusMatrix({
+        fs,
+        dir,
+        gitdir,
+        filepaths: ['d'],
+        filter: f => f === 'd/new.txt' || /file[0-5]\.txt$/.test(f),
+      })
+      expect(again).toEqual(matrix)
+    })
+
+    it('works when several calls run at the same time', async () => {
+      // Setup
+      const { fs, dir, gitdir, indexGitdir } = await makeCommittedRepo(100)
+      await makeStale(fs, indexGitdir)
+      const { fs: countedFs, counter } = countIndexWrites(fs)
+      const shared = {}
+      // Test
+      const results = await Promise.all([
+        statusMatrix({ fs: countedFs, dir, gitdir, filepaths: ['d'] }),
+        statusMatrix({ fs: countedFs, dir, gitdir, filepaths: ['d'] }),
+        statusMatrix({
+          fs: countedFs,
+          dir,
+          gitdir,
+          filepaths: ['d'],
+          cache: shared,
+        }),
+        statusMatrix({
+          fs: countedFs,
+          dir,
+          gitdir,
+          filepaths: ['d'],
+          cache: shared,
+        }),
+      ])
+      for (const matrix of results) {
+        expect(matrix).toHaveLength(100)
+        expect(
+          matrix.every(row => row[1] === 1 && row[2] === 1 && row[3] === 1)
+        ).toBe(true)
+      }
+      expect(counter.count).toBeLessThanOrEqual(4)
+      // The index is still valid and is fresh.
+      counter.reset()
+      const after = await statusMatrix({ fs: countedFs, dir, gitdir })
+      expect(after).toEqual(results[0])
+      expect(counter.count).toBe(0)
+    })
   })
 })
