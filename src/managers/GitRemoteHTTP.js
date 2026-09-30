@@ -16,10 +16,10 @@ const corsProxify = (corsProxy, url) =>
     ? `${corsProxy}${url}`
     : `${corsProxy}/${url.replace(/^https?:\/\//, '')}`
 
-const updateHeaders = (headers, auth) => {
+const updateHeaders = (headers, auth, url) => {
   // Update the basic auth header
   if (auth.username || auth.password) {
-    headers.Authorization = calculateBasicAuthHeader(auth)
+    headers.Authorization = calculateBasicAuthHeader(auth, url)
   }
   // but any manually provided headers take precedence
   if (auth.headers) {
@@ -91,7 +91,7 @@ export class GitRemoteHTTP {
     let { url, auth } = extractAuthFromUrl(_origUrl)
     const proxifiedURL = corsProxy ? corsProxify(corsProxy, url) : url
     if (auth.username || auth.password) {
-      headers.Authorization = calculateBasicAuthHeader(auth)
+      headers.Authorization = calculateBasicAuthHeader(auth, proxifiedURL)
     }
     if (protocolVersion === 2) {
       headers['Git-Protocol'] = 'version=2'
@@ -128,7 +128,7 @@ export class GitRemoteHTTP {
           if (auth && auth.cancel) {
             throw new UserCanceledError()
           } else if (auth) {
-            updateHeaders(headers, auth)
+            updateHeaders(headers, auth, proxifiedURL)
             providedAuthBefore = true
             tryAgain = true
           }
@@ -206,7 +206,7 @@ export class GitRemoteHTTP {
 
     headers['content-type'] = `application/x-${service}-request`
     headers.accept = `application/x-${service}-result`
-    updateHeaders(headers, auth)
+    updateHeaders(headers, auth, url)
 
     const res = await http.request({
       onProgress,
