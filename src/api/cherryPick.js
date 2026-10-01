@@ -13,6 +13,10 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 /**
  * Cherry-pick a commit onto the current branch
  *
+ * Like `git cherry-pick`, this refuses to run when it would overwrite local changes in the working tree.
+ * If a file the picked commit changes has staged or unstaged changes, or an untracked file is in the way,
+ * a `CherryPickLocalChangesError` listing those files is thrown before anything is written.
+ *
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
