@@ -14,6 +14,7 @@ import {
   readCommit,
   resolveRef,
   log,
+  remove,
   setConfig,
   status,
 } from 'isomorphic-git'
@@ -563,5 +564,189 @@ describe('cherryPick', () => {
     expect(error).not.toBeNull()
     expect(error.code).toBe(Errors.CherryPickRootCommitError.code)
     expect(error.data.oid).toBe(rootOid)
+  })
+  describe('local changes', () => {
+    const author = {
+      name: 'Tester',
+      email: 'test@example.com',
+      timestamp: 1600000000,
+      timezoneOffset: 0,
+    }
+
+    // master: file.txt=base, other.txt=other
+    // feature: file.txt=remote, gone.txt deleted, added.txt=added
+    async function setup(name) {
+      const { fs, dir, gitdir } = await makeFixture(name)
+      await init({ fs, dir, gitdir })
+      await fs._writeFile(join(dir, 'file.txt'), 'base\n')
+      await fs._writeFile(join(dir, 'other.txt'), 'other\n')
+      await fs._writeFile(join(dir, 'gone.txt'), 'gone\n')
+      await add({ fs, dir, gitdir, filepath: '.' })
+      await gitCommit({ fs, dir, gitdir, message: 'base', author })
+
+      await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+      await fs._writeFile(join(dir, 'file.txt'), 'remote\n')
+      await fs._writeFile(join(dir, 'added.txt'), 'added\n')
+      await fs.rm(join(dir, 'gone.txt'))
+      await add({ fs, dir, gitdir, filepath: ['file.txt', 'added.txt'] })
+      await remove({ fs, dir, gitdir, filepath: 'gone.txt' })
+      const featureOid = await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'feature',
+        author,
+      })
+
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      const headOid = await resolveRef({ fs, gitdir, ref: 'HEAD' })
+      return { fs, dir, gitdir, featureOid, headOid }
+    }
+
+    async function expectRejected(repo, filepaths, options = {}) {
+      const { fs, dir, gitdir, featureOid, headOid } = repo
+      let error = null
+      try {
+        await cherryPick({
+          fs,
+          dir,
+          gitdir,
+          oid: featureOid,
+          committer: author,
+          ...options,
+        })
+      } catch (e) {
+        error = e
+      }
+      expect(error).not.toBeNull()
+      expect(error.code).toBe(Errors.CherryPickLocalChangesError.code)
+      expect(error.data.filepaths).toEqual(filepaths)
+      expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(headOid)
+    }
+
+    it('rejects an unstaged edit to a file the commit changes', async () => {
+      const repo = await setup('tmp-cherry-dirty-unstaged')
+      const { fs, dir } = repo
+      await fs._writeFile(join(dir, 'file.txt'), 'local-dirty\n')
+
+      await expectRejected(repo, ['file.txt'])
+      expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toBe('local-dirty\n')
+    })
+
+    it('rejects a staged edit to a file the commit changes', async () => {
+      const repo = await setup('tmp-cherry-dirty-staged')
+      const { fs, dir, gitdir } = repo
+      await fs._writeFile(join(dir, 'file.txt'), 'local-staged\n')
+      await add({ fs, dir, gitdir, filepath: 'file.txt' })
+
+      await expectRejected(repo, ['file.txt'])
+      expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toBe(
+        'local-staged\n'
+      )
+      expect(await status({ fs, dir, gitdir, filepath: 'file.txt' })).toBe(
+        'modified'
+      )
+    })
+
+    it('rejects an untracked file where the commit adds one', async () => {
+      const repo = await setup('tmp-cherry-dirty-untracked')
+      const { fs, dir } = repo
+      await fs._writeFile(join(dir, 'added.txt'), 'untracked\n')
+
+      await expectRejected(repo, ['added.txt'])
+      expect(await fs.read(join(dir, 'added.txt'), 'utf8')).toBe('untracked\n')
+    })
+
+    it('rejects an edit to a file the commit deletes', async () => {
+      const repo = await setup('tmp-cherry-dirty-deleted')
+      const { fs, dir } = repo
+      await fs._writeFile(join(dir, 'gone.txt'), 'local-dirty\n')
+
+      await expectRejected(repo, ['gone.txt'])
+      expect(await fs.read(join(dir, 'gone.txt'), 'utf8')).toBe('local-dirty\n')
+    })
+
+    it('also rejects when conflicts would be written to the worktree', async () => {
+      const repo = await setup('tmp-cherry-dirty-no-abort')
+      const { fs, dir } = repo
+      await fs._writeFile(join(dir, 'file.txt'), 'local-dirty\n')
+
+      await expectRejected(repo, ['file.txt'], {
+        noUpdateBranch: true,
+        abortOnConflict: false,
+      })
+      expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toBe('local-dirty\n')
+    })
+
+    it('keeps local edits to files the commit does not touch', async () => {
+      const repo = await setup('tmp-cherry-dirty-unrelated')
+      const { fs, dir, gitdir, featureOid } = repo
+      await fs._writeFile(join(dir, 'other.txt'), 'local-dirty\n')
+
+      await cherryPick({ fs, dir, gitdir, oid: featureOid, committer: author })
+
+      expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toBe('remote\n')
+      expect(await fs.read(join(dir, 'other.txt'), 'utf8')).toBe(
+        'local-dirty\n'
+      )
+      expect(await status({ fs, dir, gitdir, filepath: 'other.txt' })).toBe(
+        '*modified'
+      )
+    })
+
+    it('does not check the worktree when it will not be written', async () => {
+      const repo = await setup('tmp-cherry-dirty-no-update')
+      const { fs, dir, gitdir, featureOid, headOid } = repo
+      await fs._writeFile(join(dir, 'file.txt'), 'local-dirty\n')
+
+      const newOid = await cherryPick({
+        fs,
+        dir,
+        gitdir,
+        oid: featureOid,
+        committer: author,
+        noUpdateBranch: true,
+      })
+
+      expect(newOid).toBeDefined()
+      expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(headOid)
+      expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toBe('local-dirty\n')
+    })
+    it('rejects any tracked local edit when conflicts would be written out', async () => {
+      const repo = await setup('tmp-cherry-dirty-conflict-write')
+      const { fs, dir, gitdir, featureOid } = repo
+      await fs._writeFile(join(dir, 'file.txt'), 'master-change\n')
+      await add({ fs, dir, gitdir, filepath: 'file.txt' })
+      await gitCommit({ fs, dir, gitdir, message: 'master change', author })
+      repo.headOid = await resolveRef({ fs, gitdir, ref: 'HEAD' })
+      await fs._writeFile(join(dir, 'other.txt'), 'local-dirty\n')
+      await fs._writeFile(join(dir, 'untracked.txt'), 'untracked\n')
+
+      await expectRejected(repo, ['other.txt'], { abortOnConflict: false })
+      expect(await fs.read(join(dir, 'other.txt'), 'utf8')).toBe(
+        'local-dirty\n'
+      )
+
+      // Without local changes the conflict is written out as before.
+      await fs._writeFile(join(dir, 'other.txt'), 'other\n')
+      let error = null
+      try {
+        await cherryPick({
+          fs,
+          dir,
+          gitdir,
+          oid: featureOid,
+          committer: author,
+          abortOnConflict: false,
+        })
+      } catch (e) {
+        error = e
+      }
+      expect(error.code).toBe(Errors.MergeConflictError.code)
+      expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toContain('<<<<<<<')
+      expect(await fs.read(join(dir, 'untracked.txt'), 'utf8')).toBe(
+        'untracked\n'
+      )
+    })
   })
 })

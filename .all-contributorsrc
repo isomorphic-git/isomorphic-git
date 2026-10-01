@@ -958,6 +958,17 @@
         "test",
         "bug"
       ]
+    },
+    {
+      "login": "TonyWu2333",
+      "name": "TonyWu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75903587?v=4",
+      "profile": "https://github.com/TonyWu2333",
+      "contributions": [
+        "code",
+        "test",
+        "doc"
+      ]
     }
   ],
   "commitConvention": "angular"
