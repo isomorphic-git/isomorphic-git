@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import { Errors, setConfig, fetch } from 'isomorphic-git'
+import { Errors, setConfig, fetch, init } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 import { sleep } from 'isomorphic-git/internal-apis'
 
@@ -403,5 +403,68 @@ describe('fetch', () => {
     // assert that tags was force-updated
     const newValue = await fs.read(`${gitdir}/refs/tags/v1.0.0`, 'utf8')
     expect(oldValue).not.toEqual(newValue)
+  })
+  describe('when the pack is missing the advertised objects', () => {
+    // A well-formed pack (PACK v2 header, zero objects, valid SHA-1 trailer) that
+    // does not contain the commits the server just advertised.
+    const emptyPack = Buffer.concat([
+      Buffer.from('PACK'),
+      Buffer.from([0, 0, 0, 2, 0, 0, 0, 0]),
+      Buffer.from('029d08823bd8a8eab510ad6ac75c823cfd3ed31e', 'hex'),
+    ])
+    const pktLine = payload =>
+      Buffer.concat([
+        Buffer.from((payload.length + 4).toString(16).padStart(4, '0')),
+        payload,
+      ])
+    const emptyPackHttp = {
+      request() {
+        return http.request.apply(null, arguments).then(response => {
+          if (
+            response.headers['content-type'] ===
+            'application/x-git-upload-pack-result'
+          ) {
+            response.body = [
+              pktLine(Buffer.from('NAK\n')),
+              pktLine(Buffer.concat([Buffer.from([1]), emptyPack])),
+              Buffer.from('0000'),
+            ].values()
+          }
+          return response
+        })
+      },
+    }
+
+    for (const singleBranch of [true, false]) {
+      it(`fails without publishing refs (singleBranch: ${singleBranch})`, async () => {
+        const { fs, dir, gitdir } = await makeFixture(
+          `test-fetch-missing-objects-${singleBranch}`
+        )
+        await init({ fs, dir, gitdir })
+
+        let error = null
+        try {
+          await fetch({
+            fs,
+            http: emptyPackHttp,
+            dir,
+            gitdir,
+            singleBranch,
+            ref: 'master',
+            url: `http://${localhost}:8888/test-fetch-server.git`,
+          })
+        } catch (e) {
+          error = e
+        }
+
+        expect(error).not.toBeNull()
+        expect(error.code).toBe(Errors.NotFoundError.code)
+        expect(error.caller).toBe('git.fetch')
+        expect(await fs.exists(`${gitdir}/refs/remotes/origin/master`)).toBe(
+          false
+        )
+        expect(await fs.exists(`${gitdir}/packed-refs`)).toBe(false)
+      })
+    }
   })
 })
