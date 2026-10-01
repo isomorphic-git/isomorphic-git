@@ -30,7 +30,7 @@ export async function request({
   }
   const { followRedirects = true, maxRedirects = 10, ...options } = fetchOptions
   /** @type {RedirectableRequest} */
-  let next = { url, method, headers, body }
+  let next = { url, method: method.toUpperCase(), headers, body }
   for (let redirects = 0; ; redirects++) {
     const res = await send({
       ...options,
@@ -47,9 +47,15 @@ export async function request({
     ) {
       return toResponse(res)
     }
-    res.resume() // Discard the redirect body
+    // Discard the redirect body. simple-get has already wrapped it in a
+    // decompressor, so a malformed body must not become an unhandled error.
+    res.on('error', () => {})
+    res.resume()
     if (redirects >= maxRedirects) throw new Error('too many redirects')
     next = redirectRequest(next, res.statusCode, location)
+    // simple-get builds a body from `form` on every call; like its own
+    // redirect handling, send it only with the first request.
+    delete options.form
   }
 }
 
