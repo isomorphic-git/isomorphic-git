@@ -152,6 +152,52 @@ describe('node http client redirects', () => {
     expect(target.requests[1].body.toString()).toBe(body[0].toString())
   })
 
+  it('treats a lowercase post like POST', async () => {
+    const target = await serve(ok)
+    const source = await serve(redirectTo(`http://127.0.0.1:${target.port}/`))
+
+    await request({
+      url: `http://127.0.0.1:${source.port}/`,
+      method: 'post',
+      body: /** @type {any} */ ([Buffer.from('payload')]),
+    })
+
+    expect(target.requests[0].method).toBe('GET')
+    expect(target.requests[0].body.length).toBe(0)
+  })
+
+  it('does not rebuild a form body after a POST becomes GET', async () => {
+    const target = await serve(ok)
+    const source = await serve(redirectTo(`http://127.0.0.1:${target.port}/`))
+
+    await request({
+      url: `http://127.0.0.1:${source.port}/`,
+      method: 'POST',
+      fetchOptions: { form: { field: 'value' } },
+    })
+
+    expect(source.requests[0].body.toString()).toBe('field=value')
+    expect(target.requests[0].method).toBe('GET')
+    expect(target.requests[0].body.length).toBe(0)
+    expect(target.requests[0].headers['content-type']).toBeUndefined()
+  })
+
+  it('ignores a malformed compressed body on a redirect', async () => {
+    const target = await serve(ok)
+    const source = await serve((req, res) => {
+      res.writeHead(302, {
+        location: `http://127.0.0.1:${target.port}/`,
+        'content-encoding': 'gzip',
+      })
+      res.end('not gzip')
+    })
+
+    const res = await request({ url: `http://127.0.0.1:${source.port}/` })
+
+    expect(res.statusCode).toBe(200)
+    expect(Buffer.from(await collect(res.body)).toString()).toBe('ok')
+  })
+
   it('honors followRedirects and maxRedirects', async () => {
     const target = await serve(ok)
     const source = await serve(redirectTo(`http://127.0.0.1:${target.port}/`))
