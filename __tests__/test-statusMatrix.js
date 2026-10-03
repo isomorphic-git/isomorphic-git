@@ -1,7 +1,13 @@
 /* eslint-env node, browser, jasmine */
 import * as path from 'path'
 
-import { statusMatrix, add, remove } from 'isomorphic-git'
+import {
+  statusMatrix,
+  add,
+  remove,
+  hashBlob,
+  updateIndex,
+} from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -448,5 +454,38 @@ describe('statusMatrix', () => {
     expect(matrix).toEqual([['a.txt', 1, 1, 1]])
     const indexAfter = await fs.read(path.join(gitdir, 'index'))
     expect(indexAfter).toEqual(indexBefore)
+  })
+
+  it('writes .git/index once when refreshing the stat info of many files', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-statusMatrix')
+    // Stage some files with blank stat info in the index, so the stat-cache
+    // refresh fires for each of them. Anything that touches tracked files
+    // without changing them (`touch`, copying the working tree) does the same.
+    const filepaths = ['e.txt', 'f.txt', 'g.txt']
+    for (const filepath of filepaths) {
+      await fs.write(path.join(dir, filepath), filepath)
+      const { oid } = await hashBlob({ object: filepath })
+      await updateIndex({ fs, dir, gitdir, filepath, oid, add: true })
+    }
+    // Count the writes to the index file
+    let indexWrites = 0
+    const write = fs.write.bind(fs)
+    fs.write = (filepath, ...args) => {
+      if (filepath === `${gitdir}/index`) indexWrites++
+      return write(filepath, ...args)
+    }
+    // Test
+    const matrix = await statusMatrix({ fs, dir, gitdir, filepaths })
+    expect(matrix).toEqual([
+      ['e.txt', 0, 2, 2],
+      ['f.txt', 0, 2, 2],
+      ['g.txt', 0, 2, 2],
+    ])
+    // One write for the whole walk, not one per file
+    expect(indexWrites).toBe(1)
+    // The stat info is up to date now, so the next walk has nothing to write
+    await statusMatrix({ fs, dir, gitdir, filepaths })
+    expect(indexWrites).toBe(1)
   })
 })

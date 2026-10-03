@@ -4,6 +4,7 @@ import { UnmergedPathsError } from '../errors/UnmergedPathsError.js'
 import { GitIndex } from '../models/GitIndex.js'
 import { compareStats } from '../utils/compareStats.js'
 import { acquireLock } from '../utils/lock.js'
+import { normalizeStats } from '../utils/normalizeStats.js'
 
 const IndexCache = Symbol('IndexCache')
 
@@ -52,7 +53,16 @@ async function isIndexStale(fs, filepath, cache) {
 
   const currStats = await fs.lstat(filepath)
   if (currStats === null) return false
-  return compareStats(savedStats, currStats)
+  if (compareStats(savedStats, currStats)) return true
+  // compareStats only looks at whole seconds, but the index is often rewritten
+  // in the same second with the same size (an entry got a new oid). Both stats
+  // come from the same fs, so compare the full timestamps too.
+  const saved = normalizeStats(savedStats)
+  const curr = normalizeStats(currStats)
+  return (
+    saved.mtimeNanoseconds !== curr.mtimeNanoseconds ||
+    saved.ctimeNanoseconds !== curr.ctimeNanoseconds
+  )
 }
 
 export class GitIndexManager {

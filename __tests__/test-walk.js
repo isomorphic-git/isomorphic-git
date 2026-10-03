@@ -12,6 +12,7 @@ import {
   hashBlob,
   init,
   writeRef,
+  updateIndex,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -767,5 +768,80 @@ describe('walk', () => {
     }
     expect(error).not.toBeNull()
     expect(error instanceof Errors.NotFoundError).toBe(true)
+  })
+
+  it('writes a stat refresh asked for after the walk has finished', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
+    // A tracked, unmodified file with blank stat info in the index
+    await fs.write(`${dir}/e.txt`, 'e')
+    const { oid } = await hashBlob({ object: 'e' })
+    await updateIndex({ fs, dir, gitdir, filepath: 'e.txt', oid, add: true })
+    // Count the writes to the index file
+    let indexWrites = 0
+    const write = fs.write.bind(fs)
+    fs.write = (filepath, ...args) => {
+      if (filepath === `${gitdir}/index`) indexWrites++
+      return write(filepath, ...args)
+    }
+    // Test
+    const [entry] = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [WORKDIR()],
+      map: async (filepath, [workdir]) =>
+        filepath === 'e.txt' ? workdir : undefined,
+    })
+    // Nothing asked for the oid during the walk, so there was nothing to write
+    expect(indexWrites).toBe(0)
+    // The walk is over, so this refresh is written right away
+    expect(await entry.oid()).toBe(oid)
+    expect(indexWrites).toBe(1)
+    // The stat info is up to date now, so the next walk has nothing to write
+    await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [WORKDIR()],
+      map: async (filepath, [workdir]) =>
+        filepath === 'e.txt' ? workdir.oid() : undefined,
+    })
+    expect(indexWrites).toBe(1)
+  })
+
+  it('does not refresh an entry that changed during the walk', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-walk')
+    // A tracked, unmodified file with blank stat info in the index
+    await fs.write(`${dir}/e.txt`, 'e')
+    const { oid } = await hashBlob({ object: 'e' })
+    await updateIndex({ fs, dir, gitdir, filepath: 'e.txt', oid, add: true })
+    // Test
+    await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [WORKDIR()],
+      map: async (filepath, [workdir]) => {
+        if (filepath !== 'e.txt') return
+        // Queue a refresh for the old content, then stage new content
+        // before the walk ends and the queue is written.
+        await workdir.oid()
+        await fs.write(`${dir}/e.txt`, 'changed')
+        await add({ fs, dir, gitdir, filepath: 'e.txt' })
+      },
+    })
+    // The queued refresh must not overwrite the newer entry
+    const { oid: changed } = await hashBlob({ object: 'changed' })
+    const [staged] = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        filepath === 'e.txt' ? stage.oid() : undefined,
+    })
+    expect(staged).toBe(changed)
   })
 })

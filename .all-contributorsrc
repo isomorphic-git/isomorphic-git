@@ -969,6 +969,16 @@
         "test",
         "doc"
       ]
+    },
+    {
+      "login": "MadalinTurluianu",
+      "name": "Madalin Turluianu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/81984912?v=4",
+      "profile": "https://github.com/MadalinTurluianu",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"

@@ -13,6 +13,8 @@ import {
   remove,
   setConfig,
   statusMatrix,
+  hashBlob,
+  updateIndex,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
@@ -800,5 +802,40 @@ describe('checkout', () => {
     expect(await fs.read(path.join(gitdir, 'HEAD'), 'utf8')).toEqual(
       'ref: refs/heads/index\n'
     )
+  })
+
+  it('writes .git/index once when refreshing the stat info of many files', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await checkout({ fs, dir, gitdir, ref: 'test-branch' })
+    // Blank the stat info of some unmodified files in the index, so the
+    // stat-cache refresh fires for each of them while checkout analyzes the
+    // working tree. Anything that touches tracked files without changing
+    // them (`touch`, copying the working tree) does the same.
+    const filepaths = ['README.md', 'package.json', 'src/index.js']
+    for (const filepath of filepaths) {
+      const object = await fs.read(path.join(dir, filepath))
+      const { oid } = await hashBlob({ object })
+      await updateIndex({ fs, dir, gitdir, filepath, oid })
+    }
+    // Count the writes to the index file
+    let indexWrites = 0
+    const write = fs.write.bind(fs)
+    fs.write = (filepath, ...args) => {
+      if (filepath === `${gitdir}/index`) indexWrites++
+      return write(filepath, ...args)
+    }
+    // Test
+    await checkout({ fs, dir, gitdir, ref: 'test-branch', force: true })
+    // One write for the whole analysis, not one per file
+    expect(indexWrites).toBe(1)
+    // The stat info is up to date now, so there is nothing left to write
+    const matrix = await statusMatrix({ fs, dir, gitdir, filepaths })
+    expect(matrix).toEqual([
+      ['README.md', 1, 1, 1],
+      ['package.json', 1, 1, 1],
+      ['src/index.js', 1, 1, 1],
+    ])
+    expect(indexWrites).toBe(1)
   })
 })
