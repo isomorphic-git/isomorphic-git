@@ -77,5 +77,11 @@ export async function _walk({
       return reduce(parent, walkedChildren)
     }
   }
-  return walk(root)
+  const result = await walk(root)
+  // Let walkers write out what they queued during the walk. WORKDIR queues
+  // its index stat refreshes so the index is written once at the end.
+  for (const walker of walkers) {
+    if (walker.flush) await walker.flush()
+  }
+  return result
 }

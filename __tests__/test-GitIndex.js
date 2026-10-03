@@ -120,4 +120,47 @@ describe('GitIndex', () => {
       }
     )
   })
+
+  it('notices an index rewritten by another cache in the same second', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-GitIndex')
+    const indexPath = `${gitdir}/index`
+    const oid1 = 'e965047ad7c57865823c7d992b1d046ea66edf78'
+    const oid2 = 'c944ebc28f05731ef588ac6298485ba5e8bf3704'
+    // Give each version of the index file a timestamp in the same second, one
+    // millisecond apart, so the test does not depend on how fast it runs.
+    let version = 0
+    const write = fs.write.bind(fs)
+    fs.write = (filepath, ...args) => {
+      if (filepath === indexPath) version++
+      return write(filepath, ...args)
+    }
+    const lstat = fs.lstat.bind(fs)
+    fs.lstat = async filepath => {
+      const stats = await lstat(filepath)
+      if (stats && filepath === indexPath) {
+        stats.mtimeMs = stats.ctimeMs = 1700000000000 + version
+      }
+      return stats
+    }
+    const cacheA = {}
+    // Test
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache: cacheA },
+      async index => {
+        index.insert({ filepath: 'a.txt', oid: oid1 })
+      }
+    )
+    // Another cache rewrites the index. The file keeps its size, so only the
+    // sub-second part of the timestamps tells the two versions apart.
+    await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {
+      index.insert({ filepath: 'a.txt', oid: oid2 })
+    })
+    await GitIndexManager.acquire(
+      { fs, gitdir, cache: cacheA },
+      async index => {
+        expect(index.entriesMap.get('a.txt').oid).toBe(oid2)
+      }
+    )
+  })
 })

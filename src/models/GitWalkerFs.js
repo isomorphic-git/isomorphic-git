@@ -14,6 +14,10 @@ export class GitWalkerFs {
     this.dir = dir
     this.gitdir = gitdir
     this.refresh = refresh
+    // Index entries whose stat info needs a refresh. `flush` writes them to
+    // the index together when the walk is finished.
+    this.refreshQueue = []
+    this.flushed = false
 
     this.config = null
     const walker = this
@@ -158,11 +162,20 @@ export class GitWalkerFs {
                 (!filemode || stats.mode === stage.mode) &&
                 compareStats(stats, stage, filemode, trustino)
               ) {
-                index.insert({
-                  filepath: entry._fullpath,
-                  stats,
-                  oid,
-                })
+                if (self.flushed) {
+                  // The walk is finished and `flush` already ran, so write
+                  // it right away.
+                  index.insert({ filepath: entry._fullpath, stats, oid })
+                } else {
+                  // Queue the refresh so `flush` can write all of them to the
+                  // index in one go when the walk is finished.
+                  self.refreshQueue.push({
+                    filepath: entry._fullpath,
+                    stage,
+                    stats,
+                    oid,
+                  })
+                }
               }
             }
           } else {
@@ -174,6 +187,26 @@ export class GitWalkerFs {
       entry._oid = oid
     }
     return entry._oid
+  }
+
+  /**
+   * Write the queued stat refreshes to the index in a single pass.
+   * `_walk` calls this once the walk is finished. The entries it returned
+   * can still be asked for their oid afterwards, so from then on `oid`
+   * writes a refresh right away instead of queueing it.
+   */
+  async flush() {
+    const { fs, gitdir, cache, refreshQueue } = this
+    this.refreshQueue = []
+    this.flushed = true
+    if (refreshQueue.length === 0) return
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
+      for (const { filepath, stage, stats, oid } of refreshQueue) {
+        // Only refresh entries that are still the ones we looked at.
+        if (index.entriesMap.get(filepath) !== stage) continue
+        index.insert({ filepath, stats, oid })
+      }
+    })
   }
 
   async _getGitConfig(fs, gitdir) {
