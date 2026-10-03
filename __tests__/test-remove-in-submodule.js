@@ -128,4 +128,24 @@ describe('remove', () => {
     `)
     expect(before.length === after.length + 5).toBe(true)
   })
+  it('files', async () => {
+    // Setup
+    const { fs, gitdir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-remove')
+    // Count the writes to the index file
+    let indexWrites = 0
+    const write = fs.write.bind(fs)
+    fs.write = (filepath, ...args) => {
+      if (filepath === `${gitdirsmfullpath}/index`) indexWrites++
+      return write(filepath, ...args)
+    }
+    // Test
+    const before = await listFiles({ fs, gitdir })
+    await remove({ fs, gitdir, filepath: ['LICENSE.md', 'package.json'] })
+    const after = await listFiles({ fs, gitdir })
+    expect(after).toEqual(
+      before.filter(f => f !== 'LICENSE.md' && f !== 'package.json')
+    )
+    expect(indexWrites).toBe(1)
+  })
 })
