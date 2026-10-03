@@ -5,7 +5,11 @@ const localhost =
   typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 export async function makeLightningFS(dir) {
-  const FS = require('@isomorphic-git/lightning-fs')
+  // Use a dynamic import instead of `require` (this is an ES module). Kept inside
+  // the function so it is only evaluated when LightningFS is actually selected.
+  const { default: FS } = await import(
+    /* webpackMode: "eager" */ '@isomorphic-git/lightning-fs'
+  )
   const _fs = new FS(`testfs`, {
     wipe: true,
     url: `http://${localhost}:9876/base/__tests__/__fixtures__`,

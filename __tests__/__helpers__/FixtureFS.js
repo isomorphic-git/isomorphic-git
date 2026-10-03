@@ -9,7 +9,11 @@ if (globalThis.jest) {
   jest.setTimeout(60_000)
 }
 
-if (globalThis.jasmine) jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
+// High enough to cover the per-spec retry wrapper (installSpecRetry): up to 3
+// attempts × ~75s each. The wrapper's own per-attempt timeout is what actually
+// fails a stuck spec; this is just the ceiling so jasmine doesn't kill a spec
+// that is legitimately retrying.
+if (globalThis.jasmine) jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000
 
 export async function makeFixture(dir) {
   return process.browser ? makeBrowserFixture(dir) : makeNodeFixture(dir)

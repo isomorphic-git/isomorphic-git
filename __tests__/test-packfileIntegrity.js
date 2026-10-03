@@ -5,6 +5,14 @@ import { readObjectPacked } from 'isomorphic-git/internal-apis'
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('packfile integrity', () => {
+  // These tests corrupt or delete the on-disk packfile and expect the raw read to
+  // fail. In the browser the packfile is backed by the read-only @zenfs/core
+  // `Fetch` layer, so a mutation/deletion doesn't surface as the expected read
+  // failure (the original bytes remain reachable), and the corruption-detection
+  // path isn't exercised the same way. They run in Node, which fully covers the
+  // integrity checks.
+  const itNode = process.browser ? it.skip : it
+
   it('should read object from valid packfile', async () => {
     // Setup - use a repo with packfile (bare .git repo)
     // For bare repos, use 'dir' as gitdir (dir contains the .git contents)
@@ -28,7 +36,7 @@ describe('packfile integrity', () => {
     expect(obj.format).toBe('content')
   })
 
-  it('should throw error when packfile trailer is corrupted', async () => {
+  itNode('should throw error when packfile trailer is corrupted', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-readObject.git')
     const cache = {}
@@ -69,7 +77,7 @@ describe('packfile integrity', () => {
     expect(error.data.message).toContain('Packfile trailer mismatch')
   })
 
-  it('should throw error when packfile payload is corrupted', async () => {
+  itNode('should throw error when packfile payload is corrupted', async () => {
     // Setup
     const { fs, dir } = await makeFixture('test-readObject.git')
     const cache = {}
@@ -141,40 +149,43 @@ describe('packfile integrity', () => {
     expect(obj2.format).toBe(obj1.format)
   })
 
-  it('should throw descriptive error when packfile cannot be read', async () => {
-    // Setup - use a repo with packfile
-    const { fs, dir } = await makeFixture('test-readObject.git')
-    const cache = {}
-    const gitdir = dir
+  itNode(
+    'should throw descriptive error when packfile cannot be read',
+    async () => {
+      // Setup - use a repo with packfile
+      const { fs, dir } = await makeFixture('test-readObject.git')
+      const cache = {}
+      const gitdir = dir
 
-    // Use a known OID from the packfile
-    const oid = '0001c3e2753b03648b6c43dd74ba7fe2f21123d6'
+      // Use a known OID from the packfile
+      const oid = '0001c3e2753b03648b6c43dd74ba7fe2f21123d6'
 
-    // Delete the .pack file but keep the .idx file
-    // This causes fs.read() to return null (file not found)
-    const packDir = gitdir + '/objects/pack'
-    const files = await fs.readdir(packDir)
-    const packFile = files.find(f => f.endsWith('.pack'))
-    if (!packFile) {
-      throw new Error('No packfile found in ' + packDir)
+      // Delete the .pack file but keep the .idx file
+      // This causes fs.read() to return null (file not found)
+      const packDir = gitdir + '/objects/pack'
+      const files = await fs.readdir(packDir)
+      const packFile = files.find(f => f.endsWith('.pack'))
+      if (!packFile) {
+        throw new Error('No packfile found in ' + packDir)
+      }
+      await fs.rm(packDir + '/' + packFile)
+
+      // Test - should throw InternalError with descriptive message
+      let error = null
+      try {
+        await readObjectPacked({
+          fs,
+          cache,
+          gitdir,
+          oid,
+        })
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).not.toBeNull()
+      expect(error instanceof Errors.InternalError).toBe(true)
+      expect(error.data.message).toContain('Could not read packfile')
     }
-    await fs.rm(packDir + '/' + packFile)
-
-    // Test - should throw InternalError with descriptive message
-    let error = null
-    try {
-      await readObjectPacked({
-        fs,
-        cache,
-        gitdir,
-        oid,
-      })
-    } catch (e) {
-      error = e
-    }
-
-    expect(error).not.toBeNull()
-    expect(error instanceof Errors.InternalError).toBe(true)
-    expect(error.data.message).toContain('Could not read packfile')
-  })
+  )
 })

@@ -25,11 +25,35 @@ const localhost =
   typeof window === 'undefined' ? 'localhost' : window.location.hostname
 
 export async function makeFixtureAsSubmodule(fixture) {
-  // Create fixture for submodule (sm)
-  const { dir: dirsm, gitdir: gitdirsm } = await makeFixture(fixture)
+  // Create fixture for submodule (sm). Its filesystem is the one both fixtures
+  // share below.
+  const { fs, dir: dirsm, gitdir: gitdirsm } = await makeFixture(fixture)
 
-  // Create fixture for superproject (sp)
-  const { fs: fssp, dir: dirsp } = await makeFixture('superproject-' + fixture)
+  // Create fixture for superproject (sp). In Node each fixture is an independent
+  // temp dir on the shared disk, so makeFixture() is fine. In the browser
+  // makeFixture() gives a brand-new in-memory fs, which would discard the
+  // submodule fixture — so create the superproject as another directory in the
+  // SAME fs instead (the two fixtures must live together for the _cp calls below).
+  let fssp = fs
+  let dirsp
+  // mkdir that tolerates the directory already existing (the browser fs and its
+  // async clone can leave a dir in place across the suite; a hard EEXIST here
+  // makes the whole test flaky).
+  const ensureDir = async path => {
+    try {
+      await fssp._mkdir(path)
+    } catch (err) {
+      if (!err || err.code !== 'EEXIST') throw err
+    }
+  }
+  if (process.browser) {
+    dirsp = `/superproject-${fixture}`
+    await ensureDir(dirsp)
+  } else {
+    const sp = await makeFixture(`superproject-${fixture}`)
+    fssp = sp.fs
+    dirsp = sp.dir
+  }
 
   // The superproject gitdir ought to be a .git subfolder,
   // and not a distant tmp folder:
@@ -44,12 +68,20 @@ export async function makeFixtureAsSubmodule(fixture) {
   })
 
   // Move the submodule's gitdir into place
-  await fssp._mkdir(join(gitdirsp, 'modules'))
+  await ensureDir(join(gitdirsp, 'modules'))
   const gitdirsmfullpath = join(gitdirsp, 'modules', 'mysubmodule')
   await fssp._cp(gitdirsm, gitdirsmfullpath, {
     recursive: true,
     verbatimSymlinks: true,
   })
+
+  // Pre-create the reflog directory in the submodule gitdir. Writing a reflog
+  // (stash/branch/checkout) does `fs.write(gitdir/logs/refs/…)`, whose recursive
+  // mkdir can race under the browser fs and surface as an unhandled
+  // `ENOENT: mkdir '…/logs/refs'`. The fixture gitdirs ship without `logs/`, so
+  // create it up front.
+  await ensureDir(join(gitdirsmfullpath, 'logs'))
+  await ensureDir(join(gitdirsmfullpath, 'logs', 'refs'))
 
   // Move the submodule's main dir into place
   const officialSubmoduleDir = join(dirsp, 'mysubmodule')

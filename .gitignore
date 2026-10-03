@@ -29,6 +29,9 @@
 /size_report.html
 /__tests__/__examples__/**
 
+# Self-signed cert generated on demand for KARMA_HTTPS=1 (make-https-cert.cjs)
+/.https-cert/
+
 # PGP misc
 openpgp.store/
 private.key

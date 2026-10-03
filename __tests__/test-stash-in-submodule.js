@@ -13,33 +13,6 @@ import {
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 
-const makeFixtureStash = async testDir => {
-  const fixtureDir = 'test-stash'
-  let { fs, dir, gitdir } = await makeFixtureAsSubmodule(fixtureDir)
-  if (process.browser && testDir) {
-    const targetDir = dir.replace(fixtureDir, `${fixtureDir}-${testDir}`)
-    // copy all files from dirName to targetDir
-    const files = await fs.readdirDeep(dir)
-    for (const file of files) {
-      const content = await fs.read(file)
-      const fileName = file.replace(`${dir}/`, '')
-      await fs.write(`${targetDir}/${fileName}`, content)
-    }
-
-    const targetGitDir = gitdir.replace(fixtureDir, `${fixtureDir}-${testDir}`)
-    const gitFiles = await fs.readdirDeep(gitdir)
-    for (const file of gitFiles) {
-      const content = await fs.read(file)
-      const fileName = file.replace(`${gitdir}/`, '')
-      await fs.write(`${targetGitDir}/${fileName}`, content)
-    }
-
-    dir = targetDir
-    gitdir = targetGitDir
-  }
-  return { fs, dir, gitdir }
-}
-
 const addUserConfig = async (fs, dir, gitdir) => {
   await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'stash tester' })
   await setConfig({
@@ -112,7 +85,7 @@ const stashChanges = async (
 
 describe('abort stash', () => {
   it('stash without user', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     let error = null
     try {
@@ -128,7 +101,7 @@ describe('abort stash', () => {
   })
 
   it('stash with no changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     // add user to config
     await addUserConfig(fs, dir, gitdir)
@@ -147,7 +120,7 @@ describe('abort stash', () => {
   })
 
   it('stash with untracked files - no other changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('pushUntracked')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     const cContentBeforeStash = 'untracked file - c'
     const dContentBeforeStash = 'untracked file - d'
@@ -174,22 +147,22 @@ describe('abort stash', () => {
 
 describe('stash push', () => {
   it('stash with staged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('pushOne')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
   })
 
   it('stash with staged and unstaged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('pushTwo')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await stashChanges(fs, dir, gitdir, true, false) // with unstaged changes
   })
 
   it('stash with staged and unstaged changes plus same file changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('pushThree')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await stashChanges(fs, dir, gitdir, true, true) // with unstaged changes
   })
 
   it('stash with untracked files - with other changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('pushUntracked')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await addUserConfig(fs, dir, gitdir)
     await fs.write(`${dir}/a.txt`, 'staged changes - a')
@@ -222,7 +195,7 @@ describe('stash push', () => {
 
 describe('stash create', () => {
   it('stash create without user', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash-create')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     let error = null
     try {
@@ -238,7 +211,7 @@ describe('stash create', () => {
   })
 
   it('stash create with no changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash-create')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     // add user to config
     await addUserConfig(fs, dir, gitdir)
@@ -257,7 +230,7 @@ describe('stash create', () => {
   })
 
   it('stash create with staged changes - returns commit hash without modifying working dir', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createOne')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     const aOriginalContent = 'staged changes - a'
@@ -303,7 +276,7 @@ describe('stash create', () => {
   })
 
   it('stash create with staged and unstaged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createTwo')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     const aOriginalContent = 'staged changes - a'
@@ -356,7 +329,7 @@ describe('stash create', () => {
   })
 
   it('stash create with staged and unstaged changes on same file', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createThree')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     const aStagedContent = 'staged changes - a'
@@ -395,7 +368,7 @@ describe('stash create', () => {
   })
 
   it('stash create with untracked files - no other changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createUntracked')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     const cContentBeforeStash = 'untracked file - c'
     const dContentBeforeStash = 'untracked file - d'
@@ -420,9 +393,7 @@ describe('stash create', () => {
   })
 
   it('stash create with untracked files - with other changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash(
-      'createUntrackedWithChanges'
-    )
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await addUserConfig(fs, dir, gitdir)
     const aOriginalContent = 'staged changes - a'
@@ -465,7 +436,7 @@ describe('stash create', () => {
   })
 
   it('stash create with deleted files', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createDeleted')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.rm(`${dir}/a.txt`)
@@ -499,7 +470,7 @@ describe('stash create', () => {
   })
 
   it('stash create with changes in nested folders', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createNested')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     const cOriginalContent = 'staged changes - c'
@@ -539,7 +510,7 @@ describe('stash create', () => {
   })
 
   it('stash create multiple times returns different hashes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createMultiple')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.write(`${dir}/a.txt`, 'first change')
@@ -574,7 +545,7 @@ describe('stash create', () => {
   })
 
   it('stash create does not interfere with existing stash list', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createWithExisting')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     // Create a regular stash first
@@ -605,7 +576,7 @@ describe('stash create', () => {
   })
 
   it('stash create with custom message', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('createMessage')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.write(`${dir}/a.txt`, 'test content')
@@ -645,7 +616,7 @@ describe('stash create', () => {
 
 describe('stash apply', () => {
   it('stash apply with staged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyOne')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
 
@@ -669,7 +640,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with staged and unstaged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyTwo')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -697,7 +668,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with staged and unstaged changes, include same file', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyThree')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, true) // staged and non-unstaged changes
 
@@ -722,7 +693,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with staged changes under two folders', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyFour')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.write(`${dir}/folder/c.txt`, 'staged changes - c')
@@ -760,7 +731,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with deleted files', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyFive')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.rm(`${dir}/a.txt`)
@@ -793,7 +764,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with deleted files and staged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applySix')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.rm(`${dir}/a.txt`)
@@ -831,7 +802,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with delete folder', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applySeven')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     await fs.mkdir(`${dir}/folder`)
@@ -869,7 +840,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with untracked files - with other staged and unstaged changes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyUntracked')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await addUserConfig(fs, dir, gitdir)
     await fs.write(`${dir}/a.txt`, 'staged changes - a')
@@ -906,7 +877,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with invalid ref idx', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyInvalidRefIdx')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -923,7 +894,7 @@ describe('stash apply', () => {
   })
 
   it('stash apply with non-default ref idx', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('applyInvalidRefIdx')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
 
@@ -954,14 +925,14 @@ describe('stash apply', () => {
 
 describe('stash list', () => {
   it('stash list with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     const stashList = await stash({ fs, dir, gitdir, op: 'list' })
     expect(stashList).toEqual([])
   })
 
   it('stash list with 1 stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged 3 file changes
 
@@ -970,7 +941,7 @@ describe('stash list', () => {
   })
 
   it('stash list with 2 stashes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
@@ -980,7 +951,7 @@ describe('stash list', () => {
   })
 
   it('stash list with default message', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     const defaultMsg = await stash({ fs, dir, gitdir, op: 'list' })
     expect(defaultMsg).toEqual([
@@ -989,7 +960,7 @@ describe('stash list', () => {
   })
 
   it('stash list with custom message', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await addUserConfig(fs, dir, gitdir)
 
@@ -1008,7 +979,7 @@ describe('stash list', () => {
 
 describe('stash drop', () => {
   it('stash drop with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('dropWithNoStash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     let error = null
     try {
@@ -1021,7 +992,7 @@ describe('stash drop', () => {
   })
 
   it('stash drop with stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -1038,7 +1009,7 @@ describe('stash drop', () => {
   })
 
   it('stash drop with invalid ref idx', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('dropInvalidRefIdx')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
 
@@ -1055,7 +1026,7 @@ describe('stash drop', () => {
   })
 
   it('stash drop with non-default ref idx', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('dropValidRefIdx')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
 
@@ -1086,7 +1057,7 @@ describe('stash drop', () => {
 
 describe('stash clear', () => {
   it('stash clear with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     let error = null
     try {
@@ -1099,7 +1070,7 @@ describe('stash clear', () => {
   })
 
   it('stash clear with stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -1116,7 +1087,7 @@ describe('stash clear', () => {
   })
 
   it('stash clear with 2 stashes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('test-stash')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
@@ -1136,7 +1107,7 @@ describe('stash clear', () => {
 
 describe('stash pop', () => {
   it('stash pop with no stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('popOne')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     let error = null
     try {
@@ -1149,7 +1120,7 @@ describe('stash pop', () => {
   })
 
   it('stash pop with 1 stash', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('popTwo')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
 
@@ -1166,7 +1137,7 @@ describe('stash pop', () => {
   })
 
   it('stash pop with 2 stashes', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('popThree')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // staged and non-unstaged changes
@@ -1184,7 +1155,7 @@ describe('stash pop', () => {
   })
 
   it('stash pop with invalid ref idx', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('popInvalidRefIdx')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, false, false) // no unstaged changes
     await stashChanges(fs, dir, gitdir, true, false) // plus unstaged changes
@@ -1202,7 +1173,7 @@ describe('stash pop', () => {
   })
 
   it('stash pop with non-default ref idx', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('dropValidRefIdx')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
 
     await stashChanges(fs, dir, gitdir, false, false, 'stash one') // no unstaged changes
 
@@ -1240,7 +1211,7 @@ describe('stash pop', () => {
 
 describe('stash regression #2138', () => {
   it('should not lose stashes after stash pop followed by stash push', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('stashRegression')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     // --- stash 1 ---
@@ -1266,7 +1237,7 @@ describe('stash regression #2138', () => {
   })
 
   it('stash list order before and after stash drop', async () => {
-    const { fs, dir, gitdir } = await makeFixtureStash('stashRegression')
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-stash')
     await addUserConfig(fs, dir, gitdir)
 
     // --- stash 1 ---

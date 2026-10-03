@@ -14,6 +14,7 @@ import {
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
+import { itSecureContext } from './__helpers__/itSecureContext.js'
 
 describe('commit', () => {
   it('prevent commit if index has unmerged paths', async () => {
@@ -388,7 +389,7 @@ describe('commit', () => {
     expect(error.code).toBe(Errors.MissingNameError.code)
   })
 
-  it('create signed commit', async () => {
+  itSecureContext('create signed commit', async () => {
     // Setup
     const { pgp } = await import('@isomorphic-git/pgp-plugin')
     const { fs, gitdir } = await makeFixture('test-commit')
