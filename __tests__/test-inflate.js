@@ -43,6 +43,10 @@ describe('inflate', () => {
       }
       expect(error instanceof InternalError).toBe(true)
       expect(error.data.message).toMatch(/^Invalid compressed buffer: .+/)
+      const serialized = error.toJSON()
+      expect(serialized.code).toBe('InternalError')
+      expect(serialized.data).toEqual(error.data)
+      expect(error.fromJSON(serialized).toJSON()).toEqual(serialized)
     })
   }
 })

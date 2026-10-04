@@ -649,7 +649,9 @@ describe('readObject', () => {
         `${gitdirsmfullpath}/objects/aa/${oid.slice(2)}`,
         Uint8Array.from(bytes)
       )
-      for (const format of ['parsed', 'content', 'wrapped']) {
+      /** @type {Array<'parsed' | 'content' | 'wrapped'>} */
+      const formats = ['parsed', 'content', 'wrapped']
+      for (const format of formats) {
         let error = null
         try {
           await readObject({ fs, gitdir, oid, format })
