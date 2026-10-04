@@ -2,6 +2,7 @@
 import { Errors, readTree } from 'isomorphic-git'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
+import { corruptZlibCases } from './__helpers__/corruptZlib.js'
 
 describe('readTree', () => {
   it('read a tree directly', async () => {
@@ -578,4 +579,25 @@ describe('readTree', () => {
     expect(error instanceof Errors.InvalidFilepathError).toBe(true)
     expect(error.data.reason).toBe('trailing-slash')
   })
+  for (const [name, bytes] of corruptZlibCases) {
+    it(`reports the decompression error for ${name} loose data`, async () => {
+      const { fs, gitdir, gitdirsmfullpath } =
+        await makeFixtureAsSubmodule('test-readTree')
+      const oid = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      // Corrupt the object store, while the API still discovers it through the .git file.
+      await fs.write(
+        `${gitdirsmfullpath}/objects/aa/${oid.slice(2)}`,
+        Uint8Array.from(bytes)
+      )
+      let error = null
+      try {
+        await readTree({ fs, gitdir, oid })
+      } catch (err) {
+        error = err
+      }
+      expect(error instanceof Errors.InternalError).toBe(true)
+      expect(error.caller).toBe('git.readTree')
+      expect(error.data.message).toMatch(/^Invalid compressed buffer: .+/)
+    })
+  }
 })

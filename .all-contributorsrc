@@ -979,6 +979,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "snowyukitty",
+      "name": "snowyukitty",
+      "avatar_url": "https://avatars.githubusercontent.com/u/270071858?v=4",
+      "profile": "https://github.com/snowyukitty",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
