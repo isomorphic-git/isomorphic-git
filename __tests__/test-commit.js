@@ -11,6 +11,7 @@ import {
   add,
   writeBlob,
   writeTree,
+  annotatedTag,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -363,6 +364,41 @@ describe('commit', () => {
     expect(parents).not.toEqual([originalOid])
     expect(parents).toEqual(parent)
     expect(_tree).toEqual(tree)
+  })
+
+  it('custom parent given as an annotated tag', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-commit')
+    const { oid: originalOid } = (await log({ fs, gitdir, depth: 1 }))[0]
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'parent-tag',
+      object: originalOid,
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    // Test
+    const sha = await commit({
+      fs,
+      gitdir,
+      parent: ['parent-tag'],
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      message: 'Commit on top of a tag',
+    })
+    // the parent should be the commit, not the tag object
+    const { commit: c } = await readCommit({ fs, gitdir, oid: sha })
+    expect(c.parent).toEqual([originalOid])
   })
 
   it('throw error if missing author', async () => {

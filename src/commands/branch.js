@@ -7,6 +7,7 @@ import { AlreadyExistsError } from '../errors/AlreadyExistsError.js'
 import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import validRef from '../utils/isValidRef.js'
+import { resolveCommit } from '../utils/resolveCommit.js'
 
 /**
  * Create a branch
@@ -53,6 +54,14 @@ export async function _branch({
     oid = await GitRefManager.resolve({ fs, gitdir, ref: object || 'HEAD' })
   } catch (e) {
     // Probably an empty repo
+  }
+
+  // If `object` is an annotated tag, use the commit it points to
+  if (oid && object) {
+    const objectRef = await GitRefManager.expand({ fs, gitdir, ref: object })
+    if (objectRef.startsWith('refs/tags/')) {
+      oid = (await resolveCommit({ fs, cache: {}, gitdir, oid })).oid
+    }
   }
 
   // Create a new ref that points at the current commit

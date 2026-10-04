@@ -144,8 +144,14 @@ export async function _commit({
       } else {
         // ensure that the parents are oids, not refs
         parent = await Promise.all(
-          parent.map(p => {
-            return GitRefManager.resolve({ fs, gitdir, ref: p })
+          parent.map(async p => {
+            const oid = await GitRefManager.resolve({ fs, gitdir, ref: p })
+            // If `p` is an annotated tag, use the commit it points to
+            const fullRef = await GitRefManager.expand({ fs, gitdir, ref: p })
+            if (fullRef.startsWith('refs/tags/')) {
+              return (await readCommit({ fs, cache, gitdir, oid })).oid
+            }
+            return oid
           })
         )
       }

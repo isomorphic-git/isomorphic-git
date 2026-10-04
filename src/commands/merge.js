@@ -11,6 +11,7 @@ import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 import { mergeTree } from '../utils/mergeTree.js'
+import { resolveCommit } from '../utils/resolveCommit.js'
 
 // import diff3 from 'node-diff3'
 /**
@@ -93,11 +94,15 @@ export async function _merge({
     gitdir,
     ref: ours,
   })
-  const theirOid = await GitRefManager.resolve({
+  let theirOid = await GitRefManager.resolve({
     fs,
     gitdir,
     ref: theirs,
   })
+  // If `theirs` is an annotated tag, use the commit it points to
+  if (theirs.startsWith('refs/tags/')) {
+    theirOid = (await resolveCommit({ fs, cache, gitdir, oid: theirOid })).oid
+  }
   // find most recent common ancestor of ref a and ref b
   const baseOids = await _findMergeBase({
     fs,

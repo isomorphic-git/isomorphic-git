@@ -16,6 +16,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { flat } from '../utils/flat.js'
+import { resolveCommit } from '../utils/resolveCommit.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
 /**
@@ -100,6 +101,12 @@ export async function _checkout({
       ref: `refs/heads/${ref}`,
       value: oid,
     })
+  }
+
+  // If `ref` is an annotated tag, use the commit it points to
+  const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
+  if (fullRef.startsWith('refs/tags/')) {
+    oid = (await resolveCommit({ fs, cache, gitdir, oid })).oid
   }
 
   // Update working dir
@@ -385,7 +392,6 @@ export async function _checkout({
 
   // Update HEAD
   if (!noUpdateHead) {
-    const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     if (fullRef.startsWith('refs/heads')) {
       await GitRefManager.writeSymbolicRef({
         fs,

@@ -15,6 +15,8 @@ import {
   statusMatrix,
   hashBlob,
   updateIndex,
+  annotatedTag,
+  resolveRef,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
@@ -164,6 +166,34 @@ describe('checkout', () => {
     `)
     const sha = await fs.read(gitdir + '/HEAD', 'utf8')
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
+  })
+
+  it('checkout by annotated tag', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'v1.0.0-annotated',
+      object: 'v1.0.0',
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const commitOid = await resolveRef({ fs, gitdir, ref: 'v1.0.0' })
+    // Test
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'v1.0.0-annotated',
+    })
+    // HEAD should point to the commit, not to the tag object
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(commitOid)
   })
 
   it('checkout by SHA', async () => {

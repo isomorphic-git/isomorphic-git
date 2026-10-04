@@ -1,7 +1,15 @@
 /* eslint-env node, browser, jasmine */
 import * as path from 'path'
 
-import { Errors, branch, init, currentBranch, listFiles } from 'isomorphic-git'
+import {
+  Errors,
+  branch,
+  init,
+  currentBranch,
+  listFiles,
+  annotatedTag,
+  resolveRef,
+} from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -41,6 +49,30 @@ describe('branch', () => {
       'new-file.txt',
     ])
     expect(await listFiles({ fs, dir, gitdir, ref: 'test-branch' })).toEqual([])
+  })
+
+  it('branch with an annotated tag as start point', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-branch-start-point')
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'start-tag',
+      object: 'start-point',
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    // Test
+    await branch({ fs, dir, gitdir, ref: 'test-branch', object: 'start-tag' })
+    // the branch should point to the commit, not to the tag object
+    expect(await resolveRef({ fs, gitdir, ref: 'test-branch' })).toBe(
+      await resolveRef({ fs, gitdir, ref: 'start-point' })
+    )
   })
 
   it('branch force', async () => {
