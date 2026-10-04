@@ -105,7 +105,7 @@ export async function _checkout({
 
   // If `ref` is an annotated tag, use the commit it points to
   const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
-  if (fullRef.startsWith('refs/tags/')) {
+  if (!noUpdateHead && fullRef.startsWith('refs/tags/')) {
     oid = (await resolveCommit({ fs, cache, gitdir, oid })).oid
   }
 

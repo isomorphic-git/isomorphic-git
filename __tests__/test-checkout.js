@@ -17,6 +17,7 @@ import {
   updateIndex,
   annotatedTag,
   resolveRef,
+  readCommit,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
@@ -194,6 +195,41 @@ describe('checkout', () => {
     })
     // HEAD should point to the commit, not to the tag object
     expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(commitOid)
+  })
+
+  it('checkout filepaths from an annotated tag of a tree', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { commit: c } = await readCommit({
+      fs,
+      gitdir,
+      oid: await resolveRef({ fs, gitdir, ref: 'v1.0.0' }),
+    })
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'tree-tag',
+      object: c.tree,
+      message: 'annotated tag of a tree',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    await fs.write(`${dir}/README.md`, 'changed', 'utf8')
+    // Test
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'tree-tag',
+      filepaths: ['README.md'],
+      noUpdateHead: true,
+      force: true,
+    })
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('changed')
   })
 
   it('checkout by SHA', async () => {
