@@ -153,8 +153,8 @@ export async function _commit({
               return (await resolveCommit({ fs, cache, gitdir, oid })).oid
             } catch (err) {
               // Parents are not required to exist locally
-              if (err instanceof NotFoundError && err.data.what === oid) {
-                return oid
+              if (err instanceof NotFoundError) {
+                return err.data.what
               }
               throw err
             }

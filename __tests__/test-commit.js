@@ -12,6 +12,7 @@ import {
   writeBlob,
   writeTree,
   annotatedTag,
+  writeTag,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -435,6 +436,44 @@ describe('commit', () => {
     // the parent should be the commit, not the tag object
     const { commit: c } = await readCommit({ fs, gitdir, oid: sha })
     expect(c.parent).toEqual([originalOid])
+  })
+
+  it('custom parent given as an annotated tag of a missing commit', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-commit')
+    const missingOid = '1111111111111111111111111111111111111111'
+    const tagOid = await writeTag({
+      fs,
+      gitdir,
+      tag: {
+        object: missingOid,
+        type: 'commit',
+        tag: 'missing-tag',
+        tagger: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+        message: 'annotated tag of a missing commit',
+      },
+    })
+    // Test
+    const sha = await commit({
+      fs,
+      gitdir,
+      parent: [tagOid],
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      message: 'Commit on top of a tag of a missing commit',
+    })
+    // the parent should be the missing commit, not the tag object
+    const { commit: c } = await readCommit({ fs, gitdir, oid: sha })
+    expect(c.parent).toEqual([missingOid])
   })
 
   it('throw error if missing author', async () => {
