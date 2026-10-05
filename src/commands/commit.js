@@ -5,16 +5,18 @@ import { EmptyCommitError } from '../errors/EmptyCommitError.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NoCommitError } from '../errors/NoCommitError.js'
-import { NotFoundError } from '../errors/NotFoundError.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
+import { hasObject } from '../storage/hasObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
-import { resolveCommit } from '../utils/resolveCommit.js'
 
 import { _readCommit as readCommit } from './readCommit.js'
 
@@ -147,17 +149,23 @@ export async function _commit({
         // ensure that the parents are oids, not refs
         parent = await Promise.all(
           parent.map(async p => {
-            const oid = await GitRefManager.resolve({ fs, gitdir, ref: p })
-            // If `p` is an annotated tag, use the commit it points to
-            try {
-              return (await resolveCommit({ fs, cache, gitdir, oid })).oid
-            } catch (err) {
-              // Parents are not required to exist locally
-              if (err instanceof NotFoundError) {
-                return err.data.what
+            let oid = await GitRefManager.resolve({ fs, gitdir, ref: p })
+            // If `p` is an annotated tag, use the commit it points to.
+            // Parents are not required to exist locally.
+            while (await hasObject({ fs, cache, gitdir, oid })) {
+              const { type, object } = await readObject({
+                fs,
+                cache,
+                gitdir,
+                oid,
+              })
+              if (type === 'commit') break
+              if (type !== 'tag') {
+                throw new ObjectTypeError(oid, type, 'commit')
               }
-              throw err
+              oid = GitAnnotatedTag.from(object).parse().object
             }
+            return oid
           })
         )
       }
