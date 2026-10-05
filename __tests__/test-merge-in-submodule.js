@@ -191,6 +191,46 @@ describe('merge', () => {
     expect(oid).toEqual(desiredOid)
   })
 
+  it('merge annotated tag oid of newest into master', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixtureAsSubmodule('test-merge')
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'newest-tag',
+      object: 'newest',
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const tagOid = await resolveRef({ fs, gitdir, ref: 'newest-tag' })
+    // Test
+    const desiredOid = await resolveRef({
+      fs,
+      gitdir,
+      ref: 'newest',
+    })
+    const m = await merge({
+      fs,
+      gitdir,
+      ours: 'master',
+      theirs: tagOid,
+      fastForwardOnly: true,
+    })
+    expect(m.oid).toEqual(desiredOid)
+    expect(m.fastForward).toBeTruthy()
+    const oid = await resolveRef({
+      fs,
+      gitdir,
+      ref: 'master',
+    })
+    expect(oid).toEqual(desiredOid)
+  })
+
   it('merge no fast-forward', async () => {
     // Setup
     const { fs, gitdir } = await makeFixtureAsSubmodule('test-merge-no-ff')

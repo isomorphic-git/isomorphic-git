@@ -401,6 +401,42 @@ describe('commit', () => {
     expect(c.parent).toEqual([originalOid])
   })
 
+  it('custom parent given as an annotated tag oid', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-commit')
+    const { oid: originalOid } = (await log({ fs, gitdir, depth: 1 }))[0]
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'parent-tag',
+      object: originalOid,
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const tagOid = await resolveRef({ fs, gitdir, ref: 'parent-tag' })
+    // Test
+    const sha = await commit({
+      fs,
+      gitdir,
+      parent: [tagOid],
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      message: 'Commit on top of a tag',
+    })
+    // the parent should be the commit, not the tag object
+    const { commit: c } = await readCommit({ fs, gitdir, oid: sha })
+    expect(c.parent).toEqual([originalOid])
+  })
+
   it('throw error if missing author', async () => {
     // Setup
     const { fs, gitdir } = await makeFixture('test-commit')

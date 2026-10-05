@@ -56,16 +56,10 @@ export async function _branch({
     // Probably an empty repo
   }
 
-  // If `object` is an annotated tag, use the commit it points to
-  if (oid && object) {
-    const objectRef = await GitRefManager.expand({ fs, gitdir, ref: object })
-    if (objectRef.startsWith('refs/tags/')) {
-      oid = (await resolveCommit({ fs, cache: {}, gitdir, oid })).oid
-    }
-  }
-
-  // Create a new ref that points at the current commit
+  // Create a new ref that points at the current commit,
+  // peeling annotated tags to the commit they point to
   if (oid) {
+    oid = (await resolveCommit({ fs, cache: {}, gitdir, oid })).oid
     await GitRefManager.writeRef({ fs, gitdir, ref: fullref, value: oid })
   }
 

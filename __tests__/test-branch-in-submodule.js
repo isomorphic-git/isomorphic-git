@@ -9,6 +9,8 @@ import {
   listFiles,
   annotatedTag,
   resolveRef,
+  readCommit,
+  listBranches,
 } from 'isomorphic-git'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
@@ -82,6 +84,108 @@ describe('branch', () => {
     expect(await resolveRef({ fs, gitdir, ref: 'test-branch' })).toBe(
       await resolveRef({ fs, gitdir, ref: 'start-point' })
     )
+  })
+
+  it('branch with an annotated tag oid as start point', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+      'test-branch-start-point'
+    )
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'start-tag',
+      object: 'start-point',
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const tagOid = await resolveRef({ fs, gitdir, ref: 'start-tag' })
+    // Test
+    await branch({ fs, dir, gitdir, ref: 'test-branch', object: tagOid })
+    // the branch should point to the commit, not to the tag object
+    expect(await resolveRef({ fs, gitdir, ref: 'test-branch' })).toBe(
+      await resolveRef({ fs, gitdir, ref: 'start-point' })
+    )
+  })
+
+  it('branch with a tag of an annotated tag as start point', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+      'test-branch-start-point'
+    )
+    const tagger = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'start-tag',
+      object: 'start-point',
+      message: 'annotated tag',
+      tagger,
+    })
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'start-tag-tag',
+      object: await resolveRef({ fs, gitdir, ref: 'start-tag' }),
+      message: 'annotated tag of an annotated tag',
+      tagger,
+    })
+    // Test
+    await branch({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      object: 'start-tag-tag',
+    })
+    // the branch should point to the commit, not to either tag object
+    expect(await resolveRef({ fs, gitdir, ref: 'test-branch' })).toBe(
+      await resolveRef({ fs, gitdir, ref: 'start-point' })
+    )
+  })
+
+  it('branch with an annotated tag of a tree as start point', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+      'test-branch-start-point'
+    )
+    const { commit: c } = await readCommit({
+      fs,
+      gitdir,
+      oid: await resolveRef({ fs, gitdir, ref: 'start-point' }),
+    })
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'tree-tag',
+      object: c.tree,
+      message: 'annotated tag of a tree',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    let error = null
+    // Test
+    try {
+      await branch({ fs, dir, gitdir, ref: 'test-branch', object: 'tree-tag' })
+    } catch (err) {
+      error = err
+    }
+    expect(error instanceof Errors.ObjectTypeError).toBe(true)
+    expect(await listBranches({ fs, gitdir })).not.toContain('test-branch')
   })
 
   it('branch force', async () => {

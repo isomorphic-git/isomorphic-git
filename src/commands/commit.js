@@ -5,6 +5,7 @@ import { EmptyCommitError } from '../errors/EmptyCommitError.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NoCommitError } from '../errors/NoCommitError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { GitCommit } from '../models/GitCommit.js'
@@ -13,6 +14,7 @@ import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
+import { resolveCommit } from '../utils/resolveCommit.js'
 
 import { _readCommit as readCommit } from './readCommit.js'
 
@@ -147,11 +149,15 @@ export async function _commit({
           parent.map(async p => {
             const oid = await GitRefManager.resolve({ fs, gitdir, ref: p })
             // If `p` is an annotated tag, use the commit it points to
-            const fullRef = await GitRefManager.expand({ fs, gitdir, ref: p })
-            if (fullRef.startsWith('refs/tags/')) {
-              return (await readCommit({ fs, cache, gitdir, oid })).oid
+            try {
+              return (await resolveCommit({ fs, cache, gitdir, oid })).oid
+            } catch (err) {
+              // Parents are not required to exist locally
+              if (err instanceof NotFoundError && err.data.what === oid) {
+                return oid
+              }
+              throw err
             }
-            return oid
           })
         )
       }

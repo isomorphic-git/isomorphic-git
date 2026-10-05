@@ -94,15 +94,13 @@ export async function _merge({
     gitdir,
     ref: ours,
   })
-  let theirOid = await GitRefManager.resolve({
-    fs,
-    gitdir,
-    ref: theirs,
-  })
   // If `theirs` is an annotated tag, use the commit it points to
-  if (theirs.startsWith('refs/tags/')) {
-    theirOid = (await resolveCommit({ fs, cache, gitdir, oid: theirOid })).oid
-  }
+  const { oid: theirOid } = await resolveCommit({
+    fs,
+    cache,
+    gitdir,
+    oid: await GitRefManager.resolve({ fs, gitdir, ref: theirs }),
+  })
   // find most recent common ancestor of ref a and ref b
   const baseOids = await _findMergeBase({
     fs,

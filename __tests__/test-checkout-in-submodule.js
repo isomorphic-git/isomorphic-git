@@ -201,6 +201,35 @@ describe('checkout', () => {
     expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(commitOid)
   })
 
+  it('checkout by annotated tag oid', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-checkout')
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'v1.0.0-annotated',
+      object: 'v1.0.0',
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const commitOid = await resolveRef({ fs, gitdir, ref: 'v1.0.0' })
+    const tagOid = await resolveRef({ fs, gitdir, ref: 'v1.0.0-annotated' })
+    // Test
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: tagOid,
+    })
+    // HEAD should point to the commit, not to the tag object
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(commitOid)
+  })
+
   it('checkout filepaths from an annotated tag of a tree', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-checkout')

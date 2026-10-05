@@ -104,9 +104,15 @@ export async function _checkout({
   }
 
   // If `ref` is an annotated tag, use the commit it points to
-  const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
-  if (!noUpdateHead && fullRef.startsWith('refs/tags/')) {
-    oid = (await resolveCommit({ fs, cache, gitdir, oid })).oid
+  if (!noUpdateHead) {
+    try {
+      oid = (await resolveCommit({ fs, cache, gitdir, oid })).oid
+    } catch (err) {
+      if (err instanceof NotFoundError && err.data.what === oid) {
+        throw new CommitNotFetchedError(ref, oid)
+      }
+      throw err
+    }
   }
 
   // Update working dir
@@ -127,6 +133,7 @@ export async function _checkout({
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
+      // Only reachable with `noUpdateHead`, otherwise the commit was already read above.
       if (err instanceof NotFoundError && err.data.what === oid) {
         throw new CommitNotFetchedError(ref, oid)
       } else {
@@ -392,6 +399,7 @@ export async function _checkout({
 
   // Update HEAD
   if (!noUpdateHead) {
+    const fullRef = await GitRefManager.expand({ fs, gitdir, ref })
     if (fullRef.startsWith('refs/heads')) {
       await GitRefManager.writeSymbolicRef({
         fs,
