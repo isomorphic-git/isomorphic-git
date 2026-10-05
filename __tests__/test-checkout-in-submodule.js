@@ -18,6 +18,8 @@ import {
   annotatedTag,
   resolveRef,
   readCommit,
+  writeTag,
+  writeRef,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
@@ -355,6 +357,38 @@ describe('checkout', () => {
         "message": "Failed to checkout "missing-branch" because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally.",
       }
     `)
+  })
+
+  it('checkout annotated tag of an unfetched commit', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-checkout')
+    const missingOid = '1111111111111111111111111111111111111111'
+    const tagOid = await writeTag({
+      fs,
+      gitdir,
+      tag: {
+        object: missingOid,
+        type: 'commit',
+        tag: 'missing-tag',
+        tagger: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+        message: 'annotated tag of a missing commit',
+      },
+    })
+    await writeRef({ fs, gitdir, ref: 'refs/tags/missing-tag', value: tagOid })
+    let error = null
+    // Test
+    try {
+      await checkout({ fs, dir, gitdir, ref: 'missing-tag' })
+    } catch (err) {
+      error = err
+    }
+    expect(error instanceof Errors.CommitNotFetchedError).toBe(true)
+    expect(error.data.oid).toBe(missingOid)
   })
 
   it('checkout file permissions', async () => {

@@ -108,8 +108,8 @@ export async function _checkout({
     try {
       oid = (await resolveCommit({ fs, cache, gitdir, oid })).oid
     } catch (err) {
-      if (err instanceof NotFoundError && err.data.what === oid) {
-        throw new CommitNotFetchedError(ref, oid)
+      if (err instanceof NotFoundError) {
+        throw new CommitNotFetchedError(ref, err.data.what)
       }
       throw err
     }
