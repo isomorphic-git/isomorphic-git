@@ -16,6 +16,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { flat } from '../utils/flat.js'
+import { resolveCommit } from '../utils/resolveCommit.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
 /**
@@ -102,6 +103,18 @@ export async function _checkout({
     })
   }
 
+  // If `ref` is an annotated tag, use the commit it points to
+  if (!noUpdateHead) {
+    try {
+      oid = (await resolveCommit({ fs, cache, gitdir, oid })).oid
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new CommitNotFetchedError(ref, err.data.what)
+      }
+      throw err
+    }
+  }
+
   // Update working dir
   if (!noCheckout) {
     let ops
@@ -120,6 +133,7 @@ export async function _checkout({
       })
     } catch (err) {
       // Throw a more helpful error message for this common mistake.
+      // Only reachable with `noUpdateHead`, otherwise the commit was already read above.
       if (err instanceof NotFoundError && err.data.what === oid) {
         throw new CommitNotFetchedError(ref, oid)
       } else {

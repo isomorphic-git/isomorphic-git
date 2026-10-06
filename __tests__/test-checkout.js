@@ -15,6 +15,11 @@ import {
   statusMatrix,
   hashBlob,
   updateIndex,
+  annotatedTag,
+  resolveRef,
+  readCommit,
+  writeTag,
+  writeRef,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
@@ -166,6 +171,98 @@ describe('checkout', () => {
     expect(sha).toBe('e10ebb90d03eaacca84de1af0a59b444232da99e\n')
   })
 
+  it('checkout by annotated tag', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'v1.0.0-annotated',
+      object: 'v1.0.0',
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const commitOid = await resolveRef({ fs, gitdir, ref: 'v1.0.0' })
+    // Test
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'v1.0.0-annotated',
+    })
+    // HEAD should point to the commit, not to the tag object
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(commitOid)
+  })
+
+  it('checkout by annotated tag oid', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'v1.0.0-annotated',
+      object: 'v1.0.0',
+      message: 'annotated tag',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const commitOid = await resolveRef({ fs, gitdir, ref: 'v1.0.0' })
+    const tagOid = await resolveRef({ fs, gitdir, ref: 'v1.0.0-annotated' })
+    // Test
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: tagOid,
+    })
+    // HEAD should point to the commit, not to the tag object
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(commitOid)
+  })
+
+  it('checkout filepaths from an annotated tag of a tree', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const { commit: c } = await readCommit({
+      fs,
+      gitdir,
+      oid: await resolveRef({ fs, gitdir, ref: 'v1.0.0' }),
+    })
+    await annotatedTag({
+      fs,
+      gitdir,
+      ref: 'tree-tag',
+      object: c.tree,
+      message: 'annotated tag of a tree',
+      tagger: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    await fs.write(`${dir}/README.md`, 'changed', 'utf8')
+    // Test
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'tree-tag',
+      filepaths: ['README.md'],
+      noUpdateHead: true,
+      force: true,
+    })
+    expect(await fs.read(`${dir}/README.md`, 'utf8')).not.toBe('changed')
+  })
+
   it('checkout by SHA', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')
@@ -254,6 +351,38 @@ describe('checkout', () => {
         "message": "Failed to checkout "missing-branch" because commit 033417ae18b174f078f2f44232cb7a374f4c60ce is not available locally. Do a git fetch to make the branch available locally.",
       }
     `)
+  })
+
+  it('checkout annotated tag of an unfetched commit', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    const missingOid = '1111111111111111111111111111111111111111'
+    const tagOid = await writeTag({
+      fs,
+      gitdir,
+      tag: {
+        object: missingOid,
+        type: 'commit',
+        tag: 'missing-tag',
+        tagger: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+        message: 'annotated tag of a missing commit',
+      },
+    })
+    await writeRef({ fs, gitdir, ref: 'refs/tags/missing-tag', value: tagOid })
+    let error = null
+    // Test
+    try {
+      await checkout({ fs, dir, gitdir, ref: 'missing-tag' })
+    } catch (err) {
+      error = err
+    }
+    expect(error instanceof Errors.CommitNotFetchedError).toBe(true)
+    expect(error.data.oid).toBe(missingOid)
   })
 
   it('checkout file permissions', async () => {
