@@ -5,10 +5,14 @@ import { EmptyCommitError } from '../errors/EmptyCommitError.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NoCommitError } from '../errors/NoCommitError.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { GitAnnotatedTag } from '../models/GitAnnotatedTag.js'
 import { GitCommit } from '../models/GitCommit.js'
 import { GitTree } from '../models/GitTree.js'
+import { hasObject } from '../storage/hasObject.js'
+import { _readObject as readObject } from '../storage/readObject.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
@@ -144,8 +148,24 @@ export async function _commit({
       } else {
         // ensure that the parents are oids, not refs
         parent = await Promise.all(
-          parent.map(p => {
-            return GitRefManager.resolve({ fs, gitdir, ref: p })
+          parent.map(async p => {
+            let oid = await GitRefManager.resolve({ fs, gitdir, ref: p })
+            // If `p` is an annotated tag, use the commit it points to.
+            // Parents are not required to exist locally.
+            while (await hasObject({ fs, cache, gitdir, oid })) {
+              const { type, object } = await readObject({
+                fs,
+                cache,
+                gitdir,
+                oid,
+              })
+              if (type === 'commit') break
+              if (type !== 'tag') {
+                throw new ObjectTypeError(oid, type, 'commit')
+              }
+              oid = GitAnnotatedTag.from(object).parse().object
+            }
+            return oid
           })
         )
       }
