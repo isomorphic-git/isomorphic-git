@@ -53,8 +53,9 @@ const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 // variable name is alphanumeric (ASCII) with -
 // variable name starts with an alphabetic character
 // variable name is case insensitive
-const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z-]*)(?: *= *(.*))?$/
-const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z-]*$/
+// whitespace (spaces or tabs) around the equal sign is ignored
+const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z0-9-]*)(?:\s*=\s*(.*))?$/
+const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9-]*$/
 
 // Comments start with either # or ; and extend to the end of line
 const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
