@@ -90,6 +90,23 @@ describe('GitConfig', () => {
       const a = await config.get('remote.bar.url')
       expect(a).toEqual('https://bar.com/project.git')
     })
+
+    it('variable name with digits', async () => {
+      const config = GitConfig.from(`[foo]
+      key1 = val1
+      key2aaa = val2`)
+      const a = await config.get('foo.key1')
+      expect(a).toEqual('val1')
+      const b = await config.get('foo.key2aaa')
+      expect(b).toEqual('val2')
+    })
+
+    it('tabs around the equal sign', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa	=	valaaa`)
+      const a = await config.get('foo.keyaaa')
+      expect(a).toEqual('valaaa')
+    })
   })
 
   describe('handle comments', () => {
@@ -266,6 +283,15 @@ describe('GitConfig', () => {
       await config.set('foo.keybbb', 'valbbb')
       expect(config.toString()).toEqual(`[foo]
 \tkeybbb = valbbb
+      keyaaa = valaaa`)
+    })
+
+    it('variable name with digits', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa`)
+      await config.set('foo.key2', 'val2')
+      expect(config.toString()).toEqual(`[foo]
+	key2 = val2
       keyaaa = valaaa`)
     })
 
