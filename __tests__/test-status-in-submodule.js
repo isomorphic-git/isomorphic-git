@@ -160,6 +160,7 @@ describe('status', () => {
   it('returns absent for case-mismatched paths on a case-insensitive filesystem', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-status')
+    await fs.write(path.join(dir, 'i/d.txt'), 'Hi')
     // On macOS and Windows the filesystem resolves 'A.TXT' to 'a.txt', which
     // used to report a tracked file's path in another case as '*added'.
     const lstat = fs._lstat
@@ -167,7 +168,7 @@ describe('status', () => {
       lstat(
         filepath
           .replace(/\/A\.TXT$/, '/a.txt')
-          .replace(/\/I\/i\.txt$/, '/i/i.txt')
+          .replace(/\/I\/d\.txt$/, '/i/d.txt')
       )
     // Test
     expect(await status({ fs, dir, gitdir, filepath: 'a.txt' })).toEqual(
@@ -177,7 +178,7 @@ describe('status', () => {
       'absent'
     )
     // The same goes for a parent directory that only matches by case.
-    expect(await status({ fs, dir, gitdir, filepath: 'I/i.txt' })).toEqual(
+    expect(await status({ fs, dir, gitdir, filepath: 'I/d.txt' })).toEqual(
       'absent'
     )
     // ...while the exact-case untracked file is still '*added'.
