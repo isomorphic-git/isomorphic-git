@@ -595,9 +595,10 @@ describe('readTree', () => {
       } catch (err) {
         error = err
       }
-      expect(error instanceof Errors.InternalError).toBe(true)
+      expect(error instanceof Error).toBe(true)
+      expect(error.name).toBe('Error')
       expect(error.caller).toBe('git.readTree')
-      expect(error.data.message).toMatch(/^Invalid compressed buffer: .+/)
+      expect(error.message).toMatch(/^Invalid compressed buffer: .+/)
     })
   }
 })

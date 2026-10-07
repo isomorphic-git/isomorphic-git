@@ -1,7 +1,6 @@
 /* eslint-env node, browser, jasmine */
 import pako from 'pako'
 
-import { InternalError } from '../src/errors/InternalError.js'
 import { inflate } from '../src/utils/inflate.js'
 
 import { corruptZlibCases } from './__helpers__/corruptZlib.js'
@@ -41,12 +40,10 @@ describe('inflate', () => {
       } catch (err) {
         error = err
       }
-      expect(error instanceof InternalError).toBe(true)
-      expect(error.data.message).toMatch(/^Invalid compressed buffer: .+/)
-      const serialized = error.toJSON()
-      expect(serialized.code).toBe('InternalError')
-      expect(serialized.data).toEqual(error.data)
-      expect(error.fromJSON(serialized).toJSON()).toEqual(serialized)
+      expect(error instanceof Error).toBe(true)
+      expect(error.name).toBe('Error')
+      expect(error.message).toMatch(/^Invalid compressed buffer: .+/)
+      expect(error.message).not.toMatch(/internal error|file an issue/)
     })
   }
 })

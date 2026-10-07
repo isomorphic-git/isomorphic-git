@@ -2,7 +2,7 @@
 /* global DecompressionStream */
 import pako from 'pako'
 
-import { InternalError } from '../errors/InternalError.js'
+import { browserInflate } from './browserInflate.js'
 
 let supportsDecompressionStream = false
 
@@ -12,20 +12,15 @@ export async function inflate(buffer) {
   }
   try {
     return supportsDecompressionStream
-      ? browserInflate(buffer)
+      ? await browserInflate(buffer)
       : pako.inflate(buffer)
   } catch (err) {
     if (typeof err === 'string') {
-      throw new InternalError(`Invalid compressed buffer: ${err}`)
+      // Pako throws strings for corrupt data; preserve existing Error objects.
+      throw new Error(`Invalid compressed buffer: ${err}`)
     }
     throw err
   }
-}
-
-async function browserInflate(buffer) {
-  const ds = new DecompressionStream('deflate')
-  const d = new Blob([buffer]).stream().pipeThrough(ds)
-  return new Uint8Array(await new Response(d).arrayBuffer())
 }
 
 function testDecompressionStream() {

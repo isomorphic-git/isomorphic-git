@@ -656,9 +656,10 @@ describe('readObject', () => {
         } catch (err) {
           error = err
         }
-        expect(error instanceof Errors.InternalError).toBe(true)
+        expect(error instanceof Error).toBe(true)
+        expect(error.name).toBe('Error')
         expect(error.caller).toBe('git.readObject')
-        expect(error.data.message).toMatch(/^Invalid compressed buffer: .+/)
+        expect(error.message).toMatch(/^Invalid compressed buffer: .+/)
       }
       const raw = await readObject({ fs, gitdir, oid, format: 'deflated' })
       expect(raw.format).toBe('deflated')
