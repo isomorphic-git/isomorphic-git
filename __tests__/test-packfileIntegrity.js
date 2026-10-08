@@ -217,8 +217,12 @@ describe('packfile integrity', () => {
       error = e
     }
 
+    expect(results.map(result => result.status)).toEqual([
+      'rejected',
+      'rejected',
+    ])
     for (const result of results) {
-      expect(result.status).toBe('rejected')
+      if (result.status !== 'rejected') continue
       expect(result.reason instanceof Errors.InternalError).toBe(true)
       expect(result.reason.data.message).toContain('Packfile payload corrupted')
     }
