@@ -596,7 +596,9 @@ describe('readTree', () => {
         error = err
       }
       expect(error instanceof Error).toBe(true)
-      expect(error.name).toBe('Error')
+      expect(error.name).toBe('DecompressionError')
+      expect(error.code).toBe('DecompressionError')
+      expect(error.isIsomorphicGitError).toBe(true)
       expect(error.caller).toBe('git.readTree')
       expect(error.message).toMatch(/^Invalid compressed buffer: .+/)
     })

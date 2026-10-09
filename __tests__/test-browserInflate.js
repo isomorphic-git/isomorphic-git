@@ -61,6 +61,8 @@ describeNative('browserInflate', () => {
       if (original.message) {
         expect(error).toBe(original)
       } else {
+        expect(error.code).toBe('DecompressionError')
+        expect(error.isIsomorphicGitError).toBe(true)
         expect(error.message).toBe(
           'Invalid compressed buffer: decompression failed'
         )

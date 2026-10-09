@@ -1,6 +1,8 @@
 /* eslint-env node, browser */
 /* global DecompressionStream */
 
+import { DecompressionError } from '../errors/DecompressionError.js'
+
 export async function browserInflate(buffer) {
   const ds = new DecompressionStream('deflate')
   const d = new Blob([buffer]).stream().pipeThrough(ds)
@@ -9,7 +11,7 @@ export async function browserInflate(buffer) {
   } catch (err) {
     // Some native implementations reject corrupt data with an empty TypeError.
     if (err && err.name === 'TypeError' && err.message === '') {
-      throw new Error('Invalid compressed buffer: decompression failed')
+      throw new DecompressionError('decompression failed')
     }
     throw err
   }

@@ -2,6 +2,8 @@
 /* global DecompressionStream */
 import pako from 'pako'
 
+import { DecompressionError } from '../errors/DecompressionError.js'
+
 import { browserInflate } from './browserInflate.js'
 
 let supportsDecompressionStream = false
@@ -17,7 +19,7 @@ export async function inflate(buffer) {
   } catch (err) {
     if (typeof err === 'string') {
       // Pako throws strings for corrupt data; preserve existing Error objects.
-      throw new Error(`Invalid compressed buffer: ${err}`)
+      throw new DecompressionError(err)
     }
     throw err
   }

@@ -41,7 +41,9 @@ describe('inflate', () => {
         error = err
       }
       expect(error instanceof Error).toBe(true)
-      expect(error.name).toBe('Error')
+      expect(error.name).toBe('DecompressionError')
+      expect(error.code).toBe('DecompressionError')
+      expect(error.isIsomorphicGitError).toBe(true)
       expect(error.message).toMatch(/^Invalid compressed buffer: .+/)
       expect(error.message).not.toMatch(/internal error|file an issue/)
     })
