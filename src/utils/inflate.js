@@ -4,7 +4,7 @@ import pako from 'pako'
 
 import { DecompressionError } from '../errors/DecompressionError.js'
 
-import { browserInflate } from './browserInflate.js'
+import { nativeInflate } from './nativeInflate.js'
 
 let supportsDecompressionStream = false
 
@@ -14,7 +14,7 @@ export async function inflate(buffer) {
   }
   try {
     return supportsDecompressionStream
-      ? await browserInflate(buffer)
+      ? await nativeInflate(buffer)
       : pako.inflate(buffer)
   } catch (err) {
     if (typeof err === 'string') {

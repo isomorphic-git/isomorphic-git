@@ -3,7 +3,7 @@
 
 import { DecompressionError } from '../errors/DecompressionError.js'
 
-export async function browserInflate(buffer) {
+export async function nativeInflate(buffer) {
   const ds = new DecompressionStream('deflate')
   const d = new Blob([buffer]).stream().pipeThrough(ds)
   try {

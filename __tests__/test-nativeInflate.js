@@ -2,7 +2,7 @@
 /* global DecompressionStream */
 import pako from 'pako'
 
-import { browserInflate } from '../src/utils/browserInflate.js'
+import { nativeInflate } from '../src/utils/nativeInflate.js'
 
 import { corruptZlibCases } from './__helpers__/corruptZlib.js'
 
@@ -14,22 +14,22 @@ const describeNative =
     ? describe
     : xdescribe
 
-describeNative('browserInflate', () => {
+describeNative('nativeInflate', () => {
   it('inflates valid binary data', async () => {
     const bytes = Uint8Array.from([0, 1, 127, 128, 255])
-    expect(await browserInflate(pako.deflate(bytes))).toEqual(bytes)
+    expect(await nativeInflate(pako.deflate(bytes))).toEqual(bytes)
   })
 
   it('inflates a valid empty stream', async () => {
     const bytes = new Uint8Array(0)
-    expect(await browserInflate(pako.deflate(bytes))).toEqual(bytes)
+    expect(await nativeInflate(pako.deflate(bytes))).toEqual(bytes)
   })
 
   for (const [name, bytes] of corruptZlibCases) {
     it(`reports ${name} compressed data with a nonempty error`, async () => {
       let error = null
       try {
-        await browserInflate(Uint8Array.from(bytes))
+        await nativeInflate(Uint8Array.from(bytes))
       } catch (err) {
         error = err
       }
@@ -52,7 +52,7 @@ describeNative('browserInflate', () => {
       }
       let error = null
       try {
-        await browserInflate(pako.deflate(Uint8Array.from([1, 2, 3])))
+        await nativeInflate(pako.deflate(Uint8Array.from([1, 2, 3])))
       } catch (err) {
         error = err
       } finally {
