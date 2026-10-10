@@ -66,7 +66,7 @@
     },
     {
       "login": "TomasHubelbauer",
-      "name": "Tomáš Hübelbauer",
+      "name": "Tom\u00e1\u0161 H\u00fcbelbauer",
       "avatar_url": "https://avatars1.githubusercontent.com/u/6831144?v=4&s=60",
       "profile": "https://TomasHubelbauer.net",
       "contributions": [
@@ -213,7 +213,7 @@
     },
     {
       "login": "hsablonniere",
-      "name": "Hubert SABLONNIÈRE",
+      "name": "Hubert SABLONNI\u00c8RE",
       "avatar_url": "https://avatars2.githubusercontent.com/u/236342?v=4&s=60",
       "profile": "https://www.hsablonniere.com/",
       "contributions": [
@@ -399,7 +399,7 @@
     },
     {
       "login": "KSXGitHub",
-      "name": "Khải",
+      "name": "Kh\u1ea3i",
       "avatar_url": "https://avatars2.githubusercontent.com/u/11488886?v=4",
       "profile": "https://github.com/KSXGitHub",
       "contributions": [
@@ -439,7 +439,7 @@
     },
     {
       "login": "linfaxin",
-      "name": "林法鑫",
+      "name": "\u6797\u6cd5\u946b",
       "avatar_url": "https://avatars2.githubusercontent.com/u/3705017?v=4",
       "profile": "https://github.com/linfaxin",
       "contributions": [
@@ -594,7 +594,7 @@
     },
     {
       "login": "CoalZombik",
-      "name": "Lukáš Cezner",
+      "name": "Luk\u00e1\u0161 Cezner",
       "avatar_url": "https://avatars.githubusercontent.com/u/49895741?v=4",
       "profile": "https://gitlab.com/CoalZombik/",
       "contributions": [
@@ -900,7 +900,7 @@
     },
     {
       "login": "Andarist",
-      "name": "Mateusz Burzyński",
+      "name": "Mateusz Burzy\u0144ski",
       "avatar_url": "https://avatars.githubusercontent.com/u/9800850?v=4",
       "profile": "https://github.com/Andarist",
       "contributions": [
@@ -995,6 +995,16 @@
       "name": "Raj Royal",
       "avatar_url": "https://avatars.githubusercontent.com/u/212665522?v=4",
       "profile": "https://github.com/ewraj",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "macabeus",
+      "name": "Bruno Macabeus",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9501115?v=4",
+      "profile": "https://github.com/macabeus",
       "contributions": [
         "code",
         "test"

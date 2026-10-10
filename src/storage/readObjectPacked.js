@@ -40,37 +40,12 @@ export async function readObjectPacked({
       }
 
       // === Packfile Integrity Verification ===
-      // Performance optimization: use _checksumVerified flag to verify only once per packfile
-      if (!p._checksumVerified) {
-        const expectedShaFromIndex = p.packfileSha
-
-        // 1. Fast Check: Verify packfile trailer matches index record
-        // Use subarray instead of slice to avoid memory copy (zero-copy for large packfiles)
-        const packTrailer = pack.subarray(-20)
-        const packTrailerSha = Array.from(packTrailer)
-          .map(b => b.toString(16).padStart(2, '0'))
-          .join('')
-        if (packTrailerSha !== expectedShaFromIndex) {
-          throw new InternalError(
-            `Packfile trailer mismatch: expected ${expectedShaFromIndex}, got ${packTrailerSha}. The packfile may be corrupted.`
-          )
-        }
-
-        // 2. Deep Integrity Check: Calculate actual SHA-1 of packfile payload.
-        // The Node package build swaps in a chunked implementation for large packs.
-        const actualPayloadSha = await shasumRange(pack, {
-          start: 0,
-          end: pack.length - 20,
-        })
-        if (actualPayloadSha !== expectedShaFromIndex) {
-          throw new InternalError(
-            `Packfile payload corrupted: calculated ${actualPayloadSha} but expected ${expectedShaFromIndex}. The packfile may have been tampered with.`
-          )
-        }
-
-        // Mark as verified to prevent performance regression on subsequent reads
-        p._checksumVerified = true
+      // Performance optimization: verify only once per packfile.
+      // Concurrent reads share the same verification promise.
+      if (!p._checksumVerification) {
+        p._checksumVerification = verifyPackfile(pack, p.packfileSha)
       }
+      await p._checksumVerification
 
       const result = await p.read({ oid, getExternalRefDelta })
       result.format = 'content'
@@ -80,4 +55,30 @@ export async function readObjectPacked({
   }
   // Failed to find it
   return null
+}
+
+async function verifyPackfile(pack, expectedShaFromIndex) {
+  // 1. Fast Check: Verify packfile trailer matches index record
+  // Use subarray instead of slice to avoid memory copy (zero-copy for large packfiles)
+  const packTrailer = pack.subarray(-20)
+  const packTrailerSha = Array.from(packTrailer)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+  if (packTrailerSha !== expectedShaFromIndex) {
+    throw new InternalError(
+      `Packfile trailer mismatch: expected ${expectedShaFromIndex}, got ${packTrailerSha}. The packfile may be corrupted.`
+    )
+  }
+
+  // 2. Deep Integrity Check: Calculate actual SHA-1 of packfile payload.
+  // The Node package build swaps in a chunked implementation for large packs.
+  const actualPayloadSha = await shasumRange(pack, {
+    start: 0,
+    end: pack.length - 20,
+  })
+  if (actualPayloadSha !== expectedShaFromIndex) {
+    throw new InternalError(
+      `Packfile payload corrupted: calculated ${actualPayloadSha} but expected ${expectedShaFromIndex}. The packfile may have been tampered with.`
+    )
+  }
 }
