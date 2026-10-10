@@ -33,6 +33,22 @@ describe('Errors', () => {
       }
     `)
   })
+  it('serializes a DecompressionError without library-bug guidance', async () => {
+    const error = new Errors.DecompressionError('buffer error')
+    error.caller = 'git.readTree'
+    expect(error instanceof Errors.DecompressionError).toBe(true)
+    expect(error.isIsomorphicGitError).toBe(true)
+    expect(error.code).toBe('DecompressionError')
+    expect(error.message).toBe('Invalid compressed buffer: buffer error')
+    expect(error.message).not.toMatch(/internal error|file an issue/)
+    const json = JSON.parse(JSON.stringify(error))
+    expect(json.data).toEqual({ message: 'buffer error' })
+    const restored = error.fromJSON(json)
+    expect(restored.toJSON().code).toBe(error.code)
+    expect(restored.toJSON().data).toEqual(error.data)
+    expect(restored.caller).toBe(error.caller)
+    expect(restored.message).toBe(error.message)
+  })
   it('create an InternalError with actionable reporting guidance', async () => {
     const e = new Errors.InternalError('Something unexpected happened.')
 

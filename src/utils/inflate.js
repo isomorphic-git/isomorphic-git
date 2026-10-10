@@ -2,21 +2,27 @@
 /* global DecompressionStream */
 import pako from 'pako'
 
+import { DecompressionError } from '../errors/DecompressionError.js'
+
+import { nativeInflate } from './nativeInflate.js'
+
 let supportsDecompressionStream = false
 
 export async function inflate(buffer) {
   if (supportsDecompressionStream === null) {
     supportsDecompressionStream = testDecompressionStream()
   }
-  return supportsDecompressionStream
-    ? browserInflate(buffer)
-    : pako.inflate(buffer)
-}
-
-async function browserInflate(buffer) {
-  const ds = new DecompressionStream('deflate')
-  const d = new Blob([buffer]).stream().pipeThrough(ds)
-  return new Uint8Array(await new Response(d).arrayBuffer())
+  try {
+    return supportsDecompressionStream
+      ? await nativeInflate(buffer)
+      : pako.inflate(buffer)
+  } catch (err) {
+    if (typeof err === 'string') {
+      // Pako throws strings for corrupt data; preserve existing Error objects.
+      throw new DecompressionError(err)
+    }
+    throw err
+  }
 }
 
 function testDecompressionStream() {
