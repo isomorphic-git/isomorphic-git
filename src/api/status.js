@@ -105,7 +105,16 @@ export async function status({
 
     const H = treeOid !== null // head
     const I = indexEntry !== null // index
-    const W = stats !== null // working dir
+    // `lstat` resolves names case-insensitively on filesystems like macOS
+    // and Windows, so `ReAdMe.Md` returns the stats of `README.md`. For a
+    // filepath tracked under that exact name (H or I) the leniency is what
+    // core.ignorecase wants: the working copy is found. For any other
+    // filepath it fabricates a file that is not there, turning 'absent'
+    // into '*added', so confirm every segment exists exactly as spelled by
+    // listing each parent directory.
+    const W =
+      stats !== null &&
+      (H || I || (await hasExactCasePath({ fs, dir, filepath })))
 
     const getWorkdirOid = async () => {
       if (I && !compareStats(indexEntry, stats)) {
@@ -188,6 +197,33 @@ export async function status({
     err.caller = 'git.status'
     throw err
   }
+}
+
+// Walks `filepath` segment by segment under `dir`, requiring each name to
+// appear exactly as spelled in the parent directory's `readdir` listing.
+// Directory listings report the case actually stored on disk even when
+// `lstat` resolves names case-insensitively. Names are compared in Unicode
+// normal form, since macOS may list `é` decomposed when it was passed composed.
+async function hasExactCasePath({ fs, dir, filepath }) {
+  const segments = filepath
+    .replace(/\\/g, '/')
+    .split('/')
+    .filter(segment => segment !== '' && segment !== '.')
+  let parent = dir
+  for (const segment of segments) {
+    let entries
+    try {
+      entries = await fs._readdir(parent)
+    } catch (err) {
+      if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return false
+      throw err
+    }
+    if (!entries.some(entry => entry.normalize() === segment.normalize())) {
+      return false
+    }
+    parent = join(parent, segment)
+  }
+  return true
 }
 
 async function getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path }) {

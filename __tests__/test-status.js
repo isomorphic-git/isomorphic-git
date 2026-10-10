@@ -156,4 +156,48 @@ describe('status', () => {
       ['a.txt', 1, 1, 1],
     ])
   })
+
+  it('returns absent for case-mismatched paths on a case-insensitive filesystem', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-status')
+    await fs.write(path.join(dir, 'i/d.txt'), 'Hi')
+    // On macOS and Windows the filesystem resolves 'A.TXT' to 'a.txt', which
+    // used to report a tracked file's path in another case as '*added'.
+    const lstat = fs._lstat
+    fs._lstat = filepath =>
+      lstat(
+        filepath
+          .replace(/\/A\.TXT$/, '/a.txt')
+          .replace(/\/I\/d\.txt$/, '/i/d.txt')
+      )
+    // Test
+    expect(await status({ fs, dir, gitdir, filepath: 'a.txt' })).toEqual(
+      'unmodified'
+    )
+    expect(await status({ fs, dir, gitdir, filepath: 'A.TXT' })).toEqual(
+      'absent'
+    )
+    // The same goes for a parent directory that only matches by case.
+    expect(await status({ fs, dir, gitdir, filepath: 'I/d.txt' })).toEqual(
+      'absent'
+    )
+    // ...while the exact-case untracked file is still '*added'.
+    expect(await status({ fs, dir, gitdir, filepath: 'd.txt' })).toEqual(
+      '*added'
+    )
+  })
+
+  it('propagates errors from the exact-case directory check', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-status')
+    const readdir = fs._readdir
+    fs._readdir = filepath =>
+      filepath === dir
+        ? Promise.reject(Object.assign(new Error('EACCES'), { code: 'EACCES' }))
+        : readdir(filepath)
+    await expect(
+      status({ fs, dir, gitdir, filepath: 'd.txt' })
+    ).rejects.toMatchObject({
+      code: 'EACCES',
+    })
+  })
 })
