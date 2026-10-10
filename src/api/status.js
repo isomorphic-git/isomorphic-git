@@ -211,14 +211,14 @@ async function hasExactCasePath({ fs, dir, filepath }) {
     .filter(segment => segment !== '' && segment !== '.')
   let parent = dir
   for (const segment of segments) {
-    const entries = await fs._readdir(parent).catch(err => {
-      if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return []
+    let entries
+    try {
+      entries = await fs._readdir(parent)
+    } catch (err) {
+      if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return false
       throw err
-    })
-    if (
-      entries === null ||
-      !entries.some(entry => entry.normalize() === segment.normalize())
-    ) {
+    }
+    if (!entries.some(entry => entry.normalize() === segment.normalize())) {
       return false
     }
     parent = join(parent, segment)
