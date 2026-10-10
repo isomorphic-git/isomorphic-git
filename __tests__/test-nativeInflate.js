@@ -25,6 +25,27 @@ describeNative('nativeInflate', () => {
     expect(await nativeInflate(pako.deflate(bytes))).toEqual(bytes)
   })
 
+  it('normalizes the real native failure for [0, 0]', async () => {
+    const bytes = Uint8Array.from([0, 0])
+    const ds = new DecompressionStream('deflate')
+    const stream = new Blob([bytes]).stream().pipeThrough(ds)
+    const original = await new Response(stream).arrayBuffer().catch(err => err)
+    const error = await nativeInflate(bytes).catch(err => err)
+
+    expect(Object.prototype.toString.call(original)).toBe('[object Error]')
+    expect(Object.prototype.toString.call(error)).toBe('[object Error]')
+    expect(error.message.length).toBeGreaterThan(0)
+    if (original.name === 'TypeError' && original.message === '') {
+      expect(error.name).toBe('DecompressionError')
+      expect(error.code).toBe('DecompressionError')
+      expect(error.isIsomorphicGitError).toBe(true)
+      expect(error.toJSON().data).toEqual({ message: 'decompression failed' })
+    } else {
+      expect(error.name).toBe(original.name)
+      expect(error.message).toBe(original.message)
+    }
+  })
+
   for (const [name, bytes] of corruptZlibCases) {
     it(`reports ${name} compressed data with a nonempty error`, async () => {
       let error = null
