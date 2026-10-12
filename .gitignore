@@ -86,6 +86,7 @@ node_modules
 
 # AUTO-GENERATED DOCS --- DO NOT EDIT BELOW THIS LINE
 docs/abortMerge.md
+docs/abortRebase.md
 docs/add.md
 docs/addNote.md
 docs/addRemote.md
@@ -95,6 +96,7 @@ docs/checkout.md
 docs/cherryPick.md
 docs/clone.md
 docs/commit.md
+docs/continueRebase.md
 docs/currentBranch.md
 docs/deleteBranch.md
 docs/deleteRef.md
@@ -134,6 +136,7 @@ docs/readNote.md
 docs/readObject.md
 docs/readTag.md
 docs/readTree.md
+docs/rebase.md
 docs/remove.md
 docs/removeNote.md
 docs/renameBranch.md

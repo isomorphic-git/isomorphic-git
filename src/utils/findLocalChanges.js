@@ -37,6 +37,8 @@ import { modified } from './modified.js'
  * @param {string} args.headTree
  * @param {string} args.baseTree
  * @param {string} args.theirTree
+ * @param {string[]} [args.ignored] - receives the ignored untracked files that
+ * writing the merge would overwrite, for callers that remove them first
  *
  * @returns {Promise<string[]>}
  */
@@ -48,6 +50,7 @@ export async function findLocalChanges({
   headTree,
   baseTree,
   theirTree,
+  ignored,
 }) {
   // Unmerged paths mean a previous merge is still unresolved. An empty index
   // means nothing was checked out yet, so nothing is staged either.
@@ -190,11 +193,21 @@ export async function findLocalChanges({
       // but only when the rules are simple enough to be sure git agrees, when
       // it is not a tracked file renamed in case, and when git does not keep
       // the directory it is in.
-      const expendable = async () =>
-        (await workdir.type()) === 'blob' &&
-        !trackedFolded.has(key) &&
-        !below(key, keptDirs) &&
-        GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath, strict: true })
+      const expendable = async () => {
+        const yes =
+          (await workdir.type()) === 'blob' &&
+          !trackedFolded.has(key) &&
+          !below(key, keptDirs) &&
+          (await GitIgnoreManager.isIgnored({
+            fs,
+            dir,
+            gitdir,
+            filepath,
+            strict: true,
+          }))
+        if (yes && ignored) ignored.push(filepath)
+        return yes
+      }
       // A tracked directory where the merge wants a file is judged through
       // the files inside it. In a working tree that was never checked out,
       // a directory there is just in the way.

@@ -87,11 +87,12 @@ export async function _commit({
     })
   }
 
-  // A merge or cherry-pick that stopped on conflicts is finished by the next
-  // commit on HEAD, like `git commit` does: its other parents come from
-  // MERGE_HEAD, its message from MERGE_MSG, and a cherry-pick keeps the picked
-  // commit's author. The commits merge and cherryPick make themselves leave
-  // it alone.
+  // A merge, cherry-pick or rebase that stopped on conflicts is finished by
+  // the next commit on HEAD, like `git commit` does: its other parents come
+  // from MERGE_HEAD, its message from MERGE_MSG, and a cherry-pick keeps the
+  // picked commit's author (a rebase does not: git only reads the author from
+  // CHERRY_PICK_HEAD). The commits merge, cherryPick and rebase make
+  // themselves leave it alone.
   const onHead =
     finishMerge &&
     ref === (await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD', depth: 2 }))
@@ -107,6 +108,7 @@ export async function _commit({
       mergeHead ? 'MERGE_HEAD' : 'CHERRY_PICK_HEAD'
     )
   }
+  const rebaseHead = onHead && !amend ? await readState('REBASE_HEAD') : null
   // Like git, a merge in progress wins: its commit is the current user's.
   const pickedCommit =
     cherryPickHead && !mergeHead
@@ -117,7 +119,8 @@ export async function _commit({
   // was appended to it as comments.
   if (!message && !amend) {
     const mergeMsg =
-      (mergeHead || cherryPickHead) && (await readState('MERGE_MSG'))
+      (mergeHead || cherryPickHead || rebaseHead) &&
+      (await readState('MERGE_MSG'))
     if (mergeMsg) message = stripConflictsComment(mergeMsg)
     if (!message) throw new MissingParameterError('message')
   }
