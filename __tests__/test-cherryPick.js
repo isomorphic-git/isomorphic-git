@@ -1196,4 +1196,252 @@ describe('cherryPick', () => {
       ])
     })
   })
+
+  it('records the cherry-pick in progress so commit keeps author and message', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-cherry-state')
+    await init({ fs, dir, gitdir })
+    const author = {
+      name: 'Original Author',
+      email: 'original@example.com',
+      timestamp: 1600000000,
+      timezoneOffset: 0,
+    }
+    const committer = {
+      name: 'Committer',
+      email: 'committer@example.com',
+      timestamp: 1700000000,
+      timezoneOffset: 0,
+    }
+    await fs._writeFile(join(dir, 'file.txt'), 'base\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    await gitCommit({ fs, dir, gitdir, message: 'base', author: committer })
+    await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+    await fs._writeFile(join(dir, 'file.txt'), 'feature\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    const featureOid = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      message: 'Feature subject\n\nFeature body.\n',
+      author,
+    })
+    await checkout({ fs, dir, gitdir, ref: 'master' })
+    await fs._writeFile(join(dir, 'file.txt'), 'master\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    const masterOid = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      message: 'master',
+      author: committer,
+    })
+
+    let error = null
+    try {
+      await cherryPick({
+        fs,
+        dir,
+        gitdir,
+        oid: featureOid,
+        committer,
+        abortOnConflict: false,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+    expect(await fs.read(`${gitdir}/CHERRY_PICK_HEAD`, 'utf8')).toBe(
+      `${featureOid}\n`
+    )
+    expect(await fs.read(`${gitdir}/MERGE_MSG`, 'utf8')).toBe(
+      'Feature subject\n\nFeature body.\n\n# Conflicts:\n#\tfile.txt\n'
+    )
+    expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toBe(
+      `<<<<<<< HEAD\nmaster\n=======\nfeature\n>>>>>>> ${featureOid.slice(
+        0,
+        7
+      )} (Feature subject)\n`
+    )
+
+    await fs._writeFile(join(dir, 'file.txt'), 'resolved\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    const oid = await gitCommit({ fs, dir, gitdir, committer })
+    const { commit } = await readCommit({ fs, gitdir, oid })
+    expect(commit.parent).toEqual([masterOid])
+    expect(commit.message).toBe('Feature subject\n\nFeature body.\n')
+    expect(commit.author).toEqual(author)
+    expect(commit.committer).toEqual(committer)
+    expect(await fs.exists(`${gitdir}/CHERRY_PICK_HEAD`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/MERGE_MSG`)).toBe(false)
+  })
+  // feature and master both change file.txt; feature also adds added.txt.
+  async function pickRepo(name) {
+    const { fs, dir, gitdir } = await makeFixture(name)
+    await init({ fs, dir, gitdir })
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    await fs._writeFile(join(dir, 'file.txt'), 'base\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    await gitCommit({ fs, dir, gitdir, message: 'base', author })
+    await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+    await fs._writeFile(join(dir, 'added.txt'), 'added\n')
+    await add({ fs, dir, gitdir, filepath: 'added.txt' })
+    const cleanOid = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      message: 'add',
+      author,
+    })
+    await fs._writeFile(join(dir, 'file.txt'), 'feature\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    const conflictOid = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      message: 'feature',
+      author,
+    })
+    await checkout({ fs, dir, gitdir, ref: 'master' })
+    await fs._writeFile(join(dir, 'file.txt'), 'master\n')
+    await add({ fs, dir, gitdir, filepath: 'file.txt' })
+    await gitCommit({ fs, dir, gitdir, message: 'master', author })
+    return {
+      fs,
+      dir,
+      gitdir,
+      realGitdir: gitdir,
+      author,
+      cleanOid,
+      conflictOid,
+    }
+  }
+
+  it('records no cherry-pick in progress when it writes nothing', async () => {
+    const { fs, dir, gitdir, realGitdir, author, conflictOid } = await pickRepo(
+      'tmp-cherry-state-none'
+    )
+    for (const options of [
+      {},
+      { dryRun: true, abortOnConflict: false },
+      // Without a working tree, abortMerge could not clear it.
+      { dir: undefined, abortOnConflict: false },
+    ]) {
+      let error = null
+      try {
+        await cherryPick({
+          fs,
+          dir,
+          gitdir,
+          oid: conflictOid,
+          committer: author,
+          ...options,
+        })
+      } catch (e) {
+        error = e
+      }
+      expect(error.code).toBe(Errors.MergeConflictError.code)
+      expect(await fs.exists(`${realGitdir}/CHERRY_PICK_HEAD`)).toBe(false)
+      expect(await fs.exists(`${realGitdir}/MERGE_MSG`)).toBe(false)
+    }
+  })
+
+  it('leaves a merge in progress alone when it picks cleanly, like git', async () => {
+    const { fs, dir, gitdir, realGitdir, author, cleanOid, conflictOid } =
+      await pickRepo('tmp-cherry-state-merge')
+    await fs.write(`${realGitdir}/MERGE_HEAD`, `${conflictOid}\n`)
+    await fs.write(`${realGitdir}/MERGE_MSG`, 'Merge it\n')
+
+    const oid = await cherryPick({
+      fs,
+      dir,
+      gitdir,
+      oid: cleanOid,
+      committer: author,
+    })
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(oid)
+    expect(await fs.read(`${realGitdir}/MERGE_HEAD`, 'utf8')).toBe(
+      `${conflictOid}\n`
+    )
+    // git's pick uses up MERGE_MSG, even the merge's.
+    expect(await fs.exists(`${realGitdir}/MERGE_MSG`)).toBe(false)
+  })
+
+  it('ends a cherry-pick in progress when it picks cleanly, like git', async () => {
+    const { fs, dir, gitdir, realGitdir, author, cleanOid, conflictOid } =
+      await pickRepo('tmp-cherry-state-pick')
+    await fs.write(`${realGitdir}/CHERRY_PICK_HEAD`, `${conflictOid}\n`)
+    await fs.write(`${realGitdir}/MERGE_MSG`, 'feature\n')
+
+    const oid = await cherryPick({
+      fs,
+      dir,
+      gitdir,
+      oid: cleanOid,
+      committer: author,
+    })
+    expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(oid)
+    expect(await fs.exists(`${realGitdir}/CHERRY_PICK_HEAD`)).toBe(false)
+    expect(await fs.exists(`${realGitdir}/MERGE_MSG`)).toBe(false)
+
+    // A dry run or a pick that does not move the branch keeps them.
+    await fs.write(`${realGitdir}/CHERRY_PICK_HEAD`, `${conflictOid}\n`)
+    await fs.write(`${realGitdir}/MERGE_MSG`, 'feature\n')
+    for (const options of [{ dryRun: true }, { noUpdateBranch: true }]) {
+      await cherryPick({
+        fs,
+        dir,
+        gitdir,
+        oid: cleanOid,
+        committer: author,
+        ...options,
+      })
+      expect(await fs.exists(`${realGitdir}/CHERRY_PICK_HEAD`)).toBe(true)
+      expect(await fs.exists(`${realGitdir}/MERGE_MSG`)).toBe(true)
+    }
+  })
+
+  it('forgets the cherry-pick in progress when checkout moves HEAD, like git', async () => {
+    const { fs, dir, gitdir, realGitdir, author, conflictOid } = await pickRepo(
+      'tmp-cherry-state-checkout'
+    )
+    await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'Committer' })
+    await setConfig({
+      fs,
+      dir,
+      gitdir,
+      path: 'user.email',
+      value: 'committer@example.com',
+    })
+    let error = null
+    try {
+      await cherryPick({
+        fs,
+        dir,
+        gitdir,
+        oid: conflictOid,
+        committer: author,
+        abortOnConflict: false,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+    expect(await fs.exists(`${realGitdir}/CHERRY_PICK_HEAD`)).toBe(true)
+
+    await checkout({ fs, dir, gitdir, ref: 'master', force: true })
+    expect(await fs.exists(`${realGitdir}/CHERRY_PICK_HEAD`)).toBe(false)
+    expect(await fs.exists(`${realGitdir}/MERGE_MSG`)).toBe(false)
+    // So the next commit is the current user's, not the picked commit's.
+    await fs._writeFile(join(dir, 'mine.txt'), 'mine\n')
+    await add({ fs, dir, gitdir, filepath: 'mine.txt' })
+    const oid = await gitCommit({ fs, dir, gitdir, message: 'mine' })
+    const { commit } = await readCommit({ fs, gitdir, oid })
+    expect(commit.author.name).toBe('Committer')
+    expect(commit.message).toBe('mine\n')
+  })
 })

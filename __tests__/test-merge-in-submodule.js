@@ -12,6 +12,7 @@ import {
   listUnmergedFiles,
   readObject,
   readBlob,
+  readCommit,
   readTree,
   remove,
   resolveRef,
@@ -21,6 +22,7 @@ import {
   commit as gitCommit,
   annotatedTag,
   writeBlob,
+  writeRef,
   writeTree,
 } from 'isomorphic-git'
 import { GitIndexManager, discoverGitdir } from 'isomorphic-git/internal-apis'
@@ -1353,7 +1355,7 @@ describe('merge', () => {
       entry.commit.message.replace('\n', '')
     )
     expect(messages.join()).toEqual(
-      [`Merge branch 'other' into master`, 'Add b.txt', 'Add a.txt'].join()
+      [`Merge branch 'other'`, 'Add b.txt', 'Add a.txt'].join()
     )
   })
 
@@ -1491,7 +1493,7 @@ describe('merge', () => {
     )
     expect(messages.join()).toEqual(
       [
-        `Merge branch 'other' into master`,
+        `Merge branch 'other'`,
         'Add file in different nested directory on other',
         'Add file in nested directory on master',
       ].join()
@@ -1659,6 +1661,159 @@ describe('merge', () => {
 
     // The text conflict still materialises in the working directory.
     expect(await fs.read(`${dir}/doc.txt`, 'utf8')).toContain('<<<<<<<')
+  })
+
+  it('names what it merges the way git does', async () => {
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+      'tmp-merge-default-message'
+    )
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+    await init({ fs, dir, gitdir, defaultBranch: 'main' })
+    await fs.write(`${dir}/a.txt`, 'a\n')
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    const base = await gitCommit({ fs, dir, gitdir, message: 'base', author })
+    await branch({ fs, dir, gitdir, ref: 'topic' })
+    const feature = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      ref: 'refs/heads/feature',
+      parent: [base],
+      tree: (await readCommit({ fs, gitdir, oid: base })).commit.tree,
+      message: 'feature',
+      author,
+    })
+    await writeRef({ fs, gitdir, ref: 'refs/tags/v1', value: feature })
+    await writeRef({
+      fs,
+      gitdir,
+      ref: 'refs/remotes/origin/feature',
+      value: feature,
+    })
+
+    for (const [ours, theirs, message] of [
+      ['main', 'feature', "Merge branch 'feature'\n"],
+      ['main', 'v1', "Merge tag 'v1'\n"],
+      [
+        'main',
+        'origin/feature',
+        "Merge remote-tracking branch 'origin/feature'\n",
+      ],
+      ['topic', 'feature', "Merge branch 'feature' into topic\n"],
+    ]) {
+      const result = await merge({
+        fs,
+        dir,
+        gitdir,
+        ours,
+        theirs,
+        fastForward: false,
+        noUpdateBranch: true,
+        author,
+      })
+      const { commit } = await readCommit({
+        fs,
+        gitdir,
+        oid: /** @type {string} */ (result.oid),
+      })
+      expect(commit.message).toBe(message)
+    }
+  })
+
+  describe('ORIG_HEAD', () => {
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    it('remembers where the branch was when a merge moves it, like git', async () => {
+      for (const kind of ['fast-forward', 'merge commit']) {
+        const { fs, dir, gitdir, gitdirsmfullpath } =
+          await makeFixtureAsSubmodule(
+            `tmp-merge-orig-head-${kind.replace(' ', '-')}`
+          )
+        await init({ fs, dir, gitdir })
+        await fs.write(`${dir}/a.txt`, 'a\n')
+        await add({ fs, dir, gitdir, filepath: 'a.txt' })
+        const base = await gitCommit({
+          fs,
+          dir,
+          gitdir,
+          message: 'base',
+          author,
+        })
+        await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+        await fs.write(`${dir}/b.txt`, 'b\n')
+        await add({ fs, dir, gitdir, filepath: 'b.txt' })
+        await gitCommit({ fs, dir, gitdir, message: 'feature', author })
+        await checkout({ fs, dir, gitdir, ref: 'master' })
+        let before = base
+        if (kind === 'merge commit') {
+          await fs.write(`${dir}/c.txt`, 'c\n')
+          await add({ fs, dir, gitdir, filepath: 'c.txt' })
+          before = await gitCommit({
+            fs,
+            dir,
+            gitdir,
+            message: 'master',
+            author,
+          })
+        }
+
+        await merge({ fs, dir, gitdir, theirs: 'feature', author })
+
+        expect(await fs.read(`${gitdirsmfullpath}/ORIG_HEAD`, 'utf8')).toBe(
+          `${before}\n`
+        )
+      }
+    })
+
+    it('leaves ORIG_HEAD alone when the checked-out branch does not move', async () => {
+      for (const kind of ['fast-forward', 'merge commit']) {
+        const { fs, dir, gitdir, gitdirsmfullpath } =
+          await makeFixtureAsSubmodule(
+            `tmp-merge-orig-head-kept-${kind.replace(' ', '-')}`
+          )
+        await init({ fs, dir, gitdir })
+        await fs.write(`${dir}/a.txt`, 'a\n')
+        await add({ fs, dir, gitdir, filepath: 'a.txt' })
+        await gitCommit({ fs, dir, gitdir, message: 'base', author })
+        await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+        await fs.write(`${dir}/b.txt`, 'b\n')
+        await add({ fs, dir, gitdir, filepath: 'b.txt' })
+        await gitCommit({ fs, dir, gitdir, message: 'feature', author })
+        await checkout({ fs, dir, gitdir, ref: 'master' })
+        if (kind === 'merge commit') {
+          await fs.write(`${dir}/c.txt`, 'c\n')
+          await add({ fs, dir, gitdir, filepath: 'c.txt' })
+          await gitCommit({ fs, dir, gitdir, message: 'master', author })
+        }
+        await branch({ fs, dir, gitdir, ref: 'other' })
+
+        for (const options of [
+          { dryRun: true },
+          { noUpdateBranch: true },
+          { ours: 'other' },
+        ]) {
+          await merge({
+            fs,
+            dir,
+            gitdir,
+            theirs: 'feature',
+            author,
+            ...options,
+          })
+          expect(await fs.exists(`${gitdirsmfullpath}/ORIG_HEAD`)).toBe(false)
+        }
+      }
+    })
   })
 
   describe('conflicts written to the working tree', () => {
@@ -3165,6 +3320,189 @@ describe('merge', () => {
         'conflict.txt',
         'sub',
       ])
+    })
+
+    it('records the merge in progress so commit can finish it', async () => {
+      const repo = await setup('tmp-merge-state')
+      const { fs, dir, gitdir, gitdirsmfullpath, featureOid, masterOid } = repo
+
+      await mergeFeature(repo)
+      expect(await fs.read(`${gitdirsmfullpath}/MERGE_HEAD`, 'utf8')).toBe(
+        `${featureOid}\n`
+      )
+      expect(await fs.read(`${gitdirsmfullpath}/ORIG_HEAD`, 'utf8')).toBe(
+        `${masterOid}\n`
+      )
+      expect(await fs.read(`${gitdirsmfullpath}/MERGE_MSG`, 'utf8')).toBe(
+        "Merge branch 'feature'\n\n# Conflicts:\n#\tconflict.txt\n"
+      )
+
+      // Resolving and committing, with no parents or message given,
+      // finishes the merge like `git commit` does.
+      await fs.write(`${dir}/conflict.txt`, 'one\nresolved\nthree\n')
+      await add({ fs, dir, gitdir, filepath: 'conflict.txt' })
+      const mergeOid = await gitCommit({ fs, dir, gitdir, author })
+      const { commit } = await readCommit({ fs, gitdir, oid: mergeOid })
+      expect(commit.parent).toEqual([masterOid, featureOid])
+      expect(commit.message).toBe("Merge branch 'feature'\n")
+      expect(await resolveRef({ fs, gitdir, ref: 'master' })).toBe(mergeOid)
+      expect(await fs.exists(`${gitdirsmfullpath}/MERGE_HEAD`)).toBe(false)
+      expect(await fs.exists(`${gitdirsmfullpath}/MERGE_MSG`)).toBe(false)
+      expect(await fs.exists(`${gitdirsmfullpath}/ORIG_HEAD`)).toBe(true)
+    })
+
+    it('names the branch merged into unless it is main or master', async () => {
+      const repo = await setup('tmp-merge-state-into')
+      const { fs, dir, gitdir, gitdirsmfullpath } = repo
+      await branch({ fs, dir, gitdir, ref: 'topic', checkout: true })
+
+      await mergeFeature(repo, { ours: 'topic' })
+      expect(await fs.read(`${gitdirsmfullpath}/MERGE_MSG`, 'utf8')).toBe(
+        "Merge branch 'feature' into topic\n\n# Conflicts:\n#\tconflict.txt\n"
+      )
+    })
+
+    it('records nothing when it writes nothing', async () => {
+      const repo = await setup('tmp-merge-state-none')
+      const { fs, gitdirsmfullpath } = repo
+
+      for (const options of [
+        { abortOnConflict: true },
+        { dryRun: true },
+        // Without a working tree, abortMerge could not clear it.
+        { dir: undefined },
+      ]) {
+        const error = await mergeFeature(repo, options)
+        expect(error.code).toBe(Errors.MergeConflictError.code)
+        for (const file of ['MERGE_HEAD', 'MERGE_MSG', 'ORIG_HEAD']) {
+          expect(await fs.exists(`${gitdirsmfullpath}/${file}`)).toBe(false)
+        }
+      }
+    })
+
+    it('records the merge when ours is HEAD', async () => {
+      const repo = await setup('tmp-merge-state-ours-head')
+      const { fs, gitdirsmfullpath, featureOid } = repo
+
+      await mergeFeature(repo, { ours: 'HEAD' })
+      expect(await fs.read(`${gitdirsmfullpath}/MERGE_HEAD`, 'utf8')).toBe(
+        `${featureOid}\n`
+      )
+    })
+
+    it('records no merge into a branch that is not checked out', async () => {
+      const repo = await setup('tmp-merge-state-other-branch')
+      const { fs, dir, gitdir, gitdirsmfullpath } = repo
+      // other is where master is, but master is checked out, so a later
+      // commit would land on master.
+      await branch({ fs, dir, gitdir, ref: 'other' })
+
+      const error = await mergeFeature(repo, { ours: 'other' })
+      expect(error.code).toBe(Errors.MergeConflictError.code)
+      for (const file of ['MERGE_HEAD', 'MERGE_MSG', 'ORIG_HEAD']) {
+        expect(await fs.exists(`${gitdirsmfullpath}/${file}`)).toBe(false)
+      }
+    })
+
+    it('lists the conflicted files in MERGE_MSG in git order', async () => {
+      const repo = await setup('tmp-merge-state-order')
+      const { fs, dir, gitdir, gitdirsmfullpath } = repo
+      for (const ref of ['feature', 'master']) {
+        await checkout({ fs, dir, gitdir, ref })
+        await fs.write(`${dir}/sub-x.txt`, `${ref}\n`)
+        await fs.write(`${dir}/sub/nested.txt`, `${ref} nested\n`)
+        await add({
+          fs,
+          dir,
+          gitdir,
+          filepath: ['sub-x.txt', 'sub/nested.txt'],
+        })
+        await gitCommit({ fs, dir, gitdir, message: `${ref} sub`, author })
+      }
+
+      await mergeFeature(repo)
+      expect(await fs.read(`${gitdirsmfullpath}/MERGE_MSG`, 'utf8')).toBe(
+        "Merge branch 'feature'\n\n# Conflicts:\n#\tconflict.txt\n#\tsub-x.txt\n#\tsub/nested.txt\n"
+      )
+    })
+
+    it('puts an explicit message in MERGE_MSG', async () => {
+      const repo = await setup('tmp-merge-state-message')
+      const { fs, gitdirsmfullpath } = repo
+
+      await mergeFeature(repo, { message: 'Custom message' })
+      expect(await fs.read(`${gitdirsmfullpath}/MERGE_MSG`, 'utf8')).toBe(
+        'Custom message\n\n# Conflicts:\n#\tconflict.txt\n'
+      )
+    })
+
+    it('refuses to start while a merge or cherry-pick is in progress, like git', async () => {
+      const repo = await setup('tmp-merge-state-in-progress')
+      const { fs, dir, gitdir, gitdirsmfullpath, featureOid, masterOid } = repo
+
+      for (const file of ['MERGE_HEAD', 'CHERRY_PICK_HEAD']) {
+        await fs.write(`${gitdirsmfullpath}/${file}`, `${featureOid}\n`)
+        for (const options of [{}, { abortOnConflict: true }]) {
+          const error = await mergeFeature(repo, options)
+          expect(error.code).toBe(Errors.MergeInProgressError.code)
+          expect(error.data.file).toBe(file)
+        }
+        // A dry run changes nothing, so it may still look.
+        const error = await mergeFeature(repo, { dryRun: true })
+        expect(error.code).toBe(Errors.MergeConflictError.code)
+        expect(await fs.read(`${gitdirsmfullpath}/${file}`, 'utf8')).toBe(
+          `${featureOid}\n`
+        )
+        await fs.rm(`${gitdirsmfullpath}/${file}`)
+      }
+      expect(await resolveRef({ fs, gitdir, ref: 'master' })).toBe(masterOid)
+      expect(await fs.read(`${dir}/conflict.txt`, 'utf8')).toBe(
+        'one\nmaster\nthree\n'
+      )
+    })
+
+    it('forgets the merge in progress when checkout moves HEAD, like git', async () => {
+      const repo = await setup('tmp-merge-state-checkout')
+      const { fs, dir, gitdir, gitdirsmfullpath, masterOid } = repo
+      await branch({ fs, dir, gitdir, ref: 'other' })
+
+      await mergeFeature(repo)
+      // Checking out some files keeps it, as `git checkout -- <path>` does.
+      await checkout({
+        fs,
+        dir,
+        gitdir,
+        ref: 'master',
+        filepaths: ['ours.txt'],
+        force: true,
+      })
+      expect(await fs.exists(`${gitdirsmfullpath}/MERGE_HEAD`)).toBe(true)
+
+      await checkout({ fs, dir, gitdir, ref: 'other', force: true })
+      for (const file of ['MERGE_HEAD', 'MERGE_MSG']) {
+        expect(await fs.exists(`${gitdirsmfullpath}/${file}`)).toBe(false)
+      }
+      // So the next commit on other is not a merge of feature.
+      await fs.write(`${dir}/ours.txt`, 'other\n')
+      await add({ fs, dir, gitdir, filepath: 'ours.txt' })
+      const oid = await gitCommit({ fs, dir, gitdir, message: 'other', author })
+      const { commit } = await readCommit({ fs, gitdir, oid })
+      expect(commit.parent).toEqual([masterOid])
+    })
+
+    it('forgets the merge in progress when branch checks out a new one, like git', async () => {
+      const repo = await setup('tmp-merge-state-branch')
+      const { fs, dir, gitdir, gitdirsmfullpath } = repo
+
+      await mergeFeature(repo)
+      // Creating a branch without checking it out keeps it.
+      await branch({ fs, dir, gitdir, ref: 'kept' })
+      expect(await fs.exists(`${gitdirsmfullpath}/MERGE_HEAD`)).toBe(true)
+
+      await branch({ fs, dir, gitdir, ref: 'other', checkout: true })
+      for (const file of ['MERGE_HEAD', 'MERGE_MSG']) {
+        expect(await fs.exists(`${gitdirsmfullpath}/${file}`)).toBe(false)
+      }
     })
   })
 

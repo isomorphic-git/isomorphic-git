@@ -494,4 +494,36 @@ describe('abortMerge', () => {
     expect(fileBContent).toEqual(fileBHeadVersion)
     expect(fileCContent).toEqual('new text for file c')
   })
+
+  it('forgets the merge in progress', async () => {
+    const { fs, gitdir, dir } = await makeFixture('test-abortMerge')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'a',
+        theirs: 'b',
+        abortOnConflict: false,
+        author,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+    expect(await fs.exists(`${gitdir}/MERGE_HEAD`)).toBe(true)
+
+    await abortMerge({ fs, dir, gitdir })
+
+    expect(await fs.exists(`${gitdir}/MERGE_HEAD`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/MERGE_MSG`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/ORIG_HEAD`)).toBe(true)
+  })
 })

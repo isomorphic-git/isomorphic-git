@@ -9,12 +9,18 @@ import { join } from '../utils/join.js'
 /**
  * Create a new commit
  *
+ * If a [merge](./merge.md) or [cherry-pick](./cherryPick.md) stopped on conflicts, a commit on HEAD finishes it the way `git commit` does:
+ * the commits in `MERGE_HEAD` become additional parents, `MERGE_MSG` is the default message, a cherry-pick keeps the picked commit's author (unless a merge is also in progress, as in git), and the state files are removed afterwards.
+ * The message is cleaned up the way `git commit` does it when the prepared message is accepted as it is: lines starting with `#` (such as the list of conflicted files) are dropped, and so are trailing whitespace, repeated blank lines and blank lines at the start and the end.
+ * Explicit `parent`, `message` and `author` arguments still win. A commit on another branch, or with `dryRun` or `noUpdateBranch`, leaves the state alone.
+ * Like git, `amend` is refused with a `MergeInProgressError` while a merge or cherry-pick is in progress.
+ *
  * @param {Object} args
  * @param {FsClient} args.fs - a file system implementation
  * @param {SignCallback} [args.onSign] - a PGP signing implementation
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.message] - The commit message to use. Required, unless `amend === true`
+ * @param {string} [args.message] - The commit message to use. Required, unless `amend === true` or a merge in progress provides one.
  * @param {Object} [args.author] - The details about the author.
  * @param {string} [args.author.name] - Default is `user.name` config.
  * @param {string} [args.author.email] - Default is `user.email` config.
@@ -31,7 +37,7 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.noUpdateBranch = false] - If true, does not update the branch pointer after creating the commit.
  * @param {boolean} [args.disallowEmpty = false] - If true, throws an error instead of creating a commit with no staged changes.
  * @param {string} [args.ref] - The fully expanded name of the branch to commit to. Default is the current branch pointed to by HEAD. (TODO: fix it so it can expand branch names without throwing if the branch doesn't exist yet.)
- * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used.
+ * @param {string[]} [args.parent] - The SHA-1 object ids of the commits to use as parents. If not specified, the commit pointed to by `ref` is used, plus the commits in `MERGE_HEAD` when committing on HEAD.
  * @param {string} [args.tree] - The SHA-1 object id of the tree to use. If not specified, a new tree object is created from the current git index.
  * @param {object} [args.cache] - a [cache](cache.md) object
  *
@@ -70,9 +76,6 @@ export async function commit({
 }) {
   try {
     assertParameter('fs', _fs)
-    if (!amend) {
-      assertParameter('message', message)
-    }
     if (signingKey) {
       assertParameter('onSign', onSign)
     }
@@ -95,6 +98,7 @@ export async function commit({
       ref,
       parent,
       tree,
+      finishMerge: true,
     })
   } catch (err) {
     err.caller = 'git.commit'

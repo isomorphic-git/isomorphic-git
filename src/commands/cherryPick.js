@@ -11,6 +11,7 @@ import { MergeLocalChangesError } from '../errors/MergeLocalChangesError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { findLocalChanges } from '../utils/findLocalChanges.js'
+import { formatMergeMessage } from '../utils/mergeState.js'
 import { applyMergedTree, mergeTree } from '../utils/mergeTree.js'
 
 const EMPTY_TREE_OID = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
@@ -140,6 +141,15 @@ export async function _cherryPick({
   )
 
   if (mergedTreeOid instanceof MergeConflictError) {
+    if (dir && !abortOnConflict && !dryRun) {
+      // Record the cherry-pick in progress the way git does, so `commit` (or
+      // `git commit`) finishes it with the picked commit's author and message.
+      await fs.write(`${gitdir}/CHERRY_PICK_HEAD`, `${cherryOid}\n`)
+      await fs.write(
+        `${gitdir}/MERGE_MSG`,
+        formatMergeMessage(cherryCommit.message, mergedTreeOid.data.filepaths)
+      )
+    }
     throw mergedTreeOid
   }
 
@@ -177,6 +187,13 @@ export async function _cherryPick({
         unmerged: new Set(),
       })
     )
+  }
+
+  // Like git, a pick that moves the branch ends a cherry-pick in progress and
+  // uses up MERGE_MSG. A merge in progress (MERGE_HEAD) stays.
+  if (!dryRun && !noUpdateBranch) {
+    await fs.rm(`${gitdir}/CHERRY_PICK_HEAD`)
+    await fs.rm(`${gitdir}/MERGE_MSG`)
   }
 
   return newOid

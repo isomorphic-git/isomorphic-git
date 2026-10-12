@@ -8,6 +8,7 @@ import { InvalidRefNameError } from '../errors/InvalidRefNameError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import validRef from '../utils/isValidRef.js'
+import { clearMergeState } from '../utils/mergeState.js'
 import { resolveCommit } from '../utils/resolveCommit.js'
 
 /**
@@ -73,5 +74,7 @@ export async function _branch({
       ref: 'HEAD',
       value: fullref,
     })
+    // Like git, moving HEAD forgets a merge or cherry-pick in progress.
+    await clearMergeState({ fs, gitdir })
   }
 }

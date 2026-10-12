@@ -17,6 +17,7 @@ import { GitRefManager } from '../managers/GitRefManager.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { flat } from '../utils/flat.js'
+import { clearMergeState } from '../utils/mergeState.js'
 import { resolveCommit } from '../utils/resolveCommit.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
@@ -411,6 +412,10 @@ export async function _checkout({
     } else {
       // detached head
       await GitRefManager.writeRef({ fs, gitdir, ref: 'HEAD', value: oid })
+    }
+    // Like git, moving HEAD forgets a merge or cherry-pick in progress.
+    if (!filepaths || filepaths.length === 0) {
+      await clearMergeState({ fs, gitdir })
     }
   }
 }
