@@ -4,7 +4,9 @@ import '../typedefs.js'
 import { TREE } from '../commands/TREE.js'
 import { _walk } from '../commands/walk.js'
 import { MergeConflictError } from '../errors/MergeConflictError.js'
+import { MergeLocalChangesError } from '../errors/MergeLocalChangesError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
@@ -72,8 +74,17 @@ export async function mergeTree({
   // An empty index means the working tree was never checked out: the whole
   // result is written then, not just what the merge changed.
   const checkedOut = index.entriesMap.size > 0
+  // Changes to the index wait until nothing is found in the way of the
+  // result, so that a refused merge leaves the index as it was.
+  const staging = []
+  const staged = {
+    insert: entry => staging.push(() => index.insert(entry)),
+    delete: entry => staging.push(() => index.delete(entry)),
+  }
+  // The names made up in reduce for versions that move aside.
+  const asides = []
   const stageEntry = async (filepath, entry, stage) =>
-    index.insert({
+    staged.insert({
       filepath,
       oid: await entry.oid(),
       mode: await entry.mode(),
@@ -241,7 +252,7 @@ export async function mergeTree({
                   else fileStages.unshift([base, 1])
                 }
                 if (updateIndex) {
-                  index.delete({ filepath })
+                  staged.delete({ filepath })
                   for (const [entry, stage] of linkStages) {
                     await stageEntry(filepath, entry, stage)
                   }
@@ -260,7 +271,7 @@ export async function mergeTree({
                 unmergedFiles.push(filepath)
                 bothModified.push(filepath)
                 if (updateIndex) {
-                  index.delete({ filepath })
+                  staged.delete({ filepath })
                   if (base && (await base.type()) === 'blob') {
                     await stageEntry(filepath, base, 1)
                   }
@@ -278,7 +289,7 @@ export async function mergeTree({
                   r.mergeResult.mode === (await ours.mode())
                 )
               ) {
-                index.insert({
+                staged.insert({
                   filepath,
                   oid: r.mergeResult.oid,
                   mode: r.mergeResult.mode,
@@ -300,7 +311,7 @@ export async function mergeTree({
             unmergedFiles.push(filepath)
             deleteByUs.push(filepath)
             if (updateIndex) {
-              index.delete({ filepath })
+              staged.delete({ filepath })
               await stageEntry(filepath, base, 1)
               await stageEntry(filepath, theirs, 3)
             }
@@ -324,7 +335,7 @@ export async function mergeTree({
             unmergedFiles.push(filepath)
             deleteByTheirs.push(filepath)
             if (updateIndex) {
-              index.delete({ filepath })
+              staged.delete({ filepath })
               await stageEntry(filepath, base, 1)
               await stageEntry(filepath, ours, 2)
             }
@@ -385,6 +396,7 @@ export async function mergeTree({
               entries.push({ ...aside.entry, path: name })
               const filepath = join(aside.dir, name)
               unmergedFiles.push(filepath)
+              asides.push(filepath)
               if (updateIndex) {
                 for (const [entry, stage] of aside.stages) {
                   await stageEntry(filepath, entry, stage)
@@ -420,6 +432,30 @@ export async function mergeTree({
             return parent
           },
   })
+
+  if (unmergedFiles.length !== 0 && dir && updateIndex) {
+    // Like git, refuse to put a version that moves aside over an untracked
+    // file or directory, unless it is a file that .gitignore ignores.
+    const inTheWay = []
+    for (const filepath of asides) {
+      const stats = await fs.lstat(`${dir}/${filepath}`)
+      if (
+        stats &&
+        (stats.isDirectory() ||
+          !(await GitIgnoreManager.isIgnored({
+            fs,
+            dir,
+            gitdir,
+            filepath,
+            strict: true,
+          })))
+      ) {
+        inTheWay.push(filepath)
+      }
+    }
+    if (inTheWay.length > 0) throw new MergeLocalChangesError(inTheWay)
+  }
+  for (const change of staging) change()
 
   if (unmergedFiles.length !== 0) {
     if (dir && updateIndex) {
@@ -662,6 +698,12 @@ export async function applyMergedTree({
           index.delete({ filepath })
           removed.push(filepath)
         }
+      } else {
+        // Nothing of ours is here, but an untracked file that .gitignore
+        // ignores may be, since findLocalChanges lets those through. Like
+        // git, replace it, or remove it to make room for a directory.
+        const stats = await fs.lstat(fullpath)
+        if (stats && !stats.isDirectory()) await fs.rm(fullpath)
       }
       if (mergedType === 'commit') {
         // Like git, stage the commit a submodule points at and give a new

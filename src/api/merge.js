@@ -41,7 +41,13 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  * Submodules are not checked out: like git, a submodule the merge adds, moves to another commit or removes is only changed in the index (with an empty directory for a new one).
  * A symlink whose target both sides changed is not merged: like git, ours is kept and the conflict is recorded in the index.
  * The built-in merge driver never merges binary files (files with a NUL byte in their first 8000 bytes): ours is kept in the working directory and the conflict is recorded in the index.
- * Writing conflicts to the working tree assumes that `ours` is the checked-out branch, as it always is in git: only what differs between `ours` and the merge result is written.
+ *
+ * Like `git merge`, this refuses to start when writing the result would overwrite local changes: any staged change, an unstaged edit to a file the merge changes, or an untracked file in its way.
+ * Untracked files that `.gitignore` ignores are not in the way: like git, the merge overwrites them. This holds only when the rules are simple enough to be sure git ignores the file too (the path and the rules that apply are printable ASCII, and the rules use no `!`, `[`, backslash, or `**` except at the start of a rule); otherwise such a file is protected like any other untracked file.
+ * A `MergeLocalChangesError` listing those files is thrown before anything is written.
+ * An unstaged edit includes a changed executable bit (unless `core.filemode` is false), and an untracked directory can be in the way too.
+ * Only conflicts are written to the working tree, so local changes never stop a merge without conflicts.
+ * Writing conflicts to the working tree assumes that `ours` is the checked-out branch, as it always is in git: only what differs between `ours` and the merge result is written, and the staged changes are found by comparing the index with `ours`.
  *
  * To complete the merge, edit the conflicting files as you see fit, and then add and commit the resolved merge.
  *

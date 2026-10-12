@@ -6,10 +6,12 @@ import { _currentBranch } from '../commands/currentBranch.js'
 import { _findMergeBase } from '../commands/findMergeBase.js'
 import { FastForwardError } from '../errors/FastForwardError.js'
 import { MergeConflictError } from '../errors/MergeConflictError.js'
+import { MergeLocalChangesError } from '../errors/MergeLocalChangesError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
+import { findLocalChanges } from '../utils/findLocalChanges.js'
 import { mergeTree } from '../utils/mergeTree.js'
 import { resolveCommit } from '../utils/resolveCommit.js'
 
@@ -137,11 +139,27 @@ export async function _merge({
     if (fastForwardOnly) {
       throw new FastForwardError()
     }
+    // Conflicts are written to the working tree and the index. Like git,
+    // refuse to write them over local changes. A clean merge leaves the
+    // working tree alone, so local changes do not stop it.
+    /** @type {string[]} */
+    let localChanges = []
+    if (dir && !abortOnConflict && !dryRun) {
+      localChanges = await findLocalChanges({
+        fs,
+        cache,
+        dir,
+        gitdir,
+        headTree: ourOid,
+        baseTree: baseOid,
+        theirTree: theirOid,
+      })
+    }
     // try a fancier merge
     const tree = await GitIndexManager.acquire(
       { fs, gitdir, cache, allowUnmerged: false },
       async index => {
-        return mergeTree({
+        const result = await mergeTree({
           fs,
           cache,
           dir,
@@ -155,9 +173,14 @@ export async function _merge({
           baseName: 'base',
           theirName: abbreviateRef(theirs),
           dryRun,
-          abortOnConflict,
+          // Nothing may be written over local changes.
+          abortOnConflict: abortOnConflict || localChanges.length > 0,
           mergeDriver,
         })
+        if (result instanceof MergeConflictError && localChanges.length > 0) {
+          throw new MergeLocalChangesError(localChanges)
+        }
+        return result
       }
     )
 
