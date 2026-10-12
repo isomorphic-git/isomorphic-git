@@ -907,4 +907,177 @@ dGs=
       ]
     `)
   })
+
+  it('filters commits by author', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const alice = {
+      name: 'Alice',
+      email: 'alice@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const bob = {
+      name: 'Bob',
+      email: 'bob@example.com',
+      timestamp: 1262356980,
+      timezoneOffset: 0,
+    }
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'a.txt'), 'a')
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author: alice, message: 'Alice first' })
+    await fs.write(path.join(dir, 'a.txt'), 'b')
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author: bob, message: 'Bob only' })
+    await fs.write(path.join(dir, 'a.txt'), 'c')
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author: alice, message: 'Alice second' })
+
+    const all = await log({ fs, dir })
+    expect(all.map(({ commit }) => commit.message.trim())).toEqual([
+      'Alice second',
+      'Bob only',
+      'Alice first',
+    ])
+
+    // Match by author name.
+    const byName = await log({ fs, dir, author: 'Alice' })
+    expect(byName.map(({ commit }) => commit.message.trim())).toEqual([
+      'Alice second',
+      'Alice first',
+    ])
+
+    // The pattern is case-insensitive and matches the "Name <email>" string.
+    const byEmail = await log({ fs, dir, author: 'BOB@EXAMPLE' })
+    expect(byEmail.map(({ commit }) => commit.message.trim())).toEqual([
+      'Bob only',
+    ])
+
+    // The pattern is a regular expression, so metacharacters are active:
+    // the "." in the pattern matches the "." in the email address.
+    const byRegex = await log({ fs, dir, author: 'alice.example' })
+    expect(byRegex.map(({ commit }) => commit.message.trim())).toEqual([
+      'Alice second',
+      'Alice first',
+    ])
+
+    // A pattern that matches nothing resolves to an empty array.
+    await expect(log({ fs, dir, author: 'nobody' })).resolves.toEqual([])
+
+    // An invalid regular expression rejects.
+    await expect(log({ fs, dir, author: '(' })).rejects.toThrow(
+      /Invalid regular expression/
+    )
+  })
+
+  it('author filter matches the author, not the committer', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const alice = {
+      name: 'Alice',
+      email: 'alice@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const bob = {
+      name: 'Bob',
+      email: 'bob@example.com',
+      timestamp: 1262356980,
+      timezoneOffset: 0,
+    }
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'a.txt'), 'a')
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({
+      fs,
+      dir,
+      author: alice,
+      committer: bob,
+      message: 'Alice authored, Bob committed',
+    })
+
+    const byAuthor = await log({ fs, dir, author: 'Alice' })
+    expect(byAuthor.map(({ commit }) => commit.message.trim())).toEqual([
+      'Alice authored, Bob committed',
+    ])
+
+    // Bob only appears as the committer, so the filter must not match him.
+    await expect(log({ fs, dir, author: 'Bob' })).resolves.toEqual([])
+  })
+
+  it('author filter counts depth against matching commits', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const alice = {
+      name: 'Alice',
+      email: 'alice@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const bob = {
+      name: 'Bob',
+      email: 'bob@example.com',
+      timestamp: 1262356980,
+      timezoneOffset: 0,
+    }
+    await init({ fs, dir })
+    for (let i = 0; i < 5; i++) {
+      await fs.write(path.join(dir, 'a.txt'), `content ${i}`)
+      await add({ fs, dir, filepath: 'a.txt' })
+      // Commits are listed newest-first, so alternate authors with i.
+      await commit({
+        fs,
+        dir,
+        author: i % 2 === 0 ? alice : bob,
+        message: `Commit ${i}`,
+      })
+    }
+
+    // Like `git log --author --max-count`, `depth` limits the number of
+    // *matching* commits, so the walk continues past commits by Bob.
+    const commits = await log({ fs, dir, author: 'Alice', depth: 2 })
+    expect(commits.map(({ commit }) => commit.message.trim())).toEqual([
+      'Commit 4',
+      'Commit 2',
+    ])
+  })
+
+  it('author filter combines with filepath', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const alice = {
+      name: 'Alice',
+      email: 'alice@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const bob = {
+      name: 'Bob',
+      email: 'bob@example.com',
+      timestamp: 1262356980,
+      timezoneOffset: 0,
+    }
+    await init({ fs, dir })
+    await fs.write(path.join(dir, 'a.txt'), 'a')
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author: alice, message: 'Alice first' })
+    await fs.write(path.join(dir, 'a.txt'), 'b')
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author: bob, message: 'Bob only' })
+    await fs.write(path.join(dir, 'a.txt'), 'c')
+    await add({ fs, dir, filepath: 'a.txt' })
+    await commit({ fs, dir, author: alice, message: 'Alice second' })
+
+    const all = await log({ fs, dir, filepath: 'a.txt' })
+    expect(all.map(({ commit }) => commit.message.trim())).toEqual([
+      'Alice second',
+      'Bob only',
+      'Alice first',
+    ])
+
+    // File tracking still sees every content change, but only Alice's
+    // commits are listed.
+    const byAuthor = await log({ fs, dir, filepath: 'a.txt', author: 'Alice' })
+    expect(byAuthor.map(({ commit }) => commit.message.trim())).toEqual([
+      'Alice second',
+      'Alice first',
+    ])
+  })
 })

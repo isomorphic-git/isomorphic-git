@@ -16,8 +16,9 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string=} args.filepath optional get the commit for the filepath only
  * @param {string} [args.ref = 'HEAD'] - The commit to begin walking backwards through the history from
- * @param {number=} [args.depth] - Limit the number of commits returned. No limit by default.
+ * @param {number=} [args.depth] - Limit the number of commits returned (after `author` and `since` filters are applied). No limit by default.
  * @param {Date} [args.since] - Return history newer than the given date. Can be combined with `depth` to get whichever is shorter.
+ * @param {string} [args.author] - Return only commits whose author matches this case-insensitive JavaScript regular expression, tested against the author's `Name <email>` string. (Unlike `git log --author`, which is case-sensitive and uses basic regular expressions.)
  * @param {boolean=} [args.force=false] do not throw error if filepath is not exist (works only for a single file). defaults to false
  * @param {boolean=} [args.follow=false] Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  * @param {boolean=} [args.includeChanges=false] Include changed file object ids for each commit. Each tuple is `[newOid, oldOid, filepath]`; an added or removed file has a null old or new oid, respectively.
@@ -45,6 +46,7 @@ export async function log({
   ref = 'HEAD',
   depth,
   since, // Date
+  author,
   force,
   follow,
   includeChanges = false,
@@ -65,6 +67,7 @@ export async function log({
       ref,
       depth,
       since,
+      author,
       force,
       follow,
       includeChanges,

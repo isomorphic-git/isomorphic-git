@@ -1009,6 +1009,17 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "ShahabAhmed01",
+      "name": "Shahab Ahmed",
+      "avatar_url": "https://avatars.githubusercontent.com/u/192491541?v=4",
+      "profile": "https://github.com/ShahabAhmed01",
+      "contributions": [
+        "code",
+        "test",
+        "doc"
+      ]
     }
   ],
   "commitConvention": "angular"
