@@ -8,11 +8,15 @@ import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
+import { assertNoSymlinkInLeadingPath } from './assertNoSymlinkInLeadingPath.js'
 import { basename } from './basename.js'
+import { dirname } from './dirname.js'
 import { isBinary } from './isBinary.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
 import { modified } from './modified.js'
+
+const EMPTY_TREE_OID = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 /**
  * Create a merged tree
@@ -59,6 +63,33 @@ export async function mergeTree({
   const bothModified = []
   const deleteByUs = []
   const deleteByTheirs = []
+  // Every path in the three trees: a name made up for a version that has to
+  // move aside must be none of them, as in git.
+  const seen = new Set()
+
+  // Record the sides of a conflicted path in the index, like git does.
+  const updateIndex = !abortOnConflict && !dryRun
+  // An empty index means the working tree was never checked out: the whole
+  // result is written then, not just what the merge changed.
+  const checkedOut = index.entriesMap.size > 0
+  const stageEntry = async (filepath, entry, stage) =>
+    index.insert({
+      filepath,
+      oid: await entry.oid(),
+      mode: await entry.mode(),
+      stage,
+    })
+  // What reduce needs to record `entry` as `filepath~<label>`.
+  const moveAside = async (filepath, label, entry, stages) => ({
+    dir: dirname(filepath),
+    name: `${basename(filepath)}~${label.replace(/\//g, '_')}`,
+    entry: {
+      mode: await entry.mode(),
+      oid: await entry.oid(),
+      type: 'blob',
+    },
+    stages,
+  })
 
   const results = await _walk({
     fs,
@@ -67,7 +98,43 @@ export async function mergeTree({
     gitdir,
     trees: [ourTree, baseTree, theirTree],
     map: async function (filepath, [ours, base, theirs]) {
+      seen.add(filepath)
       const path = basename(filepath)
+      // A directory one side replaced with a file: what is in the directory
+      // is merged as if the file side had deleted it, and reduce decides
+      // where the file goes.
+      const types = await Promise.all(
+        [ours, base, theirs].map(entry => entry && entry.type())
+      )
+      if (
+        types[1] === 'tree' &&
+        types[0] &&
+        types[2] &&
+        (types[0] === 'tree') !== (types[2] === 'tree')
+      ) {
+        const [directory, file, side] =
+          types[0] === 'tree'
+            ? [ours, theirs, 'theirs']
+            : [theirs, ours, 'ours']
+        // A submodule in place of a directory is not supported.
+        if ((await file.type()) !== 'blob') throw new MergeNotSupportedError()
+        return {
+          mode: await directory.mode(),
+          path,
+          oid: await directory.oid(),
+          type: 'tree',
+          file: {
+            mode: await file.mode(),
+            path,
+            oid: await file.oid(),
+            type: 'blob',
+          },
+          aside: () =>
+            moveAside(filepath, side === 'ours' ? ourName : theirName, file, [
+              [file, side === 'ours' ? 2 : 3],
+            ]),
+        }
+      }
       // What we did, what they did
       const ourChange = await modified(ours, base)
       const theirChange = await modified(theirs, base)
@@ -155,27 +222,68 @@ export async function mergeTree({
               theirName,
               mergeDriver,
             }).then(async r => {
+              if (r.renamed) {
+                // A symlink and a regular file: the file goes to
+                // `path~<side>` (see reduce), and each name gets the
+                // stages of its own version, and of the base if it has the
+                // same type.
+                unmergedFiles.push(filepath)
+                bothModified.push(filepath)
+                const isLink = async entry => (await entry.mode()) === 0o120000
+                const sides = { ours: [ours, 2], theirs: [theirs, 3] }
+                const [file, fileStage] = sides[r.renamed]
+                const [link, linkStage] =
+                  sides[r.renamed === 'ours' ? 'theirs' : 'ours']
+                const linkStages = [[link, linkStage]]
+                const fileStages = [[file, fileStage]]
+                if (base && (await base.type()) === 'blob') {
+                  if (await isLink(base)) linkStages.unshift([base, 1])
+                  else fileStages.unshift([base, 1])
+                }
+                if (updateIndex) {
+                  index.delete({ filepath })
+                  for (const [entry, stage] of linkStages) {
+                    await stageEntry(filepath, entry, stage)
+                  }
+                }
+                return {
+                  ...r.mergeResult,
+                  aside: await moveAside(
+                    filepath,
+                    r.renamed === 'ours' ? ourName : theirName,
+                    file,
+                    fileStages
+                  ),
+                }
+              }
               if (!r.cleanMerge) {
                 unmergedFiles.push(filepath)
                 bothModified.push(filepath)
-                if (!abortOnConflict) {
-                  let baseOid = ''
-                  if (base && (await base.type()) === 'blob') {
-                    baseOid = await base.oid()
-                  }
-                  const ourOid = await ours.oid()
-                  const theirOid = await theirs.oid()
-
+                if (updateIndex) {
                   index.delete({ filepath })
-
-                  if (baseOid) {
-                    index.insert({ filepath, oid: baseOid, stage: 1 })
+                  if (base && (await base.type()) === 'blob') {
+                    await stageEntry(filepath, base, 1)
                   }
-                  index.insert({ filepath, oid: ourOid, stage: 2 })
-                  index.insert({ filepath, oid: theirOid, stage: 3 })
+                  await stageEntry(filepath, ours, 2)
+                  await stageEntry(filepath, theirs, 3)
                 }
-              } else if (!abortOnConflict) {
-                index.insert({ filepath, oid: r.mergeResult.oid, stage: 0 })
+              } else if (
+                updateIndex &&
+                // A result equal to ours is in the index already, with the
+                // file's stats, and is not written again.
+                !(
+                  dir &&
+                  checkedOut &&
+                  r.mergeResult.oid === (await ours.oid()) &&
+                  r.mergeResult.mode === (await ours.mode())
+                )
+              ) {
+                index.insert({
+                  filepath,
+                  oid: r.mergeResult.oid,
+                  mode: r.mergeResult.mode,
+                  stage: 0,
+                })
               }
               return r.mergeResult
             })
@@ -191,14 +299,10 @@ export async function mergeTree({
           ) {
             unmergedFiles.push(filepath)
             deleteByUs.push(filepath)
-            if (!abortOnConflict) {
-              const baseOid = await base.oid()
-              const theirOid = await theirs.oid()
-
+            if (updateIndex) {
               index.delete({ filepath })
-
-              index.insert({ filepath, oid: baseOid, stage: 1 })
-              index.insert({ filepath, oid: theirOid, stage: 3 })
+              await stageEntry(filepath, base, 1)
+              await stageEntry(filepath, theirs, 3)
             }
 
             return {
@@ -219,14 +323,10 @@ export async function mergeTree({
           ) {
             unmergedFiles.push(filepath)
             deleteByTheirs.push(filepath)
-            if (!abortOnConflict) {
-              const baseOid = await base.oid()
-              const ourOid = await ours.oid()
-
+            if (updateIndex) {
               index.delete({ filepath })
-
-              index.insert({ filepath, oid: baseOid, stage: 1 })
-              index.insert({ filepath, oid: ourOid, stage: 2 })
+              await stageEntry(filepath, base, 1)
+              await stageEntry(filepath, ours, 2)
             }
 
             return {
@@ -266,6 +366,32 @@ export async function mergeTree({
             // if the parent was deleted, the children have to go
             if (!parent) return
 
+            if (parent.file) {
+              // A directory one side replaced with a file. Like git, the
+              // file takes its place if nothing is left in it, and moves
+              // aside otherwise.
+              if (entries.length === 0) return parent.file
+              parent.aside = await parent.aside()
+            }
+            // Like git, a version that cannot stay at its path is recorded
+            // as `path~<side>`, with a suffix when that name is taken in the
+            // result or in any of the three trees.
+            for (const { aside } of entries.filter(entry => entry.aside)) {
+              const taken = new Set(entries.map(entry => entry.path))
+              const free = name =>
+                !taken.has(name) && !seen.has(join(aside.dir, name))
+              let name = aside.name
+              for (let i = 0; !free(name); i++) name = `${aside.name}_${i}`
+              entries.push({ ...aside.entry, path: name })
+              const filepath = join(aside.dir, name)
+              unmergedFiles.push(filepath)
+              if (updateIndex) {
+                for (const [entry, stage] of aside.stages) {
+                  await stageEntry(filepath, entry, stage)
+                }
+              }
+            }
+
             // automatically delete directories if they have been emptied
             // except for the root directory
             if (
@@ -296,22 +422,16 @@ export async function mergeTree({
   })
 
   if (unmergedFiles.length !== 0) {
-    if (dir && !abortOnConflict) {
-      await _walk({
+    if (dir && updateIndex) {
+      await applyMergedTree({
         fs,
         cache,
         dir,
         gitdir,
-        trees: [TREE({ ref: results.oid })],
-        map: async function (filepath, [entry]) {
-          const path = `${dir}/${filepath}`
-          if ((await entry.type()) === 'blob') {
-            const mode = await entry.mode()
-            const content = await entry.content()
-            await fs.write(path, content, { mode })
-          }
-          return true
-        },
+        index,
+        treeOid: results.oid,
+        ourOid: checkedOut ? ourOid : EMPTY_TREE_OID,
+        unmerged: new Set(unmergedFiles),
       })
     }
     return new MergeConflictError(
@@ -365,12 +485,31 @@ async function mergeBlobs({
     baseOid = await base.oid()
     baseContent = await base.content()
   }
-  const mode =
-    baseMode === (await ours.mode()) ? await theirs.mode() : await ours.mode()
+  const ourMode = await ours.mode()
+  const theirMode = await theirs.mode()
+  // Like git, a symlink on one side and a regular file on the other are not
+  // merged: the symlink stays and the file is recorded under another name.
+  if ((ourMode === 0o120000) !== (theirMode === 0o120000)) {
+    const [kept, renamed] =
+      ourMode === 0o120000 ? [ours, 'theirs'] : [theirs, 'ours']
+    return {
+      cleanMerge: false,
+      renamed,
+      mergeResult: {
+        mode: await kept.mode(),
+        path,
+        oid: await kept.oid(),
+        type,
+      },
+    }
+  }
+  const mode = baseMode === ourMode ? theirMode : ourMode
+  // Like git, two modes and no base to choose between them are a conflict.
+  const modeConflict = !baseOid && ourMode !== theirMode
   // The trivial case: nothing to merge except maybe mode
   if ((await ours.oid()) === (await theirs.oid())) {
     return {
-      cleanMerge: true,
+      cleanMerge: !modeConflict,
       mergeResult: { mode, path, oid: await ours.oid(), type },
     }
   }
@@ -385,6 +524,19 @@ async function mergeBlobs({
     return {
       cleanMerge: true,
       mergeResult: { mode, path, oid: await ours.oid(), type },
+    }
+  }
+  // Like git, never merge symlink targets: ours stays and all three versions
+  // are recorded in the index.
+  if ((await ours.mode()) === 0o120000 || (await theirs.mode()) === 0o120000) {
+    return {
+      cleanMerge: false,
+      mergeResult: {
+        mode: await ours.mode(),
+        path,
+        oid: await ours.oid(),
+        type,
+      },
     }
   }
   // if both sides made changes do a merge
@@ -420,5 +572,138 @@ async function mergeBlobs({
     dryRun,
   })
 
-  return { cleanMerge, mergeResult: { mode, path, oid, type } }
+  return {
+    cleanMerge: cleanMerge && !modeConflict,
+    mergeResult: { mode, path, oid, type },
+  }
+}
+
+/**
+ * Bring the working tree and the index from `ourOid` to `treeOid`. Only paths
+ * whose blob or mode differ are written or removed, so local edits in files
+ * the merge did not touch survive, like with git. Paths in `unmerged` keep the
+ * stage entries the merge recorded.
+ *
+ * @param {Object} args
+ * @param {import('../models/FileSystem').FileSystem} args.fs
+ * @param {object} args.cache
+ * @param {string} args.dir
+ * @param {string} args.gitdir
+ * @param {import('../models/GitIndex.js').GitIndex} args.index
+ * @param {string} args.treeOid
+ * @param {string} args.ourOid
+ * @param {Set<string>} args.unmerged
+ */
+export async function applyMergedTree({
+  fs,
+  cache,
+  dir,
+  gitdir,
+  index,
+  treeOid,
+  ourOid,
+  unmerged,
+}) {
+  const removed = []
+  await _walk({
+    fs,
+    cache,
+    dir,
+    gitdir,
+    trees: [TREE({ ref: treeOid }), TREE({ ref: ourOid })],
+    map: async (filepath, [merged, ours]) => {
+      if (filepath === '.') return
+      const mergedType = merged && (await merged.type())
+      const ourType = ours && (await ours.type())
+      // Nothing to do inside a directory the merge did not change.
+      if (
+        mergedType === 'tree' &&
+        ourType === 'tree' &&
+        (await merged.oid()) === (await ours.oid())
+      ) {
+        return null
+      }
+      if (!(await modified(merged, ours))) return
+      const fullpath = `${dir}/${filepath}`
+      const replacesDirectory = ourType === 'tree'
+      if (replacesDirectory) {
+        // A directory the merge removed is emptied file by file (untracked
+        // files in it survive) and dropped below. One replaced by a file has
+        // to go now, index entries included, and the walk must not descend
+        // into what is no longer there.
+        if (!merged) return
+        await fs.rmdir(fullpath, { recursive: true })
+        index.delete({ filepath })
+      } else if (ourType === 'commit') {
+        // Submodules are not checked out. Like git, a submodule the merge
+        // removes or replaces leaves the index, and its directory goes only
+        // when it is empty: the files in it are not ours.
+        if (mergedType !== 'commit') {
+          try {
+            await fs.rmdir(fullpath)
+          } catch (err) {
+            // Not empty.
+          }
+          index.delete({ filepath })
+          removed.push(filepath)
+        }
+      } else if (ours) {
+        // Only a creating write can set the mode, and a symlink cannot be
+        // rewritten in place, so a new mode, type or link target needs a
+        // fresh file.
+        if (
+          mergedType !== 'blob' ||
+          (await merged.mode()) !== (await ours.mode()) ||
+          (await merged.mode()) === 0o120000
+        ) {
+          await fs.rm(fullpath)
+        }
+        if (mergedType !== 'blob') {
+          index.delete({ filepath })
+          removed.push(filepath)
+        }
+      }
+      if (mergedType === 'commit') {
+        // Like git, stage the commit a submodule points at and give a new
+        // one an empty directory.
+        await assertNoSymlinkInLeadingPath(fs, dir, filepath)
+        await fs.mkdir(fullpath)
+        index.insert({ filepath, oid: await merged.oid(), mode: 0o160000 })
+        return null
+      }
+      if (mergedType !== 'blob') return
+      await assertNoSymlinkInLeadingPath(fs, dir, filepath)
+      const mode = await merged.mode()
+      const oid = await merged.oid()
+      const content = await merged.content()
+      if (mode === 0o120000) {
+        // Unlike write, writelink does not create the parent directory.
+        await fs.mkdir(dirname(fullpath))
+        await fs.writelink(fullpath, Buffer.from(content))
+      } else {
+        await fs.write(
+          fullpath,
+          content,
+          mode === 0o100755 ? { mode: 0o777 } : {}
+        )
+      }
+      const done = replacesDirectory ? null : undefined
+      if (unmerged.has(filepath)) return done
+      const stats = await fs.lstat(fullpath)
+      // The executable bit from lstat cannot be trusted on Windows.
+      if (mode === 0o100755) stats.mode = 0o755
+      index.insert({ filepath, stats, oid })
+      return done
+    },
+  })
+  // Like git, drop the directories the removals emptied.
+  for (const filepath of removed) {
+    for (let d = dirname(filepath); d !== '.'; d = dirname(d)) {
+      try {
+        await fs.rmdir(`${dir}/${d}`)
+      } catch (err) {
+        break
+      }
+    }
+  }
 }

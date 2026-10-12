@@ -135,4 +135,44 @@ describe('listUnmergedFiles', () => {
       ['gone.txt', '100644', undefined, '100644'], // deleted by us
     ])
   })
+
+  it('reports each side with its own mode', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-listUnmergedFiles-modes')
+    await init({ fs, dir, gitdir })
+    await fs.write(`${dir}/run.sh`, 'base\n', { mode: 0o777 })
+    await add({ fs, dir, gitdir, filepath: 'run.sh' })
+    await commit({ fs, dir, gitdir, message: 'base', author })
+    await branch({ fs, dir, gitdir, ref: 'other', checkout: true })
+    await fs.write(`${dir}/run.sh`, 'theirs\n', { mode: 0o777 })
+    await add({ fs, dir, gitdir, filepath: 'run.sh' })
+    await commit({ fs, dir, gitdir, message: 'other', author })
+    await checkout({ fs, dir, gitdir, ref: 'master' })
+    // ours drops the executable bit
+    await fs.rm(`${dir}/run.sh`)
+    await fs.write(`${dir}/run.sh`, 'ours\n')
+    await add({ fs, dir, gitdir, filepath: 'run.sh' })
+    await commit({ fs, dir, gitdir, message: 'master', author })
+    let error = null
+    try {
+      await merge({
+        fs,
+        dir,
+        gitdir,
+        theirs: 'other',
+        abortOnConflict: false,
+        author,
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+
+    const [file] = await listUnmergedFiles({ fs, dir, gitdir })
+    const sides = [file.base, file.ours, file.theirs]
+    expect(sides.map(side => side && side.mode)).toEqual([
+      '100755',
+      '100644',
+      '100755',
+    ])
+  })
 })
