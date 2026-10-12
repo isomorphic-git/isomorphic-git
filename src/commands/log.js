@@ -21,6 +21,7 @@ import { resolveFilepathEntry } from '../utils/resolveFilepath.js'
  * @param {string=} args.filepath optional get the commit for the filepath only
  * @param {string} args.ref
  * @param {number|void} args.depth
+ * @param {string} [args.author] - Return only commits whose author matches this case-insensitive JavaScript regular expression, tested against the author's `Name <email>` string
  * @param {boolean=} [args.force=false] do not throw error if filepath is not exist (works only for a single file). defaults to false
  * @param {boolean=} [args.follow=false] Continue listing the history of a file beyond renames (works only for a single file). defaults to false
  * @param {boolean=} [args.includeChanges=false] Include changed file object ids for each commit.
@@ -42,6 +43,7 @@ export async function _log({
   ref,
   depth,
   since,
+  author,
   force,
   follow,
   includeChanges,
@@ -50,9 +52,26 @@ export async function _log({
     typeof since === 'undefined'
       ? undefined
       : Math.floor(since.valueOf() / 1000)
+  // The pattern is a case-insensitive JavaScript regular expression that is
+  // matched against the author's "Name <email>" string.
+  const authorRegex =
+    author === undefined || author === null
+      ? undefined
+      : new RegExp(author, 'i')
+  const matchesAuthor = ({ commit }) => {
+    if (authorRegex === undefined) return true
+    if (!commit.author) return false
+    return authorRegex.test(`${commit.author.name} <${commit.author.email}>`)
+  }
+  const commits = []
   // TODO: In the future, we may want to have an API where we return a
   // async iterator that emits commits.
-  const commits = []
+  // Commits that do not match the author pattern are omitted from the
+  // result, but their history is still traversed so that file tracking and
+  // `depth` behave as they do without a filter.
+  const pushCommit = commit => {
+    if (matchesAuthor(commit)) commits.push(commit)
+  }
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const tips = [await _readCommit({ fs, cache, gitdir, oid })]
@@ -62,7 +81,7 @@ export async function _log({
   let isOk
 
   function endCommit(commit) {
-    if (isOk && filepath) commits.push(commit)
+    if (isOk && filepath) pushCommit(commit)
   }
 
   while (tips.length > 0) {
@@ -90,7 +109,7 @@ export async function _log({
           lastCommit &&
           (lastFileOid !== vFileEntry.oid || lastFileMode !== vFileEntry.mode)
         ) {
-          commits.push(lastCommit)
+          pushCommit(lastCommit)
         }
         lastFileOid = vFileEntry.oid
         lastFileMode = vFileEntry.mode
@@ -122,23 +141,23 @@ export async function _log({
                     if (found.length === 1) {
                       found = found[0]
                       filepath = found
-                      if (lastCommit) commits.push(lastCommit)
+                      if (lastCommit) pushCommit(lastCommit)
                     } else {
                       found = false
-                      if (lastCommit) commits.push(lastCommit)
+                      if (lastCommit) pushCommit(lastCommit)
                       break
                     }
                   }
                 }
               } else {
                 filepath = found
-                if (lastCommit) commits.push(lastCommit)
+                if (lastCommit) pushCommit(lastCommit)
               }
             }
           }
           if (!found) {
             if (isOk && lastFileOid) {
-              commits.push(lastCommit)
+              pushCommit(lastCommit)
               if (!force) break
             }
             if (!force && !follow) throw e
@@ -148,7 +167,7 @@ export async function _log({
         } else throw e
       }
     } else {
-      commits.push(commit)
+      pushCommit(commit)
     }
 
     // Stop the loop if we have enough commits now.
