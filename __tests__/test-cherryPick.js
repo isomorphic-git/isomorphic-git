@@ -717,6 +717,62 @@ describe('cherryPick', () => {
       expect(await resolveRef({ fs, gitdir, ref: 'HEAD' })).toBe(headOid)
       expect(await fs.read(join(dir, 'file.txt'), 'utf8')).toBe('local-dirty\n')
     })
+    it('writes a clean pick the way git does', async () => {
+      const { fs, dir, gitdir } = await makeFixture('tmp-cherry-clean-write')
+      await init({ fs, dir, gitdir })
+      await fs.write(join(dir, 'mod.txt'), 'short\n')
+      await fs.write(join(dir, 'gone.txt'), 'gone\n')
+      await fs.write(join(dir, 'mode.sh'), 'run\n')
+      await fs.write(join(dir, 'sub/x.txt'), 'x\n')
+      await add({ fs, dir, gitdir, filepath: '.' })
+      await gitCommit({ fs, dir, gitdir, message: 'base', author })
+      await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+      await fs.write(join(dir, 'mod.txt'), 'much longer content\n')
+      await remove({ fs, dir, gitdir, filepath: 'gone.txt' })
+      await fs.rm(join(dir, 'gone.txt'))
+      await fs.rm(join(dir, 'mode.sh'))
+      await fs.write(join(dir, 'mode.sh'), 'run\n', { mode: 0o777 })
+      await fs.write(join(dir, 'new.sh'), 'new\n', { mode: 0o777 })
+      await remove({ fs, dir, gitdir, filepath: 'sub/x.txt' })
+      await fs.rm(join(dir, 'sub/x.txt'))
+      await add({ fs, dir, gitdir, filepath: '.' })
+      const oid = await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'feature',
+        author,
+      })
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      await fs.write(join(dir, 'other.txt'), 'other\n')
+      await add({ fs, dir, gitdir, filepath: 'other.txt' })
+      await gitCommit({ fs, dir, gitdir, message: 'master', author })
+      // Only master changed other.txt, so the pick must not write it.
+      await fs.write(join(dir, 'other.txt'), 'local edit\n')
+
+      await cherryPick({ fs, dir, gitdir, oid, committer: author })
+
+      expect(await fs.read(join(dir, 'mod.txt'), 'utf8')).toBe(
+        'much longer content\n'
+      )
+      expect(await fs.read(join(dir, 'other.txt'), 'utf8')).toBe('local edit\n')
+      expect(await fs.exists(join(dir, 'gone.txt'))).toBe(false)
+      expect(await fs.exists(join(dir, 'sub'))).toBe(false)
+      const entries = await GitIndexManager.acquire(
+        { fs, gitdir, cache: {} },
+        async index => index.entriesMap
+      )
+      expect([...entries.keys()].sort()).toEqual([
+        'mod.txt',
+        'mode.sh',
+        'new.sh',
+        'other.txt',
+      ])
+      expect(entries.get('mode.sh').mode).toBe(0o100755)
+      expect(entries.get('new.sh').mode).toBe(0o100755)
+      // The recorded size is the new file's, so git does not see it as changed.
+      expect(entries.get('mod.txt').size).toBe('much longer content\n'.length)
+    })
     it('rejects any tracked local edit when conflicts would be written out', async () => {
       const repo = await setup('tmp-cherry-dirty-conflict-write')
       const { fs, dir, gitdir, featureOid } = repo

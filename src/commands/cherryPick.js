@@ -13,8 +13,7 @@ import { CherryPickRootCommitError } from '../errors/CherryPickRootCommitError.j
 import { MergeConflictError } from '../errors/MergeConflictError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
-import { mergeTree } from '../utils/mergeTree.js'
-import { applyTreeChanges } from '../utils/walkerToTreeEntryMap.js'
+import { applyMergedTree, mergeTree } from '../utils/mergeTree.js'
 import { worthWalking } from '../utils/worthWalking.js'
 
 /**
@@ -158,17 +157,22 @@ export async function _cherryPick({
 
   // If we actually updated the branch (not a dryRun and branch pointer updated),
   // make the working tree and index match the newly created commit so there are
-  // no staged/unstaged changes left after a successful cherry-pick.
-  // Skip it when `noUpdateBranch` is true.
+  // no staged/unstaged changes left after a successful cherry-pick. The same
+  // code as a conflicted merge does it, so files are written, deleted and
+  // staged the way git does. Skip it when `noUpdateBranch` is true.
   if (dir && !dryRun && !noUpdateBranch) {
-    await applyTreeChanges({
-      fs,
-      dir,
-      gitdir,
-      stashCommit: newOid,
-      parentCommit: currentOid,
-      wasStaged: true,
-    })
+    await GitIndexManager.acquire({ fs, gitdir, cache }, index =>
+      applyMergedTree({
+        fs,
+        cache,
+        dir,
+        gitdir,
+        index,
+        treeOid: mergedTreeOid,
+        ourOid: currentCommit.tree,
+        unmerged: new Set(),
+      })
+    )
   }
 
   return newOid
