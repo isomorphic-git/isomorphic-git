@@ -122,6 +122,7 @@ docs/listRefs.md
 docs/listRemotes.md
 docs/listServerRefs.md
 docs/listTags.md
+docs/listUnmergedFiles.md
 docs/log.md
 docs/merge.md
 docs/packObjects.md

@@ -40,6 +40,7 @@ import { listRefs } from './api/listRefs.js'
 import { listRemotes } from './api/listRemotes.js'
 import { listServerRefs } from './api/listServerRefs.js'
 import { listTags } from './api/listTags.js'
+import { listUnmergedFiles } from './api/listUnmergedFiles.js'
 import { log } from './api/log.js'
 import { merge } from './api/merge.js'
 import { packObjects } from './api/packObjects.js'
@@ -116,6 +117,7 @@ export {
   listRemotes,
   listServerRefs,
   listTags,
+  listUnmergedFiles,
   log,
   merge,
   packObjects,
@@ -191,6 +193,7 @@ export default {
   listRemotes,
   listServerRefs,
   listTags,
+  listUnmergedFiles,
   log,
   merge,
   packObjects,

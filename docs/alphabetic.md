@@ -41,6 +41,7 @@ sidebar_label: Alphabetical Index
 - [listRemotes](listRemotes)
 - [listServerRefs](listServerRefs)
 - [listTags](listTags)
+- [listUnmergedFiles](listUnmergedFiles)
 - [log](log)
 - [merge](merge)
 - [packObjects](packObjects)
