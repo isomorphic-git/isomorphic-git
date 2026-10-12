@@ -128,7 +128,9 @@ export async function _cherryPick({
         theirOid: cherryCommit.tree,
         ourName: 'HEAD',
         baseName: `parent of ${cherryOid.slice(0, 7)}`,
-        theirName: cherryOid.slice(0, 7),
+        theirName: `${cherryOid.slice(0, 7)} (${
+          cherryCommit.message.split('\n')[0]
+        })`,
         dryRun,
         abortOnConflict,
         mergeDriver,

@@ -1852,7 +1852,7 @@ describe('merge', () => {
       const error = await tryMerge(repo)
       expect(error && error.code).toBe(Errors.MergeConflictError.code)
       expect(await repo.fs.read(`${repo.dir}/f.txt`, 'utf8')).toBe(
-        '<<<<<<< master\nb\n=======\nc\n>>>>>>> fé-功能\n'
+        '<<<<<<< HEAD\nb\n=======\nc\n>>>>>>> fé-功能\n'
       )
     })
 
@@ -1874,7 +1874,7 @@ describe('merge', () => {
       }
       expect(await tryMerge(repo, { mergeDriver })).toBeNull()
       expect(seen).toEqual({
-        branches: ['base', 'master', 'fé-功能'],
+        branches: ['base', 'HEAD', 'fé-功能'],
         contents: ['ä\n', 'ö\n', '功\n'],
       })
       expect(await merged(repo, 'f.txt')).toEqual(Array.from(text('ö\n功\n')))
@@ -1901,6 +1901,55 @@ describe('merge', () => {
       expect(await merged(repo, 'f.bin')).toEqual(
         Array.from(text('\0theirs 功\n'))
       )
+    })
+  })
+
+  describe('conflict markers', () => {
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    it('labels our side HEAD when ours is the checked-out branch, like git', async () => {
+      for (const ours of [undefined, 'master']) {
+        const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+          `tmp-merge-label-${ours || 'default'}`
+        )
+        await init({ fs, dir, gitdir })
+        await fs.write(`${dir}/file.txt`, 'base\n')
+        await add({ fs, dir, gitdir, filepath: 'file.txt' })
+        await gitCommit({ fs, dir, gitdir, message: 'base', author })
+        await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+        await fs.write(`${dir}/file.txt`, 'feature change\n')
+        await add({ fs, dir, gitdir, filepath: 'file.txt' })
+        await gitCommit({ fs, dir, gitdir, message: 'feature', author })
+        await checkout({ fs, dir, gitdir, ref: 'master' })
+        await fs.write(`${dir}/file.txt`, 'master change\n')
+        await add({ fs, dir, gitdir, filepath: 'file.txt' })
+        await gitCommit({ fs, dir, gitdir, message: 'master change', author })
+
+        let error = null
+        try {
+          await merge({
+            fs,
+            dir,
+            gitdir,
+            ours,
+            theirs: 'feature',
+            abortOnConflict: false,
+            author,
+          })
+        } catch (e) {
+          error = e
+        }
+        expect(error).not.toBeNull()
+        expect(error.code).toBe(Errors.MergeConflictError.code)
+        expect(await fs.read(`${dir}/file.txt`, 'utf8')).toBe(
+          '<<<<<<< HEAD\nmaster change\n=======\nfeature change\n>>>>>>> feature\n'
+        )
+      }
     })
   })
 })

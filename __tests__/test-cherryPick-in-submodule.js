@@ -789,6 +789,71 @@ describe('cherryPick in submodule', () => {
     expect(error.data.oid).toBe(rootOid)
   })
 
+  it('labels conflict markers like git (submodule)', async () => {
+    const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
+    const { dir, gitdir } = await makeFixture('tmp-cherry-sub-label')
+    await fssp._mkdir(join(dirsp, '.git'))
+    await fssp._mkdir(join(dirsp, '.git', 'modules'))
+    const gitdirsmfullpath = join(dirsp, '.git', 'modules', 'mysubmodule-label')
+    await fssp._cp(gitdir, gitdirsmfullpath, { recursive: true })
+    const officialSubmoduleDir = join(dirsp, 'mysubmodule-label')
+    await fssp._cp(dir, officialSubmoduleDir, { recursive: true })
+    const submoduleGitFile = join(officialSubmoduleDir, '.git')
+    await fssp._writeFile(
+      submoduleGitFile,
+      'gitdir: ../.git/modules/mysubmodule-label\n'
+    )
+    const repo = {
+      fs: fssp,
+      dir: officialSubmoduleDir,
+      gitdir: submoduleGitFile,
+    }
+    const author = {
+      name: 'Tester',
+      email: 'test@example.com',
+      timestamp: 1600000000,
+      timezoneOffset: 0,
+    }
+    const write = content =>
+      fssp._writeFile(join(officialSubmoduleDir, 'file.txt'), content)
+
+    await init(repo)
+    await write('base\n')
+    await add({ ...repo, filepath: 'file.txt' })
+    await gitCommit({ ...repo, message: 'base', author })
+    await branch({ ...repo, ref: 'feature', checkout: true })
+    await write('feature change\n')
+    await add({ ...repo, filepath: 'file.txt' })
+    const featureOid = await gitCommit({ ...repo, message: 'feature', author })
+    await checkout({ ...repo, ref: 'master' })
+    await write('master change\n')
+    await add({ ...repo, filepath: 'file.txt' })
+    await gitCommit({ ...repo, message: 'master change', author })
+
+    let error = null
+    try {
+      await cherryPick({
+        ...repo,
+        oid: featureOid,
+        abortOnConflict: false,
+        committer: author,
+      })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+    expect(error.code).toBe(Errors.MergeConflictError.code)
+    expect(
+      (await fssp.read(join(officialSubmoduleDir, 'file.txt'))).toString()
+    ).toBe(
+      `<<<<<<< HEAD\nmaster change\n=======\nfeature change\n>>>>>>> ${featureOid.slice(
+        0,
+        7
+      )} (feature)\n`
+    )
+  })
+
   it('throws MissingNameError when committer not set and user.name missing (submodule)', async () => {
     const { fs: fssp, dir: dirsp } = await makeFixture('superproject-test')
     const { dir, gitdir } = await makeFixture('tmp-cherry-sub4')

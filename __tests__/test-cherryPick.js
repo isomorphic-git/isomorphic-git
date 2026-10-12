@@ -320,9 +320,14 @@ describe('cherryPick', () => {
     expect(error).not.toBeNull()
     expect(error.code).toBe(Errors.MergeConflictError.code)
 
-    // Workdir should contain conflict markers
+    // Workdir should contain conflict markers, labelled like git labels them
     const content = (await fs.read(join(dir, 'file.txt'))).toString()
-    expect(content).toMatch(/<{7,}/) // '<<<<<<<' exists
+    expect(content).toBe(
+      `<<<<<<< HEAD\nmaster change\n=======\nfeature change\n>>>>>>> ${featureOid.slice(
+        0,
+        7
+      )} (feature)\n`
+    )
 
     // Index should have unmerged path for file.txt with multiple stages
     await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {

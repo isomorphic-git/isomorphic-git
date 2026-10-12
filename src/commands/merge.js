@@ -76,9 +76,8 @@ export async function _merge({
   mergeDriver,
   allowUnrelatedHistories = false,
 }) {
-  if (ours === undefined) {
-    ours = await _currentBranch({ fs, gitdir, fullname: true })
-  }
+  const currentBranch = await _currentBranch({ fs, gitdir, fullname: true })
+  if (ours === undefined) ours = currentBranch
   ours = await GitRefManager.expand({
     fs,
     gitdir,
@@ -151,7 +150,8 @@ export async function _merge({
           ourOid,
           theirOid,
           baseOid,
-          ourName: abbreviateRef(ours),
+          // git labels our side HEAD, which is what ours normally is
+          ourName: ours === currentBranch ? 'HEAD' : abbreviateRef(ours),
           baseName: 'base',
           theirName: abbreviateRef(theirs),
           dryRun,
