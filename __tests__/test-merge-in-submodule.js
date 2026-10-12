@@ -5,12 +5,18 @@ import {
   Errors,
   merge,
   add,
+  branch,
+  checkout,
+  init,
+  readBlob,
   resolveRef,
   log,
+  status,
   statusMatrix,
   commit as gitCommit,
   annotatedTag,
 } from 'isomorphic-git'
+import { GitIndexManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 
@@ -1637,5 +1643,264 @@ describe('merge', () => {
 
     // The text conflict still materialises in the working directory.
     expect(await fs.read(`${dir}/doc.txt`, 'utf8')).toContain('<<<<<<<')
+  })
+
+  describe('binary files and other bytes', () => {
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    // Commits base on master, theirs on a branch, then ours on master.
+    const setup = async (files, theirName = 'feature') => {
+      const { fs, dir, gitdir } =
+        await makeFixtureAsSubmodule('tmp-merge-binary')
+      await init({ fs, dir, gitdir })
+      const commitAll = async version => {
+        for (const [filepath, versions] of Object.entries(files)) {
+          await fs.write(`${dir}/${filepath}`, versions[version])
+        }
+        await add({ fs, dir, gitdir, filepath: '.' })
+        await gitCommit({ fs, dir, gitdir, message: version, author })
+      }
+      await commitAll('base')
+      await branch({ fs, dir, gitdir, ref: theirName, checkout: true })
+      await commitAll('theirs')
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      await commitAll('ours')
+      return { fs, dir, gitdir, theirName }
+    }
+    // Merges theirs into master, writing conflicts out; returns the error.
+    const tryMerge = async ({ fs, dir, gitdir, theirName }, options = {}) => {
+      try {
+        await merge({
+          fs,
+          dir,
+          gitdir,
+          ours: 'master',
+          theirs: theirName,
+          abortOnConflict: false,
+          author,
+          ...options,
+        })
+        return null
+      } catch (e) {
+        return e
+      }
+    }
+    const text = s => Buffer.from(s, 'utf8')
+    // The bytes of a file in the merge commit (a clean merge leaves the
+    // working tree alone).
+    const merged = async ({ fs, gitdir }, filepath) => {
+      const oid = await resolveRef({ fs, gitdir, ref: 'master' })
+      return Array.from((await readBlob({ fs, gitdir, oid, filepath })).blob)
+    }
+
+    it('does not merge binary files and keeps other bytes intact', async () => {
+      const { fs, dir, gitdir, gitdirsmfullpath } =
+        await makeFixtureAsSubmodule('tmp-merge-binary')
+      await init({ fs, dir, gitdir })
+      // A NUL byte in the first 8000 bytes makes a file binary, like in git.
+      const binary = {
+        base: Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x00, 1, 2, 3]),
+        feature: Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x00, 1, 2, 4]),
+        master: Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x00, 1, 2, 5]),
+      }
+      // Latin-1 text with a lone CR inside a line: not valid UTF-8 and not a
+      // line ending git knows, but still text.
+      const latin1 = {
+        base: Buffer.from('caf\xe9\rcr\nmiddle\nend\n', 'latin1'),
+        feature: Buffer.from('caf\xe9\rcr\nmiddle\nfeature\n', 'latin1'),
+        master: Buffer.from('master caf\xe9\rcr\nmiddle\nend\n', 'latin1'),
+        merged: Buffer.from('master caf\xe9\rcr\nmiddle\nfeature\n', 'latin1'),
+      }
+      const commitBoth = async (version, message) => {
+        await fs.write(`${dir}/image.bin`, binary[version])
+        await fs.write(`${dir}/latin1.txt`, latin1[version])
+        await add({ fs, dir, gitdir, filepath: '.' })
+        return gitCommit({ fs, dir, gitdir, message, author })
+      }
+      const baseOid = await commitBoth('base', 'base')
+      await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+      const featureOid = await commitBoth('feature', 'feature')
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      const masterOid = await commitBoth('master', 'master')
+
+      let error = null
+      try {
+        await merge({
+          fs,
+          dir,
+          gitdir,
+          ours: 'master',
+          theirs: 'feature',
+          abortOnConflict: false,
+          author,
+        })
+      } catch (e) {
+        error = e
+      }
+      expect(error).not.toBeNull()
+      expect(error.code).toBe(Errors.MergeConflictError.code)
+      expect(error.data.filepaths).toEqual(['image.bin'])
+
+      // Ours stays in the working tree, all three versions are in the index.
+      expect(Array.from(await fs.read(`${dir}/image.bin`))).toEqual(
+        Array.from(binary.master)
+      )
+      const index = await GitIndexManager.acquire(
+        { fs, gitdir: gitdirsmfullpath, cache: {} },
+        async index => index.entriesMap.get('image.bin').stages
+      )
+      const blob = async oid =>
+        (await readBlob({ fs, gitdir, oid, filepath: 'image.bin' })).oid
+      expect(index[0]).toBeUndefined()
+      expect(index.slice(1).map(entry => entry.oid)).toEqual([
+        await blob(baseOid),
+        await blob(masterOid),
+        await blob(featureOid),
+      ])
+
+      // The text file merged cleanly, byte for byte.
+      expect(Array.from(await fs.read(`${dir}/latin1.txt`))).toEqual(
+        Array.from(latin1.merged)
+      )
+      expect(await status({ fs, dir, gitdir, filepath: 'latin1.txt' })).toBe(
+        'modified'
+      )
+    })
+
+    it.each([
+      [
+        'base',
+        {
+          base: text('a\n\0\n'),
+          ours: text('ours\n'),
+          theirs: text('theirs\n'),
+        },
+      ],
+      [
+        'ours',
+        {
+          base: text('a\nb\nc\n'),
+          ours: text('a\nb\n\0\n'),
+          theirs: text('A\nb\nc\n'),
+        },
+      ],
+      [
+        'theirs',
+        {
+          base: text('a\nb\nc\n'),
+          ours: text('A\nb\nc\n'),
+          theirs: text('a\nb\n\0\n'),
+        },
+      ],
+    ])('does not merge a file that is binary only in %s', async (_, files) => {
+      const repo = await setup({ 'f.txt': files })
+      const error = await tryMerge(repo)
+      expect(error && error.code).toBe(Errors.MergeConflictError.code)
+      expect(error.data.filepaths).toEqual(['f.txt'])
+      expect(Array.from(await repo.fs.read(`${repo.dir}/f.txt`))).toEqual(
+        Array.from(files.ours)
+      )
+    })
+
+    it('treats a file as binary only for a NUL in its first 8000 bytes', async () => {
+      // 100 lines of 100 bytes after the first line; byte `at` is set to NUL.
+      const version = (at, first, last) => {
+        const buffer = text(
+          `${first}\n${`${'y'.repeat(99)}\n`.repeat(100)}${last}\n`
+        )
+        buffer[at] = 0
+        return buffer
+      }
+      const files = at => ({
+        'f.txt': {
+          base: version(at, 'a', 'end'),
+          ours: version(at, 'b', 'end'),
+          theirs: version(at, 'a', 'END'),
+        },
+      })
+
+      const binary = await setup(files(7999))
+      const error = await tryMerge(binary)
+      expect(error && error.code).toBe(Errors.MergeConflictError.code)
+      expect(Array.from(await binary.fs.read(`${binary.dir}/f.txt`))).toEqual(
+        Array.from(version(7999, 'b', 'end'))
+      )
+
+      const textual = await setup(files(8000))
+      expect(await tryMerge(textual)).toBeNull()
+      expect(await merged(textual, 'f.txt')).toEqual(
+        Array.from(version(8000, 'b', 'END'))
+      )
+    })
+
+    it('writes non-ASCII branch names into conflict markers as UTF-8', async () => {
+      const repo = await setup(
+        {
+          'f.txt': {
+            base: text('a\n'),
+            ours: text('b\n'),
+            theirs: text('c\n'),
+          },
+        },
+        'fé-功能'
+      )
+      const error = await tryMerge(repo)
+      expect(error && error.code).toBe(Errors.MergeConflictError.code)
+      expect(await repo.fs.read(`${repo.dir}/f.txt`, 'utf8')).toBe(
+        '<<<<<<< master\nb\n=======\nc\n>>>>>>> fé-功能\n'
+      )
+    })
+
+    it('gives custom merge drivers UTF-8 strings', async () => {
+      const repo = await setup(
+        {
+          'f.txt': {
+            base: text('ä\n'),
+            ours: text('ö\n'),
+            theirs: text('功\n'),
+          },
+        },
+        'fé-功能'
+      )
+      let seen = null
+      const mergeDriver = ({ branches, contents }) => {
+        seen = { branches, contents }
+        return { cleanMerge: true, mergedText: `${contents[1]}${contents[2]}` }
+      }
+      expect(await tryMerge(repo, { mergeDriver })).toBeNull()
+      expect(seen).toEqual({
+        branches: ['base', 'master', 'fé-功能'],
+        contents: ['ä\n', 'ö\n', '功\n'],
+      })
+      expect(await merged(repo, 'f.txt')).toEqual(Array.from(text('ö\n功\n')))
+    })
+
+    it('still calls custom merge drivers for binary files', async () => {
+      const repo = await setup({
+        'f.bin': {
+          base: text('\0base é\n'),
+          ours: text('\0ours\n'),
+          theirs: text('\0theirs 功\n'),
+        },
+      })
+      let seen = null
+      const mergeDriver = ({ contents, path }) => {
+        seen = { contents, path }
+        return { cleanMerge: true, mergedText: contents[2] }
+      }
+      expect(await tryMerge(repo, { mergeDriver })).toBeNull()
+      expect(seen).toEqual({
+        contents: ['\0base é\n', '\0ours\n', '\0theirs 功\n'],
+        path: 'f.bin',
+      })
+      expect(await merged(repo, 'f.bin')).toEqual(
+        Array.from(text('\0theirs 功\n'))
+      )
+    })
   })
 })
