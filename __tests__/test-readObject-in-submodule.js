@@ -2,6 +2,7 @@
 import { Errors, readObject } from 'isomorphic-git'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
+import { corruptZlibCases } from './__helpers__/corruptZlib.js'
 
 describe('readObject', () => {
   it('test missing', async () => {
@@ -638,4 +639,36 @@ describe('readObject', () => {
     expect(error instanceof Errors.InvalidFilepathError).toBe(true)
     expect(error.data.reason).toBe('trailing-slash')
   })
+  for (const [name, bytes] of corruptZlibCases) {
+    it(`reports the decompression error for ${name} loose data`, async () => {
+      const { fs, gitdir, gitdirsmfullpath } =
+        await makeFixtureAsSubmodule('test-readObject')
+      const oid = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      // Corrupt the object store, while the API still discovers it through the .git file.
+      await fs.write(
+        `${gitdirsmfullpath}/objects/aa/${oid.slice(2)}`,
+        Uint8Array.from(bytes)
+      )
+      /** @type {Array<'parsed' | 'content' | 'wrapped'>} */
+      const formats = ['parsed', 'content', 'wrapped']
+      for (const format of formats) {
+        let error = null
+        try {
+          await readObject({ fs, gitdir, oid, format })
+        } catch (err) {
+          error = err
+        }
+        expect(error instanceof Error).toBe(true)
+        expect(error.name).toBe('DecompressionError')
+        expect(error.code).toBe('DecompressionError')
+        expect(error.isIsomorphicGitError).toBe(true)
+        expect(error.caller).toBe('git.readObject')
+        expect(error.message).toMatch(/^Invalid compressed buffer: .+/)
+      }
+      const raw = await readObject({ fs, gitdir, oid, format: 'deflated' })
+      expect(raw.format).toBe('deflated')
+      if (raw.format !== 'deflated') throw new Error('wrong type')
+      expect(Array.from(raw.object)).toEqual(bytes)
+    })
+  }
 })

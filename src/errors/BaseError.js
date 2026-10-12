@@ -8,9 +8,10 @@ export class BaseError extends Error {
 
   toJSON() {
     // Error objects aren't normally serializable. So we do something about that.
+    const metadata = /** @type {any} */ (this)
     return {
-      code: this.code,
-      data: this.data,
+      code: metadata.code,
+      data: metadata.data,
       caller: this.caller,
       message: this.message,
       stack: this.stack,
@@ -19,8 +20,9 @@ export class BaseError extends Error {
 
   fromJSON(json) {
     const e = new BaseError(json.message)
-    e.code = json.code
-    e.data = json.data
+    const metadata = /** @type {any} */ (e)
+    metadata.code = json.code
+    metadata.data = json.data
     e.caller = json.caller
     e.stack = json.stack
     return e
