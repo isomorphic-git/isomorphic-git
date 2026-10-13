@@ -2,6 +2,27 @@
 import { GitPktLine } from 'isomorphic-git/internal-apis'
 
 describe('GitPktLine', () => {
+  it.each([
+    [['PACK'], 'four hexadecimal digits', 'PACK'],
+    [['<!DO'], 'four hexadecimal digits', '<!DO'],
+    [['00g8'], 'four hexadecimal digits', '00g8'],
+    [['0002'], 'pkt-line length of 0, 1, or at least 4', '0002'],
+    [['00'], 'four hexadecimal digits', '00'],
+    [['00', '08N', 'A'], '4 bytes of pkt-line data', '2 bytes'],
+  ])('rejects malformed pkt-line %#', async (chunks, expected, actual) => {
+    const iterator = chunks.map(chunk => Buffer.from(chunk))[Symbol.iterator]()
+    const stream = {
+      next() {
+        return iterator.next()
+      },
+    }
+    const read = GitPktLine.streamReader(stream)
+    expect(await read()).toBe(true)
+    expect(stream.error.code).toBe('ParseError')
+    expect(stream.error.data.expected).toBe(expected)
+    expect(stream.error.data.actual).toBe(actual)
+  })
+
   it('read stream - simple', async () => {
     const stream = [Buffer.from('0010hello world\n')]
     const read = GitPktLine.streamReader(stream)
