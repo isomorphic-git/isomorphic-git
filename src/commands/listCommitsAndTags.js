@@ -37,35 +37,67 @@ export async function listCommitsAndTags({
       finishingSet.add(oid)
     } catch (err) {}
   }
+  // The remote has everything reachable from `finish`, not just `finish`
+  // itself, so stopping only at those commits walks to the root after a
+  // merge. Like `git rev-list start --not finish`, walk both sides newest
+  // first and stop once only commits reachable from `finish` are left.
+  // Clock skew can make us send too much, never too little.
   const visited = new Set()
+  const uninteresting = new Set()
+  // Commits whose parents are still to be walked, newest first
+  const queue = []
   // Because git commits are named by their hash, there is no
   // way to construct a cycle. Therefore we won't worry about
   // setting a default recursion limit.
-  async function walk(oid) {
-    visited.add(oid)
-    const { type, object } = await readObject({ fs, cache, gitdir, oid })
+  async function walk(oid, isUninteresting = false) {
+    if (uninteresting.has(oid)) return
+    if (!isUninteresting && visited.has(oid)) return
+    let result
+    try {
+      result = await readObject({ fs, cache, gitdir, oid })
+    } catch (err) {
+      // We may not have the commits the remote advertises
+      if (isUninteresting) return
+      throw err
+    }
+    const { type, object } = result
+    ;(isUninteresting ? uninteresting : visited).add(oid)
     // Recursively resolve annotated tags
     if (type === 'tag') {
       const tag = GitAnnotatedTag.from(object)
       const commit = tag.headers().object
-      return walk(commit)
+      return walk(commit, isUninteresting)
     }
     if (type !== 'commit') {
+      if (isUninteresting) return
       throw new ObjectTypeError(oid, type, 'commit')
     }
     if (!shallows.has(oid)) {
       const commit = GitCommit.from(object)
       const parents = commit.headers().parent
-      for (oid of parents) {
-        if (!finishingSet.has(oid) && !visited.has(oid)) {
-          await walk(oid)
-        }
-      }
+      const { timestamp } = commit.headers().committer
+      let i = 0
+      while (i < queue.length && queue[i].timestamp >= timestamp) i++
+      queue.splice(i, 0, { oid, timestamp, parents })
     }
+  }
+  for (const oid of finishingSet) {
+    await walk(oid, true)
   }
   // Let's go walking!
   for (const oid of startingSet) {
     await walk(oid)
+  }
+  while (queue.some(entry => !uninteresting.has(entry.oid))) {
+    const { oid, parents } = queue.shift()
+    // A commit can be marked uninteresting after it was queued
+    const isUninteresting = uninteresting.has(oid)
+    for (const parent of parents) {
+      await walk(parent, isUninteresting)
+    }
+  }
+  for (const oid of uninteresting) {
+    visited.delete(oid)
   }
   return visited
 }
