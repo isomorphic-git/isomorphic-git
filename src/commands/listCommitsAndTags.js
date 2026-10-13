@@ -49,6 +49,14 @@ export async function listCommitsAndTags({
   // Because git commits are named by their hash, there is no
   // way to construct a cycle. Therefore we won't worry about
   // setting a default recursion limit.
+  /**
+   * Reads `oid`, peeling annotated tags, marks the commit as visited or
+   * uninteresting, and queues its parents to be walked.
+   *
+   * @param {string} oid
+   * @param {boolean} [isUninteresting] - true if the remote has this commit
+   * @returns {Promise<void>}
+   */
   async function walk(oid, isUninteresting = false) {
     if (uninteresting.has(oid)) return
     if (!isUninteresting && visited.has(oid)) return

@@ -17,6 +17,13 @@ import { makeFixture } from './__helpers__/FixtureFS.js'
 async function writeHistory({ fs, gitdir }) {
   const tree = await writeTree({ fs, gitdir, tree: [] })
   let timestamp = 1262356920
+  /**
+   * Writes a commit one second newer than the last one.
+   *
+   * @param {string} message
+   * @param {string[]} parent
+   * @returns {Promise<string>} the commit's oid
+   */
   async function commit(message, parent) {
     const person = {
       name: 'Mr. Test',
