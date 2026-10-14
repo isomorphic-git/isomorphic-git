@@ -6,6 +6,14 @@ import { mkdirp } from '../utils/mkdirp.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
 import { isPromiseLike } from '../utils/types.js'
 
+// React Native file systems on iOS report a missing file with codes like
+// ENSCOCOAERRORDOMAIN260 instead of ENOENT.
+function isNotFoundError(err) {
+  const code = err.code
+  if (typeof code !== 'string') return false
+  return code === 'ENOENT' || code === 'ENOTDIR' || code.includes('ENS')
+}
+
 function isPromiseFs(fs) {
   const test = targetFs => {
     try {
@@ -95,11 +103,7 @@ export class FileSystem {
       await this._stat(filepath)
       return true
     } catch (err) {
-      if (
-        err.code === 'ENOENT' ||
-        err.code === 'ENOTDIR' ||
-        (err.code || '').includes('ENS')
-      ) {
+      if (isNotFoundError(err)) {
         return false
       } else {
         console.log('Unhandled error in "FileSystem.exists()" function', err)
@@ -258,7 +262,7 @@ export class FileSystem {
       const stats = await this._lstat(filename)
       return stats
     } catch (err) {
-      if (err.code === 'ENOENT' || (err.code || '').includes('ENS')) {
+      if (isNotFoundError(err)) {
         return null
       }
       throw err
@@ -280,7 +284,7 @@ export class FileSystem {
       const link = await this._readlink(filename, opts)
       return Buffer.isBuffer(link) ? link : Buffer.from(link)
     } catch (err) {
-      if (err.code === 'ENOENT' || (err.code || '').includes('ENS')) {
+      if (isNotFoundError(err)) {
         return null
       }
       throw err
