@@ -388,8 +388,9 @@ export class GitRefManager {
         ref: 'HEAD',
         depth: 2,
       })
-    } catch (_) {
-      return false
+    } catch (err) {
+      if (err instanceof NotFoundError) return false
+      throw err
     }
     if (!target.startsWith('refs/heads/')) return false
     return ref === 'HEAD' || refpaths(ref).includes(target)
@@ -409,7 +410,8 @@ export class GitRefManager {
       await GitRefManager.expand({ fs, gitdir, ref })
       return true
     } catch (err) {
-      return false
+      if (err instanceof NotFoundError) return false
+      throw err
     }
   }
 
@@ -529,7 +531,7 @@ export class GitRefManager {
    * @returns {Promise<string[]>} - A sorted list of refs.
    */
   static async listRefs({ fs, gitdir, filepath }) {
-    const packedMap = GitRefManager.packedRefs({ fs, gitdir })
+    const packedMap = await GitRefManager.packedRefs({ fs, gitdir })
     let files = null
     try {
       files = await fs.readdirDeep(`${gitdir}/${filepath}`)
@@ -538,7 +540,7 @@ export class GitRefManager {
       files = []
     }
 
-    for (let key of (await packedMap).keys()) {
+    for (let key of packedMap.keys()) {
       // filter by prefix
       if (key.startsWith(filepath)) {
         // remove prefix

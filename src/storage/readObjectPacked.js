@@ -29,7 +29,12 @@ export async function readObjectPacked({
       // Derive the .pack path from the .idx path
       const packFile = indexFile.replace(/idx$/, 'pack')
       if (!p.pack) {
-        p.pack = fs.read(packFile)
+        const read = fs.read(packFile)
+        p.pack = read
+        // Let the next call retry a failed read instead of reusing it.
+        read.catch(() => {
+          if (p.pack === read) p.pack = null
+        })
       }
       const pack = await p.pack
       if (!pack) {

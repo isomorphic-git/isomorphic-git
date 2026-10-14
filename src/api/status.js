@@ -137,8 +137,7 @@ export async function status({
           // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
           // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
           if (stats.size !== -1) {
-            // We don't await this so we can return faster for one-off cases.
-            GitIndexManager.acquire(
+            await GitIndexManager.acquire(
               { fs, gitdir: updatedGitdir, cache },
               async function (index) {
                 index.insert({ filepath, stats, oid: workdirOid })
@@ -266,6 +265,7 @@ async function getHeadTree({ fs, cache, gitdir: updatedGitdir }) {
     if (e instanceof NotFoundError) {
       return []
     }
+    throw e
   }
   const { tree } = await _readTree({ fs, cache, gitdir: updatedGitdir, oid })
   return tree

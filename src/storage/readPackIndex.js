@@ -33,6 +33,12 @@ export function readPackIndex({
       emitterPrefix,
     })
     cache[PackfileCache].set(filename, p)
+    // Let the next call retry a failed load instead of reusing it.
+    p.catch(() => {
+      if (cache[PackfileCache].get(filename) === p) {
+        cache[PackfileCache].delete(filename)
+      }
+    })
   }
   return p
 }

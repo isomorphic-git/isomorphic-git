@@ -78,7 +78,7 @@ export async function _checkout({
     // TODO: Figure out what to do if both 'ref' and 'remote' are specified, ref already exists,
     // and is configured to track a different remote.
   } catch (err) {
-    if (ref === 'HEAD') throw err
+    if (ref === 'HEAD' || !(err instanceof NotFoundError)) throw err
     // If `ref` doesn't exist, create a new remote tracking branch
     // Figure out the commit to checkout
     const remoteRef = `${remote}/${ref}`
