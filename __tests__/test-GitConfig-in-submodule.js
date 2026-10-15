@@ -216,6 +216,45 @@ describe('GitConfig', () => {
       const a = await config.get('foo.keyaaa')
       expect(a).toEqual('valaaa')
     })
+
+    it('comment after a quoted value with ; or #', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = "val;aaa" # comment
+      keybbb = "val#bbb" ; comment`)
+      const a = await config.get('foo.keyaaa')
+      expect(a).toEqual('val;aaa')
+      const b = await config.get('foo.keybbb')
+      expect(b).toEqual('val#bbb')
+    })
+  })
+
+  describe('handle escape sequences', () => {
+    it('backslash', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = C:\\\\Users\\\\me\\\\.gitignore`)
+      const a = await config.get('foo.keyaaa')
+      expect(a).toEqual('C:\\Users\\me\\.gitignore')
+    })
+
+    it('tab, newline and backspace', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = log\\t--oneline
+      keybbb = line1\\nline2
+      keyccc = val\\bccc`)
+      const a = await config.get('foo.keyaaa')
+      expect(a).toEqual('log\t--oneline')
+      const b = await config.get('foo.keybbb')
+      expect(b).toEqual('line1\nline2')
+      const c = await config.get('foo.keyccc')
+      expect(c).toEqual('val\bccc')
+    })
+
+    it('quotes and backslashes together', async () => {
+      const config = GitConfig.from(`[core]
+      sshCommand = ssh -i \\"C:\\\\keys\\\\id_rsa\\"`)
+      const a = await config.get('core.sshCommand')
+      expect(a).toEqual('ssh -i "C:\\keys\\id_rsa"')
+    })
   })
 
   describe('get cast value', () => {
@@ -376,6 +415,40 @@ describe('GitConfig', () => {
       expect(config.toString()).toEqual(`[remote "foo"]
 \tbar = "hello;world"
       url = https://foo.com/project.git`)
+    })
+
+    it('new value with backslashes and quotes', async () => {
+      const config = GitConfig.from(`[core]`)
+      await config.set('core.excludesFile', 'C:\\Users\\me\\.gitignore')
+      await config.set('core.sshCommand', 'ssh -i "C:\\keys\\id_rsa"')
+      expect(config.toString()).toEqual(`[core]
+\tsshCommand = ssh -i \\"C:\\\\keys\\\\id_rsa\\"
+\texcludesFile = C:\\\\Users\\\\me\\\\.gitignore`)
+      const reparsed = GitConfig.from(config.toString())
+      expect(await reparsed.get('core.excludesFile')).toEqual(
+        'C:\\Users\\me\\.gitignore'
+      )
+      expect(await reparsed.get('core.sshCommand')).toEqual(
+        'ssh -i "C:\\keys\\id_rsa"'
+      )
+    })
+
+    it('new value with leading or trailing spaces', async () => {
+      const config = GitConfig.from(`[foo]`)
+      await config.set('foo.bar', ' hello world ')
+      expect(config.toString()).toEqual(`[foo]
+\tbar = " hello world "`)
+      const reparsed = GitConfig.from(config.toString())
+      expect(await reparsed.get('foo.bar')).toEqual(' hello world ')
+    })
+
+    it('new value with tab, newline, # and quotes', async () => {
+      const config = GitConfig.from(`[foo]`)
+      await config.set('foo.bar', 'a\tb\nc # "d"')
+      expect(config.toString()).toEqual(`[foo]
+\tbar = "a\\tb\\nc # \\"d\\""`)
+      const reparsed = GitConfig.from(config.toString())
+      expect(await reparsed.get('foo.bar')).toEqual('a\tb\nc # "d"')
     })
   })
 

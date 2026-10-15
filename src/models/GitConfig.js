@@ -57,9 +57,6 @@ const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 const VARIABLE_LINE_REGEX = /^([A-Za-z][A-Za-z0-9-]*)(?:\s*=\s*(.*))?$/
 const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9-]*$/
 
-// Comments start with either # or ; and extend to the end of line
-const VARIABLE_VALUE_COMMENT_REGEX = /^(.*?)( *[#;].*)$/
-
 const extractSectionLine = line => {
   const matches = SECTION_LINE_REGEX.exec(line)
   if (matches != null) {
@@ -73,43 +70,61 @@ const extractVariableLine = line => {
   const matches = VARIABLE_LINE_REGEX.exec(line)
   if (matches != null) {
     const [name, rawValue = 'true'] = matches.slice(1)
-    const valueWithoutComments = removeComments(rawValue)
-    const valueWithoutQuotes = removeQuotes(valueWithoutComments)
-    return [name, valueWithoutQuotes]
+    return [name, parseValue(rawValue)]
   }
   return null
 }
 
-const removeComments = rawValue => {
-  const commentMatches = VARIABLE_VALUE_COMMENT_REGEX.exec(rawValue)
-  if (commentMatches == null) {
-    return rawValue
-  }
-  const [valueWithoutComment, comment] = commentMatches.slice(1)
-  // if odd number of quotes before and after comment => comment is escaped
-  if (
-    hasOddNumberOfQuotes(valueWithoutComment) &&
-    hasOddNumberOfQuotes(comment)
-  ) {
-    return `${valueWithoutComment}${comment}`
-  }
-  return valueWithoutComment
-}
+const ESCAPED_CHARS = new Map([
+  ['t', '\t'],
+  ['b', '\b'],
+  ['n', '\n'],
+  ['\\', '\\'],
+  ['"', '"'],
+])
 
-const hasOddNumberOfQuotes = text => {
-  const numberOfQuotes = (text.match(/(?:^|[^\\])"/g) || []).length
-  return numberOfQuotes % 2 !== 0
-}
-
-const removeQuotes = text => {
-  return text.split('').reduce((newText, c, idx, text) => {
-    const isQuote = c === '"' && text[idx - 1] !== '\\'
-    const isEscapeForQuote = c === '\\' && text[idx + 1] === '"'
-    if (isQuote || isEscapeForQuote) {
-      return newText
+// This follows parse_value in config.c of canonical git: double quotes are
+// removed, # and ; outside of quotes start a comment, whitespace outside of
+// quotes is kept between words but trimmed at the end, and \t, \b, \n, \\ and
+// \" are unescaped. Canonical git rejects any other escape sequence, here the
+// backslash is kept as is.
+const parseValue = rawValue => {
+  let value = ''
+  let pendingSpace = ''
+  let inQuotes = false
+  for (let i = 0; i < rawValue.length; i++) {
+    const c = rawValue[i]
+    if (!inQuotes && /[ \t\r\v\f]/.test(c)) {
+      if (value !== '') pendingSpace += c
+      continue
     }
-    return newText + c
-  }, '')
+    if (!inQuotes && (c === '#' || c === ';')) break
+    value += pendingSpace
+    pendingSpace = ''
+    if (c === '\\' && ESCAPED_CHARS.has(rawValue[i + 1])) {
+      value += ESCAPED_CHARS.get(rawValue[++i])
+    } else if (c === '"') {
+      inQuotes = !inQuotes
+    } else {
+      value += c
+    }
+  }
+  return value
+}
+
+// This follows write_pair in config.c of canonical git.
+const serializeValue = value => {
+  if (typeof value !== 'string') return value
+  const quote =
+    value.startsWith(' ') || value.endsWith(' ') || /[#;]/.test(value)
+      ? '"'
+      : ''
+  const escaped = value.replace(/[\\"\n\t]/g, c => {
+    if (c === '\n') return '\\n'
+    if (c === '\t') return '\\t'
+    return `\\${c}`
+  })
+  return `${quote}${escaped}${quote}`
 }
 
 const lower = text => {
@@ -281,11 +296,7 @@ export class GitConfig {
           return line
         }
         if (name != null && value != null) {
-          if (typeof value === 'string' && /[#;]/.test(value)) {
-            // A `#` or `;` symbol denotes a comment, so we have to wrap it in double quotes
-            return `\t${name} = "${value}"`
-          }
-          return `\t${name} = ${value}`
+          return `\t${name} = ${serializeValue(value)}`
         }
         if (subsection != null) {
           return `[${section} "${subsection}"]`
