@@ -30,8 +30,17 @@ const author = {
   timezoneOffset: -0,
 }
 
+const posix = p => p.replace(/\\/g, '/')
+
+// join() turns Windows backslashes into slashes, so a fixture path with
+// backslashes would never match the paths the fs sees.
+async function makePosixFixture(name) {
+  const fixture = await makeFixture(name)
+  return { ...fixture, dir: posix(fixture.dir), gitdir: posix(fixture.gitdir) }
+}
+
 async function makeRepo() {
-  const { _fs, fs, dir, gitdir } = await makeFixture(
+  const { _fs, fs, dir, gitdir } = await makePosixFixture(
     'test-FileSystem-read-errors'
   )
   await init({ fs, dir, gitdir, defaultBranch: 'main' })
@@ -196,7 +205,7 @@ describe('FileSystem read errors', () => {
 
   it('listNotes fails when the notes ref cannot be read', async () => {
     // Setup
-    const { _fs, gitdir } = await makeFixture('test-listNotes')
+    const { _fs, gitdir } = await makePosixFixture('test-listNotes')
     const failing = makeFailingFS(
       _fs,
       p => p === `${gitdir}/refs/notes/commits`
@@ -275,7 +284,7 @@ describe('FileSystem read errors', () => {
 
   it('readObject fails when the pack directory cannot be listed', async () => {
     // Setup
-    const { _fs, gitdir } = await makeFixture('test-readObject')
+    const { _fs, gitdir } = await makePosixFixture('test-readObject')
     const failing = makeFailingFS(_fs, p => p === `${gitdir}/objects/pack`)
     // Test
     const error = await rejection(
@@ -290,7 +299,7 @@ describe('FileSystem read errors', () => {
 
   it('listBranches rejects only through its promise when packed-refs cannot be read', async () => {
     // Setup
-    const { _fs, gitdir } = await makeFixture('test-listBranches')
+    const { _fs, gitdir } = await makePosixFixture('test-listBranches')
     const failing = makeFailingFS(_fs, p => p === `${gitdir}/packed-refs`)
     // Finish the loose ref scan after the packed-refs read has failed, so
     // a rejection nobody awaits yet fails the test as unhandled.
@@ -307,7 +316,7 @@ describe('FileSystem read errors', () => {
 
   it('readObject retries a pack read that failed with the same cache', async () => {
     // Setup
-    const { _fs, gitdir } = await makeFixture('test-readObject')
+    const { _fs, gitdir } = await makePosixFixture('test-readObject')
     let fail = true
     const failing = makeFailingFS(_fs, p => fail && p.endsWith('.pack'))
     const cache = {}
@@ -324,7 +333,7 @@ describe('FileSystem read errors', () => {
 
   it('readObject retries a pack index read that failed with the same cache', async () => {
     // Setup
-    const { _fs, gitdir } = await makeFixture('test-readObject')
+    const { _fs, gitdir } = await makePosixFixture('test-readObject')
     let fail = true
     const failing = makeFailingFS(_fs, p => fail && p.endsWith('.idx'))
     const cache = {}
