@@ -1,6 +1,7 @@
 // @ts-check
 import '../typedefs.js'
 
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
 
@@ -29,8 +30,9 @@ export async function _currentBranch({
   if (test) {
     try {
       await GitRefManager.resolve({ fs, gitdir, ref })
-    } catch (_) {
-      return
+    } catch (err) {
+      if (err instanceof NotFoundError) return
+      throw err
     }
   }
   // Return `undefined` for detached HEAD

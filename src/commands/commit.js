@@ -5,6 +5,7 @@ import { EmptyCommitError } from '../errors/EmptyCommitError.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NoCommitError } from '../errors/NoCommitError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -89,7 +90,8 @@ export async function _commit({
       gitdir,
       ref,
     })
-  } catch {
+  } catch (err) {
+    if (!(err instanceof NotFoundError)) throw err
     // We assume that there's no commit and this is the initial commit
     initialCommit = true
   }

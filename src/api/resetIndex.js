@@ -1,4 +1,7 @@
 // @ts-check
+import { InvalidFilepathError } from '../errors/InvalidFilepathError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { ObjectTypeError } from '../errors/ObjectTypeError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { FileSystem } from '../models/FileSystem.js'
@@ -55,10 +58,8 @@ export async function resetIndex({
         ref: ref || 'HEAD',
       })
     } catch (e) {
-      if (ref) {
-        // Only throw the error if a ref is explicitly provided
-        throw e
-      }
+      // Without an explicit ref, a branch with no commits yet is fine
+      if (ref || !(e instanceof NotFoundError)) throw e
     }
 
     // Not having an oid at this point means `resetIndex()` was called without explicit `ref` on a new git
@@ -74,7 +75,14 @@ export async function resetIndex({
           filepath,
         })
       } catch (e) {
-        // This means we're resetting the file to a "deleted" state
+        // The path is not in the commit, so reset it to a "deleted" state
+        if (
+          !(e instanceof NotFoundError) &&
+          !(e instanceof InvalidFilepathError) &&
+          !(e instanceof ObjectTypeError && e.data.filepath)
+        ) {
+          throw e
+        }
         oid = null
       }
     }

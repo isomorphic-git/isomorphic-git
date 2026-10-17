@@ -6,6 +6,14 @@ import { mkdirp } from '../utils/mkdirp.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
 import { isPromiseLike } from '../utils/types.js'
 
+// React Native file systems on iOS report a missing file with codes like
+// ENSCOCOAERRORDOMAIN260 instead of ENOENT.
+function isNotFoundError(err) {
+  const code = err.code
+  if (typeof code !== 'string') return false
+  return code === 'ENOENT' || code === 'ENOTDIR' || code.includes('ENS')
+}
+
 function isPromiseFs(fs) {
   const test = targetFs => {
     try {
@@ -95,11 +103,7 @@ export class FileSystem {
       await this._stat(filepath)
       return true
     } catch (err) {
-      if (
-        err.code === 'ENOENT' ||
-        err.code === 'ENOTDIR' ||
-        (err.code || '').includes('ENS')
-      ) {
+      if (isNotFoundError(err)) {
         return false
       } else {
         console.log('Unhandled error in "FileSystem.exists()" function', err)
@@ -110,31 +114,38 @@ export class FileSystem {
 
   /**
    * Return the contents of a file if it exists, otherwise returns null.
+   * Rethrows errors that aren't related to file existence.
    *
    * @param {string} filepath - The path to the file.
    * @param {Object} [options] - Options for reading the file.
    * @returns {Promise<Buffer|string|null>} - The file contents, or `null` if the file doesn't exist.
    */
   async read(filepath, options = {}) {
+    let buffer
     try {
-      let buffer = await this._readFile(filepath, options)
-      if (options.autocrlf === 'true') {
-        try {
-          buffer = new TextDecoder('utf8', { fatal: true }).decode(buffer)
-          buffer = buffer.replace(/\r\n/g, '\n')
-          buffer = new TextEncoder().encode(buffer)
-        } catch (error) {
-          // non utf8 file
-        }
-      }
-      // Convert plain ArrayBuffers to Buffers
-      if (typeof buffer !== 'string') {
-        buffer = Buffer.from(buffer)
-      }
-      return buffer
+      buffer = await this._readFile(filepath, options)
     } catch (err) {
-      return null
+      // Ref lookup probes candidate paths that may be missing, may be a
+      // directory (`refs/remotes/origin`), or may run through a file.
+      if (isNotFoundError(err) || err.code === 'EISDIR') return null
+      throw err
     }
+    // LightningFS resolves a directory read to undefined instead of EISDIR.
+    if (buffer == null) return null
+    if (options.autocrlf === 'true') {
+      try {
+        buffer = new TextDecoder('utf8', { fatal: true }).decode(buffer)
+        buffer = buffer.replace(/\r\n/g, '\n')
+        buffer = new TextEncoder().encode(buffer)
+      } catch (error) {
+        // non utf8 file
+      }
+    }
+    // Convert plain ArrayBuffers to Buffers
+    if (typeof buffer !== 'string') {
+      buffer = Buffer.from(buffer)
+    }
+    return buffer
   }
 
   /**
@@ -206,22 +217,25 @@ export class FileSystem {
   }
 
   /**
-   * Read a directory without throwing an error is the directory doesn't exist
+   * Read a directory without throwing an error if the directory doesn't exist.
+   * Rethrows errors that aren't related to directory existence.
    *
    * @param {string} filepath - The path to the directory.
    * @returns {Promise<string[]|null>} - An array of file names, or `null` if the path is not a directory.
    */
   async readdir(filepath) {
+    let names
     try {
-      const names = await this._readdir(filepath)
-      // Ordering is not guaranteed, and system specific (Windows vs Unix)
-      // so we must sort them ourselves.
-      names.sort(compareStrings)
-      return names
+      names = await this._readdir(filepath)
     } catch (err) {
       if (err.code === 'ENOTDIR') return null
-      return []
+      if (isNotFoundError(err)) return []
+      throw err
     }
+    // Ordering is not guaranteed, and system specific (Windows vs Unix)
+    // so we must sort them ourselves.
+    names.sort(compareStrings)
+    return names
   }
 
   /**
@@ -258,7 +272,7 @@ export class FileSystem {
       const stats = await this._lstat(filename)
       return stats
     } catch (err) {
-      if (err.code === 'ENOENT' || (err.code || '').includes('ENS')) {
+      if (isNotFoundError(err)) {
         return null
       }
       throw err
@@ -280,7 +294,7 @@ export class FileSystem {
       const link = await this._readlink(filename, opts)
       return Buffer.isBuffer(link) ? link : Buffer.from(link)
     } catch (err) {
-      if (err.code === 'ENOENT' || (err.code || '').includes('ENS')) {
+      if (isNotFoundError(err)) {
         return null
       }
       throw err

@@ -48,12 +48,7 @@ export class GitIgnoreManager {
     }
     let ignoredStatus = false
     for (const [index, p] of pairs.entries()) {
-      let file
-      try {
-        file = await fs.read(p.gitignore, 'utf8')
-      } catch (err) {
-        if (err.code === 'NOENT') continue
-      }
+      const file = await fs.read(p.gitignore, 'utf8')
       const ign = ignore()
       // The patterns in .git/info/exclude are relative to the working directory,
       // so only the first pair, which holds the full filepath, can use them.

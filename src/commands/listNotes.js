@@ -24,6 +24,7 @@ export async function _listNotes({ fs, cache, gitdir, ref }) {
     if (err instanceof NotFoundError) {
       return []
     }
+    throw err
   }
 
   // Create the current note tree
