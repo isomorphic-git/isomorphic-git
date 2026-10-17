@@ -382,7 +382,8 @@ describe('clone', () => {
     }
     expect(error).not.toBeNull()
     expect(error.name).not.toEqual('TypeError')
-    expect(error.name).toEqual('CommitNotFetchedError')
+    // The fetch fails before it publishes refs that point at missing objects.
+    expect(error.name).toEqual('NotFoundError')
     expect(error.caller).toEqual('git.clone')
   })
 
