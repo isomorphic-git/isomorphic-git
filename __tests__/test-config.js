@@ -59,4 +59,21 @@ describe('config', () => {
     const url = await getConfig({ fs, gitdir, path: 'remote.origin.url' })
     expect(url).toBe('https://github.com/isomorphic-git/isomorphic-git')
   })
+
+  it('setting values with backslashes, quotes and surrounding spaces', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-config')
+    // Test
+    const values = {
+      'core.excludesFile': 'C:\\Users\\me\\.gitignore',
+      'core.sshCommand': 'ssh -i "C:\\keys\\id_rsa"',
+      'user.name': ' John "JJ" Doe ',
+    }
+    for (const [path, value] of Object.entries(values)) {
+      await setConfig({ fs, gitdir, path, value })
+    }
+    for (const [path, value] of Object.entries(values)) {
+      expect(await getConfig({ fs, gitdir, path })).toBe(value)
+    }
+  })
 })
