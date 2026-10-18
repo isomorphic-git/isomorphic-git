@@ -49,6 +49,7 @@ Examples (as C-style strings):
   "0004"            ""
 ----
 */
+import { ParseError } from '../errors/ParseError.js'
 import { StreamReader } from '../utils/StreamReader.js'
 import { padHex } from '../utils/padHex.js'
 
@@ -77,13 +78,25 @@ export class GitPktLine {
     const reader = new StreamReader(stream)
     return async function read() {
       try {
-        let length = await reader.read(4)
-        if (length == null) return true
-        length = parseInt(length.toString('utf8'), 16)
+        const header = await reader.read(4)
+        if (header == null || header.length === 0) return true
+        const hex = header.toString('utf8')
+        if (!/^[0-9a-fA-F]{4}$/.test(hex)) {
+          throw new ParseError('four hexadecimal digits', hex)
+        }
+        const length = parseInt(hex, 16)
         if (length === 0) return null
         if (length === 1) return null // delim packets
+        if (length < 4) {
+          throw new ParseError('pkt-line length of 0, 1, or at least 4', hex)
+        }
         const buffer = await reader.read(length - 4)
-        if (buffer == null) return true
+        if (buffer == null || buffer.length !== length - 4) {
+          throw new ParseError(
+            `${length - 4} bytes of pkt-line data`,
+            `${buffer == null ? 0 : buffer.length} bytes`
+          )
+        }
         return buffer
       } catch (err) {
         stream.error = err
