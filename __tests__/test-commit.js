@@ -742,4 +742,24 @@ describe('commit', () => {
     expect(commits[0].oid).toBe(sha)
     expect(commits[0].commit.parent).toEqual([originalOid])
   })
+
+  it('leaves intent-to-add entries out of the tree', async () => {
+    // Setup: `b.txt` was added with `git add -N`
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v3')
+    const { commit: parentCommit } = (await log({ fs, gitdir, depth: 1 }))[0]
+    // Test
+    const sha = await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      message: 'Second commit',
+    })
+    const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
+    expect(newCommit.tree).toBe(parentCommit.tree)
+  })
 })
