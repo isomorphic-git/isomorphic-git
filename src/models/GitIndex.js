@@ -216,6 +216,9 @@ export class GitIndex {
     }
     stats = normalizeStats(stats)
     const bfilepath = Buffer.from(filepath)
+    // Keep the skip-worktree bit of a path outside the sparse checkout.
+    // Intent-to-add is cleared, since the path is now staged.
+    const existing = stage === 0 ? this._entries.get(filepath) : undefined
     const entry = {
       ctimeSeconds: stats.ctimeSeconds,
       ctimeNanoseconds: stats.ctimeNanoseconds,
@@ -237,7 +240,7 @@ export class GitIndex {
         extended: false,
         stage,
         nameLength: bfilepath.length < 0xfff ? bfilepath.length : 0xfff,
-        skipWorktree: false,
+        skipWorktree: Boolean(existing && existing.flags.skipWorktree),
         intentToAdd: false,
       },
       stages: [],
