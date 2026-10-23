@@ -240,7 +240,7 @@ export class GitIndex {
         extended: false,
         stage,
         nameLength: bfilepath.length < 0xfff ? bfilepath.length : 0xfff,
-        skipWorktree: Boolean(existing && existing.flags.skipWorktree),
+        skipWorktree: Boolean(existing?.flags.skipWorktree),
         intentToAdd: false,
       },
       stages: [],
