@@ -134,7 +134,10 @@ export async function _commit({
   return GitIndexManager.acquire(
     { fs, gitdir, cache, allowUnmerged: false },
     async function (index) {
-      const inodes = flatFileListToDirectoryStructure(index.entries)
+      // Entries added with `git add --intent-to-add` are not part of the tree
+      const inodes = flatFileListToDirectoryStructure(
+        index.entries.filter(entry => !entry.flags.intentToAdd)
+      )
       const inode = inodes.get('.')
       if (!tree) {
         tree = await constructTree({ fs, gitdir, inode, dryRun })
