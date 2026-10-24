@@ -1030,6 +1030,16 @@
         "test",
         "doc"
       ]
+    },
+    {
+      "login": "bardbess",
+      "name": "Bardoe Bess",
+      "avatar_url": "https://avatars.githubusercontent.com/u/603684?v=4",
+      "profile": "https://github.com/bardbess",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
