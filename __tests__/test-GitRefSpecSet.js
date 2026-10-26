@@ -47,6 +47,37 @@ describe('GitRefSpecSet', () => {
     expect(refspec.localNamespaces()).toEqual(['refs/remotes/origin'])
   })
 
+  it('fetch = ^refs/heads/*-tmp (negative refspec with a suffix)', async () => {
+    const refspec = GitRefSpecSet.from([
+      '+refs/heads/*:refs/remotes/origin/*',
+      '^refs/heads/*-tmp',
+    ])
+    const result = refspec.translate([
+      'refs/heads/build-tmp',
+      'refs/heads/-tmp',
+      'refs/heads/x-tmpz',
+      'refs/heads/tmp',
+    ])
+    expect(result).toEqual([
+      ['refs/heads/x-tmpz', 'refs/remotes/origin/x-tmpz'],
+      ['refs/heads/tmp', 'refs/remotes/origin/tmp'],
+    ])
+    expect(refspec.translateOne('refs/heads/build-tmp')).toBeNull()
+  })
+
+  it('fetch = ^refs/heads/a*a (prefix and suffix do not overlap)', async () => {
+    const refspec = GitRefSpecSet.from([
+      '+refs/heads/*:refs/remotes/origin/*',
+      '^refs/heads/a*a',
+    ])
+    const result = refspec.translate([
+      'refs/heads/a',
+      'refs/heads/aa',
+      'refs/heads/aba',
+    ])
+    expect(result).toEqual([['refs/heads/a', 'refs/remotes/origin/a']])
+  })
+
   it('fetch = refs/heads/master (no destination)', async () => {
     const refspec = GitRefSpecSet.from([
       '+refs/heads/*:refs/remotes/origin/*',

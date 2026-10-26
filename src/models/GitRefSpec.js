@@ -1,9 +1,17 @@
 import { InternalError } from '../errors/InternalError.js'
 
 export class GitRefSpec {
-  constructor({ remotePath, localPath, force, matchPrefix, negative = false }) {
+  constructor({
+    remotePath,
+    remoteSuffix = '',
+    localPath,
+    force,
+    matchPrefix,
+    negative = false,
+  }) {
     Object.assign(this, {
       remotePath,
+      remoteSuffix,
       localPath,
       force,
       matchPrefix,
@@ -17,14 +25,18 @@ export class GitRefSpec {
     // the ref locally.
     if (refspec.startsWith('^') || !refspec.includes(':')) {
       const negative = refspec.startsWith('^')
-      const [, forceMatch, remotePath, remoteGlobMatch] = refspec
+      const [, forceMatch, remote] = refspec
         .slice(negative ? 1 : 0)
-        .match(/^(\+?)(.*?)(\*?)$/)
+        .match(/^(\+?)(.*)$/)
+      // The `*` of a pattern can be followed by the rest of the name, like
+      // `refs/heads/*-tmp`.
+      const star = remote.indexOf('*')
       return new GitRefSpec({
-        remotePath,
+        remotePath: star === -1 ? remote : remote.slice(0, star),
+        remoteSuffix: star === -1 ? '' : remote.slice(star + 1),
         localPath: null,
         force: forceMatch === '+',
-        matchPrefix: remoteGlobMatch === '*',
+        matchPrefix: star !== -1,
         negative,
       })
     }
@@ -48,8 +60,13 @@ export class GitRefSpec {
   }
 
   matches(remoteBranch) {
+    // Like canonical git, the `*` matches any part of the name, even an empty
+    // one, as long as the prefix and the suffix don't overlap.
     return this.matchPrefix
-      ? remoteBranch.startsWith(this.remotePath)
+      ? remoteBranch.length >=
+          this.remotePath.length + this.remoteSuffix.length &&
+          remoteBranch.startsWith(this.remotePath) &&
+          remoteBranch.endsWith(this.remoteSuffix)
       : remoteBranch === this.remotePath
   }
 
