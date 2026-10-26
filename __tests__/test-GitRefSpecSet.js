@@ -29,6 +29,35 @@ describe('GitRefSpecSet', () => {
     ])
   })
 
+  it('fetch = ^refs/heads/tmp/* (negative refspec)', async () => {
+    const refspec = GitRefSpecSet.from([
+      '+refs/heads/*:refs/remotes/origin/*',
+      '^refs/heads/tmp/*',
+      '^refs/heads/develop',
+    ])
+    const result = refspec.translate([
+      'refs/heads/master',
+      'refs/heads/develop',
+      'refs/heads/tmp/foo',
+    ])
+    expect(result).toEqual([
+      ['refs/heads/master', 'refs/remotes/origin/master'],
+    ])
+    expect(refspec.translateOne('refs/heads/tmp/foo')).toBeNull()
+    expect(refspec.localNamespaces()).toEqual(['refs/remotes/origin'])
+  })
+
+  it('fetch = refs/heads/master (no destination)', async () => {
+    const refspec = GitRefSpecSet.from([
+      '+refs/heads/*:refs/remotes/origin/*',
+      'refs/heads/master',
+    ])
+    const result = refspec.translate(['refs/heads/master'])
+    expect(result).toEqual([
+      ['refs/heads/master', 'refs/remotes/origin/master'],
+    ])
+  })
+
   it('weird HEAD implicit rule', async () => {
     const refspec = new GitRefSpecSet()
     refspec.add('+HEAD:refs/remotes/origin/HEAD')
