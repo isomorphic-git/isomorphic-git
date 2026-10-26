@@ -91,6 +91,35 @@ describe('GitConfig', () => {
       expect(a).toEqual('https://bar.com/project.git')
     })
 
+    it('comment after the section header', async () => {
+      const config = GitConfig.from(`[foo] # comment
+      keyaaa = valaaa
+      [remote "bar"] ; comment
+      url = https://bar.com/project.git`)
+      const a = await config.get('foo.keyaaa')
+      expect(a).toEqual('valaaa')
+      const b = await config.get('remote.bar.url')
+      expect(b).toEqual('https://bar.com/project.git')
+    })
+
+    it('several spaces or a tab before the subsection', async () => {
+      const config = GitConfig.from(`[remote  "foo"]
+      url = https://foo.com/project.git
+      [remote	"bar"]
+      url = https://bar.com/project.git`)
+      const a = await config.get('remote.foo.url')
+      expect(a).toEqual('https://foo.com/project.git')
+      const b = await config.get('remote.bar.url')
+      expect(b).toEqual('https://bar.com/project.git')
+    })
+
+    it('escaped subsection', async () => {
+      const config = GitConfig.from(`[foo "a\\"b\\\\c\\d"]
+      keyaaa = valaaa`)
+      const a = await config.get('foo.a"b\\cd.keyaaa')
+      expect(a).toEqual('valaaa')
+    })
+
     it('variable name with digits', async () => {
       const config = GitConfig.from(`[foo]
       key1 = val1

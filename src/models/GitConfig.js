@@ -43,9 +43,11 @@ const schema = {
 // section is alphanumeric (ASCII) with - and .
 // section is case insensitive
 // subsection is optional
-// subsection is specified after section and one or more spaces
-// subsection is specified between double quotes
-const SECTION_LINE_REGEX = /^\[([A-Za-z0-9-.]+)(?: "(.*)")?\]$/
+// subsection is specified after section and one or more spaces or tabs
+// subsection is specified between double quotes, where \ escapes the next character
+// a comment can follow the section header
+const SECTION_LINE_REGEX =
+  /^\[([A-Za-z0-9-.]+)(?:[ \t]+"((?:[^"\\]|\\.)*)")?\][ \t]*(?:[#;].*)?$/
 const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 
 // variable lines contain a name, and equal sign and then a value
@@ -61,7 +63,8 @@ const extractSectionLine = line => {
   const matches = SECTION_LINE_REGEX.exec(line)
   if (matches != null) {
     const [section, subsection] = matches.slice(1)
-    return [section, subsection]
+    // Like canonical git, drop the backslash of an escaped character
+    return [section, subsection && subsection.replace(/\\(.)/g, '$1')]
   }
   return null
 }
