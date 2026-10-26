@@ -13,6 +13,8 @@ import {
   writeTree,
   annotatedTag,
   writeTag,
+  status,
+  statusMatrix,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -762,4 +764,34 @@ describe('commit', () => {
     const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
     expect(newCommit.tree).toBe(parentCommit.tree)
   })
+
+  for (const [name, refresh] of [
+    [
+      'status',
+      (fs, dir, gitdir) => status({ fs, dir, gitdir, filepath: 'b.txt' }),
+    ],
+    ['statusMatrix', (fs, dir, gitdir) => statusMatrix({ fs, dir, gitdir })],
+  ]) {
+    it(`leaves intent-to-add entries out of the tree after ${name} refreshes their stats`, async () => {
+      // Setup: `b.txt` was added with `git add -N` and is still empty
+      const { fs, dir, gitdir } = await makeFixture('test-GitIndex-v3')
+      const { commit: parentCommit } = (await log({ fs, gitdir, depth: 1 }))[0]
+      await fs.write(path.join(dir, 'b.txt'), '')
+      // Test
+      await refresh(fs, dir, gitdir)
+      const sha = await commit({
+        fs,
+        gitdir,
+        author: {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1262356920,
+          timezoneOffset: -0,
+        },
+        message: 'Second commit',
+      })
+      const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
+      expect(newCommit.tree).toBe(parentCommit.tree)
+    })
+  }
 })

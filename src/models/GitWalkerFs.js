@@ -155,9 +155,11 @@ export class GitWalkerFs {
               // 1) if we can (because the oid and mode are the same)
               // 2) and only if we need to (because other stats differ)
               // 3) and only if the caller opted in to refreshing the index
+              // 4) and not for an intent-to-add entry, which inserting would stage
               if (
                 self.refresh &&
                 stage &&
+                !stage.flags.intentToAdd &&
                 oid === stage.oid &&
                 (!filemode || stats.mode === stage.mode) &&
                 compareStats(stats, stage, filemode, trustino)

@@ -131,8 +131,14 @@ export async function status({
           type: 'blob',
           object,
         })
-        // If the oid in the index === working dir oid but stats differed update cache
-        if (refresh && I && indexEntry.oid === workdirOid) {
+        // If the oid in the index === working dir oid but stats differed update cache.
+        // An intent-to-add entry is left alone: inserting it again would stage it.
+        if (
+          refresh &&
+          I &&
+          !indexEntry.flags.intentToAdd &&
+          indexEntry.oid === workdirOid
+        ) {
           // and as long as our fs.stats aren't bad.
           // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
           // (like the Karma webserver) because BrowserFS HTTP Backend uses HTTP HEAD requests to do fs.stat
