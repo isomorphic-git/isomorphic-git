@@ -625,12 +625,16 @@ describe('commit', () => {
     expect(newCommit.tree).toBe(parentCommit.tree)
   })
 
-  for (const [name, refresh] of [
-    [
-      'status',
-      (fs, dir, gitdir) => status({ fs, dir, gitdir, filepath: 'b.txt' }),
-    ],
-    ['statusMatrix', (fs, dir, gitdir) => statusMatrix({ fs, dir, gitdir })],
+  for (const { name, refresh } of [
+    {
+      name: 'status',
+      refresh: (fs, dir, gitdir) =>
+        status({ fs, dir, gitdir, filepath: 'b.txt' }),
+    },
+    {
+      name: 'statusMatrix',
+      refresh: (fs, dir, gitdir) => statusMatrix({ fs, dir, gitdir }),
+    },
   ]) {
     it(`leaves intent-to-add entries out of the tree after ${name} refreshes their stats`, async () => {
       // Setup: `b.txt` was added with `git add -N` and is still empty
