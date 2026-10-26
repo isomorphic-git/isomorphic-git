@@ -1040,6 +1040,17 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "SergioSRcode",
+      "name": "Sergio",
+      "avatar_url": "https://avatars.githubusercontent.com/u/104135678?v=4",
+      "profile": "https://github.com/SergioSRcode",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
