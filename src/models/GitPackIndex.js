@@ -41,6 +41,69 @@ function otherVarIntDecode(reader, startWith) {
   return result
 }
 
+// Memory that `fromPack` may use to keep resolved objects for delta bases.
+// An object larger than a quarter of this is not kept.
+const RESOLVE_CACHE_BYTES = 32 * 1024 * 1024
+
+// A cache that drops the least recently used object when it holds too many bytes.
+class ObjectCache {
+  constructor(maxBytes) {
+    this.maxBytes = maxBytes
+    this.bytes = 0
+    this.map = new Map()
+  }
+
+  get(key) {
+    const value = this.map.get(key)
+    if (value !== undefined) {
+      this.map.delete(key)
+      this.map.set(key, value)
+    }
+    return value
+  }
+
+  set(key, value) {
+    const size = value.object.byteLength
+    if (size > this.maxBytes / 4) return
+    this.map.set(key, value)
+    this.bytes += size
+    for (const [oldKey, old] of this.map) {
+      if (this.bytes <= this.maxBytes) break
+      this.map.delete(oldKey)
+      this.bytes -= old.object.byteLength
+    }
+  }
+}
+
+// Resolve an object from the data that `listpack` already inflated.
+// Return null when the object needs `readSlice`. This happens when the base of
+// a delta is not in the cache, or when the delta is corrupt.
+function resolveInflated(
+  { type, data, reference, offset },
+  cache,
+  offsetByOid
+) {
+  // `applyDelta` and `shasum` need a Buffer. This is a view and copies nothing.
+  const object = Buffer.from(data.buffer, data.byteOffset, data.byteLength)
+  if (type !== 'ofs-delta' && type !== 'ref-delta') return { type, object }
+  const baseOffset =
+    type === 'ofs-delta'
+      ? offset - decodeVarInt(new BufferCursor(reference))
+      : offsetByOid.get(reference.toString('hex'))
+  const base = cache.get(baseOffset)
+  if (!base) return null
+  try {
+    return {
+      type: base.type,
+      object: Buffer.from(applyDelta(object, base.object)),
+    }
+  } catch (err) {
+    // A corrupt delta. `readSlice` reports it again. Any other error is a bug.
+    if (err instanceof InternalError || err instanceof RangeError) return null
+    throw err
+  }
+}
+
 export class GitPackIndex {
   constructor(stuff) {
     Object.assign(this, stuff)
@@ -112,6 +175,9 @@ export class GitPackIndex {
     const offsets = new Map()
     let totalObjectCount = null
     let lastPercent = null
+    // Objects that `listpack` inflated, by pack offset. A delta finds its base here.
+    const cache = new ObjectCache(RESOLVE_CACHE_BYTES)
+    const offsetByOid = new Map()
 
     await listpack([pack], async ({ data, type, reference, offset, num }) => {
       if (totalObjectCount === null) totalObjectCount = num
@@ -147,6 +213,20 @@ export class GitPackIndex {
           offset,
         }
       }
+
+      // The object is already inflated, so get its oid now. Then the loop below
+      // does not inflate it again. That loop reads all other objects.
+      const o = offsetToObject[offset]
+      if (!o) return
+      const resolved = resolveInflated(
+        { type, data, reference, offset },
+        cache,
+        offsetByOid
+      )
+      if (!resolved) return
+      o.oid = await shasum(GitObject.wrap(resolved))
+      offsetByOid.set(o.oid, offset)
+      cache.set(offset, resolved)
     })
 
     // We need to know the lengths of the slices to compute the CRCs.
@@ -190,20 +270,21 @@ export class GitPackIndex {
       lastPercent = percent
 
       const o = offsetToObject[offset]
-      if (o.oid) continue
-      try {
-        p.readDepth = 0
-        p.externalReadDepth = 0
-        const { type, object } = await p.readSlice({ start: offset })
-        objectsByDepth[p.readDepth] += 1
-        const oid = await shasum(GitObject.wrap({ type, object }))
-        o.oid = oid
-        hashes.push(oid)
-        offsets.set(oid, offset)
-        crcs[oid] = o.crc
-      } catch (err) {
-        continue
+      if (!o.oid) {
+        // The first pass did not resolve this object, so read it.
+        try {
+          p.readDepth = 0
+          p.externalReadDepth = 0
+          const { type, object } = await p.readSlice({ start: offset })
+          objectsByDepth[p.readDepth] += 1
+          o.oid = await shasum(GitObject.wrap({ type, object }))
+        } catch (err) {
+          continue
+        }
       }
+      hashes.push(o.oid)
+      offsets.set(o.oid, offset)
+      crcs[o.oid] = o.crc
     }
 
     hashes.sort()
