@@ -1,4 +1,8 @@
 import http from './isomorphic-git/http/web/index.js'
+import { Buffer } from 'https://esm.sh/buffer@6'
+
+// isomorphic-git expects Node's built-in Buffer, which browsers don't provide
+window.Buffer = Buffer
 
 // Initialize isomorphic-git with a file system
 window.fs = new LightningFS('fs')
