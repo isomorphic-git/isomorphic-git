@@ -10,6 +10,7 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir]
  * @param {boolean} [args.bare = false]
  * @param {string} [args.defaultBranch = 'master']
+ * @param {boolean} [args.noHooks = false]
  * @returns {Promise<void>}
  */
 export async function _init({
@@ -18,12 +19,13 @@ export async function _init({
   dir,
   gitdir = bare ? dir : join(dir, '.git'),
   defaultBranch = 'master',
+  noHooks = false,
 }) {
   // Don't overwrite an existing config
   if (await fs.exists(gitdir + '/config')) return
 
   let folders = [
-    'hooks',
+    ...(noHooks ? [] : ['hooks']),
     'info',
     'objects/info',
     'objects/pack',

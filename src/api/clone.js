@@ -27,6 +27,7 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
  * @param {boolean} [args.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
+ * @param {boolean} [args.noHooks = false] - By default clone creates an empty `hooks` folder. `noHooks` disables that behavior. Chrome refuses to create `.git/hooks` through the File System Access API, see [Using the File System Access API](guide-browser-file-system-access.md).
  * @param {string} [args.remote = 'origin'] - What to name the remote that is created.
  * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
  * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
@@ -74,6 +75,7 @@ export async function clone({
   singleBranch = false,
   noCheckout = false,
   noTags = false,
+  noHooks = false,
   headers = {},
   cache = {},
   nonBlocking = false,
@@ -113,6 +115,7 @@ export async function clone({
       singleBranch,
       noCheckout,
       noTags,
+      noHooks,
       headers,
       nonBlocking,
       batchSize,
