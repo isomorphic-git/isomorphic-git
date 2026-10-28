@@ -14,6 +14,7 @@ describe('init', () => {
     expect(await fs.exists(`${gitdirsmfullpath}/refs/heads`)).toBe(true)
     expect(await fs.exists(`${gitdirsmfullpath}/HEAD`)).toBe(true)
     expect(await fs.exists(`${gitdirsmfullpath}/hooks`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(true)
   })
   it('init with noHooks', async () => {
     const { fs, dir, gitdirsmfullpath } =
@@ -23,6 +24,38 @@ describe('init', () => {
     expect(await fs.exists(`${gitdirsmfullpath}/objects`)).toBe(true)
     expect(await fs.exists(`${gitdirsmfullpath}/refs/heads`)).toBe(true)
     expect(await fs.exists(`${gitdirsmfullpath}/HEAD`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(true)
+  })
+  it('init with noConfig', async () => {
+    const { fs, dir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-init')
+    await init({ fs, dir, noConfig: true })
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(false)
+    expect(await fs.exists(`${gitdirsmfullpath}/HEAD`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/objects`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/refs/heads`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/refs/tags`)).toBe(true)
+  })
+  it('init with noConfig does not overwrite an existing repository without config', async () => {
+    // Setup
+    const { fs, dir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-init')
+    await init({ fs, dir, noConfig: true })
+    await fs.write(`${gitdirsmfullpath}/HEAD`, 'ref: refs/heads/feature\n')
+    // Test
+    await init({ fs, dir, noConfig: true })
+    expect(await fs.read(`${gitdirsmfullpath}/HEAD`, 'utf8')).toBe(
+      'ref: refs/heads/feature\n'
+    )
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(false)
+  })
+  it('init without noConfig adds a config to a repository without one', async () => {
+    // Setup
+    const { fs, dir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-init')
+    await init({ fs, dir, noConfig: true })
+    // Test
+    await init({ fs, dir })
     expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(true)
   })
   it('init --bare', async () => {

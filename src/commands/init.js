@@ -11,6 +11,7 @@ import { join } from '../utils/join.js'
  * @param {boolean} [args.bare = false]
  * @param {string} [args.defaultBranch = 'master']
  * @param {boolean} [args.noHooks = false]
+ * @param {boolean} [args.noConfig = false]
  * @returns {Promise<void>}
  */
 export async function _init({
@@ -20,9 +21,12 @@ export async function _init({
   gitdir = bare ? dir : join(dir, '.git'),
   defaultBranch = 'master',
   noHooks = false,
+  noConfig = false,
 }) {
   // Don't overwrite an existing config
   if (await fs.exists(gitdir + '/config')) return
+  // A repository made without a config is marked by its HEAD instead
+  if (noConfig && (await fs.exists(gitdir + '/HEAD'))) return
 
   let folders = [
     ...(noHooks ? [] : ['hooks']),
@@ -37,15 +41,17 @@ export async function _init({
     await fs.mkdir(folder)
   }
 
-  await fs.write(
-    gitdir + '/config',
-    '[core]\n' +
-      '\trepositoryformatversion = 0\n' +
-      '\tfilemode = false\n' +
-      `\tbare = ${bare}\n` +
-      (bare ? '' : '\tlogallrefupdates = true\n') +
-      '\tsymlinks = false\n' +
-      '\tignorecase = true\n'
-  )
+  if (!noConfig) {
+    await fs.write(
+      gitdir + '/config',
+      '[core]\n' +
+        '\trepositoryformatversion = 0\n' +
+        '\tfilemode = false\n' +
+        `\tbare = ${bare}\n` +
+        (bare ? '' : '\tlogallrefupdates = true\n') +
+        '\tsymlinks = false\n' +
+        '\tignorecase = true\n'
+    )
+  }
   await fs.write(gitdir + '/HEAD', `ref: refs/heads/${defaultBranch}\n`)
 }

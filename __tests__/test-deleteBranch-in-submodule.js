@@ -85,4 +85,16 @@ describe('deleteBranch', () => {
       await getConfig({ fs, gitdir, path: 'branch.remote.merge' })
     ).toBeUndefined()
   })
+
+  it('delete branch in a repository without a config file', async () => {
+    // Setup
+    const { fs, gitdir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-deleteBranch')
+    await fs.rm(`${gitdirsmfullpath}/config`)
+    // Test
+    await deleteBranch({ fs, gitdir, ref: 'test' })
+    const branches = await listBranches({ fs, gitdir })
+    expect(branches.includes('test')).toBe(false)
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(false)
+  })
 })
