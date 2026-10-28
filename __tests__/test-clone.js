@@ -356,7 +356,7 @@ describe('clone', () => {
           const contentType = response.headers['content-type']
           if (contentType === 'application/x-git-upload-pack-result') {
             response.body = `0012\x01PACK\x00\x00\x00\x02\x00\x00\x00\x05
-0039\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
+003a\x02Total 5 (delta 0), reused 0 (delta 0), pack-reused 0`
               .split('\n')
               .map(it => Buffer.from(it + '\n'))
               .values()
