@@ -13,6 +13,17 @@ describe('init', () => {
     expect(await fs.exists(`${gitdirsmfullpath}/objects`)).toBe(true)
     expect(await fs.exists(`${gitdirsmfullpath}/refs/heads`)).toBe(true)
     expect(await fs.exists(`${gitdirsmfullpath}/HEAD`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/hooks`)).toBe(true)
+  })
+  it('init with noHooks', async () => {
+    const { fs, dir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-init')
+    await init({ fs, dir, noHooks: true })
+    expect(await fs.exists(`${gitdirsmfullpath}/hooks`)).toBe(false)
+    expect(await fs.exists(`${gitdirsmfullpath}/objects`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/refs/heads`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/HEAD`)).toBe(true)
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(true)
   })
   it('init --bare', async () => {
     const { fs, dir } = await makeFixtureAsSubmodule('test-init')

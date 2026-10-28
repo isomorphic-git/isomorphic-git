@@ -26,6 +26,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @param {boolean} args.singleBranch
  * @param {boolean} args.noCheckout
  * @param {boolean} args.noTags
+ * @param {boolean} [args.noHooks]
  * @param {string} args.remote
  * @param {number} args.depth
  * @param {Date} args.since
@@ -61,12 +62,13 @@ export async function _clone({
   singleBranch,
   noCheckout,
   noTags,
+  noHooks,
   headers,
   nonBlocking,
   batchSize = 100,
 }) {
   try {
-    await _init({ fs, gitdir })
+    await _init({ fs, gitdir, noHooks })
     await _addRemote({ fs, gitdir, remote, url, force: false })
     if (corsProxy) {
       const config = await GitConfigManager.get({ fs, gitdir })

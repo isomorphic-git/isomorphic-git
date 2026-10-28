@@ -3,6 +3,7 @@
 import { init, getConfig, setConfig } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
+import { makeWriteBlocklistFS } from './__helpers__/makeFailingFS.js'
 
 describe('init', () => {
   it('init', async () => {
@@ -12,6 +13,33 @@ describe('init', () => {
     expect(await fs.exists(`${dir}/.git/objects`)).toBe(true)
     expect(await fs.exists(`${dir}/.git/refs/heads`)).toBe(true)
     expect(await fs.exists(`${dir}/.git/HEAD`)).toBe(true)
+    expect(await fs.exists(`${dir}/.git/hooks`)).toBe(true)
+  })
+  it('init with noHooks', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir, noHooks: true })
+    expect(await fs.exists(`${dir}/.git/hooks`)).toBe(false)
+    expect(await fs.exists(`${dir}/.git/objects`)).toBe(true)
+    expect(await fs.exists(`${dir}/.git/refs/heads`)).toBe(true)
+    expect(await fs.exists(`${dir}/.git/HEAD`)).toBe(true)
+    expect(await fs.exists(`${dir}/.git/config`)).toBe(true)
+  })
+  it('init with noHooks when the browser refuses to create .git/hooks', async () => {
+    // Setup
+    const { _fs, fs, dir } = await makeFixture('test-init')
+    const blockedFs = makeWriteBlocklistFS(_fs, ['.git/hooks'])
+    let error = null
+    try {
+      await init({ fs: blockedFs, dir })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.name).toBe('SecurityError')
+    // Test
+    await init({ fs: blockedFs, dir, noHooks: true })
+    expect(await fs.exists(`${dir}/.git/HEAD`)).toBe(true)
+    expect(await fs.exists(`${dir}/.git/config`)).toBe(true)
   })
   it('init --bare', async () => {
     const { fs, dir } = await makeFixture('test-init')
