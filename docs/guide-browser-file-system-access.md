@@ -26,6 +26,7 @@ Reads are not blocked. An app can still read every file of a repository, includi
 | --- | --- | --- |
 | `.git/hooks` | Blocked since Chrome 156 | [465668234](https://crbug.com/465668234), [553115714](https://crbug.com/553115714) |
 | `.git/config` | On Chromium main and the 156, 157 and 158 branches, not in a released build yet | [572269631](https://crbug.com/572269631) |
+| `.git/modules` | On Chromium main and the 156, 157 and 158 branches, not in a released build yet | [571913154](https://crbug.com/571913154) |
 
 A rule matches its path anywhere in a longer path, ignores case, and also blocks everything inside it.
 For example, `/projects/app/.git/hooks` and `/projects/app/.GIT/Hooks/pre-commit` are both blocked.
@@ -46,6 +47,7 @@ The rules only match a folder named `.git`, so a bare repository or a `gitdir` w
 | `deleteBranch` | writes `.git/config` when it has a section for that branch | nothing, if the repository has no config |
 
 Every other command only reads `.git/config`. A missing config file reads as an empty one.
+No command writes `.git/modules`, see [A repository with submodules](#a-repository-with-submodules).
 
 ## What to do
 
@@ -89,3 +91,13 @@ await git.checkout({ fs, dir, ref: 'feature', track: false })
 isomorphic-git never runs hook scripts (it has callbacks such as `onPrePush` and `onPostCheckout` instead),
 so a repository without a `hooks` folder works the same.
 The git command line works in it too.
+
+## A repository with submodules
+
+git keeps the git folder of each submodule in `.git/modules/<name>` of the parent repository.
+isomorphic-git can't add, clone or update submodules, so it never creates or writes `.git/modules` by itself.
+
+isomorphic-git can still run commands inside a submodule that git made.
+There the git folder is `<parent>/.git/modules/<name>`, so once Chrome blocks `.git/modules`,
+every command that writes (`commit`, `checkout`, `fetch` and so on) fails inside a submodule.
+Reading a submodule keeps working.
