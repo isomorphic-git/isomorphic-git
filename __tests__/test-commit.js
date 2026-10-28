@@ -13,6 +13,8 @@ import {
   writeTree,
   annotatedTag,
   writeTag,
+  status,
+  statusMatrix,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -741,5 +743,69 @@ describe('commit', () => {
     const commits = await log({ fs, gitdir, depth: 1 })
     expect(commits[0].oid).toBe(sha)
     expect(commits[0].commit.parent).toEqual([originalOid])
+  })
+
+  it('leaves intent-to-add entries out of the tree', async () => {
+    // Setup: `b.txt` was added with `git add -N`
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v3')
+    const { commit: parentCommit } = (await log({ fs, gitdir, depth: 1 }))[0]
+    // Test
+    const sha = await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      message: 'Second commit',
+    })
+    const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
+    expect(newCommit.tree).toBe(parentCommit.tree)
+  })
+
+  it('leaves intent-to-add entries out of the tree after status refreshes their stats', async () => {
+    // Setup: `b.txt` was added with `git add -N` and is still empty
+    const { fs, dir, gitdir } = await makeFixture('test-GitIndex-v3')
+    const { commit: parentCommit } = (await log({ fs, gitdir, depth: 1 }))[0]
+    await fs.write(path.join(dir, 'b.txt'), '')
+    // Test
+    await status({ fs, dir, gitdir, filepath: 'b.txt' })
+    const sha = await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      message: 'Second commit',
+    })
+    const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
+    expect(newCommit.tree).toBe(parentCommit.tree)
+  })
+
+  it('leaves intent-to-add entries out of the tree after statusMatrix refreshes their stats', async () => {
+    // Setup: `b.txt` was added with `git add -N` and is still empty
+    const { fs, dir, gitdir } = await makeFixture('test-GitIndex-v3')
+    const { commit: parentCommit } = (await log({ fs, gitdir, depth: 1 }))[0]
+    await fs.write(path.join(dir, 'b.txt'), '')
+    // Test
+    await statusMatrix({ fs, dir, gitdir })
+    const sha = await commit({
+      fs,
+      gitdir,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+      message: 'Second commit',
+    })
+    const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
+    expect(newCommit.tree).toBe(parentCommit.tree)
   })
 })

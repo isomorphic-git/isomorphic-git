@@ -163,4 +163,90 @@ describe('GitIndex', () => {
       }
     )
   })
+
+  it('GitIndex.from(buffer) - version 3 extended flags', async () => {
+    // Setup: an index written by canonical git after
+    // `git update-index --skip-worktree c.txt` and `git add -N b.txt`
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v3')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    // Test
+    const index = await GitIndex.from(buffer)
+    expect(index.render()).toMatchInlineSnapshot(`
+      "100644 78981922613b2afb6025042ff6bd878ac1994e85    a.txt
+      100644 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391    b.txt
+      100644 f2ad6c76f0115a6ba5b00456a849810e7ec0af20    c.txt"
+    `)
+    const flags = filepath => index.entriesMap.get(filepath).flags
+    expect(flags('a.txt')).toMatchObject({
+      extended: false,
+      skipWorktree: false,
+      intentToAdd: false,
+    })
+    expect(flags('b.txt')).toMatchObject({
+      extended: true,
+      skipWorktree: false,
+      intentToAdd: true,
+    })
+    expect(flags('c.txt')).toMatchObject({
+      extended: true,
+      skipWorktree: true,
+      intentToAdd: false,
+    })
+    // Writing it back keeps version 3 and the extended flags
+    const buffer2 = await index.toObject()
+    expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
+  })
+
+  it('GitIndex.insert keeps skip-worktree and clears intent-to-add', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v3')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    const index = await GitIndex.from(buffer)
+    // Test
+    index.insert({
+      filepath: 'b.txt',
+      oid: '61780798228d17af2d34fce4cfbdf35556832472',
+    })
+    index.insert({
+      filepath: 'c.txt',
+      oid: '61780798228d17af2d34fce4cfbdf35556832472',
+    })
+    const buffer2 = await index.toObject()
+    expect(buffer2.readUInt32BE(4)).toBe(3)
+    const index2 = await GitIndex.from(buffer2)
+    const flags = filepath => index2.entriesMap.get(filepath).flags
+    expect(flags('b.txt')).toMatchObject({
+      extended: false,
+      skipWorktree: false,
+      intentToAdd: false,
+    })
+    expect(flags('c.txt')).toMatchObject({
+      extended: true,
+      skipWorktree: true,
+      intentToAdd: false,
+    })
+  })
+
+  it('GitIndex writes version 2 when no entry needs extended flags', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v3')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    const index = await GitIndex.from(buffer)
+    // Test
+    index.insert({
+      filepath: 'b.txt',
+      oid: '61780798228d17af2d34fce4cfbdf35556832472',
+    })
+    index.entriesMap.get('c.txt').flags.skipWorktree = false
+    const buffer2 = await index.toObject()
+    expect(buffer2.readUInt32BE(4)).toBe(2)
+    const index2 = await GitIndex.from(buffer2)
+    for (const entry of index2.entries) {
+      expect(entry.flags).toMatchObject({
+        extended: false,
+        skipWorktree: false,
+        intentToAdd: false,
+      })
+    }
+  })
 })
