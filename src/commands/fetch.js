@@ -99,6 +99,15 @@ export async function _fetch({
   if (typeof url === 'undefined') {
     throw new MissingParameterError('remote OR url')
   }
+  // A url for a remote that isn't in the config (e.g. after a `noConfig`
+  // clone) saves branches with the refspec `addRemote` would have written.
+  const refspecs =
+    _url && !(await config.hasSection('remote', remote))
+      ? [
+          `+HEAD:refs/remotes/${remote}/HEAD`,
+          `+refs/heads/*:refs/remotes/${remote}/*`,
+        ]
+      : undefined
   // Figure out what remote ref to use.
   const remoteRef =
     _remoteRef ||
@@ -283,6 +292,7 @@ export async function _fetch({
       refs,
       symrefs,
       tags,
+      refspecs,
       prune,
     })
     if (prune) {
@@ -296,6 +306,7 @@ export async function _fetch({
       refs: remoteRefs,
       symrefs: remoteHTTP.symrefs,
       tags,
+      refspecs,
       prune,
       pruneTags,
     })

@@ -16,6 +16,8 @@ import { join } from '../utils/join.js'
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {boolean} [args.bare = false] - Initialize a bare repository
  * @param {string} [args.defaultBranch = 'master'] - The name of the default branch (might be changed to a required argument in 2.0.0)
+ * @param {boolean} [args.noHooks = false] - By default init creates an empty `hooks` folder. `noHooks` disables that behavior. Chrome refuses to create `.git/hooks` through the File System Access API, see [Using the File System Access API](guide-browser-file-system-access.md).
+ * @param {boolean} [args.noConfig = false] - By default init writes a `config` file. `noConfig` disables that behavior, and git then uses its default settings. Chromium is adding `.git/config` to the paths the File System Access API refuses to write. Once that ships, writing the config fails, see [Using the File System Access API](guide-browser-file-system-access.md).
  * @returns {Promise<void>}  Resolves successfully when filesystem operations are complete
  *
  * @example
@@ -29,6 +31,8 @@ export async function init({
   dir,
   gitdir = bare ? dir : join(dir, '.git'),
   defaultBranch = 'master',
+  noHooks = false,
+  noConfig = false,
 }) {
   try {
     assertParameter('fs', fs)
@@ -45,6 +49,8 @@ export async function init({
       dir,
       gitdir: updatedGitdir,
       defaultBranch,
+      noHooks,
+      noConfig,
     })
   } catch (err) {
     err.caller = 'git.init'
