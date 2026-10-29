@@ -729,4 +729,17 @@ describe('GitConfig', () => {
       url = https://bar.com/project.git`)
     })
   })
+
+  describe('has section', () => {
+    it('ignores case in the section name and matches the old form, like get', async () => {
+      const config = GitConfig.from(`[Remote "origin"]
+      url = https://foo.com/project.git
+      [remote.upstream]
+      url = https://bar.com/project.git`)
+      expect(await config.hasSection('remote', 'origin')).toBe(true)
+      expect(await config.hasSection('remote', 'upstream')).toBe(true)
+      expect(await config.hasSection('remote', 'mirror')).toBe(false)
+      expect(await config.hasSection('branch', 'origin')).toBe(false)
+    })
+  })
 })

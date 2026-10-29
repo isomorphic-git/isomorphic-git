@@ -27,6 +27,7 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  * @param {boolean} args.noCheckout
  * @param {boolean} args.noTags
  * @param {boolean} [args.noHooks]
+ * @param {boolean} [args.noConfig]
  * @param {string} args.remote
  * @param {number} args.depth
  * @param {Date} args.since
@@ -63,17 +64,20 @@ export async function _clone({
   noCheckout,
   noTags,
   noHooks,
+  noConfig,
   headers,
   nonBlocking,
   batchSize = 100,
 }) {
   try {
-    await _init({ fs, gitdir, noHooks })
-    await _addRemote({ fs, gitdir, remote, url, force: false })
-    if (corsProxy) {
-      const config = await GitConfigManager.get({ fs, gitdir })
-      await config.set(`http.corsProxy`, corsProxy)
-      await GitConfigManager.save({ fs, gitdir, config })
+    await _init({ fs, gitdir, noHooks, noConfig })
+    if (!noConfig) {
+      await _addRemote({ fs, gitdir, remote, url, force: false })
+      if (corsProxy) {
+        const config = await GitConfigManager.get({ fs, gitdir })
+        await config.set(`http.corsProxy`, corsProxy)
+        await GitConfigManager.save({ fs, gitdir, config })
+      }
     }
     const { defaultBranch, fetchHead } = await _fetch({
       fs,
@@ -87,6 +91,7 @@ export async function _clone({
       gitdir,
       ref,
       remote,
+      url: noConfig ? url : undefined,
       corsProxy,
       depth,
       since,
@@ -110,6 +115,7 @@ export async function _clone({
       ref,
       remote,
       noCheckout,
+      track: !noConfig,
       nonBlocking,
       batchSize,
     })

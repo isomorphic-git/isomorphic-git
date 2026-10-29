@@ -31,7 +31,7 @@ import { join } from '../utils/join.js'
  * @param {AuthSuccessCallback} [args.onAuthSuccess] - optional auth approved callback
  * @param {string} [args.dir] - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
- * @param {string} [args.url] - The URL of the remote repository. The default is the value set in the git config for that remote.
+ * @param {string} [args.url] - The URL of the remote repository. The default is the value set in the git config for that remote. If the remote isn't in the git config, its branches are saved under `refs/remotes/<remote>/`.
  * @param {string} [args.remote] - If URL is not specified, determines which remote to use.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {string} [args.ref] - Which branch to fetch if `singleBranch` is true. By default this is the current branch or the remote's default branch.

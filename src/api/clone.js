@@ -22,12 +22,13 @@ import { join } from '../utils/join.js'
  * @param {string} args.dir - The [working tree](dir-vs-gitdir.md) directory path
  * @param {string} [args.gitdir=join(dir,'.git')] - [required] The [git directory](dir-vs-gitdir.md) path
  * @param {string} args.url - The URL of the remote repository
- * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo.
+ * @param {string} [args.corsProxy] - Optional [CORS proxy](https://www.npmjs.com/%40isomorphic-git/cors-proxy). Value is stored in the git config file for that repo, unless `noConfig` is true.
  * @param {string} [args.ref] - Which branch to checkout. By default this is the designated "main branch" of the repository.
  * @param {boolean} [args.singleBranch = false] - Instead of the default behavior of fetching all the branches, only fetch a single branch.
  * @param {boolean} [args.noCheckout = false] - If true, clone will only fetch the repo, not check out a branch. Skipping checkout can save a lot of time normally spent writing files to disk.
  * @param {boolean} [args.noTags = false] - By default clone will fetch all tags. `noTags` disables that behavior.
  * @param {boolean} [args.noHooks = false] - By default clone creates an empty `hooks` folder. `noHooks` disables that behavior. Chrome refuses to create `.git/hooks` through the File System Access API, see [Using the File System Access API](guide-browser-file-system-access.md).
+ * @param {boolean} [args.noConfig = false] - By default clone writes a `config` file with the remote, `corsProxy` and the branch tracking. `noConfig` disables that behavior, so later `fetch`, `pull` and `push` calls need the `url`. Chromium is adding `.git/config` to the paths the File System Access API refuses to write. Once that ships, writing the config fails, see [Using the File System Access API](guide-browser-file-system-access.md).
  * @param {string} [args.remote = 'origin'] - What to name the remote that is created.
  * @param {number} [args.depth] - Integer. Determines how much of the git repository's history to retrieve
  * @param {Date} [args.since] - Only fetch commits created after the given date. Mutually exclusive with `depth`.
@@ -76,6 +77,7 @@ export async function clone({
   noCheckout = false,
   noTags = false,
   noHooks = false,
+  noConfig = false,
   headers = {},
   cache = {},
   nonBlocking = false,
@@ -116,6 +118,7 @@ export async function clone({
       noCheckout,
       noTags,
       noHooks,
+      noConfig,
       headers,
       nonBlocking,
       batchSize,
