@@ -335,6 +335,7 @@ export async function _checkout({
                     await fs.write(filepath, object, { mode: 0o777 })
                   } else if (mode === 0o120000) {
                     // symlink
+                    await fs.rm(filepath)
                     await fs.writelink(filepath, object)
                   } else {
                     throw new InternalError(
@@ -740,6 +741,7 @@ async function updateWorkingDir(
       await fs.write(filepath, object, { mode: 0o777 })
     } else if (mode === 0o120000) {
       // symlink
+      await fs.rm(filepath)
       await fs.writelink(filepath, object)
     } else {
       throw new InternalError(

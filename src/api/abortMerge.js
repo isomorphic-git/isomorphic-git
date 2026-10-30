@@ -6,8 +6,10 @@ import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
 import { IndexResetError } from '../errors/IndexResetError.js'
+import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
@@ -72,6 +74,15 @@ export async function abortMerge({
         const unmerged = unmergedPaths.includes(path)
         const unmodified = !(await modified(index, head))
 
+        if (unmodified && !unmerged) return false
+        if (head && index && (await head.type()) !== (await index.type()))
+          throw new MergeNotSupportedError()
+        if (
+          (head && (await head.type()) === 'tree') ||
+          (index && (await index.type()) === 'tree')
+        )
+          return false
+
         if (staged || unmerged) {
           return head
             ? {
@@ -81,7 +92,7 @@ export async function abortMerge({
                 type: await head.type(),
                 content: await head.content(),
               }
-            : undefined
+            : { path, deleted: true }
         }
 
         if (unmodified) return false
@@ -92,30 +103,28 @@ export async function abortMerge({
     await GitIndexManager.acquire(
       { fs, gitdir: updatedGitdir, cache },
       async function (index) {
-        // Reset paths in index and worktree, this can't be done in _walk because the
-        // STAGE walker acquires its own index lock.
-
-        for (const entry of results) {
-          if (entry === false) continue
-
-          // entry is not false, so from here we can assume index = workdir
-          if (!entry) {
-            await fs.rmdir(`${dir}/${entry.path}`, { recursive: true })
-            index.delete({ filepath: entry.path })
-            continue
-          }
-
-          if (entry.type === 'blob') {
-            const content = new TextDecoder().decode(entry.content)
-            await fs.write(`${dir}/${entry.path}`, content, {
-              mode: entry.mode,
-            })
-            index.insert({
-              filepath: entry.path,
-              oid: entry.oid,
-              stage: 0,
-            })
-          }
+        // Restore only paths changed by the merge, retaining unrelated unstaged edits.
+        for (const entry of results
+          .filter(Boolean)
+          .sort((a, b) => b.path.length - a.path.length)) {
+          if (!entry.deleted) continue
+          await assertNoSymlinkInLeadingPath(fs, dir, entry.path)
+          await fs.rm(join(dir, entry.path))
+          index.delete({ filepath: entry.path })
+        }
+        for (const entry of results.filter(Boolean)) {
+          if (entry.deleted || entry.type !== 'blob') continue
+          const filepath = join(dir, entry.path)
+          await assertNoSymlinkInLeadingPath(fs, dir, entry.path)
+          await fs.rm(filepath)
+          if (entry.mode === 0o120000)
+            await fs.writelink(filepath, Buffer.from(entry.content))
+          else await fs.write(filepath, entry.content, { mode: entry.mode })
+          index.insert({
+            filepath: entry.path,
+            oid: entry.oid,
+            stats: await fs.lstat(filepath),
+          })
         }
       }
     )
