@@ -15,7 +15,8 @@ function SecondsNanoseconds(
     milliseconds = date.valueOf()
   }
   const seconds = Math.floor(milliseconds / 1000)
-  const nanoseconds = (milliseconds - seconds * 1000) * 1000000
+  // Match the integer precision used when these timestamps are written to the index.
+  const nanoseconds = Math.floor((milliseconds - seconds * 1000) * 1000000)
   return [seconds, nanoseconds]
 }
 
