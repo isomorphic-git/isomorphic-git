@@ -67,4 +67,25 @@ describe('GitAnnotatedTag', () => {
     const tag = GitAnnotatedTag.from(tagObject)
     expect(tag.render()).toEqual(tagString)
   })
+
+  it('keeps the first object, type, tag and tagger headers', async () => {
+    const tag = GitAnnotatedTag.from(
+      `object 9144a97b79c162e6d5a08cb490848352c41b9ea1
+type commit
+tag v1.0.0
+tagger Alice <alice@example.com> 1 +0000
+object b7fa5f8d01d995c9b86c0ef2cf18742097fb2255
+type tree
+tag v2.0.0
+tagger Bob <bob@example.com> 2 +0000
+
+message
+`
+    )
+    const { object, type, tag: tagName, tagger } = tag.parse()
+    expect(object).toEqual('9144a97b79c162e6d5a08cb490848352c41b9ea1')
+    expect(type).toEqual('commit')
+    expect(tagName).toEqual('v1.0.0')
+    expect(tagger.email).toEqual('alice@example.com')
+  })
 })
