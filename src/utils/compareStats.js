@@ -8,7 +8,9 @@ export function compareStats(entry, stats, filemode = true, trustino = true) {
   const staleness =
     (filemode && e.mode !== s.mode) ||
     e.mtimeSeconds !== s.mtimeSeconds ||
+    e.mtimeNanoseconds !== s.mtimeNanoseconds ||
     e.ctimeSeconds !== s.ctimeSeconds ||
+    e.ctimeNanoseconds !== s.ctimeNanoseconds ||
     e.uid !== s.uid ||
     e.gid !== s.gid ||
     (trustino && e.ino !== s.ino) ||
