@@ -1051,6 +1051,15 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "onmax",
+      "name": "Max",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22072217?v=4",
+      "profile": "https://onmax.me/hire",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular"
