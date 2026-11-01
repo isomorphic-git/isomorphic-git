@@ -63,4 +63,51 @@ message
     )
     expect(commit.parse().parent).toEqual([firstParent, secondParent])
   })
+
+  it('ignores a parent header after the committer', async () => {
+    const commit = GitCommit.from(
+      `tree ${firstTree}
+parent ${firstParent}
+author Alice <alice@example.com> 1 +0000
+committer Alice <alice@example.com> 1 +0000
+parent ${secondParent}
+
+message
+`
+    )
+    expect(commit.parse().parent).toEqual([firstParent])
+  })
+
+  it('ignores a parent header that does not follow the tree', async () => {
+    const commit = GitCommit.from(
+      `tree ${firstTree}
+author Alice <alice@example.com> 1 +0000
+parent ${firstParent}
+committer Alice <alice@example.com> 1 +0000
+
+message
+`
+    )
+    expect(commit.parse().parent).toEqual([])
+  })
+
+  it('refuses a commit whose first header is not the tree', async () => {
+    const commit = GitCommit.from(
+      `author Alice <alice@example.com> 1 +0000
+tree ${firstTree}
+committer Alice <alice@example.com> 1 +0000
+
+message
+`
+    )
+    let error = null
+    try {
+      commit.parse()
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.code).toEqual('ParseError')
+    expect(error.data.actual).toEqual('author')
+  })
 })

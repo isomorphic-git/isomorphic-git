@@ -1,4 +1,5 @@
 import { InternalError } from '../errors/InternalError.js'
+import { ParseError } from '../errors/ParseError.js'
 import { formatAuthor } from '../utils/formatAuthor.js'
 import { indent } from '../utils/indent.js'
 import { normalizeNewlines } from '../utils/normalizeNewlines.js'
@@ -71,20 +72,34 @@ export class GitCommit {
     const obj = {
       parent: [],
     }
-    const seen = new Set()
-    for (const h of hs) {
-      const key = h.slice(0, h.indexOf(' '))
-      const value = h.slice(h.indexOf(' ') + 1)
-      if (Array.isArray(obj[key])) {
-        obj[key].push(value)
-      } else if (!seen.has(key)) {
-        // Only `parent` may appear more than once. For every other header the
-        // first occurrence wins, the way canonical git reads them. Keeping the
-        // last one instead would make a commit with a duplicate `tree` header
-        // resolve to a different tree here than in git, under the same oid.
-        seen.add(key)
-        obj[key] = value
-      }
+    const keyOf = h => h.slice(0, h.indexOf(' '))
+    const valueOf = h => h.slice(h.indexOf(' ') + 1)
+    // Git reads the start of a commit by position: one `tree`, then the
+    // `parent` lines that follow it directly. Anything after that run is an
+    // extra header that git keeps but never interprets, so a `tree` or
+    // `parent` further down must not count here either. Reading them would
+    // give the same oid a different tree, or a different ancestry, than git
+    // and every other implementation reports.
+    if (hs.length === 0 || keyOf(hs[0]) !== 'tree') {
+      throw new ParseError(
+        'tree as the first commit header',
+        keyOf(hs[0] || '')
+      )
+    }
+    obj.tree = valueOf(hs[0])
+    let index = 1
+    while (index < hs.length && keyOf(hs[index]) === 'parent') {
+      obj.parent.push(valueOf(hs[index]))
+      index++
+    }
+    const seen = new Set(['tree', 'parent'])
+    for (; index < hs.length; index++) {
+      const key = keyOf(hs[index])
+      // The first occurrence of a single-valued header wins, the way canonical
+      // git reads them.
+      if (seen.has(key)) continue
+      seen.add(key)
+      obj[key] = valueOf(hs[index])
     }
     if (obj.author) {
       obj.author = parseAuthor(obj.author)
