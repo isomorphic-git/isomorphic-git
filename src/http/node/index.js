@@ -26,6 +26,7 @@ export async function request({
     // @ts-expect-error
     body = Buffer.from(await collect(body))
   } else if (body) {
+    // @ts-expect-error
     body = asyncIteratorToStream(body)
   }
   return new Promise((resolve, reject) => {

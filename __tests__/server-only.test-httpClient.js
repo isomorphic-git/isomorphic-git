@@ -124,5 +124,44 @@ describe('httpClient', () => {
       expect(capturedOpts.family).toBe(4)
       expect(capturedOpts.url).toBe('http://example.com')
     })
+
+    it('sends an async iterable body as a stream', async () => {
+      /** @type {any} */
+      let sentBody = null
+      jest.resetModules()
+      jest.unstable_mockModule('simple-get', () => ({
+        __esModule: true,
+        default: jest.fn(
+          /**
+           * @param {any} opts
+           * @param {any} cb
+           */
+          async (opts, cb) => {
+            const chunks = []
+            for await (const chunk of opts.body) chunks.push(chunk)
+            sentBody = Buffer.concat(chunks).toString()
+            const mockResponse = Object.assign(new PassThrough(), {
+              statusCode: 200,
+              headers: {},
+            })
+            mockResponse.end()
+            cb(null, mockResponse)
+          }
+        ),
+      }))
+
+      const { request: nodeRequest } = await import('../src/http/node/index.js')
+
+      async function* body() {
+        yield Buffer.from('hello ')
+        yield Buffer.from('world')
+      }
+      await nodeRequest({
+        url: 'http://example.com',
+        method: 'POST',
+        body: body(),
+      })
+      expect(sentBody).toBe('hello world')
+    })
   })
 })
