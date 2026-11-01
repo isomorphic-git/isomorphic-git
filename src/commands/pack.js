@@ -1,7 +1,6 @@
-import Hash from 'sha.js/sha1.js'
-
 import { types } from '../commands/types.js'
 import { _readObject as readObject } from '../storage/readObject.js'
+import { createSha1 } from '../utils/createSha1.js'
 import { deflate } from '../utils/deflate.js'
 import { join } from '../utils/join.js'
 import { padHex } from '../utils/padHex.js'
@@ -21,7 +20,7 @@ export async function _pack({
   gitdir = join(dir, '.git'),
   oids,
 }) {
-  const hash = new Hash()
+  const hash = createSha1()
   const outputStream = []
   function write(chunk, enc) {
     const buff = Buffer.from(chunk, enc)
