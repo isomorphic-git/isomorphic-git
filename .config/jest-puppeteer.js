@@ -1,7 +1,7 @@
 export default {
   launch: {
     browser: process.env.JEST_BROWSER,
-    args: ['--no-sandbox'],
-	headless: true,
+    args: process.env.JEST_BROWSER === 'firefox' ? [] : ['--no-sandbox'],
+    headless: true,
   },
 }
