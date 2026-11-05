@@ -14,6 +14,15 @@ describe('deleteRemote', () => {
     const a = await listRemotes({ fs, dir, gitdir })
     expect(a).toEqual([{ remote: 'bar', url: 'git@github.com:bar/bar.git' }])
   })
+  it('deleteRemote in a repository without a config file', async () => {
+    // Setup
+    const { fs, dir, gitdir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-deleteRemote')
+    await fs.rm(`${gitdirsmfullpath}/config`)
+    // Test
+    await deleteRemote({ fs, dir, gitdir, remote: 'foo' })
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(false)
+  })
   it('missing argument', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-addRemote')

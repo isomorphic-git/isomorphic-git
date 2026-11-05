@@ -169,6 +169,54 @@ describe('clone', () => {
       `'gitdir/refs/heads/master' exists`
     )
     expect(await fs.exists(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
+    expect(await fs.exists(`${gitdirsmfullpath}/hooks`)).toBe(true)
+  })
+
+  it('clone with noHooks', async () => {
+    const { fs, dir, gitdir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-clone-karma')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      noHooks: true,
+      url: `http://${localhost}:8888/test-clone.git`,
+    })
+    expect(await fs.exists(`${gitdirsmfullpath}/hooks`)).toBe(false)
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(true)
+    expect(
+      await fs.exists(`${gitdirsmfullpath}/refs/remotes/origin/master`)
+    ).toBe(true)
+    expect(await fs.exists(`${dir}/a.txt`)).toBe(true)
+  })
+
+  it('clone with noHooks and noConfig', async () => {
+    const { fs, dir, gitdir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-clone-karma')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      noHooks: true,
+      noConfig: true,
+      url: `http://${localhost}:8888/test-clone.git`,
+    })
+    expect(await fs.exists(`${gitdirsmfullpath}/hooks`)).toBe(false)
+    expect(await fs.exists(`${gitdirsmfullpath}/config`)).toBe(false)
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/master' })
+    ).toBe('97c024f73eaab2781bf3691597bc7c833cb0e22f')
+    expect(await resolveRef({ fs, gitdir, ref: 'refs/heads/master' })).toBe(
+      '97c024f73eaab2781bf3691597bc7c833cb0e22f'
+    )
+    expect(await currentBranch({ fs, dir, gitdir })).toBe('master')
+    expect(await fs.exists(`${dir}/a.txt`)).toBe(true)
   })
 
   it('should throw error if server resets connection before reading packetlines', async () => {

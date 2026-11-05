@@ -1,5 +1,12 @@
 /* eslint-env node, browser, jasmine */
-import { Errors, setConfig, fetch } from 'isomorphic-git'
+import {
+  Errors,
+  setConfig,
+  fetch,
+  init,
+  listBranches,
+  resolveRef,
+} from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 import { sleep } from 'isomorphic-git/internal-apis'
 
@@ -331,6 +338,74 @@ describe('fetch', () => {
     expect(err).toBeDefined()
     expect(err instanceof Errors.NoRefspecError).toBe(true)
   })
+
+  it('fetch with a url saves the branches of a remote that is not in the config', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-without-config')
+    await init({ fs, dir, gitdir, noConfig: true })
+    // Test
+    await fetch({
+      fs,
+      http,
+      dir,
+      gitdir,
+      remote: 'upstream',
+      url: `http://${localhost}:8888/test-clone.git`,
+    })
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/upstream/master' })
+    ).toBe('97c024f73eaab2781bf3691597bc7c833cb0e22f')
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/upstream/HEAD' })
+    ).toBe('97c024f73eaab2781bf3691597bc7c833cb0e22f')
+    expect(await fs.exists(`${gitdir}/config`)).toBe(false)
+  })
+
+  it('fetch with a url errors if the remote is in the config without a fetch refspec', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-fetch-without-config')
+    const url = `http://${localhost}:8888/test-clone.git`
+    await init({ fs, dir, gitdir })
+    await setConfig({ fs, gitdir, path: 'remote.origin.url', value: url })
+    // Test
+    let err = null
+    try {
+      await fetch({ fs, http, dir, gitdir, remote: 'origin', url })
+    } catch (e) {
+      err = e
+    }
+    expect(err instanceof Errors.NoRefspecError).toBe(true)
+  })
+
+  for (const header of [
+    '[remote "origin"]',
+    '[Remote "origin"]',
+    '[remote.origin]',
+  ]) {
+    it(`fetch with a url uses the fetch refspec of a remote in the config as ${header}`, async () => {
+      // Setup
+      const { fs, dir, gitdir } = await makeFixture('test-fetch-without-config')
+      await init({ fs, dir, gitdir })
+      const config = await fs.read(`${gitdir}/config`, 'utf8')
+      await fs.write(
+        `${gitdir}/config`,
+        `${config}${header}\n\tfetch = +refs/heads/master:refs/remotes/origin/master\n`
+      )
+      // Test
+      await fetch({
+        fs,
+        http,
+        dir,
+        gitdir,
+        remote: 'origin',
+        url: `http://${localhost}:8888/test-clone.git`,
+      })
+      expect(await listBranches({ fs, gitdir, remote: 'origin' })).toEqual([
+        'HEAD',
+        'master',
+      ])
+    })
+  }
 
   it('fetch empty repository from git-http-mock-server', async () => {
     const { fs, dir, gitdir } = await makeFixture('test-empty')

@@ -116,6 +116,11 @@
       "version-1.x-cli",
       "version-1.x-cache"
     ],
-    "More": ["version-1.x-faq", "version-1.x-snippets", "version-1.x-webworker"]
+    "More": [
+      "version-1.x-faq",
+      "version-1.x-snippets",
+      "version-1.x-webworker",
+      "version-1.x-browser-file-system-access"
+    ]
   }
 }
