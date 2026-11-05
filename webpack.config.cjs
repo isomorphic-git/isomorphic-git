@@ -19,7 +19,7 @@ module.exports = [
       libraryTarget: 'umd',
     },
     mode: 'production',
-    devtool: 'source-map',
+    devtool: 'hidden-source-map',
     plugins: [
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
