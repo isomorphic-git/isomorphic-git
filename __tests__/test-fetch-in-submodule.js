@@ -375,4 +375,47 @@ describe('fetch', () => {
     )
     expect(oldValue).not.toEqual(newValue)
   })
+
+  it('fetch leaves credentials in the remote URL out of fetchHeadDescription', async () => {
+    const { fs, dir, gitdir } =
+      await makeFixtureAsSubmodule('test-fetch-client')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.origin.url',
+      value: `http://testuser:testpassword@${localhost}:8888/test-fetch-server.git`,
+    })
+    const { fetchHeadDescription } = await fetch({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+    })
+    expect(fetchHeadDescription).toEqual(
+      `branch 'master' of http://${localhost}:8888/test-fetch-server.git`
+    )
+  })
+
+  it('fetch leaves credentials in the url argument out of fetchHeadDescription', async () => {
+    const { fs, dir, gitdir } =
+      await makeFixtureAsSubmodule('test-fetch-client')
+    for (const url of [
+      `http://testtoken@${localhost}:8888/test-fetch-server.git`,
+      ` http://testuser:testpassword@${localhost}:8888/test-fetch-server.git`,
+    ]) {
+      const { fetchHeadDescription } = await fetch({
+        fs,
+        http,
+        dir,
+        gitdir,
+        url,
+        depth: 1,
+        singleBranch: true,
+      })
+      expect(fetchHeadDescription).not.toContain('testtoken')
+      expect(fetchHeadDescription).not.toContain('testpassword')
+    }
+  })
 })

@@ -134,4 +134,34 @@ describe('pull', () => {
       'Initial commit\n ()',
     ])
   })
+  it('pull no fast-forward leaves credentials in the remote URL out of the merge message', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-pull-no-ff')
+    await setConfig({
+      fs,
+      gitdir,
+      path: 'remote.origin.url',
+      value: `http://testuser:testpassword@${localhost}:8888/test-pull-server.git`,
+    })
+    // Test
+    await pull({
+      fs,
+      http,
+      gitdir,
+      dir,
+      remote: 'origin',
+      ref: 'refs/heads/master',
+      fastForward: false,
+      author: {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1262356920,
+        timezoneOffset: -0,
+      },
+    })
+    const logs = await log({ fs, gitdir, dir, ref: 'refs/heads/master' })
+    expect(logs[0].commit.message).toEqual(
+      `Merge branch 'master' of http://${localhost}:8888/test-pull-server.git\n`
+    )
+  })
 })
