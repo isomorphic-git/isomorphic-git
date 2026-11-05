@@ -99,6 +99,7 @@
     "index.js",
     "index.d.ts",
     "index.umd.min.js",
+    "index.umd.min.js.LICENSE.txt",
     "index.umd.min.d.ts",
     "index.umd.min.js.map",
     "managers/*",
