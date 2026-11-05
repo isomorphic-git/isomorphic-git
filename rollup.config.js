@@ -9,8 +9,6 @@ const external = [
   'crypto',
   'stream',
   'crc/lib/crc32.js',
-  'sha.js/sha1',
-  'sha.js/sha1.js',
   ...Object.keys(pkg.dependencies),
 ]
 

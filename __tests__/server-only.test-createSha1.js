@@ -1,9 +1,11 @@
 /* eslint-env node, browser, jasmine */
+import { createHash } from 'crypto'
+
 import { createSha1 } from '../src/utils/createSha1.js'
 import { createSha1 as createNodeSha1 } from '../src/utils/createSha1.node.js'
 
 const implementations = [
-  { name: 'sha.js', create: createSha1 },
+  { name: 'the embedded SHA-1', create: createSha1 },
   { name: 'node:crypto', create: createNodeSha1 },
 ]
 
@@ -29,4 +31,29 @@ describe('createSha1', () => {
       )
     })
   }
+  it('matches node:crypto across block boundaries', () => {
+    const data = Buffer.from(Array.from({ length: 200 }, (_, i) => i))
+    for (let length = 0; length <= data.length; length++) {
+      const input = data.subarray(0, length)
+      const hash = createSha1()
+      hash.update(input.subarray(0, length >> 1))
+      hash.update(input.subarray(length >> 1))
+      expect(hash.digest('hex')).toBe(
+        createHash('sha1').update(input).digest('hex')
+      )
+    }
+  })
+  it('returns a hex digest without a global Buffer', () => {
+    const { Buffer } = globalThis
+    try {
+      // @ts-expect-error
+      delete globalThis.Buffer
+      const hash = createSha1().update(new Uint8Array([0x61, 0x62, 0x63]))
+      expect(hash.digest('hex')).toBe(
+        'a9993e364706816aba3e25717850c26c9cd0d89d'
+      )
+    } finally {
+      globalThis.Buffer = Buffer
+    }
+  })
 })
