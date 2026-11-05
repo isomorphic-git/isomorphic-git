@@ -9,8 +9,6 @@ const external = [
   'crypto',
   'stream',
   'crc/lib/crc32.js',
-  'sha.js/sha1',
-  'sha.js/sha1.js',
   ...Object.keys(pkg.dependencies),
 ]
 
@@ -18,6 +16,10 @@ const nodeAliases = {
   [path.resolve(__dirname, 'src/utils/shasumRange.js')]: path.resolve(
     __dirname,
     'src/utils/shasumRange.node.js'
+  ),
+  [path.resolve(__dirname, 'src/utils/createSha1.js')]: path.resolve(
+    __dirname,
+    'src/utils/createSha1.node.js'
   ),
 }
 
