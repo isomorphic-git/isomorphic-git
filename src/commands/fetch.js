@@ -3,6 +3,7 @@ import '../typedefs.js'
 
 import { _currentBranch } from '../commands/currentBranch.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
 import { RemoteCapabilityError } from '../errors/RemoteCapabilityError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
@@ -256,53 +257,6 @@ export async function _fetch({
     oids.delete(oid)
   }
   await GitShallowManager.write({ fs, gitdir, oids })
-  // Update local remote refs
-  if (singleBranch) {
-    const refs = new Map([[fullref, oid]])
-    // But wait, maybe it was a symref, like 'HEAD'!
-    // We need to save all the refs in the symref chain (sigh).
-    const symrefs = new Map()
-    let bail = 10
-    let key = fullref
-    while (bail--) {
-      const value = remoteHTTP.symrefs.get(key)
-      if (value === undefined) break
-      symrefs.set(key, value)
-      key = value
-    }
-    // final value must not be a symref but a real ref
-    const realRef = remoteRefs.get(key)
-    // There may be no ref at all if we've fetched a specific commit hash
-    if (realRef) {
-      refs.set(key, realRef)
-    }
-    const { pruned } = await GitRefManager.updateRemoteRefs({
-      fs,
-      gitdir,
-      remote,
-      refs,
-      symrefs,
-      tags,
-      prune,
-    })
-    if (prune) {
-      response.pruned = pruned
-    }
-  } else {
-    const { pruned } = await GitRefManager.updateRemoteRefs({
-      fs,
-      gitdir,
-      remote,
-      refs: remoteRefs,
-      symrefs: remoteHTTP.symrefs,
-      tags,
-      prune,
-      pruneTags,
-    })
-    if (prune) {
-      response.pruned = pruned
-    }
-  }
   // We need this value later for the `clone` command.
   response.HEAD = remoteHTTP.symrefs.get('HEAD')
   // AWS CodeCommit doesn't list HEAD as a symref, but we can reverse engineer it
@@ -354,9 +308,6 @@ export async function _fetch({
   if (response.headers) {
     res.headers = response.headers
   }
-  if (prune) {
-    res.pruned = response.pruned
-  }
   // This is a quick fix for the empty .git/objects/pack/pack-.pack file error,
   // which due to the way `git-list-pack` works causes the program to hang when it tries to read it.
   // TODO: Longer term, we should actually:
@@ -375,5 +326,77 @@ export async function _fetch({
     })
     await fs.write(fullpath.replace(/\.pack$/, '.idx'), await idx.toBuffer())
   }
+  // Update local remote refs, now that the objects they point to are stored.
+  if (singleBranch) {
+    const refs = new Map([[fullref, oid]])
+    // But wait, maybe it was a symref, like 'HEAD'!
+    // We need to save all the refs in the symref chain (sigh).
+    const symrefs = new Map()
+    let bail = 10
+    let key = fullref
+    while (bail--) {
+      const value = remoteHTTP.symrefs.get(key)
+      if (value === undefined) break
+      symrefs.set(key, value)
+      key = value
+    }
+    // final value must not be a symref but a real ref
+    const realRef = remoteRefs.get(key)
+    // There may be no ref at all if we've fetched a specific commit hash
+    if (realRef) {
+      refs.set(key, realRef)
+    }
+    await assertRefTargetsExist({ fs, cache, gitdir, refs })
+    const { pruned } = await GitRefManager.updateRemoteRefs({
+      fs,
+      gitdir,
+      remote,
+      refs,
+      symrefs,
+      tags,
+      prune,
+    })
+    if (prune) {
+      res.pruned = pruned
+    }
+  } else {
+    await assertRefTargetsExist({ fs, cache, gitdir, refs: remoteRefs })
+    const { pruned } = await GitRefManager.updateRemoteRefs({
+      fs,
+      gitdir,
+      remote,
+      refs: remoteRefs,
+      symrefs: remoteHTTP.symrefs,
+      tags,
+      prune,
+      pruneTags,
+    })
+    if (prune) {
+      res.pruned = pruned
+    }
+  }
   return res
+}
+
+/**
+ * A server can advertise a ref and then send a pack that does not contain its
+ * object (an empty pack, for one). Publishing that ref would leave it pointing at
+ * nothing, so fail the fetch instead, like git does.
+ *
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {object} args.cache
+ * @param {string} args.gitdir
+ * @param {Map<string, string>} args.refs
+ */
+async function assertRefTargetsExist({ fs, cache, gitdir, refs }) {
+  for (const [ref, oid] of refs) {
+    // Peeled tag entries are not written as refs.
+    if (ref.endsWith('^{}')) continue
+    if (!(await hasObject({ fs, cache, gitdir, oid }))) {
+      throw new NotFoundError(
+        `object ${oid} for ${ref} in the fetched packfile`
+      )
+    }
+  }
 }
