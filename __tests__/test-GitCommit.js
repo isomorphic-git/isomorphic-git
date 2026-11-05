@@ -7,6 +7,26 @@ const firstParent = '9144a97b79c162e6d5a08cb490848352c41b9ea1'
 const secondParent = 'b7fa5f8d01d995c9b86c0ef2cf18742097fb2255'
 
 describe('GitCommit', () => {
+  it('removes only signature headers regardless of the armor format', () => {
+    const headers = `tree ${firstTree}\nauthor Alice <alice@example.com> 1 +0000\ncommitter Alice <alice@example.com> 1 +0000`
+    const extra = 'encoding UTF-8\nx-extra metadata\n continued metadata'
+    const message =
+      'Signed café\n\ngpgsig part of the message\n-----END PGP SIGNATURE-----\n'
+    const payload = `${headers}\n${extra}\n\n${message}`
+    expect(GitCommit.from(payload).withoutSignature()).toEqual(payload)
+    for (const format of ['PGP', 'SSH', 'SIGNED MESSAGE']) {
+      const signature = `gpgsig -----BEGIN ${format} SIGNATURE-----\n c2lnbmF0dXJl\n -----END ${format} SIGNATURE-----`
+      for (const signedHeaders of [
+        `${headers}\n${signature}\n${extra}`,
+        `${headers}\n${extra}\n${signature}`,
+      ]) {
+        expect(
+          GitCommit.from(`${signedHeaders}\n\n${message}`).withoutSignature()
+        ).toEqual(payload)
+      }
+    }
+  })
+
   it('keeps the first tree header', async () => {
     const commit = GitCommit.from(
       `tree ${firstTree}

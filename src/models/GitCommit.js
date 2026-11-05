@@ -145,13 +145,15 @@ export class GitCommit {
 
   withoutSignature() {
     const commit = normalizeNewlines(this._commit)
-    if (commit.indexOf('\ngpgsig') === -1) return commit
-    const headers = commit.slice(0, commit.indexOf('\ngpgsig'))
-    const message = commit.slice(
-      commit.indexOf('-----END PGP SIGNATURE-----\n') +
-        '-----END PGP SIGNATURE-----\n'.length
-    )
-    return normalizeNewlines(headers + '\n' + message)
+    let inSignature = false
+    const headers = GitCommit.justHeaders(commit)
+      .split('\n')
+      .filter(line => {
+        if (!line.startsWith(' ')) inSignature = line.startsWith('gpgsig ')
+        return !inSignature
+      })
+      .join('\n')
+    return headers + '\n\n' + GitCommit.justMessage(commit)
   }
 
   isolateSignature() {
