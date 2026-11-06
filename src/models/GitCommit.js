@@ -143,6 +143,7 @@ export class GitCommit {
     return this._commit
   }
 
+  /** Return the signature verification payload, preserving blank message lines. */
   withoutSignature() {
     const commit = normalizeNewlines(this._commit)
     let inSignature = false
@@ -153,7 +154,7 @@ export class GitCommit {
         return !inSignature
       })
       .join('\n')
-    return headers + '\n\n' + GitCommit.justMessage(commit)
+    return headers + '\n\n' + commit.slice(commit.indexOf('\n\n') + 2)
   }
 
   isolateSignature() {

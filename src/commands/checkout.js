@@ -259,6 +259,9 @@ export async function _checkout({
         })
     )
 
+    const config = await GitConfigManager.get({ fs, gitdir })
+    const allowSymlinkStub = (await config.get('core.symlinks')) === false
+
     if (nonBlocking) {
       // Filter eligible operations first
       const eligibleOps = ops.filter(
@@ -274,7 +277,7 @@ export async function _checkout({
         eligibleOps.map(
           ([method, fullpath, oid, mode, chmod]) =>
             () =>
-              updateWorkingDir({ fs, cache, gitdir, dir }, [
+              updateWorkingDir({ fs, cache, gitdir, dir, allowSymlinkStub }, [
                 method,
                 fullpath,
                 oid,
@@ -346,6 +349,7 @@ export async function _checkout({
                       filepath,
                       content: object,
                       mode,
+                      allowSymlinkStub,
                     })
                   } else {
                     throw new InternalError(
@@ -362,6 +366,10 @@ export async function _checkout({
                 // TODO: Figure out how git handles this internally.
                 if (mode === 0o100755) {
                   stats.mode = 0o755
+                }
+                if (mode === SYMLINK_MODE) {
+                  // Unsupported symlinks can be plain target files in the worktree.
+                  stats.mode = SYMLINK_MODE
                 }
                 // Submodules are present in the git index but use a unique mode different from trees
                 if (method === 'mkdir-index') {
@@ -778,6 +786,7 @@ async function isWorkdirModified({
     ) {
       // Compare raw link-target bytes without text conversion or index refresh.
       const object = await fs.read(filepath)
+      if (object === null) return true
       const { oid } = await hashObject({ type: 'blob', object })
       return (
         oid !== (await stage.oid()) && (!commit || oid !== (await commit.oid()))
@@ -795,7 +804,7 @@ async function isWorkdirModified({
 }
 
 async function updateWorkingDir(
-  { fs, cache, gitdir, dir },
+  { fs, cache, gitdir, dir, allowSymlinkStub },
   [method, fullpath, oid, mode, chmod]
 ) {
   const filepath = `${dir}/${fullpath}`
@@ -813,7 +822,13 @@ async function updateWorkingDir(
       await fs.write(filepath, object, { mode: 0o777 })
     } else if (mode === 0o120000) {
       // symlink
-      await writeWorktreeFile({ fs, filepath, content: object, mode })
+      await writeWorktreeFile({
+        fs,
+        filepath,
+        content: object,
+        mode,
+        allowSymlinkStub,
+      })
     } else {
       throw new InternalError(
         `Invalid mode 0o${mode.toString(8)} detected in blob ${oid}`
@@ -823,6 +838,9 @@ async function updateWorkingDir(
   const stats = await fs.lstat(filepath)
   if (mode === 0o100755) {
     stats.mode = 0o755
+  }
+  if (mode === SYMLINK_MODE) {
+    stats.mode = SYMLINK_MODE
   }
   if (method === 'mkdir-index') {
     stats.mode = 0o160000

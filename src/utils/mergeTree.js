@@ -508,12 +508,16 @@ async function mergeBlobs({
       mergeResult: { mode, path, oid: await ours.oid(), type },
     }
   }
-  // Binary blobs and symlink targets cannot enter the UTF-8 text merger.
+  // A replaced symlink has no text ancestry for the new regular files.
   const entries = [ours, theirs]
-  if (base && (await base.type()) === 'blob') entries.unshift(base)
+  if (base && (await base.type()) === 'blob' && baseMode !== 0o120000) {
+    entries.unshift(base)
+  } else {
+    baseContent = ''
+  }
   const contents = await Promise.all(entries.map(entry => entry.content()))
-  const modes = await Promise.all(entries.map(entry => entry.mode()))
-  let isText = !modes.includes(0o120000)
+  // Binary blobs and symlink targets cannot enter the UTF-8 text merger.
+  let isText = ![ourMode, theirMode].includes(0o120000)
   for (const content of contents) {
     const bytes = Buffer.from(content)
     if (

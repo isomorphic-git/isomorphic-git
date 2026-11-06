@@ -240,7 +240,12 @@ export function testMergeRecovery(makeFixture) {
 
   for (const nonBlocking of [false, true]) {
     for (const originalType of ['file', 'symlink']) {
-      for (const failure of ['symlink', 'rename', 'missing-rename']) {
+      for (const failure of [
+        'symlink',
+        'rename',
+        'install',
+        'missing-rename',
+      ]) {
         it(`preserves the destination after checkout failure (nonBlocking=${nonBlocking}, type=${originalType}, failure=${failure})`, async () => {
           const fixture = await prepare(makeFixture, {
             base: { alias: file('local-target', '120000') },
@@ -266,6 +271,13 @@ export function testMergeRecovery(makeFixture) {
             fixture.fs._rename = async function () {
               throw error
             }
+          } else if (failure === 'install') {
+            const rename = fixture.fs._rename
+            fixture.fs._rename = async function (oldpath, newpath) {
+              if (oldpath.endsWith('/replacement') && newpath === filepath)
+                throw error
+              await rename(oldpath, newpath)
+            }
           } else {
             fixture.fs._rename = undefined
           }
@@ -287,6 +299,87 @@ export function testMergeRecovery(makeFixture) {
         })
       }
     }
+
+    it(`retains an accessible original if installation and rollback fail (nonBlocking=${nonBlocking})`, async () => {
+      const fixture = await prepare(makeFixture, {
+        base: { alias: file('local-target', '120000') },
+        ours: { alias: file('local-target', '120000') },
+        theirs: { alias: file('remote-target', '120000') },
+      })
+      const filepath = `${fixture.dir}/alias`
+      const indexPath = `${fixture.gitdirsmfullpath || fixture.gitdir}/index`
+      const indexBefore = await fixture.fs.read(indexPath)
+      const rename = fixture.fs._rename
+      const error = Object.assign(new Error('Installation and rollback fail'), {
+        code: 'EACCES',
+      })
+      fixture.fs._rename = async function (oldpath, newpath) {
+        if (newpath === filepath) throw error
+        await rename(oldpath, newpath)
+      }
+      let recoveryPath
+      try {
+        await checkout({
+          ...fixture,
+          ref: 'incoming',
+          force: true,
+          nonBlocking,
+        })
+        throw new Error('Expected checkout to fail')
+      } catch (failure) {
+        expect(failure.code).toBe(Errors.MultipleGitError.code)
+        const recoveryError = failure.errors[0]
+        expect(recoveryError.code).toBe('InternalError')
+        expect(recoveryError.errors).toEqual([error, error])
+        recoveryPath = recoveryError.data.recoveryPath
+      }
+      expect((await fixture.fs.readlink(recoveryPath)).toString()).toBe(
+        'local-target'
+      )
+      expect(await fixture.fs.read(indexPath)).toEqual(indexBefore)
+      expect(
+        await fixture.fs.readdir(
+          recoveryPath.slice(0, recoveryPath.lastIndexOf('/'))
+        )
+      ).toEqual(['original'])
+      await rename(recoveryPath, filepath)
+    })
+
+    it(`preserves the primary error and attempts directory cleanup after unlink fails (nonBlocking=${nonBlocking})`, async () => {
+      const fixture = await prepare(makeFixture, {
+        base: { alias: file('local-target', '120000') },
+        ours: { alias: file('local-target', '120000') },
+        theirs: { alias: file('remote-target', '120000') },
+      })
+      const filepath = `${fixture.dir}/alias`
+      const namesBefore = await fixture.fs.readdir(fixture.dir)
+      const operationError = Object.assign(
+        new Error('Symlink creation failed'),
+        { code: 'EACCES', cleanupErrors: /** @type {Error[]} */ ([]) }
+      )
+      const cleanupError = Object.assign(new Error('Unlink failed'), {
+        code: 'EACCES',
+      })
+      const unlink = fixture.fs._unlink
+      fixture.fs._unlink = async function (path) {
+        if (path.endsWith('/replacement')) throw cleanupError
+        await unlink(path)
+      }
+      fixture.fs.writelink = async function () {
+        throw operationError
+      }
+      await expect(
+        checkout({ ...fixture, ref: 'incoming', force: true, nonBlocking })
+      ).rejects.toMatchObject({
+        code: Errors.MultipleGitError.code,
+        errors: [operationError],
+      })
+      expect(operationError.cleanupErrors).toEqual([cleanupError])
+      expect(await fixture.fs.readdir(fixture.dir)).toEqual(namesBefore)
+      expect((await fixture.fs.readlink(filepath)).toString()).toBe(
+        'local-target'
+      )
+    })
 
     for (const force of [false, true]) {
       it(`protects a regular-file edit matching an incoming symlink's bytes (nonBlocking=${nonBlocking}, force=${force})`, async () => {

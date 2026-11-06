@@ -242,12 +242,17 @@ A "promise" `fs` object must implement the same set functions as a "callback" im
 <a id="footnote-3">³</a> Only called with `recursive: true` option. A fallback implementation is provided if not implemented.
 
 <a id="footnote-4">⁴</a> Required to replace existing worktree entries during merge abort or symlink checkout.
-The replacement is prepared in a temporary directory beside the destination, then renamed over it.
-The adapter must preserve the destination if rename fails. Without rename, these replacements reject
+The replacement is prepared beside its destination, and the original is moved to a temporary backup
+before installation. All moves target vacant paths, so adapters need not support overwriting
+symlinks or reclaiming overwritten records. A failed installation rolls back the original. If rollback
+also fails, the error reports `data.recoveryPath`, where the original is retained for manual recovery.
+The adapter must preserve source entries when a rename fails. Without rename, replacements reject
 before changing the existing entry. New paths do not require rename. This protects each replaced path;
 checkout and abort are not transactions across all affected files.
-Before replacing an entry, the wrapper probes source-symlink preservation using private temporary
-files. Incompatible implementations such as LightningFS 3.4.2 are rejected before touching the
-destination, including regular-file replacements that would retain overwritten storage records.
-Adapters that cannot create probe symlinks retain ordinary rename support; actual symlink writes
-still enforce their support and permission checks.
+Before moving a symlink, the wrapper checks dangling source-symlink preservation using private
+entries. Incompatible implementations such as LightningFS 3.4.2 reject these symlink moves without
+touching the destination; regular-file recovery remains supported and explicitly deletes its backup
+to reclaim storage records. A failed or unavailable symlink probe never enables symlink moves.
+With `core.symlinks=false`, unsupported symlink creation can produce regular target-file stubs.
+Cleanup attempts every temporary entry and directory. Failures accompany the primary error in
+`cleanupErrors`; when cleanup alone fails, it is reported as a `MultipleGitError`.

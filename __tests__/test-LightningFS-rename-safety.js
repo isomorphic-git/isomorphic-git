@@ -2,7 +2,7 @@
 import CacheFS from '@isomorphic-git/lightning-fs/src/CacheFS.js'
 import PromisifiedFS from '@isomorphic-git/lightning-fs/src/PromisifiedFS.js'
 import { abortMerge, add, commit, init } from 'isomorphic-git'
-import { FileSystem } from 'isomorphic-git/internal-apis'
+import { FileSystem, GitIndexManager } from 'isomorphic-git/internal-apis'
 
 /** Run LightningFS's real filesystem operations with its IndexedDB boundary held in memory. */
 function createMemoryLightningFS() {
@@ -47,7 +47,7 @@ function createMemoryLightningFS() {
 describe('LightningFS rename safety', () => {
   for (const existingType of ['file', 'symlink']) {
     for (const mode of [0o100644, 0o120000]) {
-      it(`rejects unsafe replacement before touching the destination (existing=${existingType}, mode=${mode})`, async () => {
+      it(`restores regular files and rejects unsafe symlink moves (existing=${existingType}, mode=${mode})`, async () => {
         const { fs, storage } = createMemoryLightningFS()
         await fs.mkdir('/repo')
         const fixture = { fs, dir: '/repo', gitdir: '/git' }
@@ -59,6 +59,19 @@ describe('LightningFS rename safety', () => {
           await fs.write('/repo/alias', 'HEAD bytes')
         }
         await add({ ...fixture, filepath: 'alias' })
+        // LightningFS reports permission bits without the symlink type bits.
+        const committedStats = await fs.lstat('/repo/alias')
+        committedStats.mode = mode
+        await GitIndexManager.acquire(
+          { fs, gitdir: '/git', cache: {} },
+          index => {
+            index.insert({
+              filepath: 'alias',
+              stats: committedStats,
+              oid: index.entriesMap.get('alias').oid,
+            })
+          }
+        )
         await commit({
           ...fixture,
           message: 'Original',
@@ -74,10 +87,20 @@ describe('LightningFS rename safety', () => {
         const originalTarget =
           existingType === 'symlink' ? await fs.readlink('/repo/alias') : null
         const recordsBefore = storage.records.size
+        if (existingType === 'file' && mode === 0o100644) {
+          await abortMerge(fixture)
+          expect((await fs.read('/repo/alias')).toString()).toBe('HEAD bytes')
+          expect(storage.records.size).toBe(recordsBefore)
+          expect(await fs.readdir('/repo')).toEqual(['alias', 'target'])
+          expect((await fs.read('/repo/target')).toString()).toBe(
+            'Keep this target'
+          )
+          return
+        }
         await expect(abortMerge(fixture)).rejects.toMatchObject({
           code: 'InternalError',
         })
-        expect(fs.canRename).toBe(false)
+        expect(fs._renamePreservesSymlinks).toBe(false)
         expect(await fs.readdir('/repo')).toEqual(['alias', 'target'])
         expect(storage.records.size).toBe(recordsBefore)
         expect((await fs.read('/repo/target')).toString()).toBe(
