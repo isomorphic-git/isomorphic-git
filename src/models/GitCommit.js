@@ -143,14 +143,17 @@ export class GitCommit {
     return this._commit
   }
 
-  /** Return the signature verification payload, preserving blank message lines. */
+  /** Return the verification payload without signature headers, preserving the stored content. */
   withoutSignature() {
-    const commit = normalizeNewlines(this._commit)
+    const commit = this._commit
     let inSignature = false
     const headers = GitCommit.justHeaders(commit)
       .split('\n')
       .filter(line => {
-        if (!line.startsWith(' ')) inSignature = line.startsWith('gpgsig ')
+        if (!line.startsWith(' ')) {
+          inSignature =
+            line.startsWith('gpgsig ') || line.startsWith('gpgsig-sha256 ')
+        }
         return !inSignature
       })
       .join('\n')

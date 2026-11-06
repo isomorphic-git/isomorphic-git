@@ -57,7 +57,8 @@ import './typedefs-http.js'
  * @typedef {Object} ReadCommitResult
  * @property {string} oid - SHA-1 object id of this commit
  * @property {CommitObject} commit - the parsed commit object
- * @property {string} payload - PGP signing payload
+ * @property {string} payload - Verification payload without signature headers, preserving
+ * stored content
  */
 
 /**
