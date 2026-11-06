@@ -113,6 +113,7 @@ import './typedefs-http.js'
  * @property {function} [readlink] - https://nodejs.org/api/fs.html#fs_fs_readlink_path_options_callback
  * @property {function} [symlink] - https://nodejs.org/api/fs.html#fs_fs_symlink_target_path_type_callback
  * @property {function} [chmod] - https://nodejs.org/api/fs.html#fs_fs_chmod_path_mode_callback
+ * @property {function} [rename] - Required for safely replacing existing worktree blobs.
  */
 
 /**
@@ -121,6 +122,7 @@ import './typedefs-http.js'
  * @property {function} promises.readFile - https://nodejs.org/api/fs.html#fs_fspromises_readfile_path_options
  * @property {function} promises.writeFile - https://nodejs.org/api/fs.html#fs_fspromises_writefile_file_data_options
  * @property {function} promises.unlink - https://nodejs.org/api/fs.html#fs_fspromises_unlink_path
+ * @property {function} [promises.rename] - Required for safely replacing existing worktree blobs.
  * @property {function} promises.readdir - https://nodejs.org/api/fs.html#fs_fspromises_readdir_path_options
  * @property {function} promises.mkdir - https://nodejs.org/api/fs.html#fs_fspromises_mkdir_path_options
  * @property {function} promises.rmdir - https://nodejs.org/api/fs.html#fs_fspromises_rmdir_path

@@ -13,11 +13,17 @@ import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
+import { hashObject } from '../storage/hashObject.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { flat } from '../utils/flat.js'
 import { resolveCommit } from '../utils/resolveCommit.js'
 import { worthWalking } from '../utils/worthWalking.js'
+import { writeWorktreeFile } from '../utils/writeWorktreeFile.js'
+
+const FILE_TYPE_MASK = 0o170000
+const REGULAR_FILE_TYPE = 0o100000
+const SYMLINK_MODE = 0o120000
 
 /**
  * @param {object} args
@@ -253,6 +259,9 @@ export async function _checkout({
         })
     )
 
+    const config = await GitConfigManager.get({ fs, gitdir })
+    const allowSymlinkStub = (await config.get('core.symlinks')) === false
+
     if (nonBlocking) {
       // Filter eligible operations first
       const eligibleOps = ops.filter(
@@ -268,7 +277,7 @@ export async function _checkout({
         eligibleOps.map(
           ([method, fullpath, oid, mode, chmod]) =>
             () =>
-              updateWorkingDir({ fs, cache, gitdir, dir }, [
+              updateWorkingDir({ fs, cache, gitdir, dir, allowSymlinkStub }, [
                 method,
                 fullpath,
                 oid,
@@ -321,7 +330,7 @@ export async function _checkout({
                     gitdir,
                     oid,
                   })
-                  if (chmod) {
+                  if (chmod && mode !== SYMLINK_MODE) {
                     // Note: the mode option of fs.write only works when creating files,
                     // not updating them. Since the `fs` plugin doesn't expose `chmod` this
                     // is our only option.
@@ -335,7 +344,13 @@ export async function _checkout({
                     await fs.write(filepath, object, { mode: 0o777 })
                   } else if (mode === 0o120000) {
                     // symlink
-                    await fs.writelink(filepath, object)
+                    await writeWorktreeFile({
+                      fs,
+                      filepath,
+                      content: object,
+                      mode,
+                      allowSymlinkStub,
+                    })
                   } else {
                     throw new InternalError(
                       `Invalid mode 0o${mode.toString(
@@ -351,6 +366,10 @@ export async function _checkout({
                 // TODO: Figure out how git handles this internally.
                 if (mode === 0o100755) {
                   stats.mode = 0o755
+                }
+                if (mode === SYMLINK_MODE) {
+                  // Unsupported symlinks can be plain target files in the worktree.
+                  stats.mode = SYMLINK_MODE
                 }
                 // Submodules are present in the git index but use a unique mode different from trees
                 if (method === 'mkdir-index') {
@@ -414,6 +433,7 @@ export async function _checkout({
   }
 }
 
+/** Plan checkout changes while protecting unstaged content and file-type edits. */
 async function analyze({
   fs,
   cache,
@@ -426,6 +446,8 @@ async function analyze({
   restoreFromIndex,
 }) {
   let count = 0
+  const config = await GitConfigManager.get({ fs, gitdir })
+  const symlinks = await config.get('core.symlinks')
   return _walk({
     fs,
     cache,
@@ -567,15 +589,22 @@ async function analyze({
           return ['delete-index', fullpath]
         }
         // Deleted entries
-        // TODO: How to handle if stage type and workdir type mismatch?
+        // TODO: Handle workdir type mismatches for staged trees and submodules.
         case '101': {
           switch (await stage.type()) {
             case 'tree': {
               return ['rmdir-index', fullpath]
             }
             case 'blob': {
-              // Git checks that the workdir.oid === stage.oid before deleting file
-              if ((await stage.oid()) !== (await workdir.oid())) {
+              if (
+                await isWorkdirModified({
+                  fs,
+                  filepath: `${dir}/${fullpath}`,
+                  workdir,
+                  stage,
+                  symlinks,
+                })
+              ) {
                 if (force) {
                   return ['delete', fullpath]
                 } else {
@@ -622,8 +651,14 @@ async function analyze({
                 // Note: canonical git only compares with the stage. But we're smart enough
                 // to compare to the stage AND the incoming commit.
                 if (
-                  (await workdir.oid()) !== (await stage.oid()) &&
-                  (await workdir.oid()) !== (await commit.oid())
+                  await isWorkdirModified({
+                    fs,
+                    filepath: `${dir}/${fullpath}`,
+                    workdir,
+                    stage,
+                    commit,
+                    symlinks,
+                  })
                 ) {
                   if (force) {
                     return [
@@ -721,15 +756,64 @@ async function updateIndex({ index, fullpath, stats, oid }) {
     console.warn(`Error inserting ${fullpath} into index:`, e)
   }
 }
+
+/**
+ * Detect local changes without refreshing the index for file-type mismatches or symlink stubs.
+ *
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {string} args.filepath Working-file path for reading stub bytes directly.
+ * @param {WalkerEntry} args.workdir
+ * @param {WalkerEntry} args.stage
+ * @param {WalkerEntry} [args.commit] Incoming contents that are also safe to overwrite.
+ * @param {boolean} [args.symlinks] Whether Git uses real symlinks; only explicit false permits stubs.
+ * @returns {Promise<boolean>}
+ */
+async function isWorkdirModified({
+  fs,
+  filepath,
+  workdir,
+  stage,
+  commit,
+  symlinks,
+}) {
+  const stageMode = await stage.mode()
+  const workdirType = (await workdir.mode()) & FILE_TYPE_MASK
+  if ((stageMode & FILE_TYPE_MASK) !== workdirType) {
+    if (
+      symlinks === false &&
+      stageMode === SYMLINK_MODE &&
+      workdirType === REGULAR_FILE_TYPE
+    ) {
+      // Compare raw link-target bytes without text conversion or index refresh.
+      const object = await fs.read(filepath)
+      if (object === null) return true
+      const { oid } = await hashObject({ type: 'blob', object })
+      return (
+        oid !== (await stage.oid()) && (!commit || oid !== (await commit.oid()))
+      )
+    }
+    return true
+  }
+  const oid = await workdir.oid()
+  return (
+    oid !== (await stage.oid()) &&
+    (!commit ||
+      ((await commit.mode()) & FILE_TYPE_MASK) !== workdirType ||
+      oid !== (await commit.oid()))
+  )
+}
+
+/** Apply a planned checkout write and retain the committed mode in its returned index metadata. */
 async function updateWorkingDir(
-  { fs, cache, gitdir, dir },
+  { fs, cache, gitdir, dir, allowSymlinkStub },
   [method, fullpath, oid, mode, chmod]
 ) {
   const filepath = `${dir}/${fullpath}`
   if (method !== 'create-index' && method !== 'mkdir-index') {
     await assertNoSymlinkInLeadingPath(fs, dir, fullpath)
     const { object } = await readObject({ fs, cache, gitdir, oid })
-    if (chmod) {
+    if (chmod && mode !== SYMLINK_MODE) {
       await fs.rm(filepath)
     }
     if (mode === 0o100644) {
@@ -740,7 +824,13 @@ async function updateWorkingDir(
       await fs.write(filepath, object, { mode: 0o777 })
     } else if (mode === 0o120000) {
       // symlink
-      await fs.writelink(filepath, object)
+      await writeWorktreeFile({
+        fs,
+        filepath,
+        content: object,
+        mode,
+        allowSymlinkStub,
+      })
     } else {
       throw new InternalError(
         `Invalid mode 0o${mode.toString(8)} detected in blob ${oid}`
@@ -750,6 +840,9 @@ async function updateWorkingDir(
   const stats = await fs.lstat(filepath)
   if (mode === 0o100755) {
     stats.mode = 0o755
+  }
+  if (mode === SYMLINK_MODE) {
+    stats.mode = SYMLINK_MODE
   }
   if (method === 'mkdir-index') {
     stats.mode = 0o160000

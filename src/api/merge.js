@@ -28,16 +28,20 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
  *
  * Currently it does not support selecting alternative merge strategies.
  *
- * Currently it is not possible to abort an incomplete merge. To restore the worktree to a clean state, you will need to checkout an earlier commit.
+ * Use `abortMerge` to cancel an incomplete merge and restore the index and working files.
  *
  * Currently it does not directly support the behavior of `git merge --continue`. To complete a merge after manual conflict resolution, you will need to add and commit the files manually, and specify the appropriate parent commits.
  *
  * ## Manually resolving merge conflicts
- * By default, if isomorphic-git encounters a merge conflict it cannot resolve using the builtin diff3 algorithm or provided merge driver, it will abort and throw a `MergeNotSupportedError`.
+ * By default, if isomorphic-git encounters a merge conflict it cannot resolve using the builtin diff3 algorithm or provided merge driver, it will abort and throw a `MergeConflictError`.
  * This leaves the index and working tree untouched.
  *
  * When `abortOnConflict` is set to `false`, and a merge conflict cannot be automatically resolved, a `MergeConflictError` is thrown and the results of the incomplete merge will be written to the working directory.
  * This includes conflict markers in files with unresolved merge conflicts.
+ *
+ * When `dryRun` is false, `MergeConflictError.data.treeOid` identifies the stored merged tree,
+ * including text conflict markers. Omit `dir` to inspect that tree before writing working files.
+ * Unsupported merge shapes throw `MergeNotSupportedError` instead.
  *
  * To complete the merge, edit the conflicting files as you see fit, and then add and commit the resolved merge.
  *
