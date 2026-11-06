@@ -438,7 +438,7 @@ export async function mergeTree({
 }
 
 /**
- * Merge trees while retaining conflict-stage entries and an inspectable merged tree.
+ * Merge blob contents while retaining binary and symbolic-link conflicts.
  *
  * @param {Object} args
  * @param {import('../models/FileSystem').FileSystem} args.fs
