@@ -46,6 +46,7 @@ const commands = [
   'symlink',
 ]
 
+/** Bind optional rename and required filesystem operations through a promise-based interface. */
 function bindFs(target, fs) {
   if (fs.rename) {
     target._rename = isPromiseFs(fs)

@@ -2,6 +2,8 @@ import { BaseError } from './BaseError.js'
 
 export class MergeConflictError extends BaseError {
   /**
+   * Describe conflicting paths and optionally retain their merged tree for inspection.
+   *
    * @param {Array<string>} filepaths
    * @param {Array<string>} bothModified
    * @param {Array<string>} deleteByUs

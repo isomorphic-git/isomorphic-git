@@ -438,6 +438,7 @@ export async function mergeTree({
 }
 
 /**
+ * Merge trees while retaining conflict-stage entries and an inspectable merged tree.
  *
  * @param {Object} args
  * @param {import('../models/FileSystem').FileSystem} args.fs

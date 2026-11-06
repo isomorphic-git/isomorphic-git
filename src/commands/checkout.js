@@ -433,6 +433,7 @@ export async function _checkout({
   }
 }
 
+/** Plan checkout changes while protecting unstaged content and file-type edits. */
 async function analyze({
   fs,
   cache,
@@ -803,6 +804,7 @@ async function isWorkdirModified({
   )
 }
 
+/** Apply a planned checkout write and retain the committed mode in its returned index metadata. */
 async function updateWorkingDir(
   { fs, cache, gitdir, dir, allowSymlinkStub },
   [method, fullpath, oid, mode, chmod]
