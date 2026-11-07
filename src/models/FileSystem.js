@@ -133,12 +133,13 @@ export class FileSystem {
     }
     // LightningFS resolves a directory read to undefined instead of EISDIR.
     if (buffer == null) return null
-    if (options.autocrlf === 'true' && typeof buffer !== 'string') {
-      buffer = convertCrlfToLf(buffer)
-    }
     // Convert plain ArrayBuffers to Buffers
     if (typeof buffer !== 'string') {
       buffer = Buffer.from(buffer)
+      if (options.autocrlf === 'true') {
+        const converted = convertCrlfToLf(buffer)
+        if (converted !== buffer) buffer = Buffer.from(converted)
+      }
     }
     return buffer
   }

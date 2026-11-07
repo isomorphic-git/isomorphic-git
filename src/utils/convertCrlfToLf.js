@@ -38,7 +38,7 @@ export function convertCrlfToLf(buffer) {
   }
   // A trailing EOF (Ctrl-Z) is not counted as non-printable
   if (buffer.length > 0 && buffer[buffer.length - 1] === 26) nonprintable--
-  if (crlf === 0 || printable >> 7 < nonprintable) return buffer
+  if (crlf === 0 || Math.floor(printable / 128) < nonprintable) return buffer
 
   const result = new Uint8Array(buffer.length - crlf)
   let j = 0

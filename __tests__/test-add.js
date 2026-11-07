@@ -334,6 +334,8 @@ describe('add', () => {
       'bom.txt': ['efbbbf68656c6c6f0d0a', 'efbbbf68656c6c6f0a'],
       'latin1.txt': ['636166e90d0a', '636166e90a'],
       'nul.bin': ['6100620d0a', '6100620d0a'],
+      // binary only because of the non-printable byte ratio
+      'control.bin': ['61010d0a', '61010d0a'],
       'lonecr.txt': ['610d620d0a', '610d620d0a'],
     }
     for (const [filepath, [content]] of Object.entries(cases)) {
