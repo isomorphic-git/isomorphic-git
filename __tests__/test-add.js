@@ -8,6 +8,11 @@ import {
   STAGE,
   status,
   getConfig,
+  writeBlob,
+  writeTree,
+  writeCommit,
+  writeRef,
+  resetIndex,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -323,6 +328,50 @@ describe('add', () => {
     )
     expect(await status({ fs, dir, gitdir, filepath: 'README.md' })).toEqual(
       'added'
+    )
+  })
+  it('status with core.autocrlf=true reports a BOM file committed by git as unmodified', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-add-autocrlf')
+    // The blob `git add` stores for a BOM file with CRLF line endings
+    const oid = await writeBlob({
+      fs,
+      dir,
+      gitdir,
+      blob: Buffer.from('efbbbf68656c6c6f0a', 'hex'),
+    })
+    const tree = await writeTree({
+      fs,
+      dir,
+      gitdir,
+      tree: [{ mode: '100644', path: 'bom.txt', oid, type: 'blob' }],
+    })
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const commit = await writeCommit({
+      fs,
+      dir,
+      gitdir,
+      commit: {
+        message: 'add bom.txt',
+        tree,
+        parent: [],
+        author,
+        committer: author,
+      },
+    })
+    await writeRef({ fs, dir, gitdir, ref: 'HEAD', value: commit, force: true })
+    await fs.write(`${dir}/bom.txt`, Buffer.from('efbbbf68656c6c6f0d0a', 'hex'))
+    await resetIndex({ fs, dir, gitdir, filepath: 'bom.txt' })
+    // Rewrite the same bytes so the index stats no longer match and status
+    // has to hash the worktree file
+    await new Promise(resolve => setTimeout(resolve, 1100))
+    await fs.write(`${dir}/bom.txt`, Buffer.from('efbbbf68656c6c6f0d0a', 'hex'))
+    expect(await status({ fs, dir, gitdir, filepath: 'bom.txt' })).toEqual(
+      'unmodified'
     )
   })
   it('git add with core.autocrlf=true converts line endings like canonical git', async () => {
