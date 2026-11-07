@@ -1,6 +1,7 @@
 import pify from 'pify'
 
 import { compareStrings } from '../utils/compareStrings.js'
+import { convertCrlfToLf } from '../utils/convertCrlfToLf.js'
 import { dirname } from '../utils/dirname.js'
 import { mkdirp } from '../utils/mkdirp.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
@@ -132,14 +133,8 @@ export class FileSystem {
     }
     // LightningFS resolves a directory read to undefined instead of EISDIR.
     if (buffer == null) return null
-    if (options.autocrlf === 'true') {
-      try {
-        buffer = new TextDecoder('utf8', { fatal: true }).decode(buffer)
-        buffer = buffer.replace(/\r\n/g, '\n')
-        buffer = new TextEncoder().encode(buffer)
-      } catch (error) {
-        // non utf8 file
-      }
+    if (options.autocrlf === 'true' && typeof buffer !== 'string') {
+      buffer = convertCrlfToLf(buffer)
     }
     // Convert plain ArrayBuffers to Buffers
     if (typeof buffer !== 'string') {

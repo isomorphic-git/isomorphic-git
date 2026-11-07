@@ -325,4 +325,37 @@ describe('add', () => {
       'added'
     )
   })
+  it('git add with core.autocrlf=true converts line endings like canonical git', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-add-autocrlf')
+    // Expected blobs are what `git add` stores with core.autocrlf=true
+    const cases = {
+      'crlf.txt': ['610d0a620d0a', '610a620a'],
+      'mixed.txt': ['610a620d0a630a', '610a620a630a'],
+      'bom.txt': ['efbbbf68656c6c6f0d0a', 'efbbbf68656c6c6f0a'],
+      'latin1.txt': ['636166e90d0a', '636166e90a'],
+      'nul.bin': ['6100620d0a', '6100620d0a'],
+      'lonecr.txt': ['610d620d0a', '610d620d0a'],
+    }
+    for (const [filepath, [content]] of Object.entries(cases)) {
+      await fs.write(`${dir}/${filepath}`, Buffer.from(content, 'hex'))
+      await add({ fs, dir, gitdir, filepath })
+    }
+    const staged = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        cases[filepath] && stage ? [filepath, await stage.oid()] : undefined,
+    })
+    expect(staged.length).toEqual(Object.keys(cases).length)
+    for (const [filepath, oid] of staged) {
+      const { blob } = await readBlob({ fs, dir, gitdir, oid })
+      expect([filepath, Buffer.from(blob).toString('hex')]).toEqual([
+        filepath,
+        cases[filepath][1],
+      ])
+      expect(await status({ fs, dir, gitdir, filepath })).toEqual('added')
+    }
+  })
 })
