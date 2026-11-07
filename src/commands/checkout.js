@@ -183,11 +183,14 @@ export async function _checkout({
         await Promise.all(
           ops
             .filter(
-              ([method]) => method === 'delete' || method === 'delete-index'
+              ([method]) =>
+                method === 'delete' ||
+                method === 'delete-index' ||
+                method === 'update-blob-to-tree'
             )
             .map(async function ([method, fullpath]) {
               const filepath = `${dir}/${fullpath}`
-              if (method === 'delete') {
+              if (method === 'delete' || method === 'update-blob-to-tree') {
                 await fs.rm(filepath)
               }
               index.delete({ filepath: fullpath })
@@ -208,6 +211,12 @@ export async function _checkout({
       { fs, gitdir, cache },
       async function (index) {
         for (const [method, fullpath] of ops) {
+          if (method === 'update-dir-to-blob') {
+            // The tracked files inside were removed in the previous phase.
+            // Remove the directories left behind so the file can be written.
+            await removeEmptyDir(fs, `${dir}/${fullpath}`)
+            continue
+          }
           if (method === 'rmdir' || method === 'rmdir-index') {
             const filepath = `${dir}/${fullpath}`
             try {
@@ -238,7 +247,12 @@ export async function _checkout({
 
     await Promise.all(
       ops
-        .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
+        .filter(
+          ([method]) =>
+            method === 'mkdir' ||
+            method === 'mkdir-index' ||
+            method === 'update-blob-to-tree'
+        )
         .map(async function ([_, fullpath]) {
           const filepath = `${dir}/${fullpath}`
           await assertNoSymlinkInLeadingPath(fs, dir, fullpath)
@@ -260,6 +274,7 @@ export async function _checkout({
           method === 'create' ||
           method === 'create-index' ||
           method === 'update' ||
+          method === 'update-dir-to-blob' ||
           method === 'mkdir-index'
       )
 
@@ -306,6 +321,7 @@ export async function _checkout({
                   method === 'create' ||
                   method === 'create-index' ||
                   method === 'update' ||
+                  method === 'update-dir-to-blob' ||
                   method === 'mkdir-index'
               )
               .map(async function ([method, fullpath, oid, mode, chmod]) {
@@ -671,7 +687,12 @@ async function analyze({
               }
             }
             case 'tree-blob': {
-              return ['update-dir-to-blob', fullpath, await commit.oid()]
+              return [
+                'update-dir-to-blob',
+                fullpath,
+                await commit.oid(),
+                await commit.mode(),
+              ]
             }
             case 'blob-tree': {
               return ['update-blob-to-tree', fullpath]
@@ -708,6 +729,21 @@ async function analyze({
       }
     },
   })
+}
+
+// Remove a directory and any empty directories inside it. A file left inside
+// (e.g. an untracked one) makes this throw ENOTEMPTY instead of deleting it.
+async function removeEmptyDir(fs, filepath) {
+  const entries = await fs.readdir(filepath)
+  if (entries === null) return // not a directory
+  for (const entry of entries) {
+    const child = `${filepath}/${entry}`
+    const stats = await fs.lstat(child)
+    if (stats && stats.isDirectory()) {
+      await removeEmptyDir(fs, child)
+    }
+  }
+  await fs.rmdir(filepath)
 }
 
 async function updateIndex({ index, fullpath, stats, oid }) {
