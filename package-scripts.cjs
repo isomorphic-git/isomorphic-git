@@ -137,7 +137,7 @@ module.exports = {
       ),
       rollup: 'rollup -c --no-treeshake',
       typings:
-        'tsc -p declaration.tsconfig.json && cp index.d.ts index.umd.min.d.ts',
+        'tsc -p declaration.tsconfig.json && node -e "require(\'fs\').copyFileSync(\'index.d.ts\', \'index.umd.min.d.ts\')"',
       webpack: 'webpack --config webpack.config.cjs',
       indexjson:
         'npx make-index __tests__/__fixtures__ -o __tests__/__fixtures__/index.json -i __tests__/__fixtures__/index.json && node __tests__/__helpers__/make_superblock.cjs',
