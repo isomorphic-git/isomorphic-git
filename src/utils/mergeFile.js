@@ -2,6 +2,11 @@ import diff3Merge from 'diff3'
 
 const LINEBREAKS = /^.*(\r?\n|$)/gm
 
+function formatConflictSide(lines) {
+  const text = lines.join('')
+  return text && !text.endsWith('\n') ? `${text}\n` : text
+}
+
 export function mergeFile({ branches, contents }) {
   const ourName = branches[1]
   const theirName = branches[2]
@@ -30,10 +35,10 @@ export function mergeFile({ branches, contents }) {
     if (item.conflict) {
       cleanMerge = false
       mergedText += `${'<'.repeat(markerSize)} ${ourName}\n`
-      mergedText += item.conflict.a.join('')
+      mergedText += formatConflictSide(item.conflict.a)
 
       mergedText += `${'='.repeat(markerSize)}\n`
-      mergedText += item.conflict.b.join('')
+      mergedText += formatConflictSide(item.conflict.b)
       mergedText += `${'>'.repeat(markerSize)} ${theirName}\n`
     }
   }

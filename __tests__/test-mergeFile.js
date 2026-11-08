@@ -35,4 +35,23 @@ describe('mergeFile', () => {
     expect(cleanMerge).toBe(false)
     expect(mergedText).toEqual(await fs.read(`${dir}/aoc.txt`, 'utf8'))
   })
+
+  it.each([
+    ['one\nours', 'one\ntheirs'],
+    ['one\nours\n', 'one\ntheirs'],
+    ['one\nours', 'one\ntheirs\n'],
+  ])(
+    'puts conflict markers on their own lines at EOF (%j, %j)',
+    (ours, theirs) => {
+      const { cleanMerge, mergedText } = mergeFile({
+        contents: ['one\ntwo', ours, theirs],
+        branches: ['base', 'ours', 'theirs'],
+      })
+
+      expect(cleanMerge).toBe(false)
+      expect(mergedText).toBe(
+        'one\n<<<<<<< ours\nours\n=======\ntheirs\n>>>>>>> theirs\n'
+      )
+    }
+  )
 })
