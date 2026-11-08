@@ -75,6 +75,7 @@ export async function _log({
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const tips = [await _readCommit({ fs, cache, gitdir, oid })]
+  const scheduled = new Map([[oid, 0]])
   let lastFileOid
   let lastFileMode
   let lastCommit
@@ -178,13 +179,10 @@ export async function _log({
 
     // If this is not a shallow commit...
     if (!shallowCommits.has(commit.oid)) {
-      // Add the parents of this commit to the queue
-      // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
       for (const oid of commit.commit.parent) {
-        const commit = await _readCommit({ fs, cache, gitdir, oid })
-        if (!tips.map(commit => commit.oid).includes(commit.oid)) {
-          tips.push(commit)
-        }
+        if (scheduled.has(oid)) continue
+        scheduled.set(oid, scheduled.size)
+        tips.push(await _readCommit({ fs, cache, gitdir, oid }))
       }
     }
 
@@ -193,8 +191,11 @@ export async function _log({
       endCommit(commit)
     }
 
-    // Process tips in order by age
-    tips.sort((a, b) => compareAge(a.commit, b.commit))
+    // Keep file history's existing tie order, which can affect rename tracking.
+    tips.sort((a, b) => {
+      const age = compareAge(a.commit, b.commit)
+      return age || (filepath ? 0 : scheduled.get(b.oid) - scheduled.get(a.oid))
+    })
   }
   if (includeChanges) {
     for (const commit of commits) {
