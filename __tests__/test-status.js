@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import * as path from 'path'
 
+import { configureSingle, fs as zenfs, InMemory } from '@zenfs/core'
 import {
   status,
   add,
@@ -14,6 +15,49 @@ import {
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('status', () => {
+  it.each([
+    ['live', 'target.txt', 'target.txt', 'unmodified'],
+    ['dangling', 'missing.txt', 'missing.txt', 'unmodified'],
+    ['retargeted', 'target.txt', 'other.txt', '*modified'],
+    ['new', null, 'target.txt', '*modified'],
+  ])(
+    'hashes %s symlink text when cached stats differ',
+    async (_, original, current, expected) => {
+      await configureSingle({ backend: InMemory })
+      const { promises: fsp } = zenfs
+      const dir = '/status-symlinks'
+      await fsp.mkdir(dir)
+      await init({ fs: zenfs, dir })
+
+      const opts = { fs: zenfs, dir }
+      const filepath = 'link'
+      const link = dir + '/' + filepath
+      await fsp.writeFile(dir + '/target.txt', 'target contents')
+      await fsp.writeFile(dir + '/other.txt', 'target.txt')
+      if (original === null) {
+        await fsp.writeFile(link, current)
+      } else {
+        await fsp.symlink(original, link)
+      }
+      await add({ ...opts, filepath })
+      await commit({
+        ...opts,
+        message: 'Track symlink',
+        author: { name: 'Test', email: 'test@example.com' },
+      })
+
+      // Recreate the link so its stat information no longer matches the index.
+      await fsp.unlink(link)
+      await fsp.symlink(current, link)
+      const indexPath = dir + '/.git/index'
+      const before = await fsp.readFile(indexPath)
+      expect(await status({ ...opts, filepath })).toBe(expected)
+      if (expected === '*modified') {
+        expect(await fsp.readFile(indexPath)).toEqual(before)
+      }
+    }
+  )
+
   it('status', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-status')

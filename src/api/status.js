@@ -14,6 +14,7 @@ import { compareStats } from '../utils/compareStats.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
+import { normalizeMode } from '../utils/normalizeMode.js'
 
 /**
  * Tell whether a file has been changed
@@ -71,7 +72,7 @@ export async function status({
     const fs = new FileSystem(_fs)
     const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     const headTree = await getHeadTree({ fs, cache, gitdir: updatedGitdir })
-    const treeOid = await getOidAtPath({
+    const headEntry = await getEntryAtPath({
       fs,
       cache,
       gitdir: updatedGitdir,
@@ -87,6 +88,9 @@ export async function status({
         return null
       }
     )
+    const treeOid = headEntry?.oid ?? null
+    const headIsSymlink = headEntry?.mode === '120000'
+    const indexIsSymlink = indexEntry?.mode === 0o120000
     // .gitignore governs untracked files. A file in HEAD or in the index is
     // tracked, so canonical git keeps reporting its real state, and
     // `git check-ignore` does not match it. statusMatrix already does this.
@@ -101,7 +105,11 @@ export async function status({
         return 'ignored'
       }
     }
-    const stats = await fs.lstat(join(dir, filepath))
+    const workdirPath = join(dir, filepath)
+    const stats = await fs.lstat(workdirPath)
+    const workdirIsSymlink = normalizeMode(stats?.mode) === 0o120000
+    const matchesWorkdir = (workdirOid, oid, isSymlink) =>
+      workdirOid === oid && (!workdirIsSymlink || isSymlink)
 
     const H = treeOid !== null // head
     const I = indexEntry !== null // index
@@ -120,12 +128,18 @@ export async function status({
       if (I && !compareStats(indexEntry, stats)) {
         return indexEntry.oid
       } else {
-        // Read through the same core.autocrlf normalisation GitWalkerFs uses,
-        // so the working copy hashes to the blob that was stored. Without it a
-        // CRLF checkout of an LF blob reads as modified.
-        const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
-        const autocrlf = await config.get('core.autocrlf')
-        const object = await fs.read(join(dir, filepath), { autocrlf })
+        let object
+        if (workdirIsSymlink) {
+          object = await fs.readlink(workdirPath)
+        } else {
+          // Use the same core.autocrlf normalisation as GitWalkerFs.
+          const config = await GitConfigManager.get({
+            fs,
+            gitdir: updatedGitdir,
+          })
+          const autocrlf = await config.get('core.autocrlf')
+          object = await fs.read(workdirPath, { autocrlf })
+        }
         const workdirOid = await hashObject({
           gitdir: updatedGitdir,
           type: 'blob',
@@ -137,6 +151,7 @@ export async function status({
           refresh &&
           I &&
           !indexEntry.flags.intentToAdd &&
+          indexIsSymlink === workdirIsSymlink &&
           indexEntry.oid === workdirOid
         ) {
           // and as long as our fs.stats aren't bad.
@@ -161,7 +176,9 @@ export async function status({
     if (!H && W && I) {
       const workdirOid = await getWorkdirOid()
       // @ts-ignore
-      return workdirOid === indexEntry.oid ? 'added' : '*added' // -AA : -AB
+      return matchesWorkdir(workdirOid, indexEntry.oid, indexIsSymlink)
+        ? 'added'
+        : '*added' // -AA : -AB
     }
     if (H && !W && !I) return 'deleted' // A--
     if (H && !W && I) {
@@ -170,16 +187,21 @@ export async function status({
     }
     if (H && W && !I) {
       const workdirOid = await getWorkdirOid()
-      return workdirOid === treeOid ? '*undeleted' : '*undeletemodified' // A-A : A-B
+      return matchesWorkdir(workdirOid, treeOid, headIsSymlink)
+        ? '*undeleted'
+        : '*undeletemodified' // A-A : A-B
     }
     if (H && W && I) {
       const workdirOid = await getWorkdirOid()
-      if (workdirOid === treeOid) {
-        // @ts-ignore
-        return workdirOid === indexEntry.oid ? 'unmodified' : '*unmodified' // AAA : ABA
+      const matchesIndex = matchesWorkdir(
+        workdirOid,
+        indexEntry.oid,
+        indexIsSymlink
+      )
+      if (matchesWorkdir(workdirOid, treeOid, headIsSymlink)) {
+        return matchesIndex ? 'unmodified' : '*unmodified' // AAA : ABA
       } else {
-        // @ts-ignore
-        return workdirOid === indexEntry.oid ? 'modified' : '*modified' // ABB : AAB
+        return matchesIndex ? 'modified' : '*modified' // ABB : AAB
       }
     }
     /*
@@ -231,13 +253,19 @@ async function hasExactCasePath({ fs, dir, filepath }) {
   return true
 }
 
-async function getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path }) {
+async function getEntryAtPath({
+  fs,
+  cache,
+  gitdir: updatedGitdir,
+  tree,
+  path,
+}) {
   if (typeof path === 'string') path = path.split('/')
   const dirname = path.shift()
   for (const entry of tree) {
     if (entry.path === dirname) {
       if (path.length === 0) {
-        return entry.oid
+        return entry
       }
       const { type, object } = await _readObject({
         fs,
@@ -247,7 +275,7 @@ async function getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path }) {
       })
       if (type === 'tree') {
         const tree = GitTree.from(object)
-        return getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path })
+        return getEntryAtPath({ fs, cache, gitdir: updatedGitdir, tree, path })
       }
       if (type === 'blob') {
         throw new ObjectTypeError(entry.oid, type, 'blob', path.join('/'))
