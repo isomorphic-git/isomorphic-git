@@ -1012,5 +1012,43 @@ describe('checkout', () => {
       expect(await listFiles({ fs, dir })).toEqual(['d/sub/f'])
       expect(await statusMatrix({ fs, dir })).toEqual([['d/sub/f', 1, 1, 1]])
     })
+
+    it('refuses to replace a modified file with a directory', async () => {
+      const { fs, dir, dirCommit } = await setup()
+      await fs.write(`${dir}/d`, 'local change' + String.fromCharCode(10))
+
+      let error = null
+      try {
+        await checkout({ fs, dir, ref: dirCommit })
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(Errors.CheckoutConflictError)
+      expect(error.data.filepaths).toEqual(['d'])
+      expect(await fs.read(`${dir}/d`, 'utf8')).toBe(
+        'local change' + String.fromCharCode(10)
+      )
+    })
+
+    it('refuses to replace a directory holding an untracked file', async () => {
+      const { fs, dir, dirCommit, fileCommit } = await setup()
+      await checkout({ fs, dir, ref: dirCommit })
+      await fs.write(`${dir}/d/sub/untracked`, 'keep me')
+
+      let error = null
+      try {
+        await checkout({ fs, dir, ref: fileCommit })
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(Errors.CheckoutConflictError)
+      expect(error.data.filepaths).toEqual(['d'])
+      // Nothing was changed before the conflict was reported.
+      expect(await fs.read(`${dir}/d/sub/untracked`, 'utf8')).toBe('keep me')
+      expect(await fs.exists(`${dir}/d/sub/f`)).toBe(true)
+      expect(await listFiles({ fs, dir })).toEqual(['d/sub/f'])
+    })
   })
 })
