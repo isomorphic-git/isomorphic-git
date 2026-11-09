@@ -19,6 +19,10 @@ const nodeAliases = {
     __dirname,
     'src/utils/shasumRange.node.js'
   ),
+  [path.resolve(__dirname, 'src/utils/createSha1.js')]: path.resolve(
+    __dirname,
+    'src/utils/createSha1.node.js'
+  ),
 }
 
 const alias = aliases => ({
