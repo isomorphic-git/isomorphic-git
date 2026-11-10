@@ -1060,6 +1060,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "goranai",
+      "name": "Goran",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28477490?v=4",
+      "profile": "https://github.com/goranai",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"
