@@ -77,6 +77,40 @@ describe('log', () => {
     }
   )
 
+  it('emits a shared file-history ancestor only once', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const createTree = async content => {
+      const oid = await writeBlob({ fs, dir, blob: Buffer.from(content) })
+      return writeTree({
+        fs,
+        dir,
+        tree: [{ mode: '100644', path: 'file.txt', oid, type: 'blob' }],
+      })
+    }
+    const original = await createTree('original')
+    const modified = await createTree('modified')
+    const createCommit = (message, parent, tree, age) => {
+      const author = {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1700000000 + age,
+        timezoneOffset: 0,
+      }
+      return writeCommit({
+        fs,
+        dir,
+        commit: { message, tree, parent, author, committer: author },
+      })
+    }
+    const ancestor = await createCommit('Ancestor', [], original, 4)
+    const first = await createCommit('First parent', [ancestor], original, 3)
+    const second = await createCommit('Second parent', [ancestor], modified, 2)
+    const merge = await createCommit('Merge', [first, second], original, 5)
+
+    const commits = await log({ fs, dir, ref: merge, filepath: 'file.txt' })
+    expect(commits.map(({ oid }) => oid)).toEqual([ancestor, second])
+  })
+
   it('deduplicates an annotated merge parent by its resolved commit', async () => {
     const { fs, dir } = await makeFixture('test-init')
     const tree = await writeTree({ fs, dir, tree: [] })

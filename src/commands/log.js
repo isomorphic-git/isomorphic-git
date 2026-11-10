@@ -69,8 +69,11 @@ export async function _log({
   // Commits that do not match the author pattern are omitted from the
   // result, but their history is still traversed so that file tracking and
   // `depth` behave as they do without a filter.
+  const emittedFileCommits = filepath ? new Set() : null
   const pushCommit = commit => {
-    if (matchesAuthor(commit)) commits.push(commit)
+    if (!matchesAuthor(commit) || emittedFileCommits?.has(commit.oid)) return
+    emittedFileCommits?.add(commit.oid)
+    commits.push(commit)
   }
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
