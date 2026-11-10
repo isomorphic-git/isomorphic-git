@@ -33,7 +33,7 @@ const schema = {
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
-    bigFileThreshold: num,
+    bigfilethreshold: num,
   },
 }
 
@@ -201,7 +201,9 @@ export class GitConfig {
     const allValues = this.parsedConfig
       .filter(config => config.path === normalizedPath)
       .map(({ section, name, value }) => {
-        const fn = schema[section] && schema[section][name]
+        // Section and variable names are case insensitive (e.g. `fileMode`)
+        const sectionSchema = schema[lower(section)]
+        const fn = sectionSchema && sectionSchema[lower(name)]
         return fn ? fn(value) : value
       })
     return getall ? allValues : allValues.pop()
