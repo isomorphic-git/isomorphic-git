@@ -75,6 +75,7 @@ export async function _log({
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const tips = [await _readCommit({ fs, cache, gitdir, oid })]
+  const visited = new Set()
   let lastFileOid
   let lastFileMode
   let lastCommit
@@ -86,6 +87,8 @@ export async function _log({
 
   while (tips.length > 0) {
     const commit = tips.pop()
+    if (visited.has(commit.oid)) continue
+    visited.add(commit.oid)
 
     // Stop the log if we've hit the age limit
     if (
@@ -180,9 +183,10 @@ export async function _log({
     if (!shallowCommits.has(commit.oid)) {
       // Add the parents of this commit to the queue
       // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
-      for (const oid of commit.commit.parent) {
-        const commit = await _readCommit({ fs, cache, gitdir, oid })
-        if (!tips.map(commit => commit.oid).includes(commit.oid)) {
+      for (let i = commit.commit.parent.length - 1; i >= 0; i--) {
+        const oid = commit.commit.parent[i]
+        if (!visited.has(oid) && !tips.some(c => c.oid === oid)) {
+          const commit = await _readCommit({ fs, cache, gitdir, oid })
           tips.push(commit)
         }
       }
@@ -194,7 +198,13 @@ export async function _log({
     }
 
     // Process tips in order by age
-    tips.sort((a, b) => compareAge(a.commit, b.commit))
+    tips.sort((a, b) => {
+      const diff = compareAge(a.commit, b.commit)
+      if (diff !== 0) return diff
+      if (a.commit.parent && a.commit.parent.includes(b.oid)) return 1
+      if (b.commit.parent && b.commit.parent.includes(a.oid)) return -1
+      return 0
+    })
   }
   if (includeChanges) {
     for (const commit of commits) {
