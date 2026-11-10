@@ -322,6 +322,23 @@ describe('GitConfig', () => {
       expect(f).toEqual(2048)
     })
 
+    it('numeric and empty boolean', async () => {
+      // git accepts integers (0 is false) and an empty value (false)
+      const config = GitConfig.from(`[core]
+      fileMode = 0
+      bare = 1
+      logallrefupdates =
+      symlinks = 2`)
+      const a = await config.get('core.filemode')
+      const b = await config.get('core.bare')
+      const c = await config.get('core.logallrefupdates')
+      const d = await config.get('core.symlinks')
+      expect(a).toEqual(false)
+      expect(b).toEqual(true)
+      expect(c).toEqual(false)
+      expect(d).toEqual(true)
+    })
+
     it('numeric suffix', async () => {
       const configA = GitConfig.from(`[core]
       bigFileThreshold = 2k`)
