@@ -17,7 +17,7 @@ describe('log', () => {
       0,
       0,
       0,
-      ['Merge', 'First parent', 'Second parent', 'Ancestor'],
+      ['Merge', 'Second parent', 'Ancestor', 'First parent'],
     ],
     [
       'clock skew',

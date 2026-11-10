@@ -75,7 +75,7 @@ export async function _log({
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const tips = [await _readCommit({ fs, cache, gitdir, oid })]
-  const scheduled = new Map([[oid, 0]])
+  const scheduled = new Set([tips[0].oid])
   let lastFileOid
   let lastFileMode
   let lastCommit
@@ -87,6 +87,8 @@ export async function _log({
 
   while (tips.length > 0) {
     const commit = tips.pop()
+    // File history compares successive trees and may revisit a merge ancestor.
+    if (filepath) scheduled.delete(commit.oid)
 
     // Stop the log if we've hit the age limit
     if (
@@ -181,8 +183,10 @@ export async function _log({
     if (!shallowCommits.has(commit.oid)) {
       for (const oid of commit.commit.parent) {
         if (scheduled.has(oid)) continue
-        scheduled.set(oid, scheduled.size)
-        tips.push(await _readCommit({ fs, cache, gitdir, oid }))
+        const parent = await _readCommit({ fs, cache, gitdir, oid })
+        if (scheduled.has(parent.oid)) continue
+        scheduled.add(parent.oid)
+        tips.push(parent)
       }
     }
 
@@ -191,11 +195,8 @@ export async function _log({
       endCommit(commit)
     }
 
-    // Keep file history's existing tie order, which can affect rename tracking.
-    tips.sort((a, b) => {
-      const age = compareAge(a.commit, b.commit)
-      return age || (filepath ? 0 : scheduled.get(b.oid) - scheduled.get(a.oid))
-    })
+    // Process tips in order by age
+    tips.sort((a, b) => compareAge(a.commit, b.commit))
   }
   if (includeChanges) {
     for (const commit of commits) {
