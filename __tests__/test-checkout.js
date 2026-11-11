@@ -16,6 +16,7 @@ import {
   hashBlob,
   updateIndex,
   annotatedTag,
+  init,
   resolveRef,
   readCommit,
   writeTag,
@@ -966,5 +967,88 @@ describe('checkout', () => {
       ['src/index.js', 1, 1, 1],
     ])
     expect(indexWrites).toBe(1)
+  })
+
+  describe('when a path changes between a directory and a file', () => {
+    const author = { name: 'Mr. Test', email: 'mrtest@example.com' }
+
+    // Commit A has the directory `d` holding `d/sub/f`, commit B has the file `d`.
+    async function setup() {
+      const { fs, dir } = await makeFixture('test-init')
+      await init({ fs, dir })
+      await fs.mkdir(`${dir}/d/sub`)
+      await fs.write(`${dir}/d/sub/f`, 'x\n')
+      await add({ fs, dir, filepath: 'd/sub/f' })
+      const dirCommit = await commit({ fs, dir, author, message: 'dir' })
+      await remove({ fs, dir, filepath: 'd/sub/f' })
+      await fs.rm(`${dir}/d/sub/f`)
+      await fs.rmdir(`${dir}/d/sub`)
+      await fs.rmdir(`${dir}/d`)
+      await fs.write(`${dir}/d`, 'file\n')
+      await add({ fs, dir, filepath: 'd' })
+      const fileCommit = await commit({ fs, dir, author, message: 'file' })
+      return { fs, dir, dirCommit, fileCommit }
+    }
+
+    it('replaces a directory with a file', async () => {
+      const { fs, dir, dirCommit, fileCommit } = await setup()
+      await checkout({ fs, dir, ref: dirCommit })
+
+      await checkout({ fs, dir, ref: fileCommit })
+
+      expect((await fs.lstat(`${dir}/d`)).isFile()).toBe(true)
+      expect(await fs.read(`${dir}/d`, 'utf8')).toBe('file\n')
+      expect(await listFiles({ fs, dir })).toEqual(['d'])
+      expect(await statusMatrix({ fs, dir })).toEqual([['d', 1, 1, 1]])
+    })
+
+    it('replaces a file with a directory', async () => {
+      const { fs, dir, dirCommit } = await setup()
+
+      await checkout({ fs, dir, ref: dirCommit })
+
+      expect((await fs.lstat(`${dir}/d`)).isDirectory()).toBe(true)
+      expect(await fs.read(`${dir}/d/sub/f`, 'utf8')).toBe('x\n')
+      expect(await listFiles({ fs, dir })).toEqual(['d/sub/f'])
+      expect(await statusMatrix({ fs, dir })).toEqual([['d/sub/f', 1, 1, 1]])
+    })
+
+    it('refuses to replace a modified file with a directory', async () => {
+      const { fs, dir, dirCommit } = await setup()
+      await fs.write(`${dir}/d`, 'local change' + String.fromCharCode(10))
+
+      let error = null
+      try {
+        await checkout({ fs, dir, ref: dirCommit })
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(Errors.CheckoutConflictError)
+      expect(error.data.filepaths).toEqual(['d'])
+      expect(await fs.read(`${dir}/d`, 'utf8')).toBe(
+        'local change' + String.fromCharCode(10)
+      )
+    })
+
+    it('refuses to replace a directory holding an untracked file', async () => {
+      const { fs, dir, dirCommit, fileCommit } = await setup()
+      await checkout({ fs, dir, ref: dirCommit })
+      await fs.write(`${dir}/d/sub/untracked`, 'keep me')
+
+      let error = null
+      try {
+        await checkout({ fs, dir, ref: fileCommit })
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(Errors.CheckoutConflictError)
+      expect(error.data.filepaths).toEqual(['d'])
+      // Nothing was changed before the conflict was reported.
+      expect(await fs.read(`${dir}/d/sub/untracked`, 'utf8')).toBe('keep me')
+      expect(await fs.exists(`${dir}/d/sub/f`)).toBe(true)
+      expect(await listFiles({ fs, dir })).toEqual(['d/sub/f'])
+    })
   })
 })
