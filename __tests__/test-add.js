@@ -8,6 +8,11 @@ import {
   STAGE,
   status,
   getConfig,
+  writeBlob,
+  writeTree,
+  writeCommit,
+  writeRef,
+  resetIndex,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -324,5 +329,84 @@ describe('add', () => {
     expect(await status({ fs, dir, gitdir, filepath: 'README.md' })).toEqual(
       'added'
     )
+  })
+  it('status with core.autocrlf=true reports a BOM file committed by git as unmodified', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-add-autocrlf')
+    // The blob `git add` stores for a BOM file with CRLF line endings
+    const oid = await writeBlob({
+      fs,
+      dir,
+      gitdir,
+      blob: Buffer.from('efbbbf68656c6c6f0a', 'hex'),
+    })
+    const tree = await writeTree({
+      fs,
+      dir,
+      gitdir,
+      tree: [{ mode: '100644', path: 'bom.txt', oid, type: 'blob' }],
+    })
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const commit = await writeCommit({
+      fs,
+      dir,
+      gitdir,
+      commit: {
+        message: 'add bom.txt',
+        tree,
+        parent: [],
+        author,
+        committer: author,
+      },
+    })
+    await writeRef({ fs, dir, gitdir, ref: 'HEAD', value: commit, force: true })
+    await fs.write(`${dir}/bom.txt`, Buffer.from('efbbbf68656c6c6f0d0a', 'hex'))
+    await resetIndex({ fs, dir, gitdir, filepath: 'bom.txt' })
+    // Rewrite the same bytes so the index stats no longer match and status
+    // has to hash the worktree file
+    await new Promise(resolve => setTimeout(resolve, 1100))
+    await fs.write(`${dir}/bom.txt`, Buffer.from('efbbbf68656c6c6f0d0a', 'hex'))
+    expect(await status({ fs, dir, gitdir, filepath: 'bom.txt' })).toEqual(
+      'unmodified'
+    )
+  })
+  it('git add with core.autocrlf=true converts line endings like canonical git', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-add-autocrlf')
+    // Expected blobs are what `git add` stores with core.autocrlf=true
+    const cases = {
+      'crlf.txt': ['610d0a620d0a', '610a620a'],
+      'mixed.txt': ['610a620d0a630a', '610a620a630a'],
+      'bom.txt': ['efbbbf68656c6c6f0d0a', 'efbbbf68656c6c6f0a'],
+      'latin1.txt': ['636166e90d0a', '636166e90a'],
+      'nul.bin': ['6100620d0a', '6100620d0a'],
+      // binary only because of the non-printable byte ratio
+      'control.bin': ['61010d0a', '61010d0a'],
+      'lonecr.txt': ['610d620d0a', '610d620d0a'],
+    }
+    for (const [filepath, [content]] of Object.entries(cases)) {
+      await fs.write(`${dir}/${filepath}`, Buffer.from(content, 'hex'))
+      await add({ fs, dir, gitdir, filepath })
+    }
+    const staged = await walk({
+      fs,
+      dir,
+      gitdir,
+      trees: [STAGE()],
+      map: async (filepath, [stage]) =>
+        cases[filepath] && stage ? [filepath, await stage.oid()] : undefined,
+    })
+    expect(staged.length).toEqual(Object.keys(cases).length)
+    for (const [filepath, oid] of staged) {
+      const { blob } = await readBlob({ fs, dir, gitdir, oid })
+      expect([filepath, Buffer.from(blob).toString('hex')]).toEqual([
+        filepath,
+        cases[filepath][1],
+      ])
+      expect(await status({ fs, dir, gitdir, filepath })).toEqual('added')
+    }
   })
 })
