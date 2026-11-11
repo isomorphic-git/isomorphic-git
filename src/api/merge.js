@@ -24,7 +24,10 @@ import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 /**
  * Merge two branches
  *
- * Currently it will fail if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
+ * Currently it will fail with a `MergeNotSupportedError` if multiple candidate merge bases are found. (It doesn't yet implement the recursive merge strategy.)
+ *
+ * Like `git merge`, it refuses with an `UnrelatedHistoriesError` to merge two commits that have no common ancestor, unless `allowUnrelatedHistories` is set.
+ * In a shallow clone the common ancestor may simply not have been fetched yet; the error's `data.shallow` says whether the search ran into the edge of the clone.
  *
  * Currently it does not support selecting alternative merge strategies.
  *
