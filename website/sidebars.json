@@ -96,6 +96,6 @@
       "cli",
       "cache"
     ],
-    "More": ["faq", "snippets", "webworker"]
+    "More": ["faq", "snippets", "webworker", "browser-file-system-access"]
   }
 }

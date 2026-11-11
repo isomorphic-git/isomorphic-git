@@ -31,9 +31,12 @@ export async function _deleteBranch({ fs, gitdir, ref }) {
   // Delete a specified branch
   await GitRefManager.deleteRef({ fs, gitdir, ref: fullRef })
 
-  // Delete branch config entries
+  // Delete branch config entries. Leave the config file alone (or absent)
+  // when it has none.
   const abbrevRef = abbreviateRef(ref)
   const config = await GitConfigManager.get({ fs, gitdir })
-  await config.deleteSection('branch', abbrevRef)
-  await GitConfigManager.save({ fs, gitdir, config })
+  if ((await config.getSubsections('branch')).includes(abbrevRef)) {
+    await config.deleteSection('branch', abbrevRef)
+    await GitConfigManager.save({ fs, gitdir, config })
+  }
 }
