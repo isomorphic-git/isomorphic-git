@@ -403,7 +403,7 @@ describe('fetch', () => {
       await makeFixtureAsSubmodule('test-fetch-client')
     for (const url of [
       `http://testtoken@${localhost}:8888/test-fetch-server.git`,
-      ` http://testuser:testpassword@${localhost}:8888/test-fetch-server.git`,
+      `http://testuser:testpassword@${localhost}:8888/test-fetch-server.git`,
     ]) {
       const { fetchHeadDescription } = await fetch({
         fs,

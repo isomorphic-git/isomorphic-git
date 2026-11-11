@@ -83,25 +83,6 @@ describe('utils/extractAuthFromUrl', () => {
     }
   })
 
-  it('reads credentials after leading whitespace or control characters', () => {
-    for (const prefix of [' ', '\t', '\n', '\u0000', '\u00a0', '\ufeff']) {
-      const { url, auth } = extractAuthFromUrl(
-        `${prefix}https://user:pass@github.com/owner/repo.git`
-      )
-      expect(url).toEqual(`${prefix}https://github.com/owner/repo.git`)
-      expect(auth).toEqual({ username: 'user', password: 'pass' })
-    }
-  })
-
-  it('percent-decodes the credentials after leading characters', () => {
-    for (const prefix of [' ', '\u00a0', '\ufeff']) {
-      const { auth } = extractAuthFromUrl(
-        `${prefix}https://us%40er:p%40ss@github.com/owner/repo.git`
-      )
-      expect(auth).toEqual({ username: 'us@er', password: 'p@ss' })
-    }
-  })
-
   it('ignores an @ that belongs to the query or the fragment', () => {
     for (const url of [
       'https://github.com?account=user@example.com',

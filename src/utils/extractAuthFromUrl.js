@@ -2,11 +2,8 @@
 // scheme is matched case-insensitively: `HTTPS://user:pass@host/x` is a URL
 // like any other, and leaving the credentials in it is what `fetch` rejects.
 // The authority ends at the first `/`, `?` or `#`, so an `@` that lives in a
-// query or a fragment is left where it is. Leading whitespace and control
-// characters are skipped, because the Node HTTP client strips them and still
-// sends the credentials from such a URL.
-// eslint-disable-next-line no-control-regex
-const CREDENTIALS = /^([\u0000-\u0020\u00a0\ufeff]*)(https?:\/\/)([^/?#]+)@/i
+// query or a fragment is left where it is.
+const CREDENTIALS = /^(https?:\/\/)([^/?#]+)@/i
 
 export function extractAuthFromUrl(url) {
   // For whatever reason, the `fetch` API does not convert credentials embedded in the URL
@@ -21,11 +18,9 @@ export function extractAuthFromUrl(url) {
   // off the parsed URL: serializing that one would also drop an explicit
   // `:443` and append a slash to a URL that has no path, and this return value
   // is what the request goes out against.
-  // `URL` does not skip a leading no-break space or byte order mark, so the
-  // credentials are parsed from the URL without the leading characters.
   return {
-    url: url.replace(CREDENTIALS, '$1$2'),
-    auth: parseUserinfo(url.slice(credentials[1].length), credentials[3]),
+    url: url.replace(CREDENTIALS, '$1'),
+    auth: parseUserinfo(url, credentials[2]),
   }
 }
 
