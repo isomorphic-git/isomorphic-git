@@ -168,10 +168,58 @@ export async function mergeTree({
                   index.delete({ filepath })
 
                   if (baseOid) {
-                    index.insert({ filepath, oid: baseOid, stage: 1 })
+                    index.insert({
+                      filepath,
+                      oid: baseOid,
+                      stage: 1,
+                      stats: {
+                        mode: await base.mode(),
+                        ctimeSeconds: 0,
+                        ctimeNanoseconds: 0,
+                        mtimeSeconds: 0,
+                        mtimeNanoseconds: 0,
+                        dev: 0,
+                        ino: 0,
+                        uid: 0,
+                        gid: 0,
+                        size: 0,
+                      },
+                    })
                   }
-                  index.insert({ filepath, oid: ourOid, stage: 2 })
-                  index.insert({ filepath, oid: theirOid, stage: 3 })
+                  index.insert({
+                    filepath,
+                    oid: ourOid,
+                    stage: 2,
+                    stats: {
+                      mode: await ours.mode(),
+                      ctimeSeconds: 0,
+                      ctimeNanoseconds: 0,
+                      mtimeSeconds: 0,
+                      mtimeNanoseconds: 0,
+                      dev: 0,
+                      ino: 0,
+                      uid: 0,
+                      gid: 0,
+                      size: 0,
+                    },
+                  })
+                  index.insert({
+                    filepath,
+                    oid: theirOid,
+                    stage: 3,
+                    stats: {
+                      mode: await theirs.mode(),
+                      ctimeSeconds: 0,
+                      ctimeNanoseconds: 0,
+                      mtimeSeconds: 0,
+                      mtimeNanoseconds: 0,
+                      dev: 0,
+                      ino: 0,
+                      uid: 0,
+                      gid: 0,
+                      size: 0,
+                    },
+                  })
                 }
               } else if (!abortOnConflict) {
                 index.insert({ filepath, oid: r.mergeResult.oid, stage: 0 })
@@ -196,8 +244,40 @@ export async function mergeTree({
 
               index.delete({ filepath })
 
-              index.insert({ filepath, oid: baseOid, stage: 1 })
-              index.insert({ filepath, oid: theirOid, stage: 3 })
+              index.insert({
+                filepath,
+                oid: baseOid,
+                stage: 1,
+                stats: {
+                  mode: await base.mode(),
+                  ctimeSeconds: 0,
+                  ctimeNanoseconds: 0,
+                  mtimeSeconds: 0,
+                  mtimeNanoseconds: 0,
+                  dev: 0,
+                  ino: 0,
+                  uid: 0,
+                  gid: 0,
+                  size: 0,
+                },
+              })
+              index.insert({
+                filepath,
+                oid: theirOid,
+                stage: 3,
+                stats: {
+                  mode: await theirs.mode(),
+                  ctimeSeconds: 0,
+                  ctimeNanoseconds: 0,
+                  mtimeSeconds: 0,
+                  mtimeNanoseconds: 0,
+                  dev: 0,
+                  ino: 0,
+                  uid: 0,
+                  gid: 0,
+                  size: 0,
+                },
+              })
             }
 
             return {
@@ -224,8 +304,40 @@ export async function mergeTree({
 
               index.delete({ filepath })
 
-              index.insert({ filepath, oid: baseOid, stage: 1 })
-              index.insert({ filepath, oid: ourOid, stage: 2 })
+              index.insert({
+                filepath,
+                oid: baseOid,
+                stage: 1,
+                stats: {
+                  mode: await base.mode(),
+                  ctimeSeconds: 0,
+                  ctimeNanoseconds: 0,
+                  mtimeSeconds: 0,
+                  mtimeNanoseconds: 0,
+                  dev: 0,
+                  ino: 0,
+                  uid: 0,
+                  gid: 0,
+                  size: 0,
+                },
+              })
+              index.insert({
+                filepath,
+                oid: ourOid,
+                stage: 2,
+                stats: {
+                  mode: await ours.mode(),
+                  ctimeSeconds: 0,
+                  ctimeNanoseconds: 0,
+                  mtimeSeconds: 0,
+                  mtimeNanoseconds: 0,
+                  dev: 0,
+                  ino: 0,
+                  uid: 0,
+                  gid: 0,
+                  size: 0,
+                },
+              })
             }
 
             return {
@@ -317,7 +429,8 @@ export async function mergeTree({
       unmergedFiles,
       bothModified,
       deleteByUs,
-      deleteByTheirs
+      deleteByTheirs,
+      results.oid
     )
   }
 
@@ -325,6 +438,7 @@ export async function mergeTree({
 }
 
 /**
+ * Merge blob contents while retaining binary and symbolic-link conflicts.
  *
  * @param {Object} args
  * @param {import('../models/FileSystem').FileSystem} args.fs
@@ -366,6 +480,15 @@ async function mergeBlobs({
   }
   const mode =
     baseMode === (await ours.mode()) ? await theirs.mode() : await ours.mode()
+  // A symlink and a regular file are distinct types, even if one kept the base blob.
+  const ourMode = await ours.mode()
+  const theirMode = await theirs.mode()
+  if (ourMode !== theirMode && [ourMode, theirMode].includes(0o120000)) {
+    return {
+      cleanMerge: false,
+      mergeResult: { mode: ourMode, path, oid: await ours.oid(), type },
+    }
+  }
   // The trivial case: nothing to merge except maybe mode
   if ((await ours.oid()) === (await theirs.oid())) {
     return {
@@ -384,6 +507,35 @@ async function mergeBlobs({
     return {
       cleanMerge: true,
       mergeResult: { mode, path, oid: await ours.oid(), type },
+    }
+  }
+  // A replaced symlink has no text ancestry for the new regular files.
+  const entries = [ours, theirs]
+  if (base && (await base.type()) === 'blob' && baseMode !== 0o120000) {
+    entries.unshift(base)
+  } else {
+    baseContent = ''
+  }
+  const contents = await Promise.all(entries.map(entry => entry.content()))
+  // Binary blobs and symlink targets cannot enter the UTF-8 text merger.
+  let isText = ![ourMode, theirMode].includes(0o120000)
+  for (const content of contents) {
+    const bytes = Buffer.from(content)
+    if (
+      bytes.includes(0) ||
+      !Buffer.from(bytes.toString('utf8'), 'utf8').equals(bytes)
+    )
+      isText = false
+  }
+  if (!isText) {
+    return {
+      cleanMerge: false,
+      mergeResult: {
+        mode: await ours.mode(),
+        path,
+        oid: await ours.oid(),
+        type,
+      },
     }
   }
   // if both sides made changes do a merge

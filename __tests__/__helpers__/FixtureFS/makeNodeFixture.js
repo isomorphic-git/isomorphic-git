@@ -23,6 +23,7 @@ const testsDir = resolve(import.meta.dirname, '..')
 export async function useTempDir(fixture) {
   const fixturePath = await findUp(join('__fixtures__', fixture), {
     cwd: testsDir,
+    type: 'directory',
   })
 
   const tempDir = await _fs.promises.mkdtemp(TEMP_PATH)

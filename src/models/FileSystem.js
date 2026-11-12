@@ -1,8 +1,11 @@
 import pify from 'pify'
 
+import { InternalError } from '../errors/InternalError.js'
 import { compareStrings } from '../utils/compareStrings.js'
 import { dirname } from '../utils/dirname.js'
+import { join } from '../utils/join.js'
 import { mkdirp } from '../utils/mkdirp.js'
+import { removeTemporaryEntries } from '../utils/removeTemporaryEntries.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
 import { isPromiseLike } from '../utils/types.js'
 
@@ -43,7 +46,13 @@ const commands = [
   'symlink',
 ]
 
+/** Bind optional rename and required filesystem operations through a promise-based interface. */
 function bindFs(target, fs) {
+  if (fs.rename) {
+    target._rename = isPromiseFs(fs)
+      ? fs.rename.bind(fs)
+      : pify(fs.rename.bind(fs))
+  }
   if (isPromiseFs(fs)) {
     for (const command of commands) {
       target[`_${command}`] = fs[command].bind(fs)
@@ -81,6 +90,11 @@ export class FileSystem {
   constructor(fs) {
     if (typeof fs._original_unwrapped_fs !== 'undefined') return fs
 
+    /** @type {((oldpath: string, newpath: string) => Promise<void>)|undefined} */
+    this._rename = undefined
+    /** @type {boolean|undefined} Whether rename preserves source symlinks; undefined until checked. */
+    this._renamePreservesSymlinks = undefined
+
     const promises = Object.getOwnPropertyDescriptor(fs, 'promises')
     if (promises && promises.enumerable) {
       bindFs(this, fs.promises)
@@ -88,6 +102,81 @@ export class FileSystem {
       bindFs(this, fs)
     }
     this._original_unwrapped_fs = fs
+  }
+
+  /** Whether the adapter exposes rename; symlink moves require a separate conformance check. */
+  get canRename() {
+    return typeof this._rename === 'function'
+  }
+
+  /**
+   * Check source-symlink preservation using only entries in a caller-owned temporary directory.
+   * Incompatible adapters reject symlink moves without disabling regular-file recovery.
+   *
+   * @param {object} args
+   * @param {string} args.directory Temporary directory owned by this operation, with reserved probe names.
+   * @returns {Promise<void>}
+   */
+  async verifyRename({ directory }) {
+    if (this._renamePreservesSymlinks === true) return
+    if (this._renamePreservesSymlinks === false)
+      throw new InternalError(
+        'Filesystem rename does not preserve symbolic links; use a compatible adapter'
+      )
+    const link = join(directory, 'rename-link')
+    const moved = join(directory, 'rename-moved')
+    let error
+    try {
+      await this.writelink(link, Buffer.from('rename-target'))
+      const expectedTarget = await this.readlink(link)
+      try {
+        // A rename must move even a dangling symlink without resolving its target.
+        await this.rename({ oldpath: link, newpath: moved })
+      } catch (err) {
+        if (err.code !== 'ENOENT') throw err
+        this._renamePreservesSymlinks = false
+        throw new InternalError(
+          'Filesystem rename does not preserve symbolic links; use a compatible adapter'
+        )
+      }
+      const stats = await this.lstat(moved)
+      const movedTarget =
+        stats && stats.isSymbolicLink() ? await this.readlink(moved) : null
+      if (
+        !movedTarget ||
+        !expectedTarget ||
+        !movedTarget.equals(expectedTarget)
+      ) {
+        this._renamePreservesSymlinks = false
+        throw new InternalError(
+          'Filesystem rename does not preserve symbolic links; use a compatible adapter'
+        )
+      }
+      this._renamePreservesSymlinks = true
+    } catch (err) {
+      error = err
+    }
+    await removeTemporaryEntries({
+      fs: this,
+      files: [link, moved],
+      error,
+    })
+  }
+
+  /**
+   * Move an entry while preserving its type and contents. Failed moves must retain the source.
+   *
+   * @param {object} args
+   * @param {string} args.oldpath
+   * @param {string} args.newpath
+   * @returns {Promise<void>}
+   */
+  async rename({ oldpath, newpath }) {
+    if (!this._rename)
+      throw new InternalError(
+        'Replacing existing files requires fs.rename support'
+      )
+    await this._rename(oldpath, newpath)
   }
 
   /**
