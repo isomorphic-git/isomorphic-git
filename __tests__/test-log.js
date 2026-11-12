@@ -19,6 +19,118 @@ import {
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('log', () => {
+  it('does not emit shared ancestors twice in merge history (#2488)', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir, defaultBranch: 'main' })
+    const author = {
+      name: 'Test',
+      email: 'test@example.com',
+      timestamp: 1700000000,
+      timezoneOffset: 0,
+    }
+    const a = await commit({
+      fs,
+      dir,
+      message: 'A\n',
+      author,
+      committer: author,
+    })
+    const b = await commit({
+      fs,
+      dir,
+      message: 'B\n',
+      parent: [a],
+      author,
+      committer: author,
+    })
+    const c = await commit({
+      fs,
+      dir,
+      message: 'C\n',
+      parent: [a],
+      author,
+      committer: author,
+    })
+    await commit({
+      fs,
+      dir,
+      message: 'M\n',
+      parent: [b, c],
+      author,
+      committer: author,
+    })
+
+    const commits = await log({ fs, dir, ref: 'main' })
+    const messages = commits.map(x => x.commit.message.trim())
+    expect(messages).toEqual(['M', 'B', 'C', 'A'])
+  })
+
+  it('keeps transitive descendants ahead of equal-timestamp shared ancestors', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    await init({ fs, dir, defaultBranch: 'main' })
+    const authorT = {
+      name: 'Test',
+      email: 'test@example.com',
+      timestamp: 1700000000,
+      timezoneOffset: 0,
+    }
+    const authorNewer = {
+      ...authorT,
+      timestamp: 1700000001,
+    }
+    const a = await commit({
+      fs,
+      dir,
+      message: 'A\n',
+      author: authorT,
+      committer: authorT,
+    })
+    const y = await commit({
+      fs,
+      dir,
+      message: 'Y\n',
+      parent: [a],
+      author: authorT,
+      committer: authorT,
+    })
+    const x = await commit({
+      fs,
+      dir,
+      message: 'X\n',
+      parent: [y],
+      author: authorT,
+      committer: authorT,
+    })
+    const b = await commit({
+      fs,
+      dir,
+      message: 'B\n',
+      parent: [x],
+      author: authorT,
+      committer: authorT,
+    })
+    const c = await commit({
+      fs,
+      dir,
+      message: 'C\n',
+      parent: [a],
+      author: authorNewer,
+      committer: authorNewer,
+    })
+    await commit({
+      fs,
+      dir,
+      message: 'M\n',
+      parent: [b, c],
+      author: authorNewer,
+      committer: authorNewer,
+    })
+
+    const commits = await log({ fs, dir, ref: 'main' })
+    const messages = commits.map(x => x.commit.message.trim())
+    expect(messages).toEqual(['M', 'C', 'B', 'X', 'Y', 'A'])
+  })
+
   it('includes commits that only change a file mode', async () => {
     const { fs, dir } = await makeFixture('test-init')
     const author = {
