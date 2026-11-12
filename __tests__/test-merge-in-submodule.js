@@ -1340,7 +1340,7 @@ describe('merge', () => {
       entry.commit.message.replace('\n', '')
     )
     expect(messages.join()).toEqual(
-      [`Merge branch 'other' into master`, 'Add b.txt', 'Add a.txt'].join()
+      [`Merge branch 'other' into master`, 'Add a.txt', 'Add b.txt'].join()
     )
   })
 
@@ -1476,8 +1476,8 @@ describe('merge', () => {
     expect(messages.join()).toEqual(
       [
         `Merge branch 'other' into master`,
-        'Add file in different nested directory on other',
         'Add file in nested directory on master',
+        'Add file in different nested directory on other',
       ].join()
     )
   })

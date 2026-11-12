@@ -85,8 +85,53 @@ export async function _log({
     if (isOk && filepath) pushCommit(commit)
   }
 
+  async function popNextTip() {
+    tips.sort((a, b) => compareAge(a.commit, b.commit))
+    const maxTs = tips[tips.length - 1].commit.committer.timestamp
+    let tieStart = tips.length - 1
+    while (
+      tieStart > 0 &&
+      tips[tieStart - 1].commit.committer.timestamp === maxTs
+    ) {
+      tieStart--
+    }
+    if (tieStart === tips.length - 1) {
+      return tips.pop()
+    }
+
+    const tied = tips.slice(tieStart)
+    const tiedOids = new Set(tied.map(c => c.oid))
+    const ancestorsInTied = new Set()
+
+    for (const root of tied) {
+      const queue = shallowCommits.has(root.oid) ? [] : [...root.commit.parent]
+      const seen = new Set()
+      while (queue.length > 0) {
+        const oid = queue.shift()
+        if (seen.has(oid) || visited.has(oid)) continue
+        seen.add(oid)
+        if (tiedOids.has(oid) && oid !== root.oid) {
+          ancestorsInTied.add(oid)
+          continue
+        }
+        if (shallowCommits.has(oid)) continue
+        const parentCommit = await _readCommit({ fs, cache, gitdir, oid })
+        if (parentCommit.commit.committer.timestamp >= maxTs) {
+          queue.push(...parentCommit.commit.parent)
+        }
+      }
+    }
+
+    for (let i = tips.length - 1; i >= tieStart; i--) {
+      if (!ancestorsInTied.has(tips[i].oid)) {
+        return tips.splice(i, 1)[0]
+      }
+    }
+    return tips.pop()
+  }
+
   while (tips.length > 0) {
-    const commit = tips.pop()
+    const commit = await popNextTip()
     if (visited.has(commit.oid)) continue
     visited.add(commit.oid)
 
@@ -181,9 +226,9 @@ export async function _log({
 
     // If this is not a shallow commit...
     if (!shallowCommits.has(commit.oid)) {
-      // Add the parents of this commit to the queue
+      // Add the parents of this commit to the queue in reverse order so parent[0] is popped first on ties
       // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
-      for (const oid of commit.commit.parent) {
+      for (const oid of [...commit.commit.parent].reverse()) {
         if (!visited.has(oid) && !tips.some(c => c.oid === oid)) {
           const commit = await _readCommit({ fs, cache, gitdir, oid })
           tips.push(commit)
@@ -195,15 +240,6 @@ export async function _log({
     if (tips.length === 0) {
       endCommit(commit)
     }
-
-    // Process tips in order by age
-    tips.sort((a, b) => {
-      const diff = compareAge(a.commit, b.commit)
-      if (diff !== 0) return diff
-      if (a.commit.parent && a.commit.parent.includes(b.oid)) return 1
-      if (b.commit.parent && b.commit.parent.includes(a.oid)) return -1
-      return 0
-    })
   }
   if (includeChanges) {
     for (const commit of commits) {
