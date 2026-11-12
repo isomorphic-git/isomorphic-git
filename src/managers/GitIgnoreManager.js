@@ -6,6 +6,8 @@ import { basename } from '../utils/basename.js'
 import { dirname } from '../utils/dirname.js'
 import { join } from '../utils/join.js'
 
+import { GitConfigManager } from './GitConfigManager.js'
+
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of caching.
 export class GitIgnoreManager {
@@ -46,14 +48,19 @@ export class GitIgnoreManager {
         filepath: file,
       })
     }
+    // git-config core.ignorecase; missing config keeps ignore's default (true).
+    let ignorecase = true
+    const config = await GitConfigManager.get({ fs, gitdir })
+    const configured = await config.get('core.ignorecase')
+    if (typeof configured === 'boolean') ignorecase = configured
     let ignoredStatus = false
     for (const [index, p] of pairs.entries()) {
       const file = await fs.read(p.gitignore, 'utf8')
-      const ign = ignore()
+      const ign = ignore({ ignorecase })
       // The patterns in .git/info/exclude are relative to the working directory,
       // so only the first pair, which holds the full filepath, can use them.
-      if (index === 0) ign.add(excludes)
-      ign.add(file)
+      if (index === 0 && excludes) ign.add(excludes)
+      if (file) ign.add(file)
       // If the parent directory is excluded, we are done.
       // "It is not possible to re-include a file if a parent directory of that file is excluded. Git doesn’t list excluded directories for performance reasons, so any patterns on contained files have no effect, no matter where they are defined."
       // source: https://git-scm.com/docs/gitignore
