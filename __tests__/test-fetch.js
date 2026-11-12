@@ -483,6 +483,14 @@ describe('fetch', () => {
           `test-fetch-missing-objects-${singleBranch}`
         )
         await init({ fs, dir, gitdir })
+        // Without a fetch refspec, fetch stops at NoRefspecError before it
+        // writes any refs, so the assertions below would pass trivially.
+        await setConfig({
+          fs,
+          gitdir,
+          path: 'remote.origin.fetch',
+          value: '+refs/heads/*:refs/remotes/origin/*',
+        })
 
         let error = null
         try {
