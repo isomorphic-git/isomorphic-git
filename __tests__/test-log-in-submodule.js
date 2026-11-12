@@ -11,6 +11,51 @@ import {
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 
 describe('log', () => {
+  it.each([
+    [
+      'equal timestamps',
+      0,
+      0,
+      0,
+      ['Merge', 'Second parent', 'Ancestor', 'First parent'],
+    ],
+    [
+      'clock skew',
+      4,
+      3,
+      2,
+      ['Merge', 'First parent', 'Ancestor', 'Second parent'],
+    ],
+  ])(
+    'visits a shared ancestor once with %s',
+    async (_, ancestorAge, firstAge, secondAge, expected) => {
+      const { fs, dir } = await makeFixtureAsSubmodule('test-init')
+      const tree = await writeTree({ fs, dir, tree: [] })
+      const createCommit = (message, parent, age) => {
+        const author = {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1700000000 + age,
+          timezoneOffset: 0,
+        }
+        return writeCommit({
+          fs,
+          dir,
+          commit: { message, tree, parent, author, committer: author },
+        })
+      }
+      const ancestor = await createCommit('Ancestor', [], ancestorAge)
+      const first = await createCommit('First parent', [ancestor], firstAge)
+      const second = await createCommit('Second parent', [ancestor], secondAge)
+      const merge = await createCommit('Merge', [first, second], 5)
+
+      const commits = await log({ fs, dir, ref: merge })
+      expect(commits.map(({ commit }) => commit.message.trim())).toEqual(
+        expected
+      )
+    }
+  )
+
   it('includes commits that only change a file mode', async () => {
     const { fs, dir } = await makeFixtureAsSubmodule('test-init')
     const author = {

@@ -13,12 +13,138 @@ import {
   writeBlob,
   writeCommit,
   writeRef,
+  writeTag,
   writeTree,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('log', () => {
+  it.each([
+    [
+      'equal timestamps',
+      0,
+      0,
+      0,
+      ['Merge', 'Second parent', 'Ancestor', 'First parent'],
+    ],
+    [
+      'clock skew',
+      4,
+      3,
+      2,
+      ['Merge', 'First parent', 'Ancestor', 'Second parent'],
+    ],
+  ])(
+    'visits a shared ancestor once with %s',
+    async (_, ancestorAge, firstAge, secondAge, expected) => {
+      const { fs, dir } = await makeFixture('test-init')
+      const oid = await writeBlob({ fs, dir, blob: Buffer.from('content') })
+      const tree = await writeTree({
+        fs,
+        dir,
+        tree: [{ mode: '100644', path: 'file.txt', oid, type: 'blob' }],
+      })
+      const createCommit = (message, parent, age) => {
+        const author = {
+          name: 'Mr. Test',
+          email: 'mrtest@example.com',
+          timestamp: 1700000000 + age,
+          timezoneOffset: 0,
+        }
+        return writeCommit({
+          fs,
+          dir,
+          commit: { message, tree, parent, author, committer: author },
+        })
+      }
+      const ancestor = await createCommit('Ancestor', [], ancestorAge)
+      const first = await createCommit('First parent', [ancestor], firstAge)
+      const second = await createCommit('Second parent', [ancestor], secondAge)
+      const merge = await createCommit('Merge', [first, second], 5)
+
+      const commits = await log({ fs, dir, ref: merge })
+      expect(commits.map(({ commit }) => commit.message.trim())).toEqual(
+        expected
+      )
+      const fileHistory = await log({
+        fs,
+        dir,
+        ref: merge,
+        filepath: 'file.txt',
+      })
+      expect(fileHistory.map(({ oid }) => oid)).toEqual([ancestor])
+    }
+  )
+
+  it('emits a shared file-history ancestor only once', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const createTree = async content => {
+      const oid = await writeBlob({ fs, dir, blob: Buffer.from(content) })
+      return writeTree({
+        fs,
+        dir,
+        tree: [{ mode: '100644', path: 'file.txt', oid, type: 'blob' }],
+      })
+    }
+    const original = await createTree('original')
+    const modified = await createTree('modified')
+    const createCommit = (message, parent, tree, age) => {
+      const author = {
+        name: 'Mr. Test',
+        email: 'mrtest@example.com',
+        timestamp: 1700000000 + age,
+        timezoneOffset: 0,
+      }
+      return writeCommit({
+        fs,
+        dir,
+        commit: { message, tree, parent, author, committer: author },
+      })
+    }
+    const ancestor = await createCommit('Ancestor', [], original, 4)
+    const first = await createCommit('First parent', [ancestor], original, 3)
+    const second = await createCommit('Second parent', [ancestor], modified, 2)
+    const merge = await createCommit('Merge', [first, second], original, 5)
+
+    const commits = await log({ fs, dir, ref: merge, filepath: 'file.txt' })
+    expect(commits.map(({ oid }) => oid)).toEqual([ancestor, second])
+  })
+
+  it('deduplicates an annotated merge parent by its resolved commit', async () => {
+    const { fs, dir } = await makeFixture('test-init')
+    const tree = await writeTree({ fs, dir, tree: [] })
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1700000000,
+      timezoneOffset: 0,
+    }
+    const write = (message, parent) =>
+      writeCommit({
+        fs,
+        dir,
+        commit: { message, tree, parent, author, committer: author },
+      })
+    const first = await write('First parent', [])
+    const second = await write('Second parent', [])
+    const tag = await writeTag({
+      fs,
+      dir,
+      tag: {
+        object: first,
+        type: 'commit',
+        tag: 'first',
+        tagger: author,
+        message: 'First parent tag',
+      },
+    })
+    const merge = await write('Merge', [first, second, tag])
+
+    const commits = await log({ fs, dir, ref: merge })
+    expect(commits.map(({ oid }) => oid)).toEqual([merge, second, first])
+  })
+
   it('includes commits that only change a file mode', async () => {
     const { fs, dir } = await makeFixture('test-init')
     const author = {
