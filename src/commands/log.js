@@ -183,8 +183,7 @@ export async function _log({
     if (!shallowCommits.has(commit.oid)) {
       // Add the parents of this commit to the queue
       // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
-      for (let i = commit.commit.parent.length - 1; i >= 0; i--) {
-        const oid = commit.commit.parent[i]
+      for (const oid of commit.commit.parent) {
         if (!visited.has(oid) && !tips.some(c => c.oid === oid)) {
           const commit = await _readCommit({ fs, cache, gitdir, oid })
           tips.push(commit)

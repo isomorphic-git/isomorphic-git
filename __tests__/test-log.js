@@ -62,7 +62,7 @@ describe('log', () => {
 
     const commits = await log({ fs, dir, ref: 'main' })
     const messages = commits.map(x => x.commit.message.trim())
-    expect(messages).toEqual(['M', 'B', 'C', 'A'])
+    expect(messages).toEqual(['M', 'C', 'B', 'A'])
   })
 
   it('includes commits that only change a file mode', async () => {
