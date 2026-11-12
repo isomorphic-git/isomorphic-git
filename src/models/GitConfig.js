@@ -19,10 +19,10 @@ const bool = val => {
   }
 
   val = val.trim().toLowerCase()
-  if (val === 'true' || val === 'yes' || val === 'on') return true
-  if (val === 'false' || val === 'no' || val === 'off') return false
+  if (val === 'true' || val === 'yes' || val === 'on' || val === '1') return true
+  if (val === 'false' || val === 'no' || val === 'off' || val === '0') return false
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
+    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', or '0', but got ${val}`
   )
 }
 
@@ -33,7 +33,7 @@ const schema = {
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
-    bigFileThreshold: num,
+    bigfilethreshold: num,
   },
 }
 
@@ -201,7 +201,7 @@ export class GitConfig {
     const allValues = this.parsedConfig
       .filter(config => config.path === normalizedPath)
       .map(({ section, name, value }) => {
-        const fn = schema[section] && schema[section][name]
+        const fn = schema[lower(section)] && schema[lower(section)][lower(name)]
         return fn ? fn(value) : value
       })
     return getall ? allValues : allValues.pop()
