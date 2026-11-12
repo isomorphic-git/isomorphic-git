@@ -103,4 +103,20 @@ describe('isIgnored', () => {
       false
     )
   })
+
+  it('should honor core.ignorecase=false and gitignore [!] character classes', async () => {
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await fs.write(gitdir + '/config', '[core]\n\tignorecase = false\n')
+    await writeGitIgnore(fs, dir, ['README.md'])
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      false
+    )
+
+    await writeGitIgnore(fs, dir, ['[!a]*'])
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'abc' })).toBe(false)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'xyz' })).toBe(true)
+  })
 })
