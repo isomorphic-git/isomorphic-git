@@ -43,6 +43,7 @@ original_id: alphabetic
 - [listRemotes](listRemotes)
 - [listServerRefs](listServerRefs)
 - [listTags](listTags)
+- [listUnmergedFiles](listUnmergedFiles)
 - [log](log)
 - [merge](merge)
 - [packObjects](packObjects)

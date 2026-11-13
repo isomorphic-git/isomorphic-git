@@ -13,6 +13,7 @@
       "fastForward",
       "merge",
       "abortMerge",
+      "listUnmergedFiles",
       "walk",
       "stash"
     ],

@@ -6,11 +6,10 @@ import * as git from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
-// cherryPick applies the resulting tree to the working directory via
-// applyTreeChanges. It must not write a file (or mkdir) whose parent path
-// traverses a symlink, exactly like checkout. Canonical git replaces the
-// symlink with a real directory instead of following it; isomorphic-git
-// refuses the unsafe write. (node-only: needs real symlinks.)
+// cherryPick writes the resulting tree to the working directory. It must never
+// write a file (or mkdir) through a symlink. Like canonical git, it replaces a
+// tracked symlink that the picked commit turns into a directory with a real
+// directory, instead of following it. (node-only: needs real symlinks.)
 describe('cherryPick symlinked leading path', () => {
   it('does not write through a tracked directory symlink', async () => {
     const { fs, dir, gitdir } = await makeFixture(
@@ -114,23 +113,19 @@ describe('cherryPick symlinked leading path', () => {
     const lst = await fsp.lstat(join(dir, 'link'))
     expect(lst.isSymbolicLink()).toBe(true)
 
-    let error
-    try {
-      await git.cherryPick({
-        fs,
-        dir,
-        gitdir,
-        oid: evilCommit,
-        committer: author,
-      })
-    } catch (e) {
-      error = e
-    }
-    expect(error).toBeDefined()
-    const inner =
-      error && error.errors && error.errors[0] ? error.errors[0] : error
-    expect(`${inner.code || inner.name}`).toMatch(/unsafe/i)
+    await git.cherryPick({
+      fs,
+      dir,
+      gitdir,
+      oid: evilCommit,
+      committer: author,
+    })
 
+    // Like git: link is now a real directory inside the working tree.
+    expect((await fsp.lstat(join(dir, 'link'))).isDirectory()).toBe(true)
+    expect(await fsp.readFile(join(dir, 'link', 'marker'), 'utf8')).toBe(
+      'pwned\n'
+    )
     // The marker must not have been written through the symlink into the sink.
     await expect(
       fsp.readFile(join(sink, 'marker'), 'utf8')
