@@ -328,6 +328,46 @@ describe('GitConfig', () => {
       expect(d).toEqual(true)
     })
 
+    it('section and variable names are case insensitive', async () => {
+      // `git config core.fileMode false` writes the key as `fileMode`
+      const config = GitConfig.from(`[Core]
+      fileMode = false
+      BARE = true
+      LogAllRefUpdates = false
+      symLinks = false
+      ignoreCase = true
+      bigfilethreshold = 2k`)
+      const a = await config.get('core.filemode')
+      const b = await config.get('core.bare')
+      const c = await config.get('core.logallrefupdates')
+      const d = await config.get('core.symlinks')
+      const e = await config.get('core.ignorecase')
+      const f = await config.get('core.bigFileThreshold')
+      expect(a).toEqual(false)
+      expect(b).toEqual(true)
+      expect(c).toEqual(false)
+      expect(d).toEqual(false)
+      expect(e).toEqual(true)
+      expect(f).toEqual(2048)
+    })
+
+    it('numeric and empty boolean', async () => {
+      // git accepts integers (0 is false) and an empty value (false)
+      const config = GitConfig.from(`[core]
+      fileMode = 0
+      bare = 1
+      logallrefupdates =
+      symlinks = 2`)
+      const a = await config.get('core.filemode')
+      const b = await config.get('core.bare')
+      const c = await config.get('core.logallrefupdates')
+      const d = await config.get('core.symlinks')
+      expect(a).toEqual(false)
+      expect(b).toEqual(true)
+      expect(c).toEqual(false)
+      expect(d).toEqual(true)
+    })
+
     it('numeric suffix', async () => {
       const configA = GitConfig.from(`[core]
       bigFileThreshold = 2k`)

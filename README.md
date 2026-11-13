@@ -468,6 +468,9 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/SergioSRcode"><img src="https://avatars.githubusercontent.com/u/104135678?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Sergio</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=SergioSRcode" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=SergioSRcode" title="Documentation">📖</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=SergioSRcode" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://onmax.me/hire"><img src="https://avatars.githubusercontent.com/u/22072217?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Max</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=onmax" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/goranai"><img src="https://avatars.githubusercontent.com/u/28477490?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Goran</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=goranai" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=goranai" title="Tests">⚠️</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
