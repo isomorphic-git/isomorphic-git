@@ -13,6 +13,10 @@
       "fastForward",
       "merge",
       "abortMerge",
+      "listUnmergedFiles",
+      "rebase",
+      "continueRebase",
+      "abortRebase",
       "walk",
       "stash"
     ],

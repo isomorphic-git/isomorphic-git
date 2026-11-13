@@ -11,10 +11,13 @@ import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
+import { clearMergeState } from '../utils/mergeState.js'
 import { modified } from '../utils/modified.js'
 
 /**
  * Abort a merge in progress.
+ *
+ * Like `git merge --abort`, it forgets the merge or cherry-pick in progress (`MERGE_HEAD`, `MERGE_MSG`, `CHERRY_PICK_HEAD`).
  *
  * Based on the behavior of git reset --merge, i.e.  "Resets the index and updates the files in the working tree that are different between <commit> and HEAD, but keeps those which are different between the index and working tree (i.e. which have changes which have not been added). If a file that is different between <commit> and the index has unstaged changes, reset is aborted."
  *
@@ -119,6 +122,7 @@ export async function abortMerge({
         }
       }
     )
+    await clearMergeState({ fs, gitdir: updatedGitdir })
   } catch (err) {
     err.caller = 'git.abortMerge'
     throw err

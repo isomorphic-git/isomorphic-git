@@ -4,6 +4,7 @@ import { STAGE } from './api/STAGE.js'
 import { TREE } from './api/TREE.js'
 import { WORKDIR } from './api/WORKDIR.js'
 import { abortMerge } from './api/abortMerge.js'
+import { abortRebase } from './api/abortRebase.js'
 import { add } from './api/add.js'
 import { addNote } from './api/addNote.js'
 import { addRemote } from './api/addRemote.js'
@@ -13,6 +14,7 @@ import { checkout } from './api/checkout.js'
 import { cherryPick } from './api/cherryPick.js'
 import { clone } from './api/clone.js'
 import { commit } from './api/commit.js'
+import { continueRebase } from './api/continueRebase.js'
 import { currentBranch } from './api/currentBranch.js'
 import { deleteBranch } from './api/deleteBranch.js'
 import { deleteRef } from './api/deleteRef.js'
@@ -40,6 +42,7 @@ import { listRefs } from './api/listRefs.js'
 import { listRemotes } from './api/listRemotes.js'
 import { listServerRefs } from './api/listServerRefs.js'
 import { listTags } from './api/listTags.js'
+import { listUnmergedFiles } from './api/listUnmergedFiles.js'
 import { log } from './api/log.js'
 import { merge } from './api/merge.js'
 import { packObjects } from './api/packObjects.js'
@@ -51,6 +54,7 @@ import { readNote } from './api/readNote.js'
 import { readObject } from './api/readObject.js'
 import { readTag } from './api/readTag.js'
 import { readTree } from './api/readTree.js'
+import { rebase } from './api/rebase.js'
 import { remove } from './api/remove.js'
 import { removeNote } from './api/removeNote.js'
 import { renameBranch } from './api/renameBranch.js'
@@ -79,6 +83,7 @@ export {
   TREE,
   WORKDIR,
   abortMerge,
+  abortRebase,
   add,
   addNote,
   addRemote,
@@ -88,6 +93,7 @@ export {
   checkout,
   clone,
   commit,
+  continueRebase,
   getConfig,
   getConfigAll,
   setConfig,
@@ -116,6 +122,7 @@ export {
   listRemotes,
   listServerRefs,
   listTags,
+  listUnmergedFiles,
   log,
   merge,
   packObjects,
@@ -127,6 +134,7 @@ export {
   readObject,
   readTag,
   readTree,
+  rebase,
   remove,
   removeNote,
   renameBranch,
@@ -155,6 +163,7 @@ export default {
   WORKDIR,
   add,
   abortMerge,
+  abortRebase,
   addNote,
   addRemote,
   annotatedTag,
@@ -163,6 +172,7 @@ export default {
   checkout,
   clone,
   commit,
+  continueRebase,
   getConfig,
   getConfigAll,
   setConfig,
@@ -191,6 +201,7 @@ export default {
   listRemotes,
   listServerRefs,
   listTags,
+  listUnmergedFiles,
   log,
   merge,
   packObjects,
@@ -202,6 +213,7 @@ export default {
   readObject,
   readTag,
   readTree,
+  rebase,
   remove,
   removeNote,
   renameBranch,

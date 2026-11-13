@@ -199,7 +199,7 @@ export class GitIndex {
     }
   }
 
-  insert({ filepath, stats, oid, stage = 0 }) {
+  insert({ filepath, stats, oid, stage = 0, mode }) {
     if (!stats) {
       stats = {
         ctimeSeconds: 0,
@@ -229,7 +229,8 @@ export class GitIndex {
       // We provide a fallback value for `mode` here because not all fs
       // implementations assign it, but we use it in GitTree.
       // '100644' is for a "regular non-executable file"
-      mode: stats.mode || 0o100644,
+      // An explicit `mode` wins, for entries with no file to stat (merge stages).
+      mode: mode || stats.mode || 0o100644,
       uid: stats.uid,
       gid: stats.gid,
       size: stats.size,

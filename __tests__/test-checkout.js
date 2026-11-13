@@ -3,6 +3,7 @@ import * as path from 'path'
 import {
   Errors,
   checkout,
+  init,
   currentBranch,
   listFiles,
   add,
@@ -22,6 +23,7 @@ import {
   writeRef,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
+import { GitIndexManager } from 'isomorphic-git/internal-apis'
 
 /* eslint-env node, browser, jasmine */
 
@@ -966,5 +968,346 @@ describe('checkout', () => {
       ['src/index.js', 1, 1, 1],
     ])
     expect(indexWrites).toBe(1)
+  })
+  it('checkout overwrites an untracked file that .gitignore ignores, like git', async () => {
+    for (const ignore of [true, false]) {
+      const { fs, dir, gitdir } = await makeFixture(
+        `tmp-checkout-ignored-${ignore}`
+      )
+      const author = { name: 'Git', email: 'git@example.org' }
+      await init({ fs, dir, gitdir })
+      await fs.write(`${dir}/.gitignore`, ignore ? '.local\n' : '')
+      await add({ fs, dir, gitdir, filepath: '.gitignore' })
+      await commit({ fs, dir, gitdir, author, message: 'base' })
+      await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+      await fs.write(`${dir}/.local/folder.lock`, 'theirs\n')
+      await add({
+        fs,
+        dir,
+        gitdir,
+        filepath: '.local/folder.lock',
+        force: true,
+      })
+      await commit({ fs, dir, gitdir, author, message: 'feature' })
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      await fs.write(`${dir}/.local/folder.lock`, 'mine\n')
+
+      if (ignore) {
+        // dryRun reports no conflict and writes nothing
+        await checkout({ fs, dir, gitdir, ref: 'feature', dryRun: true })
+        expect(await currentBranch({ fs, dir, gitdir })).toBe('master')
+        expect(await fs.read(`${dir}/.local/folder.lock`, 'utf8')).toBe(
+          'mine\n'
+        )
+      }
+      let error = null
+      try {
+        await checkout({ fs, dir, gitdir, ref: 'feature' })
+      } catch (e) {
+        error = e
+      }
+      if (ignore) {
+        expect(error).toBeNull()
+        expect(await currentBranch({ fs, dir, gitdir })).toBe('feature')
+        expect(await fs.read(`${dir}/.local/folder.lock`, 'utf8')).toBe(
+          'theirs\n'
+        )
+        expect(await statusMatrix({ fs, dir, gitdir })).toEqual([
+          ['.gitignore', 1, 1, 1],
+          ['.local/folder.lock', 1, 1, 1],
+        ])
+      } else {
+        expect(error && error.code).toBe(Errors.CheckoutConflictError.code)
+        expect(await fs.read(`${dir}/.local/folder.lock`, 'utf8')).toBe(
+          'mine\n'
+        )
+      }
+    }
+  })
+  it('checkout overwrites an ignored untracked file whose mode differs, like git', async () => {
+    for (const commitExecutable of [true, false]) {
+      for (const sameContent of [true, false]) {
+        const { fs, dir, gitdir } = await makeFixture(
+          `tmp-checkout-ignored-mode-${commitExecutable}-${sameContent}`
+        )
+        const author = { name: 'Git', email: 'git@example.org' }
+        await init({ fs, dir, gitdir })
+        await fs.write(`${dir}/.gitignore`, '*.sh\n')
+        await add({ fs, dir, gitdir, filepath: '.gitignore' })
+        await commit({ fs, dir, gitdir, author, message: 'base' })
+        await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+        await fs.write(`${dir}/run.sh`, 'theirs\n', {
+          mode: commitExecutable ? 0o777 : 0o666,
+        })
+        const { mode: commitFileMode } = await fs.lstat(`${dir}/run.sh`)
+        await add({ fs, dir, gitdir, filepath: 'run.sh', force: true })
+        await commit({ fs, dir, gitdir, author, message: 'feature' })
+        await checkout({ fs, dir, gitdir, ref: 'master' })
+        await fs.write(`${dir}/run.sh`, sameContent ? 'theirs\n' : 'mine\n', {
+          mode: commitExecutable ? 0o666 : 0o777,
+        })
+        expect((await fs.lstat(`${dir}/run.sh`)).mode).not.toBe(commitFileMode)
+
+        await checkout({ fs, dir, gitdir, ref: 'feature' })
+
+        expect(await currentBranch({ fs, dir, gitdir })).toBe('feature')
+        expect(await fs.read(`${dir}/run.sh`, 'utf8')).toBe('theirs\n')
+        expect((await fs.lstat(`${dir}/run.sh`)).mode).toBe(commitFileMode)
+        // statusMatrix refreshes modes from disk, so read the index itself.
+        await GitIndexManager.acquire(
+          { fs, gitdir, cache: {} },
+          async function (index) {
+            expect(index.entriesMap.get('run.sh').mode).toBe(
+              commitExecutable ? 0o100755 : 0o100644
+            )
+          }
+        )
+      }
+    }
+  })
+  it('checkout overwrites a file ignored by common rules, like git', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-checkout-common-rules')
+    const author = { name: 'Git', email: 'git@example.org' }
+    const filepaths = [
+      '.env',
+      'build/out.bin',
+      'dist/app.js',
+      'logs/a.log',
+      'node_modules/x/index.js',
+      'src/cache/c',
+    ]
+    await init({ fs, dir, gitdir })
+    await fs.write(`${dir}/README`, 'base\n')
+    await add({ fs, dir, gitdir, filepath: 'README' })
+    await commit({ fs, dir, gitdir, author, message: 'base' })
+    await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+    for (const filepath of filepaths) {
+      await fs.write(`${dir}/${filepath}`, 'theirs\n')
+      await add({ fs, dir, gitdir, filepath })
+    }
+    await commit({ fs, dir, gitdir, author, message: 'feature' })
+    await checkout({ fs, dir, gitdir, ref: 'master' })
+    for (const filepath of filepaths) {
+      await fs.write(`${dir}/${filepath}`, 'mine\n')
+    }
+    await fs.write(
+      `${dir}/.gitignore`,
+      '# dependencies\r\nnode_modules/\r\n/dist\r\n*.log\r\nbuild/\r\n.env\r\n**/cache\r\n'
+    )
+
+    await checkout({ fs, dir, gitdir, ref: 'feature' })
+
+    expect(await currentBranch({ fs, dir, gitdir })).toBe('feature')
+    for (const filepath of filepaths) {
+      expect(await fs.read(`${dir}/${filepath}`, 'utf8')).toBe('theirs\n')
+    }
+  })
+  it('checkout does not depend on core.ignorecase to overwrite an ignored file', async () => {
+    // core.ignorecase may also be set outside the repository config, which
+    // isomorphic-git does not read, so only an answer it cannot change counts.
+    for (const ignoreCase of [true, false, undefined, '1']) {
+      for (const [rule, overwritten] of [
+        ['*.lock', true],
+        ['*.LOCK', false],
+      ]) {
+        const { fs, dir, gitdir } = await makeFixture(
+          `tmp-checkout-ignorecase-${ignoreCase}-${overwritten}`
+        )
+        const author = { name: 'Git', email: 'git@example.org' }
+        await init({ fs, dir, gitdir })
+        await fs.write(`${dir}/.gitignore`, `${rule}\n`)
+        await add({ fs, dir, gitdir, filepath: '.gitignore' })
+        await commit({ fs, dir, gitdir, author, message: 'base' })
+        await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+        await fs.write(`${dir}/a.lock`, 'theirs\n')
+        await add({ fs, dir, gitdir, filepath: 'a.lock', force: true })
+        await commit({ fs, dir, gitdir, author, message: 'feature' })
+        await checkout({ fs, dir, gitdir, ref: 'master' })
+        await fs.write(`${dir}/a.lock`, 'mine\n')
+        await setConfig({
+          fs,
+          dir,
+          gitdir,
+          path: 'core.ignorecase',
+          value: ignoreCase,
+        })
+
+        let error = null
+        try {
+          await checkout({ fs, dir, gitdir, ref: 'feature' })
+        } catch (e) {
+          error = e
+        }
+        expect([ignoreCase, rule, error && error.code]).toEqual([
+          ignoreCase,
+          rule,
+          overwritten ? null : Errors.CheckoutConflictError.code,
+        ])
+        expect(await fs.read(`${dir}/a.lock`, 'utf8')).toBe(
+          overwritten ? 'theirs\n' : 'mine\n'
+        )
+      }
+    }
+  })
+  // git keeps each of these files, but the `ignore` package that matches the
+  // rules would call them ignored, so checkout must report the conflict.
+  /** @type {Array<[string, Object<string, string>, string, boolean | undefined]>} */
+  const notIgnored = [
+    ['a negated class', { '.gitignore': '*.[!o]\n' }, 'main.o', false],
+    ['a name made of dots', { '.gitignore': '*\n' }, '...', false],
+    ['a class with a wildcard', { '.gitignore': '[*]\n' }, ']', false],
+    ['an escaped wildcard', { '.gitignore': '\\*\n' }, 'a', false],
+    ['a rule in info/exclude', { 'info/exclude': '*.[!o]\n' }, 'main.o', false],
+    ['a negated folder', { '.gitignore': '/*\n!/src/\n' }, 'src/main.c', false],
+    [
+      'the gitignore manual example',
+      { '.gitignore': '*\n!*/\n!*.c\n' },
+      'src/main.c',
+      false,
+    ],
+    [
+      'a negated folder in a deeper .gitignore',
+      { '.gitignore': 'd/*\n', 'd/.gitignore': '!e/\n' },
+      'd/e/a',
+      false,
+    ],
+    [
+      'a trailing /**/',
+      { '.gitignore': '.local/**/\n' },
+      '.local/f.lock',
+      false,
+    ],
+    ['a trailing tab', { '.gitignore': '*.lock\t\n' }, 'a.lock', false],
+    [
+      'a trailing no-break space',
+      { '.gitignore': '*\u00a0\n' },
+      'a.lock',
+      false,
+    ],
+    [
+      'a second carriage return',
+      { '.gitignore': '*.lock\r\r\n' },
+      'a.lock',
+      false,
+    ],
+    [
+      '? and a non-ASCII name',
+      { '.gitignore': '?.lock\n' },
+      '\u00e9.lock',
+      false,
+    ],
+    ['non-ASCII case', { '.gitignore': '\u00c9.lock\n' }, '\u00e9.lock', true],
+    [
+      'a negation that depends on case',
+      { '.gitignore': '*.lock\n!KEEP.lock\n' },
+      'keep.lock',
+      undefined,
+    ],
+  ]
+  for (const [kind, rules, filepath, ignoreCase] of notIgnored) {
+    it(`checkout keeps a file git does not ignore: ${kind}`, async () => {
+      const { fs, dir, gitdir } = await makeFixture(
+        `tmp-checkout-not-ignored-${kind.replace(/[^a-z]/g, '-')}`
+      )
+      const author = { name: 'Git', email: 'git@example.org' }
+      await init({ fs, dir, gitdir })
+      await setConfig({
+        fs,
+        dir,
+        gitdir,
+        path: 'core.ignorecase',
+        value: ignoreCase,
+      })
+      await fs.write(`${dir}/README`, 'base\n')
+      await add({ fs, dir, gitdir, filepath: 'README' })
+      await commit({ fs, dir, gitdir, author, message: 'base' })
+      await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+      await fs.write(`${dir}/${filepath}`, 'theirs\n')
+      await add({ fs, dir, gitdir, filepath, force: true })
+      await commit({ fs, dir, gitdir, author, message: 'feature' })
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      await fs.write(`${dir}/${filepath}`, 'mine\n')
+      for (const [file, content] of Object.entries(rules)) {
+        await fs.write(
+          file === 'info/exclude' ? `${gitdir}/${file}` : `${dir}/${file}`,
+          content
+        )
+      }
+
+      let error = null
+      try {
+        await checkout({ fs, dir, gitdir, ref: 'feature' })
+      } catch (e) {
+        error = e
+      }
+      expect(error && error.code).toBe(Errors.CheckoutConflictError.code)
+      expect(error.data.filepaths).toEqual([filepath])
+      expect(await currentBranch({ fs, dir, gitdir })).toBe('master')
+      expect(await fs.read(`${dir}/${filepath}`, 'utf8')).toBe('mine\n')
+    })
+  }
+  it('checkout overwrites an untracked file that .git/info/exclude ignores', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-checkout-info-exclude')
+    const author = { name: 'Git', email: 'git@example.org' }
+    await init({ fs, dir, gitdir })
+    await fs.write(`${dir}/README`, 'base\n')
+    await add({ fs, dir, gitdir, filepath: 'README' })
+    await commit({ fs, dir, gitdir, author, message: 'base' })
+    await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+    await fs.write(`${dir}/a.lock`, 'theirs\n')
+    await add({ fs, dir, gitdir, filepath: 'a.lock' })
+    await commit({ fs, dir, gitdir, author, message: 'feature' })
+    await checkout({ fs, dir, gitdir, ref: 'master' })
+    await fs.write(`${dir}/a.lock`, 'mine\n')
+    await fs.write(
+      `${gitdir}/info/exclude`,
+      '# [a comment] is not a rule\n*.lock\n'
+    )
+
+    await checkout({ fs, dir, gitdir, ref: 'feature' })
+
+    expect(await currentBranch({ fs, dir, gitdir })).toBe('feature')
+    expect(await fs.read(`${dir}/a.lock`, 'utf8')).toBe('theirs\n')
+  })
+  it('checkout keeps an ignored file when a rule file cannot be read', async () => {
+    for (const unreadable of ['d/.gitignore', 'info/exclude']) {
+      const { fs, dir, gitdir } = await makeFixture(
+        `tmp-checkout-unreadable-${unreadable.length}`
+      )
+      const author = { name: 'Git', email: 'git@example.org' }
+      await init({ fs, dir, gitdir })
+      await fs.write(`${dir}/README`, 'base\n')
+      await add({ fs, dir, gitdir, filepath: 'README' })
+      await commit({ fs, dir, gitdir, author, message: 'base' })
+      await branch({ fs, dir, gitdir, ref: 'feature', checkout: true })
+      await fs.write(`${dir}/d/a.lock`, 'theirs\n')
+      await add({ fs, dir, gitdir, filepath: 'd/a.lock' })
+      await commit({ fs, dir, gitdir, author, message: 'feature' })
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      await fs.write(`${dir}/d/a.lock`, 'mine\n')
+      await fs.write(`${dir}/d/.gitignore`, '*.lock\n')
+      await fs.write(`${gitdir}/info/exclude`, '*.lock\n')
+      const unreadablePath =
+        unreadable === 'info/exclude'
+          ? `${gitdir}/info/exclude`
+          : `${dir}/${unreadable}`
+      const readFile = fs._readFile
+      fs._readFile = async (filepath, options) => {
+        if (filepath === unreadablePath) {
+          throw Object.assign(new Error('EACCES'), { code: 'EACCES' })
+        }
+        return readFile(filepath, options)
+      }
+
+      let error = null
+      try {
+        await checkout({ fs, dir, gitdir, ref: 'feature' })
+      } catch (e) {
+        error = e
+      }
+      fs._readFile = readFile
+      expect(error && error.code).toBe(Errors.CheckoutConflictError.code)
+      expect(await fs.read(`${dir}/d/a.lock`, 'utf8')).toBe('mine\n')
+    }
   })
 })

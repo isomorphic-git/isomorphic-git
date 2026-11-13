@@ -2,6 +2,7 @@
 import '../typedefs.js'
 
 import { EmptyCommitError } from '../errors/EmptyCommitError.js'
+import { MergeInProgressError } from '../errors/MergeInProgressError.js'
 import { MissingNameError } from '../errors/MissingNameError.js'
 import { MissingParameterError } from '../errors/MissingParameterError.js'
 import { NoCommitError } from '../errors/NoCommitError.js'
@@ -16,6 +17,7 @@ import { hasObject } from '../storage/hasObject.js'
 import { _readObject as readObject } from '../storage/readObject.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 import { flatFileListToDirectoryStructure } from '../utils/flatFileListToDirectoryStructure.js'
+import { clearMergeState, stripConflictsComment } from '../utils/mergeState.js'
 import { normalizeAuthorObject } from '../utils/normalizeAuthorObject.js'
 import { normalizeCommitterObject } from '../utils/normalizeCommitterObject.js'
 
@@ -49,6 +51,7 @@ const EMPTY_TREE_OID = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
  * @param {string} [args.ref]
  * @param {string[]} [args.parent]
  * @param {string} [args.tree]
+ * @param {boolean} [args.finishMerge = false] - Finish a merge or cherry-pick in progress, like `git commit`
  *
  * @returns {Promise<string>} Resolves successfully with the SHA-1 object id of the newly created commit.
  */
@@ -68,6 +71,7 @@ export async function _commit({
   ref,
   parent,
   tree,
+  finishMerge = false,
 }) {
   // Determine ref and the commit pointed to by ref, and if it is the initial commit
   let initialCommit = false
@@ -81,6 +85,44 @@ export async function _commit({
       ref: 'HEAD',
       depth: 2,
     })
+  }
+
+  // A merge, cherry-pick or rebase that stopped on conflicts is finished by
+  // the next commit on HEAD, like `git commit` does: its other parents come
+  // from MERGE_HEAD, its message from MERGE_MSG, and a cherry-pick keeps the
+  // picked commit's author (a rebase does not: git only reads the author from
+  // CHERRY_PICK_HEAD). The commits merge, cherryPick and rebase make
+  // themselves leave it alone.
+  const onHead =
+    finishMerge &&
+    ref === (await GitRefManager.resolve({ fs, gitdir, ref: 'HEAD', depth: 2 }))
+  const readState = async file =>
+    /** @type {string|null} */ (
+      await fs.read(`${gitdir}/${file}`, { encoding: 'utf8' })
+    )
+  const mergeHead = onHead ? await readState('MERGE_HEAD') : null
+  const cherryPickHead = onHead ? await readState('CHERRY_PICK_HEAD') : null
+  // Like git, refuse to amend in the middle of one.
+  if (amend && (mergeHead || cherryPickHead)) {
+    throw new MergeInProgressError(
+      mergeHead ? 'MERGE_HEAD' : 'CHERRY_PICK_HEAD'
+    )
+  }
+  const rebaseHead = onHead && !amend ? await readState('REBASE_HEAD') : null
+  // Like git, a merge in progress wins: its commit is the current user's.
+  const pickedCommit =
+    cherryPickHead && !mergeHead
+      ? (await readCommit({ fs, gitdir, oid: cherryPickHead.trim(), cache }))
+          .commit
+      : undefined
+  // MERGE_MSG supplies the default message, without the conflict list that
+  // was appended to it as comments.
+  if (!message && !amend) {
+    const mergeMsg =
+      (mergeHead || cherryPickHead || rebaseHead) &&
+      (await readState('MERGE_MSG'))
+    if (mergeMsg) message = stripConflictsComment(mergeMsg)
+    if (!message) throw new MissingParameterError('message')
   }
 
   let refOid, refCommit
@@ -106,7 +148,12 @@ export async function _commit({
 
   // Determine author and committer information
   const author = !amend
-    ? await normalizeAuthorObject({ fs, gitdir, author: _author })
+    ? await normalizeAuthorObject({
+        fs,
+        gitdir,
+        author: _author,
+        commit: pickedCommit,
+      })
     : await normalizeAuthorObject({
         fs,
         gitdir,
@@ -115,11 +162,13 @@ export async function _commit({
       })
   if (!author) throw new MissingNameError('author')
 
+  // Whoever commits is the committer, as in git: the committer defaults to
+  // the author the caller gave, never to the one taken from a picked commit.
   const committer = !amend
     ? await normalizeCommitterObject({
         fs,
         gitdir,
-        author,
+        author: pickedCommit ? _author : author,
         committer: _committer,
       })
     : await normalizeCommitterObject({
@@ -143,7 +192,14 @@ export async function _commit({
         tree = await constructTree({ fs, gitdir, inode, dryRun })
       }
 
-      // Determine parents of this commit
+      // Determine parents of this commit. Those in MERGE_HEAD are peeled like
+      // given ones, since git writes an annotated tag there as it is.
+      if (!parent && mergeHead) {
+        parent = [
+          ...(refOid ? [refOid] : []),
+          ...mergeHead.split('\n').filter(Boolean),
+        ]
+      }
       if (!parent) {
         if (!amend) {
           parent = refOid ? [refOid] : []
@@ -185,12 +241,8 @@ export async function _commit({
       }
 
       // Determine message of this commit
-      if (!message) {
-        if (!amend) {
-          throw new MissingParameterError('message')
-        } else {
-          message = refCommit.commit.message
-        }
+      if (!message && amend) {
+        message = refCommit.commit.message
       }
 
       // Create and write new Commit object
@@ -219,6 +271,7 @@ export async function _commit({
           ref: detachedHead ? 'HEAD' : ref,
           value: oid,
         })
+        if (onHead) await clearMergeState({ fs, gitdir })
       }
       return oid
     }

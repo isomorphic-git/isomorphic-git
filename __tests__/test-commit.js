@@ -15,6 +15,7 @@ import {
   writeTag,
   status,
   statusMatrix,
+  setConfig,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -807,5 +808,286 @@ describe('commit', () => {
     })
     const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
     expect(newCommit.tree).toBe(parentCommit.tree)
+  })
+
+  it('finishes a merge recorded in MERGE_HEAD and MERGE_MSG', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-commit-merge-head')
+    await init({ fs, dir, gitdir })
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    await fs.write(`${dir}/a.txt`, 'a')
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    const first = await commit({ fs, dir, gitdir, message: 'first', author })
+    const other = await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'other',
+      author,
+      parent: [],
+      ref: 'refs/heads/other',
+    })
+    await fs.write(`${gitdir}/MERGE_HEAD`, `${other}\n`)
+    await fs.write(
+      `${gitdir}/MERGE_MSG`,
+      'Merge it\n\n# Conflicts:\n#\ta.txt\n'
+    )
+
+    // A commit on another branch leaves the merge alone.
+    let error = null
+    try {
+      await commit({ fs, dir, gitdir, author, ref: 'refs/heads/other' })
+    } catch (e) {
+      error = e
+    }
+    expect(error.code).toBe(Errors.MissingParameterError.code)
+
+    const oid = await commit({ fs, dir, gitdir, author })
+    const { commit: merged } = await readCommit({ fs, gitdir, oid })
+    expect(merged.parent).toEqual([first, other])
+    expect(merged.message).toBe('Merge it\n')
+    expect(await resolveRef({ fs, gitdir, ref: 'master' })).toBe(oid)
+    expect(await fs.exists(`${gitdir}/MERGE_HEAD`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/MERGE_MSG`)).toBe(false)
+  })
+
+  it('finishes a cherry-pick recorded in CHERRY_PICK_HEAD and MERGE_MSG', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-commit-cherry-pick-head')
+    await init({ fs, dir, gitdir })
+    await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'Committer' })
+    await setConfig({
+      fs,
+      dir,
+      gitdir,
+      path: 'user.email',
+      value: 'committer@example.com',
+    })
+    const original = {
+      name: 'Original Author',
+      email: 'original@example.com',
+      timestamp: 1600000000,
+      timezoneOffset: 0,
+    }
+    await fs.write(`${dir}/a.txt`, 'a')
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    const first = await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'first',
+      author: original,
+    })
+    const message = 'picked subject\n\nbody\n'
+    const picked = await commit({
+      fs,
+      dir,
+      gitdir,
+      message,
+      author: original,
+      parent: [first],
+      ref: 'refs/heads/picked',
+    })
+    await fs.write(`${gitdir}/CHERRY_PICK_HEAD`, `${picked}\n`)
+    await fs.write(
+      `${gitdir}/MERGE_MSG`,
+      `${message}\n# Conflicts:\n#\ta.txt\n`
+    )
+    await fs.write(`${dir}/a.txt`, 'resolved')
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+
+    // Like `git commit`: the picked author and message, the current committer.
+    const oid = await commit({ fs, dir, gitdir })
+    const { commit: made } = await readCommit({ fs, gitdir, oid })
+    expect(made.message).toBe(message)
+    expect(made.author).toEqual(original)
+    expect(made.committer.name).toBe('Committer')
+    expect(made.committer.email).toBe('committer@example.com')
+    expect(made.committer.timestamp).not.toBe(original.timestamp)
+    expect(await fs.exists(`${gitdir}/CHERRY_PICK_HEAD`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/MERGE_MSG`)).toBe(false)
+  })
+  // master has "first"; other is an unrelated commit to merge.
+  async function mergeRepo(name) {
+    const { fs, dir, gitdir } = await makeFixture(name)
+    await init({ fs, dir, gitdir })
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    await fs.write(`${dir}/a.txt`, 'a')
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    const first = await commit({ fs, dir, gitdir, message: 'first', author })
+    const other = await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'other',
+      author,
+      parent: [],
+      ref: 'refs/heads/other',
+    })
+    return { fs, dir, gitdir, realGitdir: gitdir, author, first, other }
+  }
+
+  it('takes the message from MERGE_MSG the way git commit does', async () => {
+    const { fs, dir, gitdir, realGitdir, author, first, other } =
+      await mergeRepo('tmp-commit-merge-msg')
+    await fs.write(`${realGitdir}/MERGE_HEAD`, `${other}\n`)
+    // Comment lines go, and so does surrounding whitespace, as with
+    // `git stripspace --strip-comments`.
+    await fs.write(
+      `${realGitdir}/MERGE_MSG`,
+      '\n\nMerge it  \n\n\n#42 looks like a comment\n  indented # kept\nbody\t\n\n\n# Conflicts:\n#\ta.txt\n'
+    )
+    const oid = await commit({ fs, dir, gitdir, author })
+    const { commit: merged } = await readCommit({ fs, gitdir, oid })
+    expect(merged.parent).toEqual([first, other])
+    expect(merged.message).toBe('Merge it\n\n  indented # kept\nbody\n')
+
+    // Nothing but comments and blank lines: a message is still required.
+    await fs.write(`${realGitdir}/MERGE_HEAD`, `${other}\n`)
+    await fs.write(`${realGitdir}/MERGE_MSG`, '\n  \n# Conflicts:\n#\ta.txt\n')
+    let error = null
+    try {
+      await commit({ fs, dir, gitdir, author })
+    } catch (e) {
+      error = e
+    }
+    expect(error.code).toBe(Errors.MissingParameterError.code)
+    expect(await fs.exists(`${realGitdir}/MERGE_HEAD`)).toBe(true)
+  })
+
+  it('removes every file git keeps for a merge in progress', async () => {
+    const { fs, dir, gitdir, realGitdir, author, other } = await mergeRepo(
+      'tmp-commit-merge-state-files'
+    )
+    await fs.write(`${realGitdir}/MERGE_HEAD`, `${other}\n`)
+    // git only trims spaces, tabs and carriage returns, so \v and \f stay.
+    await fs.write(`${realGitdir}/MERGE_MSG`, 'Merge it\v\n\f\n')
+    // git writes these too.
+    await fs.write(`${realGitdir}/MERGE_MODE`, '')
+    await fs.write(`${realGitdir}/AUTO_MERGE`, `${other}\n`)
+
+    const oid = await commit({ fs, dir, gitdir, author })
+    const { commit: merged } = await readCommit({ fs, gitdir, oid })
+    expect(merged.message).toBe('Merge it\v\n\f\n')
+    for (const file of [
+      'MERGE_HEAD',
+      'MERGE_MSG',
+      'MERGE_MODE',
+      'AUTO_MERGE',
+    ]) {
+      expect(await fs.exists(`${realGitdir}/${file}`)).toBe(false)
+    }
+  })
+
+  it('lets a merge in progress win over a cherry-pick for the author, like git', async () => {
+    const { fs, dir, gitdir, realGitdir, first, other } = await mergeRepo(
+      'tmp-commit-merge-and-pick'
+    )
+    await setConfig({ fs, dir, gitdir, path: 'user.name', value: 'Committer' })
+    await setConfig({
+      fs,
+      dir,
+      gitdir,
+      path: 'user.email',
+      value: 'committer@example.com',
+    })
+    const picked = await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'picked',
+      author: {
+        name: 'Picked Author',
+        email: 'picked@example.com',
+        timestamp: 1600000000,
+        timezoneOffset: 0,
+      },
+      parent: [first],
+      ref: 'refs/heads/picked',
+    })
+    // A cherry-pick that stopped on conflicts while a merge was in progress.
+    await fs.write(`${realGitdir}/MERGE_HEAD`, `${other}\n`)
+    await fs.write(`${realGitdir}/CHERRY_PICK_HEAD`, `${picked}\n`)
+    await fs.write(`${realGitdir}/MERGE_MSG`, 'picked\n')
+
+    const oid = await commit({ fs, dir, gitdir })
+    const { commit: made } = await readCommit({ fs, gitdir, oid })
+    expect(made.parent).toEqual([first, other])
+    expect(made.author.name).toBe('Committer')
+    expect(made.author.email).toBe('committer@example.com')
+  })
+
+  it('peels an annotated tag in MERGE_HEAD, which git writes as it is', async () => {
+    const { fs, dir, gitdir, realGitdir, author, first, other } =
+      await mergeRepo('tmp-commit-merge-head-tag')
+    await annotatedTag({
+      fs,
+      dir,
+      gitdir,
+      ref: 'v1',
+      object: other,
+      message: 'v1',
+      tagger: author,
+    })
+    const tag = await resolveRef({ fs, gitdir, ref: 'refs/tags/v1' })
+    expect(tag).not.toBe(other)
+    await fs.write(`${realGitdir}/MERGE_HEAD`, `${tag}\n`)
+    await fs.write(`${realGitdir}/MERGE_MSG`, "Merge tag 'v1'\n")
+
+    const oid = await commit({ fs, dir, gitdir, author })
+    const { commit: merged } = await readCommit({ fs, gitdir, oid })
+    expect(merged.parent).toEqual([first, other])
+  })
+
+  it('leaves a merge in progress alone unless it commits on HEAD', async () => {
+    const { fs, dir, gitdir, realGitdir, author, first } = await mergeRepo(
+      'tmp-commit-merge-head-elsewhere'
+    )
+    const other = await resolveRef({ fs, gitdir, ref: 'refs/heads/other' })
+    await fs.write(`${realGitdir}/MERGE_HEAD`, `${other}\n`)
+    await fs.write(`${realGitdir}/MERGE_MSG`, 'Merge it\n')
+
+    for (const options of [
+      { ref: 'refs/heads/other' },
+      // Not expanded, so not the checked-out branch.
+      { ref: 'master' },
+      { noUpdateBranch: true },
+      { dryRun: true },
+    ]) {
+      await commit({ fs, dir, gitdir, author, message: 'not it', ...options })
+      expect(await fs.exists(`${realGitdir}/MERGE_HEAD`)).toBe(true)
+      expect(await fs.exists(`${realGitdir}/MERGE_MSG`)).toBe(true)
+    }
+    expect(await resolveRef({ fs, gitdir, ref: 'refs/heads/master' })).toBe(
+      first
+    )
+  })
+
+  it('refuses to amend in the middle of a merge or cherry-pick, like git', async () => {
+    const { fs, dir, gitdir, realGitdir, author, first } = await mergeRepo(
+      'tmp-commit-merge-head-amend'
+    )
+    for (const file of ['MERGE_HEAD', 'CHERRY_PICK_HEAD']) {
+      await fs.write(`${realGitdir}/${file}`, `${first}\n`)
+      let error = null
+      try {
+        await commit({ fs, dir, gitdir, author, amend: true, message: 'x' })
+      } catch (e) {
+        error = e
+      }
+      expect(error.code).toBe(Errors.MergeInProgressError.code)
+      expect(error.data.file).toBe(file)
+      expect(await resolveRef({ fs, gitdir, ref: 'master' })).toBe(first)
+      expect(await fs.exists(`${realGitdir}/${file}`)).toBe(true)
+      await fs.rm(`${realGitdir}/${file}`)
+    }
   })
 })

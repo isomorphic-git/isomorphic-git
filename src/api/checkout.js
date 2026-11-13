@@ -12,6 +12,8 @@ import { join } from '../utils/join.js'
  *
  * If the branch already exists it will check out that branch. Otherwise, it will create a new remote tracking branch set to track the remote branch of that name.
  *
+ * Like `git checkout`, a checkout that moves HEAD (not one limited to `filepaths`) forgets a [merge](./merge.md) or [cherry-pick](./cherryPick.md) in progress.
+ *
  * @param {object} args
  * @param {FsClient} args.fs - a file system implementation
  * @param {ProgressCallback} [args.onProgress] - optional progress event callback
