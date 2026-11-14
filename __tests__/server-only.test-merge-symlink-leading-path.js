@@ -176,6 +176,84 @@ describe('merge symlink safety', () => {
     )
   })
 
+  it('flushes a symlink into a directory the merge adds', async () => {
+    // `theirs` adds `newdir/` holding nothing but a symlink. The flush has to
+    // create that directory first: unlike writing a file, creating a symlink
+    // does not create its parents.
+    const { fs, dir, gitdir } = await makeFixture('test-merge-symlink-newdir')
+    await git.init({ fs, dir, gitdir })
+    const write = blob =>
+      git.writeBlob({ fs, dir, gitdir, blob: Buffer.from(blob) })
+    const tree = tree => git.writeTree({ fs, dir, gitdir, tree })
+    const commit = (message, treeOid, parent) =>
+      git.writeCommit({
+        fs,
+        dir,
+        gitdir,
+        commit: { message, tree: treeOid, parent, author, committer: author },
+      })
+    const shared = async content => ({
+      mode: '100644',
+      path: 'shared.txt',
+      oid: await write(content),
+      type: 'blob',
+    })
+
+    const base = await commit(
+      'base\n',
+      await tree([await shared('base\n')]),
+      []
+    )
+    const ours = await commit('ours\n', await tree([await shared('ours\n')]), [
+      base,
+    ])
+    const theirs = await commit(
+      'theirs\n',
+      await tree([
+        await shared('theirs\n'),
+        {
+          mode: '040000',
+          path: 'newdir',
+          type: 'tree',
+          oid: await tree([
+            {
+              mode: '120000',
+              path: 'link',
+              oid: await write('../shared.txt'),
+              type: 'blob',
+            },
+          ]),
+        },
+      ]),
+      [base]
+    )
+    for (const [ref, value] of [
+      ['refs/heads/master', ours],
+      ['refs/heads/theirs', theirs],
+    ]) {
+      await git.writeRef({ fs, dir, gitdir, ref, value, force: true })
+    }
+    await git.writeRef({
+      fs,
+      dir,
+      gitdir,
+      ref: 'HEAD',
+      value: 'refs/heads/master',
+      symbolic: true,
+      force: true,
+    })
+    await git.checkout({ fs, dir, gitdir, ref: 'master', force: true })
+
+    const error = await mergeTheirs({ fs, dir, gitdir })
+    expect(`${error.code || error.name}`).toBe('MergeConflictError')
+
+    const lst = await fsp.lstat(join(dir, 'newdir', 'link'))
+    expect(lst.isSymbolicLink()).toBe(true)
+    expect(await fsp.readlink(join(dir, 'newdir', 'link'))).toBe(
+      '../shared.txt'
+    )
+  })
+
   it('replaces a tracked symlink rather than writing through it', async () => {
     // `theirs` replaces `link` with a regular file. That is an ordinary merge
     // result, so it must succeed - but by replacing the symlink on disk, not by

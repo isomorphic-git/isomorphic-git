@@ -1,4 +1,5 @@
 import { assertNoSymlinkInLeadingPath } from './assertNoSymlinkInLeadingPath.js'
+import { dirname } from './dirname.js'
 
 /**
  * Materialize one tracked blob in the working tree.
@@ -34,6 +35,10 @@ export async function writeWorkingTreeEntry({
     await fs.rm(path)
   }
   if (symlink) {
+    // `fs.write` creates the missing parent directories itself, `fs.writelink`
+    // does not. The leading path is already checked above, so creating them
+    // here cannot traverse a symlink either.
+    await fs.mkdir(dirname(path))
     await fs.writelink(path, Buffer.from(content))
   } else {
     await fs.write(path, content, { mode })

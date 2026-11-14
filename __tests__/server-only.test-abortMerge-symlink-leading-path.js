@@ -3,6 +3,7 @@ import { promises as fsp } from 'fs'
 import { join } from 'path'
 
 import * as git from 'isomorphic-git'
+import { GitIndexManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -35,6 +36,7 @@ async function setup({ name, evilLink }) {
 
   await git.init({ fs, dir, gitdir })
   const ctx = {
+    secret,
     write: blob => git.writeBlob({ fs, dir, gitdir, blob: Buffer.from(blob) }),
     tree: tree => git.writeTree({ fs, dir, gitdir, tree }),
   }
@@ -120,6 +122,32 @@ describe('abortMerge symlink safety', () => {
     ).rejects.toBeDefined()
     expect((await fsp.lstat(join(dir, 'link'))).isSymbolicLink()).toBe(true)
     expect(await fsp.readFile(secret, 'utf8')).toBe(SENTINEL)
+  })
+
+  it('stages a restored symlink as a symlink', async () => {
+    // The reset writes `link` back as a symlink, so the index has to record it
+    // as mode 120000. Recording it as a regular file leaves the repository
+    // dirty with a type change that nothing asked for.
+    const { fs, dir, gitdir } = await setup({
+      name: 'test-abortMerge-symlink-index-mode',
+      evilLink: async ctx => ({
+        mode: '120000',
+        path: 'link',
+        oid: await ctx.write(ctx.secret),
+        type: 'blob',
+      }),
+    })
+
+    await git.abortMerge({ fs, dir, gitdir })
+
+    expect((await fsp.lstat(join(dir, 'link'))).isSymbolicLink()).toBe(true)
+    await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {
+      expect(index.entriesMap.get('link').mode).toBe(0o120000)
+    })
+    // Nothing changed, so nothing should look changed.
+    expect(await git.statusMatrix({ fs, dir, gitdir })).toEqual([
+      ['link', 1, 1, 1],
+    ])
   })
 
   it('restores binary content byte for byte', async () => {

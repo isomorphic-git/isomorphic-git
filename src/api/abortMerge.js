@@ -123,10 +123,19 @@ export async function abortMerge({
               mode: entry.mode,
               content: entry.content,
             })
+            // Stage the file as it now sits on disk, so a symlink stays a
+            // symlink in the index instead of being recorded as a regular
+            // file. Like checkout, we can't trust the executable bit lstat
+            // reports on Windows, so that one is taken from the tree.
+            const stats = await fs.lstat(`${dir}/${entry.path}`)
+            if (entry.mode === 0o100755) {
+              stats.mode = 0o755
+            }
             index.insert({
               filepath: entry.path,
               oid: entry.oid,
               stage: 0,
+              stats,
             })
           }
         }
