@@ -123,14 +123,13 @@ export async function abortMerge({
               mode: entry.mode,
               content: entry.content,
             })
-            // Stage the file as it now sits on disk, so a symlink stays a
-            // symlink in the index instead of being recorded as a regular
-            // file. Like checkout, we can't trust the executable bit lstat
-            // reports on Windows, so that one is taken from the tree.
+            // Stage the file as it now sits on disk, so the entry does not
+            // look modified afterwards. The mode is the one being restored,
+            // never the one lstat reports: an existing file keeps its old
+            // permissions, because `mode` only applies when a file is
+            // created, and Windows does not report the executable bit.
             const stats = await fs.lstat(`${dir}/${entry.path}`)
-            if (entry.mode === 0o100755) {
-              stats.mode = 0o755
-            }
+            stats.mode = entry.mode
             index.insert({
               filepath: entry.path,
               oid: entry.oid,

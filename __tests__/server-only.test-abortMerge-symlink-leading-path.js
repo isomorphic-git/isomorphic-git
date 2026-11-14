@@ -150,6 +150,72 @@ describe('abortMerge symlink safety', () => {
     ])
   })
 
+  it('stages the mode being restored, not the one on disk', async () => {
+    // `fs.write` only applies `mode` when it creates a file, so a file that is
+    // already executable on disk stays executable. The index still has to
+    // record the mode of the commit being restored, the way git does.
+    const { fs, dir, gitdir } = await makeFixture('test-abortMerge-exec-bit')
+    await git.init({ fs, dir, gitdir })
+    const commit = await git.writeCommit({
+      fs,
+      dir,
+      gitdir,
+      commit: {
+        message: 'head\n',
+        parent: [],
+        author,
+        committer: author,
+        tree: await git.writeTree({
+          fs,
+          dir,
+          gitdir,
+          tree: [
+            {
+              // not executable
+              mode: '100644',
+              path: 'script.sh',
+              oid: await git.writeBlob({
+                fs,
+                dir,
+                gitdir,
+                blob: Buffer.from('#!/bin/sh\n'),
+              }),
+              type: 'blob',
+            },
+          ],
+        }),
+      },
+    })
+    await git.writeRef({
+      fs,
+      dir,
+      gitdir,
+      ref: 'refs/heads/master',
+      value: commit,
+      force: true,
+    })
+    await git.writeRef({
+      fs,
+      dir,
+      gitdir,
+      ref: 'HEAD',
+      value: 'refs/heads/master',
+      symbolic: true,
+      force: true,
+    })
+    await git.checkout({ fs, dir, gitdir, ref: 'master', force: true })
+
+    // Make it executable on disk and stage that, so the index and HEAD differ.
+    await fsp.chmod(join(dir, 'script.sh'), 0o755)
+    await git.add({ fs, dir, gitdir, filepath: 'script.sh' })
+
+    await git.abortMerge({ fs, dir, gitdir })
+
+    await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {
+      expect(index.entriesMap.get('script.sh').mode).toBe(0o100644)
+    })
+  })
+
   it('restores binary content byte for byte', async () => {
     // The reset writes the blob as it is stored. Decoding it as UTF-8 first
     // would replace every invalid byte with U+FFFD and change the file size.
