@@ -8,10 +8,12 @@ import { _walk } from '../commands/walk.js'
 import { IndexResetError } from '../errors/IndexResetError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { modified } from '../utils/modified.js'
+import { writeWorkingTreeEntry } from '../utils/writeWorkingTreeEntry.js'
 
 /**
  * Abort a merge in progress.
@@ -89,6 +91,14 @@ export async function abortMerge({
       },
     })
 
+    // Refuse the whole reset before touching the index or the working tree, so
+    // an unsafe path cannot leave either of them half reset.
+    for (const entry of results) {
+      if (entry && entry.type === 'blob') {
+        await assertNoSymlinkInLeadingPath(fs, dir, entry.path)
+      }
+    }
+
     await GitIndexManager.acquire(
       { fs, gitdir: updatedGitdir, cache },
       async function (index) {
@@ -106,9 +116,12 @@ export async function abortMerge({
           }
 
           if (entry.type === 'blob') {
-            const content = new TextDecoder().decode(entry.content)
-            await fs.write(`${dir}/${entry.path}`, content, {
+            await writeWorkingTreeEntry({
+              fs,
+              dir,
+              filepath: entry.path,
               mode: entry.mode,
+              content: entry.content,
             })
             index.insert({
               filepath: entry.path,

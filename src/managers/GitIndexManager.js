@@ -101,7 +101,16 @@ export class GitIndexManager {
       if (unmergedPaths.length && !allowUnmerged)
         throw new UnmergedPathsError(unmergedPaths)
 
-      result = await closure(index)
+      try {
+        result = await closure(index)
+      } catch (err) {
+        // A failed closure may already have mutated the in-memory index. Drop
+        // it so the next acquire reloads the unchanged index from disk, rather
+        // than flushing a half-applied change that was never written.
+        theIndexCache.map.delete(filepath)
+        theIndexCache.stats.delete(filepath)
+        throw err
+      }
       if (index._dirty) {
         // Acquire a file lock while we're writing the index file
         // let fileLock = await Lock(filepath)
