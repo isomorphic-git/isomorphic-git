@@ -12,6 +12,7 @@ import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
 import { modified } from './modified.js'
+import { writeWorkingTreeEntry } from './writeWorkingTreeEntry.js'
 
 /**
  * Create a merged tree
@@ -303,11 +304,14 @@ export async function mergeTree({
         gitdir,
         trees: [TREE({ ref: results.oid })],
         map: async function (filepath, [entry]) {
-          const path = `${dir}/${filepath}`
           if ((await entry.type()) === 'blob') {
-            const mode = await entry.mode()
-            const content = await entry.content()
-            await fs.write(path, content, { mode })
+            await writeWorkingTreeEntry({
+              fs,
+              dir,
+              filepath,
+              mode: await entry.mode(),
+              content: await entry.content(),
+            })
           }
           return true
         },

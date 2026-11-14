@@ -8,10 +8,12 @@ import { _walk } from '../commands/walk.js'
 import { IndexResetError } from '../errors/IndexResetError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { modified } from '../utils/modified.js'
+import { writeWorkingTreeEntry } from '../utils/writeWorkingTreeEntry.js'
 
 /**
  * Abort a merge in progress.
@@ -89,6 +91,14 @@ export async function abortMerge({
       },
     })
 
+    // Refuse the whole reset before touching the index or the working tree, so
+    // an unsafe path cannot leave either of them half reset.
+    for (const entry of results) {
+      if (entry && entry.type === 'blob') {
+        await assertNoSymlinkInLeadingPath(fs, dir, entry.path)
+      }
+    }
+
     await GitIndexManager.acquire(
       { fs, gitdir: updatedGitdir, cache },
       async function (index) {
@@ -106,14 +116,25 @@ export async function abortMerge({
           }
 
           if (entry.type === 'blob') {
-            const content = new TextDecoder().decode(entry.content)
-            await fs.write(`${dir}/${entry.path}`, content, {
+            await writeWorkingTreeEntry({
+              fs,
+              dir,
+              filepath: entry.path,
               mode: entry.mode,
+              content: entry.content,
             })
+            // Stage the file as it now sits on disk, so the entry does not
+            // look modified afterwards. The mode is the one being restored,
+            // never the one lstat reports: an existing file keeps its old
+            // permissions, because `mode` only applies when a file is
+            // created, and Windows does not report the executable bit.
+            const stats = await fs.lstat(`${dir}/${entry.path}`)
+            stats.mode = entry.mode
             index.insert({
               filepath: entry.path,
               oid: entry.oid,
               stage: 0,
+              stats,
             })
           }
         }

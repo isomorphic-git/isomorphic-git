@@ -164,6 +164,34 @@ describe('GitIndex', () => {
     )
   })
 
+  it('discards cached index changes when the closure throws', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-GitIndex')
+    const oid = 'e965047ad7c57865823c7d992b1d046ea66edf78'
+    const cache = {}
+    let before
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
+      before = index.render()
+    })
+    // Test
+    const failure = new Error('closure failed')
+    await expect(
+      GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
+        index.insert({ filepath: 'ghost.txt', oid })
+        throw failure
+      })
+    ).rejects.toBe(failure)
+    // The insert was never written to disk, so it must not survive in the
+    // cache either - otherwise the next write flushes a half-applied change.
+    await GitIndexManager.acquire({ fs, gitdir, cache }, async index => {
+      expect(index.render()).toEqual(before)
+      expect(index.entriesMap.has('ghost.txt')).toBe(false)
+    })
+    await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {
+      expect(index.entriesMap.has('ghost.txt')).toBe(false)
+    })
+  })
+
   it('GitIndex.from(buffer) - version 3 extended flags', async () => {
     // Setup: an index written by canonical git after
     // `git update-index --skip-worktree c.txt` and `git add -N b.txt`
