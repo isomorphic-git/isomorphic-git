@@ -13,6 +13,7 @@ import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { modified } from '../utils/modified.js'
+import { writeWorkingTreeEntry } from '../utils/writeWorkingTreeEntry.js'
 
 /**
  * Abort a merge in progress.
@@ -115,9 +116,12 @@ export async function abortMerge({
           }
 
           if (entry.type === 'blob') {
-            const content = new TextDecoder().decode(entry.content)
-            await fs.write(`${dir}/${entry.path}`, content, {
+            await writeWorkingTreeEntry({
+              fs,
+              dir,
+              filepath: entry.path,
               mode: entry.mode,
+              content: entry.content,
             })
             index.insert({
               filepath: entry.path,
