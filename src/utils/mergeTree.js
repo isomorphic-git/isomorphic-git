@@ -8,6 +8,7 @@ import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
 import { GitTree } from '../models/GitTree.js'
 import { _writeObject as writeObject } from '../storage/writeObject.js'
 
+import { assertNoSymlinkInLeadingPath } from './assertNoSymlinkInLeadingPath.js'
 import { basename } from './basename.js'
 import { join } from './join.js'
 import { mergeFile } from './mergeFile.js'
@@ -305,6 +306,7 @@ export async function mergeTree({
         map: async function (filepath, [entry]) {
           const path = `${dir}/${filepath}`
           if ((await entry.type()) === 'blob') {
+            await assertNoSymlinkInLeadingPath(fs, dir, filepath)
             const mode = await entry.mode()
             const content = await entry.content()
             await fs.write(path, content, { mode })

@@ -8,6 +8,7 @@ import { _walk } from '../commands/walk.js'
 import { IndexResetError } from '../errors/IndexResetError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { FileSystem } from '../models/FileSystem.js'
+import { assertNoSymlinkInLeadingPath } from '../utils/assertNoSymlinkInLeadingPath.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
@@ -88,6 +89,14 @@ export async function abortMerge({
         else throw new IndexResetError(path)
       },
     })
+
+    // Refuse the whole reset before touching the index or the working tree, so
+    // an unsafe path cannot leave either of them half reset.
+    for (const entry of results) {
+      if (entry && entry.type === 'blob') {
+        await assertNoSymlinkInLeadingPath(fs, dir, entry.path)
+      }
+    }
 
     await GitIndexManager.acquire(
       { fs, gitdir: updatedGitdir, cache },
