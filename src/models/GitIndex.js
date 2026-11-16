@@ -49,6 +49,34 @@ function renderCacheEntryExtendedFlags(entry) {
   )
 }
 
+// Version 4 stores how many bytes to drop from the end of the previous path
+// with the same variable width encoding as OFS_DELTA offsets in packfiles
+function readVarInt(reader) {
+  let byte = reader.readUInt8()
+  let value = byte & 0b01111111
+  while (byte & 0b10000000) {
+    byte = reader.readUInt8()
+    value = (value + 1) * 128 + (byte & 0b01111111)
+  }
+  return value
+}
+
+function encodeVarInt(value) {
+  const bytes = [value & 0b01111111]
+  while ((value >>>= 7)) {
+    value--
+    bytes.unshift(0b10000000 | (value & 0b01111111))
+  }
+  return Buffer.from(bytes)
+}
+
+function commonPrefixLength(a, b) {
+  const length = Math.min(a.length, b.length)
+  let i = 0
+  while (i < length && a[i] === b[i]) i++
+  return i
+}
+
 export class GitIndex {
   /*::
    _entries: Map<string, CacheEntry>
@@ -56,6 +84,9 @@ export class GitIndex {
    */
   constructor(entries, unmergedPaths) {
     this._dirty = false
+    // Version of the index file this was read from. Like git, keep writing
+    // version 4 once the index uses it.
+    this._version = 2
     this._unmergedPaths = unmergedPaths || new Set()
     this._entries = entries || new Map()
   }
@@ -98,20 +129,26 @@ export class GitIndex {
       throw new InternalError(`Invalid dircache magic file number: ${magic}`)
     }
 
-    // Verify shasum after we ensured that the file has a magic number
-    const shaComputed = await shasum(buffer.slice(0, -20))
+    // Verify shasum after we ensured that the file has a magic number.
+    // An all zero checksum is not checked, like git does: that is what git
+    // writes with index.skipHash (also turned on by feature.manyFiles).
     const shaClaimed = buffer.slice(-20).toString('hex')
-    if (shaClaimed !== shaComputed) {
-      throw new InternalError(
-        `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
-      )
+    if (shaClaimed !== '0'.repeat(40)) {
+      const shaComputed = await shasum(buffer.slice(0, -20))
+      if (shaClaimed !== shaComputed) {
+        throw new InternalError(
+          `Invalid checksum in GitIndex buffer: expected ${shaClaimed} but saw ${shaComputed}`
+        )
+      }
     }
 
     const version = reader.readUInt32BE()
-    if (version !== 2 && version !== 3) {
+    if (version !== 2 && version !== 3 && version !== 4) {
       throw new InternalError(`Unsupported dircache version: ${version}`)
     }
+    index._version = version
     const numEntries = reader.readUInt32BE()
+    let previousPath = Buffer.alloc(0)
     let i = 0
     while (!reader.eof() && i < numEntries) {
       const entry = {}
@@ -138,12 +175,32 @@ export class GitIndex {
         entry.flags.skipWorktree = Boolean(extendedFlags & SKIP_WORKTREE)
         entry.flags.intentToAdd = Boolean(extendedFlags & INTENT_TO_ADD)
       }
-      const pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
-      if (pathlength < 1) {
-        throw new InternalError(`Got a path length of: ${pathlength}`)
+      if (version === 4) {
+        // The path is the previous one with some bytes dropped from its end
+        // and the NUL terminated string that follows appended to it
+        const strip = readVarInt(reader)
+        const length = buffer.indexOf(0, reader.tell()) - reader.tell()
+        if (strip > previousPath.length || length < 0) {
+          throw new InternalError(
+            `Invalid path compression in index entry after ${previousPath}`
+          )
+        }
+        previousPath = Buffer.concat([
+          previousPath.slice(0, previousPath.length - strip),
+          reader.slice(length),
+        ])
+        if (previousPath.length === 0) {
+          throw new InternalError('Got a path length of: 0')
+        }
+        entry.path = previousPath.toString('utf8')
+      } else {
+        const pathlength = buffer.indexOf(0, reader.tell() + 1) - reader.tell()
+        if (pathlength < 1) {
+          throw new InternalError(`Got a path length of: ${pathlength}`)
+        }
+        // TODO: handle pathnames larger than 12 bits
+        entry.path = reader.toString('utf8', pathlength)
       }
-      // TODO: handle pathnames larger than 12 bits
-      entry.path = reader.toString('utf8', pathlength)
 
       // Prevent malicious paths like "..\foo"
       if (entry.path.includes('..\\') || entry.path.includes('../')) {
@@ -153,7 +210,8 @@ export class GitIndex {
       // The next bit is awkward. We expect 1 to 8 null characters
       // such that the total size of the entry is a multiple of 8 bits.
       // (Hence subtract 12 bytes for the header.)
-      let padding = 8 - ((reader.tell() - 12) % 8)
+      // Version 4 has no padding, only the NUL that ends the path.
+      let padding = version === 4 ? 1 : 8 - ((reader.tell() - 12) % 8)
       if (padding === 0) padding = 8
       while (padding--) {
         const tmp = reader.readUInt8()
@@ -171,6 +229,17 @@ export class GitIndex {
       index._addEntry(entry)
 
       i++
+    }
+    // Extensions whose signature starts with an uppercase letter are optional
+    // caches. The others (like the split index and the sparse index) change
+    // what the entries mean, so like git, refuse an index that has one.
+    while (reader.tell() + 8 <= buffer.length - 20) {
+      const signature = reader.toString('utf8', 4)
+      const size = reader.readUInt32BE()
+      if (!(signature[0] >= 'A' && signature[0] <= 'Z')) {
+        throw new InternalError(`Unsupported index extension: ${signature}`)
+      }
+      reader.seek(reader.tell() + size)
     }
     return index
   }
@@ -283,13 +352,25 @@ export class GitIndex {
       .join('\n')
   }
 
-  static async _entryToBuffer(entry) {
+  static async _entryToBuffer(entry, previousPath) {
     const bpath = Buffer.from(entry.path)
     const extended = hasExtendedFlags(entry)
-    // the fixed length + the extended flags (if any) + the filename + at
-    // least one null char => align by 8
-    const length =
-      Math.ceil((62 + (extended ? 2 : 0) + bpath.length + 1) / 8) * 8
+    let name = bpath
+    let length
+    if (previousPath) {
+      // Version 4: the number of bytes to drop from the end of the previous
+      // path, then what to append to it, and no padding
+      const common = commonPrefixLength(previousPath, bpath)
+      name = Buffer.concat([
+        encodeVarInt(previousPath.length - common),
+        bpath.slice(common),
+      ])
+      length = 62 + (extended ? 2 : 0) + name.length + 1
+    } else {
+      // the fixed length + the extended flags (if any) + the filename + at
+      // least one null char => align by 8
+      length = Math.ceil((62 + (extended ? 2 : 0) + bpath.length + 1) / 8) * 8
+    }
     const written = Buffer.alloc(length)
     const writer = new BufferCursor(written)
     const stat = normalizeStats(entry)
@@ -308,7 +389,7 @@ export class GitIndex {
     if (extended) {
       writer.writeUInt16BE(renderCacheEntryExtendedFlags(entry))
     }
-    writer.write(entry.path, bpath.length, 'utf8')
+    writer.copy(name)
     return written
   }
 
@@ -316,17 +397,26 @@ export class GitIndex {
     const header = Buffer.alloc(12)
     const writer = new BufferCursor(header)
     writer.write('DIRC', 4, 'utf8')
-    // Like canonical git, only use version 3 when an entry needs it
-    writer.writeUInt32BE(this.entriesFlat.some(hasExtendedFlags) ? 3 : 2)
+    // Like canonical git, keep version 4 if the index was read as version 4,
+    // otherwise only use version 3 when an entry needs it
+    const version =
+      this._version === 4 ? 4 : this.entriesFlat.some(hasExtendedFlags) ? 3 : 2
+    writer.writeUInt32BE(version)
     writer.writeUInt32BE(this.entriesFlat.length)
 
+    let previousPath = version === 4 ? Buffer.alloc(0) : undefined
+    const entryToBuffer = entry => {
+      const buffer = GitIndex._entryToBuffer(entry, previousPath)
+      if (previousPath) previousPath = Buffer.from(entry.path)
+      return buffer
+    }
     let entryBuffers = []
     for (const entry of this.entries) {
-      entryBuffers.push(GitIndex._entryToBuffer(entry))
+      entryBuffers.push(entryToBuffer(entry))
       if (entry.stages.length > 1) {
         for (const stage of entry.stages) {
           if (stage && stage !== entry) {
-            entryBuffers.push(GitIndex._entryToBuffer(stage))
+            entryBuffers.push(entryToBuffer(stage))
           }
         }
       }

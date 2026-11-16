@@ -467,4 +467,29 @@ describe('statusMatrix', () => {
     await statusMatrix({ fs, dir, gitdir, filepaths })
     expect(indexWrites).toBe(1)
   })
+
+  it('statusMatrix with an index written with feature.manyFiles', async () => {
+    // Setup: git writes a version 4 index with an all zero checksum there
+    const { fs, dir, gitdir, gitdirsmfullpath } = await makeFixtureAsSubmodule(
+      'test-GitIndex-manyFiles'
+    )
+    // Test
+    let matrix = await statusMatrix({ fs, dir, gitdir })
+    expect(matrix).toEqual([
+      ['a.txt', 1, 1, 1],
+      ['dir/b.txt', 1, 1, 1],
+      ['dir/sub/c.txt', 1, 1, 1],
+    ])
+    await fs.write(path.join(dir, 'dir/b.txt'), 'changed\n')
+    await add({ fs, dir, gitdir, filepath: 'dir/b.txt' })
+    matrix = await statusMatrix({ fs, dir, gitdir })
+    expect(matrix).toEqual([
+      ['a.txt', 1, 1, 1],
+      ['dir/b.txt', 1, 2, 2],
+      ['dir/sub/c.txt', 1, 1, 1],
+    ])
+    // The index stays at version 4
+    const index = await fs.read(path.join(gitdirsmfullpath, 'index'))
+    expect(index.readUInt32BE(4)).toBe(4)
+  })
 })
