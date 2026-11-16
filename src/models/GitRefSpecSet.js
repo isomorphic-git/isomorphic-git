@@ -18,10 +18,15 @@ export class GitRefSpecSet {
     this.rules.push(rule)
   }
 
+  isExcluded(remoteRef) {
+    return this.rules.some(rule => rule.negative && rule.matches(remoteRef))
+  }
+
   translate(remoteRefs) {
     const result = []
     for (const rule of this.rules) {
       for (const remoteRef of remoteRefs) {
+        if (this.isExcluded(remoteRef)) continue
         const localRef = rule.translate(remoteRef)
         if (localRef) {
           result.push([remoteRef, localRef])
@@ -33,6 +38,7 @@ export class GitRefSpecSet {
 
   translateOne(remoteRef) {
     let result = null
+    if (this.isExcluded(remoteRef)) return result
     for (const rule of this.rules) {
       const localRef = rule.translate(remoteRef)
       if (localRef) {
@@ -44,7 +50,7 @@ export class GitRefSpecSet {
 
   localNamespaces() {
     return this.rules
-      .filter(rule => rule.matchPrefix)
+      .filter(rule => rule.matchPrefix && rule.localPath !== null)
       .map(rule => rule.localPath.replace(/\/$/, ''))
   }
 }
