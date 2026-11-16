@@ -328,6 +328,24 @@ describe('GitConfig', () => {
       expect(d).toEqual(true)
     })
 
+    it('numeric boolean 0 and 1', async () => {
+      const config = GitConfig.from(`[core]
+      filemode = 0
+      bare = 1
+      ignorecase = 0`)
+      expect(await config.get('core.filemode')).toEqual(false)
+      expect(await config.get('core.bare')).toEqual(true)
+      expect(await config.get('core.ignorecase')).toEqual(false)
+    })
+
+    it('mixed-case section and variable names still use the schema', async () => {
+      const config = GitConfig.from(`[Core]
+      ignoreCase = false
+      bigfilethreshold = 2k`)
+      expect(await config.get('core.ignorecase')).toEqual(false)
+      expect(await config.get('core.bigFileThreshold')).toEqual(2048)
+    })
+
     it('numeric suffix', async () => {
       const configA = GitConfig.from(`[core]
       bigFileThreshold = 2k`)
