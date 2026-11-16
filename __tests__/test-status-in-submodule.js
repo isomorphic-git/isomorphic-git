@@ -93,6 +93,46 @@ describe('status', () => {
     }
   )
 
+  it.each([
+    ['true', true],
+    ['unset', undefined],
+    ['false', false],
+  ])(
+    'reports a staged symlink-to-file change when core.symlinks is %s',
+    async (_, symlinks) => {
+      await configureSingle({ backend: InMemory })
+      const { promises: fsp } = zenfs
+      const dir = '/status-staged-symlink'
+      await fsp.mkdir(dir)
+      await init({ fs: zenfs, dir, gitdir: '/modules/status-staged-symlink' })
+      await fsp.writeFile(
+        dir + '/.git',
+        'gitdir: ../modules/status-staged-symlink\n'
+      )
+
+      const opts = { fs: zenfs, dir }
+      const filepath = 'link'
+      const link = dir + '/' + filepath
+      await fsp.symlink('target.txt', link)
+      await add({ ...opts, filepath })
+      await commit({
+        ...opts,
+        message: 'Track symlink',
+        author: { name: 'Test', email: 'test@example.com' },
+      })
+
+      await setConfig({ ...opts, path: 'core.symlinks', value: true })
+      await fsp.unlink(link)
+      await fsp.writeFile(link, 'target.txt')
+      await add({ ...opts, filepath })
+      await setConfig({ ...opts, path: 'core.symlinks', value: symlinks })
+      expect(await status({ ...opts, filepath })).toBe('modified')
+
+      await fsp.writeFile(link, 'different contents')
+      expect(await status({ ...opts, filepath })).toBe('*modified')
+    }
+  )
+
   it('reports a symlink that disappears before it is read as deleted', async () => {
     await configureSingle({ backend: InMemory })
     const { promises: fsp } = zenfs

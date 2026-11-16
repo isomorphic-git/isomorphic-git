@@ -211,6 +211,8 @@ export async function status({
         indexEntry.oid,
         indexIsSymlink
       )
+      // core.symlinks only affects workdir comparisons, not staged entry types.
+      if (matchesIndex && headIsSymlink !== indexIsSymlink) return 'modified'
       if (await matchesWorkdir(workdirOid, treeOid, headIsSymlink)) {
         return matchesIndex ? 'unmodified' : '*unmodified' // AAA : ABA
       } else {
