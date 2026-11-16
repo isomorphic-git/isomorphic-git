@@ -58,6 +58,77 @@ describe('status', () => {
     }
   )
 
+  it.each([
+    ['true', true, '*modified'],
+    ['unset', undefined, '*modified'],
+    ['false', false, 'unmodified'],
+  ])(
+    'compares a plain file with a tracked symlink when core.symlinks is %s',
+    async (_, symlinks, expected) => {
+      await configureSingle({ backend: InMemory })
+      const { promises: fsp } = zenfs
+      const dir = '/status-symlinks'
+      await fsp.mkdir(dir)
+      await init({ fs: zenfs, dir })
+
+      const opts = { fs: zenfs, dir }
+      const filepath = 'link'
+      const link = dir + '/' + filepath
+      await fsp.writeFile(dir + '/target.txt', 'target contents')
+      await fsp.symlink('target.txt', link)
+      await add({ ...opts, filepath })
+      await commit({
+        ...opts,
+        message: 'Track symlink',
+        author: { name: 'Test', email: 'test@example.com' },
+      })
+      await setConfig({ ...opts, path: 'core.symlinks', value: symlinks })
+
+      // A plain file holding the link text hashes to the same blob as the link.
+      await fsp.unlink(link)
+      await fsp.writeFile(link, 'target.txt')
+      expect(await status({ ...opts, filepath })).toBe(expected)
+    }
+  )
+
+  it('reports a symlink that disappears before it is read as deleted', async () => {
+    await configureSingle({ backend: InMemory })
+    const { promises: fsp } = zenfs
+    const dir = '/status-symlinks'
+    await fsp.mkdir(dir)
+    await init({ fs: zenfs, dir })
+
+    const opts = { fs: zenfs, dir }
+    const filepath = 'link'
+    const link = dir + '/' + filepath
+    await fsp.symlink('target.txt', link)
+    await add({ ...opts, filepath })
+    await commit({
+      ...opts,
+      message: 'Track symlink',
+      author: { name: 'Test', email: 'test@example.com' },
+    })
+
+    // Recreate the link so its stat information no longer matches the index.
+    await fsp.unlink(link)
+    await fsp.symlink('target.txt', link)
+    // lstat still sees the link, but it is gone by the time its text is read.
+    const racing = {
+      promises: new Proxy(fsp, {
+        get(target, name) {
+          if (name === 'readlink') {
+            return async () => {
+              throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' })
+            }
+          }
+          const value = target[name]
+          return typeof value === 'function' ? value.bind(target) : value
+        },
+      }),
+    }
+    expect(await status({ fs: racing, dir, filepath })).toBe('*deleted')
+  })
+
   it('status', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-status')

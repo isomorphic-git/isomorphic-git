@@ -108,8 +108,18 @@ export async function status({
     const workdirPath = join(dir, filepath)
     const stats = await fs.lstat(workdirPath)
     const workdirIsSymlink = normalizeMode(stats?.mode) === 0o120000
-    const matchesWorkdir = (workdirOid, oid, isSymlink) =>
-      workdirOid === oid && (!workdirIsSymlink || isSymlink)
+    const getConfig = () => GitConfigManager.get({ fs, gitdir: updatedGitdir })
+    // Equal content is not enough when the entry type differs. A tracked
+    // symlink that is a plain file in the working directory is a type change,
+    // unless core.symlinks is false: then git checks symlinks out as plain
+    // files that hold the link text.
+    const matchesWorkdir = async (workdirOid, oid, isSymlink) => {
+      if (workdirOid !== oid) return false
+      if (workdirIsSymlink) return isSymlink
+      if (!isSymlink) return true
+      const config = await getConfig()
+      return (await config.get('core.symlinks')) === false
+    }
 
     const H = treeOid !== null // head
     const I = indexEntry !== null // index
@@ -120,7 +130,7 @@ export async function status({
     // filepath it fabricates a file that is not there, turning 'absent'
     // into '*added', so confirm every segment exists exactly as spelled by
     // listing each parent directory.
-    const W =
+    let W =
       stats !== null &&
       (H || I || (await hasExactCasePath({ fs, dir, filepath })))
 
@@ -133,13 +143,12 @@ export async function status({
           object = await fs.readlink(workdirPath)
         } else {
           // Use the same core.autocrlf normalisation as GitWalkerFs.
-          const config = await GitConfigManager.get({
-            fs,
-            gitdir: updatedGitdir,
-          })
+          const config = await getConfig()
           const autocrlf = await config.get('core.autocrlf')
           object = await fs.read(workdirPath, { autocrlf })
         }
+        // The entry disappeared after lstat.
+        if (object === null) return null
         const workdirOid = await hashObject({
           gitdir: updatedGitdir,
           type: 'blob',
@@ -170,13 +179,19 @@ export async function status({
       }
     }
 
+    let workdirOid
+    if (W && (H || I)) {
+      workdirOid = await getWorkdirOid()
+      // Nothing is left to hash, so the entry is missing from the workdir.
+      if (workdirOid === null) W = false
+    }
+
     if (!H && !W && !I) return 'absent' // ---
     if (!H && !W && I) return '*absent' // -A-
     if (!H && W && !I) return '*added' // --A
     if (!H && W && I) {
-      const workdirOid = await getWorkdirOid()
       // @ts-ignore
-      return matchesWorkdir(workdirOid, indexEntry.oid, indexIsSymlink)
+      return (await matchesWorkdir(workdirOid, indexEntry.oid, indexIsSymlink))
         ? 'added'
         : '*added' // -AA : -AB
     }
@@ -186,19 +201,17 @@ export async function status({
       return treeOid === indexEntry.oid ? '*deleted' : '*deleted' // AA- : AB-
     }
     if (H && W && !I) {
-      const workdirOid = await getWorkdirOid()
-      return matchesWorkdir(workdirOid, treeOid, headIsSymlink)
+      return (await matchesWorkdir(workdirOid, treeOid, headIsSymlink))
         ? '*undeleted'
         : '*undeletemodified' // A-A : A-B
     }
     if (H && W && I) {
-      const workdirOid = await getWorkdirOid()
-      const matchesIndex = matchesWorkdir(
+      const matchesIndex = await matchesWorkdir(
         workdirOid,
         indexEntry.oid,
         indexIsSymlink
       )
-      if (matchesWorkdir(workdirOid, treeOid, headIsSymlink)) {
+      if (await matchesWorkdir(workdirOid, treeOid, headIsSymlink)) {
         return matchesIndex ? 'unmodified' : '*unmodified' // AAA : ABA
       } else {
         return matchesIndex ? 'modified' : '*modified' // ABB : AAB
