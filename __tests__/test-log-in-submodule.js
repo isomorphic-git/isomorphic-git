@@ -12,6 +12,9 @@ import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 
 describe('log', () => {
   it.each([
+    // The order asserted for equal committer timestamps is isomorphic-git's
+    // existing tie order, not native Git's (Merge, First parent, Second
+    // parent, Ancestor). This case only checks the ancestor is visited once.
     [
       'equal timestamps',
       0,

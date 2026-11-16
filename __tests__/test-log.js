@@ -21,6 +21,9 @@ import { makeFixture } from './__helpers__/FixtureFS.js'
 
 describe('log', () => {
   it.each([
+    // The order asserted for equal committer timestamps is isomorphic-git's
+    // existing tie order, not native Git's (Merge, First parent, Second
+    // parent, Ancestor). This case only checks the ancestor is visited once.
     [
       'equal timestamps',
       0,
@@ -111,6 +114,9 @@ describe('log', () => {
     expect(commits.map(({ oid }) => oid)).toEqual([ancestor, second])
   })
 
+  // Guards the second lookup in the parent loop rather than the reported
+  // duplicate: _readCommit peels an annotated tag, so a tag parent is only
+  // recognised as already scheduled by its resolved commit oid.
   it('deduplicates an annotated merge parent by its resolved commit', async () => {
     const { fs, dir } = await makeFixture('test-init')
     const tree = await writeTree({ fs, dir, tree: [] })
