@@ -45,12 +45,38 @@ describe('utils/join', () => {
       ['/', '/foo'],
       ['/', '//foo'],
       ['/', '', '/foo'],
+      ['.', 'x/b', '..', '/b/c.js'],
+      ['/.', 'x/b', '..', '/b/c.js'],
+      ['/foo', '../../../bar'],
+      ['foo', '../../../bar'],
+      ['foo/', '../../../bar'],
+      ['foo/x', '../../../bar'],
+      ['./', '..', '/foo'],
+      ['./', '..', '..', '/foo'],
+      ['.', '..', '..', '/foo'],
+      ['', '..', '..', '/foo'],
+      ['/', '..'],
+      ['/', '..', '..'],
     ]
     fixtures.forEach(fixture => {
       it(`"${JSON.stringify(fixture)}" should join to "${path.join(
         ...fixture
       )}"`, () => {
         expect(join(...fixture)).toEqual(path.join(...fixture))
+      })
+    })
+  })
+  describe('when given Windows paths', () => {
+    const fixtures = [
+      [['C:\\foo\\bar', 'baz'], 'C:/foo/bar/baz'],
+      [['C:\\foo', '..'], 'C:/'],
+      [['C:\\a\\b', '..\\..\\..'], 'C:/'],
+      [['foo', 'C:\\bar', 'baz'], 'C:/bar/baz'],
+      [['C:/repo', '.git\\worktrees\\wt'], 'C:/repo/.git/worktrees/wt'],
+    ]
+    fixtures.forEach(([fixture, expected]) => {
+      it(`"${JSON.stringify(fixture)}" should join to "${expected}"`, () => {
+        expect(join(...fixture)).toEqual(expected)
       })
     })
   })
