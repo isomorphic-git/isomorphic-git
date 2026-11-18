@@ -157,6 +157,46 @@ describe('status', () => {
     ])
   })
 
+  it('reports a file committed with CRLF as unmodified with core.autocrlf', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-empty')
+    await init({ fs, dir, gitdir })
+    const files = {
+      // "caf\xe9\r\n" in Latin-1, which is not valid UTF-8
+      'latin1.txt': Buffer.from('636166e90d0a', 'hex'),
+      'utf8.txt': Buffer.from('one\r\ntwo\r\n'),
+    }
+    for (const [filepath, content] of Object.entries(files)) {
+      await fs.write(path.join(dir, filepath), content)
+      await add({ fs, dir, gitdir, filepath })
+    }
+    await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'initial',
+      author: { name: 'Test', email: 'test@example.com' },
+    })
+    await setConfig({ fs, dir, gitdir, path: 'core.autocrlf', value: true })
+    // Rewrite the same bytes so the index stats no longer match and status
+    // has to hash the working copy
+    await new Promise(resolve => setTimeout(resolve, 1100))
+    for (const [filepath, content] of Object.entries(files)) {
+      await fs.write(path.join(dir, filepath), content)
+    }
+    // Test
+    // The blobs in the index have CRLF, so canonical git does not convert
+    // the working copy and reports both files as clean. statusMatrix comes
+    // first and does not refresh the index, so status has to hash as well.
+    expect(await statusMatrix({ fs, dir, gitdir, refresh: false })).toEqual([
+      ['latin1.txt', 1, 1, 1],
+      ['utf8.txt', 1, 1, 1],
+    ])
+    for (const filepath of Object.keys(files)) {
+      expect(await status({ fs, dir, gitdir, filepath })).toEqual('unmodified')
+    }
+  })
+
   it('returns absent for case-mismatched paths on a case-insensitive filesystem', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-status')

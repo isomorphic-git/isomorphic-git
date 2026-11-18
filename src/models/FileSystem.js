@@ -3,6 +3,7 @@ import pify from 'pify'
 import { compareStrings } from '../utils/compareStrings.js'
 import { convertCrlfToLf } from '../utils/convertCrlfToLf.js'
 import { dirname } from '../utils/dirname.js'
+import { isAutocrlf } from '../utils/isAutocrlf.js'
 import { mkdirp } from '../utils/mkdirp.js'
 import { rmRecursive } from '../utils/rmRecursive.js'
 import { isPromiseLike } from '../utils/types.js'
@@ -136,9 +137,16 @@ export class FileSystem {
     // Convert plain ArrayBuffers to Buffers
     if (typeof buffer !== 'string') {
       buffer = Buffer.from(buffer)
-      if (options.autocrlf === 'true') {
+      if (isAutocrlf(options.autocrlf)) {
         const converted = convertCrlfToLf(buffer)
-        if (converted !== buffer) buffer = Buffer.from(converted)
+        // Like canonical git, keep the CRLF of a file whose blob in the index
+        // already has CRLF, so that it does not show as modified forever.
+        if (
+          converted !== buffer &&
+          !(options.hasCrlfInIndex && (await options.hasCrlfInIndex()))
+        ) {
+          buffer = Buffer.from(converted)
+        }
       }
     }
     return buffer

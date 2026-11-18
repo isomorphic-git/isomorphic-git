@@ -8,6 +8,7 @@ import {
   STAGE,
   status,
   getConfig,
+  setConfig,
   writeBlob,
   writeTree,
   writeCommit,
@@ -27,6 +28,20 @@ const writeGitIgnore = async (fs, dir) =>
 // NOTE: we cannot actually commit a real symlink in fixtures because it relies on core.symlinks being enabled
 const writeSymlink = async (fs, dir) =>
   fs._symlink('c/e.txt', dir + '/e-link.txt')
+
+// The content of the blob the index holds for a file, as hex
+async function stagedHex({ fs, dir, gitdir, filepath }) {
+  const [oid] = await walk({
+    fs,
+    dir,
+    gitdir,
+    trees: [STAGE()],
+    map: async (path, [stage]) =>
+      path === filepath && stage ? stage.oid() : undefined,
+  })
+  const { blob } = await readBlob({ fs, dir, gitdir, oid })
+  return Buffer.from(blob).toString('hex')
+}
 
 describe('add', () => {
   it('file', async () => {
@@ -407,6 +422,46 @@ describe('add', () => {
         cases[filepath][1],
       ])
       expect(await status({ fs, dir, gitdir, filepath })).toEqual('added')
+    }
+  })
+  it('git add with core.autocrlf=true keeps CRLF when the blob in the index has CRLF', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-add-autocrlf')
+    const filepath = 'latin1.txt'
+    await setConfig({ fs, dir, gitdir, path: 'core.autocrlf', value: false })
+    await fs.write(`${dir}/${filepath}`, Buffer.from('636166e90d0a', 'hex'))
+    await add({ fs, dir, gitdir, filepath })
+    await setConfig({ fs, dir, gitdir, path: 'core.autocrlf', value: true })
+    await fs.write(
+      `${dir}/${filepath}`,
+      Buffer.from('636166e90d0a6d6f72650d0a', 'hex')
+    )
+    await add({ fs, dir, gitdir, filepath })
+    // The blob `git add` stores: the CRLF already in the index is kept
+    expect(await stagedHex({ fs, dir, gitdir, filepath })).toEqual(
+      '636166e90d0a6d6f72650d0a'
+    )
+  })
+  it('git add converts line endings for every true spelling of core.autocrlf and for input', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-add-autocrlf')
+    const values = {
+      TRUE: true,
+      1: true,
+      on: true,
+      Yes: true,
+      input: true,
+      false: false,
+      0: false,
+      off: false,
+    }
+    for (const [value, converts] of Object.entries(values)) {
+      await setConfig({ fs, dir, gitdir, path: 'core.autocrlf', value })
+      const filepath = `autocrlf-${value}.txt`
+      await fs.write(`${dir}/${filepath}`, Buffer.from('610d0a620d0a', 'hex'))
+      await add({ fs, dir, gitdir, filepath })
+      expect([value, await stagedHex({ fs, dir, gitdir, filepath })]).toEqual([
+        value,
+        converts ? '610a620a' : '610d0a620d0a',
+      ])
     }
   })
 })

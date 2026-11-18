@@ -24,4 +24,32 @@ describe('FileSystem.read with autocrlf', () => {
     expect(Buffer.isBuffer(buffer)).toBe(true)
     expect(buffer.toString('hex')).toEqual('610a620a')
   })
+  it('keeps CRLF when the blob in the index has CRLF', async () => {
+    const { fs, dir } = await makeFixture('test-FileSystem-autocrlf')
+    await fs.write(`${dir}/file.txt`, Buffer.from('610d0a620d0a', 'hex'))
+    for (const [inIndex, hex] of [
+      [true, '610d0a620d0a'],
+      [false, '610a620a'],
+    ]) {
+      const buffer = await fs.read(`${dir}/file.txt`, {
+        autocrlf: 'true',
+        hasCrlfInIndex: async () => inIndex,
+      })
+      expect(buffer.toString('hex')).toEqual(hex)
+    }
+  })
+  it('does not look at the index for a file without CRLF', async () => {
+    const { fs, dir } = await makeFixture('test-FileSystem-autocrlf')
+    await fs.write(`${dir}/file.txt`, Buffer.from('610a620a', 'hex'))
+    let calls = 0
+    const buffer = await fs.read(`${dir}/file.txt`, {
+      autocrlf: 'true',
+      hasCrlfInIndex: async () => {
+        calls++
+        return false
+      },
+    })
+    expect(buffer.toString('hex')).toEqual('610a620a')
+    expect(calls).toEqual(0)
+  })
 })

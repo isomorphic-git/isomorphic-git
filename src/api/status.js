@@ -12,6 +12,7 @@ import { _readObject } from '../storage/readObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { compareStats } from '../utils/compareStats.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
+import { hasCrlfInIndex } from '../utils/hasCrlfInIndex.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
 
@@ -125,7 +126,16 @@ export async function status({
         // CRLF checkout of an LF blob reads as modified.
         const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
         const autocrlf = await config.get('core.autocrlf')
-        const object = await fs.read(join(dir, filepath), { autocrlf })
+        const object = await fs.read(join(dir, filepath), {
+          autocrlf,
+          hasCrlfInIndex: () =>
+            hasCrlfInIndex({
+              fs,
+              cache,
+              gitdir: updatedGitdir,
+              entry: indexEntry,
+            }),
+        })
         const workdirOid = await hashObject({
           gitdir: updatedGitdir,
           type: 'blob',
