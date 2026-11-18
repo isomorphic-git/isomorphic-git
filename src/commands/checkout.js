@@ -141,6 +141,22 @@ export async function _checkout({
       }
     }
 
+    // A directory replaced by a file must hold nothing besides the tracked files
+    // this checkout deletes: anything else (an untracked file, or a tracked one left
+    // out by `filepaths`) would be lost, so report a conflict before touching anything.
+    if (!force) {
+      const deleted = new Set(
+        ops.filter(([method]) => method === 'delete').map(([, path]) => path)
+      )
+      for (const [method, fullpath] of ops.slice()) {
+        if (method !== 'update-dir-to-blob') continue
+        const files = await filesUnder(fs, dir, fullpath)
+        if (files.some(file => !deleted.has(file))) {
+          ops.push(['conflict', fullpath])
+        }
+      }
+    }
+
     // Report conflicts
     const conflicts = ops
       .filter(([method]) => method === 'conflict')
@@ -183,12 +199,20 @@ export async function _checkout({
         await Promise.all(
           ops
             .filter(
-              ([method]) => method === 'delete' || method === 'delete-index'
+              ([method]) =>
+                method === 'delete' ||
+                method === 'delete-index' ||
+                method === 'update-blob-to-tree'
             )
             .map(async function ([method, fullpath]) {
               const filepath = `${dir}/${fullpath}`
               if (method === 'delete') {
                 await fs.rm(filepath)
+              } else if (method === 'update-blob-to-tree') {
+                const stats = await fs.lstat(filepath)
+                if (stats && !stats.isDirectory()) {
+                  await fs.rm(filepath)
+                }
               }
               index.delete({ filepath: fullpath })
               if (onProgress) {
@@ -208,6 +232,14 @@ export async function _checkout({
       { fs, gitdir, cache },
       async function (index) {
         for (const [method, fullpath] of ops) {
+          if (method === 'update-dir-to-blob') {
+            // The tracked files inside were removed in the previous phase, and
+            // without `force` nothing else is left (checked before any change).
+            // Remove what remains so the file can be written, and its index entries.
+            await removeTree(fs, `${dir}/${fullpath}`)
+            index.delete({ filepath: fullpath })
+            continue
+          }
           if (method === 'rmdir' || method === 'rmdir-index') {
             const filepath = `${dir}/${fullpath}`
             try {
@@ -238,7 +270,12 @@ export async function _checkout({
 
     await Promise.all(
       ops
-        .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
+        .filter(
+          ([method]) =>
+            method === 'mkdir' ||
+            method === 'mkdir-index' ||
+            method === 'update-blob-to-tree'
+        )
         .map(async function ([_, fullpath]) {
           const filepath = `${dir}/${fullpath}`
           await assertNoSymlinkInLeadingPath(fs, dir, fullpath)
@@ -260,6 +297,7 @@ export async function _checkout({
           method === 'create' ||
           method === 'create-index' ||
           method === 'update' ||
+          method === 'update-dir-to-blob' ||
           method === 'mkdir-index'
       )
 
@@ -306,6 +344,7 @@ export async function _checkout({
                   method === 'create' ||
                   method === 'create-index' ||
                   method === 'update' ||
+                  method === 'update-dir-to-blob' ||
                   method === 'mkdir-index'
               )
               .map(async function ([method, fullpath, oid, mode, chmod]) {
@@ -671,9 +710,27 @@ async function analyze({
               }
             }
             case 'tree-blob': {
-              return ['update-dir-to-blob', fullpath, await commit.oid()]
+              // Something other than a directory (e.g. a symlink) is in the way.
+              if (workdir && (await workdir.type()) !== 'tree' && !force) {
+                return ['conflict', fullpath]
+              }
+              return [
+                'update-dir-to-blob',
+                fullpath,
+                await commit.oid(),
+                await commit.mode(),
+              ]
             }
             case 'blob-tree': {
+              // Don't lose local changes to the file the directory replaces.
+              if (
+                workdir &&
+                !force &&
+                ((await workdir.type()) !== 'blob' ||
+                  (await workdir.oid()) !== (await stage.oid()))
+              ) {
+                return ['conflict', fullpath]
+              }
               return ['update-blob-to-tree', fullpath]
             }
             case 'commit-commit': {
@@ -708,6 +765,39 @@ async function analyze({
       }
     },
   })
+}
+
+// The paths, relative to `dir`, of everything but directories below `fullpath`.
+// Symbolic links are listed, not followed.
+async function filesUnder(fs, dir, fullpath) {
+  const stats = await fs.lstat(`${dir}/${fullpath}`)
+  if (!stats || !stats.isDirectory()) return []
+  const files = []
+  for (const entry of (await fs.readdir(`${dir}/${fullpath}`)) || []) {
+    const child = `${fullpath}/${entry}`
+    const childStats = await fs.lstat(`${dir}/${child}`)
+    if (childStats && childStats.isDirectory()) {
+      files.push(...(await filesUnder(fs, dir, child)))
+    } else {
+      files.push(child)
+    }
+  }
+  return files
+}
+
+// Remove `filepath` and everything below it. Symbolic links are removed, not
+// followed, so nothing outside the working tree is touched.
+async function removeTree(fs, filepath) {
+  const stats = await fs.lstat(filepath)
+  if (!stats) return
+  if (!stats.isDirectory()) {
+    await fs.rm(filepath)
+    return
+  }
+  for (const entry of (await fs.readdir(filepath)) || []) {
+    await removeTree(fs, `${filepath}/${entry}`)
+  }
+  await fs.rmdir(filepath)
 }
 
 async function updateIndex({ index, fullpath, stats, oid }) {
