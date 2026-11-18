@@ -4,13 +4,18 @@ import ignore from 'ignore'
 
 import { basename } from '../utils/basename.js'
 import { dirname } from '../utils/dirname.js'
+import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
+
+import { GitConfigManager } from './GitConfigManager.js'
 
 // I'm putting this in a Manager because I reckon it could benefit
 // from a LOT of caching.
 export class GitIgnoreManager {
   /**
    * Determines whether a given file is ignored based on `.gitignore` rules and exclusion files.
+   * Matching is case-sensitive when `core.ignorecase` is false, and follows
+   * fnmatch rules for character classes (`[!a]` negates the class).
    *
    * @param {Object} args
    * @param {FSClient} args.fs - A file system implementation.
@@ -24,6 +29,20 @@ export class GitIgnoreManager {
     if (basename(filepath) === '.git') return true
     // '.' is not a valid gitignore entry, so '.' is never ignored
     if (filepath === '.') return false
+    // Resolve the real git directory first: in a submodule (or worktree)
+    // `.git` is a file pointing at the real git directory, and neither the
+    // config nor the exclude file can be read through it.
+    gitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
+    // Whether .gitignore matching is case-sensitive is governed by
+    // core.ignorecase. Canonical git writes it on init (false on
+    // case-sensitive filesystems); when it is unset, keep the `ignore`
+    // library's default of case-insensitive matching.
+    let ignorecase = true
+    const config = await GitConfigManager.get({ fs, gitdir })
+    const ignorecaseValue = await config.get('core.ignorecase')
+    if (ignorecaseValue !== undefined) {
+      ignorecase = ignorecaseValue
+    }
     // Check and load exclusion rules from project exclude file (.git/info/exclude)
     let excludes = ''
     const excludesFile = join(gitdir, 'info', 'exclude')
@@ -49,11 +68,13 @@ export class GitIgnoreManager {
     let ignoredStatus = false
     for (const [index, p] of pairs.entries()) {
       const file = await fs.read(p.gitignore, 'utf8')
-      const ign = ignore()
+      const ign = ignore({ ignorecase })
       // The patterns in .git/info/exclude are relative to the working directory,
       // so only the first pair, which holds the full filepath, can use them.
       if (index === 0) ign.add(excludes)
-      ign.add(file)
+      // A missing .gitignore reads back as null, and `ignore` 7.x throws on
+      // `add(null)`, so only add when there is something to add.
+      if (file) ign.add(file)
       // If the parent directory is excluded, we are done.
       // "It is not possible to re-include a file if a parent directory of that file is excluded. Git doesn’t list excluded directories for performance reasons, so any patterns on contained files have no effect, no matter where they are defined."
       // source: https://git-scm.com/docs/gitignore
