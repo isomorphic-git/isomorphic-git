@@ -12,17 +12,25 @@ const num = val => {
   return n
 }
 
-// This is straight from git_parse_maybe_bool_text in config.c of canonical git
+// This is straight from git_parse_maybe_bool in config.c of canonical git
 const bool = val => {
   if (typeof val === 'boolean') {
     return val
   }
 
   val = val.trim().toLowerCase()
-  if (val === 'true' || val === 'yes' || val === 'on') return true
-  if (val === 'false' || val === 'no' || val === 'off') return false
+  if (val === 'true' || val === 'yes' || val === 'on' || val === '1')
+    return true
+  if (
+    val === 'false' ||
+    val === 'no' ||
+    val === 'off' ||
+    val === '0' ||
+    val === ''
+  )
+    return false
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
+    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', or an empty value, but got ${val}`
   )
 }
 
@@ -33,7 +41,9 @@ const schema = {
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
-    bigFileThreshold: num,
+    // Lowercase key: section and key names are case-insensitive in git
+    // config, and `get` looks the decoder up by lowercased names.
+    bigfilethreshold: num,
   },
 }
 
@@ -201,7 +211,11 @@ export class GitConfig {
     const allValues = this.parsedConfig
       .filter(config => config.path === normalizedPath)
       .map(({ section, name, value }) => {
-        const fn = schema[section] && schema[section][name]
+        // The key is found by its normalized path, so the decoder lookup
+        // must use the same normalization — section and key names are
+        // case-insensitive in git config, so `ignoreCase = false` must
+        // decode the same as `ignorecase = false`.
+        const fn = schema[lower(section)] && schema[lower(section)][lower(name)]
         return fn ? fn(value) : value
       })
     return getall ? allValues : allValues.pop()

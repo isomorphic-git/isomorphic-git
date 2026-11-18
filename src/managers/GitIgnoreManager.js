@@ -33,22 +33,37 @@ export class GitIgnoreManager {
     // `.git` is a file pointing at the real git directory, and neither the
     // config nor the exclude file can be read through it.
     gitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
+    // A linked worktree keeps its shared config (and info/exclude) in the
+    // directory named by the private gitdir's `commondir` file; ordinary
+    // repos and submodules have no such file and keep using `gitdir`.
+    let configGitdir = gitdir
+    const commondir = await fs.read(join(gitdir, 'commondir'), 'utf8')
+    if (commondir) {
+      const commondirPath = commondir.trim()
+      // Worktrees use absolute gitdir paths; submodules use relative ones.
+      const isAbsolute =
+        commondirPath.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(commondirPath)
+      configGitdir = isAbsolute ? commondirPath : join(gitdir, commondirPath)
+    }
     // Whether .gitignore matching is case-sensitive is governed by
-    // core.ignorecase. Canonical git writes it on init (false on
-    // case-sensitive filesystems); when it is unset, keep the `ignore`
+    // core.ignorecase. Canonical git sets it to true on init when its probe
+    // detects a case-insensitive filesystem, and normally leaves it unset
+    // on a case-sensitive filesystem; when it is unset, keep the `ignore`
     // library's default of case-insensitive matching.
     let ignorecase = true
-    const config = await GitConfigManager.get({ fs, gitdir })
+    const config = await GitConfigManager.get({ fs, gitdir: configGitdir })
     const ignorecaseValue = await config.get('core.ignorecase')
     if (ignorecaseValue !== undefined) {
       ignorecase = ignorecaseValue
     }
-    // Check and load exclusion rules from project exclude file (.git/info/exclude)
-    let excludes = ''
-    const excludesFile = join(gitdir, 'info', 'exclude')
-    if (await fs.exists(excludesFile)) {
-      excludes = await fs.read(excludesFile, 'utf8')
-    }
+    // Check and load exclusion rules from project exclude file (.git/info/exclude).
+    // Read it once: it may vanish between an existence check and the read,
+    // and `ignore` 7.x throws on `add(null)`, so only add it when the read
+    // returns content. (A missing file reads back as null.)
+    const excludes = await fs.read(
+      join(configGitdir, 'info', 'exclude'),
+      'utf8'
+    )
     // Find all the .gitignore files that could affect this file
     const pairs = [
       {
@@ -71,7 +86,7 @@ export class GitIgnoreManager {
       const ign = ignore({ ignorecase })
       // The patterns in .git/info/exclude are relative to the working directory,
       // so only the first pair, which holds the full filepath, can use them.
-      if (index === 0) ign.add(excludes)
+      if (index === 0 && excludes) ign.add(excludes)
       // A missing .gitignore reads back as null, and `ignore` 7.x throws on
       // `add(null)`, so only add when there is something to add.
       if (file) ign.add(file)

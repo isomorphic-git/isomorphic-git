@@ -328,6 +328,35 @@ describe('GitConfig', () => {
       expect(d).toEqual(true)
     })
 
+    it('boolean spellings from canonical git', async () => {
+      // git_parse_maybe_bool in config.c accepts 0/1 and an empty value,
+      // and a bare key (no `=`) means true. Verified against git 2.43.0:
+      // `ignorecase = 0` -> false, `= 1` -> true, `=` -> false.
+      const config0 = GitConfig.from(`[core]
+      ignorecase = 0`)
+      const config1 = GitConfig.from(`[core]
+      ignorecase = 1`)
+      const configEmpty = GitConfig.from(`[core]
+      ignorecase =`)
+      const configBare = GitConfig.from(`[core]
+      ignorecase`)
+      expect(await config0.get('core.ignorecase')).toEqual(false)
+      expect(await config1.get('core.ignorecase')).toEqual(true)
+      expect(await configEmpty.get('core.ignorecase')).toEqual(false)
+      expect(await configBare.get('core.ignorecase')).toEqual(true)
+    })
+
+    it('schema lookup is case-insensitive for section and key names', async () => {
+      // The key is found by its normalized path, so the decoder lookup must
+      // use the same normalization — otherwise `ignoreCase = false` comes
+      // back as the string "false" instead of the boolean false.
+      const config = GitConfig.from(`[Core]
+      IgnoreCase = false`)
+      expect(await config.get('core.ignorecase')).toEqual(false)
+      expect(await config.get('core.ignoreCase')).toEqual(false)
+      expect(typeof (await config.get('core.ignorecase'))).toEqual('boolean')
+    })
+
     it('numeric suffix', async () => {
       const configA = GitConfig.from(`[core]
       bigFileThreshold = 2k`)
