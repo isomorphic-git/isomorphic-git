@@ -69,12 +69,16 @@ export async function _log({
   // Commits that do not match the author pattern are omitted from the
   // result, but their history is still traversed so that file tracking and
   // `depth` behave as they do without a filter.
+  const emittedFileCommits = filepath ? new Set() : null
   const pushCommit = commit => {
-    if (matchesAuthor(commit)) commits.push(commit)
+    if (!matchesAuthor(commit) || emittedFileCommits?.has(commit.oid)) return
+    emittedFileCommits?.add(commit.oid)
+    commits.push(commit)
   }
   const shallowCommits = await GitShallowManager.read({ fs, gitdir })
   const oid = await GitRefManager.resolve({ fs, gitdir, ref })
   const tips = [await _readCommit({ fs, cache, gitdir, oid })]
+  const scheduled = new Set([tips[0].oid])
   let lastFileOid
   let lastFileMode
   let lastCommit
@@ -86,6 +90,8 @@ export async function _log({
 
   while (tips.length > 0) {
     const commit = tips.pop()
+    // File history compares successive trees and may revisit a merge ancestor.
+    if (filepath) scheduled.delete(commit.oid)
 
     // Stop the log if we've hit the age limit
     if (
@@ -178,13 +184,12 @@ export async function _log({
 
     // If this is not a shallow commit...
     if (!shallowCommits.has(commit.oid)) {
-      // Add the parents of this commit to the queue
-      // Note: for the case of a commit with no parents, it will concat an empty array, having no net effect.
       for (const oid of commit.commit.parent) {
-        const commit = await _readCommit({ fs, cache, gitdir, oid })
-        if (!tips.map(commit => commit.oid).includes(commit.oid)) {
-          tips.push(commit)
-        }
+        if (scheduled.has(oid)) continue
+        const parent = await _readCommit({ fs, cache, gitdir, oid })
+        if (scheduled.has(parent.oid)) continue
+        scheduled.add(parent.oid)
+        tips.push(parent)
       }
     }
 
