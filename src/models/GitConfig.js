@@ -20,9 +20,13 @@ const bool = val => {
 
   val = val.trim().toLowerCase()
   if (val === 'true' || val === 'yes' || val === 'on') return true
-  if (val === 'false' || val === 'no' || val === 'off') return false
+  if (val === 'false' || val === 'no' || val === 'off' || val === '') {
+    return false
+  }
+  // Like git_parse_maybe_bool, an integer is false only when it is 0
+  if (/^[-+]?\d+$/.test(val)) return Number(val) !== 0
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
+    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', or an integer, but got ${val}`
   )
 }
 
@@ -33,7 +37,7 @@ const schema = {
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
-    bigFileThreshold: num,
+    bigfilethreshold: num,
   },
 }
 
@@ -201,7 +205,9 @@ export class GitConfig {
     const allValues = this.parsedConfig
       .filter(config => config.path === normalizedPath)
       .map(({ section, name, value }) => {
-        const fn = schema[section] && schema[section][name]
+        // Section and variable names are case insensitive (e.g. `fileMode`)
+        const sectionSchema = schema[lower(section)]
+        const fn = sectionSchema && sectionSchema[lower(name)]
         return fn ? fn(value) : value
       })
     return getall ? allValues : allValues.pop()
