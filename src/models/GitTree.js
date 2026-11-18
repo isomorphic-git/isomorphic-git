@@ -24,6 +24,24 @@ function mode2type(mode) {
   throw new InternalError(`Unexpected GitTree entry mode: ${mode}`)
 }
 
+// Normalize a mode read from a tree object the way git's canon_mode() does.
+// Trees written by early versions of git or by other tools can hold modes like
+// 100664 or 120664, which `git fsck` only warns about and git reads as 100644
+// and 120000. A mode of an unknown type is returned unchanged.
+function canonicalMode(mode) {
+  if (/^[0-7]+$/.test(mode)) {
+    const value = parseInt(mode, 8)
+    // prettier-ignore
+    switch (value & 0o170000) {
+      case 0o040000: return '040000'
+      case 0o100000: return value & 0o100 ? '100755' : '100644'
+      case 0o120000: return '120000'
+      case 0o160000: return '160000'
+    }
+  }
+  return mode
+}
+
 function parseBuffer(buffer) {
   const _entries = []
   let cursor = 0
@@ -40,8 +58,7 @@ function parseBuffer(buffer) {
         `GitTree: Error parsing buffer at byte location ${cursor}: Could not find the next null character.`
       )
     }
-    let mode = buffer.slice(cursor, space).toString('utf8')
-    if (mode === '40000') mode = '040000' // makes it line up neater in printed output
+    const mode = canonicalMode(buffer.slice(cursor, space).toString('utf8'))
     const type = mode2type(mode)
     const path = buffer.slice(space + 1, nullchar).toString('utf8')
 

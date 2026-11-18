@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import { Errors, readTree } from 'isomorphic-git'
+import { Errors, readTree, writeObject } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 import { corruptZlibCases } from './__helpers__/corruptZlib.js'
@@ -578,6 +578,31 @@ describe('readTree', () => {
     expect(error).not.toBeNull()
     expect(error instanceof Errors.InvalidFilepathError).toBe(true)
     expect(error.data.reason).toBe('trailing-slash')
+  })
+  it('reads legacy file modes the way git does', async () => {
+    // Trees written by early versions of git can hold modes like 100664.
+    // git reads them as 100644, 100755 and 120000 (see canon_mode() in git).
+    const { fs, gitdir } = await makeFixture('test-readTree')
+    const blob = Buffer.from('375f9392774e7a7c8a1ae23a6d13b5c133e42c45', 'hex')
+    const entry = (mode, name) =>
+      Buffer.concat([Buffer.from(`${mode} ${name}\0`), blob])
+    const oid = await writeObject({
+      fs,
+      gitdir,
+      type: 'tree',
+      format: 'content',
+      object: Buffer.concat([
+        entry('100664', 'a.txt'),
+        entry('100775', 'b.sh'),
+        entry('120664', 'c.link'),
+      ]),
+    })
+    const { tree } = await readTree({ fs, gitdir, oid })
+    expect(tree.map(({ mode, type, path }) => [mode, type, path])).toEqual([
+      ['100644', 'blob', 'a.txt'],
+      ['100755', 'blob', 'b.sh'],
+      ['120000', 'blob', 'c.link'],
+    ])
   })
   for (const [name, bytes] of corruptZlibCases) {
     it(`reports the decompression error for ${name} loose data`, async () => {
