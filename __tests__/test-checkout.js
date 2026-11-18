@@ -20,6 +20,7 @@ import {
   readCommit,
   writeTag,
   writeRef,
+  init,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
@@ -966,5 +967,61 @@ describe('checkout', () => {
       ['src/index.js', 1, 1, 1],
     ])
     expect(indexWrites).toBe(1)
+  })
+
+  it('handles paths transitioning between directory and file (#2487)', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-init')
+    await init({ fs, dir, gitdir, defaultBranch: 'main' })
+    const author = {
+      name: 'Test',
+      email: 'test@example.com',
+      timestamp: 1700000000,
+      timezoneOffset: 0,
+    }
+
+    // 1. Directory -> File
+    await fs.mkdir(`${dir}/d`)
+    await fs.write(`${dir}/d/f`, 'hello')
+    await add({ fs, dir, gitdir, filepath: 'd/f' })
+    await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'c1: dir',
+      author,
+      committer: author,
+    })
+    await branch({ fs, dir, gitdir, ref: 'branch-dir' })
+
+    await remove({ fs, dir, gitdir, filepath: 'd/f' })
+    await fs.rm(`${dir}/d/f`)
+    await fs.rmdir(`${dir}/d`)
+    await fs.write(`${dir}/d`, 'file content')
+    await add({ fs, dir, gitdir, filepath: 'd' })
+    await commit({
+      fs,
+      dir,
+      gitdir,
+      message: 'c2: file',
+      author,
+      committer: author,
+    })
+
+    // Checkout directory branch
+    await checkout({ fs, dir, gitdir, ref: 'branch-dir' })
+    expect((await fs.lstat(`${dir}/d`)).isDirectory()).toBe(true)
+
+    // Checkout file branch
+    await checkout({ fs, dir, gitdir, ref: 'main' })
+    expect((await fs.lstat(`${dir}/d`)).isFile()).toBe(true)
+    expect(await fs.read(`${dir}/d`, 'utf8')).toBe('file content')
+
+    const matrix = await statusMatrix({ fs, dir, gitdir, filepaths: ['d'] })
+    expect(matrix).toEqual([['d', 1, 1, 1]])
+
+    // Switch back to directory branch
+    await checkout({ fs, dir, gitdir, ref: 'branch-dir' })
+    expect((await fs.lstat(`${dir}/d`)).isDirectory()).toBe(true)
+    expect(await fs.read(`${dir}/d/f`, 'utf8')).toBe('hello')
   })
 })
