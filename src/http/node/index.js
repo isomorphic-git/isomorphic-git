@@ -85,10 +85,21 @@ function redirectRequest(previous, statusCode, location) {
   let { method, body } = previous
   const dropped = ['host']
   if (!sameOrigin) dropped.push('authorization', 'cookie')
-  if (method === 'POST' && (statusCode === 301 || statusCode === 302)) {
+  // Like curl and RFC 7231 §6.4.4, a 303 always turns into a GET; a 301 or 302
+  // turns only a POST into one.
+  if (
+    (statusCode === 303 && method !== 'GET' && method !== 'HEAD') ||
+    (method === 'POST' && (statusCode === 301 || statusCode === 302))
+  ) {
     method = 'GET'
     body = undefined
     dropped.push('content-length', 'content-type')
+  } else if (body && !Buffer.isBuffer(body)) {
+    // A streamed body has been read by the first request and would be resent
+    // empty.
+    throw new Error(
+      `cannot follow a ${statusCode} redirect: the request body is a stream and cannot be replayed`
+    )
   }
   /** @type {Object<string, string>} */
   const headers = {}

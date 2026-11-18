@@ -152,6 +152,51 @@ describe('node http client redirects', () => {
     expect(target.requests[1].body.toString()).toBe(body[0].toString())
   })
 
+  it('turns POST into GET on 303 and does not forward the body', async () => {
+    const target = await serve(ok)
+    const source = await serve(
+      redirectTo(`http://localhost:${target.port}/`, 303)
+    )
+
+    await request({
+      url: `http://127.0.0.1:${source.port}/`,
+      method: 'POST',
+      headers: {
+        ...credentials,
+        'Content-Type': 'application/x-git-receive-pack-request',
+      },
+      body: /** @type {any} */ ([Buffer.from('PACK<<pack payload>>')]),
+    })
+
+    expect(source.requests[0].body.toString()).toBe('PACK<<pack payload>>')
+    expect(target.requests[0].method).toBe('GET')
+    expect(target.requests[0].body.length).toBe(0)
+    expect(target.requests[0].headers['content-type']).toBeUndefined()
+    expect(target.requests[0].headers.authorization).toBeUndefined()
+  })
+
+  it('refuses to replay a streamed body on 307 and 308', async () => {
+    const target = await serve(ok)
+    for (const status of [307, 308]) {
+      const source = await serve(
+        redirectTo(`http://127.0.0.1:${target.port}/`, status)
+      )
+      async function* body() {
+        yield Buffer.from('streamed payload')
+      }
+
+      await expect(
+        request({
+          url: `http://127.0.0.1:${source.port}/`,
+          method: 'POST',
+          body: /** @type {any} */ (body()),
+        })
+      ).rejects.toThrow(`cannot follow a ${status} redirect`)
+      expect(source.requests[0].body.toString()).toBe('streamed payload')
+    }
+    expect(target.requests).toHaveLength(0)
+  })
+
   it('treats a lowercase post like POST', async () => {
     const target = await serve(ok)
     const source = await serve(redirectTo(`http://127.0.0.1:${target.port}/`))
