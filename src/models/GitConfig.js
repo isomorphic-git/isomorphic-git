@@ -12,8 +12,8 @@ const num = val => {
   return n
 }
 
-// This is straight from git_parse_maybe_bool_text in config.c of canonical git
-const bool = val => {
+// This is straight from git_parse_maybe_bool in config.c of canonical git
+export const bool = val => {
   if (typeof val === 'boolean') {
     return val
   }
@@ -21,6 +21,8 @@ const bool = val => {
   val = val.trim().toLowerCase()
   if (val === 'true' || val === 'yes' || val === 'on') return true
   if (val === 'false' || val === 'no' || val === 'off') return false
+  // An integer is true unless it is 0
+  if (/^[-+]?\d+$/.test(val)) return parseInt(val) !== 0
   throw Error(
     `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
   )
