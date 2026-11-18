@@ -7,6 +7,72 @@ const firstParent = '9144a97b79c162e6d5a08cb490848352c41b9ea1'
 const secondParent = 'b7fa5f8d01d995c9b86c0ef2cf18742097fb2255'
 
 describe('GitCommit', () => {
+  it('preserves stored message content in signed and unsigned payloads', () => {
+    const headers = `tree ${firstTree}\nauthor Alice <alice@example.com> 1 +0000\ncommitter Alice <alice@example.com> 1 +0000`
+    for (const message of [
+      '\n\nVerbatim message\n\nMore details\n',
+      'Trailing blank lines\n\n\n',
+      'CRLF message\r\nwith a carriage return\rinside\r\n\r\n',
+      'No terminal newline',
+      '',
+    ]) {
+      const payload = `${headers}\n\n${message}`
+      expect(GitCommit.from(payload).withoutSignature()).toEqual(payload)
+      for (const format of ['PGP', 'SSH']) {
+        const signature = `gpgsig -----BEGIN ${format} SIGNATURE-----\n c2lnbmF0dXJl\n -----END ${format} SIGNATURE-----`
+        expect(
+          GitCommit.from(
+            `${headers}\n${signature}\n\n${message}`
+          ).withoutSignature()
+        ).toEqual(payload)
+      }
+    }
+  })
+
+  it('removes both hash signature headers while retaining other headers', () => {
+    const headers = `tree ${firstTree}\nauthor Alice <alice@example.com> 1 +0000\ncommitter Alice <alice@example.com> 1 +0000`
+    const extra =
+      'encoding UTF-8\nx-extra metadata\r\n continued metadata\ngpgsig-sha256-extra retained'
+    const sha1Signature =
+      'gpgsig signature\n continuation\n another continuation'
+    const sha256Signature =
+      'gpgsig-sha256 signature\n continuation\n another continuation'
+    const message = '\nMessage\r\n\ngpgsig-sha256 part of the message\n\n'
+    const payload = `${headers}\n${extra}\n\n${message}`
+    for (const signedHeaders of [
+      [headers, sha256Signature, extra],
+      [headers, sha1Signature, sha256Signature, extra],
+      [headers, sha256Signature, extra, sha1Signature],
+      [headers, extra, sha1Signature, sha256Signature],
+    ]) {
+      expect(
+        GitCommit.from(
+          `${signedHeaders.join('\n')}\n\n${message}`
+        ).withoutSignature()
+      ).toEqual(payload)
+    }
+  })
+
+  it('removes only signature headers regardless of the armor format', () => {
+    const headers = `tree ${firstTree}\nauthor Alice <alice@example.com> 1 +0000\ncommitter Alice <alice@example.com> 1 +0000`
+    const extra = 'encoding UTF-8\nx-extra metadata\n continued metadata'
+    const message =
+      'Signed café\n\ngpgsig part of the message\n-----END PGP SIGNATURE-----\n'
+    const payload = `${headers}\n${extra}\n\n${message}`
+    expect(GitCommit.from(payload).withoutSignature()).toEqual(payload)
+    for (const format of ['PGP', 'SSH', 'SIGNED MESSAGE']) {
+      const signature = `gpgsig -----BEGIN ${format} SIGNATURE-----\n c2lnbmF0dXJl\n -----END ${format} SIGNATURE-----`
+      for (const signedHeaders of [
+        `${headers}\n${signature}\n${extra}`,
+        `${headers}\n${extra}\n${signature}`,
+      ]) {
+        expect(
+          GitCommit.from(`${signedHeaders}\n\n${message}`).withoutSignature()
+        ).toEqual(payload)
+      }
+    }
+  })
+
   it('keeps the first tree header', async () => {
     const commit = GitCommit.from(
       `tree ${firstTree}

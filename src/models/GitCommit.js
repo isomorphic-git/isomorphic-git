@@ -143,15 +143,21 @@ export class GitCommit {
     return this._commit
   }
 
+  /** Return the verification payload without signature headers, preserving the stored content. */
   withoutSignature() {
-    const commit = normalizeNewlines(this._commit)
-    if (commit.indexOf('\ngpgsig') === -1) return commit
-    const headers = commit.slice(0, commit.indexOf('\ngpgsig'))
-    const message = commit.slice(
-      commit.indexOf('-----END PGP SIGNATURE-----\n') +
-        '-----END PGP SIGNATURE-----\n'.length
-    )
-    return normalizeNewlines(headers + '\n' + message)
+    const commit = this._commit
+    let inSignature = false
+    const headers = GitCommit.justHeaders(commit)
+      .split('\n')
+      .filter(line => {
+        if (!line.startsWith(' ')) {
+          inSignature =
+            line.startsWith('gpgsig ') || line.startsWith('gpgsig-sha256 ')
+        }
+        return !inSignature
+      })
+      .join('\n')
+    return headers + '\n\n' + commit.slice(commit.indexOf('\n\n') + 2)
   }
 
   isolateSignature() {
