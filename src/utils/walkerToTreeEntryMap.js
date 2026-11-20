@@ -193,6 +193,13 @@ export async function writeTreeChanges({
   return _writeTree({ fs, gitdir, tree: treeEntries })
 }
 
+/**
+ * Writes the changes between two commits to the working tree and, with `wasStaged`, to the index.
+ *
+ * @param {object} args
+ * @param {boolean} [args.stageDeletions = false] - with `wasStaged`, remove files the change deletes from the index
+ * (cherry-pick); without it their index entries keep the parent's version (stash apply)
+ */
 export async function applyTreeChanges({
   fs,
   dir,
@@ -200,6 +207,7 @@ export async function applyTreeChanges({
   stashCommit,
   parentCommit,
   wasStaged,
+  stageDeletions = false,
 }) {
   const dirRemoved = []
   const stageUpdated = []
@@ -227,8 +235,13 @@ export async function applyTreeChanges({
       if (!stash && parent) {
         const method = type === 'tree' ? 'rmdir' : 'rm'
         if (type === 'tree') dirRemoved.push(filepath)
-        if (type === 'blob' && wasStaged)
-          stageUpdated.push({ filepath, oid: await parent.oid() }) // stats is undefined, will stage the deletion with index.insert
+        if (type === 'blob' && wasStaged) {
+          stageUpdated.push(
+            stageDeletions
+              ? { filepath, deleted: true }
+              : { filepath, oid: await parent.oid() } // stats is undefined: index.insert keeps the entry with the parent's oid
+          )
+        }
         return { method, filepath }
       }
 
@@ -303,8 +316,9 @@ export async function applyTreeChanges({
 
   // update the stage
   await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {
-    stageUpdated.forEach(({ filepath, stats, oid }) => {
-      index.insert({ filepath, stats, oid })
+    stageUpdated.forEach(({ filepath, stats, oid, deleted }) => {
+      if (deleted) index.delete({ filepath })
+      else index.insert({ filepath, stats, oid })
     })
   })
 }
