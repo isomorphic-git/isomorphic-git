@@ -23,6 +23,35 @@ describe('GitTree entry-name validation', () => {
     rejects('.git ')
   })
 
+  // Win32 drops the trailing dots and spaces of a path component but recognizes "."
+  // and ".." first, so `.. ` resolves to the parent directory and escapes the working
+  // directory just like a plain "..". git rejects the whole class in
+  // is_valid_win32_path(): a component may not end in a dot or a space, except for
+  // "." and ".." themselves.
+  it('rejects ".." and "." with trailing dots and spaces', () => {
+    rejects('.. ')
+    rejects('..  ')
+    rejects('.. .')
+    rejects('...')
+    rejects('. ')
+    rejects(' ')
+  })
+
+  // The ADS split has to happen before the "." and ".." test too, not only before the
+  // ".git" test, or `..::$INDEX_ALLOCATION` names the parent directory.
+  it('rejects NTFS Alternate Data Streams of . and ..', () => {
+    rejects('..::$INDEX_ALLOCATION')
+    rejects('..:foo')
+    rejects('.. :foo')
+    rejects('.:$DATA')
+  })
+
+  it('accepts names that only end in a dot or a space', () => {
+    expect(GitTree.from(entry('100644', 'foo ')).entries()[0].path).toBe('foo ')
+    expect(GitTree.from(entry('100644', 'foo.')).entries()[0].path).toBe('foo.')
+    expect(GitTree.from(entry('100644', '..\t')).entries()[0].path).toBe('..\t')
+  })
+
   it('rejects NTFS 8.3 short name aliases for .git', () => {
     rejects('git~1')
     rejects('GIT~1')

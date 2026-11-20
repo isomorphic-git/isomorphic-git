@@ -62,11 +62,14 @@ function parseBuffer(buffer) {
     // colon names the actual entry we normalize and check.
     const ntfsClean = hfsClean.split(':')[0]
     const normalized = ntfsClean.toLowerCase().replace(/[. ]+$/, '')
+    // Win32 drops the trailing dots and spaces of a path component, so every name
+    // built only from dots and spaces aliases "." or "..", not just those two exact
+    // spellings: `.. ` resolves to the parent directory. git rejects the whole class
+    // in is_valid_win32_path().
     if (
       path.includes('\\') ||
       path.includes('/') ||
-      hfsClean === '.' ||
-      hfsClean === '..' ||
+      /^[. ]+$/.test(ntfsClean) ||
       normalized === '.git' ||
       /^\.?git~[1-9]$/.test(normalized)
     ) {
