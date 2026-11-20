@@ -284,6 +284,7 @@ export async function mergeTree({
               const object = tree.toObject()
               const oid = await writeObject({
                 fs,
+                cache,
                 gitdir,
                 type: 'tree',
                 object,

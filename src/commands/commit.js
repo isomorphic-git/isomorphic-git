@@ -140,7 +140,7 @@ export async function _commit({
       )
       const inode = inodes.get('.')
       if (!tree) {
-        tree = await constructTree({ fs, gitdir, inode, dryRun })
+        tree = await constructTree({ fs, cache, gitdir, inode, dryRun })
       }
 
       // Determine parents of this commit
@@ -206,6 +206,7 @@ export async function _commit({
       }
       const oid = await writeObject({
         fs,
+        cache,
         gitdir,
         type: 'commit',
         object: comm.toObject(),
@@ -225,13 +226,19 @@ export async function _commit({
   )
 }
 
-async function constructTree({ fs, gitdir, inode, dryRun }) {
+async function constructTree({ fs, cache, gitdir, inode, dryRun }) {
   // use depth first traversal
   const children = inode.children
   for (const inode of children) {
     if (inode.type === 'tree') {
       inode.metadata.mode = '040000'
-      inode.metadata.oid = await constructTree({ fs, gitdir, inode, dryRun })
+      inode.metadata.oid = await constructTree({
+        fs,
+        cache,
+        gitdir,
+        inode,
+        dryRun,
+      })
     }
   }
   const entries = children.map(inode => ({
@@ -243,6 +250,7 @@ async function constructTree({ fs, gitdir, inode, dryRun }) {
   const tree = GitTree.from(entries)
   const oid = await writeObject({
     fs,
+    cache,
     gitdir,
     type: 'tree',
     object: tree.toObject(),

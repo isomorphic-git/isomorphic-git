@@ -15,9 +15,11 @@ import {
   writeTag,
   status,
   statusMatrix,
+  updateIndex,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
+import { listLooseObjects } from './__helpers__/listLooseObjects.js'
 
 describe('commit', () => {
   it('prevent commit if index has unmerged paths', async () => {
@@ -807,5 +809,30 @@ describe('commit', () => {
     })
     const { commit: newCommit } = await readCommit({ fs, gitdir, oid: sha })
     expect(newCommit.tree).toBe(parentCommit.tree)
+  })
+  it('writes loose objects only for new trees and the commit when the old trees are packed', async () => {
+    // Setup: all objects of the fixture are in one pack. Expected oids come
+    // from canonical git making the same change and commit.
+    const { fs, dir, gitdir } = await makeFixture('test-commit-packed')
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: 0,
+    }
+    const blob = await writeBlob({ fs, gitdir, blob: Buffer.from('b2\n') })
+    await updateIndex({ fs, dir, gitdir, filepath: 'src/lib/b.txt', oid: blob })
+    // Test
+    const sha = await commit({ fs, gitdir, author, message: 'Change b' })
+    expect(sha).toBe('710a3e9a0017dcf20e3968413d7f0ed604147348')
+    // Only src/lib, src, the root tree, the commit and the blob are new.
+    // The unchanged trees (docs, src/lib/deep) stay packed only.
+    expect(await listLooseObjects(fs, gitdir)).toEqual([
+      '51a44d47cdcd28c002de96b6c64f7c1ee7fe9eea',
+      '710a3e9a0017dcf20e3968413d7f0ed604147348',
+      'dc5f935a8e7a088b93a6e8f1a59e18b7dee2a634',
+      'e6bfff5c1d0f0ecd501552b43a1e13d8008abc31',
+      'ebce015c7c022085ef50914c70c41b8ca2586bb4',
+    ])
   })
 })
