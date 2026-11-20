@@ -666,6 +666,20 @@ describe('cherryPick', () => {
       expect(await fs.read(join(dir, 'gone.txt'), 'utf8')).toBe('local-dirty\n')
     })
 
+    it('removes a deleted file from the index', async () => {
+      const repo = await setup('tmp-cherry-deleted-index')
+      const { fs, dir, gitdir, featureOid } = repo
+
+      await cherryPick({ fs, dir, gitdir, oid: featureOid, committer: author })
+
+      // the deleted file is gone from the worktree and the index,
+      // so the status is clean (before the fix it stayed in the index)
+      expect(await fs.exists(join(dir, 'gone.txt'))).toBe(false)
+      expect(await status({ fs, dir, gitdir, filepath: 'gone.txt' })).toBe(
+        'absent'
+      )
+    })
+
     it('also rejects when conflicts would be written to the worktree', async () => {
       const repo = await setup('tmp-cherry-dirty-no-abort')
       const { fs, dir } = repo
