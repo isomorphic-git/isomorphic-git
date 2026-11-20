@@ -30,10 +30,12 @@ const bool = val => {
   )
     return false
   // git_parse_maybe_bool also accepts any integer: zero is false and
-  // nonzero is true.
+  // nonzero is true. git's integer parser accepts unit suffixes
+  // (k/m/g, see parse_unit_factor above), so `2k` is true too.
   if (/^[+-]?\d+$/.test(val)) return Number(val) !== 0
+  if (/^[+-]?\d+[kmg]$/.test(val)) return num(val) !== 0
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', an empty value, or an integer, but got ${val}`
+    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', an empty value, or an integer (with optional k/m/g suffix), but got ${val}`
   )
 }
 

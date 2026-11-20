@@ -361,15 +361,27 @@ describe('GitConfig', () => {
       expect(await config42.get('core.ignorecase')).toEqual(true)
     })
 
+    it('accepts git integer suffixes as booleans', async () => {
+      // git 2.43.0 accepts `2k` as boolean `true`: its boolean parser
+      // uses the integer parser, which supports unit suffixes.
+      // `0k` is still zero, hence false.
+      const configSuffix = GitConfig.from(`[core]
+      ignorecase = 2k`)
+      const configZeroSuffix = GitConfig.from(`[core]
+      ignorecase = 0k`)
+      const configMeg = GitConfig.from(`[core]
+      ignorecase = 2m`)
+      expect(await configSuffix.get('core.ignorecase')).toEqual(true)
+      expect(await configZeroSuffix.get('core.ignorecase')).toEqual(false)
+      expect(await configMeg.get('core.ignorecase')).toEqual(true)
+    })
+
     it('rejects non-integer boolean values', async () => {
       const configFloat = GitConfig.from(`[core]
       ignorecase = 2.5`)
-      const configSuffix = GitConfig.from(`[core]
-      ignorecase = 2k`)
       const configWord = GitConfig.from(`[core]
       ignorecase = maybe`)
       await expect(configFloat.get('core.ignorecase')).rejects.toThrow()
-      await expect(configSuffix.get('core.ignorecase')).rejects.toThrow()
       await expect(configWord.get('core.ignorecase')).rejects.toThrow()
     })
 
