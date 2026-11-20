@@ -1060,6 +1060,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "w0244079",
+      "name": "Michael Caines",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6243082?v=4",
+      "profile": "https://www.nscc.ca/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"

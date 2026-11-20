@@ -13,6 +13,7 @@ import {
   checkout,
   readCommit,
   resolveRef,
+  listFiles,
   log,
   remove,
   setConfig,
@@ -748,5 +749,48 @@ describe('cherryPick', () => {
         'untracked\n'
       )
     })
+  })
+  it('cherry-pick of a commit that deletes a file removes it from the index', async () => {
+    const { fs, dir, gitdir } = await makeFixture('tmp-cherry-delete')
+    await init({ fs, dir, gitdir })
+    const author = {
+      name: 'Author',
+      email: 'author@example.com',
+      timestamp: 1600000000,
+      timezoneOffset: 0,
+    }
+    await fs._writeFile(join(dir, 'file.txt'), 'base\n')
+    await fs._writeFile(join(dir, 'gone.txt'), 'deleted on feature\n')
+    await add({ fs, dir, gitdir, filepath: ['file.txt', 'gone.txt'] })
+    await gitCommit({ fs, dir, gitdir, message: 'base', author })
+
+    await branch({ fs, dir, gitdir, ref: 'feature' })
+    await checkout({ fs, dir, gitdir, ref: 'feature' })
+    await remove({ fs, dir, gitdir, filepath: 'gone.txt' })
+    await fs.rm(join(dir, 'gone.txt'))
+    const featureOid = await gitCommit({
+      fs,
+      dir,
+      gitdir,
+      message: 'delete gone.txt',
+      author,
+    })
+
+    await checkout({ fs, dir, gitdir, ref: 'master' })
+    await fs._writeFile(join(dir, 'master.txt'), 'master\n')
+    await add({ fs, dir, gitdir, filepath: 'master.txt' })
+    await gitCommit({ fs, dir, gitdir, message: 'master update', author })
+
+    await cherryPick({ fs, dir, gitdir, oid: featureOid, committer: author })
+
+    // Like `git cherry-pick`: gone from the working tree, the index and HEAD
+    expect(await fs.exists(join(dir, 'gone.txt'))).toBe(false)
+    expect(await listFiles({ fs, dir, gitdir })).toEqual([
+      'file.txt',
+      'master.txt',
+    ])
+    expect(await status({ fs, dir, gitdir, filepath: 'gone.txt' })).toBe(
+      'absent'
+    )
   })
 })

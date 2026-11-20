@@ -166,6 +166,7 @@ export async function _cherryPick({
       stashCommit: newOid,
       parentCommit: currentOid,
       wasStaged: true,
+      stageDeletions: true,
     })
   }
 
