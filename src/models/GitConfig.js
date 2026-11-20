@@ -29,8 +29,11 @@ const bool = val => {
     val === ''
   )
     return false
+  // git_parse_maybe_bool also accepts any integer: zero is false and
+  // nonzero is true.
+  if (/^[+-]?\d+$/.test(val)) return Number(val) !== 0
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', or an empty value, but got ${val}`
+    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', an empty value, or an integer, but got ${val}`
   )
 }
 
@@ -210,12 +213,26 @@ export class GitConfig {
     const normalizedPath = normalizePath(path).path
     const allValues = this.parsedConfig
       .filter(config => config.path === normalizedPath)
-      .map(({ section, name, value }) => {
+      .map(({ section, subsection, name, value }) => {
         // The key is found by its normalized path, so the decoder lookup
         // must use the same normalization — section and key names are
         // case-insensitive in git config, so `ignoreCase = false` must
         // decode the same as `ignorecase = false`.
-        const fn = schema[lower(section)] && schema[lower(section)][lower(name)]
+        // Decoders apply only to top-level entries: a subsection (e.g.
+        // `[core "topic"]`) has its own namespace, so its values keep
+        // their raw form. The lookup must also use own properties only:
+        // `schema['constructor']` would otherwise resolve the inherited
+        // Object constructor.
+        const sectionSchema =
+          subsection == null &&
+          Object.prototype.hasOwnProperty.call(schema, lower(section))
+            ? schema[lower(section)]
+            : undefined
+        const fn =
+          sectionSchema &&
+          Object.prototype.hasOwnProperty.call(sectionSchema, lower(name))
+            ? sectionSchema[lower(name)]
+            : undefined
         return fn ? fn(value) : value
       })
     return getall ? allValues : allValues.pop()

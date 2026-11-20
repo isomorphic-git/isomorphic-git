@@ -191,6 +191,7 @@ export async function statusMatrix({
             const isIgnored = await GitIgnoreManager.isIgnored({
               fs,
               dir,
+              gitdir: updatedGitdir,
               filepath,
             })
             if (isIgnored) {

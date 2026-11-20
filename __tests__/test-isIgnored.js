@@ -237,6 +237,37 @@ describe('isIgnored', () => {
       })
     ).toBe(false)
   })
+  it('should keep a trailing space in the commondir path', async () => {
+    // Setup — a common directory whose name ends in a space: canonical
+    // git strips only trailing CR/LF from the commondir file, so the
+    // space is part of the path and the shared info/exclude must be read
+    // from it.
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    const worktreeDir = dir + '/wt'
+    const privateGitdir = gitdir + '/worktrees/topic'
+    const sharedDir = gitdir + '/common '
+    await fs.write(worktreeDir + '/.git', `gitdir: ${privateGitdir}\n`)
+    await fs.write(privateGitdir + '/commondir', `${sharedDir}\n`)
+    await fs.write(privateGitdir + '/gitdir', worktreeDir + '/.git\n')
+    await writeExclude(fs, sharedDir, ['*.tmp'])
+    // Test
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'a.tmp',
+      })
+    ).toBe(true)
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'a.txt',
+      })
+    ).toBe(false)
+  })
   it('should not throw when .git/info/exclude disappears after the existence check', async () => {
     // Setup — simulate info/exclude vanishing between `exists` and `read`:
     // the existence check succeeds but the read comes back empty.

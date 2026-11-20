@@ -39,7 +39,10 @@ export class GitIgnoreManager {
     let configGitdir = gitdir
     const commondir = await fs.read(join(gitdir, 'commondir'), 'utf8')
     if (commondir) {
-      const commondirPath = commondir.trim()
+      // Canonical git strips only trailing CR/LF from the commondir file
+      // (get_common_dir_noenv), so a directory name ending in a space or
+      // tab keeps it.
+      const commondirPath = commondir.replace(/[\r\n]+$/, '')
       // Worktrees use absolute gitdir paths; submodules use relative ones.
       const isAbsolute =
         commondirPath.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(commondirPath)

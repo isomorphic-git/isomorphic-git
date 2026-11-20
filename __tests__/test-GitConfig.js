@@ -346,6 +346,62 @@ describe('GitConfig', () => {
       expect(await configBare.get('core.ignorecase')).toEqual(true)
     })
 
+    it('integer booleans beyond 0 and 1', async () => {
+      // git_parse_maybe_bool in config.c accepts any integer: zero is
+      // false and nonzero is true. Verified against git 2.43.0:
+      // `ignorecase = 2` -> true, `= -1` -> true, `= 42` -> true.
+      const config2 = GitConfig.from(`[core]
+      ignorecase = 2`)
+      const configNeg = GitConfig.from(`[core]
+      ignorecase = -1`)
+      const config42 = GitConfig.from(`[core]
+      ignorecase = 42`)
+      expect(await config2.get('core.ignorecase')).toEqual(true)
+      expect(await configNeg.get('core.ignorecase')).toEqual(true)
+      expect(await config42.get('core.ignorecase')).toEqual(true)
+    })
+
+    it('rejects non-integer boolean values', async () => {
+      const configFloat = GitConfig.from(`[core]
+      ignorecase = 2.5`)
+      const configSuffix = GitConfig.from(`[core]
+      ignorecase = 2k`)
+      const configWord = GitConfig.from(`[core]
+      ignorecase = maybe`)
+      await expect(configFloat.get('core.ignorecase')).rejects.toThrow()
+      await expect(configSuffix.get('core.ignorecase')).rejects.toThrow()
+      await expect(configWord.get('core.ignorecase')).rejects.toThrow()
+    })
+
+    it('does not decode subsection entries with top-level decoders', async () => {
+      // `[core "topic"]` has its own namespace: its `ignorecase` keeps
+      // the raw value instead of being decoded (and rejected) as a
+      // boolean.
+      const config = GitConfig.from(`[Core "topic"]
+      IgnoreCase = custom`)
+      expect(await config.get('core.topic.ignorecase')).toEqual('custom')
+      // ...while a top-level entry still decodes.
+      const top = GitConfig.from(`[Core]
+      IgnoreCase = false`)
+      expect(await top.get('core.ignorecase')).toEqual(false)
+      expect(typeof (await top.get('core.ignorecase'))).toEqual('boolean')
+    })
+
+    it('does not resolve decoders through the prototype chain', async () => {
+      // `schema['constructor']` would otherwise resolve the inherited
+      // Object constructor: `[constructor] length = 3` threw
+      // `fn is not a function`, and `[core] constructor = hello` came
+      // back as a String object instead of the string 'hello'.
+      const configA = GitConfig.from(`[constructor]
+      length = 3`)
+      expect(await configA.get('constructor.length')).toEqual('3')
+      const configB = GitConfig.from(`[core]
+      constructor = hello`)
+      const value = await configB.get('core.constructor')
+      expect(value).toEqual('hello')
+      expect(typeof value).toEqual('string')
+    })
+
     it('schema lookup is case-insensitive for section and key names', async () => {
       // The key is found by its normalized path, so the decoder lookup must
       // use the same normalization — otherwise `ignoreCase = false` comes
