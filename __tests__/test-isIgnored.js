@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import { isIgnored } from 'isomorphic-git'
+import { isIgnored, setConfig } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -102,5 +102,212 @@ describe('isIgnored', () => {
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/f/keep.log' })).toBe(
       false
     )
+  })
+  it('should respect core.ignorecase=false', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: false })
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      false
+    )
+  })
+  it('should match case-insensitively when core.ignorecase is true', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: true })
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      true
+    )
+  })
+  it('should still match case-insensitively when a [core.ignorecase] section follows', async () => {
+    // Setup — a `[core.ignorecase]` section header normalizes to the same
+    // path as the variable; it must not override the true value with null.
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: true })
+    const configText = await fs.read(gitdir + '/config', 'utf8')
+    await fs.write(gitdir + '/config', configText + '\n[core.ignorecase]\n')
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      true
+    )
+  })
+  it('should treat [!a] as a negated character class', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await writeGitIgnore(fs, dir, ['[!a]*'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'abc' })).toBe(false)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'xyz' })).toBe(true)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'bcd' })).toBe(true)
+  })
+  it('should respect core.ignorecase = 0', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: '0' })
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      false
+    )
+  })
+  it('should respect core.ignorecase = 1', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: '1' })
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      true
+    )
+  })
+  it('should respect core.ignoreCase = false (mixed-case key)', async () => {
+    // Setup — canonical git preserves the case the user typed, so the key
+    // can be written `ignoreCase`; it must still decode to boolean false.
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignoreCase', value: false })
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      false
+    )
+  })
+  it('should read core.ignorecase from the shared config in a linked worktree', async () => {
+    // Setup — build a linked-worktree layout by hand, as canonical
+    // `git worktree add` writes it: the worktree `.git` file points at the
+    // private gitdir, whose `commondir` file names the shared config
+    // directory (relative to the private gitdir).
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: false })
+    const worktreeDir = dir + '/wt'
+    const privateGitdir = gitdir + '/worktrees/topic'
+    await fs.write(worktreeDir + '/.git', `gitdir: ${privateGitdir}\n`)
+    await fs.write(privateGitdir + '/commondir', '../..\n')
+    await fs.write(privateGitdir + '/gitdir', worktreeDir + '/.git\n')
+    await writeGitIgnore(fs, worktreeDir, ['README.md'])
+    // Test
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'README.md',
+      })
+    ).toBe(true)
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'readme.md',
+      })
+    ).toBe(false)
+  })
+  it('should read .git/info/exclude from the shared config directory in a linked worktree', async () => {
+    // Setup — same linked-worktree layout; canonical git reads
+    // info/exclude from the common directory, not the private gitdir.
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    const worktreeDir = dir + '/wt'
+    const privateGitdir = gitdir + '/worktrees/topic'
+    await fs.write(worktreeDir + '/.git', `gitdir: ${privateGitdir}\n`)
+    await fs.write(privateGitdir + '/commondir', '../..\n')
+    await fs.write(privateGitdir + '/gitdir', worktreeDir + '/.git\n')
+    await writeExclude(fs, gitdir, ['*.tmp'])
+    // Test
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'a.tmp',
+      })
+    ).toBe(true)
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'a.txt',
+      })
+    ).toBe(false)
+  })
+  it('should keep a trailing space in the commondir path', async () => {
+    // Setup — a common directory whose name ends in a space: canonical
+    // git strips only trailing CR/LF from the commondir file, so the
+    // space is part of the path and the shared info/exclude must be read
+    // from it.
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    const worktreeDir = dir + '/wt'
+    const privateGitdir = gitdir + '/worktrees/topic'
+    const sharedDir = gitdir + '/common '
+    await fs.write(worktreeDir + '/.git', `gitdir: ${privateGitdir}\n`)
+    await fs.write(privateGitdir + '/commondir', `${sharedDir}\n`)
+    await fs.write(privateGitdir + '/gitdir', worktreeDir + '/.git\n')
+    await writeExclude(fs, sharedDir, ['*.tmp'])
+    // Test
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'a.tmp',
+      })
+    ).toBe(true)
+    expect(
+      await isIgnored({
+        fs,
+        dir: worktreeDir,
+        gitdir: worktreeDir + '/.git',
+        filepath: 'a.txt',
+      })
+    ).toBe(false)
+  })
+  it('should not throw when .git/info/exclude disappears after the existence check', async () => {
+    // Setup — simulate info/exclude vanishing between `exists` and `read`:
+    // the existence check succeeds but the read comes back empty.
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await writeGitIgnore(fs, dir, ['a.txt'])
+    const flakyFs = new Proxy(fs, {
+      get(target, prop) {
+        if (prop === 'exists') {
+          return async filepath =>
+            filepath.endsWith('info/exclude') ? true : target.exists(filepath)
+        }
+        if (prop === 'read') {
+          return async (filepath, options) =>
+            filepath.endsWith('info/exclude')
+              ? null
+              : target.read(filepath, options)
+        }
+        const value = target[prop]
+        return typeof value === 'function' ? value.bind(target) : value
+      },
+    })
+    // Test — the .gitignore rules must still be evaluated.
+    expect(
+      await isIgnored({ fs: flakyFs, gitdir, dir, filepath: 'a.txt' })
+    ).toBe(true)
+    expect(
+      await isIgnored({ fs: flakyFs, gitdir, dir, filepath: 'b.txt' })
+    ).toBe(false)
   })
 })

@@ -328,6 +328,132 @@ describe('GitConfig', () => {
       expect(d).toEqual(true)
     })
 
+    it('boolean spellings from canonical git', async () => {
+      // git_parse_maybe_bool in config.c accepts 0/1 and an empty value,
+      // and a bare key (no `=`) means true. Verified against git 2.43.0:
+      // `ignorecase = 0` -> false, `= 1` -> true, `=` -> false.
+      const config0 = GitConfig.from(`[core]
+      ignorecase = 0`)
+      const config1 = GitConfig.from(`[core]
+      ignorecase = 1`)
+      const configEmpty = GitConfig.from(`[core]
+      ignorecase =`)
+      const configBare = GitConfig.from(`[core]
+      ignorecase`)
+      expect(await config0.get('core.ignorecase')).toEqual(false)
+      expect(await config1.get('core.ignorecase')).toEqual(true)
+      expect(await configEmpty.get('core.ignorecase')).toEqual(false)
+      expect(await configBare.get('core.ignorecase')).toEqual(true)
+    })
+
+    it('integer booleans beyond 0 and 1', async () => {
+      // git_parse_maybe_bool in config.c accepts any integer: zero is
+      // false and nonzero is true. Verified against git 2.43.0:
+      // `ignorecase = 2` -> true, `= -1` -> true, `= 42` -> true.
+      const config2 = GitConfig.from(`[core]
+      ignorecase = 2`)
+      const configNeg = GitConfig.from(`[core]
+      ignorecase = -1`)
+      const config42 = GitConfig.from(`[core]
+      ignorecase = 42`)
+      expect(await config2.get('core.ignorecase')).toEqual(true)
+      expect(await configNeg.get('core.ignorecase')).toEqual(true)
+      expect(await config42.get('core.ignorecase')).toEqual(true)
+    })
+
+    it('accepts git integer suffixes as booleans', async () => {
+      // git 2.43.0 accepts `2k` as boolean `true`: its boolean parser
+      // uses the integer parser, which supports unit suffixes.
+      // `0k` is still zero, hence false.
+      const configSuffix = GitConfig.from(`[core]
+      ignorecase = 2k`)
+      const configZeroSuffix = GitConfig.from(`[core]
+      ignorecase = 0k`)
+      const configMeg = GitConfig.from(`[core]
+      ignorecase = 2m`)
+      expect(await configSuffix.get('core.ignorecase')).toEqual(true)
+      expect(await configZeroSuffix.get('core.ignorecase')).toEqual(false)
+      expect(await configMeg.get('core.ignorecase')).toEqual(true)
+    })
+
+    it('accepts hexadecimal integers as booleans', async () => {
+      // git 2.43.0 accepts hex ints via its integer parser (strtol base
+      // 0), with the same k/m/g suffixes: `0x1k` -> true, `0x0` -> false.
+      // Verified against git 2.43.0 with `git config --get --bool`.
+      const configHex = GitConfig.from(`[core]
+      ignorecase = 0x1k`)
+      const configHexZero = GitConfig.from(`[core]
+      ignorecase = 0x0`)
+      const configHexPlain = GitConfig.from(`[core]
+      ignorecase = 0x2`)
+      expect(await configHex.get('core.ignorecase')).toEqual(true)
+      expect(await configHexZero.get('core.ignorecase')).toEqual(false)
+      expect(await configHexPlain.get('core.ignorecase')).toEqual(true)
+    })
+
+    it('ignores section headers when looking up a value', async () => {
+      // `[core.ignorecase]` as a section header normalizes to the same
+      // path as the `ignorecase` variable under `[core]`; a later header
+      // must not override the variable's value with null. Verified
+      // against git 2.43.0: `git config --get core.ignorecase` still
+      // returns true.
+      const config = GitConfig.from(`[core]
+      ignorecase = true
+      [core.ignorecase]`)
+      expect(await config.get('core.ignorecase')).toEqual(true)
+      expect(typeof (await config.get('core.ignorecase'))).toEqual('boolean')
+      expect(await config.getall('core.ignorecase')).toEqual([true])
+    })
+
+    it('rejects non-integer boolean values', async () => {
+      const configFloat = GitConfig.from(`[core]
+      ignorecase = 2.5`)
+      const configWord = GitConfig.from(`[core]
+      ignorecase = maybe`)
+      await expect(configFloat.get('core.ignorecase')).rejects.toThrow()
+      await expect(configWord.get('core.ignorecase')).rejects.toThrow()
+    })
+
+    it('does not decode subsection entries with top-level decoders', async () => {
+      // `[core "topic"]` has its own namespace: its `ignorecase` keeps
+      // the raw value instead of being decoded (and rejected) as a
+      // boolean.
+      const config = GitConfig.from(`[Core "topic"]
+      IgnoreCase = custom`)
+      expect(await config.get('core.topic.ignorecase')).toEqual('custom')
+      // ...while a top-level entry still decodes.
+      const top = GitConfig.from(`[Core]
+      IgnoreCase = false`)
+      expect(await top.get('core.ignorecase')).toEqual(false)
+      expect(typeof (await top.get('core.ignorecase'))).toEqual('boolean')
+    })
+
+    it('does not resolve decoders through the prototype chain', async () => {
+      // `schema['constructor']` would otherwise resolve the inherited
+      // Object constructor: `[constructor] length = 3` threw
+      // `fn is not a function`, and `[core] constructor = hello` came
+      // back as a String object instead of the string 'hello'.
+      const configA = GitConfig.from(`[constructor]
+      length = 3`)
+      expect(await configA.get('constructor.length')).toEqual('3')
+      const configB = GitConfig.from(`[core]
+      constructor = hello`)
+      const value = await configB.get('core.constructor')
+      expect(value).toEqual('hello')
+      expect(typeof value).toEqual('string')
+    })
+
+    it('schema lookup is case-insensitive for section and key names', async () => {
+      // The key is found by its normalized path, so the decoder lookup must
+      // use the same normalization — otherwise `ignoreCase = false` comes
+      // back as the string "false" instead of the boolean false.
+      const config = GitConfig.from(`[Core]
+      IgnoreCase = false`)
+      expect(await config.get('core.ignorecase')).toEqual(false)
+      expect(await config.get('core.ignoreCase')).toEqual(false)
+      expect(typeof (await config.get('core.ignorecase'))).toEqual('boolean')
+    })
+
     it('numeric suffix', async () => {
       const configA = GitConfig.from(`[core]
       bigFileThreshold = 2k`)

@@ -12,17 +12,34 @@ const num = val => {
   return n
 }
 
-// This is straight from git_parse_maybe_bool_text in config.c of canonical git
+// This is straight from git_parse_maybe_bool in config.c of canonical git
 const bool = val => {
   if (typeof val === 'boolean') {
     return val
   }
 
   val = val.trim().toLowerCase()
-  if (val === 'true' || val === 'yes' || val === 'on') return true
-  if (val === 'false' || val === 'no' || val === 'off') return false
+  if (val === 'true' || val === 'yes' || val === 'on' || val === '1')
+    return true
+  if (
+    val === 'false' ||
+    val === 'no' ||
+    val === 'off' ||
+    val === '0' ||
+    val === ''
+  )
+    return false
+  // git_parse_maybe_bool also accepts any integer: zero is false and
+  // nonzero is true. git's integer parser accepts unit suffixes
+  // (k/m/g, see parse_unit_factor above), so `2k` is true too.
+  if (/^[+-]?\d+$/.test(val)) return Number(val) !== 0
+  if (/^[+-]?\d+[kmg]$/.test(val)) return num(val) !== 0
+  // git's integer parser reads hex (strtol base 0), so `0x1k` is true
+  // and `0x0` is false. `num` already handles the 0x prefix (parseInt)
+  // plus the k/m/g suffix, so only the acceptance check is missing.
+  if (/^[+-]?0x[0-9a-f]+[kmg]?$/.test(val)) return num(val) !== 0
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', or 'off', but got ${val}`
+    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', an empty value, or an integer (decimal or hexadecimal, with optional k/m/g suffix), but got ${val}`
   )
 }
 
@@ -33,7 +50,9 @@ const schema = {
     logallrefupdates: bool,
     symlinks: bool,
     ignorecase: bool,
-    bigFileThreshold: num,
+    // Lowercase key: section and key names are case-insensitive in git
+    // config, and `get` looks the decoder up by lowercased names.
+    bigfilethreshold: num,
   },
 }
 
@@ -199,9 +218,32 @@ export class GitConfig {
   async get(path, getall = false) {
     const normalizedPath = normalizePath(path).path
     const allValues = this.parsedConfig
-      .filter(config => config.path === normalizedPath)
-      .map(({ section, name, value }) => {
-        const fn = schema[section] && schema[section][name]
+      // Section headers have no variable name and no value, but a
+      // dotted header normalizes to the same path as a variable: e.g.
+      // `[core.ignorecase]` is `core.ignorecase`, just like the
+      // `ignorecase` variable under `[core]`. Exclude headers so a
+      // later header cannot override the variable's value with null.
+      .filter(config => config.path === normalizedPath && config.name != null)
+      .map(({ section, subsection, name, value }) => {
+        // The key is found by its normalized path, so the decoder lookup
+        // must use the same normalization — section and key names are
+        // case-insensitive in git config, so `ignoreCase = false` must
+        // decode the same as `ignorecase = false`.
+        // Decoders apply only to top-level entries: a subsection (e.g.
+        // `[core "topic"]`) has its own namespace, so its values keep
+        // their raw form. The lookup must also use own properties only:
+        // `schema['constructor']` would otherwise resolve the inherited
+        // Object constructor.
+        const sectionSchema =
+          subsection == null &&
+          Object.prototype.hasOwnProperty.call(schema, lower(section))
+            ? schema[lower(section)]
+            : undefined
+        const fn =
+          sectionSchema &&
+          Object.prototype.hasOwnProperty.call(sectionSchema, lower(name))
+            ? sectionSchema[lower(name)]
+            : undefined
         return fn ? fn(value) : value
       })
     return getall ? allValues : allValues.pop()

@@ -1,5 +1,5 @@
 /* eslint-env node, browser, jasmine */
-import { isIgnored } from 'isomorphic-git'
+import { isIgnored, setConfig } from 'isomorphic-git'
 
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 
@@ -109,5 +109,40 @@ describe('isIgnored', () => {
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/f/keep.log' })).toBe(
       false
     )
+  })
+  it('should respect core.ignorecase=false', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixtureAsSubmodule('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: false })
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      false
+    )
+  })
+  it('should match case-insensitively when core.ignorecase is true', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixtureAsSubmodule('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: true })
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'README.md' })).toBe(
+      true
+    )
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      true
+    )
+  })
+  it('should treat [!a] as a negated character class', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixtureAsSubmodule('test-isIgnored')
+    await writeGitIgnore(fs, dir, ['[!a]*'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'abc' })).toBe(false)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'xyz' })).toBe(true)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'bcd' })).toBe(true)
   })
 })
