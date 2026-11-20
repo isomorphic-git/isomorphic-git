@@ -129,6 +129,19 @@ describe('isIgnored', () => {
       true
     )
   })
+  it('should still match case-insensitively when a [core.ignorecase] section follows', async () => {
+    // Setup — a `[core.ignorecase]` section header normalizes to the same
+    // path as the variable; it must not override the true value with null.
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: true })
+    const configText = await fs.read(gitdir + '/config', 'utf8')
+    await fs.write(gitdir + '/config', configText + '\n[core.ignorecase]\n')
+    await writeGitIgnore(fs, dir, ['README.md'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'readme.md' })).toBe(
+      true
+    )
+  })
   it('should treat [!a] as a negated character class', async () => {
     // Setup
     const { fs, gitdir, dir } = await makeFixture('test-isIgnored')

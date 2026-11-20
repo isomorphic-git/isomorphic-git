@@ -376,6 +376,35 @@ describe('GitConfig', () => {
       expect(await configMeg.get('core.ignorecase')).toEqual(true)
     })
 
+    it('accepts hexadecimal integers as booleans', async () => {
+      // git 2.43.0 accepts hex ints via its integer parser (strtol base
+      // 0), with the same k/m/g suffixes: `0x1k` -> true, `0x0` -> false.
+      // Verified against git 2.43.0 with `git config --get --bool`.
+      const configHex = GitConfig.from(`[core]
+      ignorecase = 0x1k`)
+      const configHexZero = GitConfig.from(`[core]
+      ignorecase = 0x0`)
+      const configHexPlain = GitConfig.from(`[core]
+      ignorecase = 0x2`)
+      expect(await configHex.get('core.ignorecase')).toEqual(true)
+      expect(await configHexZero.get('core.ignorecase')).toEqual(false)
+      expect(await configHexPlain.get('core.ignorecase')).toEqual(true)
+    })
+
+    it('ignores section headers when looking up a value', async () => {
+      // `[core.ignorecase]` as a section header normalizes to the same
+      // path as the `ignorecase` variable under `[core]`; a later header
+      // must not override the variable's value with null. Verified
+      // against git 2.43.0: `git config --get core.ignorecase` still
+      // returns true.
+      const config = GitConfig.from(`[core]
+      ignorecase = true
+      [core.ignorecase]`)
+      expect(await config.get('core.ignorecase')).toEqual(true)
+      expect(typeof (await config.get('core.ignorecase'))).toEqual('boolean')
+      expect(await config.getall('core.ignorecase')).toEqual([true])
+    })
+
     it('rejects non-integer boolean values', async () => {
       const configFloat = GitConfig.from(`[core]
       ignorecase = 2.5`)

@@ -34,8 +34,12 @@ const bool = val => {
   // (k/m/g, see parse_unit_factor above), so `2k` is true too.
   if (/^[+-]?\d+$/.test(val)) return Number(val) !== 0
   if (/^[+-]?\d+[kmg]$/.test(val)) return num(val) !== 0
+  // git's integer parser reads hex (strtol base 0), so `0x1k` is true
+  // and `0x0` is false. `num` already handles the 0x prefix (parseInt)
+  // plus the k/m/g suffix, so only the acceptance check is missing.
+  if (/^[+-]?0x[0-9a-f]+[kmg]?$/.test(val)) return num(val) !== 0
   throw Error(
-    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', an empty value, or an integer (with optional k/m/g suffix), but got ${val}`
+    `Expected 'true', 'false', 'yes', 'no', 'on', 'off', '1', '0', an empty value, or an integer (decimal or hexadecimal, with optional k/m/g suffix), but got ${val}`
   )
 }
 
@@ -214,7 +218,12 @@ export class GitConfig {
   async get(path, getall = false) {
     const normalizedPath = normalizePath(path).path
     const allValues = this.parsedConfig
-      .filter(config => config.path === normalizedPath)
+      // Section headers have no variable name and no value, but a
+      // dotted header normalizes to the same path as a variable: e.g.
+      // `[core.ignorecase]` is `core.ignorecase`, just like the
+      // `ignorecase` variable under `[core]`. Exclude headers so a
+      // later header cannot override the variable's value with null.
+      .filter(config => config.path === normalizedPath && config.name != null)
       .map(({ section, subsection, name, value }) => {
         // The key is found by its normalized path, so the decoder lookup
         // must use the same normalization — section and key names are
