@@ -65,6 +65,7 @@ export async function _removeNote({
   // Create the new note tree
   const treeOid = await _writeTree({
     fs,
+    cache,
     gitdir,
     tree,
   })

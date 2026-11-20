@@ -1,7 +1,9 @@
 /* eslint-env node, browser, jasmine */
 import { writeObject } from 'isomorphic-git'
+import { _writeObject } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
+import { listLooseObjects } from './__helpers__/listLooseObjects.js'
 
 // NOTE: These are mostly the `readObject` tests but in reverse
 describe('writeObject', () => {
@@ -346,5 +348,102 @@ dBWrLc3kdnemrlhSRzR2
       },
     })
     expect(oid).toEqual('6e90dfd7573404a225888071ecaa572882b4e45c')
+  })
+})
+
+// Oids below come from `git hash-object`.
+const PACKED_BLOB = {
+  content: 'b\n',
+  oid: '61780798228d17af2d34fce4cfbdf35556832472',
+}
+const PACK = 'pack-303bdf96157de75ee3c96ef1505c359b8d57a873'
+const NEW_BLOB = {
+  content: 'new\n',
+  oid: '3e757656cf36eca53338e520d134963a44f793f8',
+}
+
+describe('_writeObject with pack files', () => {
+  const writeBlob = (fs, gitdir, content, extra) =>
+    _writeObject({
+      fs,
+      gitdir,
+      type: 'blob',
+      object: Buffer.from(content),
+      ...extra,
+    })
+
+  it('does not write a loose copy of a blob that a pack holds', async () => {
+    const { fs, gitdir } = await makeFixture('test-commit-packed')
+    const oid = await writeBlob(fs, gitdir, PACKED_BLOB.content, { cache: {} })
+    expect(oid).toBe(PACKED_BLOB.oid)
+    expect(await listLooseObjects(fs, gitdir)).toEqual([])
+  })
+
+  it('writes a loose object that no pack holds', async () => {
+    const { fs, gitdir } = await makeFixture('test-commit-packed')
+    const oid = await writeBlob(fs, gitdir, NEW_BLOB.content, { cache: {} })
+    expect(oid).toBe(NEW_BLOB.oid)
+    expect(await listLooseObjects(fs, gitdir)).toEqual([NEW_BLOB.oid])
+  })
+
+  it('writes a loose object when a pack index cannot be read', async () => {
+    const { fs, gitdir } = await makeFixture('test-commit-packed')
+    // Pack files are read-only, so replace the .idx instead of writing over it.
+    await fs.rm(`${gitdir}/objects/pack/${PACK}.idx`)
+    await fs.write(`${gitdir}/objects/pack/${PACK}.idx`, 'not an index')
+    const oid = await writeBlob(fs, gitdir, NEW_BLOB.content, { cache: {} })
+    expect(oid).toBe(NEW_BLOB.oid)
+    expect(await listLooseObjects(fs, gitdir)).toEqual([NEW_BLOB.oid])
+  })
+
+  it('writes a loose copy when the pack of a cached index is deleted', async () => {
+    const { fs, gitdir } = await makeFixture('test-commit-packed')
+    const cache = {}
+    await writeBlob(fs, gitdir, NEW_BLOB.content, { cache })
+    // An external `git gc` removes the pack after its index is cached.
+    await fs.rm(`${gitdir}/objects/pack/${PACK}.pack`)
+    const oid = await writeBlob(fs, gitdir, PACKED_BLOB.content, { cache })
+    expect(oid).toBe(PACKED_BLOB.oid)
+    expect(await listLooseObjects(fs, gitdir)).toEqual([
+      NEW_BLOB.oid,
+      PACKED_BLOB.oid,
+    ])
+  })
+
+  it('writes a loose copy of a packed object when no cache is given', async () => {
+    const { fs, gitdir } = await makeFixture('test-commit-packed')
+    const oid = await writeBlob(fs, gitdir, PACKED_BLOB.content)
+    expect(oid).toBe(PACKED_BLOB.oid)
+    expect(await listLooseObjects(fs, gitdir)).toEqual([PACKED_BLOB.oid])
+  })
+
+  it('writes a loose object when objects/pack does not exist', async () => {
+    const { fs, gitdir } = await makeFixture('test-writeBlob')
+    await fs.mkdir(`${gitdir}/objects`)
+    const oid = await writeBlob(fs, gitdir, NEW_BLOB.content, { cache: {} })
+    expect(oid).toBe(NEW_BLOB.oid)
+    expect(await listLooseObjects(fs, gitdir)).toEqual([NEW_BLOB.oid])
+  })
+
+  it('writes nothing on dryRun, with and without packs', async () => {
+    const packed = await makeFixture('test-commit-packed')
+    const empty = await makeFixture('test-writeBlob')
+    await empty.fs.mkdir(`${empty.gitdir}/objects`)
+    const oids = []
+    for (const { fs, gitdir } of [packed, empty]) {
+      for (const content of [PACKED_BLOB.content, NEW_BLOB.content]) {
+        oids.push(
+          await writeBlob(fs, gitdir, content, { cache: {}, dryRun: true })
+        )
+      }
+    }
+    expect(oids).toEqual([
+      PACKED_BLOB.oid,
+      NEW_BLOB.oid,
+      PACKED_BLOB.oid,
+      NEW_BLOB.oid,
+    ])
+    expect(await listLooseObjects(packed.fs, packed.gitdir)).toEqual([])
+    expect(await listLooseObjects(empty.fs, empty.gitdir)).toEqual([])
   })
 })

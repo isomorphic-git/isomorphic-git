@@ -83,6 +83,7 @@ export async function _addNote({
   }
   const noteOid = await writeObject({
     fs,
+    cache,
     gitdir,
     type: 'blob',
     object: note,
@@ -93,6 +94,7 @@ export async function _addNote({
   tree.push({ mode: '100644', path: oid, oid: noteOid, type: 'blob' })
   const treeOid = await _writeTree({
     fs,
+    cache,
     gitdir,
     tree,
   })

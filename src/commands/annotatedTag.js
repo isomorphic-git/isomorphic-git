@@ -82,6 +82,7 @@ export async function _annotatedTag({
   }
   const value = await writeObject({
     fs,
+    cache,
     gitdir,
     type: 'tag',
     object: tagObject.toObject(),
