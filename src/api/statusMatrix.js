@@ -5,9 +5,11 @@ import { STAGE } from '../commands/STAGE.js'
 import { TREE } from '../commands/TREE.js'
 import { WORKDIR } from '../commands/WORKDIR.js'
 import { _walk } from '../commands/walk.js'
+import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { FileSystem } from '../models/FileSystem.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { comparableMode } from '../utils/comparableMode.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { join } from '../utils/join.js'
 import { worthWalking } from '../utils/worthWalking.js'
@@ -178,6 +180,9 @@ export async function statusMatrix({
 
     const fs = new FileSystem(_fs)
     const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
+    const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
+    // Unset means true, as in canonical git
+    const filemode = (await config.get('core.filemode')) !== false
     return await _walk({
       fs,
       cache,
@@ -240,7 +245,18 @@ export async function statusMatrix({
         } else if (workdirType === 'blob') {
           workdirOid = await workdir.oid()
         }
-        const entry = [undefined, headOid, workdirOid, stageOid]
+        // Compare the mode as well as the content, so a `chmod +x` or a file
+        // replaced by a symlink with the same text is reported as a change.
+        const withMode = async (walkerEntry, oid) =>
+          oid === undefined
+            ? undefined
+            : `${oid} ${comparableMode(await walkerEntry.mode(), filemode)}`
+        const entry = [
+          undefined,
+          await withMode(head, headOid),
+          await withMode(workdir, workdirOid),
+          await withMode(stage, stageOid),
+        ]
         const result = entry.map(value => entry.indexOf(value))
         result.shift() // remove leading undefined entry
         return [filepath, ...result]

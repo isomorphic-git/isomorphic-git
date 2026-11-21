@@ -10,10 +10,13 @@ import { FileSystem } from '../models/FileSystem.js'
 import { GitTree } from '../models/GitTree.js'
 import { _readObject } from '../storage/readObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
+import { comparableMode } from '../utils/comparableMode.js'
 import { compareStats } from '../utils/compareStats.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
 import { hashObject } from '../utils/hashObject.js'
 import { join } from '../utils/join.js'
+import { normalizeMode } from '../utils/normalizeMode.js'
+import { normalizeStats } from '../utils/normalizeStats.js'
 
 /**
  * Tell whether a file has been changed
@@ -71,13 +74,14 @@ export async function status({
     const fs = new FileSystem(_fs)
     const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
     const headTree = await getHeadTree({ fs, cache, gitdir: updatedGitdir })
-    const treeOid = await getOidAtPath({
+    const treeEntry = await getEntryAtPath({
       fs,
       cache,
       gitdir: updatedGitdir,
       tree: headTree,
       path: filepath,
     })
+    const treeOid = treeEntry === null ? null : treeEntry.oid
     const indexEntry = await GitIndexManager.acquire(
       { fs, gitdir: updatedGitdir, cache },
       async function (index) {
@@ -116,6 +120,20 @@ export async function status({
       stats !== null &&
       (H || I || (await hasExactCasePath({ fs, dir, filepath })))
 
+    const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
+    // Unset means true, as in canonical git
+    const filemode = (await config.get('core.filemode')) !== false
+    // Compare the mode as well as the content, so a `chmod +x` or a file
+    // replaced by a symlink with the same text is reported as a change.
+    const treeMode = H && normalizeMode(parseInt(treeEntry.mode, 8))
+    const treeId = H && `${treeOid} ${comparableMode(treeMode, filemode)}`
+    const indexId =
+      I && `${indexEntry.oid} ${comparableMode(indexEntry.mode, filemode)}`
+    const getWorkdirId = async () => {
+      const mode = comparableMode(normalizeStats(stats).mode, filemode)
+      return `${await getWorkdirOid()} ${mode}`
+    }
+
     const getWorkdirOid = async () => {
       if (I && !compareStats(indexEntry, stats)) {
         return indexEntry.oid
@@ -123,7 +141,6 @@ export async function status({
         // Read through the same core.autocrlf normalisation GitWalkerFs uses,
         // so the working copy hashes to the blob that was stored. Without it a
         // CRLF checkout of an LF blob reads as modified.
-        const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
         const autocrlf = await config.get('core.autocrlf')
         const object = await fs.read(join(dir, filepath), { autocrlf })
         const workdirOid = await hashObject({
@@ -133,11 +150,13 @@ export async function status({
         })
         // If the oid in the index === working dir oid but stats differed update cache.
         // An intent-to-add entry is left alone: inserting it again would stage it.
+        // A changed mode is left alone too: inserting the new stats would stage it.
         if (
           refresh &&
           I &&
           !indexEntry.flags.intentToAdd &&
-          indexEntry.oid === workdirOid
+          indexEntry.oid === workdirOid &&
+          indexEntry.mode === normalizeStats(stats).mode
         ) {
           // and as long as our fs.stats aren't bad.
           // size of -1 happens over a BrowserFS HTTP Backend that doesn't serve Content-Length headers
@@ -159,27 +178,24 @@ export async function status({
     if (!H && !W && I) return '*absent' // -A-
     if (!H && W && !I) return '*added' // --A
     if (!H && W && I) {
-      const workdirOid = await getWorkdirOid()
-      // @ts-ignore
-      return workdirOid === indexEntry.oid ? 'added' : '*added' // -AA : -AB
+      const workdirId = await getWorkdirId()
+      return workdirId === indexId ? 'added' : '*added' // -AA : -AB
     }
     if (H && !W && !I) return 'deleted' // A--
     if (H && !W && I) {
       // @ts-ignore
-      return treeOid === indexEntry.oid ? '*deleted' : '*deleted' // AA- : AB-
+      return treeId === indexId ? '*deleted' : '*deleted' // AA- : AB-
     }
     if (H && W && !I) {
-      const workdirOid = await getWorkdirOid()
-      return workdirOid === treeOid ? '*undeleted' : '*undeletemodified' // A-A : A-B
+      const workdirId = await getWorkdirId()
+      return workdirId === treeId ? '*undeleted' : '*undeletemodified' // A-A : A-B
     }
     if (H && W && I) {
-      const workdirOid = await getWorkdirOid()
-      if (workdirOid === treeOid) {
-        // @ts-ignore
-        return workdirOid === indexEntry.oid ? 'unmodified' : '*unmodified' // AAA : ABA
+      const workdirId = await getWorkdirId()
+      if (workdirId === treeId) {
+        return workdirId === indexId ? 'unmodified' : '*unmodified' // AAA : ABA
       } else {
-        // @ts-ignore
-        return workdirOid === indexEntry.oid ? 'modified' : '*modified' // ABB : AAB
+        return workdirId === indexId ? 'modified' : '*modified' // ABB : AAB
       }
     }
     /*
@@ -231,13 +247,19 @@ async function hasExactCasePath({ fs, dir, filepath }) {
   return true
 }
 
-async function getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path }) {
+async function getEntryAtPath({
+  fs,
+  cache,
+  gitdir: updatedGitdir,
+  tree,
+  path,
+}) {
   if (typeof path === 'string') path = path.split('/')
   const dirname = path.shift()
   for (const entry of tree) {
     if (entry.path === dirname) {
       if (path.length === 0) {
-        return entry.oid
+        return entry
       }
       const { type, object } = await _readObject({
         fs,
@@ -247,7 +269,7 @@ async function getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path }) {
       })
       if (type === 'tree') {
         const tree = GitTree.from(object)
-        return getOidAtPath({ fs, cache, gitdir: updatedGitdir, tree, path })
+        return getEntryAtPath({ fs, cache, gitdir: updatedGitdir, tree, path })
       }
       if (type === 'blob') {
         throw new ObjectTypeError(entry.oid, type, 'blob', path.join('/'))

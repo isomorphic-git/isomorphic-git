@@ -138,7 +138,8 @@ export class GitWalkerFs {
           const stage = index.entriesMap.get(entry._fullpath)
           const stats = await entry.stat()
           const config = await self._getGitConfig(fs, gitdir)
-          const filemode = await config.get('core.filemode')
+          // Unset means true, as in canonical git
+          const filemode = (await config.get('core.filemode')) !== false
           const trustino =
             typeof process !== 'undefined'
               ? !(process.platform === 'win32')
