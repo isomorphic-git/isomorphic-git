@@ -54,4 +54,37 @@ describe('mergeFile', () => {
       )
     }
   )
+
+  it('keeps a lone CR inside a line', () => {
+    const { cleanMerge, mergedText } = mergeFile({
+      contents: ['a\rb\nmid\nc\rd\n', 'A\rb\nmid\nc\rd\n', 'a\rb\nmid\nc\rD\n'],
+      branches: ['base', 'ours', 'theirs'],
+    })
+    expect(cleanMerge).toBe(true)
+    expect(mergedText).toBe('A\rb\nmid\nc\rD\n')
+  })
+
+  it('treats a CR at the end of the text as an ordinary byte', () => {
+    // Same result as `git merge-file`.
+    const { cleanMerge, mergedText } = mergeFile({
+      contents: ['a\n\r\n', 'a\n', '\r\na\n\r'],
+      branches: ['base', 'ours', 'theirs'],
+    })
+    expect(cleanMerge).toBe(false)
+    expect(mergedText).toBe(
+      '<<<<<<< ours\na\n=======\n\r\na\n\r\n>>>>>>> theirs\n'
+    )
+  })
+
+  it('splits text without a final LF into lines like git', () => {
+    // Same result as `git merge-file`.
+    const { cleanMerge, mergedText } = mergeFile({
+      contents: ['a\nb\n', 'a\n', 'b\na\na'],
+      branches: ['base', 'ours', 'theirs'],
+    })
+    expect(cleanMerge).toBe(false)
+    expect(mergedText).toBe(
+      '<<<<<<< ours\na\n=======\nb\na\na\n>>>>>>> theirs\n'
+    )
+  })
 })
