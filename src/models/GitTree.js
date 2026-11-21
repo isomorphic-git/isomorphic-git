@@ -24,6 +24,22 @@ function mode2type(mode) {
   throw new InternalError(`Unexpected GitTree entry mode: ${mode}`)
 }
 
+// Drop the trailing dots and spaces of a name, the way Win32 does. A backward
+// scan, because `/[. ]+$/` costs O(n^2) on a name that is a long run of dots
+// followed by anything else: the engine retries the run from every start offset,
+// and an entry name arrives off the wire with no length bound. Only the
+// reserved-name checks below see this value; the stored path keeps its own
+// spelling.
+function stripTrailingDotsAndSpaces(name) {
+  let end = name.length
+  while (end > 0) {
+    const c = name.charCodeAt(end - 1)
+    if (c !== 46 /* . */ && c !== 32 /* space */) break
+    end--
+  }
+  return end === name.length ? name : name.slice(0, end)
+}
+
 // Reject reserved entry names, matching git's verify_path(): path separators,
 // "." and ".." (which resolve outside the working directory), and ".git" (which git
 // disallows as a path component). Checks mirror git's is_ntfs_dotgit() and
@@ -45,15 +61,16 @@ function assertSafeEntryPath(path) {
   // directory itself. git forbids *any* ADS, so only the portion before the first
   // colon names the actual entry we normalize and check.
   const ntfsClean = hfsClean.split(':')[0]
-  const normalized = ntfsClean.toLowerCase().replace(/[. ]+$/, '')
+  const normalized = stripTrailingDotsAndSpaces(ntfsClean.toLowerCase())
   // Win32 drops the trailing dots and spaces of a path component, so every name
   // built only from dots and spaces aliases "." or "..", not just those two exact
   // spellings: `.. ` resolves to the parent directory. git rejects the whole class
-  // in is_valid_win32_path().
+  // in is_valid_win32_path(). `normalized` is empty for exactly that class, which
+  // is why the test is on it rather than on another trailing-run pattern.
   if (
     path.includes('\\') ||
     path.includes('/') ||
-    /^[. ]+$/.test(ntfsClean) ||
+    (normalized === '' && ntfsClean !== '') ||
     normalized === '.git' ||
     /^\.?git~[1-9]$/.test(normalized)
   ) {

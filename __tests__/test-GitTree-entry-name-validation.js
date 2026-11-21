@@ -112,6 +112,18 @@ describe('GitTree entry-name validation', () => {
     )
   })
 
+  // An entry name arrives off the wire with no length bound, so stripping the
+  // trailing dots and spaces must not cost more than a pass over the name. The
+  // regex this replaced, `/[. ]+$/`, retried the run of dots from every offset:
+  // 8.8 seconds for the name below, against 0.2 ms for a backward scan. The bound
+  // is loose on purpose; it only has to catch a return to quadratic behaviour.
+  it('strips a long run of trailing dots in linear time', () => {
+    const name = '.'.repeat(200000) + 'a'
+    const start = Date.now()
+    expect(GitTree.from(entry('100644', name)).entries()[0].path).toBe(name)
+    expect(Date.now() - start).toBeLessThan(1500)
+  })
+
   // The same names have to be refused when the entries arrive as objects rather
   // than as wire bytes, or `writeTree` mints a tree that `readTree` then refuses.
   describe('applies the same rules to an array of entries', () => {
