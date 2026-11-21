@@ -4,12 +4,14 @@ import {
   checkout,
   clone,
   currentBranch,
+  fetch,
   resolveRef,
   getConfig,
 } from 'isomorphic-git'
 import http from 'isomorphic-git/http'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
+import { makeWriteBlocklistFS } from './__helpers__/makeFailingFS.js'
 
 // this is so it works with either Node local tests or Browser WAN tests
 const localhost =
@@ -157,6 +159,137 @@ describe('clone', () => {
       `'gitdir/refs/heads/master' exists`
     )
     expect(await fs.exists(`${dir}/a.txt`)).toBe(true, `'a.txt' exists`)
+    expect(await fs.exists(`${gitdir}/hooks`)).toBe(true)
+  })
+
+  it('clone with noHooks', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      noHooks: true,
+      url: `http://${localhost}:8888/test-clone.git`,
+    })
+    expect(await fs.exists(`${gitdir}/hooks`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/config`)).toBe(true)
+    expect(await fs.exists(`${gitdir}/refs/remotes/origin/master`)).toBe(true)
+    expect(await fs.exists(`${dir}/a.txt`)).toBe(true)
+  })
+
+  it('clone with noHooks when the browser refuses to create .git/hooks', async () => {
+    // Setup
+    const { _fs, fs, dir } = await makeFixture('test-clone-karma')
+    const blockedFs = makeWriteBlocklistFS(_fs, ['.git/hooks'])
+    const url = `http://${localhost}:8888/test-clone.git`
+    let error = null
+    try {
+      await clone({
+        fs: blockedFs,
+        http,
+        dir,
+        depth: 1,
+        singleBranch: true,
+        url,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.name).toBe('SecurityError')
+    // Test
+    await clone({
+      fs: blockedFs,
+      http,
+      dir,
+      depth: 1,
+      singleBranch: true,
+      noHooks: true,
+      url,
+    })
+    expect(await fs.exists(`${dir}/.git/refs/remotes/origin/master`)).toBe(true)
+    expect(await fs.exists(`${dir}/a.txt`)).toBe(true)
+  })
+
+  it('clone with noHooks and noConfig', async () => {
+    const { fs, dir, gitdir } = await makeFixture('test-clone-karma')
+    await clone({
+      fs,
+      http,
+      dir,
+      gitdir,
+      depth: 1,
+      singleBranch: true,
+      noHooks: true,
+      noConfig: true,
+      url: `http://${localhost}:8888/test-clone.git`,
+    })
+    expect(await fs.exists(`${gitdir}/hooks`)).toBe(false)
+    expect(await fs.exists(`${gitdir}/config`)).toBe(false)
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/master' })
+    ).toBe('97c024f73eaab2781bf3691597bc7c833cb0e22f')
+    expect(await resolveRef({ fs, gitdir, ref: 'refs/heads/master' })).toBe(
+      '97c024f73eaab2781bf3691597bc7c833cb0e22f'
+    )
+    expect(await currentBranch({ fs, dir, gitdir })).toBe('master')
+    expect(await fs.exists(`${dir}/a.txt`)).toBe(true)
+  })
+
+  it('clone with noHooks and noConfig when the browser refuses to write .git/hooks and .git/config', async () => {
+    // Setup
+    const { _fs, fs, dir } = await makeFixture('test-clone-karma')
+    const blockedFs = makeWriteBlocklistFS(_fs, ['.git/hooks', '.git/config'])
+    const url = `http://${localhost}:8888/test-clone.git`
+    let error = null
+    try {
+      await clone({
+        fs: blockedFs,
+        http,
+        dir,
+        depth: 1,
+        singleBranch: true,
+        noHooks: true,
+        url,
+      })
+    } catch (err) {
+      error = err
+    }
+    expect(error).not.toBeNull()
+    expect(error.name).toBe('SecurityError')
+    // Test
+    // A CORS proxy that passes every request on to the server
+    const corsProxy = `http://${localhost}:9999`
+    const proxiedUrls = []
+    const proxiedHttp = {
+      request: ({ url, ...rest }) => {
+        proxiedUrls.push(url)
+        return http.request({
+          ...rest,
+          url: url.replace(`${corsProxy}/`, 'http://'),
+        })
+      },
+    }
+    await clone({
+      fs: blockedFs,
+      http: proxiedHttp,
+      dir,
+      depth: 1,
+      singleBranch: true,
+      noHooks: true,
+      noConfig: true,
+      url,
+      corsProxy,
+    })
+    expect(proxiedUrls.length).toBeGreaterThan(0)
+    expect(proxiedUrls.every(u => u.startsWith(`${corsProxy}/`))).toBe(true)
+    await fetch({ fs: blockedFs, http, dir, url })
+    expect(await fs.exists(`${dir}/.git/config`)).toBe(false)
+    expect(await fs.exists(`${dir}/.git/refs/remotes/origin/master`)).toBe(true)
+    expect(await fs.exists(`${dir}/a.txt`)).toBe(true)
   })
 
   it('should throw error if server resets connection before reading packetlines', async () => {

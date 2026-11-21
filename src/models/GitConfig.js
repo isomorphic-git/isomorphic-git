@@ -211,6 +211,15 @@ export class GitConfig {
     return this.get(path, true)
   }
 
+  // Like `get`, this ignores case in the section name and also matches the
+  // old `[section.subsection]` form.
+  async hasSection(section, subsection) {
+    const sectionPath = getPath(section, subsection, null)
+    return this.parsedConfig.some(
+      config => config.isSection && config.path === sectionPath
+    )
+  }
+
   async getSubsections(section) {
     return this.parsedConfig
       .filter(config => config.isSection && config.section === section)

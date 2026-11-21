@@ -11,6 +11,9 @@ import { GitConfigManager } from '../managers/GitConfigManager.js'
  */
 export async function _deleteRemote({ fs, gitdir, remote }) {
   const config = await GitConfigManager.get({ fs, gitdir })
-  await config.deleteSection('remote', remote)
-  await GitConfigManager.save({ fs, gitdir, config })
+  // Leave the config file alone (or absent) when the remote isn't in it
+  if ((await config.getSubsections('remote')).includes(remote)) {
+    await config.deleteSection('remote', remote)
+    await GitConfigManager.save({ fs, gitdir, config })
+  }
 }
