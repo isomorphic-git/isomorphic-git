@@ -64,7 +64,11 @@ export async function setConfig({
     // assertParameter('value', value) // We actually allow 'undefined' as a value to unset/delete
 
     const fs = new FileSystem(_fs)
-    const updatedGitdir = await discoverGitdir({ fsp: fs, dotgit: gitdir })
+    const updatedGitdir = await discoverGitdir({
+      fsp: fs,
+      dotgit: gitdir,
+      checkObjectFormat: false,
+    })
     const config = await GitConfigManager.get({ fs, gitdir: updatedGitdir })
     if (append) {
       await config.append(path, value)

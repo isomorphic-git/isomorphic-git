@@ -35,7 +35,11 @@ export async function getConfigAll({
     assertParameter('path', path)
 
     const fsp = new FileSystem(fs)
-    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
+    const updatedGitdir = await discoverGitdir({
+      fsp,
+      dotgit: gitdir,
+      checkObjectFormat: false,
+    })
     return await _getConfigAll({
       fs: fsp,
       gitdir: updatedGitdir,

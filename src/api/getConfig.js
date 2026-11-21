@@ -39,7 +39,11 @@ export async function getConfig({ fs, dir, gitdir = join(dir, '.git'), path }) {
     assertParameter('path', path)
 
     const fsp = new FileSystem(fs)
-    const updatedGitdir = await discoverGitdir({ fsp, dotgit: gitdir })
+    const updatedGitdir = await discoverGitdir({
+      fsp,
+      dotgit: gitdir,
+      checkObjectFormat: false,
+    })
     return await _getConfig({
       fs: fsp,
       gitdir: updatedGitdir,

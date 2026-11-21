@@ -15,11 +15,20 @@
  * A consequence is that __tests__ must occasionally be informed
  * about submodules also, since those call src/commands/ directly.
  *
+ * Every command of src/api/ that works on a repository passes through here,
+ * so this is also where a repository isomorphic-git cannot operate on is
+ * refused, before anything is read from it or written to it (see
+ * `assertObjectFormat`). The config commands pass `checkObjectFormat: false`,
+ * since reading or writing the config is safe in any repository, and is how
+ * an application can learn which object format a repository uses. In a
+ * linked worktree, the config checked is that of the repository, which the
+ * `commondir` file of the worktree's gitdir names.
  *
  */
 
 // import * as path from 'path'
 
+import { assertObjectFormat } from './assertObjectFormat.js'
 import { assertParameter } from './assertParameter.js'
 import { dirname } from './dirname.js'
 import { join } from './join.js'
@@ -29,10 +38,37 @@ function isAbsolute(filepath) {
   return filepath.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(filepath)
 }
 
-export async function discoverGitdir({ fsp, dotgit }) {
+export async function discoverGitdir({
+  fsp,
+  dotgit,
+  checkObjectFormat = true,
+}) {
   assertParameter('fsp', fsp)
   assertParameter('dotgit', dotgit)
 
+  const gitdir = await findGitdir({ fsp, dotgit })
+  if (checkObjectFormat) {
+    await assertObjectFormat({
+      fs: fsp,
+      gitdir: await findCommonGitdir({ fsp, gitdir }),
+    })
+  }
+  return gitdir
+}
+
+// The gitdir of a linked worktree holds only what is its own, such as HEAD and
+// the index. Its `commondir` file names the gitdir of the repository, which
+// holds the config.
+async function findCommonGitdir({ fsp, gitdir }) {
+  const commondir = await fsp.read(join(gitdir, 'commondir'), {
+    encoding: 'utf8',
+  })
+  if (commondir === null) return gitdir
+  const path = commondir.trimEnd()
+  return isAbsolute(path) ? path : join(gitdir, path)
+}
+
+async function findGitdir({ fsp, dotgit }) {
   const dotgitStat = await fsp
     ._stat(dotgit)
     .catch(() => ({ isFile: () => false, isDirectory: () => false }))
