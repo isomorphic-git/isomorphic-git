@@ -5,6 +5,9 @@ import {
   Errors,
   merge,
   add,
+  branch,
+  checkout,
+  init,
   resolveRef,
   log,
   statusMatrix,
@@ -590,6 +593,8 @@ describe('merge', () => {
     }
     expect(error).not.toBeNull()
     expect(error.code).toBe(Errors.MergeNotSupportedError.code)
+    expect(error.data).toEqual({ what: 'conflicts' })
+    expect(error.message).toBe('Merges with conflicts are not supported yet.')
   })
 
   it("merge 'g' and 'g-delete-file' (delete by theirs)", async () => {
@@ -1637,5 +1642,208 @@ describe('merge', () => {
 
     // The text conflict still materialises in the working directory.
     expect(await fs.read(`${dir}/doc.txt`, 'utf8')).toContain('<<<<<<<')
+  })
+
+  describe('no merge base', () => {
+    const author = {
+      name: 'Mr. Test',
+      email: 'mrtest@example.com',
+      timestamp: 1262356920,
+      timezoneOffset: -0,
+    }
+
+    async function expectUnrelated(repo, shallow) {
+      const { fs, dir, gitdir } = repo
+      let error = null
+      try {
+        await merge({
+          fs,
+          dir,
+          gitdir,
+          ours: 'master',
+          theirs: 'other',
+          author,
+        })
+      } catch (e) {
+        error = e
+      }
+      expect(error).not.toBeNull()
+      expect(error.code).toBe(Errors.UnrelatedHistoriesError.code)
+      expect(error.data).toEqual({ ours: 'master', theirs: 'other', shallow })
+      expect(error.message).toBe(
+        'Refusing to merge unrelated histories: master and other have no common ancestor.' +
+          (shallow
+            ? ' This is a shallow clone, so the common ancestor may not have been fetched yet.'
+            : '') +
+          ' To merge them anyway, call merge with allowUnrelatedHistories: true.'
+      )
+    }
+
+    it('refuses to merge unrelated histories', async () => {
+      const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+        'tmp-merge-unrelated'
+      )
+      await init({ fs, dir, gitdir })
+      await fs.write(`${dir}/a.txt`, 'a')
+      await add({ fs, dir, gitdir, filepath: 'a.txt' })
+      await gitCommit({ fs, dir, gitdir, message: 'master', author })
+      await fs.write(`${dir}/b.txt`, 'b')
+      await add({ fs, dir, gitdir, filepath: 'b.txt' })
+      await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'other',
+        author,
+        parent: [],
+        ref: 'refs/heads/other',
+      })
+
+      await expectUnrelated({ fs, dir, gitdir }, false)
+    })
+
+    it('does not report shallow for unrelated histories in a full clone', async () => {
+      const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+        'tmp-merge-unrelated-deep'
+      )
+      await init({ fs, dir, gitdir })
+      await fs.write(`${dir}/a.txt`, 'a')
+      await add({ fs, dir, gitdir, filepath: 'a.txt' })
+      await gitCommit({ fs, dir, gitdir, message: 'master 1', author })
+      await fs.write(`${dir}/a.txt`, 'aa')
+      await add({ fs, dir, gitdir, filepath: 'a.txt' })
+      await gitCommit({ fs, dir, gitdir, message: 'master 2', author })
+      await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'other',
+        author,
+        parent: [],
+        ref: 'refs/heads/other',
+      })
+
+      await expectUnrelated({ fs, dir, gitdir }, false)
+    })
+
+    it('says when the edge of a shallow clone was the reason', async () => {
+      const { fs, dir, gitdir, gitdirsmfullpath } =
+        await makeFixtureAsSubmodule('tmp-merge-shallow')
+      await init({ fs, dir, gitdir })
+      await fs.write(`${dir}/a.txt`, 'base')
+      await add({ fs, dir, gitdir, filepath: 'a.txt' })
+      await gitCommit({ fs, dir, gitdir, message: 'base', author })
+      await branch({ fs, dir, gitdir, ref: 'other', checkout: true })
+      await fs.write(`${dir}/b.txt`, 'b')
+      await add({ fs, dir, gitdir, filepath: 'b.txt' })
+      const otherOid = await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'other',
+        author,
+      })
+      await checkout({ fs, dir, gitdir, ref: 'master' })
+      await fs.write(`${dir}/a.txt`, 'master')
+      await add({ fs, dir, gitdir, filepath: 'a.txt' })
+      const masterOid = await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'master',
+        author,
+      })
+
+      // As after `git clone --depth 1`: both tips are the edge of history.
+      await fs.write(
+        `${gitdirsmfullpath}/shallow`,
+        `${masterOid}\n${otherOid}\n`
+      )
+      await expectUnrelated({ fs, dir, gitdir }, true)
+
+      // With the history fetched, the same merge goes through.
+      await fs.rm(`${gitdirsmfullpath}/shallow`)
+      const result = await merge({
+        fs,
+        dir,
+        gitdir,
+        ours: 'master',
+        theirs: 'other',
+        author,
+      })
+      expect(result.mergeCommit).toBe(true)
+    })
+
+    it('does not blame the shallow edge when it is a root commit', async () => {
+      const { fs, dir, gitdir, gitdirsmfullpath } =
+        await makeFixtureAsSubmodule('tmp-merge-shallow-roots')
+      await init({ fs, dir, gitdir })
+      await fs.write(`${dir}/a.txt`, 'a')
+      await add({ fs, dir, gitdir, filepath: 'a.txt' })
+      const masterOid = await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'master',
+        author,
+      })
+      await fs.write(`${dir}/b.txt`, 'b')
+      await add({ fs, dir, gitdir, filepath: 'b.txt' })
+      const otherOid = await gitCommit({
+        fs,
+        dir,
+        gitdir,
+        message: 'other',
+        author,
+        parent: [],
+        ref: 'refs/heads/other',
+      })
+
+      // `git clone --depth 1` lists root commits in .git/shallow too, but
+      // nothing was cut off there.
+      await fs.write(
+        `${gitdirsmfullpath}/shallow`,
+        `${masterOid}\n${otherOid}\n`
+      )
+      await expectUnrelated({ fs, dir, gitdir }, false)
+    })
+
+    it('refuses a criss-cross merge with a clear error', async () => {
+      const { fs, dir, gitdir } = await makeFixtureAsSubmodule(
+        'tmp-merge-criss-cross'
+      )
+      await init({ fs, dir, gitdir })
+      await fs.write(`${dir}/a.txt`, 'base')
+      await add({ fs, dir, gitdir, filepath: 'a.txt' })
+      const base = await gitCommit({ fs, dir, gitdir, message: 'base', author })
+      const commit = (message, parent, ref) =>
+        gitCommit({ fs, dir, gitdir, message, author, parent, ref })
+      const m1 = await commit('m1', [base], 'refs/heads/master')
+      const o1 = await commit('o1', [base], 'refs/heads/other')
+      await commit('mx', [m1, o1], 'refs/heads/master')
+      await commit('ox', [o1, m1], 'refs/heads/other')
+
+      let error = null
+      try {
+        await merge({
+          fs,
+          dir,
+          gitdir,
+          ours: 'master',
+          theirs: 'other',
+          author,
+        })
+      } catch (e) {
+        error = e
+      }
+      expect(error).not.toBeNull()
+      expect(error.code).toBe(Errors.MergeNotSupportedError.code)
+      expect(error.data).toEqual({
+        what: 'more than one merge base (criss-cross)',
+      })
+      expect(error.message).toBe(
+        'Merges with more than one merge base (criss-cross) are not supported yet.'
+      )
+    })
   })
 })

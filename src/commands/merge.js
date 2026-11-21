@@ -3,10 +3,11 @@ import '../typedefs.js'
 
 import { _commit } from '../commands/commit.js'
 import { _currentBranch } from '../commands/currentBranch.js'
-import { _findMergeBase } from '../commands/findMergeBase.js'
+import { _findMergeBases } from '../commands/findMergeBase.js'
 import { FastForwardError } from '../errors/FastForwardError.js'
 import { MergeConflictError } from '../errors/MergeConflictError.js'
 import { MergeNotSupportedError } from '../errors/MergeNotSupportedError.js'
+import { UnrelatedHistoriesError } from '../errors/UnrelatedHistoriesError.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { abbreviateRef } from '../utils/abbreviateRef.js'
@@ -102,20 +103,26 @@ export async function _merge({
     oid: await GitRefManager.resolve({ fs, gitdir, ref: theirs }),
   })
   // find most recent common ancestor of ref a and ref b
-  const baseOids = await _findMergeBase({
+  const { bases: baseOids, shallow } = await _findMergeBases({
     fs,
     cache,
     gitdir,
     oids: [ourOid, theirOid],
   })
-  if (baseOids.length !== 1) {
-    if (baseOids.length === 0 && allowUnrelatedHistories) {
-      // 4b825…  == the empty tree used by git
-      baseOids.push('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
-    } else {
-      // TODO: Recursive Merge strategy
-      throw new MergeNotSupportedError()
+  if (baseOids.length === 0) {
+    if (!allowUnrelatedHistories) {
+      throw new UnrelatedHistoriesError(
+        abbreviateRef(ours),
+        abbreviateRef(theirs),
+        shallow
+      )
     }
+    // 4b825…  == the empty tree used by git
+    baseOids.push('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
+  }
+  if (baseOids.length > 1) {
+    // TODO: Recursive Merge strategy
+    throw new MergeNotSupportedError('more than one merge base (criss-cross)')
   }
   const baseOid = baseOids[0]
   // handle fast-forward case
