@@ -41,6 +41,8 @@ describe('merge', () => {
     }
     expect(error).not.toBeNull()
     expect(error.code).toBe(Errors.UnmergedPathsError.code)
+    expect(error.data.filepaths).toEqual(['a', 'b'])
+    expect(error.message).toContain('unmerged files: a, b.')
   })
   it('merge master into master', async () => {
     // Setup
