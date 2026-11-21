@@ -24,6 +24,60 @@ function mode2type(mode) {
   throw new InternalError(`Unexpected GitTree entry mode: ${mode}`)
 }
 
+// Drop the trailing dots and spaces of a name, the way Win32 does. A backward
+// scan, because `/[. ]+$/` costs O(n^2) on a name that is a long run of dots
+// followed by anything else: the engine retries the run from every start offset,
+// and an entry name arrives off the wire with no length bound. Only the
+// reserved-name checks below see this value; the stored path keeps its own
+// spelling.
+function stripTrailingDotsAndSpaces(name) {
+  let end = name.length
+  while (end > 0) {
+    const c = name.charCodeAt(end - 1)
+    if (c !== 46 /* . */ && c !== 32 /* space */) break
+    end--
+  }
+  return end === name.length ? name : name.slice(0, end)
+}
+
+// Reject reserved entry names, matching git's verify_path(): path separators,
+// "." and ".." (which resolve outside the working directory), and ".git" (which git
+// disallows as a path component). Checks mirror git's is_ntfs_dotgit() and
+// is_hfs_dotgit(): case-insensitive, trailing dots/spaces stripped (NTFS),
+// NTFS 8.3 short name aliases (git~1..git~9), NTFS Alternate Data Streams, and
+// HFS+ ignorable Unicode characters stripped (zero-width joiners, directional
+// marks, BOM, etc.).
+//
+// Every entry name passes through here, whether it was parsed off the wire or
+// handed in as an object, so the same tree cannot be written and then refused on
+// the way back in.
+function assertSafeEntryPath(path) {
+  const hfsClean = path.replace(
+    /[\u200C-\u200F\u202A-\u202E\u206A-\u206F\uFEFF]/g,
+    ''
+  )
+  // NTFS Alternate Data Streams are referenced as `<name>:<stream>:<type>`, and a
+  // directory's default stream lets `.git::$INDEX_ALLOCATION` resolve to the `.git`
+  // directory itself. git forbids *any* ADS, so only the portion before the first
+  // colon names the actual entry we normalize and check.
+  const ntfsClean = hfsClean.split(':')[0]
+  const normalized = stripTrailingDotsAndSpaces(ntfsClean.toLowerCase())
+  // Win32 drops the trailing dots and spaces of a path component, so every name
+  // built only from dots and spaces aliases "." or "..", not just those two exact
+  // spellings: `.. ` resolves to the parent directory. git rejects the whole class
+  // in is_valid_win32_path(). `normalized` is empty for exactly that class, which
+  // is why the test is on it rather than on another trailing-run pattern.
+  if (
+    path.includes('\\') ||
+    path.includes('/') ||
+    (normalized === '' && ntfsClean !== '') ||
+    normalized === '.git' ||
+    /^\.?git~[1-9]$/.test(normalized)
+  ) {
+    throw new UnsafeFilepathError(path)
+  }
+}
+
 function parseBuffer(buffer) {
   const _entries = []
   let cursor = 0
@@ -44,34 +98,7 @@ function parseBuffer(buffer) {
     if (mode === '40000') mode = '040000' // makes it line up neater in printed output
     const type = mode2type(mode)
     const path = buffer.slice(space + 1, nullchar).toString('utf8')
-
-    // Reject reserved entry names, matching git's verify_path(): path separators,
-    // "." and ".." (which resolve outside the working directory), and ".git" (which git
-    // disallows as a path component). Checks mirror git's is_ntfs_dotgit() and
-    // is_hfs_dotgit(): case-insensitive, trailing dots/spaces stripped (NTFS),
-    // NTFS 8.3 short name aliases (git~1..git~9), NTFS Alternate Data Streams, and
-    // HFS+ ignorable Unicode characters stripped (zero-width joiners, directional
-    // marks, BOM, etc.).
-    const hfsClean = path.replace(
-      /[\u200C-\u200F\u202A-\u202E\u206A-\u206F\uFEFF]/g,
-      ''
-    )
-    // NTFS Alternate Data Streams are referenced as `<name>:<stream>:<type>`, and a
-    // directory's default stream lets `.git::$INDEX_ALLOCATION` resolve to the `.git`
-    // directory itself. git forbids *any* ADS, so only the portion before the first
-    // colon names the actual entry we normalize and check.
-    const ntfsClean = hfsClean.split(':')[0]
-    const normalized = ntfsClean.toLowerCase().replace(/[. ]+$/, '')
-    if (
-      path.includes('\\') ||
-      path.includes('/') ||
-      hfsClean === '.' ||
-      hfsClean === '..' ||
-      normalized === '.git' ||
-      /^\.?git~[1-9]$/.test(normalized)
-    ) {
-      throw new UnsafeFilepathError(path)
-    }
+    assertSafeEntryPath(path)
 
     const oid = buffer.slice(nullchar + 1, nullchar + 21).toString('hex')
     cursor = nullchar + 21
@@ -101,6 +128,7 @@ function nudgeIntoShape(entry) {
   if (!entry.type) {
     entry.type = mode2type(entry.mode) // index
   }
+  assertSafeEntryPath(entry.path)
   return entry
 }
 

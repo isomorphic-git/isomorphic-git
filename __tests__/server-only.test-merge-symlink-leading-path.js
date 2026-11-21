@@ -249,9 +249,8 @@ describe('merge symlink safety', () => {
 
     const lst = await fsp.lstat(join(dir, 'newdir', 'link'))
     expect(lst.isSymbolicLink()).toBe(true)
-    expect(await fsp.readlink(join(dir, 'newdir', 'link'))).toBe(
-      '../shared.txt'
-    )
+    const target = await fsp.readlink(join(dir, 'newdir', 'link'))
+    expect(target).toBe(join('..', 'shared.txt'))
   })
 
   it('replaces a tracked symlink rather than writing through it', async () => {
