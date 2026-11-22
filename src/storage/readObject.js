@@ -1,6 +1,7 @@
 import { InternalError } from '../errors/InternalError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitObject } from '../models/GitObject.js'
+import { mayHaveLooseObject } from '../storage/objectDirectories.js'
 import { readObjectLoose } from '../storage/readObjectLoose.js'
 import { readObjectPacked } from '../storage/readObjectPacked.js'
 import { inflate } from '../utils/inflate.js'
@@ -36,25 +37,22 @@ export async function _readObject({
   if (oid === '4b825dc642cb6eb9a060e54bf8d69288fbee4904') {
     result = { format: 'wrapped', object: Buffer.from(`tree 0\x00`) }
   }
-  // Look for it in the loose object directory.
+  // Look for it where the cache says it can be: in its loose object directory
+  // when it was listed there, then in the packs listed. The cache can be out of
+  // date, so when that fails, look everywhere, as without a cache.
   if (!result) {
-    result = await readObjectLoose({ fs, gitdir, oid })
-  }
-  // Check to see if it's in a packfile.
-  if (!result) {
-    result = await readObjectPacked({
-      fs,
-      cache,
-      gitdir,
-      oid,
-      getExternalRefDelta,
-    })
+    const args = { fs, cache, gitdir, oid, getExternalRefDelta }
+    result =
+      (await findObject({ ...args, fresh: false }).catch(() => null)) ||
+      (await findObject({ ...args, fresh: true }))
 
     if (!result) {
       throw new NotFoundError(oid)
     }
+  }
 
-    // Directly return packed result, as specified: packed objects always return the 'content' format.
+  // Directly return packed result, as specified: packed objects always return the 'content' format.
+  if (result.format === 'content') {
     return result
   }
 
@@ -85,4 +83,29 @@ export async function _readObject({
   result.format = 'content'
 
   return result
+}
+
+// Read a loose object, or else a packed one. Unless `fresh`, skip the loose read
+// when the cached listing of its directory does not have it, and look only in
+// the packs that the cache lists.
+async function findObject({
+  fs,
+  cache,
+  gitdir,
+  oid,
+  getExternalRefDelta,
+  fresh,
+}) {
+  if (fresh || (await mayHaveLooseObject({ fs, cache, gitdir, oid }))) {
+    const result = await readObjectLoose({ fs, gitdir, oid })
+    if (result) return result
+  }
+  return readObjectPacked({
+    fs,
+    cache,
+    gitdir,
+    oid,
+    getExternalRefDelta,
+    fresh,
+  })
 }

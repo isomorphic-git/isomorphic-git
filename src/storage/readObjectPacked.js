@@ -1,6 +1,6 @@
 import { InternalError } from '../errors/InternalError.js'
+import { readPackList } from '../storage/objectDirectories.js'
 import { readPackIndex } from '../storage/readPackIndex.js'
-import { join } from '../utils/join.js'
 import { shasumRange } from '../utils/shasumRange.js'
 
 export async function readObjectPacked({
@@ -10,11 +10,11 @@ export async function readObjectPacked({
   oid,
   format = 'content',
   getExternalRefDelta,
+  fresh = true,
 }) {
   // Check to see if it's in a packfile.
   // Iterate through all the .idx files
-  let list = await fs.readdir(join(gitdir, 'objects/pack'))
-  list = list.filter(x => x.endsWith('.idx'))
+  const list = await readPackList({ fs, cache, gitdir, fresh })
   for (const filename of list) {
     const indexFile = `${gitdir}/objects/pack/${filename}`
     const p = await readPackIndex({

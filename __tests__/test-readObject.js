@@ -1,5 +1,7 @@
 /* eslint-env node, browser, jasmine */
-import { Errors, readObject } from 'isomorphic-git'
+import { Errors, readObject, writeObject } from 'isomorphic-git'
+import { GitObject, GitPackIndex, shasum } from 'isomorphic-git/internal-apis'
+import pako from 'pako'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 import { corruptZlibCases } from './__helpers__/corruptZlib.js'
@@ -669,4 +671,137 @@ describe('readObject', () => {
       expect(Array.from(raw.object)).toEqual(bytes)
     })
   }
+  describe('with a cache', () => {
+    // Count the calls to the file system that list or read `objects`.
+    // Read an object as its content.
+    async function readContent(args) {
+      const result = await readObject({ ...args, format: 'content' })
+      if (result.format !== 'content') throw new Error('wrong format')
+      return result
+    }
+
+    function spy(fs) {
+      /** @type {{ readdir: string[], readFile: string[] }} */
+      const calls = { readdir: [], readFile: [] }
+      const original = { readdir: fs._readdir, readFile: fs._readFile }
+      fs._readdir = (path, ...args) => {
+        calls.readdir.push(path)
+        return original.readdir(path, ...args)
+      }
+      fs._readFile = (path, ...args) => {
+        calls.readFile.push(path)
+        return original.readFile(path, ...args)
+      }
+      const restore = () =>
+        Object.assign(fs, {
+          _readdir: original.readdir,
+          _readFile: original.readFile,
+        })
+      return { calls, restore }
+    }
+
+    it('lists the packs once, and reads no loose object that is not there', async () => {
+      const { fs, gitdir } = await makeFixture('test-readObject')
+      const cache = {}
+      const packed = [
+        '0b8faa11b353db846b40eb064dfb299816542a46',
+        '0001c3e2753b03648b6c43dd74ba7fe2f21123d6',
+        '007e7738d257fe78da6938990a40e4310dfc0757',
+        '00b91c8b8ddfb43df70ef334088b7d840e5053db',
+        '010b3cca1e055adbdaad43f1be54f97ab1f1d5ce',
+      ]
+      const loose = 'e10ebb90d03eaacca84de1af0a59b444232da99e'
+      const { calls, restore } = spy(fs)
+      try {
+        for (const oid of [...packed, loose]) {
+          const { oid: read } = await readObject({ fs, gitdir, oid, cache })
+          expect(read).toBe(oid)
+        }
+      } finally {
+        restore()
+      }
+      expect(
+        calls.readdir.filter(p => p.endsWith('objects/pack'))
+      ).toHaveLength(1)
+      const looseReads = calls.readFile.filter(p =>
+        /objects\/[0-9a-f]{2}\//.test(p)
+      )
+      expect(looseReads).toHaveLength(1)
+      expect(looseReads[0].endsWith(`objects/e1/${loose.slice(2)}`)).toBe(true)
+    })
+
+    it('finds a pack added after the packs were listed', async () => {
+      const { fs, gitdir } = await makeFixture('test-readObject')
+      const cache = {}
+      await readObject({
+        fs,
+        gitdir,
+        cache,
+        oid: '0b8faa11b353db846b40eb064dfb299816542a46',
+      })
+      // A pack of one new blob, and its index.
+      const blob = Buffer.from('a blob in a new pack\n')
+      const entry = Buffer.concat([
+        Buffer.from([
+          0b10110000 | (blob.byteLength & 0b1111),
+          blob.byteLength >> 4,
+        ]),
+        Buffer.from(pako.deflate(blob)),
+      ])
+      const header = Buffer.alloc(12)
+      header.write('PACK')
+      header.writeUInt32BE(2, 4)
+      header.writeUInt32BE(1, 8)
+      const body = Buffer.concat([header, entry])
+      const pack = Buffer.concat([body, Buffer.from(await shasum(body), 'hex')])
+      const index = await GitPackIndex.fromPack({ pack })
+      const name = `${gitdir}/objects/pack/pack-${index.packfileSha}`
+      await fs.write(`${name}.pack`, pack)
+      await fs.write(`${name}.idx`, await index.toBuffer())
+      // Test
+      const oid = index.hashes[0]
+      const { type, object } = await readContent({ fs, gitdir, cache, oid })
+      expect(type).toBe('blob')
+      expect(Buffer.from(object).equals(blob)).toBe(true)
+    })
+
+    it('finds a loose object written after its directory was listed', async () => {
+      const { fs, gitdir } = await makeFixture('test-readObject')
+      const cache = {}
+      const blob = Buffer.from('a new loose blob\n')
+      const oid = await shasum(GitObject.wrap({ type: 'blob', object: blob }))
+      let error = null
+      try {
+        await readObject({ fs, gitdir, cache, oid })
+      } catch (err) {
+        error = err
+      }
+      expect(error instanceof Errors.NotFoundError).toBe(true)
+      // Test
+      await writeObject({ fs, gitdir, type: 'blob', object: blob })
+      const { object } = await readContent({ fs, gitdir, cache, oid })
+      expect(Buffer.from(object).equals(blob)).toBe(true)
+    })
+
+    it('finds an object that moved from a removed pack to a loose object', async () => {
+      const { fs, gitdir } = await makeFixture('test-readObject')
+      const cache = {}
+      const oid = '0b8faa11b353db846b40eb064dfb299816542a46'
+      const { type, object } = await readContent({ fs, gitdir, oid })
+      // List its loose directory and the packs, and read the pack index, but
+      // not the pack itself, by reading an object of the same directory that
+      // is nowhere.
+      await readObject({ fs, gitdir, cache, oid: `0b${'f'.repeat(38)}` }).catch(
+        () => {}
+      )
+      const name = `${gitdir}/objects/pack/pack-1a1e70d2f116e8cb0cb42d26019e5c7d0eb01888`
+      await fs.rm(`${name}.pack`)
+      await fs.rm(`${name}.idx`)
+      await writeObject({ fs, gitdir, type, object })
+      // Test
+      const read = await readContent({ fs, gitdir, cache, oid })
+      expect(read.type).toBe(type)
+      expect(Buffer.from(read.object).equals(Buffer.from(object))).toBe(true)
+    })
+  })
 })
