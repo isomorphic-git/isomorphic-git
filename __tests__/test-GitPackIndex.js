@@ -295,4 +295,14 @@ describe('GitPackIndex', () => {
     expect(p.hashes).toEqual([oid])
     expect(p.offsets.size).toBe(1)
   })
+  it('to .idx file from a .pack of 1000 objects, as git writes it', async () => {
+    const { fs, gitdir } = await makeFixture('test-GitPackIndex-deltas')
+    // 1000 blobs whose oids start with 249 different bytes. The .idx is the one
+    // `git pack-objects` wrote, so its fanout table is git's.
+    const idx = await fs.read(path.join(gitdir, 'fanout.idx'))
+    const pack = await fs.read(path.join(gitdir, 'fanout.pack'))
+    const p = await GitPackIndex.fromPack({ pack })
+    expect(p.hashes.length).toBe(1000)
+    expect((await p.toBuffer()).equals(idx)).toBe(true)
+  })
 })
