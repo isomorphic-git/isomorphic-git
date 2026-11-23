@@ -300,13 +300,15 @@ export class GitPackIndex {
     write('ff744f63', 'hex')
     // Write out version number 2
     write('00000002', 'hex')
-    // Write fanout table
+    // Write fanout table: entry i counts the objects whose first byte is at most i.
+    const counts = new Uint32Array(256)
+    for (const hash of this.hashes) {
+      counts[parseInt(hash.slice(0, 2), 16)]++
+    }
     const fanoutBuffer = new BufferCursor(Buffer.alloc(256 * 4))
+    let count = 0
     for (let i = 0; i < 256; i++) {
-      let count = 0
-      for (const hash of this.hashes) {
-        if (parseInt(hash.slice(0, 2), 16) <= i) count++
-      }
+      count += counts[i]
       fanoutBuffer.writeUInt32BE(count)
     }
     buffers.push(fanoutBuffer.buffer)
