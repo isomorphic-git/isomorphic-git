@@ -45,9 +45,9 @@ const schema = {
 // subsection is optional
 // subsection is specified after section and one or more spaces or tabs
 // subsection is specified between double quotes, where \ escapes the next character
-// a comment can follow the section header
+// a comment, or a variable, can follow the section header on the same line
 const SECTION_LINE_REGEX =
-  /^\[([A-Za-z0-9-.]+)(?:[ \t]+"((?:[^"\\]|\\.)*)")?\][ \t]*(?:[#;].*)?$/
+  /^\[([A-Za-z0-9-.]+)(?:[ \t]+"((?:[^"\\]|\\.)*)")?\][ \t]*(.*)$/
 const SECTION_REGEX = /^[A-Za-z0-9-.]+$/
 
 // variable lines contain a name, and equal sign and then a value
@@ -62,9 +62,20 @@ const VARIABLE_NAME_REGEX = /^[A-Za-z][A-Za-z0-9-]*$/
 const extractSectionLine = line => {
   const matches = SECTION_LINE_REGEX.exec(line)
   if (matches != null) {
-    const [section, subsection] = matches.slice(1)
+    const [section, subsection, rest] = matches.slice(1)
+    let variable = null
+    if (rest !== '' && !/^[#;]/.test(rest)) {
+      // Like canonical git, read a variable that follows the header
+      variable = extractVariableLine(rest)
+      if (variable == null) return null
+    }
     // Like canonical git, drop the backslash of an escaped character
-    return [section, subsection && subsection.replace(/\\(.)/g, '$1')]
+    return [
+      section,
+      subsection && subsection.replace(/\\(.)/g, '$1'),
+      variable,
+      line.slice(0, line.length - rest.length).trimEnd(),
+    ]
   }
   return null
 }
@@ -169,7 +180,7 @@ export class GitConfig {
     let section = null
     let subsection = null
     this.parsedConfig = text
-      ? text.split('\n').map(line => {
+      ? text.split('\n').flatMap(line => {
           let name = null
           let value = null
 
@@ -177,7 +188,33 @@ export class GitConfig {
           const extractedSection = extractSectionLine(trimmedLine)
           const isSection = extractedSection != null
           if (isSection) {
-            ;[section, subsection] = extractedSection
+            let variable, header
+            ;[section, subsection, variable, header] = extractedSection
+            if (variable != null) {
+              // A header and a variable on one line are two records, each with
+              // a line of its own, so the variable can be changed or removed.
+              ;[name, value] = variable
+              return [
+                {
+                  line: header,
+                  isSection,
+                  section,
+                  subsection,
+                  name: null,
+                  value: null,
+                  path: getPath(section, subsection, null),
+                },
+                {
+                  line: `\t${trimmedLine.slice(header.length).trim()}`,
+                  isSection: false,
+                  section,
+                  subsection,
+                  name,
+                  value,
+                  path: getPath(section, subsection, name),
+                },
+              ]
+            }
           } else {
             const extractedVariable = extractVariableLine(trimmedLine)
             const isVariable = extractedVariable != null

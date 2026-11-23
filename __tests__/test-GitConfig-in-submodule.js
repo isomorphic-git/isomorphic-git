@@ -109,6 +109,68 @@ describe('GitConfig', () => {
     })
   })
 
+  describe('a variable on the same line as its section header', () => {
+    it('get', async () => {
+      const config = GitConfig.from(`[core] bare = true
+      [extensions] objectformat = sha256 # comment
+      [remote "origin"]   url = https://foo.com/project.git
+      fetch = +refs/heads/*:refs/remotes/origin/*
+      [foo] keyaaa`)
+      expect(await config.get('core.bare')).toBe(true)
+      expect(await config.get('extensions.objectformat')).toEqual('sha256')
+      expect(await config.get('remote.origin.url')).toEqual(
+        'https://foo.com/project.git'
+      )
+      expect(await config.get('remote.origin.fetch')).toEqual(
+        '+refs/heads/*:refs/remotes/origin/*'
+      )
+      expect(await config.get('foo.keyaaa')).toBe('true')
+      expect(await config.getSubsections('remote')).toEqual(['origin'])
+    })
+
+    it('is not read after a comment', async () => {
+      const config = GitConfig.from(`[foo] # keyaaa = valaaa
+      keybbb = valbbb`)
+      expect(await config.get('foo.keyaaa')).toBeUndefined()
+      expect(await config.get('foo.keybbb')).toEqual('valbbb')
+    })
+
+    it('makes the line no header when it is not a variable', async () => {
+      const config = GitConfig.from(`[foo]
+      keyaaa = valaaa
+      [bar] =oops
+      keyaaa = valbar`)
+      expect(await config.getall('foo.keyaaa')).toEqual(['valaaa', 'valbar'])
+      expect(await config.get('bar.keyaaa')).toBeUndefined()
+    })
+
+    it('set, append and delete', async () => {
+      const config = GitConfig.from(`[foo] keyaaa = valaaa
+      keybbb = valbbb`)
+      await config.set('foo.keyaaa', 'newvalaaa')
+      await config.append('foo.keyaaa', 'valccc')
+      expect(await config.getall('foo.keyaaa')).toEqual(['newvalaaa', 'valccc'])
+      expect(config.toString()).toEqual(`[foo]
+\tkeyaaa = newvalaaa
+\tkeyaaa = valccc
+      keybbb = valbbb`)
+      await config.set('foo.keyaaa', undefined)
+      await config.set('foo.keyaaa', undefined)
+      expect(await config.get('foo.keyaaa')).toBeUndefined()
+      expect(config.toString()).toEqual(`[foo]
+      keybbb = valbbb`)
+    })
+
+    it('toString puts the variable on a line of its own', async () => {
+      const config = GitConfig.from(`[core] bare = true
+[remote "origin"] url = https://foo.com/project.git`)
+      expect(config.toString()).toEqual(`[core]
+\tbare = true
+[remote "origin"]
+\turl = https://foo.com/project.git`)
+    })
+  })
+
   describe('handle comments', () => {
     it('lines starting with # or ;', async () => {
       const config = GitConfig.from(`[foo]
