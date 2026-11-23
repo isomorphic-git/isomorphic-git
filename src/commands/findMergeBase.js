@@ -11,8 +11,25 @@ import { _readObject as readObject } from '../storage/readObject.js'
  * @param {string} args.gitdir
  * @param {string[]} args.oids
  *
+ * @returns {Promise<string[]>}
  */
-export async function _findMergeBase({ fs, cache, gitdir, oids }) {
+export async function _findMergeBase(args) {
+  return (await _findMergeBases(args)).bases
+}
+
+/**
+ * Like `_findMergeBase`, but also tells whether the search ran into the edge
+ * of a shallow clone, in which case a base may exist in the unfetched history.
+ *
+ * @param {object} args
+ * @param {import('../models/FileSystem.js').FileSystem} args.fs
+ * @param {any} args.cache
+ * @param {string} args.gitdir
+ * @param {string[]} args.oids
+ *
+ * @returns {Promise<{bases: string[], shallow: boolean}>}
+ */
+export async function _findMergeBases({ fs, cache, gitdir, oids }) {
   // Note: right now, the tests are geared so that the output should match that of
   // `git merge-base --all --octopus`
   // because without the --octopus flag, git's output seems to depend on the ORDER of the oids,
@@ -27,6 +44,7 @@ export async function _findMergeBase({ fs, cache, gitdir, oids }) {
   const common = new Set()
   const parents = new Map()
   const shallows = await GitShallowManager.read({ fs, gitdir })
+  let shallow = false
   const readParents = async oid => {
     if (parents.has(oid)) return parents.get(oid)
     const { object, type } = await readObject({ fs, cache, gitdir, oid })
@@ -35,6 +53,9 @@ export async function _findMergeBase({ fs, cache, gitdir, oids }) {
     }
     const commit = GitCommit.from(object)
     const { parent } = commit.parseHeaders()
+    // git also lists root commits in .git/shallow when a clone's depth ends
+    // exactly at the start of history; nothing was cut off there.
+    if (shallows.has(oid) && parent.length > 0) shallow = true
     const result = shallows.has(oid) ? [] : parent
     parents.set(oid, result)
     return result
@@ -63,7 +84,7 @@ export async function _findMergeBase({ fs, cache, gitdir, oids }) {
     heads = Array.from(newheads.values())
   }
 
-  if (common.size < 2) return [...common]
+  if (common.size < 2) return { bases: [...common], shallow }
 
   // A merge base is only "best" when it is not an ancestor of another
   // common ancestor. This also keeps independent criss-cross bases.
@@ -82,5 +103,5 @@ export async function _findMergeBase({ fs, cache, gitdir, oids }) {
       }
     }
   }
-  return [...common].filter(oid => !redundant.has(oid))
+  return { bases: [...common].filter(oid => !redundant.has(oid)), shallow }
 }
