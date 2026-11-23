@@ -155,14 +155,14 @@ jobs:
           # Use X Virtual Frame Buffer (xvfb) to run the browser with no display (headless).
           xvfb-run --auto-servernum --server-args='-screen 0, 1920x1080x24' npx nps \
             test.setup \
-            test.karma
+          test.${{ matrix.karma-launcher == 'FirefoxHeadless' && 'firefox' || 'chrome' }}
         env:
           BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
           BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          TEST_BROWSERS: ${{ matrix.karma-launcher }}
-
+          JEST_BROWSER: ${{ matrix.karma-launcher == 'FirefoxHeadless' && 'firefox' || 'chrome' }}
+          
       - name: Save test results
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
