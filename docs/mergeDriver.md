@@ -35,6 +35,8 @@ If we were to merge `topic` into `main`, the `branches` array would look like: `
 ### MergeDriverParams#contents
 The `contents` array contains the file contents respective of each branch. Like the `branches` array, the first index always refers to the merge base. The second index always refers to the branch we are merging into, i.e. 'ours'. Subsequent indexes refer to the branches we are merging, i.e. 'theirs'.
 
+The contents are decoded as UTF-8, and `mergedText` is encoded as UTF-8 when it is written, so bytes that are not valid UTF-8 are not kept. Like in git, a custom merge driver is also called for binary files (files with a NUL byte in their first 8000 bytes), which the built-in driver never merges.
+
 For example, say we have a file `text.txt` which contains:
 ```
 original
