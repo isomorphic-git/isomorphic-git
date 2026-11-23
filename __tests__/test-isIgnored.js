@@ -1,5 +1,6 @@
 /* eslint-env node, browser, jasmine */
 import { isIgnored } from 'isomorphic-git'
+import { GitIgnoreManager } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -102,5 +103,77 @@ describe('isIgnored', () => {
     expect(await isIgnored({ fs, gitdir, dir, filepath: 'c/f/keep.log' })).toBe(
       false
     )
+  })
+  it('should keep matching without regard to case, and with classes', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await writeGitIgnore(fs, dir, ['*.LOCK', '[ab].txt'])
+    // Test
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'x.lock' })).toBe(true)
+    expect(await isIgnored({ fs, gitdir, dir, filepath: 'a.txt' })).toBe(true)
+  })
+  it('strict mode answers true only for rules matched like git', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    await writeGitIgnore(fs, dir, ['*.lock', '.git', '*.LOG'])
+    const strictlyIgnored = filepath =>
+      GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath, strict: true })
+    // Test
+    expect(await strictlyIgnored('a.lock')).toBe(true)
+    expect(await strictlyIgnored('sub/a.lock')).toBe(true)
+    expect(await strictlyIgnored('a.txt')).toBe(false)
+    // never a .git folder, nor a match that depends on core.ignorecase
+    expect(await strictlyIgnored('sub/.git')).toBe(false)
+    expect(await strictlyIgnored('a.log')).toBe(false)
+  })
+  it('strict mode answers false for paths and rules it cannot match like git', async () => {
+    // Setup
+    const { fs, gitdir, dir } = await makeFixture('test-isIgnored')
+    const strictlyIgnored = filepath =>
+      GitIgnoreManager.isIgnored({ fs, dir, gitdir, filepath, strict: true })
+    // Test
+    for (const [rule, filepath, ignored] of [
+      ['**/a.tmp', 'd/a.tmp', true],
+      ['/**/a.tmp', 'd/a.tmp', false],
+      // git reads `\` as part of the name, not as a folder separator
+      ['?', 'a\\b', false],
+      ['*', '...', false],
+      ['*.lock', '.../a.lock', false],
+    ]) {
+      await writeGitIgnore(fs, dir, [rule])
+      expect([rule, filepath, await strictlyIgnored(filepath)]).toEqual([
+        rule,
+        filepath,
+        ignored,
+      ])
+    }
+  })
+  it('strict mode answers false for rule files it cannot read', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-isIgnored')
+    await writeGitIgnore(fs, dir, ['*.lock'])
+    await writeExclude(fs, gitdir, ['*.lock'])
+    const readFile = fs._readFile
+    let replace = {}
+    fs._readFile = async (filepath, options) => {
+      if (!(filepath in replace)) return readFile(filepath, options)
+      if (replace[filepath] instanceof Error) throw replace[filepath]
+      return replace[filepath]
+    }
+    const strictlyIgnored = () =>
+      GitIgnoreManager.isIgnored({
+        fs,
+        dir,
+        gitdir,
+        filepath: 'a.lock',
+        strict: true,
+      })
+    const unreadable = Object.assign(new Error('EACCES'), { code: 'EACCES' })
+    // Test
+    expect(await strictlyIgnored()).toBe(true)
+    for (const file of [`${dir}/.gitignore`, `${gitdir}/info/exclude`]) {
+      replace = { [file]: unreadable }
+      expect(await strictlyIgnored()).toBe(false)
+    }
   })
 })

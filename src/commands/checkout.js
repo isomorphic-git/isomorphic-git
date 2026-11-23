@@ -11,6 +11,7 @@ import { InternalError } from '../errors/InternalError.js'
 import { MultipleGitError } from '../errors/MultipleGitError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { GitConfigManager } from '../managers/GitConfigManager.js'
+import { GitIgnoreManager } from '../managers/GitIgnoreManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { GitRefManager } from '../managers/GitRefManager.js'
 import { _readObject as readObject } from '../storage/readObject.js'
@@ -321,10 +322,10 @@ export async function _checkout({
                     gitdir,
                     oid,
                   })
-                  if (chmod) {
-                    // Note: the mode option of fs.write only works when creating files,
-                    // not updating them. Since the `fs` plugin doesn't expose `chmod` this
-                    // is our only option.
+                  // Note: the mode option of fs.write only works when creating files,
+                  // not updating them. Since the `fs` plugin doesn't expose `chmod` this
+                  // is our only option. A symlink cannot be rewritten in place either.
+                  if (chmod || mode === 0o120000) {
                     await fs.rm(filepath)
                   }
                   if (mode === 0o100644) {
@@ -506,9 +507,21 @@ async function analyze({
               return ['conflict', fullpath]
             }
             case 'blob-blob': {
+              // Like git, an untracked file that .gitignore ignores may be
+              // overwritten. Only checked when it would otherwise conflict,
+              // and strictly: the answer is "ignored" only if git agrees.
+              const overwrite = async () =>
+                force ||
+                GitIgnoreManager.isIgnored({
+                  fs,
+                  dir,
+                  gitdir,
+                  filepath: fullpath,
+                  strict: true,
+                })
               // Is the incoming file different?
               if ((await commit.oid()) !== (await workdir.oid())) {
-                if (force) {
+                if (await overwrite()) {
                   return [
                     'update',
                     fullpath,
@@ -522,7 +535,7 @@ async function analyze({
               } else {
                 // Is the incoming file a different mode?
                 if ((await commit.mode()) !== (await workdir.mode())) {
-                  if (force) {
+                  if (await overwrite()) {
                     return [
                       'update',
                       fullpath,
@@ -729,7 +742,8 @@ async function updateWorkingDir(
   if (method !== 'create-index' && method !== 'mkdir-index') {
     await assertNoSymlinkInLeadingPath(fs, dir, fullpath)
     const { object } = await readObject({ fs, cache, gitdir, oid })
-    if (chmod) {
+    // A symlink cannot be rewritten in place, so it is replaced too.
+    if (chmod || mode === 0o120000) {
       await fs.rm(filepath)
     }
     if (mode === 0o100644) {
