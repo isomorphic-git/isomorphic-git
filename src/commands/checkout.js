@@ -183,11 +183,14 @@ export async function _checkout({
         await Promise.all(
           ops
             .filter(
-              ([method]) => method === 'delete' || method === 'delete-index'
+              ([method]) =>
+                method === 'delete' ||
+                method === 'delete-index' ||
+                method === 'update-blob-to-tree'
             )
             .map(async function ([method, fullpath]) {
               const filepath = `${dir}/${fullpath}`
-              if (method === 'delete') {
+              if (method === 'delete' || method === 'update-blob-to-tree') {
                 await fs.rm(filepath)
               }
               index.delete({ filepath: fullpath })
@@ -208,10 +211,14 @@ export async function _checkout({
       { fs, gitdir, cache },
       async function (index) {
         for (const [method, fullpath] of ops) {
-          if (method === 'rmdir' || method === 'rmdir-index') {
+          if (
+            method === 'rmdir' ||
+            method === 'rmdir-index' ||
+            method === 'update-dir-to-blob'
+          ) {
             const filepath = `${dir}/${fullpath}`
             try {
-              if (method === 'rmdir') {
+              if (method === 'rmdir' || method === 'update-dir-to-blob') {
                 await fs.rmdir(filepath)
               }
               index.delete({ filepath: fullpath })
@@ -238,7 +245,12 @@ export async function _checkout({
 
     await Promise.all(
       ops
-        .filter(([method]) => method === 'mkdir' || method === 'mkdir-index')
+        .filter(
+          ([method]) =>
+            method === 'mkdir' ||
+            method === 'mkdir-index' ||
+            method === 'update-blob-to-tree'
+        )
         .map(async function ([_, fullpath]) {
           const filepath = `${dir}/${fullpath}`
           await assertNoSymlinkInLeadingPath(fs, dir, fullpath)
@@ -260,7 +272,8 @@ export async function _checkout({
           method === 'create' ||
           method === 'create-index' ||
           method === 'update' ||
-          method === 'mkdir-index'
+          method === 'mkdir-index' ||
+          method === 'update-dir-to-blob'
       )
 
       const updateWorkingDirResults = await batchAllSettled(
@@ -306,7 +319,8 @@ export async function _checkout({
                   method === 'create' ||
                   method === 'create-index' ||
                   method === 'update' ||
-                  method === 'mkdir-index'
+                  method === 'mkdir-index' ||
+                  method === 'update-dir-to-blob'
               )
               .map(async function ([method, fullpath, oid, mode, chmod]) {
                 const filepath = `${dir}/${fullpath}`
@@ -671,7 +685,12 @@ async function analyze({
               }
             }
             case 'tree-blob': {
-              return ['update-dir-to-blob', fullpath, await commit.oid()]
+              return [
+                'update-dir-to-blob',
+                fullpath,
+                await commit.oid(),
+                await commit.mode(),
+              ]
             }
             case 'blob-tree': {
               return ['update-blob-to-tree', fullpath]
@@ -699,7 +718,10 @@ async function analyze({
       children = flat(children)
       if (!parent) {
         return children
-      } else if (parent && parent[0] === 'rmdir') {
+      } else if (
+        parent &&
+        (parent[0] === 'rmdir' || parent[0] === 'update-dir-to-blob')
+      ) {
         children.push(parent)
         return children
       } else {
