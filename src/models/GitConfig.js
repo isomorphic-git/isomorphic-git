@@ -199,7 +199,9 @@ export class GitConfig {
   async get(path, getall = false) {
     const normalizedPath = normalizePath(path).path
     const allValues = this.parsedConfig
-      .filter(config => config.path === normalizedPath)
+      // A section header, or a blank line under it, has no name, but the path of
+      // its subsection can look like a variable's: `[extensions "objectformat"]`.
+      .filter(config => config.name != null && config.path === normalizedPath)
       .map(({ section, name, value }) => {
         const fn = schema[section] && schema[section][name]
         return fn ? fn(value) : value

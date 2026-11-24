@@ -91,6 +91,17 @@ describe('GitConfig', () => {
       expect(a).toEqual('https://bar.com/project.git')
     })
 
+    it('a section header is not a variable of the subsection its path names', async () => {
+      const config = GitConfig.from(`[extensions]
+      objectformat = sha256
+      [extensions "objectformat"]
+
+      [remote "origin"]`)
+      expect(await config.get('extensions.objectformat')).toEqual('sha256')
+      expect(await config.getall('extensions.objectformat')).toEqual(['sha256'])
+      expect(await config.get('remote.origin')).toBeUndefined()
+    })
+
     it('comment after the section header', async () => {
       const config = GitConfig.from(`[foo] # comment
       keyaaa = valaaa
