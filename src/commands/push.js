@@ -140,6 +140,7 @@ export async function _push({
       }
     }
   }
+  const isRemoteTag = fullRemoteRef.startsWith('refs/tags/')
   const oldoid =
     httpRemote.refs.get(fullRemoteRef) ||
     '0000000000000000000000000000000000000000'
@@ -230,7 +231,7 @@ export async function _push({
     if (!force) {
       // Is it a tag that already exists?
       if (
-        fullRef.startsWith('refs/tags') &&
+        isRemoteTag &&
         oldoid !== '0000000000000000000000000000000000000000'
       ) {
         throw new PushRejectedError('tag-exists')
@@ -295,12 +296,7 @@ export async function _push({
   }
 
   // Update the local copy of the remote ref
-  if (
-    remote &&
-    result.ok &&
-    result.refs[fullRemoteRef].ok &&
-    !fullRef.startsWith('refs/tags')
-  ) {
+  if (remote && result.ok && result.refs[fullRemoteRef].ok && !isRemoteTag) {
     // TODO: I think this should actually be using a refspec transform rather than assuming 'refs/remotes/{remote}'
     const ref = `refs/remotes/${remote}/${fullRemoteRef.replace(
       'refs/heads/',
