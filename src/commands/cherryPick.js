@@ -166,6 +166,9 @@ export async function _cherryPick({
       stashCommit: newOid,
       parentCommit: currentOid,
       wasStaged: true,
+      // a file the picked commit deletes must leave the index too,
+      // otherwise it shows up as a staged addition after the cherry-pick
+      stageDeletions: true,
     })
   }
 

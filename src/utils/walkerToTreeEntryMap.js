@@ -200,9 +200,14 @@ export async function applyTreeChanges({
   stashCommit,
   parentCommit,
   wasStaged,
+  // When true, a deleted blob is removed from the index (staged deletion).
+  // When false, the entry is left in place with the parent's oid, so the
+  // deletion comes back unstaged — like `git stash pop` without `--index`.
+  stageDeletions = false,
 }) {
   const dirRemoved = []
   const stageUpdated = []
+  const stageDeleted = []
 
   // analyze the changes
   const ops = await _walk({
@@ -227,8 +232,15 @@ export async function applyTreeChanges({
       if (!stash && parent) {
         const method = type === 'tree' ? 'rmdir' : 'rm'
         if (type === 'tree') dirRemoved.push(filepath)
-        if (type === 'blob' && wasStaged)
-          stageUpdated.push({ filepath, oid: await parent.oid() }) // stats is undefined, will stage the deletion with index.insert
+        if (type === 'blob' && wasStaged) {
+          if (stageDeletions) {
+            stageDeleted.push(filepath)
+          } else {
+            // stats is undefined, so index.insert keeps the entry with the
+            // parent's oid and the deletion stays unstaged (stash behaviour)
+            stageUpdated.push({ filepath, oid: await parent.oid() })
+          }
+        }
         return { method, filepath }
       }
 
@@ -305,6 +317,9 @@ export async function applyTreeChanges({
   await GitIndexManager.acquire({ fs, gitdir, cache: {} }, async index => {
     stageUpdated.forEach(({ filepath, stats, oid }) => {
       index.insert({ filepath, stats, oid })
+    })
+    stageDeleted.forEach(filepath => {
+      index.delete({ filepath })
     })
   })
 }
