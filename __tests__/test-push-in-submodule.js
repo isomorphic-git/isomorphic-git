@@ -216,6 +216,41 @@ describe('push', () => {
       false
     )
   })
+  it('fast-forwards a remote branch from a lightweight tag', async () => {
+    const { fs, gitdir } = await makeFixtureAsSubmodule('test-push')
+    const result = await push({
+      fs,
+      http,
+      gitdir,
+      url: `http://${localhost}:8888/test-push-server.git`,
+      ref: 'refs/tags/lightweight-tag',
+      remoteRef: 'master',
+    })
+    expect(result.refs['refs/heads/master'].ok).toBe(true)
+    expect(
+      await resolveRef({ fs, gitdir, ref: 'refs/remotes/origin/master' })
+    ).toEqual(
+      await resolveRef({ fs, gitdir, ref: 'refs/tags/lightweight-tag' })
+    )
+  })
+  it('rejects replacing a remote tag from a local branch without force', async () => {
+    const { fs, gitdir } = await makeFixtureAsSubmodule(
+      'test-git-http-mock-server'
+    )
+    await expect(
+      push({
+        fs,
+        http,
+        gitdir,
+        url: `http://${localhost}:8888/test-git-http-mock-server.git`,
+        ref: 'refs/heads/main',
+        remoteRef: 'refs/tags/v1.3.1',
+      })
+    ).rejects.toMatchObject({
+      code: Errors.PushRejectedError.code,
+      data: { reason: 'tag-exists' },
+    })
+  })
   it('push with annotated tag', async () => {
     // Setup
     const { fs, gitdir } = await makeFixtureAsSubmodule('test-push')
