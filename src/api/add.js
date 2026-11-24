@@ -10,6 +10,7 @@ import { FileSystem } from '../models/FileSystem.js'
 import { _writeObject } from '../storage/writeObject.js'
 import { assertParameter } from '../utils/assertParameter.js'
 import { discoverGitdir } from '../utils/discoverGitdir.js'
+import { hasCrlfInIndex } from '../utils/hasCrlfInIndex.js'
 import { join } from '../utils/join.js'
 import { posixifyPathBuffer } from '../utils/posixifyPathBuffer.js'
 
@@ -61,6 +62,7 @@ export async function add({
           fs,
           filepath,
           index,
+          cache,
           force,
           parallel,
           autocrlf,
@@ -91,6 +93,7 @@ async function addToIndex({
   fs,
   filepath,
   index,
+  cache,
   force,
   parallel,
   autocrlf,
@@ -123,6 +126,7 @@ async function addToIndex({
             fs,
             filepath: [join(currentFilepath, child)],
             index,
+            cache,
             force,
             parallel,
             autocrlf,
@@ -137,6 +141,7 @@ async function addToIndex({
             fs,
             filepath: [join(currentFilepath, child)],
             index,
+            cache,
             force,
             parallel,
             autocrlf,
@@ -146,7 +151,16 @@ async function addToIndex({
     } else {
       const object = stats.isSymbolicLink()
         ? await fs.readlink(join(dir, currentFilepath)).then(posixifyPathBuffer)
-        : await fs.read(join(dir, currentFilepath), { autocrlf })
+        : await fs.read(join(dir, currentFilepath), {
+            autocrlf,
+            hasCrlfInIndex: () =>
+              hasCrlfInIndex({
+                fs,
+                cache,
+                gitdir,
+                entry: index.entriesMap.get(currentFilepath),
+              }),
+          })
       if (object === null) throw new NotFoundError(currentFilepath)
       const oid = await _writeObject({ fs, gitdir, type: 'blob', object })
       index.insert({ filepath: currentFilepath, stats, oid })

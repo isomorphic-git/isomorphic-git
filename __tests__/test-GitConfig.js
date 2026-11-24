@@ -312,6 +312,16 @@ describe('GitConfig', () => {
       expect(g).toEqual(2)
     })
 
+    it('numeric boolean', async () => {
+      const config = GitConfig.from(`[core]
+      filemode = 1
+      bare = 0`)
+      const a = await config.get('core.filemode')
+      const b = await config.get('core.bare')
+      expect(a).toEqual(true)
+      expect(b).toEqual(false)
+    })
+
     it('special boolean', async () => {
       const config = GitConfig.from(`[core]
       filemode = off

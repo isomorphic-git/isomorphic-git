@@ -1,6 +1,7 @@
 import { GitConfigManager } from '../managers/GitConfigManager.js'
 import { GitIndexManager } from '../managers/GitIndexManager.js'
 import { compareStats } from '../utils/compareStats.js'
+import { hasCrlfInIndex } from '../utils/hasCrlfInIndex.js'
 import { join } from '../utils/join.js'
 import { normalizeStats } from '../utils/normalizeStats.js'
 import { shasum } from '../utils/shasum.js'
@@ -113,7 +114,10 @@ export class GitWalkerFs {
         } else {
           const config = await this._getGitConfig(fs, gitdir)
           const autocrlf = await config.get('core.autocrlf')
-          content = await fs.read(`${dir}/${entry._fullpath}`, { autocrlf })
+          content = await fs.read(`${dir}/${entry._fullpath}`, {
+            autocrlf,
+            hasCrlfInIndex: () => this._hasCrlfInIndex(entry),
+          })
         }
         // workaround for a BrowserFS edge case
         entry._actualSize = content.length
@@ -144,6 +148,8 @@ export class GitWalkerFs {
               ? !(process.platform === 'win32')
               : true
           if (!stage || compareStats(stats, stage, filemode, trustino)) {
+            // `content` cannot take the index lock while it is held here
+            entry._stage = stage || null
             const content = await entry.content()
             if (content === undefined) {
               oid = undefined
@@ -209,6 +215,17 @@ export class GitWalkerFs {
         index.insert({ filepath, stats, oid })
       }
     })
+  }
+
+  async _hasCrlfInIndex(entry) {
+    const { fs, gitdir, cache } = this
+    let stage = entry._stage
+    if (stage === undefined) {
+      stage = await GitIndexManager.acquire({ fs, gitdir, cache }, index =>
+        index.entriesMap.get(entry._fullpath)
+      )
+    }
+    return hasCrlfInIndex({ fs, cache, gitdir, entry: stage })
   }
 
   async _getGitConfig(fs, gitdir) {
