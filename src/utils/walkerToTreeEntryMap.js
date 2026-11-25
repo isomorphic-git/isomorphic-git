@@ -16,6 +16,7 @@ import { join } from './join.js'
 // Re-exported so existing importers (e.g. commands/stash.js) keep working.
 import { acquireLock } from './lock.js'
 import { posixifyPathBuffer } from './posixifyPathBuffer.js'
+import { writeWorkingTreeEntry } from './writeWorkingTreeEntry.js'
 
 export { acquireLock }
 
@@ -248,6 +249,7 @@ export async function applyTreeChanges({
             method: 'write',
             filepath,
             oid,
+            mode: await stash.mode(),
           }
         }
       }
@@ -280,21 +282,24 @@ export async function applyTreeChanges({
               currentFilepath.startsWith(removedDir)
             )
           ) {
-            // Don't write through a symlinked leading path (see checkout): a
-            // parent component that is a symlink could redirect the write to a
-            // location outside the working tree.
-            await assertNoSymlinkInLeadingPath(fs, dir, op.filepath)
             const { object } = await _readObject({
               fs,
               cache: {},
               gitdir,
               oid: op.oid,
             })
-            // just like checkout, since mode only applicable to create, not update, delete first
-            if (await fs.exists(currentFilepath)) {
-              await fs.rm(currentFilepath)
-            }
-            await fs.write(currentFilepath, object) // only handles regular files for now
+            // writeWorkingTreeEntry checks the leading path and, using lstat,
+            // removes an existing symlink at the destination rather than
+            // writing through it. fs.exists follows symlinks, so a destination
+            // that is itself a symlink to a missing file would otherwise be
+            // written through, escaping the working tree.
+            await writeWorkingTreeEntry({
+              fs,
+              dir,
+              filepath: op.filepath,
+              mode: op.mode,
+              content: object,
+            })
           }
           break
       }
