@@ -2,7 +2,7 @@
 
 import * as path from 'path'
 
-import { GitIndex, GitIndexManager } from 'isomorphic-git/internal-apis'
+import { GitIndex, GitIndexManager, shasum } from 'isomorphic-git/internal-apis'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
 
@@ -276,5 +276,141 @@ describe('GitIndex', () => {
         intentToAdd: false,
       })
     }
+  })
+
+  it('GitIndex.from(buffer) - version 4', async () => {
+    // Setup: an index written by canonical git with `index.version = 4`,
+    // with `git add -N b.txt`, `git update-index --skip-worktree c.txt`
+    // and a conflict in conflict.txt
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v4')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    // Test
+    const index = await GitIndex.from(buffer)
+    expect(index.render()).toMatchInlineSnapshot(`
+      "100644 78981922613b2afb6025042ff6bd878ac1994e85    a.txt
+      100644 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391    b.txt
+      100644 f2ad6c76f0115a6ba5b00456a849810e7ec0af20    c.txt
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    conflict.txt
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    docs/cafè.md
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    docs/café.md
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    long/directory-name-directory-name-directory-name-directory-name-directory-name-directory-name-directory-name-directory-name-directory-name-directory-name-directory-name-directory-name-file.txt
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    src/components/very/long/directory/name/Button.js
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    src/components/very/long/directory/name/Buttons.js
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    src/components/very/long/directory/name/Card.js
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    src/components/very/long/directory/other/x.js
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    zzz.txt
+      100644 78981922613b2afb6025042ff6bd878ac1994e85    日本語/ファイル.txt"
+    `)
+    expect(index.unmergedPaths).toEqual(['conflict.txt'])
+    expect(
+      index.entriesFlat
+        .filter(entry => entry.path === 'conflict.txt')
+        .map(entry => [entry.flags.stage, entry.oid])
+    ).toEqual([
+      [1, '78981922613b2afb6025042ff6bd878ac1994e85'],
+      [2, 'f2ad6c76f0115a6ba5b00456a849810e7ec0af20'],
+      [3, '78981922613b2afb6025042ff6bd878ac1994e85'],
+    ])
+    const flags = filepath => index.entriesMap.get(filepath).flags
+    expect(flags('b.txt')).toMatchObject({
+      extended: true,
+      skipWorktree: false,
+      intentToAdd: true,
+    })
+    expect(flags('c.txt')).toMatchObject({
+      extended: true,
+      skipWorktree: true,
+      intentToAdd: false,
+    })
+    // Writing it back gives the same entries, byte for byte
+    const buffer2 = await index.toObject()
+    expect(buffer2.readUInt32BE(4)).toBe(4)
+    expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
+  })
+
+  it('GitIndex keeps version 4 when entries change', async () => {
+    // Setup
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v4')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    const index = await GitIndex.from(buffer)
+    // Test
+    index.insert({
+      filepath: 'b.txt',
+      oid: '61780798228d17af2d34fce4cfbdf35556832472',
+    })
+    index.entriesMap.get('c.txt').flags.skipWorktree = false
+    index.insert({
+      filepath: 'src/components/very/long/directory/name/Buttons.jsx',
+      oid: '61780798228d17af2d34fce4cfbdf35556832472',
+    })
+    index.delete({ filepath: 'docs/cafè.md' })
+    const buffer2 = await index.toObject()
+    expect(buffer2.readUInt32BE(4)).toBe(4)
+    const index2 = await GitIndex.from(buffer2)
+    expect(index2.entriesFlat.map(entry => [entry.path, entry.oid])).toEqual(
+      index.entriesFlat.map(entry => [entry.path, entry.oid])
+    )
+    for (const entry of index2.entries) {
+      expect(entry.flags).toMatchObject({
+        skipWorktree: false,
+        intentToAdd: false,
+      })
+    }
+  })
+
+  it('GitIndex.from(buffer) - all zero checksum', async () => {
+    // Setup: an index written by canonical git with `index.skipHash = true`
+    const { fs, gitdir } = await makeFixture('test-GitIndex-skipHash')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    expect(buffer.slice(-20)).toEqual(Buffer.alloc(20))
+    // Test
+    const index = await GitIndex.from(buffer)
+    expect(index.render()).toMatchInlineSnapshot(`
+      "100644 78981922613b2afb6025042ff6bd878ac1994e85    a.txt
+      100644 61780798228d17af2d34fce4cfbdf35556832472    b.txt"
+    `)
+    // Written back with a real checksum, which git reads as well
+    const buffer2 = await index.toObject()
+    expect(buffer2.slice(-20)).not.toEqual(Buffer.alloc(20))
+    expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
+    await GitIndex.from(buffer2)
+  })
+
+  it('GitIndex.from(buffer) - feature.manyFiles', async () => {
+    // Setup: an index written by canonical git with `feature.manyFiles = true`,
+    // which means version 4, an all zero checksum and the untracked cache
+    const { fs, gitdir } = await makeFixture('test-GitIndex-manyFiles')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    // Test
+    const index = await GitIndex.from(buffer)
+    expect(index.render()).toMatchInlineSnapshot(`
+      "100644 78981922613b2afb6025042ff6bd878ac1994e85    a.txt
+      100644 61780798228d17af2d34fce4cfbdf35556832472    dir/b.txt
+      100644 f2ad6c76f0115a6ba5b00456a849810e7ec0af20    dir/sub/c.txt"
+    `)
+    const buffer2 = await index.toObject()
+    expect(buffer2.readUInt32BE(4)).toBe(4)
+    expect(buffer.slice(0, buffer2.length - 20)).toEqual(buffer2.slice(0, -20))
+  })
+
+  it('GitIndex.from(buffer) - unsupported extension', async () => {
+    // Setup: append the empty `sdir` extension that git writes for a sparse
+    // index
+    const { fs, gitdir } = await makeFixture('test-GitIndex-v3')
+    const buffer = await fs.read(path.join(gitdir, 'index'))
+    const body = Buffer.concat([
+      buffer.slice(0, -20),
+      Buffer.from('sdir\0\0\0\0', 'latin1'),
+    ])
+    const sha = Buffer.from(await shasum(body), 'hex')
+    // Test
+    let error = null
+    try {
+      await GitIndex.from(Buffer.concat([body, sha]))
+    } catch (e) {
+      error = e
+    }
+    expect(error).not.toBeNull()
+    expect(error.data.message).toBe('Unsupported index extension: sdir')
   })
 })
