@@ -23,6 +23,35 @@ describe('GitTree entry-name validation', () => {
     rejects('.git ')
   })
 
+  // Win32 drops the trailing dots and spaces of a path component but recognizes "."
+  // and ".." first, so `.. ` resolves to the parent directory and escapes the working
+  // directory just like a plain "..". git rejects the whole class in
+  // is_valid_win32_path(): a component may not end in a dot or a space, except for
+  // "." and ".." themselves.
+  it('rejects ".." and "." with trailing dots and spaces', () => {
+    rejects('.. ')
+    rejects('..  ')
+    rejects('.. .')
+    rejects('...')
+    rejects('. ')
+    rejects(' ')
+  })
+
+  // The ADS split has to happen before the "." and ".." test too, not only before the
+  // ".git" test, or `..::$INDEX_ALLOCATION` names the parent directory.
+  it('rejects NTFS Alternate Data Streams of . and ..', () => {
+    rejects('..::$INDEX_ALLOCATION')
+    rejects('..:foo')
+    rejects('.. :foo')
+    rejects('.:$DATA')
+  })
+
+  it('accepts names that only end in a dot or a space', () => {
+    expect(GitTree.from(entry('100644', 'foo ')).entries()[0].path).toBe('foo ')
+    expect(GitTree.from(entry('100644', 'foo.')).entries()[0].path).toBe('foo.')
+    expect(GitTree.from(entry('100644', '..\t')).entries()[0].path).toBe('..\t')
+  })
+
   it('rejects NTFS 8.3 short name aliases for .git', () => {
     rejects('git~1')
     rejects('GIT~1')
@@ -81,6 +110,86 @@ describe('GitTree entry-name validation', () => {
     expect(GitTree.from(entry('100644', 'git~0')).entries()[0].path).toBe(
       'git~0'
     )
+  })
+
+  // An entry name arrives off the wire with no length bound, so stripping the
+  // trailing dots and spaces must not cost more than a pass over the name. The
+  // regex this replaced, `/[. ]+$/`, retried the run of dots from every offset:
+  // 8.8 seconds for the name below, against 0.2 ms for a backward scan. The bound
+  // is loose on purpose; it only has to catch a return to quadratic behaviour.
+  it('strips a long run of trailing dots in linear time', () => {
+    const name = '.'.repeat(200000) + 'a'
+    const start = Date.now()
+    expect(GitTree.from(entry('100644', name)).entries()[0].path).toBe(name)
+    expect(Date.now() - start).toBeLessThan(1500)
+  })
+
+  // The same names have to be refused when the entries arrive as objects rather
+  // than as wire bytes, or `writeTree` mints a tree that `readTree` then refuses.
+  describe('applies the same rules to an array of entries', () => {
+    const rejectsArray = name =>
+      expect(() =>
+        GitTree.from([{ mode: '100644', path: name, oid: oid.toString('hex') }])
+      ).toThrow(/unsafe/i)
+
+    it('rejects the reserved names', () => {
+      rejectsArray('.')
+      rejectsArray('..')
+      rejectsArray('.git')
+      rejectsArray('.GIT')
+      rejectsArray('git~1')
+    })
+
+    it('rejects ".." and "." with trailing dots and spaces', () => {
+      rejectsArray('.. ')
+      rejectsArray('..  ')
+      rejectsArray('.. .')
+      rejectsArray('...')
+      rejectsArray('. ')
+    })
+
+    it('rejects Alternate Data Streams and HFS+ ignorable variants', () => {
+      rejectsArray('.git::$INDEX_ALLOCATION')
+      rejectsArray('..:foo')
+      rejectsArray('.g‌it')
+    })
+
+    it('rejects a path separator, which is never a single entry name', () => {
+      rejectsArray('a/b')
+      rejectsArray('a\\b')
+    })
+
+    it('accepts names that only end in a dot or a space', () => {
+      const tree = GitTree.from([
+        { mode: '100644', path: 'foo ', oid: oid.toString('hex') },
+        { mode: '100644', path: 'foo.', oid: oid.toString('hex') },
+      ])
+      expect(
+        tree
+          .entries()
+          .map(e => e.path)
+          .sort()
+      ).toEqual(['foo ', 'foo.'])
+    })
+
+    it('round-trips an ordinary name through toObject', () => {
+      const tree = GitTree.from([
+        { mode: '100644', path: 'normal.txt', oid: oid.toString('hex') },
+      ])
+      const reparsed = GitTree.from(tree.toObject())
+      expect(reparsed.entries()).toEqual([
+        {
+          mode: '100644',
+          path: 'normal.txt',
+          oid: oid.toString('hex'),
+          type: 'blob',
+        },
+      ])
+    })
+
+    it('accepts an empty tree', () => {
+      expect(GitTree.from([]).entries()).toEqual([])
+    })
   })
 
   it('accepts ordinary names, including .gitignore', () => {
