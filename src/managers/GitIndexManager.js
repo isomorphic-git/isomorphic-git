@@ -49,10 +49,11 @@ async function updateCachedIndexFile(fs, filepath, cache) {
 async function isIndexStale(fs, filepath, cache) {
   const savedStats = cache.stats.get(filepath)
   if (savedStats === undefined) return true
-  if (savedStats === null) return false
 
   const currStats = await fs.lstat(filepath)
-  if (currStats === null) return false
+  if (savedStats === null || currStats === null) {
+    return savedStats !== currStats
+  }
   if (compareStats(savedStats, currStats)) return true
   // compareStats only looks at whole seconds, but the index is often rewritten
   // in the same second with the same size (an entry got a new oid). Both stats
