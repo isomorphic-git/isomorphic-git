@@ -470,6 +470,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/bardbess"><img src="https://avatars.githubusercontent.com/u/603684?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Bardoe Bess</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=bardbess" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=bardbess" title="Tests">⚠️</a></td>
+    <td align="center"><a href="http://j1.io/"><img src="https://avatars.githubusercontent.com/u/3282078?v=4?s=60" width="60px;" alt=""/><br /><sub><b>Joe Sweeney</b></sub></a><br /><a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jswny" title="Code">💻</a> <a href="https://github.com/isomorphic-git/isomorphic-git/commits?author=jswny" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
