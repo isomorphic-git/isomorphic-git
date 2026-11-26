@@ -1070,6 +1070,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "jswny",
+      "name": "Joe Sweeney",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3282078?v=4",
+      "profile": "http://j1.io/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "commitConvention": "angular"

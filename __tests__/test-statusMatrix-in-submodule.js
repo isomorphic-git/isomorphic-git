@@ -69,6 +69,36 @@ describe('statusMatrix', () => {
     expect(b).toEqual([['b.txt', 0, 2, 2]])
   })
 
+  it('refreshes the cached status when the index is created', async () => {
+    const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-empty')
+    const cache = {}
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
+
+    expect(
+      await statusMatrix({ fs, dir, gitdir, cache, filepaths: ['a.txt'] })
+    ).toEqual([['a.txt', 0, 2, 0]])
+    await add({ fs, dir, gitdir, filepath: 'a.txt' })
+    expect(
+      await statusMatrix({ fs, dir, gitdir, cache, filepaths: ['a.txt'] })
+    ).toEqual([['a.txt', 0, 2, 2]])
+  })
+
+  it('refreshes the cached status when the index is removed', async () => {
+    const { fs, dir, gitdir, gitdirsmfullpath } =
+      await makeFixtureAsSubmodule('test-empty')
+    const cache = {}
+    await fs.write(path.join(dir, 'a.txt'), 'Hi')
+    await add({ fs, dir, gitdir, cache, filepath: 'a.txt' })
+
+    expect(
+      await statusMatrix({ fs, dir, gitdir, cache, filepaths: ['a.txt'] })
+    ).toEqual([['a.txt', 0, 2, 2]])
+    await fs.rm(path.join(gitdirsmfullpath, 'index'))
+    expect(
+      await statusMatrix({ fs, dir, gitdir, cache, filepaths: ['a.txt'] })
+    ).toEqual([['a.txt', 0, 2, 0]])
+  })
+
   it('statusMatrix in an fresh git repo with no commits and .gitignore', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-empty')
