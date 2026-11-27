@@ -1,6 +1,7 @@
 /* eslint-env node, browser, jasmine */
 import * as path from 'path'
 
+import { configureSingle, fs as zenfs, InMemory } from '@zenfs/core'
 import {
   status,
   add,
@@ -14,6 +15,163 @@ import {
 import { makeFixtureAsSubmodule } from './__helpers__/FixtureFSSubmodule.js'
 
 describe('status', () => {
+  it.each([
+    ['live', 'target.txt', 'target.txt', 'unmodified'],
+    ['dangling', 'missing.txt', 'missing.txt', 'unmodified'],
+    ['retargeted', 'target.txt', 'other.txt', '*modified'],
+    ['new', null, 'target.txt', '*modified'],
+  ])(
+    'hashes %s symlink text when cached stats differ',
+    async (_, original, current, expected) => {
+      await configureSingle({ backend: InMemory })
+      const { promises: fsp } = zenfs
+      const dir = '/status-symlinks'
+      await fsp.mkdir(dir)
+      await init({ fs: zenfs, dir, gitdir: '/modules/status-symlinks' })
+      await fsp.writeFile(dir + '/.git', 'gitdir: ../modules/status-symlinks\n')
+
+      const opts = { fs: zenfs, dir }
+      const filepath = 'link'
+      const link = dir + '/' + filepath
+      await fsp.writeFile(dir + '/target.txt', 'target contents')
+      await fsp.writeFile(dir + '/other.txt', 'target.txt')
+      if (original === null) {
+        await fsp.writeFile(link, current)
+      } else {
+        await fsp.symlink(original, link)
+      }
+      await add({ ...opts, filepath })
+      await commit({
+        ...opts,
+        message: 'Track symlink',
+        author: { name: 'Test', email: 'test@example.com' },
+      })
+
+      // Recreate the link so its stat information no longer matches the index.
+      await fsp.unlink(link)
+      await fsp.symlink(current, link)
+      const indexPath = '/modules/status-symlinks/index'
+      const before = await fsp.readFile(indexPath)
+      expect(await status({ ...opts, filepath })).toBe(expected)
+      if (expected === '*modified') {
+        expect(await fsp.readFile(indexPath)).toEqual(before)
+      }
+    }
+  )
+
+  it.each([
+    ['true', true, '*modified'],
+    ['unset', undefined, '*modified'],
+    ['false', false, 'unmodified'],
+  ])(
+    'compares a plain file with a tracked symlink when core.symlinks is %s',
+    async (_, symlinks, expected) => {
+      await configureSingle({ backend: InMemory })
+      const { promises: fsp } = zenfs
+      const dir = '/status-symlinks'
+      await fsp.mkdir(dir)
+      await init({ fs: zenfs, dir, gitdir: '/modules/status-symlinks' })
+      await fsp.writeFile(dir + '/.git', 'gitdir: ../modules/status-symlinks\n')
+
+      const opts = { fs: zenfs, dir }
+      const filepath = 'link'
+      const link = dir + '/' + filepath
+      await fsp.writeFile(dir + '/target.txt', 'target contents')
+      await fsp.symlink('target.txt', link)
+      await add({ ...opts, filepath })
+      await commit({
+        ...opts,
+        message: 'Track symlink',
+        author: { name: 'Test', email: 'test@example.com' },
+      })
+      await setConfig({ ...opts, path: 'core.symlinks', value: symlinks })
+
+      // A plain file holding the link text hashes to the same blob as the link.
+      await fsp.unlink(link)
+      await fsp.writeFile(link, 'target.txt')
+      expect(await status({ ...opts, filepath })).toBe(expected)
+    }
+  )
+
+  it.each([
+    ['true', true],
+    ['unset', undefined],
+    ['false', false],
+  ])(
+    'reports a staged symlink-to-file change when core.symlinks is %s',
+    async (_, symlinks) => {
+      await configureSingle({ backend: InMemory })
+      const { promises: fsp } = zenfs
+      const dir = '/status-staged-symlink'
+      await fsp.mkdir(dir)
+      await init({ fs: zenfs, dir, gitdir: '/modules/status-staged-symlink' })
+      await fsp.writeFile(
+        dir + '/.git',
+        'gitdir: ../modules/status-staged-symlink\n'
+      )
+
+      const opts = { fs: zenfs, dir }
+      const filepath = 'link'
+      const link = dir + '/' + filepath
+      await fsp.symlink('target.txt', link)
+      await add({ ...opts, filepath })
+      await commit({
+        ...opts,
+        message: 'Track symlink',
+        author: { name: 'Test', email: 'test@example.com' },
+      })
+
+      await setConfig({ ...opts, path: 'core.symlinks', value: true })
+      await fsp.unlink(link)
+      await fsp.writeFile(link, 'target.txt')
+      await add({ ...opts, filepath })
+      await setConfig({ ...opts, path: 'core.symlinks', value: symlinks })
+      expect(await status({ ...opts, filepath })).toBe('modified')
+
+      await fsp.writeFile(link, 'different contents')
+      expect(await status({ ...opts, filepath })).toBe('*modified')
+    }
+  )
+
+  it('reports a symlink that disappears before it is read as deleted', async () => {
+    await configureSingle({ backend: InMemory })
+    const { promises: fsp } = zenfs
+    const dir = '/status-symlinks'
+    await fsp.mkdir(dir)
+    await init({ fs: zenfs, dir, gitdir: '/modules/status-symlinks' })
+    await fsp.writeFile(dir + '/.git', 'gitdir: ../modules/status-symlinks\n')
+
+    const opts = { fs: zenfs, dir }
+    const filepath = 'link'
+    const link = dir + '/' + filepath
+    await fsp.symlink('target.txt', link)
+    await add({ ...opts, filepath })
+    await commit({
+      ...opts,
+      message: 'Track symlink',
+      author: { name: 'Test', email: 'test@example.com' },
+    })
+
+    // Recreate the link so its stat information no longer matches the index.
+    await fsp.unlink(link)
+    await fsp.symlink('target.txt', link)
+    // lstat still sees the link, but it is gone by the time its text is read.
+    const racing = {
+      promises: new Proxy(fsp, {
+        get(target, name) {
+          if (name === 'readlink') {
+            return async () => {
+              throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' })
+            }
+          }
+          const value = target[name]
+          return typeof value === 'function' ? value.bind(target) : value
+        },
+      }),
+    }
+    expect(await status({ fs: racing, dir, filepath })).toBe('*deleted')
+  })
+
   it('status', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixtureAsSubmodule('test-status')
