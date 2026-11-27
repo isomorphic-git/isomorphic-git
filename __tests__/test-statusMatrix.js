@@ -7,6 +7,7 @@ import {
   remove,
   hashBlob,
   updateIndex,
+  setConfig,
 } from 'isomorphic-git'
 
 import { makeFixture } from './__helpers__/FixtureFS.js'
@@ -53,6 +54,21 @@ describe('statusMatrix', () => {
     await fs.rm(path.join(dir, 'e.txt'))
     matrix = await statusMatrix({ fs, dir, gitdir, filepaths: ['e.txt'] })
     expect(matrix).toEqual([['e.txt', 0, 0, 3]])
+  })
+
+  it('statusMatrix uses the caller-supplied gitdir for the ignore check', async () => {
+    // Setup — the worktree and its git directory live apart (as
+    // makeFixture lays them out): the supplied gitdir says
+    // core.ignorecase = false, so a `README.md` rule must not match an
+    // untracked `readme.md`. The walk uses the supplied gitdir; the
+    // ignore check must use the same repository.
+    const { fs, dir, gitdir } = await makeFixture('test-statusMatrix')
+    await setConfig({ fs, gitdir, path: 'core.ignorecase', value: false })
+    await fs.write(path.join(dir, '.gitignore'), 'README.md')
+    await fs.write(path.join(dir, 'readme.md'), 'Hi')
+    // Test
+    const matrix = await statusMatrix({ fs, dir, gitdir })
+    expect(matrix).toContainEqual(['readme.md', 0, 2, 0])
   })
 
   it('statusMatrix in an fresh git repo with no commits', async () => {
