@@ -41,6 +41,35 @@ function packEntry(type, data, extra = Buffer.alloc(0)) {
   ])
 }
 
+// Make a pack of the given blobs.
+function packOfBlobs(blobs) {
+  const header = Buffer.alloc(12)
+  header.write('PACK')
+  header.writeUInt32BE(2, 4)
+  header.writeUInt32BE(blobs.length, 8)
+  return Buffer.concat([
+    header,
+    ...blobs.map(blob => packEntry(3, blob)),
+    Buffer.alloc(20),
+  ])
+}
+
+// Run `fn` with `crypto.subtle.digest` replaced by `digest`, which is passed the original.
+async function withDigest(digest, fn) {
+  // Let `shasum` pick WebCrypto before the digest is replaced.
+  await shasum(new Uint8Array([]))
+  const subtle = globalThis.crypto.subtle
+  const original = subtle.digest
+  subtle.digest = function (...args) {
+    return digest(original.bind(subtle), ...args)
+  }
+  try {
+    return await fn()
+  } finally {
+    subtle.digest = original
+  }
+}
+
 describe('GitPackIndex', () => {
   it('from .idx', async () => {
     const { fs, gitdirsmfullpath } =
@@ -325,5 +354,125 @@ describe('GitPackIndex', () => {
     const oid = await shasum(GitObject.wrap({ type: 'blob', object: blob }))
     expect(p.hashes).toEqual([oid])
     expect(p.offsets.size).toBe(1)
+  })
+  it('from .pack resolves a ref-delta whose base is still being hashed', async () => {
+    const blob = Buffer.from('hello\n')
+    const base = await shasum(GitObject.wrap({ type: 'blob', object: blob }))
+    // Copy the 6 bytes of the base, then insert "world\n".
+    const delta = Buffer.concat([
+      Buffer.from([6, 12, 0x90, 6, 6]),
+      Buffer.from('world\n'),
+    ])
+    const header = Buffer.alloc(12)
+    header.write('PACK')
+    header.writeUInt32BE(2, 4)
+    header.writeUInt32BE(2, 8)
+    const pack = Buffer.concat([
+      header,
+      packEntry(3, blob),
+      packEntry(7, delta, Buffer.from(base, 'hex')),
+      Buffer.alloc(20),
+    ])
+    // The first pass hashes objects concurrently. The ref-delta names the blob
+    // right before it, so it must wait for that hash instead of falling back
+    // to `readSlice`.
+    const [p, calls] = await countReadSlice(() =>
+      GitPackIndex.fromPack({ pack })
+    )
+    expect(calls).toBe(0)
+    const oid = await shasum(
+      GitObject.wrap({ type: 'blob', object: Buffer.from('hello\nworld\n') })
+    )
+    expect(p.hashes).toEqual([base, oid].sort())
+  })
+  it('from .pack hashes more objects than it hashes at once', async () => {
+    const blobs = Array.from({ length: 300 }, (_, i) =>
+      Buffer.from(`blob ${i}\n`)
+    )
+    const header = Buffer.alloc(12)
+    header.write('PACK')
+    header.writeUInt32BE(2, 4)
+    header.writeUInt32BE(blobs.length, 8)
+    const pack = Buffer.concat([
+      header,
+      ...blobs.map(blob => packEntry(3, blob)),
+      Buffer.alloc(20),
+    ])
+    const [p, calls] = await countReadSlice(() =>
+      GitPackIndex.fromPack({ pack })
+    )
+    expect(calls).toBe(0)
+    const oids = await Promise.all(
+      blobs.map(object => shasum(GitObject.wrap({ type: 'blob', object })))
+    )
+    expect(p.hashes).toEqual(oids.sort())
+    expect(p.offsets.size).toBe(blobs.length)
+  })
+  it('from .pack rejects with the error of a hash', async () => {
+    const blobs = ['a', 'b', 'c'].map(s => Buffer.from(`${s}\n`))
+    const pack = packOfBlobs(blobs)
+    const error = new Error('digest failed')
+    let calls = 0
+    const result = withDigest(
+      (digest, ...args) =>
+        ++calls === 1 ? Promise.reject(error) : digest(...args),
+      () =>
+        GitPackIndex.fromPack({
+          pack,
+          // Yield to the event loop between objects, as a progress bar may.
+          onProgress: () => new Promise(resolve => setTimeout(resolve, 10)),
+        })
+    )
+    await expect(result).rejects.toBe(error)
+  })
+  it('from .pack leaves no hash rejection unhandled when the pack is corrupt', async () => {
+    const header = Buffer.alloc(12)
+    header.write('PACK')
+    header.writeUInt32BE(2, 4)
+    header.writeUInt32BE(2, 8)
+    // The second blob says that it has 3 bytes, but it inflates to 4.
+    const corrupt = Buffer.concat([
+      Buffer.from([0x33]),
+      Buffer.from(pako.deflate(Buffer.from('abcd'))),
+    ])
+    const pack = Buffer.concat([
+      header,
+      packEntry(3, Buffer.from('a\n')),
+      corrupt,
+      Buffer.alloc(20),
+    ])
+    // The hash of the first blob fails, and nothing waits for it, since reading
+    // the second one throws first.
+    const result = withDigest(
+      () => Promise.reject(new Error('digest failed')),
+      () => GitPackIndex.fromPack({ pack })
+    )
+    await expect(result).rejects.toThrow('Inflated object size is different')
+    // Give Node a turn to report a rejection that nothing handled.
+    await new Promise(resolve => setTimeout(resolve, 10))
+  })
+  it('from .pack hashes at most 32 MiB at a time', async () => {
+    // Two objects of 20 MiB, so that both together are above the limit.
+    const blobs = [1, 2].map(i => Buffer.alloc(20 * 1024 * 1024, i))
+    const pack = packOfBlobs(blobs)
+    let bytes = 0
+    let maxBytes = 0
+    const p = await withDigest(
+      async (digest, algorithm, data) => {
+        bytes += data.byteLength
+        maxBytes = Math.max(maxBytes, bytes)
+        try {
+          return await digest(algorithm, data)
+        } finally {
+          bytes -= data.byteLength
+        }
+      },
+      () => GitPackIndex.fromPack({ pack })
+    )
+    expect(maxBytes).toBeLessThanOrEqual(32 * 1024 * 1024)
+    const oids = await Promise.all(
+      blobs.map(object => shasum(GitObject.wrap({ type: 'blob', object })))
+    )
+    expect(p.hashes).toEqual(oids.sort())
   })
 })

@@ -45,6 +45,12 @@ function otherVarIntDecode(reader, startWith) {
 // An object larger than a quarter of this is not kept.
 const RESOLVE_CACHE_BYTES = 32 * 1024 * 1024
 
+// How many objects `fromPack` hashes at once, and how many bytes they may hold.
+// Hashing is asynchronous (WebCrypto runs it off the main thread), so hashing
+// several objects at once saves a round trip for each of them.
+const MAX_HASHING = 64
+const MAX_HASHING_BYTES = 32 * 1024 * 1024
+
 // A cache that drops the least recently used object when it holds too many bytes.
 class ObjectCache {
   constructor(maxBytes) {
@@ -178,6 +184,14 @@ export class GitPackIndex {
     // Objects that `listpack` inflated, by pack offset. A delta finds its base here.
     const cache = new ObjectCache(RESOLVE_CACHE_BYTES)
     const offsetByOid = new Map()
+    // The objects being hashed, and the bytes they hold.
+    const hashing = []
+    let hashingBytes = 0
+    const hashed = async () => {
+      await Promise.all(hashing)
+      hashing.length = 0
+      hashingBytes = 0
+    }
 
     await listpack([pack], async ({ data, type, reference, offset, num }) => {
       if (totalObjectCount === null) totalObjectCount = num
@@ -218,16 +232,43 @@ export class GitPackIndex {
       // does not inflate it again. That loop reads all other objects.
       const o = offsetToObject[offset]
       if (!o) return
-      const resolved = resolveInflated(
+      let resolved = resolveInflated(
         { type, data, reference, offset },
         cache,
         offsetByOid
       )
+      if (!resolved && type === 'ref-delta' && hashing.length > 0) {
+        // The base may be one of the objects still being hashed.
+        await hashed()
+        resolved = resolveInflated(
+          { type, data, reference, offset },
+          cache,
+          offsetByOid
+        )
+      }
       if (!resolved) return
-      o.oid = await shasum(GitObject.wrap(resolved))
-      offsetByOid.set(o.oid, offset)
+      const wrapped = GitObject.wrap(resolved)
+      // Wait for the objects being hashed if this one would go over a limit.
+      // An object larger than the byte limit is hashed alone.
+      if (
+        hashing.length >= MAX_HASHING ||
+        (hashing.length > 0 &&
+          hashingBytes + wrapped.byteLength > MAX_HASHING_BYTES)
+      ) {
+        await hashed()
+      }
+      const hash = shasum(wrapped).then(oid => {
+        o.oid = oid
+        offsetByOid.set(oid, offset)
+      })
+      // `hashed` throws the error of a failed hash. Until it runs, the loop may
+      // wait on other things, so mark the rejection as handled meanwhile.
+      hash.catch(() => {})
+      hashing.push(hash)
+      hashingBytes += wrapped.byteLength
       cache.set(offset, resolved)
     })
+    await hashed()
 
     // We need to know the lengths of the slices to compute the CRCs.
     const offsetArray = Object.keys(offsetToObject).map(Number)
